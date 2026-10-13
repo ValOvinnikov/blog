@@ -33,24 +33,32 @@ describe('persistStagedImage', () => {
 
   it('passes an upload failure through', async () => {
     const file = new File(['x'], 'logo.png', { type: 'image/png' });
-    const upload = vi.fn().mockResolvedValue({ ok: false, error: 'Too big.' });
+    const upload = vi
+      .fn()
+      .mockResolvedValue({ ok: false, error: { reason: 'fileMissing' } });
 
     const result = await persistStagedImage(
       { url: 'blob:local', file },
       { upload, clear: vi.fn() },
     );
 
-    expect(result).toEqual({ ok: false, error: 'Too big.' });
+    expect(result).toEqual({ ok: false, error: { reason: 'fileMissing' } });
   });
 
   it('passes a clear failure through', async () => {
-    const clear = vi.fn().mockResolvedValue({ ok: false, error: 'Nope.' });
+    const clear = vi.fn().mockResolvedValue({
+      ok: false,
+      error: { reason: 'removeFailed', values: { kind: 'logo' } },
+    });
 
     const result = await persistStagedImage(
       { url: undefined },
       { upload: vi.fn(), clear },
     );
 
-    expect(result).toEqual({ ok: false, error: 'Nope.' });
+    expect(result).toEqual({
+      ok: false,
+      error: { reason: 'removeFailed', values: { kind: 'logo' } },
+    });
   });
 });

@@ -410,6 +410,23 @@
       "replace": "Vorlagen-Logo ersetzen"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "Datei-Uploads sind für diese Umgebung noch nicht eingerichtet.",
+    "fileMissing": "Wählen Sie eine Datei zum Hochladen.",
+    "fileTooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}.",
+    "unreadableImage": "Diese Datei ist kein lesbares Bild.",
+    "unrecognizedTarget": "Unbekanntes Upload-Ziel.",
+    "brandImageTypeUnsupported": "Wählen Sie ein PNG-, JPEG-, WebP- oder SVG-Bild.",
+    "imageTooSmall": "Das Bild ist zu klein — mindestens {size}×{size} px.",
+    "imageTooLarge": "Das Bild ist zu groß — höchstens {size}×{size} px.",
+    "faviconNotSquare": "Das Favicon muss quadratisch sein — dieses ist {width}×{height} px. Schneiden Sie es vor dem Hochladen quadratisch zu.",
+    "svgFaviconNotSquare": "Das Favicon muss quadratisch sein — dieses ist {width}×{height} px (laut viewBox/width/height). Schneiden Sie es vor dem Hochladen quadratisch zu.",
+    "emailLogoSvg": "SVG-Logos werden nicht unterstützt — Gmail, Outlook und Yahoo stellen SVG in E-Mails nicht dar, sodass das Logo als fehlendes Bild ankäme.",
+    "emailLogoWebp": "WebP-Logos werden nicht unterstützt — zu viele E-Mail-Programme stellen WebP nicht zuverlässig dar.",
+    "emailLogoTypeUnsupported": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild.",
+    "uploadFailed": "{kind, select, favicon {Das Favicon} other {Das Logo}} konnte nicht hochgeladen werden — bitte erneut versuchen.",
+    "removeFailed": "{kind, select, favicon {Das Favicon} other {Das Logo}} konnte nicht entfernt werden — bitte erneut versuchen."
+  },
   "brandAssetField": {
     "savesWithChanges": "Wird mit den Änderungen gespeichert",
     "logo": {
@@ -465,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
-    "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
     "replyToLabel": "Antwortadresse",
     "replyToHint": "Wohin Antworten auf die E-Mails Ihrer Website gehen.",
     "footerAddressLabel": "Postanschrift in der Fußzeile",
     "footerAddressHint": "Für Massen-E-Mails gesetzlich vorgeschrieben — wird in der Fußzeile jeder E-Mail Ihrer Website angezeigt.",
     "logoLabel": "E-Mail-Logo",
-    "logoHint": "Wird in jeder E-Mail und jeder Sprache verwendet. Eine Vorlage kann es mit einem eigenen Logo überschreiben."
+    "logoHint": "Wird in jeder E-Mail und jeder Sprache verwendet. Eine Vorlage kann es mit einem eigenen Logo überschreiben.",
+    "errors": {
+      "senderNameInvalid": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild — SVG und WebP werden von gängigen E-Mail-Programmen nicht unterstützt.",
@@ -629,7 +648,11 @@
     "submitButton": "Bereitstellung starten",
     "confirmOwnerInviteButton": "Bestätigen und Inhaber einladen",
     "submittingBeginButton": "Bereitstellung wird gestartet…",
-    "submittingInviteButton": "Inhaber wird eingeladen…"
+    "submittingInviteButton": "Inhaber wird eingeladen…",
+    "ownerInviteConfirmation": "Kein Konto für {email} gefunden — diese Person erhält eine Einladung, sich anzumelden und diesen Mandanten als Inhaber zu verwalten.",
+    "errors": {
+      "createFailed": "Der Mandant konnte nicht erstellt werden — bitte erneut versuchen."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Bereitstellung",
@@ -761,19 +784,30 @@
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "Mandantendetails gespeichert.",
-    "provisioningStartedError": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
-    "archivedError": "Dieser Mandant ist archiviert; seine Details können nicht mehr bearbeitet werden.",
-    "notFoundError": "Mandant nicht gefunden.",
-    "ownerAlreadyJoinedError": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
-    "ownerEmailTakenError": "Für diese E-Mail-Adresse gibt es bei diesem Mandanten bereits eine ausstehende Einladung.",
     "lockedAnnouncement": "Einige Felder der Mandantendetails sind jetzt gesperrt.",
     "unlockedAnnouncement": "Weitere Felder der Mandantendetails sind jetzt bearbeitbar.",
     "fieldLockedReasonStep": "Gesperrt — der Schritt „{step}“ ist bereits abgeschlossen und hat diesen Wert verwendet.",
     "fieldLockedReasonRunning": "Gesperrt, während die Bereitstellung läuft.",
     "fieldLockedReasonSucceeded": "Gesperrt — die Bereitstellung ist bereits abgeschlossen.",
     "fieldLockedReasonArchived": "Gesperrt — dieser Mandant ist archiviert.",
-    "localeIsAdditionalError": "Diese Sprache ist bereits eine zusätzliche Sprache. Entfernen Sie sie zuerst dort.",
-    "localeInvalidError": "Wählen Sie eine unterstützte Sprache."
+    "errors": {
+      "notFound": "Mandant nicht gefunden.",
+      "archived": "Dieser Mandant ist archiviert; seine Details können nicht mehr bearbeitet werden.",
+      "localeIsAdditional": "Diese Sprache ist bereits eine zusätzliche Sprache. Entfernen Sie sie zuerst dort.",
+      "provisioningStarted": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
+      "ownerAlreadyJoined": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
+      "saveFailed": "Die Mandantendaten konnten nicht gespeichert werden — bitte erneut versuchen."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Geben Sie einen Mandantennamen ein.",
+    "domainInvalid": "Geben Sie eine gültige Domain ein.",
+    "domainTaken": "Diese Domain wird bereits verwendet.",
+    "domainAttachedElsewhere": "Diese Domain ist bereits mit einem anderen Vercel-Projekt verknüpft — geben Sie sie dort frei oder verwenden Sie eine andere Domain.",
+    "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "planUnsupported": "Wählen Sie einen unterstützten Tarif.",
+    "localeUnsupported": "Wählen Sie eine unterstützte Sprache.",
+    "ownerEmailTaken": "Für diese E-Mail-Adresse gibt es bei diesem Mandanten bereits eine ausstehende Einladung."
   },
   "archivedTenantNotice": {
     "title": "Dieser Mandant ist archiviert",
@@ -816,6 +850,18 @@
     "dialogDescription": "Dies startet provision-tenant.yml, das jede bereitgestellte Ressource dieses Mandanten wiederherstellt. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
     "confirmButton": "Reaktivieren",
     "confirmingButton": "Wird gestartet…"
+  },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Geben Sie zur Bestätigung den Namen des Mandanten ein.",
+    "notFound": "Mandant nicht gefunden.",
+    "nameMismatch": "Stimmt nicht mit dem Namen des Mandanten überein.",
+    "alreadyDeprovisioned": "Dieser Mandant ist bereits deprovisioniert.",
+    "notDeprovisioned": "Dieser Mandant ist nicht deprovisioniert.",
+    "alreadyInProgress": "Die Provisionierung läuft bereits.",
+    "notArchived": "Dieser Mandant muss archiviert werden, bevor er gelöscht werden kann.",
+    "deprovisionFailed": "Die Deprovisionierung konnte nicht gestartet werden — bitte erneut versuchen.",
+    "reactivateFailed": "Die Reaktivierung konnte nicht gestartet werden — bitte erneut versuchen.",
+    "deleteFailed": "Der Mandant konnte nicht gelöscht werden — bitte erneut versuchen."
   },
   "featuresSettings": {
     "heading": "Funktionen",

@@ -7,17 +7,24 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { z } from 'zod';
 
 import { startProvisioning } from './start-provisioning';
+import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 
 const reactivateTenantInputSchema = z.object({
-  confirm: z.string().trim().min(1, 'Type the tenant name to confirm.'),
+  confirm: z.string().trim().min(1),
 });
 
 export type TReactivateTenantInput = z.input<
   typeof reactivateTenantInputSchema
 >;
 
-export type TReactivateTenantResult =
-  { ok: true } | { ok: false; error: string };
+export type TReactivateTenantResult = TTenantLifecycleResult<
+  | 'confirmRequired'
+  | 'notFound'
+  | 'notDeprovisioned'
+  | 'nameMismatch'
+  | 'alreadyInProgress'
+  | 'reactivateFailed'
+>;
 
 /**
  * The danger page's "Reactivate tenant" control, the recovery path for a
@@ -34,37 +41,34 @@ export const reactivateTenantAction = async (
 
   const parsed = reactivateTenantInputSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Invalid input.',
-    };
+    return { ok: false, reason: 'confirmRequired' };
   }
 
   const tenant = await queries.tenants.getTenantById(tenantId, {
     includeArchived: true,
   });
   if (!tenant) {
-    return { ok: false, error: 'Tenant not found.' };
+    return { ok: false, reason: 'notFound' };
   }
 
   if (!tenant.deprovisionedAt) {
-    return { ok: false, error: 'This tenant is not deprovisioned.' };
+    return { ok: false, reason: 'notDeprovisioned' };
   }
 
   if (parsed.data.confirm !== tenant.name) {
-    return { ok: false, error: "Doesn't match the tenant's name." };
+    return { ok: false, reason: 'nameMismatch' };
   }
 
   const { outcome } = await startProvisioning(tenantId);
 
   if (outcome === 'already-in-progress') {
-    return { ok: false, error: 'Provisioning is already running.' };
+    return { ok: false, reason: 'alreadyInProgress' };
   }
   if (outcome === 'not-found') {
-    return { ok: false, error: 'Tenant not found.' };
+    return { ok: false, reason: 'notFound' };
   }
   if (outcome === 'dispatch-error') {
-    return { ok: false, error: "Couldn't start reactivation — try again." };
+    return { ok: false, reason: 'reactivateFailed' };
   }
 
   await recordAuditEvent({

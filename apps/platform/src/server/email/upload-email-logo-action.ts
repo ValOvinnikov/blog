@@ -11,6 +11,7 @@ import {
   setEmailLogoUrl,
 } from '@platform/server/email/email-logo-store';
 import { validateEmailLogoUpload } from '@platform/server/email/validate-email-logo';
+import type { TUploadError } from '@platform/server/uploads/upload-error';
 import { buildEmailLogoBlobPath } from '@platform/utils/email-logo-blob-path/email-logo-blob-path';
 import {
   emailLogoTargetSchema,
@@ -20,7 +21,7 @@ import { logger } from '@platform/utils/logger/logger';
 import { put } from '@vercel/blob';
 
 export type TUploadEmailLogoResult =
-  { ok: true; url: string } | { ok: false; error: string };
+  { ok: true; url: string } | { ok: false; error: TUploadError };
 
 export const uploadEmailLogoAction = async (
   tenantId: string,
@@ -78,6 +79,9 @@ export const uploadEmailLogoAction = async (
       target: logoTarget,
       error,
     });
-    return { ok: false, error: "Couldn't upload the logo — try again." };
+    return {
+      ok: false,
+      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
+    };
   }
 };

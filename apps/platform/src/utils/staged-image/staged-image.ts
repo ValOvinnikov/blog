@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import type { TUploadError } from '@platform/server/uploads/upload-error';
 
 export type TStagedImage = { url: TMaybeUndefined<string>; file?: File };
 
@@ -13,13 +14,13 @@ export const createStagingHandlers = (
 });
 
 type TPersistStagedImageResult =
-  { ok: true; image: TStagedImage } | { ok: false; error: string };
+  { ok: true; image: TStagedImage } | { ok: false; error: TUploadError };
 
 type TPersistStagedImageActions = {
   upload: (
     formData: FormData,
-  ) => Promise<{ ok: true; url: string } | { ok: false; error: string }>;
-  clear: () => Promise<{ ok: true } | { ok: false; error: string }>;
+  ) => Promise<{ ok: true; url: string } | { ok: false; error: TUploadError }>;
+  clear: () => Promise<{ ok: true } | { ok: false; error: TUploadError }>;
 };
 
 export const persistStagedImage = async (

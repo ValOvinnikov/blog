@@ -6,6 +6,7 @@ import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { deprovisionTenantAction } from '@platform/server/provisioning/deprovision-tenant-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { useTenantLifecycleAction } from '@platform/utils/use-tenant-lifecycle-action/use-tenant-lifecycle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -23,6 +24,7 @@ export const DeprovisionTenantControl = ({
 }: TDeprovisionTenantControlProps) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
+  const deprovisionTenant = useTenantLifecycleAction(deprovisionTenantAction);
   const [isDryRun, setIsDryRun] = useState(true);
   const { id, name } = tenant;
 
@@ -42,7 +44,7 @@ export const DeprovisionTenantControl = ({
           <ConfirmDialog
             expectedValue={name}
             onConfirm={(confirm) =>
-              deprovisionTenantAction(id, { confirm, dryRun: isDryRun })
+              deprovisionTenant(id, { confirm, dryRun: isDryRun })
             }
             onConfirmed={() => router.refresh()}
             onOpenChange={(isOpen) => {

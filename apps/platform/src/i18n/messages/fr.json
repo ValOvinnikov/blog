@@ -410,6 +410,23 @@
       "replace": "Remplacer le logo du modèle"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "L'import de fichiers n'est pas encore configuré pour cet environnement.",
+    "fileMissing": "Choisissez un fichier à importer.",
+    "fileTooLarge": "Ce fichier est trop volumineux — la limite est de {limit}.",
+    "unreadableImage": "Ce fichier n'est pas une image lisible.",
+    "unrecognizedTarget": "Destination d'import non reconnue.",
+    "brandImageTypeUnsupported": "Choisissez une image PNG, JPEG, WebP ou SVG.",
+    "imageTooSmall": "L'image est trop petite — au moins {size}×{size} px.",
+    "imageTooLarge": "L'image est trop grande — au plus {size}×{size} px.",
+    "faviconNotSquare": "Le favicon doit être une image carrée — celle-ci fait {width}×{height} px. Recadrez-la en carré avant de l'importer.",
+    "svgFaviconNotSquare": "Le favicon doit être une image carrée — celle-ci fait {width}×{height} px (d'après son viewBox/width/height). Recadrez-la en carré avant de l'importer.",
+    "emailLogoSvg": "Les logos SVG ne sont pas pris en charge — Gmail, Outlook et Yahoo n'affichent pas le SVG dans les e-mails, le logo apparaîtrait donc comme une image manquante.",
+    "emailLogoWebp": "Les logos WebP ne sont pas pris en charge — trop de clients de messagerie n'affichent pas le WebP de manière fiable.",
+    "emailLogoTypeUnsupported": "Choisissez une image PNG, JPEG ou GIF.",
+    "uploadFailed": "Impossible d'importer {kind, select, favicon {le favicon} other {le logo}} — veuillez réessayer.",
+    "removeFailed": "Impossible de supprimer {kind, select, favicon {le favicon} other {le logo}} — veuillez réessayer."
+  },
   "brandAssetField": {
     "savesWithChanges": "Enregistré avec les modifications",
     "logo": {
@@ -465,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
-    "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
     "replyToLabel": "Adresse de réponse",
     "replyToHint": "L'adresse où arrivent les réponses aux e-mails de votre site.",
     "footerAddressLabel": "Adresse postale du pied de page",
     "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail envoyé par votre site.",
     "logoLabel": "Logo des e-mails",
-    "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo."
+    "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo.",
+    "errors": {
+      "senderNameInvalid": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",
@@ -629,7 +648,11 @@
     "submitButton": "Lancer le provisionnement",
     "confirmOwnerInviteButton": "Confirmer et inviter le propriétaire",
     "submittingBeginButton": "Lancement du provisionnement…",
-    "submittingInviteButton": "Invitation du propriétaire…"
+    "submittingInviteButton": "Invitation du propriétaire…",
+    "ownerInviteConfirmation": "Aucun compte trouvé pour {email} — une invitation lui sera envoyée pour se connecter et gérer ce locataire en tant que propriétaire.",
+    "errors": {
+      "createFailed": "Impossible de créer le locataire — veuillez réessayer."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Provisionnement",
@@ -761,19 +784,30 @@
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
     "alertSuccess": "Détails du locataire enregistrés.",
-    "provisioningStartedError": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
-    "archivedError": "Ce locataire est archivé ; ses détails ne peuvent plus être modifiés.",
-    "notFoundError": "Locataire introuvable.",
-    "ownerAlreadyJoinedError": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
-    "ownerEmailTakenError": "Cet e-mail fait déjà l'objet d'une invitation en attente pour ce locataire.",
     "lockedAnnouncement": "Certains champs des détails du locataire sont désormais verrouillés.",
     "unlockedAnnouncement": "D'autres champs des détails du locataire sont désormais modifiables.",
     "fieldLockedReasonStep": "Verrouillé — l'étape « {step} » est déjà terminée et a utilisé cette valeur.",
     "fieldLockedReasonRunning": "Verrouillé pendant le provisionnement.",
     "fieldLockedReasonSucceeded": "Verrouillé — le provisionnement est déjà terminé.",
     "fieldLockedReasonArchived": "Verrouillé — ce locataire est archivé.",
-    "localeIsAdditionalError": "Cette langue est déjà une langue supplémentaire. Retirez-la d'abord de cette liste.",
-    "localeInvalidError": "Choisissez une langue prise en charge."
+    "errors": {
+      "notFound": "Locataire introuvable.",
+      "archived": "Ce locataire est archivé ; ses détails ne peuvent plus être modifiés.",
+      "localeIsAdditional": "Cette langue est déjà une langue supplémentaire. Retirez-la d'abord de cette liste.",
+      "provisioningStarted": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
+      "ownerAlreadyJoined": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
+      "saveFailed": "Impossible d'enregistrer les informations du locataire — veuillez réessayer."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Saisissez un nom de locataire.",
+    "domainInvalid": "Saisissez un domaine valide.",
+    "domainTaken": "Ce domaine est déjà utilisé.",
+    "domainAttachedElsewhere": "Ce domaine est déjà rattaché à un autre projet Vercel — libérez-le là-bas ou utilisez un autre domaine.",
+    "emailInvalid": "Saisissez une adresse e-mail valide.",
+    "planUnsupported": "Choisissez une formule prise en charge.",
+    "localeUnsupported": "Choisissez une langue prise en charge.",
+    "ownerEmailTaken": "Cet e-mail fait déjà l'objet d'une invitation en attente pour ce locataire."
   },
   "archivedTenantNotice": {
     "title": "Ce locataire est archivé",
@@ -816,6 +850,18 @@
     "dialogDescription": "Cette action lance provision-tenant.yml, qui restaure toutes les ressources provisionnées pour ce locataire. Saisissez le nom du locataire pour confirmer.",
     "confirmButton": "Réactiver",
     "confirmingButton": "Lancement…"
+  },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Saisissez le nom du locataire pour confirmer.",
+    "notFound": "Locataire introuvable.",
+    "nameMismatch": "Ne correspond pas au nom du locataire.",
+    "alreadyDeprovisioned": "Ce locataire est déjà déprovisionné.",
+    "notDeprovisioned": "Ce locataire n'est pas déprovisionné.",
+    "alreadyInProgress": "Le provisionnement est déjà en cours.",
+    "notArchived": "Ce locataire doit être archivé avant de pouvoir être supprimé.",
+    "deprovisionFailed": "Impossible de lancer le déprovisionnement — veuillez réessayer.",
+    "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",
+    "deleteFailed": "Impossible de supprimer le locataire — veuillez réessayer."
   },
   "featuresSettings": {
     "heading": "Fonctionnalités",

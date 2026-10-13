@@ -410,6 +410,23 @@
       "replace": "Sjabloonlogo vervangen"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "Bestandsuploads zijn voor deze omgeving nog niet ingesteld.",
+    "fileMissing": "Kies een bestand om te uploaden.",
+    "fileTooLarge": "Dat bestand is te groot — de limiet is {limit}.",
+    "unreadableImage": "Dat bestand is geen leesbare afbeelding.",
+    "unrecognizedTarget": "Onbekend uploaddoel.",
+    "brandImageTypeUnsupported": "Kies een PNG-, JPEG-, WebP- of SVG-afbeelding.",
+    "imageTooSmall": "De afbeelding is te klein — minimaal {size}×{size} px.",
+    "imageTooLarge": "De afbeelding is te groot — maximaal {size}×{size} px.",
+    "faviconNotSquare": "Het favicon moet vierkant zijn — dit is {width}×{height} px. Snijd het vóór het uploaden bij tot een vierkant.",
+    "svgFaviconNotSquare": "Het favicon moet vierkant zijn — dit is {width}×{height} px (volgens viewBox/width/height). Snijd het vóór het uploaden bij tot een vierkant.",
+    "emailLogoSvg": "SVG-logo's worden niet ondersteund — Gmail, Outlook en Yahoo tonen geen SVG in e-mail, dus het logo zou als ontbrekende afbeelding aankomen.",
+    "emailLogoWebp": "WebP-logo's worden niet ondersteund — te veel e-mailprogramma's tonen WebP niet betrouwbaar.",
+    "emailLogoTypeUnsupported": "Kies een PNG-, JPEG- of GIF-afbeelding.",
+    "uploadFailed": "{kind, select, favicon {Het favicon} other {Het logo}} kon niet worden geüpload — probeer het opnieuw.",
+    "removeFailed": "{kind, select, favicon {Het favicon} other {Het logo}} kon niet worden verwijderd — probeer het opnieuw."
+  },
   "brandAssetField": {
     "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
     "logo": {
@@ -465,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
-    "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
     "replyToLabel": "Antwoordadres",
     "replyToHint": "Waar antwoorden op de e-mails van je site naartoe gaan.",
     "footerAddressLabel": "Postadres in voettekst",
     "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail die je site verstuurt.",
     "logoLabel": "E-maillogo",
-    "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo."
+    "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo.",
+    "errors": {
+      "senderNameInvalid": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",
@@ -629,7 +648,11 @@
     "submitButton": "Inrichting starten",
     "confirmOwnerInviteButton": "Bevestigen en eigenaar uitnodigen",
     "submittingBeginButton": "Inrichting starten…",
-    "submittingInviteButton": "Eigenaar uitnodigen…"
+    "submittingInviteButton": "Eigenaar uitnodigen…",
+    "ownerInviteConfirmation": "Geen account gevonden voor {email} — er wordt een uitnodiging gestuurd om in te loggen en deze tenant als eigenaar te beheren.",
+    "errors": {
+      "createFailed": "De tenant kon niet worden aangemaakt — probeer het opnieuw."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Inrichting",
@@ -761,19 +784,30 @@
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
     "alertSuccess": "Tenantgegevens opgeslagen.",
-    "provisioningStartedError": "De inrichting van deze tenant is al gestart; de gegevens kunnen niet meer worden bewerkt.",
-    "archivedError": "Deze tenant is gearchiveerd; de gegevens kunnen niet meer worden bewerkt.",
-    "notFoundError": "Tenant niet gevonden.",
-    "ownerAlreadyJoinedError": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
-    "ownerEmailTakenError": "Voor dit e-mailadres staat al een uitnodiging open bij deze tenant.",
     "lockedAnnouncement": "Sommige velden met tenantgegevens zijn nu vergrendeld.",
     "unlockedAnnouncement": "Meer velden met tenantgegevens zijn nu bewerkbaar.",
     "fieldLockedReasonStep": "Vergrendeld — de stap \"{step}\" is al voltooid en heeft deze waarde gebruikt.",
     "fieldLockedReasonRunning": "Vergrendeld zolang de inrichting loopt.",
     "fieldLockedReasonSucceeded": "Vergrendeld — de inrichting is al voltooid.",
     "fieldLockedReasonArchived": "Vergrendeld — deze tenant is gearchiveerd.",
-    "localeIsAdditionalError": "Deze taal is al een extra taal. Verwijder deze daar eerst.",
-    "localeInvalidError": "Kies een ondersteunde taal."
+    "errors": {
+      "notFound": "Tenant niet gevonden.",
+      "archived": "Deze tenant is gearchiveerd; de gegevens kunnen niet meer worden bewerkt.",
+      "localeIsAdditional": "Deze taal is al een extra taal. Verwijder deze daar eerst.",
+      "provisioningStarted": "De inrichting van deze tenant is al gestart; de gegevens kunnen niet meer worden bewerkt.",
+      "ownerAlreadyJoined": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
+      "saveFailed": "De tenantgegevens konden niet worden opgeslagen — probeer het opnieuw."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Vul een tenantnaam in.",
+    "domainInvalid": "Vul een geldig domein in.",
+    "domainTaken": "Dit domein is al in gebruik.",
+    "domainAttachedElsewhere": "Dit domein is al gekoppeld aan een ander Vercel-project — maak het daar vrij of gebruik een ander domein.",
+    "emailInvalid": "Vul een geldig e-mailadres in.",
+    "planUnsupported": "Kies een ondersteund abonnement.",
+    "localeUnsupported": "Kies een ondersteunde taal.",
+    "ownerEmailTaken": "Voor dit e-mailadres staat al een uitnodiging open bij deze tenant."
   },
   "archivedTenantNotice": {
     "title": "Deze tenant is gearchiveerd",
@@ -816,6 +850,18 @@
     "dialogDescription": "Dit start provision-tenant.yml, dat elke ingerichte resource van deze tenant herstelt. Typ de naam van de tenant om te bevestigen.",
     "confirmButton": "Opnieuw activeren",
     "confirmingButton": "Starten…"
+  },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Typ de naam van de tenant om te bevestigen.",
+    "notFound": "Tenant niet gevonden.",
+    "nameMismatch": "Komt niet overeen met de naam van de tenant.",
+    "alreadyDeprovisioned": "Deze tenant is al ontmanteld.",
+    "notDeprovisioned": "Deze tenant is niet ontmanteld.",
+    "alreadyInProgress": "De inrichting loopt al.",
+    "notArchived": "Deze tenant moet worden gearchiveerd voordat hij kan worden verwijderd.",
+    "deprovisionFailed": "De ontmanteling kon niet worden gestart — probeer het opnieuw.",
+    "reactivateFailed": "Het opnieuw activeren kon niet worden gestart — probeer het opnieuw.",
+    "deleteFailed": "De tenant kon niet worden verwijderd — probeer het opnieuw."
   },
   "featuresSettings": {
     "heading": "Functies",

@@ -46,7 +46,6 @@ const clickConfirmInviteOwner = async (
 const mockOwnerInviteConfirmation = (overrides: {
   email: string;
   token?: string;
-  message: string;
 }) => {
   createTenantActionMock.mockResolvedValueOnce({
     ok: false,
@@ -95,31 +94,29 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   it('shows a field-level error returned from the Server Action', async () => {
     createTenantActionMock.mockResolvedValue({
       ok: false,
-      fieldErrors: { ownerEmail: 'No registered user matches this email.' },
+      fieldErrors: { ownerEmail: { reason: 'emailInvalid' } },
     });
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
 
-    expect(
-      await screen.findByText('No registered user matches this email.'),
-    ).toBeVisible();
+    expect(await screen.findByText('Enter a valid email.')).toBeVisible();
   });
 
   it('marks the field with a returned error invalid and describes it by that error', async () => {
     createTenantActionMock.mockResolvedValue({
       ok: false,
-      fieldErrors: { ownerEmail: 'No registered user matches this email.' },
+      fieldErrors: { ownerEmail: { reason: 'emailInvalid' } },
     });
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
-    await screen.findByText('No registered user matches this email.');
+    await screen.findByText('Enter a valid email.');
 
     const ownerEmail = screen.getByRole('textbox', { name: 'Owner email' });
     expect(ownerEmail).toHaveAttribute('aria-invalid', 'true');
     expect(ownerEmail).toHaveAccessibleDescription(
-      expect.stringContaining('No registered user matches this email.'),
+      expect.stringContaining('Enter a valid email.'),
     );
   });
 
@@ -162,7 +159,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       ownerInviteConfirmation: {
         email: 'owner@example.com',
         token: 'confirmation-token',
-        message: 'No account found for owner@example.com.',
       },
     });
     createTenantActionMock.mockImplementationOnce(
@@ -196,8 +192,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       ok: false,
       ownerInviteConfirmation: {
         email: 'owner@example.com',
-        message:
-          "No account found for owner@example.com — they'll be sent an invite to sign in and manage this tenant as owner.",
+        token: 'confirmation-token',
       },
     });
 
@@ -217,7 +212,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   it('resubmits with confirmOwnerInviteToken set once the operator confirms an unchanged owner email', async () => {
     mockOwnerInviteConfirmation({
       email: 'owner@example.com',
-      message: 'No account found for owner@example.com.',
     });
 
     await fillValidForm(user);
@@ -234,7 +228,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   it('resubmits with confirmOwnerInviteToken set when the owner email only differs from the server-normalized form by case or whitespace', async () => {
     mockOwnerInviteConfirmation({
       email: 'john.doe@example.com',
-      message: 'No account found for john.doe@example.com.',
     });
 
     await user.type(
@@ -264,19 +257,18 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   it('drops the stale confirmation and re-requires a fresh confirm once the owner email is edited', async () => {
     mockOwnerInviteConfirmation({
       email: 'owner@example.com',
-      message: 'No account found for owner@example.com.',
     });
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
-    await screen.findByText('No account found for owner@example.com.');
+    await screen.findByText(/^No account found for owner@example\.com /);
 
     await user.type(
       screen.getByRole('textbox', { name: 'Owner email' }),
       '.uk',
     );
     expect(
-      screen.queryByText('No account found for owner@example.com.'),
+      screen.queryByText(/^No account found for owner@example\.com /),
     ).not.toBeInTheDocument();
     expect(
       await screen.findByRole('button', { name: /begin provisioning/i }),
@@ -295,7 +287,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     mockOwnerInviteConfirmation({
       email: 'owner@example.com',
       token: 'confirmation-token-for-owner-example-com',
-      message: 'No account found for owner@example.com.',
     });
 
     await fillValidForm(user);
@@ -314,12 +305,11 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     mockOwnerInviteConfirmation({
       email: 'owner@example.com',
       token: 'confirmation-token-for-owner-example-com',
-      message: 'No account found for owner@example.com.',
     });
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
-    await screen.findByText('No account found for owner@example.com.');
+    await screen.findByText(/^No account found for owner@example\.com /);
 
     await user.type(
       screen.getByRole('textbox', { name: 'Owner email' }),
@@ -338,7 +328,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   it('shows a general error returned from the Server Action', async () => {
     createTenantActionMock.mockResolvedValue({
       ok: false,
-      error: "Couldn't create the tenant — try again.",
+      error: 'createFailed',
     });
 
     await fillValidForm(user);

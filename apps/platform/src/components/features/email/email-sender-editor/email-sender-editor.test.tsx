@@ -58,10 +58,10 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
   });
 
   it('shows a sender-name error against the field', () => {
-    setup({ senderNameError: 'Enter a name.' });
+    setup({ senderNameError: 'senderNameInvalid' });
 
     expect(screen.getByLabelText('Sender name')).toHaveAccessibleDescription(
-      'The display name on the From address — unrelated to the site title. Enter a name.',
+      expect.stringContaining('not an email address'),
     );
   });
 

@@ -410,6 +410,23 @@
       "replace": "Replace template logo"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "File uploads are not configured for this environment yet.",
+    "fileMissing": "Choose a file to upload.",
+    "fileTooLarge": "That file is too large — the limit is {limit}.",
+    "unreadableImage": "That file isn't a readable image.",
+    "unrecognizedTarget": "Unrecognized upload target.",
+    "brandImageTypeUnsupported": "Choose a PNG, JPEG, WebP, or SVG image.",
+    "imageTooSmall": "Image is too small — at least {size}×{size}px.",
+    "imageTooLarge": "Image is too large — at most {size}×{size}px.",
+    "faviconNotSquare": "Favicon must be a square image — this one is {width}×{height}px. Crop it to a square before uploading.",
+    "svgFaviconNotSquare": "Favicon must be a square image — this one is {width}×{height}px (from its viewBox/width/height). Crop it to a square before uploading.",
+    "emailLogoSvg": "SVG logos are not supported — Gmail, Outlook and Yahoo do not render SVG in email, so this would ship as a missing image.",
+    "emailLogoWebp": "WebP logos are not supported — too many email clients don't render WebP reliably.",
+    "emailLogoTypeUnsupported": "Choose a PNG, JPEG, or GIF image.",
+    "uploadFailed": "Couldn't upload the {kind, select, favicon {favicon} other {logo}} — try again.",
+    "removeFailed": "Couldn't remove the {kind, select, favicon {favicon} other {logo}} — try again."
+  },
   "brandAssetField": {
     "savesWithChanges": "Saves with changes",
     "logo": {
@@ -465,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
-    "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
     "replyToLabel": "Reply-to address",
     "replyToHint": "Where replies to your site's emails go.",
     "footerAddressLabel": "Footer postal address",
     "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every email your site sends.",
     "logoLabel": "Email logo",
-    "logoHint": "Used in every email, in every language. A template can override it with its own logo."
+    "logoHint": "Used in every email, in every language. A template can override it with its own logo.",
+    "errors": {
+      "senderNameInvalid": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
@@ -629,7 +648,11 @@
     "submitButton": "Begin provisioning",
     "confirmOwnerInviteButton": "Confirm & invite owner",
     "submittingBeginButton": "Beginning provisioning…",
-    "submittingInviteButton": "Inviting owner…"
+    "submittingInviteButton": "Inviting owner…",
+    "ownerInviteConfirmation": "No account found for {email} — they'll be sent an invite to sign in and manage this tenant as owner.",
+    "errors": {
+      "createFailed": "Couldn't create the tenant — try again."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Provisioning",
@@ -761,19 +784,30 @@
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Tenant details saved.",
-    "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited.",
-    "archivedError": "This tenant is archived; its details can no longer be edited.",
-    "notFoundError": "Tenant not found.",
-    "ownerAlreadyJoinedError": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
-    "ownerEmailTakenError": "This email already has a pending invite on this tenant.",
     "lockedAnnouncement": "Some tenant detail fields are now locked.",
     "unlockedAnnouncement": "More tenant detail fields are now editable.",
     "fieldLockedReasonStep": "Locked — the \"{step}\" step has already completed and used this value.",
     "fieldLockedReasonRunning": "Locked while provisioning is running.",
     "fieldLockedReasonSucceeded": "Locked — provisioning has already finished.",
     "fieldLockedReasonArchived": "Locked — this tenant is archived.",
-    "localeIsAdditionalError": "This language is already an additional language. Remove it there first.",
-    "localeInvalidError": "Choose a supported language."
+    "errors": {
+      "notFound": "Tenant not found.",
+      "archived": "This tenant is archived; its details can no longer be edited.",
+      "localeIsAdditional": "This language is already an additional language. Remove it there first.",
+      "provisioningStarted": "This tenant's provisioning has already started; its details can no longer be edited.",
+      "ownerAlreadyJoined": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
+      "saveFailed": "Couldn't save tenant details — try again."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Enter a tenant name.",
+    "domainInvalid": "Enter a valid domain.",
+    "domainTaken": "This domain is already in use.",
+    "domainAttachedElsewhere": "This domain is already attached to a different Vercel project — free it up there, or use a different domain.",
+    "emailInvalid": "Enter a valid email.",
+    "planUnsupported": "Choose a supported plan.",
+    "localeUnsupported": "Choose a supported language.",
+    "ownerEmailTaken": "This email already has a pending invite on this tenant."
   },
   "archivedTenantNotice": {
     "title": "This tenant is archived",
@@ -816,6 +850,18 @@
     "dialogDescription": "This dispatches provision-tenant.yml, which restores every provisioned resource for this tenant. Type the tenant's name to confirm.",
     "confirmButton": "Reactivate",
     "confirmingButton": "Dispatching…"
+  },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Type the tenant name to confirm.",
+    "notFound": "Tenant not found.",
+    "nameMismatch": "Doesn't match the tenant's name.",
+    "alreadyDeprovisioned": "This tenant is already deprovisioned.",
+    "notDeprovisioned": "This tenant is not deprovisioned.",
+    "alreadyInProgress": "Provisioning is already running.",
+    "notArchived": "This tenant must be archived before it can be deleted.",
+    "deprovisionFailed": "Couldn't start deprovisioning — try again.",
+    "reactivateFailed": "Couldn't start reactivation — try again.",
+    "deleteFailed": "Couldn't delete the tenant — try again."
   },
   "featuresSettings": {
     "heading": "Features",

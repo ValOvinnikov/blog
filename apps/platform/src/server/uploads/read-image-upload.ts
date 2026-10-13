@@ -1,13 +1,14 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config/types';
+import type { TUploadError } from '@platform/server/uploads/upload-error';
 import { imageSize } from 'image-size';
 
 export type TImageFormat = { contentType: string; extension: string };
 
 export type TImageUploadValidationResult =
   | { ok: true; asset: TImageFormat & { buffer: Buffer } }
-  | { ok: false; error: string };
+  | { ok: false; error: TUploadError };
 
 type TReadImageUploadResult =
   | {
@@ -19,9 +20,7 @@ type TReadImageUploadResult =
         height: number;
       };
     }
-  | { ok: false; error: string };
-
-export const UNREADABLE_IMAGE_ERROR = "That file isn't a readable image.";
+  | { ok: false; error: TUploadError };
 
 /**
  * Reads the real header bytes rather than trusting the browser-reported
@@ -33,13 +32,13 @@ export const readImageUpload = async (
   maxSizeLabel: string,
 ): Promise<TReadImageUploadResult> => {
   if (file.size === 0) {
-    return { ok: false, error: 'Choose a file to upload.' };
+    return { ok: false, error: { reason: 'fileMissing' } };
   }
 
   if (file.size > maxBytes) {
     return {
       ok: false,
-      error: `That file is too large — the limit is ${maxSizeLabel}.`,
+      error: { reason: 'fileTooLarge', values: { limit: maxSizeLabel } },
     };
   }
 
@@ -49,6 +48,6 @@ export const readImageUpload = async (
     const { type, width, height } = imageSize(buffer);
     return { ok: true, image: { buffer, type, width, height } };
   } catch {
-    return { ok: false, error: UNREADABLE_IMAGE_ERROR };
+    return { ok: false, error: { reason: 'unreadableImage' } };
   }
 };

@@ -78,7 +78,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   it('shows the error message inline and never refreshes when the action fails', async () => {
     reactivateTenantActionMock.mockResolvedValue({
       ok: false,
-      error: 'Provisioning is already running.',
+      reason: 'alreadyInProgress',
     });
     setup();
 

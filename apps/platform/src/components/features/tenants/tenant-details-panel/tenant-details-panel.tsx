@@ -17,6 +17,7 @@ import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provid
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   updateTenantDetailsAction,
+  type TUpdateTenantDetailsError,
   type TUpdateTenantDetailsFieldErrors,
 } from '@platform/server/tenants/update-tenant-details-action';
 import {
@@ -25,6 +26,7 @@ import {
   type TTenantFieldLockReason,
   type TTenantFieldLocks,
 } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState, useTransition } from 'react';
@@ -60,6 +62,7 @@ export const TenantDetailsPanel = ({
   const t = useTranslations('tenantDetailsPanel');
   const tSteps = useTranslations('provisioningStatusView');
   const tLanguage = useTranslations('languageNames');
+  const fieldErrorText = useTenantFieldErrorText();
   const toast = useToast();
   const router = useRouter();
   const panelId = useId();
@@ -70,7 +73,7 @@ export const TenantDetailsPanel = ({
   const [fieldErrors, setFieldErrors] =
     useState<TUpdateTenantDetailsFieldErrors>({});
   const [formError, setFormError] =
-    useState<TMaybeUndefined<string>>(undefined);
+    useState<TMaybeUndefined<TUpdateTenantDetailsError>>(undefined);
   const [isPending, startTransition] = useTransition();
   const isArchived = Boolean(tenant.deprovisionedAt);
 
@@ -191,7 +194,9 @@ export const TenantDetailsPanel = ({
 
   return (
     <div className={root()} data-tenant-details-panel={panelId}>
-      {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
+      {formError && (
+        <Alert type={ALERT_TYPE.ERROR} title={t(`errors.${formError}`)} />
+      )}
 
       <Card>
         <Card.Header title={t('heading')} />
@@ -221,7 +226,7 @@ export const TenantDetailsPanel = ({
                     key={key}
                     label={t(labelKey)}
                     hint={lockReason}
-                    error={fieldErrors[key]}
+                    error={fieldErrorText(fieldErrors[key])}
                     control={{ isDisabled: Boolean(lockReason) }}
                   >
                     <TextInput

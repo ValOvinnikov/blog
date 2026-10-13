@@ -74,9 +74,7 @@ describe(updateEmailConfigAction, () => {
 
       expect(result).toEqual({
         ok: false,
-        fieldErrors: {
-          senderName: expect.stringContaining('not an email address'),
-        },
+        fieldErrors: { senderName: 'senderNameInvalid' },
       });
       expect(requireTenantMembership).not.toHaveBeenCalled();
       expect(upsertEmailConfigMock).not.toHaveBeenCalled();

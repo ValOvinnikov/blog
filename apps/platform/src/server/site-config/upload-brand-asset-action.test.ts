@@ -118,7 +118,7 @@ describe(uploadBrandAssetAction, () => {
   it('re-resolves the tenant from the session before touching Blob or the db', async () => {
     validateBrandAssetUploadMock.mockResolvedValue({
       ok: false,
-      error: 'nope',
+      error: { reason: 'unreadableImage' },
     });
 
     await uploadBrandAssetAction(
@@ -137,7 +137,7 @@ describe(uploadBrandAssetAction, () => {
       makeFormData(null),
     );
 
-    expect(result).toEqual({ ok: false, error: 'Choose a file to upload.' });
+    expect(result).toEqual({ ok: false, error: { reason: 'fileMissing' } });
     expect(putMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -145,7 +145,7 @@ describe(uploadBrandAssetAction, () => {
   it('returns the validation error and never calls Blob when validation fails', async () => {
     validateBrandAssetUploadMock.mockResolvedValue({
       ok: false,
-      error: 'Favicon must be a square image.',
+      error: { reason: 'brandImageTypeUnsupported' },
     });
 
     const result = await uploadBrandAssetAction(
@@ -156,7 +156,7 @@ describe(uploadBrandAssetAction, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: 'Favicon must be a square image.',
+      error: { reason: 'brandImageTypeUnsupported' },
     });
     expect(putMock).not.toHaveBeenCalled();
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -237,7 +237,7 @@ describe(uploadBrandAssetAction, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "Couldn't upload the logo — try again.",
+      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
     });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -254,7 +254,7 @@ describe(uploadBrandAssetAction, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "Couldn't upload the logo — try again.",
+      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -271,7 +271,7 @@ describe(uploadBrandAssetAction, () => {
 
       expect(result).toEqual({
         ok: false,
-        error: 'File uploads are not configured for this environment yet.',
+        error: { reason: 'uploadsNotConfigured' },
       });
       expect(validateBrandAssetUploadMock).not.toHaveBeenCalled();
       expect(putMock).not.toHaveBeenCalled();

@@ -53,11 +53,11 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringContaining('64×40'),
+      error: {
+        reason: 'faviconNotSquare',
+        values: { width: 64, height: 40 },
+      },
     });
-    if (!result.ok) {
-      expect(result.error).toMatch(/square/i);
-    }
   });
 
   it('rejects an empty file', async () => {
@@ -65,7 +65,7 @@ describe(validateBrandAssetUpload, () => {
 
     const result = await validateBrandAssetUpload(file, 'logo');
 
-    expect(result).toEqual({ ok: false, error: 'Choose a file to upload.' });
+    expect(result).toEqual({ ok: false, error: { reason: 'fileMissing' } });
   });
 
   it('rejects a file over the size limit before reading its bytes', async () => {
@@ -75,7 +75,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringContaining('too large'),
+      error: { reason: 'fileTooLarge', values: { limit: '1.0 MB' } },
     });
   });
 
@@ -92,7 +92,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: 'Choose a PNG, JPEG, WebP, or SVG image.',
+      error: { reason: 'brandImageTypeUnsupported' },
     });
   });
 
@@ -129,11 +129,11 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringContaining('100×40'),
+      error: {
+        reason: 'svgFaviconNotSquare',
+        values: { width: 100, height: 40 },
+      },
     });
-    if (!result.ok) {
-      expect(result.error).toMatch(/square/i);
-    }
   });
 
   it('rejects an SVG that declares no width/height/viewBox to check squareness against', async () => {
@@ -143,7 +143,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "That file isn't a readable image.",
+      error: { reason: 'unreadableImage' },
     });
   });
 
@@ -187,7 +187,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "That file isn't a readable image.",
+      error: { reason: 'unreadableImage' },
     });
   });
 
@@ -196,7 +196,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringContaining('too small'),
+      error: { reason: 'imageTooSmall', values: { size: 32 } },
     });
   });
 });

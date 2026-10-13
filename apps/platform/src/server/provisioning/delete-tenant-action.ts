@@ -7,13 +7,21 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
+import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
+
 const deleteTenantInputSchema = z.object({
-  confirm: z.string().trim().min(1, 'Type the tenant name to confirm.'),
+  confirm: z.string().trim().min(1),
 });
 
 export type TDeleteTenantInput = z.input<typeof deleteTenantInputSchema>;
 
-export type TDeleteTenantResult = { ok: true } | { ok: false; error: string };
+export type TDeleteTenantResult = TTenantLifecycleResult<
+  | 'confirmRequired'
+  | 'notFound'
+  | 'nameMismatch'
+  | 'notArchived'
+  | 'deleteFailed'
+>;
 
 /**
  * The tenant status page's hard-delete control. Fetches the tenant to
@@ -31,20 +39,17 @@ export const deleteTenantAction = async (
 
   const parsed = deleteTenantInputSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Invalid input.',
-    };
+    return { ok: false, reason: 'confirmRequired' };
   }
 
   const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
   if (!tenant) {
-    return { ok: false, error: 'Tenant not found.' };
+    return { ok: false, reason: 'notFound' };
   }
 
   const { confirm } = parsed.data;
   if (confirm !== tenant.name) {
-    return { ok: false, error: "Doesn't match the tenant's name." };
+    return { ok: false, reason: 'nameMismatch' };
   }
 
   let result;
@@ -52,18 +57,15 @@ export const deleteTenantAction = async (
     result = await queries.tenants.deleteTenant(tenantId);
   } catch (error) {
     logger.error('tenants.delete_failed', { tenantId, error });
-    return { ok: false, error: "Couldn't delete the tenant — try again." };
+    return { ok: false, reason: 'deleteFailed' };
   }
 
   if (result.outcome === 'not-found') {
-    return { ok: false, error: 'Tenant not found.' };
+    return { ok: false, reason: 'notFound' };
   }
 
   if (result.outcome === 'not-archived') {
-    return {
-      ok: false,
-      error: 'This tenant must be archived before it can be deleted.',
-    };
+    return { ok: false, reason: 'notArchived' };
   }
 
   await recordAuditEvent({

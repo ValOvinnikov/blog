@@ -13,34 +13,34 @@ import {
   createOwnerInviteToken,
   verifyOwnerInviteToken,
 } from '@platform/server/tenants/owner-invite-token';
+import {
+  toTenantFieldErrors,
+  type TTenantFieldError,
+} from '@platform/server/tenants/tenant-field-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const createTenantInputSchema = z.object({
-  name: z.string().trim().min(1, 'Enter a tenant name.'),
-  domain: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
+  name: z.string().trim().min(1),
+  domain: z.string().trim().toLowerCase().regex(DOMAIN_PATTERN),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
-  ownerEmail: z.string().trim().toLowerCase().email('Enter a valid email.'),
+  ownerEmail: z.string().trim().toLowerCase().email(),
   confirmOwnerInviteToken: z.string().optional(),
 });
 
 export type TCreateTenantInput = z.input<typeof createTenantInputSchema>;
 
 export type TCreateTenantFieldErrors = Partial<
-  Record<keyof TCreateTenantInput, string>
+  Record<keyof TCreateTenantInput, TTenantFieldError>
 >;
 
 export type TCreateTenantResult = {
   ok: false;
-  error?: string;
+  error?: 'createFailed';
   fieldErrors?: TCreateTenantFieldErrors;
-  ownerInviteConfirmation?: { email: string; message: string; token: string };
+  ownerInviteConfirmation?: { email: string; token: string };
 };
 
 /**
@@ -53,14 +53,18 @@ export const createTenantAction = async (
 
   const parsed = createTenantInputSchema.safeParse(input);
   if (!parsed.success) {
-    const fieldErrors: TCreateTenantFieldErrors = {};
-    for (const issue of parsed.error.issues) {
-      const key = issue.path[0];
-      if (typeof key === 'string' && !(key in fieldErrors)) {
-        fieldErrors[key as keyof TCreateTenantInput] = issue.message;
-      }
-    }
-    return { ok: false, fieldErrors };
+    return {
+      ok: false,
+      fieldErrors: toTenantFieldErrors<keyof TCreateTenantInput>(
+        parsed.error.issues,
+        {
+          name: 'nameRequired',
+          domain: 'domainInvalid',
+          plan: 'planUnsupported',
+          ownerEmail: 'emailInvalid',
+        },
+      ),
+    };
   }
 
   const { name, domain, plan, ownerEmail, confirmOwnerInviteToken } =
@@ -73,7 +77,6 @@ export const createTenantAction = async (
       ownerInviteConfirmation: {
         email: ownerEmail,
         token: createOwnerInviteToken(ownerEmail),
-        message: `No account found for ${ownerEmail} — they'll be sent an invite to sign in and manage this tenant as owner.`,
       },
     };
   }
@@ -86,7 +89,7 @@ export const createTenantAction = async (
   if (existingDomain) {
     return {
       ok: false,
-      fieldErrors: { domain: 'This domain is already in use.' },
+      fieldErrors: { domain: { reason: 'domainTaken' } },
     };
   }
 
@@ -95,10 +98,7 @@ export const createTenantAction = async (
   if (domainAvailability === DOMAIN_AVAILABILITY.IN_USE) {
     return {
       ok: false,
-      fieldErrors: {
-        domain:
-          'This domain is already attached to a different Vercel project — free it up there, or use a different domain.',
-      },
+      fieldErrors: { domain: { reason: 'domainAttachedElsewhere' } },
     };
   }
 
@@ -119,13 +119,13 @@ export const createTenantAction = async (
         domain,
         error: result.error,
       });
-      return { ok: false, error: "Couldn't create the tenant — try again." };
+      return { ok: false, error: 'createFailed' };
     }
 
     tenantId = result.data.id;
   } catch (error) {
     logger.error('tenants.create_draft_failed', { domain, error });
-    return { ok: false, error: "Couldn't create the tenant — try again." };
+    return { ok: false, error: 'createFailed' };
   }
 
   await recordAuditEvent({

@@ -2,7 +2,6 @@ import 'server-only';
 
 import {
   readImageUpload,
-  UNREADABLE_IMAGE_ERROR,
   type TImageFormat,
   type TImageUploadValidationResult,
 } from '@platform/server/uploads/read-image-upload';
@@ -34,7 +33,7 @@ const validateSvgAsset = (
 ): TImageUploadValidationResult => {
   const sanitized = sanitizeSvgMarkup(buffer.toString('utf-8'));
   if (!sanitized) {
-    return { ok: false, error: UNREADABLE_IMAGE_ERROR };
+    return { ok: false, error: { reason: 'unreadableImage' } };
   }
   const sanitizedBuffer = Buffer.from(sanitized, 'utf-8');
 
@@ -43,12 +42,13 @@ const validateSvgAsset = (
     try {
       dimensions = imageSize(sanitizedBuffer);
     } catch {
-      return { ok: false, error: UNREADABLE_IMAGE_ERROR };
+      return { ok: false, error: { reason: 'unreadableImage' } };
     }
-    if (dimensions.width !== dimensions.height) {
+    const { width, height } = dimensions;
+    if (width !== height) {
       return {
         ok: false,
-        error: `Favicon must be a square image — this one is ${dimensions.width}×${dimensions.height}px (from its viewBox/width/height). Crop it to a square before uploading.`,
+        error: { reason: 'svgFaviconNotSquare', values: { width, height } },
       };
     }
   }
@@ -77,7 +77,7 @@ export const validateBrandAssetUpload = async (
 
   const format = type ? IMAGE_FORMAT_BY_DETECTED_TYPE[type] : undefined;
   if (!format) {
-    return { ok: false, error: 'Choose a PNG, JPEG, WebP, or SVG image.' };
+    return { ok: false, error: { reason: 'brandImageTypeUnsupported' } };
   }
 
   if (type === 'svg') {
@@ -88,20 +88,20 @@ export const validateBrandAssetUpload = async (
   if (width < bounds.min || height < bounds.min) {
     return {
       ok: false,
-      error: `Image is too small — at least ${bounds.min}×${bounds.min}px.`,
+      error: { reason: 'imageTooSmall', values: { size: bounds.min } },
     };
   }
   if (width > bounds.max || height > bounds.max) {
     return {
       ok: false,
-      error: `Image is too large — at most ${bounds.max}×${bounds.max}px.`,
+      error: { reason: 'imageTooLarge', values: { size: bounds.max } },
     };
   }
 
   if (kind === 'favicon' && width !== height) {
     return {
       ok: false,
-      error: `Favicon must be a square image — this one is ${width}×${height}px. Crop it to a square before uploading.`,
+      error: { reason: 'faviconNotSquare', values: { width, height } },
     };
   }
 

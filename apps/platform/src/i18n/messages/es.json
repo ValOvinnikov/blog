@@ -410,6 +410,23 @@
       "replace": "Sustituir el logotipo de la plantilla"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "La subida de archivos aún no está configurada en este entorno.",
+    "fileMissing": "Elija un archivo para subir.",
+    "fileTooLarge": "El archivo es demasiado grande: el límite es {limit}.",
+    "unreadableImage": "El archivo no es una imagen legible.",
+    "unrecognizedTarget": "Destino de subida no reconocido.",
+    "brandImageTypeUnsupported": "Elija una imagen PNG, JPEG, WebP o SVG.",
+    "imageTooSmall": "La imagen es demasiado pequeña: mínimo {size}×{size} px.",
+    "imageTooLarge": "La imagen es demasiado grande: máximo {size}×{size} px.",
+    "faviconNotSquare": "El favicon debe ser una imagen cuadrada; esta mide {width}×{height} px. Recórtela en forma cuadrada antes de subirla.",
+    "svgFaviconNotSquare": "El favicon debe ser una imagen cuadrada; esta mide {width}×{height} px (según su viewBox/width/height). Recórtela en forma cuadrada antes de subirla.",
+    "emailLogoSvg": "No se admiten logotipos SVG: Gmail, Outlook y Yahoo no muestran SVG en el correo, así que llegaría como una imagen ausente.",
+    "emailLogoWebp": "No se admiten logotipos WebP: demasiados clientes de correo no muestran WebP de forma fiable.",
+    "emailLogoTypeUnsupported": "Elija una imagen PNG, JPEG o GIF.",
+    "uploadFailed": "No se pudo subir {kind, select, favicon {el favicon} other {el logotipo}}. Vuelva a intentarlo.",
+    "removeFailed": "No se pudo quitar {kind, select, favicon {el favicon} other {el logotipo}}. Vuelva a intentarlo."
+  },
   "brandAssetField": {
     "savesWithChanges": "Se guarda con los cambios",
     "logo": {
@@ -465,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Nombre del remitente",
     "senderNameHint": "El nombre visible en la dirección del remitente; no tiene relación con el título del sitio.",
-    "senderNameInvalidError": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",
     "replyToLabel": "Dirección de respuesta",
     "replyToHint": "Adónde van las respuestas a los correos de su sitio.",
     "footerAddressLabel": "Dirección postal del pie",
     "footerAddressHint": "Un requisito legal para los envíos masivos: se muestra en el pie de todos los correos que envía su sitio.",
     "logoLabel": "Logotipo del correo",
-    "logoHint": "Se usa en todos los correos y en todos los idiomas. Una plantilla puede sustituirlo por su propio logotipo."
+    "logoHint": "Se usa en todos los correos y en todos los idiomas. Una plantilla puede sustituirlo por su propio logotipo.",
+    "errors": {
+      "senderNameInvalid": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Elija una imagen PNG, JPEG o GIF: los principales clientes de correo no admiten SVG ni WebP.",
@@ -629,7 +648,11 @@
     "submitButton": "Iniciar aprovisionamiento",
     "confirmOwnerInviteButton": "Confirmar e invitar al propietario",
     "submittingBeginButton": "Iniciando aprovisionamiento…",
-    "submittingInviteButton": "Invitando al propietario…"
+    "submittingInviteButton": "Invitando al propietario…",
+    "ownerInviteConfirmation": "No hay ninguna cuenta para {email}. Recibirá una invitación para iniciar sesión y gestionar este cliente como propietario.",
+    "errors": {
+      "createFailed": "No se pudo crear el cliente. Vuelva a intentarlo."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Aprovisionamiento",
@@ -761,19 +784,30 @@
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
     "alertSuccess": "Detalles del cliente guardados.",
-    "provisioningStartedError": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
-    "archivedError": "Este cliente está archivado; sus detalles ya no se pueden editar.",
-    "notFoundError": "No se encontró el cliente.",
-    "ownerAlreadyJoinedError": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
-    "ownerEmailTakenError": "Este correo electrónico ya tiene una invitación pendiente en este cliente.",
     "lockedAnnouncement": "Algunos campos de detalles del cliente están ahora bloqueados.",
     "unlockedAnnouncement": "Ahora se pueden editar más campos de detalles del cliente.",
     "fieldLockedReasonStep": "Bloqueado: el paso «{step}» ya se ha completado y ha usado este valor.",
     "fieldLockedReasonRunning": "Bloqueado mientras se ejecuta el aprovisionamiento.",
     "fieldLockedReasonSucceeded": "Bloqueado: el aprovisionamiento ya ha finalizado.",
     "fieldLockedReasonArchived": "Bloqueado: este cliente está archivado.",
-    "localeIsAdditionalError": "Este idioma ya es un idioma adicional. Quítelo de ahí primero.",
-    "localeInvalidError": "Elija un idioma compatible."
+    "errors": {
+      "notFound": "No se encontró el cliente.",
+      "archived": "Este cliente está archivado; sus detalles ya no se pueden editar.",
+      "localeIsAdditional": "Este idioma ya es un idioma adicional. Quítelo de ahí primero.",
+      "provisioningStarted": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
+      "ownerAlreadyJoined": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
+      "saveFailed": "No se pudieron guardar los datos del cliente. Vuelva a intentarlo."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Introduzca un nombre de cliente.",
+    "domainInvalid": "Introduzca un dominio válido.",
+    "domainTaken": "Este dominio ya está en uso.",
+    "domainAttachedElsewhere": "Este dominio ya está vinculado a otro proyecto de Vercel. Libérelo allí o use otro dominio.",
+    "emailInvalid": "Introduzca un correo electrónico válido.",
+    "planUnsupported": "Elija un plan compatible.",
+    "localeUnsupported": "Elija un idioma compatible.",
+    "ownerEmailTaken": "Este correo electrónico ya tiene una invitación pendiente en este cliente."
   },
   "archivedTenantNotice": {
     "title": "Este cliente está archivado",
@@ -816,6 +850,18 @@
     "dialogDescription": "Esto lanza provision-tenant.yml, que restaura todos los recursos aprovisionados para este cliente. Escriba el nombre del cliente para confirmar.",
     "confirmButton": "Reactivar",
     "confirmingButton": "Lanzando…"
+  },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Escriba el nombre del cliente para confirmar.",
+    "notFound": "No se encontró el cliente.",
+    "nameMismatch": "No coincide con el nombre del cliente.",
+    "alreadyDeprovisioned": "Este cliente ya está desaprovisionado.",
+    "notDeprovisioned": "Este cliente no está desaprovisionado.",
+    "alreadyInProgress": "El aprovisionamiento ya está en curso.",
+    "notArchived": "Este cliente debe archivarse antes de poder eliminarlo.",
+    "deprovisionFailed": "No se pudo iniciar el desaprovisionamiento. Vuelva a intentarlo.",
+    "reactivateFailed": "No se pudo iniciar la reactivación. Vuelva a intentarlo.",
+    "deleteFailed": "No se pudo eliminar el cliente. Vuelva a intentarlo."
   },
   "featuresSettings": {
     "heading": "Funciones",

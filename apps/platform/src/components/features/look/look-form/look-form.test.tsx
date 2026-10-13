@@ -737,7 +737,7 @@ describe(`<${LookForm.name}/>`, () => {
     it('fails the save with the upload error and keeps the draft when the upload fails', async () => {
       uploadBrandAssetActionMock.mockResolvedValue({
         ok: false,
-        error: "Couldn't upload the logo — try again.",
+        error: { reason: 'uploadFailed', values: { kind: 'logo' } },
       });
       setup();
 

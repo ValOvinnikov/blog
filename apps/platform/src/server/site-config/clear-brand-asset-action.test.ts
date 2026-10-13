@@ -154,7 +154,7 @@ describe(clearBrandAssetAction, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "Couldn't remove the favicon — try again.",
+      error: { reason: 'removeFailed', values: { kind: 'favicon' } },
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });

@@ -9,12 +9,13 @@ import {
   SENDER_NAME_INVALID,
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { logger } from '@platform/utils/logger/logger';
-import { getTranslations } from 'next-intl/server';
 import type { z } from 'zod';
 
 export type TUpdateEmailConfigInput = z.input<typeof emailSenderInputSchema>;
+export type TSenderNameError = 'senderNameInvalid';
+
 export type TUpdateEmailConfigResult =
-  { ok: true } | { ok: false; fieldErrors?: { senderName?: string } };
+  { ok: true } | { ok: false; fieldErrors?: { senderName?: TSenderNameError } };
 
 export const updateEmailConfigAction = async (
   tenantId: string,
@@ -27,11 +28,7 @@ export const updateEmailConfigAction = async (
     );
     if (!isSenderNameInvalid) return { ok: false };
 
-    const t = await getTranslations('emailSettingsForm');
-    return {
-      ok: false,
-      fieldErrors: { senderName: t('senderNameInvalidError') },
-    };
+    return { ok: false, fieldErrors: { senderName: 'senderNameInvalid' } };
   }
 
   const { tenant } = await requireTenantMembership(tenantId);

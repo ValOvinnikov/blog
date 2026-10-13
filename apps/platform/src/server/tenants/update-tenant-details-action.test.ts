@@ -86,7 +86,7 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: false, error: 'Tenant not found.' });
+    expect(result).toEqual({ ok: false, error: 'notFound' });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 
@@ -97,10 +97,7 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({
-      ok: false,
-      error: 'This tenant is archived; its details can no longer be edited.',
-    });
+    expect(result).toEqual({ ok: false, error: 'archived' });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -113,7 +110,7 @@ describe('updateTenantDetailsAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { primaryDomain: expect.any(String) },
+      fieldErrors: { primaryDomain: { reason: 'domainInvalid' } },
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
@@ -126,7 +123,7 @@ describe('updateTenantDetailsAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { ownerEmail: expect.any(String) },
+      fieldErrors: { ownerEmail: { reason: 'emailInvalid' } },
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
@@ -166,7 +163,7 @@ describe('updateTenantDetailsAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { primaryDomain: expect.any(String) },
+      fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
     });
   });
 
@@ -177,7 +174,7 @@ describe('updateTenantDetailsAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { primaryDomain: expect.any(String) },
+      fieldErrors: { primaryDomain: { reason: 'domainInvalid' } },
     });
   });
 
@@ -192,8 +189,7 @@ describe('updateTenantDetailsAction', () => {
     expect(result).toEqual({
       ok: false,
       fieldErrors: {
-        primaryDomain:
-          'Locked — the "Connect domain" step has already completed and used this value.',
+        primaryDomain: { reason: 'domainLocked', step: 'MAP_DOMAIN' },
       },
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -206,11 +202,7 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({
-      ok: false,
-      error:
-        "This tenant's provisioning has already started; its details can no longer be edited.",
-    });
+    expect(result).toEqual({ ok: false, error: 'provisioningStarted' });
   });
 
   it('maps an owner-email-taken outcome onto an ownerEmail field error', async () => {
@@ -223,7 +215,7 @@ describe('updateTenantDetailsAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { ownerEmail: expect.any(String) },
+      fieldErrors: { ownerEmail: { reason: 'ownerEmailTaken' } },
     });
   });
 
@@ -255,17 +247,7 @@ describe('updateTenantDetailsAction', () => {
       ownerEmail: 'new-owner@example.com',
     });
 
-    expect(result).toEqual({
-      ok: false,
-      error:
-        "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
-    });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error).not.toBe(
-        "Couldn't save tenant details — try again.",
-      );
-    }
+    expect(result).toEqual({ ok: false, error: 'ownerAlreadyJoined' });
   });
 
   it('does not record an audit event for an owner-email-taken outcome', async () => {
@@ -362,7 +344,7 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, error: 'saveFailed' });
   });
 
   it('rejects a language outside the supported list without saving', async () => {
@@ -373,7 +355,7 @@ describe('updateTenantDetailsAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { locale: 'Choose a supported language.' },
+      fieldErrors: { locale: { reason: 'localeUnsupported' } },
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
@@ -391,11 +373,7 @@ describe('updateTenantDetailsAction', () => {
       locale: LOCALE_ISO_CODES.NL,
     });
 
-    expect(result).toEqual({
-      ok: false,
-      error:
-        'This language is already an additional language. Remove it there first.',
-    });
+    expect(result).toEqual({ ok: false, error: 'localeIsAdditional' });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 });

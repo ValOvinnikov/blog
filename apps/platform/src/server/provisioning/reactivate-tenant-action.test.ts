@@ -95,10 +95,7 @@ describe('reactivateTenantAction', () => {
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      ok: false,
-      error: 'Type the tenant name to confirm.',
-    });
+    expect(result).toEqual({ ok: false, reason: 'confirmRequired' });
   });
 
   it("rejects a confirmation that doesn't match the tenant's live name", async () => {
@@ -108,10 +105,7 @@ describe('reactivateTenantAction', () => {
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(recordAuditEventMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      ok: false,
-      error: "Doesn't match the tenant's name.",
-    });
+    expect(result).toEqual({ ok: false, reason: 'nameMismatch' });
   });
 
   it('refuses a tenant that is not deprovisioned', async () => {
@@ -125,10 +119,7 @@ describe('reactivateTenantAction', () => {
     });
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      ok: false,
-      error: 'This tenant is not deprovisioned.',
-    });
+    expect(result).toEqual({ ok: false, reason: 'notDeprovisioned' });
   });
 
   it('refuses an unknown tenant id', async () => {
@@ -137,16 +128,16 @@ describe('reactivateTenantAction', () => {
     const result = await reactivateTenantAction('ghost', { confirm: 'Acme' });
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ ok: false, error: 'Tenant not found.' });
+    expect(result).toEqual({ ok: false, reason: 'notFound' });
   });
 
   it.each([
-    ['already-in-progress', 'Provisioning is already running.'],
-    ['not-found', 'Tenant not found.'],
-    ['dispatch-error', "Couldn't start reactivation — try again."],
+    ['already-in-progress', 'alreadyInProgress'],
+    ['not-found', 'notFound'],
+    ['dispatch-error', 'reactivateFailed'],
   ])(
     'records nothing and refuses when provisioning reports %s',
-    async (outcome, error) => {
+    async (outcome, reason) => {
       startProvisioningMock.mockResolvedValue({ outcome });
 
       const result = await reactivateTenantAction('tenant-1', {
@@ -154,7 +145,7 @@ describe('reactivateTenantAction', () => {
       });
 
       expect(recordAuditEventMock).not.toHaveBeenCalled();
-      expect(result).toEqual({ ok: false, error });
+      expect(result).toEqual({ ok: false, reason });
     },
   );
 });

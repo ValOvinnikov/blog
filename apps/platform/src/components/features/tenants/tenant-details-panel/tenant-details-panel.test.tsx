@@ -215,7 +215,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('shows a field error and does not refresh when saving fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
-        fieldErrors: { primaryDomain: 'This domain is already in use.' },
+        fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
       });
       const tenant = makeClientTenant();
       render(
@@ -243,8 +243,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
         fieldErrors: {
-          name: 'Enter a tenant name.',
-          primaryDomain: 'Enter a valid domain.',
+          name: { reason: 'nameRequired' },
+          primaryDomain: { reason: 'domainInvalid' },
         },
       });
       const tenant = makeClientTenant();
@@ -301,7 +301,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('does not show a success alert when saving fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
-        fieldErrors: { primaryDomain: 'This domain is already in use.' },
+        fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
       });
       const tenant = makeClientTenant();
       render(
@@ -326,8 +326,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
-        error:
-          "This tenant's provisioning has already started; its details can no longer be edited.",
+        error: 'provisioningStarted',
       });
       const tenant = makeClientTenant();
       render(
@@ -352,8 +351,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('shows a distinct, non-generic message when the owner has already joined, and does not refresh', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
-        error:
-          "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
+        error: 'ownerAlreadyJoined',
       });
       const tenant = makeClientTenant({ id: 'tenant-1' });
       render(
@@ -383,7 +381,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
         fieldErrors: {
-          ownerEmail: 'This email already has a pending invite on this tenant.',
+          ownerEmail: { reason: 'ownerEmailTaken' },
         },
       });
       const tenant = makeClientTenant();
@@ -554,8 +552,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
         fieldErrors: {
-          primaryDomain:
-            'Locked — the "Connect domain" step has already completed and used this value.',
+          primaryDomain: { reason: 'domainLocked', step: 'MAP_DOMAIN' },
         },
       });
       const tenant = makeClientTenant({ id: 'tenant-1' });
@@ -1084,7 +1081,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('stays on the page with the save error shown when Save and leave fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
-        error: "Couldn't save — try again.",
+        error: 'saveFailed',
       });
       renderGuardedPanel();
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -1095,7 +1092,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Save and leave' }));
 
       expect(
-        await screen.findByText("Couldn't save — try again."),
+        await screen.findByText("Couldn't save tenant details — try again."),
       ).toBeVisible();
       expect(push).not.toHaveBeenCalled();
       expect(nameInput).toHaveValue('Acme Ltd');
