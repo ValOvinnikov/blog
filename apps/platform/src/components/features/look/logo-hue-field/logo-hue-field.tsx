@@ -2,10 +2,7 @@
 
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
-import {
-  accentHueGradient,
-  buildLogoPreviewTokens,
-} from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
 
@@ -69,7 +66,6 @@ export const LogoHueField = ({
           onChange={onChange}
           isDisabled={follows || isDisabled}
           aria-describedby={ariaDescribedBy}
-          trackStyle={{ background: accentHueGradient() }}
         />
         <span className={hueValue()}>
           {follows ? t('followsAccent') : t('hueValue', { hue: resolvedHue })}
