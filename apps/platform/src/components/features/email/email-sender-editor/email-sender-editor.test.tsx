@@ -18,6 +18,7 @@ const setup = customRenderInSettingsForm(EmailSenderEditor, {
   logo: { url: undefined },
   onSenderChange: vi.fn(),
   onLogoStage: vi.fn(),
+  senderNameInputId: 'sender-name',
 });
 
 describe(`<${EmailSenderEditor.name}/>`, () => {

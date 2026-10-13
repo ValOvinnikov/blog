@@ -17,6 +17,7 @@ export type TEmailSenderEditorProps = {
   logo: TStagedImage;
   onSenderChange: (sender: TEmailSenderDraft) => void;
   onLogoStage: (logo: TStagedImage) => void;
+  senderNameInputId: string;
   senderNameError?: string;
 };
 
@@ -25,6 +26,7 @@ export const EmailSenderEditor = ({
   logo,
   onSenderChange,
   onLogoStage,
+  senderNameInputId,
   senderNameError,
 }: TEmailSenderEditorProps) => {
   const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
@@ -52,7 +54,7 @@ export const EmailSenderEditor = ({
             label={t('senderNameLabel')}
             hint={t('senderNameHint')}
             error={senderNameError}
-            control={control}
+            control={{ ...control, id: senderNameInputId }}
           >
             <TextInput
               placeholder={tPreview('defaultSender')}

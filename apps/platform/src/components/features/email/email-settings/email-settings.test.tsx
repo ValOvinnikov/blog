@@ -352,6 +352,58 @@ describe(`<${EmailSettings.name}/>`, () => {
       expect(saveBar()).toHaveTextContent('1 unsaved change');
       expect(saveBar()).not.toHaveTextContent(/All languages|English/);
     });
+
+    describe('when the sender name is rejected', () => {
+      const goToFirstField = () =>
+        user.click(
+          within(saveBar()).getByRole('link', { name: 'Go to the first one' }),
+        );
+
+      const saveAndSettle = async () => {
+        await user.click(screen.getByRole('button', { name: 'Save changes' }));
+        await within(saveBar()).findByRole('link', {
+          name: 'Go to the first one',
+        });
+        await within(saveBar()).findByRole('button', { name: 'Save changes' });
+      };
+
+      beforeEach(async () => {
+        updateEmailConfigActionMock.mockResolvedValue({
+          ok: false,
+          fieldErrors: { senderName: 'Enter a name, not an address.' },
+        });
+        setup();
+        await user.type(screen.getByLabelText('Sender name'), 'a@b');
+      });
+
+      it('opens Sender & footer and focuses the sender name from a template', async () => {
+        await openSignInTemplate(user);
+        await user.type(screen.getByLabelText('Subject (English)'), '!');
+        await saveAndSettle();
+
+        expect(saveBar()).toHaveTextContent('1 field needs attention');
+
+        await goToFirstField();
+
+        expect(screen.getByLabelText('Sender name')).toHaveFocus();
+        expect(picker()).toHaveTextContent(/^Sender & footer/);
+      });
+
+      it('returns to the Edit tab and focuses the sender name from the Preview', async () => {
+        await user.click(screen.getByRole('tab', { name: 'Preview' }));
+        await saveAndSettle();
+
+        expect(saveBar()).toHaveTextContent('1 field needs attention');
+
+        await goToFirstField();
+
+        expect(screen.getByRole('tab', { name: 'Edit' })).toHaveAttribute(
+          'aria-selected',
+          'true',
+        );
+        expect(screen.getByLabelText('Sender name')).toHaveFocus();
+      });
+    });
   });
 
   it('shows the sender-name error the save returns', async () => {
