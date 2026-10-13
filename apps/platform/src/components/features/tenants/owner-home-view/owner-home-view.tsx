@@ -1,13 +1,11 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
+import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
-import { PageHeader } from '@platform/components/shared/page-header';
-import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TDomainVerificationStatus } from '@platform/constants/domain';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
@@ -19,9 +17,9 @@ import { ownerHomeViewVariants } from './owner-home-view-variants';
 export type TOwnerHomeViewProps = {
   tenant: TTenant;
   domainVerificationStatus: Promise<TDomainVerificationStatus>;
-  ownerEmail: string | undefined;
-  ownerJoinedAt: string | undefined;
-  ownerJoinedAtIso: string | undefined;
+  ownerEmail: TMaybeUndefined<string>;
+  ownerJoinedAt: TMaybeUndefined<string>;
+  ownerJoinedAtIso: TMaybeUndefined<string>;
 };
 
 export const OwnerHomeView = ({
@@ -31,31 +29,14 @@ export const OwnerHomeView = ({
   ownerJoinedAt,
   ownerJoinedAtIso,
 }: TOwnerHomeViewProps) => {
-  const tTenantsTable = useTranslations('tenantsTable');
-  const t = useTranslations('tenantOverviewPage');
   const tOwnerHome = useTranslations('ownerHomePage');
   const { root, cardsStack } = ownerHomeViewVariants();
 
   return (
     <div className={root()}>
-      <PageHeader
-        title={tenant.name}
+      <TenantPageHeader
+        tenant={tenant}
         description={tOwnerHome('description')}
-        badges={
-          <>
-            <StatusBadge tone={tenantStatusTone(tenant.status)}>
-              {tTenantsTable(`status.${tenant.status}`)}
-            </StatusBadge>
-            <StatusBadge tone="plan" hasDot={false}>
-              {tTenantsTable(`plan.${tenant.plan}`)}
-            </StatusBadge>
-          </>
-        }
-        actions={
-          <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
-            {t('openSiteAction')}
-          </ExternalLinkButton>
-        }
       />
 
       {tenant.deprovisionedAt && (

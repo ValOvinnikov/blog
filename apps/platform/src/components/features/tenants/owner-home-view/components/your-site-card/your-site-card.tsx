@@ -5,6 +5,7 @@ import { DetailList } from '@platform/components/shared/detail-list';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { tenantSiteUrl } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
 import { yourSiteCardVariants } from './your-site-card-variants';
@@ -45,7 +46,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
             isMono={true}
             action={
               <ExternalLinkButton
-                href={`https://${tenant.primaryDomain}`}
+                href={tenantSiteUrl(tenant.primaryDomain)}
                 variant="ghost"
                 size={SIZE.SM}
                 ariaLabel={openDomainLabel}

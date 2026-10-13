@@ -10,14 +10,10 @@ import { ProvisioningBanner } from '@platform/components/features/tenants/provis
 import { useProvisioningPoll } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
 import { TenantDetailsPanel } from '@platform/components/features/tenants/tenant-details-panel';
+import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
-import { PageHeader } from '@platform/components/shared/page-header';
-import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
-import { useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
 import { tenantOverviewViewVariants } from './tenant-overview-view-variants';
@@ -42,8 +38,6 @@ export const TenantOverviewView = ({
   auditEvents,
   findings,
 }: TTenantOverviewViewProps) => {
-  const tTenantsTable = useTranslations('tenantsTable');
-  const t = useTranslations('tenantOverviewPage');
   const archivedNoticeId = useId();
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
   const {
@@ -58,24 +52,7 @@ export const TenantOverviewView = ({
 
   return (
     <div className={root()}>
-      <PageHeader
-        title={tenant.name}
-        badges={
-          <>
-            <StatusBadge tone={tenantStatusTone(tenant.status)}>
-              {tTenantsTable(`status.${tenant.status}`)}
-            </StatusBadge>
-            <StatusBadge tone="plan" hasDot={false}>
-              {tTenantsTable(`plan.${tenant.plan}`)}
-            </StatusBadge>
-          </>
-        }
-        actions={
-          <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
-            {t('openSiteAction')}
-          </ExternalLinkButton>
-        }
-      />
+      <TenantPageHeader tenant={tenant} />
 
       {tenant.deprovisionedAt && (
         <ArchivedTenantNotice
