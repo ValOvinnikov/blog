@@ -1,6 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
@@ -8,50 +7,21 @@ import { reactivateTenantAction } from '@platform/server/provisioning/reactivate
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
 
 import { reactivateTenantControlVariants } from './reactivate-tenant-control-variants';
 
 export type TReactivateTenantControlProps = {
-  tenant: TClientTenant;
+  tenant: Pick<TClientTenant, 'id' | 'name'>;
 };
 
-/**
- * The danger page's recovery control for an archived tenant, offered
- * alongside the hard delete so a mistaken deprovision has a way back.
- */
 export const ReactivateTenantControl = ({
   tenant,
 }: TReactivateTenantControlProps) => {
   const t = useTranslations('reactivateTenantControl');
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
-  const [isPending, startTransition] = useTransition();
+  const { id, name } = tenant;
 
   const { content } = reactivateTenantControlVariants();
-
-  const handleOpenChange = (next: boolean) => {
-    setOpen(next);
-    if (!next) {
-      setConfirm('');
-      setError(undefined);
-    }
-  };
-
-  const handleConfirm = () => {
-    setError(undefined);
-    startTransition(async () => {
-      const result = await reactivateTenantAction(tenant.id, { confirm });
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      handleOpenChange(false);
-      router.refresh();
-    });
-  };
 
   return (
     <Card>
@@ -62,23 +32,18 @@ export const ReactivateTenantControl = ({
 
           <ConfirmDialog
             tone="primary"
-            isOpen={open}
-            onOpenChange={handleOpenChange}
-            triggerLabel={t('triggerButton')}
-            title={t('dialogTitle', { name: tenant.name })}
-            description={t('dialogDescription')}
-            error={error}
-            confirmLabel={t('confirmLabel', { name: tenant.name })}
-            confirmHint={t('confirmHint')}
-            confirmValue={confirm}
-            onConfirmValueChange={setConfirm}
-            expectedValue={tenant.name}
-            onConfirm={handleConfirm}
-            isPending={isPending}
-            confirmButtonLabel={t('confirmButton')}
-            confirmingButtonLabel={t('confirmingButton')}
-            cancelLabel={t('cancelButton')}
-          />
+            expectedValue={name}
+            onConfirm={(confirm) => reactivateTenantAction(id, { confirm })}
+            onConfirmed={() => router.refresh()}
+          >
+            <ConfirmDialog.Trigger>{t('triggerButton')}</ConfirmDialog.Trigger>
+            <ConfirmDialog.Content
+              title={t('dialogTitle', { name })}
+              description={t('dialogDescription')}
+              confirmButtonLabel={t('confirmButton')}
+              confirmingButtonLabel={t('confirmingButton')}
+            />
+          </ConfirmDialog>
         </div>
       </Card.Body>
     </Card>

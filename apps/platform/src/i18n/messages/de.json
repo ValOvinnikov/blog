@@ -785,6 +785,11 @@
     "allOption": "Alle",
     "loading": "Mandanten werden geladen…"
   },
+  "confirmDialog": {
+    "confirmLabel": "Zur Bestätigung „{name}“ eingeben",
+    "confirmHint": "Muss exakt mit dem Namen des Mandanten übereinstimmen.",
+    "cancelButton": "Abbrechen"
+  },
   "deprovisionTenantControl": {
     "cardTitle": "Diesen Mandanten deprovisionieren",
     "archivedCardTitle": "Diesen Mandanten endgültig löschen",
@@ -793,18 +798,13 @@
     "inProgressHint": "Für diesen Mandanten läuft bereits eine Deprovisionierung.",
     "dialogTitle": "{name} deprovisionieren",
     "dialogDescription": "Dies startet deprovision-tenant.yml, das jede bereitgestellte Ressource dieses Mandanten abbaut. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
-    "confirmLabel": "Zur Bestätigung „{name}“ eingeben",
-    "confirmHint": "Muss exakt mit dem Namen des Mandanten übereinstimmen.",
     "dryRunLabel": "Probelauf (nur Vorschau, nichts wird gelöscht)",
-    "cancelButton": "Abbrechen",
     "confirmButton": "Deprovisionieren",
     "confirmingButton": "Wird gestartet…",
     "deleteDescription": "Entfernt diesen Mandanten und jeden abhängigen Eintrag (Mitgliedschaften, Abonnenten, Lesezeichen, Domains, Website-Konfiguration) endgültig aus der Datenbank. Dies kann nicht rückgängig gemacht werden und gibt die Domain zur erneuten Verwendung frei.",
     "deleteTriggerButton": "Mandant endgültig löschen",
     "deleteDialogTitle": "{name} löschen",
     "deleteDialogDescription": "Dies löscht den Mandanteneintrag und alles, was davon abhängt, endgültig. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
-    "deleteConfirmLabel": "Zur Bestätigung „{name}“ eingeben",
-    "deleteConfirmHint": "Muss exakt mit dem Namen des Mandanten übereinstimmen.",
     "deleteConfirmButton": "Löschen",
     "deleteConfirmingButton": "Wird gelöscht…"
   },
@@ -814,9 +814,6 @@
     "triggerButton": "Mandant reaktivieren",
     "dialogTitle": "{name} reaktivieren",
     "dialogDescription": "Dies startet provision-tenant.yml, das jede bereitgestellte Ressource dieses Mandanten wiederherstellt. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
-    "confirmLabel": "Zur Bestätigung „{name}“ eingeben",
-    "confirmHint": "Muss exakt mit dem Namen des Mandanten übereinstimmen.",
-    "cancelButton": "Abbrechen",
     "confirmButton": "Reaktivieren",
     "confirmingButton": "Wird gestartet…"
   },

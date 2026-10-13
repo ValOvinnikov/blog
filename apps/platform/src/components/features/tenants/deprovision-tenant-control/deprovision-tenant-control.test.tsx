@@ -1,49 +1,46 @@
 import { customRender, screen, within } from '@platform/testing/custom-render';
-import { mockRouter } from '@platform/testing/mock-router';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { makeClientTenant } from '@platform/testing/tenants/fixtures';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeprovisionTenantControl } from './deprovision-tenant-control';
 
-const { deprovisionTenantActionMock, deleteTenantActionMock } = vi.hoisted(
-  () => ({
-    deprovisionTenantActionMock: vi.fn(),
-    deleteTenantActionMock: vi.fn(),
-  }),
-);
+const { deprovisionTenantActionMock } = vi.hoisted(() => ({
+  deprovisionTenantActionMock: vi.fn(),
+}));
 
 vi.mock('@platform/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: deprovisionTenantActionMock,
 }));
 
-vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
-  deleteTenantAction: deleteTenantActionMock,
-}));
+const TENANT = makeClientTenant({ deprovisionedAt: null });
 
-const setup = customRender(DeprovisionTenantControl, {
-  tenant: makeClientTenant(),
-});
+const setup = customRender(DeprovisionTenantControl, { tenant: TENANT });
+
+const openDialog = async (user: UserEvent) => {
+  await user.click(screen.getByRole('button', { name: 'Deprovision' }));
+  return screen.findByRole('alertdialog', { name: /deprovision acme inc\./i });
+};
+
+const getDryRunSwitch = () =>
+  screen.getByRole('switch', {
+    name: 'Dry run (preview only, nothing is deleted)',
+  });
 
 describe(`<${DeprovisionTenantControl.name}/>`, () => {
   let user: UserEvent;
-
   const refreshMock = vi.fn();
-  const pushMock = vi.fn();
 
   beforeEach(() => {
     user = userEvent.setup();
     deprovisionTenantActionMock.mockReset();
     deprovisionTenantActionMock.mockResolvedValue({ ok: true });
-    deleteTenantActionMock.mockReset();
-    deleteTenantActionMock.mockResolvedValue({ ok: true });
     refreshMock.mockReset();
-    pushMock.mockReset();
-    mockRouter({ push: pushMock, refresh: refreshMock });
+    mockRouterRefresh(refreshMock);
   });
 
-  it('titles the card "Deprovision this tenant" for a live tenant', () => {
-    setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
+  it('titles the card "Deprovision this tenant"', () => {
+    setup();
 
     expect(
       screen.getByRole('heading', {
@@ -53,84 +50,71 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('titles the card "Delete this tenant permanently" for an already-deprovisioned tenant', () => {
-    setup({
-      tenant: makeClientTenant({
-        deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
-      }),
-    });
-
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: 'Delete this tenant permanently',
-      }),
-    ).toBeVisible();
-  });
-
   it('does not duplicate a "Danger zone" heading inside the card', () => {
-    setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
+    setup();
 
     expect(screen.queryByText('Danger zone')).not.toBeInTheDocument();
-  });
-
-  it('never renders the live-tenant trigger, or a Deprovisioned badge of its own, for an already-deprovisioned tenant', () => {
-    setup({
-      tenant: makeClientTenant({
-        deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
-      }),
-    });
-
-    expect(screen.queryByText('Deprovisioned')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Deprovision' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('does not render the delete-permanently trigger for a live tenant', () => {
-    setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
-
-    expect(
-      screen.queryByRole('button', { name: 'Delete tenant permanently' }),
-    ).not.toBeInTheDocument();
   });
 
   it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Deprovision' }));
+    const dialog = await openDialog(user);
 
-    const dialog = await screen.findByRole('alertdialog', {
-      name: /deprovision acme inc\./i,
-    });
     expect(dialog).toBeVisible();
     expect(
       within(dialog).getByRole('button', { name: 'Deprovision' }),
     ).toBeDisabled();
   });
 
-  it('enables the confirm button only once the typed name matches, and calls the action on confirm', async () => {
-    const tenant = makeClientTenant();
-    setup({ tenant });
-
-    await user.click(screen.getByRole('button', { name: 'Deprovision' }));
+  it('calls the action as a dry run with the typed name, then refreshes', async () => {
+    setup();
+    const dialog = await openDialog(user);
     await user.type(
       screen.getByRole('textbox', { name: /type "acme inc\."/i }),
       'Acme Inc.',
     );
 
-    const dialog = screen.getByRole('alertdialog');
-    const confirmButton = within(dialog).getByRole('button', {
-      name: 'Deprovision',
-    });
-    expect(confirmButton).toBeEnabled();
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Deprovision' }),
+    );
 
-    await user.click(confirmButton);
-
-    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(tenant.id, {
+    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
       confirm: 'Acme Inc.',
       dryRun: true,
     });
+    await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
+  });
+
+  it('runs for real once the dry-run switch is turned off', async () => {
+    setup();
+    const dialog = await openDialog(user);
+    await user.click(getDryRunSwitch());
+    await user.type(
+      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
+      'Acme Inc.',
+    );
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Deprovision' }),
+    );
+
+    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
+      confirm: 'Acme Inc.',
+      dryRun: false,
+    });
+  });
+
+  it('turns the dry-run switch back on when the dialog closes', async () => {
+    setup();
+    await openDialog(user);
+    await user.click(getDryRunSwitch());
+    expect(getDryRunSwitch()).not.toBeChecked();
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await openDialog(user);
+
+    expect(getDryRunSwitch()).toBeChecked();
   });
 
   it('shows the error message inline and never refreshes when the action fails', async () => {
@@ -139,16 +123,14 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
       error: "Doesn't match the tenant's name.",
     });
     setup();
-
-    await user.click(screen.getByRole('button', { name: 'Deprovision' }));
+    const dialog = await openDialog(user);
     await user.type(
       screen.getByRole('textbox', { name: /type "acme inc\."/i }),
       'Acme Inc.',
     );
+
     await user.click(
-      within(screen.getByRole('alertdialog')).getByRole('button', {
-        name: 'Deprovision',
-      }),
+      within(dialog).getByRole('button', { name: 'Deprovision' }),
     );
 
     expect(
@@ -157,77 +139,9 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
     expect(refreshMock).not.toHaveBeenCalled();
   });
 
-  it('opens a delete-permanently confirm dialog requiring the tenant name, disabled until it matches', async () => {
-    setup({
-      tenant: makeClientTenant({
-        deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
-      }),
-    });
-
-    await user.click(
-      screen.getByRole('button', { name: 'Delete tenant permanently' }),
-    );
-
-    expect(
-      await screen.findByRole('alertdialog', { name: /delete acme inc\./i }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Delete' })).toBeDisabled();
-  });
-
-  it('enables the delete confirm button only once the typed name matches, calls the action, and redirects to the tenant list', async () => {
-    const tenant = makeClientTenant({
-      deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
-    });
-    setup({ tenant });
-
-    await user.click(
-      screen.getByRole('button', { name: 'Delete tenant permanently' }),
-    );
-    await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-      'Acme Inc.',
-    );
-
-    const confirmButton = screen.getByRole('button', { name: 'Delete' });
-    expect(confirmButton).toBeEnabled();
-
-    await user.click(confirmButton);
-
-    expect(deleteTenantActionMock).toHaveBeenCalledWith(tenant.id, {
-      confirm: 'Acme Inc.',
-    });
-    expect(pushMock).toHaveBeenCalledWith(adminRoutes.tenants());
-  });
-
-  it('shows the delete error message inline and never redirects when the action fails', async () => {
-    deleteTenantActionMock.mockResolvedValue({
-      ok: false,
-      error: "Doesn't match the tenant's name.",
-    });
-    setup({
-      tenant: makeClientTenant({
-        deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
-      }),
-    });
-
-    await user.click(
-      screen.getByRole('button', { name: 'Delete tenant permanently' }),
-    );
-    await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-      'Acme Inc.',
-    );
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
-
-    expect(
-      await screen.findByText("Doesn't match the tenant's name."),
-    ).toBeVisible();
-    expect(pushMock).not.toHaveBeenCalled();
-  });
-
   describe('isDeprovisioningInProgress', () => {
     it('renders the trigger enabled by default, with no in-progress hint', () => {
-      setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
+      setup();
 
       expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
       expect(
@@ -237,20 +151,12 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
       ).not.toBeInTheDocument();
     });
 
-    it('disables the trigger and shows the hint while a run is in progress', () => {
-      setup({
-        tenant: makeClientTenant({ deprovisionedAt: null }),
-        isDeprovisioningInProgress: true,
-      });
+    it('marks the trigger aria-disabled and describes it with the hint while a run is in progress', () => {
+      setup({ isDeprovisioningInProgress: true });
 
       const trigger = screen.getByRole('button', { name: 'Deprovision' });
       expect(trigger).toHaveAttribute('aria-disabled', 'true');
       expect(trigger).not.toBeDisabled();
-      expect(
-        screen.getByText(
-          'A deprovisioning run is already in progress for this tenant.',
-        ),
-      ).toBeVisible();
       expect(trigger).toHaveAccessibleDescription(
         'A deprovisioning run is already in progress for this tenant.',
       );

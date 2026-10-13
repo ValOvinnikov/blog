@@ -1,185 +1,189 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { customRender, screen, within } from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 
-import { ConfirmDialog, type TConfirmDialogProps } from './confirm-dialog';
+import { ConfirmDialog } from './confirm-dialog';
 
-const baseProps: Omit<
-  TConfirmDialogProps,
-  'isOpen' | 'onOpenChange' | 'confirmValue' | 'onConfirmValueChange'
-> = {
-  triggerLabel: 'Open dialog',
-  title: 'Confirm this action',
-  description: 'This cannot be undone.',
-  confirmLabel: 'Type "acme" to confirm',
-  confirmHint: 'This action is irreversible.',
-  expectedValue: 'acme',
-  onConfirm: vi.fn(),
-  isPending: false,
-  confirmButtonLabel: 'Confirm',
-  confirmingButtonLabel: 'Confirming…',
-  cancelLabel: 'Cancel',
+type THarnessProps = Omit<
+  ComponentProps<typeof ConfirmDialog>,
+  'expectedValue' | 'children'
+> & {
+  disabledReason?: string;
 };
 
-const ControlledConfirmDialog = (props: Partial<TConfirmDialogProps> = {}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [confirmValue, setConfirmValue] = useState('');
+const ConfirmDialogHarness = ({ disabledReason, ...props }: THarnessProps) => (
+  <ConfirmDialog expectedValue="acme" {...props}>
+    <ConfirmDialog.Trigger disabledReason={disabledReason}>
+      Open dialog
+    </ConfirmDialog.Trigger>
+    <ConfirmDialog.Content
+      title="Confirm this action"
+      description="This cannot be undone."
+      confirmButtonLabel="Confirm"
+      confirmingButtonLabel="Confirming…"
+    >
+      <span data-testid="extra">Extra content</span>
+    </ConfirmDialog.Content>
+  </ConfirmDialog>
+);
 
-  return (
-    <ConfirmDialog
-      {...baseProps}
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
-      confirmValue={confirmValue}
-      onConfirmValueChange={setConfirmValue}
-      {...props}
-    />
-  );
-};
+const onConfirmMock = vi.fn();
+
+const setup = customRender(ConfirmDialogHarness, {
+  onConfirm: onConfirmMock,
+});
+
+const getConfirmField = () =>
+  screen.getByRole('textbox', { name: 'Type "acme" to confirm' });
+
+const getConfirmButton = () =>
+  within(screen.getByRole('alertdialog')).getByRole('button', {
+    name: 'Confirm',
+  });
 
 describe(ConfirmDialog, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
+    onConfirmMock.mockReset();
+    onConfirmMock.mockResolvedValue({ ok: true });
   });
 
-  it('opens the dialog from the trigger and shows the title and description', async () => {
-    render(<ControlledConfirmDialog />);
+  it('opens the dialog from the trigger and shows the title, description and extra content', async () => {
+    setup();
 
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
     expect(
-      await screen.findByRole('alertdialog', {
-        name: 'Confirm this action',
-      }),
+      await screen.findByRole('alertdialog', { name: 'Confirm this action' }),
     ).toBeVisible();
     expect(screen.getByText('This cannot be undone.')).toBeVisible();
+    expect(screen.getByTestId('extra')).toBeVisible();
   });
 
-  it('disables the confirm button until the typed value matches expectedValue', async () => {
-    render(<ControlledConfirmDialog />);
+  it('names the confirm field after the expected value, with the shared hint', async () => {
+    setup();
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-    expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
-
-    await user.type(
-      screen.getByRole('textbox', { name: 'Type "acme" to confirm' }),
-      'acme',
+    expect(getConfirmField()).toHaveAccessibleDescription(
+      "Must match the tenant's name exactly.",
     );
-
-    expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
+    expect(getConfirmField()).not.toHaveAttribute('aria-label');
   });
 
-  it('names the confirm field from the FormField label, with no redundant aria-label', async () => {
-    render(<ControlledConfirmDialog />);
+  it('enables confirm only once the typed value matches exactly', async () => {
+    setup();
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-    const input = screen.getByRole('textbox', {
-      name: 'Type "acme" to confirm',
-    });
-    expect(input).not.toHaveAttribute('aria-label');
+    expect(getConfirmButton()).toBeDisabled();
+
+    await user.type(getConfirmField(), 'acm');
+    expect(getConfirmButton()).toBeDisabled();
+
+    await user.type(getConfirmField(), 'e');
+    expect(getConfirmButton()).toBeEnabled();
   });
 
-  it('calls onConfirm when the confirm button is clicked', async () => {
-    const onConfirm = vi.fn();
-    render(<ControlledConfirmDialog onConfirm={onConfirm} />);
+  it('calls onConfirm with the typed value, then closes and calls onConfirmed', async () => {
+    const onConfirmed = vi.fn();
+    setup({ onConfirmed });
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-    await user.type(
-      screen.getByRole('textbox', { name: 'Type "acme" to confirm' }),
-      'acme',
-    );
+    await user.type(getConfirmField(), 'acme');
 
-    await user.click(screen.getByRole('button', { name: 'Confirm' }));
+    await user.click(getConfirmButton());
 
-    expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(onConfirmMock).toHaveBeenCalledWith('acme');
+    await vi.waitFor(() => expect(onConfirmed).toHaveBeenCalledTimes(1));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
-  it('closes the dialog when cancel is clicked', async () => {
-    render(<ControlledConfirmDialog />);
+  it('shows the server error inline and stays open when onConfirm fails', async () => {
+    const onConfirmed = vi.fn();
+    onConfirmMock.mockResolvedValue({ ok: false, error: 'Something broke.' });
+    setup({ onConfirmed });
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-    await screen.findByRole('alertdialog');
+    await user.type(getConfirmField(), 'acme');
+
+    await user.click(getConfirmButton());
+
+    expect(await screen.findByText('Something broke.')).toBeVisible();
+    expect(screen.getByRole('alertdialog')).toBeVisible();
+    expect(onConfirmed).not.toHaveBeenCalled();
+  });
+
+  it('shows and announces the pending label while onConfirm runs', async () => {
+    onConfirmMock.mockReturnValue(new Promise(() => {}));
+    setup();
+    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+    await user.type(getConfirmField(), 'acme');
+
+    await user.click(getConfirmButton());
+
+    const pendingButton = await within(
+      screen.getByRole('alertdialog'),
+    ).findByRole('button', { name: 'Confirming…' });
+    expect(pendingButton).toBeDisabled();
+    expect(pendingButton).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent('Confirming…');
+  });
+
+  it('resets the typed value and the error when closed with cancel, and reports the close', async () => {
+    const onOpenChange = vi.fn();
+    onConfirmMock.mockResolvedValue({ ok: false, error: 'Something broke.' });
+    setup({ onOpenChange });
+    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+    await user.type(getConfirmField(), 'acme');
+    await user.click(getConfirmButton());
+    await screen.findByText('Something broke.');
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-  });
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
 
-  it('shows the error message when provided', async () => {
-    render(<ControlledConfirmDialog error="Something went wrong." />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-    expect(await screen.findByText('Something went wrong.')).toBeVisible();
+    expect(getConfirmField()).toHaveValue('');
+    expect(screen.queryByText('Something broke.')).not.toBeInTheDocument();
   });
 
-  it('disables the confirm button and shows the pending label while isPending', async () => {
-    render(<ControlledConfirmDialog isPending={true} />);
-    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-    await user.type(
-      screen.getByRole('textbox', { name: 'Type "acme" to confirm' }),
-      'acme',
-    );
+  describe('with a disabled reason', () => {
+    beforeEach(() => {
+      setup({ disabledReason: 'A run is already in progress.' });
+    });
 
-    const confirmButton = screen.getByRole('button', { name: 'Confirming…' });
-    expect(confirmButton).toBeDisabled();
-    expect(confirmButton).toHaveAttribute('aria-busy', 'true');
+    it('keeps the trigger focusable but aria-disabled, described by the reason', async () => {
+      const trigger = screen.getByRole('button', { name: 'Open dialog' });
+
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).not.toBeDisabled();
+      expect(trigger).toHaveAccessibleDescription(
+        'A run is already in progress.',
+      );
+      expect(screen.getByText('A run is already in progress.')).toBeVisible();
+
+      await user.tab();
+      expect(trigger).toHaveFocus();
+    });
+
+    it('never opens the dialog by click or keyboard', async () => {
+      const trigger = screen.getByRole('button', { name: 'Open dialog' });
+
+      await user.click(trigger);
+      await user.keyboard('{Enter}');
+      await user.keyboard(' ');
+
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
   });
 
-  it('announces the pending label in a status region while isPending', async () => {
-    render(<ControlledConfirmDialog isPending={true} />);
-    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-
-    expect(screen.getByRole('status')).toHaveTextContent('Confirming…');
-  });
-
-  it('renders extra content passed as children between the field and the actions', async () => {
-    render(
-      <ControlledConfirmDialog>
-        <span data-testid="extra">Extra content</span>
-      </ControlledConfirmDialog>,
-    );
-    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-
-    expect(await screen.findByTestId('extra')).toBeVisible();
-  });
-
-  it('renders the trigger enabled by default', () => {
-    render(<ControlledConfirmDialog />);
-
-    expect(screen.getByRole('button', { name: 'Open dialog' })).toBeEnabled();
-  });
-
-  it('marks the trigger aria-disabled rather than natively disabled when isTriggerDisabled is set, so it stays reachable', async () => {
-    render(<ControlledConfirmDialog isTriggerDisabled={true} />);
+  it('renders the trigger enabled with no reason when none is given', () => {
+    setup();
 
     const trigger = screen.getByRole('button', { name: 'Open dialog' });
-    expect(trigger).toHaveAttribute('aria-disabled', 'true');
-    expect(trigger).not.toBeDisabled();
-
-    await user.tab();
-    expect(trigger).toHaveFocus();
-
-    await user.click(trigger);
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-
-    await user.keyboard('{Enter}');
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-
-    await user.keyboard(' ');
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-  });
-
-  it('associates the disabled trigger with triggerAriaDescribedBy', () => {
-    render(
-      <ControlledConfirmDialog
-        isTriggerDisabled={true}
-        triggerAriaDescribedBy="hint-id"
-      />,
-    );
-
-    expect(screen.getByRole('button', { name: 'Open dialog' })).toHaveAttribute(
-      'aria-describedby',
-      'hint-id',
-    );
+    expect(trigger).toBeEnabled();
+    expect(trigger).not.toHaveAttribute('aria-disabled');
+    expect(trigger).not.toHaveAttribute('aria-describedby');
   });
 });
