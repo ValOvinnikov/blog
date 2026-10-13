@@ -10,7 +10,7 @@ import {
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { logger } from '@platform/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 export type TUpdateEmailConfigInput = z.input<typeof emailSenderInputSchema>;
 export type TUpdateEmailConfigResult =

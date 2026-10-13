@@ -9,13 +9,12 @@ import {
   type TTenantProvisioningStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
+import { STEP_ORDER } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
 import type { TProvisioningErrorKind } from '@platform/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
-
-import { STEP_ORDER } from '../provisioning-status-view/use-provisioning-poll';
 
 import { provisioningBannerVariants } from './provisioning-banner-variants';
 
