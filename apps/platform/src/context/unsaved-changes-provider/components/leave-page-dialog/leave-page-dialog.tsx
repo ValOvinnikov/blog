@@ -1,11 +1,9 @@
 'use client';
 
 import { AlertDialog } from '@base-ui/react/alert-dialog';
+import { AlertDialogShell } from '@platform/components/shared/alert-dialog-shell';
 import { Button } from '@platform/components/shared/button';
-import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { useTranslations } from 'next-intl';
-
-import { leavePageDialogVariants } from './leave-page-dialog-variants';
 
 type TLeavePageDialogProps = {
   isOpen: boolean;
@@ -25,12 +23,6 @@ export const LeavePageDialog = ({
   onSave,
 }: TLeavePageDialogProps) => {
   const t = useTranslations('leavePageDialog');
-  const {
-    backdrop,
-    popup,
-    description: descriptionSlot,
-    actions,
-  } = leavePageDialogVariants();
 
   return (
     <AlertDialog.Root
@@ -39,16 +31,11 @@ export const LeavePageDialog = ({
         if (!open && !isSaving) onStay();
       }}
     >
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop className={backdrop()} />
-        <AlertDialog.Popup className={popup()}>
-          <AlertDialog.Title className={headingVariants({ size: 'cardTitle' })}>
-            {t('title')}
-          </AlertDialog.Title>
-          <AlertDialog.Description className={descriptionSlot()}>
-            {description}
-          </AlertDialog.Description>
-          <div className={actions()}>
+      <AlertDialogShell
+        title={t('title')}
+        description={description}
+        actions={
+          <>
             <Button variant="ghost" onClick={onStay} isDisabled={isSaving}>
               {t('stay')}
             </Button>
@@ -63,9 +50,9 @@ export const LeavePageDialog = ({
             >
               {t('saveAndLeave')}
             </Button>
-          </div>
-        </AlertDialog.Popup>
-      </AlertDialog.Portal>
+          </>
+        }
+      />
     </AlertDialog.Root>
   );
 };

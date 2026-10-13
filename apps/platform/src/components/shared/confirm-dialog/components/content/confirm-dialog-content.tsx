@@ -1,11 +1,10 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
+import { AlertDialogShell } from '@platform/components/shared/alert-dialog-shell';
 import { Button } from '@platform/components/shared/button';
 import { useConfirmDialogContext } from '@platform/components/shared/confirm-dialog/confirm-dialog-context';
-import { confirmDialogVariants } from '@platform/components/shared/confirm-dialog/confirm-dialog-variants';
 import { FormField } from '@platform/components/shared/form-field';
-import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { TextInput } from '@platform/components/shared/text-input';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -35,36 +34,13 @@ export const ConfirmDialogContent = ({
     isPending,
     confirm,
   } = useConfirmDialogContext();
-  const {
-    backdrop,
-    popup,
-    description: descriptionSlot,
-    actions,
-  } = confirmDialogVariants();
 
   return (
-    <AlertDialog.Portal>
-      <AlertDialog.Backdrop className={backdrop()} />
-      <AlertDialog.Popup className={popup()}>
-        <AlertDialog.Title className={headingVariants({ size: 'cardTitle' })}>
-          {title}
-        </AlertDialog.Title>
-        <AlertDialog.Description className={descriptionSlot()}>
-          {description}
-        </AlertDialog.Description>
-
-        {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
-
-        <FormField
-          label={t('confirmLabel', { name: expectedValue })}
-          hint={t('confirmHint')}
-        >
-          <TextInput value={confirmValue} onChange={setConfirmValue} />
-        </FormField>
-
-        {children}
-
-        <div className={actions()}>
+    <AlertDialogShell
+      title={title}
+      description={description}
+      actions={
+        <>
           <AlertDialog.Close render={<Button type="button" variant="ghost" />}>
             {t('cancelButton')}
           </AlertDialog.Close>
@@ -78,8 +54,19 @@ export const ConfirmDialogContent = ({
           >
             {confirmButtonLabel}
           </Button>
-        </div>
-      </AlertDialog.Popup>
-    </AlertDialog.Portal>
+        </>
+      }
+    >
+      {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
+
+      <FormField
+        label={t('confirmLabel', { name: expectedValue })}
+        hint={t('confirmHint')}
+      >
+        <TextInput value={confirmValue} onChange={setConfirmValue} />
+      </FormField>
+
+      {children}
+    </AlertDialogShell>
   );
 };
