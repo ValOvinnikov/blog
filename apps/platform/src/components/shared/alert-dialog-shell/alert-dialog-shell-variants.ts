@@ -1,6 +1,6 @@
 import { tv } from '@platform/utils/tv/tv';
 
-export const leavePageDialogVariants = tv({
+export const alertDialogShellVariants = tv({
   slots: {
     backdrop: [
       'fixed inset-0 bg-admin-text/50',
