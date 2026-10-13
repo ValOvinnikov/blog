@@ -6,13 +6,13 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
   type TElevateTenantOwnerOutcome,
-  type TTenantProvisioningStatus,
-  type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import { STEP_ORDER } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
+import {
+  STEP_ORDER,
+  type TUseProvisioningPollResult,
+} from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
-import type { TProvisioningErrorKind } from '@platform/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
@@ -20,12 +20,15 @@ import { provisioningBannerVariants } from './provisioning-banner-variants';
 
 export type TProvisioningBannerProps = {
   tenantId: string;
-  provisioningStatus: TTenantProvisioningStatus | null;
-  stepStatuses: TTenantProvisioningStepStatus[];
-  isOverallFailed: boolean;
-  isProvisioningRunning: boolean;
-  errorKind: TProvisioningErrorKind | undefined;
-  ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
+  poll: Pick<
+    TUseProvisioningPollResult,
+    | 'provisioningStatus'
+    | 'stepStatuses'
+    | 'isOverallFailed'
+    | 'isProvisioningRunning'
+    | 'errorKind'
+    | 'ownerElevationOutcome'
+  >;
 };
 
 const ACTIONABLE_OWNER_ELEVATION_OUTCOMES: TElevateTenantOwnerOutcome[] = [
@@ -35,13 +38,16 @@ const ACTIONABLE_OWNER_ELEVATION_OUTCOMES: TElevateTenantOwnerOutcome[] = [
 
 export const ProvisioningBanner = ({
   tenantId,
-  provisioningStatus,
-  stepStatuses,
-  isOverallFailed,
-  isProvisioningRunning,
-  errorKind,
-  ownerElevationOutcome,
+  poll,
 }: TProvisioningBannerProps) => {
+  const {
+    provisioningStatus,
+    stepStatuses,
+    isOverallFailed,
+    isProvisioningRunning,
+    errorKind,
+    ownerElevationOutcome,
+  } = poll;
   const t = useTranslations('provisioningBanner');
   const tSteps = useTranslations('provisioningStatusView');
   const { root } = provisioningBannerVariants();

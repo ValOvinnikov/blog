@@ -6,6 +6,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -39,7 +40,7 @@ import { useLockStateChange } from './use-lock-state-change';
 export type TTenantDetailsPanelProps = {
   tenant: TClientTenant;
   fieldLocks: TTenantFieldLocks;
-  ownerEmail: TMaybeUndefined<string>;
+  owner: TMaybeUndefined<TTenantOwnerMembership>;
   archivedNoticeId?: string;
 };
 
@@ -49,18 +50,13 @@ const TEXT_FIELDS = [
   { key: 'ownerEmail', labelKey: 'ownerEmailLabel', type: 'email' },
 ] as const;
 
-/**
- * Renders every field as a control at all times, disabling only the ones a
- * completed provisioning step has already baked into an external resource —
- * so a field that caused a provisioning failure stays correctable instead of
- * the whole panel locking as a unit.
- */
 export const TenantDetailsPanel = ({
   tenant,
   fieldLocks,
-  ownerEmail,
+  owner,
   archivedNoticeId,
 }: TTenantDetailsPanelProps) => {
+  const ownerEmail = owner?.email;
   const t = useTranslations('tenantDetailsPanel');
   const tSteps = useTranslations('provisioningStatusView');
   const tLanguage = useTranslations('languageNames');

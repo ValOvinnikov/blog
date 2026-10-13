@@ -1,99 +1,61 @@
-'use client';
-
-import type { TMaybeUndefined } from '@blog/config';
-import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import type { TFindingSummary } from '@blog/db/schema/findings';
+import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
+import { queries } from '@blog/db';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
+import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
+import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
-import { ProvisioningBanner } from '@platform/components/features/tenants/provisioning-banner';
-import { useProvisioningPoll } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
-import { TenantDetailsPanel } from '@platform/components/features/tenants/tenant-details-panel';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
-import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
-import { useId, type ReactNode } from 'react';
+import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
+import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { adminRoutes } from '@platform/utils/routes/routes';
+import { Suspense } from 'react';
 
+import { TenantProvisioningSection } from './components/tenant-provisioning-section/tenant-provisioning-section';
 import { tenantOverviewViewVariants } from './tenant-overview-view-variants';
 
 export type TTenantOverviewViewProps = {
-  tenant: TClientTenant;
-  domainCard: ReactNode;
-  ownerEmail: TMaybeUndefined<string>;
-  ownerJoinedAt: TMaybeUndefined<string>;
-  ownerJoinedAtIso: TMaybeUndefined<string>;
-  auditEvents: TAuditEvent[];
-  findings: TFindingSummary[];
+  tenant: TTenant;
 };
 
-// One poll instance feeds both the banner and the field locks so they never disagree.
-export const TenantOverviewView = ({
+export const TenantOverviewView = async ({
   tenant,
-  domainCard,
-  ownerEmail,
-  ownerJoinedAt,
-  ownerJoinedAtIso,
-  auditEvents,
-  findings,
 }: TTenantOverviewViewProps) => {
-  const archivedNoticeId = useId();
+  const { id, primaryDomain } = tenant;
+  const clientTenant = toClientTenant(tenant);
+  const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
+  const [owner, auditEvents, findings] = await Promise.all([
+    queries.memberships.getTenantOwnerMembership(id),
+    queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
+      limit: 5,
+    }),
+    queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
+  ]);
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
-  const {
-    provisioningStatus,
-    provisioningSteps,
-    stepStatuses,
-    isOverallFailed,
-    isProvisioningRunning,
-    errorKind,
-    ownerElevationOutcome,
-  } = useProvisioningPoll(tenant);
 
   return (
     <div className={root()}>
       <TenantPageHeader tenant={tenant} />
 
-      {tenant.deprovisionedAt && (
-        <ArchivedTenantNotice
-          id={archivedNoticeId}
-          archivedAt={tenant.deprovisionedAt}
-        />
-      )}
+      <TenantProvisioningSection tenant={clientTenant} owner={owner} />
 
-      <ProvisioningBanner
-        tenantId={tenant.id}
-        provisioningStatus={provisioningStatus}
-        stepStatuses={stepStatuses}
-        isOverallFailed={isOverallFailed}
-        isProvisioningRunning={isProvisioningRunning}
-        errorKind={errorKind}
-        ownerElevationOutcome={ownerElevationOutcome}
-      />
-
-      <TenantDetailsPanel
-        tenant={tenant}
-        fieldLocks={computeTenantFieldLocks(
-          provisioningSteps,
-          provisioningStatus,
-        )}
-        ownerEmail={ownerEmail}
-        archivedNoticeId={archivedNoticeId}
-      />
-
-      <FindingsCard tenantId={tenant.id} findings={findings} />
+      <FindingsCard tenantId={id} findings={findings} />
 
       <div className={cardsGrid()}>
         <div className={cardsColumn()}>
-          {domainCard}
-          <OwnerCard
-            ownerEmail={ownerEmail}
-            ownerJoinedAt={ownerJoinedAt}
-            ownerJoinedAtIso={ownerJoinedAtIso}
-          />
+          <Suspense fallback={<DomainCardSkeleton />}>
+            <LiveDomainCard
+              tenant={clientTenant}
+              domainVerificationStatus={domainVerificationStatus}
+              dnsHref={adminRoutes.tenantDomain(id)}
+            />
+          </Suspense>
+          <OwnerCard owner={owner} />
         </div>
         <div className={cardsColumn()}>
-          <ContentWorkspaceCard tenant={tenant} />
+          <ContentWorkspaceCard tenant={clientTenant} />
           <RecentActivityCard events={auditEvents} />
         </div>
       </div>
