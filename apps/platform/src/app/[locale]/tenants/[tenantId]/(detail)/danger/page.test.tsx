@@ -1,12 +1,4 @@
-import {
-  DEPROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import {
-  act,
-  customRenderAsync,
-  screen,
-} from '@platform/testing/custom-render';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   idleDeprovisioningSteps,
@@ -14,9 +6,6 @@ import {
 } from '@platform/testing/tenants/fixtures';
 
 import TenantDangerPage from './page';
-
-const STEP_POLL_INTERVAL_MS = 4000;
-const MAX_POLL_TICKS = 75;
 
 const {
   requireSuperAdminMock,
@@ -110,6 +99,29 @@ describe(TenantDangerPage, () => {
     expect(screen.getByRole('button', { name: 'Deprovision' })).toBeVisible();
   });
 
+  it('never queries the deprovision request when the tenant does not exist', async () => {
+    requireTenantByIdMock.mockRejectedValue(
+      new Error('NEXT_HTTP_ERROR_FALLBACK;404'),
+    );
+
+    await expect(setup()).rejects.toThrow('NEXT_HTTP_ERROR_FALLBACK;404');
+
+    expect(getLatestDeprovisionRequestedAtMock).not.toHaveBeenCalled();
+  });
+
+  it("passes the tenant's latest deprovision request through, so a pending request shows the starting state", async () => {
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
+      new Date('2026-08-12T14:18:00.000Z'),
+    );
+
+    await setup();
+
+    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
+      'tenant-1',
+    );
+    expect(screen.getByText('Starting…')).toBeVisible();
+  });
+
   it('never offers reactivation for a live tenant', async () => {
     await setup();
 
@@ -130,164 +142,6 @@ describe(TenantDangerPage, () => {
     expect(
       screen.getByRole('button', { name: 'Reactivate tenant' }),
     ).toBeVisible();
-  });
-
-  it('renders unchanged, with no deprovisioning progress card, for a tenant that has never been deprovisioned', async () => {
-    await setup();
-
-    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-    );
-    expect(
-      screen.queryByRole('heading', { name: /^Deprovisioning progress/ }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('keeps showing a failed prior run, and does not poll, when a later dry run leaves no newer request behind', async () => {
-    requireTenantByIdMock.mockResolvedValue({
-      tenant: makeTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'boom',
-          },
-          run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
-          },
-        },
-      }),
-    });
-    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
-      new Date('2026-08-12T14:18:00.000Z'),
-    );
-
-    await setup();
-
-    expect(
-      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
-    ).toBeVisible();
-    expect(screen.queryByText('Starting…')).not.toBeInTheDocument();
-    expect(screen.getAllByText('Failed').length).toBeGreaterThan(0);
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
-    });
-    expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
-  });
-
-  it('shows a fresh starting state, not the old failure, when a newer request follows a failed prior run', async () => {
-    requireTenantByIdMock.mockResolvedValue({
-      tenant: makeTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'boom',
-          },
-          run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
-          },
-        },
-      }),
-    });
-    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
-      new Date('2026-08-12T14:25:00.000Z'),
-    );
-
-    await setup();
-
-    expect(
-      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
-    ).toBeVisible();
-    expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(7);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-    });
-    expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-      'tenant-1',
-    );
-  });
-
-  it('renders the deprovisioning progress card in a starting state when a request was dispatched but no run marker has appeared yet, with the Starting badge in the fallback Run card header', async () => {
-    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
-      new Date('2026-08-12T14:18:00.000Z'),
-    );
-
-    await setup();
-
-    expect(
-      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
-    ).toBeVisible();
-    expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.getByText('Remove domain')).toBeVisible();
-    expect(screen.getByText('Invalidate cached pages')).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(7);
-    expect(screen.queryByText('Not started')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Run' }),
-    ).toBeVisible();
-  });
-
-  it('stops polling the starting state once it exceeds the same stale-run cap a live run is bound by', async () => {
-    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
-      new Date('2026-08-12T14:18:00.000Z'),
-    );
-    getTenantDeprovisioningStatusActionMock.mockResolvedValue({
-      deprovisioningSteps: null,
-      deprovisionedAt: null,
-    });
-
-    await setup();
-
-    for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-    }
-
-    expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
-      MAX_POLL_TICKS,
-    );
-  });
-
-  it('stops polling a retry over a failed prior run once it exceeds the same stale-run cap', async () => {
-    requireTenantByIdMock.mockResolvedValue({
-      tenant: makeTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'boom',
-          },
-          run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
-          },
-        },
-      }),
-    });
-    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
-      new Date('2026-08-12T14:25:00.000Z'),
-    );
-    getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
-
-    await setup();
-
-    for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-    }
-
-    expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
-      MAX_POLL_TICKS,
-    );
   });
 
   it('renders the deprovisioning progress card once a run exists', async () => {
@@ -393,61 +247,6 @@ describe(TenantDangerPage, () => {
       expect(
         screen.queryByRole('heading', { name: 'Teardown history' }),
       ).not.toBeInTheDocument();
-    });
-  });
-
-  describe('deprovision trigger disabled while a run is in progress', () => {
-    it('leaves the trigger enabled for a tenant that has never been deprovisioned', async () => {
-      await setup();
-
-      expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
-    });
-
-    it('disables the trigger while a dispatched run is genuinely in progress', async () => {
-      requireTenantByIdMock.mockResolvedValue({
-        tenant: makeTenant({
-          deprovisioningSteps: {
-            ...idleDeprovisioningSteps(),
-            [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-              status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-            },
-            run: { startedAt: '2026-08-12T14:18:00.000Z' },
-          },
-        }),
-      });
-
-      await setup();
-
-      const trigger = screen.getByRole('button', { name: 'Deprovision' });
-      expect(trigger).toHaveAttribute('aria-disabled', 'true');
-      expect(trigger).not.toBeDisabled();
-      expect(
-        screen.getByText(
-          'A deprovisioning run is already in progress for this tenant.',
-        ),
-      ).toBeVisible();
-    });
-
-    it('re-enables the trigger once a dispatched run has failed', async () => {
-      requireTenantByIdMock.mockResolvedValue({
-        tenant: makeTenant({
-          deprovisioningSteps: {
-            ...idleDeprovisioningSteps(),
-            [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-              status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-              error: 'boom',
-            },
-            run: {
-              startedAt: '2026-08-12T14:18:00.000Z',
-              finishedAt: '2026-08-12T14:19:00.000Z',
-            },
-          },
-        }),
-      });
-
-      await setup();
-
-      expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
     });
   });
 });

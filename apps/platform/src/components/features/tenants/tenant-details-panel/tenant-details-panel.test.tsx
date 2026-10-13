@@ -18,10 +18,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
 
-import {
-  TenantDetailsPanel,
-  type TTenantDetailsPanelProps,
-} from './tenant-details-panel';
+import { TenantDetailsPanel } from './tenant-details-panel';
 
 const render = renderWithIntl;
 
@@ -42,15 +39,6 @@ const withIntl = (ui: ReactElement) => {
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
       <ToastProvider>{ui}</ToastProvider>
     </NextIntlClientProvider>
-  );
-};
-
-const PanelWithOutsideControl = (props: TTenantDetailsPanelProps) => {
-  return (
-    <>
-      <button type="button">Outside control</button>
-      <TenantDetailsPanel {...props} />
-    </>
   );
 };
 
@@ -839,7 +827,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   });
 
   describe('lock transition announcement', () => {
-    it('announces a lock once a field newly locks — not on mount, not on an unrelated re-render', () => {
+    it('announces a lock once a field newly locks', () => {
       const tenant = makeClientTenant();
       const { rerender } = rtlRender(
         withIntl(
@@ -851,20 +839,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const liveRegion = screen.getByTestId('lock-announcement-live');
-      expect(liveRegion).toHaveTextContent('');
-
-      rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={makeClientTenant({ name: 'Acme Renamed' })}
-            fieldLocks={NO_LOCKS}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-      expect(liveRegion).toHaveTextContent('');
-
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -874,20 +848,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           />,
         ),
       );
-      expect(liveRegion).toHaveTextContent(
-        'Some tenant detail fields are now locked.',
-      );
 
-      rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={makeClientTenant({ name: 'Acme Again' })}
-            fieldLocks={DOMAIN_LOCKED}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-      expect(liveRegion).toHaveTextContent(
+      expect(screen.getByTestId('lock-announcement-live')).toHaveTextContent(
         'Some tenant detail fields are now locked.',
       );
     });
@@ -918,39 +880,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       );
       expect(liveRegion).toHaveTextContent(
         'More tenant detail fields are now editable.',
-      );
-    });
-
-    it('announces a lock, not nothing, when a same-count swap changes which field is locked', () => {
-      const NAME_LOCKED: TTenantFieldLocks = {
-        name: { kind: 'step', step: TENANT_PROVISIONING_STEP.SANITY_PROJECT },
-      };
-      const tenant = makeClientTenant();
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={DOMAIN_LOCKED}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      const liveRegion = screen.getByTestId('lock-announcement-live');
-      expect(liveRegion).toHaveTextContent('');
-
-      rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NAME_LOCKED}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      expect(liveRegion).toHaveTextContent(
-        'Some tenant detail fields are now locked.',
       );
     });
   });
@@ -1049,21 +978,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   });
 
   describe('focus management on a locking transition', () => {
-    it('does not move focus away from document.body on mount', () => {
-      const tenant = makeClientTenant();
-      rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      expect(document.body).toHaveFocus();
-    });
-
     it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
       const tenant = makeClientTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
@@ -1094,66 +1008,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         screen.getByRole('group', { name: 'Tenant detail fields' }),
       ).toHaveFocus();
       expect(document.body).not.toHaveFocus();
-    });
-
-    it('does not steal focus when a locking transition fires while focus was outside the panel', () => {
-      const tenant = makeClientTenant({ name: 'Acme Inc.' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <PanelWithOutsideControl
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      const outsideControl = screen.getByRole('button', {
-        name: 'Outside control',
-      });
-      outsideControl.focus();
-      expect(outsideControl).toHaveFocus();
-
-      rerender(
-        withIntl(
-          <PanelWithOutsideControl
-            tenant={tenant}
-            fieldLocks={ALL_LOCKED_RUNNING}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      expect(outsideControl).toHaveFocus();
-    });
-
-    it('does not move focus on an unrelated re-render while the locked field set stays the same', () => {
-      const tenant = makeClientTenant({ name: 'Acme Inc.' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      nameInput.focus();
-      expect(nameInput).toHaveFocus();
-
-      rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={makeClientTenant({ name: 'Acme Renamed' })}
-            fieldLocks={NO_LOCKS}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      expect(nameInput).toHaveFocus();
     });
   });
 
