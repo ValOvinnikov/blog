@@ -1,3 +1,5 @@
+import { NEUTRAL_EMAIL_PALETTE } from '@blog/email/html/neutral-shell/neutral-shell';
+import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import type { TPortableTextContent } from '@blog/email/portable-text';
 import { TENANT_EMAIL_BRAND as brand } from '@blog/email/testing/tenant-email-brand';
 
@@ -15,7 +17,7 @@ function bodyOf(text: string): TPortableTextContent {
 }
 
 describe(buildMagicLinkEmail, () => {
-  it('escapes an unsafe url in the unbranded fallback link', () => {
+  it('percent-encodes an unsafe url in the neutral fallback action', () => {
     const { html } = buildMagicLinkEmail({
       url: `https://example.com/callback?token="><img src=x onerror=alert(1)>`,
       subject: 'Sign in to your account',
@@ -23,7 +25,7 @@ describe(buildMagicLinkEmail, () => {
     });
 
     expect(html).not.toContain('"><img src=x onerror=alert(1)>');
-    expect(html).toContain('&quot;&gt;&lt;img src=x onerror=alert(1)&gt;');
+    expect(html).toContain('%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E');
   });
 
   describe('without a tenant identity', () => {
@@ -52,8 +54,25 @@ describe(buildMagicLinkEmail, () => {
       expect(email.html).toContain('Sign in');
     });
 
-    it('renders plain, unstyled html when no tenant identity is given', () => {
-      expect(email.html).not.toContain('<!doctype html>');
+    it('renders a styled document titled with the subject', () => {
+      expect(email.html).toContain('<!doctype html>');
+      expect(email.html).toContain(`<title>${email.subject}</title>`);
+    });
+
+    it('renders the action as a button in the achromatic neutral palette', () => {
+      expect(email.html).toContain(
+        `background-color:${NEUTRAL_EMAIL_PALETTE.brandPrimarySolid}`,
+      );
+    });
+
+    it('names no brand in a header mark or a copyright line', () => {
+      expect(email.html).not.toContain('<svg');
+      expect(email.html).not.toContain('&copy;');
+    });
+
+    it('renders no operator branding', () => {
+      expect(email.html).not.toContain('Tenant Alerts');
+      expect(email.html).not.toContain(PLATFORM_EMAIL_BRAND.brandPrimarySolid);
     });
   });
 

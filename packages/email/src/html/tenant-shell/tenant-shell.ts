@@ -37,12 +37,12 @@ export function buildTenantShell({
 }: TBuildTenantShellInput): string {
   return renderEmailShell({
     palette: brand,
-    brandName,
+    title: brandName,
+    identity: { brandName, markPalette: brand, logoImageUrl },
     previewText,
     bodyHtml,
     structuralHtml,
     actionHtml,
-    logoImageUrl,
     footerPostalAddress,
   });
 }
