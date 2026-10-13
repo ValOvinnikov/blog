@@ -7,14 +7,16 @@ import {
   type TVoiceFieldId,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
-import type { TSaveVoiceOverridesResult } from '@platform/server/site-config/save-voice-overrides-action';
+import {
+  saveVoiceOverridesAction,
+  type TSaveVoiceOverridesResult,
+} from '@platform/server/site-config/save-voice-overrides-action';
 import {
   buildSitePreviewTheme,
   type TSitePreviewThemeValues,
@@ -51,10 +53,6 @@ export type TVoiceSettingsProps = {
   defaultLocale: TLocaleIsoCode;
   liveLocales: TLocaleIsoCode[];
   previewTheme: TSitePreviewThemeValues;
-  saveAction: (
-    tenantId: string,
-    overridesByLocale: TVoiceOverridesByLocaleInput,
-  ) => Promise<TSaveVoiceOverridesResult>;
   savedAt?: Date;
   archivedAt?: Date;
 };
@@ -65,7 +63,6 @@ export const VoiceSettings = ({
   defaultLocale,
   liveLocales,
   previewTheme,
-  saveAction,
   savedAt,
   archivedAt,
 }: TVoiceSettingsProps) => {
@@ -99,7 +96,7 @@ export const VoiceSettings = ({
     useFormSubmission<TVoiceDraft, TSaveVoiceOverridesResult>({
       initialValues: initialDraft,
       onSubmit: async (draft) => {
-        const result = await saveAction(
+        const result = await saveVoiceOverridesAction(
           tenantId,
           toVoiceOverridesInput(draft, liveLocales),
         );
@@ -166,8 +163,6 @@ export const VoiceSettings = ({
       isWide={true}
       title={t('heading')}
       description={t('description')}
-      saveButtonLabel={t('saveButton')}
-      savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
       onDiscard={() => replaceDraft(saved)}
       changeCount={countVoiceChanges(saved, values, liveLocales)}
@@ -188,8 +183,9 @@ export const VoiceSettings = ({
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
-      hasError={status === 'error' && !hasFieldErrors}
-      errorTitle={t('alertError')}
+      errorTitle={
+        status === 'error' && !hasFieldErrors ? t('alertError') : undefined
+      }
       headerActions={
         liveLocales.length > 1 && (
           <LanguagePicker

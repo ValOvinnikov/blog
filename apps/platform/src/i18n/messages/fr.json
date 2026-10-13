@@ -305,8 +305,6 @@
     "heading": "Apparence",
     "subtitle": "Personnalisez ce site. L'aperçu montre vos modifications — rien n'est en ligne avant d'enregistrer.",
     "resetButton": "Rétablir le préréglage",
-    "saveButton": "Enregistrer les modifications",
-    "savingButton": "Enregistrement…",
     "alertSuccess": "Apparence enregistrée.",
     "alertError": "Impossible d'enregistrer les paramètres d'apparence — veuillez réessayer.",
     "presetLabel": "Préréglage",
@@ -441,8 +439,6 @@
   "emailForm": {
     "pageHeading": "E-mail",
     "pageSubtitle": "Les e-mails que reçoivent vos lecteurs et votre équipe. Laissez un champ vide pour utiliser la valeur par défaut.",
-    "saveButton": "Enregistrer les modifications",
-    "savingButton": "Enregistrement…",
     "alertSuccess": "Paramètres d'e-mail enregistrés.",
     "alertError": "Certaines modifications n'ont pas été enregistrées — celles encore marquées « Non enregistré ». Veuillez réessayer.",
     "senderItemLabel": "Expéditeur et pied de page",
@@ -533,8 +529,6 @@
     "fixedCopyNote": "Les boutons, menus et libellés sont traduits pour vous et restent identiques sur tous les sites ; ils ne figurent donc pas ici.",
     "editingLanguageNote": "Vous modifiez : <strong>{language}</strong> — les autres langues gardent leur propre texte.",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# liste} other {# listes}}} other {{total, plural, one {# champ} other {# champs}}}} · {customised, plural, =0 {tout par défaut} one {# personnalisé} other {# personnalisés}}",
-    "saveButton": "Enregistrer les modifications",
-    "savingButton": "Enregistrement…",
     "alertSuccess": "Voix enregistrée.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
@@ -866,8 +860,6 @@
   "featuresSettings": {
     "heading": "Fonctionnalités",
     "description": "Activez ou désactivez les fonctionnalités de votre site. Les options verrouillées nécessitent la formule Growth.",
-    "saveButton": "Enregistrer les modifications",
-    "savingButton": "Enregistrement…",
     "alertSuccess": "Fonctionnalités enregistrées.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "planLockedBadge": "Formule Growth",
@@ -911,8 +903,6 @@
   "languagesSettings": {
     "heading": "Langues",
     "description": "Choisissez les langues dans lesquelles le site est publié, en plus de sa langue par défaut.",
-    "saveButton": "Enregistrer les modifications",
-    "savingButton": "Enregistrement…",
     "alertSuccess": "Langues enregistrées.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "switchOn": "Activée",
@@ -936,7 +926,9 @@
     "fieldsNeedAttention": "{count, plural, one {# champ à vérifier} other {# champs à vérifier}}",
     "goToFirstField": "Aller au premier",
     "shortcut": "⌘S / Ctrl+S",
-    "discard": "Annuler les modifications"
+    "discard": "Annuler les modifications",
+    "save": "Enregistrer les modifications",
+    "saving": "Enregistrement…"
   },
   "leavePageDialog": {
     "title": "Quitter sans enregistrer ?",

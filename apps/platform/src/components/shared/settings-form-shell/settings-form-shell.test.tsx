@@ -37,15 +37,11 @@ const draftFor = (
 const baseProps: TSettingsFormShellProps<TValues> = {
   title: 'Features',
   description: 'Toggle capabilities for this tenant.',
-  saveButtonLabel: 'Save changes',
-  savingButtonLabel: 'Saving…',
   onSave: vi.fn().mockResolvedValue(true),
   onDiscard: vi.fn(),
   changeCount: 0,
   isPending: false,
   archivedNoticeId: 'archived-notice',
-  hasError: false,
-  errorTitle: 'Something went wrong — try again.',
   draft: draftFor(SAVED),
   children: <p>tab body</p>,
 };
@@ -250,7 +246,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows no error alert when hasError is false', () => {
+  it('shows no error alert without an error title', () => {
     renderShell();
 
     expect(
@@ -258,8 +254,8 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows the error alert when hasError is true', () => {
-    renderShell({ hasError: true });
+  it('shows the error alert when an error title is set', () => {
+    renderShell({ errorTitle: 'Something went wrong — try again.' });
 
     expect(screen.getByText('Something went wrong — try again.')).toBeVisible();
   });

@@ -3,6 +3,7 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
+import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -11,6 +12,12 @@ import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent from '@testing-library/user-event';
 
 import { VoiceSettings, type TVoiceSettingsProps } from './voice-settings';
+
+vi.mock('@platform/server/site-config/save-voice-overrides-action', () => ({
+  saveVoiceOverridesAction: vi.fn(),
+}));
+
+const saveVoiceOverridesActionMock = vi.mocked(saveVoiceOverridesAction);
 
 mockRouterRefresh();
 
@@ -56,7 +63,6 @@ const setup = customRender(VoiceSettingsWithListSamples, {
   defaultLocale: EN,
   liveLocales: [EN],
   previewTheme: defaultLookFormValues(),
-  saveAction: vi.fn(),
 });
 
 const setupBilingual = (overrides: Partial<TVoiceSettingsProps> = {}) =>
@@ -401,14 +407,14 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
   describe('saving', () => {
     it('leaves every untouched rich field exactly as stored, in every language', async () => {
-      const saveAction = vi.fn().mockResolvedValue({ ok: true });
-      setupBilingual({ saveAction });
+      saveVoiceOverridesActionMock.mockResolvedValue({ ok: true });
+      setupBilingual();
 
       await user.clear(notFoundHeading());
       await user.type(notFoundHeading(), 'Lost');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(saveAction).toHaveBeenCalledWith('tenant-1', {
+      expect(saveVoiceOverridesActionMock).toHaveBeenCalledWith('tenant-1', {
         [EN]: {
           notFoundHeading: 'Lost',
           notFoundSupportingText: storedOverrides[EN].notFoundSupportingText,
@@ -422,7 +428,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('shows a toast and refreshes after a successful save', async () => {
       const refresh = mockRouterRefresh();
-      setup({ saveAction: vi.fn().mockResolvedValue({ ok: true }) });
+      saveVoiceOverridesActionMock.mockResolvedValue({ ok: true });
+      setup();
 
       await user.type(notFoundHeading(), 'Lost');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -433,7 +440,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('shows an error alert and does not refresh when the save fails', async () => {
       const refresh = mockRouterRefresh();
-      setup({ saveAction: vi.fn().mockResolvedValue({ ok: false }) });
+      saveVoiceOverridesActionMock.mockResolvedValue({ ok: false });
+      setup();
 
       await user.type(notFoundHeading(), 'Lost');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -445,14 +453,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('shows a rejected field inline and counts it on the save bar until edited', async () => {
-      setup({
-        saveAction: vi.fn().mockResolvedValue({
-          ok: false,
-          fieldErrorsByLocale: {
-            [EN]: { notFoundHeading: 'Must be 100 characters or fewer.' },
-          },
-        }),
+      saveVoiceOverridesActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrorsByLocale: {
+          [EN]: { notFoundHeading: 'Must be 100 characters or fewer.' },
+        },
       });
+      setup();
 
       await user.type(notFoundHeading(), 'Lost');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -479,14 +486,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('switches to the language and opens the list that holds a rejected field', async () => {
-      setupBilingual({
-        saveAction: vi.fn().mockResolvedValue({
-          ok: false,
-          fieldErrorsByLocale: {
-            [DE]: { tagEmpty: 'Missing required placeholder {name}.' },
-          },
-        }),
+      saveVoiceOverridesActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrorsByLocale: {
+          [DE]: { tagEmpty: 'Missing required placeholder {name}.' },
+        },
       });
+      setupBilingual();
 
       await user.type(notFoundHeading(), '!');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -509,15 +515,14 @@ describe(`<${VoiceSettings.name}/>`, () => {
         );
 
       it('counts a field rejected in two languages once per language', async () => {
-        setupBilingual({
-          saveAction: vi.fn().mockResolvedValue({
-            ok: false,
-            fieldErrorsByLocale: {
-              [EN]: { notFoundHeading: 'Must be 100 characters or fewer.' },
-              [DE]: { notFoundHeading: 'Höchstens 100 Zeichen.' },
-            },
-          }),
+        saveVoiceOverridesActionMock.mockResolvedValue({
+          ok: false,
+          fieldErrorsByLocale: {
+            [EN]: { notFoundHeading: 'Must be 100 characters or fewer.' },
+            [DE]: { notFoundHeading: 'Höchstens 100 Zeichen.' },
+          },
         });
+        setupBilingual();
 
         await user.type(notFoundHeading(), '!');
         await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -526,17 +531,16 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it('goes to the first rejected field in page order', async () => {
-        setup({
-          saveAction: vi.fn().mockResolvedValue({
-            ok: false,
-            fieldErrorsByLocale: {
-              [EN]: {
-                blogListEmpty: 'Missing required placeholder.',
-                notFoundHeading: 'Must be 100 characters or fewer.',
-              },
+        saveVoiceOverridesActionMock.mockResolvedValue({
+          ok: false,
+          fieldErrorsByLocale: {
+            [EN]: {
+              blogListEmpty: 'Missing required placeholder.',
+              notFoundHeading: 'Must be 100 characters or fewer.',
             },
-          }),
+          },
         });
+        setup();
 
         await user.type(notFoundHeading(), 'Lost');
         await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -546,17 +550,16 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it('opens an earlier rejected list in place of the open one', async () => {
-        setup({
-          saveAction: vi.fn().mockResolvedValue({
-            ok: false,
-            fieldErrorsByLocale: {
-              [EN]: {
-                topicEmpty: 'Missing required placeholder {name}.',
-                tagEmpty: 'Missing required placeholder {name}.',
-              },
+        saveVoiceOverridesActionMock.mockResolvedValue({
+          ok: false,
+          fieldErrorsByLocale: {
+            [EN]: {
+              topicEmpty: 'Missing required placeholder {name}.',
+              tagEmpty: 'Missing required placeholder {name}.',
             },
-          }),
+          },
         });
+        setup();
         const section = card('Empty lists');
 
         await user.click(
@@ -572,14 +575,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it('returns to the language that holds the first rejected field', async () => {
-        setupBilingual({
-          saveAction: vi.fn().mockResolvedValue({
-            ok: false,
-            fieldErrorsByLocale: {
-              [DE]: { tagEmpty: 'Missing required placeholder {name}.' },
-            },
-          }),
+        saveVoiceOverridesActionMock.mockResolvedValue({
+          ok: false,
+          fieldErrorsByLocale: {
+            [DE]: { tagEmpty: 'Missing required placeholder {name}.' },
+          },
         });
+        setupBilingual();
 
         await user.type(notFoundHeading(), '!');
         await user.click(screen.getByRole('button', { name: 'Save changes' }));

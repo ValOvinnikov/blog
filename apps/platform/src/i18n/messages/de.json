@@ -305,8 +305,6 @@
     "heading": "Erscheinungsbild",
     "subtitle": "Gestalte diese Website. Die Vorschau zeigt deine Änderungen — live ist erst, was du speicherst.",
     "resetButton": "Auf Vorlage zurücksetzen",
-    "saveButton": "Änderungen speichern",
-    "savingButton": "Wird gespeichert…",
     "alertSuccess": "Erscheinungsbild gespeichert.",
     "alertError": "Die Einstellungen zum Erscheinungsbild konnten nicht gespeichert werden — bitte erneut versuchen.",
     "presetLabel": "Vorlage",
@@ -441,8 +439,6 @@
   "emailForm": {
     "pageHeading": "E-Mail",
     "pageSubtitle": "Die E-Mails, die Ihre Leser und Ihr Team erhalten. Lassen Sie ein Feld leer, um den Standard zu verwenden.",
-    "saveButton": "Änderungen speichern",
-    "savingButton": "Wird gespeichert…",
     "alertSuccess": "E-Mail-Einstellungen gespeichert.",
     "alertError": "Nicht alle Änderungen konnten gespeichert werden — was noch als „Nicht gespeichert“ markiert ist, wurde nicht gespeichert. Bitte erneut versuchen.",
     "senderItemLabel": "Absender & Fußzeile",
@@ -533,8 +529,6 @@
     "fixedCopyNote": "Schaltflächen, Menüs und Beschriftungen werden für Sie übersetzt und sind auf jeder Website gleich, deshalb sind sie hier nicht aufgeführt.",
     "editingLanguageNote": "Sie bearbeiten <strong>{language}</strong> — andere Sprachen behalten ihren eigenen Text.",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}} · {customised, plural, =0 {alles Standard} other {# angepasst}}",
-    "saveButton": "Änderungen speichern",
-    "savingButton": "Wird gespeichert…",
     "alertSuccess": "Tonalität gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
@@ -866,8 +860,6 @@
   "featuresSettings": {
     "heading": "Funktionen",
     "description": "Schalten Sie Funktionen Ihrer Website ein oder aus. Gesperrte Schalter erfordern den Growth-Tarif.",
-    "saveButton": "Änderungen speichern",
-    "savingButton": "Wird gespeichert…",
     "alertSuccess": "Funktionen gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "planLockedBadge": "Growth-Tarif",
@@ -911,8 +903,6 @@
   "languagesSettings": {
     "heading": "Sprachen",
     "description": "Wählen Sie, in welchen Sprachen die Website neben ihrer Standardsprache veröffentlicht wird.",
-    "saveButton": "Änderungen speichern",
-    "savingButton": "Wird gespeichert…",
     "alertSuccess": "Sprachen gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "switchOn": "An",
@@ -936,7 +926,9 @@
     "fieldsNeedAttention": "{count, plural, one {# Feld braucht Aufmerksamkeit} other {# Felder brauchen Aufmerksamkeit}}",
     "goToFirstField": "Zum ersten Feld",
     "shortcut": "⌘S / Strg+S",
-    "discard": "Verwerfen"
+    "discard": "Verwerfen",
+    "save": "Änderungen speichern",
+    "saving": "Wird gespeichert…"
   },
   "leavePageDialog": {
     "title": "Ohne Speichern verlassen?",

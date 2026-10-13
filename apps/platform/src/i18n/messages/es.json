@@ -305,8 +305,6 @@
     "heading": "Aspecto",
     "subtitle": "Personaliza este sitio. La vista previa muestra tus cambios — nada se publica hasta que guardes.",
     "resetButton": "Restablecer ajuste predefinido",
-    "saveButton": "Guardar cambios",
-    "savingButton": "Guardando…",
     "alertSuccess": "Aspecto guardado.",
     "alertError": "No se pudo guardar la configuración de Aspecto. Vuelva a intentarlo.",
     "presetLabel": "Ajuste predefinido",
@@ -441,8 +439,6 @@
   "emailForm": {
     "pageHeading": "Correo electrónico",
     "pageSubtitle": "Los correos que reciben sus lectores y su equipo. Deje un campo en blanco para usar el valor predeterminado.",
-    "saveButton": "Guardar cambios",
-    "savingButton": "Guardando…",
     "alertSuccess": "Configuración del correo guardada.",
     "alertError": "No se guardaron todos los cambios: los que siguen marcados como «Sin guardar» no se guardaron. Vuelva a intentarlo.",
     "senderItemLabel": "Remitente y pie",
@@ -533,8 +529,6 @@
     "fixedCopyNote": "Los botones, menús y etiquetas se traducen por usted y son iguales en todos los sitios, por eso no aparecen aquí.",
     "editingLanguageNote": "Editando <strong>{language}</strong>: los demás idiomas conservan su propio texto.",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# lista} other {# listas}}} other {{total, plural, one {# campo} other {# campos}}}} · {customised, plural, =0 {todo predeterminado} one {# personalizado} other {# personalizados}}",
-    "saveButton": "Guardar cambios",
-    "savingButton": "Guardando…",
     "alertSuccess": "Voz guardada.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",
@@ -866,8 +860,6 @@
   "featuresSettings": {
     "heading": "Funciones",
     "description": "Active o desactive las funciones de su sitio. Las opciones bloqueadas requieren el plan Growth.",
-    "saveButton": "Guardar cambios",
-    "savingButton": "Guardando…",
     "alertSuccess": "Funciones guardadas.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "planLockedBadge": "Plan Growth",
@@ -911,8 +903,6 @@
   "languagesSettings": {
     "heading": "Idiomas",
     "description": "Elija en qué idiomas se publica el sitio, además de su idioma predeterminado.",
-    "saveButton": "Guardar cambios",
-    "savingButton": "Guardando…",
     "alertSuccess": "Idiomas guardados.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "switchOn": "Activado",
@@ -936,7 +926,9 @@
     "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
     "goToFirstField": "Ir al primero",
     "shortcut": "⌘S / Ctrl+S",
-    "discard": "Descartar"
+    "discard": "Descartar",
+    "save": "Guardar cambios",
+    "saving": "Guardando…"
   },
   "leavePageDialog": {
     "title": "¿Salir sin guardar?",

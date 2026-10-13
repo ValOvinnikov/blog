@@ -7,6 +7,7 @@ import { SettingsFormShell } from '@platform/components/shared/settings-form-she
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Switch } from '@platform/components/shared/switch';
 import { useToast } from '@platform/context/toast-provider';
+import { updateFeaturesAction } from '@platform/server/settings-features/update-features-action';
 import {
   CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
@@ -26,10 +27,6 @@ export type TFeaturesSettingsProps = {
   tenantId: string;
   entitledCapabilities: TCapability[];
   initialValues: TSettingsFeaturesValues;
-  saveAction: (
-    tenantId: string,
-    values: TSettingsFeaturesValues,
-  ) => Promise<{ ok: boolean }>;
   savedAt?: Date;
   archivedAt?: Date;
 };
@@ -40,7 +37,6 @@ export const FeaturesSettings = ({
   tenantId,
   entitledCapabilities,
   initialValues,
-  saveAction,
   savedAt,
   archivedAt,
 }: TFeaturesSettingsProps) => {
@@ -54,7 +50,7 @@ export const FeaturesSettings = ({
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TSettingsFeaturesValues, { ok: boolean }>({
       initialValues,
-      onSubmit: (vals) => saveAction(tenantId, vals),
+      onSubmit: (vals) => updateFeaturesAction(tenantId, vals),
       onSuccess: (submittedValues) => {
         setSavedValues(submittedValues);
         toast.success({
@@ -77,16 +73,13 @@ export const FeaturesSettings = ({
     <SettingsFormShell
       title={t('heading')}
       description={t('description')}
-      saveButtonLabel={t('saveButton')}
-      savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
       onDiscard={() => setValues(savedValues)}
       changeCount={changeCount}
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
-      hasError={status === 'error'}
-      errorTitle={t('alertError')}
+      errorTitle={status === 'error' ? t('alertError') : undefined}
       draft={{
         tenantId,
         page: 'features',
