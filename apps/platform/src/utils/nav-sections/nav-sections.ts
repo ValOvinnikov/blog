@@ -9,7 +9,6 @@ import type {
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
 
-/** Structurally compatible with both `useTranslations`'s and `getTranslations`'s return type, without fighting next-intl's per-namespace literal-key generic. */
 export type TNavTranslator = (
   key: string,
   values?: Record<string, string | number>,

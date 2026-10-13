@@ -1,12 +1,10 @@
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
-import { getSession } from '@platform/server/auth/auth';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
-import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
+import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
 import {
   operatorNavSections,
   tenantNavSections,
-  type TNavTranslator,
 } from '@platform/utils/nav-sections/nav-sections';
 import { getTranslations } from 'next-intl/server';
 
@@ -24,12 +22,11 @@ type TProps = {
 export default async function TenantDetailLayout({ children, params }: TProps) {
   const { tenantId } = await params;
   const { tenant, admin } = await requireTenantById(tenantId);
-  const session = await getSession();
-  const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
-  const t = await getTranslations('tenantLayout');
-  const tNavSections = (await getTranslations(
-    'navSections',
-  )) as unknown as TNavTranslator;
+  const [{ isSidebarInitiallyCollapsed, tNavSections, userName }, t] =
+    await Promise.all([
+      loadAdminShellChrome(),
+      getTranslations('tenantLayout'),
+    ]);
 
   return (
     <AdminShell
@@ -40,7 +37,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}
       roleChip={{
-        name: session?.user?.name ?? session?.user?.email ?? undefined,
+        name: userName,
         role: admin.role,
         scope: t('scopeLabel'),
       }}
