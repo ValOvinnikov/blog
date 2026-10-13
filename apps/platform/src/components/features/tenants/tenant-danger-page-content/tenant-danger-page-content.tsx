@@ -1,5 +1,6 @@
 'use client';
 
+import { DeleteTenantControl } from '@platform/components/features/tenants/delete-tenant-control';
 import { DeprovisionTenantControl } from '@platform/components/features/tenants/deprovision-tenant-control';
 import {
   DeprovisioningStatusView,
@@ -43,7 +44,7 @@ export const TenantDangerPageContent = ({
           <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
           <div className={actionsRow()}>
             <ReactivateTenantControl tenant={tenant} />
-            <DeprovisionTenantControl tenant={tenant} />
+            <DeleteTenantControl tenant={tenant} />
           </div>
           {showDeprovisioningStatus && (
             <div className={historySection()}>

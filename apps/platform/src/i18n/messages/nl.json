@@ -801,6 +801,11 @@
     "allOption": "Alle",
     "loading": "Tenants worden geladen…"
   },
+  "confirmDialog": {
+    "confirmLabel": "Typ \"{name}\" om te bevestigen",
+    "confirmHint": "Moet exact overeenkomen met de naam van de tenant.",
+    "cancelButton": "Annuleren"
+  },
   "deprovisionTenantControl": {
     "cardTitle": "Deze tenant ontmantelen",
     "archivedCardTitle": "Deze tenant definitief verwijderen",
@@ -809,18 +814,13 @@
     "inProgressHint": "Er loopt al een ontmanteling voor deze tenant.",
     "dialogTitle": "{name} ontmantelen",
     "dialogDescription": "Dit start deprovision-tenant.yml, dat elke ingerichte resource van deze tenant afbreekt. Typ de naam van de tenant om te bevestigen.",
-    "confirmLabel": "Typ \"{name}\" om te bevestigen",
-    "confirmHint": "Moet exact overeenkomen met de naam van de tenant.",
     "dryRunLabel": "Proefrun (alleen voorbeeld, er wordt niets verwijderd)",
-    "cancelButton": "Annuleren",
     "confirmButton": "Ontmantelen",
     "confirmingButton": "Starten…",
     "deleteDescription": "Verwijdert deze tenant en elke afhankelijke rij (lidmaatschappen, abonnees, bladwijzers, domeinen, siteconfiguratie) definitief uit de database. Dit kan niet ongedaan worden gemaakt en maakt het domein weer vrij voor hergebruik.",
     "deleteTriggerButton": "Tenant definitief verwijderen",
     "deleteDialogTitle": "{name} verwijderen",
     "deleteDialogDescription": "Dit verwijdert de tenantrij en alles wat ervan afhankelijk is definitief. Typ de naam van de tenant om te bevestigen.",
-    "deleteConfirmLabel": "Typ \"{name}\" om te bevestigen",
-    "deleteConfirmHint": "Moet exact overeenkomen met de naam van de tenant.",
     "deleteConfirmButton": "Verwijderen",
     "deleteConfirmingButton": "Verwijderen…"
   },
@@ -830,9 +830,6 @@
     "triggerButton": "Tenant opnieuw activeren",
     "dialogTitle": "{name} opnieuw activeren",
     "dialogDescription": "Dit start provision-tenant.yml, dat elke ingerichte resource van deze tenant herstelt. Typ de naam van de tenant om te bevestigen.",
-    "confirmLabel": "Typ \"{name}\" om te bevestigen",
-    "confirmHint": "Moet exact overeenkomen met de naam van de tenant.",
-    "cancelButton": "Annuleren",
     "confirmButton": "Opnieuw activeren",
     "confirmingButton": "Starten…"
   },

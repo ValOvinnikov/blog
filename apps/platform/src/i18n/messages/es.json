@@ -801,6 +801,11 @@
     "allOption": "Todos",
     "loading": "Cargando clientes…"
   },
+  "confirmDialog": {
+    "confirmLabel": "Escriba «{name}» para confirmar",
+    "confirmHint": "Debe coincidir exactamente con el nombre del cliente.",
+    "cancelButton": "Cancelar"
+  },
   "deprovisionTenantControl": {
     "cardTitle": "Desaprovisionar este cliente",
     "archivedCardTitle": "Eliminar este cliente de forma permanente",
@@ -809,18 +814,13 @@
     "inProgressHint": "Ya hay un desaprovisionamiento en curso para este cliente.",
     "dialogTitle": "Desaprovisionar {name}",
     "dialogDescription": "Esto lanza deprovision-tenant.yml, que desmonta todos los recursos aprovisionados para este cliente. Escriba el nombre del cliente para confirmar.",
-    "confirmLabel": "Escriba «{name}» para confirmar",
-    "confirmHint": "Debe coincidir exactamente con el nombre del cliente.",
     "dryRunLabel": "Simulación (solo vista previa, no se elimina nada)",
-    "cancelButton": "Cancelar",
     "confirmButton": "Desaprovisionar",
     "confirmingButton": "Lanzando…",
     "deleteDescription": "Elimina de forma permanente este cliente y todas las filas dependientes (membresías, suscriptores, guardados, dominios, configuración del sitio) de la base de datos. Esta acción no se puede deshacer y libera su dominio para reutilizarlo.",
     "deleteTriggerButton": "Eliminar cliente de forma permanente",
     "deleteDialogTitle": "Eliminar {name}",
     "deleteDialogDescription": "Esto elimina de forma permanente la fila del cliente y todo lo que depende de ella. Escriba el nombre del cliente para confirmar.",
-    "deleteConfirmLabel": "Escriba «{name}» para confirmar",
-    "deleteConfirmHint": "Debe coincidir exactamente con el nombre del cliente.",
     "deleteConfirmButton": "Eliminar",
     "deleteConfirmingButton": "Eliminando…"
   },
@@ -830,9 +830,6 @@
     "triggerButton": "Reactivar cliente",
     "dialogTitle": "Reactivar {name}",
     "dialogDescription": "Esto lanza provision-tenant.yml, que restaura todos los recursos aprovisionados para este cliente. Escriba el nombre del cliente para confirmar.",
-    "confirmLabel": "Escriba «{name}» para confirmar",
-    "confirmHint": "Debe coincidir exactamente con el nombre del cliente.",
-    "cancelButton": "Cancelar",
     "confirmButton": "Reactivar",
     "confirmingButton": "Lanzando…"
   },

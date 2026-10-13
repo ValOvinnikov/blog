@@ -801,6 +801,11 @@
     "allOption": "All",
     "loading": "Loading tenants…"
   },
+  "confirmDialog": {
+    "confirmLabel": "Type \"{name}\" to confirm",
+    "confirmHint": "Must match the tenant's name exactly.",
+    "cancelButton": "Cancel"
+  },
   "deprovisionTenantControl": {
     "cardTitle": "Deprovision this tenant",
     "archivedCardTitle": "Delete this tenant permanently",
@@ -809,18 +814,13 @@
     "inProgressHint": "A deprovisioning run is already in progress for this tenant.",
     "dialogTitle": "Deprovision {name}",
     "dialogDescription": "This dispatches deprovision-tenant.yml, which tears down every provisioned resource for this tenant. Type the tenant's name to confirm.",
-    "confirmLabel": "Type \"{name}\" to confirm",
-    "confirmHint": "Must match the tenant's name exactly.",
     "dryRunLabel": "Dry run (preview only, nothing is deleted)",
-    "cancelButton": "Cancel",
     "confirmButton": "Deprovision",
     "confirmingButton": "Dispatching…",
     "deleteDescription": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases its domain for reuse.",
     "deleteTriggerButton": "Delete tenant permanently",
     "deleteDialogTitle": "Delete {name}",
     "deleteDialogDescription": "This permanently deletes the tenant row and everything that depends on it. Type the tenant's name to confirm.",
-    "deleteConfirmLabel": "Type \"{name}\" to confirm",
-    "deleteConfirmHint": "Must match the tenant's name exactly.",
     "deleteConfirmButton": "Delete",
     "deleteConfirmingButton": "Deleting…"
   },
@@ -830,9 +830,6 @@
     "triggerButton": "Reactivate tenant",
     "dialogTitle": "Reactivate {name}",
     "dialogDescription": "This dispatches provision-tenant.yml, which restores every provisioned resource for this tenant. Type the tenant's name to confirm.",
-    "confirmLabel": "Type \"{name}\" to confirm",
-    "confirmHint": "Must match the tenant's name exactly.",
-    "cancelButton": "Cancel",
     "confirmButton": "Reactivate",
     "confirmingButton": "Dispatching…"
   },

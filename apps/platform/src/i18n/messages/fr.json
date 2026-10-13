@@ -801,6 +801,11 @@
     "allOption": "Tous",
     "loading": "Chargement des locataires…"
   },
+  "confirmDialog": {
+    "confirmLabel": "Saisissez « {name} » pour confirmer",
+    "confirmHint": "Doit correspondre exactement au nom du locataire.",
+    "cancelButton": "Annuler"
+  },
   "deprovisionTenantControl": {
     "cardTitle": "Déprovisionner ce locataire",
     "archivedCardTitle": "Supprimer définitivement ce locataire",
@@ -809,18 +814,13 @@
     "inProgressHint": "Un déprovisionnement est déjà en cours pour ce locataire.",
     "dialogTitle": "Déprovisionner {name}",
     "dialogDescription": "Cette action lance deprovision-tenant.yml, qui démantèle toutes les ressources provisionnées pour ce locataire. Saisissez le nom du locataire pour confirmer.",
-    "confirmLabel": "Saisissez « {name} » pour confirmer",
-    "confirmHint": "Doit correspondre exactement au nom du locataire.",
     "dryRunLabel": "Simulation (aperçu uniquement, rien n'est supprimé)",
-    "cancelButton": "Annuler",
     "confirmButton": "Déprovisionner",
     "confirmingButton": "Lancement…",
     "deleteDescription": "Supprime définitivement ce locataire et toutes les lignes dépendantes (adhésions, abonnés, favoris, domaines, configuration du site) de la base de données. Cette action est irréversible et libère son domaine pour une nouvelle utilisation.",
     "deleteTriggerButton": "Supprimer définitivement le locataire",
     "deleteDialogTitle": "Supprimer {name}",
     "deleteDialogDescription": "Cette action supprime définitivement la ligne du locataire et tout ce qui en dépend. Saisissez le nom du locataire pour confirmer.",
-    "deleteConfirmLabel": "Saisissez « {name} » pour confirmer",
-    "deleteConfirmHint": "Doit correspondre exactement au nom du locataire.",
     "deleteConfirmButton": "Supprimer",
     "deleteConfirmingButton": "Suppression…"
   },
@@ -830,9 +830,6 @@
     "triggerButton": "Réactiver le locataire",
     "dialogTitle": "Réactiver {name}",
     "dialogDescription": "Cette action lance provision-tenant.yml, qui restaure toutes les ressources provisionnées pour ce locataire. Saisissez le nom du locataire pour confirmer.",
-    "confirmLabel": "Saisissez « {name} » pour confirmer",
-    "confirmHint": "Doit correspondre exactement au nom du locataire.",
-    "cancelButton": "Annuler",
     "confirmButton": "Réactiver",
     "confirmingButton": "Lancement…"
   },
