@@ -165,7 +165,7 @@ describe(buildMagicLinkProvider, () => {
     });
   });
 
-  it('still delivers, unbranded, when the host resolves to no tenant', async () => {
+  it('still delivers, in the unnamed neutral shell, when the host resolves to no tenant', async () => {
     getTenantByDomainMock.mockResolvedValue(undefined);
 
     await provider.sendVerificationRequest({
@@ -182,11 +182,11 @@ describe(buildMagicLinkProvider, () => {
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.not.stringContaining('<!doctype html>'),
+      html: expect.not.stringContaining('&copy;'),
     });
   });
 
-  it('still delivers, unbranded, when the tenant domain lookup throws', async () => {
+  it('still delivers, in the unnamed neutral shell, when the tenant domain lookup throws', async () => {
     getTenantByDomainMock.mockRejectedValue(new Error('db error'));
 
     await provider.sendVerificationRequest({
@@ -203,7 +203,7 @@ describe(buildMagicLinkProvider, () => {
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.not.stringContaining('<!doctype html>'),
+      html: expect.not.stringContaining('&copy;'),
     });
   });
 

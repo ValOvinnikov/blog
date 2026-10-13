@@ -19,7 +19,11 @@ export function buildOperatorShell({
 }: TBuildOperatorShellInput): string {
   return renderEmailShell({
     palette: PLATFORM_EMAIL_BRAND,
-    brandName: OPERATOR_BRAND_NAME,
+    title: OPERATOR_BRAND_NAME,
+    identity: {
+      brandName: OPERATOR_BRAND_NAME,
+      markPalette: PLATFORM_EMAIL_BRAND,
+    },
     previewText,
     bodyHtml,
   });
