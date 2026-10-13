@@ -370,7 +370,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       beforeEach(async () => {
         updateEmailConfigActionMock.mockResolvedValue({
           ok: false,
-          fieldErrors: { senderName: 'Enter a name, not an address.' },
+          fieldErrors: { senderName: 'senderNameInvalid' },
         });
         setup();
         await user.type(screen.getByLabelText('Sender name'), 'a@b');
@@ -409,16 +409,14 @@ describe(`<${EmailSettings.name}/>`, () => {
   it('shows the sender-name error the save returns', async () => {
     updateEmailConfigActionMock.mockResolvedValue({
       ok: false,
-      fieldErrors: { senderName: 'Enter a name, not an address.' },
+      fieldErrors: { senderName: 'senderNameInvalid' },
     });
     setup();
 
     await user.type(screen.getByLabelText('Sender name'), 'a@b');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    expect(
-      await screen.findByText('Enter a name, not an address.'),
-    ).toBeVisible();
+    expect(await screen.findByText(/not an email address/)).toBeVisible();
   });
 
   it('restores an unsaved translation after leaving the page, but not a staged logo', async () => {

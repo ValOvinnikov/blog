@@ -3,7 +3,10 @@
 import type { TLocaleIsoCode } from '@blog/config';
 import { clearEmailLogoAction } from '@platform/server/email/clear-email-logo-action';
 import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-action';
-import { updateEmailConfigAction } from '@platform/server/email-config/update-email-config-action';
+import {
+  updateEmailConfigAction,
+  type TSenderNameError,
+} from '@platform/server/email-config/update-email-config-action';
 import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
 import {
   blankToNull,
@@ -43,7 +46,7 @@ export const useEmailDraft = ({
   onSaved,
 }: TUseEmailDraftArgs) => {
   const [saved, setSaved] = useState(initialDraft);
-  const [senderNameError, setSenderNameError] = useState<string>();
+  const [senderNameError, setSenderNameError] = useState<TSenderNameError>();
 
   const submission = useFormSubmission<TEmailDraft, { ok: boolean }>({
     initialValues: initialDraft,

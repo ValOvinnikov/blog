@@ -482,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
-    "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
     "replyToLabel": "Adresse de réponse",
     "replyToHint": "L'adresse où arrivent les réponses aux e-mails de votre site.",
     "footerAddressLabel": "Adresse postale du pied de page",
     "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail envoyé par votre site.",
     "logoLabel": "Logo des e-mails",
-    "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo."
+    "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo.",
+    "errors": {
+      "senderNameInvalid": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",

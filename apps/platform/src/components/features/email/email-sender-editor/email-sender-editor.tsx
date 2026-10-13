@@ -6,6 +6,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import type { TSenderNameError } from '@platform/server/email-config/update-email-config-action';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
@@ -18,7 +19,7 @@ export type TEmailSenderEditorProps = {
   onSenderChange: (sender: TEmailSenderDraft) => void;
   onLogoStage: (logo: TStagedImage) => void;
   senderNameInputId: string;
-  senderNameError?: string;
+  senderNameError?: TSenderNameError;
 };
 
 export const EmailSenderEditor = ({
@@ -53,7 +54,7 @@ export const EmailSenderEditor = ({
           <FormField
             label={t('senderNameLabel')}
             hint={t('senderNameHint')}
-            error={senderNameError}
+            error={senderNameError && t(`errors.${senderNameError}`)}
             control={{ ...control, id: senderNameInputId }}
           >
             <TextInput

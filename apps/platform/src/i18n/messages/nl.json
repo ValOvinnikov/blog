@@ -482,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
-    "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
     "replyToLabel": "Antwoordadres",
     "replyToHint": "Waar antwoorden op de e-mails van je site naartoe gaan.",
     "footerAddressLabel": "Postadres in voettekst",
     "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail die je site verstuurt.",
     "logoLabel": "E-maillogo",
-    "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo."
+    "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo.",
+    "errors": {
+      "senderNameInvalid": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",

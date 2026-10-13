@@ -482,13 +482,15 @@
   "emailSettingsForm": {
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
-    "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
     "replyToLabel": "Reply-to address",
     "replyToHint": "Where replies to your site's emails go.",
     "footerAddressLabel": "Footer postal address",
     "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every email your site sends.",
     "logoLabel": "Email logo",
-    "logoHint": "Used in every email, in every language. A template can override it with its own logo."
+    "logoHint": "Used in every email, in every language. A template can override it with its own logo.",
+    "errors": {
+      "senderNameInvalid": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @."
+    }
   },
   "emailLogoField": {
     "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
