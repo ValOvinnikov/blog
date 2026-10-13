@@ -20,11 +20,13 @@
  * that, by Sanity project id, and reuses the existing row instead of
  * creating a duplicate — so a run interrupted partway through (e.g. between
  * creating the tenant and writing its domain row) recovers on re-run rather
- * than failing on a unique-constraint conflict. Every write below (domain,
- * membership) is itself a no-op-safe upsert. `--owner-email` must already
- * have a `users` row — this script does not create one; the owner signs in
- * once first (via the site's normal Auth.js flow) so a real,
- * correctly-linked account exists before it is granted a membership.
+ * than failing on a unique-constraint conflict. A domain match whose tenant
+ * already holds a different Sanity project id is refused, never repointed.
+ * Every write below (domain, membership) is itself a no-op-safe upsert.
+ * `--owner-email` must already have a `users` row — this script does not
+ * create one; the owner signs in once first (via the site's normal Auth.js
+ * flow) so a real, correctly-linked account exists before it is granted a
+ * membership.
  *
  * `db:seed-tenant`'s `--conditions=react-server` node flag makes `getDb()`'s
  * `import 'server-only'` resolve to its no-op export outside Next.js's own
@@ -141,14 +143,19 @@ function parseArgs(argv: string[]): TParsedArgs {
   };
 }
 
-// Exported for direct testing of the idempotency check without also
-// exercising argv parsing or the domain/membership writes `main()` wraps it
-// in.
 export async function resolveOrCreateTenant(
   args: TParsedArgs,
 ): Promise<TTenant> {
   const existing = await getTenantByDomain(args.primaryDomain);
   if (existing) {
+    if (
+      existing.sanityProjectId !== null &&
+      existing.sanityProjectId !== args.sanityProjectId
+    ) {
+      throw new Error(
+        `seed-tenant: domain "${args.primaryDomain}" belongs to tenant "${existing.id}", which holds Sanity project "${existing.sanityProjectId}", not "${args.sanityProjectId}".`,
+      );
+    }
     console.warn(
       `Tenant "${existing.name}" already exists (${existing.id}) — reusing it.`,
     );

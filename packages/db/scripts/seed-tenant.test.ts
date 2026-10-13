@@ -90,6 +90,27 @@ describe(resolveOrCreateTenant, () => {
     expect(result.id).toBe('tenant-1');
   });
 
+  it('reuses the domain-matched tenant when it has no Sanity project id yet', async () => {
+    getTenantByDomainMock.mockResolvedValue(tenant({ sanityProjectId: null }));
+
+    const result = await resolveOrCreateTenant(args);
+
+    expect(createTenantMock).not.toHaveBeenCalled();
+    expect(result.id).toBe('tenant-1');
+  });
+
+  it('rejects when the domain-matched tenant holds a different Sanity project id', async () => {
+    getTenantByDomainMock.mockResolvedValue(
+      tenant({ sanityProjectId: 'proj-other' }),
+    );
+
+    await expect(resolveOrCreateTenant(args)).rejects.toThrow(
+      'seed-tenant: domain "acme.example.com" belongs to tenant "tenant-1", which holds Sanity project "proj-other", not "proj-acme".',
+    );
+    expect(createTenantMock).not.toHaveBeenCalled();
+    expect(getTenantIdBySanityProjectIdMock).not.toHaveBeenCalled();
+  });
+
   it('throws when createTenant fails', async () => {
     createTenantMock.mockResolvedValue({
       ok: false,
