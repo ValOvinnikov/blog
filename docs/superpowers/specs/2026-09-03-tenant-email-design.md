@@ -3,9 +3,8 @@
 **Status:** Design pass, approved in brainstorming 2026-09-03. Supersedes the
 per-consumer migration scope of epic #2605's sub-issues #2607–#2611, which were
 written against the assumption that `@blog/email`'s shell was correct as
-scaffolded. It is not — see §1. Builds on
-[`2026-08-13-tenant-config-postgres-admin-design.md`](./2026-08-13-tenant-config-postgres-admin-design.md)
-for where tenant configuration lives.
+scaffolded. It is not — see §1. Where tenant configuration lives
+(`site_config` in `@blog/db`) is described in `SPEC.md` §6.
 
 **Date:** 2026-09-03
 

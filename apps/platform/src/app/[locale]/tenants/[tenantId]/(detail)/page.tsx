@@ -1,68 +1,24 @@
-import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
-import { queries } from '@blog/db';
-import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
-import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
 import { TenantOverviewView } from '@platform/components/features/tenants/tenant-overview-view';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
-import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
-import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { formatDate } from '@platform/utils/format-date/format-date';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  renderTenantScopedPage,
+  tenantPageMetadata,
+} from '@platform/server/tenant-pages/render-tenant-scoped-page';
 import type { Metadata } from 'next';
-import { getLocale, getTranslations } from 'next-intl/server';
-import { Suspense } from 'react';
-
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('pageMetadata');
-  return { title: t('tenantOverview') };
-}
 
 type TProps = {
   params: Promise<{ tenantId: string }>;
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return tenantPageMetadata('tenantOverview');
+}
+
 export default async function TenantOverviewPage({ params }: TProps) {
   const { tenantId } = await params;
 
-  const { tenant } = await requireTenantById(tenantId);
-  const clientTenant = toClientTenant(tenant);
-  const domainVerificationStatus = getDomainVerificationStatus(
-    tenant.primaryDomain,
-  );
-  const [ownerEmail, ownerMembership, auditEvents, findings, locale] =
-    await Promise.all([
-      queries.memberships.getTenantOwnerEmail(tenant.id),
-      queries.memberships.getTenantOwnerMembership(tenant.id),
-      queries.auditEvents.listAuditEventsForTarget(
-        AUDIT_TARGET_TYPE.TENANT,
-        tenant.id,
-        { limit: 5 },
-      ),
-      queries.findings.listFindingsForTenant(tenant.id, FINDING_STATUS.OPEN),
-      getLocale(),
-    ]);
-
-  return (
-    <TenantOverviewView
-      tenant={clientTenant}
-      domainCard={
-        <Suspense fallback={<DomainCardSkeleton />}>
-          <LiveDomainCard
-            tenant={clientTenant}
-            domainVerificationStatus={domainVerificationStatus}
-            dnsHref={adminRoutes.tenantDomain(tenant.id)}
-          />
-        </Suspense>
-      }
-      ownerEmail={ownerEmail}
-      ownerJoinedAt={
-        ownerMembership
-          ? formatDate(ownerMembership.joinedAt, locale)
-          : undefined
-      }
-      ownerJoinedAtIso={ownerMembership?.joinedAt.toISOString()}
-      auditEvents={auditEvents}
-      findings={findings}
-    />
+  return renderTenantScopedPage(
+    () => requireTenantById(tenantId),
+    TenantOverviewView,
   );
 }

@@ -57,7 +57,7 @@ describe(getTenantOwnerMembership, () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined when only a pending OWNER invite exists (no real membership row)', async () => {
+  it('falls back to a pending OWNER invite with its email and no join date', async () => {
     await db().insert(schema.membershipInvites).values({
       tenantId,
       email: 'owner@example.com',
@@ -66,7 +66,57 @@ describe(getTenantOwnerMembership, () => {
 
     const result = await getTenantOwnerMembership(tenantId);
 
+    expect(result).toEqual({ email: 'owner@example.com' });
+  });
+
+  it('ignores an OWNER invite that has already been consumed', async () => {
+    await db()
+      .insert(schema.membershipInvites)
+      .values({
+        tenantId,
+        email: 'owner@example.com',
+        role: MEMBERSHIP_ROLE.OWNER,
+        consumedAt: new Date('2026-08-12T00:00:00.000Z'),
+      });
+
+    const result = await getTenantOwnerMembership(tenantId);
+
     expect(result).toBeUndefined();
+  });
+
+  it('ignores a non-OWNER invite on the same tenant', async () => {
+    await db().insert(schema.membershipInvites).values({
+      tenantId,
+      email: 'editor@example.com',
+      role: MEMBERSHIP_ROLE.EDITOR,
+    });
+
+    const result = await getTenantOwnerMembership(tenantId);
+
+    expect(result).toBeUndefined();
+  });
+
+  it('prefers a real OWNER membership over a pending invite', async () => {
+    await insertTestUser(db(), {
+      id: 'user-1',
+      email: 'signed-in@example.com',
+    });
+    const [membership] = await db()
+      .insert(schema.memberships)
+      .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.OWNER })
+      .returning();
+    await db().insert(schema.membershipInvites).values({
+      tenantId,
+      email: 'invited@example.com',
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
+
+    const result = await getTenantOwnerMembership(tenantId);
+
+    expect(result).toEqual({
+      email: 'signed-in@example.com',
+      joinedAt: membership!.createdAt,
+    });
   });
 
   it('returns undefined when the tenant has no OWNER membership or invite', async () => {
@@ -75,7 +125,7 @@ describe(getTenantOwnerMembership, () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined when the owner user has no email on file', async () => {
+  it('returns undefined when the owner user has no email on file and no invite is pending', async () => {
     await insertTestUser(db(), { id: 'user-1', email: null });
     await db().insert(schema.memberships).values({
       userId: 'user-1',

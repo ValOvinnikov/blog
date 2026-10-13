@@ -9,6 +9,9 @@ import { flushSync } from 'react-dom';
 
 import { saveBarVariants } from './save-bar-variants';
 
+const FIELD_CONTROL =
+  'input:not([type="hidden"]), select, textarea, button, [tabindex]:not([tabindex="-1"])';
+
 export type TInvalidFields = {
   ids: string[];
   revealFirst?: () => void;
@@ -57,6 +60,11 @@ export const SaveBar = ({
     if (revealFirst) flushSync(revealFirst);
     const target = document.getElementById(firstInvalidFieldId);
     target?.focus({ preventScroll: true });
+    if (target && !target.contains(document.activeElement)) {
+      target
+        .querySelector<HTMLElement>(FIELD_CONTROL)
+        ?.focus({ preventScroll: true });
+    }
     target?.scrollIntoView({ block: 'center' });
   };
 

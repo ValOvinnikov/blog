@@ -1,5 +1,9 @@
 import { renderEmailAction } from '@blog/email/html/email-action/email-action';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
+import {
+  buildNeutralShell,
+  NEUTRAL_EMAIL_PALETTE,
+} from '@blog/email/html/neutral-shell/neutral-shell';
 import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
 import {
   serializePortableText,
@@ -52,17 +56,25 @@ export function buildInviteMagicLinkEmail({
   const bodyHtml = serializePortableText(body);
   const tenantNamesHtml = renderInvitedTenantNamesHtml(tenantNames);
 
+  const action = {
+    label: ACCEPT_INVITE_ACTION_LABEL,
+    url,
+    variant: 'button',
+  } as const;
+
   if (!tenantIdentity) {
     return {
       subject,
-      html: `${tenantNamesHtml}${bodyHtml}<p><a href="${escapeHtml(url)}">${ACCEPT_INVITE_ACTION_LABEL}</a></p>`,
+      html: buildNeutralShell({
+        title: subject,
+        bodyHtml,
+        structuralHtml: tenantNamesHtml,
+        actionHtml: renderEmailAction(action, NEUTRAL_EMAIL_PALETTE),
+      }),
     };
   }
 
-  const actionHtml = renderEmailAction(
-    { label: ACCEPT_INVITE_ACTION_LABEL, url, variant: 'button' },
-    tenantIdentity.brand,
-  );
+  const actionHtml = renderEmailAction(action, tenantIdentity.brand);
 
   return {
     subject,

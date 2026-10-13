@@ -1,5 +1,8 @@
 import { renderEmailAction } from '@blog/email/html/email-action/email-action';
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
+import {
+  buildNeutralShell,
+  NEUTRAL_EMAIL_PALETTE,
+} from '@blog/email/html/neutral-shell/neutral-shell';
 import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
 import {
   serializePortableText,
@@ -38,17 +41,24 @@ export function buildMagicLinkEmail({
 }: TMagicLinkEmailInput): TMagicLinkEmailContent {
   const bodyHtml = serializePortableText(body);
 
+  const action = {
+    label: SIGN_IN_ACTION_LABEL,
+    url,
+    variant: 'button',
+  } as const;
+
   if (!tenantIdentity) {
     return {
       subject,
-      html: `${bodyHtml}<p><a href="${escapeHtml(url)}">${SIGN_IN_ACTION_LABEL}</a></p>`,
+      html: buildNeutralShell({
+        title: subject,
+        bodyHtml,
+        actionHtml: renderEmailAction(action, NEUTRAL_EMAIL_PALETTE),
+      }),
     };
   }
 
-  const actionHtml = renderEmailAction(
-    { label: SIGN_IN_ACTION_LABEL, url, variant: 'button' },
-    tenantIdentity.brand,
-  );
+  const actionHtml = renderEmailAction(action, tenantIdentity.brand);
 
   return {
     subject,

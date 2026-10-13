@@ -260,7 +260,10 @@ export const LookForm = ({
       onSave={handleSave}
       onDiscard={handleDiscard}
       changeCount={changeCount}
-      invalidFields={{ ids: isAccentHueRejected ? [accentHueFieldId] : [] }}
+      invalidFields={{
+        ids: isAccentHueRejected ? [accentHueFieldId] : [],
+        revealFirst: () => tabsProps.onChange('edit'),
+      }}
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}

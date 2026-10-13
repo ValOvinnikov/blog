@@ -1,35 +1,32 @@
 'use client';
 
 import { Slider } from '@base-ui/react/slider';
+import { accentHueGradient } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import type { AriaAttributes, CSSProperties } from 'react';
 
 import { hueSliderVariants } from './hue-slider-variants';
 
 const HUE_MIN = 0;
 const HUE_MAX = 360;
+const TRACK_STYLE: CSSProperties = { background: accentHueGradient() };
 
 export type THueSliderProps = {
+  id?: string;
   ariaLabel: string;
   value: number;
   onChange: (value: number) => void;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
-  trackStyle?: CSSProperties;
   className?: string;
 };
 
-/**
- * A single-thumb 0–360° hue slider, used by both the accent and logo hue
- * fields — its own gradient-track formula and follow-accent state live in
- * the caller, this component only carries the drag interaction.
- */
 export const HueSlider = ({
+  id,
   ariaLabel,
   value,
   onChange,
   isDisabled,
   'aria-describedby': ariaDescribedBy,
-  trackStyle,
   className,
 }: THueSliderProps) => {
   const { root, control, track, thumb } = hueSliderVariants();
@@ -47,12 +44,9 @@ export const HueSlider = ({
       className={root({ class: className })}
     >
       <Slider.Control className={control()}>
-        <Slider.Track
-          className={track()}
-          style={trackStyle}
-          data-testid="hue-slider-track"
-        >
+        <Slider.Track className={track()} style={TRACK_STYLE}>
           <Slider.Thumb
+            id={id}
             aria-label={ariaLabel}
             aria-describedby={ariaDescribedBy}
             className={thumb()}

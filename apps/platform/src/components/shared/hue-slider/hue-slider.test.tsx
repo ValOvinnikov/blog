@@ -26,21 +26,6 @@ describe(HueSlider, () => {
     expect(handleChange).toHaveBeenCalledWith(101);
   });
 
-  it('applies the given trackStyle gradient to the track element', () => {
-    render(
-      <HueSlider
-        ariaLabel="Accent hue"
-        value={100}
-        onChange={vi.fn()}
-        trackStyle={{ background: 'linear-gradient(90deg, red, blue)' }}
-      />,
-    );
-
-    expect(screen.getByTestId('hue-slider-track')).toHaveStyle({
-      background: 'linear-gradient(90deg, red, blue)',
-    });
-  });
-
   it('marks the slider disabled when isDisabled is passed', () => {
     render(
       <HueSlider

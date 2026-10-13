@@ -398,6 +398,44 @@ describe(`<${LookForm.name}/>`, () => {
     expect(updateLookActionMock).not.toHaveBeenCalled();
   });
 
+  describe('when the accent hue is rejected', () => {
+    const rejectAccentHue = async () => {
+      const slider = screen.getByRole('slider', { name: 'Accent hue' });
+      slider.focus();
+      await user.keyboard('{ArrowRight}');
+      slider.blur();
+    };
+
+    const goToFirstField = () =>
+      user.click(screen.getByRole('link', { name: 'Go to the first one' }));
+
+    beforeEach(() => {
+      isAccentHueAccessibleMock.mockImplementation((hue) => hue !== 251);
+      setup();
+    });
+
+    it('focuses the accent hue slider from the save bar', async () => {
+      await rejectAccentHue();
+
+      await goToFirstField();
+
+      expect(screen.getByRole('slider', { name: 'Accent hue' })).toHaveFocus();
+    });
+
+    it('returns to the Edit tab and focuses the accent hue slider from the Preview', async () => {
+      await rejectAccentHue();
+      await user.click(screen.getByRole('tab', { name: 'Preview' }));
+
+      await goToFirstField();
+
+      expect(screen.getByRole('tab', { name: 'Edit' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      expect(screen.getByRole('slider', { name: 'Accent hue' })).toHaveFocus();
+    });
+  });
+
   it('previews a changed radius scale and density before saving', async () => {
     setup();
 

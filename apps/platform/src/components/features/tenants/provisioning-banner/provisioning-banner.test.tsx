@@ -2,14 +2,13 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
-import { ProvisioningBanner } from './provisioning-banner';
+import {
+  ProvisioningBanner,
+  type TProvisioningBannerProps,
+} from './provisioning-banner';
 
-// `ProvisioningBanner` only imports `STEP_ORDER` from
-// `use-provisioning-poll`, but that module also imports these three Server
-// Actions at the top level — mocked out purely so this render test doesn't
-// transitively load the Auth.js chain behind them.
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
   retryProvisioningStepAction: vi.fn(),
 }));
@@ -24,15 +23,21 @@ vi.mock(
 const idleStepStatuses = () =>
   Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.IDLE);
 
-const setup = customRender(ProvisioningBanner, {
-  tenantId: 'tenant-1',
+type TPoll = TProvisioningBannerProps['poll'];
+
+const idlePoll: TPoll = {
   provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
   stepStatuses: idleStepStatuses(),
   isOverallFailed: false,
   isProvisioningRunning: false,
   errorKind: undefined,
   ownerElevationOutcome: undefined,
-});
+};
+
+const setup = (poll: Partial<TPoll> = {}) =>
+  renderWithIntl(
+    <ProvisioningBanner tenantId="tenant-1" poll={{ ...idlePoll, ...poll }} />,
+  );
 
 const READY_STEP_STATUSES = Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE);
 
@@ -40,9 +45,6 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
   it('renders nothing for a tenant that has not started provisioning', () => {
     setup();
 
-    // The shared render wrapper always mounts an (empty) toast viewport, so
-    // the container itself is never fully empty — assert the banner's own
-    // possible outputs are absent instead.
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
@@ -141,7 +143,6 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
       });
 
       expect(screen.getByText('Provisioned')).toBeVisible();
-      // Only the "ready" banner's own status role — no owner-elevation row.
       expect(screen.getAllByRole('status')).toHaveLength(1);
     },
   );

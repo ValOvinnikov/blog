@@ -16,6 +16,8 @@ import { TenantDetailsPanel } from './tenant-details-panel';
 
 const render = renderWithIntl;
 
+const OWNER = { email: 'owner@example.com' };
+
 const NO_LOCKS: TTenantFieldLocks = {};
 const ALL_LOCKED_RUNNING: TTenantFieldLocks = {
   name: { kind: 'running' },
@@ -61,7 +63,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -98,7 +100,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -115,7 +117,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -144,7 +146,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -177,7 +179,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -206,7 +208,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -236,7 +238,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -265,7 +267,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -292,7 +294,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -318,7 +320,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -344,7 +346,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -375,7 +377,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -404,7 +406,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={DOMAIN_LOCKED}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -429,7 +431,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={DOMAIN_LOCKED}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -463,7 +465,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={nameLocked}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -492,7 +494,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={{ plan: { kind: 'succeeded' } }}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -519,7 +521,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             locale: LOCALE_ISO_CODES.EN,
           })}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -547,7 +549,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -581,7 +583,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={ALL_LOCKED_RUNNING}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -607,7 +609,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -624,7 +626,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -641,7 +643,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={DOMAIN_LOCKED}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -659,7 +661,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -671,7 +673,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={DOMAIN_LOCKED}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -688,7 +690,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -703,7 +705,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -738,7 +740,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -773,7 +775,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -790,7 +792,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' })}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -807,7 +809,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -815,7 +817,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={DOMAIN_LOCKED}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -830,7 +832,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={DOMAIN_LOCKED}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -841,7 +843,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
       expect(liveRegion).toHaveTextContent(
@@ -860,7 +862,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -889,7 +891,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -913,7 +915,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           <TenantDetailsPanel
             tenant={tenant}
             fieldLocks={NO_LOCKS}
-            ownerEmail="owner@example.com"
+            owner={OWNER}
             archivedNoticeId="archived-notice"
           />
           <p id="archived-notice">This tenant is archived.</p>
@@ -933,7 +935,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -950,7 +952,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -962,7 +964,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         <TenantDetailsPanel
           tenant={tenant}
           fieldLocks={ALL_LOCKED_RUNNING}
-          ownerEmail="owner@example.com"
+          owner={OWNER}
         />,
       );
 
@@ -982,7 +984,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           <TenantDetailsPanel
             tenant={makeClientTenant({ name: 'Acme Inc.' })}
             fieldLocks={NO_LOCKS}
-            ownerEmail="owner@example.com"
+            owner={OWNER}
           />
           <GuardedLink href="/tenants">Tenants</GuardedLink>
         </>,

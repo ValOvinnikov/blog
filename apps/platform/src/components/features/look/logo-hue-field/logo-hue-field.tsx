@@ -1,11 +1,9 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
-import {
-  accentHueGradient,
-  buildLogoPreviewTokens,
-} from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
 
@@ -13,8 +11,8 @@ import { logoHueFieldVariants } from './logo-hue-field-variants';
 
 export type TLogoHueFieldProps = {
   accentHue: number;
-  logoHue: number | undefined;
-  onChange: (logoHue: number | undefined) => void;
+  logoHue: TMaybeUndefined<number>;
+  onChange: (logoHue: TMaybeUndefined<number>) => void;
   isDark: boolean;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
@@ -69,7 +67,6 @@ export const LogoHueField = ({
           onChange={onChange}
           isDisabled={follows || isDisabled}
           aria-describedby={ariaDescribedBy}
-          trackStyle={{ background: accentHueGradient() }}
         />
         <span className={hueValue()}>
           {follows ? t('followsAccent') : t('hueValue', { hue: resolvedHue })}
