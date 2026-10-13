@@ -1,20 +1,16 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
 type TSettingsFormState = {
   isArchived: boolean;
   isPending: boolean;
-  archivedDescribedBy: string | undefined;
+  archivedDescribedBy: TMaybeUndefined<string>;
 };
 
-const NOT_IN_A_FORM: TSettingsFormState = {
-  isArchived: false,
-  isPending: false,
-  archivedDescribedBy: undefined,
-};
-
-const SettingsFormContext = createContext<TSettingsFormState>(NOT_IN_A_FORM);
+const SettingsFormContext =
+  createContext<TMaybeUndefined<TSettingsFormState>>(undefined);
 
 type TSettingsFormProviderProps = {
   isArchived: boolean;
@@ -45,4 +41,12 @@ export const SettingsFormProvider = ({
   );
 };
 
-export const useSettingsFormState = () => useContext(SettingsFormContext);
+export const useSettingsFormState = (): TSettingsFormState => {
+  const context = useContext(SettingsFormContext);
+  if (!context) {
+    throw new Error(
+      'useSettingsFormState must be used within a SettingsFormProvider',
+    );
+  }
+  return context;
+};

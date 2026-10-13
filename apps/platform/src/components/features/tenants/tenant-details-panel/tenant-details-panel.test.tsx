@@ -1,10 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
-import { ToastProvider } from '@platform/context/toast-provider';
-import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
-import messages from '@platform/i18n/messages/en.json';
 import {
   renderWithIntl,
   screen,
@@ -13,10 +10,7 @@ import {
 import { mockRouter } from '@platform/testing/mock-router';
 import { makeClientTenant } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
-import { render as rtlRender } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { NextIntlClientProvider } from 'next-intl';
-import type { ReactElement } from 'react';
 
 import { TenantDetailsPanel } from './tenant-details-panel';
 
@@ -34,14 +28,6 @@ const ALL_LOCKED_RUNNING: TTenantFieldLocks = {
 };
 const DOMAIN_LOCKED: TTenantFieldLocks = {
   primaryDomain: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
-};
-
-const withIntl = (ui: ReactElement) => {
-  return (
-    <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-      <ToastProvider>{ui}</ToastProvider>
-    </NextIntlClientProvider>
-  );
 };
 
 const { updateTenantDetailsActionMock } = vi.hoisted(() => ({
@@ -633,14 +619,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('mid-edit lock transition', () => {
     it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
       const tenant = makeClientTenant({ primaryDomain: 'acme.example.com' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />,
-        ),
+      const { rerender } = render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          owner={OWNER}
+        />,
       );
 
       const domainInput = screen.getByRole('textbox', {
@@ -653,13 +637,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       ).toHaveValue('unsaved-domain.example.com');
 
       rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={DOMAIN_LOCKED}
-            owner={OWNER}
-          />,
-        ),
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={DOMAIN_LOCKED}
+          owner={OWNER}
+        />,
       );
 
       expect(
@@ -672,14 +654,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
       const tenant = makeClientTenant({ name: 'Acme Inc.' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />,
-        ),
+      const { rerender } = render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          owner={OWNER}
+        />,
       );
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -687,13 +667,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       await user.type(nameInput, 'Acme Renamed (unsaved)');
 
       rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={DOMAIN_LOCKED}
-            owner={OWNER}
-          />,
-        ),
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={DOMAIN_LOCKED}
+          owner={OWNER}
+        />,
       );
 
       expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
@@ -790,14 +768,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         tenant: makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
       const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />,
-        ),
+      const { rerender } = render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          owner={OWNER}
+        />,
       );
 
       await user.clear(screen.getByRole('textbox', { name: 'Name' }));
@@ -810,13 +786,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
 
       rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' })}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />,
-        ),
+        <TenantDetailsPanel
+          tenant={makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' })}
+          fieldLocks={NO_LOCKS}
+          owner={OWNER}
+        />,
       );
 
       expect(
@@ -828,24 +802,20 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('lock transition announcement', () => {
     it('announces a lock once a field newly locks', () => {
       const tenant = makeClientTenant();
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />,
-        ),
+      const { rerender } = render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          owner={OWNER}
+        />,
       );
 
       rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={DOMAIN_LOCKED}
-            owner={OWNER}
-          />,
-        ),
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={DOMAIN_LOCKED}
+          owner={OWNER}
+        />,
       );
 
       expect(screen.getByTestId('lock-announcement-live')).toHaveTextContent(
@@ -855,27 +825,23 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('announces an unlock once a field becomes editable again', () => {
       const tenant = makeClientTenant();
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={DOMAIN_LOCKED}
-            owner={OWNER}
-          />,
-        ),
+      const { rerender } = render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={DOMAIN_LOCKED}
+          owner={OWNER}
+        />,
       );
 
       const liveRegion = screen.getByTestId('lock-announcement-live');
       expect(liveRegion).toHaveTextContent('');
 
       rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />,
-        ),
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          owner={OWNER}
+        />,
       );
       expect(liveRegion).toHaveTextContent(
         'More tenant detail fields are now editable.',
@@ -979,14 +945,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('focus management on a locking transition', () => {
     it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
       const tenant = makeClientTenant({ name: 'Acme Inc.' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />,
-        ),
+      const { rerender } = render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          owner={OWNER}
+        />,
       );
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -994,13 +958,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(nameInput).toHaveFocus();
 
       rerender(
-        withIntl(
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={ALL_LOCKED_RUNNING}
-            owner={OWNER}
-          />,
-        ),
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={ALL_LOCKED_RUNNING}
+          owner={OWNER}
+        />,
       );
 
       expect(
@@ -1015,14 +977,14 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     const renderGuardedPanel = () =>
       render(
-        <UnsavedChangesProvider>
+        <>
           <TenantDetailsPanel
             tenant={makeClientTenant({ name: 'Acme Inc.' })}
             fieldLocks={NO_LOCKS}
             owner={OWNER}
           />
           <GuardedLink href="/tenants">Tenants</GuardedLink>
-        </UnsavedChangesProvider>,
+        </>,
       );
 
     beforeEach(() => {

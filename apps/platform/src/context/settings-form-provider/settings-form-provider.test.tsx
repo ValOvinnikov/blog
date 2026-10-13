@@ -21,14 +21,10 @@ const renderInProvider = (isArchived: boolean, isPending: boolean) => {
 };
 
 describe(SettingsFormProvider, () => {
-  it('reports not archived and not pending outside a provider', () => {
-    const { result } = renderHook(() => useSettingsFormState());
-
-    expect(result.current).toEqual({
-      isArchived: false,
-      isPending: false,
-      archivedDescribedBy: undefined,
-    });
+  it('throws when read outside a provider', () => {
+    expect(() => renderHook(() => useSettingsFormState())).toThrow(
+      'useSettingsFormState must be used within a SettingsFormProvider',
+    );
   });
 
   it('points fields at the archived notice while archived', () => {

@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { useRouter } from '@platform/i18n/base-navigation';
 import {
   formatLanguageChanges,
@@ -32,9 +33,8 @@ type TUnsavedChangesContext = {
   interceptNavigation: (href: string, event: TNavigateEvent) => void;
 };
 
-const UnsavedChangesContext = createContext<TUnsavedChangesContext | undefined>(
-  undefined,
-);
+const UnsavedChangesContext =
+  createContext<TMaybeUndefined<TUnsavedChangesContext>>(undefined);
 
 type TUnsavedChangesProviderProps = {
   children: ReactNode;
@@ -113,15 +113,25 @@ export const UnsavedChangesProvider = ({
   );
 };
 
-export const useUnsavedChangesGuard = (guard: TUnsavedChangesGuard | null) => {
+const useUnsavedChangesContext = (hookName: string) => {
   const context = useContext(UnsavedChangesContext);
+  if (!context) {
+    throw new Error(
+      `${hookName} must be used within an UnsavedChangesProvider`,
+    );
+  }
+  return context;
+};
+
+export const useUnsavedChangesGuard = (guard: TUnsavedChangesGuard | null) => {
+  const { setGuard } = useUnsavedChangesContext('useUnsavedChangesGuard');
 
   useEffect(() => {
-    context?.setGuard(guard);
+    setGuard(guard);
   });
 
-  useEffect(() => () => context?.setGuard(null), [context]);
+  useEffect(() => () => setGuard(null), [setGuard]);
 };
 
 export const useInterceptNavigation = () =>
-  useContext(UnsavedChangesContext)?.interceptNavigation;
+  useUnsavedChangesContext('useInterceptNavigation').interceptNavigation;
