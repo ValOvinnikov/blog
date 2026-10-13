@@ -1,6 +1,7 @@
 import { AUDIT_ACTION, type TAuditAction } from '@blog/config';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import { Card } from '@platform/components/shared/card';
+import { CardList } from '@platform/components/shared/card-list';
 import { Text } from '@platform/components/shared/text';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { useLocale, useTranslations } from 'next-intl';
@@ -26,15 +27,7 @@ const ACTIVITY_GLYPH: Record<TAuditAction, string> = {
 export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
   const t = useTranslations('tenantOverviewPage');
   const locale = useLocale();
-  const {
-    activityList,
-    activityRow,
-    activityIcon,
-    activityBody,
-    activityMessage,
-    activitySub,
-    activityTime,
-  } = recentActivityCardVariants();
+  const { activityIcon } = recentActivityCardVariants();
 
   return (
     <Card>
@@ -47,31 +40,26 @@ export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
         }
       />
       <Card.Body>
-        {events.length === 0 ? (
-          <Text variant="supporting">{t('activityEmpty')}</Text>
-        ) : (
-          <div className={activityList()}>
-            {events.map((event) => (
-              <div className={activityRow()} key={event.id}>
+        <CardList
+          items={events}
+          emptyMessage={t('activityEmpty')}
+          renderRow={(event) => (
+            <CardList.Row key={event.id}>
+              <CardList.Lead>
                 <span className={activityIcon()} aria-hidden="true">
                   {ACTIVITY_GLYPH[event.action]}
                 </span>
-                <div className={activityBody()}>
-                  <span className={activityMessage()}>
-                    {t(`activityAction.${event.action}`)}
-                  </span>
-                  <span className={activitySub()}>{event.actorEmail}</span>
-                </div>
-                <time
-                  dateTime={event.createdAt.toISOString()}
-                  className={activityTime()}
-                >
-                  {formatRelativeTime(event.createdAt, t, locale)}
-                </time>
-              </div>
-            ))}
-          </div>
-        )}
+              </CardList.Lead>
+              <CardList.Primary>
+                {t(`activityAction.${event.action}`)}
+              </CardList.Primary>
+              <CardList.Secondary>{event.actorEmail}</CardList.Secondary>
+              <CardList.Time date={event.createdAt}>
+                {formatRelativeTime(event.createdAt, t, locale)}
+              </CardList.Time>
+            </CardList.Row>
+          )}
+        />
       </Card.Body>
     </Card>
   );
