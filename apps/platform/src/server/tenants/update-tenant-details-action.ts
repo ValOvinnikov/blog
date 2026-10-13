@@ -10,27 +10,19 @@ import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
+import {
+  toTenantFieldErrors,
+  type TTenantFieldError,
+} from '@platform/server/tenants/tenant-field-error';
 import { logger } from '@platform/utils/logger/logger';
-import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
 const updateTenantDetailsInputSchema = z.object({
-  name: z.string().trim().min(1, 'Enter a tenant name.'),
-  primaryDomain: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
+  name: z.string().trim().min(1),
+  primaryDomain: z.string().trim().toLowerCase().regex(DOMAIN_PATTERN),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
-  locale: z.string().refine(isLocaleIsoCode, {
-    message: 'Choose a supported language.',
-  }),
-  ownerEmail: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email('Enter a valid email.')
-    .optional(),
+  locale: z.string().refine(isLocaleIsoCode),
+  ownerEmail: z.string().trim().toLowerCase().email().optional(),
 });
 
 export type TUpdateTenantDetailsActionInput = z.input<
@@ -38,14 +30,22 @@ export type TUpdateTenantDetailsActionInput = z.input<
 >;
 
 export type TUpdateTenantDetailsFieldErrors = Partial<
-  Record<keyof TUpdateTenantDetailsActionInput, string>
+  Record<keyof TUpdateTenantDetailsActionInput, TTenantFieldError>
 >;
+
+export type TUpdateTenantDetailsError =
+  | 'notFound'
+  | 'archived'
+  | 'localeIsAdditional'
+  | 'provisioningStarted'
+  | 'ownerAlreadyJoined'
+  | 'saveFailed';
 
 export type TUpdateTenantDetailsActionResult =
   | { ok: true; tenant: TTenant }
   | {
       ok: false;
-      error?: string;
+      error?: TUpdateTenantDetailsError;
       fieldErrors?: TUpdateTenantDetailsFieldErrors;
     };
 
@@ -68,34 +68,35 @@ export const updateTenantDetailsAction = async (
 
   const parsed = updateTenantDetailsInputSchema.safeParse(input);
   if (!parsed.success) {
-    const fieldErrors: TUpdateTenantDetailsFieldErrors = {};
-    for (const issue of parsed.error.issues) {
-      const key = issue.path[0];
-      if (typeof key === 'string' && !(key in fieldErrors)) {
-        fieldErrors[key as keyof TUpdateTenantDetailsActionInput] =
-          issue.message;
-      }
-    }
-    return { ok: false, fieldErrors };
+    return {
+      ok: false,
+      fieldErrors: toTenantFieldErrors<keyof TUpdateTenantDetailsActionInput>(
+        parsed.error.issues,
+        {
+          name: 'nameRequired',
+          primaryDomain: 'domainInvalid',
+          plan: 'planUnsupported',
+          locale: 'localeUnsupported',
+          ownerEmail: 'emailInvalid',
+        },
+      ),
+    };
   }
 
   const tenant = await queries.tenants.getTenantById(tenantId, {
     includeArchived: true,
   });
   if (!tenant) {
-    const t = await getTranslations('tenantDetailsPanel');
-    return { ok: false, error: t('notFoundError') };
+    return { ok: false, error: 'notFound' };
   }
   if (tenant.deprovisionedAt) {
-    const t = await getTranslations('tenantDetailsPanel');
-    return { ok: false, error: t('archivedError') };
+    return { ok: false, error: 'archived' };
   }
   if (
     parsed.data.locale !== tenant.locale &&
     tenant.additionalLocales.includes(parsed.data.locale)
   ) {
-    const t = await getTranslations('tenantDetailsPanel');
-    return { ok: false, error: t('localeIsAdditionalError') };
+    return { ok: false, error: 'localeIsAdditional' };
   }
 
   try {
@@ -117,40 +118,32 @@ export const updateTenantDetailsAction = async (
       case 'domain-taken':
         return {
           ok: false,
-          fieldErrors: { primaryDomain: 'This domain is already in use.' },
+          fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
         };
       case 'domain-invalid':
         return {
           ok: false,
-          fieldErrors: { primaryDomain: 'Enter a valid domain.' },
+          fieldErrors: { primaryDomain: { reason: 'domainInvalid' } },
         };
-      case 'domain-locked': {
-        const t = await getTranslations('tenantDetailsPanel');
-        const tSteps = await getTranslations('provisioningStatusView');
+      case 'domain-locked':
         return {
           ok: false,
           fieldErrors: {
-            primaryDomain: t('fieldLockedReasonStep', {
-              step: tSteps(`stepLabel.${result.blockingStep}`),
-            }),
+            primaryDomain: {
+              reason: 'domainLocked',
+              step: result.blockingStep,
+            },
           },
         };
-      }
-      case 'provisioning-started': {
-        const t = await getTranslations('tenantDetailsPanel');
-        return { ok: false, error: t('provisioningStartedError') };
-      }
-      case 'owner-email-taken': {
-        const t = await getTranslations('tenantDetailsPanel');
+      case 'provisioning-started':
+        return { ok: false, error: 'provisioningStarted' };
+      case 'owner-email-taken':
         return {
           ok: false,
-          fieldErrors: { ownerEmail: t('ownerEmailTakenError') },
+          fieldErrors: { ownerEmail: { reason: 'ownerEmailTaken' } },
         };
-      }
-      case 'owner-already-joined': {
-        const t = await getTranslations('tenantDetailsPanel');
-        return { ok: false, error: t('ownerAlreadyJoinedError') };
-      }
+      case 'owner-already-joined':
+        return { ok: false, error: 'ownerAlreadyJoined' };
       default: {
         const unhandledOutcome: never = result;
         throw new Error(
@@ -160,6 +153,6 @@ export const updateTenantDetailsAction = async (
     }
   } catch (error) {
     logger.error('tenants.update_details_failed', { tenantId, error });
-    return { ok: false, error: "Couldn't save tenant details — try again." };
+    return { ok: false, error: 'saveFailed' };
   }
 };

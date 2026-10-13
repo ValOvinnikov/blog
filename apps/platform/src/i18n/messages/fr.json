@@ -629,7 +629,11 @@
     "submitButton": "Lancer le provisionnement",
     "confirmOwnerInviteButton": "Confirmer et inviter le propriétaire",
     "submittingBeginButton": "Lancement du provisionnement…",
-    "submittingInviteButton": "Invitation du propriétaire…"
+    "submittingInviteButton": "Invitation du propriétaire…",
+    "ownerInviteConfirmation": "Aucun compte trouvé pour {email} — une invitation lui sera envoyée pour se connecter et gérer ce locataire en tant que propriétaire.",
+    "errors": {
+      "createFailed": "Impossible de créer le locataire — veuillez réessayer."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Provisionnement",
@@ -761,19 +765,30 @@
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
     "alertSuccess": "Détails du locataire enregistrés.",
-    "provisioningStartedError": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
-    "archivedError": "Ce locataire est archivé ; ses détails ne peuvent plus être modifiés.",
-    "notFoundError": "Locataire introuvable.",
-    "ownerAlreadyJoinedError": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
-    "ownerEmailTakenError": "Cet e-mail fait déjà l'objet d'une invitation en attente pour ce locataire.",
     "lockedAnnouncement": "Certains champs des détails du locataire sont désormais verrouillés.",
     "unlockedAnnouncement": "D'autres champs des détails du locataire sont désormais modifiables.",
     "fieldLockedReasonStep": "Verrouillé — l'étape « {step} » est déjà terminée et a utilisé cette valeur.",
     "fieldLockedReasonRunning": "Verrouillé pendant le provisionnement.",
     "fieldLockedReasonSucceeded": "Verrouillé — le provisionnement est déjà terminé.",
     "fieldLockedReasonArchived": "Verrouillé — ce locataire est archivé.",
-    "localeIsAdditionalError": "Cette langue est déjà une langue supplémentaire. Retirez-la d'abord de cette liste.",
-    "localeInvalidError": "Choisissez une langue prise en charge."
+    "errors": {
+      "notFound": "Locataire introuvable.",
+      "archived": "Ce locataire est archivé ; ses détails ne peuvent plus être modifiés.",
+      "localeIsAdditional": "Cette langue est déjà une langue supplémentaire. Retirez-la d'abord de cette liste.",
+      "provisioningStarted": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
+      "ownerAlreadyJoined": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
+      "saveFailed": "Impossible d'enregistrer les informations du locataire — veuillez réessayer."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Saisissez un nom de locataire.",
+    "domainInvalid": "Saisissez un domaine valide.",
+    "domainTaken": "Ce domaine est déjà utilisé.",
+    "domainAttachedElsewhere": "Ce domaine est déjà rattaché à un autre projet Vercel — libérez-le là-bas ou utilisez un autre domaine.",
+    "emailInvalid": "Saisissez une adresse e-mail valide.",
+    "planUnsupported": "Choisissez une formule prise en charge.",
+    "localeUnsupported": "Choisissez une langue prise en charge.",
+    "ownerEmailTaken": "Cet e-mail fait déjà l'objet d'une invitation en attente pour ce locataire."
   },
   "archivedTenantNotice": {
     "title": "Ce locataire est archivé",

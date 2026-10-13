@@ -629,7 +629,11 @@
     "submitButton": "Inrichting starten",
     "confirmOwnerInviteButton": "Bevestigen en eigenaar uitnodigen",
     "submittingBeginButton": "Inrichting starten…",
-    "submittingInviteButton": "Eigenaar uitnodigen…"
+    "submittingInviteButton": "Eigenaar uitnodigen…",
+    "ownerInviteConfirmation": "Geen account gevonden voor {email} — er wordt een uitnodiging gestuurd om in te loggen en deze tenant als eigenaar te beheren.",
+    "errors": {
+      "createFailed": "De tenant kon niet worden aangemaakt — probeer het opnieuw."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Inrichting",
@@ -761,19 +765,30 @@
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
     "alertSuccess": "Tenantgegevens opgeslagen.",
-    "provisioningStartedError": "De inrichting van deze tenant is al gestart; de gegevens kunnen niet meer worden bewerkt.",
-    "archivedError": "Deze tenant is gearchiveerd; de gegevens kunnen niet meer worden bewerkt.",
-    "notFoundError": "Tenant niet gevonden.",
-    "ownerAlreadyJoinedError": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
-    "ownerEmailTakenError": "Voor dit e-mailadres staat al een uitnodiging open bij deze tenant.",
     "lockedAnnouncement": "Sommige velden met tenantgegevens zijn nu vergrendeld.",
     "unlockedAnnouncement": "Meer velden met tenantgegevens zijn nu bewerkbaar.",
     "fieldLockedReasonStep": "Vergrendeld — de stap \"{step}\" is al voltooid en heeft deze waarde gebruikt.",
     "fieldLockedReasonRunning": "Vergrendeld zolang de inrichting loopt.",
     "fieldLockedReasonSucceeded": "Vergrendeld — de inrichting is al voltooid.",
     "fieldLockedReasonArchived": "Vergrendeld — deze tenant is gearchiveerd.",
-    "localeIsAdditionalError": "Deze taal is al een extra taal. Verwijder deze daar eerst.",
-    "localeInvalidError": "Kies een ondersteunde taal."
+    "errors": {
+      "notFound": "Tenant niet gevonden.",
+      "archived": "Deze tenant is gearchiveerd; de gegevens kunnen niet meer worden bewerkt.",
+      "localeIsAdditional": "Deze taal is al een extra taal. Verwijder deze daar eerst.",
+      "provisioningStarted": "De inrichting van deze tenant is al gestart; de gegevens kunnen niet meer worden bewerkt.",
+      "ownerAlreadyJoined": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
+      "saveFailed": "De tenantgegevens konden niet worden opgeslagen — probeer het opnieuw."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Vul een tenantnaam in.",
+    "domainInvalid": "Vul een geldig domein in.",
+    "domainTaken": "Dit domein is al in gebruik.",
+    "domainAttachedElsewhere": "Dit domein is al gekoppeld aan een ander Vercel-project — maak het daar vrij of gebruik een ander domein.",
+    "emailInvalid": "Vul een geldig e-mailadres in.",
+    "planUnsupported": "Kies een ondersteund abonnement.",
+    "localeUnsupported": "Kies een ondersteunde taal.",
+    "ownerEmailTaken": "Voor dit e-mailadres staat al een uitnodiging open bij deze tenant."
   },
   "archivedTenantNotice": {
     "title": "Deze tenant is gearchiveerd",

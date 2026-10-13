@@ -629,7 +629,11 @@
     "submitButton": "Bereitstellung starten",
     "confirmOwnerInviteButton": "Bestätigen und Inhaber einladen",
     "submittingBeginButton": "Bereitstellung wird gestartet…",
-    "submittingInviteButton": "Inhaber wird eingeladen…"
+    "submittingInviteButton": "Inhaber wird eingeladen…",
+    "ownerInviteConfirmation": "Kein Konto für {email} gefunden — diese Person erhält eine Einladung, sich anzumelden und diesen Mandanten als Inhaber zu verwalten.",
+    "errors": {
+      "createFailed": "Der Mandant konnte nicht erstellt werden — bitte erneut versuchen."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Bereitstellung",
@@ -761,19 +765,30 @@
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "Mandantendetails gespeichert.",
-    "provisioningStartedError": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
-    "archivedError": "Dieser Mandant ist archiviert; seine Details können nicht mehr bearbeitet werden.",
-    "notFoundError": "Mandant nicht gefunden.",
-    "ownerAlreadyJoinedError": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
-    "ownerEmailTakenError": "Für diese E-Mail-Adresse gibt es bei diesem Mandanten bereits eine ausstehende Einladung.",
     "lockedAnnouncement": "Einige Felder der Mandantendetails sind jetzt gesperrt.",
     "unlockedAnnouncement": "Weitere Felder der Mandantendetails sind jetzt bearbeitbar.",
     "fieldLockedReasonStep": "Gesperrt — der Schritt „{step}“ ist bereits abgeschlossen und hat diesen Wert verwendet.",
     "fieldLockedReasonRunning": "Gesperrt, während die Bereitstellung läuft.",
     "fieldLockedReasonSucceeded": "Gesperrt — die Bereitstellung ist bereits abgeschlossen.",
     "fieldLockedReasonArchived": "Gesperrt — dieser Mandant ist archiviert.",
-    "localeIsAdditionalError": "Diese Sprache ist bereits eine zusätzliche Sprache. Entfernen Sie sie zuerst dort.",
-    "localeInvalidError": "Wählen Sie eine unterstützte Sprache."
+    "errors": {
+      "notFound": "Mandant nicht gefunden.",
+      "archived": "Dieser Mandant ist archiviert; seine Details können nicht mehr bearbeitet werden.",
+      "localeIsAdditional": "Diese Sprache ist bereits eine zusätzliche Sprache. Entfernen Sie sie zuerst dort.",
+      "provisioningStarted": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
+      "ownerAlreadyJoined": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
+      "saveFailed": "Die Mandantendaten konnten nicht gespeichert werden — bitte erneut versuchen."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Geben Sie einen Mandantennamen ein.",
+    "domainInvalid": "Geben Sie eine gültige Domain ein.",
+    "domainTaken": "Diese Domain wird bereits verwendet.",
+    "domainAttachedElsewhere": "Diese Domain ist bereits mit einem anderen Vercel-Projekt verknüpft — geben Sie sie dort frei oder verwenden Sie eine andere Domain.",
+    "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "planUnsupported": "Wählen Sie einen unterstützten Tarif.",
+    "localeUnsupported": "Wählen Sie eine unterstützte Sprache.",
+    "ownerEmailTaken": "Für diese E-Mail-Adresse gibt es bei diesem Mandanten bereits eine ausstehende Einladung."
   },
   "archivedTenantNotice": {
     "title": "Dieser Mandant ist archiviert",

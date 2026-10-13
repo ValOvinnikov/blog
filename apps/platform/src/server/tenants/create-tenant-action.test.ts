@@ -114,7 +114,7 @@ describe('createTenantAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { domain: expect.any(String) },
+      fieldErrors: { domain: { reason: 'domainInvalid' } },
     });
     expect(getUserByEmailMock).not.toHaveBeenCalled();
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -130,7 +130,6 @@ describe('createTenantAction', () => {
       ownerInviteConfirmation: {
         email: 'owner@example.com',
         token: expect.any(String),
-        message: expect.any(String),
       },
     });
     expect(result.fieldErrors).toBeUndefined();
@@ -152,7 +151,6 @@ describe('createTenantAction', () => {
       ownerInviteConfirmation: {
         email: 'owner@example.com',
         token: expect.any(String),
-        message: expect.any(String),
       },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -172,7 +170,6 @@ describe('createTenantAction', () => {
       ownerInviteConfirmation: {
         email: 'owner@example.com',
         token: expect.any(String),
-        message: expect.any(String),
       },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -264,7 +261,7 @@ describe('createTenantAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { domain: expect.any(String) },
+      fieldErrors: { domain: { reason: 'domainTaken' } },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
@@ -276,7 +273,7 @@ describe('createTenantAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { domain: expect.any(String) },
+      fieldErrors: { domain: { reason: 'domainAttachedElsewhere' } },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
@@ -320,7 +317,7 @@ describe('createTenantAction', () => {
 
     const result = await createTenantAction(validInput);
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, error: 'createFailed' });
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
@@ -337,7 +334,7 @@ describe('createTenantAction', () => {
 
     const result = await createTenantAction(validInput);
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, error: 'createFailed' });
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(

@@ -629,7 +629,11 @@
     "submitButton": "Iniciar aprovisionamiento",
     "confirmOwnerInviteButton": "Confirmar e invitar al propietario",
     "submittingBeginButton": "Iniciando aprovisionamiento…",
-    "submittingInviteButton": "Invitando al propietario…"
+    "submittingInviteButton": "Invitando al propietario…",
+    "ownerInviteConfirmation": "No hay ninguna cuenta para {email}. Recibirá una invitación para iniciar sesión y gestionar este cliente como propietario.",
+    "errors": {
+      "createFailed": "No se pudo crear el cliente. Vuelva a intentarlo."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Aprovisionamiento",
@@ -761,19 +765,30 @@
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
     "alertSuccess": "Detalles del cliente guardados.",
-    "provisioningStartedError": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
-    "archivedError": "Este cliente está archivado; sus detalles ya no se pueden editar.",
-    "notFoundError": "No se encontró el cliente.",
-    "ownerAlreadyJoinedError": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
-    "ownerEmailTakenError": "Este correo electrónico ya tiene una invitación pendiente en este cliente.",
     "lockedAnnouncement": "Algunos campos de detalles del cliente están ahora bloqueados.",
     "unlockedAnnouncement": "Ahora se pueden editar más campos de detalles del cliente.",
     "fieldLockedReasonStep": "Bloqueado: el paso «{step}» ya se ha completado y ha usado este valor.",
     "fieldLockedReasonRunning": "Bloqueado mientras se ejecuta el aprovisionamiento.",
     "fieldLockedReasonSucceeded": "Bloqueado: el aprovisionamiento ya ha finalizado.",
     "fieldLockedReasonArchived": "Bloqueado: este cliente está archivado.",
-    "localeIsAdditionalError": "Este idioma ya es un idioma adicional. Quítelo de ahí primero.",
-    "localeInvalidError": "Elija un idioma compatible."
+    "errors": {
+      "notFound": "No se encontró el cliente.",
+      "archived": "Este cliente está archivado; sus detalles ya no se pueden editar.",
+      "localeIsAdditional": "Este idioma ya es un idioma adicional. Quítelo de ahí primero.",
+      "provisioningStarted": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
+      "ownerAlreadyJoined": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
+      "saveFailed": "No se pudieron guardar los datos del cliente. Vuelva a intentarlo."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Introduzca un nombre de cliente.",
+    "domainInvalid": "Introduzca un dominio válido.",
+    "domainTaken": "Este dominio ya está en uso.",
+    "domainAttachedElsewhere": "Este dominio ya está vinculado a otro proyecto de Vercel. Libérelo allí o use otro dominio.",
+    "emailInvalid": "Introduzca un correo electrónico válido.",
+    "planUnsupported": "Elija un plan compatible.",
+    "localeUnsupported": "Elija un idioma compatible.",
+    "ownerEmailTaken": "Este correo electrónico ya tiene una invitación pendiente en este cliente."
   },
   "archivedTenantNotice": {
     "title": "Este cliente está archivado",

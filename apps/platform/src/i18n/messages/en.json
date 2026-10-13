@@ -629,7 +629,11 @@
     "submitButton": "Begin provisioning",
     "confirmOwnerInviteButton": "Confirm & invite owner",
     "submittingBeginButton": "Beginning provisioning…",
-    "submittingInviteButton": "Inviting owner…"
+    "submittingInviteButton": "Inviting owner…",
+    "ownerInviteConfirmation": "No account found for {email} — they'll be sent an invite to sign in and manage this tenant as owner.",
+    "errors": {
+      "createFailed": "Couldn't create the tenant — try again."
+    }
   },
   "provisioningStatusView": {
     "pageTitle": "Provisioning",
@@ -761,19 +765,30 @@
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Tenant details saved.",
-    "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited.",
-    "archivedError": "This tenant is archived; its details can no longer be edited.",
-    "notFoundError": "Tenant not found.",
-    "ownerAlreadyJoinedError": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
-    "ownerEmailTakenError": "This email already has a pending invite on this tenant.",
     "lockedAnnouncement": "Some tenant detail fields are now locked.",
     "unlockedAnnouncement": "More tenant detail fields are now editable.",
     "fieldLockedReasonStep": "Locked — the \"{step}\" step has already completed and used this value.",
     "fieldLockedReasonRunning": "Locked while provisioning is running.",
     "fieldLockedReasonSucceeded": "Locked — provisioning has already finished.",
     "fieldLockedReasonArchived": "Locked — this tenant is archived.",
-    "localeIsAdditionalError": "This language is already an additional language. Remove it there first.",
-    "localeInvalidError": "Choose a supported language."
+    "errors": {
+      "notFound": "Tenant not found.",
+      "archived": "This tenant is archived; its details can no longer be edited.",
+      "localeIsAdditional": "This language is already an additional language. Remove it there first.",
+      "provisioningStarted": "This tenant's provisioning has already started; its details can no longer be edited.",
+      "ownerAlreadyJoined": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
+      "saveFailed": "Couldn't save tenant details — try again."
+    }
+  },
+  "tenantFieldErrors": {
+    "nameRequired": "Enter a tenant name.",
+    "domainInvalid": "Enter a valid domain.",
+    "domainTaken": "This domain is already in use.",
+    "domainAttachedElsewhere": "This domain is already attached to a different Vercel project — free it up there, or use a different domain.",
+    "emailInvalid": "Enter a valid email.",
+    "planUnsupported": "Choose a supported plan.",
+    "localeUnsupported": "Choose a supported language.",
+    "ownerEmailTaken": "This email already has a pending invite on this tenant."
   },
   "archivedTenantNotice": {
     "title": "This tenant is archived",

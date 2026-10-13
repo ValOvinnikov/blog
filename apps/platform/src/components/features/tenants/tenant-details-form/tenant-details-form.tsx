@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
+import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -13,7 +13,9 @@ import { TextInput } from '@platform/components/shared/text-input';
 import {
   createTenantAction,
   type TCreateTenantFieldErrors,
+  type TCreateTenantResult,
 } from '@platform/server/tenants/create-tenant-action';
+import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 
@@ -33,11 +35,9 @@ const INITIAL_VALUES: TFormValues = {
   ownerEmail: '',
 };
 
-type TOwnerInviteConfirmation = {
-  email: string;
-  message: string;
-  token: string;
-};
+type TOwnerInviteConfirmation = NonNullable<
+  TCreateTenantResult['ownerInviteConfirmation']
+>;
 
 /**
  * The wizard's Details step — the one part of tenant creation an operator
@@ -48,9 +48,11 @@ type TOwnerInviteConfirmation = {
  */
 export const TenantDetailsForm = () => {
   const t = useTranslations('tenantDetailsForm');
+  const fieldErrorText = useTenantFieldErrorText();
   const [values, setValues] = useState<TFormValues>(INITIAL_VALUES);
   const [fieldErrors, setFieldErrors] = useState<TCreateTenantFieldErrors>({});
-  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [formError, setFormError] =
+    useState<TMaybeUndefined<TCreateTenantResult['error']>>(undefined);
   const [ownerInviteConfirmation, setOwnerInviteConfirmation] =
     useState<TOwnerInviteConfirmation | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -107,7 +109,9 @@ export const TenantDetailsForm = () => {
 
   return (
     <div className={root()}>
-      {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
+      {formError && (
+        <Alert type={ALERT_TYPE.ERROR} title={t(`errors.${formError}`)} />
+      )}
 
       <div className={cardWrap()}>
         <div
@@ -124,7 +128,7 @@ export const TenantDetailsForm = () => {
               <div className={fields()}>
                 <FormTextInput
                   label={t('nameLabel')}
-                  error={fieldErrors.name}
+                  error={fieldErrorText(fieldErrors.name)}
                   value={values.name}
                   onChange={(value) => updateField('name', value)}
                 />
@@ -132,7 +136,7 @@ export const TenantDetailsForm = () => {
                 <FormTextInput
                   label={t('domainLabel')}
                   hint={t('domainHint')}
-                  error={fieldErrors.domain}
+                  error={fieldErrorText(fieldErrors.domain)}
                   value={values.domain}
                   onChange={(value) => updateField('domain', value)}
                 />
@@ -153,12 +157,14 @@ export const TenantDetailsForm = () => {
                 <FormField
                   label={t('ownerEmailLabel')}
                   hint={t('ownerEmailHint')}
-                  error={fieldErrors.ownerEmail}
+                  error={fieldErrorText(fieldErrors.ownerEmail)}
                   footer={
                     ownerInviteConfirmation && (
                       <Alert
                         type={ALERT_TYPE.INFO}
-                        title={ownerInviteConfirmation.message}
+                        title={t('ownerInviteConfirmation', {
+                          email: ownerInviteConfirmation.email,
+                        })}
                       />
                     )
                   }
