@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
@@ -13,7 +14,7 @@ export type TColourCardProps = {
   accentHue: number;
   accentHueFieldId: string;
   isAccentHueRejected: boolean;
-  logoHue: number | undefined;
+  logoHue: TMaybeUndefined<number>;
   onFieldChange: TLookFormFieldSetter;
   hasUnsavedChanges: boolean;
 };

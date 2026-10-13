@@ -13,7 +13,6 @@ export type TLookFieldProps = {
   error?: string;
   isOptional?: boolean;
   isGroup?: boolean;
-  id?: string;
   children: ReactNode;
 };
 
@@ -23,7 +22,6 @@ export const LookField = ({
   error,
   isOptional = false,
   isGroup = false,
-  id,
   children,
 }: TLookFieldProps) => {
   const t = useTranslations('lookForm');
@@ -56,7 +54,7 @@ export const LookField = ({
   );
 
   return (
-    <Field.Root id={id} invalid={Boolean(error)}>
+    <Field.Root invalid={Boolean(error)}>
       {isGroup ? (
         // ToggleGroup ignores Field's description ids, so the group carries the hint.
         <Fieldset.Root

@@ -44,11 +44,7 @@ export const HueSlider = ({
       className={root({ class: className })}
     >
       <Slider.Control className={control()}>
-        <Slider.Track
-          className={track()}
-          style={TRACK_STYLE}
-          data-testid="hue-slider-track"
-        >
+        <Slider.Track className={track()} style={TRACK_STYLE}>
           <Slider.Thumb
             id={id}
             aria-label={ariaLabel}

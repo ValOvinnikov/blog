@@ -82,6 +82,20 @@ describe(`<${SaveBar.name}/>`, () => {
       expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
     });
 
+    it('focuses the control inside a first field that cannot take focus', async () => {
+      renderWithIntl(
+        <div id="field-heading">
+          <input aria-label="Heading" />
+        </div>,
+      );
+
+      await userEvent.click(
+        screen.getByRole('link', { name: 'Go to the first one' }),
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
+    });
+
     it('keeps Save and Discard available', () => {
       expect(
         screen.getByRole('button', { name: 'Save changes' }),

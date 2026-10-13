@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
 import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -10,8 +11,8 @@ import { logoHueFieldVariants } from './logo-hue-field-variants';
 
 export type TLogoHueFieldProps = {
   accentHue: number;
-  logoHue: number | undefined;
-  onChange: (logoHue: number | undefined) => void;
+  logoHue: TMaybeUndefined<number>;
+  onChange: (logoHue: TMaybeUndefined<number>) => void;
   isDark: boolean;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
