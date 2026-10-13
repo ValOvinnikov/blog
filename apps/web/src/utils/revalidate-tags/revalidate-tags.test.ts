@@ -57,12 +57,6 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
-  it('maps the theme settings singleton to its ISR tag', () => {
-    expect(
-      getRevalidateTagsForType('settings_theme', 'settings-theme'),
-    ).toEqual(['theme-settings']);
-  });
-
   it('includes the per-document tag for module types', () => {
     expect(getRevalidateTagsForType('module_hero', 'hero-1')).toEqual([
       'modules:hero',

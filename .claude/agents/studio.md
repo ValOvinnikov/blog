@@ -219,8 +219,8 @@ src/schema-types/modules/hero-blog/
 - The export is `{camelCase(name minus prefix)}Schema`, with a group suffix
   only where the bare name would collide across groups: pages are
   `<name>PageSchema` (`page_tag` → `tagPageSchema`, because `blog_tag` →
-  `tagSchema`) and settings are `<name>SettingsSchema` (`settings_theme` →
-  `themeSettingsSchema`). Blog, modules, objects and portable-text use the bare
+  `tagSchema`) and settings are `<name>SettingsSchema` (`settings_footer` →
+  `footerSettingsSchema`). Blog, modules, objects and portable-text use the bare
   form.
 - `objects/` holds `type: 'object'`/image types only; the `type: 'array'`
   block editors (`richText`, `proseText`, `inlineText`) live in
@@ -244,8 +244,8 @@ Type names follow `{group}_{name}`, except `person`, which is ungrouped.
 Documents: `person`, `blog_tag`, `blog_topic`; page documents `page_home`,
 `page_blog`, `page_landing`, `page_post`, `page_tag`, `page_topic`,
 `page_tagIndex`, `page_topicIndex`;
-singletons `settings_site`, `settings_navigation`, `settings_footer`,
-`settings_theme`; and the reusable module documents
+singletons `settings_site`, `settings_navigation`, `settings_footer`;
+and the reusable module documents
 `module_content`, `module_cta`, `module_hero`, `module_heroBlog`,
 `module_newsletter`, `module_postFeatured`, `module_postLatest`,
 `module_postList`, `module_postRelated`, `module_taxonomyList`. Shared

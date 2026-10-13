@@ -38,7 +38,7 @@ const readPixels = (css: string, token: string): number =>
   Number(css.match(new RegExp(`${token}: (\\d+)px;`))?.[1]);
 
 describe('buildThemeStyleBlock', () => {
-  it('reproduces the static Console defaults for the no-settings_theme-document case', () => {
+  it('reproduces the static Console defaults', () => {
     const css = buildThemeStyleBlock(CONSOLE_TOKENS);
 
     expect(css).toContain('--brand-primary: oklch(0.53 0.17 250);');

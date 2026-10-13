@@ -519,14 +519,11 @@ separator: BRAND_TAGLINE_SEPARATORS }`, replacing a plain string so the
   service layer can join it with a chosen separator glyph). Carries no SEO
   fields — page metadata and the RSS channel description are authored on the
   pages themselves.
-- `settings_theme` (singleton, `themeSettingsSchema`) — `titleField` (bare; see
-  helper note below), `preset` (required, `PRESET_ID` stored value:
-  `CONSOLE`/`EDITORIAL`), `accentHue`/`logoHue` (optional numbers, 0-360,
-  OKLCH hue channels — `logoHue` falls back to `accentHue` when unset),
-  `headingFont`/`bodyFont` (optional, `FONT_CHOICE`), `radiusScale`
-  (optional, `RADIUS_SCALE`), `density` (optional, `DENSITY`) — a
-  tenant-level theme override resolved against `PRESET_REGISTRY` in
-  `@blog/config`; part of the Phase 2 configurability epic (#1285).
+- Theme has no Studio schema. Tenant theme settings live in Postgres, in
+  `site_config`, edited in the platform and resolved against
+  `PRESET_REGISTRY` in `@blog/config`. The Sanity theme singleton that
+  once held them was deleted after the Postgres cutover left it with no read
+  path.
 - Voice copy has no Studio schema. Tenant-overridable UI strings live in
   Postgres, in `site_config`'s `voiceOverrides`, edited in the platform's
   Voice page and merged over the neutral catalog at request time. The

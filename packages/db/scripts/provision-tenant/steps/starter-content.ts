@@ -1,4 +1,3 @@
-import { PRESET_ID } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 // Fixed document ids (published, not `drafts.`-prefixed). No generated
@@ -7,7 +6,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 const STARTER_DOCUMENT_IDS = {
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
-  THEME: 'provisioning.settings.theme',
   SITE: 'provisioning.settings.site',
   HOME: 'provisioning.settings.home',
 } as const;
@@ -40,13 +38,6 @@ export function buildStarterDocuments(
     _id: STARTER_DOCUMENT_IDS.FOOTER,
     _type: 'settings_footer',
     title: 'Footer',
-  };
-
-  const theme: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.THEME,
-    _type: 'settings_theme',
-    title: 'Theme',
-    preset: PRESET_ID.CONSOLE,
   };
 
   const site: TSanityDocument = {
@@ -82,5 +73,5 @@ export function buildStarterDocuments(
     },
   };
 
-  return [navigation, footer, theme, site, home];
+  return [navigation, footer, site, home];
 }
