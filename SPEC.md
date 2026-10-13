@@ -1513,8 +1513,13 @@ their own data through the request context: `SiteHeader`, `SiteFooter`,
 `SiteAnalytics` (`apps/web/src/components/shared/`). Site settings come
 from one per-request loader, `apps/web/src/server/site-settings/`, shared
 by `generateMetadata`, the layout, the header, the footer and any module
-that needs them. **There are two 404 boundaries above it, and each renders
-its own English `DocumentShell`:** `app/[tenant]/not-found.tsx` and
+that needs them. **A `notFound()` thrown by a page under it renders
+`app/[tenant]/[locale]/not-found.tsx`** inside the layout, so the 404 keeps
+the tenant's header, footer, theme and Voice: the boundary renders
+`LocaleNotFoundPage`, a client leaf that reads its copy from the layout's
+providers, and takes its metadata from `getNotFoundContext()`. **Two more
+404 boundaries sit above the layout, and each renders its own
+`DocumentShell`:** `app/[tenant]/not-found.tsx` and
 `app/global-not-found.tsx` (enabled by `experimental.globalNotFound`, since
 there is no single root layout to compose a 404 from).
 `app/[tenant]/not-found.tsx` exists because a segment's own
@@ -1522,13 +1527,28 @@ there is no single root layout to compose a 404 from).
 so a `notFound()` thrown inside `[tenant]/[locale]/layout.tsx` itself is
 catchable only one segment up — without it that throw escaped to a 500 on
 every route. That is a Next.js file-convention rule, independent of the
-route's static/dynamic classification. Like `app/global-not-found.tsx`,
-`app/[tenant]/not-found.tsx` resolves no tenant and renders unthemed —
-including the 404 a site-settings failure or an unsupported locale raises
-in the layout. It must never read `headers()`: on the same prerendered
-`/[tenant]/[locale]` route that would be expected to bail the render out of
-static and — with no `pages/500.html` to fall back on — return a bare 500 in
-place of the 404, the same failure #3191 fixed at the root boundary.
+route's static/dynamic classification. It catches the 404 a site-settings
+failure or an unsupported locale raises in the layout, and renders
+`StandaloneNotFoundPage` for the requested tenant in the served language,
+themed but without chrome. Both boundaries resolve their tenant through
+`getNotFoundContext()`, which waits for the layout to enter the route. Neither
+may read `headers()`: on the same prerendered `/[tenant]/[locale]` route
+that would be expected to bail the render out of static and — with no
+`pages/500.html` to fall back on — return a bare 500 in place of the 404,
+the same failure #3191 fixed at the root boundary.
+
+**A page-level 404's server HTML is empty; the boundary renders on the
+client.** Observed in a production build of a minimal reproduction of this
+route tree on Next 16.3.8 (the version `apps/web` resolves), not of
+`apps/web` itself, which needs live credentials to build: a page that
+calls `notFound()` answers 404 with an empty `<html id="__next_error__">`
+shell, and the boundary — chrome included — appears only once the browser
+renders the RSC payload. This held for every route shape tried, including a
+plain static route outside `[tenant]` and a `force-dynamic` one, so it is
+Next's SSR error-recovery path, not this route tree. Consequently `curl`
+cannot tell the boundaries apart; checking which one serves a 404 needs a
+browser. Soft navigation into a 404 lands on the same boundary as a document
+GET.
 
 **The request context** (`apps/web/src/server/request-context/`) is where a
 `[tenant]/[locale]` request's tenant-wide values live, so they are not
@@ -1555,27 +1575,12 @@ back to the platform project elsewhere.
 URLs that match no route. It has no `[tenant]` route param to thread even
 when one exists in the URL, and never resolves a tenant at all:
 it renders `StandaloneNotFoundPage` with no argument, always falling back to
-default theme tokens and base messages. What was actually checked: curling
-four content-404 URLs against a production build — `/tags` (an index page
-with no `generateStaticParams` of its own), `/nonexistent-xyz`,
-`/blog/page/abc`, `/blog/page/999` — returned 404 with no `Header`/`Footer`
-chrome in any response; that is the whole of the evidence. Chrome-absence
-rules out the 404 having rendered inside the locale layout (the deleted
-`[tenant]/[locale]/not-found.tsx` would have carried that chrome) and
-nothing more: which of the two remaining boundaries served these four was
-not determined, since neither one renders chrome and theme tokens were
-never checked. Whether a `notFound()` thrown by a _page_ under
-`[tenant]/[locale]` — as opposed to one thrown by the layout itself —
-escalates past `app/[tenant]/not-found.tsx` to land here is therefore an
-open question, not a finding, tracked in #3209. All four were direct
-document GETs — a soft client-side navigation into a 404 takes a different
-router path and wasn't tested. The escalation's cause, if there is one,
-isn't confirmed either: `[tenant]/[locale]/layout.tsx` keeping its own
-`generateStaticParams` (`locale` only) classifies the whole subtree for
-on-demand blocking generation, which is a plausible contributor, but it
-can't be the whole explanation on its own — it would equally predict
-`app/[tenant]/not-found.tsx` being bypassed for the layout's own throw,
-which the paragraph above says it is not. `i18n/request.ts`
+default theme tokens and base messages. Page-level 404s under
+`[tenant]/[locale]` never reach it: in a browser against the same
+reproduction, the `/tags`, unknown `[...slug]` and `/blog/page/999` shapes
+all rendered the
+nearest enclosing boundary, and before the nested boundary existed that was
+`app/[tenant]/not-found.tsx`, not this one. `i18n/request.ts`
 is likewise tenant-independent, returning the base locale messages only.
 This split exists because `getRequestConfig` (and, before `<html lang>`
 moved into `[tenant]/[locale]/layout.tsx`, the old `app/layout.tsx`) sits
