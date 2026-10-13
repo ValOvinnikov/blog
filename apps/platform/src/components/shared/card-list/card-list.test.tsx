@@ -5,14 +5,18 @@ import { CardList } from './card-list';
 type TEntry = { id: string; title: string };
 
 const renderEntry = ({ id, title }: TEntry) => (
-  <CardList.Row
-    key={id}
-    lead={<span>Lead {id}</span>}
-    primary={title}
-    secondary={`Secondary ${id}`}
-    time={{ date: new Date('2026-08-24T12:00:00.000Z'), label: '5m ago' }}
-  >
-    <button type="button">Details {id}</button>
+  <CardList.Row key={id}>
+    <CardList.Lead>
+      <span>Lead {id}</span>
+    </CardList.Lead>
+    <CardList.Primary>{title}</CardList.Primary>
+    <CardList.Secondary>{`Secondary ${id}`}</CardList.Secondary>
+    <CardList.Footer>
+      <button type="button">Details {id}</button>
+    </CardList.Footer>
+    <CardList.Time date={new Date('2026-08-24T12:00:00.000Z')}>
+      5m ago
+    </CardList.Time>
   </CardList.Row>
 );
 

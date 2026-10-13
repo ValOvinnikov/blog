@@ -13,9 +13,8 @@ export const cardListVariants = tv({
   variants: {
     align: {
       start: {
-        row: ['items-start'],
+        row: ['items-start [&>time]:pt-0.5'],
         body: ['flex flex-col gap-1'],
-        time: ['pt-0.5'],
       },
       center: {
         row: ['items-center'],

@@ -28,24 +28,22 @@ export const FindingsCard = ({ tenantId, findings }: TFindingsCardProps) => {
           items={findings}
           emptyMessage={t('empty')}
           renderRow={(finding) => (
-            <CardList.Row
-              key={finding.id}
-              align="start"
-              lead={
+            <CardList.Row key={finding.id} align="start">
+              <CardList.Lead>
                 <StatusBadge tone={findingSeverityTone(finding.severity)}>
                   {tSeverity(finding.severity)}
                 </StatusBadge>
-              }
-              primary={tKind(finding.kind)}
-              secondary={tSource(finding.source)}
-              time={{
-                date: finding.lastSeenAt,
-                label: formatDate(finding.lastSeenAt, locale),
-              }}
-            >
+              </CardList.Lead>
+              <CardList.Primary>{tKind(finding.kind)}</CardList.Primary>
+              <CardList.Secondary>{tSource(finding.source)}</CardList.Secondary>
               {finding.hasDetails && (
-                <FindingDetails tenantId={tenantId} findingId={finding.id} />
+                <CardList.Footer>
+                  <FindingDetails tenantId={tenantId} findingId={finding.id} />
+                </CardList.Footer>
               )}
+              <CardList.Time date={finding.lastSeenAt}>
+                {formatDate(finding.lastSeenAt, locale)}
+              </CardList.Time>
             </CardList.Row>
           )}
         />

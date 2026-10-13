@@ -44,20 +44,20 @@ export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
           items={events}
           emptyMessage={t('activityEmpty')}
           renderRow={(event) => (
-            <CardList.Row
-              key={event.id}
-              lead={
+            <CardList.Row key={event.id}>
+              <CardList.Lead>
                 <span className={activityIcon()} aria-hidden="true">
                   {ACTIVITY_GLYPH[event.action]}
                 </span>
-              }
-              primary={t(`activityAction.${event.action}`)}
-              secondary={event.actorEmail}
-              time={{
-                date: event.createdAt,
-                label: formatRelativeTime(event.createdAt, t, locale),
-              }}
-            />
+              </CardList.Lead>
+              <CardList.Primary>
+                {t(`activityAction.${event.action}`)}
+              </CardList.Primary>
+              <CardList.Secondary>{event.actorEmail}</CardList.Secondary>
+              <CardList.Time date={event.createdAt}>
+                {formatRelativeTime(event.createdAt, t, locale)}
+              </CardList.Time>
+            </CardList.Row>
           )}
         />
       </Card.Body>
