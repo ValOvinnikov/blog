@@ -1618,8 +1618,10 @@ is unaffected.)
 
 **Voice-as-content**: `apps/web/src/utils/resolve-tenant-messages/` resolves
 each request's `next-intl` messages as a two-layer merge — the request
-language's catalog ← the tenant's overrides for that same language, on every
-page and for every language the tenant serves; a language with no override
+language's catalog (`SITE_MESSAGES_BY_LOCALE`, one
+`packages/config/src/voice/site-messages.<lang>.json` per language, passed in
+by `apps/web/src/i18n/request.ts`) ← the tenant's overrides for that same
+language, on every page and for every language the tenant serves; a language with no override
 for a field keeps that language's catalog default. There
 is no preset layer: a preset is a _look_, and carries no copy. The `preset`
 and the Voice overrides come from the same `site_config` row and the same
@@ -1644,10 +1646,12 @@ placeholders and length cap, alongside the neutral catalog
 list of its own: `@blog/db` generates the override validation from it (a
 `RICH` value is checked against `VOICE_PORTABLE_TEXT_SCHEMA` — bold, italic
 and links only — and a failure returns per-language `fieldErrorsByLocale`),
-`apps/web`'s `resolveTenantMessages` sets each `TEXT`/`MULTILINE` override at
-its registry path, and the platform's Voice page renders one control per
-field. The editable set is bounded to page-level prose an editor writes in
-the site's own voice: 11 fields on the archive and bookmarks empty states
+`apps/web`'s `resolveTenantMessages` sets every override at its registry path
+(a `RICH` one projected to plain text, since a message leaf must be a string),
+and the platform's Voice page renders one control per field. That catalog is
+the public site's only; `apps/platform`'s own `i18n/messages/en.json` is its
+admin UI's copy and is unrelated to Voice. The editable set is bounded to
+page-level prose an editor writes in the site's own voice: 11 fields on the archive and bookmarks empty states
 and the 404 and error pages (surfaces `ARCHIVE`, `BOOKMARKS`, `NOT_FOUND`,
 `ERROR`), eight of them `RICH`; buttons, labels, statuses, enforced-behaviour
 copy, third-party names and accessibility-only text stay fixed in the catalog
