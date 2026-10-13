@@ -10,7 +10,7 @@ export const runErrorCardVariants = tv({
     details: ['mt-1'],
     detailsText: [
       'mt-2 rounded-admin-control bg-admin-surface-2 p-3',
-      'font-mono text-xs text-admin-muted whitespace-pre-wrap break-words',
+      'font-mono text-admin-12-5 text-admin-muted whitespace-pre-wrap break-words',
     ],
   },
 });

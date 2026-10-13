@@ -9,7 +9,7 @@ export const recentActivityCardVariants = tv({
     ],
     activityIcon: [
       'flex h-7 w-7 flex-none items-center justify-center',
-      'rounded-full bg-admin-surface-2 text-sm text-admin-muted',
+      'rounded-full bg-admin-surface-2 text-admin-14 text-admin-muted',
     ],
     activityBody: ['min-w-0 flex-1'],
     activityMessage: ['block text-[13px] text-admin-text'],

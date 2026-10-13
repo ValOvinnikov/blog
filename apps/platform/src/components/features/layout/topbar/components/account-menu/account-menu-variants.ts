@@ -4,7 +4,7 @@ export const accountMenuVariants = tv({
   slots: {
     trigger: [
       'ml-auto inline-flex shrink-0 items-center gap-[7px] rounded-full border border-admin-line',
-      'bg-admin-surface p-1 text-xs whitespace-nowrap text-admin-muted shadow-admin',
+      'bg-admin-surface p-1 text-admin-12-5 whitespace-nowrap text-admin-muted shadow-admin',
       'md:py-1 md:pr-[11px] md:pl-1.5',
       'transition-colors duration-base ease-smooth',
       'hover:border-admin-brand hover:text-admin-text',
