@@ -6,12 +6,12 @@ import type { Session } from 'next-auth';
 
 const {
   requireSuperAdminMock,
-  listTenantsByIdsMock,
+  getTenantByIdMock,
   dispatchDeprovisioningWorkflowMock,
   insertAuditEventMock,
 } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
   dispatchDeprovisioningWorkflowMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
 }));
@@ -26,7 +26,7 @@ vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    tenants: { getTenantById: getTenantByIdMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
@@ -57,8 +57,8 @@ describe('deprovisionTenantAction', () => {
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
-    listTenantsByIdsMock.mockReset();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    getTenantByIdMock.mockReset();
+    getTenantByIdMock.mockResolvedValue(tenant);
     dispatchDeprovisioningWorkflowMock.mockReset();
     dispatchDeprovisioningWorkflowMock.mockResolvedValue(true);
     insertAuditEventMock.mockReset();
@@ -92,7 +92,7 @@ describe('deprovisionTenantAction', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(redirect).not.toHaveBeenCalled();
-    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -107,7 +107,7 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('returns an error when the tenant is not found', async () => {
-    listTenantsByIdsMock.mockResolvedValue([]);
+    getTenantByIdMock.mockResolvedValue(undefined);
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: true,
@@ -118,9 +118,10 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('returns an error when the tenant is already deprovisioned', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      { ...tenant, deprovisionedAt: new Date('2026-01-01T00:00:00.000Z') },
-    ]);
+    getTenantByIdMock.mockResolvedValue({
+      ...tenant,
+      deprovisionedAt: new Date('2026-01-01T00:00:00.000Z'),
+    });
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: true,

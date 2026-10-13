@@ -6,12 +6,12 @@ import type { Session } from 'next-auth';
 
 const {
   requireSuperAdminMock,
-  listTenantsByIdsMock,
+  getTenantByIdMock,
   deleteTenantMock,
   insertAuditEventMock,
 } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
   deleteTenantMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
 }));
@@ -27,7 +27,7 @@ vi.mock('@platform/utils/logger/logger');
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
-      listTenantsByIds: listTenantsByIdsMock,
+      getTenantById: getTenantByIdMock,
       deleteTenant: deleteTenantMock,
     },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
@@ -56,8 +56,8 @@ describe('deleteTenantAction', () => {
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
-    listTenantsByIdsMock.mockReset();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    getTenantByIdMock.mockReset();
+    getTenantByIdMock.mockResolvedValue(tenant);
     deleteTenantMock.mockReset();
     deleteTenantMock.mockResolvedValue({ outcome: 'deleted' });
     insertAuditEventMock.mockReset();
@@ -85,12 +85,12 @@ describe('deleteTenantAction', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(redirect).not.toHaveBeenCalled();
-    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
   it('returns an error when the tenant is not found', async () => {
-    listTenantsByIdsMock.mockResolvedValue([]);
+    getTenantByIdMock.mockResolvedValue(undefined);
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });

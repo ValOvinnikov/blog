@@ -1,16 +1,18 @@
 'use server';
 
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { z } from 'zod';
 
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
+import {
+  confirmTenantInputSchema,
+  resolveConfirmedTenant,
+} from './resolve-confirmed-tenant';
 import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 
-const deprovisionTenantInputSchema = z.object({
-  confirm: z.string().trim().min(1),
+const deprovisionTenantInputSchema = confirmTenantInputSchema.extend({
   dryRun: z.boolean(),
 });
 
@@ -27,10 +29,8 @@ export type TDeprovisionTenantResult = TTenantLifecycleResult<
 >;
 
 /**
- * The tenant status page's "Deprovision tenant" control. `confirm` is
- * checked against the tenant's live name here as a fast-fail UX convenience
- * only — `deprovision-tenant.yml` re-validates it independently before doing
- * anything destructive.
+ * `confirm` is checked here as a fast-fail convenience only;
+ * `deprovision-tenant.yml` re-validates it before doing anything destructive.
  */
 export const deprovisionTenantAction = async (
   tenantId: string,
@@ -43,19 +43,15 @@ export const deprovisionTenantAction = async (
     return { ok: false, reason: 'confirmRequired' };
   }
 
-  const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
-  if (!tenant) {
-    return { ok: false, reason: 'notFound' };
-  }
-
-  if (tenant.deprovisionedAt) {
-    return { ok: false, reason: 'alreadyDeprovisioned' };
-  }
-
   const { confirm, dryRun } = parsed.data;
-  if (confirm !== tenant.name) {
-    return { ok: false, reason: 'nameMismatch' };
+  const resolved = await resolveConfirmedTenant(tenantId, confirm, {
+    precondition: ({ deprovisionedAt }) =>
+      deprovisionedAt ? 'alreadyDeprovisioned' : undefined,
+  });
+  if (!resolved.ok) {
+    return resolved;
   }
+  const { tenant } = resolved;
 
   const dispatched = await dispatchDeprovisioningWorkflow({
     tenantId,
