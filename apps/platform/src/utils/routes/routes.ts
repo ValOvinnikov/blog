@@ -38,3 +38,5 @@ export const adminRoutes = {
   dashboardSelectTenantHref: (tenantId: string) =>
     `/api/dashboard/select-tenant?tenantId=${tenantId}`,
 } as const;
+
+export const tenantSiteUrl = (domain: string) => `https://${domain}`;
