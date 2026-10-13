@@ -5,10 +5,12 @@ import {
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { renderHook } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import {
   UnsavedChangesProvider,
+  useInterceptNavigation,
   useUnsavedChangesGuard,
   type TUnsavedChangesGuard,
 } from './unsaved-changes-provider';
@@ -44,6 +46,18 @@ describe(UnsavedChangesProvider, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+  });
+
+  it('throws when a page registers a guard outside a provider', () => {
+    expect(() => renderHook(() => useUnsavedChangesGuard(null))).toThrow(
+      'useUnsavedChangesGuard must be used within an UnsavedChangesProvider',
+    );
+  });
+
+  it('throws when a link intercepts navigation outside a provider', () => {
+    expect(() => renderHook(() => useInterceptNavigation())).toThrow(
+      'useInterceptNavigation must be used within an UnsavedChangesProvider',
+    );
   });
 
   it('lets an in-app link navigate when nothing is unsaved', async () => {

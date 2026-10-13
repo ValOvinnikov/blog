@@ -21,7 +21,7 @@ export const GuardedLink = ({
       href={href}
       onNavigate={(event) => {
         onNavigate?.(event);
-        interceptNavigation?.(href, event);
+        interceptNavigation(href, event);
       }}
     />
   );
