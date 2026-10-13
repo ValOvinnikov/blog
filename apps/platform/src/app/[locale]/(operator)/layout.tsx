@@ -1,13 +1,8 @@
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { OperatorBreadcrumb } from '@platform/components/features/layout/operator-breadcrumb';
-import { getSession } from '@platform/server/auth/auth';
 import { requireAdmin } from '@platform/server/auth/require-admin';
-import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
-import {
-  operatorNavSections,
-  type TNavTranslator,
-} from '@platform/utils/nav-sections/nav-sections';
-import { getTranslations } from 'next-intl/server';
+import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
+import { operatorNavSections } from '@platform/utils/nav-sections/nav-sections';
 
 type TProps = {
   children: React.ReactNode;
@@ -27,11 +22,8 @@ type TProps = {
  */
 export default async function OperatorLayout({ children }: TProps) {
   const admin = await requireAdmin();
-  const session = await getSession();
-  const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
-  const tNavSections = (await getTranslations(
-    'navSections',
-  )) as unknown as TNavTranslator;
+  const { isSidebarInitiallyCollapsed, tNavSections, userName } =
+    await loadAdminShellChrome();
 
   return (
     <AdminShell
@@ -39,7 +31,7 @@ export default async function OperatorLayout({ children }: TProps) {
       sections={operatorNavSections(tNavSections)}
       crumb={<OperatorBreadcrumb />}
       roleChip={{
-        name: session?.user?.name ?? session?.user?.email ?? undefined,
+        name: userName,
         role: admin.role,
         scope: tNavSections('platformLabel'),
       }}

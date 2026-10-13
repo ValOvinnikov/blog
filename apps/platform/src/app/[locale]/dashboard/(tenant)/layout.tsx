@@ -1,18 +1,13 @@
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
-import { getSession } from '@platform/server/auth/auth';
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
-import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
-import {
-  dashboardNavSections,
-  type TNavTranslator,
-} from '@platform/utils/nav-sections/nav-sections';
+import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
+import { dashboardNavSections } from '@platform/utils/nav-sections/nav-sections';
 import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
-import { getTranslations } from 'next-intl/server';
 
 type TProps = {
   children: React.ReactNode;
@@ -31,11 +26,8 @@ type TProps = {
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();
   const { admin: sessionAdmin } = await listSessionTenants();
-  const session = await getSession();
-  const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
-  const tNavSections = (await getTranslations(
-    'navSections',
-  )) as unknown as TNavTranslator;
+  const { isSidebarInitiallyCollapsed, tNavSections, userName } =
+    await loadAdminShellChrome();
 
   // A virtual membership is correct for authorization but never a correct
   // identity label, so the role chip shows the admin role behind it instead.
@@ -55,7 +47,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       }
       crumb={<DashboardBreadcrumb />}
       roleChip={{
-        name: session?.user?.name ?? session?.user?.email ?? undefined,
+        name: userName,
         role: admin?.role ?? membership.role,
         scope: admin ? tNavSections('platformLabel') : tenant.name,
       }}
