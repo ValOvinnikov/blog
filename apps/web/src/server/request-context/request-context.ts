@@ -177,9 +177,9 @@ const buildNotFoundContext = async (
 };
 
 /**
- * Next renders `[tenant]/not-found.tsx` alongside the `[tenant]/[locale]`
- * layout on every request, so this waits for that layout to enter the route
- * rather than reading the store before it has.
+ * Next renders both `not-found.tsx` boundaries alongside the
+ * `[tenant]/[locale]` layout on every request, so this waits for that layout
+ * to enter the route rather than reading the store before it has.
  */
 export const getNotFoundContext = (): Promise<TNotFoundContext> => {
   const store = getStore();
