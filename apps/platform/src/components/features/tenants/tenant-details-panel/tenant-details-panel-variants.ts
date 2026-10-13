@@ -10,7 +10,6 @@ export const tenantDetailsPanelVariants = tv({
     ],
     lockAnnouncementLive: ['sr-only'],
     wideField: ['lg:col-span-2'],
-    planControl: ['self-start'],
     footerActions: ['ml-auto flex items-center gap-2.5'],
   },
 });
