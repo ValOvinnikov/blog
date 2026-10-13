@@ -635,7 +635,6 @@
     "pageTitle": "Bereitstellung",
     "description": "{tenantName} · jeder Schritt lässt sich unabhängig fortsetzen.",
     "stepsCardTitle": "Schritte",
-    "stepsCompletionBadge": "{done} von {total} erledigt",
     "stepLabel": {
       "SANITY_PROJECT": "Arbeitsbereich erstellen",
       "SEED_CONTENT": "Startinhalte anlegen",
@@ -643,12 +642,6 @@
       "MAP_DOMAIN": "Domain verbinden",
       "CREATE_WEBHOOK": "CMS mit Website verbinden",
       "VERIFY_CONTENT": "Inhalte auf Bereitschaft prüfen"
-    },
-    "statusLabel": {
-      "IDLE": "Nicht gestartet",
-      "RUNNING": "Läuft…",
-      "DONE": "Abgeschlossen",
-      "FAILED": "Fehlgeschlagen"
     },
     "retryButton": "Bereitstellung erneut versuchen",
     "retryingButton": "Bereitstellung wird erneut versucht…",
@@ -683,26 +676,10 @@
     },
     "technicalDetailsToggle": "Technische Details",
     "ownerLabel": "Inhaber",
-    "ownerInvitedPendingBadge": "Eingeladen, ausstehend",
-    "stepRunningNow": "jetzt",
-    "relativeJustNow": "Gerade eben",
-    "relativeMinutesAgo": "vor {minutes} Min.",
-    "relativeHoursAgo": "vor {hours} Std.",
-    "relativeDaysAgo": "vor {days} Tg.",
-    "runCardTitle": "Lauf",
-    "runCardEmpty": "Es wurde noch kein Lauf gestartet.",
-    "runStartedLabel": "Gestartet",
-    "runFinishedLabel": "Beendet",
-    "runRegistryLabel": "Registry",
-    "runStartedPending": "Warten auf den Start des Laufs…",
-    "runFinishedPending": "—",
-    "runWorkflowLogLink": "Workflow-Protokoll"
+    "ownerInvitedPendingBadge": "Eingeladen, ausstehend"
   },
   "deprovisioningStatusView": {
     "cardTitle": "Fortschritt der Deprovisionierung",
-    "stepsCompletionBadge": "{done} von {total} erledigt",
-    "startingBadge": "Wird gestartet…",
-    "preRunStepStatusLabel": "In Warteschlange",
     "stepLabel": {
       "REMOVE_DOMAIN": "Domain entfernen",
       "ARCHIVE_SANITY_PROJECT": "Sanity-Projekt archivieren",
@@ -712,13 +689,6 @@
       "PURGE_READER_DATA": "Leserdaten löschen",
       "INVALIDATE_TENANT_CACHE": "Zwischengespeicherte Seiten invalidieren"
     },
-    "statusLabel": {
-      "IDLE": "Nicht gestartet",
-      "RUNNING": "Läuft…",
-      "DONE": "Abgeschlossen",
-      "FAILED": "Fehlgeschlagen"
-    },
-    "stepRunningNow": "jetzt",
     "failedStepLabel": "Fehlgeschlagen bei „{step}“.",
     "errorKind": {
       "permission": {
@@ -742,7 +712,17 @@
         "nextStep": "Starten Sie den Rückbau erneut oder prüfen Sie die technischen Details, bevor Sie um Hilfe bitten."
       }
     },
-    "technicalDetailsToggle": "Technische Details",
+    "technicalDetailsToggle": "Technische Details"
+  },
+  "runStatus": {
+    "statusLabel": {
+      "IDLE": "Nicht gestartet",
+      "RUNNING": "Läuft…",
+      "DONE": "Abgeschlossen",
+      "FAILED": "Fehlgeschlagen"
+    },
+    "stepsCompletionBadge": "{done} von {total} erledigt",
+    "stepRunningNow": "jetzt",
     "relativeJustNow": "Gerade eben",
     "relativeMinutesAgo": "vor {minutes} Min.",
     "relativeHoursAgo": "vor {hours} Std.",
@@ -750,9 +730,13 @@
     "runCardTitle": "Lauf",
     "runCardEmpty": "Es wurde noch kein Lauf gestartet.",
     "runStartedLabel": "Gestartet",
+    "runStartedPending": "Warten auf den Start des Laufs…",
     "runFinishedLabel": "Beendet",
     "runFinishedPending": "—",
-    "runWorkflowLogLink": "Workflow-Protokoll"
+    "runRegistryLabel": "Registry",
+    "runWorkflowLogLink": "Workflow-Protokoll",
+    "startingBadge": "Wird gestartet…",
+    "preRunStepStatusLabel": "In Warteschlange"
   },
   "tenantDangerPage": {
     "title": "Gefahrenzone",

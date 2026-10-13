@@ -95,6 +95,21 @@ describe(`<${RunCard.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('takes the heading level it is given', () => {
+    setup({ headingLevel: 3 });
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Run' }),
+    ).toBeVisible();
+  });
+
+  it('says no run has started yet when there is no run', () => {
+    setup({ run: undefined });
+
+    expect(screen.getByText('No run has started yet.')).toBeVisible();
+    expect(screen.queryByText('Started')).not.toBeInTheDocument();
+  });
+
   it('renders actions in the card header', () => {
     setup({ actions: <span>Complete</span> });
 

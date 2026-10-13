@@ -5,8 +5,5 @@ export const provisioningStatusViewVariants = tv({
     root: ['flex flex-col gap-6'],
     ownerRow: ['flex flex-wrap items-center gap-2'],
     cardsRow: ['flex flex-col gap-6', 'lg:grid lg:grid-cols-2 lg:items-start'],
-    stepsCard: ['bg-admin-surface'],
-    stepsSummary: ['flex items-center gap-2.5'],
-    overallStatusLive: ['inline-flex items-center'],
   },
 });

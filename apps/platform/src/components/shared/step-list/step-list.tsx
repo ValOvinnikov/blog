@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 
 import { stepListVariants } from './step-list-variants';
 
-type TStepListStep = {
+export type TStepListStep = {
   key: string;
   title: string;
   status: TTenantProvisioningStepStatus;

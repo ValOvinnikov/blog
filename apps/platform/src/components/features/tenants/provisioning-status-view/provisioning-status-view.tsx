@@ -1,27 +1,22 @@
 'use client';
 
-import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
+import { RunCard } from '@platform/components/features/tenants/run-card';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
-import { Alert } from '@platform/components/shared/alert';
+import { RunStatusBadge } from '@platform/components/features/tenants/run-status-badge';
+import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
-import { Card } from '@platform/components/shared/card';
-import { Disclosure } from '@platform/components/shared/disclosure';
-import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import { StepList } from '@platform/components/shared/step-list';
 import { Text } from '@platform/components/shared/text';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
-import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
-import { useCollapseOnDone } from '@platform/utils/use-collapse-on-done/use-collapse-on-done';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
-import { RunCard } from './components/run-card/run-card';
+import { DispatchNotice } from './components/dispatch-notice/dispatch-notice';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
@@ -35,14 +30,12 @@ export const ProvisioningStatusView = ({
   ownerEmail,
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
-  const locale = useLocale();
   const {
     dispatchNotice,
     isStarting,
     isRetrying,
     handleStart,
     handleRetry,
-    stepStatuses,
     displayStepStatuses,
     stepUpdatedAt,
     provisioningRun,
@@ -55,67 +48,16 @@ export const ProvisioningStatusView = ({
   } = useProvisioningPoll(tenant);
   useRelativeTimeTick();
 
-  const doneStepCount = stepStatuses.filter(
-    (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
-  ).length;
   const isArchived = Boolean(tenant.deprovisionedAt);
   const archivedNoticeId = useId();
-  const isOverallDone =
-    displayOverallStatus === TENANT_PROVISIONING_STEP_STATUS.DONE;
-  const { isOpen: isStepsOpen, onOpenChange: setIsStepsOpen } =
-    useCollapseOnDone(isOverallDone);
+  const { root, ownerRow, cardsRow } = provisioningStatusViewVariants();
 
-  const {
-    root,
-    ownerRow,
-    cardsRow,
-    stepsCard,
-    stepsSummary,
-    overallStatusLive,
-  } = provisioningStatusViewVariants();
-
-  const stepListSteps = STEP_ORDER.map((stepKey, index) => {
-    const status =
-      displayStepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
-    const isFailed = status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-    const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
-    const isRunning = status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
-    const updatedAt = stepUpdatedAt[index];
-    const relativeUpdatedAt =
-      (isDone || isFailed) && updatedAt
-        ? formatRelativeTime(new Date(updatedAt), t, locale)
-        : undefined;
-
-    return {
-      key: stepKey,
-      title: t(`stepLabel.${stepKey}`),
-      status,
-      statusLabel: t(`statusLabel.${status}`),
-      trailingSlot: isRunning ? t('stepRunningNow') : undefined,
-      updatedAt,
-      updatedAtLabel: relativeUpdatedAt,
-    };
-  });
-
-  const overallStatusBadge = isOverallFailed ? (
-    <StatusBadge tone="bad">
-      {t(`statusLabel.${TENANT_PROVISIONING_STEP_STATUS.FAILED}`)}
-    </StatusBadge>
-  ) : (
-    <StatusBadge tone={provisioningStepTone(displayOverallStatus)}>
-      {t(`statusLabel.${displayOverallStatus}`)}
-    </StatusBadge>
-  );
-
-  const overallStatusBadgeLive = (
-    <span
-      className={overallStatusLive()}
-      aria-live="polite"
-      data-testid="run-status-live"
-    >
-      {overallStatusBadge}
-    </span>
-  );
+  const steps = STEP_ORDER.map((stepKey, index) => ({
+    key: stepKey,
+    title: t(`stepLabel.${stepKey}`),
+    status: displayStepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
+    updatedAt: stepUpdatedAt[index],
+  }));
 
   const retryButtonNode = isOverallFailed ? (
     <Button
@@ -145,7 +87,13 @@ export const ProvisioningStatusView = ({
 
   const runCardActions = (
     <>
-      {overallStatusBadgeLive}
+      <RunStatusBadge
+        status={
+          isOverallFailed
+            ? TENANT_PROVISIONING_STEP_STATUS.FAILED
+            : displayOverallStatus
+        }
+      />
       {retryButtonNode}
     </>
   );
@@ -172,60 +120,20 @@ export const ProvisioningStatusView = ({
         </div>
       )}
 
-      {dispatchNotice && (
-        <Alert
-          type={
-            dispatchNotice === 'already-in-progress'
-              ? ALERT_TYPE.INFO
-              : ALERT_TYPE.ERROR
-          }
-          title={
-            dispatchNotice === 'not-found'
-              ? t('startErrorNotFound')
-              : dispatchNotice === 'archived'
-                ? t('startErrorArchived')
-                : dispatchNotice === 'already-in-progress'
-                  ? t('startNoticeAlreadyInProgress')
-                  : t('startError')
-          }
-        />
-      )}
+      {dispatchNotice && <DispatchNotice notice={dispatchNotice} />}
 
       <div className={cardsRow()}>
         <div data-testid="provisioning-steps">
-          <Disclosure
-            className={stepsCard()}
-            isOpen={isStepsOpen}
-            onOpenChange={setIsStepsOpen}
-            headingLevel={2}
-            summary={
-              <span className={stepsSummary()}>
-                <span className={headingVariants({ size: 'cardTitle' })}>
-                  {t('stepsCardTitle')}
-                </span>
-                <StatusBadge tone="neutral">
-                  {t('stepsCompletionBadge', {
-                    done: doneStepCount,
-                    total: STEP_ORDER.length,
-                  })}
-                </StatusBadge>
-              </span>
+          <RunStepsCard
+            title={t('stepsCardTitle')}
+            steps={steps}
+            isDone={
+              displayOverallStatus === TENANT_PROVISIONING_STEP_STATUS.DONE
             }
-          >
-            <StepList steps={stepListSteps} />
-          </Disclosure>
+          />
         </div>
 
-        {provisioningRun ? (
-          <RunCard run={provisioningRun} actions={runCardActions} />
-        ) : (
-          <Card>
-            <Card.Header title={t('runCardTitle')} actions={runCardActions} />
-            <Card.Body>
-              <Text variant="supporting">{t('runCardEmpty')}</Text>
-            </Card.Body>
-          </Card>
-        )}
+        <RunCard run={provisioningRun} actions={runCardActions} />
       </div>
 
       {isOverallFailed && errorKind && (

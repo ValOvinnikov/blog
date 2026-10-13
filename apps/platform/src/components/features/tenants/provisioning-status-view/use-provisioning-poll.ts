@@ -54,7 +54,7 @@ const stepUpdatedAtFor = (
 ): TMaybeUndefined<string>[] =>
   STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
 
-type TDispatchNoticeKind =
+export type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
 export type TUseProvisioningPollResult = {
