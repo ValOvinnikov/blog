@@ -5,7 +5,7 @@ import {
 } from '@blog/db/constants';
 import { idleProvisioningSteps } from '@platform/testing/tenants/fixtures';
 
-import { computeTenantFieldLocks } from './tenant-field-locks';
+import { computeTenantFieldLocks, lockAllFields } from './tenant-field-locks';
 
 describe(computeTenantFieldLocks, () => {
   it('locks nothing while every step is IDLE and provisioningStatus is not PROVISIONING', () => {
@@ -169,6 +169,18 @@ describe(computeTenantFieldLocks, () => {
       plan: { kind: 'running' },
       locale: { kind: 'running' },
       ownerEmail: { kind: 'running' },
+    });
+  });
+});
+
+describe(lockAllFields, () => {
+  it('locks every field with the given reason', () => {
+    expect(lockAllFields({ kind: 'archived' })).toEqual({
+      name: { kind: 'archived' },
+      primaryDomain: { kind: 'archived' },
+      plan: { kind: 'archived' },
+      locale: { kind: 'archived' },
+      ownerEmail: { kind: 'archived' },
     });
   });
 });

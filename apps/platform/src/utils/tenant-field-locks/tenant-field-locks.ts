@@ -28,6 +28,14 @@ export type TTenantFieldLocks = Partial<
   Record<TTenantFieldKey, TTenantFieldLockReason>
 >;
 
+export const lockAllFields = (
+  reason: TTenantFieldLockReason,
+): TTenantFieldLocks => {
+  return Object.fromEntries(
+    ALL_FIELD_KEYS.map((key) => [key, reason]),
+  ) as TTenantFieldLocks;
+};
+
 export const computeTenantFieldLocks = (
   steps: TTenantProvisioningState | null,
   provisioningStatus: TTenantProvisioningStatus | null,
@@ -54,10 +62,7 @@ export const computeTenantFieldLocks = (
     return locks;
   }
 
-  const reason: TTenantFieldLockReason =
-    state === 'SUCCEEDED' ? { kind: 'succeeded' } : { kind: 'running' };
-
-  return Object.fromEntries(
-    ALL_FIELD_KEYS.map((key) => [key, reason]),
-  ) as TTenantFieldLocks;
+  return lockAllFields(
+    state === 'SUCCEEDED' ? { kind: 'succeeded' } : { kind: 'running' },
+  );
 };
