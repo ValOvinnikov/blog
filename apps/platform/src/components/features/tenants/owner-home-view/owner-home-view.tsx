@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
@@ -17,17 +18,13 @@ import { ownerHomeViewVariants } from './owner-home-view-variants';
 export type TOwnerHomeViewProps = {
   tenant: TTenant;
   domainVerificationStatus: Promise<TDomainVerificationStatus>;
-  ownerEmail: TMaybeUndefined<string>;
-  ownerJoinedAt: TMaybeUndefined<string>;
-  ownerJoinedAtIso: TMaybeUndefined<string>;
+  owner: TMaybeUndefined<TTenantOwnerMembership>;
 };
 
 export const OwnerHomeView = ({
   tenant,
   domainVerificationStatus,
-  ownerEmail,
-  ownerJoinedAt,
-  ownerJoinedAtIso,
+  owner,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { root, cardsStack } = ownerHomeViewVariants();
@@ -53,11 +50,7 @@ export const OwnerHomeView = ({
             dnsHref={adminRoutes.dashboardDomain()}
           />
         </Suspense>
-        <OwnerCard
-          ownerEmail={ownerEmail}
-          ownerJoinedAt={ownerJoinedAt}
-          ownerJoinedAtIso={ownerJoinedAtIso}
-        />
+        <OwnerCard owner={owner} />
       </div>
 
       <MakeItYoursCard />

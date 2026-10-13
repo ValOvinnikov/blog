@@ -11,14 +11,12 @@ import DashboardOverviewPage from './page';
 const {
   listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
-  getTenantOwnerEmailMock,
   getTenantOwnerMembershipMock,
   getDomainVerificationStatusMock,
   cookiesMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
-  getTenantOwnerEmailMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
   cookiesMock: vi.fn(),
@@ -31,7 +29,6 @@ vi.mock('@blog/db', async () => ({
   queries: {
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
-      getTenantOwnerEmail: getTenantOwnerEmailMock,
       getTenantOwnerMembership: getTenantOwnerMembershipMock,
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
@@ -61,8 +58,6 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    getTenantOwnerEmailMock.mockReset();
-    getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
     getTenantOwnerMembershipMock.mockReset();
     getTenantOwnerMembershipMock.mockResolvedValue({
       email: 'owner@example.com',
@@ -100,8 +95,9 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
       'acme.example.com',
     );
-    expect(getTenantOwnerEmailMock).toHaveBeenCalledWith('tenant-1');
-    expect(getTenantOwnerMembershipMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
+      'tenant-1',
+    );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
     ).toBeVisible();

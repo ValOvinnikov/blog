@@ -9,9 +9,10 @@ describe(OwnerCard, () => {
     beforeEach(() => {
       render(
         <OwnerCard
-          ownerEmail="owner@example.com"
-          ownerJoinedAt="Aug 12, 2026"
-          ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+          owner={{
+            email: 'owner@example.com',
+            joinedAt: new Date('2026-08-12T00:00:00.000Z'),
+          }}
         />,
       );
     });
@@ -39,14 +40,16 @@ describe(OwnerCard, () => {
     });
   });
 
-  it('shows the invited-pending badge when the owner has no resolved email', () => {
-    render(
-      <OwnerCard
-        ownerEmail={undefined}
-        ownerJoinedAt={undefined}
-        ownerJoinedAtIso={undefined}
-      />,
-    );
+  it('shows the invited email without a Joined row while the owner is a pending invite', () => {
+    render(<OwnerCard owner={{ email: 'invited@example.com' }} />);
+
+    expect(screen.getByText('invited@example.com')).toBeVisible();
+    expect(screen.queryByText('Invited, pending')).not.toBeInTheDocument();
+    expect(screen.queryByText('Joined')).not.toBeInTheDocument();
+  });
+
+  it('shows the invited-pending badge when the tenant has no owner', () => {
+    render(<OwnerCard owner={undefined} />);
 
     expect(screen.getByText('Invited, pending')).toBeVisible();
     expect(screen.queryByText('Joined')).not.toBeInTheDocument();

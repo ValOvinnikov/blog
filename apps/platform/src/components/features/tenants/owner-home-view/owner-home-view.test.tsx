@@ -13,9 +13,10 @@ const defaultProps: TOwnerHomeViewProps = {
   domainVerificationStatus: Promise.resolve(
     DOMAIN_VERIFICATION_STATUS.VERIFIED,
   ),
-  ownerEmail: 'sam@northwind.dev',
-  ownerJoinedAt: 'Aug 12, 2026',
-  ownerJoinedAtIso: '2026-08-12T00:00:00.000Z',
+  owner: {
+    email: 'sam@northwind.dev',
+    joinedAt: new Date('2026-08-12T00:00:00.000Z'),
+  },
 };
 
 const renderView = customRender(OwnerHomeView, defaultProps);

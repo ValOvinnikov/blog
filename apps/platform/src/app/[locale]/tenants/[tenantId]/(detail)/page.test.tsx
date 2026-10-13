@@ -32,14 +32,12 @@ const makeFinding = (
 
 const {
   requireTenantByIdMock,
-  getTenantOwnerEmailMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
 } = vi.hoisted(() => ({
   requireTenantByIdMock: vi.fn(),
-  getTenantOwnerEmailMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
@@ -54,7 +52,6 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {
-      getTenantOwnerEmail: getTenantOwnerEmailMock,
       getTenantOwnerMembership: getTenantOwnerMembershipMock,
     },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
@@ -103,8 +100,6 @@ describe(TenantOverviewPage, () => {
     requireTenantByIdMock.mockReset();
     tenant = makeTenant();
     requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
-    getTenantOwnerEmailMock.mockReset();
-    getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
     getTenantOwnerMembershipMock.mockReset();
     getTenantOwnerMembershipMock.mockResolvedValue({
       email: 'owner@example.com',
@@ -124,8 +119,9 @@ describe(TenantOverviewPage, () => {
     await setup();
 
     expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
-    expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
-    expect(getTenantOwnerMembershipMock).toHaveBeenCalledWith(tenant.id);
+    expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
+      tenant.id,
+    );
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
       'acme.example.com',
     );
@@ -140,7 +136,7 @@ describe(TenantOverviewPage, () => {
     ).toBeVisible();
   });
 
-  it('formats and passes the owner membership join date to the Joined row', async () => {
+  it('shows the owner membership join date in the Joined row', async () => {
     await setup();
 
     expect(screen.getByText('Joined')).toBeVisible();
@@ -149,13 +145,22 @@ describe(TenantOverviewPage, () => {
     expect(joinedTime).toHaveAttribute('dateTime', '2026-08-12T00:00:00.000Z');
   });
 
-  it('omits the Joined row when the owner is still a pending invite', async () => {
-    getTenantOwnerEmailMock.mockResolvedValue(undefined);
-    getTenantOwnerMembershipMock.mockResolvedValue(undefined);
+  it('shows the invited email without a Joined row when the owner is still a pending invite', async () => {
+    getTenantOwnerMembershipMock.mockResolvedValue({
+      email: 'invited@example.com',
+    });
 
     await setup();
 
     expect(screen.queryByText('Joined')).not.toBeInTheDocument();
+    expect(screen.getByText('invited@example.com')).toBeVisible();
+  });
+
+  it('shows the invited-pending badge when the tenant has no owner', async () => {
+    getTenantOwnerMembershipMock.mockResolvedValue(undefined);
+
+    await setup();
+
     expect(screen.getByText('Invited, pending')).toBeVisible();
   });
 
