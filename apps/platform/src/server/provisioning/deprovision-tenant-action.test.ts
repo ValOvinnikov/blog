@@ -102,7 +102,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: true,
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'nameMismatch' });
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -113,7 +113,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: true,
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'notFound' });
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -126,7 +126,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: true,
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'alreadyDeprovisioned' });
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -167,7 +167,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: false,
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'deprovisionFailed' });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 

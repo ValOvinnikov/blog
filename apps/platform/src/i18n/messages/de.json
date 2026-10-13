@@ -817,6 +817,18 @@
     "confirmButton": "Reaktivieren",
     "confirmingButton": "Wird gestartet…"
   },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Geben Sie zur Bestätigung den Namen des Mandanten ein.",
+    "notFound": "Mandant nicht gefunden.",
+    "nameMismatch": "Stimmt nicht mit dem Namen des Mandanten überein.",
+    "alreadyDeprovisioned": "Dieser Mandant ist bereits deprovisioniert.",
+    "notDeprovisioned": "Dieser Mandant ist nicht deprovisioniert.",
+    "alreadyInProgress": "Die Provisionierung läuft bereits.",
+    "notArchived": "Dieser Mandant muss archiviert werden, bevor er gelöscht werden kann.",
+    "deprovisionFailed": "Die Deprovisionierung konnte nicht gestartet werden — bitte erneut versuchen.",
+    "reactivateFailed": "Die Reaktivierung konnte nicht gestartet werden — bitte erneut versuchen.",
+    "deleteFailed": "Der Mandant konnte nicht gelöscht werden — bitte erneut versuchen."
+  },
   "featuresSettings": {
     "heading": "Funktionen",
     "description": "Schalten Sie Funktionen Ihrer Website ein oder aus. Gesperrte Schalter erfordern den Growth-Tarif.",

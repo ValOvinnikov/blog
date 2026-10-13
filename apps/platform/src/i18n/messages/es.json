@@ -817,6 +817,18 @@
     "confirmButton": "Reactivar",
     "confirmingButton": "Lanzando…"
   },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Escriba el nombre del cliente para confirmar.",
+    "notFound": "No se encontró el cliente.",
+    "nameMismatch": "No coincide con el nombre del cliente.",
+    "alreadyDeprovisioned": "Este cliente ya está desaprovisionado.",
+    "notDeprovisioned": "Este cliente no está desaprovisionado.",
+    "alreadyInProgress": "El aprovisionamiento ya está en curso.",
+    "notArchived": "Este cliente debe archivarse antes de poder eliminarlo.",
+    "deprovisionFailed": "No se pudo iniciar el desaprovisionamiento. Vuelva a intentarlo.",
+    "reactivateFailed": "No se pudo iniciar la reactivación. Vuelva a intentarlo.",
+    "deleteFailed": "No se pudo eliminar el cliente. Vuelva a intentarlo."
+  },
   "featuresSettings": {
     "heading": "Funciones",
     "description": "Active o desactive las funciones de su sitio. Las opciones bloqueadas requieren el plan Growth.",

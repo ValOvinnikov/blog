@@ -817,6 +817,18 @@
     "confirmButton": "Réactiver",
     "confirmingButton": "Lancement…"
   },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Saisissez le nom du locataire pour confirmer.",
+    "notFound": "Locataire introuvable.",
+    "nameMismatch": "Ne correspond pas au nom du locataire.",
+    "alreadyDeprovisioned": "Ce locataire est déjà déprovisionné.",
+    "notDeprovisioned": "Ce locataire n'est pas déprovisionné.",
+    "alreadyInProgress": "Le provisionnement est déjà en cours.",
+    "notArchived": "Ce locataire doit être archivé avant de pouvoir être supprimé.",
+    "deprovisionFailed": "Impossible de lancer le déprovisionnement — veuillez réessayer.",
+    "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",
+    "deleteFailed": "Impossible de supprimer le locataire — veuillez réessayer."
+  },
   "featuresSettings": {
     "heading": "Fonctionnalités",
     "description": "Activez ou désactivez les fonctionnalités de votre site. Les options verrouillées nécessitent la formule Growth.",

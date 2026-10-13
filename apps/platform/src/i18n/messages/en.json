@@ -817,6 +817,18 @@
     "confirmButton": "Reactivate",
     "confirmingButton": "Dispatching…"
   },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Type the tenant name to confirm.",
+    "notFound": "Tenant not found.",
+    "nameMismatch": "Doesn't match the tenant's name.",
+    "alreadyDeprovisioned": "This tenant is already deprovisioned.",
+    "notDeprovisioned": "This tenant is not deprovisioned.",
+    "alreadyInProgress": "Provisioning is already running.",
+    "notArchived": "This tenant must be archived before it can be deleted.",
+    "deprovisionFailed": "Couldn't start deprovisioning — try again.",
+    "reactivateFailed": "Couldn't start reactivation — try again.",
+    "deleteFailed": "Couldn't delete the tenant — try again."
+  },
   "featuresSettings": {
     "heading": "Features",
     "description": "Turn your site's features on or off. Locked toggles require the Growth plan.",

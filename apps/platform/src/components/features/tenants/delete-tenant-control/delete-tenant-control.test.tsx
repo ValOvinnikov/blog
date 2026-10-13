@@ -91,7 +91,7 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
     it('shows the error inline and never navigates when the action fails', async () => {
       deleteTenantActionMock.mockResolvedValue({
         ok: false,
-        error: "Doesn't match the tenant's name.",
+        reason: 'nameMismatch',
       });
       await user.type(
         screen.getByRole('textbox', { name: /type "acme inc\."/i }),

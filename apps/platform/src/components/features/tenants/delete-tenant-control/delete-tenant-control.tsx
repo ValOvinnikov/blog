@@ -6,6 +6,7 @@ import { Text } from '@platform/components/shared/text';
 import { deleteTenantAction } from '@platform/server/provisioning/delete-tenant-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { useTenantLifecycleAction } from '@platform/utils/use-tenant-lifecycle-action/use-tenant-lifecycle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -18,6 +19,7 @@ export type TDeleteTenantControlProps = {
 export const DeleteTenantControl = ({ tenant }: TDeleteTenantControlProps) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
+  const deleteTenant = useTenantLifecycleAction(deleteTenantAction);
   const { id, name } = tenant;
 
   const { cardBorder, cardHeader, cardTitle, content } =
@@ -35,7 +37,7 @@ export const DeleteTenantControl = ({ tenant }: TDeleteTenantControlProps) => {
 
           <ConfirmDialog
             expectedValue={name}
-            onConfirm={(confirm) => deleteTenantAction(id, { confirm })}
+            onConfirm={(confirm) => deleteTenant(id, { confirm })}
             onConfirmed={() => router.push(adminRoutes.tenants())}
           >
             <ConfirmDialog.Trigger>

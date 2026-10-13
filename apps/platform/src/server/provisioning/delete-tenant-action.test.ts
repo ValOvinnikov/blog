@@ -95,7 +95,7 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'notFound' });
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
@@ -104,7 +104,7 @@ describe('deleteTenantAction', () => {
       confirm: 'wrong-name',
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'nameMismatch' });
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
@@ -114,7 +114,7 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'notArchived' });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -124,7 +124,7 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'notFound' });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -151,7 +151,7 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(result).toEqual({ ok: false, reason: 'deleteFailed' });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.delete_failed',

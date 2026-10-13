@@ -817,6 +817,18 @@
     "confirmButton": "Opnieuw activeren",
     "confirmingButton": "Starten…"
   },
+  "tenantLifecycleErrors": {
+    "confirmRequired": "Typ de naam van de tenant om te bevestigen.",
+    "notFound": "Tenant niet gevonden.",
+    "nameMismatch": "Komt niet overeen met de naam van de tenant.",
+    "alreadyDeprovisioned": "Deze tenant is al ontmanteld.",
+    "notDeprovisioned": "Deze tenant is niet ontmanteld.",
+    "alreadyInProgress": "De inrichting loopt al.",
+    "notArchived": "Deze tenant moet worden gearchiveerd voordat hij kan worden verwijderd.",
+    "deprovisionFailed": "De ontmanteling kon niet worden gestart — probeer het opnieuw.",
+    "reactivateFailed": "Het opnieuw activeren kon niet worden gestart — probeer het opnieuw.",
+    "deleteFailed": "De tenant kon niet worden verwijderd — probeer het opnieuw."
+  },
   "featuresSettings": {
     "heading": "Functies",
     "description": "Zet de functies van je site aan of uit. Vergrendelde schakelaars vereisen het Growth-abonnement.",

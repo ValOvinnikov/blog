@@ -7,9 +7,10 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { z } from 'zod';
 
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
+import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 
 const deprovisionTenantInputSchema = z.object({
-  confirm: z.string().trim().min(1, 'Type the tenant name to confirm.'),
+  confirm: z.string().trim().min(1),
   dryRun: z.boolean(),
 });
 
@@ -17,8 +18,13 @@ export type TDeprovisionTenantInput = z.input<
   typeof deprovisionTenantInputSchema
 >;
 
-export type TDeprovisionTenantResult =
-  { ok: true } | { ok: false; error: string };
+export type TDeprovisionTenantResult = TTenantLifecycleResult<
+  | 'confirmRequired'
+  | 'notFound'
+  | 'alreadyDeprovisioned'
+  | 'nameMismatch'
+  | 'deprovisionFailed'
+>;
 
 /**
  * The tenant status page's "Deprovision tenant" control. `confirm` is
@@ -34,24 +40,21 @@ export const deprovisionTenantAction = async (
 
   const parsed = deprovisionTenantInputSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Invalid input.',
-    };
+    return { ok: false, reason: 'confirmRequired' };
   }
 
   const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
   if (!tenant) {
-    return { ok: false, error: 'Tenant not found.' };
+    return { ok: false, reason: 'notFound' };
   }
 
   if (tenant.deprovisionedAt) {
-    return { ok: false, error: 'This tenant is already deprovisioned.' };
+    return { ok: false, reason: 'alreadyDeprovisioned' };
   }
 
   const { confirm, dryRun } = parsed.data;
   if (confirm !== tenant.name) {
-    return { ok: false, error: "Doesn't match the tenant's name." };
+    return { ok: false, reason: 'nameMismatch' };
   }
 
   const dispatched = await dispatchDeprovisioningWorkflow({
@@ -61,12 +64,9 @@ export const deprovisionTenantAction = async (
   });
 
   if (!dispatched) {
-    return { ok: false, error: "Couldn't start deprovisioning — try again." };
+    return { ok: false, reason: 'deprovisionFailed' };
   }
 
-  // A dry run never actually deprovisions anything — only a real dispatch
-  // is a lifecycle fact worth recording. The workflow records the outcome
-  // itself; this row attests only that it was asked to run.
   if (!dryRun) {
     await recordAuditEvent({
       logEvent: 'provisioning.deprovision_audit_failed',

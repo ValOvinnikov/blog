@@ -120,7 +120,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   it('shows the error message inline and never refreshes when the action fails', async () => {
     deprovisionTenantActionMock.mockResolvedValue({
       ok: false,
-      error: "Doesn't match the tenant's name.",
+      reason: 'nameMismatch',
     });
     setup();
     const dialog = await openDialog(user);
