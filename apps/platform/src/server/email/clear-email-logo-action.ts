@@ -9,13 +9,15 @@ import {
   getEmailLogoUrl,
   setEmailLogoUrl,
 } from '@platform/server/email/email-logo-store';
+import type { TUploadError } from '@platform/server/uploads/upload-error';
 import {
   emailLogoTargetSchema,
   type TEmailLogoTarget,
 } from '@platform/utils/email-logo-target/email-logo-target';
 import { logger } from '@platform/utils/logger/logger';
 
-export type TClearEmailLogoResult = { ok: true } | { ok: false; error: string };
+export type TClearEmailLogoResult =
+  { ok: true } | { ok: false; error: TUploadError };
 
 export const clearEmailLogoAction = async (
   tenantId: string,
@@ -53,6 +55,9 @@ export const clearEmailLogoAction = async (
       target: logoTarget,
       error,
     });
-    return { ok: false, error: "Couldn't remove the logo — try again." };
+    return {
+      ok: false,
+      error: { reason: 'removeFailed', values: { kind: 'logo' } },
+    };
   }
 };

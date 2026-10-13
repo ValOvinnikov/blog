@@ -9,6 +9,7 @@ import {
   getBrandAssetUrl,
   setBrandAssetUrl,
 } from '@platform/server/site-config/brand-asset-store';
+import type { TUploadError } from '@platform/server/uploads/upload-error';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
@@ -16,7 +17,7 @@ import {
 import { logger } from '@platform/utils/logger/logger';
 
 export type TClearBrandAssetResult =
-  { ok: true } | { ok: false; error: string };
+  { ok: true } | { ok: false; error: TUploadError };
 
 export const clearBrandAssetAction = async (
   tenantId: string,
@@ -57,7 +58,7 @@ export const clearBrandAssetAction = async (
     });
     return {
       ok: false,
-      error: `Couldn't remove the ${targetKind} — try again.`,
+      error: { reason: 'removeFailed', values: { kind: targetKind } },
     };
   }
 };

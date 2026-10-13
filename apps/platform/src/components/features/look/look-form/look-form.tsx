@@ -30,6 +30,7 @@ import {
   isSameStagedImage,
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
+import { useUploadErrorText } from '@platform/utils/use-upload-error-text/use-upload-error-text';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -119,6 +120,7 @@ export const LookForm = ({
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
+  const uploadErrorText = useUploadErrorText();
   const [repickKinds, setRepickKinds] = useState<TBrandAssetKind[]>([]);
   const {
     values,
@@ -265,7 +267,9 @@ export const LookForm = ({
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error'}
-      errorTitle={brandImageError ?? t('alertError')}
+      errorTitle={
+        brandImageError ? uploadErrorText(brandImageError) : t('alertError')
+      }
       isWide={true}
       draft={{
         tenantId,

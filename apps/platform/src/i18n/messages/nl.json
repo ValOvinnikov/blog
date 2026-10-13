@@ -410,6 +410,23 @@
       "replace": "Sjabloonlogo vervangen"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "Bestandsuploads zijn voor deze omgeving nog niet ingesteld.",
+    "fileMissing": "Kies een bestand om te uploaden.",
+    "fileTooLarge": "Dat bestand is te groot — de limiet is {limit}.",
+    "unreadableImage": "Dat bestand is geen leesbare afbeelding.",
+    "unrecognizedTarget": "Onbekend uploaddoel.",
+    "brandImageTypeUnsupported": "Kies een PNG-, JPEG-, WebP- of SVG-afbeelding.",
+    "imageTooSmall": "De afbeelding is te klein — minimaal {size}×{size} px.",
+    "imageTooLarge": "De afbeelding is te groot — maximaal {size}×{size} px.",
+    "faviconNotSquare": "Het favicon moet vierkant zijn — dit is {width}×{height} px. Snijd het vóór het uploaden bij tot een vierkant.",
+    "svgFaviconNotSquare": "Het favicon moet vierkant zijn — dit is {width}×{height} px (volgens viewBox/width/height). Snijd het vóór het uploaden bij tot een vierkant.",
+    "emailLogoSvg": "SVG-logo's worden niet ondersteund — Gmail, Outlook en Yahoo tonen geen SVG in e-mail, dus het logo zou als ontbrekende afbeelding aankomen.",
+    "emailLogoWebp": "WebP-logo's worden niet ondersteund — te veel e-mailprogramma's tonen WebP niet betrouwbaar.",
+    "emailLogoTypeUnsupported": "Kies een PNG-, JPEG- of GIF-afbeelding.",
+    "uploadFailed": "{kind, select, favicon {Het favicon} other {Het logo}} kon niet worden geüpload — probeer het opnieuw.",
+    "removeFailed": "{kind, select, favicon {Het favicon} other {Het logo}} kon niet worden verwijderd — probeer het opnieuw."
+  },
   "brandAssetField": {
     "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
     "logo": {

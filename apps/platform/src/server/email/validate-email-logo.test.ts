@@ -106,7 +106,7 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringMatching(/svg/i),
+      error: { reason: 'emailLogoSvg' },
     });
   });
 
@@ -115,7 +115,7 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringMatching(/webp/i),
+      error: { reason: 'emailLogoWebp' },
     });
   });
 
@@ -126,7 +126,7 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringMatching(/too large/i),
+      error: { reason: 'fileTooLarge', values: { limit: '100 KB' } },
     });
   });
 
@@ -135,7 +135,7 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: expect.stringMatching(/400×400/),
+      error: { reason: 'imageTooLarge', values: { size: 400 } },
     });
   });
 
@@ -146,7 +146,7 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: 'Choose a file to upload.',
+      error: { reason: 'fileMissing' },
     });
   });
 

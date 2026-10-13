@@ -145,7 +145,7 @@ describe(clearEmailLogoAction, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "Couldn't remove the logo — try again.",
+      error: { reason: 'removeFailed', values: { kind: 'logo' } },
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });

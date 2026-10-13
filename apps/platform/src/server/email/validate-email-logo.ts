@@ -36,23 +36,15 @@ export const validateEmailLogoUpload = async (
   const { buffer, type, width, height } = read.image;
 
   if (type === 'svg') {
-    return {
-      ok: false,
-      error:
-        'SVG logos are not supported — Gmail, Outlook and Yahoo do not render SVG in email, so this would ship as a missing image.',
-    };
+    return { ok: false, error: { reason: 'emailLogoSvg' } };
   }
   if (type === 'webp') {
-    return {
-      ok: false,
-      error:
-        "WebP logos are not supported — too many email clients don't render WebP reliably.",
-    };
+    return { ok: false, error: { reason: 'emailLogoWebp' } };
   }
 
   const format = type ? IMAGE_FORMAT_BY_DETECTED_TYPE[type] : undefined;
   if (!format) {
-    return { ok: false, error: 'Choose a PNG, JPEG, or GIF image.' };
+    return { ok: false, error: { reason: 'emailLogoTypeUnsupported' } };
   }
 
   if (
@@ -61,7 +53,10 @@ export const validateEmailLogoUpload = async (
   ) {
     return {
       ok: false,
-      error: `Image is too large — at most ${EMAIL_LOGO_MAX_DIMENSION_PX}×${EMAIL_LOGO_MAX_DIMENSION_PX}px.`,
+      error: {
+        reason: 'imageTooLarge',
+        values: { size: EMAIL_LOGO_MAX_DIMENSION_PX },
+      },
     };
   }
 

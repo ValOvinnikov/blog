@@ -410,6 +410,23 @@
       "replace": "Sustituir el logotipo de la plantilla"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "La subida de archivos aún no está configurada en este entorno.",
+    "fileMissing": "Elija un archivo para subir.",
+    "fileTooLarge": "El archivo es demasiado grande: el límite es {limit}.",
+    "unreadableImage": "El archivo no es una imagen legible.",
+    "unrecognizedTarget": "Destino de subida no reconocido.",
+    "brandImageTypeUnsupported": "Elija una imagen PNG, JPEG, WebP o SVG.",
+    "imageTooSmall": "La imagen es demasiado pequeña: mínimo {size}×{size} px.",
+    "imageTooLarge": "La imagen es demasiado grande: máximo {size}×{size} px.",
+    "faviconNotSquare": "El favicon debe ser una imagen cuadrada; esta mide {width}×{height} px. Recórtela en forma cuadrada antes de subirla.",
+    "svgFaviconNotSquare": "El favicon debe ser una imagen cuadrada; esta mide {width}×{height} px (según su viewBox/width/height). Recórtela en forma cuadrada antes de subirla.",
+    "emailLogoSvg": "No se admiten logotipos SVG: Gmail, Outlook y Yahoo no muestran SVG en el correo, así que llegaría como una imagen ausente.",
+    "emailLogoWebp": "No se admiten logotipos WebP: demasiados clientes de correo no muestran WebP de forma fiable.",
+    "emailLogoTypeUnsupported": "Elija una imagen PNG, JPEG o GIF.",
+    "uploadFailed": "No se pudo subir {kind, select, favicon {el favicon} other {el logotipo}}. Vuelva a intentarlo.",
+    "removeFailed": "No se pudo quitar {kind, select, favicon {el favicon} other {el logotipo}}. Vuelva a intentarlo."
+  },
   "brandAssetField": {
     "savesWithChanges": "Se guarda con los cambios",
     "logo": {

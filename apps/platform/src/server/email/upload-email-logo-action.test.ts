@@ -161,7 +161,7 @@ describe(uploadEmailLogoAction, () => {
   it('returns the validation error and never calls Blob when validation fails', async () => {
     validateEmailLogoUploadMock.mockResolvedValue({
       ok: false,
-      error: 'SVG logos are not supported.',
+      error: { reason: 'emailLogoSvg' },
     });
 
     const result = await uploadEmailLogoAction(
@@ -172,7 +172,7 @@ describe(uploadEmailLogoAction, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: 'SVG logos are not supported.',
+      error: { reason: 'emailLogoSvg' },
     });
     expect(putMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -211,7 +211,7 @@ describe(uploadEmailLogoAction, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "Couldn't upload the logo — try again.",
+      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -228,7 +228,7 @@ describe(uploadEmailLogoAction, () => {
 
       expect(result).toEqual({
         ok: false,
-        error: 'File uploads are not configured for this environment yet.',
+        error: { reason: 'uploadsNotConfigured' },
       });
       expect(putMock).not.toHaveBeenCalled();
     } finally {

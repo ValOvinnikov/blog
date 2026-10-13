@@ -410,6 +410,23 @@
       "replace": "Remplacer le logo du modèle"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "L'import de fichiers n'est pas encore configuré pour cet environnement.",
+    "fileMissing": "Choisissez un fichier à importer.",
+    "fileTooLarge": "Ce fichier est trop volumineux — la limite est de {limit}.",
+    "unreadableImage": "Ce fichier n'est pas une image lisible.",
+    "unrecognizedTarget": "Destination d'import non reconnue.",
+    "brandImageTypeUnsupported": "Choisissez une image PNG, JPEG, WebP ou SVG.",
+    "imageTooSmall": "L'image est trop petite — au moins {size}×{size} px.",
+    "imageTooLarge": "L'image est trop grande — au plus {size}×{size} px.",
+    "faviconNotSquare": "Le favicon doit être une image carrée — celle-ci fait {width}×{height} px. Recadrez-la en carré avant de l'importer.",
+    "svgFaviconNotSquare": "Le favicon doit être une image carrée — celle-ci fait {width}×{height} px (d'après son viewBox/width/height). Recadrez-la en carré avant de l'importer.",
+    "emailLogoSvg": "Les logos SVG ne sont pas pris en charge — Gmail, Outlook et Yahoo n'affichent pas le SVG dans les e-mails, le logo apparaîtrait donc comme une image manquante.",
+    "emailLogoWebp": "Les logos WebP ne sont pas pris en charge — trop de clients de messagerie n'affichent pas le WebP de manière fiable.",
+    "emailLogoTypeUnsupported": "Choisissez une image PNG, JPEG ou GIF.",
+    "uploadFailed": "Impossible d'importer {kind, select, favicon {le favicon} other {le logo}} — veuillez réessayer.",
+    "removeFailed": "Impossible de supprimer {kind, select, favicon {le favicon} other {le logo}} — veuillez réessayer."
+  },
   "brandAssetField": {
     "savesWithChanges": "Enregistré avec les modifications",
     "logo": {

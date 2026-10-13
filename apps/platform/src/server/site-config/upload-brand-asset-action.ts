@@ -11,6 +11,7 @@ import {
   setBrandAssetUrl,
 } from '@platform/server/site-config/brand-asset-store';
 import { validateBrandAssetUpload } from '@platform/server/site-config/validate-brand-asset';
+import type { TUploadError } from '@platform/server/uploads/upload-error';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
@@ -19,7 +20,7 @@ import { logger } from '@platform/utils/logger/logger';
 import { put } from '@vercel/blob';
 
 export type TUploadBrandAssetResult =
-  { ok: true; url: string } | { ok: false; error: string };
+  { ok: true; url: string } | { ok: false; error: TUploadError };
 
 // `kind` is re-validated although the client only sends one of two literals: a Server Action is a public endpoint.
 export const uploadBrandAssetAction = async (
@@ -81,7 +82,7 @@ export const uploadBrandAssetAction = async (
     });
     return {
       ok: false,
-      error: `Couldn't upload the ${targetKind} — try again.`,
+      error: { reason: 'uploadFailed', values: { kind: targetKind } },
     };
   }
 };

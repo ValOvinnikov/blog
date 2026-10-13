@@ -410,6 +410,23 @@
       "replace": "Replace template logo"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "File uploads are not configured for this environment yet.",
+    "fileMissing": "Choose a file to upload.",
+    "fileTooLarge": "That file is too large — the limit is {limit}.",
+    "unreadableImage": "That file isn't a readable image.",
+    "unrecognizedTarget": "Unrecognized upload target.",
+    "brandImageTypeUnsupported": "Choose a PNG, JPEG, WebP, or SVG image.",
+    "imageTooSmall": "Image is too small — at least {size}×{size}px.",
+    "imageTooLarge": "Image is too large — at most {size}×{size}px.",
+    "faviconNotSquare": "Favicon must be a square image — this one is {width}×{height}px. Crop it to a square before uploading.",
+    "svgFaviconNotSquare": "Favicon must be a square image — this one is {width}×{height}px (from its viewBox/width/height). Crop it to a square before uploading.",
+    "emailLogoSvg": "SVG logos are not supported — Gmail, Outlook and Yahoo do not render SVG in email, so this would ship as a missing image.",
+    "emailLogoWebp": "WebP logos are not supported — too many email clients don't render WebP reliably.",
+    "emailLogoTypeUnsupported": "Choose a PNG, JPEG, or GIF image.",
+    "uploadFailed": "Couldn't upload the {kind, select, favicon {favicon} other {logo}} — try again.",
+    "removeFailed": "Couldn't remove the {kind, select, favicon {favicon} other {logo}} — try again."
+  },
   "brandAssetField": {
     "savesWithChanges": "Saves with changes",
     "logo": {

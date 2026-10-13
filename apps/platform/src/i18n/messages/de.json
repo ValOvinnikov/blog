@@ -410,6 +410,23 @@
       "replace": "Vorlagen-Logo ersetzen"
     }
   },
+  "uploadErrors": {
+    "uploadsNotConfigured": "Datei-Uploads sind für diese Umgebung noch nicht eingerichtet.",
+    "fileMissing": "Wählen Sie eine Datei zum Hochladen.",
+    "fileTooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}.",
+    "unreadableImage": "Diese Datei ist kein lesbares Bild.",
+    "unrecognizedTarget": "Unbekanntes Upload-Ziel.",
+    "brandImageTypeUnsupported": "Wählen Sie ein PNG-, JPEG-, WebP- oder SVG-Bild.",
+    "imageTooSmall": "Das Bild ist zu klein — mindestens {size}×{size} px.",
+    "imageTooLarge": "Das Bild ist zu groß — höchstens {size}×{size} px.",
+    "faviconNotSquare": "Das Favicon muss quadratisch sein — dieses ist {width}×{height} px. Schneiden Sie es vor dem Hochladen quadratisch zu.",
+    "svgFaviconNotSquare": "Das Favicon muss quadratisch sein — dieses ist {width}×{height} px (laut viewBox/width/height). Schneiden Sie es vor dem Hochladen quadratisch zu.",
+    "emailLogoSvg": "SVG-Logos werden nicht unterstützt — Gmail, Outlook und Yahoo stellen SVG in E-Mails nicht dar, sodass das Logo als fehlendes Bild ankäme.",
+    "emailLogoWebp": "WebP-Logos werden nicht unterstützt — zu viele E-Mail-Programme stellen WebP nicht zuverlässig dar.",
+    "emailLogoTypeUnsupported": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild.",
+    "uploadFailed": "{kind, select, favicon {Das Favicon} other {Das Logo}} konnte nicht hochgeladen werden — bitte erneut versuchen.",
+    "removeFailed": "{kind, select, favicon {Das Favicon} other {Das Logo}} konnte nicht entfernt werden — bitte erneut versuchen."
+  },
   "brandAssetField": {
     "savesWithChanges": "Wird mit den Änderungen gespeichert",
     "logo": {
