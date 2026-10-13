@@ -1,13 +1,12 @@
 import type { TFindingSummary } from '@blog/db/schema/findings';
 import { Card } from '@platform/components/shared/card';
+import { CardList } from '@platform/components/shared/card-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import { Text } from '@platform/components/shared/text';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { FindingDetails } from './components/finding-details/finding-details';
-import { findingsCardVariants } from './findings-card-variants';
 
 export type TFindingsCardProps = {
   tenantId: string;
@@ -20,44 +19,36 @@ export const FindingsCard = ({ tenantId, findings }: TFindingsCardProps) => {
   const tSeverity = useTranslations('findingSeverityLabel');
   const tSource = useTranslations('findingSourceLabel');
   const tKind = useTranslations('findingKindLabel');
-  const { list, row, body, kindText, sourceText, time } =
-    findingsCardVariants();
 
   return (
     <Card>
       <Card.Header title={t('title')} />
       <Card.Body>
-        {findings.length === 0 ? (
-          <Text variant="supporting">{t('empty')}</Text>
-        ) : (
-          <div className={list()}>
-            {findings.map((finding) => (
-              <div className={row()} key={finding.id}>
+        <CardList
+          items={findings}
+          emptyMessage={t('empty')}
+          renderRow={(finding) => (
+            <CardList.Row
+              key={finding.id}
+              align="start"
+              lead={
                 <StatusBadge tone={findingSeverityTone(finding.severity)}>
                   {tSeverity(finding.severity)}
                 </StatusBadge>
-                <div className={body()}>
-                  <span className={kindText()}>{tKind(finding.kind)}</span>
-                  <span className={sourceText()}>
-                    {tSource(finding.source)}
-                  </span>
-                  {finding.hasDetails && (
-                    <FindingDetails
-                      tenantId={tenantId}
-                      findingId={finding.id}
-                    />
-                  )}
-                </div>
-                <time
-                  dateTime={finding.lastSeenAt.toISOString()}
-                  className={time()}
-                >
-                  {formatDate(finding.lastSeenAt, locale)}
-                </time>
-              </div>
-            ))}
-          </div>
-        )}
+              }
+              primary={tKind(finding.kind)}
+              secondary={tSource(finding.source)}
+              time={{
+                date: finding.lastSeenAt,
+                label: formatDate(finding.lastSeenAt, locale),
+              }}
+            >
+              {finding.hasDetails && (
+                <FindingDetails tenantId={tenantId} findingId={finding.id} />
+              )}
+            </CardList.Row>
+          )}
+        />
       </Card.Body>
     </Card>
   );
