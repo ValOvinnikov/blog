@@ -1,7 +1,6 @@
 # Admin Panel (`apps/platform`) — Product & Page Design
 
-> **Companion to**
-> `docs/superpowers/specs/2026-08-13-tenant-config-postgres-admin-design.md`
+> **Companion to** `SPEC.md` §4, §6 and §13
 > (infrastructure: Next.js, deployment, data model, session sharing). This doc
 > is the product surface — what pages exist, who sees them, and the
 > interaction patterns that make this a purpose-built tool rather than a
