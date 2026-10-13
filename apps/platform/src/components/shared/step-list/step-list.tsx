@@ -1,7 +1,13 @@
+import type { IWithClassName } from '@blog/config/types';
 import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
+import { StepIndicator } from '@platform/components/shared/step-indicator';
+import {
+  STEP_INDICATOR_STATE,
+  type TStepIndicatorState,
+} from '@platform/constants/step-indicator';
 import type { ReactNode } from 'react';
 
 import { stepListVariants } from './step-list-variants';
@@ -16,23 +22,24 @@ export type TStepListStep = {
   updatedAtLabel?: string;
 };
 
-type TStepListProps = {
+type TStepListProps = IWithClassName & {
   steps: TStepListStep[];
-  className?: string;
 };
 
-/**
- * A numbered/✓/! indicator stepper with a connector between steps and a
- * visually-hidden per-step status announcement — every value it renders is
- * already resolved by the caller.
- */
+const INDICATOR_STATE_BY_STATUS: Record<
+  TTenantProvisioningStepStatus,
+  TStepIndicatorState
+> = {
+  [TENANT_PROVISIONING_STEP_STATUS.IDLE]: STEP_INDICATOR_STATE.UPCOMING,
+  [TENANT_PROVISIONING_STEP_STATUS.RUNNING]: STEP_INDICATOR_STATE.RUNNING,
+  [TENANT_PROVISIONING_STEP_STATUS.DONE]: STEP_INDICATOR_STATE.DONE,
+  [TENANT_PROVISIONING_STEP_STATUS.FAILED]: STEP_INDICATOR_STATE.FAILED,
+};
+
 export const StepList = ({ steps, className }: TStepListProps) => {
   const {
     list,
     step,
-    indicatorCol,
-    circle,
-    connector,
     stepBody,
     stepTitle,
     stepStatusLive,
@@ -55,29 +62,18 @@ export const StepList = ({ steps, className }: TStepListProps) => {
           },
           index,
         ) => {
-          const isFailed = status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-          const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
-          const isLast = index === steps.length - 1;
-
           return (
             <div className={step()} key={key}>
-              <div className={indicatorCol()}>
-                <span className={circle({ status })} aria-hidden="true">
-                  {isDone ? '✓' : isFailed ? '!' : index + 1}
-                </span>
-                {!isLast && (
-                  <span
-                    className={connector({ isDone })}
-                    aria-hidden="true"
-                    data-testid="step-connector"
-                  />
-                )}
-              </div>
+              <StepIndicator
+                state={INDICATOR_STATE_BY_STATUS[status]}
+                stepNumber={index + 1}
+                hasConnector={index < steps.length - 1}
+                isConnectorDone={
+                  status === TENANT_PROVISIONING_STEP_STATUS.DONE
+                }
+              />
               <div className={stepBody()}>
                 <span className={stepTitle()}>{title}</span>
-                {/* The circle glyph is decorative (`aria-hidden`); this
-                    visually-hidden text is what actually carries the step's
-                    status to assistive tech, inside a stable live region. */}
                 <span
                   className={stepStatusLive()}
                   aria-live="polite"
