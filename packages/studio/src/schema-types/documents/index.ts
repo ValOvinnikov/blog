@@ -17,7 +17,6 @@ import { redirectSchema } from './redirect/redirect';
 import { footerSettingsSchema } from './settings/footer/footer';
 import { navigationSettingsSchema } from './settings/navigation/navigation';
 import { siteSettingsSchema } from './settings/site-settings/site-settings';
-import { themeSettingsSchema } from './settings/theme/theme';
 import { migrationStateSchema } from './system/migration-state/migration-state';
 import { homeTemplateSchema } from './templates/home/home';
 import { landingTemplateSchema } from './templates/landing/landing';
@@ -54,6 +53,5 @@ export const documents = [
   siteSettingsSchema,
   navigationSettingsSchema,
   footerSettingsSchema,
-  themeSettingsSchema,
   migrationStateSchema,
 ];

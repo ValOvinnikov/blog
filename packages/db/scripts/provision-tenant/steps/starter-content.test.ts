@@ -3,13 +3,12 @@ import { buildStarterDocuments } from './starter-content';
 describe(buildStarterDocuments, () => {
   const tenant = { name: 'Acme Corporation' };
 
-  it('builds exactly the six starter documents, all published (no drafts. prefix)', () => {
+  it('builds exactly the four starter documents, all published (no drafts. prefix)', () => {
     const documents = buildStarterDocuments(tenant);
 
     expect(documents.map((doc) => doc._type)).toEqual([
       'settings_navigation',
       'settings_footer',
-      'settings_theme',
       'settings_site',
       'page_home',
     ]);

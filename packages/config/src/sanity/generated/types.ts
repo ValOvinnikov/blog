@@ -868,24 +868,6 @@ export type MigrationState = {
   }>;
 };
 
-export type Settings_theme = {
-  _id: string;
-  _type: 'settings_theme';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  preset?: 'CONSOLE' | 'EDITORIAL';
-  accentHue?: number;
-  logoHue?: number;
-  headingFont?:
-    'SPACE_GROTESK' | 'NEWSREADER' | 'JETBRAINS_MONO' | 'FRAUNCES' | 'INTER';
-  bodyFont?:
-    'SPACE_GROTESK' | 'NEWSREADER' | 'JETBRAINS_MONO' | 'FRAUNCES' | 'INTER';
-  radiusScale?: 'SM' | 'MD' | 'LG' | 'XL';
-  density?: 'DEFAULT' | 'COMPACT';
-};
-
 export type Settings_footer = {
   _id: string;
   _type: 'settings_footer';
@@ -2258,7 +2240,6 @@ export type AllSanitySchemaTypes =
   | WideLayout
   | HeroLayout
   | MigrationState
-  | Settings_theme
   | Settings_footer
   | Settings_navigation
   | Settings_site
