@@ -5,24 +5,17 @@ import {
   type TVoiceFieldId,
   type TVoiceSurface,
 } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import { VoiceSpecimen } from '@platform/components/features/site-preview/voice-specimen';
+import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceField } from '@platform/components/features/voice/voice-field';
 import { VoiceListRow } from '@platform/components/features/voice/voice-list-row';
 import { useVoiceListSamples } from '@platform/components/features/voice/voice-list-samples-provider';
 import { Accordion } from '@platform/components/shared/accordion';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import {
   countCustomisedVoiceFields,
-  voiceDefaultText,
-  voiceFieldInputId,
   voiceFieldsOf,
-  type TVoiceDraftValue,
-  type TVoiceField,
-  type TVoiceFieldErrors,
-  type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
@@ -31,29 +24,18 @@ import { voiceSurfaceCardVariants } from './voice-surface-card-variants';
 
 export type TVoiceSurfaceCardProps = {
   surface: TVoiceSurface;
-  locale: TLocaleIsoCode;
-  fieldIdPrefix: string;
-  values: TVoiceLocaleDraft;
-  savedValues: TVoiceLocaleDraft;
-  errors: TVoiceFieldErrors;
-  openFieldId?: TVoiceFieldId;
-  onOpenField: (id: TVoiceFieldId | undefined) => void;
-  onFieldChange: (id: TVoiceFieldId, value: TVoiceDraftValue) => void;
-  specimenTheme: TSitePreviewTheme;
 };
 
-export const VoiceSurfaceCard = ({
-  surface,
-  locale,
-  fieldIdPrefix,
-  values,
-  savedValues,
-  errors,
-  openFieldId,
-  onOpenField,
-  onFieldChange,
-  specimenTheme,
-}: TVoiceSurfaceCardProps) => {
+export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
+  const {
+    locale,
+    values,
+    savedValues,
+    errors,
+    openListFieldId,
+    setOpenListFieldId,
+    specimenTheme,
+  } = useVoiceEditor();
   const t = useTranslations('voiceSettings');
   const tSurfaces = useTranslations('voiceSurfaces');
   const tDescriptions = useTranslations('voiceSurfaceDescriptions');
@@ -76,23 +58,13 @@ export const VoiceSurfaceCard = ({
     previewNote,
     summary,
   } = voiceSurfaceCardVariants({ isPreviewOpen });
+  const isArchive = surface === VOICE_SURFACE.ARCHIVE;
+  const openFieldId = isArchive ? openListFieldId : undefined;
   const fields = voiceFieldsOf(surface);
   const trackFocusOf = (id: TVoiceFieldId) => ({
     onFocus: () => setFocusedFieldId(id),
     onBlur: () => setFocusedFieldId(undefined),
   });
-  const renderField = (field: TVoiceField) => (
-    <VoiceField
-      inputId={voiceFieldInputId(fieldIdPrefix, field.id)}
-      field={field}
-      value={values[field.id]}
-      savedValue={savedValues[field.id]}
-      placeholder={voiceDefaultText(locale, field)}
-      error={errors[field.id]}
-      onChange={(next) => onFieldChange(field.id, next)}
-      hasVisibleLabel={surface !== VOICE_SURFACE.ARCHIVE}
-    />
-  );
 
   return (
     <section aria-label={tSurfaces(surface)}>
@@ -103,7 +75,7 @@ export const VoiceSurfaceCard = ({
           actions={
             <span className={summary()}>
               {t('surfaceSummary', {
-                unit: surface === VOICE_SURFACE.ARCHIVE ? 'lists' : 'fields',
+                unit: isArchive ? 'lists' : 'fields',
                 total: fields.length,
                 customised: countCustomisedVoiceFields(values, fields),
               })}
@@ -112,10 +84,10 @@ export const VoiceSurfaceCard = ({
         />
         <Card.Body className={body()}>
           <div className={fieldsSlot()}>
-            {surface === VOICE_SURFACE.ARCHIVE ? (
+            {isArchive ? (
               <Accordion
                 openValue={openFieldId}
-                onOpenValueChange={onOpenField}
+                onOpenValueChange={setOpenListFieldId}
               >
                 {fields.map((field) => (
                   <div key={field.id} {...trackFocusOf(field.id)}>
@@ -127,7 +99,7 @@ export const VoiceSurfaceCard = ({
                       error={errors[field.id]}
                       isOpen={openFieldId === field.id}
                     >
-                      {renderField(field)}
+                      <VoiceField field={field} />
                     </VoiceListRow>
                   </div>
                 ))}
@@ -135,7 +107,7 @@ export const VoiceSurfaceCard = ({
             ) : (
               fields.map((field) => (
                 <div key={field.id} {...trackFocusOf(field.id)}>
-                  {renderField(field)}
+                  <VoiceField field={field} />
                 </div>
               ))
             )}
