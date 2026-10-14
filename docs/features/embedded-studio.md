@@ -1,0 +1,146 @@
+---
+title: Embedded Studio
+status: built
+layers: [studio, platform, db, config]
+code:
+  - packages/studio/src/studio-mount.tsx
+  - packages/studio/src/studio-mount.test.tsx
+  - packages/studio/src/studio-config.ts
+  - packages/studio/src/studio-config.test.ts
+  - packages/studio/src/index.ts
+  - packages/studio/sanity.config.ts
+  - packages/studio/sanity-env.ts
+  - apps/platform/src/components/features/studio/**
+  - apps/platform/src/app/**/studio/**
+  - apps/platform/src/utils/content-security-policy/**
+epics: [4840, 4956, 4959, 4035, 1036]
+---
+
+# Embedded Studio
+
+## What it does
+
+One Sanity Studio, built from the shared `@blog/studio` package, serves every
+tenant. The platform mounts it inside its own shell at a tenant-scoped route
+and points it at that tenant's own Sanity project and dataset. Owners edit
+their site's content there and operators can open any tenant's. The Studio is
+configured per tenant: its languages follow the tenant's live locales, and
+module types whose capability is off for the tenant carry a warning.
+
+## Surfaces and routes
+
+- `/dashboard/studio/**`: the owner's Studio for the active workspace.
+- `/tenants/{id}/studio/**`: the operator's Studio for any tenant, archived
+  ones included.
+- Both are `[[...tool]]` catch-alls; the Studio's own router owns everything
+  below `basePath`, including structure paths whose ids contain dots. The
+  platform proxy skips only root-level dotted paths, so those still resolve.
+- The `studio` segment switches the shell to full-bleed: the content column is
+  pinned to the viewport and the Studio fills it (`ShellFrame`).
+- The sidebar shows a Studio item under "Content" in both trees.
+- Outside the platform, `pnpm --filter @blog/studio dev` runs the same config
+  standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
+
+## Data
+
+- Neon `tenants`: `sanityProjectId`, `sanityDataset` and
+  `sanityReadTokenEncrypted` decide whether the Studio can mount at all;
+  `deprovisionedAt` decides whether it is replaced by the archived notice.
+  `locale`, `additionalLocales` and `plan` give the live locales
+  (`selectLiveLocales`).
+- Neon `settings_features`: the saved capability toggles, clamped to the plan's
+  entitlement (`getEnabledCapabilities`), become `enabledCapabilities`.
+- Content lives in the tenant's own Sanity project and dataset; the Studio
+  reads and writes it from the browser. Nothing in the platform caches it.
+  Publishing triggers the tenant's revalidation webhook (see
+  [rendering-and-caching](./rendering-and-caching.md)).
+
+## Configuration
+
+- No Studio setting is edited in the platform itself. The owner or operator
+  changes its inputs elsewhere: languages on the Languages page
+  ([languages](./languages.md)), capabilities on the Features page
+  ([plans-and-entitlements](./plans-and-entitlements.md)).
+- A capability that is off does not hide a module type. The type's title gets
+  "(off in Features)" in array insert menus, an inserted item carries a
+  validation warning, and a document of that type shows a caution banner.
+  Today only `module_newsletter` is mapped to a capability (NEWSLETTER).
+- With a single live locale the language filter is hidden and
+  single-language inputs apply.
+- Look and Voice do not reach the Studio; its UI is Sanity's own, in English.
+
+## Constraints and invariants
+
+- `StudioMount` takes plain props only (`projectId`, `dataset`, `basePath`,
+  `title`, `enabledCapabilities`, `defaultLocale`, `liveLocales`) and calls
+  `buildStudioConfig` itself. It is the only `'use client'` file in
+  `@blog/studio`. Nothing exports a built config: calling the builder in a
+  Server Component pulls the Sanity SDK into the RSC graph, where `swr`,
+  Sanity's bundled CSS and `sanity-plugin-media` break.
+- `apps/platform` reaches Sanity only through `StudioMount`. ESLint bans
+  `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@blog/service` there.
+- `StudioMount` fills its parent (`height: 100%`) instead of `NextStudio`'s
+  `100vh` and adds no global styles of its own. The Studio's Inter
+  `@font-face` stays loaded on every platform route after one visit.
+- `StudioMountView` renders, in order: the archived notice for a deprovisioned
+  tenant; a "Studio isn't ready yet" warning while project, dataset or read
+  token is missing; otherwise the mount, titled with the tenant name.
+- The route is gated by the shell: `resolveDashboardTenant` on `/dashboard`
+  and `requireTenantById` (any admin role) on `/tenants/{id}`. Neither page is
+  plan-gated.
+- What the browser may read or write is decided by Sanity. The user signs
+  into Sanity with their own account, and the tenant project's member roles
+  apply. The platform session only gates the route.
+- The tenant project must allow the platform origin as a credentialed CORS
+  origin. Provisioning adds it from `ADMIN_APP_BASE_URL`
+  ([tenant-provisioning](./tenant-provisioning.md)).
+- The platform CSP allows the Studio: `connect-src https://*.sanity.io
+https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
+  Google avatars, and `font-src https://design-system-static.sanity.io`.
+- `buildStudioConfig` removes the bare templates of translated page types (the
+  i18n plugin adds one per language), gives `migration-state` documents no
+  actions and no "new document" entry, and wraps the landing page's publish
+  action with landing redirects ([landing-tree](./landing-tree.md)).
+
+## Dependencies
+
+- `@blog/studio` (schema, structure, plugins: structure, vision, code input,
+  media, document internationalization, internationalized arrays).
+- `@blog/db` for the tenant row, live locales and `PLAN_REGISTRY`;
+  `@blog/config` for `TCapability` and `LOCALE_ISO_CODES`.
+- Features: [studio-authoring](./studio-authoring.md) (schema and desk
+  structure), [platform-shell](./platform-shell.md),
+  [tenant-provisioning](./tenant-provisioning.md),
+  [module-system](./module-system.md), [languages](./languages.md).
+- Env: none in the platform for the mount (ids come from the tenant row). The
+  standalone CLI Studio reads `SANITY_STUDIO_PROJECT_ID` and
+  `SANITY_STUDIO_DATASET`.
+
+## Entry points
+
+- `packages/studio/src/studio-mount.tsx`
+- `packages/studio/src/studio-config.ts`
+- `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.tsx`
+- `apps/platform/src/app/[locale]/dashboard/(tenant)/studio/[[...tool]]/page.tsx`
+- `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/studio/[[...tool]]/page.tsx`
+- `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
+- `apps/platform/src/utils/content-security-policy/content-security-policy.ts`
+
+## Tests and stories
+
+- `packages/studio/src/studio-mount.test.tsx` and
+  `packages/studio/src/studio-config.test.ts`.
+- `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.test.tsx`.
+- `apps/platform/src/utils/content-security-policy/content-security-policy.test.ts`.
+- Capability warnings: `packages/studio/src/schema-types/inputs/capability-warning-input/*.test.ts`.
+- No Storybook in either workspace.
+
+## Related
+
+- #4840 epic: platform front door. Owner Studio access becomes a worker job,
+  and the mount happens only once access is READY.
+- #4956 `StudioMount` takes the owner's login provider.
+- #4959 the sidebar Studio link carries access states; an explainer replaces
+  the mount before READY.
+- #4035 localize the Studio interface for editors.
+- #1036 draft preview with Sanity Presentation.

@@ -1,0 +1,117 @@
+---
+title: Look
+status: built
+layers: [config, db, web, platform]
+code:
+  - packages/config/src/constants/preset.ts
+  - packages/config/src/constants/card-style.ts
+  - packages/db/src/schema/site-config.ts
+  - packages/db/src/queries/site-config/**
+  - apps/platform/src/app/*/dashboard/*/look/**
+  - apps/platform/src/app/*/tenants/*/*/look/**
+  - apps/platform/src/components/features/look/**
+  - apps/platform/src/components/features/site-preview/look-sample/**
+  - apps/platform/src/components/features/site-preview/site-theme-frame/**
+  - apps/platform/src/components/shared/preset-picker/**
+  - apps/platform/src/components/shared/hue-slider/**
+  - apps/platform/src/components/shared/font-picker/**
+  - apps/platform/src/config/**
+  - apps/platform/src/server/site-config/update-look-action*.ts
+  - apps/platform/src/server/site-config/*brand-asset*.ts
+  - apps/platform/src/server/site-config/sanitize-svg-markup*.ts
+  - apps/platform/src/server/site-config/site-config-or-defaults*.ts
+  - apps/platform/src/utils/default-look-values/**
+  - apps/platform/src/utils/look-form-values/**
+  - apps/platform/src/utils/theme-preview-tokens/**
+  - apps/platform/src/utils/brand-asset-limits/**
+  - apps/web/src/server/site-config/get-site-config/**
+  - apps/web/src/server/site-config/get-language-switcher-style/**
+  - apps/web/src/utils/to-theme-tokens/**
+  - apps/web/src/utils/get-theme-tokens/**
+  - apps/web/src/utils/build-theme-style-block/**
+  - apps/web/src/components/shared/theme-scope/**
+  - apps/web/src/config/fonts.ts
+  - apps/web/src/config/font-loaders/**
+epics: [4987, 4991, 4992, 4993, 4999, 4960]
+---
+
+# Look
+
+## What it does
+
+The Look page is where a tenant owner styles their public site without touching code. They pick a preset (Console or Editorial), then adjust the accent hue, the logo-mark hue, the heading and body fonts, corner radius, density, card style and the language-switcher style, and upload a logo and favicon. A live preview shows the result in light or dark and at desktop or phone width before saving. One save restyles every page of the site, and the accent and logo hues also colour the tenant's emails.
+
+## Surfaces and routes
+
+- **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape, Brand and Language switcher cards. Not plan-gated.
+- **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style.
+- **Email** — `resolveTenantEmailBrand` turns the preset, accent hue and logo hue into hex colours for the magic-link, newsletter and test emails.
+- No Studio surface: the theme is not Sanity content.
+
+## Data
+
+- `site_config` (Neon) — one row per tenant (unique `tenant_id`, cascade delete). Look columns: `preset` (`preset_id` pgEnum), `accent_hue` (int), `logo_hue` (int, nullable = follow the accent), `heading_font` and `body_font` (`font_choice`), `radius_scale` (`SM`/`MD`/`LG`/`XL`), `density` (`DEFAULT`/`COMPACT`), `card_style` (`ACCENT_BAR` default, `OUTLINED`), `language_switcher_style` (`MENU_CODE` default, `MENU_GLOBE`, `CODES`), `logo_asset_url`, `favicon_asset_url`. The same row holds Voice's `voice_overrides`.
+- `PRESET_REGISTRY` (`@blog/config`) — `CONSOLE`: hue 250, Space Grotesk / Newsreader, `MD`, `DEFAULT`, `ACCENT_BAR`. `EDITORIAL`: hue 28, Fraunces / Inter, `SM`, `COMPACT`, `OUTLINED`. Each preset also carries the capability `featureDefaults`.
+- Provisioning writes no row. With no row, the site renders the Console preset and the form opens on Console defaults.
+- Brand images live in Vercel Blob at `tenants/<id>/<logo|favicon>.<ext>`, public. A replaced or cleared image's old blob is deleted best-effort.
+- **Caching (web)** — `getSiteConfig` is `unstable_cache` per tenant, tag `site-config:<id>`, 3600s fallback (`TENANT_CONFIG_REVALIDATE_SECONDS`). `updateLookAction` POSTs `/api/revalidate-site-config` after the write, which expires the tenant's tags and purges the whole layout.
+
+## Configuration
+
+- Any tenant member, and any operator (as a virtual owner), can save. An archived tenant's form is read-only.
+- Picking a preset re-seeds the accent hue, fonts, radius, density and card style from `PRESET_REGISTRY` and clears the logo hue. The language-switcher style and brand images are kept. "Reset" appears once any value diverges from the preset.
+- The five fonts are allowed in either role; each has a heading and a body loader in `apps/web`.
+- The language-switcher control appears only when the tenant has more than one live language.
+- Unsaved edits persist as a draft in `localStorage`, keyed by tenant and page under `platform.settings-draft.v1`. Staged image files cannot survive a reload, so a restored draft asks for them again.
+- Reach: every page of the tenant's site, its emails, and the platform's own Voice specimens (through `theme-preview-tokens`). Plans do not gate any Look field.
+
+## Constraints and invariants
+
+- The resolved theme is never partial. `toThemeTokens` fills every gap from the row's preset, and a missing row or failed fetch falls back to `CONSOLE`.
+- Accent and logo ramps are declared in both `:root` and `.dark`. Radius, density, card style and the image-scrim ramp go in `:root` only (see [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)).
+- `theme.css`'s static values equal what `buildThemeStyleBlock` emits for the Console preset; `build-theme-style-block.test.ts` reads `theme.css` for the radius, spacing, item-card and scrim tokens, and checks the brand and logo ramps against fixed literals.
+- Accent-hue guard: the form blocks saving and `updateLookAction` refuses a hue that `isAccentHueAccessible` rejects. The site and emails replace such a stored hue with the preset's. The guard checks one pair, `--text` on `--brand-primary-muted` in both modes at 4.5:1, which every hue from 0 to 360 passes. So the refusal never fires today, and the other accent-dependent pairs (button labels, links on grey bands) are not checked.
+- The logo hue is unguarded; it colours only the generated three-layer brand mark.
+- `ACCENT_BAR` item cards stay square whatever the radius; only `OUTLINED` follows the radius scale.
+- Density rescales layout spacing only. Tailwind's base `--spacing` is untouched, so controls keep their size.
+- Fonts are self-hosted woff2 files in both apps, with no Google Fonts fetch. Only the Console pair and the mono font preload on the site.
+- Brand images: PNG, JPEG, WebP or SVG. The logo may be up to 4 MB and 32–4000px; the favicon up to 1 MB, 16–512px and square. The server sniffs the real bytes and sanitises SVG; the client check is a convenience only.
+- Images upload before the Look save. The upload and clear actions do not revalidate the site; the `updateLookAction` call that follows does.
+- The public site's header logo and favicon come from the Studio's Site Settings brand logo. `logo_asset_url` and `favicon_asset_url` appear only in the Look preview, and no public render reads them.
+- Every save writes an audit event (`SETTINGS_UPDATED` on `SITE_CONFIG`).
+
+## Dependencies
+
+- Layers: `config` (presets, theme declaration tables, the hue guard), `db` (`site_config`), `web`, `platform`.
+- Features: [design-tokens-and-surfaces](./design-tokens-and-surfaces.md), [voice](./voice.md) (shares the row, preview tokens and revalidation), [languages](./languages.md), [email](./email.md), [platform-shell](./platform-shell.md), [tenant-access](./tenant-access.md), [audit-and-findings](./audit-and-findings.md), [rendering-and-caching](./rendering-and-caching.md), [plans-and-entitlements](./plans-and-entitlements.md) (preset feature defaults).
+- Env: `SITE_CONFIG_REVALIDATE_SECRET` (both apps), `WEB_APP_URL` and `BLOB_READ_WRITE_TOKEN` (platform).
+
+## Entry points
+
+- `packages/config/src/constants/preset.ts` — `PRESET_REGISTRY`, `FONT_CHOICE`, `RADIUS_SCALE`, `DENSITY`, `LANGUAGE_SWITCHER_STYLE`
+- `packages/db/src/schema/site-config.ts`
+- `apps/platform/src/components/features/look/look-page-content/look-page-content.tsx`
+- `apps/platform/src/components/features/look/look-form/look-form.tsx`, `use-look-form-state.ts`, `use-look-save.ts`
+- `apps/platform/src/utils/look-form-values/look-form-values.ts` — `applyPresetDefaults`
+- `apps/platform/src/server/site-config/update-look-action.ts`, `upload-brand-asset-action.ts`, `validate-brand-asset.ts`
+- `apps/platform/src/utils/theme-preview-tokens/theme-preview-tokens.ts`
+- `apps/web/src/utils/to-theme-tokens/to-theme-tokens.ts`
+- `apps/web/src/utils/build-theme-style-block/build-theme-style-block.ts`
+- `apps/web/src/components/shared/theme-scope/theme-scope.tsx`
+- `apps/web/src/config/fonts.ts`
+
+## Tests and stories
+
+- Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`.
+- Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `apps/web/src/config/fonts.test.ts`.
+- db: `packages/db/src/queries/site-config/**/*.test.ts`.
+- Stories: `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`. The platform has no stories.
+
+## Related
+
+- #4987 — epic: accessible text and colour on the public site. It retunes the ramps and rebuilds the hue guard.
+- #4991 — brand and metadata colours reach AA at every accent hue.
+- #4992 — the accent-hue guard checks every accent pair and names the ones that fail.
+- #4993 — the Look page explains which parts a refused hue would make unreadable.
+- #4999 — the hue guard and the tenant email brand read the theme ramps instead of copies.
+- #4960 — the onboarding wizard's preset and accent quick-pick writes the first `site_config` row.

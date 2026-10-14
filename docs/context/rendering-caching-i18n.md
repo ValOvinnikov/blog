@@ -216,7 +216,7 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   the CDN lets a just-purged tag refetch a still-stale CDN response and
   re-cache it — do not flip it back on as a perf optimisation (#316).
 - **Preview/drafts:** Next.js Draft Mode + Sanity Presentation — planned
-  post-deployment (see `docs/BACKLOG.md`), enabled by `SANITY_API_READ_TOKEN`.
+  (epic #1036), enabled by `SANITY_API_READ_TOKEN`.
 - **i18n:** all content routes under `src/app/[tenant]/[locale]/`; next-intl
   with `localePrefix: 'as-needed'` (no prefix for the tenant's default
   language, a prefix for the others). Locales come from `LOCALE_ISO_CODES` in

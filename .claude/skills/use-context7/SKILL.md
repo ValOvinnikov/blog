@@ -10,80 +10,60 @@ description: >-
 
 # Use context7 for live documentation
 
-Training data goes stale. The context7 MCP server fetches current, version-matched
-docs for any library so you implement against the real API, not a cached
-approximation. Treat it like a mandatory read before writing non-trivial
-integration code.
+Training data goes stale. context7 returns current, version-matched docs, so
+code is written against the installed API rather than a remembered one.
 
 ## When to use it
 
-Use context7 whenever you would otherwise be guessing:
+Whenever you would otherwise guess:
 
-- A CLI command or flag you are not certain of
-  (`sanity schema extract`, `sanity typegen generate` options, `pnpm` workspace
-  flags, Turbo task config keys).
-- A configuration file format that changes between major versions
-  (`sanity.cli.ts` typegen block, `next.config.ts` options, Tailwind v4
-  `@import`/`@source` directives, Vitest config shape).
-- A library API whose call signature, generic constraints, or import path may
-  have shifted (`defineType`/`defineField`/`defineArrayMember` in Sanity v6,
-  groqd builder methods, `client.fetch` options).
-- A deprecation notice you hit mid-task — look up the replacement immediately
-  rather than working around the old API.
-- Any "latest" install: verify the scaffold commands and default choices before
-  running them.
+- A CLI command or flag (`sanity schema extract`, `sanity typegen generate`,
+  `sanity migrations`, `drizzle-kit`, pnpm workspace flags, `turbo.json` keys).
+- A config format that changes between majors (`sanity.cli.ts`'s `typegen`
+  block, `next.config.ts`, Tailwind v4 `@import`/`@source`, `vitest.config.ts`).
+- An API whose signature, generics or import path may have moved
+  (`defineType`/`defineField`/`defineArrayMember`, groqd builder methods,
+  `client.fetch` options, Auth.js v5 callbacks).
+- A deprecation hit mid-task — look up the replacement and use it; never leave
+  the deprecated call in place or work around it.
+- A scaffold or "latest" install — verify the commands and defaults first.
 
-## When NOT to use it
+Skip it for refactoring working code, general TypeScript or algorithm logic,
+and this repo's own rules — `SPEC.md`, `docs/features/` and the layer skills
+are the source for those, not external docs.
 
-Skip context7 for:
+## The two calls
 
-- Refactoring existing, already-working code.
-- General programming logic (algorithms, data transformation, TypeScript
-  narrowing patterns).
-- Business rules that live in `SPEC.md` — that is the canonical source, not
-  external docs.
+1. **`resolve-library-id`** — `libraryName` is the official name (`Next.js`,
+   `Sanity`, `Drizzle ORM`); `query` is the task. Read the installed major from
+   the consuming workspace's `package.json` — or, when the entry reads
+   `catalog:`, from the root `pnpm-workspace.yaml` `catalog:` block — and pick
+   the result whose versions include it, using its `/org/project/version` ID.
+2. **`query-docs`** — that `libraryId`, `language: 'TypeScript'`, and a
+   `query` scoped to one concept (`"typegen configuration in sanity.cli.ts"`,
+   `"defineArrayMember image fields"`, `"structureTool singleton"`). Two
+   concepts are two calls.
 
-## The two-step pattern
+Each tool allows three calls per question; after that, use the best result.
+Apply what came back, and query again only when the task moves to a different
+API area. The code you write follows the fetched docs, not training-data
+recollection.
 
-1. **Resolve** — call context7 with the library name to get its versioned library
-   ID. Be specific: `"sanity v6"` is better than `"sanity"`.
+## Libraries worth checking here
 
-2. **Fetch** — call context7 with the resolved ID and a focused topic string
-   (e.g. `"typegen configuration sanity.cli.ts"`, `"defineArrayMember image
-fields"`, `"structureTool singleton desk structure"`). Narrow the topic so the
-   returned snippet is actionable, not a wall of text.
-
-Apply what you learn immediately; do not re-read unless the task shifts to a
-different API area.
-
-## Key libraries for this repo
-
-| Library                  | Use context7 when…                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------------- |
-| `sanity` v6              | `defineType`/`defineField` options, desk structure, typegen workflow, `schema extract` |
-| `@sanity/code-input`     | Plugin registration, `code` array member usage                                         |
-| `next-sanity`            | `defineQuery`, `createClient`, `useLiveMode`, `SanityImage`                            |
-| `next` v16               | `generateMetadata`, `generateStaticParams`, App Router conventions, `revalidatePath`   |
-| `tailwindcss` v4         | `@import`/`@source` directives, preset/plugin API, config format changes               |
-| `vitest`                 | Config keys, `mergeConfig`, environment options                                        |
-| `@testing-library/react` | Query priority, async utilities, `userEvent` v14 API                                   |
-| `@sanity/cli`            | `sanity schema extract` flags, `sanity deploy` options                                 |
-| `turbo`                  | `turbo.json` task keys, `dependsOn`, `outputs`                                         |
-
-## Integration with other skills
-
-- In `develop-feature` step 1 (Investigate): if a library version is central to
-  the plan, resolve + fetch docs before writing the plan.
-- In `add-content-type` steps 1–2: fetch Sanity `defineType` and typegen docs if
-  you hit an unexpected type error or deprecation.
-- In `testing-practices`: fetch Vitest or Testing Library docs when config or
-  query API feels uncertain.
-- In `seo-and-metadata`: fetch Next.js `generateMetadata` docs for any new
-  metadata field or JSON-LD shape.
-
-## Checklist
-
-- [ ] Resolved the correct versioned library ID before fetching.
-- [ ] Topic string was specific enough to return actionable content.
-- [ ] Implementation matches the fetched docs, not training-data assumptions.
-- [ ] No deprecated API left in place when the docs showed a replacement.
+| Library                                        | Look up                                                         |
+| ---------------------------------------------- | --------------------------------------------------------------- |
+| `sanity`                                       | `define*` options, `structureTool`, Studio config               |
+| `@sanity/cli`                                  | `schema extract`, `typegen generate`, `migrations` flags        |
+| `@sanity/code-input`                           | Plugin registration, `code` array member                        |
+| `groqd`                                        | Builder methods, `InferResultType`/`InferFragmentType`          |
+| `next-sanity`                                  | `createClient`, `client.fetch` options                          |
+| `sanity-image`                                 | `SanityImage` props                                             |
+| `next`                                         | App Router conventions, `generateMetadata`, caching/revalidate  |
+| `next-auth` (v5 beta), `@auth/drizzle-adapter` | Config shape, callbacks, adapter tables                         |
+| `drizzle-orm`, `drizzle-kit`                   | Query builder, schema API, `generate`/`migrate`                 |
+| `@base-ui/react`                               | Component parts, props, data attributes                         |
+| `tailwindcss`, `tailwind-variants`             | v4 directives and theme, `tv()` slots/variants                  |
+| `next-intl`                                    | Message formatting, ICU syntax, request config                  |
+| `vitest`, `@testing-library/*`                 | Config keys, `mergeConfig`, `vi.mock`, queries, `userEvent` v14 |
+| `turbo`                                        | Task keys, `dependsOn`, `outputs`, env                          |

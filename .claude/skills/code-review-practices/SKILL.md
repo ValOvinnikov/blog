@@ -9,29 +9,31 @@ description: >-
 
 # Code review practices
 
-Review against the contracts in `SPEC.md` (the single durable reference). The
-architecture is the deliverable, so boundary violations are blocking, not nits.
+Review against the layer contracts in `CLAUDE.md` and the architecture in
+`SPEC.md`. Boundary violations are blocking, not nits. Other files cite
+sections 0–7 by number (`reviewer.md`, `testing-practices`,
+`docs/context/claude-code.md`, `configs/eslint/README.md`) — keep the
+numbering.
 
-**Spec sync (blocking):** if the diff changes architecture, layer contracts,
-env vars, or the content model, `SPEC.md` must be updated in the same PR.
+**Spec and feature-doc sync (blocking).** The diff carries every doc update
+`CLAUDE.md` "Spec sync", "Feature docs" and "Docs sync" require, in the same
+PR: `SPEC.md` for an architecture-core change, the feature's
+`docs/features/<feature>.md` (created on first touch) for a behaviour change,
+and for a content-model change that page plus any `SPEC.md` §6 entry still
+describing the old shape.
 
 ## 0. Mechanical pass (blocking — run the commands, don't eyeball)
 
-Checklist prose gets skimmed; commands don't miss. Run each of these over the
-**full diff** (`git diff origin/main...HEAD`, plus `git diff` if the tree is dirty)
-and treat every hit as a blocking finding unless explicitly allowed:
+Run each over the **full diff** (`git diff origin/main...HEAD`, plus `git diff`
+if the tree is dirty). Every hit is a blocking finding unless allowed below.
 
 ```bash
 BASE=origin/main
 D() { git diff "$BASE"...HEAD; git diff; }
 
-# Debug artifacts — no bare console.* lands in app or package source.
-# apps/web and apps/platform log through their shared logger
-# (src/utils/logger/logger.ts, wrapping createLogger from @blog/insight);
-# service/db/auth never log at all — they return the error to the caller.
-# Exempt: packages/insight/src/** (the logger itself), <repo-root>/scripts/**,
-# packages/studio/scripts/**, packages/db/scripts/**, packages/db/drizzle.config.ts
-# (stdout IS the interface), *.test.ts(x), and apps/web/e2e/**.
+# Bare console.* and debugger. Exempt: files outside no-console's .ts/.tsx
+# scope (root scripts/** and packages/studio/scripts/**, all .mjs), tests, and
+# the per-workspace preset exemptions CLAUDE.md → "No bare console.*" lists.
 D | grep -nE '^\+.*console\.(log|info|debug|trace|warn|error)'
 D | grep -nE '^\+.*\bdebugger\b'
 
@@ -49,306 +51,213 @@ D | grep -nE '^(<<<<<<<|>>>>>>>)'
 D | grep -nE '^\+.*(_TOKEN|_SECRET|API_KEY)\s*[:=]'
 git diff "$BASE"...HEAD --name-only | grep -E '^\.env'
 
-# Real-looking Sanity project id pasted into a fixture (#2268) — a hit here
-# isn't automatically a violation (the id could already be an intentional
-# fake), but it flags the exact injection vector for a manual look: a real
-# Access API error string copy-pasted into a test.
+# A real Sanity project id pasted into a fixture via a copied Access API error.
+# Read each hit — the id may be an intentional fake. Deliberately narrow: a
+# general id-shaped pattern flags every mock id, hash and slug.
 D | grep -nE '^\+.*/access/project/[a-z0-9]{8}/'
 
-# Tests that restate their source (testing-practices → "What not to test"):
-# an expected value copied verbatim out of the file under test — a field
-# list, an option list, a default, "exposes X as a function", a constant's
-# value. The grep narrows; the judgement is by eye, and a hit is blocking.
+# Tests that restate their source (testing-practices → "What not to test").
+# The grep narrows; judge by eye.
 D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.function.\)|\.name\)\.toBe\()'
 
-# Tests that bypass Testing Library (testing-practices → "Never drop to a raw
-# DOM query"): a class assertion, a raw DOM query, a node walk, or queries
-# destructured from render() instead of `screen`. Lint fails all four, with
-# one gap this grep exists to close: `no-node-access` skips a *chained* walk
-# (`container.children[0]`, `el.firstChild.textContent`), so those reach
-# review unflagged and unsuppressed. Every hit is blocking — a bare one means
-# a suppression was added, a chained one means lint never saw it.
+# Tests that bypass Testing Library (testing-practices "Writing a component
+# test" → "Never drop to a raw DOM query"). Lint fails all of these except a
+# chained walk (`container.children[0]`), so a bare hit means a suppression
+# was added.
 D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
 D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
 
 # Faking our own components, or reading a fake's arguments (testing-practices
-# → "What to fake"). A `vi.mock` of an @web/@platform/@blog/ui component is
-# blocking unless the file is a `*-module-renderer.test.tsx` or a route
-# file's test under `src/app/`; `mock.calls` is blocking
-# when it pulls props out of a faked component outside those two cases.
+# → "What to fake"). A vi.mock of our own component is allowed only in a
+# *-module-renderer.test.tsx or a route file's test under src/app/. A
+# mock.calls hit is blocking only when it reads a faked component's props
+# outside those files — reading an edge fake's arguments is fine.
 D | awk '/^\+\+\+ b\//{f=$0} /^\+vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/ && f !~ /(module-renderer|\/src\/app\/.*)\.test/{print FNR": "$0}'
 D | grep -nE '^\+.*mock\.calls'
 
-# Test titles over 80 characters (testing-practices → Conventions). Blocking
-# on added or edited titles only.
+# Added or edited test titles over 80 characters (testing-practices → Conventions).
 D | grep -nE "^\+[[:space:]]*it(\.each\(.*\))?\([[:space:]]*['\"\`][^'\"\`]{81,}"
 
-# Comments that restate the code (CLAUDE.md → "Comments default to zero").
-# A doc block opening with the identifier (`Name — does X`) restates the
-# name; a doc block three or more lines long is narrating how, not what
-# for; a `//` indented four or more spaces is inside a body. Each hit is
-# blocking unless it is the one-line gotcha the rule allows — read it.
+# Comments (CLAUDE.md → "Comments default to zero"): a `Name — does X` doc
+# block, a doc block of three or more lines, a `//` inside a body. Read each
+# hit — the one-line gotcha the rule allows is not a finding.
 D | grep -nE '^\+[[:space:]]*\* [A-Z][A-Za-z0-9]+ — '
 D | awk '/^\+[[:space:]]*\/\*\*/{n=0;b=1;next} b&&/^\+[[:space:]]*\*\//{b=0;if(n>=3)print FNR": doc block of "n" lines";next} b&&/^\+/{n++}'
 D | grep -nE '^\+ {4,}// '
 
-# Any comment added to a test file. Test files carry none — the `describe`
-# and `it` titles are the documentation, so a comment there is a title that
-# grew a paragraph. Every hit is blocking (testing-practices → "No comments").
+# Any comment in a test file (testing-practices "What not to test" → "No
+# comments in a test file").
 D | awk '/^\+\+\+ b\//{t=($0 ~ /\.test\.tsx?$/)} t&&/^\+[[:space:]]*(\/\/|\/\*\*|\*[[:space:]])/{print FNR": "$0}'
 
-# Clones. Run over every workspace the diff touches, then read the hits that
-# involve a changed file. A clone the diff creates — a helper, component,
-# hook, test fake, fixture or repeated test arrangement — is blocking; a
-# clone whose copies were all on main before the diff is filed. ~5s for the whole repo.
+# Clones across every workspace the diff touches (~5s); read the hits that
+# involve a changed file. A clone the diff creates — helper, component, hook,
+# test fake, fixture, repeated arrangement — is blocking; one whose copies were
+# all on main already is filed.
 WS=$( (git diff "$BASE"...HEAD --name-only; git diff --name-only) | grep -E '\.(ts|tsx)$' | cut -d/ -f1-2 | sort -u )
 [ -n "$WS" ] && pnpm dlx jscpd@4 --min-tokens 60 --min-lines 8 \
   --ignore '**/node_modules/**,**/generated/**,**/.next/**' --reporters console $WS 2>/dev/null \
   | grep -A2 'Clone found'
 ```
 
-Also scan the diff by eye for commented-out code blocks — grep can't catch
-those reliably. ESLint's `no-console` (in `configs/eslint/base.js`) backs this
-up at lint time; the grep pass exists so review catches what config misses.
-
-Expected false positives: a diff that edits this skill (or other docs quoting
-these patterns) will hit its own example strings. Hits inside documentation
-code fences are not findings — report only hits in real code.
-
-**Why not a repo-wide CI grep for "id-shaped" strings (#2268 AC4).** A general
-pattern match for any 8-character lowercase-alphanumeric string would flag
-routine mock ids, hashes, and slugs across the whole test suite — the false
-positive rate makes it worse than no check at all. Real Sanity project ids
-are also provisioned per-tenant at runtime, so there is no fixed denylist to
-grep for. The narrow, precedent-matching mechanical grep above (scoped to the
-literal `/access/project/<id>/` URL shape that caused this leak) catches a
-recurrence of the same mistake without that blast radius; a broader
-CI-enforced guard was deliberately not added.
+Also scan by eye for commented-out code, which grep can't catch reliably. Hits
+inside documentation code fences (this skill quoting its own patterns) are not
+findings.
 
 ## 1. Layer boundaries (blocking)
 
-- `@blog/ui` imports **no** `service`, `sanity`, `next-sanity`, or `fetch`. Pure
-  props in, markup out.
-- `@blog/service` imports **no** React and nothing from `@blog/ui`. It is the
-  only package importing the Sanity SDKs.
-- `apps/web` is the only place `ui` and `service` meet: Server Components fetch
-  via `service`, pass typed props to `ui`. No GROQ or raw Sanity client in `web`.
-- Links in `apps/web` go through the single `SmartLink`
-  (`@web/components/shared/smart-link`): it is locale-aware (renders next-intl's
-  `Link` internally, falling back to `next/link` only for protocol-relative
-  hrefs), derives `rel` from `target`, and is the polymorphic `as`/`linkAs`
-  target for `@blog/ui` components. Don't add new raw `next/link` imports, and
-  don't import the i18n `Link` from `@web/i18n/navigation` directly at a call
-  site — `SmartLink` is the one link component (`@web/i18n/navigation` still
-  provides `permanentRedirect`/`usePathname`).
-- Dependency graph stays acyclic: `web → ui/service/config/utils`,
-  `service → config/utils`, `ui → config`, `studio → config, utils (typegen source)`.
+Map each changed file to its workspace and read its imports against `CLAUDE.md`
+→ "Layer contracts"; every breach is blocking. The recurring misses:
+
+- `@blog/ui` imports no `service`, Sanity SDK or `fetch` — props in, markup out.
+- `apps/web` fetches in Server Components through `@blog/service` and passes
+  typed props to `@blog/ui`; no GROQ or raw Sanity client in `web`.
+- Links in `apps/web` go through `SmartLink`, never `next/link` or
+  `@web/i18n/navigation`'s `Link` at a call site. No lint rule enforces it
+  (→ `.claude/agents/web.md`).
 
 ## 2. Type safety (blocking)
 
-- No `any`; `unknown` is narrowed. `strict` + `noUncheckedIndexedAccess` honoured.
-- `@blog/service` uses the generated types in
-  `packages/config/src/sanity/generated/types.ts` — no hand-redeclared content
-  shapes. `@blog/ui` defines its own prop types; it does not import from
-  `@blog/service` or depend on service view-models.
-- If schemas changed, the generated types were regenerated (`pnpm typegen`) and
-  committed, downstream `service` types updated, and — for existing-shape
-  changes — a content migration is present or explicitly ruled out.
-- No hand-written type `@blog/config` already exports — `T | undefined` is
-  `TMaybeUndefined<T>` — outside the exempt workspaces (CLAUDE.md →
-  Conventions). Blocking on lines the diff adds; on other lines of a file the
-  diff touches, see "Drift left in a touched file" below.
-- **Every** groqd field's nullability is explicit — each `sub.field(...)` ends
-  in `.notNull()` or `.nullable(true)`; no implicit/plain projected field. A
-  schema-`.required()` field gets `.notNull()`; an optional one gets
-  `.nullable(true)`. An unmarked projected/reference field silently requires
-  non-null and throws at `.parse()` on null data → 404. Flag any
-  `sub.field(...)` not terminated by `.notNull()`/`.nullable()`, and any
-  `.notNull()` on a schema-optional field that should fall back rather than 404.
-- **Studio schema/migration diffs** hold the `studio-schema-practices` bar:
-  - No stored-value or `_type` literal repeated across files — constants from
-    `@blog/config` (renaming a stored value must be a one-file change).
-  - Repeated field patterns (e.g. mode+custom pairs) extracted into a schema
-    helper, not copy-pasted.
-  - Restructures keep **validation parity**: constraints that existed on the
-    old shape exist on the new one (container-level `rule.custom()`/`min` for
-    moved required fields, cardinality rules once arrays allow duplicates) —
-    or the PR explicitly states which constraint was dropped and why.
-  - Migrations: target-state idempotency guard on **every** document-type
-    branch, one source of truth for moved-field lists, and a co-located test
-    (transform + re-run no-op).
+- No `any`; `unknown` is narrowed; `strict` and `noUncheckedIndexedAccess`
+  (`configs/tsconfig/base.json`) honoured.
+- Content shapes come from `packages/config/src/sanity/generated/types.ts`,
+  never hand-redeclared. `@blog/ui` defines its own prop types and imports no
+  service view-model.
+- A schema change commits its `pnpm typegen` output and updates `service`. An
+  existing-shape change carries a migration or rules one out explicitly; a
+  `packages/db/src/schema` change carries its `db:generate` migration
+  (→ `CLAUDE.md` "Check for migrations", "Check for `db` (Neon/Drizzle)
+  migrations too").
+- No hand-written form of a type `@blog/config` exports, outside
+  `@blog/utils`, `@blog/insight`, `@blog/email` and the generated Sanity types
+  (→ `CLAUDE.md` "Use `@blog/config`'s shared types" for the list). Blocking
+  on added lines; elsewhere in a touched file see §7 "Drift left in a touched
+  file". Helper and constant placement, and the one-line idioms that never get
+  a helper: `.claude/agents/config.md`.
+- Every groqd `sub.field(...)` ends in `.notNull()` (schema-required) or
+  `.nullable(true)` (optional). Flag an unterminated one — it throws on null
+  and 404s — and a `.notNull()` on an optional field that should fall back
+  (→ `.claude/agents/service.md`).
+- Studio schema and migration diffs hold the `studio-schema-practices` bar:
+  stored values and `_type`s as `@blog/config` constants; repeated field
+  patterns in a helper; validation parity across a restructure, or the dropped
+  constraint named in the PR; every migration with a target-state idempotency
+  guard on each document-type branch, one source for moved-field lists, and a
+  co-located transform + re-run test.
 
 ## 3. Rendering & data
 
-- Server Components by default; `"use client"` only where interaction needs it.
-- ISR present (`next: { revalidate, tags }`); revalidate route verifies the
+- Server Components by default; `'use client'` at the leaf that needs it.
+- ISR present (`next: { revalidate, tags }`); revalidate routes verify the
   secret. No accidental fully-dynamic rendering of static content.
-- Queries project only needed fields; no over-fetching.
-- No request waterfall: a Server Component that awaits two independent
-  fetches one after the other, or a route that blocks on a slow fetch it
-  could stream behind `Suspense`, is a finding. Same for a client component
-  handed a whole service result when it renders two fields of it. The rules
-  that apply, and the ones this repo overrides (never flag a missing memo),
-  are in `react-component-practices` → "Vercel's React rules".
+- Queries project only the fields used.
+- No request waterfall: two independent fetches awaited in sequence, a route
+  blocking on a slow fetch it could stream behind `Suspense`, or a client
+  component handed a whole service result to render two fields. Which Vercel
+  rules apply, and the ones overridden here (never flag a missing memo):
+  `react-component-practices` → "Vercel's React rules".
 
 ## 4. SEO & accessibility
 
-- Per-route `generateMetadata` (canonical, OG, Twitter); JSON-LD on posts.
-- `sitemap.ts` / `robots.ts` / RSS still valid after route changes.
-- Semantic HTML, image `alt`, focus-visible, color contrast via tokens.
+- Route, metadata, JSON-LD, `sitemap.ts`, `robots.ts` and RSS changes hold
+  `seo-and-metadata`: per-route `generateMetadata` (canonical, OG, Twitter),
+  JSON-LD on posts, feeds still valid.
+- Semantic HTML, image `alt`, visible focus, contrast via tokens.
 
-## 5. Styling
+## 5. Styling & structure
 
-- Token utilities from the shared preset, not raw hex. Dark mode intact.
-- New `ui` class names are reachable by the web app's `@source` glob.
-- No raw Tailwind class strings inline in JSX — in `@blog/ui` **and**
-  `apps/web` alike. Classes live in a co-located `{component}-variants.ts`
-  via `tv()` from `tailwind-variants`. No standalone `clsx` or `tailwind-merge`
-  usage. Exception: `next/font` variable class names in `layout.tsx`.
-- In `slots`-based `tv()` calls, every slot value is always an array of
-  strings — never a bare string — even a single-class slot. Applies in
-  `@blog/ui` (see `ui-library-practices`) and `apps/web` alike, since it's a
-  `tailwind-variants` styling convention, not something scoped to one layer.
-  `hero: ['mb-8 aspect-video ...']`, not `hero: 'mb-8 aspect-video ...'`.
-- Responsive classes are mobile-first, using only `md:`/`lg:` as the primary
-  tiers (no custom `--breakpoint-*`).
-- `apps/platform` UI follows `platform-ui-practices`: every row of its "Red
-  flags — stop" table that the diff writes is a finding, and so is a value
-  that differs from its Type or Spacing table or its colour, radius or
-  elevation rules.
+- Token utilities from the shared preset, never raw hex; dark mode intact. New
+  `@blog/ui` classes are reachable by the apps' `@source` glob
+  (`apps/web/index.css`, `apps/platform/index.css`).
+- No class strings inline in JSX in any React workspace — classes go through a
+  module-scope `tv()`; no standalone `clsx` or `tailwind-merge`. Exception:
+  `next/font` variable class names in `layout.tsx`. Where the `tv()` lives,
+  and when a `*-variants.ts` is folded in or extracted →
+  `react-component-practices` § Styling files.
+- Every `slots` value in a `tv()` is an array of strings, even a single class.
+- Mobile-first, `md:`/`lg:` as the layout tiers, no custom `--breakpoint-*`
+  (→ `ui-library-practices` "Responsive design").
+- Findings on what the diff writes or touches, converged on touch:
+  - a `components/shared/` component with a single consuming domain →
+    `react-component-practices` § Where a component lives;
+  - a touched file over its budget (`CLAUDE.md` "File size budgets") that does
+    not extract the part it changes → `react-component-practices` § Size and
+    splitting;
+  - props over the ceiling, forwarded unchanged through two or more layers or
+    hand-bundled into a local object, or a view-model spread and
+    re-destructured → `react-component-practices` § Props.
+- `apps/platform` UI: every row of `platform-ui-practices` "Red flags — stop"
+  the diff writes is a finding, as is a value off its "Type", "Colour and
+  contrast" or "Spacing, radius, elevation" rules.
 
 ## 6. Tests & stories
 
-- New/changed `ui` components have a co-located `*.test.tsx` and a Storybook
-  story (follow `ui-storybook` skill). Both are required, not optional.
-- New/changed `service` functions have a co-located `*.test.ts`.
-- **"Required" means behaviour coverage, not a file.** A schema, registry,
-  constant or barrel change with no logic in it gets no test, and a test
-  whose expected value is a literal copied out of the file under test
-  (field list, option list, default, fieldset, "exposes X as a function",
-  constant value) is **blocking** — delete it, don't keep it (full rule:
-  `testing-practices` → "What not to test"). Sibling cases that differ only
-  in an input and an expected value are one `it.each`. An arrangement line
-  repeated across `it`s (a uniform render, `userEvent.setup()`, a fake's
-  default, a fixture build) is **blocking** — it moves into `beforeEach`;
-  an inline `setup({ overrides })` is not repetition. A test fake, fixture
-  or builder the diff copies from another file is **blocking**: it moves to
-  `testing/` or `__mocks__/` in this diff. Repetition that was already on
-  `main` and that the diff adds nothing to is filed, not fixed (CLAUDE.md →
+- A new or changed `@blog/ui` component has a story (`ui-storybook`) and a
+  co-located behaviour test; a styling-only change gets the story and
+  `no-tests-needed`, never a test. A new or changed `service` function has a
+  co-located `*.test.ts`.
+- Coverage means behaviour, not a file. A test whose expected value is a
+  literal copied out of the file under test is **blocking** — delete it. A
+  class assertion is the same mistake, prop-driven or not
+  (→ `testing-practices` "What not to test").
+- Sibling cases differing only in input and expected value are one `it.each`.
+- **Test setup (blocking on what the diff adds)** → `testing-practices`
+  "Where tests live", "Rendering and arrangement", "What to fake"; repetition
+  already on `main` that the diff adds nothing to is filed (`CLAUDE.md`
   "Duplication that already existed is filed, not fixed inline").
-- Bug fixes include a regression test that failed before the fix.
-- **Suite labels — a component takes ``describe(`<${Component.name}/>`, …)``,
-  everything else takes the bare symbol `describe(theSymbol, …)`.** A string
-  literal is correct only where no single symbol names the suite (a registry, a
-  route module, a group of behaviours). The common miss is a **bare symbol on a
-  component** — `describe(PostShare, …)` — which looks like it satisfies "pass
-  the symbol, not a string" but is the wrong form. Flag it in any file the diff
-  creates or touches; a pre-existing string title elsewhere is not this diff's
-  problem. Full rule: `testing-practices` → suite naming.
-- **Class assertions — allowed when the class is prop-driven, flagged when it
-  is static.** A class that changes with a prop, variant, or state is part of
-  the component's contract: `align="CENTER"` producing `text-center` is
-  behaviour, and a test asserting it is correct. Do **not** flag those, and do
-  not ask for them to be replaced by a mocked-consumer prop assertion. What to
-  flag is an assertion on a class the component applies **unconditionally** —
-  it never varies with input, so the test only restates the implementation and
-  turns any restyle into a failure (layout, spacing, colour, border,
-  background, typography, radius/shadow, icon size). Where the component
-  exposes a semantic or ARIA equivalent (`aria-current` over an active-state
-  class), prefer it — it survives a restyle — but that is a preference, not a
-  blocking finding. Stale assertions (a class no longer present in the
-  component) are always blocking. Full rule: `testing-practices` → "What not
-  to test".
+- A bug fix has a regression test that failed before the fix.
+- Suite labels: a component takes ``describe(`<${Component.name}/>`, …)``,
+  anything else the bare symbol. The common miss is a bare symbol on a
+  component. Flag it in files the diff creates or touches
+  (→ `testing-practices` Conventions).
 - `pnpm test` green.
 
 ## 7. Hygiene
 
-- Conventional commit, one concern per PR. No stray bare `console.*`, no committed
-  secrets/`.env`. `type-check`/`lint`/`test` are confirmed by `verify-runner`
-  before this review is dispatched — reviewer trusts that result rather than
-  re-running the suite. `build` is CI-only (`ci.yml`'s `build` job gates every
-  PR); it is not part of the local/review loop.
-- **Drift left in a touched file (blocking).** Read every file the diff
-  touches in full, not only its hunks. Mechanical drift anywhere in it — a
-  comment that fails the comment test, a hand-written type `@blog/config`
-  exports, a dead import or export, a pattern a later convention replaced —
-  is a finding, because CLAUDE.md → "Examine before you change" requires the
-  change to fix it. Drift in files the diff does not touch is not a finding.
-  Check too that the implementing agent's **Examined** section exists and that
-  what it says it left is reported, not quietly dropped.
+- Conventional commit, one concern per PR; no committed secrets or `.env*`.
+  `verify-runner` has already confirmed `type-check`/`lint`/`test` — trust it
+  rather than re-running the suite. `build` is CI-only.
+- **Drift left in a touched file (blocking).** Read every touched file in
+  full, not only its hunks. Mechanical drift anywhere in it — a comment that
+  fails the comment test, a hand-written type `@blog/config` exports, a dead
+  import or export, a pattern a later convention replaced — is a finding
+  (→ `CLAUDE.md` "Examine before you change"). Drift in untouched files is
+  not. Check the implementing agent's **Examined** section exists and that
+  what it left is reported, not dropped.
+- **Comments (blocking).** Read every comment the diff adds or touches, not
+  only the grep hits, against `CLAUDE.md` "Comments default to zero". A
+  sibling carrying the same block is no defence — it is the drift, and the
+  diff deletes the sibling's copy where it touches that file.
+- **Manual-test issue (flagged, not blocking).** Flag a UI or behaviour diff
+  whose dispatch names no manual-test issue (→ `develop-feature`
+  § Manual-test issue).
 - **Voice candidates (listed, not blocking).** Under a "Voice candidates"
-  heading, list:
-  - every catalog key the diff adds or rewords in
-    `packages/config/src/voice/site-messages.*.json`, with the list it landed
-    on (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`);
-  - every new `@blog/ui` prop that renders visible text.
-
-  The orchestrator checks each one against the classification recorded in
-  the ticket. If the ticket does not record one, it goes to the user before
-  commit (CLAUDE.md "Check for Voice candidates").
-
-- **Inline comments (blocking).** Read every comment the diff adds or
-  touches, not just grep for keywords. Any comment sitting inside a
-  function/component body — narrating what a line, branch, or step does —
-  is blocking unless it is the single narrow exception: one line explaining
-  a genuine non-obvious constraint the code truly cannot express on its own
-  (a hidden gotcha, a workaround for a specific bug). Everything else inside
-  a function body, including `TODO:`/`FIXME:` markers used to explain rather
-  than to flag open work, gets flagged.
-- **Doc comment content (blocking).** A doc comment is not a default: it
-  is allowed only above a function/component/export, at most one per, and
-  only where the name genuinely cannot carry the purpose. **Flag as
-  blocking any doc comment that could be regenerated from the name, the
-  parameter names and the return type** — `HeroProfileModule — fetches
-module_heroProfile data and hands it to HeroProfileModuleView` is the
-  canonical offender, and the `Name — does X` opening is banned outright
-  whatever follows it. That the sibling files carry the same block is not a
-  defence; it is the drift being corrected, and the diff should be deleting
-  the sibling's copy too where it touches that file. When one is warranted
-  it states what the thing is **for** in one short sentence — flag as
-  blocking anything that instead describes **how** it works: a step-by-step
-  walkthrough of internal implementation (what each hook/branch does), a
-  listing of props/behavior the type signature already states, more than
-  one sentence of prose, an issue/PR number cited as narrative (anything
-  outside a `TODO:`/`FIXME:` block), a `docs/superpowers/**` path, a
-  roadmap phase name, or a "not wired up yet" note. A comment that reads like a changelog or a design-doc summary is too
-  long — that content belongs in the PR description (dated, reachable via
-  `git blame`), not the source file. This applies per layer agent's own
-  `## Comments` section (see e.g. `.claude/agents/web.md`) — the reviewer is
-  the independent check that catches it even when the authoring agent
-  doesn't self-police.
+  heading, list every key the diff adds or rewords in
+  `packages/config/src/voice/site-messages.*.json` with the list it landed on
+  (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`), and every new `@blog/ui` prop that
+  renders visible text. The orchestrator checks each against the ticket's
+  classification (`CLAUDE.md` "Check for Voice candidates").
 
 ## How to run a review here
 
-**Pre-commit reviews are delegated to the `reviewer` subagent**
-(`.claude/agents/reviewer.md`) — a fresh context has no author bias and no
-memory of "why the code is fine". The orchestrator dispatches it after the
-verify gates pass and before asking to commit; it runs the passes below and
-reports a verdict with blocking/non-blocking findings. If you are reviewing
-manually (e.g. someone else's PR, or the subagent is unavailable), run the
-same passes yourself.
+Pre-commit reviews go to the `reviewer` subagent (`.claude/agents/reviewer.md`)
+— a fresh context with no author bias. A manual review (a solo session's
+self-review, someone else's PR) runs the same three passes, in order; a hit in
+an early pass does not skip a later one:
 
-The review runs **three passes** over the diff, in order — a hit in an early
-pass does not skip the later ones:
+1. **Mechanical (§0).** Run the commands; every hit is blocking.
+2. **Contract (the sync item and §1–7).** Map each changed file to its layer and walk the
+   checklist, boundary and type findings first.
+3. **General** — what a contract check won't catch:
+   - **Security:** injection/XSS/SSRF, auth/authz, secrets, unsafe
+     deserialization.
+   - **Performance:** N+1 queries, O(n²) in hot paths, unbounded
+     loops/queries, resource leaks.
+   - **Correctness:** empty/null/overflow, race conditions, error handling and
+     propagation, off-by-one, migration idempotency (a re-run never
+     overwrites or loses data).
+   - **Maintainability:** naming, single responsibility, test coverage, and
+     duplication checked against the **repo**, not the diff — a confirmed
+     duplicate is blocking (→ `reviewer.md` "Duplication is checked against
+     the repo, not against the diff").
 
-1. **Mechanical pass (section 0).** Run the commands; every hit is blocking.
-2. **Contract pass (sections 1–7).** Map each changed file to its layer, walk
-   the checklist; flag boundary/type issues first (blocking) then quality.
-   This encodes _our_ architecture — a generic reviewer can't know it.
-3. **General pass.** The dimensions a contract check won't catch:
-   - **Security:** injection/XSS/SSRF, auth/authz, secrets, unsafe deserialization.
-   - **Performance:** N+1 queries, O(n²) in hot paths, unbounded loops/queries,
-     resource leaks.
-   - **Correctness:** edge cases (empty/null/overflow), race conditions, error
-     handling/propagation, off-by-one, **migration idempotency** (a re-run must
-     not overwrite/lose data).
-   - **Maintainability:** naming, single responsibility, duplication, test coverage.
-     Duplication is checked against the **repo**, not the diff — the copy a new
-     helper duplicates lives in a file the diff does not touch, so reading the
-     diff alone never reveals it, and a confirmed duplicate is blocking. The
-     mechanics are in `.claude/agents/reviewer.md`; don't restate them here.
-
-There is no CI-side review workflow — the `reviewer` subagent's pre-commit
-pass, run before every push, is the only gate. (A `claude-code-review` CI
-workflow existed briefly but was removed as redundant with this pass — see
-`docs/context/ci-automation.md`.)
+No CI workflow reviews code; this pre-commit pass is the only review gate.

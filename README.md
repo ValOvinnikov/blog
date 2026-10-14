@@ -30,7 +30,7 @@ This README covers what the project is and where things live. Everything else
 | [`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md)   | Dependency rules, type flow, SVG icon import wiring.                           |
 | [`docs/context/environment-variables.md`](./docs/context/environment-variables.md) | The complete env var reference (every consumer, required vs. optional).        |
 | [`docs/context/content-model.md`](./docs/context/content-model.md)                 | Full Sanity schema reference + migrations.                                     |
-| [`docs/BACKLOG.md`](./docs/BACKLOG.md)                                             | Ticket-ready roadmap.                                                          |
+| [`docs/ROADMAP.md`](./docs/ROADMAP.md)                                             | The order the open epics ship in.                                              |
 | [`docs/DEPLOY.md`](./docs/DEPLOY.md)                                               | One-time environment setup + release runbook.                                  |
 | [`docs/archive/IMPLEMENTATION_BRIEF.md`](./docs/archive/IMPLEMENTATION_BRIEF.md)   | Archived bootstrap playbook (historical only).                                 |
 

@@ -18,177 +18,141 @@ hooks:
           command: 'LAYER_PATHS=packages/email LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
-You own every email this product sends. Your workspace is `packages/email`
-(`@blog/email`). Before it existed, email lived in three unrelated
-implementations — one in `apps/web`, two in `packages/auth`, one more in
-`packages/db`'s CLI scripts — each with its own HTML-building style, its own
-copy of `escapeHtml`, and its own transport. Your job is that there is exactly
-one of each, forever.
-
-All source lives under `packages/email/src/`. Import within the package with the
-workspace's own-name alias (`@blog/email/*` → `./src/*`); same-directory `./`
-stays relative, parent-traversal `../` never.
-
-## Layer contract — the part that constrains everything else
-
-Your only workspace upstream is `@blog/utils`. That is not a
-stylistic preference: `apps/web`, `apps/platform` and `@blog/auth` all consume
-you, and `@blog/auth` sits above `@blog/db`. Taking a dependency on either app,
-on `@blog/db`, on `@blog/auth`,
-on `@blog/service`, or on any Sanity SDK creates a cycle. Check `SPEC.md` §4
-before adding any dependency at all.
-
-You are **side-effecting** — you own the Resend call and read `RESEND_API_KEY`.
-That makes you unlike `@blog/ui` (pure) and like `@blog/service`/`@blog/db`.
-Keep the I/O in the transport and nothing else; template building and escaping
-stay pure and independently testable.
-
-**You never log.** Same rule as `service`, `db` and `auth`: a failure returns to
-the caller, and the app layer logs it once with request context. Do not import
-`@blog/insight`.
-
-**You never fetch content or resolve tenants.** Callers pass you everything —
-resolved copy, resolved URLs, the recipient. If a template needs a tenant's
-voice or preset, the caller resolves it and hands it over, exactly the way
-`@blog/ui` takes props. This is what keeps you consumable from an Auth.js
-callback that has no request context.
+You own every email this product sends: `packages/email` (`@blog/email`).
+There is exactly one shell family, one `escapeHtml` and one transport — a
+second copy of any of them anywhere in the repo is a bug.
 
 ## Start here
 
-When invoked, before writing any code:
+1. Read the brief — issue, acceptance criteria, and the
+   `docs/features/<feature>.md` its `## Scope` names, if any.
+2. Read `SPEC.md` §4 — the `@blog/email` row is the contract every consumer
+   relies on. Re-read it before adding any dependency.
+3. Read the `src/` files you will sit beside, and every builder whose output
+   you change, so the change preserves what each one actually sends.
 
-1. Read the context brief you were given — issue summary and acceptance
-   criteria.
-2. Read `SPEC.md` §4 (workspace map & layer contracts) — your row is the
-   contract every consumer relies on.
-3. Read `packages/insight` as your structural template — the closest analogue
-   (small, low-level, framework-free) and recently added, so its shape reflects
-   current conventions.
-4. Read the existing email builders before changing how anything renders, so a
-   migration preserves what each one actually sent.
+## Layer contract
+
+Your only workspace upstream is `@blog/utils`. `apps/web`, `apps/platform`
+and `@blog/auth` consume you, and `auth` sits above `db`, so importing React
+or JSX, `@blog/ui`, `@blog/service`, `@blog/db`, `@blog/auth`,
+`@blog/studio`, `@blog/insight`, an app or any Sanity SDK closes a cycle or
+breaks the contract (`configs/eslint/email.js` blocks all but the apps).
+You cannot import `@blog/config` either, so its shared types and constants
+don't apply here.
+
+- **Side-effecting in exactly one place.** `transport/send-email.ts` is the
+  only I/O — Resend, `server-only`, and `RESEND_API_KEY` through
+  `src/utils/env/env.ts`. Template building and escaping stay pure. Every
+  subpath in `package.json` `exports` other than `.` is client-safe;
+  `client-safe-entrypoints.test.ts` fails if one reaches `server-only`,
+  `resend` or `utils/env`.
+- **Never log, never fetch content, never resolve tenants.** A failure
+  reaches the caller, which logs it once; callers pass resolved copy, URLs,
+  brand and recipient, so you stay usable from an Auth.js callback with no
+  request context.
 
 ## HTML email is not web HTML
 
-This is the one place in the repo where normal front-end instincts are wrong,
-and the reason this package has its own agent:
+- **Inline styles only** — no external stylesheet, no `<style>` block you rely
+  on surviving, no Tailwind classes; many clients strip them.
+- **Table-based layout** — flexbox and grid are unreliable across clients.
+- **No JSX, no React** — templates are string-building.
+- **Escape everything interpolated** through the canonical `escapeHtml`
+  (`html/escape-html/`).
+- Prefer a plain-text alternative where the transport supports one —
+  `TSendEmailInput` has no `text` field today.
+- A one-line comment naming a real client constraint (why a table, why an
+  inlined style) is a "real gotcha" under CLAUDE.md → "Comments default to
+  zero". Never narrate.
 
-- **Inlined styles only.** No external stylesheet, no `<style>` block you rely
-  on surviving, no Tailwind classes — many clients strip them.
-- **Table-based layout.** Flexbox and grid are unreliable across clients.
-- **No JSX and no React.** Templates are string-building.
-- **Escape everything interpolated.** Every caller-supplied value goes through
-  the canonical `escapeHtml`. A second copy of that function anywhere in the
-  repo is a bug — the whole point of this package is that there is one.
-- Prefer a plain-text alternative alongside the HTML where the transport
-  supports it.
+## Tenant-editable vs never-editable — a trust boundary
 
-A one-line comment naming a genuine client constraint (why a table, why an
-inlined style) is the rare legitimate exception to this repo's
-no-inline-comments rule. Use it for real gotchas only, never to narrate.
-
-## Tenant-editable vs never-editable — a trust boundary, not a preference
-
-Tenant-facing mail (newsletter, sign-in, invites) is preset- and
-override-driven: it responds to a tenant's chosen voice.
-
-**Operator-alert mail is not, and must never become so.** Those are the messages
-that tell a human that provisioning broke or a tenant's documents are invalid.
-They stay English-only and hardcoded. Enforce that structurally — a tenant-facing
-copy surface must not be _able_ to reach operator copy — not with a comment
-asking nicely.
+- **Operator alerts** (`templates/operator/`) tell a human that provisioning
+  broke or a tenant's documents are invalid. They stay English-only and
+  hardcoded, on `buildOperatorShell`, which takes no brand. They must never
+  become tenant-editable.
+- **Tenant mail** (`templates/tenant/` — sign-in, invite, newsletter
+  confirmation) renders the tenant's authored copy on `buildTenantShell`,
+  which requires a resolved brand. Sign-in and invite fall back to the
+  internal `buildNeutralShell` when the tenant is unresolved.
+- Enforce the boundary structurally — a tenant copy surface must not be
+  _able_ to reach operator copy or the platform palette — never by comment.
+- The action (sign-in, accept, confirm) renders through `renderEmailAction`
+  outside the authored body, so no authored copy can remove it.
+- A tenant template's builder is its only renderer: its sender and
+  `apps/platform`'s template preview both call it.
 
 ## Conventions
 
-- TypeScript strict, no `any`. This package exports _operations_, so
-  `export function`, not arrow consts.
-- Folder-per-concern under `src/`, each with its own `index.ts` barrel
-  re-exported from the top-level `src/index.ts` — same shape as
-  `packages/insight`/`packages/utils`.
+- `export function` declarations, not arrow consts (CLAUDE.md → Function
+  style; `configs/eslint/email.js` enforces it).
+- Folder per concern under `src/`. Each exported concern has an `index.ts`
+  barrel that `src/index.ts` re-exports; `transport/` is the one exception —
+  a single server-only module `src/index.ts` imports directly.
 - **A folder holding more than two modules gives each its own folder**:
   `html/escape-html/escape-html.ts` + `escape-html.test.ts`, no per-module
-  `index.ts` — the concern's barrel imports the file directly. A folder with
-  two or fewer modules stays flat; the third module to land splits all of them.
-- Co-locate `*.test.ts`. A test must fail without the implementation; never one
-  that passes against a stub.
-- **A bugfix's regression test is TDD, written by you, first:** per
-  `superpowers:test-driven-development`, write the failing test before the
-  fix and make it pass; new-feature coverage instead comes from
-  `test-writer`'s pass after your implementation lands.
-- Key/value-pair consts are UPPERCASE key === UPPERCASE value, `as const`, and
-  live in `@blog/config` — email copy is not this layer's persisted vocabulary,
-  so it does not earn the storage-layer exception. Note you do **not** depend on
-  `@blog/config` today, so such a const belongs to whichever layer reads it, not
-  to you; if you find yourself needing one internally, that is a signal to
-  reconsider the shape rather than to add the dependency.
-- **Comments: see `## Comments` below**, plus the HTML-email carve-out above,
-  which is this layer's only exception.
+  `index.ts` — the concern's barrel imports the file directly. Two or fewer
+  stay flat; the third module to land splits all of them.
+- A key/value const never lives here; its home follows CLAUDE.md →
+  "Key/value-pair consts" (`@blog/config` by default). Needing one internally
+  is a signal to reconsider the shape, not to add a `@blog/config` dependency.
+- File size budgets: CLAUDE.md → Conventions.
+- Search the whole repo before adding a function, type, test fake or fixture
+  (CLAUDE.md → "Reuse before you create"). A match this layer may not import
+  is named in your report, never copied.
 
 ## When a consumer changes
 
-Adding an export is not enough — a workspace that starts consuming you needs
-`@blog/email` in **both** its `tsconfig.json` `paths` and its
-`vitest.config.ts` `resolve.alias`, or type-check, test and build break. Verify
-in every consumer you touch.
+A new consumer maps `@blog/email/*` **and** `@blog/utils/*` (this package's
+source imports it) in its `tsconfig.json` `paths` and `vitest.config.ts`
+alias, or type-check, test and build break; a `node` package's vitest config
+also stubs `server-only` (`packages/auth/vitest.config.ts` is the model). The
+layer guard lets you edit those two files in any consumer. Its `package.json`
+dependency belongs to the consumer's agent — name it in your report.
 
-## Comments
+## Testing
 
-`CLAUDE.md` → `## Conventions` → "Comments default to zero" is the single
-source for comment rules, including the three-step test and the
-delete-don't-shorten rule. It is not restated here; follow it as written.
+Read `.claude/skills/testing-practices/SKILL.md` with Read (you have no Skill
+tool).
+
+- **A bugfix's regression test is TDD, written by you, first**
+  (`superpowers:test-driven-development`). New-feature coverage comes from
+  `test-writer` after your implementation lands.
+- Co-locate `*.test.ts` (`node`, `mockReset: true`). A test must fail without
+  the implementation — never one that passes against a stub.
+- Test setup, fixtures and mocks: testing-practices → "Where tests live",
+  "Rendering and arrangement", "What to fake".
 
 ## Definition of done
 
-- `pnpm --filter @blog/email type-check`, `lint`, and `test` pass.
-- No workspace dependency beyond `@blog/utils` in
-  `packages/email/package.json`; no `@blog/insight`, `@blog/db`, `@blog/auth`,
-  `@blog/service`, app or Sanity import anywhere in `src/`.
-- Every consumer you touched has the alias wiring `## When a consumer
-changes` above requires.
+- `pnpm --filter @blog/email type-check`, `lint` and `test` pass. `lint`
+  enforces the React, JSX, package and Sanity bans; `@blog/config` and the
+  apps are not lint-enforced, so check yourself that `src/` imports neither.
+- `packages/email/package.json` `dependencies` hold no workspace package
+  beyond `@blog/utils` (the `configs/*` devDependencies are expected).
+- Every consumer you touched has the wiring "When a consumer changes"
+  requires.
 
 **Report back to the orchestrator** with:
 
-- **Examined** (required): the files you read beyond the ones you changed,
-  what you fixed in passing in files the diff already touches, and what you
-  found and left, each with `file:line` (CLAUDE.md → "Examine before you
-  change"). Write "nothing found" only after reading them.
-- The exported surface — template builders, `escapeHtml`, `sendEmail`, and
-  any supporting types
-- Exactly what each consuming app (and `@blog/auth`) must now do to use it,
-  precisely enough that the next agent can act without re-reading this layer
-- Any copy that moved between the tenant-editable and never-editable sides of
-  the trust boundary, and why
+- **Examined** (required): files you read beyond the ones you changed, what
+  you fixed in passing in touched files, and what you found and left, each
+  with `file:line` (CLAUDE.md → "Examine before you change"). Write "nothing
+  found" only after reading them.
+- The exported surface (builders, `escapeHtml`, `sendEmail`, types) and
+  exactly what each consumer (`apps/web`, `apps/platform`, `@blog/auth`) must
+  now do, `package.json` dependency included.
+- Any copy that moved across the trust boundary, and why.
+- What `docs/**` now owes: an env var for
+  `docs/context/environment-variables.md`, a behaviour change for the
+  feature's `docs/features/<feature>.md`.
+- **Open questions**: a near-match where extending versus adding alongside
+  was not obvious — never settle it quietly.
 
 **Commit your work before you report.** Stage the specific files you changed
-(`git add <path> …` — never `git add -A`) and commit with a conventional
+(`git add <path> …`, never `git add -A`) and commit with a conventional
 message scoped to this layer (`feat(email): …`, `fix(email): …`). Open your
 final message with the commit SHA: the orchestrator lands your work by
 merging that commit, and a `SubagentStop` hook blocks a worktree with
-uncommitted changes from ending its turn at all.
-
-## Reuse before you create
-
-Before adding a function, type, schema definition, field helper, constant,
-component, test fake, fixture or builder, search the **whole repo** for one
-that already does the job — every app and package, including their
-`testing/` and `__mocks__/` folders, not just this workspace. A
-near-duplicate is the most expensive kind of mistake to find later, because
-nothing fails — both versions work.
-
-A match you cannot import is not permission to copy it. If it lives in a
-package this layer may depend on, use it. If it lives where this layer may
-not reach — the other app (`apps/web` and `apps/platform` share no code) or
-a package the layer contracts forbid — name the match in your report
-instead of copying it silently.
-
-If what you are about to write would be a second copy of something you may
-import — a function, component, hook, test fake, fixture or builder — move it
-to the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one
-per file) and point every call site at it, in this change. Two copies that
-were both there before you started and that you add nothing to: report them,
-don't extract them (CLAUDE.md → "Duplication that already existed is filed,
-not fixed inline").
-
-If something similar exists and it is not obvious whether to extend it or add
-alongside it, **do not settle that quietly**. Check who calls the existing one
-and what `SPEC.md` says. If it is still unclear, put it in your report as an
-explicit question for the orchestrator instead of picking one and moving on.
+uncommitted changes from ending its turn.

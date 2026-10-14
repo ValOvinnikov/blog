@@ -5,9 +5,10 @@ description: Use when building or editing an interactive component in apps/web �
 
 # Web component practices (apps/web)
 
-`apps/web` is where pure `@blog/ui` meets client interactivity. The rules below
-keep that boundary clean; each was written after a real failure, the first two
-on the share-popover branch (#620).
+`apps/web` is where pure `@blog/ui` meets client interactivity. These rules
+keep that boundary clean. They sit on top of `react-component-practices`
+(server first, `useId`, props, state, styling files, placement, size), which
+they do not repeat.
 
 ## Rule 1 — slot in, never wrap
 
@@ -17,209 +18,140 @@ pass it **into** the slot — never wrap the pure component and re-forward its
 props.
 
 ```tsx
-// ✅ web builds the widget; the pure component renders one opaque slot child
-<PostMeta author={post.author} share={<PostShare url={url} links={links} />} />
+// ✅ web builds the widget; PostMeta renders one opaque slot child
+<PostMeta author={post.author} share={<PostShare url={url} title={post.title} links={shareLinks} />} />
 
-// ❌ "share" component owns PostMeta + tunnels a controlled-props bag through it
+// ❌ a "share" component that owns PostMeta and tunnels a state bag through it
 <PostShareButtons author={post.author} publishedAt={…}
   share={{ open, onOpenChange, isCopied, triggerRef, … }} />
-//   → confusing name vs. job, drills ~10 props PostMeta never reads,
-//     forces vi.mock('@blog/ui') to test (see testing-practices)
 ```
 
-**Self-check:** taking another component's data props (`author`, `publishedAt`)
-_plus_ a bag of interactive state = you wrapped when you should have slotted in.
+**Self-check:** a component that takes another component's data props
+(`author`, `publishedAt`) _plus_ a bag of interactive state, or whose test
+only passes with a faked `@blog/ui` component, wrapped where it should have
+slotted in (`testing-practices` → "What to fake"). The `@blog/ui` side of
+this rule is `ui-library-practices` → "Component conventions".
 
 ## Rule 2 — client behaviour in ref-based hooks
 
-Outside-click, Escape, focus-trap, and clipboard go in small colocated hooks
-keyed off **refs** — not in the component body via `getElementById` / ad-hoc
-`document` listeners / document-wide `querySelectorAll`.
+Outside-click, Escape, focus trap and clipboard go in small hooks keyed off
+**refs** — never in the component body via `getElementById`, ad-hoc
+`document` listeners or a document-wide `querySelectorAll`. `src/hooks/`
+already ships `usePopover`, `useDismissibleMenu` and `useCopyToClipboard`;
+reuse before writing one.
 
 ```tsx
-// ✅ component body wires refs, reads results
+// ✅ the body wires refs and reads results
 const { open, toggle, triggerRef, panelRef } = usePopover();
 const { isCopied, copy } = useCopyToClipboard();
 
-// ❌ imperative DOM in the body (caused the focus-return bug on #620)
+// ❌ imperative DOM in the body — this is what broke focus return on the share popover
 document.getElementById(id); document.addEventListener('mousedown', …);
 ```
 
-The listeners still exist — but inside a hook's `useEffect`, scoped to a `ref`
-(`panelRef.current`, not `getElementById`), cleaned up on unmount, and unit-
-testable. A component body that touches `document` directly is the smell.
-Generate the `aria-controls` id with `useId()`, not a hardcoded default.
+The listeners still exist — inside the hook's `useEffect`, scoped to a ref
+(`panelRef.current`), cleaned up on unmount, and unit-testable on the hook. A
+component body that touches `document` directly is the smell.
 
-## Rule 3 — split a growing island by context, not one file per concern
+## Rule 3 — split a growing island at its state branches
 
-A client island that renders genuinely different UI per state (loading vs.
-logged-out vs. logged-in; empty vs. populated; idle vs. a multi-step sub-flow)
-stays a single file only while it's small. Once one file is mixing "which
-branch am I in" with "what does this branch render" with "how does this one
-sub-flow manage its own state", split it — this was missed on `AuthMenu`
-(#1107), which grew to 320 lines carrying a pure helper, a fully separate
-logged-in render tree, a fully separate logged-out render tree, and an
-inline-expanding email sub-flow's own four-piece state machine, all in one
-file.
+A client island that renders genuinely different UI per state (loading /
+signed-out / signed-in; empty / populated; idle / a multi-step sub-flow)
+splits as soon as one file mixes _which branch am I in_, _what this branch
+renders_ and _how this sub-flow manages its state_ — even under the size
+budget. Budgets are CLAUDE.md → "File size budgets"; the general extraction
+signals, and where hooks and helpers go, are `react-component-practices` →
+"Size and splitting". The island's own cut:
 
-Split along **context boundaries**, not arbitrary line counts:
+- **Each mutually exclusive top-level branch** → its own child in
+  `components/<branch>/`. The parent becomes a thin dispatcher: it reads the
+  session/loading state, owns only what every branch shares (here the one
+  `usePopover()`), and renders the matching child.
+- **A sub-flow's state machine** (its `useState`s, effects and the handler
+  tying them together) → a `use-<flow>.ts` beside the component that calls
+  it, even with one caller. Test the state machine on the hook, not through
+  the parent's rendered output.
 
-- **A pure helper with no JSX** (derives a value, no hooks) → its own file,
-  co-located in the component's folder (`to-session-username.ts`, tested
-  directly, not only indirectly through the component that calls it).
-- **A self-contained sub-flow's state** (its own `useState`s, `useEffect`s, and
-  the handler that ties them together) → its own hook
-  (`use-email-sign-in.ts`), even if only one component calls it. The test for
-  "does this state machine work" belongs on the hook, not re-derived through
-  the parent component's rendered output.
-- **Each mutually-exclusive top-level render branch** (logged-in vs.
-  logged-out) → its own sub-component (`account-menu.tsx`, `sign-in-menu.tsx`)
-  in the same folder. The parent file becomes a thin dispatcher: read
-  session/loading state, render the matching sub-component, nothing else.
-
-Once a split produces **two or more** files of the same kind, group them into
-a matching subfolder rather than leaving everything flat at the top level —
-a flat folder with a dispatcher, two render branches, a hook, and a helper
-side by side is exactly the "crowded" problem this rule exists to fix one
-level up, just recreated inside the folder instead of inside one file. Mirror
-`@blog/ui`'s own compound-component precedent (`Panel`'s
-`components/header/`, `components/body/`, each sub-part in its own folder
-under `components/`, no barrel export since they're never imported from
-outside the parent) and this repo's existing top-level
-`src/hooks/` vs. `src/utils/` distinction — a stateful hook is not a "util,"
-even when, as here, it's private to one component rather than promoted to
-the shared top-level folder:
-
-```
-src/components/shared/auth-menu/
-  auth-menu.tsx                    # dispatcher: loading | AccountMenu | SignInMenu
-  auth-menu-variants.ts            # shared styling contract for the whole island
-  auth-menu.test.tsx
-  index.ts                         # re-exports AuthMenu only
-  components/
-    account-menu/
-      account-menu.tsx             # logged-in render tree
-    sign-in-menu/
-      sign-in-menu.tsx             # logged-out render tree, composes the hook below
-  hooks/
-    use-email-sign-in.ts           # the email sub-flow's state machine
-    use-email-sign-in.test.tsx
-  utils/
-    to-session-username.ts         # pure helper, tested directly
-    to-session-username.test.ts
-```
-
-A single split-out file of a given kind stays at the top level — don't create
-a one-entry `hooks/`/`utils/`/`components/` folder pre-emptively "for
-consistency." The subfolder earns its place at the second file of that kind,
-same as the parent split earning its place at the second context in one file.
-
-This is the same "extract at the second repetition" discipline
-(`.claude/agents/web.md`) applied one level earlier — a single component
-mixing three-plus contexts is itself the second-repetition signal, even
-without a second caller. Don't split a component that only has one render
-path with straightforward state; splitting there fragments things for no
-reason. The signal is genuine context boundaries within one file, not size
-alone.
-
-**Variants split the same way components do.** A single shared
-`{island}-variants.ts` holding every slot for every split-out sub-component
-recreates the same crowding this rule already fixes for components — once
-`AccountMenu`/`SignInMenu` own their own render trees, each also owns a
-co-located `account-menu-variants.ts` / `sign-in-menu-variants.ts` in its own
-folder for the slots _only it_ uses. A slot genuinely used by **two or more**
-sub-components (here, `panel` and `label` — both menus render the popover
-surface and its title) stays in the shared top-level `auth-menu-variants.ts`
-instead of being duplicated into each — duplicating a shared slot risks the
-two copies drifting apart on the next edit, exactly the "second repetition"
-failure mode this document keeps coming back to. The dispatcher's own
-single-consumer slots (e.g. `placeholderLabel`) stay in the top-level file
-too — it's the dispatcher's own file, not a subfolder concern:
+`AuthMenu` models the cut:
 
 ```
 auth-menu/
-  auth-menu.tsx
-  auth-menu-variants.ts              # dispatcher's own slots + genuinely shared ones (panel, window)
+  auth-menu.tsx           # dispatcher: Spinner | AccountMenu | SignInMenu
+  auth-menu-variants.ts   # `panel` (both menus) + `statusIndicator` (dispatcher only — a leftover)
   components/
     account-menu/
-      account-menu.tsx
-      account-menu-variants.ts       # avatarTrigger, acctRow, accountName, accountEmail, signOutItem
+      account-menu.tsx    # signed-in branch
     sign-in-menu/
-      sign-in-menu.tsx
-      sign-in-menu-variants.ts       # signInTrigger, cmdLine, cmdPrompt, providerButton, hint, …
+      sign-in-menu.tsx    # signed-out branch, composes useEmailSignIn
 ```
 
-A component consuming both its own slots and a shared one calls both `tv()`
-functions (`const { avatarTrigger, ... } = accountMenuVariants(); const
-{ panel, window } = authMenuVariants();`) — this is a small amount of extra
-call-site surface in exchange for each variants file only describing the one
-component's own styling contract, which is the same trade this rule already
-makes for the components themselves.
+Its leftovers predate the `react-component-practices` rules — don't copy
+them. A diff that touches one fixes it:
+
+- AuthMenu sits in `shared/` with a barrel, though only `site-header`
+  imports it → `site-header/components/auth-menu/` ("Where a component
+  lives").
+- `use-email-sign-in.ts` sits in a one-entry `hooks/` → beside
+  `sign-in-menu.tsx`.
+- `statusIndicator`, and each menu's single-consumer `*-variants.ts` → a
+  `tv()` in the `.tsx` that renders them ("Styling files").
+- The popover state reaches each menu as five forwarded props (`panelId`,
+  `isOpen`, `toggle`, `triggerRef`, `panelRef`) → one object typed from its
+  source ("Props").
+
+Below the budget, don't split a component that has one render path and
+straightforward state.
 
 ## Rule 4 — reach for a `@blog/ui` atom before a raw HTML element
 
-If `@blog/ui` already ships an atom for the element you're about to write —
-`Button`, `TextInput`, `IconButton`, `Avatar` — use it, even for something as
-small as a disabled loading placeholder. A raw `<button>`/`<input>` in
-`apps/web` should be the exception (a framework-coupled wrapper genuinely
-needs bare markup — `SmartLink`, `SanityImage`), not something reached for by
-default because it's faster to type. `Button` already forwards every native
-`ButtonHTMLAttributes` prop (`disabled`, `aria-hidden`, …) via `{...rest}`, so
-there is rarely a real capability gap forcing a hand-rolled element — check
-the atom's actual prop type before assuming it can't do what you need.
+If `@blog/ui` ships an atom for the element — `Button`, `IconButton`,
+`TextInput`, `Avatar` — use it, even for a small disabled or loading control.
+Bare markup in `apps/web` is the exception: a framework-coupled wrapper
+(`SmartLink`, `SanityImage`) or a capability the atom's prop type genuinely
+lacks. Atoms take closed prop types with state-named booleans (`Button` takes
+`isDisabled`, not `disabled`), so read the prop type before deciding it can't
+do the job.
 
 ```tsx
-// ❌ hand-rolled — no reason not to use Button, which forwards disabled/aria-hidden fine
-<button type="button" disabled aria-hidden="true" className={signInTrigger()}>
-  <span className={placeholderLabel()}>{t('signIn')}</span>
-</button>
+// ❌ a parallel implementation of Button
+<button type="button" disabled={emailStep === 'submitting'} onClick={handleEmailSubmit} className={…}>
 
-// ✅ reuses the design system, one class-merge to verify instead of a parallel implementation
-<Button disabled aria-hidden="true" className={signInTrigger()}>
-  <span className={placeholderLabel()}>{t('signIn')}</span>
-</Button>
+// ✅ sign-in-menu.tsx
+<Button size={SIZE.SM} isDisabled={emailStep === 'submitting'} onClick={handleEmailSubmit}>
 ```
 
 ## Rule 5 — merge Portable Text component maps, never spread them
 
-A Portable Text component in `apps/web` owns the design-system component map,
-and any caller-supplied overrides combine with it rather than replacing it.
-Every combination — the library's defaults, ours, and a caller's overrides —
-goes through `mergeComponents` from `@portabletext/react`. **Object spread is
-banned here outright, at every layer.**
+`PortableText` owns the design-system component map; a caller's overrides
+combine with it rather than replace it. Every combination — the library's
+`defaultComponents`, ours, a caller's — goes through `mergeComponents` from
+`@portabletext/react`. **Object spread is banned here outright, at every
+layer**, and hand-building one category counts as spreading.
 
 ```tsx
-// ✅ merges per category: overriding marks.linkRef keeps marks.strong and marks.em
-mergeComponents(mergeComponents(defaultComponents, OWN_COMPONENTS), overrides)
+// ✅ merges per category: overriding marks.code keeps marks.strong (library) and marks.linkRef (ours)
+const baseComponents = mergeComponents(defaultComponents, portableTextComponents);
+mergeComponents(baseComponents, components);
 
-// ❌ replaces the whole category: a caller passing any `marks` silently
-//    drops strong, em and linkRef
-{ ...OWN_COMPONENTS, ...overrides }
-{ marks: { ...OWN_COMPONENTS.marks, ...overrides.marks } }  // same bug, hand-built
+// ❌ replaces the whole category: a caller passing any `marks` silently drops strong, em and linkRef
+{ ...baseComponents, ...components }
+{ marks: { ...baseComponents.marks, ...components.marks } }  // same bug, hand-built
 ```
 
-The second form is the dangerous one because **nothing fails**. Every field on
-`PortableTextComponents` is optional, so dropping `marks.strong` type-checks,
-passes lint, and passes every existing test — it surfaces only as unstyled
-text in production. Type-checking cannot catch this class of bug, so the
-coverage has to be behavioural: a test that overrides **one** entry in a
-category and asserts the **other** entries in that same category still render.
-
-Hand-building a single category counts as spreading. Nest `mergeComponents`
-calls instead of flattening them.
+**Nothing fails** when this breaks: every field on `PortableTextComponents`
+is optional, so dropping `marks.strong` type-checks, lints and passes every
+existing test, and surfaces only as unstyled text in production. The
+coverage has to be behavioural — a test that overrides **one** entry in a
+category and asserts the **other** entries in that category still render
+(`portable-text.test.tsx`, "keeps the default strong mark when a caller
+overrides the code mark").
 
 ## Also
 
-- Pass view-models through (`author={post.author}`), don't hand-map fields — if
-  it doesn't type-check, align the pure component's prop names in
-  `ui-library-practices` → "Shape data props to the view-model".
-- `'use client'` stays on the smallest interactive leaf (CLAUDE.md conventions).
-- Testing an inverted composition needs a fake `@blog/ui` mock — that mock is
-  the signal to slot-in instead (`testing-practices`).
-- `apps/web` components follow the same `{component-name}-variants.ts` +
-  `tv()` conventions as `packages/ui` — including comment discipline. A
-  non-obvious magic number (a sticky offset, a `scroll-mt` value) gets a
-  1–3 line comment stating the value and the one non-obvious fact behind it,
-  never a multi-paragraph essay re-deriving the layout — this has recurred on
-  `apps/web` variants files specifically. Full rule + before/after example:
-  `ui-library-practices` → "Group classes by concern".
+- Props, including passing a view-model whole (`author={post.author}`):
+  `react-component-practices` → "Props". When a view-model field won't
+  type-check against a `@blog/ui` prop, rename the prop
+  (`ui-library-practices` → "Shape data props to the view-model you're fed").
+- Which file holds the `tv()`, including after a split:
+  `react-component-practices` → "Styling files"; class grouping:
+  `ui-library-practices` → "Styling".

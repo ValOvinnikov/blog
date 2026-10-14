@@ -1,256 +1,185 @@
 ---
 name: studio-schema-practices
 description: >-
-  Best practices for Sanity schema types and content migrations in packages/studio.
-  Use when adding or restructuring schema types, writing validation, building
-  desk structure, or authoring a migration. Complements the studio agent and the
-  add-content-type skill — this is the quality bar for how Studio code is
-  written, not just what it models.
+  Use when adding or restructuring Sanity schema types in packages/studio,
+  writing validation, descriptions or option lists, or authoring a content
+  migration — the quality bar for how Studio code is written.
 ---
 
 # Studio schema & migration practices
 
-The schema layer is the source of truth for every downstream type, so
-sloppiness here multiplies through `service`/`ui`/`web`. These rules exist
-because each one was violated in a real PR and cost review time.
+The schema is the source of truth for every downstream type, so a flaw here
+multiplies through `service`, `ui` and `web`. Naming, file layout, the desk and
+tests: `.claude/agents/studio.md`. The content model: `SPEC.md` §6.
 
 ## Schema definition quality
 
-### DRY — extract repeated field patterns (rule of three, applied at two)
+### DRY — one factory per repeated field shape
 
-If the same field shape appears **twice**, extract a factory helper; never
-copy-paste it a third time. The canonical offender: a "mode + custom value"
-pair (radio source selector + hidden custom field + conditional
-`rule.custom()` validation) repeated four times in one module, ~40 lines each.
-Write it once:
+The change that would write a field shape a second time extracts a factory
+instead (CLAUDE.md → "Reuse before you create"). Read `fields/` and `objects/`
+first: a factory that fits except for its copy gains an optional `description`
+override, never a clone. `ctaButtonsField` (`fields/cta-buttons-field/`) is the
+model — the array, its limits and its one-action-per-variant check written
+once, with `title`, `description`, `min` and `max` as overrides.
 
-```ts
-// schema-types/modules/hero/hero.ts — local to the one schema that uses it
-type TModeFieldPair = {
-  name: string; // 'heroTitle' → mode field is `${name}Mode`
-  title: string;
-  modeOptions: { title: string; value: string }[];
-  customType?: 'string' | 'text';
-};
+Where a factory lives follows its reach:
 
-const modeFieldPair = ({
-  name,
-  title,
-  modeOptions,
-  customType = 'string',
-}: TModeFieldPair) => [
-  defineField({
-    name: `${name}Mode`,
-    title: `${title} Source`,
-    type: 'string',
-    options: { layout: 'radio', list: modeOptions },
-    validation: (rule) => rule.required(),
-  }),
-  defineField({
-    name,
-    title: `Custom ${title}`,
-    type: customType,
-    hidden: ({ parent }) => !isMode(parent, `${name}Mode`, MODE.CUSTOM),
-    validation: (rule) =>
-      rule.custom((value, context) =>
-        isMode(context.parent, `${name}Mode`, MODE.CUSTOM) && !value
-          ? `Custom ${title.toLowerCase()} is required when ${title} Source is Custom.`
-          : true,
-      ),
-  }),
-];
-```
+- used by one schema → a local, non-exported function in that schema file;
+- wraps one object type → beside the object (`objects/seo/seo-field.ts`);
+- shared more widely → `schema-types/fields/<name>/<name>.ts`.
 
-Where a factory lives follows its reach: used by one schema → a local,
-non-exported function in that schema file; wraps one object type → beside the
-object (`objects/seo/seo-field.ts`); shared more widely →
-`schema-types/fields/<name>/<name>.ts`. Validators with more than one caller
-live in `schema-types/validation/<name>/<name>.ts`. All are schema-only
-utilities, never exported to other packages.
+A validator moves to `schema-types/validation/<name>/<name>.ts` once it has a
+second caller or logic worth testing (a cross-document read, a cardinality or
+cross-field check) — an inline `rule.custom` is never tested. All of these are
+schema-only and never exported from the package.
 
 ### No magic strings — every stored value is a constant
 
-A string that is **stored in a document** or **matched against in code**
-(`options.list` values, mode discriminators, `_type` names referenced in
-`initialValue`/migrations/queries) must come from a single constant. New
-enum-ish values follow the UPPERCASE key/value rule in `@blog/config`
-(`constants/`); `_type` names get a const object too (values stay the real
-type names):
+A value **stored in a document** or **matched in code** — `options.list`
+values, mode discriminators, values written by `initialValue` or a migration —
+comes from one UPPERCASE key/value const in `@blog/config` `constants/`
+(CLAUDE.md → Conventions), as `LINK_TYPE` does for `link`'s `linkType`. The
+test: if renaming the value would touch more than one file, it should have been
+a constant.
 
-```ts
-// @blog/config constants/module.ts
-export const MODULE_TYPE = {
-  HERO: 'module_hero',
-  POST_LIST: 'module_postList',
-  CONTENT: 'module_content',
-  CTA: 'module_cta',
-} as const;
-```
-
-The test: if renaming a stored value requires edits in more than one file
-(schema + initialValue + migration + service), it should have been a
-constant. **Legacy lowercase stored values** (`'postCategory'`, `'custom'`)
-can't be silently uppercased — that's a data migration; centralize them
-as-is and flag the rename as follow-up work.
+- **`_type` names are not `@blog/config` constants.** Inside the Studio,
+  reference the schema's `.name` (`to: [{ type: linkSchema.name }]` in
+  `objects/link-ref/link-ref.ts`), never a string, so a rename is
+  compiler-checked. Where importing the schema would close an import cycle,
+  import its sibling `<name>-type.ts` const instead (`PAGE_POST_TYPE` from
+  `documents/pages/post/post-type.ts`) — don't "fix" those to `.name`.
+  Downstream literals are checked against the generated types (`TModuleType`,
+  groqd's `filterByType`); a migration uses the literal or a local const
+  ("Migration quality").
+- **A stored value that isn't uppercase can't be uppercased in place** — that
+  is a data migration. Centralize it as-is and raise the rename separately.
 
 ### Validation parity — restructures never silently drop constraints
 
-When fields move into an object or array (e.g. flat fields → `modules[]`),
-the constraints must move with them or be consciously re-decided:
+When fields move into an object or array, their constraints move with them or
+are consciously re-decided:
 
-- A previously `required()` capability needs a container-level rule — e.g.
-  `modules` gets `rule.custom()` enforcing "exactly one `module_hero`" or at
-  least `min(1)`, if the page cannot render without it.
-- Cardinality that the old shape guaranteed implicitly (one hero, one post
-  list) must be enforced explicitly once an array makes duplicates possible —
-  otherwise downstream code that picks `.find(...)` silently ignores editor
-  input.
-- If you decide a constraint should genuinely be dropped, say so in your
-  report — a dropped validation is a contract change for `service`
-  (`.notNull()` decisions), never a side effect.
+- A capability that was `required()` needs a container-level rule (`min(1)` or
+  a `rule.custom()`) if the page cannot render without it.
+- Cardinality the old shape guaranteed implicitly is enforced explicitly once
+  an array allows duplicates (`validate-pricing-single-highlighted-tier`) —
+  otherwise a downstream `.find(...)` silently ignores editor input.
+- A constraint dropped on purpose is named in your report: it is a contract
+  change for `service`'s `.notNull()` decisions, never a side effect.
+- **A new field on an existing document type gets no `required()`.**
+  `initialValue` never backfills, so every stored document would turn invalid.
+  Give it an `initialValue` and have `service` read it through `coalesce()`,
+  or pair the `required()` with a backfill migration.
 
 ### Naming & prose stay truthful after a move
 
-- Renaming/moving a type means updating helper type names, descriptions, and
-  preview text. A generic `module_hero` must not keep a `THomePageParent`
-  helper type or a "Post featured in the **Home** hero" description.
-- Follow `{group}_{name}` for new types; each type in its own file; register
-  in the group index.
-- **Schema defs are named exports** — `export const {localName}Schema =
-defineType(...)` (`heroSchema`, `postPageSchema`, `siteSettingsSchema`), never
-  `export default defineType`. Registration indexes and cross-references
-  import the named symbol (`to: [{ type: heroSchema.name }]`), so a rename is
-  compiler-checked instead of a stringly-typed hunt.
+Moving or renaming a type updates its helper type names, descriptions and
+preview text — a generic module must not keep a `THomePageParent` type or a
+"Post featured in the **Home** hero" description. Naming, file layout and the
+named `{localName}Schema` export: `.claude/agents/studio.md` → "Naming" and
+"File layout".
 
 ### Previews
 
-- Every document and object type gets a `preview` (icon + meaningful
-  title/subtitle) — editors navigate by these.
-- Type the `prepare` input instead of scattering `as` casts where practical
-  (`prepare({ title }: { title?: string })`).
+- Every document and object type gets a `preview` — icon plus a meaningful
+  title/subtitle; editors navigate by them.
+- Type the `prepare` input (`prepare({ title }: { title?: string })`) instead
+  of scattering `as` casts.
 
 ### Descriptions — every type, every field, written for an editor
 
-**Every registered type and every field an editor can see carries a
-`description`.** A type's says what the thing is **for**, in one sentence. A
-field's says what it is for **and when to set it**. Both are read by
-non-technical people inside the Studio, so they use the words an editor would
-use for what appears on the page — never an internal `_type` value, an
-uppercase enum identifier (`SPLIT`, `PRIMARY`), or a component name.
+Every registered type and every editor-visible field carries a `description`.
+A type's says what it is **for**, in one sentence. A field's says what to put
+in it **and when to set it** — never how the widget behaves or what each
+option means. Use the editor's words for what appears on the page — never a
+`_type`, an enum identifier (`SPLIT`, `PRIMARY`) or a component name.
 
-**Never restate validation.** No "required", no "max 60 characters", no "up to
-two". The Studio already renders the required marker and the character
-counter, so a prose copy is redundant the day it is written and wrong the day
-the rule changes. Say what the field is for; let the widget state the rule.
+**Never restate validation** — no "required", "max 60 characters", "up to
+two". The Studio renders the required marker and the counter, so prose is
+redundant on day one and wrong once the rule changes. Describe a
+**consequence**, not a **constraint**: "Aim for a sentence or two; a single
+word displays poorly" survives a change to `max()`; "keep between 30 and 60
+characters" does not. State a real but unenforced rule qualitatively.
 
-The distinction that matters when you are tempted: describing a **constraint**
-is out, describing a **consequence** is in. "Required — keep between 30 and 60
-characters" is a constraint. "Aim for a full sentence or two so it reads well;
-a single word displays poorly" is a consequence, survives a change to
-`max()`, and is genuinely more useful. When a rule is real but unenforced,
-express it qualitatively rather than reintroducing the number.
+Copy every caller would repeat lives on the factory as its default
+(`ctaButtonsField`, `brandVariantField`). A caller overrides it only where the
+default would be untrue for that field — never with the same words — so read
+the default before writing one.
 
-**Nothing enforces this automatically** — there is no registry test asserting
-every type and field carries a description, deliberately. It falls to whoever
-writes and whoever reviews the schema. A mechanical check could only ever
-confirm a description is present, which is the easy half; the half that
-matters is whether it tells an editor something true and useful, and that
-needs a reader.
-
-Where a shared field factory would otherwise have every caller pass the same
-description, the copy belongs **on the factory**, not repeated at each call
-site — `headingBlockField` carries one generic description that suits both a
-page and a module, and takes no option to override it.
-A description repeated verbatim across call sites is the same duplication
-problem as any other repeated literal.
+No test checks any of this — a test could only confirm a description exists,
+not that it is true. The author and the reviewer own it.
 
 ### Option lists — `required()` is the guard, the layout is presentation
 
-A dropdown always renders a blank option for the unset state, and it cannot be
-removed or renamed. Neither `initialValue` nor `validation` suppresses it.
-
-**That blank is not a trap, and it is not a reason to pick a layout.**
-`required()` marks the field invalid the moment it is blank: the Studio shows
-the error inline on the field, and publish is blocked until it is set. The
-editor cannot ship a document in that state whichever layout is used — and a
-radio has an unset state too, it just renders as "no button selected" instead
-of an empty row.
-
-So `required()` decides nothing about layout. Choose by how the field reads in
-the form:
-
-- **Dropdown** — the default, and the right call for most fields. Compact, and
-  it keeps a long form scannable.
-- **Radio** — when the editor benefits from seeing every option at once
-  without opening anything. The strongest case is a field driving other
-  fields' `hidden:` predicates: they flip it to reveal the rest of the form,
-  so the available choices should be visible while they decide.
-
-Option count is not the test either, though a list long enough to need
-scrolling argues against radio on its own terms.
-
-**Put `required()` on the field whenever blank is not a legal value** — that
-is the part that matters, and it is independent of the layout. `heroVariantField`
-is the model: `layout: 'dropdown'`, an `initialValue`, and `rule.required()`.
-
-**State the layout explicitly either way** rather than relying on the default,
-so a reader can tell a decision was made from the code alone.
-
-The `modeFieldPair` factory above keeps `layout: 'radio'` because its mode
-field gates a conditional custom field, not because it is `required()`.
+- **State `layout` on every `options.list`**, so the code shows a decision was
+  made. Dropdown is the default. Radio is for when the editor benefits from
+  seeing every option at once — in practice a field driving other fields'
+  `hidden:` predicates, like `linkType` in `documents/link/link.ts`. Option
+  count is not the test, though a list long enough to scroll argues against
+  radio.
+- **`required()` decides nothing about layout.** A dropdown's blank option
+  can't be removed, but `required()` flags it inline and blocks publish, and a
+  radio has an unset state too.
+- **Put `required()` wherever blank is not a legal value** (subject to the
+  new-field rule above). `variantField` (`fields/variant-field/`) is the model:
+  `layout: 'dropdown'`, an `initialValue`, `rule.required()`.
 
 ### No toggle beside the field it switches on
 
-When a boolean's only job is to switch an optional field on, drop the boolean.
-A filled field is the switch. A pricing tier is highlighted when its
-`highlightLabel` is filled; it has no `isHighlighted` toggle. With two fields,
-the toggle can be off while the label is filled, and the editor can't tell
-which one wins. When a view needs the boolean, the consumer derives it from
-the filled field.
+When a boolean's only job is to switch an optional field on, drop the boolean —
+a filled field is the switch. A pricing tier is highlighted when its
+`highlightLabel` is filled; it has no `isHighlighted`. With both, the toggle can
+be off while the label is filled, and the editor can't tell which wins. A view
+that needs the boolean derives it from the field.
 
-A field that acts as the switch gets **no `initialValue`**. A default would
-switch it on for every new item, so a new pricing tier would start out
-highlighted.
+The switching field gets **no `initialValue`** — a default would switch it on
+for every new item.
 
-Keep a separate boolean only when it means something the field can't express
-on its own, for example a flag that changes behaviour while the field keeps
-its value.
+Keep a separate boolean only when it means something the field can't express,
+such as a flag that changes behaviour while the field keeps its value.
 
 ## Migration quality
 
-- **Idempotency via target-state guard, symmetric across all document types.**
-  Skip when the _target_ shape is already present (`modules !== undefined`),
-  not when the _source_ field is absent — a doc with both old and new shapes
-  must not be re-wrapped or clobbered. Every `documentTypes` branch uses the
-  same guard style.
-- **One source of truth for moved fields.** The field list exists once (a
-  `const ... as const` array); the legacy type, the module builder, and the
-  `unset()` list all derive from it. Four hand-maintained parallel lists is
-  how fields get orphaned.
-- **Every migration ships a co-located test** (`*.test.ts`): the transform on
-  a representative fixture, and a re-run on already-migrated input proving
-  it's a no-op (idempotency). See `testing-practices`.
-- **No header comment.** The export → dry → inspect → human-gated run
-  workflow lives in `migrations/README.md`, and what a migration transforms
-  goes in its PR description (CLAUDE.md → "Comments default to zero"). The
-  deploy-ordering constraint still holds: migrate production **before**
-  deploying code that expects the new shape.
-- Stored values written by the migration come from the same `@blog/config`
-  constants the schema uses.
+The export → dry-run → inspect → human-gated run workflow, and `lib/` for
+helpers a second migration needs: `migrations/README.md`.
+
+- **Idempotency via a target-state guard, in the same style on every
+  `documentTypes` branch.** Skip when the _target_ shape is present
+  (`modules !== undefined`), not when the _source_ field is absent — a doc
+  holding both shapes must not be re-wrapped or clobbered.
+- **One source of truth for moved fields** — a `const … as const` list from
+  which the legacy type, the builder and the `unset()` list all derive.
+  Parallel hand-kept lists are how fields get orphaned.
+- **Stored values come from the same `@blog/config` constants the schema
+  uses**; `_type` names are the literal or a local const.
+- **Never import a Studio schema module (`src/schema-types`), or anything that
+  reaches bare `sanity` or React** — `sanity/migrate` is fine. Every
+  migration's `index.ts` is loaded to build `sanity migrations list`, so one
+  such import breaks every migration while type-check and vitest stay green.
+  Redeclare a schema-module constant locally (the test imports the real one,
+  so drift fails), and run `pnpm --filter @blog/studio migrate:list` before
+  committing.
+- **Every migration ships a co-located `*.test.ts`**: the transform on a
+  representative fixture, and a re-run on migrated input proving it a no-op
+  (`testing-practices` → "What to test").
+- **No header comment** — what it transforms goes in the PR description.
+- Both deploy workflows run `migrate` before `deploy-web`; a migration run by
+  hand goes before the code that expects its shape.
 
 ## Definition of done additions
 
-Beyond the studio agent's checklist:
+Beyond `.claude/agents/studio.md` → "Definition of done":
 
-- No copy-pasted field pattern that a helper should own.
+- No copy-pasted field shape that a factory should own.
 - No stored-value literal repeated across files.
-- Every new type and field has a description, written for an editor, restating
-  no validation.
+- Every new type and field has an editor-facing description that restates no
+  validation.
 - Every new `options.list` states its `layout`, and carries `required()`
   wherever blank is not a legal value — two independent decisions.
-- Restructure PRs state explicitly which constraints moved, were added, or
-  were dropped — and why.
-- Migration has its test and both guards.
-- No test file beside a schema — validation, limits, required, `hidden` and
-  previews included (`testing-practices` → "What not to test"). Validators
-  in `schema-types/validation/` and migrations are the tested code.
+- No `required()` on a new field of an existing type without a backfill
+  migration.
+- Restructure PRs state which constraints moved, were added or were dropped,
+  and why.
+- Every migration has its test and a target-state guard on each branch, and
+  `migrate:list` loads it.

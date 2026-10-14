@@ -9,424 +9,255 @@ description: >-
 
 # Testing practices (Vitest + Testing Library)
 
-Stack: **Vitest** as the runner, **@testing-library/react** + **jest-dom** for
-components, **jsdom** for the DOM environment. Shared config lives in
-`@blog/config/vitest/preset`.
+Vitest runs everything; components use `@testing-library/react`, `jest-dom`
+and `@testing-library/user-event` on jsdom.
 
-**Two-tier, by design.** Each layer agent (`studio`/`service`/`ui`/`web`) still
-writes tests for what it implements — that responsibility isn't removed. The
-`test-writer` subagent (`.claude/agents/test-writer.md`) runs afterward as a
-dedicated, fresh-context pass over the same diff, per `develop-feature` step
-4: it catches gaps a layer agent's attention thins out on by the end of its
-own run (#396). It holds the bar in both directions: it adds only what
-protects behaviour, and it deletes a new test that fails "What not to test"
-below. Overlap where a layer agent already wrote thorough coverage is
-expected and fine — `test-writer` doesn't duplicate or rewrite adequate
-existing tests, and "nothing to add" is a complete outcome.
+**Who writes tests.** A bugfix's regression test is written first by the
+owning layer agent (`superpowers:test-driven-development`). New-feature
+coverage comes from `test-writer`'s fresh-context pass (`develop-feature` §4),
+which adds only what protects behaviour, deletes a new test that fails "What
+not to test", and treats "nothing to add" as a complete outcome.
 
 ## Where tests live
 
-- **Co-located** next to the source file, named `{filename}.test.ts(x)`:
-  `Button.tsx` → `Button.test.tsx`, `transformer.ts` → `transformer.test.ts`.
-- Service fixtures live in `packages/service/src/testing/`, mirroring the
-  domain tree. Each exports a `make*` factory returning a raw (`TRaw*`) shape
-  with a `Partial<…>` overrides param. Import via the workspace alias:
-  `import { makeRawPostCard } from '@blog/service/testing/pages/fixtures'`.
-- **`web` and `ui` follow the same `src/testing/` pattern** for fixtures shared
-  by more than one file (a component's `.test.tsx` **and** its `.stories.tsx`,
-  or two unrelated test files that both need the same domain shape — e.g. an
-  SEO object or a tag/author/post mock consumed by a page test and a metadata
-  builder test). Mirror the component tree, keeping the `pages/`/`shared/`
-  split (`src/components/pages/blog-post-page/` →
-  `src/testing/pages/blog-post-page/fixtures.ts`); export small builder
-  functions, import via the workspace alias (`@web/testing/…`), never a
-  relative path once shared. A fixture used by exactly one test file stays
-  inline; promote it the moment a second file needs the same shape — not
-  necessarily the sibling story, any second consumer counts. Distinct from
-  `src/storybook/fixtures/` (`web-storybook`) — Storybook-only view-model
-  mocks (`TPostDetail`, …) never imported by a test.
-- **Check `testing/` for an existing builder before writing a mock literal —
-  REQUIRED, not a preference.** Before hand-rolling an object shaped like a
-  known domain entity (SEO, tag, author, post/post-card, category, …) inside a
-  `*.test.ts(x)` file, grep `packages/service/src/testing/` (service tests) or
-  `apps/web/src/testing/`/`packages/ui/src/testing/` (web/ui tests) for a
-  builder that already covers it (`makeRaw*` in service, `make*` in web/ui) —
-  reuse it with `overrides` rather than duplicating the shape inline, even if
-  the existing builder lives in a directory the new test wouldn't otherwise
-  touch. If no builder exists yet and the shape is a generic domain entity
-  (not something specific to the one component/route under test), **add the
-  builder to `testing/` in the same PR** rather than inlining it "for now" —
-  the promotion trigger above (second consumer) exists precisely so this
-  doesn't need a separate follow-up PR once a second file predictably needs
-  the same shape.
-- Run from root: `pnpm test` (all), or `pnpm --filter @blog/ui test`.
-  Watch mode: `pnpm test:watch`.
-
-## When to run tests
-
-- Run `pnpm --filter <pkg> type-check` after each major group of files — fast,
-  catches structural errors early without verbose test output.
-- Run the full test suite **once, after all implementation is complete**:
-  `pnpm --filter <pkg> test`.
+- **Co-located**, named `{filename}.test.ts(x)`: `button.tsx` →
+  `button.test.tsx`.
+- **A fixture two or more files need lives in that workspace's
+  `src/testing/`**, mirroring the source tree
+  (`apps/web/src/components/pages/blog-post-page/` →
+  `apps/web/src/testing/pages/blog-post-page/fixtures.tsx`). Export small
+  `make*` builders taking a `Partial<…>` overrides param, and import them
+  through the workspace alias (`@web/testing/…`), never a relative path.
+  Service builders return the raw `TRaw*` shape
+  (`makeRawPostCard` from `@blog/service/testing/pages/fixtures`). A fixture
+  one test file uses stays inline; it moves to `testing/` in the change that
+  adds a second consumer — a story or any other test file counts. A fixture
+  literal repeated across files is the same case: it becomes a builder.
+  Story-only view-model data follows `web-storybook`.
+- **Check `testing/` for a builder before writing a mock literal — required.**
+  Before hand-rolling an object shaped like a domain entity (SEO, tag,
+  author, post, category, tenant, membership, …), grep the workspace's
+  `src/testing/` — and `packages/service/src/testing/` for raw Sanity shapes —
+  and reuse the builder with overrides, even from a directory the test would
+  not otherwise touch. A generic entity with no builder yet gets one in
+  `testing/` in the same PR, not inline "for now".
+- **Run:** `pnpm test`, `pnpm --filter <pkg> test`, `pnpm test:watch`. Run
+  `pnpm --filter <pkg> type-check` after each group of files and the full
+  suite once, when implementation is complete.
 
 ## Per-package setup
 
-- **ui / web** (`jsdom`): a `vitest.config.ts` merges the preset and sets
-  `environment: "jsdom"` + `setupFiles: ["./vitest.setup.ts"]`, where the setup
-  file does `import "@testing-library/jest-dom/vitest";`.
-- **service** (`node`): merge the preset with `environment: "node"`. No DOM.
-- **Import aliases in tests.** Each `vitest.config.ts` `resolve.alias` must map
-  the workspace's own alias **and every dependency's** alias (e.g. service's
-  vitest maps `@blog/service/*` → its `src` and `@blog/config/*` → config's
-  `src`). Vitest doesn't read `tsconfig` `paths`, so a missing dependency alias
-  makes cross-package imports — and `vi.mock` of an aliased module — fail. Add a
-  new dependency's alias here whenever a package starts importing it in tests.
-  See CLAUDE.md → Conventions (per-workspace aliases).
+The shared preset is `@blog/vitest-config/preset` (`configs/vitest/preset.ts`):
+globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
 
-```ts
-// vitest.config.ts (ui / web)
-import preset from '@blog/config/vitest/preset';
-import { defineConfig, mergeConfig } from 'vitest/config';
-export default mergeConfig(
-  preset,
-  defineConfig({
-    test: { environment: 'jsdom', setupFiles: ['./vitest.setup.ts'] },
-  }),
-);
-```
+- **`apps/web`, `apps/platform`** — `createVitestConfig({ resolve: { alias } })`
+  from the preset: jsdom, `src/vitest-setup.ts`, `server-only` stubbed. It
+  runs `*.test.ts` in a `node` project and `*.test.tsx` in `jsdom`, so a test
+  that renders JSX is `.tsx`. When the extension picks the wrong environment
+  — a `.ts` test that needs `DOMParser`, `window` or `renderHook`, a `.tsx`
+  that must run in `node` — its first line is a
+  `@vitest-environment <env>` docblock: the one per-file override, and the
+  only comment a test file may carry.
+- **`packages/ui`** — merges the preset with jsdom and `src/test-setup.ts`.
+- **Every other package** runs in `node`; `service`, `db`, `auth` and `email`
+  also set `mockReset: true`.
+- **Aliases.** Vitest does not read `tsconfig` `paths`. `resolve.alias` maps
+  the workspace's own alias and every dependency's
+  (`blogPackageAlias('<pkg>', import.meta.url)` in the apps), or cross-package
+  imports — and `vi.mock` of an aliased module — fail.
 
-## What to test (and what not to)
+## What to test
 
-- **`@blog/ui`** — behaviour and contract, not markup snapshots. Query by role/
-  text (`getByRole("button", { name: ... })`), assert rendered props and
-  interactions via `@testing-library/user-event`. Never a class — not even
-  one a prop toggles (see "What not to test").
-- **`@blog/service`** — pure logic: GROQ result → domain mapping, `urlForImage`
-  output, error/empty handling. **Mock the Sanity client** (`vi.mock`); never
-  hit the network. No `revalidate` timing tests.
-- **`web`** — route/page components with `service` functions mocked; assert that
-  the data renders and metadata is produced. Keep these light; prefer pushing
-  logic down into `ui`/`service` where it's cheaper to test.
-- **`packages/studio/src`** — never a schema definition (see "What not to
-  test"); only the validators in `schema-types/validation/`, the
-  `structure/`, `inputs/` and `preview/` helpers, `studio-config` and
+- **`@blog/ui`** — behaviour and contract through roles, text and
+  `userEvent` ("Writing a component test"); never markup, never a class.
+- **`@blog/service`** — pure logic: GROQ result → domain mapping,
+  `urlForImage` output, error/empty handling, with the query runner faked.
+  No `revalidate` timing tests.
+- **`apps/web`, `apps/platform`** — pages and components with only the edges
+  faked ("What to fake"); assert what renders and the metadata produced. Keep
+  route tests light — push logic down to where it is cheaper to test.
+- **`packages/studio`** — never a schema definition ("What not to test").
+  Test the code outside
+  `schema-types/{documents,objects,modules,fields}/` — pure helpers and
+  wiring such as the cross-document validators in `schema-types/validation/`,
+  the `schema-types/{inputs,preview,queries,portable-text}/` helpers,
+  `structure/`, `document-actions/`, `testing/`, `studio-config` and
   `studio-mount`.
-- **`packages/studio/migrations/*`** — a migration's `document()` handler is a pure
-  function (doc → mutations), so test it directly. Cover **transform correctness**
-  (a legacy doc maps to the expected module/field shape) and **idempotency**
-  (running it against an already-migrated doc returns `undefined`/no-op — never
-  re-transforms or overwrites data). Extract the transform into a small helper if
-  that makes it easier to assert.
+- **`packages/studio/migrations/*`** — test the `document()` handler directly,
+  a pure doc → mutations function. Cover **transform correctness** (a legacy
+  doc maps to the expected shape) and **idempotency** (an already-migrated doc
+  returns `undefined`, never re-transformed). Extract the transform into a
+  helper when that makes it easier to assert.
 
 ## Conventions
 
-- **Mock user/author names and emails are always fake — never a real person's
-  name or email, including this repo's own maintainer.** Test fixtures for
-  account/auth/identity/author data (`user.name`, `user.email`,
-  `author.name`, avatar `alt`/`name` props, etc.) use a placeholder identity
-  (`'Jane Doe'`, `'jane@example.com'`, or similar) instead of a real one that
-  happened to be handy while writing the test. This applies to co-located
-  `*.test.ts(x)` fixtures and `.stories.tsx` mock data alike — not to actual
-  site content (blog posts, author bios) under `content/` or `docs/`, which
-  legitimately name real people on purpose.
-- Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
-  `it("renders the post title and author")`.
-- **An `it` title states the behaviour a user or caller sees, in 80
-  characters or fewer.** It never names a prop, a mock, a helper or how the
-  code gets there. "labels the region with the carousel title", not
-  "composes the region label from the carousel.regionLabel Voice key rather
-  than passing the title straight through". A title that needs "rather than"
-  or "instead of" is arguing with an implementation nobody wrote. Long
-  existing titles are shortened when the file is touched, not in a sweep.
-- **Never label a suite with a hand-written string when a symbol names it.**
-  Vitest derives the suite name from the reference's `.name`, so the label can
-  never drift: rename the symbol and the suite name follows, and deleting it is
-  a compile error instead of a stale string. Which form to use depends on
-  **what the suite targets**, and there are exactly two:
+- **Identities in fixtures are fake** — never a real person's name or email,
+  the maintainer's included. `user.name`, `user.email`, `author.name`, avatar
+  `alt` and the like use placeholders (`'Jane Doe'`, `'jane@example.com'`) in
+  tests and stories alike.
+- **One behaviour per `it`, Arrange–Act–Assert, and the title states that
+  behaviour in 80 characters or fewer.** It never names a prop, a mock, a
+  helper or how the code gets there: "labels the region with the carousel
+  title", not "composes the region label from the carousel.regionLabel Voice
+  key rather than passing the title straight through". A title that needs
+  "rather than" or "instead of" is arguing with an implementation nobody
+  wrote. Shorten long existing titles when the file is touched, never in a
+  sweep.
+- **Suite naming — never a hand-written string when a symbol names the
+  suite.** Vitest takes the label from the reference's `.name`, so a rename
+  follows and a deletion is a compile error.
 
   | the suite targets                            | form                                    |
   | -------------------------------------------- | --------------------------------------- |
   | a **component**                              | ``describe(`<${Component.name}/>`, …)`` |
   | anything else (function, hook, class, const) | `describe(theSymbol, …)`                |
 
-  A string is correct only when no single symbol names the suite — a registry,
-  a route module, or a group of related behaviours.
-
-  **A component takes the JSX-style template literal — never the bare symbol.**
-  This is the rule most often got wrong, because the bare-symbol form looks
-  like it already satisfies "pass the symbol, not a string". It does not. The
-  two forms are not interchangeable, and a bare symbol on a component is a
-  defect to fix, not a legacy string awaiting migration.
-
   ```tsx
-  // ✅ a component — JSX-style template literal
-  describe(`<${PostShare.name}/>`, () => {
-    it('renders the share links', () => {
-      /* … */
-    });
-  });
-
-  // ❌ describe(PostShare, () => { … })     — bare symbol; components take the JSX form
-  // ❌ describe('PostShare', () => { … })   — string drifts on rename
+  // ✅ a component: JSX-style, no space before the slash
+  describe(`<${PostShare.name}/>`, () => {});
+  // ✅ anything else: the symbol itself
+  describe(objectKeys, () => {});
+  // ❌ describe(PostShare, …)   — a bare symbol on a component is a defect
+  // ❌ describe('PostShare', …) — a string drifts on rename
   ```
 
-  ```ts
-  // ✅ a plain function — the symbol itself
-  import { objectKeys } from './objects';
+  A string is right only when no single symbol names the suite — a registry,
+  a route module, a group of behaviours. Existing string titles migrate when
+  the file is touched, never in a mass rename; a bare symbol on a component
+  is fixed whenever the file is touched and never written new.
 
-  describe(objectKeys, () => {
-    it("returns the object's keys", () => {
-      /* … */
-    });
-  });
+- **Deterministic:** no real dates, network or randomness — inject or freeze.
+- **A bugfix gets a regression test that fails before the fix**, unless it is
+  a pure styling fix with no behavioural surface, which gets
+  `no-tests-needed` instead of a class assertion.
 
-  // ❌ describe('objectKeys', () => { … })  — string drifts on rename
-  ```
+## Rendering and arrangement
 
-  Match the component form's spacing exactly — `<${X.name}/>`, no space before
-  the slash — so suite labels stay uniform in the test output.
+- **Render through the workspace's `testing/custom-render` — never RTL's own
+  `render`.** The wrapper mounts the app's providers and re-exports the RTL
+  surface (`screen`, `within`, `fireEvent`, …), so a test imports everything
+  from it; its re-exported `render` still skips the providers.
+  `customRender(Component, defaultProps)` returns `setup(overrides?)`, with
+  props inferred (`NoInfer`) — no type argument.
 
-  Existing **string** titles migrate opportunistically when a test is touched;
-  no mass rename. A **bare symbol on a component** is different: fix it
-  whenever you touch that file, and never write a new one.
+  | wrapper                           | exports                                                                         | providers                                                           |
+  | --------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+  | `@blog/ui/testing/custom-render`  | `customRender`, `renderElement`                                                 | passthrough — `@blog/ui` is prop-driven                             |
+  | `@web/testing/custom-render`      | `customRender`, `customRenderAsync`, `customRenderServerAsync`, `renderElement` | the `[tenant]/[locale]/layout.tsx` stack (`@web/testing/providers`) |
+  | `@platform/testing/custom-render` | `customRender`, `customRenderAsync`, `renderWithIntl`, `renderHookWithIntl`     | `NextIntlClientProvider`, `ToastProvider`, `UnsavedChangesProvider` |
 
-- Prefer semantic queries (`getByRole`, `getByText`, `getByLabelText`) over
-  `getByTestId`. Use `getByTestId` when a semantic query would be ambiguous —
-  this is common in molecule and organism integration tests where the same role
-  appears multiple times (e.g. multiple `<img>` or `<button>` elements).
-  `IWithDataTestId` is on every `@blog/ui` component for exactly this purpose.
-- **Never drop to a raw DOM query** (`container.querySelector`/`querySelectorAll`,
-  `document.querySelector`, or any other direct DOM API) in place of a
-  Testing Library query. If no semantic query reaches an element — typically a
-  purely decorative, empty, roleless element like a blinking-cursor span —
-  add a **fixed, hardcoded `data-testid`** directly on that element in the
-  component and query it with `getByTestId`/`queryByTestId`:
-
-  ```tsx
-  // ✅ correct — element has no role/text, so it gets its own fixed test id
-  <span className={cursor()} aria-hidden="true" data-testid="cursor" />;
-
-  // test:
-  expect(screen.getByTestId('cursor')).toHaveAttribute('aria-hidden', 'true');
-
-  // ❌ wrong — raw DOM query as an escape hatch
-  expect(container.querySelector('[aria-hidden="true"]:empty')).toBeTruthy();
-  ```
-
-  (This fixed `data-testid` differs from the consumer-supplied
-  `IWithDataTestId`/`dataTestId` prop — that one is for the component's own
-  root; this is a literal on a roleless internal element.)
-
-  **Mostly lint, and review for the rest.** `testing-library/no-container`,
-  `testing-library/no-node-access` and `testing-library/prefer-screen-queries`
-  are `error` in every `*.test.{ts,tsx}` (`configs/eslint/base.js`), so a
-  raw query, a bare node walk (`el.parentElement`, `container.children`,
-  `.firstChild`) or `const { getByRole } = render(…)` instead of
-  `screen.getByRole` fails `pnpm lint`. **A chained one does not:**
-  `container.children[0]`, `container.firstChild.textContent` and
-  `el.parentElement.id` all pass, because `no-node-access` skips a property
-  access that is itself the object of another one and the outer property is
-  not a node property. That is not a licence to chain — it is the same
-  banned walk, caught by the reviewer's mechanical scan
-  (`code-review-practices` §0) instead of by lint. The one legitimate
-  `eslint-disable-next-line testing-library/no-node-access`
-  is a structural-layout claim with no semantic handle (an image being a
-  direct child of its frame); it goes on that single line, with the reason
-  in the `it` title, not in a comment.
-
-- **`.toBeVisible()` for positive render assertions**, not
-  `.toBeInTheDocument()` — the latter is valid only with `.not`, to assert
-  absence.
-- **No dedicated `dataTestId` test** — a test that queries by a missing test id
-  already fails; an explicit assertion adds nothing.
-- **Render component tests through the `customRender` factory from the package's
-  `testing/custom-render` wrapper — never `render` from `@testing-library/react`
-  directly.** `customRender(Component, defaultProps)` binds a component to its
-  default props and returns a provider-wrapped `setup(overrides?)` renderer; the
-  wrapper also re-exports the full RTL surface (`screen`/`fireEvent`/…) so a test
-  imports everything from one module. Props are inferred from the component (via
-  `NoInfer`) — no type argument at the call site.
-  - `@blog/ui/testing/custom-render` — `customRender` + `renderElement`; the
-    provider wrapper is a passthrough (`@blog/ui` is pure/prop-driven).
-  - `@web/testing/custom-render` — `customRender`, `customRenderAsync`, and
-    `renderElement`; mounts `NextIntlClientProvider` (matching `[locale]/layout.tsx`).
-
-  Define `setup` once per file, then:
-  - **Sync component + props** → `const setup = customRender(Component, {…});`
-  - **Async server/page component** (called as `await Page({…})`) →
-    `const setup = customRenderAsync(Page, {…});` and `await setup(…)` (also
-    supports `await expect(setup({…})).rejects.toThrow(…)` for pages that throw).
-  - **Ad-hoc JSX / not one component+props** (compound children, polymorphic `as`
-    overrides, a pre-built element) → `renderElement(<…>)`.
-
-  ```tsx
-  import { customRender, screen } from '@blog/ui/testing/custom-render';
-
-  const setup = customRender(PostMeta, { author, publishedAt, formattedDate });
-
-  it('shows reading time when provided', () => {
-    setup({ readingTimeMinutes: 5 }); // override one prop; defaults kept
-    expect(screen.getByText('5 min read')).toBeVisible();
-  });
-
-  // ❌ never RTL's render directly: import { render } from '@testing-library/react';
-  ```
+  Bind `setup` once per file at module level:
+  - **Sync component** → `customRender(Component, {…})`.
+  - **Async Server Component or page** (`await Page({…})`) →
+    `customRenderAsync(Page, {…})`, then `await setup(…)` — or
+    `await expect(setup({…})).rejects.toThrow(…)` for a page that throws. In
+    `apps/web`, a tree that nests further async Server Components needs
+    `customRenderServerAsync`.
+  - **Ad-hoc JSX** (compound children, a polymorphic `as`, a pre-built
+    element) → `renderElement(<…>)`, or `renderWithIntl(<…>)` in
+    `apps/platform`.
+  - **A platform hook that reads its providers** → `renderHookWithIntl`.
+  - **A platform component that reads `useSettingsFormState()`** →
+    `customRenderInSettingsForm` (`@platform/testing/render-in-settings-form`,
+    which wraps `SettingsFormProvider`) — never a stand-in provider written
+    for one test file.
 
 - **Repeated arrangement goes in `beforeEach` — mandatory.** When two or more
-  `it`s in a `describe` open with the same line, that line moves into the
-  `describe`'s `beforeEach`: a uniform `setup()` render, `userEvent.setup()`,
-  a fake's default (`vi.mocked(fn).mockResolvedValue(…)`), a fixture build,
-  fake timers (`vi.useFakeTimers()` / `vi.setSystemTime(…)`). A value the
-  cases read (`user`, a fixture) is a `let` declared in the `describe` and
-  assigned in `beforeEach`. Each `it` keeps only what makes it different — an
-  inline `setup({ overrides })` stays in the `it`, because different props are
-  not repeated arrangement; that is the factory's purpose. Never pair a
-  `beforeEach` render with an inline one in the same `describe` (it
-  double-renders); a genuinely different render goes in its own `describe`.
-  Anything `beforeEach` changes globally (fake timers, a stubbed global) is
-  undone in `afterEach`. Arrangement duplicated across `it`s is a blocking
-  review finding. (Testing Library auto-cleans between tests; drive small
-  variations through the shared render where you can — e.g. an outside click
-  via `fireEvent.mouseDown(document.body)`.)
+  `it`s in a `describe` open with the same line — a uniform `setup()`,
+  `userEvent.setup()`, a fake's override, a fixture build, fake timers — that
+  line moves into the `describe`'s `beforeEach`. A value the cases read
+  (`user`, a fixture) is a `let` in the `describe`, assigned in `beforeEach`;
+  anything it changes globally (fake timers, a stubbed global) is undone in
+  `afterEach`. Arrangement that repeats its shape but varies per case is one
+  named helper (`setup()`, `renderX()`), never copy-pasted. Each `it` keeps
+  only what differs: an inline `setup({ overrides })` is not repetition —
+  that is the factory's purpose. Never pair a `beforeEach` render with an
+  inline one in the same `describe` (it double-renders); a genuinely
+  different render gets its own `describe`, and a small variation is driven
+  through the shared render where possible (an outside click is
+  `fireEvent.mouseDown(document.body)`). **Blocking in review:** an arrangement line
+  duplicated across `it`s, and the same `render(<X …/>)` prop bag three or
+  more times in one file.
 
   ```tsx
-  // ✅ uniform props → beforeEach
   const setup = customRender(PostShare, defaultProps);
+
   describe(`<${PostShare.name}/>`, () => {
     beforeEach(() => {
       setup();
     });
+
     it('is closed by default', () => {
-      expect(screen.getByRole('button')).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'Share' })).toHaveAttribute(
         'aria-expanded',
         'false',
       );
     });
   });
-
-  // ✅ varying props → inline setup({…}) per it (no beforeEach)
-  const setup = customRender(Eyebrow, { children: 'Featured Post' });
-  it('renders as a link when href is set', () => {
-    setup({ href: '/category/x', children: 'X' });
-    expect(screen.getByRole('link', { name: 'X' })).toHaveAttribute(
-      'href',
-      '/category/x',
-    );
-  });
   ```
-
-- Use `vi.fn()` / `vi.mock()` for edges only — see "What to fake".
-- Deterministic: no real dates/network/random. Inject or freeze.
-- A bug fix gets a regression test that fails before the fix — **unless** it's
-  a pure styling fix (borders/spacing/tokens) with no behavioural surface, which
-  gets the `no-tests-needed` label instead of a class assertion.
-
-## What to fake
-
-**Fake the edges of the app, never our own components.** An edge is code that
-reaches outside the process or the request: `@blog/service`, `@blog/db` (or
-its `client` inside `packages/db`), the Sanity query runner, tenant and auth
-resolution, `env`, the logger, each app's `i18n/navigation`, Server Action
-modules (the `'use server'` files under each app's `src/server/`),
-`next/cache`, `next/navigation`, `next-auth` and `next-auth/react`.
-Everything between the edges — our components, `@blog/ui`, our helpers, our
-context providers — renders for real, so the test sees what the user sees.
-The rules below hold in `apps/web` and `apps/platform` alike.
-
-- `SmartLink` is ours: fake `@web/i18n/navigation` under it, never
-  `SmartLink` itself.
-- A context provider is ours too. A component that calls `useToast` renders
-  inside the real `ToastProvider`, and the test asserts the toast text on
-  screen. Never fake the hook.
-- Check the app's `src/vitest-setup.ts` before writing a `vi.mock`. Both apps
-  fake `next/navigation`, `next-intl/server` and `next/font/google` there
-  for every test, so a test never mocks those again.
-
-- **Never `vi.mock` an `@web/*`, `@platform/*` or `@blog/ui` component to test
-  its parent.** Render the real child and query what it puts on screen. A
-  child that won't render in jsdom (a carousel library needing
-  `IntersectionObserver`, `matchMedia`) gets that browser API stubbed once in
-  the workspace's vitest setup file, not the child faked per test file.
-- **Never read a fake's arguments to assert what a child receives.**
-  `vi.mocked(Carousel).mock.calls.at(-1)[0]` followed by calling
-  `renderItem` by hand tests the wiring, not the result. Render, then query.
-  Checking an edge was called (`expect(getCta).toHaveBeenCalledWith('cta-1',
-tenant)`) is fine: that call is the component's contract with the outside.
-- **Two exceptions, both thin dispatchers whose children have their own
-  tests.**
-  - **A module renderer** (`apps/web` only). A `*-module-renderer` picks one
-    of many async modules per `_type`; its test may stub each module to
-    render its id, because rendering them for real would pull in every
-    module's fakes. The stub proves the dispatch.
-  - **A route file** (`src/app/**/page.tsx`, `not-found.tsx`, in either
-    app). Its test may stub the page component it renders and assert the
-    route params and props it hands over, because the page component's own
-    test covers what it renders.
-- **An edge fake is written once, next to the module it replaces.** Put the
-  default fake in a `__mocks__/` directory beside the module's file
-  (`server/tenant/tenant-base-url/__mocks__/tenant-base-url.ts` for
-  `server/tenant/tenant-base-url/tenant-base-url.ts`); a test then writes
-  `vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url')` with no factory and
-  Vitest picks it up, alias included. Platform is the same:
-  `server/auth/__mocks__/auth.ts` serves every
-  `vi.mock('@platform/server/auth/auth')`. Export each fake function as a
-  `vi.fn()` with a sensible default, and let a test change it with
-  `vi.mocked(fn).mockResolvedValueOnce(…)`. Use the `Once` form, or reset in
-  `beforeEach`, because the preset's `clearMocks` clears calls but keeps an
-  implementation a previous test set. An inline factory is only for a fake
-  that exists in one file.
 
 ## Writing a component test
 
 The shape of every `@blog/ui`, `apps/web` and `apps/platform` component test.
-A test proves what the user sees and does through the accessibility tree;
-it never reads state, props, handlers or markup shape.
+It proves what the user sees and does through the accessibility tree, and
+never reads state, props, handlers or markup shape.
 
-- **Query ladder — decided 2026-09-22, in this order, no skipping down:**
-  1. `screen.getByRole(role, { name })` for anything that has a role — a
-     button, link, heading, textbox, list, img, dialog. Always with the
-     accessible name; a role query without a name is the second-worst query
-     on this list. A button is `getByRole('button', { name: 'Save' })`,
-     never `getByText('Save')` — `getByText` on an interactive element hides
-     a missing accessible name, and that is the review finding.
-  2. `screen.getByText` for static copy that has no role — a paragraph, a
+- **Query ladder — in this order, no skipping down:**
+  1. `screen.getByRole(role, { name })` for anything with a role — button,
+     link, heading, textbox, list, img, dialog — always with the accessible
+     name. A button is `getByRole('button', { name: 'Save' })`, never
+     `getByText('Save')`, which hides a missing accessible name.
+  2. `screen.getByText` for static copy with no role — a paragraph, a
      caption, a `<dd>`.
-  3. `screen.getByTestId` last, only when neither reaches the element, via a
-     fixed `data-testid` literal on the roleless element in the component
-     (`hero-media`). A test that needs a test id for a button or a link is
-     reporting a markup bug (`react-component-practices` → "Accessible by
-     construction"), not a missing id.
+  3. `screen.getByTestId` last, when neither reaches the element: a fixed
+     `data-testid` literal on the roleless element in the component
+     (`hero-media`), or the root `dataTestId` prop (`IWithDataTestId`) when
+     several same-role elements cannot be told apart. A test that needs a
+     test id for a button or a link is reporting a markup bug
+     (`react-component-practices` → "Accessible by construction").
 
-  Everything goes through `screen` (or `within(element)` to scope);
-  `container`, `baseElement`, a node walk and queries destructured from
-  `render()` are lint errors — see "Never drop to a raw DOM query".
+  Scope with `within(element)`. No test asserts that a `dataTestId` is
+  applied — querying by it already fails when it is missing.
 
-- **Presence is `.toBeVisible()`, absence is `screen.queryBy*` +
+- **Never drop to a raw DOM query.** `container.querySelector`,
+  `document.querySelector`, a node walk (`el.parentElement`,
+  `container.children`, `.firstChild`) and queries destructured from
+  `render()` are replaced by a `screen` query (or `within(element)` to
+  scope); an element nothing reaches gets a fixed `data-testid` in the
+  component:
+
+  ```tsx
+  <span className={cursor()} aria-hidden="true" data-testid="cursor" />;
+  expect(screen.getByTestId('cursor')).toHaveAttribute('aria-hidden', 'true'); // ✅
+  expect(container.querySelector('[aria-hidden="true"]:empty')).toBeTruthy(); // ❌
+  ```
+
+  `testing-library/no-container`, `no-node-access` and
+  `prefer-screen-queries` are errors in every `*.test.{ts,tsx}`
+  (`configs/eslint/base.js`). A **chained** walk (`container.children[0]`,
+  `el.parentElement.id`) slips past `no-node-access`; it is the same banned
+  walk, caught by `code-review-practices` §0. The one legitimate
+  `eslint-disable-next-line testing-library/no-node-access` is a
+  structural-layout claim with no semantic handle (an image being a direct
+  child of its frame), on that single line, with the reason in the `it`
+  title.
+
+- **Presence is `.toBeVisible()`; absence is `screen.queryBy*` +
   `.not.toBeInTheDocument()`.** Never `.toBeInTheDocument()` for presence
-  (hidden still passes) and never `getBy*` for absence (it throws before the
-  matcher runs).
-- **Interaction is `userEvent`, created in `beforeEach`.** Assign
-  `user = userEvent.setup()` there (see "Repeated arrangement goes in
-  `beforeEach`"), then `await user.click(…)`, `user.type(…)`,
-  `user.keyboard('{Escape}')` — it dispatches the whole event sequence a
-  real user produces. `fireEvent` is reserved for an event `userEvent` cannot
-  produce, such as an outside `mousedown` on `document.body`; a `fireEvent.click`
-  is a finding.
-- **Async is `findBy*` or `waitFor`, never a manual `act` or a `setTimeout`.**
-  `await screen.findByRole(…)` for something that appears; `waitFor` around
-  the expectation for a state that settles. An `act` warning is a missing `await`
-  on a `userEvent` call or a `findBy`, not a reason to wrap in `act`.
-- **One behaviour per `it`, arranged by a module-level `setup`.** `setup` is
-  the workspace's `customRender(Component, defaultProps)` bound once at the
-  top of the file; each case calls `setup(overrides)` and never keeps its
-  return value — there is no `container` to reach into. Sibling cases that
-  differ only in input and expectation are `it.each`. The title states the
-  behaviour and, for a structural claim that needs an `eslint-disable-next-line`,
-  the reason — never a comment.
-- **Assert the observable the prop changes.** A prop that toggles
-  `aria-current`, `disabled`, a rendered element or visible text is tested on
-  that; a prop whose only effect is styling has no test surface — a story and
-  `no-tests-needed` ("What not to test"). Never a snapshot.
+  (hidden still passes), never `getBy*` for absence (it throws first).
+- **Interaction is `userEvent`, set up in `beforeEach`** (`user =
+userEvent.setup()`), then `await user.click(…)`, `user.type(…)`,
+  `user.keyboard('{Escape}')`. `fireEvent` only for an event `userEvent`
+  cannot produce, such as an outside `mousedown` on `document.body`; a
+  `fireEvent.click` is a finding.
+- **Async is `findBy*` or `waitFor`**, never a manual `act` or a
+  `setTimeout`. An `act` warning means a missing `await` on a `userEvent` call
+  or a `findBy`.
+- **Each case calls `setup(overrides)` and discards its return** — there is
+  no `container` to reach into.
+- **Assert the observable the prop changes** — `aria-current`, `disabled`, a
+  rendered element, visible text. A prop whose only effect is styling has no
+  test surface ("What not to test"). Never a snapshot.
 
 ```tsx
 const setup = customRender(SubscribeForm, {
@@ -454,7 +285,7 @@ describe(`<${SubscribeForm.name}/>`, () => {
     expect(onSubscribe).toHaveBeenCalledWith('jane@example.com');
   });
 
-  it('replaces the form with the confirmation once the subscription resolves', async () => {
+  it('replaces the form with the confirmation once subscribed', async () => {
     setup({ onSubscribe: vi.fn().mockResolvedValue(undefined) });
 
     await user.click(screen.getByRole('button', { name: 'Subscribe' }));
@@ -467,95 +298,134 @@ describe(`<${SubscribeForm.name}/>`, () => {
 });
 ```
 
+## What to fake
+
+**Fake the edges of the app, never our own code.** An edge reaches outside
+the process or the request: `@blog/service`, `@blog/db` (its `client` inside
+`packages/db`), the Sanity query runner, tenant and auth resolution, `env`,
+the logger, each app's `i18n/navigation`, Server Action modules (the
+`'use server'` files under `src/server/`), `next/cache`, `next/navigation`,
+`next-auth` and `next-auth/react`. Our components, `@blog/ui`, our helpers
+and our context providers render for real. This holds in both apps.
+
+- `SmartLink` is ours: fake `@web/i18n/navigation` under it, never
+  `SmartLink`. A component calling `useToast` renders inside the real
+  `ToastProvider` and the test asserts the toast on screen; never fake the
+  hook.
+- **Check the app's `src/vitest-setup.ts` before writing a `vi.mock`.** Both
+  apps fake `next/navigation`, `next-intl/server` and `next/font/local` and
+  stub `ResizeObserver` and `matchMedia` there (`apps/web` also
+  `IntersectionObserver`); never mock those again.
+- **Never `vi.mock` an `@web/*`, `@platform/*` or `@blog/ui` component to test
+  its parent.** Render the real child. One that will not render in jsdom gets
+  the missing browser API stubbed once in the workspace's setup file, not the
+  child faked per file.
+- **Never read a fake's arguments to assert what a child receives** —
+  `vi.mocked(Carousel).mock.calls.at(-1)[0]` tests wiring, not the result.
+  Asserting an edge was called (`expect(getCta).toHaveBeenCalledWith('cta-1',
+tenant)`) is fine: that call is the contract with the outside.
+- **Two exceptions, both thin dispatchers whose children have their own
+  tests:**
+  - **A per-page module renderer** (`apps/web`'s `*-module-renderer.tsx`,
+    which maps `_type` to a module and calls `renderModules` from
+    `@web/modules/module-renderer`) may stub each module to render its id —
+    rendering them for real would pull in every module's fakes.
+  - **A route file** (`src/app/**/page.tsx`, `not-found.tsx`, either app) may
+    stub the page component it renders and assert the params and props it
+    hands over.
+- **A shared edge fake lives in `__mocks__/` beside the module it
+  replaces** (`server/tenant/tenant-base-url/__mocks__/tenant-base-url.ts`;
+  `apps/platform`'s `server/auth/__mocks__/auth.ts`). Where one exists, a
+  test writes a bare `vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url')`
+  with no factory and Vitest picks it up, alias included. Export each fake
+  as a `vi.fn()` with a sensible default.
+  - **A `vi.mock` factory byte-identical in three or more files becomes a
+    `__mocks__/` file** in the change that would write the third copy; until
+    then an inline factory is fine. Two are already far past three copies,
+    so the next test that needs one extracts it instead of writing another:
+    db's `@blog/db/client` (`src/__mocks__/client.ts`), and service's
+    `@blog/service/sanity/query/query` — a partial mock, because every loader
+    needs the real `q` builder, so its `__mocks__/query.ts` spreads
+    `vi.importActual(…)` and replaces only `runQuery`; `mockRun`
+    (`@blog/service/testing/mock-run-query`) stays the typed handle.
+  - **Never restate a `__mocks__` default in `beforeEach`** —
+    `mockResolvedValue(DEFAULT_REQUEST_CONTEXT)`, the default auth session.
+    Override only what the case changes.
+  - **Override with the `Once` form, or call `vi.mocked(fn).mockReset()` in
+    `beforeEach`** — it restores the `vi.fn(impl)` default; never re-set the
+    default value. The preset's `clearMocks` clears calls but keeps an
+    implementation a previous test set; `service`, `db`, `auth` and `email`
+    set `mockReset: true`, which does the reset before every test.
+
 ## What not to test
 
-- **Never assert the source back at itself.** A schema's field list,
-  option list, default, fieldset, group, field order, title, icon or registry
+- **Never assert the source back at itself.** A schema's field list, option
+  list, default, fieldset, group, field order, title, icon or registry
   membership; a barrel "exposes X as a function"; an exported constant's
   value; a component's static prop defaults; editor-facing copy — a
-  `description`, a label, a placeholder or any other human sentence pinned to
-  its exact literal
+  `description`, label or placeholder pinned to its literal
   (`expect(displayModeField().description).toBe('Grid lays the posts out in rows. …')`);
   a field helper's default-vs-override precedence, which is `??`, not a
-  contract. **The test: if the expected value is a literal copied out of the
-  file under test, the test restates the source — delete it.** Typegen,
-  `type-check` and the Studio itself already guard the shapes, and copy is
-  reviewed in the diff, so the test protects nothing and fails on every
-  intentional change. If a field having _some_ description matters, assert
-  that it is non-empty; never which words it contains.
+  contract. **If the expected value is a literal copied out of the file under
+  test, delete the test.** Typegen, `type-check` and the Studio guard the
+  shapes and the diff reviews the copy. If a field having _some_ description
+  matters, assert it is non-empty, never its words.
 - **A Studio schema definition gets no test at all.** Everything under
   `packages/studio/src/schema-types/{documents,objects,modules,fields}/` is
-  declaration, and that covers its logic too: `required()`, a min/max
-  limit, a `rule.custom` written inside the schema, a conditional `hidden`,
-  a preview `prepare`, an `initialValue`, a field factory's branches. Each
-  one is read straight back out of the schema, is visible to the editor the
-  moment the Studio loads, and is changed only on purpose — so its test
-  fails on every intentional edit and on nothing else. A schema change ships
-  with `no-tests-needed`. What `packages/studio` does test is code that is
-  not a schema: the extracted cross-document validators in
-  `schema-types/validation/` (they query the dataset and strip drafts, which
-  the Studio does not show you when it breaks), the `structure/`, `inputs/`
-  and `preview/` helpers, `studio-config`, `studio-mount`, and migrations.
-- **Sibling cases use `it.each`, never copied blocks.** Three `it`s that
+  declaration, its logic included: `required()`, a min/max, a `rule.custom`
+  written inside the schema, a conditional `hidden`, a preview `prepare`, an
+  `initialValue`, a field factory's branches. Each is read straight back out
+  of the schema, visible the moment the Studio loads, and changed only on
+  purpose. A schema change ships with `no-tests-needed`; what is testable in
+  the Studio is under "What to test".
+- **Sibling cases use `it.each`, never copied blocks** — three `it`s that
   differ only in an input and an expected value are one table-driven test.
-  A test file that repeats an arrangement it already contains is fixed in
-  the same change, not later; two files that need the same arrangement share
-  a builder in `testing/` (see "Where tests live").
 - **Never assert a class — unconditional or prop-driven, no exceptions.** A
-  Tailwind utility is the source restated: the expected value is a string
-  copied out of the `*-variants.ts` file under test, so the test fails on
-  every restyle (a token swap, `text-center` → `justify-center`, a wrapper
-  `<div>`) and passes on every visual regression that keeps the class name.
-  "The class only appears when the prop is set" does not change that — it is
-  still the variants map read back, and it is the case agents reach for most
-  (`toHaveClass('hover:bg-brand-primary-muted')` gated on `link`). What a
-  prop-driven style _means_ has a semantic observable: `aria-current` for the
-  active item, `aria-disabled`/`disabled` for the disabled control, `role`
-  and the rendered element for a link-vs-article card, visible text for
-  copy. Assert that. When the prop's only effect is styling, the change has
-  no unit-test surface: Storybook covers it and the ticket carries
-  `no-tests-needed`. The forwarded `className` is not an exception either —
-  it is a one-line `cn()` call, and a test for it restates that line.
-  Mechanically enforced: the `no-class-assertions` rule in
-  `configs/eslint/base.js` fails `toHaveClass`, `.className`/`.classList`
-  reads and `class`-attribute assertions in every `*.test.{ts,tsx}`. No
-  baseline remains anywhere — epics #3461 and #3522 drained the last
-  `eslint-suppressions.json` — so a class assertion is a lint failure, not a
-  judgement call.
-- **No comments in a test file — none.** The `describe` and `it` titles are
-  the documentation: a "why this case exists" belongs in the `it` title, a
-  "why this mock" belongs in the helper's name, and a "the other route is
-  covered by the loader's tests" is a title that grew a paragraph. The
-  general comment rule's one-line-gotcha exception does not apply here —
-  a test with a gotcha worth a sentence is a test whose title or fixture
-  is wrong. The reviewer greps every added comment line in `*.test.ts(x)`
-  and each hit is blocking.
-- **No snapshot tests** — they couple tests to markup and break on unrelated changes.
-- **No implementation details** — test what a component does, not how it does it.
-- **No network calls** — always mock the Sanity client and `service` functions.
-- **Never mock our own components** — "What to fake" has the rule and its
-  one exception. A test that can only pass by faking a sibling `@blog/ui`
-  component is usually a composition smell: the web component wraps the pure
-  one instead of being passed into its slot. Fix the structure
-  (`web-component-practices`) and test the real composed tree.
+  Tailwind utility is the source restated: the expected string is copied out
+  of the component's `tv()` definition, so the test fails on every restyle
+  and passes on every visual regression that keeps the class name. "The
+  class only appears when the prop is set" is still the variants map read
+  back (`toHaveClass('hover:bg-brand-primary-muted')` gated on `link` is the
+  case agents reach for most). What a prop-driven style _means_ has a
+  semantic observable — `aria-current`, `aria-disabled`/`disabled`, `role`
+  and the rendered element, visible text; assert that. When the prop's only
+  effect is styling, Storybook covers it and the ticket carries
+  `no-tests-needed`. A forwarded `className` is no exception — it is the
+  `class: className` argument to the component's `tv()` call. The
+  `no-class-assertions` rule (`configs/eslint/base.js`)
+  fails `toHaveClass`, `.className`/`.classList` reads and `class`-attribute
+  assertions in every `*.test.{ts,tsx}`, with no suppression baseline left.
+- **No comments in a test file** other than the `@vitest-environment`
+  docblock ("Per-package setup"). A "why this case exists" belongs in the
+  `it` title, a "why this mock" in the helper's name. The one-line-gotcha
+  exception of the general comment rule does not apply: a test with a gotcha
+  worth a sentence has the wrong title or fixture. Every other added comment
+  line in `*.test.ts(x)` is blocking in review.
+- **No snapshots, no implementation details, no network calls.**
+- **Never mock our own components** ("What to fake"). A test that only
+  passes by faking a sibling `@blog/ui` component usually means the web
+  component wraps the pure one instead of filling its slot — fix the
+  structure (`web-component-practices`) and test the real tree.
 
 ## Coverage strategy
 
-Think pyramid: **many** fast, focused unit tests (`ui`/`service`/migrations),
-**few** heavier route/integration tests. Spend coverage on what matters —
-**business-critical paths, edge cases (empty/null/limits), error & empty
-handling, and data integrity/idempotency**. **Skip** trivial getters, framework
-code, one-off scripts, and declarative config (see "What not to test"). When adding a feature, do a quick **gap scan**: does
-each new critical path _and_ each error/empty branch have a test? Note gaps
-rather than leaving them silent.
+Many fast unit tests (`ui`, `service`, migrations), few heavier route tests.
+Spend coverage on business-critical paths, edge cases (empty, null, limits),
+error and empty handling, and data integrity/idempotency; skip trivial
+getters, framework code, one-off scripts and declarative config. When adding
+a feature, gap-scan: does each new critical path and each error/empty branch
+have a test? Report gaps rather than leaving them silent.
 
 ## Checklist
 
-- [ ] Test co-located and named `*.test.ts(x)`.
-- [ ] Migrations: transform-correctness + idempotency tested.
-- [ ] Right environment (jsdom for components, node for service).
-- [ ] Only edges faked, shared fakes from `__mocks__/`; no network, no real time.
-- [ ] Queried by role/text; asserts behaviour, not implementation detail.
+- [ ] Co-located `*.test.ts(x)`; a test that renders JSX is `.tsx`; any
+      other environment need is a `@vitest-environment` docblock.
+- [ ] Rendered through the workspace's `testing/custom-render`.
+- [ ] Only edges faked; shared fakes from `__mocks__/`, defaults not restated;
+      no network, no real time.
+- [ ] Fixtures from `testing/` builders, no duplicated literals.
+- [ ] Queried by role, then text; asserts behaviour, not implementation.
 - [ ] Every `it` title is behaviour, 80 characters or fewer.
-- [ ] No arrangement line repeated across `it`s — it lives in `beforeEach`.
+- [ ] No arrangement repeated across `it`s; no prop bag rendered 3+ times.
+- [ ] Migrations: transform correctness + idempotency.
 - [ ] `pnpm --filter <pkg> test` passes.

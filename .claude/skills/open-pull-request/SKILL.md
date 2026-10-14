@@ -8,539 +8,305 @@ description: >-
 
 # Open a pull request (branch → work → PR)
 
-The delivery loop for this repo. `develop-feature` says how to _build_ a change;
-this skill says how to _ship it for review_.
+`develop-feature` says how to _build_ a change; this skill says how to _ship it
+for review_. `CLAUDE.md` "Delivery gate sequence" is the summary; the
+mechanics are here.
+
+`<n>` is always the **issue** number; `<pr>` is the PR number `gh pr create`
+printed. Issues and PRs share one counter, so the two are almost never equal.
 
 ## Scope: prefer per-layer PRs
 
-Split a multi-layer feature into separate PRs per layer (`config → studio →
-service → ui → web` when config changes are involved, otherwise `studio →
-service → ui → web`; dependency order) — smaller diffs review faster.
-**Ship them one at a time: each layer's PR runs the full gate sequence
-below, including the merge, before the next layer's work starts**, on a
-branch cut from the `main` that now contains it. Nothing below the current
-layer is open, nothing above it exists yet. **Split only when each layer's
-PR merges to `main` green on its own** (typically additive changes).
-Keep it a single PR when a partial merge breaks the build — e.g. renaming a
-shared `_type`/generated type that downstream references reds `type-check` until
-all layers land. One concern per PR still holds either way. Rule of record:
-`CLAUDE.md` → "One layer at a time — merged before the next starts".
+One PR per layer, in dependency order, each merged before the next layer's
+work starts on a branch cut from the `main` that contains it. Keep it one PR
+only when a partial merge would red `main` (e.g. a shared `_type` or generated
+type rename). Rules of record: `CLAUDE.md` "Split by workspace, always" and
+"One layer at a time — merged before the next starts".
+
+In a split, **only the completing PR carries `Closes #<n>`** — the wording
+rule and the auto-close traps are under "PR body template" below.
 
 ### Stacked PRs — only on the user's say-so, then `gh stack`
 
-A stack is the user's call, never the orchestrator's: the default above is
-sequential, and "the next layer is ready" or "the wait is long" does not
-change it. When the user says to stack, the `github/gh-stack` extension is
-installed (`gh extension list` → `gh stack`). Use it rather than hand-rolling
-bases with `gh pr create --base <branch>`:
+A stack is the user's call, never the orchestrator's. Viability (the bottom PR
+green on `main` alone, or expand/contract, or one PR) is `CLAUDE.md` "Stacked
+PRs". Independent pieces never stack: each gets its own branch off `main`.
+Use the installed `github/gh-stack` extension, never hand-rolled
+`gh pr create --base <branch>`:
 
 ```bash
 gh stack init                 # start a stack targeting main
 gh stack init b1 b2 b3        # or adopt existing branches as a stack
 gh stack add <branch>         # add a branch on top of the current stack
-gh stack submit               # push every branch, create/update all PRs
-gh stack sync                 # restack after a base merges upstream
 gh stack view                 # see the current stack
+gh stack push                 # force-push every stack branch        — Gate 3
+gh stack submit --open        # push all, create/update the PRs      — Gates 3 + 4
+gh stack sync                 # fetch, restack, force-push all       — Gate 3
 ```
 
-`submit` and `sync` are the reason to use it: `sync` restacks automatically
-when a lower PR merges, which is the step most likely to be forgotten
-by hand.
+- **`push`, `sync` and `submit` all push** every stack branch with
+  `--force-with-lease`, so each run needs its own fresh Gate 3 approval;
+  `submit` also opens PRs, so it needs Gate 4 too. Run `sync` after every
+  lower PR merges — the step most often forgotten — but ask first.
+- **Never run `gh stack merge`** — merging is the human's.
+- **`submit` from an agent's shell is non-interactive**: it skips its editor,
+  uses auto-generated titles and no body, and opens drafts unless `--open`
+  (or `gh pr ready <pr>` afterwards). Then run
+  `gh pr edit <pr> --title "…" --body "…"` on each new PR per "PR body
+  template", and Gate 5 for each.
 
-**Stacking relaxes the "split only when each layer merges green alone"
-constraint above — for every PR except the bottom one.** That rule exists
-because a partial merge to `main` can red the build. A stacked PR targets its
-predecessor's branch, not `main`, so intermediate states never land on `main`.
+**Every stacked PR runs the full required suite** because the six workflows
+behind the required checks — `ci.yml`, `knip.yml`, `dependency-review.yml`,
+`zizmor.yml`, `actionlint.yml`, `hooks.yml` — declare a bare `pull_request:`
+trigger. Never add a `branches:` filter to one: a required check that never
+starts leaves the PR `BLOCKED` forever instead of failing it (`ci.yml`'s
+header). The check list: `docs/context/ci-automation.md`.
 
-**But the bottom PR targets `main`, and inherits `main`'s ruleset in full.**
-Required `Type-check` and `Build` apply to it exactly as they would to an
-unstacked PR. If the first layer cannot compile alone, that PR is
-permanently `BLOCKED` — not red, blocked — and because nothing above it can
-merge until it does, the whole stack is dead. The align-hoist stack
-(#2689 → #2690 → #2691) hit this: the studio PR removed `sectionHeader.align`
-while `packages/service` still selected it, so `Type-check` could never pass
-there, and the three PRs had to be collapsed into one after the fact.
+**Collapsing a stack after the fact:**
 
-**Before stacking, ask whether the bottom PR is green on its own.** If it
-isn't, either keep the change as one PR, or restructure it expand/contract so
-that it is: the bottom PR adds the new field without removing the old one,
-the PRs above migrate each consumer, and a final PR deletes the old field.
-Each of those is green alone, so the stack is real rather than notional.
-
-**If a stack has to be collapsed after the fact,** retarget the _top_ PR
-(which already contains every commit) to `main`, close the others as
-superseded, and move the `Closes #<n>` keywords for every issue in the stack
-onto the survivor. Note that changing a base fires no workflow: see the
-CodeQL note below.
-
-**A stacked PR gets the full required suite, and the triggers must stay that
-way.** The six workflows behind the eleven required checks — `ci.yml`
-(Type-check, Lint, Test, Build, Typegen, Migrations) plus `knip.yml`,
-`dependency-review.yml`, `zizmor.yml`, `actionlint.yml` and `hooks.yml`
-(one each) — declare a bare `pull_request:` trigger with no
-`branches:` filter, so they run whatever branch the PR targets.
-
-**Do not re-add a `branches:` filter to any of them.** Each file scopes its
-own trigger, so narrowing one silently drops that workflow's checks from every
-PR based on something other than `main`. Because these are _required_ status
-checks, a workflow that never starts leaves the PR on `BLOCKED` waiting for a
-check that will never arrive — it does not fail, it hangs. This is the same
-deadlock `ci.yml`'s header comment describes when it explains why the workflow
-carries no `paths-ignore`; a base-branch filter reaches it through a different
-door. Both filters are absent on purpose, and each file's header says so.
-
-**CodeQL is the exception to that, and it bites when collapsing a stack.**
-CodeQL runs through GitHub's _default setup_ — there is no `codeql.yml` in
-`.github/workflows/` — and default setup only analyzes PRs targeting the
-default branch. So a PR built on a stack branch has none of its three
-required contexts (`CodeQL`, `Analyze (actions)`,
-`Analyze (javascript-typescript)`), and retargeting it to `main` does not
-create them: a base change triggers no workflow run, and neither does closing
-and reopening the PR. Only a `synchronize` — a push to the head branch —
-does. `gh pr update-branch <n>` is the cleanest trigger, since it merges
-`main` in and clears staleness at the same time.
-
-(CodeQL is not among the eleven: it runs from GitHub's default code-scanning
-setup on a schedule, with no workflow file in `.github/workflows/`, and is
-enforced by a separate `code_scanning` ruleset rule rather than as a required
-status check.)
-
-**When NOT to stack.** If the pieces are genuinely independent — no compile-time
-dependency between them — give each its own branch off `main` and skip the
-stack entirely. Independent PRs merge in any order, get CI for free, and cost
-no restacking. Stack only when a later PR genuinely will not compile without an
-earlier one.
-
-**Only the completing PR includes `Closes #<n>`.** In a per-layer split, every
-earlier layer's PR body must reference the tracked issue without an adjacent
-closing keyword — see the "PR body template" section below for the exact
-wording rule and an example.
-
-**Auto-close-keyword gotcha — GitHub's substring match ignores tense, and it
-scans commit messages too, not just PR bodies.** GitHub auto-closes an issue
-whenever `close(s)?|fix(es)?|resolve(s)? #N` appears _anywhere_ in the PR
-body, even inside prose describing a _future_ action, not just a directive
-line. A partial-implementation PR that says "...confirm this live, then
-close #N" gets that issue auto-closed on merge regardless — the keyword and
-number are adjacent, so GitHub's regex fires. If a PR body must explain that
-it does **not** close its tracked issue, never let a closing keyword sit
-directly next to the issue reference anywhere in the body: rephrase with
-intervening words so the two aren't adjacent — e.g. "revisit and close issue
-#N later" breaks the adjacency; "then close #N" does not.
-
-**This applies equally to the squash-merge commit message** — a separate
-surface GitHub also scans, which can diverge from the reviewed PR body at
-merge time (GitHub composes the squash message from the PR title + body by
-default, but it can be hand-edited at merge time, and a direct `git commit`
-message on a squashed branch can differ entirely from what was in the PR
-body). Confirmed for real: a PR whose _body_ correctly avoided the adjacent
-form still triggered a real auto-close on issue #399 a third time (2026-07)
-because its **commit message** quoted the original incident narrative in a
-form that put a closing keyword directly next to that real issue number,
-which GitHub's scanner parsed the same way it parses PR bodies. When writing
-about this gotcha itself — in a PR body, an issue, docs, _or_ a commit
-message — never let a closing keyword land directly next to a **real** issue
-number, including when illustrating the pattern: use a placeholder like
-`#N` for examples (as this section does throughout), and wherever a genuine
-historical reference to a real issue number is unavoidable, always keep an
-intervening word between the keyword and the number.
-
-**If this bites anyway: reopening an issue does not revert board Status.**
-This happened for real with issue #399 — merging a PR whose body put a
-closing keyword directly next to that issue's number auto-closed it, the
-board's "Pull request merged" workflow set Status to Done, the issue was
-manually reopened, but Status stayed on Done. ~2 hours later the board's
-"Auto-close issue" workflow (fires on Status → Done) closed it again, with
-no PR/commit reference at all. A **third** auto-close later came from a
-squash-merge commit message (see above), not a PR body at all. If a similar
-incident recurs, check the board Status field alongside open/closed
-state — reopening only fixes one of the two — and check both the PR body
-and its actual merge commit message, not just the former.
+1. Retarget the _top_ PR, which already holds every commit:
+   `gh pr edit <top> --base main`.
+2. Close the others as superseded, and move every stacked issue's
+   `Closes #<n>` onto the survivor.
+3. Ask to push (Gate 3), then run `gh pr update-branch <top>`. CodeQL's
+   default setup analyzes only PRs into `main`, so the retargeted PR has none
+   of `CodeQL`, `Analyze (actions)` or `Analyze (javascript-typescript)`, and
+   a base change or close/reopen triggers nothing. Only a push to the head
+   branch does; `update-branch` is that push, and merges `main` in too.
 
 ## ABSOLUTE RULES — never violate
 
-- **Never push without explicit user approval for that specific push.**
-  Prior push approvals — on other branches, or for an earlier push on this
-  same branch — do not carry over. This includes a follow-up push that fixes
-  a CI failure found at Gate 5a: ask fresh, every time.
-- **Never create a PR without explicit user approval.**
-  Ask separately, after the push is confirmed.
-- **Committing needs no approval — commit the reviewed work freely.**
-  Committing is local and reversible; the human gates are push and PR.
-- **Never push (Gate 3) before the `reviewer` subagent has returned
-  `APPROVE` on the final diff.** New changes after an APPROVE invalidate it —
-  re-review before pushing again — and a merge from `origin/main` is a new
-  change: it re-runs verify and review the same as an edit would. A **docs-only** diff (nothing outside
-  `docs/**`, `SPEC.md`, `README.md`, `CLAUDE.md`, `.claude/**/*.md`) is the
-  one exception: it takes the inline identifier check `CLAUDE.md`'s delivery
-  gate step 4 describes instead of a `reviewer` dispatch. A `.sh`/`.js` file
-  under `.claude/` (a hook, a guard script) is not covered by this exemption
-  — it is executable tooling, not prose, and still requires the `reviewer`
-  dispatch plus the local `shellcheck`/guard-test pass in `develop-feature`
-  §5.
-- **Never merge.** Merging is the human's call only.
-- **Never deploy.** `sanity deploy` and Vercel deploys are human-run only.
-- **Never set `--assignee` or `--reviewer` on the PR.** The repo owner cannot
-  approve their own PR if they're the assignee. If a second collaborator exists,
-  use `--reviewer <them>`.
-- **Never push or create a PR directly to `main`.**
+- **Never push without explicit approval for that specific push.** No earlier
+  approval carries over — not another branch's, not an earlier push on this
+  one, not the original push before a Gate 5a CI fix. A `gh stack` command
+  that pushes is a push.
+- **Never create a PR without explicit approval**, asked separately after the
+  push succeeds.
+- **Committing needs no approval** — it is local and reversible.
+- **Never push before review passes on the final diff**: every dispatched
+  reviewer's `APPROVE`/`PASS` (`develop-feature` §6), or for a docs-only diff
+  the inline identifier check (`CLAUDE.md` delivery gate step 4). Any later
+  change invalidates it, a merge from `origin/main` included.
+- **Never merge, never deploy.** Both are the human's.
+- **Never set `--assignee` or `--reviewer` on the PR** — an owner assigned to
+  their own PR cannot approve it. With a second collaborator,
+  `--reviewer <them>` is fine.
+- **Never push to `main` directly or open a PR from it.**
 
-## The strict gate sequence
+## The gate sequence
 
-Work through these gates in order. **Committing is free; stop at the push and PR gates and wait for the user.**
+Committing is free; stop at Gates 3 and 4 and wait for the user.
 
-### Gate 0 — Pull the issue and set In Progress
+### Gate 0 — Set In Progress, then branch
 
-1. Dispatch **`board-keeper`** **synchronously** (this blocks the branch
-   checkout below, so it's a documented exception to the background-by-default
-   rule alongside Gate 7 — see `CLAUDE.md`'s "Dispatch subagents in the
-   background by default" section) with the
-   trigger `"starting work on #<n>"`. In one dispatch it: looks up the item ID
-   (memory first, then the API), sets the issue's status → In Progress with
-   re-verify, and — if the issue has a parent — checks the parent's board
-   status too and promotes it to In Progress if it's still Todo/blank, also
-   re-verified. See `board-keeper.md`'s `"starting work on #<n>"` trigger for
-   the exact steps. **Starting several sibling sub-issues in parallel (e.g.
-   about to dispatch multiple layer subagents in the same turn) is one
-   batched dispatch listing every issue number, not one `board-keeper`
-   dispatch per issue** — e.g. `"starting work on #86, #87, #88, #89"`.
-
-   This single dispatch replaces two `gh api graphql` calls this step used to
-   run inline (added in commit `be0c1fc`, then regressed once in practice
-   when an orchestrating session jumped straight to the status mutation
-   without walking the rest of Gate 0 — inline prose is easy to skip; a
-   named subagent dispatch is not).
-
-   Project item IDs are not worth keeping. `board-keeper` resolves one per
-   dispatch in a single query, and a remembered ID addresses nothing once an
-   item has been removed and re-added to the board.
-
-2. Checkout a new branch from up-to-date `main`:
+1. Dispatch `board-keeper` **synchronously** with `"starting work on #<n>"` —
+   one of the two synchronous dispatches (`CLAUDE.md` "Dispatch subagents in
+   the background by default"), because the checkout below depends on it. It
+   sets the issue, and a Todo or blank parent, to In Progress and re-verifies
+   each write (`board-keeper.md` Step 1d). Sibling sub-issues starting
+   together are **one** dispatch: `"starting work on #86, #87, #88, #89"`.
+2. Branch from a fresh `origin/main`. Never `git switch main`: in a worktree
+   it fails, because the main checkout already has `main` checked out.
 
    ```
-   git switch main && git pull --ff-only
-   git switch -c <type>/<n>-<short-slug>
+   git fetch origin
+   git switch --no-track -c <type>/<n>-<short-slug> origin/main
    ```
 
-   `<type>` is a conventional-commit type matching the work (`feat`, `fix`,
-   `tooling`, `docs`, `chore`, etc. — see `CLAUDE.md`'s commitlint list);
-   `<n>` is the issue number. This is the convention every recent branch
-   actually uses — the older `issue/<n>-*` form (issues #3–122) is legacy
-   only, not the current standard (`board-keeper`'s branch-detection check
-   matches both).
+   A session already on a generated `claude/<words>-<id>` branch renames it
+   instead: `git rebase origin/main`, then
+   `git branch -m <type>/<n>-<short-slug>`.
 
-   **Exception — worktree-isolating subagents.** When the implementation will
-   be delegated to subagents that run in their own git worktrees
-   (`develop-feature` multi-layer flow), keep `main` checked out here instead
-   of switching: the feature branch is created inside the agent's worktree,
-   and you land it from the agent's commit during verification. Switching the
-   main checkout too creates two competing copies of the branch.
+   `<type>` is a commitlint type (`feat`, `fix`, `tooling`, `docs`, `chore`,
+   …). `board-keeper` and `board-auto-sync.yml` read the issue from that
+   shape; a generated `claude/<words>-<id>` name is refused at push by
+   `.claude/hooks/pre-bash-branch-name-guard.sh`.
 
-### Gate 1 — Do the work
+   **Worktree-delegated work:** when layer subagents run in their own
+   worktrees (`develop-feature` §3) and this session is the shared main
+   checkout, leave it on `main`. The feature branch is created in the agent's
+   worktree and landed from its commit; switching here too makes two
+   competing copies of the branch.
 
-- Follow `develop-feature` for implementation and per-layer delegation.
-- Merge `origin/main` in first (`git fetch origin && git merge origin/main`,
-  or rebase), then run the verify step from `develop-feature` § 5 —
-  `pnpm typegen` inline when the schema changed, then `verify-runner` with
-  `pnpm verify`. A merge from `main` done later, after verify or review,
-  sends the branch back to this bullet: both are re-run. Do not use the
-  `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen
-  and the six gating scripts `pnpm verify` chains after `test`.
-- Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
-  final diff — it applies `code-review-practices` (mechanical scan + contract
-  pass + general pass). Fix any blocking findings, re-verify, and re-dispatch
-  until it returns `APPROVE`. Do not move to Gate 2 without an `APPROVE` on
-  the diff as it stands. Skip the dispatch for a docs-only diff and run the
-  inline identifier check from `CLAUDE.md`'s gate step 4 instead.
-- Report results, including the review verdict. Do not proceed past Gate 1 if
-  any check is red.
+### Gate 1 — Do the work, verify, review
 
-### Gate 2 — Commit the reviewed work
+Follow `develop-feature` §3–§6: merge `origin/main` in first, `pnpm typegen`
+when a schema changed, `verify-runner` with `pnpm verify`, then every required
+reviewer until each passes. A merge from `main` after verify or review sends
+the branch back through both. Report the results and the review verdict, and
+never leave Gate 1 on red.
 
-Once the `reviewer` has returned `APPROVE` on the final diff, commit — **no
-approval needed**. Committing is local and reversible; the gates that need the
-human are push and PR (below). Then proceed to Gate 3.
+### Gate 2 — Commit
+
+Commit the reviewed work — no approval needed. Then Gate 3.
 
 ### Gate 3 — Ask to push
 
-After the commit is made, ask:
-
 > "Changes committed. Ready to push branch `<type>/<n>-<short-slug>` to origin — shall I go ahead?"
 
-Wait for explicit approval. Do not push until the user confirms.
+For a docs-only diff, say it was docs-only and identifier-checked. Push only on
+an explicit yes.
 
-### Gate 4 — Ask to create the PR
-
-After the push succeeds, ask:
+### Gate 4 — Ask to open the PR
 
 > "Branch pushed. Shall I open the pull request now?"
 
-Wait for explicit approval. Only then run:
+Only on an explicit yes. Always pass `--head`: without it `gh` uses the
+current branch, which is `main` in a checkout left there for
+worktree-delegated work.
 
 ```
-gh pr create --base main \
+gh pr create --base main --head <type>/<n>-<short-slug> \
   --title "<conventional title>" \
-  --body "<summary + Closes #<n>, per the PR body template below>"
+  --body "<per the PR body template below>"
 ```
 
-### Gate 5 — Set Code Review on the board, then tag the session
+### Gate 5 — Board to Code Review, then the job label
 
-Immediately after the PR is created, set status → **Code Review** (`679cfd06`):
+1. **Dispatch `board-keeper` synchronously with `"after PR #<n>"`** — the
+   issue number, not `<pr>` (`board-keeper.md` Step 1c). It confirms the
+   issue reached Code Review — `board-auto-sync.yml` has usually moved it
+   already — writes it if not, and re-verifies. This is the second
+   synchronous dispatch and also the "after PR" reconciliation of `CLAUDE.md`
+   "Board reconciliation" — don't dispatch it twice.
+2. **Tag the PR with this job's label**, so concurrent background jobs' PRs
+   are tellable apart in the PR list:
 
-```
-gh api graphql -f query='mutation {
-  updateProjectV2ItemFieldValue(input:{
-    projectId:"PVT_kwHOAIMQW84BcK3T"
-    itemId:"<ITEM_ID>"
-    fieldId:"PVTSSF_lAHOAIMQW84BcK3TzhW1nPs"
-    value:{singleSelectOptionId:"679cfd06"}
-  }) { projectV2Item { id } }
-}'
-```
+   ```
+   JOB=$(basename "$CLAUDE_JOB_DIR")
+   NAME=$(jq -r '.name // empty' "$CLAUDE_JOB_DIR/state.json")
+   SLUG=$(printf '%s' "${NAME:-$JOB}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' \
+     | sed 's/^-*//; s/-*$//')
 
-#### Then tag the PR with this session's agent label
+   PREV=$(gh label list --limit 200 --json name,description \
+     --jq ".[] | select(.description == \"$JOB\") | .name")
 
-Several background jobs run against this repo at once, and their PRs are
-otherwise indistinguishable in the GitHub PR list — same author, same branch
-convention, nothing naming the session that opened them. One label fixes that,
-because GitHub renders labels as chips directly in the list row:
+   if [ -n "$PREV" ] && [ "$PREV" != "job:$SLUG" ]; then
+     gh label edit "$PREV" --name "job:$SLUG"
+   elif [ -z "$PREV" ]; then
+     gh label create "job:$SLUG" --color D4D8DC --description "$JOB"
+   fi
+   gh pr edit <pr> --add-label "job:$SLUG"
+   ```
 
-```
-JOB=$(basename "$CLAUDE_JOB_DIR")
-NAME=$(jq -r '.name // empty' "$CLAUDE_JOB_DIR/state.json")
-SLUG=$(printf '%s' "${NAME:-$JOB}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' \
-  | sed 's/^-*//; s/-*$//')
+   - **Skip silently when `$CLAUDE_JOB_DIR` is unset** — a foreground session
+     has no job and nothing to disambiguate. A missing chip is not a failure.
+   - **The chip shows the session's name** (`job:static-generation`); the job
+     id is only the label's description, the lookup key that survives a
+     rename. An unnamed job falls back to the id.
+   - **A renamed session renames its label** with `gh label edit --name`,
+     which updates every PR already carrying it. Never mint a second label,
+     and never use `--force` — it keys on the name, the wrong key.
+   - `board-keeper` deletes the label once no open PR carries it, on its
+     `"after merge of #<n>"` trigger.
 
-# One label per job, keyed by the job id in its description — so a renamed
-# session renames its existing label instead of minting a second one.
-PREV=$(gh label list --limit 200 --json name,description \
-  --jq ".[] | select(.description == \"$JOB\") | .name")
+3. **Report the PR URL** only once the board write is confirmed, and hold any
+   "done"/"shipped" framing until Gate 5a reports — say "PR open, board
+   updated, CI running — watching checks next".
 
-if [ -n "$PREV" ] && [ "$PREV" != "job:$SLUG" ]; then
-  gh label edit "$PREV" --name "job:$SLUG"
-elif [ -z "$PREV" ]; then
-  gh label create "job:$SLUG" --color D4D8DC --description "$JOB"
-fi
-gh pr edit <n> --add-label "job:$SLUG"
-```
-
-**The chip carries the session's name, and the job id goes in the
-description — not the other way round.** Only the label's name renders in the
-PR list row; a description is invisible there. So the visible half has to be
-the thing the human recognises — `job:static-generation`, the name they gave
-the session and see in their own job list. A daemon hash like `ab922b91`
-identifies the session to the machine and to nobody else, and putting it on
-the chip makes every PR look alike, which is the exact problem this label
-exists to solve.
-
-The id lives in the description purely as the **stable key** the label is
-looked up by — the one identifier that survives a rename. It is machinery,
-not something a reader is meant to use: a label has nowhere else to carry
-metadata, so that is where it goes, and a human hovering the chip to find a
-hash is not a workflow anyone has. Do not add it to the chip text on the
-theory that someone might want it there.
-
-**A session renamed mid-flight renames its label; it never creates a second
-one.** A GitHub label is an object, so `gh label edit --name` propagates to
-every PR already carrying it — the chip on a PR opened an hour ago updates
-too. Minting a fresh label instead would leave every earlier PR showing a
-name the session no longer has, which is worse than the hash this replaced:
-a stale name reads as current and misidentifies the job, where a hash merely
-says nothing. Do not reach for `--force` here — it creates-or-updates by
-_name_, which is precisely the wrong key.
-
-An unnamed job falls back to the id for the chip too, since a nameless chip
-is worse than an opaque one. The muted grey keeps the chip reading as
-metadata beside the `prio:*` and `layer:*` chips rather than competing with
-them.
-
-**Skip this silently when `$CLAUDE_JOB_DIR` is unset.** A foreground session
-has no job id — and no ambiguity to resolve either, since the label exists
-only to tell concurrent background jobs apart. A missing chip is a valid
-state, never a failure to report or work around.
-
-**This step does not apply to a solo cloud session at all.** Those sessions
-ship without `gh` and do not open PRs from here — see `CLAUDE.md`'s
-"Solo-session mode", where PR creation itself is already replaced by the
-evidence protocol. There is nothing to label and no binary to label it with.
-Do not substitute an MCP or REST call to reach the same end: the mechanism is
-local-orchestrator-only, exactly like the Gate 5 board write it sits beside,
-and for the same reason.
-
-The label identifies the **job**, not an individual subagent: one job
-dispatches many layer agents into a single PR. That is the granularity that
-answers the question actually being asked of it — "which of my running
-sessions do I go back to in order to approve this push?"
-
-It is also not a claim of authorship. Every PR is authored by the repo
-owner's GitHub account, because `gh` authenticates as them and there is no
-separate agent identity; and PR creation is the orchestrator's own step at
-this gate, never a subagent's.
-
-`board-keeper` deletes the label once no open PR carries it (its
-`"after merge of #<n>"` trigger), so the set stays bounded to live work.
-
-Report the PR URL — but hold off on any "done"/"shipped" framing until
-Gate 5a below reports CI status. If Gate 5a hasn't run yet, say so explicitly
-("PR open, board updated, CI still running — watching checks next") rather
-than implying the issue is finished.
+A solo cloud session does neither step 1 nor step 2, and never substitutes an
+MCP or REST call for them (`CLAUDE.md` "Solo-session mode").
 
 ### Gate 5a — Watch CI to completion
 
-Not a new approval gate for opening the PR (it runs automatically, right
-after Gate 5) — but the pipeline it drives when a check fails still passes
-through the normal push-approval gate (Gate 3) every single time, fresh, no
-exceptions.
+Runs automatically after Gate 5. Every fix push still goes through a fresh
+Gate 3.
 
-1. **Extract the PR number and dispatch `ci-watcher`** (primary mechanism,
-   #464). `gh pr create`'s stdout (Gate 4) already printed the PR URL, e.g.
-   `https://github.com/ValOvinnikov/blog/pull/478` — take the trailing
-   number. Dispatch the **`ci-watcher` subagent**
-   (`.claude/agents/ci-watcher.md`) via the Agent tool with
-   `run_in_background: true`, passing that number explicitly: "watch PR #478
-   to completion." **Never pass the branch or the issue number** — issues
-   and PRs share one counter, so the PR opened for issue #`<n>` is almost
-   never numbered `<n>` itself; passing it would watch the wrong PR (or one
-   that doesn't exist) — this is the exact bug the reviewer caught during
-   #461's first pass.
+1. **Dispatch `ci-watcher` in the background with `<pr>`** — the trailing
+   number of the URL `gh pr create` printed, never the issue number or the
+   branch. The agent absorbs `--watch`'s polling output so your context
+   doesn't; stay responsive until it reports.
 
-   `ci-watcher` runs `gh pr checks <n> --watch` on your behalf and blocks
-   _its own_ turn until every check reaches a terminal state
-   (success/failure/skipped) — typically a few minutes for this repo's
-   workflows. Because it's dispatched in the background, your own turn is
-   not blocked: continue other queued work (or respond to the user) until
-   notified. This is the reason the watch loop is delegated at all — run
-   inline, `--watch`'s polling refreshes land permanently in your own
-   context (measured at ~3,000–3,500 tokens for one real PR), paid again on
-   every subsequent turn until compaction; delegated, that cost is paid in
-   `ci-watcher`'s own disposable context instead.
+   **Fallback** when a subagent can't be dispatched: run `gh pr checks <pr>`
+   once — never `--watch` inline — report the result honestly, "pending"
+   included, and tell the user to re-check later. CI status never goes
+   unreported.
 
-   **Fallback** if dispatching a subagent isn't viable (background dispatch
-   unsupported in the current environment, or another reason a subagent
-   genuinely can't be used here) — fall back to watching directly, same as
-   before #464: run one non-blocking check yourself, with the explicit PR
-   number, never `--watch` synchronously —
+2. **All green:** say so with the PR URL. Gate 6 governs from here.
+3. **Any failure, required or not** — "not required to merge" is not "safe to
+   ignore". `ci-watcher` hands over the check names, run URLs and a
+   `--log-failed` excerpt; the diagnosis is yours:
+   - Name the precise cause — `file:line`, the failing test and assertion,
+     the typegen drift. "CI failed" is not a diagnosis.
+   - Route the fix to the owning layer agent; fix it yourself only when the
+     file is outside every agent's scope (`CLAUDE.md` "Use the scoped
+     agents").
+   - Re-run the local step matching the failing check (`develop-feature` §5);
+     `pnpm --filter <web|platform> build` only to diagnose a `Build` failure.
+   - Re-run `verify-runner` with `pnpm verify`, then re-dispatch every
+     required reviewer until each passes (`develop-feature` §5–§6) — for a
+     docs-only fix, the inline identifier check instead. The fix is a new
+     diff; the earlier pass does not cover it.
+   - Commit, then **ask to push afresh**, exactly as at Gate 3.
+   - Re-dispatch `ci-watcher` on the same `<pr>` and return to step 2.
+4. **Stop and ask** rather than push a speculative fix when the failure needs
+   a design or behaviour decision, is flaky or infra-only and doesn't
+   reproduce locally, or needs a judgment call such as a security-review flag.
 
-   ```
-   gh pr checks <n>
-   ```
+### Gate 6 — Merge (the human's)
 
-   — report the result honestly, including "pending" if checks haven't
-   finished, and tell the user a manual re-check may be needed later (e.g.
-   "run `gh pr checks <n>` again in a few minutes"). Never let CI status go
-   unreported because the session moved on; a silent "I'll assume it's
-   fine" is exactly the gap this gate closes.
-
-2. **`ci-watcher` reports all green:** report that explicitly alongside the
-   PR URL. Nothing further to do — Gate 6 governs from here.
-
-3. **`ci-watcher` reports a failure — required or not.** A check outside the
-   required list (see the companion issue #462, which promotes some of these
-   to required) is not exempt: "not required to merge" is not "safe to
-   ignore." `ci-watcher`'s report hands you the failing check name(s), the
-   run/job URL, and a raw `--log-failed` excerpt as data — it does not
-   diagnose or suggest a fix; that stays your job:
-
-   - Read the excerpt and name the precise cause — compiler/lint error with
-     file:line, the specific failing test name and assertion, a typegen
-     drift diff, etc. "CI failed" is not a diagnosis; report what actually
-     broke.
-   - Fix it like any other implementation work: delegate to the owning
-     layer's subagent if the fix lands in a layer file, or fix directly if
-     it's tooling/config/docs (this change's own territory).
-   - Re-run the specific local verify step from `develop-feature` §5 that
-     matches the failing check (e.g. `pnpm --filter web build` for a build
-     check, `pnpm test` for a test job) rather than the whole suite blindly.
-   - Commit the fix — no approval needed (committing is free).
-   - **Ask to push again — a fresh, explicit approval, exactly like Gate 3.**
-     A push made to fix CI is still a push. The approval for the original
-     push does not cover it; ask every time, same branch or not.
-   - Once pushed, re-dispatch `ci-watcher` on the same PR number (or repeat
-     step 1's fallback) and go back to step 2.
-
-4. **Stop and ask the human** instead of guessing when a failure isn't
-   safely automatable — a genuine design/behavior question the fix would
-   have to answer, a flaky or infra-only failure that doesn't reproduce
-   locally, or a check whose fix requires judgment calls this skill can't
-   make for you (e.g. a security-review flag). Report what you found and
-   wait; do not push a speculative fix.
-
-### Gate 6 — Done (automatic on merge)
-
-The `Closes #<n>` in the PR body closes the issue on merge.
-The board moves to **Done** (`98236657`) automatically via the GitHub integration.
-Do not manually set Done.
-
-## Board IDs (hardcoded for this project)
-
-| Key             | Value                            |
-| --------------- | -------------------------------- |
-| Project ID      | `PVT_kwHOAIMQW84BcK3T`           |
-| Status field ID | `PVTSSF_lAHOAIMQW84BcK3TzhW1nPs` |
-| Todo            | `f75ad846`                       |
-| In Progress     | `47fc9ee4`                       |
-| Code Review     | `679cfd06`                       |
-| Done            | `98236657`                       |
+`Closes #<n>` closes the issue on merge and the board's "Item closed" workflow
+moves it to Done — never set Done by hand. After the merge, dispatch
+`board-keeper` with `"after merge of #<n>"`.
 
 ## PR body template
 
-**A PR body is a highlight list, not a write-up. Hard cap: 12 lines and
-1200 characters.** If it doesn't fit, the body is describing the diff instead
-of summarising it — cut, don't reformat.
+**A highlight list, not a write-up. Hard cap: 12 lines and 1200 characters.**
+If it doesn't fit, it is describing the diff instead of summarising it — cut,
+don't reformat.
 
 ```
 <one sentence: what this PR makes possible that wasn't possible before>
 
 ## Summary
-- <layer>: <what changed, one line — no more than one line per layer touched>
+- <layer>: <what changed — one line per layer touched>
 
+Manual test: #<m>
 Closes #<n>
 ```
 
-**There is no test-plan checklist.** The delivery gate sequence already
-requires `type-check`, `lint` and `test` to pass before the work is committed,
-and CI re-runs them as required checks on the PR itself. A hand-ticked copy in
-the body is a claim, not evidence — it proves nothing the checks don't, and it
-cost a third of the body's budget. Mention verification only when it is
-_not_ routine: a check knowingly red, a step deliberately skipped, or
-something a reviewer must run by hand.
+- **`Manual test: #<m>`** — the completing PR links its manual-test issue,
+  never with a closing keyword (→ `develop-feature` §2 "Manual-test issue").
+  Drop the line when there is none.
+- **`Closes #<n>` goes only on the PR that completes the issue.** Earlier
+  layer PRs write `Part of #<n>`, or a mention with words between keyword and
+  number ("see #<n> for the full scope").
+- **No test-plan checklist.** The gates require the checks before commit and
+  CI re-runs them on the PR, so a hand-ticked copy proves nothing. Mention
+  verification only when it isn't routine: a check knowingly red, a step
+  deliberately skipped, something a reviewer must run by hand.
 
-**Never put these in a PR body** — each one is the diff restating itself, and
-the diff is already attached:
+**Never in a PR body** — each is the diff restating itself:
 
-- **Code blocks.** No `tsx`/`ts`/`groq` snippets, no before/after pairs, no
-  type signatures. A reviewer who wants the code clicks "Files changed".
-- **Per-file or per-function enumeration.** "Touched `x.tsx`, `y.ts`,
-  `z.test.ts`" and "added `foo()`, renamed `bar()`" are both the file list
-  spelled out longhand.
-- **Design-rationale essays.** `## The validation rule`, `## Why no fallback`,
-  `## Service nullability mirrors the schema` — sections explaining _how_ the
-  implementation reasons. One line of _why_ belongs in the opening sentence;
-  the rest belongs in the code or in the issue.
-- **Test narration.** "Verified the test fails without the fix by
-  reintroducing …" — the gates and CI already establish that the suite passes.
-  Say it only if a reviewer must do something differently because of it.
-- **Tables that restate the Summary.** A per-layer table and a per-layer bullet
-  list are the same content twice.
+- Code blocks — snippets, before/after pairs, type signatures.
+- Per-file or per-function enumeration.
+- Design-rationale sections; one line of _why_ belongs in the opening
+  sentence, the rest in the code or the issue.
+- Test narration ("verified the test fails without the fix by …").
+- A table restating the Summary.
 
-The test to apply before opening: **does this sentence tell the reviewer
-something the diff cannot?** If no, delete it. Genuine exceptions — a
-migration's rollback plan, a deliberate behaviour change a reviewer would
-otherwise flag as a bug, a known-broken check — are worth their lines; they
-are also rare, and one or two sentences each.
+Before opening, ask of each sentence: **does it tell the reviewer something
+the diff cannot?** If not, delete it. Genuine exceptions — a migration's
+rollback plan, a deliberate behaviour change a reviewer would otherwise flag
+as a bug, a known-broken check — get a sentence or two each.
 
-**`Closes #<n>` is conditional — only the PR that completes the tracked
-issue includes it.** In a per-layer split (see "Scope: prefer per-layer PRs"
-above), every layer's PR merging first with `Closes #<n>` in its body would
-auto-close the issue prematurely, before later layers land. Earlier layer
-PRs reference the issue without a closing keyword instead:
+### Closing keywords — the auto-close traps
 
-```
-Part of #<n>
-```
+GitHub closes an issue whenever one of its nine keywords — `close`, `closes`,
+`closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved` — sits
+directly before `#N` **anywhere**: in a PR body, in any tense ("…then close
+#N", "fixed #N"), and in commit messages — the squash-merge message too, which
+can be edited at merge time and diverge from the reviewed body.
 
-or a plain mention with intervening words (e.g. "see #<n> for the full
-scope") — never a bare `#<n>` immediately after `close`/`closes`/`fix`/
-`fixes`/`resolve`/`resolves`, per the auto-close-keyword gotcha above. Only
-the final layer's PR — the one that actually finishes the issue — carries
-`Closes #<n>`.
+- In a PR that must not close its issue, keep words between any closing
+  keyword and the number: "revisit and close issue #N later", never
+  "then close #N".
+- When writing about this trap — in a PR, issue, doc or commit message — use
+  the `#N` placeholder; a real issue number never directly follows a closing
+  keyword.
+- **If it bites, reopen the issue and confirm its Status left Done.** The
+  board's "Item reopened" workflow moves it from Done to In Progress; check
+  with an independent read of the item (`board-keeper.md` Step 4's `node(id:)`
+  query). If it is still Done, move it back yourself — a backward move
+  `board-keeper` reports but never makes — and re-read it the same way. Then
+  check both the PR body and the actual merge commit message for the trigger.

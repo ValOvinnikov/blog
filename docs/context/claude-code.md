@@ -13,13 +13,18 @@ contracts:
   - `config` — `packages/config`, `packages/utils`, `configs/*`: UPPERCASE
     constants shared by more than one workspace (a const only one app reads
     lives in that app's `src/constants/`), the `routes` URL builder, shared config packages, cross-workspace
-    alias wiring, guards `src/sanity/generated/` (typegen-only).
+    alias wiring, guards `src/sanity/generated/` (typegen-only). Its file is
+    also the one home every other agent points at for where shared types
+    (`TMaybeUndefined`/`TMaybeNull`/`TNullable`, `TValueOf`), helpers and
+    constants live, and which one-line idioms never get a helper.
   - `studio` — Sanity schemas, content modelling, typegen, and the `StudioMount` component `apps/platform` renders.
   - `service` — Sanity client, GROQ, typed fetchers (no React).
   - `db` — `packages/db` (`@blog/db`): Neon Postgres + Drizzle, the
-    relational sibling to `service` for the engagement layer (Auth.js,
-    comments, ratings, bookmarks, subscribers); never Sanity, never React,
-    consumed by the two apps (`web`, `admin`) and by `@blog/auth`; owns the
+    relational sibling to `service` (Auth.js users and sessions, tenants,
+    memberships, admins, site config, subscribers, bookmarks, audit events,
+    findings; comments and ratings are planned, with no tables yet); never
+    React, never Sanity outside its provisioning CLI, consumed by the two
+    apps (`web`, `platform`) and by `@blog/auth`; owns the
     `drizzle-kit generate`/`migrate`
     schema-migration workflow.
   - `auth` — `packages/auth` (`@blog/auth`): the Auth.js configuration both
@@ -33,11 +38,13 @@ contracts:
   - `platform-app` — `apps/platform`, the operator/tenant admin panel: a second Next.js
     app with its own deployment and domain, gated by the session `apps/web`
     already issues. A sibling to `web`, not a step after it — its upstreams are
-    `config`, `db`, and `ui` only, so it never waits on `studio`/`service`, which
-    it must not import. Interactive primitives come from Base UI installed in
-    that app and styled from its own `admin-*` tokens; reusable blocks are built
-    on them in `components/shared/` per `platform-ui-practices`, and nothing
-    is added to `@blog/ui` for it. Its "Start here" names the
+    `config`, `db` and `auth` (with `@blog/ui` confined to `site-preview/`), so
+    it never waits on `studio`/`service`, which it must not import. Interactive
+    primitives come from Base UI installed in that app and styled from its own
+    `admin-*` tokens; reusable blocks are built on them per
+    `platform-ui-practices` and placed per `react-component-practices` →
+    "Where a component lives", and nothing is added to `@blog/ui` for it. Its
+    "Start here" names the
     three admin design documents — the product-design spec (intent), the
     interactive mock (approved information architecture and layout), and the
     corrections brief (real token values, and the defects the mock still
@@ -70,12 +77,14 @@ contracts:
     contract substituted a raw `curl` of the vendor's docs site instead. The
     read-only agents below are deliberately not granted them — they review and
     report rather than implement against an API.
-  - Those ten, plus `test-writer`, also carry a **Reuse before you create**
-    section, requiring a search for an existing function, type, schema
-    definition or helper before adding one, and surfacing an
-    extend-vs-add-alongside call to the orchestrator as a question rather than
-    settling it silently. It is duplicated per agent because agent definitions
-    have no include mechanism — change one, change all eleven.
+  - Those ten, plus `test-writer`, point at `CLAUDE.md`'s **Reuse before you
+    create** — a search for an existing function, type, schema definition,
+    helper, test fake or fixture before adding one, a second copy moved to its
+    shared home in the change that would create it, and an
+    extend-vs-add-alongside call surfaced as a question rather than settled
+    silently. The rule is stated once there; each agent adds only its layer's
+    specifics (what it may import, where a match it may not import is
+    reported).
   - The same eleven list a required **Examined** item first in their "Report
     back" section: what they read beyond the files they changed, what they
     fixed in passing, and what they found and left. The rule it reports on,
@@ -143,8 +152,9 @@ XModuleView` block that the rule already forbade and no review had
     had landed on `main` in between.
   - `a11y-reviewer` — read-only accessibility audit of
     `packages/ui`/`apps/web`/`apps/platform` diffs against
-    `ui-library-practices`' non-negotiable rules; dispatched alongside
-    `reviewer` whenever a diff touches those layers.
+    `react-component-practices` → "Accessible by construction" plus each
+    tree's own rules (`ui-library-practices`, `platform-ui-practices`);
+    dispatched alongside `reviewer` whenever a diff touches those layers.
   - `explore` — read-only discovery scout (Haiku). Answers "where is X / how
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
@@ -195,7 +205,11 @@ XModuleView` block that the rule already forbade and no review had
     (and a parent issue number if it's a sub-issue), which creates the
     issue, places it on the board, and confirms status/labels/parent-link
     as one verified operation, so creation and placement can never be
-    decoupled into a forgettable second step. Re-queries every status write
+    decoupled into a forgettable second step. A manual-test issue
+    (`develop-feature` §2) arrives in the same batch as its implementation
+    tickets, labelled `manual-test` with their `prio:*`; closed as completed
+    by the owner with no `Closes` PR, it reads as Done rather than as a
+    wrongly closed issue. Re-queries every status write
     it makes to catch `gh project item-edit`'s known silent-failure mode,
     runs a three-step preflight before any board write — is `gh` installed,
     is the GraphQL API reachable, does the token carry the `project` scope —
@@ -206,13 +220,13 @@ XModuleView` block that the rule already forbade and no review had
     reported as outstanding board work rather than misdiagnosed as a missing
     scope, and the MCP-backed half of the dispatch — issue creation, labels,
     milestones, sub-issue links — still completes. On a targeted
-    after-merge trigger it also sweeps orphaned `agent:*` labels — the
-    `agent:<job-id>` chip `open-pull-request` Gate 5 puts on every PR so
+    after-merge trigger it also sweeps orphaned `job:*` labels — the
+    `job:<session-name>` chip `open-pull-request` Gate 5 puts on every PR so
     that concurrently running background jobs stay tellable apart in the
     GitHub PR list — deleting only those no open PR still carries, so the
     set stays bounded to live work. The prefix is filtered in `jq` rather
     than via `gh label list --search`, which also matches descriptions and
-    would sweep in unrelated labels whose text mentions an agent. It also
+    would sweep in unrelated labels whose text mentions a job. It also
     reports destructive-looking moves (e.g.
     reopening a wrongly-closed issue) for the orchestrator instead of
     applying them. Dispatched to create any new issue, when starting work on
@@ -500,9 +514,10 @@ file` are all denied alike) — an earlier version only handled the
     `layer-scope-guard.test.sh` pins the deny/allow matrix against throwaway
     directories under a worktree-shaped path — hermetic, no live session
     state.
-- **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js` and
-  `boolean-prop-prefix.js` are the repo's only hand-written rules (with a
-  `create()` visitor). They sit alongside two `no-restricted-imports` helpers
+- **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js`,
+  `boolean-prop-prefix.js`, `no-class-assertions.js` and
+  `text-input-textarea-accessible-name.js` are the repo's hand-written rules
+  (each with a `create()` visitor). They sit alongside two `no-restricted-imports` helpers
   that are configuration rather than rules: `no-upstream-imports.js`, a
   flat-config preset blocking a base-of-the-graph package from importing
   `@blog/service`/`@blog/ui`, and `no-vitest-globals-import.js`, a shared
@@ -527,7 +542,7 @@ file` are all denied alike) — an earlier version only handled the
   - `boolean-prop-prefix.js` — requires boolean members of `T*Props`/`I*Props`
     to start with `is`/`has`/`can`/`should` (`prefetch`/`priority` allowlisted
     as third-party passthrough names). Registered in `ui.js`, `web.js`, and
-    `admin.js`. This cannot be `@typescript-eslint/naming-convention`: its
+    `platform.js`. This cannot be `@typescript-eslint/naming-convention`: its
     boolean form needs `types: ['boolean']` and therefore type-aware linting,
     which `base.js` does not enable. Reading the declared annotation
     syntactically catches most cases, because props here are always annotated
@@ -692,33 +707,37 @@ file` are all denied alike) — an earlier version only handled the
     files, so it only fills the gaps).
 
 - **Skills** (`.claude/skills/`):
-  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (CLAUDE.md "Check for Voice candidates").
+  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (CLAUDE.md "Check for Voice candidates"). Its plan also carries a **Manual test** line: a change to what a page shows or how it behaves files a manual-test issue with its tickets (§2 "Manual-test issue"), and every ticket's `## Scope` names its `Feature doc:`.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
-  - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app` (server-first, closed props, derived state, provider hooks that throw outside their provider, composition, no unmeasured memo, accessible by construction).
-  - `ui-library-practices` — building pure, prop-driven design-system components.
-  - `platform-ui-practices` — the `apps/platform` admin design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, the size rule, and a red-flags table; the reviewer checks platform diffs against it.
-  - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, merge Portable Text component maps rather than spreading them).
+  - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app`: server-first, where a component lives (`shared/` only for one imported by two domains), the props contract with its ceiling (7 in `apps/platform`, 10 in `packages/ui` and `apps/web`) and the drop → group → slot → hook → context ladder, derived state, provider hooks that throw outside their provider, styling files (a `*-variants.ts` only once a second component imports it), size and splitting, no unmeasured memo, accessible by construction.
+  - `ui-library-practices` — building pure, prop-driven design-system components; keeps each component's sibling `-variants.ts` because `scripts/gen-ui-index.mjs` reads it.
+  - `platform-ui-practices` — the `apps/platform` admin design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, and a red-flags table; placement, props and size defer to `react-component-practices`. The reviewer checks platform diffs against it.
+  - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, split a growing island at its state branches, a `@blog/ui` atom before raw markup, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
-  - `testing-practices` — Vitest + Testing Library conventions: fake only the edges (shared fakes in `__mocks__/`), never our own components, repeated per-`it` arrangement in `beforeEach` (mandatory), and behaviour titles of 80 characters or fewer.
+  - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, never our own components faked, and behaviour titles of 80 characters or fewer.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
-  - `code-review-practices` — boundary/type/SEO/test checklist before a PR.
+  - `code-review-practices` — boundary/type/SEO/test checklist before a PR, plus the spec and feature-doc sync item, converge-on-touch findings (placement, size, props, variants files) and a flag on a UI or behaviour diff with no manual-test issue.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
     dead code, convention drift); files findings as tracked issues, never
     edits directly. Micro-findings batch into one per-layer umbrella issue
     per sweep instead of one issue each; every filed issue defaults to
     `prio:later` (`prio:someday` if speculative) and gets `cloud-ok` when it
-    meets the solo-cloud-session criteria. No fixed cadence — run whenever
-    asked, naming the layer.
+    meets the solo-cloud-session criteria. Conventions that converge on
+    touch (a single-consumer `*-variants.ts`, a single-domain `shared/`
+    component, file size alone, a raw type form, a missing feature page) are
+    never swept. No fixed cadence — run whenever asked, naming the layer.
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
-    Gate 5 also tags the PR `agent:<job-id>`, using the job id from
-    `$CLAUDE_JOB_DIR` with the job's name as the label description, so
-    parallel background jobs are distinguishable at a glance in the GitHub
-    PR list; a foreground session has no job id and skips it silently. The
-    step is scoped to local orchestrator sessions only — a solo cloud
-    session opens no PR from here and ships without `gh`, so it is carved
-    out explicitly rather than left to fail, alongside the board writes it
-    already cannot make.
+    The completing PR's body links its manual-test issue without a closing
+    keyword. Gate 5 also tags the PR `job:<session-name>` — the slugified
+    session name from `$CLAUDE_JOB_DIR/state.json`, with the job id as the
+    label description so a renamed session renames its label instead of
+    minting a second — so parallel background jobs are distinguishable at a
+    glance in the GitHub PR list; a foreground session has no job and skips
+    it silently. The step is scoped to local orchestrator sessions only — a
+    solo cloud session opens no PR from here and ships without `gh`, so it is
+    carved out explicitly rather than left to fail, alongside the board
+    writes it already cannot make.
   - `use-context7` — fetch live, version-matched library docs before guessing.
   - Plugin skills (provisioned via `.claude/settings.json`, see below):
     `superpowers:systematic-debugging`, `superpowers:test-driven-development`,
@@ -727,6 +746,19 @@ file` are all denied alike) — an earlier version only handled the
     by `develop-feature`), `vercel:nextjs`, `vercel:next-cache-components`,
     `vercel:react-best-practices` (scoped by `react-component-practices`),
     `vercel:deployments-cicd`, `frontend-design:frontend-design`.
+- **One home per rule.** Each convention is stated in full in one file; every
+  other agent or skill that touches it carries a one-line pointer, so a
+  change is made once and copies cannot drift. The homes of the rules
+  adopted 2026-10-14:
+  - Where a component lives, props (ceiling and ladder), styling files,
+    size and splitting → `react-component-practices`.
+  - File size budgets, feature docs (`docs/features/<feature>.md`), spec
+    sync and design-doc retention → `CLAUDE.md` Conventions.
+  - Shared types, helpers and constants → `.claude/agents/config.md`.
+  - Test setup — render wrappers, `beforeEach`/setup helpers, `__mocks__/`,
+    fixture builders → `testing-practices`.
+  - Manual-test issues → `develop-feature` §2; the issue template is in
+    `CLAUDE.md` "Issue body template".
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
   the generated Sanity types (`packages/config/src/sanity/generated/`, regenerate

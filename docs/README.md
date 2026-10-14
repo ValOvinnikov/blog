@@ -23,27 +23,27 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
   - `rendering-caching-i18n.md` — ISR, the skim pipeline, i18n mechanics.
   - `seo-accessibility.md` — metadata, JSON-LD, breadcrumbs, a11y checklist.
   - `surfaces-and-routing.md` — routing conventions + per-surface layout history.
-- **`docs/BACKLOG.md`** — ticket-ready roadmap.
+- **`docs/features/`** — the feature catalogue: one `<feature>.md` per
+  feature (what it does, surfaces, data, configuration, invariants, entry
+  points), indexed by status and layers in `docs/features/README.md`. Every
+  shipped feature has a page; a PR that changes a feature updates its page,
+  and one that adds a feature adds its page (`CLAUDE.md`'s "Feature docs"
+  bullet).
+- **`docs/ROADMAP.md`** — the order the open epics ship in, open decisions,
+  and the release plan (Release 1 promote, Release 2 sell).
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
 - **`docs/design-reference/`** — design-system reference (HTML mockup +
   component specs + tokens), a separate concern from the specs/plans below.
   Standalone; not tied to the archive lifecycle.
 
-## Active design docs (in progress or not yet reflected in `SPEC.md`)
+## Active design docs (in progress or not yet reflected in a feature page)
 
 `docs/superpowers/specs/*` and `docs/superpowers/plans/*` — produced by the
 `superpowers:brainstorming`/`writing-plans` skills while a feature is being
-designed/built. A doc stays here until its work has shipped **and** `SPEC.md`
-has been updated to describe the final shape — see the directory listing for
-what's currently active. Once both are true, the doc is **deleted** in the
-same PR that syncs `SPEC.md` (`CLAUDE.md`'s "Design-doc retention" rule) —
-`SPEC.md` is the durable record; the design doc doesn't stick around as a
-second copy that can drift from it.
-
-A doc can also be retired **early**, before its work ships, once its epic has
-been cut into self-contained tickets: the cross-cutting shape moves into the
-epic issue body, which then says it is the design of record, and the
-`SPEC.md` sync is owed by the epic's final PR. Same rule in `CLAUDE.md`.
+designed/built; see the directory listing for what's currently active. When
+one is done and when it is deleted — into its `docs/features/` page, not into
+`SPEC.md` — is `CLAUDE.md`'s "Design-doc retention" rule, including early
+retirement into an epic body.
 
 ## Archived design docs (frozen history — pre-2026-07-27 only)
 

@@ -1,116 +1,112 @@
 ---
 name: add-content-type
 description: >-
-  End-to-end recipe for adding or extending a content type across every layer of
-  this blog monorepo — Sanity schema → typegen (into @blog/config) →
-  @blog/service query → @blog/ui component → apps/web route. Use whenever a
-  feature touches more than one workspace, so boundaries and the type flow
-  stay intact.
+  Use when a change spans more than one workspace — above all adding or
+  extending a Sanity document, module or object whose shape has to reach
+  @blog/config typegen, @blog/service, @blog/ui and apps/web.
 ---
 
 # Add a content type (end-to-end)
 
-This is the cross-layer recipe. It's the procedure most likely to leak a boundary
-(fetching in `ui`, hand-writing a type, GROQ in `web`), so follow the order and
-let each layer's agent own its step. Architecture rules live in `SPEC.md`.
-
-## The flow (always this direction)
+The cross-layer procedure most likely to leak a boundary — a fetch in `ui`, a
+hand-written type, GROQ in `web`. Each layer's agent owns its step; this file
+says what each step hands the next. The lifecycle around it is
+`develop-feature`; data flow is `SPEC.md` §5, the content model §6.
 
 ```
 studio (schema) ──typegen──► @blog/config ──► @blog/service ──► apps/web ──props──► @blog/ui
 ```
 
-Build in dependency order. Never skip a layer; never reverse the arrows.
+- Never reverse an arrow. Build order is `studio → service → ui → web`,
+  skipping untouched layers; a new stored-value constant is a `config`
+  dispatch first. One PR per layer, merged before the next starts → CLAUDE.md
+  "One layer at a time".
+- The plan carries Copy and Manual test (CLAUDE.md "Say what it touches before
+  starting"). The content-model change updates or creates its `docs/features/`
+  page (CLAUDE.md "Feature docs"), plus any `SPEC.md` §6 entry for that shape
+  ("Spec sync").
 
-## Step 1 — Schema (`packages/studio`) · agent: `studio`
+## 1. Schema + typegen — `packages/studio` · `studio`
 
-- **Migration check first:** if the change alters an _existing_ shape, surface
-  a migration plan (`packages/studio/migrations/README.md`) before touching the
-  schema. Additive optional-only changes need none — say so explicitly.
-- Define/extend the type in `packages/studio/src/schema-types/` with
-  `defineType`/`defineField`; follow the `{group}_{name}` naming convention.
-  A new type gets its own directory named after the type minus its group
-  prefix, with the test beside it and no barrel — `modules/hero-blog/hero-blog.ts`
-  - `hero-blog.test.ts`; documents under `documents/{blog,pages,settings,system}/`,
-    plain objects under `objects/`, Portable Text editors under `portable-text/`.
-    Export `<name>Schema` (`<name>PageSchema` / `<name>SettingsSchema` for pages
-    and settings). A field factory used by this one schema is a local function
-    in the schema file; one that wraps a single object lives beside that object
-    (`objects/seo/seo-field.ts`); one shared more widely goes in `fields/`.
-    Full rules in `.claude/agents/studio.md` § "One schema per directory".
-- Add `validation: rule => rule.required()` on any field consumers will assume;
-  images get `options: { hotspot: true }` + a required `alt`. Enum-ish stored
-  values use UPPERCASE key/value constants from `@blog/config` (`constants/`).
-- Register it in the group's registry (`modules/index.ts`, `objects/index.ts`,
-  `documents/index.ts`, `portable-text/index.ts`) and, for anything an editor
-  opens from the desk, add `{ schema }` (or `{ schema, mode: 'singleton' }`)
-  to the right group in `src/structure/sections/<section>-section.ts` — never
-  a hand-built `S.listItem()` chain in `studio-structure.ts`.
-- If any `defineType`/`defineField`/`defineArrayMember` option or the typegen
-  workflow is uncertain, use the `use-context7` skill to fetch Sanity v6 docs
-  before writing schema code.
+- **Migration check first** → CLAUDE.md "Check for migrations": an existing
+  shape changing needs a plan put to the user; additive optional-only needs
+  none — say so.
+- Conventions → `.claude/agents/studio.md`, `studio-schema-practices`. Most
+  often missed: registering the type in its group's `index.ts`, and its desk
+  entry — a `{ schema }` in `src/structure/sections/<section>-section.ts` for a
+  document, or one entry in `src/structure/module-kinds/module-kinds.ts` for a
+  module (heroes: the Heroes group in `sections/modules-section.ts`) →
+  studio.md "The desk". A module missing from `module-kinds.ts` is also
+  missing from `modulesField`'s insert menu.
+- **The studio PR for a new `module_*` carries these, or `type-check` reds:**
+  its `REVALIDATE_TAGS` key in
+  `apps/web/src/utils/revalidate-tags/revalidate-tags.ts` (exhaustive over
+  module types → `SPEC.md` §6, `docs/context/content-model.md`), and — when a
+  template's `modulesField({ extend })` or `heroField({ allow })` (or
+  `page_post`'s `modulesField`) admits it — that page's assertion in
+  `packages/config/src/types/page-module.test.ts`.
+- When the schema is done, `pnpm --filter @blog/studio typegen` once, re-run
+  until the diff is minimal, and commit
+  `packages/config/src/sanity/generated/` with it.
 
-## Step 2 — Typegen (`packages/studio`) · agent: `studio`
+## 2. Data access — `packages/service` · `service`
 
-- Run `pnpm --filter @blog/studio typegen`. Confirm the shape appears in
-  `packages/config/src/sanity/generated/types.ts`. Typegen can be
-  non-deterministic — re-run until the diff is minimal. **Commit the generated
-  files.**
-- Do not hand-write the content type anywhere — typegen is the source of truth.
+- `src/features/<domain>/<name>/`: groqd query with explicit `sub.field()`
+  projections, thin loader, transformer to a view-model with no faked
+  defaults, a `{ v1: { … } }` action in `safeAsync` on the `src/index.ts`
+  facade → `.claude/agents/service.md`. Types derive from the generated types
+  or `InferResultType`; no React.
+- `runQuery(query, { parameters, tenant, ...isr(tags, tenant.projectId) })`
+  tags every `_type` the query reads, dereferenced ones included (`isr()`'s
+  doc comment). A tag absent from `REVALIDATE_TAGS`' values fails
+  `pnpm check:revalidate-tags-sync`, but that check only proves the tag exists
+  somewhere.
+- **A new cached document `_type` gets its own `REVALIDATE_TAGS` key and a
+  `TCachedDocumentType` entry** in the PR that first tags it. Nothing fails
+  without them, and an unmapped type purges nothing on publish.
 
-## Step 3 — Data access (`packages/service`) · agent: `service`
+## 3. Presentation — `packages/ui` · `ui`
 
-- Add a groqd query with explicit `sub.field()` projections (`.notNull()` last
-  in the chain for schema-required fields), a transformer to a `T | undefined`
-  view-model (no faked defaults), and expose the action through the feature's
-  versioned facade (`service.<domain>.<feature>.v1.*`).
-- Return types derive from the generated types in `@blog/config` (or
-  `InferResultType`/`InferFragmentType`); no `any`. **No React import.**
-- **Imports use the workspace alias** (`@blog/service/*` here, `@web/*` in web,
-  `@blog/studio` in studio, …), never parent-traversal `../` — see CLAUDE.md →
-  Conventions. If a layer starts importing a package it didn't before, add that
-  dependency's alias to the consumer's `tsconfig` `paths` **and**
-  `vitest.config.ts` alias, or type-check/test/build will fail.
-- ISR via `runQuery(query, { parameters, ...isr('tag') })`.
-- Add a co-located `*.test.ts` (node env) mocking the client.
+- Pure and prop-driven at the right Atomic level: no
+  `service`/`sanity`/`fetch`/`next/*`, plain typed props the web view-model
+  satisfies structurally. Portable Text is composed in `apps/web`
+  (`@web/components/shared/portable-text`), never here.
+- `react-component-practices`, then `ui-library-practices`. The folder's
+  `index.ts` exports the component and its props type; consumers import
+  `@blog/ui/components/<level>/<name>` (no root barrel). Every new or changed
+  component gets a story (`ui-storybook`).
 
-## Step 4 — Presentation (`packages/ui`) · agent: `ui`
+## 4. Composition — `apps/web` · `web`
 
-- Build the component(s) at the right Atomic layer; pure and prop-driven.
-- **No `service`/`sanity`/`fetch` imports** — accept plain typed props (shared
-  types from `@blog/config` where they fit). Portable Text rendering is
-  composed in `apps/web` (`PortableTextRenderer`), not here.
-- Token utilities only; forward `className`; JSDoc; co-locate a `*.test.tsx`.
-- Export from the `src/index.ts` barrel.
+- A module: `src/modules/<name>/` (`<name>-module.tsx` fetches,
+  `<name>-module-view.tsx` renders) plus an entry in the map of every allowing
+  `<page>-module-renderer.tsx` — the maps are `Partial`, so a missing entry
+  compiles and renders nothing — dispatched by `renderModules` /
+  `renderHeroModule`. A routed document: a route under
+  `src/app/[tenant]/[locale]/`. → `.claude/agents/web.md`.
+- The Server Component calls `service.<domain>.<name>.v1.*`, checks
+  `ok && data`, passes plain props to `@blog/ui`. No GROQ, no Sanity client.
+- `dataTestId` on each `@blog/ui` component an E2E test targets: stable
+  kebab-case scoped to the page or section (`post-article-header`).
+- A new route: `generateMetadata`, plus `sitemap.ts` and RSS when publicly
+  listed → `seo-and-metadata`.
 
-## Step 5 — Composition (`apps/web`) · agent: `web`
+## 5. Test, verify, review
 
-- Add/extend the route. The Server Component calls the `service` function and
-  passes plain props into the `@blog/ui` component. **No GROQ, no Sanity client,
-  no inline presentation here.**
-- Pass `dataTestId` on every `@blog/ui` component that needs to be targeted by
-  E2E tests. Use a consistent, stable naming convention (kebab-case, scoped to
-  the page/section):
-  ```tsx
-  <ThemeToggle dataTestId="header-theme-toggle" />
-  ```
-- `generateStaticParams` + `generateMetadata` for new routes; update
-  `sitemap.ts` / RSS if the content is publicly listed.
-- If a new field affects published content, ensure the revalidate webhook covers
-  it (right tag/path).
+`develop-feature` §4–6: `test-writer` covers each layer's new code after
+implementation; the orchestrator runs `pnpm typegen`, then dispatches
+`verify-runner` with `pnpm verify`; `reviewer` (`code-review-practices`), plus
+`a11y-reviewer` for ui/web components and `seo-auditor` for a new route,
+metadata or feed.
 
-## Step 6 — Verify
+## Boundary checklist
 
-- `pnpm typegen` (clean), then from root: `pnpm type-check`, `pnpm lint`,
-  `pnpm test`. All green. `pnpm build` is CI-only (`ci.yml`), not part of
-  local verify.
-- Run the `code-review-practices` skill over the diff before opening the PR.
-
-## Boundary checklist (the whole point)
-
-- [ ] Type came from typegen, not hand-written.
-- [ ] Existing-shape changes have a migration plan (dry-run → backup →
+- [ ] Type from typegen, generated files committed; nothing hand-written.
+- [ ] Existing-shape change has a migration plan (dry-run → backup →
       human-gated run).
-- [ ] `service` has no React; `ui` has no `service`/`sanity`/`fetch`.
-- [ ] `web` has no GROQ/Sanity client and no presentation that belongs in `ui`.
-- [ ] Tests added at the `service` and `ui` layers; metadata/feeds updated.
+- [ ] Every new `module_*` and cached document `_type` has its
+      `REVALIDATE_TAGS` key (a document: its `TCachedDocumentType` entry too).
+- [ ] `service` has no React; `ui` has no `service`/`sanity`/`fetch`/`next/*`;
+      `web` has no GROQ, Sanity client or presentation that belongs in `ui`.
+- [ ] Metadata, sitemap and feeds updated; manual-test issue filed; feature
+      doc updated or created; `SPEC.md` §6 synced.
