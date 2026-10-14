@@ -40,8 +40,8 @@ packages/
   email      Email shell, escapeHtml, Resend transport                (@blog/email)
   utils      Framework-free helpers                                   (@blog/utils)
 configs/     eslint, next, prettier, tailwind, tsconfig, vitest presets
-docs/        README.md (index), context/ (one file per topic), BACKLOG.md, DEPLOY.md
-SPEC.md      architecture — the durable reference
+docs/        README.md (index), context/ (one file per topic), features/ (per feature), BACKLOG.md, DEPLOY.md
+SPEC.md      architecture core — layer contracts, data flow, cross-cutting rules
 ```
 
 ## Where to look first, cheapest first

@@ -404,10 +404,8 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   the app's `Link`. It must accept and forward the ref and the props Base UI
   merges in. Check this before passing any closed-props component as `render`,
   and never close such a contract during a props cleanup.
-- A component that reads `useSettingsFormState()` is tested through
-  `customRenderInSettingsForm` (`@platform/testing/render-in-settings-form`,
-  which wraps `SettingsFormProvider`), never a stand-in provider written for
-  one test file.
+- Testing a component that reads `useSettingsFormState()`:
+  `testing-practices` → "Rendering and arrangement".
 
 ## Data loading
 
@@ -588,9 +586,9 @@ of them:
 | More code in a file over its size budget                                                                         | Extract the part you change first (`react-component-practices` § Size and splitting)                                              |
 | A feature component styling a Base UI part another page also uses                                                | A block at the level its consumers share (`react-component-practices` § Where a component lives), used from both                  |
 | A new prop on a component at seven (`FormField`, `FormTextInput`)                                                | Restructure first (`react-component-practices` § Props), or compose its parts, as `FormField` around `TextInput`                  |
-| A prop every caller fills the same way, derives one-to-one from another prop, or that only a test passes         | Own it inside the component (`useTranslations`, import the action, derive it); the test uses `vi.mock`                            |
-| Copying `useState` for open/value/error, `useTransition` and reset-on-close into another caller                  | One `use<Name>` hook; the component owns that state                                                                               |
-| Three booleans or handlers that configure one footer button or trigger                                           | A named `ReactNode` slot or a compound part                                                                                       |
+| A prop every caller fills the same way, derives one-to-one from another prop, or that only a test passes         | The ladder's "Drop" step (`react-component-practices` § Props)                                                                    |
+| Copying `useState` for open/value/error, `useTransition` and reset-on-close into another caller                  | The ladder's "Hook" step (`react-component-practices` § Props)                                                                    |
+| Three booleans or handlers that configure one footer button or trigger                                           | The ladder's "Slot" step (`react-component-practices` § Props)                                                                    |
 | `isArchived` + `archivedNoticeId` passed to every card under `SettingsFormShell`                                 | `useSettingsFormState()` in each card                                                                                             |
 | `const a = await x(); const b = await y();` where `y` doesn't use `a`                                            | `const [a, b] = await Promise.all([x(), y()])`                                                                                    |
 | `auth()` called directly, or a tenant query repeated in a layout or page                                         | The `cache()`-wrapped resolver: `getSession`, `requireAdmin`, `requireTenantById`, `resolveDashboardTenant`, `listSessionTenants` |

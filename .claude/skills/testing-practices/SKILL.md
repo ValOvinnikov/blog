@@ -157,6 +157,10 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
     element) → `renderElement(<…>)`, or `renderWithIntl(<…>)` in
     `apps/platform`.
   - **A platform hook that reads its providers** → `renderHookWithIntl`.
+  - **A platform component that reads `useSettingsFormState()`** →
+    `customRenderInSettingsForm` (`@platform/testing/render-in-settings-form`,
+    which wraps `SettingsFormProvider`) — never a stand-in provider written
+    for one test file.
 
 - **Repeated arrangement goes in `beforeEach` — mandatory.** When two or more
   `it`s in a `describe` open with the same line — a uniform `setup()`,
@@ -337,10 +341,12 @@ tenant)`) is fine: that call is the contract with the outside.
   as a `vi.fn()` with a sensible default.
   - **A `vi.mock` factory byte-identical in three or more files becomes a
     `__mocks__/` file** in the change that would write the third copy; until
-    then an inline factory is fine. Known cases: db's `@blog/db/client`, and
-    service's `@blog/service/sanity/query/query` — a partial mock, because
-    every loader needs the real `q` builder, so its `__mocks__/query.ts`
-    spreads `vi.importActual(…)` and replaces only `runQuery`; `mockRun`
+    then an inline factory is fine. Two are already far past three copies,
+    so the next test that needs one extracts it instead of writing another:
+    db's `@blog/db/client` (`src/__mocks__/client.ts`), and service's
+    `@blog/service/sanity/query/query` — a partial mock, because every loader
+    needs the real `q` builder, so its `__mocks__/query.ts` spreads
+    `vi.importActual(…)` and replaces only `runQuery`; `mockRun`
     (`@blog/service/testing/mock-run-query`) stays the typed handle.
   - **Never restate a `__mocks__` default in `beforeEach`** —
     `mockResolvedValue(DEFAULT_REQUEST_CONTEXT)`, the default auth session.

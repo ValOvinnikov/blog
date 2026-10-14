@@ -642,13 +642,14 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   silently reorders a Postgres enum — confirm with `db:generate` that no
   migration appears.
 
-- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). One
-  component there, `Carousel`, is nonetheless client-only — it owns
-  `useEmblaCarousel` — and carries no directive: the consumer declares the
-  boundary, the way `sanity-image`'s `SanityImage` works. The one package that
-  may carry it is `@blog/studio`, whose mount component is irreducibly
-  client-side; that exception is scoped to that component and does not license
-  the directive anywhere else in `packages/*`. In `apps/web` it IS the right
+- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). Two
+  components there, `Carousel` and `Dialog`, are nonetheless client-only —
+  they own client hooks (`useEmblaCarousel`, Base UI's dialog) — and carry no
+  directive: the consumer declares the boundary, the way `sanity-image`'s
+  `SanityImage` works. The one package that may carry it is `@blog/studio`,
+  whose mount component is irreducibly client-side; that exception is scoped
+  to that component and does not license the directive anywhere else in
+  `packages/*`. In `apps/web` it IS the right
   tool — add it at the _leaf boundary_ that genuinely needs the client: React
   hooks (`useState`/`useEffect`), browser APIs, event handlers, or wrapping a
   third-party component that uses hooks internally (e.g. the `sanity-image`

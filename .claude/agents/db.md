@@ -201,12 +201,9 @@ tool).
   over a mocked `getDb`, seed rows with the `insertTest*` builders
   (`@blog/db/testing/fixtures`), and clear the tables a file writes in
   `afterEach`.
-- Never write another inline `vi.mock('@blog/db/client', …)` factory: it
-  already repeats across the query tests, so the next test that needs it
-  extracts `src/__mocks__/client.ts` instead.
-- Arrangement, fixture builders and shared `vi.mock` factories:
-  testing-practices → "Where tests live", "Rendering and arrangement", "What
-  to fake".
+- Arrangement, fixture builders and shared `vi.mock` factories
+  (`@blog/db/client` is a known `__mocks__/` case): testing-practices →
+  "Where tests live", "Rendering and arrangement", "What to fake".
 - A cross-cutting case (an FK cascade) goes in the test file of the function
   that most naturally exercises it, not a catch-all file.
 - Run `pnpm --filter @blog/db type-check` after each major group of files;
