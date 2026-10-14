@@ -17,6 +17,7 @@ import {
   countVoiceChanges,
   toVoiceOverridesInput,
   voiceDefaultText,
+  voiceErrorReveal,
   voiceErrorsInOrder,
   withVoiceValue,
 } from './voice-draft';
@@ -204,5 +205,20 @@ describe(voiceErrorsInOrder, () => {
         [EN, DE],
       ),
     ).toEqual([]);
+  });
+});
+
+describe(voiceErrorReveal, () => {
+  it('opens the language and the list a list field error sits in', () => {
+    expect(voiceErrorReveal({ locale: DE, fieldId: 'topicEmpty' })).toEqual({
+      locale: DE,
+      listFieldId: 'topicEmpty',
+    });
+  });
+
+  it('opens only the language for an error outside the lists', () => {
+    expect(
+      voiceErrorReveal({ locale: FR, fieldId: 'notFoundHeading' }),
+    ).toEqual({ locale: FR, listFieldId: undefined });
   });
 });

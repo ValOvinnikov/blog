@@ -4,9 +4,11 @@ import { Field } from '@base-ui/react/field';
 import {
   VOICE_FIELD_KIND,
   VOICE_PORTABLE_TEXT_SCHEMA,
+  VOICE_SURFACE,
   type TVoiceFieldKind,
   type TVoicePortableText,
 } from '@blog/config';
+import { useVoiceFieldState } from '@platform/components/features/voice/voice-editor-provider';
 import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
@@ -19,7 +21,6 @@ import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   isVoiceValueCustomised,
-  type TVoiceDraftValue,
   type TVoiceField,
 } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
@@ -28,32 +29,21 @@ import { useState } from 'react';
 import { voiceFieldVariants } from './voice-field-variants';
 
 export type TVoiceFieldProps = {
-  inputId: string;
-  field: Pick<TVoiceField, 'id' | 'placeholders'> & { kind: TVoiceFieldKind };
-  value: TVoiceDraftValue;
-  savedValue: TVoiceDraftValue;
-  placeholder: string;
-  error?: string;
-  onChange: (value: TVoiceDraftValue) => void;
-  hasVisibleLabel?: boolean;
+  field: Pick<TVoiceField, 'id' | 'placeholders' | 'surface'> & {
+    kind: TVoiceFieldKind;
+  };
 };
 
-export const VoiceField = ({
-  inputId,
-  field,
-  value,
-  savedValue,
-  placeholder,
-  error,
-  onChange,
-  hasVisibleLabel = true,
-}: TVoiceFieldProps) => {
+export const VoiceField = ({ field }: TVoiceFieldProps) => {
+  const { inputId, value, savedValue, error, placeholder, onChange } =
+    useVoiceFieldState(field.id);
   const t = useTranslations('voiceSettings');
   const { isArchived: isReadOnly, archivedDescribedBy } =
     useSettingsFormState();
   const tLabels = useTranslations('voiceFieldLabels');
   const tHints = useTranslations('voiceFieldHints');
   const [editorRevision, setEditorRevision] = useState(0);
+  const hasVisibleLabel = field.surface !== VOICE_SURFACE.ARCHIVE;
   const {
     root,
     header,

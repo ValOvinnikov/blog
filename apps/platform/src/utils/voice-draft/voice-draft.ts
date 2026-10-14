@@ -6,6 +6,7 @@ import {
   VOICE_SURFACE,
   type TVoiceFieldId,
   type TVoicePortableText,
+  type TMaybeUndefined,
   type TVoiceSurface,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
@@ -61,6 +62,23 @@ export const voiceErrorsInOrder = (
       ({ id }) => errors[locale]?.[id] !== undefined,
     ).map(({ id }) => ({ locale, fieldId: id })),
   );
+
+type TVoiceErrorReveal = {
+  locale: TLocaleIsoCode;
+  listFieldId: TMaybeUndefined<TVoiceFieldId>;
+};
+
+export const voiceErrorReveal = ({
+  locale,
+  fieldId,
+}: TVoiceFieldError): TVoiceErrorReveal => ({
+  locale,
+  listFieldId: voiceFieldsOf(VOICE_SURFACE.ARCHIVE).some(
+    ({ id }) => id === fieldId,
+  )
+    ? fieldId
+    : undefined,
+});
 
 export const voiceFieldInputId = (
   idPrefix: string,
