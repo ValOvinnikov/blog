@@ -1,9 +1,10 @@
 'use server';
 
-import { VOICE_FIELDS } from '@blog/config';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE, VOICE_FIELDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
@@ -49,6 +50,13 @@ export const saveVoiceOverridesAction = async (
     }
 
     await revalidateSiteConfig(tenant.id);
+    await recordAuditEvent({
+      logEvent: 'site_config.voice_audit_failed',
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: tenant.id,
+      details: { voiceOverridesByLocale: parsed.data },
+    });
 
     return { ok: true };
   } catch (error) {

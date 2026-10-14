@@ -1,1 +1,1 @@
-export { NavItemContent } from './nav-item-content';
+export { NavItemContent, type TNavItemBadge } from './nav-item-content';

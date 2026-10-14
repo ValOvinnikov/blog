@@ -6,16 +6,12 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HUE_MAX,
+  HUE_MIN,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
-  type TCardStyle,
-  type TDensity,
-  type TFontChoice,
-  type TLanguageSwitcherStyle,
-  type TPresetId,
-  type TRadiusScale,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -24,43 +20,23 @@ import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-si
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
-const HUE_MIN = 0;
-const HUE_MAX = 360;
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 
 const updateLookInputSchema = z.object({
-  preset: z.enum(Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]]),
+  preset: z.enum(PRESET_ID),
   accentHue: hueSchema.refine(isAccentHueAccessible),
   logoHue: hueSchema.nullable(),
-  headingFont: z.enum(
-    Object.values(FONT_CHOICE) as [TFontChoice, ...TFontChoice[]],
-  ),
-  bodyFont: z.enum(
-    Object.values(FONT_CHOICE) as [TFontChoice, ...TFontChoice[]],
-  ),
-  radiusScale: z.enum(
-    Object.values(RADIUS_SCALE) as [TRadiusScale, ...TRadiusScale[]],
-  ),
-  density: z.enum(Object.values(DENSITY) as [TDensity, ...TDensity[]]),
-  languageSwitcherStyle: z.enum(
-    Object.values(LANGUAGE_SWITCHER_STYLE) as [
-      TLanguageSwitcherStyle,
-      ...TLanguageSwitcherStyle[],
-    ],
-  ),
-  cardStyle: z.enum(Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]]),
+  headingFont: z.enum(FONT_CHOICE),
+  bodyFont: z.enum(FONT_CHOICE),
+  radiusScale: z.enum(RADIUS_SCALE),
+  density: z.enum(DENSITY),
+  languageSwitcherStyle: z.enum(LANGUAGE_SWITCHER_STYLE),
+  cardStyle: z.enum(CARD_STYLE),
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;
 export type TUpdateLookResult = { ok: true } | { ok: false };
 
-/**
- * The Look tab's save action, called directly from `LookForm` (not a native
- * form submission, since it gathers several controls' state at once).
- * `requireTenantMembership` re-checks the session against `tenantId` here
- * too — the page's own gate proves nothing about who actually invoked this
- * endpoint.
- */
 export const updateLookAction = async (
   tenantId: string,
   input: TUpdateLookInput,

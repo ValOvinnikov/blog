@@ -51,6 +51,9 @@ export const LANGUAGE_SWITCHER_STYLE = {
 
 export type TLanguageSwitcherStyle = TValueOf<typeof LANGUAGE_SWITCHER_STYLE>;
 
+export const HUE_MIN = 0;
+export const HUE_MAX = 360;
+
 export type TThemeTokens = {
   accentHue: number;
   logoHue?: number;

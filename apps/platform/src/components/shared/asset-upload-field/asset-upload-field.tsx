@@ -24,7 +24,7 @@ import { assetUploadFieldVariants } from './asset-upload-field-variants';
 
 export type TAssetUploadSpec = {
   kind: TBrandAssetKind | TEmailLogoKind;
-  size: 'sm' | 'md';
+  size: typeof SIZE.SM | typeof SIZE.MD;
   acceptedMimeTypes: readonly string[];
   validateFile: (file: File) => TMaybeUndefined<string>;
   stagedBadgeLabel?: string;
@@ -68,7 +68,7 @@ export const AssetUploadField = ({
     .filter(Boolean)
     .join(' ');
   const { onPick, onClear } = createStagingHandlers(onStage);
-  const fileName = size === 'sm' ? getFileName(image) : undefined;
+  const fileName = size === SIZE.SM ? getFileName(image) : undefined;
 
   const {
     field,

@@ -3,11 +3,11 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import { ProvisioningBanner } from '@platform/components/features/tenants/provisioning-banner';
-import { useProvisioningPoll } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { TenantDetailsPanel } from '@platform/components/features/tenants/tenant-details-panel';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useId } from 'react';
 
 export type TTenantProvisioningSectionProps = {

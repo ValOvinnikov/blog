@@ -1,4 +1,4 @@
-import { EMAIL_TEMPLATE_TYPE, type TEmailTemplateType } from '@blog/config';
+import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { sanitizeHref } from '@blog/email/html';
 import { z } from 'zod';
 
@@ -11,9 +11,7 @@ const SENDER_NAME_FORBIDDEN_PATTERN = /[<>",;@\u0000-\u001f\u007f]/;
 
 export const SENDER_NAME_INVALID = 'sender-name-invalid';
 
-export const EMAIL_TEMPLATE_TYPE_VALUES = Object.values(
-  EMAIL_TEMPLATE_TYPE,
-) as [TEmailTemplateType, ...TEmailTemplateType[]];
+export const emailTemplateTypeSchema = z.enum(EMAIL_TEMPLATE_TYPE);
 
 const portableTextBlockSchema = z
   .object({ _type: z.string(), _key: z.string() })

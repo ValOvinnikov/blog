@@ -1,38 +1,24 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import { ToastProvider } from '@platform/context/toast-provider';
-import messages from '@platform/i18n/messages/en.json';
+import {
+  act,
+  renderHookWithIntl,
+  screen,
+  waitFor,
+} from '@platform/testing/custom-render';
 import {
   idleProvisioningSteps,
   makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
-import {
-  act,
-  renderHook as rtlRenderHook,
-  screen,
-  waitFor,
-} from '@testing-library/react';
-import { NextIntlClientProvider } from 'next-intl';
-import type { ReactNode } from 'react';
 
-import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
+import { useProvisioningPoll } from './use-provisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const TOAST_EXIT_BUFFER_MS = 1000;
 const MAX_POLL_TICKS = 375;
-
-const Wrapper = ({ children }: { children: ReactNode }) => (
-  <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-    <ToastProvider>{children}</ToastProvider>
-  </NextIntlClientProvider>
-);
-
-const renderHook: typeof rtlRenderHook = (callback, options) =>
-  rtlRenderHook(callback, { wrapper: Wrapper, ...options });
 
 const {
   retryProvisioningStepActionMock,
@@ -63,28 +49,19 @@ describe(useProvisioningPoll, () => {
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
   });
 
-  describe('STEP_ORDER', () => {
-    it('is the six core provisioning steps, excluding OWNER_ELEVATION', () => {
-      expect(STEP_ORDER).toHaveLength(6);
-      expect(STEP_ORDER).not.toContain(
-        TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-      );
-    });
-  });
-
   describe('ownerElevationOutcome', () => {
     it('is undefined when the OWNER_ELEVATION step has not reported yet', () => {
       const tenant = makeClientTenant({
         provisioningSteps: idleProvisioningSteps(),
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBeUndefined();
     });
 
     it('is undefined when provisioningSteps itself is null', () => {
       const tenant = makeClientTenant({ provisioningSteps: null });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBeUndefined();
     });
@@ -99,7 +76,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBe('STALLED');
     });
@@ -133,7 +110,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
         provisioningSteps: allStepsDone,
       });
-      const { result: withoutResult } = renderHook(() =>
+      const { result: withoutResult } = renderHookWithIntl(() =>
         useProvisioningPoll(withoutOwnerElevation),
       );
 
@@ -147,7 +124,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result: withResult } = renderHook(() =>
+      const { result: withResult } = renderHookWithIntl(() =>
         useProvisioningPoll(withStalledOwnerElevation),
       );
 
@@ -170,7 +147,7 @@ describe(useProvisioningPoll, () => {
       const withoutRun = makeClientTenant({
         provisioningSteps: idleProvisioningSteps(),
       });
-      const { result: withoutResult } = renderHook(() =>
+      const { result: withoutResult } = renderHookWithIntl(() =>
         useProvisioningPoll(withoutRun),
       );
       expect(withoutResult.current.provisioningRun).toBeUndefined();
@@ -184,7 +161,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result: withResult } = renderHook(() =>
+      const { result: withResult } = renderHookWithIntl(() =>
         useProvisioningPoll(withRun),
       );
       expect(withResult.current.provisioningRun).toEqual({
@@ -193,7 +170,7 @@ describe(useProvisioningPoll, () => {
       });
     });
 
-    it('exposes stepUpdatedAt parallel to STEP_ORDER, undefined for a step with none recorded', () => {
+    it('exposes stepUpdatedAt in core step order, undefined for a step with none recorded', () => {
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -203,7 +180,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.stepUpdatedAt[0]).toBe('2026-08-12T14:19:00.000Z');
       expect(result.current.stepUpdatedAt[1]).toBeUndefined();
@@ -213,7 +190,7 @@ describe(useProvisioningPoll, () => {
       const tenant = makeClientTenant({
         provisioningSteps: idleProvisioningSteps(),
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.allIdle).toBe(true);
       expect(result.current.isOverallFailed).toBe(false);
@@ -233,7 +210,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.isOverallFailed).toBe(true);
       expect(result.current.failedStepError).toBe('fetch failed');
@@ -251,7 +228,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.isOverallFailed).toBe(false);
       expect(result.current.failedStepError).toBeUndefined();
@@ -269,7 +246,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.isProvisioningRunning).toBe(true);
       expect(result.current.isOverallFailed).toBe(false);
@@ -295,7 +272,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.isOverallFailed).toBe(true);
       expect(result.current.displayStepStatuses[3]).toBe(
@@ -317,7 +294,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.isOverallFailed).toBe(true);
       expect(result.current.failedStepError).toBe('boom');
@@ -328,10 +305,10 @@ describe(useProvisioningPoll, () => {
         provisioningSteps: idleProvisioningSteps(),
       });
       retryProvisioningStepActionMock.mockReturnValue(new Promise(() => {}));
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       act(() => {
-        result.current.handleStart();
+        result.current.handleDispatch();
       });
 
       await waitFor(() => {
@@ -372,7 +349,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.stepStatuses[0]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -394,7 +371,7 @@ describe(useProvisioningPoll, () => {
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       });
-      renderHook(() => useProvisioningPoll(tenant));
+      renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
@@ -411,7 +388,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: idleProvisioningSteps(),
       });
-      renderHook(() => useProvisioningPoll(tenant));
+      renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -434,7 +411,7 @@ describe(useProvisioningPoll, () => {
           provisioningStatus,
           provisioningSteps: idleProvisioningSteps(),
         });
-        renderHook(() => useProvisioningPoll(tenant));
+        renderHookWithIntl(() => useProvisioningPoll(tenant));
 
         await act(async () => {
           await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
@@ -459,7 +436,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: runningSteps,
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
@@ -483,7 +460,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
@@ -505,7 +482,7 @@ describe(useProvisioningPoll, () => {
       });
 
       act(() => {
-        result.current.handleRetry();
+        result.current.handleDispatch();
       });
 
       await act(async () => {
@@ -537,7 +514,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: stuckSteps,
       });
-      renderHook(() => useProvisioningPoll(tenant));
+      renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
         await act(async () => {
@@ -559,10 +536,10 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: idleProvisioningSteps(),
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
-        result.current.handleStart();
+        result.current.handleDispatch();
       });
 
       for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
@@ -586,7 +563,7 @@ describe(useProvisioningPoll, () => {
       });
       const visibility = vi.spyOn(document, 'visibilityState', 'get');
       visibility.mockReturnValue('hidden');
-      renderHook(() => useProvisioningPoll(tenant));
+      renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
@@ -613,7 +590,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: idleProvisioningSteps(),
       });
-      const { unmount } = renderHook(() => useProvisioningPoll(tenant));
+      const { unmount } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       unmount();
 
@@ -637,7 +614,7 @@ describe(useProvisioningPoll, () => {
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
         new Error('NEXT_REDIRECT'),
       );
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -669,13 +646,13 @@ describe(useProvisioningPoll, () => {
     });
   });
 
-  describe('retry/start dispatch', () => {
-    it('dispatches a retry and reports no error on success', async () => {
+  describe('dispatch', () => {
+    it('dispatches the workflow and reports no error on success', async () => {
       const tenant = makeClientTenant({ id: 'tenant-1' });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       act(() => {
-        result.current.handleRetry();
+        result.current.handleDispatch();
       });
 
       await waitFor(() => {
@@ -684,7 +661,7 @@ describe(useProvisioningPoll, () => {
         );
       });
       await waitFor(() => {
-        expect(result.current.isRetrying).toBe(false);
+        expect(result.current.isDispatchPending).toBe(false);
       });
       expect(result.current.dispatchNotice).toBeUndefined();
     });
@@ -694,10 +671,10 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'not-found',
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       act(() => {
-        result.current.handleStart();
+        result.current.handleDispatch();
       });
 
       await waitFor(() => {
@@ -710,10 +687,10 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'archived',
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       act(() => {
-        result.current.handleStart();
+        result.current.handleDispatch();
       });
 
       await waitFor(() => {
@@ -726,10 +703,10 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'dispatch-error',
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       act(() => {
-        result.current.handleStart();
+        result.current.handleDispatch();
       });
 
       await waitFor(() => {
@@ -742,16 +719,16 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'already-in-progress',
       });
-      const { result } = renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       act(() => {
-        result.current.handleStart();
+        result.current.handleDispatch();
       });
 
       await waitFor(() => {
         expect(result.current.dispatchNotice).toBe('already-in-progress');
       });
-      expect(result.current.isStarting).toBe(false);
+      expect(result.current.isDispatchPending).toBe(false);
     });
   });
 });

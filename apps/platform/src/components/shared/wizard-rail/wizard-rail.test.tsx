@@ -3,9 +3,17 @@ import { render, screen } from '@platform/testing/custom-render';
 import { WizardRail } from './wizard-rail';
 
 const steps = [
-  { title: 'Details', description: 'Name, domain, plan' },
-  { title: 'Sanity project', description: 'Create + configure' },
-  { title: 'Seed content', description: 'Starter documents' },
+  { id: 'details', title: 'Details', description: 'Name, domain, plan' },
+  {
+    id: 'sanity-project',
+    title: 'Sanity project',
+    description: 'Create + configure',
+  },
+  {
+    id: 'seed-content',
+    title: 'Seed content',
+    description: 'Starter documents',
+  },
 ];
 
 describe(WizardRail, () => {

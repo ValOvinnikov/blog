@@ -1,6 +1,7 @@
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
-import { parseTenantProvisioningRepo } from '@platform/utils/tenant-provisioning-repo/tenant-provisioning-repo';
+
+import { parseTenantProvisioningRepo } from './tenant-provisioning-repo';
 
 const WORKFLOW_REF = 'main';
 const DISPATCH_TIMEOUT_MS = 5000;
@@ -18,11 +19,7 @@ export type TDispatchGitHubWorkflowInput = {
   logContext: Record<string, unknown>;
 };
 
-/**
- * Sends a `workflow_dispatch` request to trigger a GitHub Actions workflow
- * in the tenant-provisioning repo. Never throws — a missing token/repo, a
- * non-2xx response, or a network failure is logged and reported as `false`.
- */
+/** Never throws: a missing token or repo, a non-2xx response or a network failure is logged and returns `false`. */
 export const dispatchGitHubWorkflow = async ({
   workflowFile,
   inputs,

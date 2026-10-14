@@ -1,5 +1,8 @@
-import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import {
+  OPERATOR_ALERT_KIND,
+  type TOperatorAlertBody,
+} from '@blog/config/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME, queries } from '@blog/db';
 import {
   buildDocumentValidationAlertEmail,
   buildOwnerElevationAlertEmail,
@@ -12,11 +15,14 @@ import { logger } from '@platform/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-const OPERATOR_ALERT_SCHEMA = z.discriminatedUnion('kind', [
+const operatorAlertBodySchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal(OPERATOR_ALERT_KIND.OWNER_ELEVATION),
     tenantId: z.string().min(1),
-    outcome: z.enum(['STALLED', 'AMBIGUOUS_MEMBERSHIP']),
+    outcome: z.enum([
+      ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
+    ]),
   }),
   z.object({
     kind: z.literal(OPERATOR_ALERT_KIND.DOCUMENT_VALIDATION),
@@ -24,7 +30,7 @@ const OPERATOR_ALERT_SCHEMA = z.discriminatedUnion('kind', [
     invalidDocumentCount: z.number().int().min(0),
     isCritical: z.boolean(),
   }),
-]);
+]) satisfies z.ZodType<TOperatorAlertBody>;
 
 /**
  * Inbound, machine-callable alert endpoint — `@blog/db`'s CLI scripts report
@@ -63,7 +69,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const parsed = OPERATOR_ALERT_SCHEMA.safeParse(body);
+  const parsed = operatorAlertBodySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { message: 'Malformed alert body.' },
@@ -99,9 +105,7 @@ export async function POST(request: Request): Promise<NextResponse> {
           isCritical: parsed.data.isCritical,
         });
 
-  const fromAddress = resolveOperatorAlertFromAddress(
-    env.OPERATOR_ALERT_FROM_ADDRESS,
-  );
+  const fromAddress = resolveOperatorAlertFromAddress();
 
   const results = await Promise.allSettled(
     recipients.map((to) => sendEmail({ to, from: fromAddress, subject, html })),

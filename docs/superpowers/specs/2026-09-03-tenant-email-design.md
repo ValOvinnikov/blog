@@ -172,7 +172,7 @@ a website logo and wrong for email on every axis:
 
 The SVG exclusion is the one that will look wrong to whoever implements it. SVG
 is the obvious logo format on the web, the existing validator already accepts and
-sanitises it (`src/utils/sanitize-svg-markup/`), and rejecting it feels like a
+sanitises it (`src/server/site-config/sanitize-svg-markup/`), and rejecting it feels like a
 regression. It is not: an SVG logo renders as nothing in the major clients, and a
 tenant testing in a client that happens to support it would ship broken mail to
 everyone else. Reject at upload with a message that says why.

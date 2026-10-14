@@ -23,10 +23,7 @@ const getInitials = (name: string): string => {
   return `${first}${last}`.toUpperCase();
 };
 
-/**
- * Sits beside the name it represents, so the initials it renders are
- * decorative — always `aria-hidden`.
- */
+/** Always `aria-hidden`: it sits beside the name it represents. */
 export const Avatar = ({ name, variant, className }: TAvatarProps) => (
   <span
     aria-hidden="true"

@@ -661,9 +661,7 @@
       "VERIFY_CONTENT": "Vérifier que le contenu est prêt"
     },
     "retryButton": "Relancer le provisionnement",
-    "retryingButton": "Relance du provisionnement…",
     "startButton": "Démarrer le provisionnement",
-    "startingButton": "Démarrage…",
     "startError": "Impossible de démarrer le provisionnement — veuillez réessayer.",
     "startErrorNotFound": "Ce locataire est introuvable — actualisez la page et réessayez.",
     "startErrorArchived": "Ce locataire est archivé ; le provisionnement ne peut pas être démarré.",

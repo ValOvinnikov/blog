@@ -15,11 +15,9 @@ export const FeaturesPageContent = async ({
   tenant,
 }: TFeaturesPageContentProps) => {
   const entitledCapabilities = PLAN_REGISTRY[tenant.plan];
-  const rawInitialValues = await getSettingsFeaturesOrDefaults(tenant.id);
-  // A plan downgrade can leave a stale `true` for a now-unentitled
-  // capability in the saved row — clamp it before the form ever renders it.
+  const { values, savedAt } = await getSettingsFeaturesOrDefaults(tenant.id);
   const initialValues = withComingSoonOff(
-    clampToEntitlement(rawInitialValues, entitledCapabilities),
+    clampToEntitlement(values, entitledCapabilities),
   );
 
   return (
@@ -27,6 +25,7 @@ export const FeaturesPageContent = async ({
       tenantId={tenant.id}
       entitledCapabilities={entitledCapabilities}
       initialValues={initialValues}
+      savedAt={savedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );

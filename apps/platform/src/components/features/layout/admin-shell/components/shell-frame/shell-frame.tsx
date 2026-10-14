@@ -14,18 +14,7 @@ export type TShellFrameProps = {
   isSidebarInitiallyCollapsed?: boolean;
 };
 
-/**
- * Owns the sidebar/topbar/content grid on behalf of `AdminShell` — a client
- * leaf so it can read the active route segment. `AdminShell`'s Server
- * Component callers can't: a layout never re-renders on navigation, so it
- * never sees a fresh pathname/segment.
- *
- * Also owns the `SidebarCollapseProvider` boundary: `sidebar` arrives as an
- * already-rendered (server-rendered) `ReactNode`, so nothing further down
- * this tree can hold the collapse state itself — this is the lowest point
- * both the collapse toggle (inside `sidebar`) and the sidebar's own
- * collapse-aware CSS can share it from.
- */
+// A client leaf so it can read the active segment, which a layout never re-renders to see.
 export const ShellFrame = ({
   sidebar,
   topbar,

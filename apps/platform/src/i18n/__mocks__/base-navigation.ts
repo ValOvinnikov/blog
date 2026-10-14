@@ -1,13 +1,7 @@
+import { createRouterStub } from '@platform/testing/router-stub';
 import { createElement, type MouseEvent, type ReactNode } from 'react';
 
-const router = {
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: vi.fn(),
-};
+const router = createRouterStub();
 
 export const useRouter = vi.fn(() => router);
 

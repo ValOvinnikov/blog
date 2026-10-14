@@ -13,10 +13,8 @@ export const getEnabledCapabilities = async ({
   id,
   plan,
 }: Pick<TTenant, 'id' | 'plan'>): Promise<TCapability[]> => {
-  const values = clampToEntitlement(
-    await getSettingsFeaturesOrDefaults(id),
-    PLAN_REGISTRY[plan],
-  );
+  const { values: savedValues } = await getSettingsFeaturesOrDefaults(id);
+  const values = clampToEntitlement(savedValues, PLAN_REGISTRY[plan]);
 
   return CAPABILITY_TOGGLES.filter(({ field }) => values[field]).map(
     ({ capability }) => capability,

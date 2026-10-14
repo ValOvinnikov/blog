@@ -1,3 +1,4 @@
+import { PRESET_ID } from '@blog/config';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -33,12 +34,12 @@ export const presetPickerVariants = tv({
       false: {},
     },
     preset: {
-      CONSOLE: {
+      [PRESET_ID.CONSOLE]: {
         mini: ['bg-[#0f1115]'],
         miniPrimary: ['text-[oklch(0.7_0.16_250)]'],
         miniSecondary: ['text-admin-side-text'],
       },
-      EDITORIAL: {
+      [PRESET_ID.EDITORIAL]: {
         mini: ['bg-[#fbf7f0]'],
         miniPrimary: ['text-[#2a2320]'],
         miniSecondary: ['text-[#8a7f74]'],

@@ -1,12 +1,6 @@
 import { defineSchema } from '@portabletext/editor';
 
-/**
- * The editor's block vocabulary — kept in exact lockstep with
- * `@blog/email`'s `serializePortableText`, which drops any block type or
- * style it doesn't recognise rather than passing it through. Offering a
- * decorator, style or list here that the serializer can't render would let
- * a tenant author copy that silently disappears from the sent email.
- */
+/** Must match `@blog/email`'s `serializePortableText`, which silently drops any block type, style or mark it does not recognise. */
 export const EMAIL_PORTABLE_TEXT_SCHEMA = defineSchema({
   decorators: [{ name: 'strong' }, { name: 'em' }],
   styles: [{ name: 'normal' }, { name: 'h2' }],

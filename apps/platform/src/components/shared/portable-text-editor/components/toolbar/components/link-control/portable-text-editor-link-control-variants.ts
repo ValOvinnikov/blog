@@ -1,3 +1,4 @@
+import { FIELD_FOCUS_CLASSES } from '@platform/utils/field-surface-classes/field-surface-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const portableTextEditorLinkControlVariants = tv({
@@ -6,7 +7,7 @@ export const portableTextEditorLinkControlVariants = tv({
     input: [
       'min-h-11 w-full md:min-h-0 md:w-56 rounded-admin-control border px-2 py-1',
       'text-[16px] md:text-[13px] text-admin-text bg-admin-surface border-admin-control-line',
-      'focus-visible:outline-2 focus-visible:outline-admin-brand-weak focus-visible:border-admin-brand',
+      FIELD_FOCUS_CLASSES,
     ],
     error: ['order-last basis-full text-[11.5px] text-admin-bad'],
   },

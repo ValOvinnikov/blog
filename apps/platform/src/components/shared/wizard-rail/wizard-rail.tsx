@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { wizardRailVariants } from './wizard-rail-variants';
 
 export type TWizardRailStep = {
+  id: string;
   title: ReactNode;
   description: ReactNode;
 };
@@ -35,7 +36,7 @@ export const WizardRail = ({
 
             return (
               <li
-                key={index}
+                key={step.id}
                 className={item()}
                 aria-current={isActive ? 'step' : undefined}
               >

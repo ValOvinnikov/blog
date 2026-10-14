@@ -1,11 +1,5 @@
-import {
-  FINDING_KIND,
-  FINDING_SEVERITY,
-  FINDING_SOURCE,
-  FINDING_STATUS,
-} from '@blog/config/constants';
-import type { TFindingSummary } from '@blog/db/schema/findings';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { makeFinding } from '@platform/testing/findings/fixtures';
 
 import { FindingsCard } from './findings-card';
 
@@ -14,23 +8,6 @@ vi.mock('@platform/server/findings/get-finding-details-action', () => ({
 }));
 
 const render = renderWithIntl;
-
-const makeFinding = (
-  overrides: Partial<TFindingSummary> = {},
-): TFindingSummary => ({
-  id: 'finding-1',
-  tenantId: 'tenant-1',
-  source: FINDING_SOURCE.TENANT_PROVISIONING,
-  kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
-  severity: FINDING_SEVERITY.CRITICAL,
-  status: FINDING_STATUS.OPEN,
-  dedupeKey: 'dedupe-1',
-  hasDetails: false,
-  firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
-  lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
-  resolvedAt: null,
-  ...overrides,
-});
 
 describe(FindingsCard, () => {
   describe('with no findings', () => {

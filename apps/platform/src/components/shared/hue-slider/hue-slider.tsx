@@ -1,13 +1,12 @@
 'use client';
 
 import { Slider } from '@base-ui/react/slider';
+import { HUE_MAX, HUE_MIN } from '@blog/config';
 import { accentHueGradient } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import type { AriaAttributes, CSSProperties } from 'react';
 
 import { hueSliderVariants } from './hue-slider-variants';
 
-const HUE_MIN = 0;
-const HUE_MAX = 360;
 const TRACK_STYLE: CSSProperties = { background: accentHueGradient() };
 
 export type THueSliderProps = {

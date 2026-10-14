@@ -77,6 +77,9 @@
   --text-admin-16: 16px;
   --text-admin-24: 24px;
 
+  /* Clears the sticky topbar for sticky panels and scroll targets. */
+  --spacing-admin-topbar: 68px;
+
   --radius-admin: 6px;
   --radius-admin-control: 4px;
 

@@ -6,7 +6,7 @@ import {
   DOMAIN_PATTERN,
   isLocaleIsoCode,
 } from '@blog/config';
-import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
+import { queries, TENANT_PLAN } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
@@ -20,7 +20,7 @@ import { z } from 'zod';
 const updateTenantDetailsInputSchema = z.object({
   name: z.string().trim().min(1),
   primaryDomain: z.string().trim().toLowerCase().regex(DOMAIN_PATTERN),
-  plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
+  plan: z.enum(TENANT_PLAN),
   locale: z.string().refine(isLocaleIsoCode),
   ownerEmail: z.string().trim().toLowerCase().email().optional(),
 });
@@ -49,17 +49,6 @@ export type TUpdateTenantDetailsActionResult =
       fieldErrors?: TUpdateTenantDetailsFieldErrors;
     };
 
-/**
- * The provisioning status page's editable-details save handler — reachable
- * whenever the panel that calls it shows any editable field: every step
- * `IDLE`, or FAILED with a field an already-completed step hasn't locked.
- * The client only ever submits a locked field's unchanged value, but that's
- * a UX affordance, not an authorization boundary — the `domain-locked`
- * outcome below is the real enforcement, re-checked here against the
- * current db row regardless of what the client sends. Likewise the disabled
- * panel an archived tenant renders is a UX affordance too — the
- * `deprovisionedAt` check below is what actually stops the write.
- */
 export const updateTenantDetailsAction = async (
   tenantId: string,
   input: TUpdateTenantDetailsActionInput,

@@ -4,20 +4,21 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
+  HUE_MAX,
+  HUE_MIN,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
   RADIUS_DECLARATIONS,
   type TCardStyle,
   type TDensity,
   type TFontChoice,
+  type TMaybeUndefined,
   type TRadiusScale,
   type TThemeDeclarations,
 } from '@blog/config';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { CSSProperties } from 'react';
 
-const HUE_MIN = 0;
-const HUE_MAX = 360;
 const HUE_GRADIENT_STEP = 20;
 
 // theme.css derives these in @theme, i.e. on :root, so they must be re-derived where the preview overrides their inputs.
@@ -50,7 +51,7 @@ const buildShapePreviewTokens = (
 
 export type TThemePreviewValues = {
   accentHue: number;
-  logoHue: number | undefined;
+  logoHue: TMaybeUndefined<number>;
   radiusScale: TRadiusScale;
   density: TDensity;
   cardStyle: TCardStyle;

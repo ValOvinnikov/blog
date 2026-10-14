@@ -29,7 +29,10 @@ describe(getEnabledCapabilities, () => {
   });
 
   it('includes a capability the plan entitles and the toggle enables', async () => {
-    getSettingsFeaturesOrDefaultsMock.mockResolvedValue(allOn);
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: allOn,
+      savedAt: undefined,
+    });
 
     const result = await getEnabledCapabilities({
       id: 'tenant-1',
@@ -42,8 +45,8 @@ describe(getEnabledCapabilities, () => {
 
   it('omits a capability whose toggle is off even when the plan entitles it', async () => {
     getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
-      ...allOn,
-      newsletterEnabled: false,
+      values: { ...allOn, newsletterEnabled: false },
+      savedAt: undefined,
     });
 
     const result = await getEnabledCapabilities({
@@ -56,7 +59,10 @@ describe(getEnabledCapabilities, () => {
   });
 
   it('omits a capability the plan does not entitle even when its toggle is on', async () => {
-    getSettingsFeaturesOrDefaultsMock.mockResolvedValue(allOn);
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: allOn,
+      savedAt: undefined,
+    });
 
     const result = await getEnabledCapabilities({
       id: 'tenant-1',

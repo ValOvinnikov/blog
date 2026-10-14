@@ -161,7 +161,7 @@ describe(Button, () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
-  it("announces pendingLabel by updating the persistent status region's own text in place, rather than inserting a new element already populated", () => {
+  it("announces pendingLabel by updating the persistent status region's own text in place, rather than inserting a new element, since a screen reader only announces a change to a region that already existed", () => {
     const { rerender } = render(
       <Button isPending={false} pendingLabel="Saving…">
         Save
@@ -177,8 +177,6 @@ describe(Button, () => {
       </Button>,
     );
 
-    // A screen reader only announces a change within a region that already
-    // existed — the same node must update, not get replaced by a fresh one.
     expect(screen.getByRole('status')).toBe(status);
     expect(status).toHaveTextContent('Saving…');
   });

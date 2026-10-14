@@ -1,11 +1,10 @@
 import { WorkspacePendingView } from '@platform/components/features/layout/workspace-pending-view';
 import { requireSessionUserId } from '@platform/server/auth/require-session-user-id';
+import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('pageMetadata');
-  return { title: t('workspacePending') };
+  return pageMetadata('workspacePending');
 }
 
 /**

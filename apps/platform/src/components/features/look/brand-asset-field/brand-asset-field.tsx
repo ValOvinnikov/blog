@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, SIZE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import {
   AssetUploadField,
@@ -40,7 +40,7 @@ export const BrandAssetField = ({
 
   const asset: TAssetUploadSpec = {
     kind,
-    size: 'sm',
+    size: SIZE.SM,
     acceptedMimeTypes: ACCEPTED_IMAGE_MIME_TYPES,
     validateFile: (file) => {
       const quickError = quickClientImageCheck(file, kind);

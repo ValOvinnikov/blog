@@ -39,13 +39,6 @@ type TOwnerInviteConfirmation = NonNullable<
   TCreateTenantResult['ownerInviteConfirmation']
 >;
 
-/**
- * The wizard's Details step — the one part of tenant creation an operator
- * fills in by hand. Submitting calls `createTenantAction`, which redirects
- * straight to the new tenant's status page on success; every value this
- * component receives back from that call is therefore a validation failure
- * to show inline, never a success payload.
- */
 export const TenantDetailsForm = () => {
   const t = useTranslations('tenantDetailsForm');
   const fieldErrorText = useTenantFieldErrorText();
@@ -77,12 +70,6 @@ export const TenantDetailsForm = () => {
     }
   };
 
-  const normalizedOwnerEmail = values.ownerEmail.trim().toLowerCase();
-  const confirmedInvite =
-    ownerInviteConfirmation?.email === normalizedOwnerEmail
-      ? ownerInviteConfirmation
-      : undefined;
-
   const handleSubmit = () => {
     setFormError(undefined);
     setFieldErrors({});
@@ -90,7 +77,7 @@ export const TenantDetailsForm = () => {
     startTransition(async () => {
       const result = await createTenantAction({
         ...values,
-        confirmOwnerInviteToken: confirmedInvite?.token,
+        confirmOwnerInviteToken: ownerInviteConfirmation?.token,
       });
       setFieldErrors(result.fieldErrors ?? {});
       setFormError(result.error);
@@ -103,9 +90,12 @@ export const TenantDetailsForm = () => {
     { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
   ];
 
-  const pendingLabel = confirmedInvite
+  const pendingLabel = ownerInviteConfirmation
     ? t('submittingInviteButton')
     : t('submittingBeginButton');
+  const idleLabel = ownerInviteConfirmation
+    ? t('confirmOwnerInviteButton')
+    : t('submitButton');
 
   return (
     <div className={root()}>
@@ -186,11 +176,7 @@ export const TenantDetailsForm = () => {
                   isPending={isPending}
                   hasArrow={!isPending}
                 >
-                  {isPending
-                    ? pendingLabel
-                    : ownerInviteConfirmation
-                      ? t('confirmOwnerInviteButton')
-                      : t('submitButton')}
+                  {isPending ? pendingLabel : idleLabel}
                 </Button>
               </div>
             </Card.Footer>

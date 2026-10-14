@@ -11,8 +11,9 @@ import {
   maxUploadMbLabel,
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
-import { sanitizeSvgMarkup } from '@platform/utils/sanitize-svg-markup/sanitize-svg-markup';
 import { imageSize } from 'image-size';
+
+import { sanitizeSvgMarkup } from './sanitize-svg-markup';
 
 const IMAGE_FORMAT_BY_DETECTED_TYPE: Record<string, TImageFormat> = {
   png: { contentType: 'image/png', extension: 'png' },

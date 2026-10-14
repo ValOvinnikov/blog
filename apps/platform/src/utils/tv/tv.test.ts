@@ -13,4 +13,12 @@ describe(tv, () => {
     expect(classes).toContain('text-label');
     expect(classes).toContain('text-admin-faint');
   });
+
+  it('keeps an admin shadow alongside a shadow colour and lets a later admin radius replace an earlier one', () => {
+    const variants = tv({ base: 'rounded-admin shadow-admin' });
+
+    const classes = variants({ class: 'rounded-admin-control shadow-black' });
+
+    expect(classes).toBe('shadow-admin rounded-admin-control shadow-black');
+  });
 });

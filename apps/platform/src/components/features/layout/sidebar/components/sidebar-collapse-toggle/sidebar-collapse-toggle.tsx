@@ -12,7 +12,6 @@ export type TSidebarCollapseToggleProps = {
   className?: string;
 };
 
-/** Reads the collapse state from context rather than props because `Sidebar` stays a Server Component. */
 export const SidebarCollapseToggle = ({
   className,
 }: TSidebarCollapseToggleProps) => {

@@ -1,14 +1,8 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { SIDEBAR_COLLAPSED_COOKIE } from '@platform/utils/sidebar-collapsed-cookie/sidebar-collapsed-cookie';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 
 import { sidebarCollapseProviderVariants } from './sidebar-collapse-provider-variants';
 
@@ -19,44 +13,29 @@ type TSidebarCollapseContextValue = {
   toggle: () => void;
 };
 
-const SidebarCollapseContext = createContext<
-  TSidebarCollapseContextValue | undefined
->(undefined);
+const SidebarCollapseContext =
+  createContext<TMaybeUndefined<TSidebarCollapseContextValue>>(undefined);
 
 export type TSidebarCollapseProviderProps = {
   isInitiallyCollapsed: boolean;
   children: ReactNode;
 };
 
-/**
- * Wraps `Sidebar` and the rest of `ShellFrame`'s content in a single
- * `data-collapsed`-carrying element, so `Sidebar`'s own server-rendered
- * markup can react to collapse state through a `group-data-*` selector —
- * `Sidebar` itself never needs a client boundary for this; the toggle
- * button (`useSidebarCollapse`) and this provider are what do.
- *
- * This state, not the cookie, is authoritative for the rest of the session:
- * a Next.js layout doesn't re-render on client-side navigation, so writing
- * the cookie alone would never move a toggle that's already on screen.
- */
+// This state, not the cookie, is authoritative: a layout never re-renders on client navigation.
 export const SidebarCollapseProvider = ({
   isInitiallyCollapsed,
   children,
 }: TSidebarCollapseProviderProps) => {
   const [isCollapsed, setIsCollapsed] = useState(isInitiallyCollapsed);
 
-  const toggle = useCallback(() => {
-    setIsCollapsed((current) => {
-      const next = !current;
-      document.cookie = `${SIDEBAR_COLLAPSED_COOKIE}=${next}; max-age=${SIDEBAR_COLLAPSED_COOKIE_MAX_AGE_SECONDS}; path=/; SameSite=Lax`;
-      return next;
-    });
-  }, []);
-
-  const value = useMemo(() => ({ isCollapsed, toggle }), [isCollapsed, toggle]);
+  const toggle = () => {
+    const next = !isCollapsed;
+    document.cookie = `${SIDEBAR_COLLAPSED_COOKIE}=${next}; max-age=${SIDEBAR_COLLAPSED_COOKIE_MAX_AGE_SECONDS}; path=/; SameSite=Lax`;
+    setIsCollapsed(next);
+  };
 
   return (
-    <SidebarCollapseContext.Provider value={value}>
+    <SidebarCollapseContext.Provider value={{ isCollapsed, toggle }}>
       <div
         data-collapsed={isCollapsed ? 'true' : undefined}
         data-testid="sidebar-collapse-root"
@@ -68,7 +47,6 @@ export const SidebarCollapseProvider = ({
   );
 };
 
-/** Reads the sidebar's collapse state and toggle — throws outside `SidebarCollapseProvider`. */
 export const useSidebarCollapse = (): TSidebarCollapseContextValue => {
   const context = useContext(SidebarCollapseContext);
   if (!context) {

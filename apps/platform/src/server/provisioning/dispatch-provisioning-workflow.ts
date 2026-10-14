@@ -1,28 +1,17 @@
-import { dispatchGitHubWorkflow } from '@platform/utils/dispatch-github-workflow/dispatch-github-workflow';
 import { env } from '@platform/utils/env/env';
+
+import { dispatchGitHubWorkflow } from './dispatch-github-workflow';
 
 const WORKFLOW_FILE = 'provision-tenant.yml';
 
-/**
- * `workflow_dispatch` trigger for `.github/workflows/provision-tenant.yml` —
- * a deliberate, narrowly-scoped (`actions: write` only) exception to keeping
- * deploy-adjacent credentials inside CI: only the trigger crosses into
- * application code here, never the provisioning work itself. Never throws:
- * a failure here (missing token, network error, the workflow file not
- * existing yet, a non-2xx response) is logged and swallowed — but reported
- * via the return value so the caller can revert the `PROVISIONING` status
- * transition it made before dispatching, rather than leaving the tenant
- * stuck showing a workflow that never actually started.
- */
+/** Only the trigger crosses into app code, with an `actions: write`-only token; the provisioning work stays in CI. */
 export const dispatchProvisioningWorkflow = async (
   tenantId: string,
 ): Promise<boolean> => {
   const adminAppBaseUrlOverride =
     env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE;
 
-  // Local-dev-only: forces the `development` dataset regardless of
-  // TENANT_PROVISIONING_DATASET, as a safety net against ever creating a
-  // `production`-dataset Sanity project by accident.
+  // A local-dev override always forces `development`, so a dev run can never create a `production` dataset.
   const tenantSanityDataset = adminAppBaseUrlOverride
     ? 'development'
     : env.TENANT_PROVISIONING_DATASET;

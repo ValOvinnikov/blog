@@ -12,13 +12,7 @@ export type TFontOption = {
   fontFamily: string;
 };
 
-/**
- * The closed set of five selectable fonts — `next/font` loaders must be
- * static and module-scoped, so this list can't grow without a code change
- * and a deploy. Each entry's `fontFamily` is the real, already-loaded
- * webfont's resolved CSS value, so a picker or preview applying it via
- * inline style renders the font itself, not a system-font approximation.
- */
+/** `next/font` loaders must be static and module-scoped, so this set cannot grow without a code change. */
 export const FONT_OPTIONS: Record<TFontChoice, TFontOption> = {
   [FONT_CHOICE.SPACE_GROTESK]: {
     value: FONT_CHOICE.SPACE_GROTESK,

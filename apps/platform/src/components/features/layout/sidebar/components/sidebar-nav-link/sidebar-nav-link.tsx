@@ -1,9 +1,8 @@
 'use client';
 
+import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
 import { Link, usePathname } from '@platform/i18n/navigation';
 import type { ReactNode } from 'react';
-
-import { sidebarVariants } from './sidebar-variants';
 
 export type TSidebarNavLinkProps = {
   href: string;
@@ -11,11 +10,7 @@ export type TSidebarNavLinkProps = {
   children: ReactNode;
 };
 
-/**
- * A client boundary: matches `href` against the current route to decide the
- * active state. `Sidebar` itself, and every inert row it renders, stay
- * server components.
- */
+// The client boundary for the active state; `Sidebar` and its inert rows stay Server Components.
 export const SidebarNavLink = ({
   href,
   title,

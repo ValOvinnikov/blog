@@ -1,14 +1,15 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { TAdminRole, TMembershipRole } from '@blog/db/constants';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { AccountMenu } from './components/account-menu';
-import { TopbarNavMenu } from './topbar-nav-menu';
+import { TopbarNavMenu } from './components/topbar-nav-menu';
 import { topbarVariants } from './topbar-variants';
 
 export type TRoleChipProps = {
-  name: string | undefined;
+  name: TMaybeUndefined<string>;
   role: TAdminRole | TMembershipRole;
   scope: string;
 };

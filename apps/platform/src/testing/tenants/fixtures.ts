@@ -51,7 +51,6 @@ export const idleDeprovisioningSteps = (): TTenantDeprovisioningState => {
   };
 };
 
-/** Every deprovisioning step DONE, with no `run` set — pass one via the caller's own spread when a test needs it. */
 export const doneDeprovisioningSteps = (): TTenantDeprovisioningState => {
   const done: TDeprovisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
@@ -84,7 +83,6 @@ const doneProvisioningSteps = (): TTenantProvisioningState => {
   };
 };
 
-/** Shared `TTenant` fixture builder — used by any test that needs a full tenant row rather than a single field. */
 export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
     id: 'tenant-1',
@@ -111,11 +109,6 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   };
 };
 
-/**
- * A fully provisioned tenant — every step DONE except the owner-elevation
- * outcome, which is still pending — for tests of a tab/page that only needs
- * a READY tenant to render, not the provisioning flow itself.
- */
 export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return makeTenant({
     sanityProjectId: 'proj-1',

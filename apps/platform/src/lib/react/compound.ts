@@ -15,12 +15,7 @@ interface ICompoundSlots<M extends TComponentMap> {
   unmatched: ReactNode[];
 }
 
-/**
- * `Children.forEach` treats a `<>...</>` Fragment as one opaque child instead
- * of descending into it — common when a compound root's `children` is built
- * as a single JSX expression. Recursing here lets `mapCompoundSlots` match
- * slots the same way regardless of Fragment wrapping.
- */
+// `Children.forEach` treats a Fragment as one opaque child, so slots inside one would otherwise go unmatched.
 const flattenFragments = (children: ReactNode): ReactNode[] => {
   const flat: ReactNode[] = [];
   Children.forEach(children, (child) => {
@@ -34,12 +29,6 @@ const flattenFragments = (children: ReactNode): ReactNode[] => {
   return flat;
 };
 
-/**
- * Resolves a compound root's `children` against a map of known slot
- * components. Anything that doesn't match a known slot (unknown component,
- * stray text, a duplicate occurrence of an already-matched slot) is returned
- * via `unmatched` instead of being silently dropped.
- */
 export const mapCompoundSlots = <M extends TComponentMap>(
   children: ReactNode,
   componentTypes: M,
@@ -64,7 +53,6 @@ export const mapCompoundSlots = <M extends TComponentMap>(
   return { slots, unmatched };
 };
 
-/** A compound component: its root intersected with its named slot sub-components. */
 export type TCompoundComponent<
   Root extends ElementType,
   Parts extends Record<string, ElementType>,
@@ -74,7 +62,6 @@ type TSlotElement<Parts extends Record<string, ElementType>> = {
   [K in keyof Parts]: ReactElement<ComponentProps<Parts[K]>, Parts[K]>;
 }[keyof Parts];
 
-/** Strictly types a compound root's `children` to its own known slots. */
 type TMaybeSlotElement<Parts extends Record<string, ElementType>> =
   TSlotElement<Parts> | false | null | undefined;
 

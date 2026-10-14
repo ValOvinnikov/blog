@@ -9,10 +9,6 @@ export type TToastViewportProps = {
   dataTestId?: string;
 };
 
-/**
- * The fixed, bottom-right region that stacks `Toast` rows. A pure layout
- * shell — the queue, cap, and dismissal logic live in `ToastProvider`.
- */
 export const ToastViewport = ({
   ariaLabel,
   children,

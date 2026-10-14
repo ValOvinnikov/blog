@@ -1,6 +1,6 @@
 import { ALERT_TYPE, type TAlertType } from '@blog/config';
-import type { TDispatchNoticeKind } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { Alert } from '@platform/components/shared/alert';
+import type { TDispatchNoticeKind } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useTranslations } from 'next-intl';
 
 const NOTICE_MESSAGES = {

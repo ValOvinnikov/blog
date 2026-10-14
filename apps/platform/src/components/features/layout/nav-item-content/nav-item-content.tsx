@@ -10,15 +10,17 @@ import {
 
 import { navItemContentVariants } from './nav-item-content-variants';
 
+export type TNavItemBadge = {
+  label: string;
+  tone: TStatusBadgeProps['tone'];
+  hasDot?: boolean;
+};
+
 export type TNavItemContentProps = {
   icon: TRegisteredIconName;
   label: string;
   disabledReason?: string;
-  badge?: {
-    label: string;
-    tone: TStatusBadgeProps['tone'];
-    hasDot?: boolean;
-  };
+  badge?: TNavItemBadge;
 };
 
 export const NavItemContent = ({

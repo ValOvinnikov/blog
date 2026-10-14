@@ -1,10 +1,9 @@
+import { cardVariants } from '@platform/components/shared/card/card-variants';
 import {
   Heading,
   type THeadingLevel,
 } from '@platform/components/shared/heading';
 import type { ReactNode } from 'react';
-
-import { cardVariants } from '../../card-variants';
 
 export type TCardHeaderProps = {
   title: ReactNode;

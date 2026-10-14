@@ -21,6 +21,7 @@ export type TSettingsFeatureToggles = Pick<
 
 export type TSettingsFeaturesAndPreset = {
   features: TMaybeUndefined<TSettingsFeatureToggles>;
+  updatedAt: TMaybeUndefined<Date>;
   preset: TMaybeUndefined<TPresetId>;
 };
 
@@ -37,6 +38,7 @@ export async function getSettingsFeaturesAndPreset(
         analyticsEnabled: settingsFeatures.analyticsEnabled,
         consentBannerEnabled: settingsFeatures.consentBannerEnabled,
       },
+      updatedAt: settingsFeatures.updatedAt,
       preset: siteConfig.preset,
     })
     .from(tenants)
@@ -46,6 +48,7 @@ export async function getSettingsFeaturesAndPreset(
 
   return {
     features: row?.features ?? undefined,
+    updatedAt: row?.updatedAt ?? undefined,
     preset: row?.preset ?? undefined,
   };
 }

@@ -8,17 +8,15 @@ import {
   type TTenantStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
+import type { TStatusBadgeProps } from '@platform/components/shared/status-badge';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 
-type TBadgeTone = 'ok' | 'warn' | 'bad' | 'neutral' | 'brand';
+type TBadgeTone = NonNullable<TStatusBadgeProps['tone']>;
 
-// Tone is a design-system concern, not display text — the visible label for
-// each status/plan lives in `i18n/messages/en.json` under `tenantsTable`,
-// keyed by these same enum values.
 const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
   [TENANT_STATUS.ACTIVE]: 'ok',
   [TENANT_STATUS.SUSPENDED]: 'warn',
@@ -26,12 +24,13 @@ const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
 };
 
 const PROVISIONING_STEP_TONE: Record<
-  Exclude<TTenantProvisioningStepStatus, 'FAILED'>,
+  TTenantProvisioningStepStatus,
   TBadgeTone
 > = {
   [TENANT_PROVISIONING_STEP_STATUS.IDLE]: 'neutral',
   [TENANT_PROVISIONING_STEP_STATUS.RUNNING]: 'warn',
   [TENANT_PROVISIONING_STEP_STATUS.DONE]: 'ok',
+  [TENANT_PROVISIONING_STEP_STATUS.FAILED]: 'bad',
 };
 
 const DOMAIN_VERIFICATION_TONE: Record<TDomainVerificationStatus, TBadgeTone> =
@@ -74,9 +73,8 @@ export const tenantStatusTone = (status: TTenantStatus) =>
 export const findingSeverityTone = (severity: TFindingSeverity) =>
   FINDING_SEVERITY_TONE[severity];
 
-export const provisioningStepTone = (
-  status: Exclude<TTenantProvisioningStepStatus, 'FAILED'>,
-) => PROVISIONING_STEP_TONE[status];
+export const provisioningStepTone = (status: TTenantProvisioningStepStatus) =>
+  PROVISIONING_STEP_TONE[status];
 
 export const domainVerificationTone = (status: TDomainVerificationStatus) =>
   DOMAIN_VERIFICATION_TONE[status];

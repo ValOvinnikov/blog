@@ -12,16 +12,11 @@ import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
-  EMAIL_TEMPLATE_TYPE_VALUES,
   emailTemplateCopyInputSchema,
+  emailTemplateTypeSchema,
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
-
-const LOCALE_ISO_CODE_VALUES = Object.values(LOCALE_ISO_CODES) as [
-  TLocaleIsoCode,
-  ...TLocaleIsoCode[],
-];
 
 export type TUpdateEmailTemplateInput = z.input<
   typeof emailTemplateCopyInputSchema
@@ -35,10 +30,8 @@ export const updateEmailTemplateAction = async (
   locale: TLocaleIsoCode,
   input: TUpdateEmailTemplateInput,
 ): Promise<TUpdateEmailTemplateResult> => {
-  const parsedTemplateType = z
-    .enum(EMAIL_TEMPLATE_TYPE_VALUES)
-    .safeParse(templateType);
-  const parsedLocale = z.enum(LOCALE_ISO_CODE_VALUES).safeParse(locale);
+  const parsedTemplateType = emailTemplateTypeSchema.safeParse(templateType);
+  const parsedLocale = z.enum(LOCALE_ISO_CODES).safeParse(locale);
   const parsedInput = emailTemplateCopyInputSchema.safeParse(input);
   if (
     !parsedTemplateType.success ||

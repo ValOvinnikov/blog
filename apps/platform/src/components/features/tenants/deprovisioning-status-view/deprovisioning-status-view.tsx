@@ -1,26 +1,25 @@
 'use client';
 
-import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
+import {
+  CORE_DEPROVISIONING_STEPS,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import { RunCard } from '@platform/components/features/tenants/run-card';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
 import { RunStatusBadge } from '@platform/components/features/tenants/run-status-badge';
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import type { THeadingLevel } from '@platform/components/shared/heading';
+import type { TUseDeprovisioningPollResult } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
 import { useTranslations } from 'next-intl';
 
 import { deprovisioningStatusViewVariants } from './deprovisioning-status-view-variants';
-import {
-  STEP_ORDER,
-  type TUseDeprovisioningPollResult,
-} from './use-deprovisioning-poll';
 
 export type TDeprovisioningStatusViewProps = {
   poll: TUseDeprovisioningPollResult;
   headingLevel?: Exclude<THeadingLevel, 1>;
 };
 
-/** No retry control: a failed run is re-dispatched through `DeprovisionTenantControl`, which the page renders above this. */
 export const DeprovisioningStatusView = ({
   poll,
   headingLevel = 2,
@@ -43,7 +42,7 @@ export const DeprovisioningStatusView = ({
   const isPreRun = deprovisioningSteps === null;
   const { root, cardsRow } = deprovisioningStatusViewVariants();
 
-  const steps = STEP_ORDER.map((stepKey, index) => ({
+  const steps = CORE_DEPROVISIONING_STEPS.map((stepKey, index) => ({
     key: stepKey,
     title: t(`stepLabel.${stepKey}`),
     status: stepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,

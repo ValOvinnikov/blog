@@ -1,9 +1,7 @@
 import { EmailPageContent } from '@platform/components/features/email/email-page-content';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
-import {
-  renderTenantScopedPage,
-  tenantPageMetadata,
-} from '@platform/server/tenant-pages/render-tenant-scoped-page';
+import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
+import { renderTenantScopedPage } from '@platform/server/tenant-pages/render-tenant-scoped-page';
 import type { Metadata } from 'next';
 
 type TProps = {
@@ -11,7 +9,7 @@ type TProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  return tenantPageMetadata('email');
+  return pageMetadata('email');
 }
 
 export default async function EmailPage({ params }: TProps) {

@@ -8,7 +8,11 @@ import {
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 
-import { defaultLookFormValues, toLookFormValues } from './default-look-values';
+import {
+  defaultLookFormValues,
+  lookFormValuesOrDefaults,
+  toLookFormValues,
+} from './default-look-values';
 
 describe(defaultLookFormValues, () => {
   it('matches the Console preset registry defaults, with logo hue following accent', () => {
@@ -63,5 +67,13 @@ describe(toLookFormValues, () => {
       logo: { url: 'https://example.blob.vercel-storage.com/logo.png' },
       favicon: { url: 'https://example.blob.vercel-storage.com/favicon.png' },
     });
+  });
+});
+
+describe(lookFormValuesOrDefaults, () => {
+  it('falls back to the defaults when there is no saved row', () => {
+    expect(lookFormValuesOrDefaults(undefined)).toEqual(
+      defaultLookFormValues(),
+    );
   });
 });

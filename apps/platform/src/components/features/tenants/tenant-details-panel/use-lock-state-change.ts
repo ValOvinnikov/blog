@@ -25,12 +25,6 @@ export type TUseLockStateChangeResult = {
   fieldsContainerRef: RefObject<HTMLDivElement | null>;
 };
 
-/**
- * Tracks the locked-field set across renders (derived-during-render, per
- * React's guidance) so a background poll's lock transition — not user
- * action — announces itself and moves focus onto the fields container only
- * when it fires while focus was already inside the panel.
- */
 export const useLockStateChange = ({
   panelId,
   fieldLocks,
@@ -39,38 +33,30 @@ export const useLockStateChange = ({
   onFieldsLocked,
 }: TUseLockStateChangeArgs): TUseLockStateChangeResult => {
   const lockedFieldKeys = lockedFieldKeysOf(fieldLocks);
-  const [renderedLockedFieldsKey, setRenderedLockedFieldsKey] = useState(() =>
-    [...lockedFieldKeys].sort().join(','),
+  const sortedLockedFieldKeys = [...lockedFieldKeys].sort();
+  const [renderedLockedKeys, setRenderedLockedKeys] = useState(
+    sortedLockedFieldKeys,
   );
   const [lockAnnouncement, setLockAnnouncement] = useState('');
   const [shouldMoveFocusOnTransition, setShouldMoveFocusOnTransition] =
     useState(false);
   const fieldsContainerRef = useRef<HTMLDivElement>(null);
-  const isMountRef = useRef(true);
 
-  const nextLockedFieldsKey = [...lockedFieldKeys].sort().join(',');
-  if (nextLockedFieldsKey !== renderedLockedFieldsKey) {
-    const previousLockedKeys = new Set(
-      renderedLockedFieldsKey
-        ? (renderedLockedFieldsKey.split(',') as TTenantFieldKey[])
-        : [],
+  const hasLockSetChanged =
+    sortedLockedFieldKeys.length !== renderedLockedKeys.length ||
+    sortedLockedFieldKeys.some(
+      (key, index) => key !== renderedLockedKeys[index],
     );
+  if (hasLockSetChanged) {
+    const previousLockedKeys = new Set(renderedLockedKeys);
     const currentLockedKeys = new Set(lockedFieldKeys);
     const newlyLockedKeys = lockedFieldKeys.filter(
       (key) => !previousLockedKeys.has(key),
     );
-    const newlyUnlockedKeys = [...previousLockedKeys].filter(
+    const newlyUnlockedKeys = renderedLockedKeys.filter(
       (key) => !currentLockedKeys.has(key),
     );
-    setRenderedLockedFieldsKey(nextLockedFieldsKey);
-    // Set-based, not count-based: a same-count swap (one field locks as
-    // another unlocks) must still announce the lock rather than cancel out
-    // to nothing.
-    if (newlyLockedKeys.length > 0) {
-      setLockAnnouncement(lockedAnnouncement);
-    } else if (newlyUnlockedKeys.length > 0) {
-      setLockAnnouncement(unlockedAnnouncement);
-    }
+    setRenderedLockedKeys(sortedLockedFieldKeys);
     setShouldMoveFocusOnTransition(
       Boolean(
         document.activeElement?.closest(
@@ -79,23 +65,20 @@ export const useLockStateChange = ({
       ),
     );
     if (newlyLockedKeys.length > 0) {
+      setLockAnnouncement(lockedAnnouncement);
       onFieldsLocked(newlyLockedKeys);
+    } else if (newlyUnlockedKeys.length > 0) {
+      setLockAnnouncement(unlockedAnnouncement);
     }
   }
 
-  // A layout effect commits after the live-region text mutation above and
-  // before paint, so the focus move lands after that text is in the DOM
-  // rather than racing it.
+  // A layout effect moves focus before paint, after the live-region text is in the DOM.
   useLayoutEffect(() => {
-    if (isMountRef.current) {
-      isMountRef.current = false;
-      return;
-    }
     if (!shouldMoveFocusOnTransition) {
       return;
     }
     fieldsContainerRef.current?.focus();
-  }, [renderedLockedFieldsKey, shouldMoveFocusOnTransition]);
+  }, [renderedLockedKeys, shouldMoveFocusOnTransition]);
 
   return { lockAnnouncement, fieldsContainerRef };
 };

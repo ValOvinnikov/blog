@@ -1,5 +1,6 @@
-import { dispatchGitHubWorkflow } from '@platform/utils/dispatch-github-workflow/dispatch-github-workflow';
 import { env } from '@platform/utils/env/env';
+
+import { dispatchGitHubWorkflow } from './dispatch-github-workflow';
 
 const WORKFLOW_FILE = 'deprovision-tenant.yml';
 
@@ -9,16 +10,7 @@ export type TDispatchDeprovisioningWorkflowInput = {
   dryRun: boolean;
 };
 
-/**
- * `workflow_dispatch` trigger for `.github/workflows/deprovision-tenant.yml`.
- * Never throws — every failure (missing token, network error, non-2xx
- * response) is logged and swallowed — but reports success via its return
- * value so the caller can tell whether the workflow was actually requested.
- * `confirm` is re-checked here against the tenant's live name by the caller
- * before this is ever invoked, but the workflow itself re-validates it
- * independently — this dispatch is a convenience trigger, not the safety
- * boundary.
- */
+/** The workflow re-validates `confirm` itself; this dispatch is a trigger, not the safety boundary. */
 export const dispatchDeprovisioningWorkflow = async ({
   tenantId,
   confirm,

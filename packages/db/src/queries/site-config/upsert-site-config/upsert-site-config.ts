@@ -14,6 +14,8 @@ import {
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
+  HUE_MAX,
+  HUE_MIN,
   isLocaleIsoCode,
   LOCALE_ISO_CODES,
   PRESET_ID,
@@ -40,9 +42,6 @@ import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { toSiteConfigResult, type TSiteConfigResult } from '../get-site-config';
-
-const HUE_MIN = 0;
-const HUE_MAX = 360;
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 

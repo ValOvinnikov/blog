@@ -45,11 +45,6 @@ const isValidationResult = (
   );
 };
 
-/**
- * Recognizes the `DOCUMENT_VALIDATION`/`SCHEMA_VALIDATION_ERROR` finding
- * shape; returns `null` for anything else so the caller can fall back to a
- * raw dump.
- */
 export const parseDocumentValidationDetails = (
   details: Record<string, unknown>,
 ): TDocumentValidationDetails | null => {

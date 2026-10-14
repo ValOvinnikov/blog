@@ -5,14 +5,11 @@ import { inter } from '@platform/config/font-loaders/inter-font';
 import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { routing } from '@platform/i18n/routing';
+import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import {
-  getMessages,
-  getTranslations,
-  setRequestLocale,
-} from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   children: React.ReactNode;
@@ -24,8 +21,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('pageMetadata');
-  return { title: t('root') };
+  return pageMetadata('root');
 }
 
 export default async function LocaleLayout({ children, params }: TProps) {

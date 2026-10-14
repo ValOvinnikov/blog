@@ -1,3 +1,4 @@
+import { SIZE } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { selectFile } from '@platform/testing/select-file';
 import userEvent from '@testing-library/user-event';
@@ -14,7 +15,7 @@ const baseProps: TAssetUploadFieldProps = {
   onStage: vi.fn(),
   asset: {
     kind: 'logo',
-    size: 'md',
+    size: SIZE.MD,
     acceptedMimeTypes: ['image/png', 'image/jpeg', 'image/webp'],
     validateFile: () => undefined,
   },

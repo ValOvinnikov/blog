@@ -16,10 +16,6 @@ export type TFontPickerProps = {
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
-/**
- * Renders the closed set of five `FONT_CHOICE` options, each in its own
- * loaded webfont — reused for both the heading and body pickers.
- */
 export const FontPicker = ({
   ariaLabel,
   value,

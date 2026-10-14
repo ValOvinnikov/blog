@@ -1,25 +1,18 @@
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { TenantsTable } from './tenants-table';
 
 const render = renderWithIntl;
-
-const buildTenant = (overrides: Partial<TTenant> = {}): TTenant =>
-  makeTenant({
-    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    ...overrides,
-  });
 
 describe(TenantsTable, () => {
   it('renders one row per tenant with its name, domain, plan and status', () => {
     render(
       <TenantsTable
         tenants={[
-          buildTenant(),
-          buildTenant({
+          makeReadyTenant(),
+          makeReadyTenant({
             id: 'tenant-2',
             name: 'Harbor Co.',
             primaryDomain: 'harbor.example.com',
@@ -44,8 +37,8 @@ describe(TenantsTable, () => {
     render(
       <TenantsTable
         tenants={[
-          buildTenant(),
-          buildTenant({
+          makeReadyTenant(),
+          makeReadyTenant({
             id: 'tenant-2',
             name: 'Harbor Co.',
             primaryDomain: 'harbor.example.com',
@@ -66,10 +59,10 @@ describe(TenantsTable, () => {
     render(
       <TenantsTable
         tenants={[
-          buildTenant({
+          makeReadyTenant({
             provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
           }),
-          buildTenant({
+          makeReadyTenant({
             id: 'tenant-2',
             name: 'Harbor Co.',
             primaryDomain: 'harbor.example.com',
@@ -88,7 +81,7 @@ describe(TenantsTable, () => {
   });
 
   it('names the scrollable table region and the actions column for screen readers', () => {
-    render(<TenantsTable tenants={[buildTenant()]} />);
+    render(<TenantsTable tenants={[makeReadyTenant()]} />);
 
     expect(screen.getByRole('region', { name: 'Tenants' })).toContainElement(
       screen.getByRole('table'),
@@ -97,7 +90,7 @@ describe(TenantsTable, () => {
   });
 
   it('renders the created date as a machine-readable time', () => {
-    render(<TenantsTable tenants={[buildTenant()]} />);
+    render(<TenantsTable tenants={[makeReadyTenant()]} />);
 
     expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
       'dateTime',

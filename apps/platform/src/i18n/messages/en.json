@@ -661,9 +661,7 @@
       "VERIFY_CONTENT": "Confirm content is ready"
     },
     "retryButton": "Retry provisioning",
-    "retryingButton": "Retrying provisioning…",
     "startButton": "Start provisioning",
-    "startingButton": "Starting…",
     "startError": "Couldn't start provisioning — try again.",
     "startErrorNotFound": "Couldn't find this tenant — refresh the page and try again.",
     "startErrorArchived": "This tenant is archived; provisioning can't be started.",
