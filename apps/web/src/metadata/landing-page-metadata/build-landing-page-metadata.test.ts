@@ -178,8 +178,8 @@ describe('buildLandingPageMetadata', () => {
     it('emits locale, alternate locale and url for an EN page with a live NL translation', async () => {
       const metadata = await buildLandingPageMetadata('about-us');
 
-      expect(metadata.openGraph?.locale).toBe('en');
-      expect(metadata.openGraph?.alternateLocale).toEqual(['nl']);
+      expect(metadata.openGraph?.locale).toBe('en_US');
+      expect(metadata.openGraph?.alternateLocale).toEqual(['nl_NL']);
       expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
     });
   });
@@ -201,7 +201,7 @@ describe('buildLandingPageMetadata', () => {
     it('emits only locale and url, with no alternate locale, for a page with no translation', async () => {
       const metadata = await buildLandingPageMetadata('about-us');
 
-      expect(metadata.openGraph?.locale).toBe('en');
+      expect(metadata.openGraph?.locale).toBe('en_US');
       expect(metadata.openGraph?.alternateLocale).toBeUndefined();
       expect(metadata.openGraph?.url).toBe('/about-us');
     });
@@ -265,8 +265,8 @@ describe('buildLandingPageMetadata', () => {
     it('emits locale, alternate locale and url for the NL translation of the same page', async () => {
       const metadata = await buildLandingPageMetadata('over-ons');
 
-      expect(metadata.openGraph?.locale).toBe('nl');
-      expect(metadata.openGraph?.alternateLocale).toEqual(['en']);
+      expect(metadata.openGraph?.locale).toBe('nl_NL');
+      expect(metadata.openGraph?.alternateLocale).toEqual(['en_US']);
       expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
     });
   });

@@ -21,6 +21,14 @@ export const LOCALE_BCP47_TAGS = {
   ES: 'es',
 } as const satisfies Record<keyof typeof LOCALE_ISO_CODES, string>;
 
+export const LOCALE_OPEN_GRAPH_TAGS = {
+  EN: 'en_US',
+  NL: 'nl_NL',
+  FR: 'fr_FR',
+  DE: 'de_DE',
+  ES: 'es_ES',
+} as const satisfies Record<keyof typeof LOCALE_ISO_CODES, string>;
+
 export const LOCALE_NATIVE_LABEL = {
   EN: 'English',
   NL: 'Nederlands',
