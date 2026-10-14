@@ -4,6 +4,7 @@ import { tv } from 'tailwind-variants';
 export const pricingPeriodSwitchVariants = tv({
   slots: {
     control: ['mb-6 flex'],
+    switch: ['rounded-full', '*:rounded-full'],
   },
   variants: {
     align: {

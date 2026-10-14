@@ -39,6 +39,7 @@ export const PricingPeriodSwitch = ({
           value={selected}
           onChange={setSelected}
           ariaLabel={t('periodSwitchLabel')}
+          className={v.switch()}
         />
       </div>
       {panels.map(({ period, content }) => (
