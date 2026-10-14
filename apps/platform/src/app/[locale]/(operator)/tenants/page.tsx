@@ -1,12 +1,11 @@
 import { queries } from '@blog/db';
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
+import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { env } from '@platform/utils/env/env';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('pageMetadata');
-  return { title: t('tenants') };
+  return pageMetadata('tenants');
 }
 
 type TProps = {

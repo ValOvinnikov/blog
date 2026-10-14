@@ -4,6 +4,9 @@ import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provid
 import messages from '@platform/i18n/messages/en.json';
 import {
   render as rtlRender,
+  renderHook as rtlRenderHook,
+  type RenderHookOptions,
+  type RenderHookResult,
   type RenderOptions,
   type RenderResult,
 } from '@testing-library/react';
@@ -12,7 +15,7 @@ import { createElement, type ComponentType, type ReactNode } from 'react';
 
 type TRenderOpts = Omit<RenderOptions, 'wrapper'>;
 
-// Mirrors `[locale]/layout.tsx`'s client providers, which every rendered tree sits under live.
+// Client renders need the real intl provider, as every page gets from `[locale]/layout.tsx`.
 const AppProviders = ({ children }: { children: ReactNode }) => (
   <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
     <ToastProvider>
@@ -21,12 +24,6 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
   </NextIntlClientProvider>
 );
 
-/**
- * Async-server-component variant: binds an async component + default props;
- * `await setup(overrides?)` awaits the component with the merged props, then
- * renders the result. Also lets `await expect(setup({…})).rejects.toThrow(…)`
- * work for routes that redirect before returning JSX.
- */
 export const customRenderAsync = <P extends object>(
   Component: (props: P) => Promise<ReactNode>,
   defaultProps: NoInfer<P>,
@@ -45,11 +42,6 @@ export const renderWithIntl = (
   options?: TRenderOpts,
 ): RenderResult => rtlRender(ui, { ...options, wrapper: AppProviders });
 
-/**
- * Bind a (sync) component + its default props once, get a `setup(overrides?)`
- * renderer — the sync counterpart of `customRenderAsync`, for the common case
- * of many tests rendering the same component with one or two props varied.
- */
 export const customRender = <P extends object>(
   Component: ComponentType<P>,
   defaultProps: NoInfer<P>,
@@ -60,5 +52,11 @@ export const customRender = <P extends object>(
       wrapper: AppProviders,
     });
 };
+
+export const renderHookWithIntl = <TResult, TProps>(
+  callback: (props: TProps) => TResult,
+  options?: Omit<RenderHookOptions<TProps>, 'wrapper'>,
+): RenderHookResult<TResult, TProps> =>
+  rtlRenderHook(callback, { ...options, wrapper: AppProviders });
 
 export * from '@testing-library/react';

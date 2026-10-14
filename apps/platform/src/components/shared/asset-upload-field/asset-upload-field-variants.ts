@@ -1,3 +1,4 @@
+import { SIZE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
 
 export const assetUploadFieldVariants = tv({
@@ -21,14 +22,14 @@ export const assetUploadFieldVariants = tv({
   },
   variants: {
     size: {
-      md: {
+      [SIZE.MD]: {
         root: [
           'flex-col rounded-admin border-[1.5px] border-dashed border-admin-line p-[14px]',
         ],
         thumb: ['size-12 rounded-admin-control'],
         actions: ['mt-[11px] flex-wrap'],
       },
-      sm: {
+      [SIZE.SM]: {
         field: ['@container'],
         root: [
           'flex-wrap items-center gap-3 rounded-admin border border-admin-line px-3 py-2.5',
@@ -41,6 +42,6 @@ export const assetUploadFieldVariants = tv({
     },
   },
   defaultVariants: {
-    size: 'md',
+    size: SIZE.MD,
   },
 });

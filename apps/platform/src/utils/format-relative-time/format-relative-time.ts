@@ -1,4 +1,5 @@
 import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
+import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -9,16 +10,10 @@ const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   day: 'numeric',
 };
 
-/** Structurally compatible with both `useTranslations`'s and `getTranslations`'s return type, without fighting next-intl's per-namespace literal-key generic. */
-export type TRelativeTimeTranslator = (
-  key: string,
-  values?: Record<string, string | number>,
-) => string;
-
 /** Falls back to an absolute short date past a week, where a relative label stops being useful at a glance. */
 export const formatRelativeTime = (
   date: Date,
-  t: TRelativeTimeTranslator,
+  t: TLooseTranslator,
   locale: TLocaleIsoCode,
   now: Date = new Date(),
 ): string => {

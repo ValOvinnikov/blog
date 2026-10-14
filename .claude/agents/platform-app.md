@@ -513,7 +513,7 @@ them to fix these.
   - Each surface's specimen lives in `site-preview/voice-specimen/` and places
     every field through a `Record<TVoiceFieldId, …>` map, so a registered
     field with no place fails type-check. Wrap a field's specimen text in
-    `VoiceKeyFrame` (`data-voice-key`) for the focus outline; never widen a
+    `VoiceKeyFrame` for the focus outline; never widen a
     `@blog/ui` prop for it.
   - Rich values render through `site-preview/voice-rich-text/`, which handles
     exactly `VOICE_PORTABLE_TEXT_SCHEMA`'s marks; the platform may not

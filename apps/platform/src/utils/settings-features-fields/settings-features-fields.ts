@@ -15,12 +15,6 @@ export type TCapabilityToggle = {
   isComingSoon?: boolean;
 };
 
-/**
- * The single source of truth mapping each `TCapability` to its
- * `settings_features` column — the Features tab renders one row per entry,
- * and the Server Action walks the same list to re-check plan entitlement
- * per capability before writing anything.
- */
 export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
   {
     capability: CAPABILITY.COMMENTS,
@@ -42,7 +36,6 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
   { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
 ];
 
-/** Converts a `PRESET_REGISTRY[preset].featureDefaults` map into the column-keyed view-model shape. */
 export const featureDefaultsToValues = (
   defaults: Record<TCapability, boolean>,
 ): TSettingsFeaturesValues => {
@@ -53,14 +46,7 @@ export const featureDefaultsToValues = (
   return values;
 };
 
-/**
- * Forces every capability outside `entitledCapabilities` to `false` before
- * the values ever reach the form. A stale `true` left over from a plan
- * downgrade would otherwise render a locked toggle checked-but-disabled and
- * ride along in every subsequent save payload, permanently tripping
- * `updateFeaturesAction`'s reject-whole-save check even when the operator
- * only touches an entitled field.
- */
+/** A stale `true` from a plan downgrade would otherwise ride along in every save and trip `updateFeaturesAction`'s reject-whole-save check. */
 export const clampToEntitlement = (
   values: TSettingsFeaturesValues,
   entitledCapabilities: TCapability[],

@@ -1,12 +1,6 @@
 import { createTV } from 'tailwind-variants';
 
-/**
- * Project-configured `tv`. Import this instead of `tv` from `tailwind-variants`.
- *
- * Keep these lists in sync with `theme.css`'s custom `--text-*`/`--font-*`/
- * `--tracking-*`/`--spacing-*` tokens, or `tailwind-merge` will misclassify
- * or silently drop them again.
- */
+// Keep these lists in sync with the custom tokens in `theme.css` and `admin-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
   'display',
   'hero',
@@ -59,6 +53,11 @@ const SPACING_TOKENS = [
   'card-y',
 ];
 
+const RADIUS_TOKENS = ['admin', 'admin-control'];
+
+const SHADOW_TOKENS = ['admin', 'admin-lg'];
+
+/** Project-configured `tv`. Import this instead of `tv` from `tailwind-variants`. */
 export const tv = createTV({
   twMergeConfig: {
     extend: {
@@ -66,6 +65,11 @@ export const tv = createTV({
         'font-size': [{ text: FONT_SIZE_TOKENS }],
         'font-family': [{ font: FONT_FAMILY_TOKENS }],
         tracking: [{ tracking: TRACKING_TOKENS }],
+        rounded: [{ rounded: RADIUS_TOKENS }],
+        'rounded-t': [{ 'rounded-t': RADIUS_TOKENS }],
+        'rounded-b': [{ 'rounded-b': RADIUS_TOKENS }],
+        'rounded-br': [{ 'rounded-br': RADIUS_TOKENS }],
+        shadow: [{ shadow: SHADOW_TOKENS }],
         p: [{ p: SPACING_TOKENS }],
         px: [{ px: SPACING_TOKENS }],
         py: [{ py: SPACING_TOKENS }],

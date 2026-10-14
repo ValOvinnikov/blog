@@ -17,34 +17,23 @@ import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
 } from '@platform/utils/provisioning-error/provisioning-error';
+import {
+  findFailedStep,
+  stepStatusesFor,
+  stepUpdatedAtFor,
+} from '@platform/utils/run-steps/run-steps';
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
 import { useEffect, useRef, useState } from 'react';
 
-export const STEP_ORDER = CORE_DEPROVISIONING_STEPS;
-
 const STEP_POLL_INTERVAL_MS = 4000;
-// Bounds a run that never reports a terminal step (a crashed runner),
-// comfortably past any realistic teardown duration.
-const MAX_POLL_TICKS = 75; // ~5 minutes of visible polling at STEP_POLL_INTERVAL_MS
+// ~5 minutes: bounds a crashed runner, well past any realistic teardown.
+const MAX_POLL_TICKS = 75;
 
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.RUNNING,
   TENANT_PROVISIONING_STEP_STATUS.FAILED,
   TENANT_PROVISIONING_STEP_STATUS.DONE,
 ];
-
-const stepStatusesFor = (
-  steps: TTenantDeprovisioningState | null,
-): TTenantProvisioningStepStatus[] =>
-  STEP_ORDER.map(
-    (stepKey) =>
-      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  );
-
-const stepUpdatedAtFor = (
-  steps: TTenantDeprovisioningState | null,
-): TMaybeUndefined<string>[] =>
-  STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
 
 const deriveOverallStatus = (
   statuses: TTenantProvisioningStepStatus[],
@@ -61,9 +50,7 @@ const isTerminalOverallStatus = (
   status === TENANT_PROVISIONING_STEP_STATUS.DONE ||
   status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
 
-// A dispatch that postdates the tenant's own last run (its `finishedAt`, or
-// `startedAt` for one still in flight) is a retry the workflow hasn't
-// reported in on yet — including one dispatched over a stale FAILED run.
+// A dispatch newer than the last run is a retry not yet reported, even over a stale FAILED run.
 const isRetryPending = (
   deprovisionRequestedAt: TMaybeUndefined<string>,
   run: TMaybeUndefined<TDeprovisioningRun>,
@@ -120,7 +107,10 @@ export const useDeprovisioningPoll = (
     ? null
     : polledDeprovisioningSteps;
 
-  const stepStatuses = stepStatusesFor(deprovisioningSteps);
+  const stepStatuses = stepStatusesFor(
+    deprovisioningSteps,
+    CORE_DEPROVISIONING_STEPS,
+  );
   const overallStatus = deriveOverallStatus(stepStatuses);
   const isRunning = overallStatus === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
   const isInProgress = isEnabled && !isTerminalOverallStatus(overallStatus);
@@ -161,20 +151,19 @@ export const useDeprovisioningPoll = (
     };
   }, [tenant.id, shouldPoll]);
 
-  const stepUpdatedAt = stepUpdatedAtFor(deprovisioningSteps);
+  const stepUpdatedAt = stepUpdatedAtFor(
+    deprovisioningSteps,
+    CORE_DEPROVISIONING_STEPS,
+  );
   const run = deprovisioningSteps?.run;
   const isFailed = overallStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED;
   const isDone = overallStatus === TENANT_PROVISIONING_STEP_STATUS.DONE;
 
-  const failedStepEntry = isFailed
-    ? STEP_ORDER.find(
-        (stepKey) =>
-          deprovisioningSteps?.[stepKey]?.status ===
-          TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      )
+  const failedStep = isFailed
+    ? findFailedStep(stepStatuses, CORE_DEPROVISIONING_STEPS)
     : undefined;
-  const failedStepError = failedStepEntry
-    ? deprovisioningSteps?.[failedStepEntry]?.error
+  const failedStepError = failedStep
+    ? deprovisioningSteps?.[failedStep]?.error
     : undefined;
   const errorKind = isFailed
     ? classifyProvisioningError(failedStepError)
@@ -190,7 +179,7 @@ export const useDeprovisioningPoll = (
     isInProgress,
     isFailed,
     isDone,
-    failedStep: failedStepEntry,
+    failedStep,
     failedStepError,
     errorKind,
   };

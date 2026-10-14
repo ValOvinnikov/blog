@@ -7,8 +7,7 @@ type TWindow = { count: number; startedAt: number };
 
 const windows = new Map<string, TWindow>();
 
-// Per server instance, like apps/web's client-log limiter: it bounds one
-// admin's sends on a warm instance, not across the fleet.
+// Per server instance: it bounds one admin's sends on a warm instance, not across the fleet.
 export const takeTestEmailSend = (userId: string, now = Date.now()) => {
   for (const [key, window] of windows) {
     if (now - window.startedAt >= WINDOW_MS) windows.delete(key);

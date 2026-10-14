@@ -9,10 +9,10 @@ import {
   idleDeprovisioningSteps,
   makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
+import { useDeprovisioningPoll } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 import userEvent from '@testing-library/user-event';
 
 import { DeprovisioningStatusView } from './deprovisioning-status-view';
-import { useDeprovisioningPoll } from './use-deprovisioning-poll';
 
 const render = renderWithIntl;
 

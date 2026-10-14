@@ -8,7 +8,7 @@ import {
 } from '@platform/components/features/layout/topbar';
 import type { ReactNode } from 'react';
 
-import { ShellFrame } from './components/shell-frame/shell-frame';
+import { ShellFrame } from './components/shell-frame';
 
 export type TAdminShellProps = {
   sections: TSidebarNavSection[];
@@ -19,13 +19,6 @@ export type TAdminShellProps = {
   children: ReactNode;
 };
 
-/**
- * The persistent frame (sidebar + topbar) both the Platform and Tenant
- * layouts render around their gated pages. Carries no authorization logic
- * itself — each layout decides what `sections`/`roleChip` it's entitled to
- * show before this ever renders. `ShellFrame` decides the content column's
- * padded-vs-full-bleed mode from the active route segment.
- */
 export const AdminShell = ({
   sections,
   switcher,

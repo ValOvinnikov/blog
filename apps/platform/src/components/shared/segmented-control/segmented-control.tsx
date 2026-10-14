@@ -22,13 +22,7 @@ export type TSegmentedControlProps<TValue extends string> = {
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
-/**
- * A small either/or choice (plan, density, visibility) rendered as a single
- * always-one-selected group. Built on Base UI's Toggle Group rather than a
- * radiogroup pattern, so clicking the already-selected option would normally
- * toggle it off — that case is swallowed here rather than surfaced, since a
- * segmented control has no "none selected" state.
- */
+/** Built on Base UI's Toggle Group, so clicking the selected option would deselect it; that is swallowed, as there is no "none selected" state. */
 export const SegmentedControl = <TValue extends string>({
   options,
   value,

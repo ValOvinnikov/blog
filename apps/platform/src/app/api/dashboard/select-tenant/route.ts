@@ -7,12 +7,7 @@ import { NextResponse } from 'next/server';
 
 const ACTIVE_TENANT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
-/**
- * Sets the active-tenant cookie after re-verifying `tenantId` against the
- * user's own memberships, or that the tenant exists for a SUPERADMIN. Every
- * link here must pass `prefetch={false}`: a prefetch is a GET and would select
- * the tenant.
- */
+// Every link here must pass `prefetch={false}`: a prefetch is a GET and would select the tenant.
 export async function GET(request: Request): Promise<NextResponse> {
   const url = new URL(request.url);
   const session = await auth();

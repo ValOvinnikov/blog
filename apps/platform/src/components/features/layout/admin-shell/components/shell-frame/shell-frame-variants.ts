@@ -4,21 +4,13 @@ export const shellFrameVariants = tv({
   slots: {
     root: [
       'flex min-h-dvh flex-col bg-admin-bg text-admin-text md:flex-row',
-      // 68px clears the sticky topbar when the document scrolls to a target.
-      '[html:has(&)]:scroll-pt-[68px]',
+      '[html:has(&)]:scroll-pt-admin-topbar',
     ],
     main: ['flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip'],
     content: ['flex-1'],
   },
   variants: {
-    // `root` always grows past the viewport and lets the whole document
-    // scroll, in both modes — that's what keeps `Sidebar` reachable by
-    // scroll however many nav rows it holds, at any viewport height or
-    // zoom level; it must never be capped or `overflow-hidden`. Full-bleed
-    // instead pins `main` itself to the viewport (`h-dvh` + the same
-    // `sticky`/`self-start` pattern `Sidebar` already uses), which gives
-    // `content` a definite, viewport-sized height to hand down to a child
-    // (e.g. embedded Studio) that manages its own internal scrolling.
+    // Never cap or clip `root` (the document must scroll to keep `Sidebar` reachable); full-bleed pins `main` to the viewport instead.
     isFullBleed: {
       true: {
         main: ['h-dvh overflow-hidden md:sticky md:top-0 md:self-start'],

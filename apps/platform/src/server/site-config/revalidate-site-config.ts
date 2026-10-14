@@ -4,14 +4,6 @@ import { logger } from '@platform/utils/logger/logger';
 const REVALIDATE_PATH = '/api/revalidate-site-config';
 const SITE_CONFIG_REVALIDATE_TIMEOUT_MS = 5000;
 
-/**
- * Best-effort call to `apps/web`'s on-demand revalidation endpoint after a
- * Look/Voice save writes `site_config`, so the change appears live within
- * seconds instead of the fallback cache window. Never throws — a failure
- * here (missing config, network error, non-2xx response) is logged and
- * swallowed, since the calling save has already succeeded and that fallback
- * window remains the safety net either way.
- */
 export const revalidateSiteConfig = async (tenantId: string): Promise<void> => {
   const { WEB_APP_URL: webAppUrl, SITE_CONFIG_REVALIDATE_SECRET: secret } = env;
 

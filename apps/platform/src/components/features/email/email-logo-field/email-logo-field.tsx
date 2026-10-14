@@ -1,5 +1,6 @@
 'use client';
 
+import { SIZE } from '@blog/config';
 import {
   AssetUploadField,
   type TAssetUploadSpec,
@@ -33,7 +34,7 @@ export const EmailLogoField = ({
 
   const asset: TAssetUploadSpec = {
     kind,
-    size: 'md',
+    size: SIZE.MD,
     acceptedMimeTypes: ACCEPTED_EMAIL_LOGO_MIME_TYPES,
     validateFile: (file) => {
       const quickError = quickClientEmailLogoCheck(file);

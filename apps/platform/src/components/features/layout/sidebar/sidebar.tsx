@@ -1,31 +1,22 @@
-import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
+import {
+  NavItemContent,
+  type TNavItemBadge,
+} from '@platform/components/features/layout/nav-item-content';
 import { BrandMark } from '@platform/components/shared/brand-mark';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
-import type { TStatusBadgeProps } from '@platform/components/shared/status-badge';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { SidebarCollapseToggle } from './components/sidebar-collapse-toggle';
-import { SidebarNavLink } from './sidebar-nav-link';
+import { SidebarNavLink } from './components/sidebar-nav-link';
 import { sidebarVariants } from './sidebar-variants';
-
-type TSidebarNavBadge = {
-  label: string;
-  tone: TStatusBadgeProps['tone'];
-  hasDot?: boolean;
-};
 
 type TSidebarNavItemBase = {
   label: string;
   icon: TRegisteredIconName;
-  badge?: TSidebarNavBadge;
+  badge?: TNavItemBadge;
 };
 
-/**
- * An item either links somewhere — its active state is detected from the
- * current route, not passed in — or, with no `href`, renders as an inert
- * row. Never an `<a>` with nowhere to go.
- */
 export type TSidebarNavItem = TSidebarNavItemBase &
   (
     | { href: string; disabledReason?: never }
@@ -43,12 +34,6 @@ export type TSidebarProps = {
   switcher?: ReactNode;
 };
 
-/**
- * The persistent nav shell for both the Platform and Tenant sections. Each
- * caller supplies only the sections it's authorized to show — the component
- * itself carries no authorization logic. Growing a section (e.g. adding a
- * built tab) is a matter of appending an item, not reshaping this component.
- */
 export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
   const t = useTranslations('sidebar');
   const {

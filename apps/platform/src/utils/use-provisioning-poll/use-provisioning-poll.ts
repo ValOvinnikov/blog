@@ -22,12 +22,15 @@ import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
 } from '@platform/utils/provisioning-error/provisioning-error';
+import {
+  findFailedStep,
+  stepStatusesFor,
+  stepUpdatedAtFor,
+} from '@platform/utils/run-steps/run-steps';
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect, useRef, useTransition } from 'react';
-
-export const STEP_ORDER = CORE_PROVISIONING_STEPS;
 
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -37,32 +40,16 @@ const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
 ];
 
 const STEP_POLL_INTERVAL_MS = 4000;
-// Outlasts the workflow's 20-minute job timeout plus runner pickup, so only a
-// runner that stopped reporting reaches it.
-const MAX_POLL_TICKS = 375; // 25 minutes of visible polling at STEP_POLL_INTERVAL_MS
-
-const stepStatusesFor = (
-  steps: TTenantProvisioningState | null,
-): TTenantProvisioningStepStatus[] =>
-  STEP_ORDER.map(
-    (stepKey) =>
-      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  );
-
-const stepUpdatedAtFor = (
-  steps: TTenantProvisioningState | null,
-): TMaybeUndefined<string>[] =>
-  STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
+// 25 minutes: outlasts the workflow's 20-minute job timeout plus runner pickup.
+const MAX_POLL_TICKS = 375;
 
 export type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
 export type TUseProvisioningPollResult = {
   dispatchNotice: TMaybeUndefined<TDispatchNoticeKind>;
-  isStarting: boolean;
-  isRetrying: boolean;
-  handleStart: () => void;
-  handleRetry: () => void;
+  isDispatchPending: boolean;
+  handleDispatch: () => void;
   provisioningStatus: TTenantProvisioningStatus | null;
   provisioningSteps: TTenantProvisioningState | null;
   stepStatuses: TTenantProvisioningStepStatus[];
@@ -72,7 +59,7 @@ export type TUseProvisioningPollResult = {
   allIdle: boolean;
   isProvisioningRunning: boolean;
   isOverallFailed: boolean;
-  displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
+  displayOverallStatus: TTenantProvisioningStepStatus;
   failedStepError: TMaybeUndefined<string>;
   errorKind: TMaybeUndefined<TProvisioningErrorKind>;
   ownerElevationOutcome: TMaybeUndefined<TElevateTenantOwnerOutcome>;
@@ -84,11 +71,8 @@ export const useProvisioningPoll = (
   const router = useRouter();
   const toast = useToast();
   const t = useTranslations('provisioningStatusView');
-  // Non-null while the current pollErrorWarning toast is showing, so a
-  // recovering tick dismisses the exact toast a failing one raised.
   const pollErrorToastIdRef = useRef<string | null>(null);
-  const [isRetrying, setIsRetrying] = useState(false);
-  const [isStarting, setIsStarting] = useState(false);
+  const [isDispatchPending, setIsDispatchPending] = useState(false);
   const [dispatchNotice, setDispatchNotice] =
     useState<TMaybeUndefined<TDispatchNoticeKind>>(undefined);
   const [, startTransition] = useTransition();
@@ -107,9 +91,6 @@ export const useProvisioningPoll = (
     setPollTicks(0);
   }
 
-  // The status only turns PROVISIONING once the dispatch's own round trip
-  // resolves, so the in-flight click stands in for it until then.
-  const isDispatchPending = isStarting || isRetrying;
   const provisioningStatus = isDispatchPending
     ? TENANT_PROVISIONING_STATUS.PROVISIONING
     : polledProvisioningStatus;
@@ -158,19 +139,24 @@ export const useProvisioningPoll = (
     };
   }, [tenant.id, shouldPoll, toast, t]);
 
-  const stepStatuses = stepStatusesFor(provisioningSteps);
-  const stepUpdatedAt = stepUpdatedAtFor(provisioningSteps);
+  const stepStatuses = stepStatusesFor(
+    provisioningSteps,
+    CORE_PROVISIONING_STEPS,
+  );
+  const stepUpdatedAt = stepUpdatedAtFor(
+    provisioningSteps,
+    CORE_PROVISIONING_STEPS,
+  );
   const provisioningRun = provisioningSteps?.run;
   const allIdle = stepStatuses.every(
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
   );
-  // `OVERALL_STATUS_PRIORITY` covers every step status, so this always matches.
-  const overallStepStatus = OVERALL_STATUS_PRIORITY.find((candidate) =>
-    stepStatuses.includes(candidate),
-  ) as TTenantProvisioningStepStatus;
+  const overallStepStatus =
+    OVERALL_STATUS_PRIORITY.find((candidate) =>
+      stepStatuses.includes(candidate),
+    ) ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
 
-  // A retry leaves the previous run's FAILED entry in place until the runner
-  // reaches that step again, so it must not read as a current failure.
+  // A retry keeps the previous run's FAILED entries until the runner reaches them again.
   const displayStepStatuses = isProvisioningRunning
     ? stepStatuses.map((status) =>
         status === TENANT_PROVISIONING_STEP_STATUS.FAILED
@@ -182,11 +168,11 @@ export const useProvisioningPoll = (
   const isOverallFailed =
     overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED &&
     provisioningStatus === TENANT_PROVISIONING_STATUS.FAILED;
-  const failedStepError = isOverallFailed
-    ? STEP_ORDER.map((stepKey) => provisioningSteps?.[stepKey]).find(
-        (stepState) =>
-          stepState?.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      )?.error
+  const failedStep = isOverallFailed
+    ? findFailedStep(stepStatuses, CORE_PROVISIONING_STEPS)
+    : undefined;
+  const failedStepError = failedStep
+    ? provisioningSteps?.[failedStep]?.error
     : undefined;
   const errorKind = isOverallFailed
     ? classifyProvisioningError(failedStepError)
@@ -195,15 +181,13 @@ export const useProvisioningPoll = (
   const ownerElevationOutcome =
     provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
 
-  const displayOverallStatus = (
-    isProvisioningRunning
-      ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
-      : overallStepStatus
-  ) as Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
+  const displayOverallStatus = isProvisioningRunning
+    ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
+    : overallStepStatus;
 
-  const runProvisioningDispatch = (setPending: (pending: boolean) => void) => {
+  const handleDispatch = () => {
     setDispatchNotice(undefined);
-    setPending(true);
+    setIsDispatchPending(true);
     setPollTicks(0);
     startTransition(async () => {
       const result = await retryProvisioningStepAction(tenant.id);
@@ -221,19 +205,14 @@ export const useProvisioningPoll = (
         );
       }
 
-      setPending(false);
+      setIsDispatchPending(false);
     });
   };
 
-  const handleRetry = () => runProvisioningDispatch(setIsRetrying);
-  const handleStart = () => runProvisioningDispatch(setIsStarting);
-
   return {
     dispatchNotice,
-    isStarting,
-    isRetrying,
-    handleStart,
-    handleRetry,
+    isDispatchPending,
+    handleDispatch,
     provisioningStatus,
     provisioningSteps,
     stepStatuses,

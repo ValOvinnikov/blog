@@ -1,9 +1,9 @@
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { makeTenant } from '@platform/testing/tenants/fixtures';
 
 import { DashboardTenantPicker } from './dashboard-tenant-picker';
 
@@ -12,19 +12,14 @@ vi.mock('@platform/server/auth/sign-out-action');
 const render = renderWithIntl;
 
 const tenants = [
-  {
-    id: 'tenant-1',
-    name: 'Acme Inc.',
-    primaryDomain: 'acme.example.com',
-    deprovisionedAt: null,
-  },
-  {
+  makeTenant(),
+  makeTenant({
     id: 'tenant-2',
     name: 'Globex Corp.',
     primaryDomain: 'globex.example.com',
     deprovisionedAt: new Date('2026-01-01'),
-  },
-] as TTenant[];
+  }),
+];
 
 describe(DashboardTenantPicker, () => {
   it('renders a heading and every tenant as a visible link through the select-tenant endpoint', () => {

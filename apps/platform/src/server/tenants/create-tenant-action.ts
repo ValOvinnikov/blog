@@ -1,7 +1,7 @@
 'use server';
 
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE, DOMAIN_PATTERN } from '@blog/config';
-import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
+import { queries, TENANT_PLAN } from '@blog/db';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -25,7 +25,7 @@ import { z } from 'zod';
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1),
   domain: z.string().trim().toLowerCase().regex(DOMAIN_PATTERN),
-  plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
+  plan: z.enum(TENANT_PLAN),
   ownerEmail: z.string().trim().toLowerCase().email(),
   confirmOwnerInviteToken: z.string().optional(),
 });
@@ -43,9 +43,6 @@ export type TCreateTenantResult = {
   ownerInviteConfirmation?: { email: string; token: string };
 };
 
-/**
- * Never resolves `{ ok: true }`: success ends in `redirect()`, which throws.
- */
 export const createTenantAction = async (
   input: TCreateTenantInput,
 ): Promise<TCreateTenantResult> => {
@@ -93,8 +90,6 @@ export const createTenantAction = async (
     };
   }
 
-  // Advisory only: NOT_CONFIGURED/ERROR both mean "can't tell" and fall
-  // through unchecked.
   if (domainAvailability === DOMAIN_AVAILABILITY.IN_USE) {
     return {
       ok: false,
@@ -136,9 +131,6 @@ export const createTenantAction = async (
     details: { name, domain, plan, ownerEmail },
   });
 
-  // `redirect: false` returns a result instead of throwing, since this
-  // action has its own `redirect()` below; a failed send never blocks
-  // provisioning.
   if (!owner) {
     try {
       const inviteEmailResult = await signIn('email', {
@@ -161,8 +153,6 @@ export const createTenantAction = async (
     }
   }
 
-  // The status page reports whatever state provisioning landed in, so every
-  // outcome redirects there.
   await startProvisioning(tenantId);
 
   redirect(adminRoutes.tenantProvisioning(tenantId));

@@ -1,7 +1,10 @@
 'use client';
 
 import { SIZE, type TMaybeUndefined } from '@blog/config';
-import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
+import {
+  CORE_PROVISIONING_STEPS,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import { RunCard } from '@platform/components/features/tenants/run-card';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
 import { RunStatusBadge } from '@platform/components/features/tenants/run-status-badge';
@@ -12,13 +15,13 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { DispatchNotice } from './components/dispatch-notice/dispatch-notice';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
-import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 type TProvisioningStatusViewProps = {
   tenant: TClientTenant;
@@ -32,10 +35,7 @@ export const ProvisioningStatusView = ({
   const t = useTranslations('provisioningStatusView');
   const {
     dispatchNotice,
-    isStarting,
-    isRetrying,
-    handleStart,
-    handleRetry,
+    handleDispatch,
     displayStepStatuses,
     stepUpdatedAt,
     provisioningRun,
@@ -52,7 +52,7 @@ export const ProvisioningStatusView = ({
   const archivedNoticeId = useId();
   const { root, ownerRow, cardsRow } = provisioningStatusViewVariants();
 
-  const steps = STEP_ORDER.map((stepKey, index) => ({
+  const steps = CORE_PROVISIONING_STEPS.map((stepKey, index) => ({
     key: stepKey,
     title: t(`stepLabel.${stepKey}`),
     status: displayStepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
@@ -64,11 +64,11 @@ export const ProvisioningStatusView = ({
       type="button"
       variant="secondary"
       size={SIZE.SM}
-      onClick={handleRetry}
-      isDisabled={isRetrying || isArchived || isProvisioningRunning}
+      onClick={handleDispatch}
+      isDisabled={isArchived}
       aria-describedby={isArchived ? archivedNoticeId : undefined}
     >
-      {isRetrying ? t('retryingButton') : t('retryButton')}
+      {t('retryButton')}
     </Button>
   ) : null;
 
@@ -77,11 +77,11 @@ export const ProvisioningStatusView = ({
       <Button
         type="button"
         variant="primary"
-        onClick={handleStart}
-        isDisabled={isStarting || isArchived}
+        onClick={handleDispatch}
+        isDisabled={isArchived}
         aria-describedby={isArchived ? archivedNoticeId : undefined}
       >
-        {isStarting ? t('startingButton') : t('startButton')}
+        {t('startButton')}
       </Button>
     ) : null;
 

@@ -10,7 +10,6 @@ export type TVoiceKeyFrameProps = {
   children: ReactNode;
 };
 
-/** Marks the specimen text a Voice field renders, so focusing that field can outline it without widening a `@blog/ui` prop. */
 export const VoiceKeyFrame = ({
   fieldId,
   isFocused,
@@ -21,7 +20,6 @@ export const VoiceKeyFrame = ({
 
   return (
     <Element
-      data-voice-key={fieldId}
       data-focused={isFocused}
       data-testid={`voice-key-${fieldId}`}
       className={voiceKeyFrameVariants({ isFocused })}

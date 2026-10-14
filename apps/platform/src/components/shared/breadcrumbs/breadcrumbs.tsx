@@ -12,11 +12,6 @@ export type TBreadcrumbsProps = {
   ariaLabel: string;
 };
 
-/**
- * An ancestor trail: every item but the last — and any item with no `href`
- * — renders as a real link; the last item always renders as the current,
- * non-clickable label regardless of whether it carries an `href`.
- */
 export const Breadcrumbs = ({ items, ariaLabel }: TBreadcrumbsProps) => {
   const { root, list, item, sep, link, current } = breadcrumbsVariants();
 

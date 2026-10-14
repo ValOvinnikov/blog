@@ -1,22 +1,10 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import { AUDIT_ACTION } from '@blog/config';
+import { makeAuditEvent } from '@platform/testing/audit-events/fixtures';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { RecentActivityCard } from './recent-activity-card';
 
 const render = renderWithIntl;
-
-const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
-  id: 'event-1',
-  actorId: 'user-1',
-  actorEmail: 'vo@valstack.dev',
-  action: AUDIT_ACTION.CREATED,
-  targetType: AUDIT_TARGET_TYPE.TENANT,
-  targetId: 'tenant-1',
-  details: null,
-  createdAt: new Date('2026-08-24T12:00:00.000Z'),
-  ...overrides,
-});
 
 describe(RecentActivityCard, () => {
   afterEach(() => {
@@ -38,8 +26,8 @@ describe(RecentActivityCard, () => {
     render(
       <RecentActivityCard
         events={[
-          makeEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
-          makeEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
+          makeAuditEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
+          makeAuditEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
         ]}
       />,
     );

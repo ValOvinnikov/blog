@@ -1,6 +1,5 @@
+import type { TSanityValidationResult } from '@platform/components/features/tenants/findings-card/components/finding-details/parse-document-validation-details';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-
-import type { TSanityValidationResult } from '../../parse-document-validation-details';
 
 import { DocumentValidationTable } from './document-validation-table';
 

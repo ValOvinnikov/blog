@@ -661,9 +661,7 @@
       "VERIFY_CONTENT": "Confirmar que el contenido está listo"
     },
     "retryButton": "Reintentar aprovisionamiento",
-    "retryingButton": "Reintentando aprovisionamiento…",
     "startButton": "Iniciar aprovisionamiento",
-    "startingButton": "Iniciando…",
     "startError": "No se pudo iniciar el aprovisionamiento. Vuelva a intentarlo.",
     "startErrorNotFound": "No se encontró este cliente. Vuelva a cargar la página e inténtelo de nuevo.",
     "startErrorArchived": "Este cliente está archivado; no se puede iniciar el aprovisionamiento.",

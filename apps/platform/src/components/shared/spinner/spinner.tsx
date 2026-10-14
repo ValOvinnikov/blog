@@ -7,11 +7,7 @@ export type TSpinnerProps = {
   className?: string;
 };
 
-/**
- * The accessible name always comes from `label` via `aria-label` —
- * `role="status"` does not pick up name-from-content, so `hasLabel` only
- * controls whether that same text is *also* rendered visibly beside it.
- */
+/** `role="status"` takes no name from content, so `label` is always the `aria-label`; `hasLabel` only also shows it. */
 export const Spinner = ({
   label,
   hasLabel = false,

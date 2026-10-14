@@ -2,15 +2,12 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 
-const {
-  requireAdminMock,
-  listTenantsByIdsMock,
-  getDomainVerificationStatusMock,
-} = vi.hoisted(() => ({
-  requireAdminMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
-  getDomainVerificationStatusMock: vi.fn(),
-}));
+const { requireAdminMock, getTenantByIdMock, getDomainVerificationStatusMock } =
+  vi.hoisted(() => ({
+    requireAdminMock: vi.fn(),
+    getTenantByIdMock: vi.fn(),
+    getDomainVerificationStatusMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
@@ -18,7 +15,7 @@ vi.mock('@platform/server/auth/require-admin', () => ({
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
-  queries: { tenants: { listTenantsByIds: listTenantsByIdsMock } },
+  queries: { tenants: { getTenantById: getTenantByIdMock } },
 }));
 
 vi.mock('./get-domain-verification-status', () => ({
@@ -29,7 +26,7 @@ describe('getDomainVerificationStatusAction', () => {
   beforeEach(() => {
     requireAdminMock.mockReset();
     requireAdminMock.mockResolvedValue({ id: 'admin-1' });
-    listTenantsByIdsMock.mockReset();
+    getTenantByIdMock.mockReset();
     getDomainVerificationStatusMock.mockReset();
   });
 
@@ -43,14 +40,14 @@ describe('getDomainVerificationStatusAction', () => {
     await expect(getDomainVerificationStatusAction('tenant-1')).rejects.toThrow(
       'NEXT_REDIRECT',
     );
-    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();
   });
 
   it("resolves the domain from the tenant's own database row, never from the caller's argument", async () => {
-    listTenantsByIdsMock.mockResolvedValue([
+    getTenantByIdMock.mockResolvedValue(
       makeTenant({ id: 'tenant-1', primaryDomain: 'acme.example.com' }),
-    ]);
+    );
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.VERIFIED,
     );
@@ -59,7 +56,9 @@ describe('getDomainVerificationStatusAction', () => {
 
     const result = await getDomainVerificationStatusAction('tenant-1');
 
-    expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
+    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
+      includeArchived: true,
+    });
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
       'acme.example.com',
     );
@@ -70,7 +69,7 @@ describe('getDomainVerificationStatusAction', () => {
   });
 
   it('returns ERROR without checking any domain when the tenant id resolves to no row', async () => {
-    listTenantsByIdsMock.mockResolvedValue([]);
+    getTenantByIdMock.mockResolvedValue(undefined);
     const { getDomainVerificationStatusAction } =
       await import('./get-domain-verification-status-action');
 

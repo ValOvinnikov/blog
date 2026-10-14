@@ -1,5 +1,6 @@
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import messages from '@platform/i18n/messages/en.json';
+import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { createTranslator } from 'next-intl';
 
@@ -7,14 +8,13 @@ import {
   dashboardNavSections,
   operatorNavSections,
   tenantNavSections,
-  type TNavTranslator,
 } from './nav-sections';
 
 const t = createTranslator({
   locale: 'EN',
   messages,
   namespace: 'navSections',
-}) as unknown as TNavTranslator;
+}) as unknown as TLooseTranslator;
 
 describe('operatorNavSections', () => {
   it('gives both Tenants and Add tenant real hrefs', () => {

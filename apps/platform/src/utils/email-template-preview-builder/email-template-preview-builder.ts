@@ -43,11 +43,6 @@ const PREVIEW_BUILDERS: Record<
     }).html,
 };
 
-/**
- * Renders a template type through the same `@blog/email` builder its sender
- * calls, with placeholder action URLs and the tenant's own name as the
- * invited organisation.
- */
 export const buildEmailTemplatePreviewHtml = (
   templateType: TEmailTemplateType,
   input: TEmailTemplatePreviewInput,

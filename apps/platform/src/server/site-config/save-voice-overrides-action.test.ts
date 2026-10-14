@@ -1,3 +1,4 @@
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { LOCALE_ISO_CODES, PRESET_ID } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -9,14 +10,20 @@ const {
   upsertSiteConfigMock,
   revalidateSiteConfigMock,
   loggerErrorMock,
+  recordAuditEventMock,
 } = vi.hoisted(() => ({
   getSiteConfigOrDefaultsMock: vi.fn(),
   upsertSiteConfigMock: vi.fn(),
   revalidateSiteConfigMock: vi.fn(),
   loggerErrorMock: vi.fn(),
+  recordAuditEventMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
+
+vi.mock('@platform/server/audit/record-audit-event', () => ({
+  recordAuditEvent: recordAuditEventMock,
+}));
 
 vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
   revalidateSiteConfig: revalidateSiteConfigMock,
@@ -65,6 +72,8 @@ describe(saveVoiceOverridesAction, () => {
     upsertSiteConfigMock.mockReset();
     revalidateSiteConfigMock.mockReset();
     loggerErrorMock.mockReset();
+    recordAuditEventMock.mockReset();
+    recordAuditEventMock.mockResolvedValue(undefined);
     revalidateSiteConfigMock.mockResolvedValue(undefined);
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...savedTheme,
@@ -115,6 +124,7 @@ describe(saveVoiceOverridesAction, () => {
       expect(getSiteConfigOrDefaultsMock).not.toHaveBeenCalled();
       expect(upsertSiteConfigMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).not.toHaveBeenCalled();
+      expect(recordAuditEventMock).not.toHaveBeenCalled();
     },
   );
 
@@ -132,6 +142,7 @@ describe(saveVoiceOverridesAction, () => {
       expect.objectContaining({ tenantId: 'tenant-1' }),
     );
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
+    expect(recordAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('returns the rejected fields per language without revalidating', async () => {
@@ -149,6 +160,7 @@ describe(saveVoiceOverridesAction, () => {
 
     expect(result).toEqual({ ok: false, fieldErrorsByLocale });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
+    expect(recordAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('returns ok:true and revalidates once on a successful save', async () => {
@@ -159,5 +171,17 @@ describe(saveVoiceOverridesAction, () => {
 
     expect(result).toEqual({ ok: true });
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('records a SETTINGS_UPDATED audit event on the site config after a confirmed save', async () => {
+    await saveVoiceOverridesAction('tenant-1', overridesByLocale);
+
+    expect(recordAuditEventMock).toHaveBeenCalledWith({
+      logEvent: 'site_config.voice_audit_failed',
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: 'tenant-1',
+      details: { voiceOverridesByLocale: overridesByLocale },
+    });
   });
 });

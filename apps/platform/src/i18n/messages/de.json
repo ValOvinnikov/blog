@@ -661,9 +661,7 @@
       "VERIFY_CONTENT": "Inhalte auf Bereitschaft prüfen"
     },
     "retryButton": "Bereitstellung erneut versuchen",
-    "retryingButton": "Bereitstellung wird erneut versucht…",
     "startButton": "Bereitstellung starten",
-    "startingButton": "Wird gestartet…",
     "startError": "Die Bereitstellung konnte nicht gestartet werden — bitte erneut versuchen.",
     "startErrorNotFound": "Dieser Mandant wurde nicht gefunden — laden Sie die Seite neu und versuchen Sie es erneut.",
     "startErrorArchived": "Dieser Mandant ist archiviert; die Bereitstellung kann nicht gestartet werden.",

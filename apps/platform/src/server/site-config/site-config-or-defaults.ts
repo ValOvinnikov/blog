@@ -3,11 +3,12 @@ import 'server-only';
 import type {
   TDensity,
   TFontChoice,
+  TMaybeUndefined,
   TPresetId,
   TRadiusScale,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
 
 export type TSiteConfigThemeAndAssets = {
   preset: TPresetId;
@@ -16,37 +17,34 @@ export type TSiteConfigThemeAndAssets = {
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
   density: TDensity;
-  logoAssetUrl: string | undefined;
-  faviconAssetUrl: string | undefined;
+  logoAssetUrl: TMaybeUndefined<string>;
+  faviconAssetUrl: TMaybeUndefined<string>;
 };
 
 export const getSiteConfigOrDefaults = async (
   tenantId: string,
 ): Promise<TSiteConfigThemeAndAssets> => {
-  const siteConfig = await queries.siteConfig.getSiteConfig(tenantId);
-  if (siteConfig) {
-    return {
-      preset: siteConfig.preset,
-      accentHue: siteConfig.accentHue,
-      headingFont: siteConfig.headingFont,
-      bodyFont: siteConfig.bodyFont,
-      radiusScale: siteConfig.radiusScale,
-      density: siteConfig.density,
-      logoAssetUrl: siteConfig.logoAssetUrl,
-      faviconAssetUrl: siteConfig.faviconAssetUrl,
-    };
-  }
-
-  const defaults = defaultLookFormValues();
+  const {
+    preset,
+    accentHue,
+    headingFont,
+    bodyFont,
+    radiusScale,
+    density,
+    logo,
+    favicon,
+  } = lookFormValuesOrDefaults(
+    await queries.siteConfig.getSiteConfig(tenantId),
+  );
 
   return {
-    preset: defaults.preset,
-    accentHue: defaults.accentHue,
-    headingFont: defaults.headingFont,
-    bodyFont: defaults.bodyFont,
-    radiusScale: defaults.radiusScale,
-    density: defaults.density,
-    logoAssetUrl: undefined,
-    faviconAssetUrl: undefined,
+    preset,
+    accentHue,
+    headingFont,
+    bodyFont,
+    radiusScale,
+    density,
+    logoAssetUrl: logo.url,
+    faviconAssetUrl: favicon.url,
   };
 };

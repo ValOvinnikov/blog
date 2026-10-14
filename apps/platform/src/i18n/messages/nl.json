@@ -661,9 +661,7 @@
       "VERIFY_CONTENT": "Controleren of content klaar is"
     },
     "retryButton": "Inrichting opnieuw proberen",
-    "retryingButton": "Inrichting opnieuw proberen…",
     "startButton": "Inrichting starten",
-    "startingButton": "Starten…",
     "startError": "Inrichting kon niet worden gestart. Probeer het opnieuw.",
     "startErrorNotFound": "Deze tenant is niet gevonden. Vernieuw de pagina en probeer het opnieuw.",
     "startErrorArchived": "Deze tenant is gearchiveerd; de inrichting kan niet worden gestart.",

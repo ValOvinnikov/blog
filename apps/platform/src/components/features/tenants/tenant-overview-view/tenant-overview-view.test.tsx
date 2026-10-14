@@ -1,25 +1,20 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import {
-  FINDING_KIND,
-  FINDING_SEVERITY,
-  FINDING_SOURCE,
-  FINDING_STATUS,
-} from '@blog/config/constants';
+import { AUDIT_TARGET_TYPE } from '@blog/config';
+import { FINDING_STATUS } from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
-import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import type { TFindingSummary } from '@blog/db/schema/findings';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
+import { makeAuditEvent } from '@platform/testing/audit-events/fixtures';
 import {
   act,
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { makeFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   idleProvisioningSteps,
@@ -84,35 +79,6 @@ vi.mock('@platform/server/findings/get-finding-details-action', () => ({
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
-
-const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
-  id: 'event-1',
-  actorId: 'user-1',
-  actorEmail: 'vo@valstack.dev',
-  action: AUDIT_ACTION.CREATED,
-  targetType: AUDIT_TARGET_TYPE.TENANT,
-  targetId: 'tenant-1',
-  details: null,
-  createdAt: new Date('2026-08-24T12:00:00.000Z'),
-  ...overrides,
-});
-
-const makeFinding = (
-  overrides: Partial<TFindingSummary> = {},
-): TFindingSummary => ({
-  id: 'finding-1',
-  tenantId: 'tenant-1',
-  source: FINDING_SOURCE.TENANT_PROVISIONING,
-  kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
-  severity: FINDING_SEVERITY.CRITICAL,
-  status: FINDING_STATUS.OPEN,
-  dedupeKey: 'dedupe-1',
-  hasDetails: false,
-  firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
-  lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
-  resolvedAt: null,
-  ...overrides,
-});
 
 const setup = async ({ tenant = makeTenant() } = {}) => {
   const ui = await TenantOverviewView({ tenant });
@@ -329,7 +295,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.VERIFIED,
     );
-    listAuditEventsForTargetMock.mockResolvedValue([makeEvent()]);
+    listAuditEventsForTargetMock.mockResolvedValue([makeAuditEvent()]);
     listFindingsForTenantMock.mockResolvedValue([makeFinding()]);
 
     await setup({

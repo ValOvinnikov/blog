@@ -6,6 +6,7 @@ import {
   type TDensity,
   type TFontChoice,
   type TLanguageSwitcherStyle,
+  type TMaybeUndefined,
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config';
@@ -15,7 +16,7 @@ import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 export type TLookFormValues = {
   preset: TPresetId;
   accentHue: number;
-  logoHue: number | undefined;
+  logoHue: TMaybeUndefined<number>;
   headingFont: TFontChoice;
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
@@ -31,11 +32,7 @@ export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
   value: TLookFormValues[K],
 ) => void;
 
-/**
- * The starting values for a tenant with no `site_config` row yet — the same
- * Console defaults `build-theme-style-block.ts` falls back to when no theme
- * has been saved.
- */
+/** The Console defaults `build-theme-style-block.ts` also falls back to before any theme is saved. */
 export const defaultLookFormValues = (): TLookFormValues => {
   const { themeTokens: consoleTokens, cardStyle } =
     PRESET_REGISTRY[PRESET_ID.CONSOLE];
@@ -72,3 +69,8 @@ export const toLookFormValues = (
     favicon: { url: siteConfig.faviconAssetUrl },
   };
 };
+
+export const lookFormValuesOrDefaults = (
+  siteConfig: TMaybeUndefined<TSiteConfigResult>,
+): TLookFormValues =>
+  siteConfig ? toLookFormValues(siteConfig) : defaultLookFormValues();

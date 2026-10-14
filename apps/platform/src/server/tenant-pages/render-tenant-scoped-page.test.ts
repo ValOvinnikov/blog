@@ -1,13 +1,11 @@
-import type { TTenant } from '@blog/db/schema/tenants';
+import { TENANT_PLAN } from '@blog/db/constants';
+import { makeTenant } from '@platform/testing/tenants/fixtures';
 
-import {
-  renderTenantScopedPage,
-  tenantPageMetadata,
-} from './render-tenant-scoped-page';
+import { renderTenantScopedPage } from './render-tenant-scoped-page';
 
 describe('renderTenantScopedPage', () => {
   it('resolves the tenant and hands it to the page content renderer', async () => {
-    const tenant = { id: 'tenant-1' } as TTenant;
+    const tenant = makeTenant();
     const resolveTenant = vi.fn().mockResolvedValue({ tenant });
     const PageContent = vi.fn().mockResolvedValue('rendered content');
 
@@ -32,7 +30,7 @@ describe('renderTenantScopedPage', () => {
 
 describe('renderTenantScopedPage with a plan-gated page', () => {
   it("answers 404 when the tenant's plan cannot use the page", async () => {
-    const tenant = { id: 'tenant-1', plan: 'FREE' } as TTenant;
+    const tenant = makeTenant({ plan: TENANT_PLAN.FREE });
     const PageContent = vi.fn();
 
     await expect(
@@ -47,7 +45,7 @@ describe('renderTenantScopedPage with a plan-gated page', () => {
   });
 
   it("renders the page when the tenant's plan can use it", async () => {
-    const tenant = { id: 'tenant-1', plan: 'GROWTH' } as TTenant;
+    const tenant = makeTenant({ plan: TENANT_PLAN.GROWTH });
     const PageContent = vi.fn().mockResolvedValue('rendered content');
 
     await expect(
@@ -57,19 +55,5 @@ describe('renderTenantScopedPage with a plan-gated page', () => {
         'languages',
       ),
     ).resolves.toBe('rendered content');
-  });
-});
-
-describe('tenantPageMetadata', () => {
-  it('resolves the title for the given pageMetadata key', async () => {
-    await expect(tenantPageMetadata('features')).resolves.toEqual({
-      title: 'Features · Admin',
-    });
-    await expect(tenantPageMetadata('look')).resolves.toEqual({
-      title: 'Look · Admin',
-    });
-    await expect(tenantPageMetadata('voice')).resolves.toEqual({
-      title: 'Voice · Admin',
-    });
   });
 });

@@ -3,19 +3,15 @@ import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
+import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type {
   TPlanPage,
   TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
 
-export type TNavTranslator = (
-  key: string,
-  values?: Record<string, string | number>,
-) => string;
-
 export const operatorNavSections = (
-  t: TNavTranslator,
+  t: TLooseTranslator,
 ): TSidebarNavSection[] => [
   {
     label: t('platformLabel'),
@@ -50,7 +46,7 @@ type TTenantNavHrefs = {
 };
 
 const configurationNavItems = (
-  t: TNavTranslator,
+  t: TLooseTranslator,
   hrefs: TTenantNavHrefs,
   access: TPlanPageAccess,
 ): TSidebarNavItem[] => {
@@ -99,14 +95,14 @@ export const EVERY_PLAN_PAGE: TPlanPageAccess = {
   team: true,
 };
 
-const studioNavItem = (t: TNavTranslator, href: string) => ({
+const studioNavItem = (t: TLooseTranslator, href: string) => ({
   label: t('studio'),
   icon: ICONS.STUDIO,
   href,
 });
 
 export const tenantNavSections = (
-  t: TNavTranslator,
+  t: TLooseTranslator,
   tenantId: string,
   tenantName: string,
 ): TSidebarNavSection[] => {
@@ -165,7 +161,7 @@ export const tenantNavSections = (
 };
 
 export const dashboardNavSections = (
-  t: TNavTranslator,
+  t: TLooseTranslator,
   access: TPlanPageAccess,
 ): TSidebarNavSection[] => {
   const hrefs: TTenantNavHrefs = {

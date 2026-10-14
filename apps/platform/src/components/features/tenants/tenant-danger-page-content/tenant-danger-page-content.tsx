@@ -2,15 +2,13 @@
 
 import { DeleteTenantControl } from '@platform/components/features/tenants/delete-tenant-control';
 import { DeprovisionTenantControl } from '@platform/components/features/tenants/deprovision-tenant-control';
-import {
-  DeprovisioningStatusView,
-  useDeprovisioningPoll,
-} from '@platform/components/features/tenants/deprovisioning-status-view';
+import { DeprovisioningStatusView } from '@platform/components/features/tenants/deprovisioning-status-view';
 import { ReactivateTenantControl } from '@platform/components/features/tenants/reactivate-tenant-control';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Heading } from '@platform/components/shared/heading';
 import { PageHeader } from '@platform/components/shared/page-header';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { useDeprovisioningPoll } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 import { useTranslations } from 'next-intl';
 
 import { tenantDangerPageContentVariants } from './tenant-danger-page-content-variants';

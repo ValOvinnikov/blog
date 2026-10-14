@@ -10,18 +10,17 @@ import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-b
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
 import { takeTestEmailSend } from '@platform/server/email/test-email-rate-limit';
 import {
-  EMAIL_TEMPLATE_TYPE_VALUES,
   emailSenderInputSchema,
   emailTemplateCopyInputSchema,
+  emailTemplateTypeSchema,
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
 const sendTestEmailInputSchema = z.object({
-  templateType: z.enum(EMAIL_TEMPLATE_TYPE_VALUES),
+  templateType: emailTemplateTypeSchema,
   copy: emailTemplateCopyInputSchema,
   sender: emailSenderInputSchema,
 });
@@ -67,7 +66,7 @@ export const sendTestEmailAction = async (
     await sendEmail({
       to,
       from: applyTenantSenderName(
-        resolveOperatorAlertFromAddress(env.OPERATOR_ALERT_FROM_ADDRESS),
+        resolveOperatorAlertFromAddress(),
         sender.senderName ?? undefined,
       ),
       subject: t('testSubject', { subject }),

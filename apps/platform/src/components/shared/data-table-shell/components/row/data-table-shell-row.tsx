@@ -1,6 +1,5 @@
+import { dataTableShellVariants } from '@platform/components/shared/data-table-shell/data-table-shell-variants';
 import type { ReactNode } from 'react';
-
-import { dataTableShellVariants } from '../../data-table-shell-variants';
 
 export type TDataTableShellRowProps = {
   children: ReactNode;

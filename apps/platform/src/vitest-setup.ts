@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
@@ -7,21 +8,19 @@ import messages from './i18n/messages/en.json';
 
 type TGetTranslationsArg =
   string | { locale?: TLocaleIsoCode; namespace?: string } | undefined;
-type TTranslationValues = Record<string, string | number>;
 
 const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
   typeof arg === 'string' ? arg : arg?.namespace;
 
 // createTranslator's const-generic namespace rejects the runtime string one.
-type TLooseTranslator = ((
-  key: string,
-  values?: TTranslationValues,
-) => string) & { raw: (key: string) => unknown };
+type TRawLooseTranslator = TLooseTranslator & {
+  raw: (key: string) => unknown;
+};
 const createLooseTranslator = createTranslator as unknown as (config: {
   locale: string;
   messages: typeof messages;
   namespace?: string;
-}) => TLooseTranslator;
+}) => TRawLooseTranslator;
 
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
@@ -42,29 +41,26 @@ vi.mock('next-intl/server', () => ({
 
 // Total: an export not listed here is undefined, so add it here, never per test.
 // createNavigation reads permanentRedirect at import, so it must exist.
-vi.mock('next/navigation', () => ({
-  redirect: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
-  }),
-  notFound: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
-  }),
-  permanentRedirect: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
-  }),
-  unstable_rethrow: vi.fn(),
-  useParams: vi.fn(() => ({})),
-  usePathname: vi.fn(() => '/'),
-  useSelectedLayoutSegment: vi.fn(() => null),
-  useRouter: vi.fn(() => ({
-    push: vi.fn(),
-    replace: vi.fn(),
-    prefetch: vi.fn(),
-    back: vi.fn(),
-    forward: vi.fn(),
-    refresh: vi.fn(),
-  })),
-}));
+vi.mock('next/navigation', async () => {
+  const { createRouterStub } = await import('@platform/testing/router-stub');
+
+  return {
+    redirect: vi.fn(() => {
+      throw new Error('NEXT_REDIRECT');
+    }),
+    notFound: vi.fn(() => {
+      throw new Error('NEXT_NOT_FOUND');
+    }),
+    permanentRedirect: vi.fn(() => {
+      throw new Error('NEXT_REDIRECT');
+    }),
+    unstable_rethrow: vi.fn(),
+    useParams: vi.fn(() => ({})),
+    usePathname: vi.fn(() => '/'),
+    useSelectedLayoutSegment: vi.fn(() => null),
+    useRouter: vi.fn(createRouterStub),
+  };
+});
 
 // Unsaved settings drafts persist in localStorage, so one test's draft would
 // otherwise be offered for restore in the next.

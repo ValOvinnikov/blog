@@ -1,8 +1,7 @@
+import type { TSanityValidationResult } from '@platform/components/features/tenants/findings-card/components/finding-details/parse-document-validation-details';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { sanityValidationMarkerTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
-
-import type { TSanityValidationResult } from '../../parse-document-validation-details';
 
 import { documentValidationTableVariants } from './document-validation-table-variants';
 

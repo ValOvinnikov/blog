@@ -19,14 +19,6 @@ export type TTopbarNavMenuProps = {
   switcher?: ReactNode;
 };
 
-/**
- * The mobile stand-in for `Sidebar`: a compact Topbar trigger that reveals
- * the same nav sections (and tenant switcher) in an on-demand popup instead
- * of an always-expanded stack, so nav stays reachable without an unbounded
- * sticky block ever covering page content. Reuses `sidebarVariants`' own
- * row/section styling so the popup reads as the same nav, not a second
- * design.
- */
 export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
   const t = useTranslations('topbarNavMenu');
   const pathname = usePathname();

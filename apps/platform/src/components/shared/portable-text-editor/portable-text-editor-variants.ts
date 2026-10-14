@@ -1,5 +1,9 @@
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { DISABLED_READONLY_SURFACE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
+import {
+  FIELD_FOCUS_CLASSES,
+  FIELD_SURFACE_CLASSES,
+} from '@platform/utils/field-surface-classes/field-surface-classes';
 import { INVALID_SURFACE_CLASSES } from '@platform/utils/invalid-state-classes/invalid-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -7,9 +11,9 @@ export const portableTextEditorVariants = tv({
   slots: {
     root: ['flex', 'flex-col'],
     editable: [
-      'min-h-[140px] w-full rounded-admin-control border px-[11px] py-[9px]',
-      'text-[16px] md:text-[13.5px] text-admin-text bg-admin-surface border-admin-control-line',
-      'focus-visible:outline-2 focus-visible:outline-admin-brand-weak focus-visible:border-admin-brand',
+      'min-h-[140px] w-full',
+      FIELD_SURFACE_CLASSES,
+      FIELD_FOCUS_CLASSES,
       '[&_p]:relative [&_h2]:relative [&_p]:m-0 [&_h2]:m-0 [&_h2]:text-[16px] [&_h2]:font-semibold [&_h2]:font-admin [&_h2]:tracking-normal',
       '[&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5',
       INVALID_SURFACE_CLASSES,

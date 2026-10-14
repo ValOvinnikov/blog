@@ -3,10 +3,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import type { TVoiceListSamples } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
-import {
-  defaultLookFormValues,
-  toLookFormValues,
-} from '@platform/utils/default-look-values/default-look-values';
+import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import { getTranslations } from 'next-intl/server';
 
@@ -25,7 +22,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
     radiusScale,
     density,
     cardStyle,
-  } = config ? toLookFormValues(config) : defaultLookFormValues();
+  } = lookFormValuesOrDefaults(config);
   const listSamplesByLocale = Object.fromEntries(
     await Promise.all(
       liveLocales.map(async (locale) => {

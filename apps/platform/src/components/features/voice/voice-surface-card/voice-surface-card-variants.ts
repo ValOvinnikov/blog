@@ -9,7 +9,7 @@ export const voiceSurfaceCardVariants = tv({
       'lg:rounded-br-admin lg:border-l lg:border-admin-line lg:bg-admin-bg lg:p-4',
     ],
     previewContent: [
-      'flex flex-col gap-3 lg:sticky lg:top-[68px] lg:max-h-[calc(100dvh-160px)] lg:overflow-y-auto lg:overscroll-contain',
+      'flex flex-col gap-3 lg:sticky lg:top-admin-topbar lg:max-h-[calc(100dvh-160px)] lg:overflow-y-auto lg:overscroll-contain',
     ],
     previewToggle: ['w-full lg:hidden'],
     preview: [

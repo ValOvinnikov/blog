@@ -9,7 +9,7 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { act, renderHook } from '@testing-library/react';
 
-import { STEP_ORDER, useDeprovisioningPoll } from './use-deprovisioning-poll';
+import { useDeprovisioningPoll } from './use-deprovisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const MAX_POLL_TICKS = 75;
@@ -46,20 +46,6 @@ describe(useDeprovisioningPoll, () => {
   beforeEach(() => {
     getTenantDeprovisioningStatusActionMock.mockReset();
     getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
-  });
-
-  describe('STEP_ORDER', () => {
-    it('is the seven core deprovisioning steps, in run order', () => {
-      expect(STEP_ORDER).toEqual([
-        DEPROVISIONING_STEP.REMOVE_DOMAIN,
-        DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
-        DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
-        DEPROVISIONING_STEP.CLEAR_ARTIFACTS,
-        DEPROVISIONING_STEP.ARCHIVE_TENANT,
-        DEPROVISIONING_STEP.PURGE_READER_DATA,
-        DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
-      ]);
-    });
   });
 
   describe('status derivation', () => {

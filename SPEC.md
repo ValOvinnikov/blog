@@ -1685,8 +1685,8 @@ open at a time. Saving goes through the settings save bar, which shows
 platform may import `@blog/ui` from. They render the same atoms the site
 passes that copy into, themed through `theme-preview-tokens` and the tenant's
 fonts with the Look preview's light/dark toggle, and fed from the form's
-draft. Each field's text sits in a `data-voice-key` wrapper that outlines
-while the field has focus. A `Record<TVoiceFieldId, …>` placement map means
+draft. Each field's text sits in a `VoiceKeyFrame` that outlines while the
+field has focus. A `Record<TVoiceFieldId, …>` placement map means
 registering a field without placing it fails type-check. Fidelity is
 best-effort: the layout around the atoms is a platform copy with nothing to
 catch drift, the same trade the Look sample accepts. On a phone each card

@@ -5,22 +5,12 @@ import {
   planPageAccess,
   type TPlanPage,
 } from '@platform/utils/plan-page-access/plan-page-access';
-import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 type TTenantPageContent = (props: { tenant: TTenant }) => Promise<ReactNode>;
 
-/**
- * Shared body of a dashboard/tenant route page pair: resolve which tenant
- * is in scope (the dashboard route from the session's memberships, the
- * `/tenants/[tenantId]` route from the URL param) and hand it to the shared
- * `*PageContent` renderer both variants render. Called directly, not as
- * JSX — an async component nested via JSX only resolves under React's real
- * RSC renderer, which this repo's `customRenderAsync` test helper doesn't
- * emulate.
- */
+// Called as a function, never as JSX: an async component nested via JSX resolves only under a real RSC renderer.
 export const renderTenantScopedPage = async <T extends { tenant: TTenant }>(
   resolveTenant: () => Promise<T>,
   PageContent: TTenantPageContent,
@@ -31,15 +21,4 @@ export const renderTenantScopedPage = async <T extends { tenant: TTenant }>(
     notFound();
   }
   return PageContent({ tenant });
-};
-
-/**
- * `generateMetadata` for a dashboard/tenant route pair — both variants show
- * the same title, keyed by the shared `pageMetadata` translation bucket.
- */
-export const tenantPageMetadata = async (
-  titleKey: string,
-): Promise<Metadata> => {
-  const t = await getTranslations('pageMetadata');
-  return { title: t(titleKey) };
 };

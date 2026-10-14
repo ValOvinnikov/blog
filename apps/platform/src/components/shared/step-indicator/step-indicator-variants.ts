@@ -1,3 +1,4 @@
+import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
 import { tv } from '@platform/utils/tv/tv';
 
 export const stepIndicatorVariants = tv({
@@ -11,11 +12,13 @@ export const stepIndicatorVariants = tv({
   },
   variants: {
     state: {
-      DONE: { circle: ['bg-admin-ok text-white'] },
-      FAILED: { circle: ['bg-admin-bad text-white'] },
-      RUNNING: { circle: ['bg-admin-warn text-white'] },
-      ACTIVE: { circle: ['bg-admin-brand text-white'] },
-      UPCOMING: { circle: ['bg-admin-line-2 text-admin-muted'] },
+      [STEP_INDICATOR_STATE.DONE]: { circle: ['bg-admin-ok text-white'] },
+      [STEP_INDICATOR_STATE.FAILED]: { circle: ['bg-admin-bad text-white'] },
+      [STEP_INDICATOR_STATE.RUNNING]: { circle: ['bg-admin-warn text-white'] },
+      [STEP_INDICATOR_STATE.ACTIVE]: { circle: ['bg-admin-brand text-white'] },
+      [STEP_INDICATOR_STATE.UPCOMING]: {
+        circle: ['bg-admin-line-2 text-admin-muted'],
+      },
     },
     isConnectorDone: {
       true: { connector: ['bg-admin-ok'] },

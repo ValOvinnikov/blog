@@ -9,17 +9,6 @@ import {
   type TProvisioningBannerProps,
 } from './provisioning-banner';
 
-vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
-  retryProvisioningStepAction: vi.fn(),
-}));
-
-vi.mock(
-  '@platform/server/provisioning/get-tenant-provisioning-status-action',
-  () => ({
-    getTenantProvisioningStatusAction: vi.fn(),
-  }),
-);
-
 const idleStepStatuses = () =>
   Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.IDLE);
 

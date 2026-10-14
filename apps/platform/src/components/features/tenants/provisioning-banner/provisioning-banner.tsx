@@ -2,18 +2,17 @@
 
 import { ALERT_TYPE, SIZE } from '@blog/config';
 import {
+  CORE_PROVISIONING_STEPS,
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
-import {
-  STEP_ORDER,
-  type TUseProvisioningPollResult,
-} from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { findFailedStep } from '@platform/utils/run-steps/run-steps';
+import type { TUseProvisioningPollResult } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useTranslations } from 'next-intl';
 
 import { provisioningBannerVariants } from './provisioning-banner-variants';
@@ -90,14 +89,11 @@ export const ProvisioningBanner = ({
   }
 
   if (isOverallFailed) {
-    const failedIndex = stepStatuses.findIndex(
-      (status) => status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
-    );
-    const failedStepKey = STEP_ORDER[failedIndex];
+    const failedStep = findFailedStep(stepStatuses, CORE_PROVISIONING_STEPS);
     const failedDescription =
-      errorKind && failedStepKey
+      errorKind && failedStep
         ? t('failedDescription', {
-            step: tSteps(`stepLabel.${failedStepKey}`),
+            step: tSteps(`stepLabel.${failedStep}`),
             reason: tSteps(`errorKind.${errorKind}.headline`),
           })
         : t('failedDescriptionFallback');
@@ -106,8 +102,10 @@ export const ProvisioningBanner = ({
       <Alert
         type={ALERT_TYPE.ERROR}
         title={t('failedTitle', {
-          step: failedIndex + 1,
-          total: STEP_ORDER.length,
+          step: failedStep
+            ? CORE_PROVISIONING_STEPS.indexOf(failedStep) + 1
+            : 0,
+          total: CORE_PROVISIONING_STEPS.length,
         })}
         description={failedDescription}
         action={viewStepsButton}
@@ -126,7 +124,7 @@ export const ProvisioningBanner = ({
         type={ALERT_TYPE.WARNING}
         title={t('runningTitle', {
           step: currentStep,
-          total: STEP_ORDER.length,
+          total: CORE_PROVISIONING_STEPS.length,
         })}
         description={t('runningDescription')}
         action={viewStepsButton}

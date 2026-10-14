@@ -13,8 +13,7 @@ export const topbarNavMenuVariants = tv({
       'data-[popup-open]:border-admin-brand data-[popup-open]:text-admin-text',
     ],
     popup: [
-      // Portalled to `body`, outside the sidebar, so it carries the
-      // sidebar's `--admin-side*` surface itself.
+      // Portalled outside the sidebar, so it carries the `--admin-side*` surface itself.
       'w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-admin border',
       'border-admin-side-line bg-admin-side py-2 shadow-admin-lg outline-none',
       'max-h-[var(--available-height)]',

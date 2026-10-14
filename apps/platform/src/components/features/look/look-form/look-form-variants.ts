@@ -4,9 +4,9 @@ export const lookFormVariants = tv({
   slots: {
     columns: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
     editPanel: ['flex flex-col gap-6'],
-    // 68px clears the sticky topbar; 160px also leaves room for the save bar below.
+    // 160px leaves room for the topbar above and the save bar below.
     previewPanel: [
-      'lg:sticky lg:top-[68px] lg:-m-1 lg:max-h-[calc(100dvh-160px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:p-1',
+      'lg:sticky lg:top-admin-topbar lg:-m-1 lg:max-h-[calc(100dvh-160px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:p-1',
     ],
   },
   variants: {

@@ -27,7 +27,11 @@ describe(getSettingsFeaturesAndPreset, () => {
   it('returns neither features nor preset when the tenant has saved neither', async () => {
     const result = await getSettingsFeaturesAndPreset(tenantId);
 
-    expect(result).toEqual({ features: undefined, preset: undefined });
+    expect(result).toEqual({
+      features: undefined,
+      updatedAt: undefined,
+      preset: undefined,
+    });
   });
 
   it('returns the preset alone when only site_config exists', async () => {
@@ -45,6 +49,7 @@ describe(getSettingsFeaturesAndPreset, () => {
 
     expect(result).toEqual({
       features: undefined,
+      updatedAt: undefined,
       preset: PRESET_ID.EDITORIAL,
     });
   });
@@ -67,6 +72,7 @@ describe(getSettingsFeaturesAndPreset, () => {
         analyticsEnabled: false,
         consentBannerEnabled: false,
       },
+      updatedAt: expect.any(Date),
       preset: undefined,
     });
   });
