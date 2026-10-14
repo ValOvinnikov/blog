@@ -2168,15 +2168,24 @@ with no children it renders nothing. Its authored fields are `title`,
 `brandVariant`, an optional `headingBlock` (the one module whose heading is
 not required), `contentAlignment` and a wide `layout`.
 
-**Redirects.** A `redirect` document holds a language, a source path, a
-destination path and whether it is a prefix redirect; editors manage them
-under the Settings sidebar section. Publishing a Landing page whose path changed
-(its slug or parent) creates one from the old path to the new — a prefix
-redirect when the page has descendants, so the whole subtree follows — while
-collapsing redirects that pointed at the old path and removing any whose
-source is now a live page. When a Landing path finds no page, the site checks
-redirects for that language (exact match, then the longest prefix, keeping
-the remaining path) and answers 301; otherwise it 404s. Redirects cover
+**Redirects.** A `redirect` document holds a language, a Source path, a
+Destination path, whether it is a prefix redirect, a status (Permanent or
+Temporary, default Permanent; a redirect with no status behaves as Permanent)
+and an optional editor-only Description; editors manage them under the
+Settings sidebar section. Publishing a Landing page whose path changed (its
+slug or parent) creates one from the old path to the new, marked
+`isAutomatic` and Permanent — a prefix redirect when the page has
+descendants, so the whole subtree follows — while collapsing redirects that
+pointed at the old path and removing any whose source is now a live page. An
+automatic redirect shows a notice naming the page that moved, and warns when
+its Source or Destination differs from the published value. Validation
+checks pages in the redirect's language: a Destination with no published page
+(a Landing page by its full parent chain, a post, topic or tag by slug, or a
+fixed route such as `/blog`) is an error that blocks publishing; a Source
+where a page is published is a warning, since the page wins. When a Landing
+path finds no page, the site checks redirects for that language (exact
+match, then the longest prefix, keeping the remaining path) and answers 308
+for Permanent or 307 for Temporary; otherwise it 404s. Redirects cover
 Landing paths only.
 
 Full mechanics:
