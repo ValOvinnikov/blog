@@ -19,11 +19,11 @@ export const settingsSection: TStructureSection = {
     },
     {
       dividerBefore: true,
-      items: [{ schema: siteSettingsSchema, mode: 'singleton' }],
+      items: [{ schema: redirectSchema }],
     },
     {
       dividerBefore: true,
-      items: [{ schema: redirectSchema }],
+      items: [{ schema: siteSettingsSchema, mode: 'singleton' }],
     },
   ],
 };
