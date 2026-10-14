@@ -113,7 +113,6 @@ export const LookForm = ({
   archivedAt,
 }: TLookFormProps) => {
   const hasMultipleLanguages = liveLocales.length > 1;
-  const archivedNoticeId = useId();
   const accentHueFieldId = useId();
   const { view, tabsProps, panelProps } = useViewTabs();
   const toast = useToast();
@@ -122,64 +121,6 @@ export const LookForm = ({
   const tHue = useTranslations('logoHueField');
   const uploadErrorText = useUploadErrorText();
   const [repickKinds, setRepickKinds] = useState<TBrandAssetKind[]>([]);
-  const {
-    values,
-    setValues,
-    status,
-    isPending,
-    handleSubmit,
-    savedValues,
-    brandImageError,
-  } = useLookSave({
-    tenantId,
-    initialValues,
-    onSaved: () => {
-      setRepickKinds([]);
-      toast.success({
-        message: t('alertSuccess'),
-      });
-    },
-  });
-
-  const changeCount = countChanges(values, savedValues);
-  const isDivergedFromPreset =
-    countChanges(values, applyPresetDefaults(values.preset, values)) > 0;
-  const isAccentHueRejected = !isAccentHueAccessible(values.accentHue);
-  const hasCardChanges = (card: keyof typeof CARD_FIELDS) =>
-    CARD_FIELDS[card].some((key) => isFieldChanged(key, values, savedValues));
-
-  const handleSave = () =>
-    isAccentHueRejected ? Promise.resolve(false) : handleSubmit();
-
-  const updateField: TLookFormFieldSetter = (key, value) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
-    if (isBrandAssetKind(key)) {
-      setRepickKinds((prev) => prev.filter((kind) => kind !== key));
-    }
-  };
-
-  const handleDiscard = () => {
-    setValues(savedValues);
-    setRepickKinds([]);
-  };
-
-  const handlePresetChange = (preset: TPresetId) => {
-    setValues((prev) => applyPresetDefaults(preset, prev));
-  };
-
-  const handleReset = () => {
-    setValues((prev) => applyPresetDefaults(prev.preset, prev));
-  };
-
-  const handleRestore = (draftValues: TLookFormValues) => {
-    setRepickKinds(listLostStagedFiles(draftValues));
-    setValues((prev) => ({
-      ...draftValues,
-      logo: prev.logo,
-      favicon: prev.favicon,
-    }));
-  };
-
   const displayBrandImage = ({ file }: TStagedImage) =>
     file === undefined ? t('brandImageUnchanged') : t('brandImagePicked');
 
@@ -251,6 +192,68 @@ export const LookForm = ({
     },
   ];
 
+  const {
+    values,
+    setValues,
+    savedValues,
+    status,
+    isPending,
+    form,
+    brandImageError,
+  } = useLookSave({
+    tenantId,
+    initialValues,
+    archivedAt,
+    onSuccess: () => {
+      setRepickKinds([]);
+      toast.success({
+        message: t('alertSuccess'),
+      });
+    },
+    onDiscard: () => setRepickKinds([]),
+    countChanges,
+    canSave: ({ accentHue }) => isAccentHueAccessible(accentHue),
+    invalidFields: ({ accentHue }) => ({
+      ids: isAccentHueAccessible(accentHue) ? [] : [accentHueFieldId],
+      revealFirst: () => tabsProps.onChange('edit'),
+    }),
+    draft: {
+      tenantId,
+      page: 'look',
+      savedAt,
+      fields: draftFields,
+      onRestore: (draftValues) => {
+        setRepickKinds(listLostStagedFiles(draftValues));
+        setValues((prev) => ({
+          ...draftValues,
+          logo: prev.logo,
+          favicon: prev.favicon,
+        }));
+      },
+    },
+  });
+
+  const isDivergedFromPreset =
+    countChanges(values, applyPresetDefaults(values.preset, values)) > 0;
+  const isAccentHueRejected = !isAccentHueAccessible(values.accentHue);
+  const hasCardChanges = (card: keyof typeof CARD_FIELDS) =>
+    CARD_FIELDS[card].some((key) => isFieldChanged(key, values, savedValues));
+
+  const updateField: TLookFormFieldSetter = (key, value) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+    if (isBrandAssetKind(key)) {
+      setRepickKinds((prev) => prev.filter((kind) => kind !== key));
+    }
+  };
+
+  const handlePresetChange = (preset: TPresetId) => {
+    setValues((prev) => applyPresetDefaults(preset, prev));
+  };
+
+  const handleReset = () => {
+    setValues((prev) => applyPresetDefaults(prev.preset, prev));
+  };
+
   const { columns, editPanel, previewPanel } = lookFormVariants();
   const saveErrorTitle = brandImageError
     ? uploadErrorText(brandImageError)
@@ -260,27 +263,9 @@ export const LookForm = ({
     <SettingsFormShell
       title={t('heading')}
       description={t('subtitle')}
-      onSave={handleSave}
-      onDiscard={handleDiscard}
-      changeCount={changeCount}
-      invalidFields={{
-        ids: isAccentHueRejected ? [accentHueFieldId] : [],
-        revealFirst: () => tabsProps.onChange('edit'),
-      }}
-      isPending={isPending}
-      archivedAt={archivedAt}
-      archivedNoticeId={archivedNoticeId}
+      form={form}
       errorTitle={status === 'error' ? saveErrorTitle : undefined}
       isWide={true}
-      draft={{
-        tenantId,
-        page: 'look',
-        values,
-        savedValues,
-        savedAt,
-        fields: draftFields,
-        onRestore: handleRestore,
-      }}
     >
       <ViewTabs {...tabsProps} />
       <div className={columns()}>

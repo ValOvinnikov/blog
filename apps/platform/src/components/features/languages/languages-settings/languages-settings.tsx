@@ -8,16 +8,18 @@ import {
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
-import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import {
+  SettingsFormShell,
+  useSettingsForm,
+} from '@platform/components/shared/settings-form-shell';
 import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { useToast } from '@platform/context/toast-provider';
 import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
 import { additionalLocalesToSave } from '@platform/utils/additional-locales-to-save/additional-locales-to-save';
-import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 import { languagesSettingsVariants } from './languages-settings-variants';
 
@@ -43,37 +45,56 @@ export const LanguagesSettings = ({
   archivedAt,
 }: TLanguagesSettingsProps) => {
   const { stored, live, limit: additionalLocaleLimit } = locales;
-  const isArchived = Boolean(archivedAt);
-  const archivedNoticeId = useId();
   const t = useTranslations('languagesSettings');
   const tLanguage = useTranslations('languageNames');
   const { defaultLanguage } = languagesSettingsVariants();
   const toast = useToast();
   const router = useRouter();
   const [savedLocales, setSavedLocales] = useState(stored);
-  const [savedLiveLocales, setSavedLiveLocales] = useState(live);
   const isOverLimit = savedLocales.length > additionalLocaleLimit;
-  const { values, setValues, status, isPending, handleSubmit } =
-    useFormSubmission<TLocaleIsoCode[], { ok: boolean }>({
-      initialValues: savedLiveLocales,
-      onSubmit: (liveLocales) =>
-        updateTenantLanguagesAction(
-          tenantId,
-          additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
-        ),
-      onSuccess: (liveLocales) => {
-        setSavedLocales(
-          additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
-        );
-        setSavedLiveLocales(liveLocales);
-        toast.success({ message: t('alertSuccess') });
-        router.refresh();
-      },
-    });
+  const {
+    values,
+    setValues,
+    status,
+    isPending,
+    isArchived,
+    archivedNoticeId,
+    form,
+  } = useSettingsForm<TLocaleIsoCode[], { ok: boolean }>({
+    initialValues: live,
+    archivedAt,
+    onSubmit: (liveLocales) =>
+      updateTenantLanguagesAction(
+        tenantId,
+        additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
+      ),
+    onSuccess: (liveLocales) => {
+      setSavedLocales(
+        additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
+      );
+      toast.success({ message: t('alertSuccess') });
+      router.refresh();
+    },
+    countChanges: (liveLocales, savedLiveLocales) =>
+      SUPPORTED_LOCALES.filter(
+        (locale) =>
+          liveLocales.includes(locale) !== savedLiveLocales.includes(locale),
+      ).length,
+    draft: {
+      tenantId,
+      page: 'languages',
+      savedAt,
+      fields: SUPPORTED_LOCALES.filter(
+        (locale) => locale !== defaultLocale,
+      ).map((locale) => ({
+        id: locale,
+        label: tLanguage(locale),
+        display: (liveLocales: TLocaleIsoCode[]) =>
+          liveLocales.includes(locale) ? t('switchOn') : t('switchOff'),
+      })),
+    },
+  });
 
-  const changeCount = SUPPORTED_LOCALES.filter(
-    (locale) => values.includes(locale) !== savedLiveLocales.includes(locale),
-  ).length;
   const isAtLimit = values.length >= additionalLocaleLimit;
 
   const handleToggle = (locale: TLocaleIsoCode, checked: boolean) => {
@@ -109,29 +130,8 @@ export const LanguagesSettings = ({
     <SettingsFormShell
       title={t('heading')}
       description={t('description')}
-      onSave={handleSubmit}
-      onDiscard={() => setValues(savedLiveLocales)}
-      changeCount={changeCount}
-      isPending={isPending}
-      archivedAt={archivedAt}
-      archivedNoticeId={archivedNoticeId}
+      form={form}
       errorTitle={status === 'error' ? t('alertError') : undefined}
-      draft={{
-        tenantId,
-        page: 'languages',
-        values,
-        savedValues: savedLiveLocales,
-        savedAt,
-        fields: SUPPORTED_LOCALES.filter(
-          (locale) => locale !== defaultLocale,
-        ).map((locale) => ({
-          id: locale,
-          label: tLanguage(locale),
-          display: (liveLocales: TLocaleIsoCode[]) =>
-            liveLocales.includes(locale) ? t('switchOn') : t('switchOff'),
-        })),
-        onRestore: setValues,
-      }}
     >
       <Card>
         <Card.Header title={t('defaultHeading')} />

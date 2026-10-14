@@ -1,6 +1,10 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@blog/config';
+import {
+  useSettingsForm,
+  type TUseSettingsFormArgs,
+} from '@platform/components/shared/settings-form-shell';
 import { clearEmailLogoAction } from '@platform/server/email/clear-email-logo-action';
 import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-action';
 import {
@@ -24,13 +28,17 @@ import {
 } from '@platform/utils/email-draft-changes/email-draft-changes';
 import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
 import { persistStagedImage } from '@platform/utils/staged-image/staged-image';
-import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useState } from 'react';
 
-type TUseEmailDraftArgs = {
+type TUseEmailDraftArgs = Omit<
+  TUseSettingsFormArgs<TEmailDraft, { ok: boolean }>,
+  'initialValues' | 'onSubmit' | 'onSuccess' | 'invalidFields'
+> & {
   tenantId: string;
   initialDraft: TEmailDraft;
   liveLocales: TLocaleIsoCode[];
+  senderNameInputId: string;
+  revealSenderName: () => void;
   onSaved: () => void;
 };
 
@@ -43,20 +51,34 @@ export const useEmailDraft = ({
   tenantId,
   initialDraft,
   liveLocales,
+  senderNameInputId,
+  revealSenderName,
   onSaved,
+  onDiscard,
+  ...settingsArgs
 }: TUseEmailDraftArgs) => {
-  const [saved, setSaved] = useState(initialDraft);
   const [senderNameError, setSenderNameError] = useState<TSenderNameError>();
 
-  const submission = useFormSubmission<TEmailDraft, { ok: boolean }>({
+  const settings = useSettingsForm<TEmailDraft, { ok: boolean }>({
+    ...settingsArgs,
     initialValues: initialDraft,
+    invalidFields: () => ({
+      ids: senderNameError ? [senderNameInputId] : [],
+      revealFirst: revealSenderName,
+    }),
+    onDiscard: () => {
+      setSenderNameError(undefined);
+      onDiscard?.();
+    },
+    onSuccess: onSaved,
     onSubmit: async (draft) => {
+      const { savedValues: saved, setSavedValues, setValues } = settings;
       let nextSaved = saved;
       let nextDraft = draft;
 
       const finish = (ok: boolean) => {
-        setSaved(nextSaved);
-        submission.setValues(nextDraft);
+        setSavedValues(nextSaved);
+        setValues(nextDraft);
         return { ok };
       };
 
@@ -106,10 +128,9 @@ export const useEmailDraft = ({
         nextDraft = withCopy(nextDraft, change, savedCopy);
       }
 
-      onSaved();
       return finish(true);
     },
   });
 
-  return { ...submission, saved, senderNameError, setSenderNameError };
+  return { ...settings, senderNameError, setSenderNameError };
 };

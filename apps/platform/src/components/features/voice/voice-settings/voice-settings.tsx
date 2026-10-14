@@ -4,6 +4,7 @@ import {
   ALERT_TYPE,
   VOICE_FIELDS,
   VOICE_SURFACE,
+  type TMaybeUndefined,
   type TVoiceFieldId,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
@@ -11,7 +12,10 @@ import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surf
 import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
-import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import {
+  SettingsFormShell,
+  useSettingsForm,
+} from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import {
   saveVoiceOverridesAction,
@@ -21,7 +25,6 @@ import {
   buildSitePreviewTheme,
   type TSitePreviewThemeValues,
 } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
-import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import {
   countCustomisedVoiceFields,
@@ -72,13 +75,10 @@ export const VoiceSettings = ({
   const tLanguage = useTranslations('languageNames');
   const toast = useToast();
   const router = useRouter();
-  const archivedNoticeId = useId();
   const fieldIdPrefix = useId();
-  const [saved, setSaved] = useState(initialDraft);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
-  const [openListFieldId, setOpenListFieldId] = useState<
-    TVoiceFieldId | undefined
-  >('blogListEmpty');
+  const [openListFieldId, setOpenListFieldId] =
+    useState<TMaybeUndefined<TVoiceFieldId>>('blogListEmpty');
   const [fieldErrors, setFieldErrors] = useState<TVoiceFieldErrorsByLocale>({});
   const [revision, setRevision] = useState(0);
   const { mode, setMode, isDark } = usePreviewColorScheme();
@@ -92,37 +92,6 @@ export const VoiceSettings = ({
     }
   };
 
-  const { values, setValues, status, isPending, handleSubmit } =
-    useFormSubmission<TVoiceDraft, TSaveVoiceOverridesResult>({
-      initialValues: initialDraft,
-      onSubmit: async (draft) => {
-        const result = await saveVoiceOverridesAction(
-          tenantId,
-          toVoiceOverridesInput(draft, liveLocales),
-        );
-        const errors = result.ok ? {} : (result.fieldErrorsByLocale ?? {});
-        setFieldErrors(errors);
-        const [firstError] = voiceErrorsInOrder(
-          errors,
-          selectedLocale,
-          liveLocales,
-        );
-        if (firstError) revealError(firstError);
-        return result;
-      },
-      onSuccess: (submitted) => {
-        setSaved(submitted);
-        toast.success({ message: t('alertSuccess') });
-        router.refresh();
-      },
-    });
-
-  const { intro, controls, languageEmphasis, cards } = voiceSettingsVariants();
-  const specimenTheme = buildSitePreviewTheme(previewTheme, isDark);
-  const languageName = tLanguage(selectedLocale);
-  const draftValues = localeDraftOf(values, selectedLocale);
-  const savedValues = localeDraftOf(saved, selectedLocale);
-  const localeErrors = fieldErrors[selectedLocale] ?? {};
   const errorsInOrder = voiceErrorsInOrder(
     fieldErrors,
     selectedLocale,
@@ -130,6 +99,80 @@ export const VoiceSettings = ({
   );
   const [firstError] = errorsInOrder;
   const hasFieldErrors = firstError !== undefined;
+
+  const resetEdits = () => {
+    setFieldErrors({});
+    setRevision((current) => current + 1);
+  };
+
+  const { values, setValues, savedValues, status, isPending, form } =
+    useSettingsForm<TVoiceDraft, TSaveVoiceOverridesResult>({
+      initialValues: initialDraft,
+      archivedAt,
+      onSubmit: async (draft) => {
+        const result = await saveVoiceOverridesAction(
+          tenantId,
+          toVoiceOverridesInput(draft, liveLocales),
+        );
+        const errors = result.ok ? {} : (result.fieldErrorsByLocale ?? {});
+        setFieldErrors(errors);
+        const [firstSaveError] = voiceErrorsInOrder(
+          errors,
+          selectedLocale,
+          liveLocales,
+        );
+        if (firstSaveError) revealError(firstSaveError);
+        return result;
+      },
+      onSuccess: () => {
+        toast.success({ message: t('alertSuccess') });
+        router.refresh();
+      },
+      onDiscard: resetEdits,
+      countChanges: (draft, saved) =>
+        countVoiceChanges(saved, draft, liveLocales),
+      countChangesByLanguage: (draft, saved) =>
+        liveLocales.length > 1
+          ? liveLocales.map((locale) => ({
+              language: tLanguage(locale),
+              count: countLanguageVoiceChanges(saved, draft, locale),
+            }))
+          : [],
+      invalidFields: () => ({
+        ids: errorsInOrder.map(({ fieldId }) =>
+          voiceFieldInputId(fieldIdPrefix, fieldId),
+        ),
+        revealFirst: firstError && (() => revealError(firstError)),
+      }),
+      draft: {
+        tenantId,
+        page: 'voice',
+        savedAt,
+        fields: liveLocales.flatMap((locale) =>
+          VOICE_FIELDS.map((field) => ({
+            id: `${locale}.${field.id}`,
+            label: t('draftFieldLabel', {
+              surface: tSurfaces(field.surface),
+              field: tLabels(field.id),
+              language: tLanguage(locale),
+            }),
+            display: (draft: TVoiceDraft) =>
+              voiceValueAsText(localeDraftOf(draft, locale)[field.id]),
+          })),
+        ),
+        onRestore: (restored) => {
+          setValues(buildVoiceDraft(restored, liveLocales));
+          resetEdits();
+        },
+      },
+    });
+
+  const { intro, controls, languageEmphasis, cards } = voiceSettingsVariants();
+  const specimenTheme = buildSitePreviewTheme(previewTheme, isDark);
+  const languageName = tLanguage(selectedLocale);
+  const draftValues = localeDraftOf(values, selectedLocale);
+  const savedLocaleValues = localeDraftOf(savedValues, selectedLocale);
+  const localeErrors = fieldErrors[selectedLocale] ?? {};
 
   const changeField = (id: TVoiceFieldId, value: TVoiceDraftValue) => {
     setValues((prev) => withVoiceValue(prev, selectedLocale, id, value));
@@ -139,50 +182,12 @@ export const VoiceSettings = ({
     }));
   };
 
-  const replaceDraft = (next: TVoiceDraft) => {
-    setValues(next);
-    setFieldErrors({});
-    setRevision((current) => current + 1);
-  };
-
-  const draftFields = liveLocales.flatMap((locale) =>
-    VOICE_FIELDS.map((field) => ({
-      id: `${locale}.${field.id}`,
-      label: t('draftFieldLabel', {
-        surface: tSurfaces(field.surface),
-        field: tLabels(field.id),
-        language: tLanguage(locale),
-      }),
-      display: (draft: TVoiceDraft) =>
-        voiceValueAsText(localeDraftOf(draft, locale)[field.id]),
-    })),
-  );
-
   return (
     <SettingsFormShell
       isWide={true}
       title={t('heading')}
       description={t('description')}
-      onSave={handleSubmit}
-      onDiscard={() => replaceDraft(saved)}
-      changeCount={countVoiceChanges(saved, values, liveLocales)}
-      changesByLanguage={
-        liveLocales.length > 1
-          ? liveLocales.map((locale) => ({
-              language: tLanguage(locale),
-              count: countLanguageVoiceChanges(saved, values, locale),
-            }))
-          : []
-      }
-      invalidFields={{
-        ids: errorsInOrder.map(({ fieldId }) =>
-          voiceFieldInputId(fieldIdPrefix, fieldId),
-        ),
-        revealFirst: firstError && (() => revealError(firstError)),
-      }}
-      isPending={isPending}
-      archivedAt={archivedAt}
-      archivedNoticeId={archivedNoticeId}
+      form={form}
       errorTitle={
         status === 'error' && !hasFieldErrors ? t('alertError') : undefined
       }
@@ -199,16 +204,6 @@ export const VoiceSettings = ({
           />
         )
       }
-      draft={{
-        tenantId,
-        page: 'voice',
-        values,
-        savedValues: saved,
-        savedAt,
-        fields: draftFields,
-        onRestore: (restored) =>
-          replaceDraft(buildVoiceDraft(restored, liveLocales)),
-      }}
     >
       <div className={intro()}>
         <div className={controls()}>
@@ -246,7 +241,7 @@ export const VoiceSettings = ({
             locale={selectedLocale}
             fieldIdPrefix={fieldIdPrefix}
             values={draftValues}
-            savedValues={savedValues}
+            savedValues={savedLocaleValues}
             errors={localeErrors}
             openFieldId={
               surface === VOICE_SURFACE.ARCHIVE ? openListFieldId : undefined

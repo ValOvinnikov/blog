@@ -1,5 +1,9 @@
 'use client';
 
+import {
+  useSettingsForm,
+  type TUseSettingsFormArgs,
+} from '@platform/components/shared/settings-form-shell';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
@@ -14,34 +18,32 @@ import {
   persistStagedImage,
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
-import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useState } from 'react';
 
-type TUseLookSaveArgs = {
+type TUseLookSaveArgs = Omit<
+  TUseSettingsFormArgs<TLookFormValues, { ok: boolean }>,
+  'onSubmit'
+> & {
   tenantId: string;
-  initialValues: TLookFormValues;
-  onSaved: () => void;
 };
 
 export const useLookSave = ({
   tenantId,
-  initialValues,
-  onSaved,
+  ...settingsArgs
 }: TUseLookSaveArgs) => {
-  const [savedValues, setSavedValues] =
-    useState<TLookFormValues>(initialValues);
   const [brandImageError, setBrandImageError] = useState<TUploadError>();
 
-  const submission = useFormSubmission<TLookFormValues, { ok: boolean }>({
-    initialValues,
+  const settings = useSettingsForm<TLookFormValues, { ok: boolean }>({
+    ...settingsArgs,
     onSubmit: async (vals) => {
+      const { savedValues, setSavedValues, setValues } = settings;
       const savedImages: Partial<Record<TBrandAssetKind, TStagedImage>> = {};
 
       const finish = (ok: boolean) => {
         setSavedValues((prev) =>
           ok ? { ...vals, ...savedImages } : { ...prev, ...savedImages },
         );
-        submission.setValues((prev) => ({ ...prev, ...savedImages }));
+        setValues((prev) => ({ ...prev, ...savedImages }));
         return { ok };
       };
 
@@ -73,8 +75,7 @@ export const useLookSave = ({
       });
       return finish(result.ok);
     },
-    onSuccess: onSaved,
   });
 
-  return { ...submission, savedValues, brandImageError };
+  return { ...settings, brandImageError };
 };

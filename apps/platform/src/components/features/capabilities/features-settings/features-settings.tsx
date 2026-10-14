@@ -3,7 +3,10 @@
 import type { TCapability } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
-import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import {
+  SettingsFormShell,
+  useSettingsForm,
+} from '@platform/components/shared/settings-form-shell';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Switch } from '@platform/components/shared/switch';
 import { useToast } from '@platform/context/toast-provider';
@@ -12,10 +15,8 @@ import {
   CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
-import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
 
 const countChanges = (
   a: TSettingsFeaturesValues,
@@ -40,27 +41,42 @@ export const FeaturesSettings = ({
   savedAt,
   archivedAt,
 }: TFeaturesSettingsProps) => {
-  const isArchived = Boolean(archivedAt);
-  const archivedNoticeId = useId();
   const t = useTranslations('featuresSettings');
   const toast = useToast();
   const router = useRouter();
-  const [savedValues, setSavedValues] =
-    useState<TSettingsFeaturesValues>(initialValues);
-  const { values, setValues, status, isPending, handleSubmit } =
-    useFormSubmission<TSettingsFeaturesValues, { ok: boolean }>({
-      initialValues,
-      onSubmit: (vals) => updateFeaturesAction(tenantId, vals),
-      onSuccess: (submittedValues) => {
-        setSavedValues(submittedValues);
-        toast.success({
-          message: t('alertSuccess'),
-        });
-        router.refresh();
-      },
-    });
-
-  const changeCount = countChanges(values, savedValues);
+  const {
+    values,
+    setValues,
+    status,
+    isPending,
+    isArchived,
+    archivedNoticeId,
+    form,
+  } = useSettingsForm<TSettingsFeaturesValues, { ok: boolean }>({
+    initialValues,
+    archivedAt,
+    onSubmit: (vals) => updateFeaturesAction(tenantId, vals),
+    onSuccess: () => {
+      toast.success({
+        message: t('alertSuccess'),
+      });
+      router.refresh();
+    },
+    countChanges,
+    draft: {
+      tenantId,
+      page: 'features',
+      savedAt,
+      fields: CAPABILITY_TOGGLES.filter(
+        ({ isComingSoon }) => !isComingSoon,
+      ).map(({ capability, field }) => ({
+        id: field,
+        label: t(`toggleLabel.${capability}`),
+        display: (draftValues: TSettingsFeaturesValues) =>
+          draftValues[field] ? t('switchOn') : t('switchOff'),
+      })),
+    },
+  });
 
   const handleToggle = (
     field: keyof TSettingsFeaturesValues,
@@ -73,29 +89,8 @@ export const FeaturesSettings = ({
     <SettingsFormShell
       title={t('heading')}
       description={t('description')}
-      onSave={handleSubmit}
-      onDiscard={() => setValues(savedValues)}
-      changeCount={changeCount}
-      isPending={isPending}
-      archivedAt={archivedAt}
-      archivedNoticeId={archivedNoticeId}
+      form={form}
       errorTitle={status === 'error' ? t('alertError') : undefined}
-      draft={{
-        tenantId,
-        page: 'features',
-        values,
-        savedValues,
-        savedAt,
-        fields: CAPABILITY_TOGGLES.filter(
-          ({ isComingSoon }) => !isComingSoon,
-        ).map(({ capability, field }) => ({
-          id: field,
-          label: t(`toggleLabel.${capability}`),
-          display: (draftValues: TSettingsFeaturesValues) =>
-            draftValues[field] ? t('switchOn') : t('switchOff'),
-        })),
-        onRestore: setValues,
-      }}
     >
       <Card>
         <Card.Header title={t('capabilitiesHeading')} />

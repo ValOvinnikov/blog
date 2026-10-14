@@ -6,34 +6,21 @@ import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenan
 import { PageHeader } from '@platform/components/shared/page-header';
 import { SettingsFormProvider } from '@platform/context/settings-form-provider';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
-import {
-  formatLanguageChanges,
-  type TLanguageChangeCount,
-} from '@platform/utils/format-language-changes/format-language-changes';
+import { formatLanguageChanges } from '@platform/utils/format-language-changes/format-language-changes';
 import { useTranslations } from 'next-intl';
 import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
 import { SaveBar, type TInvalidFields } from './components/save-bar/save-bar';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
-import {
-  useSettingsDraft,
-  type TSettingsFormDraft,
-} from './use-settings-draft';
+import { useSettingsDraft } from './use-settings-draft';
+import type { TSettingsForm } from './use-settings-form';
 
 export type TSettingsFormShellProps<TValues> = {
   title: string;
   description: string;
-  onSave: () => Promise<boolean>;
-  onDiscard: () => void;
-  changeCount: number;
-  changesByLanguage?: TLanguageChangeCount[];
-  invalidFields?: TInvalidFields;
-  isPending: boolean;
-  archivedAt?: Date;
-  archivedNoticeId: string;
+  form: TSettingsForm<TValues>;
   errorTitle?: string;
-  draft: TSettingsFormDraft<TValues>;
   isWide?: boolean;
   headerActions?: ReactNode;
   children: ReactNode;
@@ -47,20 +34,24 @@ const isSaveShortcut = (event: KeyboardEvent) =>
 export const SettingsFormShell = <TValues,>({
   title,
   description,
-  onSave,
-  onDiscard,
-  changeCount,
-  changesByLanguage = [],
-  invalidFields = NO_INVALID_FIELDS,
-  isPending,
-  archivedAt,
-  archivedNoticeId,
+  form,
   errorTitle,
-  draft,
   isWide = false,
   headerActions,
   children,
 }: TSettingsFormShellProps<TValues>) => {
+  const {
+    save,
+    discard,
+    changeCount,
+    changesByLanguage,
+    invalidFields = NO_INVALID_FIELDS,
+    isPending,
+    isArchived,
+    archivedAt,
+    archivedNoticeId,
+    draft,
+  } = form;
   const t = useTranslations('saveBar');
   const { root, alert, savedStatus, liveStatus } = settingsFormShellVariants({
     isWide,
@@ -83,7 +74,7 @@ export const SettingsFormShell = <TValues,>({
   } = useSettingsDraft(draft, isDirty);
 
   const handleSave = async () => {
-    const isSaved = await onSave();
+    const isSaved = await save();
     if (isSaved) {
       forgetDraft();
       setHasSavedSinceEdit(true);
@@ -92,7 +83,7 @@ export const SettingsFormShell = <TValues,>({
   };
 
   const handleDiscard = () => {
-    onDiscard();
+    discard();
     forgetDraft();
   };
 
@@ -167,7 +158,7 @@ export const SettingsFormShell = <TValues,>({
       )}
 
       <SettingsFormProvider
-        isArchived={Boolean(archivedAt)}
+        isArchived={isArchived}
         isPending={isPending}
         archivedNoticeId={archivedNoticeId}
       >
