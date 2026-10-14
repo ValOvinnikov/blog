@@ -110,3 +110,11 @@ export const WithModuleActions: TStory = {
 export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };
+
+export const PhoneStackedRows: TStory = {
+  globals: { viewport: 'mobile' },
+};
+
+export const TabletStackedRows: TStory = {
+  globals: { viewport: 'tablet' },
+};

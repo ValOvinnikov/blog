@@ -30,14 +30,18 @@ export const FeatureHighlightRow = ({
       data-testid={dataTestId}
     >
       <div className={s.media()}>
-        <MediaFrame ratio="classic" dataTestId={`${dataTestId}-media`}>
+        <MediaFrame
+          ratio="video"
+          className={s.frame()}
+          dataTestId={`${dataTestId}-media`}
+        >
           <SanityImage
             image={item.image}
             width={800}
             height={600}
-            sizes="(min-width: 768px) 50vw, 100vw"
+            sizes="(min-width: 1024px) 50vw, 100vw"
             loading="lazy"
-            className="size-full object-cover"
+            className={s.image()}
           />
         </MediaFrame>
       </div>
