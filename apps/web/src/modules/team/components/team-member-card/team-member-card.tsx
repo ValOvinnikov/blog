@@ -10,36 +10,34 @@ import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
-import {
-  CIRCLE_IMAGE_SIZE,
-  SQUARE_IMAGE_SIZE,
-} from '@web/utils/media-card-image-size';
+import { CIRCLE_IMAGE_SIZE } from '@web/utils/media-card-image-size';
 
 import {
   teamMemberCardAvatarFallbackVariants,
   teamMemberCardVariants,
 } from './team-member-card-variants';
 
+// 2x the square photo's `w-48` cap.
+const CAPPED_SQUARE_IMAGE_SIZE = 384;
+
 export interface ITeamMemberCardProps extends IWithClassName, IWithDataTestId {
   member: TTeamMember;
   imageShape: TTeamModule['imageShape'];
   align: 'left' | 'center';
-  imageSizes: string;
 }
 
 export const TeamMemberCard = ({
   member,
   imageShape,
   align,
-  imageSizes,
   className,
   dataTestId,
 }: ITeamMemberCardProps) => {
   const mediaShape =
     imageShape === CARD_IMAGE_SHAPE.CIRCLE ? 'circle' : 'square';
   const imageSize =
-    mediaShape === 'circle' ? CIRCLE_IMAGE_SIZE : SQUARE_IMAGE_SIZE;
-  const s = teamMemberCardVariants();
+    mediaShape === 'circle' ? CIRCLE_IMAGE_SIZE : CAPPED_SQUARE_IMAGE_SIZE;
+  const s = teamMemberCardVariants({ shape: mediaShape, align });
 
   return (
     <MediaCard
@@ -48,15 +46,14 @@ export const TeamMemberCard = ({
       className={className}
       dataTestId={dataTestId}
     >
-      <MediaCard.Media shape={mediaShape} align={align}>
+      <MediaCard.Media shape={mediaShape} align={align} className={s.media()}>
         {member.image ? (
           <SanityImage
             image={member.image}
             width={imageSize}
             height={imageSize}
-            sizes={mediaShape === 'circle' ? undefined : imageSizes}
             loading="lazy"
-            className="size-full object-cover"
+            className={s.image()}
           />
         ) : (
           <Avatar

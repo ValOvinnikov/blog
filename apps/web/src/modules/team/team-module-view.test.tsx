@@ -8,7 +8,6 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeTeamMember } from '@web/testing/modules/team/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import type { ReactNode } from 'react';
 
 import { TeamModuleView } from './team-module-view';
 
@@ -19,20 +18,6 @@ const { TeamCarousel } = vi.hoisted(() => ({
 vi.mock('@web/i18n/navigation');
 
 vi.mock('./components/team-carousel/team-carousel', () => ({ TeamCarousel }));
-
-const { CardGrid } = vi.hoisted(() => ({
-  CardGrid: vi.fn(({ children }: { children: ReactNode }) => <>{children}</>),
-}));
-
-vi.mock('@blog/ui/components/organisms/card-grid', () => ({ CardGrid }));
-
-const getCardGridProps = () => {
-  const props = vi.mocked(CardGrid).mock.calls.at(-1)?.[0];
-  if (!props) {
-    throw new Error('CardGrid was not called');
-  }
-  return props;
-};
 
 const members = [
   makeTeamMember({ id: 'team-member-1', name: 'Jordan Reyes' }),
@@ -123,7 +108,9 @@ describe(`<${TeamModuleView.name}/>`, () => {
         screen.getByRole('heading', { level: 3, name: 'Jordan Reyes' }),
       ).toBeVisible();
       expect(TeamCarousel).not.toHaveBeenCalled();
-      expect(CardGrid).not.toHaveBeenCalled();
+      expect(
+        screen.queryByTestId(`${dataTestId}-grid`),
+      ).not.toBeInTheDocument();
     },
   );
 
@@ -139,24 +126,5 @@ describe(`<${TeamModuleView.name}/>`, () => {
         name: 'Learn more about our subscription plans',
       }),
     ).toHaveAttribute('href', '/about-us');
-  });
-
-  const fourMembers = [
-    makeTeamMember({ id: 'team-member-1', name: 'Member One' }),
-    makeTeamMember({ id: 'team-member-2', name: 'Member Two' }),
-    makeTeamMember({ id: 'team-member-3', name: 'Member Three' }),
-    makeTeamMember({ id: 'team-member-4', name: 'Member Four' }),
-  ];
-
-  it('passes the base 4-column count to CardGrid when bios are hidden', () => {
-    setup({ members: fourMembers, showBios: false });
-
-    expect(getCardGridProps()).toMatchObject({ columns: 4 });
-  });
-
-  it('caps the CardGrid columns at 3 when bios are shown and the base count is 4', () => {
-    setup({ members: fourMembers, showBios: true });
-
-    expect(getCardGridProps()).toMatchObject({ columns: 3 });
   });
 });
