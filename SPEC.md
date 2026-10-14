@@ -319,6 +319,13 @@ dead anchor. Declaring `annotations` explicitly also replaces the default
 annotation set, so prose offers no paste-a-URL annotation of its own — an
 author picks an existing `link` document instead, which is the point.
 
+**Body-text decorators are declared explicitly, each with a toolbar icon.**
+`articleText`, `listedText` and `paragraphText` all offer Bold (`strong`),
+Italic (`em`), Subscript (`sub`) and Superscript (`sup`); `articleText` also
+keeps Sanity's Code, Underline and Strike. The Studio toolbar shows them as
+icon buttons with the title as the tooltip, and `apps/web`'s shared Portable
+Text marks render `sub` and `sup` as `<sub>` and `<sup>`.
+
 **`settings_navigation`, `settings_footer` and `person` all author
 through the library.** `settings_navigation.items` is an array of `linkRef`,
 so a navigation item carries no label of its own — the label comes from the
