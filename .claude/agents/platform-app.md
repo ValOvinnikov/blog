@@ -209,6 +209,9 @@ page builder and no SEO surface to justify them.
   small. Placement is `react-component-practices` → "Where a component
   lives". The Features tab's domain is `capabilities`, to avoid
   `features/features/`.
+- **A route's view lives at its domain's level**
+  (`features/findings/findings-view/`), even when its `page.tsx` is the only
+  importer: the route counts as that domain's consumer.
 - **A `shared/` or `features/` component folder has an `index.ts` barrel**,
   and consumers import the folder. The barrel re-exports the component plus
   only what code outside the folder imports — its hook, a context provider or
@@ -343,10 +346,6 @@ The Voice page edits the site copy registered in `@blog/config`'s
 - **Per-role page access** beyond the split above — the design doc states a
   default and flags it open. Follow the ticket; if it is silent, report the
   ambiguity.
-- **Where a route's view lives when its `page.tsx` is the only importer.**
-  Today it sits at the domain level (`features/findings/findings-view/`); the
-  placement table puts a one-consumer component with its consumer. Follow the
-  existing tree and raise the question in your report.
 
 ## Testing
 
