@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
 import { applyLandingRedirects } from '@blog/studio/document-actions/apply-landing-redirects/apply-landing-redirects';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
@@ -67,7 +67,7 @@ describe(applyLandingRedirects, () => {
       ({ client, operations } = createClient([page('faq', 'faq')]));
     });
 
-    it('redirects a renamed page from its old path', async () => {
+    it('redirects a renamed page from its old path with an automatic, permanent redirect', async () => {
       await applyLandingRedirects(client, page('drafts.faq', 'questions'));
 
       expect(operations).toEqual([
@@ -78,6 +78,8 @@ describe(applyLandingRedirects, () => {
             source: '/faq',
             destination: '/questions',
             isPrefix: false,
+            status: REDIRECT_STATUS.PERMANENT,
+            isAutomatic: true,
           },
         },
         'commit',

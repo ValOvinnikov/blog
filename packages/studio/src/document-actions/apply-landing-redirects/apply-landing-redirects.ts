@@ -1,4 +1,7 @@
-import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
+import {
+  LANDING_PAGE_MAX_DEPTH,
+  REDIRECT_STATUS,
+} from '@blog/config/constants';
 import {
   planLandingRedirects,
   type TExistingRedirect,
@@ -117,6 +120,8 @@ export const applyLandingRedirects = async (
     _type: REDIRECT_TYPE,
     [LANGUAGE_FIELD]: language,
     ...plan.create,
+    status: REDIRECT_STATUS.PERMANENT,
+    isAutomatic: true,
   });
 
   await transaction.commit();

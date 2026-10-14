@@ -2160,8 +2160,8 @@ with no children it renders nothing. Its authored fields are `title`,
 not required), `contentAlignment` and a wide `layout`.
 
 **Redirects.** A `redirect` document holds a language, a source path, a
-destination path and whether it is a prefix redirect; editors manage them in
-the Redirects sidebar section. Publishing a Landing page whose path changed
+destination path and whether it is a prefix redirect; editors manage them
+under the Settings sidebar section. Publishing a Landing page whose path changed
 (its slug or parent) creates one from the old path to the new — a prefix
 redirect when the page has descendants, so the whole subtree follows — while
 collapsing redirects that pointed at the old path and removing any whose

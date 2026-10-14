@@ -1,12 +1,19 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import { REDIRECT_STATUS, type TLocaleIsoCode } from '@blog/config/constants';
 import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
 import { languageField } from '@blog/studio/schema-types/fields/language-field/language-field';
+import { AutomaticRedirectNoticeInput } from '@blog/studio/schema-types/inputs/automatic-redirect-notice-input/automatic-redirect-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
 import {
   validateRedirectDestination,
   validateRedirectSource,
 } from '@blog/studio/schema-types/validation/validate-redirect-chain/validate-redirect-chain';
+import {
+  validateAutomaticRedirectUnchanged,
+  validateRedirectDestinationPage,
+  validateRedirectSourcePage,
+} from '@blog/studio/schema-types/validation/validate-redirect-page/validate-redirect-page';
+import { toTitleCase } from '@blog/utils/primitives';
 import { Signpost } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -25,6 +32,7 @@ export const redirectSchema = defineType({
   description:
     'Sends visitors from an old address to a new one, so links to a page that moved keep working. Moving or renaming a Landing page adds one automatically.',
   icon: Signpost,
+  components: { input: AutomaticRedirectNoticeInput },
   fields: [
     defineField({
       ...languageField(),
@@ -36,11 +44,11 @@ export const redirectSchema = defineType({
     }),
     defineField({
       name: 'source',
-      title: 'From',
+      title: 'Source',
       type: 'string',
       description:
         'The old address visitors arrive at, e.g. /modules/old-faq. A page published at this address always wins over the redirect.',
-      validation: (rule) =>
+      validation: (rule) => [
         rule
           .required()
           .custom((value: string | undefined) =>
@@ -49,14 +57,17 @@ export const redirectSchema = defineType({
               : validatePath(value),
           )
           .custom(validateRedirectSource),
+        rule.custom(validateRedirectSourcePage).warning(),
+        rule.custom(validateAutomaticRedirectUnchanged('source')).warning(),
+      ],
     }),
     defineField({
       name: 'destination',
-      title: 'To',
+      title: 'Destination',
       type: 'string',
       description:
-        'The address visitors are sent to instead, e.g. /modules/faq.',
-      validation: (rule) =>
+        'The address visitors are sent to instead, e.g. /modules/faq. A page must be published there.',
+      validation: (rule) => [
         rule
           .required()
           .custom(validatePath)
@@ -65,7 +76,12 @@ export const redirectSchema = defineType({
             value && value === document?.source
               ? 'A redirect cannot send visitors to the address they came from.'
               : true,
-          ),
+          )
+          .custom(validateRedirectDestinationPage),
+        rule
+          .custom(validateAutomaticRedirectUnchanged('destination'))
+          .warning(),
+      ],
     }),
     defineField({
       name: 'isPrefix',
@@ -74,6 +90,36 @@ export const redirectSchema = defineType({
       description:
         'Also redirect every address beneath the old one, e.g. /old/faq to /new/faq. Use it when a page with sub-pages moved.',
       initialValue: false,
+    }),
+    defineField({
+      name: 'status',
+      title: 'Status',
+      type: 'string',
+      description:
+        'Permanent tells browsers and search engines the page has moved for good. Temporary tells them it will come back.',
+      options: {
+        layout: 'radio',
+        list: Object.values(REDIRECT_STATUS).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      initialValue: REDIRECT_STATUS.PERMANENT,
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      description: 'Notes for editors. Never shown on the site.',
+    }),
+    defineField({
+      name: 'isAutomatic',
+      title: 'Created Automatically',
+      type: 'boolean',
+      description: 'Set when moving a Landing page created this redirect.',
+      readOnly: true,
+      hidden: ({ value }) => value !== true,
     }),
   ],
   preview: {
