@@ -135,6 +135,22 @@ describe(`<${PortableText.name}/>`, () => {
     expect(screen.getByText('const x = 1').tagName).toBe('CODE');
   });
 
+  it('renders the sub mark as subscript and the sup mark as superscript', () => {
+    const value: TPortableTextBody = [
+      portableTextBlock([
+        portableTextSpan('H'),
+        portableTextSpan('2', ['sub']),
+        portableTextSpan('O and x'),
+        portableTextSpan('n', ['sup']),
+      ]),
+    ];
+
+    setup({ value });
+
+    expect(screen.getByText('2').tagName).toBe('SUB');
+    expect(screen.getByText('n').tagName).toBe('SUP');
+  });
+
   it('renders bullet and numbered lists', () => {
     const value: TPortableTextBody = [
       portableTextBlock([portableTextSpan('First bullet')], {

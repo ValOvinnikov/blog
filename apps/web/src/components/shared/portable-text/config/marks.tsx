@@ -11,6 +11,8 @@ export const markComponents: PortableTextReactComponents['marks'] = {
   code: ({ children }: PortableTextMarkComponentProps) => (
     <InlineCode>{children}</InlineCode>
   ),
+  sub: ({ children }: PortableTextMarkComponentProps) => <sub>{children}</sub>,
+  sup: ({ children }: PortableTextMarkComponentProps) => <sup>{children}</sup>,
   linkRef: ({
     children,
     value: annotation,
