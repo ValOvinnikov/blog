@@ -6,8 +6,8 @@ export const formFieldVariants = tv({
     header: ['flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5'],
     label: [
       'flex items-center gap-[7px]',
-      'text-[13px] font-semibold text-admin-text',
+      'text-admin-13 font-semibold text-admin-text',
     ],
-    error: ['text-[11.5px] text-admin-bad'],
+    error: ['text-admin-11-5 text-admin-bad'],
   },
 });

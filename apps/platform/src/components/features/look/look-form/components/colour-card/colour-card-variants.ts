@@ -7,7 +7,7 @@ export const colourCardVariants = tv({
       'size-[52px] shrink-0 rounded-admin shadow-admin ring-1 ring-inset ring-black/6',
     ],
     hueValue: [
-      'shrink-0 text-right text-[12.5px] tabular-nums text-admin-muted',
+      'shrink-0 text-right text-admin-12-5 tabular-nums text-admin-muted',
     ],
   },
 });

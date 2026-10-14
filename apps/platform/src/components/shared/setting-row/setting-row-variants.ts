@@ -8,11 +8,11 @@ export const settingRowVariants = tv({
       'border-b border-admin-line-2 last:border-b-0',
     ],
     content: ['min-w-0 flex-1'],
-    label: ['block text-[13px] font-semibold text-admin-text'],
+    label: ['block text-admin-13 font-semibold text-admin-text'],
     description: ['mt-0.5 block'],
     reason: [
       'mt-[5px] flex items-start gap-[5px]',
-      'text-[12px] leading-[1.45] text-admin-muted',
+      'text-admin-12 leading-[1.45] text-admin-muted',
     ],
     control: ['flex shrink-0 items-center gap-2'],
   },

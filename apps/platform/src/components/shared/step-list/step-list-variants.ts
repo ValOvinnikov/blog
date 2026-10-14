@@ -5,10 +5,10 @@ export const stepListVariants = tv({
     list: ['flex flex-1 flex-col'],
     step: ['flex flex-1 flex-wrap gap-3'],
     stepBody: ['flex min-w-0 flex-1 flex-col gap-1 pb-4'],
-    stepTitle: ['text-[13.5px] font-semibold text-admin-text'],
+    stepTitle: ['text-admin-13-5 font-semibold text-admin-text'],
     stepStatusLive: ['inline-flex items-center'],
     stepWhen: [
-      'ml-auto flex-none whitespace-nowrap pt-0.5 text-[12px] text-admin-muted',
+      'ml-auto flex-none whitespace-nowrap pt-0.5 text-admin-12 text-admin-muted',
     ],
     visuallyHidden: ['sr-only'],
   },

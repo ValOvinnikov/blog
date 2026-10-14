@@ -4,7 +4,7 @@ export const settingsFormShellVariants = tv({
   slots: {
     root: ['flex flex-col gap-6'],
     alert: ['w-fit'],
-    savedStatus: ['text-[12px] text-admin-ok'],
+    savedStatus: ['text-admin-12 text-admin-ok'],
     liveStatus: ['sr-only'],
   },
   variants: {

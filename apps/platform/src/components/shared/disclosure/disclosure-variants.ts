@@ -24,7 +24,7 @@ export const disclosureVariants = tv({
       },
       inline: {
         trigger: [
-          'gap-1 text-[13px] font-medium text-admin-text',
+          'gap-1 text-admin-13 font-medium text-admin-text',
           'underline-offset-2 hover:underline',
         ],
         chevron: ['order-first text-admin-text'],

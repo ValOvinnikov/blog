@@ -6,7 +6,7 @@ export const statusBadgeVariants = tv({
     root: [
       'inline-flex items-center gap-1.5',
       'rounded-full px-2.5 py-0.5',
-      'text-[11.5px] font-semibold whitespace-nowrap',
+      'text-admin-11-5 font-semibold whitespace-nowrap',
     ],
     dot: ['size-1.5 rounded-full bg-current'],
   },

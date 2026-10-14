@@ -11,8 +11,8 @@ export const alertVariants = tv({
     ],
     icon: ['mt-0.5 self-start'],
     text: ['min-w-[200px] flex-1'],
-    title: ['block text-[13.5px] font-semibold'],
-    description: ['text-admin-muted text-[12.5px]'],
+    title: ['block text-admin-13-5 font-semibold'],
+    description: ['text-admin-muted text-admin-12-5'],
     action: ['flex flex-wrap items-center gap-2'],
   },
   variants: {

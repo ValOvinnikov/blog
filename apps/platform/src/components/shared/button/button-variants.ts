@@ -60,14 +60,14 @@ export const buttonVariants = tv({
       variant: STYLED_VARIANTS,
       size: SIZE.SM,
       class: {
-        root: ['min-h-11 px-[9px] py-[5px] text-[12px] md:min-h-0'],
+        root: ['min-h-11 px-[9px] py-[5px] text-admin-12 md:min-h-0'],
       },
     },
     {
       variant: STYLED_VARIANTS,
       size: SIZE.MD,
       class: {
-        root: ['min-h-11 px-[13px] py-[8px] text-[13px] md:min-h-0'],
+        root: ['min-h-11 px-[13px] py-[8px] text-admin-13 md:min-h-0'],
       },
     },
   ],

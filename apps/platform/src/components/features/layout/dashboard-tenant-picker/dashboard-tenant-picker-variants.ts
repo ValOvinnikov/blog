@@ -10,9 +10,9 @@ export const dashboardTenantPickerVariants = tv({
     ],
     nameRow: ['flex min-w-0 items-center gap-1.5'],
     name: [
-      'min-w-0 flex-1 truncate text-[13.5px] font-semibold text-admin-text',
+      'min-w-0 flex-1 truncate text-admin-13-5 font-semibold text-admin-text',
     ],
-    domain: ['truncate font-mono text-[12px] text-admin-muted'],
+    domain: ['truncate font-mono text-admin-12 text-admin-muted'],
     badge: ['shrink-0'],
   },
 });

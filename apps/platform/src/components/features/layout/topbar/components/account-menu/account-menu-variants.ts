@@ -20,7 +20,7 @@ export const accountMenuVariants = tv({
     ],
     item: [
       'flex min-h-11 cursor-pointer items-center rounded-admin-control px-2.5 py-1.5',
-      'text-[13px] text-admin-text outline-none md:min-h-0',
+      'text-admin-13 text-admin-text outline-none md:min-h-0',
       'data-[highlighted]:bg-admin-surface-2',
     ],
   },
