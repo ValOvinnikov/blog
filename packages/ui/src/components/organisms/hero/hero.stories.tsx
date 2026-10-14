@@ -324,6 +324,12 @@ export const BannerToneSecondary: TStory = {
   },
 };
 
+export const BannerToneSecondaryWideDesktop: TStory = {
+  ...BannerToneSecondary,
+  parameters: { layout: 'fullscreen' },
+  globals: { viewport: 'wideDesktop' },
+};
+
 const bannerWithoutMediaContent = (
   <Hero.Cta>
     <NavLink href="/posts/design-system">Read more</NavLink>

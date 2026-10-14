@@ -1,5 +1,5 @@
 import { IMAGE_LAYOUT } from '@blog/config';
-import { FULL_BLEED, tv } from '@blog/ui/lib/styling';
+import { FULL_BLEED, MEDIA_MAX_WIDTH, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const imageWithCaptionVariants = tv({
@@ -12,8 +12,7 @@ export const imageWithCaptionVariants = tv({
         figure: ['w-full'],
       },
       [IMAGE_LAYOUT.FULL_BLEED]: {
-        // Centred on its parent, so the parent column must itself be viewport-centred.
-        figure: FULL_BLEED,
+        figure: [...FULL_BLEED, MEDIA_MAX_WIDTH],
       },
       [IMAGE_LAYOUT.FLOAT_LEFT]: {
         // Padding, not margin, carries the gap: a consumer's `mx-*` on prose children zeroes a float's margins. Floats start at `lg:` so the wrapped text column stays wide enough to read.

@@ -1,7 +1,7 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, SPACING_SCALE } from '@blog/config';
 
 import { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
-import { FULL_BLEED } from './full-bleed';
+import { FULL_BLEED, MEDIA_MAX_WIDTH } from './full-bleed';
 import {
   BRAND_SCRIM_CENTER,
   BRAND_SCRIM_LEFT_FROM_SM,
@@ -14,7 +14,7 @@ import { tv } from './tv';
 
 const NEUTRAL_TONES = [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY];
 
-/** The IMAGE_SCRIM surface: a full-bleed photo under a scrim, or the tone's band surface without one, sized and padded by the band ladder. */
+/** The IMAGE_SCRIM surface: the tone's full-bleed band, sized and padded by the band ladder, optionally carrying a photo under a scrim. */
 export const bannerVariants = tv({
   slots: {
     root: [
@@ -23,7 +23,8 @@ export const bannerVariants = tv({
       'min-h-[calc(var(--banner-top)+var(--banner-bottom))] px-gutter',
     ],
     media: [
-      'absolute inset-0 -z-20 overflow-hidden',
+      'absolute inset-0 -z-20 mx-auto overflow-hidden',
+      MEDIA_MAX_WIDTH,
       '[&>*]:block [&>*]:h-full [&>*]:w-full [&>*]:object-cover',
     ],
     overlay: ['pointer-events-none absolute inset-0 -z-10'],
@@ -35,17 +36,15 @@ export const bannerVariants = tv({
   },
   variants: {
     tone: {
-      [BRAND_VARIANT.PRIMARY]: {},
-      [BRAND_VARIANT.SECONDARY]: {},
-      [BRAND_VARIANT.BRAND_PRIMARY]: {},
+      [BRAND_VARIANT.PRIMARY]: { root: ['bg-primary-subtle'] },
+      [BRAND_VARIANT.SECONDARY]: { root: ['bg-secondary'] },
+      [BRAND_VARIANT.BRAND_PRIMARY]: { root: ['bg-brand-primary-muted'] },
     },
     hasMedia: {
       true: {},
       // Slotted copy styled for a photo (`*-on-image`) takes the surface's ink when there is none.
       false: {
-        root: [
-          '[--on-image:var(--text)] [--on-image-muted:var(--text-muted)]',
-        ],
+        root: ['[--on-image:var(--text)] [--on-image-muted:var(--text-muted)]'],
       },
     },
     position: {
@@ -115,19 +114,14 @@ export const bannerVariants = tv({
   },
   compoundVariants: [
     {
-      tone: BRAND_VARIANT.PRIMARY,
-      hasMedia: false,
-      class: { root: ['bg-primary-subtle'] },
-    },
-    {
       tone: BRAND_VARIANT.SECONDARY,
       hasMedia: false,
-      class: { root: ['bg-secondary surface-secondary'] },
+      class: { root: ['surface-secondary'] },
     },
     {
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       hasMedia: false,
-      class: { root: ['bg-brand-primary-muted surface-brand-primary'] },
+      class: { root: ['surface-brand-primary'] },
     },
     {
       tone: BRAND_VARIANT.BRAND_PRIMARY,
