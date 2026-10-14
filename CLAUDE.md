@@ -810,10 +810,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 - **Feature docs:** `docs/features/<feature>.md` is the per-feature reference —
   what it does, surfaces and routes, data (Sanity documents, Neon tables),
   configuration and plan gating, constraints and invariants, dependencies,
-  entry points, tests and stories, related epics. A PR that changes a
-  feature's behaviour updates its page in the same PR; a feature with no page
-  yet gets one when a PR first changes it — on touch, never as a sweep. Every
-  ticket's `## Scope` carries a `Feature doc:` line.
+  entry points, tests and stories, related epics. Every shipped feature has a
+  page, listed in `docs/features/README.md`. A PR that changes a feature's
+  behaviour updates its page in the same PR, and a PR that adds a feature adds
+  its page. Every ticket's `## Scope` carries a `Feature doc:` line.
 - **Design-doc retention:** a `docs/superpowers/specs/*`/`plans/*` doc is
   "done" once its PR(s) merged **and** its final shape is in the feature page —
   **delete** it, with its paired plan, in the PR that does that sync. The
