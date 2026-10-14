@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_64 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_65 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -384,6 +384,11 @@ Variants: wrapped: (boolean)
 Page-builder organism rendering a call-to-action in one of three layouts.
 Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean)
+
+### Dialog — `components/organisms/dialog/dialog.tsx`
+
+A modal window over the page, named by its heading; client-only, so the consumer declares the client boundary.
+Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel: string · fallbackFocusRef?: RefObject<HTMLElement | null> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Footer — `components/organisms/footer/footer.tsx`
 
