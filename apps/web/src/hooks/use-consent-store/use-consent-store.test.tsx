@@ -1,4 +1,5 @@
 import { CONSENT_CATEGORY } from '@blog/config';
+import { CONSENT_STATUS } from '@web/constants/consent';
 import { act, renderHook } from '@web/testing/custom-render';
 import { renderToString } from 'react-dom/server';
 
@@ -15,7 +16,7 @@ describe(useConsentStore, () => {
   it('reads as unknown on the server', () => {
     const Probe = () => <p>{useConsentStore().status}</p>;
 
-    expect(renderToString(<Probe />)).toContain('unknown');
+    expect(renderToString(<Probe />)).toContain(CONSENT_STATUS.UNKNOWN);
   });
 
   it.each([
@@ -27,7 +28,7 @@ describe(useConsentStore, () => {
 
     const { result } = renderHook(() => useConsentStore());
 
-    expect(result.current.status).toBe('unanswered');
+    expect(result.current.status).toBe(CONSENT_STATUS.UNANSWERED);
     expect(result.current.granted).toEqual([]);
   });
 
@@ -36,7 +37,7 @@ describe(useConsentStore, () => {
 
     const { result } = renderHook(() => useConsentStore());
 
-    expect(result.current.status).toBe('answered');
+    expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
     expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
   });
 
@@ -62,7 +63,7 @@ describe(useConsentStore, () => {
     it('grants every optional category on accept all', () => {
       act(() => result.current.acceptAll());
 
-      expect(result.current.status).toBe('answered');
+      expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
       expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
     });
 
@@ -80,7 +81,7 @@ describe(useConsentStore, () => {
 
     act(() => result.current.rejectAll());
 
-    expect(result.current.status).toBe('answered');
+    expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
     expect(result.current.granted).toEqual([]);
   });
 
@@ -90,6 +91,6 @@ describe(useConsentStore, () => {
 
     act(() => first.result.current.acceptAll());
 
-    expect(second.result.current.status).toBe('answered');
+    expect(second.result.current.status).toBe(CONSENT_STATUS.ANSWERED);
   });
 });

@@ -1,4 +1,5 @@
 import { CONSENT_CATEGORY } from '@blog/config';
+import { CONSENT_STATUS } from '@web/constants/consent';
 import { act, renderHook } from '@web/testing/custom-render';
 
 import { useConsent } from './use-consent';
@@ -23,13 +24,13 @@ describe(useConsent, () => {
     });
 
     it('reads a missing cookie as unanswered', () => {
-      expect(result.current.status).toBe('unanswered');
+      expect(result.current.status).toBe(CONSENT_STATUS.UNANSWERED);
     });
 
     it('updates the status without a reload once the category is granted', () => {
       act(() => result.current.grant());
 
-      expect(result.current.status).toBe('granted');
+      expect(result.current.status).toBe(CONSENT_STATUS.GRANTED);
       expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
     });
   });
@@ -44,7 +45,7 @@ describe(useConsent, () => {
         useConsent(CONSENT_CATEGORY.EXTERNAL_MEDIA),
       );
 
-      expect(result.current.status).toBe('denied');
+      expect(result.current.status).toBe(CONSENT_STATUS.DENIED);
     });
 
     it('always reports the necessary category as granted once answered', () => {
@@ -52,7 +53,7 @@ describe(useConsent, () => {
         useConsent(CONSENT_CATEGORY.NECESSARY),
       );
 
-      expect(result.current.status).toBe('granted');
+      expect(result.current.status).toBe(CONSENT_STATUS.GRANTED);
     });
   });
 });

@@ -1800,16 +1800,17 @@ costs convenience, never compliance.
   cookie via `useSyncExternalStore`, parses it once per cookie value, and
   notifies every subscriber on each write, so already-rendered content updates
   without a reload. It returns `{ status, granted, save, acceptAll, rejectAll }`,
-  where `status` is `unknown` (server render and first paint), `unanswered` or
-  `answered`. `useConsent(category)` derives `{ status, grant }` from it, where
-  `status` is `unknown`, `granted`, `denied` or `unanswered`. The cookie's
+  where `status` is `UNKNOWN` (server render and first paint), `UNANSWERED` or
+  `ANSWERED`. `useConsent(category)` derives `{ status, grant }` from it, where
+  `status` is `UNKNOWN`, `GRANTED`, `DENIED` or `UNANSWERED`. The cookie's
   `decodeConsent`/`encodeConsent` codec has the store as its only caller, so
-  features never read the cookie directly. `ConsentPreferencesProvider`,
+  features never read the cookie directly. Every status is a `CONSENT_STATUS`
+  value from `apps/web`'s `constants/consent.ts`. `ConsentPreferencesProvider`,
   mounted for every tenant through the locale layout's client providers, holds
   only the preferences dialog's open state (`isOpen`, `open`, `close`) and the
   footer button it returns focus to.
 - _Banner._ Shown only when the tenant's `CONSENT_BANNER` capability is
-  enabled and the status is `unanswered`: a non-modal card with equal-weight
+  enabled and the status is `UNANSWERED`: a non-modal card with equal-weight
   Accept all / Reject all and a Settings action.
 - _Preferences._ `@blog/ui`'s `Dialog` wrapping `ConsentPreferences` —
   Necessary locked on, External media never pre-ticked, one Close beside Save.

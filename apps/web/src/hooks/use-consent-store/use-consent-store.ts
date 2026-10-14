@@ -1,6 +1,7 @@
 'use client';
 
 import type { TConsentCategory, TMaybeUndefined } from '@blog/config';
+import { CONSENT_STATUS, type TConsentStatus } from '@web/constants/consent';
 import {
   CONSENT_COOKIE_NAME,
   decodeConsent,
@@ -10,14 +11,20 @@ import {
 import { readCookie } from '@web/utils/read-cookie';
 import { useSyncExternalStore } from 'react';
 
-type TConsentStatus = 'unknown' | 'unanswered' | 'answered';
+type TConsentStoreStatus = Exclude<
+  TConsentStatus,
+  typeof CONSENT_STATUS.GRANTED | typeof CONSENT_STATUS.DENIED
+>;
 
 type TConsentSnapshot = {
-  status: TConsentStatus;
+  status: TConsentStoreStatus;
   granted: readonly TConsentCategory[];
 };
 
-const UNKNOWN_SNAPSHOT: TConsentSnapshot = { status: 'unknown', granted: [] };
+const UNKNOWN_SNAPSHOT: TConsentSnapshot = {
+  status: CONSENT_STATUS.UNKNOWN,
+  granted: [],
+};
 
 const listeners = new Set<() => void>();
 let lastRead: TMaybeUndefined<{
@@ -35,8 +42,8 @@ const subscribe = (listener: () => void) => {
 const toSnapshot = (value: TMaybeUndefined<string>): TConsentSnapshot => {
   const granted = decodeConsent(value);
   return granted
-    ? { status: 'answered', granted }
-    : { status: 'unanswered', granted: [] };
+    ? { status: CONSENT_STATUS.ANSWERED, granted }
+    : { status: CONSENT_STATUS.UNANSWERED, granted: [] };
 };
 
 const getSnapshot = (): TConsentSnapshot => {

@@ -1,9 +1,13 @@
 'use client';
 
 import { CONSENT_CATEGORY, type TConsentCategory } from '@blog/config';
+import { CONSENT_STATUS, type TConsentStatus } from '@web/constants/consent';
 import { useConsentStore } from '@web/hooks/use-consent-store';
 
-type TCategoryConsentStatus = 'unknown' | 'unanswered' | 'granted' | 'denied';
+type TCategoryConsentStatus = Exclude<
+  TConsentStatus,
+  typeof CONSENT_STATUS.ANSWERED
+>;
 
 export const useConsent = (
   category: TConsentCategory,
@@ -15,9 +19,12 @@ export const useConsent = (
     save([...new Set([...granted, category])]);
   };
 
-  if (status !== 'answered') return { status, grant };
+  if (status !== CONSENT_STATUS.ANSWERED) return { status, grant };
 
   const isGranted =
     category === CONSENT_CATEGORY.NECESSARY || granted.includes(category);
-  return { status: isGranted ? 'granted' : 'denied', grant };
+  return {
+    status: isGranted ? CONSENT_STATUS.GRANTED : CONSENT_STATUS.DENIED,
+    grant,
+  };
 };
