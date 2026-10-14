@@ -13,6 +13,11 @@ export const getDraftsClient = (context: ValidationContext) =>
     .getClient({ apiVersion: DRAFTS_CLIENT_API_VERSION })
     .withConfig({ perspective: 'drafts' });
 
+export const getPublishedClient = (context: ValidationContext) =>
+  context
+    .getClient({ apiVersion: DRAFTS_CLIENT_API_VERSION })
+    .withConfig({ perspective: 'published' });
+
 /**
  * A rejected `fetch` means the network failed, not that the document is
  * invalid — every `getDraftsClient`-based validator routes its fetch through

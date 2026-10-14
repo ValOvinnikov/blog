@@ -6613,6 +6613,37 @@
           "type": "boolean"
         },
         "optional": true
+      },
+      "status": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PERMANENT"
+            },
+            {
+              "type": "string",
+              "value": "TEMPORARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "description": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "isAutomatic": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
       }
     }
   },
