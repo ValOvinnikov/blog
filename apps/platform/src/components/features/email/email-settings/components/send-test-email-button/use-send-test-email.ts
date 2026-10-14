@@ -11,7 +11,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
-type TTestEmail = {
+export type TTestEmail = {
   templateType: TEmailTemplateType;
   subject: string;
   body: TEmailTemplateBlock[];
