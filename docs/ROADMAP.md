@@ -113,19 +113,20 @@ module presets (#2803).
   sub-processor list.
 - **Support channel and status page** tooling.
 - **Stripe webhook endpoint**: in `apps/platform` or `apps/worker`.
-- **Milestones**: the proposed restructure below.
 
-## Proposed milestone restructure (not applied)
+## Milestones
 
-- **R1 — public launch** (new): #5085 and its prerequisites, #1292 and its
-  chain, #4987's Release-1 subset, #1645.
-- **Module catalogue** (rename M9 "Portfolio"): the module epics and their
-  subs. #1292 moves to R1, #3076 to #4987, #2813 to Cleanup.
-- **Tooling & DX** (replaces M2 "Hardening"): #661, #1602–#1604, #1740, #1896,
-  #2637, #2657, #3099. Close M2 once it is empty.
-- **Cleanup** (new): #5197 (module_hero), #3663, #3600, #1880, #2036, #1785,
-  #2918.
-- **Unchanged**: M4, M5, M8 (#1645 moves to R1).
+- **R1 — public launch**: #5085 and its children, provisioning #4945–#4948,
+  the contact form #1292 and #3667–#3674, #4987's Release-1 fixes (#3076,
+  #4989–#4991, #4994, #4995, #4997–#4999), forced colours #5129/#5130, and
+  #1645.
+- **Module catalogue** (formerly M9 "Portfolio"): the module epics and their
+  sub-issues.
+- **Tooling & DX** (formerly M2 "Hardening"): CI, agent tooling and DX
+  decisions. #1036 has no milestone.
+- **Cleanup**: #5197 (module_hero) and its chain, #3663, #3600, #1880, #2036,
+  #1785, #2918.
+- **M4, M5, M8**: unchanged, except that #1645 moved to R1.
 
 ## Deferred
 
