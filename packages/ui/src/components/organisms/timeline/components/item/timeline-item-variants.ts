@@ -4,9 +4,9 @@ import { tv } from '@blog/ui/lib/styling';
 export const timelineItemVariants = tv({
   slots: {
     root: [
-      'relative grid grid-cols-[3rem_1fr] items-start gap-x-4',
+      'relative grid grid-cols-[var(--timeline-marker-track)_1fr] items-start gap-4',
       'pb-8 last:pb-0',
-      'before:absolute before:top-8 before:bottom-0 before:left-6 before:w-px before:bg-divider before:content-[""]',
+      'before:absolute before:top-8 before:bottom-0 before:left-[calc(var(--timeline-marker-track)/2)] before:w-px before:bg-divider before:content-[""]',
       'last:before:hidden',
     ],
     marker: ['relative row-span-full self-start justify-self-center'],
@@ -15,13 +15,14 @@ export const timelineItemVariants = tv({
   variants: {
     orientation: {
       [TIMELINE_ORIENTATION.VERTICAL]: {},
+      // 9rem of the timeline per item is the narrowest a step stays readable, gap included.
       [TIMELINE_ORIENTATION.HORIZONTAL]: {
         root: [
-          'lg:grid-cols-1 lg:pb-0 lg:flex-1',
-          'lg:before:top-4 lg:before:bottom-auto lg:before:h-px lg:before:bg-divider',
+          '@min-[9rem]/timeline:min-w-0 @min-[9rem]/timeline:flex-1 @min-[9rem]/timeline:grid-cols-1 @min-[9rem]/timeline:pb-0',
+          '@min-[9rem]/timeline:before:top-4 @min-[9rem]/timeline:before:bottom-auto @min-[9rem]/timeline:before:h-px @min-[9rem]/timeline:before:w-auto',
         ],
-        marker: ['lg:row-span-1'],
-        content: ['lg:col-start-1 lg:gap-3'],
+        marker: ['@min-[9rem]/timeline:row-span-1'],
+        content: ['@min-[9rem]/timeline:col-start-1'],
       },
     },
     itemAlignment: {
@@ -34,18 +35,22 @@ export const timelineItemVariants = tv({
       orientation: TIMELINE_ORIENTATION.HORIZONTAL,
       itemAlignment: CONTENT_ALIGNMENT.LEFT,
       class: {
-        root: ['lg:before:inset-x-0 lg:before:w-auto'],
-        marker: ['lg:justify-self-start'],
-        content: ['lg:text-left'],
+        root: [
+          '@min-[9rem]/timeline:before:-right-[calc(var(--timeline-gap)+var(--timeline-marker-track)/2)]',
+        ],
+        marker: ['@min-[9rem]/timeline:justify-self-start'],
+        content: ['@min-[9rem]/timeline:text-left'],
       },
     },
     {
       orientation: TIMELINE_ORIENTATION.HORIZONTAL,
       itemAlignment: CONTENT_ALIGNMENT.CENTER,
       class: {
-        root: ['lg:before:left-1/2 lg:before:right-[-50%] lg:before:w-auto'],
-        marker: ['lg:justify-self-center'],
-        content: ['lg:text-center'],
+        root: [
+          '@min-[9rem]/timeline:before:left-1/2 @min-[9rem]/timeline:before:-right-[calc(50%+var(--timeline-gap))]',
+        ],
+        marker: ['@min-[9rem]/timeline:justify-self-center'],
+        content: ['@min-[9rem]/timeline:text-center'],
       },
     },
   ],
