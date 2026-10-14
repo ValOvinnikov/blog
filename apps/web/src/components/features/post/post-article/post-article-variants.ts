@@ -4,7 +4,6 @@ import { tv } from 'tailwind-variants';
 export const postArticleVariants = tv({
   slots: {
     hero: ['mx-auto w-full', 'max-w-page px-gutter'],
-    // Hidden on SKIM — the inverse of `skimPanelVariants`' own gate.
     body: [
       'mx-auto w-full px-gutter',
       'mt-8',
@@ -30,16 +29,14 @@ export const postArticleVariants = tv({
     metaActions: ['inline-flex items-center gap-2'],
   },
   variants: {
-    // `body` itself carries no measure cap — `rail`/`footerInRail`/`content`
-    // each cap their own width instead.
     withRail: {
       true: {
         body: ['lg:max-w-page', 'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10'],
         // The grid column is not viewport-centred, so a viewport-wide breakout would overflow it; a full bleed image fills the column instead.
         content: [
           'lg:[&_[data-full-bleed]_figure]:left-0',
-          'lg:[&_[data-full-bleed]_figure]:ml-0',
           'lg:[&_[data-full-bleed]_figure]:w-full',
+          'lg:[&_[data-full-bleed]_figure]:translate-x-0',
         ],
       },
       false: {
