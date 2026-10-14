@@ -22,11 +22,14 @@ export type TConsentPreferencesProps = IWithClassName &
     onCategoryChange: (id: string, checked: boolean) => void;
     saveLabel: string;
     onSave: () => void;
-  };
+  } & (
+    | { closeLabel?: never; onClose?: never }
+    | { closeLabel: string; onClose: () => void }
+  );
 
 const s = consentPreferencesVariants();
 
-/** The body of the cookie-consent preferences dialog — one switch row per category and a Save action — rendered without its own `<dialog>`, which the caller owns. */
+/** The body of the cookie-consent preferences dialog; the caller owns the `<dialog>` itself. */
 export const ConsentPreferences = ({
   headingLevel,
   heading,
@@ -35,11 +38,13 @@ export const ConsentPreferences = ({
   onCategoryChange,
   saveLabel,
   onSave,
+  closeLabel,
+  onClose,
   className,
   dataTestId,
 }: TConsentPreferencesProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <Heading level={headingLevel} className={s.heading()}>
+    <Heading level={headingLevel} size={SIZE.SM} className={s.heading()}>
       {heading}
     </Heading>
     <div className={s.list()}>
@@ -55,6 +60,11 @@ export const ConsentPreferences = ({
       ))}
     </div>
     <div className={s.actions()}>
+      {onClose && (
+        <Button variant="ghost" size={SIZE.MD} onClick={onClose}>
+          {closeLabel}
+        </Button>
+      )}
       <Button variant="primary" size={SIZE.MD} onClick={onSave}>
         {saveLabel}
       </Button>

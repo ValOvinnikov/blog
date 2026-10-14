@@ -52,6 +52,18 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
+export const WithClose: TStory = {
+  args: {
+    closeLabel: 'Close',
+    onClose: () => {},
+  },
+};
+
+export const WithCloseOnPhone: TStory = {
+  args: WithClose.args,
+  globals: { viewport: 'phone' },
+};
+
 const InteractiveDemo = () => {
   const [values, setValues] = useState(initialValues);
 

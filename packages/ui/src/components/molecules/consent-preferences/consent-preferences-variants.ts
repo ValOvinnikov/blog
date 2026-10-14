@@ -5,6 +5,6 @@ export const consentPreferencesVariants = tv({
     root: ['flex flex-col gap-4'],
     heading: ['text-text'],
     list: ['flex flex-col'],
-    actions: ['flex justify-end pt-2'],
+    actions: ['flex items-center justify-end gap-2 pt-2'],
   },
 });

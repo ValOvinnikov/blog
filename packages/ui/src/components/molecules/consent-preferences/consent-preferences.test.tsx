@@ -16,6 +16,7 @@ faker.seed(123);
 
 const heading = faker.lorem.words(3);
 const saveLabel = faker.word.verb();
+const closeLabel = faker.word.adjective();
 
 const necessaryLabel = faker.word.noun();
 const necessaryDescription = faker.lorem.sentence();
@@ -164,6 +165,18 @@ describe(`<${ConsentPreferences.name}/>`, () => {
       await userEvent.keyboard('{Enter}');
       expect(onSave).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('renders no Close action when closeLabel and onClose are omitted', () => {
+    setup();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+  });
+
+  it('renders a Close action and calls onClose when clicked', async () => {
+    const onClose = vi.fn();
+    setup({ closeLabel, onClose });
+    await userEvent.click(screen.getByRole('button', { name: closeLabel }));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('forwards dataTestId to the root element', () => {
