@@ -1,5 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 import {
   useSettingsForm,
@@ -8,139 +7,119 @@ import {
 
 type TValues = { name: string };
 type TResult = { ok: boolean };
-type THarnessArgs = Partial<TUseSettingsFormArgs<TValues, TResult>> & {
-  writesOwnSavedValues?: boolean;
-};
+type TArgs = TUseSettingsFormArgs<TValues, TResult>;
 
-const Harness = ({ writesOwnSavedValues, ...args }: THarnessArgs) => {
-  const settings = useSettingsForm<TValues, TResult>({
-    initialValues: { name: 'saved' },
-    archivedAt: undefined,
-    countChanges: (values, savedValues) =>
-      values.name === savedValues.name ? 0 : 1,
-    draft: { tenantId: 'tenant-1', page: 'test', fields: [] },
-    ...args,
-    onSubmit: async (values) => {
-      if (writesOwnSavedValues) {
-        settings.setSavedValues({ name: `${values.name} (uploaded)` });
-      }
-      return args.onSubmit ? args.onSubmit(values) : { ok: true };
-    },
-  });
-  const { values, setValues, savedValues, isArchived, form } = settings;
+const SAVED: TValues = { name: 'saved' };
+const EDITED: TValues = { name: 'edited' };
 
-  return (
-    <div>
-      <span data-testid="value">{values.name}</span>
-      <span data-testid="saved">{savedValues.name}</span>
-      <span data-testid="changes">{form.changeCount}</span>
-      <span data-testid="archived">{String(isArchived)}</span>
-      <span data-testid="invalid">{form.invalidFields?.ids.join(',')}</span>
-      <button type="button" onClick={() => setValues({ name: 'edited' })}>
-        edit
-      </button>
-      <button type="button" onClick={() => void form.save()}>
-        save
-      </button>
-      <button type="button" onClick={form.discard}>
-        discard
-      </button>
-    </div>
+const renderSettingsForm = (overrides: Partial<TArgs> = {}) =>
+  renderHook(() =>
+    useSettingsForm<TValues, TResult>({
+      initialValues: SAVED,
+      archivedAt: undefined,
+      onSubmit: async () => ({ ok: true }),
+      countChanges: (values, savedValues) =>
+        values.name === savedValues.name ? 0 : 1,
+      draft: { tenantId: 'tenant-1', page: 'test', fields: [] },
+      ...overrides,
+    }),
   );
+
+const editAndSave = async (
+  result: ReturnType<typeof renderSettingsForm>['result'],
+) => {
+  act(() => result.current.setValues(EDITED));
+  let isSaved = false;
+  await act(async () => {
+    isSaved = await result.current.form.save();
+  });
+  return isSaved;
 };
 
 describe(useSettingsForm, () => {
-  let user: UserEvent;
+  it('counts the edits made since the last save', () => {
+    const { result } = renderSettingsForm();
 
-  beforeEach(() => {
-    user = userEvent.setup();
-  });
+    act(() => result.current.setValues(EDITED));
 
-  it('counts the edits made since the last save', async () => {
-    render(<Harness />);
-
-    await user.click(screen.getByRole('button', { name: 'edit' }));
-
-    expect(screen.getByTestId('changes')).toHaveTextContent('1');
+    expect(result.current.form.changeCount).toBe(1);
   });
 
   it('treats the submitted values as saved once the save succeeds', async () => {
     const onSuccess = vi.fn();
-    render(<Harness onSuccess={onSuccess} />);
-    await user.click(screen.getByRole('button', { name: 'edit' }));
+    const { result } = renderSettingsForm({ onSuccess });
 
-    await user.click(screen.getByRole('button', { name: 'save' }));
+    expect(await editAndSave(result)).toBe(true);
 
-    await waitFor(() =>
-      expect(screen.getByTestId('saved')).toHaveTextContent('edited'),
-    );
-    expect(screen.getByTestId('changes')).toHaveTextContent('0');
-    expect(onSuccess).toHaveBeenCalledWith({ name: 'edited' }, { ok: true });
+    await waitFor(() => expect(result.current.savedValues).toEqual(EDITED));
+    expect(result.current.form.changeCount).toBe(0);
+    expect(onSuccess).toHaveBeenCalledWith(EDITED, { ok: true });
   });
 
   it('keeps the saved values when the save fails', async () => {
-    render(<Harness onSubmit={async () => ({ ok: false })} />);
-    await user.click(screen.getByRole('button', { name: 'edit' }));
+    const { result } = renderSettingsForm({
+      onSubmit: async () => ({ ok: false }),
+    });
 
-    await user.click(screen.getByRole('button', { name: 'save' }));
+    expect(await editAndSave(result)).toBe(false);
 
-    await waitFor(() =>
-      expect(screen.getByTestId('changes')).toHaveTextContent('1'),
-    );
-    expect(screen.getByTestId('saved')).toHaveTextContent('saved');
+    expect(result.current.savedValues).toEqual(SAVED);
+    expect(result.current.form.changeCount).toBe(1);
+    expect(result.current.status).toBe('error');
   });
 
   it('keeps saved values a save wrote for itself', async () => {
-    render(<Harness writesOwnSavedValues={true} />);
-    await user.click(screen.getByRole('button', { name: 'edit' }));
+    const UPLOADED: TValues = { name: 'edited (uploaded)' };
+    const { result } = renderSettingsForm({
+      onSubmit: async () => {
+        result.current.setSavedValues(UPLOADED);
+        return { ok: true };
+      },
+    });
 
-    await user.click(screen.getByRole('button', { name: 'save' }));
+    await editAndSave(result);
 
-    await waitFor(() =>
-      expect(screen.getByTestId('saved')).toHaveTextContent(
-        'edited (uploaded)',
-      ),
-    );
+    await waitFor(() => expect(result.current.savedValues).toEqual(UPLOADED));
   });
 
   it('does not submit while the values cannot be saved', async () => {
     const onSubmit = vi.fn().mockResolvedValue({ ok: true });
-    render(<Harness onSubmit={onSubmit} canSave={() => false} />);
-    await user.click(screen.getByRole('button', { name: 'edit' }));
+    const { result } = renderSettingsForm({ onSubmit, canSave: () => false });
 
-    await user.click(screen.getByRole('button', { name: 'save' }));
+    expect(await editAndSave(result)).toBe(false);
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('returns to the saved values and calls onDiscard on discard', async () => {
+  it('returns to the saved values and calls onDiscard on discard', () => {
     const onDiscard = vi.fn();
-    render(<Harness onDiscard={onDiscard} />);
-    await user.click(screen.getByRole('button', { name: 'edit' }));
+    const { result } = renderSettingsForm({ onDiscard });
+    act(() => result.current.setValues(EDITED));
 
-    await user.click(screen.getByRole('button', { name: 'discard' }));
+    act(() => result.current.form.discard());
 
-    expect(screen.getByTestId('value')).toHaveTextContent('saved');
+    expect(result.current.values).toEqual(SAVED);
     expect(onDiscard).toHaveBeenCalledTimes(1);
   });
 
-  it('reports the invalid fields for the current values', async () => {
-    render(
-      <Harness
-        invalidFields={({ name }) => ({
-          ids: name === 'edited' ? ['name-field'] : [],
-        })}
-      />,
-    );
+  it('reports the invalid fields for the current values', () => {
+    const { result } = renderSettingsForm({
+      invalidFields: ({ name }) => ({
+        ids: name === EDITED.name ? ['name-field'] : [],
+      }),
+    });
 
-    await user.click(screen.getByRole('button', { name: 'edit' }));
+    act(() => result.current.setValues(EDITED));
 
-    expect(screen.getByTestId('invalid')).toHaveTextContent('name-field');
+    expect(result.current.form.invalidFields?.ids).toEqual(['name-field']);
   });
 
   it('is archived when the tenant has an archive date', () => {
-    render(<Harness archivedAt={new Date('2026-08-26T00:00:00.000Z')} />);
+    const { result } = renderSettingsForm({
+      archivedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
 
-    expect(screen.getByTestId('archived')).toHaveTextContent('true');
+    expect(result.current.isArchived).toBe(true);
+    expect(result.current.form.isArchived).toBe(true);
   });
 });
