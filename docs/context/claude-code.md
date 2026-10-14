@@ -514,9 +514,10 @@ file` are all denied alike) — an earlier version only handled the
     `layer-scope-guard.test.sh` pins the deny/allow matrix against throwaway
     directories under a worktree-shaped path — hermetic, no live session
     state.
-- **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js` and
-  `boolean-prop-prefix.js` are the repo's only hand-written rules (with a
-  `create()` visitor). They sit alongside two `no-restricted-imports` helpers
+- **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js`,
+  `boolean-prop-prefix.js`, `no-class-assertions.js` and
+  `text-input-textarea-accessible-name.js` are the repo's hand-written rules
+  (each with a `create()` visitor). They sit alongside two `no-restricted-imports` helpers
   that are configuration rather than rules: `no-upstream-imports.js`, a
   flat-config preset blocking a base-of-the-graph package from importing
   `@blog/service`/`@blog/ui`, and `no-vitest-globals-import.js`, a shared
