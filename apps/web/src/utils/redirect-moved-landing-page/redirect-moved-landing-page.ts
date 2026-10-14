@@ -24,5 +24,5 @@ export const redirectMovedLandingPage = async <T>(
   if (!redirect.data) return;
 
   const { locale } = await getRequestContext();
-  permanentRedirect({ href: redirect.data, locale });
+  permanentRedirect({ href: redirect.data.destination, locale });
 };

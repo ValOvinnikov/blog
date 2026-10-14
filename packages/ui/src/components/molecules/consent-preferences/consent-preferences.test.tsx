@@ -14,7 +14,6 @@ import {
 
 faker.seed(123);
 
-const heading = faker.lorem.words(3);
 const saveLabel = faker.word.verb();
 const closeLabel = faker.word.adjective();
 
@@ -45,8 +44,6 @@ const values: Record<string, boolean> = {
 };
 
 const setup = customRender(ConsentPreferences, {
-  headingLevel: 2,
-  heading,
   categories,
   values,
   onCategoryChange: vi.fn(),
@@ -58,12 +55,6 @@ describe(`<${ConsentPreferences.name}/>`, () => {
   describe('rendering', () => {
     beforeEach(() => {
       setup();
-    });
-
-    it('renders the heading at the given level', () => {
-      expect(
-        screen.getByRole('heading', { level: 2, name: heading }),
-      ).toBeVisible();
     });
 
     it('renders one switch per category with its label and description', () => {
@@ -190,8 +181,6 @@ describe(`<${ConsentPreferences.name}/>`, () => {
     renderElement(
       <>
         <ConsentPreferences
-          headingLevel={2}
-          heading={heading}
           categories={[analyticsCategory]}
           values={values}
           onCategoryChange={vi.fn()}
@@ -199,8 +188,6 @@ describe(`<${ConsentPreferences.name}/>`, () => {
           onSave={vi.fn()}
         />
         <ConsentPreferences
-          headingLevel={2}
-          heading={heading}
           categories={[
             {
               id: 'analytics',

@@ -19,7 +19,7 @@ export type TDialogProps = IWithClassName &
     onOpenChange: (isOpen: boolean) => void;
     heading: string;
     headingLevel: THeadingLevel;
-    closeLabel: string;
+    closeLabel?: string;
     fallbackFocusRef?: RefObject<HTMLElement | null>;
     children?: ReactNode;
   };
@@ -69,13 +69,15 @@ export const Dialog = ({
                 </Heading>
               )}
             />
-            <BaseDialog.Close
-              render={
-                <IconButton ariaLabel={closeLabel} className={s.close()}>
-                  <Icon name={ICONS.CLOSE} size={SIZE.SM} />
-                </IconButton>
-              }
-            />
+            {closeLabel && (
+              <BaseDialog.Close
+                render={
+                  <IconButton ariaLabel={closeLabel} className={s.close()}>
+                    <Icon name={ICONS.CLOSE} size={SIZE.SM} />
+                  </IconButton>
+                }
+              />
+            )}
           </div>
           {children}
         </BaseDialog.Popup>

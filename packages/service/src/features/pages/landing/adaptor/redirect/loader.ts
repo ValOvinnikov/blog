@@ -6,16 +6,17 @@ import {
 } from '@blog/service/sanity/query/query';
 
 import { redirectsQuery } from './query';
-import { toRedirectDestination } from './transformer';
+import { toLandingRedirect } from './transformer';
+import type { TLandingRedirect } from './types';
 
 export async function getRedirect(
   segments: string[],
   tenant: TTenantSanityContext,
-): Promise<TMaybeUndefined<string>> {
+): Promise<TMaybeUndefined<TLandingRedirect>> {
   const redirects = await runQuery(redirectsQuery, {
     tenant,
     ...isr('redirect', tenant.projectId),
   });
 
-  return toRedirectDestination(redirects, `/${segments.join('/')}`);
+  return toLandingRedirect(redirects, `/${segments.join('/')}`);
 }

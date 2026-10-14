@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
 import { service } from '@blog/service';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -34,7 +34,10 @@ describe(redirectMovedLandingPage, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });
-    getRedirectMock.mockResolvedValueOnce({ ok: true, data: '/modules/faq' });
+    getRedirectMock.mockResolvedValueOnce({
+      ok: true,
+      data: { destination: '/modules/faq', status: REDIRECT_STATUS.PERMANENT },
+    });
 
     await expect(redirectMovedLandingPage(MISSING, 'old-faq')).rejects.toThrow(
       'NEXT_REDIRECT',

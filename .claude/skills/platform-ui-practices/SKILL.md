@@ -20,10 +20,7 @@ The values here are decided. Where this skill and
 `docs/design-reference/admin-panel-mock.html` disagree on a value, this skill
 wins; the mock still sets layout intent.
 
-Some decided primitives and tokens have not landed. Each is marked **Not yet:**
-with what to write until it does. Never invent the missing token or primitive,
-and never patch its gap at one call site: the change that lands it fixes every
-caller at once. Code paths below are under `apps/platform/src/`.
+Code paths below are under `apps/platform/src/`.
 
 **Start from a recipe.** Copy the one that fits whole, rename it, and keep every
 class and prop it shows; the sections after the recipes give the rules.
@@ -43,16 +40,15 @@ class and prop it shows; the sections after the recipes give the rules.
       actions={<RefreshButton />}
     />
     <Card.Body>
-      <Text className={summary()}>{t('visitsSummary', { count })}</Text>
+      <Text>{t('visitsSummary', { count })}</Text>
     </Card.Body>
   </Card>
 </div>
 ```
 
-- Variants: `root` is `flex flex-col gap-6`; `summary` is
-  `text-[13.5px] text-admin-text`, the slot for primary content and values (a
-  sentence, a count, a name). **Not yet:** `Text`'s body variant has no size,
-  so `Text` without it renders at the 14px body base. `variant="muted"` (12.5px) is only for
+- Variants: `root` is `flex flex-col gap-6`. `Text`'s default `body` variant
+  (13.5px, `text-admin-text`) is for primary content and values (a sentence, a
+  count, a name). `variant="muted"` (12.5px) is only for
   a description or a secondary line, `supporting` only for a page description
   (`PageHeader`'s): never pick either
   to get a size.
@@ -131,14 +127,14 @@ export const auditLogTableVariants = tv({
     table: ['w-full border-collapse text-left'],
     head: [
       'border-b border-admin-line-2 px-[14px] py-2.5',
-      'text-[11px] font-bold uppercase tracking-[.06em] text-admin-muted',
+      'text-admin-11 font-bold uppercase tracking-[.06em] text-admin-muted',
     ],
     row: [
       'border-b border-admin-line-2 last:border-b-0 hover:bg-admin-surface-2',
     ],
-    cell: ['px-[14px] py-3 align-middle text-[13.5px] text-admin-text'],
-    secondary: ['block text-[12px] text-admin-muted'],
-    empty: ['p-8 text-center text-[13.5px] text-admin-muted'],
+    cell: ['px-[14px] py-3 align-middle text-admin-13-5 text-admin-text'],
+    secondary: ['block text-admin-12 text-admin-muted'],
+    empty: ['p-8 text-center text-admin-13-5 text-admin-muted'],
   },
 });
 ```
@@ -153,14 +149,12 @@ export const auditLogTableVariants = tv({
 
 ### Editing a shared primitive
 
-- Change only what your task needs. Its other **Not yet:** gaps stay for the
-  change that fixes them; name them in your report. A gap you do fix is fixed in
+- Change only what your task needs. A gap you fix in a primitive is fixed in
   full, every class its rule names, never the colour without the size.
-- New code never copies a primitive's not-yet classes: a control you build gets
-  `border-admin-control-line`, `Button`'s focus ring and the type table's sizes.
-  A primitive at seven props takes no new prop; compose its parts instead.
-- In a file you edit, lines your task changes follow this skill in full; drift
-  on other lines stays and goes in your report.
+- A primitive at seven props takes no new prop; compose its parts instead.
+- In a file you edit, mechanical drift from this skill on any line is fixed in
+  the same change; anything that changes behaviour goes in your report
+  (CLAUDE.md, "Examine before you change").
 
 ## Page anatomy
 
@@ -183,11 +177,9 @@ export const auditLogTableVariants = tv({
   page fills the shell.
 - Columns collapse to one below `lg` (`grid-cols-1 lg:grid-cols-2` with
   `items-start`), never at `md`. A preview column is
-  `lg:sticky lg:top-[68px] lg:self-start` (68px clears the sticky topbar). From
-  `xl`, Email folds its list into the item picker and splits editor and preview
-  50/50, like Look. **Not yet:** Email keeps its 240px list from `lg` (the
-  picker shows only below `lg`) and splits `minmax(0,1fr)_minmax(420px,1fr)` at
-  `xl`.
+  `lg:sticky lg:top-[68px] lg:self-start` (68px clears the sticky topbar).
+  Email picks its item from the item picker at every width and splits editor
+  and preview 50/50 from `lg`, like Look.
 - A grid inside a column sizes from that column: `@container` on the card body
   and `@sm:grid-cols-2` on the grid.
 - Pre-shell pages (workspace pending, tenant picker) render `PreShellFrame`: a
@@ -195,19 +187,17 @@ export const auditLogTableVariants = tv({
   `max-w-sm` column, and one `Card` whose top is the `PageHeader` band passed
   as `header`, with the content in its body. Choices are visible light-surface link rows, none
   pre-selected; dark sidebar components never sit on a light page.
-- Full-bleed is for the mounted Studio only. Anything else on the Studio route
-  (archived, not provisioned) renders in the normal padded column. **Not yet:**
-  `ShellFrame` picks full-bleed from the `studio` segment alone, so
-  `StudioMountView`'s archived and not-provisioned states render full-bleed; the
-  fix belongs in `ShellFrame`, not a wrapper in the page.
+- The Studio route is full-bleed in every state, and is the only route that
+  is: neither `ShellFrame` nor `StudioMountView` adds padding around the
+  mounted Studio or its archived and not-provisioned states.
 
 ## Cards
 
 - Every content group in a page body is a `Card`. `Card.Footer` is only for a
   form's submit actions, right-aligned (an `ml-auto` group, as
   `tenant-details-panel-variants.ts` `footerActions`).
-- `Card.Header` passes `headingLevel={2}`; a section nested under a card section
-  passes 3. **Not yet:** the default is 3, so omitting it skips a level.
+- `Card.Header` is level 2 by default; a section nested under a card section
+  passes `headingLevel={3}`.
 - `Card.Header` `actions` hold card-scoped status and small controls only: a
   `StatusBadge`, a 12px muted count, an `sm` `Button`, a `SegmentedControl`.
 - Padding comes from the parts (header `px-[18px] py-3.5`, body `p-[18px]`);
@@ -258,13 +248,12 @@ values (`DetailList.Row isMono`).
   One token per size, named by its pixel value: `text-admin-11`,
   `text-admin-11-5`, `text-admin-12`, `text-admin-12-5`, `text-admin-13`,
   `text-admin-13-5`, `text-admin-14`, `text-admin-15`, `text-admin-16`,
-  `text-admin-24`. **Not yet:** most call sites still write the pixel value
-  (`text-[13.5px]`); new code uses the token, and invents no size off the scale.
+  `text-admin-24`. Never write the pixel value (`text-[13.5px]`) or a size off
+  the scale; the font, preset and upload pickers' specimen labels are artwork
+  and exempt.
 - A site preview applies the tenant's fonts by setting `--font-display-family`
   and `--font-body-family` on its root, never `--font-display`, `--font-read` or
-  an inline `fontFamily`. **Not yet:** `voice-specimen.tsx` sets
-  `--font-display`/`--font-read` and `look-sample.tsx` an inline `fontFamily`;
-  don't copy either.
+  an inline `fontFamily`; `SiteThemeFrame` sets them.
 
 ## Colour and contrast
 
@@ -282,11 +271,7 @@ values (`DetailList.Row isMono`).
 - Every control boundary is `border-admin-control-line` (3.48:1): text fields,
   the editor, selects, radio circles, the switch's off track, the segmented
   track, menu triggers. `border-admin-line` (1.24:1) is decorative structure
-  only: card borders, dividers, the dashed upload box. **Not yet:** `TextInput`,
-  `Textarea` and `PortableTextEditor` still draw an `admin-line` border, and
-  `Switch`'s off track (`bg-admin-line`) and `SegmentedControl`'s track
-  (`bg-admin-line-2`) are fills with no boundary. Compose them anyway; never copy
-  them onto a new control.
+  only: card borders, dividers, the dashed upload box.
 - A selected item shows a 3:1 marker (`border-admin-brand`, a bar), not a
   `bg-admin-brand-weak` fill alone, and announces itself as pressed, checked or
   selected.
@@ -295,8 +280,6 @@ values (`DetailList.Row isMono`).
   `outline-hidden`); on the dark sidebar `ring-admin-side-accent` with
   `ring-offset-admin-side`. A text field turns its border `admin-brand`.
   `outline-admin-brand-weak` (1.12:1) is not a focus indicator.
-- **Not yet:** the sidebar section labels (3.16:1) fail. Their fix is a token
-  change; don't override them per call site.
 - `plan` is for plan tiers only.
 
 ## Spacing, radius, elevation
@@ -338,15 +321,11 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   `Alert` (ERROR) under the header.
 - An embedded edit panel outside the shell (today only the tenant details panel)
   calls `useUnsavedChangesGuard`, submits from a right-aligned `Card.Footer`,
-  and shows its save error above the card. **Not yet:** `tenant-details-panel.tsx`
-  calls no `useUnsavedChangesGuard` and renders its error `Alert` inside
-  `Card.Body`.
+  and shows its save error above the card.
 - `SettingRow` describes a Base UI control in its slot by its description and
-  lock reason, through `Field`. **Not yet:** `FormField` gives the hint no id
-  and `FormTextInput` never links its error, so neither is announced. That is
-  fixed inside those primitives; don't wire it per call site (no
-  `` `${id}-error` `` strings, no id'd span in `hint`, no ids threaded past
-  `SettingRow`). Name the gap in your report.
+  lock reason, through `Field`. `FormField` links its hint and error to the
+  control itself; never wire them per call site (no `` `${id}-error` `` strings,
+  no id'd span in `hint`, no ids threaded past `SettingRow`).
 - Use the shared controls (`Switch`, `SegmentedControl` for a small either/or,
   `TextInput`, `Textarea`, `PortableTextEditor`, `AssetUploadField`,
   `PresetPicker`, `FontPicker`, `HueSlider`). A mode one of them lacks belongs
@@ -513,9 +492,8 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
     replace both with one join in `@blog/db`.
 - **One read per request.** Anything that more than one layout, page or
   component reads during a request goes through a `cache()`-wrapped function,
-  as the tenant resolvers do (`requireTenantById`, `resolveDashboardTenant`,
-  `listSessionTenants`). **Not yet:** there is no cached `getSession`, and
-  `requireAdmin` (with its `auth()` call) isn't `cache()`-wrapped.
+  as `getSession`, `requireAdmin` and the tenant resolvers do
+  (`requireTenantById`, `resolveDashboardTenant`, `listSessionTenants`).
   - A page under a gated layout takes the tenant from the layout's cached
     resolver.
   - Never query again for a row you already have. Derive from it, for example
@@ -558,19 +536,17 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 
 ## Phones (below `md`)
 
-- Text fields are at least 16px (`text-[16px] md:text-[13.5px]`) so iOS doesn't
+- Text fields are at least 16px (`text-admin-16 md:text-admin-13-5`) so iOS doesn't
   zoom, and touch targets at least 44px (`min-h-11 md:min-h-0`). Both live in
   the primitives; add no call-site overrides to a shared primitive. A control
   you build yourself carries both.
 - A page with an editor beside a preview gives phones Edit/Preview tabs below
   `lg` and renders only the active pane, whose `tabpanel` role applies below
-  `lg` only. That is Look's `ViewTabs` (Base UI Tabs), for Look and Email; Voice
-  keeps its per-card preview toggle. **Not yet:** `ViewTabs` lives in
-  `components/features/look/look-form/components/view-tabs/` with Look's ids and
-  labels, and Look's two panels carry `role="tabpanel"` at every width; its
-  second consumer moves it to `components/shared/`, and the role drops at `lg`.
-- A dialog keeps a 16px gutter (`w-[calc(100%-2rem)] max-w-md`). **Not yet:**
-  `ConfirmDialog`'s popup is `w-full max-w-md`; only `LeavePageDialog` has it.
+  `lg` only. That is the shared `ViewTabs` (Base UI Tabs,
+  `components/shared/view-tabs/`), used by Look and Email; Voice keeps its
+  per-card preview toggle.
+- A dialog renders through `AlertDialogShell`, which keeps a 16px gutter
+  (`w-[calc(100%-2rem)] max-w-md`).
 - Tables scroll sideways inside their card, and fact lists stack the term above
   the value below `md`. `DataTableShell` and `DetailList` own both; never
   add them per page. The shell's scroll region is named by its `ariaLabel`,
@@ -622,50 +598,50 @@ panes.
 
 ## Red flags — stop
 
-| You are about to write…                                                                                          | Write instead                                                                                                                                                        |
-| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<Text>` with no size slot, or `variant="muted"` / `"supporting"` to size a card's main content or value         | `Text` with the page recipe's `summary` slot (`text-[13.5px] text-admin-text`)                                                                                       |
-| `<Text variant="hint">`                                                                                          | `FormField` `hint` for a field; `variant="muted"` for meta                                                                                                           |
-| `text-sm`, `text-xs`, `text-base`, `text-label`, `text-meta`                                                     | The role's pixel value, e.g. `text-[13.5px]`                                                                                                                         |
-| Table classes of your own: 18px cell padding, no row hover, a left-aligned empty line                            | The table recipe's variants, unchanged                                                                                                                               |
-| A `div` with `rounded-admin border p-[18px] shadow-admin`                                                        | `<Card>` with `Card.Header` and `Card.Body`                                                                                                                          |
-| A paragraph opening `Card.Body` that says what the card is for                                                   | `Card.Header` `supportingText`                                                                                                                                       |
-| A hand-built tinted box with a glyph                                                                             | `Alert`; a failure card is a `Card` with a bad header                                                                                                                |
-| A second `h1`, or `<Heading level={1}>` in a page body                                                           | `PageHeader` `title`, once per page                                                                                                                                  |
-| `<h2>`, `<h3>` or a `font-semibold` span as a section title                                                      | `Card.Header` `title`                                                                                                                                                |
-| `<Card.Header title={…}>` with no `headingLevel`                                                                 | `headingLevel={2}`                                                                                                                                                   |
-| `hint={<span className="text-[11.5px] …">…</span>}`                                                              | `hint={t('…')}`                                                                                                                                                      |
-| A field with a format rule and no `error`/`isInvalid` or `invalidFields.ids` entry, or an entry naming a wrapper | The settings-fields recipe's error path, all four parts, with the focusable control's own id                                                                         |
-| ``aria-describedby={`${id}-error`}`` beside `FormField`, or ids threaded past `SettingRow`                       | Nothing at the call site; report the gap                                                                                                                             |
-| `<Alert>` inside a field for its validation error                                                                | `FormField` `error`                                                                                                                                                  |
-| A switch blocked by the plan or a limit with no `lockedReason`                                                   | `isLocked` + a reason for every lock (settings-fields recipe)                                                                                                        |
-| Half a not-yet fix in a primitive (the colour but not the size)                                                  | Leave it for its own change, or fix every class its rule names                                                                                                       |
-| `border-admin-line` on a text field, select, track or radio                                                      | `border-admin-control-line`                                                                                                                                          |
-| `text-admin-faint` on text someone has to read                                                                   | `text-admin-muted`                                                                                                                                                   |
-| `text-indigo-800`, a hex, any raw palette colour                                                                 | An `admin-*` token                                                                                                                                                   |
-| `outline-admin-brand-weak` as the only focus cue                                                                 | `Button`'s `focus-visible:ring-2` ring with offset                                                                                                                   |
-| `gap-[18px]` or `gap-5` between cards, `gap-5` or `mb-[18px]` between fields                                     | `gap-6` between cards, `gap-4` on the fields' parent                                                                                                                 |
-| `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-admin` or `rounded-admin-control`                                                                                                                           |
-| `font-sans`, `font-ui` or an inline `fontFamily` on admin chrome                                                 | Nothing; the font belongs on `<body>` (**Not yet:** unset, see Type)                                                                                                 |
-| `sm:grid-cols-2` inside a half-width column                                                                      | `@container` on the body, `@sm:grid-cols-2` on the grid                                                                                                              |
-| `@base-ui/react/switch` imported outside `shared/switch/`                                                        | The shared `Switch`; raise a missing mode                                                                                                                            |
-| `{isPending ? t('saving') : t('save')}` as button children                                                       | `isPending` + `pendingLabel`                                                                                                                                         |
-| The page's main action in the body, a non-form action in `Card.Footer`, a default-size `Button` in `Card.Header` | `PageHeader` `actions`; a card-scoped one as `size={SIZE.SM}` in `Card.Header` `actions`                                                                             |
-| An English literal in JSX, an `aria-label` or a placeholder                                                      | A key in all five catalogues                                                                                                                                         |
-| `label.toLowerCase()`, `` `${a} — ${b}` ``, `` `${hue}°` ``                                                      | One ICU message with arguments                                                                                                                                       |
-| `min-h-11` or `text-[16px]` at a shared primitive's call site                                                    | Nothing; the primitive owns phone sizing                                                                                                                             |
-| More code in a 200+ line component that does more than one job                                                   | Split it first                                                                                                                                                       |
-| A feature component styling a Base UI part another page also uses                                                | A block in `components/shared/`, used from both pages                                                                                                                |
-| An eighth prop, or any new prop on a component already at seven or more (`FormField`, `FormTextInput`)           | Restructure first (drop, group, slot, hook or context), or compose its parts, as `FormField` around `TextInput`                                                      |
-| A prop every caller fills the same way, derives one-to-one from another prop, or that only a test passes         | Own it inside the component (`useTranslations`, import the action, derive it); the test uses `vi.mock`                                                               |
-| `isArchived` + `archivedNoticeId`, or the same set of values, passed to every card in a list                     | Read them from the form's context once `SettingsFormProvider` lands. **Not yet:** it doesn't exist; pass them as props and don't build a page-local context for them |
-| Copying `useState` for open/value/error, `useTransition` and reset-on-close into another caller                  | One `use<Name>` hook; the component owns that state                                                                                                                  |
-| Three booleans or handlers that configure one footer button or trigger                                           | A named `ReactNode` slot or a compound part                                                                                                                          |
-| `const a = await x(); const b = await y();` where `y` doesn't use `a`                                            | `const [a, b] = await Promise.all([x(), y()])`                                                                                                                       |
-| Calling `auth()`, `requireAdmin()` or a tenant query again in a layout or page                                   | The `cache()`-wrapped resolver the gate already used (`requireTenantById`, `resolveDashboardTenant`, `listSessionTenants`)                                           |
-| `queries.tenants.getX(tenant.id)` when `tenant` is already in hand                                               | Derive it from the row, e.g. `queries.tenants.selectLiveLocales(tenant)`                                                                                             |
-| Awaiting a slow external call (the Vercel API) in a page's top-level `Promise.all`                               | An async section inside `<Suspense>`, fallback `Skeleton`                                                                                                            |
-| Loading data that only a closed Disclosure, Menu or inactive tab shows                                           | A Server Action called on first open with a `Spinner`, or a route segment per tab                                                                                    |
-| `tenant={row}` or `hrefFor={() => …}` passed to a `'use client'` component                                       | A server-side projection of only the fields it renders, with hrefs computed on the server                                                                            |
-| A `setInterval` poll inside a hook that runs on every render path                                                | Gate it on the condition that renders its view, stop at a terminal state, cap ticks, and pause while the tab is hidden                                               |
-| A dynamic route with no `loading.tsx`, or a `router.push` with no pending state                                  | A `loading.tsx` page skeleton; `startTransition` plus a `Spinner`                                                                                                    |
+| You are about to write…                                                                                          | Write instead                                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<Text>` with no size slot, or `variant="muted"` / `"supporting"` to size a card's main content or value         | `<Text>` (body, 13.5px)                                                                                                                                  |
+| `<Text variant="hint">`                                                                                          | `FormField` `hint` for a field; `variant="muted"` for meta                                                                                               |
+| `text-sm`, `text-xs`, `text-base`, `text-label`, `text-meta`                                                     | The role's `text-admin-*` token, e.g. `text-admin-13-5`                                                                                                  |
+| Table classes of your own: 18px cell padding, no row hover, a left-aligned empty line                            | The table recipe's variants, unchanged                                                                                                                   |
+| A `div` with `rounded-admin border p-[18px] shadow-admin`                                                        | `<Card>` with `Card.Header` and `Card.Body`                                                                                                              |
+| A paragraph opening `Card.Body` that says what the card is for                                                   | `Card.Header` `supportingText`                                                                                                                           |
+| A hand-built tinted box with a glyph                                                                             | `Alert`; a failure card is a `Card` with a bad header                                                                                                    |
+| A second `h1`, or `<Heading level={1}>` in a page body                                                           | `PageHeader` `title`, once per page                                                                                                                      |
+| `<h2>`, `<h3>` or a `font-semibold` span as a section title                                                      | `Card.Header` `title`                                                                                                                                    |
+| `<Card.Header title={…}>` with no `headingLevel`                                                                 | `headingLevel={2}`                                                                                                                                       |
+| `hint={<span className="text-[11.5px] …">…</span>}`                                                              | `hint={t('…')}`                                                                                                                                          |
+| A field with a format rule and no `error`/`isInvalid` or `invalidFields.ids` entry, or an entry naming a wrapper | The settings-fields recipe's error path, all four parts, with the focusable control's own id                                                             |
+| ``aria-describedby={`${id}-error`}`` beside `FormField`, or ids threaded past `SettingRow`                       | Nothing; `FormField` links them                                                                                                                          |
+| `<Alert>` inside a field for its validation error                                                                | `FormField` `error`                                                                                                                                      |
+| A switch blocked by the plan or a limit with no `lockedReason`                                                   | `isLocked` + a reason for every lock (settings-fields recipe)                                                                                            |
+| Half a fix in a primitive (the colour but not the size)                                                          | Fix every class its rule names, or leave it and report it                                                                                                |
+| `border-admin-line` on a text field, select, track or radio                                                      | `border-admin-control-line`                                                                                                                              |
+| `text-admin-faint` on text someone has to read                                                                   | `text-admin-muted`                                                                                                                                       |
+| `text-indigo-800`, a hex, any raw palette colour                                                                 | An `admin-*` token                                                                                                                                       |
+| `outline-admin-brand-weak` as the only focus cue                                                                 | `Button`'s `focus-visible:ring-2` ring with offset                                                                                                       |
+| `gap-[18px]` or `gap-5` between cards, `gap-5` or `mb-[18px]` between fields                                     | `gap-6` between cards, `gap-4` on the fields' parent                                                                                                     |
+| `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-admin` or `rounded-admin-control`                                                                                                               |
+| `font-sans`, `font-ui` or an inline `fontFamily` on admin chrome                                                 | Nothing; the font is set once on `<body>`                                                                                                                |
+| `sm:grid-cols-2` inside a half-width column                                                                      | `@container` on the body, `@sm:grid-cols-2` on the grid                                                                                                  |
+| `@base-ui/react/switch` imported outside `shared/switch/`                                                        | The shared `Switch`; raise a missing mode                                                                                                                |
+| `{isPending ? t('saving') : t('save')}` as button children                                                       | `isPending` + `pendingLabel`                                                                                                                             |
+| The page's main action in the body, a non-form action in `Card.Footer`, a default-size `Button` in `Card.Header` | `PageHeader` `actions`; a card-scoped one as `size={SIZE.SM}` in `Card.Header` `actions`                                                                 |
+| An English literal in JSX, an `aria-label` or a placeholder                                                      | A key in all five catalogues                                                                                                                             |
+| `label.toLowerCase()`, `` `${a} — ${b}` ``, `` `${hue}°` ``                                                      | One ICU message with arguments                                                                                                                           |
+| `min-h-11` or `text-[16px]` at a shared primitive's call site                                                    | Nothing; the primitive owns phone sizing                                                                                                                 |
+| More code in a 200+ line component that does more than one job                                                   | Split it first                                                                                                                                           |
+| A feature component styling a Base UI part another page also uses                                                | A block in `components/shared/`, used from both pages                                                                                                    |
+| An eighth prop, or any new prop on a component already at seven or more (`FormField`, `FormTextInput`)           | Restructure first (drop, group, slot, hook or context), or compose its parts, as `FormField` around `TextInput`                                          |
+| A prop every caller fills the same way, derives one-to-one from another prop, or that only a test passes         | Own it inside the component (`useTranslations`, import the action, derive it); the test uses `vi.mock`                                                   |
+| `isArchived` + `archivedNoticeId`, or the same set of values, passed to every card in a list                     | Read them from the form's context (`useSettingsFormState`); never build a page-local context for them                                                    |
+| Copying `useState` for open/value/error, `useTransition` and reset-on-close into another caller                  | One `use<Name>` hook; the component owns that state                                                                                                      |
+| Three booleans or handlers that configure one footer button or trigger                                           | A named `ReactNode` slot or a compound part                                                                                                              |
+| `const a = await x(); const b = await y();` where `y` doesn't use `a`                                            | `const [a, b] = await Promise.all([x(), y()])`                                                                                                           |
+| Calling `auth()`, `requireAdmin()` or a tenant query again in a layout or page                                   | The `cache()`-wrapped function the gate already used (`getSession`, `requireAdmin`, `requireTenantById`, `resolveDashboardTenant`, `listSessionTenants`) |
+| `queries.tenants.getX(tenant.id)` when `tenant` is already in hand                                               | Derive it from the row, e.g. `queries.tenants.selectLiveLocales(tenant)`                                                                                 |
+| Awaiting a slow external call (the Vercel API) in a page's top-level `Promise.all`                               | An async section inside `<Suspense>`, fallback `Skeleton`                                                                                                |
+| Loading data that only a closed Disclosure, Menu or inactive tab shows                                           | A Server Action called on first open with a `Spinner`, or a route segment per tab                                                                        |
+| `tenant={row}` or `hrefFor={() => …}` passed to a `'use client'` component                                       | A server-side projection of only the fields it renders, with hrefs computed on the server                                                                |
+| A `setInterval` poll inside a hook that runs on every render path                                                | Gate it on the condition that renders its view, stop at a terminal state, cap ticks, and pause while the tab is hidden                                   |
+| A dynamic route with no `loading.tsx`, or a `router.push` with no pending state                                  | A `loading.tsx` page skeleton; `startTransition` plus a `Spinner`                                                                                        |

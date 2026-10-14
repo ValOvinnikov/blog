@@ -1,8 +1,17 @@
-import { CONSENT_CATEGORY, type TConsentCategory } from '@blog/config';
+import {
+  CONSENT_CATEGORY,
+  type TConsentCategory,
+  type TMaybeUndefined,
+} from '@blog/config';
 
-const CONSENT_COOKIE_NAME = 'consent';
+export const CONSENT_COOKIE_NAME = 'consent';
 const CONSENT_COOKIE_VERSION = '1';
-const CONSENT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 180;
+const CONSENT_COOKIE_ATTRIBUTES = [
+  `Max-Age=${60 * 60 * 24 * 180}`,
+  'Path=/',
+  'SameSite=Lax',
+  'Secure',
+];
 
 export const OPTIONAL_CONSENT_CATEGORIES: readonly TConsentCategory[] =
   Object.values(CONSENT_CATEGORY).filter(
@@ -12,35 +21,19 @@ export const OPTIONAL_CONSENT_CATEGORIES: readonly TConsentCategory[] =
 const isOptionalCategory = (value: string): value is TConsentCategory =>
   OPTIONAL_CONSENT_CATEGORIES.some((category) => category === value);
 
-export const readConsentCookieValue = (cookieString: string): string => {
-  const prefix = `${CONSENT_COOKIE_NAME}=`;
-  const entry = cookieString
-    .split('; ')
-    .find((candidate) => candidate.startsWith(prefix));
-  return entry ? entry.slice(prefix.length) : '';
+export const decodeConsent = (
+  value: TMaybeUndefined<string>,
+): TMaybeUndefined<TConsentCategory[]> => {
+  const [version, list, ...rest] = (value ?? '').split('.');
+  if (version !== CONSENT_COOKIE_VERSION || list === undefined || rest.length)
+    return undefined;
+
+  const categories = list.split(',').filter((category) => category !== '');
+  return categories.every(isOptionalCategory) ? categories : undefined;
 };
 
-export const parseConsentCookieValue = (
-  value: string,
-): TConsentCategory[] | null => {
-  const separatorIndex = value.indexOf('.');
-  if (separatorIndex === -1) return null;
-  if (value.slice(0, separatorIndex) !== CONSENT_COOKIE_VERSION) return null;
-
-  const categories = value
-    .slice(separatorIndex + 1)
-    .split(',')
-    .filter((category) => category !== '');
-  return categories.every(isOptionalCategory) ? categories : null;
-};
-
-export const serializeConsentCookie = (
-  granted: readonly TConsentCategory[],
-): string =>
+export const encodeConsent = (granted: readonly TConsentCategory[]): string =>
   [
     `${CONSENT_COOKIE_NAME}=${CONSENT_COOKIE_VERSION}.${granted.filter(isOptionalCategory).join(',')}`,
-    `Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}`,
-    'Path=/',
-    'SameSite=Lax',
-    'Secure',
+    ...CONSENT_COOKIE_ATTRIBUTES,
   ].join('; ');
