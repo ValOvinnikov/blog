@@ -158,6 +158,7 @@ export type { THomePage } from './features/pages/home';
 export type {
   TLandingBreadcrumb,
   TLandingPage,
+  TLandingRedirect,
   TLandingSectionNavigation,
   TLandingSectionPage,
 } from './features/pages/landing';
