@@ -1,4 +1,4 @@
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { renderElement, screen, waitFor } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useRef, useState } from 'react';
@@ -54,6 +54,13 @@ const Harness = ({ hidesOpenerOnClose = false }) => {
 describe(`<${Dialog.name}/>`, () => {
   let user: UserEvent;
 
+  const openDialog = async () => {
+    await user.click(screen.getByRole('button', { name: openLabel }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: closeLabel })).toHaveFocus(),
+    );
+  };
+
   beforeEach(() => {
     user = userEvent.setup();
   });
@@ -67,7 +74,7 @@ describe(`<${Dialog.name}/>`, () => {
   describe('when opened', () => {
     beforeEach(async () => {
       renderElement(<Harness />);
-      await user.click(screen.getByRole('button', { name: openLabel }));
+      await openDialog();
     });
 
     it('is a modal dialog named by its heading', () => {
@@ -78,10 +85,6 @@ describe(`<${Dialog.name}/>`, () => {
         screen.getByRole('heading', { level: 2, name: heading }),
       ).toBeVisible();
       expect(screen.getByText(body)).toBeVisible();
-    });
-
-    it('moves focus to the close control', () => {
-      expect(screen.getByRole('button', { name: closeLabel })).toHaveFocus();
     });
 
     it('closes on Escape and returns focus to the opener', async () => {
@@ -106,7 +109,7 @@ describe(`<${Dialog.name}/>`, () => {
 
   it('moves focus to the fallback target when the opener is gone', async () => {
     renderElement(<Harness hidesOpenerOnClose={true} />);
-    await user.click(screen.getByRole('button', { name: openLabel }));
+    await openDialog();
 
     await user.click(screen.getByRole('button', { name: actionLabel }));
 
