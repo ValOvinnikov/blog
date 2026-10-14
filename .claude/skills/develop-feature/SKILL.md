@@ -10,660 +10,411 @@ description: >-
 
 # Develop a feature (lifecycle + delegation)
 
-This is the orchestration playbook. The per-layer agents and the other skills
-know _how_ to do their part; this skill says _what order_ and _who does which
-part_. Run it at the start of any non-trivial task.
-
-## IMPORTANT: every issue follows the strict gate sequence in `open-pull-request`
-
-Committing is free (no approval needed); push and PR are two separate gates,
-each requiring explicit user approval. Never bundle them. See
-`open-pull-request` skill for the full sequence.
+The orchestration playbook: what order things happen in and who does each part.
+The layer agents and the other skills know _how_; `CLAUDE.md` holds the rules
+this points at. Every issue then follows the gate sequence in
+`open-pull-request` — committing is free; push and PR are two separate
+approvals, never bundled.
 
 ## 0. Decide the shape
 
-- Trivial / single-file / one layer → just do it (still test + review).
+- Trivial / single-file / one layer → dispatch that layer's agent directly,
+  skipping the multi-layer recipe (still test + review).
 - Spans multiple layers → use the `add-content-type` recipe and delegate per
   layer as below.
-- **Filing a new issue for a feature that spans 2+ layers → file an epic
-  (parent) plus one sub-issue per layer, never a single flat issue.** This is
-  step 0's own "prefer one PR per layer" rule one level earlier: ticket
-  structure informs PR structure. See `CLAUDE.md`'s "Never call
-  `gh issue create` directly" section for the exact dispatch mechanics
-  (batch-create the epic first, then each sub-issue with `parent=<epic-number>`, one
-  `board-keeper` dispatch). Working an _existing_ issue that already spans
-  layers doesn't retroactively need this — it only applies when you're the one
-  filing the ticket.
-- **One PR per layer, shipped one at a time** (`config → studio → service →
-ui → web` when config changes are involved, otherwise `studio → service →
-ui → web`; dependency order) so each review stays small — **and each
-  layer's PR is approved and merged before the next layer's work starts.**
-  Steps 1–8 below run to completion for one layer, then start over for the
-  next, on a branch cut from the `main` that now contains the previous layer.
-  Only two things change that: the user says to stack (then `gh stack`, per
-  `open-pull-request`), or the layers cannot be split at all — **split only
-  when each layer merges to `main` green on its own** (typically additive
-  changes). Keep a single PR when a partial merge would break the build: e.g.
-  renaming a shared `_type` or generated type that downstream consumes reds
-  `type-check` until every layer lands. The orchestrator never stacks on its
-  own initiative. Full rule: `CLAUDE.md` → "One layer at a time".
+- Filing a ticket for a 2+-layer feature → an epic plus one sub-issue per
+  layer, created in one `board-keeper` dispatch (→ `CLAUDE.md` "A feature
+  spanning 2+ layers always gets an epic" for the rule, "Never call
+  `gh issue create` directly" for the dispatch). An existing multi-layer issue
+  is not re-filed.
+- One PR per layer, merged one at a time (→ `CLAUDE.md` "Planning work —
+  mandatory, not advisory"): steps 1–8 run to completion for one layer, then
+  start again on a branch cut from the `main` that now holds it. Combine
+  layers only when splitting would red `main`; stack only when the user says
+  to.
 
 ## 1. Investigate + set status (main session)
 
-- **Fetch the GitHub issue** with `gh issue view <number>` to get the full body
-  and acceptance criteria — don't rely solely on what the user said in the prompt.
-- Restate the task and acceptance criteria. Read `SPEC.md` for the contracts.
-- Locate the affected files/layers. Identify which workspaces change:
-  `config` (`packages/config`, `packages/utils`, `configs/*`), `studio`,
-  `service`, `ui`, `web`.
+- **`gh issue view <n>`** for the full body and acceptance criteria — don't
+  rely on the prompt alone.
+- Restate the task and criteria. Read `SPEC.md` for the contracts, and the
+  feature's page under `docs/features/` when one exists.
+- Identify which workspaces change.
 - **`explore` vs. inline `Bash`/`Read` — decide by whether the target path is
-  already known, not by query count.** Dispatch the **`explore` subagent**
-  (`.claude/agents/explore.md`) whenever you're searching for something
-  ("where does X live", "how does Y work", "is there already a Z", "what else
-  references this") — even a single `grep` across a package is unbounded
-  discovery if you don't already know which file has the answer. It answers
-  from a cheap, disposable Haiku context and returns conclusions plus
-  `file:line` pointers, so the rediscovery never enters this session's window.
-  Read or grep inline only to verify a specific, already-named file (named by
-  the user, the issue body, a prior `explore` dispatch, or this step's own
-  prior output).
-  **Ask `explore` for the nearest existing sibling too** — the schema,
-  loader, component, view or migration most like what is being built — as
-  a path plus one line on how it differs. That path goes into every layer
-  agent's brief (step 3, item 6): an agent that starts cold with no sibling
-  named re-invents the shape, and the repo's clones (a toast provider copied
-  whole between the two apps, migration helpers copied across three folders)
-  are what that costs.
-  **"I already have context from a prior session" is not an exemption** —
-  cached memory can be stale (`feedback_memory_staleness_check.md`) and
-  doesn't change whether what you're about to run is a _verification_ of a
-  known file or a _search_ for an unknown one. If you catch yourself
-  justifying an inline `grep`/`find`/`Read` as "narrow" because you already
-  suspect where the answer is, that suspicion is exactly the hypothesis
-  `explore` should confirm — dispatch it, feeding it your suspected path(s)
-  as a starting hypothesis rather than checking them yourself.
-- If the task touches a library API, CLI command, or config format you are not
-  certain of, run the `use-context7` skill **before** writing the plan — fetch
-  the relevant docs now, not mid-implementation.
-- **Migration check (schema changes).** If the work alters an _existing_ content
-  shape — renaming/removing/moving a field, renaming a `_type`, restructuring a
-  document — existing `production` documents will be orphaned unless migrated.
-  Decide now whether a data migration is required. If yes, it is part of the plan
-  (see step 2); if the change is purely additive/optional, note explicitly that
-  no migration is needed. Purely new types/fields need none.
-- **Voice check (site copy).** List every visible string on the public site
-  that the work adds or rewords. That covers new or changed catalog keys,
-  and the copy any new `@blog/ui` text prop (label, title, message,
-  placeholder) will carry once `web` wires it. Give each a recommended
-  classification under CLAUDE.md's "Check for Voice candidates". This list is
-  the plan's **Copy** line in step 2. A feature that starts in `@blog/ui`
-  lists its copy now, not in the later `web` ticket, because the component's
-  props decide whether the copy can be a Voice field.
-- Surface unknowns early; ask the user only if a decision is genuinely theirs.
-- **Follow Gate 0 in `open-pull-request`** — pull the issue from the board,
-  set status → In Progress, checkout a new branch from `main`. For multi-layer
-  work, run the `superpowers:using-git-worktrees` skill to set up an isolated
-  worktree before delegating.
+  already known, not by query count.** Searching ("where does X live", "is
+  there already a Z", "what references this") → dispatch `explore`
+  (`.claude/agents/explore.md`): it works in a disposable Haiku context and
+  returns conclusions plus `file:line`, so the rediscovery never enters this
+  window. Read or grep inline only to verify a file already named by the user,
+  the issue, a prior `explore` or this step. Prior-session context is no
+  exemption — memory goes stale — and a suspicion about where the answer lives
+  is the hypothesis to hand `explore`, not to check yourself.
+- **Ask `explore` for the nearest existing sibling** — the schema, loader,
+  component, view or migration most like what is being built — as a path plus
+  one line on how it differs. It goes into every layer brief (step 3, item 6);
+  an agent briefed without one re-invents the shape and clones code.
+- Uncertain of a library API, CLI flag or config format → run `use-context7`
+  now, before the plan.
+- **Migration check** → `CLAUDE.md` "Check for migrations" and "Check for `db`
+  (Neon/Drizzle) migrations too". Decide now; when the change is purely
+  additive, say explicitly that no migration is needed.
+- **Voice check** → list every public-site string the work adds or rewords,
+  including the copy a new `@blog/ui` text prop will carry once `web` wires
+  it, each with a recommended classification (`CLAUDE.md` "Check for Voice
+  candidates"). This is the plan's **Copy** line.
+- **Manual-test check** → if the change alters what a page shows or how it
+  behaves, the plan carries a manual-test issue (step 2).
+- Surface unknowns early; ask only when a decision is genuinely the user's.
+- **Follow Gate 0 in `open-pull-request`** — board → In Progress, the branch,
+  and its exception for worktree-delegated work. For multi-layer work, run
+  `superpowers:using-git-worktrees` before delegating.
 
 ## 2. Plan (main session)
 
-- For any feature that adds new behaviour or touches more than one layer, run
-  `superpowers:brainstorming` **before** writing the plan — explore intent,
-  constraints, and design decisions first.
-- Write the change as ordered steps **in dependency order**:
-  `config → studio → types(typegen) → service → ui → web` (drop `config` if it
-  has no changes). Never reverse it.
-- Explicitly mark which layers are **unaffected** — those agents are skipped
-  entirely. Do not invoke an agent whose layer has no changes.
-- Note which step each subagent owns.
-- **State the Copy line** from step 1's Voice check in the split you put to
-  the user. List each string with its recommended classification, or write
-  "none". The user's approval settles it.
-  - Write the settled classifications into the ticket body before dispatch.
-  - Name each key's list (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`) in the
-    dispatch prompt.
-  - A string an agent reports under **Voice candidates** that the plan did
+- New behaviour or more than one layer → run `superpowers:brainstorming`
+  before writing the plan.
+- Order the steps by dependency and never reverse it:
+  `config → studio → typegen → service → ui → web`, and
+  `config → db → auth → platform-app` on the platform side. Drop the layers
+  that don't change.
+- Mark the unaffected layers; their agents are not invoked. Note which agent
+  owns each step.
+- **Put the split to the user before the first dispatch**, carrying every
+  line `CLAUDE.md` "Say what it touches before starting" requires. Once they
+  approve it:
+  - write the settled Copy classifications into the ticket body, and name
+    each key's list (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`) in the dispatch
+    prompt;
+  - a string an agent reports under **Voice candidates** that the plan did
     not list goes to the user before commit.
-- **If the investigation flagged a migration**, the plan must include it as an
-  explicit step — which documents/fields change, the `sanity/migrate` transform,
-  and the dry-run → backup → human-gated run sequence — and **prompt the user
-  with that migration plan** before implementing (the live-data change is theirs
-  to approve, like a deploy). Follow `packages/studio/migrations/README.md`. Sequence it
-  right after the schema+typegen step and before the `service` layer consumes the
-  new shape.
+- Each ticket's `## Scope` carries a `Feature doc:` line —
+  `update | create | none` (→ `CLAUDE.md` "Feature docs" and the sub-issue
+  template in "Issue body template").
+- **Migration flagged** → it is an explicit plan step, sequenced right after
+  schema + typegen and before `service` consumes the new shape; its plan goes
+  to the user before implementing (→ `CLAUDE.md` "Check for migrations").
 
-## 3. Implement — delegate to the scoped subagent for each layer
+### Manual-test issue
 
-Hand each layer's work to its agent (use the Agent tool, or state which agent
-owns it). Do them in dependency order; later steps depend on earlier output.
-**Skip any agent whose layer has no changes** — don't invoke it at all.
+Any change that alters what a page shows or how it behaves — UI, copy,
+routing, validation, interaction, user-visible caching or revalidation —
+ships with a manual-test issue.
 
-**One layer per pass.** Under the default split (§0) this step dispatches
-only the layer whose PR is next — the following layer's agent is not
-dispatched until that PR has merged, and then it starts from a fresh branch
-off `main`. Dispatching two layers' agents back to back is only right inside
-a single PR: a supporting package (`config`, `utils`, `db`, …) riding along
-with the main workspace that needs it, or layers combined because the split
-would red `main`. The commit-landing discipline below is for those cases.
+- **Create it with the implementation tickets**, in the same `board-keeper`
+  dispatch: a sub-issue of the epic, or linked from the single ticket.
+  Labels: `manual-test` plus the same `prio:*` label as the work.
+- **Write the body from the manual-test template** in `CLAUDE.md` "Issue
+  body template".
+- **The completing PR body links it without a closing keyword** (→
+  `open-pull-request` "PR body template"). It closes only after the owner has
+  run it.
+- **Walk the owner through it one step per message**, waiting for each
+  result before sending the next.
 
-**A bugfix is TDD, done by the layer agent itself:** it writes the failing
-regression test before the fix and makes it pass, per
-`superpowers:test-driven-development`; new feature code carries no
-self-written tests at this step — that coverage is `test-writer`'s pass in
+## 3. Implement — delegate each layer to its agent
+
+Hand each layer's work to its agent in dependency order, and skip any agent
+whose layer has no changes. Every file in an agent's domain — first draft,
+review fix and follow-up alike — is written by that agent (→ `CLAUDE.md` "Use
+the scoped agents"). When you do a layer yourself (solo-session mode), apply
+that agent's rules and skill.
+
+**One layer per pass.** Under the default split this step dispatches only the
+layer whose PR is next. Two layers' agents back to back is right only inside
+one PR: a supporting package (`config`, `utils`, `db`, …) riding along with
+the workspace that needs it, or layers combined because the split would red
+`main`.
+
+**A bugfix is TDD, done by the layer agent itself** — the failing regression
+test first, then the fix (`superpowers:test-driven-development`). New feature
+code carries no self-written tests here; that is `test-writer`'s pass in
 step 4.
 
-**Land each agent's commit onto your current local branch before dispatching
-the next one.** Every layer agent carries `isolation: worktree`, and
-`worktree.baseRef: "head"` in `.claude/settings.json` means the _next_
-dispatched agent's worktree branches from _your_ local `HEAD` — so it only
-sees a prior agent's work once that commit is actually on your branch:
-`git merge --ff-only <sha>` when the next agent branches from the same tip,
-`git cherry-pick <sha>` if `HEAD` has moved since (parallel agents, an
-intervening `pnpm typegen` commit). See `docs/context/claude-code.md`'s
-"Sequential agent worktrees compose" note for the full mechanism, and step 4
-below for why this discipline matters just as much before dispatching
-`test-writer`.
+**Land each agent's commit on your local branch before dispatching the next
+agent.** Every layer agent carries `isolation: worktree`, and
+`worktree.baseRef: "head"` in `.claude/settings.json` branches the next
+worktree from your local `HEAD` — so an agent sees earlier work only once that
+commit is on your branch. Use `git merge --ff-only <sha>` from the same tip,
+`git cherry-pick <sha>` when `HEAD` has moved (parallel agents, an
+intervening typegen commit). Mechanism: `docs/context/claude-code.md`
+"Sequential agent worktrees compose".
 
 | Layer / work                                                 | Agent          | Skill it should apply                                                               |
 | ------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------- |
-| Constants, `routes`, shared types, `configs/*`, alias wiring | `config`       | —                                                                                   |
-| Sanity schema + `pnpm typegen`                               | `studio`       | `studio-schema-practices`                                                           |
+| Constants, `routes`, shared types, `configs/*`, alias wiring | `config`       | `testing-practices`                                                                 |
+| Sanity schema                                                | `studio`       | `studio-schema-practices`                                                           |
 | GROQ + typed fetcher                                         | `service`      | `add-content-type`, `testing-practices`                                             |
 | Drizzle schema, migrations, typed queries                    | `db`           | `testing-practices`                                                                 |
 | Shared Auth.js config (providers, adapter, session, cookies) | `auth`         | `testing-practices`                                                                 |
 | Components                                                   | `ui`           | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
 | Routes / metadata / feeds                                    | `web`          | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
-| Admin-panel routes, Server Actions, Base UI forms            | `platform-app` | `testing-practices`                                                                 |
+| Admin-panel routes, Server Actions, Base UI forms            | `platform-app` | `platform-ui-practices`, `testing-practices`                                        |
 | Structured logging (`createLogger`, log sanitization)        | `insight`      | `testing-practices`                                                                 |
+| Email shell, `escapeHtml`, `sendEmail` transport             | `email`        | `testing-practices`                                                                 |
 
-`db`, `auth`, `platform-app`, and `insight` are the rows that are **not** steps in
-that chain. `db` and `platform-app` are siblings to `service` and `web`
-respectively, `auth` is a thin layer above `db`, `insight` is independent (like
-`config`/`utils`), and none of the four consumes Sanity.
-`config → db → auth → platform-app` runs in parallel to `studio → service → ui → web`,
-not after it. `insight` has no upstream and no downstream in this chain today
-— dispatch it standalone when the work is genuinely `packages/insight`'s.
+For any React component, `ui`, `web` and `platform-app` apply
+`react-component-practices` before their layer skill. `studio` may run
+typegen in its worktree to check its schema; the authoritative run is yours,
+in §5. `db`, `auth`, `platform-app`, `insight` and `email` are not steps in
+the Sanity chain; when each is dispatched is in `CLAUDE.md` "Use the scoped
+agents". Each agent's model is set in its definition file — don't override it
+unless the user asks.
 
-All subagents use **Sonnet** (set in each agent's definition file — do not
-override with a different model unless the user explicitly asks).
+**Context handoff — every agent starts cold.** Every dispatch prompt includes:
 
-**Context handoff (critical):** Each subagent starts cold. Every Agent tool
-prompt must include:
+1. A one-sentence summary and the issue number.
+2. The acceptance criteria from the issue.
+3. What the previous layer produced — copy the signatures (types, functions,
+   components), not a description of them.
+4. Which files to read or create.
+5. The definition of done for this layer.
+6. The nearest sibling to model on (step 1), as a path. The agent mirrors its
+   structure and naming; copying more than a few lines out of it means a
+   shared helper to extract (→ `CLAUDE.md` "Reuse before you create"), and the
+   report says so. **State in the brief that the sibling's comments are not
+   part of the model** — its doc block is drift to leave behind, or the agent
+   writes one more `XModule — fetches module_x` block.
 
-1. One-sentence summary of the feature / issue number
-2. Acceptance criteria from the GitHub issue
-3. What the previous layer produced (new type names, exported functions,
-   component names) — copy the relevant signatures, not just a description
-4. Which specific files to read or create
-5. Definition of done for that layer (what "finished" looks like)
-6. The nearest existing sibling to model on (from step 1), as a path — the
-   agent extends or mirrors its structure and naming rather than
-   re-inventing; if it finds itself copying more than a few lines out of it,
-   that is a shared helper to extract, and the report says so. **Its
-   comments are not part of the model**: a sibling's doc block is drift to
-   leave behind (and to delete where the sibling itself is touched), never a
-   template — say so in the brief, because every module on `main` carries
-   the same `XModule — fetches module_x` block and an agent left to itself
-   writes the eleventh
-
-If you do a layer yourself instead of delegating, still apply that layer's
-agent rules and skill.
+**The docs the PR owes are yours to write**, because `docs/**` and `SPEC.md`
+sit outside every agent's scope (→ `CLAUDE.md` "Spec sync" and "Feature
+docs"). Write them before step 6 so the reviewer sees them.
 
 ## 4. Test
 
-**This step covers new-feature coverage only** — a bugfix's regression test
-was already written first, TDD-style, by the owning layer agent in step 3;
-`test-writer` never touches an already-passing bugfix test.
+New-feature coverage only — a bugfix's regression test was written first in
+step 3, and `test-writer` never touches it.
 
-- **Land every layer agent's commit onto your current local branch before
-  dispatching `test-writer`** (#1796) — `worktree.baseRef: "head"` in
-  `.claude/settings.json` means `test-writer`'s own worktree branches from
-  _your_ local `HEAD`, exactly like chaining two layer agents (see
-  `docs/context/claude-code.md`'s "Sequential agent worktrees" note). If a
-  layer agent's product change still lives only on its own
-  `worktree-agent-<id>` branch when `test-writer` is dispatched, its worktree
-  won't contain it — the fix is landing the commit first (`git merge --ff-only`
-  or `git cherry-pick`, same as step 3), never a manual copy/race into the
-  freshly-created worktree.
-- Dispatch the **`test-writer` subagent** (`.claude/agents/test-writer.md`)
-  once every layer agent's commit is landed. Give it the same
-  context-handoff package as step 3 (issue summary, acceptance criteria) plus
-  a diff summary and the new exports/components/types each layer agent
-  produced — it starts cold like any subagent. It applies `testing-practices`
-  per layer and is scoped to `*.test.ts(x)` files only, enforced by a
-  `PreToolUse` guard (#396): a test that can't pass without a product-code
-  change comes back as a finding for you to route to the owning layer agent,
-  never a fix `test-writer` makes itself.
-- Tests run once per layer when implementation is complete — not after each
+- **Land every layer agent's commit first**, as in step 3. `test-writer`'s
+  worktree branches from your `HEAD`, so a change still only on a
+  `worktree-agent-<id>` branch is invisible to it. Never copy files into its
+  worktree instead.
+- Dispatch **`test-writer`** (`.claude/agents/test-writer.md`) with the step 3
+  handoff plus a diff summary and the new exports, components and types each
+  layer produced. It applies `testing-practices`, is confined to
+  `*.test.ts(x)` by `test-writer-scope-guard.sh`, and returns a test that
+  needs a product change as a finding for you to route to the owning agent.
+- Tests run once per layer when implementation is complete, not after each
   file.
-- New routes/metadata: sanity-check `sitemap`/RSS.
-- **Land `test-writer`'s own commit too**, same as any other subagent, before
-  moving to step 5.
-- **The fail-without-the-fix check (`feedback_test_must_fail_without_the_fix`)
-  is the orchestrator's job, not `test-writer`'s** (#1796) — `test-writer`
-  cannot make or revert a product-code change under any tool, so it cannot
-  perform this check itself. After landing its tests, for each regression
-  test written specifically to cover a fix: temporarily back out _only_ the
-  product-code file(s) it targets — `git checkout <parent-sha> -- <file>`,
-  never the test file (by this point the fix is already committed on your
-  local branch per the landing step above, so `git stash` has nothing
-  uncommitted to stash and silently no-ops instead of reverting anything) —
-  run that one test and confirm it fails, then restore the file
-  (`git checkout HEAD -- <file>`) and confirm the suite is green again before
-  continuing. Skip this for tests that aren't regression tests for a specific
-  fix (new-feature coverage with no "should have failed before" claim doesn't
-  need it).
+- New routes or metadata: sanity-check `sitemap` and RSS.
+- Land `test-writer`'s commit too before step 5.
+- **The fail-without-the-fix check is yours** — `test-writer` cannot revert
+  product code. For each regression test covering a specific fix:
+  `git checkout <parent-sha> -- <product file>` (never the test file;
+  `git stash` silently no-ops because the fix is already committed), run that
+  one test and confirm it fails, `git checkout HEAD -- <product file>`, and
+  confirm the suite is green. Skip it for new-feature coverage that makes no
+  "failed before" claim.
 
 ## 5. Verify
 
-**The sequence opens with `git fetch origin && git merge origin/main`** (or a
-rebase onto it), before anything is verified. Verifying a branch that
-is behind `main` proves nothing about what CI will run: #3144 verified green,
-merged `main` in afterwards, and CI's Test job failed a minute later on a
-schema type that had landed on `main` in between. The same rule runs the
-other way — a merge from `origin/main` **after** `verify-runner` or
-`reviewer` has already run invalidates both, exactly like any other new
-change: re-run the verify sequence and re-dispatch `reviewer` before the
-push ask.
+**Open with `git fetch origin && git merge origin/main`** (or a rebase onto
+it) — a branch verified behind `main` proves nothing about what CI runs. A
+merge from `origin/main` after `verify-runner` or `reviewer` ran invalidates
+both: re-verify and re-review before the push ask.
 
-Dispatch the **`verify-runner` subagent** (`.claude/agents/verify-runner.md`)
-to run the integration verify pass instead of running it inline yourself —
-`pnpm verify` output across up to 11 packages is purely mechanical (a
-compiler/test runner either succeeds or fails; no interpretation is needed
-to know which), so it belongs in the subagent's disposable Haiku context,
-not this session's. **Dispatch it in the background
-(`run_in_background: true`), same as every other subagent** — verify is a
-blocking prerequisite before `reviewer` can run in step 6, but that ordering
-holds regardless: the orchestrator resumes on `verify-runner`'s completion
-notification and dispatches `reviewer` then, without sitting blocked and
-unable to respond to the user meanwhile. Give it `pnpm verify` as the exact
-command; it does not decide or guess scope.
+1. **Schema changed?** Run `pnpm typegen` yourself, inline — it writes
+   `packages/config/src/sanity/generated/`, so `verify-runner`'s
+   `read-only-agent-guard.sh` denies it. Re-run until the diff is minimal.
+   Skip when no schema file changed.
+2. **Dispatch `verify-runner`** (`.claude/agents/verify-runner.md`), in the
+   background like every dispatch, with `pnpm verify` as the exact command
+   (the chain is in `CLAUDE.md` Conventions). It never chooses scope.
+   - **Its first command is `cd <absolute path of the checkout to verify>`,
+     and every later command carries the same `cd … &&`** — it is not
+     worktree-isolated and otherwise runs wherever its shell starts, which
+     has been the stale main checkout.
+   - Its report opens with `pwd` and `git rev-parse HEAD`. **Compare that SHA
+     with your own `HEAD` before dispatching `reviewer`**; reject and
+     re-dispatch on a mismatch, or on a report that names no commit.
 
-**The dispatch's first command is `cd <absolute path of the checkout to
-verify>`, and every later command is prefixed with the same `cd … &&`.**
-`verify-runner` is not worktree-isolated, so without it the run lands in
-whatever directory its shell starts in — on 2026-08-20 that was the stale
-main checkout, reporting 3 files / 25 tests for a diff whose worktree held
-4 / 29. Its report opens with `pwd` and `git rev-parse HEAD`; **compare that
-SHA with your own `git rev-parse HEAD` before dispatching `reviewer`**, and
-reject the report — re-dispatch with the path corrected — if they differ. A
-report that names no commit is rejected the same way.
+There is no per-package or `--filter` variant: Turbo already caches untouched
+packages, and scoped runs are how type-check, revalidate-tag, migration-index,
+client-graph, turbo-env and UI-index failures reached CI unseen. There is no
+local `build` either — reproduce a CI build failure only to diagnose it
+(`open-pull-request` Gate 5a).
 
-**`pnpm typegen` never goes to `verify-runner`.** It mutates
-`packages/config/src/sanity/generated/` in place — that is a write, not a
-read-only verify step, and `verify-runner`'s `read-only-agent-guard.sh` hook
-denies it same as it would for `reviewer`/`explore`/`ci-watcher`. When the
-schema changed, run it yourself, inline, in this session _before_
-dispatching `verify-runner`.
-
-**One sequence, whatever the task touched:**
-
-1. **Schema changed?** Run `pnpm typegen` yourself, inline — regenerates the
-   types in `packages/config/src/sanity/generated/` from the current schema
-   (`sanity schema extract` overwrites `schema.json` in place, so no manual
-   clean is needed first). Typegen can be non-deterministic — re-run until
-   the diff is minimal. Skip this step when no schema file changed.
-2. Dispatch `verify-runner` with `pnpm verify` — the root script chains
-   `type-check`, `lint`, `test`, `knip`, `check:client-graph`,
-   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
-   `check:migration-index` and `gen:ui-index:check` with `&&`, so it stops at
-   the first failure and mirrors every required or gating CI check that has a
-   local equivalent (`docs/context/ci-automation.md` has the mapping).
-
-There is no per-package or studio-only variant. Turbo caches the packages a
-diff never touched, so a scoped `--filter` run saved little — and it is how
-the `@blog/db` type error on #2876 and the `Revalidate tags sync`,
-`Migration index`, `Client graph`, `Turbo env sync` and `UI index` failures
-on other branches reached CI without ever running locally.
-
-**Hook/script changes need a local shellcheck + guard-test pass too.** When
-the diff touches `.claude/hooks/**` or `scripts/*.sh`, run this before
-commit — it mirrors `hooks.yml`'s required `Shellcheck + guard tests` job:
+**A hook or script diff** (`.claude/hooks/**`, `scripts/*.sh`) also runs the
+`Shellcheck + guard tests` job of `.github/workflows/hooks.yml` locally before
+commit — that file is the source of truth if this list drifts:
 
 ```
 shellcheck .claude/hooks/*.sh scripts/*.sh
 bash .claude/hooks/read-only-agent-guard.test.sh
 sh .claude/hooks/gate-bypass-guard.test.sh
 sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
+sh .claude/hooks/pre-bash-branch-name-guard.test.sh
 bash .claude/hooks/test-writer-scope-guard.test.sh
 bash .claude/hooks/pre-agent-gate0-guard.test.sh
+bash .claude/hooks/post-edit.test.sh
 bash .claude/hooks/subagent-stop-commit-guard.test.sh
 bash .claude/hooks/layer-scope-guard.test.sh
 sh scripts/vercel-ignore-affected.test.sh
 ```
 
-Such a diff is not docs-only (the exemption in `CLAUDE.md`'s gate step 4
-covers `.claude/**/*.md`, not scripts), so it still gets the `reviewer`
-dispatch in step 6 in addition to this local pass.
+Such a diff is not docs-only, so it still gets `reviewer` in step 6.
 
-**No local `build` step.** CI's `ci.yml` runs a dedicated `build` job (Next.js
-build + Sanity Studio build) gating every PR — a local re-run duplicates it.
-Measured cost of adding it to the local loop: +~65% tokens and +~4.6× wall
-time on a `verify-runner` dispatch, for a check CI already gates on. If you
-need to reproduce an actual CI build failure, run the specific failing
-command locally then (`open-pull-request` Gate 5a) — that's targeted
-diagnosis, not a routine step.
+Every check passes before step 6. `verify-runner` only reports the failing
+command and trimmed output; diagnose it yourself or route the fix to the
+owning agent, then re-dispatch. Never proceed on red.
 
-All checks must pass before moving to self-review. If `verify-runner` reports
-a failure, diagnose it yourself (or delegate the fix to the owning layer's
-subagent) — `verify-runner` only reports which command failed and the
-trimmed output, it never diagnoses or fixes. Fix the failing layer, then
-re-dispatch `verify-runner` from the failed step — do not proceed with any
-red check.
+## 6. Review (blocking — Gate 2 is not offered until this passes)
 
-## 6. Review (blocking — Gate 2 must not be offered until this passes)
+**Run `git fetch origin` before dispatching any reviewer** (`reviewer`,
+`a11y-reviewer`, `seo-auditor`) — a worktree session's local `main` goes
+stale, and the read-only guard denies them `git fetch`. Every prompt names the
+base as `origin/main`, never bare `main`, and states the expected file count
+(`git diff origin/main...HEAD --name-only | wc -l`, plus dirty working-tree
+files) so the reviewer can flag a mismatch.
 
-Before dispatching **any** reviewer (`reviewer`, `a11y-reviewer`,
-`seo-auditor`), run `git fetch origin` to refresh the ref — a worktree
-session's local `main` can go stale relative to what actually merged (#2739:
-a stale ref showed the reviewer 87 files instead of 18). The read-only guard
-denies these subagents `git fetch`, so only the orchestrator can refresh it.
-Every dispatch prompt names the base ref as `origin/main` (never bare
-`main`) and states the expected file count
-(`git diff origin/main...HEAD --name-only | wc -l`, plus any dirty
-working-tree files) so the subagent can flag a mismatch itself.
-
-- Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
-  full diff (`origin/main...HEAD` + working tree). It applies `code-review-practices`
-  — mechanical scan, contract pass, general pass — with fresh eyes and reports
-  a verdict.
-- **If the diff touches `packages/ui`, `apps/web`, or `apps/platform` components**, also dispatch
-  the **`a11y-reviewer` subagent** (`.claude/agents/a11y-reviewer.md`) over the
-  same diff — it checks the `ui-library-practices` accessibility rules
-  (`ariaLabel` prop convention, no in-component date formatting, real heading
-  tags, polymorphic `linkAs`, `alt` text, `focus-visible`, icon labelling) that
-  `reviewer`'s general pass does not specifically enumerate. Skip it entirely
-  for diffs with no `ui`/`web`/`admin` files.
-- **If the diff touches `apps/web` routes, metadata, structured data, or
-  feeds** (any of: `generateMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`,
-  `rss.xml/route.ts`, or a new/changed route under `apps/web/src/app`), also
-  dispatch the **`seo-auditor` subagent** (`.claude/agents/seo-auditor.md`)
-  over the same diff, alongside `reviewer` — not instead of it. It applies
-  the `seo-and-metadata` skill as an audit checklist and reports a verdict in
-  the same `APPROVE` / blocking / non-blocking / not-checked format. A single
-  `apps/web` diff can trigger both `a11y-reviewer` and `seo-auditor` at once —
-  dispatch whichever of the two conditions match; they check different things
-  and neither substitutes for the other.
-- Fix every **blocking** finding from any dispatched reviewer (delegating to
-  the owning layer agent where appropriate), re-run the affected verify checks
-  from step 5, then re-dispatch whichever subagent found the issue until every
-  dispatched reviewer returns its pass verdict (`APPROVE` / `PASS`).
-- Only after every dispatched reviewer's pass verdict (`APPROVE` / `PASS`) may
-  you proceed to step 7 and commit the reviewed work + ask to push — a pass from `a11y-reviewer` or
-  `seo-auditor` does not excuse a `NEEDS FIXES`/blocking result from any other
-  dispatched reviewer, or vice versa. A review that
-  never ran is a blocking finding in itself — "the diff is small" or "checks
-  are green" does not substitute for the review.
-- **Non-blocking findings don't gate this PR, but don't let them evaporate
-  either.** A finding a reviewer correctly judged non-blocking (worth doing,
-  not worth delaying this diff for) still represents real, identified work —
-  relaying it to the user once in a summary and moving on is not the same as
-  tracking it. Real incident: `reviewer` flagged the same DRY-violation
-  pattern (near-identical repeated blocks) as non-blocking on #1162's review;
-  the orchestrator repeated the finding back to the user in its own summary
-  but took no further action, and the user had to independently notice the
-  same pattern in a sibling file and ask for it to be ticketed before
-  anything happened. For every non-blocking finding you judge genuinely
-  worth fixing (not every nitpick — use judgment same as anywhere else),
-  **file a follow-up issue via `board-keeper`** (`CLAUDE.md`'s "Never call
-  `gh issue create` directly" mechanics apply) before moving on to the next
-  step, rather than letting it live only in a chat summary. This applies
-  per-finding, not per-review — a review can return one blocking fix plus
-  three non-blocking notes, and only some of those three may warrant a
-  ticket; file the ones that do, say so for the ones that don't and why.
+- **`reviewer`** (`.claude/agents/reviewer.md`) over the full diff
+  (`origin/main...HEAD` + working tree); it applies `code-review-practices`.
+  A docs-only diff gets the inline identifier check instead (`CLAUDE.md`
+  delivery gate step 4).
+- **`a11y-reviewer`** as well when the diff touches `packages/ui`, `apps/web`
+  or `apps/platform` components.
+- **`seo-auditor`** as well when the diff touches `apps/web` routes, metadata,
+  structured data or feeds — `generateMetadata`, JSON-LD, `sitemap.ts`,
+  `robots.ts`, an `rss.xml/route.ts`, or any new or changed route under
+  `apps/web/src/app`. One diff can need both; neither substitutes for
+  `reviewer` or for the other.
+- **Fix every blocking finding** through the owning agent, re-run step 5, and
+  re-dispatch the reviewer that raised it until every dispatched reviewer
+  passes (`APPROVE` / `PASS`). One reviewer's pass does not excuse another's
+  blocking result. A review that never ran is itself blocking — a small diff
+  or green checks do not substitute.
+- **Non-blocking findings don't gate the PR, but never leave one only in a
+  chat summary.** Each one worth doing is fixed on this branch by the owning
+  agent when it is the same layer and small, or else filed through
+  `board-keeper` before moving on (→ `CLAUDE.md` "Findings found mid-work get
+  fixed in the current work"). Say which ones you are not acting on, and why.
 
 ## 7. Hand off to the gate sequence
 
-- Follow Gates 2–5a in `open-pull-request` exactly:
-  - Gate 2: commit the reviewed work (no approval needed)
-  - Gate 3: ask to push (separate, explicit approval)
-  - Gate 4: ask to create the PR (separate, explicit approval)
-  - Gate 5: set status → Code Review immediately after PR is created
-  - Gate 5a: dispatch `ci-watcher` (background) to watch CI to completion,
-    then diagnose and fix any failure it reports — see `open-pull-request`
-    for the full mechanics (any resulting push still needs its own fresh
-    Gate 3 approval)
-- **Then dispatch `board-keeper`** (`.claude/agents/board-keeper.md`) with a
-  targeted `"after PR #<n>"` trigger — no approval needed, it's not a gate.
-  It re-queries the status write Gate 5 just made to confirm it actually
-  stuck (`gh project item-edit` has silently failed before). This is a cheap,
-  single-issue check by default now — it does not sweep the rest of the
-  board unless you append "...also reconcile the board" or dispatch it bare
-  for a full sweep. Dispatch it again (targeted `"after merge of #<n>"`)
-  after this PR merges, and run a full sweep any time you're asked to
-  "reconcile the board" or a targeted check surfaces something that looks
-  broader than the one issue.
+Follow `open-pull-request` exactly:
+
+- Gate 2: commit the reviewed work (no approval needed).
+- Gate 3: ask to push — its own explicit approval.
+- Gate 4: ask to open the PR — its own explicit approval. The completing PR's
+  body links the manual-test issue without a closing keyword.
+- Gate 5: `board-keeper` with `"after PR #<n>"`, synchronously. It sets Code
+  Review and is also the "after PR" reconciliation, so don't dispatch it
+  twice. Then the job label.
+- Gate 5a: `ci-watcher` in the background; diagnose and fix any failure it
+  reports. Every fix push needs a fresh Gate 3 approval.
+
+After the PR merges, dispatch `board-keeper` with `"after merge of #<n>"`
+(Gate 6; → `CLAUDE.md` "Board reconciliation").
 
 ## 8. Remove the subagent worktrees you created
 
-**When: as soon as the worktree's commits exist on the remote.** That is the
-whole safety condition — `git cherry origin/<feat-branch>` passing _is_ the
-proof the push landed, and a pushed branch stays recoverable whatever happens
-to the local directory. So the trigger is the **push (Gate 6)**, not the PR;
-opening the PR adds nothing a removal was waiting for. (Same anchor the
-scratchpad buffers below use, for the same reason.)
+`CLAUDE.md` delivery gate step 8 states the rules — your own dispatch record
+only, lock files, an isolated session exiting first, scratchpads by exact
+path. This section is the procedure and its checks.
 
-Two kinds of worktree, two timings:
+**When:**
 
-- **Layer-agent worktrees (`agent-<id>`)** — removable once the agent's patch
-  is captured and landed on the `feat/` branch, which happens when its
-  completion notification arrives, well before the push. Waiting longer buys
-  nothing: the worktree already holds no unique work. Do not remove one while
-  its agent may still be resumed via `SendMessage` — harness teardown of an
-  idle agent preserves the work and recreates it on resume, but
-  `git worktree remove` is permanent.
-- **The session's own feature worktree** (`EnterWorktree`-created, holding the
-  `feat/` branch itself) — safe from the push onward, but **keep it until CI is
-  green**. A Gate 5a CI fix is made on that branch; removing it at push just
-  means re-creating a worktree to make the fix in.
+- **Layer-agent worktrees (`agent-<id>`)** — once the agent's patch is landed
+  on your local `feat/` branch, which can be before the push; the worktree
+  holds no unique work after that. Not while its agent may still be resumed
+  via `SendMessage`: harness teardown preserves the work,
+  `git worktree remove` does not.
+- **The session's own feature worktree** — from the push (Gate 3), not the
+  PR, but keep it until CI is green, since a Gate 5a fix is made there.
 
-Remove them: nothing else
-will. The harness only auto-sweeps worktrees that have **no uncommitted
-changes, no untracked files, and no unpushed commits** — and a
-`worktree-agent-*` branch is never pushed under its own name, so these
-accumulate forever otherwise (26 once piled up). Worktrees created since
-issue #410 share the main checkout's `node_modules` (~80 MB each instead of
-~1.2 GB — see `docs/context/claude-code.md`), but they still clutter
-`git worktree list` and hold branches. A subagent cannot do this itself — it
-cannot remove the worktree it is standing in.
+Nothing else removes them — a `worktree-agent-*` branch is never pushed, so
+the harness never sweeps it — and a subagent cannot remove the worktree it
+stands in.
 
 ### First: is this session itself inside a worktree?
 
-If you ran `EnterWorktree` — every background job does, before its first edit
-— **you cannot perform any of this step from where you are standing**, and
-finding that out one refused command at a time wastes a lot of context. The
-isolation guard refuses anything whose working directory resolves back to the
-shared checkout, which is every command below:
+If you ran `EnterWorktree` (every background job does), exit it as `CLAUDE.md`
+step 8 says — `ExitWorktree` with `action: "keep"`, because `remove` would
+also delete the branch and the removal below is the checked path. The
+isolation guard that refuses `git -C <other worktree>` and
+`git worktree remove` from inside is a different guard from the lock file; no
+workaround (a wrapper script, a `cd` that hides the target, disabling the
+sandbox) is in bounds.
 
-```
-git -C <other worktree> status --porcelain
-> ...this command redirects git to the shared checkout via -C. Refusing to run it.
-git worktree remove <path>
-> This session is isolated in the worktree `...`, but this command's working
-> directory resolved to the shared checkout. Refusing to run it.
-```
+### The checks
 
-This is a **different** protection from the lock-file check further down —
-that one refuses `git worktree remove` on a path another job still owns
-(#669); this one refuses the command before it gets that far, on the basis of
-where its working directory resolves. Both are doing their job here. There is
-no in-place workaround, and inventing one — a wrapper script, a `cd` that
-hides the target, disabling the sandbox — is out of bounds. On top of it, you
-cannot remove your **own** feature worktree while standing in it whatever the
-permissions say.
-
-**The sequence is exit-then-clean:**
-
-1. Finish the work: commit, push (Gate 6), and let CI settle. Until the branch
-   is on the remote, nothing here is safe to delete anyway — that is the same
-   safety condition the rest of this step is built on.
-2. Call `ExitWorktree` with `action: "keep"`. The session's working directory
-   returns to the shared checkout. Use `keep`, not `remove` — `remove` would
-   also delete the branch, and the removal below is the checked path.
-3. Run this step exactly as written. Every command now resolves normally,
-   including `git worktree remove` on your own feature worktree, which is
-   only possible from outside it.
-
-**If the job has to end before the push** — work still in flight, a Gate 5a
-fix outstanding, the session interrupted — then do not clean up at all.
-Report the exact worktree and scratchpad paths this session created in the
-final message instead. A later non-isolated session sweeps them under the same
-three ownership checks; an uncleaned worktree is a nuisance, a wrongly-deleted
-one is lost work.
-
-### Only your own worktrees — never enumerate `git worktree list`
-
-**This machine runs several Claude sessions at once, each with its own
-worktrees, all under the same `.claude/worktrees/`.** `git worktree list`
-therefore shows other jobs' live worktrees alongside yours. Cleaning up means
-removing **the worktrees this session created** — not everything that happens
-to be listed. Build the removal list from your own dispatch record (note each
-worktree path as you create/dispatch it), never by looping over
-`git worktree list` output.
-
-Then, before touching any path on that list, confirm it is still yours:
+For each worktree on your own list:
 
 ```bash
 name=$(basename <worktree>)
 lock=$(git rev-parse --git-common-dir)/worktrees/$name/locked
-[ -f "$lock" ] && { echo "OWNED BY: $(cat "$lock")"; }   # -> skip, not yours
-```
-
-The harness locks every worktree it materializes for a live session or agent,
-with a reason naming the owner and its pid — `claude session
-fix-1788-storybook-fonts (pid 76582 start …)` / `claude agent
-agent-a6bad5fd611dd5df6 (pid …)`. A lock file present means **some process
-still owns that worktree**: another parallel job, or one of your own subagents
-that has not finished. Skip it and move on.
-
-Attempting removal anyway gives you:
-
-```
-fatal: cannot remove a locked working tree, lock reason: claude session … (pid …)
-use 'remove -f -f' to override or unlock first
-```
-
-**That message is the guard working, not an obstacle to route around.** Do not
-run `git worktree remove -f -f`, do not `git worktree unlock` a worktree you do
-not own, and do not retry it later in the same session. Forcing it deletes a
-live session's working directory out from under it — that is exactly how #669's
-config agent lost its uncommitted work to a broad sweep. A locked worktree that
-is not yours needs no action from you at all: its owner removes it when that job
-ends.
-
-A bare `git worktree prune` is safe (it only drops metadata for directories that
-are already gone) — a `for` loop over `git worktree list` is not.
-
-For each worktree **you created for this task**, and that the ownership check
-above cleared:
-
-```bash
+[ -f "$lock" ] && echo "OWNED BY: $(cat "$lock")"  # -> skip, not yours
 git fetch origin                                  # stale refs answer the wrong question
 branch=$(git -C <worktree> branch --show-current)
 git -C <worktree> status --porcelain              # must be EMPTY
-git cherry origin/<feat-branch> "$branch"         # must print no '+' lines
+git cherry <target> "$branch"                     # must print no '+' lines
 git worktree remove <worktree>                    # never --force
 ```
 
-- **All three checks must pass** — unlocked, clean, landed — and only then
-  remove.
-- **`git fetch origin` first, every time.** Both the `git cherry` check and the
-  post-merge check below read a remote-tracking ref; against a stale one they
-  answer the wrong question.
-- **Compare against the pushed `feat/` branch — NOT `origin/main`.** At this
-  point the branch is pushed but unmerged, so the commits are on `feat/…`,
-  not yet on `main`; checking `origin/main` reports every commit as unmerged
-  and you would never clean anything up. Using `origin/<feat-branch>` also
-  proves the work reached the remote, which is what makes deleting the local
-  worktree safe.
-- **Use `git cherry`, not `git rev-list --count`.** rev-list counts SHAs, so a
-  squash- or rebase-merged branch still looks "ahead" and you would keep a
-  worktree whose work is fully landed.
-- Uncommitted changes exist nowhere else and are unrecoverable — if `status` is
-  dirty, leave the worktree and tell the user what is in it.
-- Removal keeps the branch — committed work stays recoverable, which is what
-  makes this safe.
-- Worktrees created before the shared-`node_modules` change (issue #410) hold
-  a private ~1.1 GB `node_modules`, so their deletion is slow — remove them
-  one at a time with a generous timeout; an interrupted removal leaves a
-  half-deleted worktree that then needs `--force` — the one legitimate use of
-  that flag, on a worktree you own that you were already mid-way through
-  removing, and still never `-f -f` on a locked one. Shared-deps worktrees
-  (root `node_modules` is a symlink) remove in seconds.
-- **Leftovers from earlier sessions are not yours to sweep on your own
-  initiative.** Unlocked `agent-*` worktrees with no live owner do accumulate,
-  but clearing them is a separate, explicitly requested cleanup — not part of
-  this gate. When asked to do it, apply the same three checks to each one
-  individually, and still skip every locked path.
+- **Remove only when all three pass** — unlocked, clean, landed.
+- A lock names its owner and pid: another job, or one of your own unfinished
+  subagents. `fatal: cannot remove a locked working tree` is the guard
+  working — skip the path and don't retry it.
+- **Until the PR merges, `<target>` is the `feat/` branch, not
+  `origin/main`** — the work is unmerged, so against `origin/main` everything
+  looks unlanded. Before the push it is your local `<feat-branch>`
+  (layer-agent worktrees only); after the push it is `origin/<feat-branch>`,
+  which also proves the work reached the remote.
+- **Use `git cherry`, not `git rev-list --count`** — rev-list counts SHAs, so
+  a squash- or rebase-merged branch still looks ahead.
+- A dirty `status` is uncommitted work that exists nowhere else: leave the
+  worktree and tell the user what is in it.
+- Removal keeps the branch, which is what makes it safe.
+- A worktree whose root `node_modules` is a real directory, not a symlink
+  (created before #410, or given a private tree for a dependency change),
+  deletes slowly. Remove those one at a time with a generous timeout. An
+  interrupted removal leaves a half-deleted worktree that needs `--force` —
+  the flag's one legitimate use: on a worktree you own and were already
+  removing, never `-f -f` on a locked one.
+- `git worktree prune` is safe (it drops metadata for directories already
+  gone); a loop over `git worktree list` is not.
+- Leftovers from earlier sessions are a separate, explicitly requested
+  cleanup — then the same three checks, one path at a time, still skipping
+  every locked one.
 
 ### After the PR merged
 
-A worktree that outlived its PR takes the same three checks, comparing against
-`origin/main` — GitHub deletes the `feat/` branch on merge, so
-`origin/<feat-branch>` no longer resolves.
+The same three checks with `<target>` = `origin/main` — GitHub deletes the
+`feat/` branch on merge, so `origin/<feat-branch>` no longer resolves.
 
 - **A "removing will discard N commits" refusal is usually false.** The
-  `ExitWorktree`/cleanup guard counts commits against your **local** `main`,
-  and local `main` does not move when a PR merges on GitHub — so every branch
-  you ever merged still looks unmerged, and N grows with each merge. Do not
-  take the number at face value, and do not reflexively answer it with
-  `discard_changes: true`. Settle it with the authoritative test:
+  `ExitWorktree`/cleanup guard counts against your local `main`, which does
+  not move when a PR merges on GitHub. Don't answer it with
+  `discard_changes: true` on reflex; settle it:
 
   ```bash
   git fetch origin
   git merge-base --is-ancestor <branch> origin/main && echo MERGED || echo NOT-MERGED
   ```
 
-  `MERGED` means the commits are in `origin/main` and discarding loses nothing.
-  `NOT-MERGED` means the guard is right — keep the worktree and tell the user
-  what is in it. (Seen on `fix/1788-storybook-fonts`: the guard claimed 22
-  commits at risk; the branch was an ancestor of `origin/main` with zero
-  unique commits.)
+  `MERGED` → discarding loses nothing. `NOT-MERGED` → the guard is right;
+  keep the worktree and tell the user what is in it.
 
-- **Fix the cause, not just the symptom.** The refusal recurs after every merge
-  until local `main` is synced. Fast-forward it once the working tree is clean
-  — `git merge --ff-only origin/main` — and the guard stops firing on
-  already-merged branches.
+- **Fix the cause:** once the working tree is clean,
+  `git merge --ff-only origin/main` syncs local `main` and the guard stops
+  firing on merged branches.
 
-### Remove the scratchpad transfer buffers too
+### Scratchpad transfer buffers
 
-The `.claude/scratchpad*/` directory an agent exported its diff into is a
-**transfer buffer**, not a record. Once the assembled work is committed and
-pushed, git holds it and the copy is pure duplication — delete it in the same
-pass as the worktrees, and for the same reason.
+An agent's `.claude/scratchpad*/` export is a transfer buffer, not a record.
+Once the work is pushed, git holds it — delete the buffer in the same pass.
 
-**Do not delete it before the push.** Between an agent finishing and its work
-reaching the remote, that export can be the only surviving copy: idle agent
-worktrees get torn down, taking their uncommitted files with them. Push is the
-line that makes the copy redundant.
+- **Not before the push.** Until then the export can be the only surviving
+  copy, because idle agent worktrees are torn down with their uncommitted
+  files.
+- **Exact paths from your dispatch record, one at a time — never a
+  wildcard.** A scratchpad has no lock file, so `rm -rf` on another job's
+  buffer succeeds silently. Issue-keyed names are not ownership either: one
+  issue collects variants across sessions (`1786/`, `1786-tests/`).
+- Leftovers from earlier sessions are a separate, explicitly requested
+  cleanup that first confirms no live job is still writing to them.
 
-**Delete the exact paths you created — never a wildcard.** Parallel jobs share
-`.claude/scratchpad*/` the same way they share `.claude/worktrees/`, but with
-one critical difference: **a scratchpad has no lock file**. Nothing refuses the
-operation, nothing prints a `fatal:` — `rm -rf .claude/scratchpads/*` silently
-destroys another running job's in-flight transfer buffer, and the first sign of
-trouble is that job's assembly step finding an empty directory. The issue-keyed
-names are not sufficient ownership either: the same issue accumulates variants
-across sessions (`1786/` and `1786-tests/`, `1754-focus-lock/`,
-`1754-focus-conditional/`, `1754-focus-final/`), so even
-`rm -rf .claude/scratchpads/1786*` can reach outside your own work. Remove the
-specific directories from your dispatch record, one at a time.
+## 9. Deploy — never yours to run
 
-Leftovers from earlier sessions are the same story as orphan worktrees — real,
-but somebody else's to authorize. They are cheap (the whole tree was ~1 MB
-across 10 directories when this was written), so clearing them is a separate
-explicitly-requested cleanup, and one that has to confirm no live job is still
-writing to a directory before touching it.
-
-## 9. Deploy — human-gated, never automatic
-
-- `sanity deploy` (`@blog/studio`) and Vercel deploys are **manual, human-run** steps. Do
-  not run them. At most, remind the user of the commands (`docs/DEPLOY.md`).
-
-## Guardrails
-
-- Respect every layer boundary (`SPEC.md`). A cross-layer feature that leaks a
-  boundary is wrong even if it "works".
-- Regenerate + commit the generated types in
-  `packages/config/src/sanity/generated/` after schema changes.
-- Don't read or commit `.env*`.
+Never run a deploy yourself — the pipeline owns them (currently paused to
+manual dispatch), and any manual trigger is a push-class action that needs the
+user's approval (→ `CLAUDE.md` "Deployment").

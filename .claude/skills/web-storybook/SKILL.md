@@ -1,328 +1,195 @@
 ---
 name: web-storybook
 description: >-
-  How to write, run, and maintain Storybook stories in apps/web. Covers RSC
-  caveats, service-layer mocking, and page-composition story conventions.
-  Use when adding stories for Next.js pages, layouts, or client components in
-  apps/web. Complements ui-storybook (for pure design-system stories) and
-  seo-and-metadata.
+  Use when adding or editing a story in apps/web — a module or page view, an
+  async page, a client component — or changing apps/web's Storybook config.
+  Covers what to story, aliasing server-only modules, fixtures and titles.
+  Pure @blog/ui stories follow ui-storybook.
 ---
 
 # Storybook in `apps/web`
 
-Storybook v10 with `@storybook/nextjs-vite` (Vite-based — `@storybook/nextjs`'s
-webpack preset requires `next/config`, which Next.js 16 removed entirely; see
-[storybookjs/storybook#29421](https://github.com/storybookjs/storybook/issues/29421)).
-Runs on port **6007**.
+Storybook 10 on `@storybook/nextjs-vite`, port **6007** — not
+`@storybook/nextjs`, whose webpack preset needs `next/config`, which Next 16
+removed.
 
 ```
 pnpm --filter web storybook        # dev server
 pnpm --filter web storybook:build  # static build
 ```
 
-RSC experimental mode is enabled (`features.experimentalRSC: true` in
-`.storybook/main.ts`). `@storybook/nextjs-vite` handles Next.js Image, Link,
-and navigation stubs automatically. `Meta`/`StoryObj`/`Preview` types come
-from `@storybook/nextjs-vite` (the framework package), not `@storybook/react`
-— Storybook 10 moved to framework-based type imports.
+- `Meta`/`StoryObj`/`Preview` come from `@storybook/nextjs-vite`, never
+  `@storybook/react`.
+- Viewport, controls, interactions and actions are core. `@storybook/addon-docs`
+  is the one explicit addon in `.storybook/main.ts`; `tags: ['autodocs']`
+  needs it.
+- `features.experimentalRSC: true` renders `async` Server Components; the
+  framework stubs `next/image`, `next/link` and `next/navigation`.
+- `.storybook/preview.tsx` already gives every story what the real layout
+  does: the `AppProviders` decorator (`@web/testing/providers` — next-intl and
+  the `SanityImage` base URL, shared with `customRender`), `apps/web/index.css`
+  (the theme plus the `@source` for `packages/ui`), the CONSOLE preset's font
+  classes, and `layout: 'fullscreen'`. A story adds none of these; set
+  `parameters.layout: 'padded'` for a small component.
 
-Storybook 10 folded `@storybook/addon-essentials` into core (viewport,
-controls, interactions, actions ship for free — no addon needed). The one
-piece that didn't move to core is docs: `@storybook/addon-docs` is an
-explicit `addons` entry in `.storybook/main.ts`, required for the
-`tags: ['autodocs']` convention below to work.
+Story format, `meta.args`, controls and `render` follow `ui-storybook` — the
+rules are the same here. This skill covers only what differs in `apps/web`.
 
-## What to story in `apps/web`
+## What to story
 
-`apps/web` stories are for **compositions** — components that wire `@blog/ui`
-to real page structure. Two categories:
+`apps/web` stories are compositions that wire `@blog/ui` to real page
+structure. A pure design-system component is storied in `packages/ui`.
 
-| Type                                 | Examples                                 | Note                                 |
-| ------------------------------------ | ---------------------------------------- | ------------------------------------ |
-| **Client components**                | theme toggle, mobile nav, share buttons  | Straightforward; no RSC setup needed |
-| **Server components / page layouts** | `PostPage`, `HomeLayout`, `CategoryPage` | Require service mocks (see below)    |
+| Kind                    | Story                                                            | Example                       |
+| ----------------------- | ---------------------------------------------------------------- | ----------------------------- |
+| Module                  | the pure `<x>-module-view.tsx`, never the async `<x>-module.tsx` | `CtaModuleView`               |
+| Page with a view        | the pure `<x>-page-view.tsx`                                     | `AccountPageView`             |
+| Async page with no view | the page itself, its server modules aliased (B below)            | `TopicIndexPage`              |
+| Client component        | the component                                                    | `SiteNavigation`, `PostShare` |
 
-Pure design-system components belong in `@blog/ui` stories, not here. If you
-find yourself storying a `Button` in `apps/web`, move it to `packages/ui`.
+Routes under `src/app/` are never storied — story the view the route renders.
 
-## Where stories live
+## Where stories live, and `title`
 
-Co-locate stories next to the component. The globs in `main.ts` cover:
+Co-locate `<file>.stories.tsx` beside the component. `.storybook/main.ts`
+globs only `src/components/**` and `src/modules/**`.
 
-```
-src/app/**/*.stories.@(ts|tsx)
-src/components/**/*.stories.@(ts|tsx)
-```
+`title` takes its prefix from the top-level folder; a nested component takes
+the same prefix (`shared/portable-text/components/code-block/` →
+`Components/CodeBlock`).
 
-Example:
+| Folder                                  | `title`                                                          |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `src/modules/<x>/`                      | `Modules/<X>Module`                                              |
+| `src/components/pages/<x>/`             | `Pages/<Name>` (`Pages/Landing/LandingPageLayout`)               |
+| `src/components/features/<domain>/<x>/` | `Features/<Domain>/<Name>` (`Features/Post/PostTableOfContents`) |
+| `src/components/page-templates/<x>/`    | `Page Templates/<Name>`                                          |
+| `src/components/shared/<x>/`            | `Components/<Name>`                                              |
 
-```
-src/app/[locale]/blog/[slug]/
-  page.tsx
-  page.stories.tsx   ← here
-```
-
-(Kebab-case files, `src/`-rooted paths — same conventions as the rest of
-`apps/web`.)
-
-## Story format (CSF 3)
+## Story shape
 
 ```tsx
+import { ASIDE_KIND } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { PostPage } from './post-page';
-import { mockPost } from '@web/storybook/fixtures/post';
+
+import { DeepAside } from './deep-aside';
 
 const meta = {
-  title: 'Pages/PostPage',
-  component: PostPage,
+  title: 'Components/DeepAside',
+  component: DeepAside,
   tags: ['autodocs'],
-  args: { post: mockPost },
-} satisfies Meta<typeof PostPage>;
+  parameters: { layout: 'padded' },
+  argTypes: {
+    kind: { control: 'select', options: Object.values(ASIDE_KIND) },
+  },
+  args: {
+    kind: ASIDE_KIND.DIGRESSION,
+    label: 'Digression',
+    children: <p>…</p>,
+  },
+} satisfies Meta<typeof DeepAside>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type TStory = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const LongBody: Story = {
-  args: { post: { ...mockPost, body: mockPost.bodyLong } },
+export const Digression: TStory = {};
+export const WhyNot: TStory = {
+  args: { kind: ASIDE_KIND.WHY_NOT, label: 'Why not X' },
 };
 ```
 
-## Args and controls
+Every dictionary-const, alias-union or `tv()`-backed prop gets an explicit
+`select` (an inline union infers its own) → `ui-storybook` § Controls. Web
+case: `NewsletterForm.align` is typed `TContentAlignment`, but
+`newsletter-form.tsx` never imports `CONTENT_ALIGNMENT`. A
+`Record<TEnum, string>` label-map prop is keyed by the enum, not valued by
+it — it needs no control.
 
-- **A prop backed by an UPPERCASE key/value dictionary const (the
-  `@blog/config` constant convention — `BRAND_VARIANT`, `ASIDE_KIND`,
-  `CTA_VARIANT`, …) always gets an explicit `select` control with
-  `options: Object.values(THE_CONST)`.** Free-text input is not acceptable for
-  such a prop: it invites an arbitrary invalid string where the valid set is
-  already known and enumerable.
+## Components that fetch
 
-  ```tsx
-  // ❌ before — no argTypes entry, so `kind` renders as a free-text box
-  const meta = {
-    title: 'Components/DeepAside',
-    component: DeepAside,
-    tags: ['autodocs'],
-    args: { kind: ASIDE_KIND.DIGRESSION, label: 'Digression' },
-  } satisfies Meta<typeof DeepAside>;
+Storybook has no Sanity connection, no request context, and cannot evaluate a
+`server-only` module in its browser bundle.
 
-  // ✅ after — a select bound to the real dictionary
-  const meta = {
-    title: 'Components/DeepAside',
-    component: DeepAside,
-    tags: ['autodocs'],
-    argTypes: {
-      kind: {
-        control: 'select',
-        options: Object.values(ASIDE_KIND),
-      },
-    },
-    args: { kind: ASIDE_KIND.DIGRESSION, label: 'Digression' },
-  } satisfies Meta<typeof DeepAside>;
-  ```
+### A — Story the view (default)
 
-  **Scope the options to the subset the prop actually accepts.** Several
-  modules narrow a wider dictionary (`TBrandVariantOf<'PRIMARY' | 'SECONDARY'>`
-  on content/newsletter/post-list/taxonomy-list, where cta/hero/section take
-  all three). A blanket `Object.values()` there offers a value the type
-  rejects — trading a permissive text box for a dropdown of invalid options.
-  List the narrowed subset instead:
+The async component does the server-only work — request context,
+`@blog/service`, `auth()`, translations — and renders a pure view with the
+result: `src/modules/cta/cta-module.tsx` → `cta-module-view.tsx`,
+`src/components/pages/account-page/account-page.tsx` → `account-page-view.tsx`.
+Story the view, with args built from `@web/testing` builders. The view's prop
+shape → `react-component-practices` § Props.
 
-  ```tsx
-  brandVariant: {
-    control: 'select',
-    options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-  },
-  ```
+### B — Alias the server module
 
-  **Audit from the component's prop types, not from the story's imports.** A
-  story file often doesn't import the const its component's prop is typed
-  against — `NewsletterForm.align` is typed `TContentAlignment`, and nothing in
-  `newsletter-form.tsx` imports the `CONTENT_ALIGNMENT` value at all — so an
-  import-driven sweep silently misses those props. For each story, open the component, read its full prop type, and
-  follow every prop's type alias back to its definition looking for
-  `TValueOf<typeof SOME_UPPERCASE_CONST>`.
-
-  A prop typed as a literal union with no dictionary const behind it is a
-  different case, and it splits by how the prop is declared. Storybook runs
-  the default `react-docgen` here, which resolves an **inline** union
-  (`variant: 'full' | 'compact'`) into its full option list — inference gives
-  a working select, so leave it alone — but emits only the bare alias name for
-  an **alias-typed** one (`headingLevel: THeadingLevel` yields just
-  `{ name: 'THeadingLevel' }`), with no values to build a control from. An
-  alias-typed
-  prop needs an explicit `argTypes` entry. Rather than repeat the union's
-  members in every story, give the union a runtime array and derive the type
-  from it (`export const HEADING_LEVELS = [1, 2, 3, 4] as const;` then
-  `type THeadingLevel = (typeof HEADING_LEVELS)[number]`), and point the
-  control at that const so the two cannot drift:
-
-  ```tsx
-  headingLevel: {
-    control: 'select',
-    options: HEADING_LEVELS,
-  },
-  ```
-
-  These list consts are named in the **plural**, as against the singular
-  dictionary consts whose values you reach through `Object.values`. Where no
-  such const exists, a literal array is the fallback — match the declared type
-  exactly (`THeadingLevel` takes numbers, not strings).
-
-  `Record<TEnum, string>` label maps are keyed by an enum rather than valued
-  by one, so there is nothing to select.
-
-## Mocking `@blog/service`
-
-Server Components in `apps/web` call service functions (`getPosts`,
-`getPost`, etc.). Storybook does not run a real Sanity connection, so you
-must mock the service layer.
-
-### Approach A — Accept data as props (preferred)
-
-Extract the data-fetching into the route `page.tsx` and accept data as props
-in the component:
-
-```tsx
-// post-page.tsx (pure, accepts typed props)
-export function PostPage({ post }: { post: TPostDetail }) { ... }
-
-// src/app/[locale]/blog/[slug]/page.tsx (fetches + passes props)
-export default async function Page({ params }: TProps) {
-  const { slug } = await params;
-  const result = await service.pages.post.v1.getPostBySlug(slug);
-  if (!result.ok) notFound();
-  return <PostPage post={result.data} />;
-}
-```
-
-Now `PostPage.tsx` is a pure, easily-storied component.
-
-### Approach B — Module mock for RSC
-
-For async Server Components that fetch internally, use Storybook's module
-mock. Create a mock file and register it:
+When the storied component is itself async (`TopicIndexPage`), or pulls in a
+server-only or side-effecting module transitively (`newsletter-actions`, a
+`'use server'` module that pulls in `@blog/db`; `@web/server/auth/auth` via
+the account-page sections; `@web/utils/report-client-error`, which fires a
+network request), alias that exact import specifier in `.storybook/main.ts`
+to a stand-in under `.storybook/mocks/`:
 
 ```ts
-// .storybook/mocks/service.ts
-export const getPosts = async () => [mockPost];
-export const getPost = async () => mockPost;
-// ... etc.
+// main.ts is ESM — resolve paths from import.meta.url, not __dirname
+viteFinal: async (config) => {
+  config.resolve ??= {};
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    '@web/server/request-context/request-context': fileURLToPath(
+      new URL('./mocks/request-context.ts', import.meta.url),
+    ),
+  };
+  return config;
+},
 ```
 
-```ts
-// .storybook/main.ts — main.ts is loaded as ESM (no __dirname/require), so
-// resolve the mock path via import.meta.url
-import { fileURLToPath } from 'node:url';
+- Key the alias by the full specifier the component imports — an alias
+  applies to every story.
+- A relative specifier can't be keyed safely, since `resolve.alias` matches
+  the string alone: stub it with an importer-scoped `resolveId` plugin, as
+  `main.ts` does for `./encrypt-secret`.
+- The stand-in exports the same names and returns data from `@web/testing`
+  builders (`.storybook/mocks/get-topic-index-page.ts`).
+- Prefer A for a new component; B is for an async component with no view, or
+  a server-only/side-effecting module pulled in transitively.
 
-const config: StorybookConfig = {
-  // ...
-  async viteFinal(viteConfig) {
-    viteConfig.resolve ??= {};
-    viteConfig.resolve.alias = {
-      ...viteConfig.resolve.alias,
-      '@blog/service': fileURLToPath(
-        new URL('./mocks/service.ts', import.meta.url),
-      ),
-    };
-    return viteConfig;
-  },
-};
-```
+## Navigation
 
-Only add the alias when the story file needs it — prefer Approach A for
-new components to avoid the coupling.
-
-## RSC caveats
-
-- `experimentalRSC: true` lets Storybook render `async` Server Components,
-  but support is still experimental. Prefer Approach A (pure components) to
-  avoid edge cases.
-- `"use client"` components story identically to any React component — no
-  special setup needed.
-- Next.js navigation (`useRouter`, `usePathname`) is automatically stubbed
-  by `@storybook/nextjs-vite`. Control it via `parameters.nextjs.navigation`.
+A component that reads the active route gets
+`parameters.nextjs.navigation.pathname` (`preview.tsx` sets
+`nextjs.appDirectory: true` for every story):
 
 ```tsx
-export const WithActiveNav: Story = {
-  parameters: {
-    nextjs: {
-      navigation: { pathname: '/blog/my-post' },
-    },
-  },
+export const OnBlog: TStory = {
+  parameters: { nextjs: { navigation: { pathname: '/blog' } } },
 };
 ```
 
 ## Fixtures
 
-Two separate fixture locations — don't conflate them:
+Story data comes from the `make*` builders in `apps/web/src/testing/`
+(`@web/testing/{shared,modules,pages}/<name>/fixtures`) — the same builders
+the tests use; location and the second-consumer rule → `testing-practices` §
+Where tests live. Data only one story file uses stays inline in that file.
 
-- `apps/web/src/storybook/fixtures/` — Storybook-only. Mocks the **service
-  view-models** (`TPostDetail`, `THomePage`, … from `@blog/service`), the
-  shapes pages actually receive, not raw Sanity documents. Never import these
-  from a test file.
+## Viewports
 
-  ```ts
-  // src/storybook/fixtures/post.ts
-  import type { TPostDetail } from '@blog/service';
-  export const mockPost: TPostDetail = {
-    title: 'Hello World',
-    slug: 'hello-world',
-    // ...view-model fields, not raw Sanity document fields
-  };
-  ```
+`.storybook/preview.tsx` declares `mobile` (390px), `tablet` (820px) and
+`desktop` (1280px). Per-story viewport rules → `ui-storybook` § Viewports
+(web precedent: `SiteNavigation`'s mobile stories).
 
-- `apps/web/src/testing/` — fixtures shared between a component's
-  `.stories.tsx` **and** its `.test.tsx` (e.g. raw Portable Text / schema-shaped
-  data a lower-level component renders directly, not a page-level
-  view-model). Mirrors the component tree; see `testing-practices` → "Where
-  tests live" for the convention and import path
-  (`@web/testing/<component>/fixtures`).
+## Checklist
 
-If a story's data is also something a test needs, it belongs in
-`src/testing/`, not `src/storybook/fixtures/`.
-
-## Tailwind in apps/web stories
-
-The `@storybook/nextjs-vite` framework picks up `next.config.ts` and, being
-Vite-based, resolves CSS through Vite's built-in PostCSS pipeline — it
-auto-detects `postcss.config.mjs` at the app root, so the existing
-`@tailwindcss/postcss` plugin config keeps working unchanged. The global
-stylesheet is `apps/web/index.css` (the one `src/app/[locale]/layout.tsx`
-imports) — import it in `.storybook/preview.ts`:
-
-```ts
-import '../index.css';
-```
-
-This ensures `@import` of the shared theme and the `@source` directive for
-`packages/ui` are active in Storybook.
-
-## Naming convention
-
-Use page-level paths: `"Pages/PostPage"`, `"Pages/HomePage"`,
-`"Layouts/PageLayout"`, `"Components/MobileNav"`.
-
-## Checklist before finishing
-
-- [ ] Component accepts data as props (Approach A) rather than fetching
-      internally, where possible.
-- [ ] All required props provided via `args`; no live Sanity calls.
-- [ ] Any dictionary-const-backed prop has an `argTypes` `select` control with
-      `options: Object.values(THE_CONST)`, narrowed to the subset the prop
-      accepts — checked against the component's prop types, not the story's
-      imports.
-- [ ] Any prop whose type is a literal union behind a **named alias** has an
-      explicit `argTypes` `select` control — docgen never resolves an alias,
-      so inference cannot supply one. Source its `options` from the plural
-      array const the type is derived from, not a repeated literal list.
-      Inline unions need nothing.
-- [ ] `nextjs.navigation.pathname` set if component checks active route.
-- [ ] Fixtures live in `src/storybook/fixtures/`; not imported outside Storybook.
-- [ ] Story compiles clean — `.storybook` and `src/**/*.tsx` (including
-      `.stories.tsx`) are covered by `apps/web/tsconfig.json`'s `include`, so
-      `pnpm --filter web type-check` already catches TS errors here; no
-      separate `storybook:build` needed. Verify the story renders correctly
-      in the running dev server (`pnpm --filter web storybook`) — that's the
-      check for actual Storybook/Vite runtime issues type-check can't see.
+- [ ] The view is storied, not the loader; no live Sanity call and no
+      unaliased server-only import.
+- [ ] `title` carries its folder's prefix; `tags: ['autodocs']` on `meta`.
+- [ ] Required and shared props in `meta.args`; controls per `ui-storybook`
+      § Controls.
+- [ ] Data from `@web/testing` builders, or inline when only this story file
+      uses it.
+- [ ] `nextjs.navigation.pathname` set if the component reads the active
+      route.
+- [ ] `pnpm --filter web type-check` passes — `apps/web/tsconfig.json`
+      includes `.storybook/**` and every `src/**/*.tsx`, stories too, so no
+      `storybook:build` is needed — and the story renders in
+      `pnpm --filter web storybook`, which catches the Vite runtime failures
+      type-check can't.

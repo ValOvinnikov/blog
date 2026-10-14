@@ -1,80 +1,64 @@
 # Compound components (`@blog/ui`)
 
-Reference for the `ui-library-practices` skill. Read this when authoring or
-editing a compound component (multiple named slots).
+Reference for `ui-library-practices` § Compound components, which says when to
+pick compound over `as` and why the mechanism is context-free. This file holds
+the mechanics. Besides several swappable seams, compound also fits a component
+that owns text the consumer must wrap in its own markup.
 
-Use a compound component when a component owns **more than one**
-framework-coupled seam — e.g. it renders both a link and an image internally,
-or a whole family of child elements the consumer needs to swap in (a router
-`Link`, a Sanity-aware image, a client-only interactive control). A single
-`as` prop only swaps _one_ seam; compound splits the component into named
-slots so the consumer controls each one independently. `Header` (nav links +
-action buttons), `Footer` (nav links + copyright), `PostCard`, and `Hero`
-(cover image + title/CTA link) all use this pattern.
+## The primitives — `@blog/ui/lib/react`
 
-**Why not React Context** (the classic compound-component mechanism,
-Radix-style): `createContext`/`useContext` requires a client boundary, and
-`@blog/ui` must stay server-component-safe. This repo uses a **context-free,
-children-introspection** pattern instead: the root scans its `children` at
-render time and matches each one against a map of known slot components — no
-shared runtime state, works identically in RSC and client components.
+Defined in `packages/ui/src/lib/react/compound.tsx`. Import them; never
+re-derive the mechanism per component.
 
-## The shared primitives — `packages/ui/src/lib/react/compound.tsx`
+- `mapCompoundSlots(children, Parts)` returns `{ slots, unmatched }`. `slots`
+  is keyed and typed like `Parts`; Fragment-wrapped children are flattened
+  first. `unmatched` collects unknown element types, stray text and repeats of
+  an already-filled slot (first occurrence wins). **Never drop `unmatched`** —
+  render it somewhere sensible in the root, keyed through `Fragment` (a bare
+  `ReactNode[]` triggers React's missing-key warning).
+- `TCompoundComponent<Root, Parts>` types the assembled export as
+  `Root & Parts`, so `Header.Brand` autocompletes.
+- `TCompoundChildren<Parts>` types the root's `children` as its slots (plus
+  arrays of them, `false`, `null`, `undefined`). It is best-effort: it rejects
+  stray text, but any JSX element type-checks (JSX is typed
+  `ReactElement<any, any>`), so `unmatched` is the runtime backstop.
 
-- `mapCompoundSlots(children, componentTypes)` — the runtime resolver.
-  Takes `children` and a `{ SlotName: Component }` map; returns
-  `{ slots, unmatched }`. `slots` is keyed exactly like the input map and
-  typed accordingly. `unmatched` collects anything that didn't match a known
-  slot — unknown component types, stray text, and duplicate occurrences of
-  an already-matched slot (first occurrence wins). **Never drop `unmatched`
-  silently** — render it somewhere sensible in the root, keyed via `Fragment`
-  (a bare `ReactNode[]` array triggers React's missing-key warning):
-  ```tsx
-  {
-    unmatched.map((node, i) => <Fragment key={i}>{node}</Fragment>);
-  }
-  ```
-- `TCompoundComponent<Root, Parts>` — types the assembled export:
-  `Root & Parts`, so `Header.Brand`/`Header.Nav`/etc. autocomplete.
-- `TCompoundChildren<Parts>` — strictly types a compound root's `children`
-  to only the slots in its own `Parts` map (plus arrays of them, `false`,
-  `null`, `undefined`). Best-effort at the type level (content that reaches
-  children through `.map()`/fragments widens to `ReactNode`) —
-  `mapCompoundSlots`'s `unmatched` output is the runtime backstop for
-  exactly that gap.
+## When the root resolves slots
 
-Import them from `@blog/ui/lib/react` — never re-derive this mechanism per
-component.
-
-## When to use the helper
-
-Use `mapCompoundSlots` when the root places each named part in a fixed position or wrapper, or must catch unknown children. A compound whose parts are a repeated list (items, rows, cells) renders `children` directly; a slot-shaped sub-part of it uses the helper.
+Call `mapCompoundSlots` when the root places each part in a fixed position or
+wrapper, or must catch unknown children. A compound whose parts are a repeated
+list (items, rows, cells) renders `children` directly and types them as the
+item part only — `TCompoundChildren<Pick<typeof TimelineParts, 'Item'>>` —
+while the slot-shaped item (`TimelineItem`) resolves its own slots.
 
 ## Authoring a compound component
 
-Sub-components live in `components/{child-name}/` and each owns its variants.
-One `Parts` map drives everything — the `children` type, the resolver call,
-and the assembled export:
+Each part lives in `components/<child-name>/` and keeps its own `tv()` in a
+sibling `-variants.ts` (this package's exception — `ui-library-practices` §
+Styling); it never imports the parent's. Simplified from
+`packages/ui/src/components/organisms/header/`, which also has an `Actions`
+part and a slots `tv()` for the root's wrappers:
 
 ```
 header/
   components/
     brand/
       header-brand.tsx
-      header-brand-variants.ts   ← child's own tv(), no parent import
+      header-brand-variants.ts
     nav/
       header-nav.tsx
       header-nav-variants.ts
-  header-variants.ts             ← root element only
-  header.tsx                     ← root + assembly, no inline child defs
+  header-variants.ts   ← the root's own elements, not the parts'
+  header.tsx           ← root + assembly, no inline part definitions
+  index.ts             ← Header + THeaderProps only
 ```
 
 ```tsx
 // components/brand/header-brand.tsx
-import { headerBrandVariants } from './header-brand-variants';
 export type THeaderBrandProps = IWithClassName &
   IWithDataTestId & { children?: ReactNode };
 
+/** The slot that holds the site's logo or wordmark. */
 export const HeaderBrand = ({
   className,
   children,
@@ -90,17 +74,7 @@ export const HeaderBrand = ({
 ```
 
 ```tsx
-// header.tsx — root + assembly only, no inline sub-component definitions
-import {
-  mapCompoundSlots,
-  type TCompoundChildren,
-  type TCompoundComponent,
-} from '@blog/ui/lib/react';
-
-import { HeaderBrand } from './components/brand/header-brand';
-import { HeaderNav } from './components/nav/header-nav';
-import { headerVariants } from './header-variants';
-
+// header.tsx
 const HeaderParts = {
   Brand: HeaderBrand,
   Nav: HeaderNav,
@@ -111,6 +85,7 @@ export type THeaderProps = IWithClassName &
     children?: TCompoundChildren<typeof HeaderParts>;
   };
 
+/** The site header shell that lays out its brand and navigation. */
 const HeaderRoot = ({ children, className, dataTestId }: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   return (
@@ -131,87 +106,62 @@ export const Header: TCompoundComponent<typeof HeaderRoot, typeof HeaderParts> =
   Object.assign(HeaderRoot, HeaderParts);
 ```
 
+The local `Parts` const is the assembled export — `Object.assign(Root, Parts)`
+is the shape `scripts/gen-ui-index.mjs` follows to list slots. `children` and
+the resolver take the same map, or only the subset the root positions:
+`MediaCard` resolves `MediaCardSlotParts` and exports `Link` beside it
+(`{ ...MediaCardSlotParts, Link: CardLink }`), because the consumer nests the
+link inside `MediaCard.Title`.
+
 ## Rules
 
-- **Sub-components are hand-authored, not generated by a factory.** This repo
-  explicitly rejected a `createSlot`/`createCompoundSlot` abstraction — each
-  sub-component is a normal arrow function with its own `tv` slot. Only
-  `mapCompoundSlots` is shared. The ~15-line root-assembly pattern (resolve →
-  render slots → `Object.assign`) is expected to repeat per component — that
-  repetition is the deliberate trade-off for not having a factory, not a DRY
-  violation to fix.
-- **Slots are generic positioning containers — never force element types or
-  borrow styles from other atoms.** A slot like `Hero.Cta` or `PostCard.Title`
-  is a plain wrapper with only its own layout/spacing styles. The consumer
-  decides what goes inside (`<Button>`, `<a>`, a router `Link`) and supplies
-  that element's own styling. Never import another atom's variants (e.g.
-  `buttonVariants`) inside a slot — that couples the slot to a specific visual
-  treatment.
+- **Parts are hand-authored, never generated by a factory.** No
+  `createSlot`-style abstraction; only `mapCompoundSlots` is shared. The
+  ~15-line assembly (resolve → render slots → `Object.assign`) repeats per
+  component by design — not a duplication finding.
+- **A slot is a positioning container.** It carries only its own layout and
+  spacing; the consumer picks the element inside and that element's styling.
+  Never borrow another atom's variants inside a slot.
   ```tsx
-  // ✅ generic wrapper, consumer owns the element and its style
-  export type THeroCtaProps = IWithClassName &
-    IWithDataTestId & { children?: ReactNode };
-
-  export const HeroCta = ({
-    className,
-    children,
-    dataTestId,
-  }: THeroCtaProps) => (
-    <div
-      className={heroCtaVariants({ class: className })}
-      data-testid={dataTestId}
-    >
-      {children}
-    </div>
-  );
-  // consumer: <Hero.Cta><Button as="a" href="/post">Read more</Button></Hero.Cta>
-
-  // ❌ slot steals buttonVariants, forcing button styling on any child
+  // ✅ consumer owns the element and its style
+  <Hero.Cta>
+    <LinkButton href="/post">Read more</LinkButton>
+  </Hero.Cta>;
+  // ❌ the slot forces button styling on whatever it holds
   <div className={buttonVariants({ class: heroCtaVariants() })}>
     {children}
   </div>;
   ```
-- **Barrel exports stay unchanged by compound-ness:** `index.ts` exports only
-  the assembled compound (`Header`) and its root props type (`THeaderProps`) —
-  never the sub-components or their prop types. Consumers reach sub-components
-  only through dot-notation (`Header.Brand`).
-- **Image/media slots are positioning containers, not the image itself.** A
-  slot like `PostCard.Media`/`Hero.Media` wraps _whatever_ image element the
-  consumer renders (`next/image`, a Sanity-aware component, plain `<img>`) — so
-  its `tv` slot must not carry `object-cover` (a no-op on a `<div>`); use
-  `relative overflow-hidden` so a `next/image fill` has the parent it expects,
-  and let the consumer's image supply its own `object-fit`.
+- **A media slot wraps the image, it is not the image.** `MediaCard.Media` /
+  `Hero.Media` hold whatever the consumer renders (`next/image`, a
+  Sanity-aware image, `<img>`). The wrapper is `relative` + `overflow-hidden`
+  (the parent a `next/image fill` expects; `Hero.Media` gets it from
+  `MediaFrame` when framed) and never puts `object-cover` on itself, where it
+  is a no-op. A full-bleed wrapper may size its child with
+  `[&>*]:object-cover`, as the Banner hero's media wrapper does
+  (`packages/ui/src/lib/styling/banner.ts`) around an unframed `Hero.Media`.
+- **The barrel ignores compound-ness.** `index.ts` exports the assembled
+  compound and its root props type only — never a part or a part's props
+  type. Consumers reach parts through dot-notation (`Header.Brand`).
 
-## Namespaced exports without slot resolution
+## Namespaced alternatives (no slot resolution)
 
-Not every multi-part organism is a slot-compound. Some export a namespace of
-**mutually-exclusive alternatives** that never render together — e.g.
-`NewsletterSignup.Full` / `NewsletterSignup.Compact`, two independent
-densities of the same form, assembled via plain `Object.assign` rather than
-`mapCompoundSlots` (there is no `children` to resolve). The same
-`components/{child-name}/` layout still applies to these: each alternative,
-and any internal partial shared between them, gets its own
-`components/{name}/` folder next to the root assembly file. A `tv()` call
-that is genuinely shared across the alternatives (one `variant` axis, not
-independent per-child variants) is the one exception — it can stay a single
-root-level `{component}-variants.ts` instead of being split per child.
-Stories and tests move into `components/{name}/` alongside each alternative
-(`components/full/newsletter-signup-full.stories.tsx` +
-`.test.tsx`, same for `compact`) — each alternative is tested and
-demonstrated on its own, not through a shared root file. A thin root-level
-`.test.tsx` is only worth keeping if there's a case that exercises the
-_assembled_ export itself (e.g. `NewsletterSignup.Full`/`.Compact` identity,
-barrel shape) rather than either alternative's own behavior — otherwise
-delete it once its cases are redistributed. This differs from true
-slot-compounds (`Header`, `Hero`), where sub-components are never
-independently exported or tested and so have no stories/tests of their own
-at all — here, each namespaced alternative _is_ independently exported, so
-it gets its own.
+Some organisms export **mutually exclusive alternatives** that never render
+together — `NewsletterSignup.Full` / `.Compact`, two densities of one form. The
+export is a plain object literal (`{ Full: NewsletterSignupFull, Compact:
+NewsletterSignupCompact }`): no `Object.assign`, no `children` to resolve.
 
-## When NOT to use compound
-
-If the component only ever needs to swap **one** element (a nav link, a
-heading tag), don't build a compound API — use the plain `as` prop
-(`polymorphic-and-as.md`). Compound earns its complexity only when there are
-multiple independent slots or the component owns text that must be wrapped in
-consumer-controlled markup.
+- Each alternative, and any partial they share (`components/content/`), gets
+  its own `components/<name>/` folder beside the root file.
+- A `tv()` the alternatives share on one `variant` axis stays a single root
+  `newsletter-signup-variants.ts` — it has several consumers
+  (`react-component-practices` § Styling files).
+- Each alternative is a whole component a consumer renders alone
+  (`<NewsletterSignup.Full>`), so the barrel exports its props type and it
+  gets its own story and test in its folder
+  (`components/full/newsletter-signup-full.stories.tsx` + `.test.tsx`). The
+  root `.test.tsx` / `.stories.tsx` keep only what exercises the assembled
+  namespace (which alternative each key wires to, an overview of both); delete
+  them once nothing like that remains.
+- Slot compounds differ: a part only renders inside its root, so parts get no
+  stories or tests of their own.

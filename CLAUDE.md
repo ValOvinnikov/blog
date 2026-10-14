@@ -1,9 +1,11 @@
 # CLAUDE.md
 
-Guidance for working in this repo. See `SPEC.md` (architecture — the single
-durable reference) and `docs/BACKLOG.md` (ticket-ready roadmap).
-`docs/archive/IMPLEMENTATION_BRIEF.md` is frozen history — do not read it for
-current behaviour, and when it disagrees with `SPEC.md`, the spec wins.
+Guidance for working in this repo. `SPEC.md` is the architecture core — layer
+contracts, data flow, cross-cutting rules — and `docs/features/<feature>.md` is
+the per-feature reference ("Feature docs" under Conventions). Open work lives on
+the project board ("Ticket priority & triage"); `docs/BACKLOG.md` is the
+ticket-ready roadmap. `docs/archive/` is frozen history — never read it for
+current behaviour; when it disagrees with `SPEC.md`, the spec wins.
 
 ## What this is
 
@@ -15,8 +17,8 @@ content; a Next.js 16 App Router site renders it; types flow end-to-end.
 ```
 web → ui, service, db, auth, config, utils   service → config, utils (no React)
 platform → db, auth, config, utils, studio   studio → config, utils (typegen source)
-ui → config (no Sanity/fetch)               configs/* → consumed by all
-db → config, utils (no React/Sanity)        auth → db, config, utils
+ui → config, utils (no Sanity/fetch)        configs/* → consumed by all
+db → config, utils (no React/Sanity)        auth → db, config, email
 config → utils (OKLCH maths behind the shared contrast guard)
 insight → nothing (base of graph, like utils)
 email → utils (sits low; both apps and auth consume it)
@@ -24,24 +26,24 @@ graph is acyclic
 ```
 
 - `@blog/ui` is pure and prop-driven — never imports `service`/`sanity`/`fetch`.
-- `@blog/service` is the only package importing the Sanity SDKs; never imports React.
+- `@blog/service` is the only request-path package importing the Sanity SDKs;
+  never imports React. (`@blog/studio` is the Studio and schema owner;
+  `@blog/db`'s provisioning exception is below.)
 - `@blog/db` is the only package importing the Neon/Drizzle SDKs — Postgres
-  data (Auth.js sessions, comments, ratings, bookmarks, subscribers, tenants,
-  memberships, admins, site config, audit events, findings); never imports
-  React or any Sanity SDK, and
-  never imports/is imported by `@blog/service` (siblings, not dependents — see
-  `.claude/agents/db.md`). **Imported only by the two apps and `@blog/auth`**,
-  which binds the Auth.js adapter to its tables. Its `src/` library code never
-  imports `@blog/insight` either — that stays the two apps' job, same as any
-  other log call. The one exception is scoped to
-  `packages/db/scripts/provision-tenant/`,
-  `packages/db/scripts/deprovision-tenant/`,
-  `packages/db/scripts/recheck-tenant-owners/`,
-  `packages/db/scripts/validate-tenant-documents/`, and
-  `packages/db/scripts/migrate-tenant-content/`, standalone CLI tools
-  outside the request-handling path: they import `@blog/insight`'s
-  `sanitizeLogMessage` directly rather than keeping their own drifted copy.
-  Full rationale: `SPEC.md` §4.
+  data: Auth.js users and sessions, tenants and their domains, memberships and
+  invites, admins, site config, feature toggles, email config and templates,
+  subscribers, bookmarks, audit events and findings (comments and ratings are
+  planned; no tables exist yet). It never imports React or `@blog/service`
+  (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
+  by the two apps and `@blog/auth`**, which binds the Auth.js adapter to its
+  tables. It imports no Sanity SDK, and its `src/` never imports
+  `@blog/insight` — logging is the apps' job. Two scoped exceptions, both in
+  standalone CLI tools outside the request path (`SPEC.md` §4):
+  `packages/db/scripts/provision-tenant/` uses `@sanity/client` to seed a new
+  tenant's content, and five tools — `provision-tenant/`,
+  `deprovision-tenant/`, `recheck-tenant-owners/`,
+  `validate-tenant-documents/` and `migrate-tenant-content/` — import
+  `sanitizeLogMessage` directly rather than keep a drifted copy.
 - `apps/web` is the only place `ui` and `service` (and `db`) meet (Server
   Components fetch, pass typed props to `ui`).
 - `@blog/auth` holds the Auth.js configuration both apps pass to their own
@@ -54,55 +56,41 @@ graph is acyclic
   separately (`docs/context/environment-variables.md`). See
   `.claude/agents/auth.md`.
 - `apps/platform` is a separate Next.js app (its own deployment and domain) for
-  the operator/tenant admin panel — it consumes `db`, `auth`, `config`,
-  `utils` and `@blog/studio`, and **never Sanity or `@blog/service`
-  directly**. It reaches the Studio only through `@blog/studio`'s mount
-  component, which builds the Sanity config internally, so the ESLint
-  `no-restricted-imports` group still bans `sanity`, `next-sanity`,
-  `@sanity/*`, `groqd` and `@blog/service` under `apps/platform`. It owns its own
-  presentational primitives (Text, Card, Icon, Button, …) as well as its
-  interactive ones, all built on Base UI and styled in-app; nothing is added
-  to `@blog/ui` for it. The one exception is
-  `apps/platform/src/components/features/site-preview/`,
-  which renders the tenant's real site (BrandMark, Heading, Panel,
-  Text, Button) so the live theme preview doesn't drift from what `apps/web`
-  actually looks like — an ESLint `no-restricted-imports` guard confines
-  `@blog/ui` imports under `apps/platform` to that one directory. See
-  `.claude/agents/platform-app.md`.
+  the operator/tenant admin panel — it consumes `db`, `auth`, `config`, `utils`
+  and `@blog/studio`, and **never Sanity or `@blog/service` directly**: it
+  reaches the Studio only through `@blog/studio`'s mount component, and ESLint
+  `no-restricted-imports` bans `sanity`, `next-sanity`, `@sanity/*`, `groqd`
+  and `@blog/service` there. It owns its presentational primitives (Text, Card,
+  Icon, Button, …) as well as its interactive ones, built on Base UI and styled
+  in-app; nothing is added to `@blog/ui` for it. The one exception is
+  `apps/platform/src/components/features/site-preview/`, which renders the
+  tenant's real site with `@blog/ui` so the live theme preview cannot drift
+  from `apps/web` — an ESLint guard confines `@blog/ui` imports under
+  `apps/platform` to that directory. See `.claude/agents/platform-app.md`.
 - `@blog/studio` (`packages/studio`) is the Sanity Studio: schema types (the
-  source of truth for every content shape), desk structure, content
-  migrations, and a `StudioMount` component that takes plain strings
-  (`projectId`, `dataset`, `basePath`, `title`), builds the Studio config
-  **internally**, and renders it. It is a **package, not a deployed app** —
-  `apps/platform` mounts it, which is what lets one Studio serve every tenant.
-  Upstream is `config` and `utils` only. Nothing may export a _built_ config
-  object out of the package: a Server Component calling the builder drags the
-  Sanity SDK into the RSC graph, where `swr`, `sanity`'s bundled CSS and
-  `sanity-plugin-media` all break under the `react-server` condition. See
-  `.claude/agents/studio.md`.
+  source of truth for every content shape), desk structure, content migrations,
+  and a `StudioMount` component that takes plain strings (`projectId`,
+  `dataset`, `basePath`, `title`), builds the Studio config **internally**, and
+  renders it. It is a **package, not a deployed app** — `apps/platform` mounts
+  it, so one Studio serves every tenant. Upstream is `config` and `utils` only.
+  Nothing may export a _built_ config object out of the package: a Server
+  Component calling the builder drags the Sanity SDK into the RSC graph, where
+  `swr`, `sanity`'s CSS and `sanity-plugin-media` break under the
+  `react-server` condition. See `.claude/agents/studio.md`.
 - `@blog/insight` (`packages/insight`) holds the structured logger core —
-  `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`. Sits at the base of
-  the dependency graph alongside `utils` — depends on nothing.
-  `sanitizeLogMessage` is `@blog/insight`'s sole canonical implementation —
-  `@blog/utils`'s former copy was removed once every call site migrated onto
-  this package instead. Both apps consume it: `apps/web` and `apps/platform` each expose one
-  shared logger at `src/utils/logger/logger.ts` carrying their own `service`
-  value, and import that rather than calling `createLogger` per module.
-  `service`, `db` and `auth` never log at all — failures reach the caller and
-  the app layer logs them once, with request context. The one exception is
-  `@blog/db`'s standalone `provision-tenant`/`deprovision-tenant`/
-  `recheck-tenant-owners`/`validate-tenant-documents` CLI scripts, which
-  import `sanitizeLogMessage` (not
-  the logger) directly — see the `@blog/db` bullet above and `SPEC.md` §4. See
-  `.claude/agents/insight.md`.
+  `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`, its sole canonical
+  implementation. It depends on nothing. `apps/web` and `apps/platform` each
+  expose one shared logger at `src/utils/logger/logger.ts` carrying their own
+  `service` value, and import that rather than calling `createLogger` per
+  module. `service`, `db` and `auth` never log — failures reach the caller and
+  the app layer logs them once, with request context (the `@blog/db` CLI tools
+  above are the one exception). See `.claude/agents/insight.md`.
 - `@blog/email` (`packages/email`) is the single home for every email the
   product sends — the shared branded HTML shell, the canonical `escapeHtml`,
-  and the typed `sendEmail` Resend transport. Upstream is `utils` only, which
-  is what lets both apps **and** `@blog/auth` consume it without a cycle
-  (`auth` sits above `db`, so a dependency on either would close one). It is
-  side-effecting — it owns the send call — but **never logs**, and never
-  resolves tenants or fetches content: callers pass it resolved copy and URLs,
-  the way `@blog/ui` takes props. That is what keeps it
+  and the typed `sendEmail` Resend transport. Upstream is `utils` only, so both
+  apps **and** `@blog/auth` consume it without a cycle. It owns the send call
+  but **never logs**, and never resolves tenants or fetches content: callers
+  pass it resolved copy and URLs, the way `@blog/ui` takes props, which keeps it
   usable from an Auth.js callback with no request context. Operator-alert copy
   stays hardcoded and must never become tenant-editable. See
   `.claude/agents/email.md`.
@@ -119,26 +107,23 @@ automatic pipeline; this skill is how the right ones get used in the right order
 
 ## Planning work — mandatory, not advisory
 
-These are requirements, not guidance. They exist because a bundled PR wastes
-review time and hides what actually changed.
+These are requirements, not guidance: a bundled PR wastes review time and hides
+what actually changed.
 
 ### Split by workspace, always
 
 **The main workspaces are the unit of work: `studio`, `service`, `ui`, `web`,
 `platform`.** Plan every non-trivial task as one chunk per workspace, and ship
 one PR per chunk. The supporting packages — `config`, `utils`, `db`, `auth`,
-`insight`, `email` — do not get a chunk of their own by default: a small change
-to one rides along in the PR of whichever main workspace needs it.
+`insight`, `email` — get no chunk of their own by default: a small change to one
+rides along in the PR of whichever main workspace needs it.
 
-**Combine chunks only when splitting them would break.** The test is mechanical:
-would the earlier PR merge to `main` green on its own? Renaming a shared `_type`,
-symbol or generated type reds `type-check` in every consumer until they all land,
-so those consumers belong in one PR. Anything that merges green alone ships
-alone. "It's all one feature", "the split is more work" and "they're small" are
-not reasons to combine.
-
-This strengthens "Prefer per-layer PRs" below from a preference into a
-requirement; the green-alone test is the same test.
+**Combine chunks only when splitting them would break.** The test is
+mechanical: would the earlier PR merge to `main` green on its own? Renaming a
+shared `_type`, symbol or generated type reds `type-check` in every consumer
+until they all land, so those consumers belong in one PR. Anything that merges
+green alone ships alone. "It's all one feature", "the split is more work" and
+"they're small" are not reasons to combine.
 
 ### One layer at a time — merged before the next starts
 
@@ -148,55 +133,38 @@ workspace that is `studio → service → ui → web` (`config` first when it
 changes, `db → auth → platform-app` for the platform side); a feature that
 skips a layer skips that step. The next layer's branch is cut from a `main`
 that already contains the previous layer, so its agent builds against the
-merged shape rather than a local guess at it — and every review is of one
-layer, against `main`, with nothing open above or below it.
+merged shape and every review is of one layer against `main` — a later layer
+never bakes in a shape an earlier layer's review then changes.
 
 The sequence is: dispatch the current layer's agent → verify → review →
 commit → push and PR (each gate approved separately) → wait for the merge →
-only then dispatch the next layer. "Waiting for the merge" is idle time on
-this feature, not a cue to start the next layer on a branch off the open PR;
-that is a stack, and a stack is not the default.
+only then dispatch the next layer. Waiting for the merge is idle time on this
+feature, not a cue to branch the next layer off the open PR — that is a stack.
+**Two exceptions, and only two**, neither invoked silently:
 
-**Two exceptions, and only two:**
-
-- **The user says to stack.** Then, and only then, the next layer's branch
-  is cut from the previous layer's branch and the chain ships through
-  `gh stack` (mechanics in "Stacked PRs" below and in `open-pull-request`).
-  The orchestrator never chooses to stack on its own — not to save a wait,
-  not because the layers are small, not because the next one is "obvious".
-- **A hard dependency that prevents the split.** When the green-alone test
-  above fails — the earlier layer cannot merge to `main` without the later
-  one, as with a rename every consumer reads — the affected layers are one
-  PR, per "Combine chunks only when splitting them would break". That is a
-  combination, not a stack: still one branch, one review, one merge.
-
-Neither exception is the orchestrator's to invoke silently: the stacking one
-needs the user's instruction, and the hard-dependency one is stated in the
-split put to the user (next section) before the first dispatch.
-
-Adopted 2026-09-21. Until then a multi-layer feature could have every layer's
-agent dispatched back to back, its commits chained locally, and its PRs
-opened as a stack or a burst — which put three or four reviews in flight at
-once and let a later layer bake in a shape the earlier layer's review then
-changed.
+- **The user says to stack.** Then, and only then, the chain ships through
+  `gh stack` ("Stacked PRs" under Conventions). The orchestrator never chooses
+  to stack — not to save a wait, not because the layers are small, not because
+  the next one is "obvious".
+- **A hard dependency that prevents the split** (the green-alone test fails, as
+  with a rename every consumer reads). The affected layers are one PR — a
+  combination, not a stack — and that is stated in the split put to the user
+  before the first dispatch.
 
 ### Split by surface too, not only by workspace
 
 Workspace is one axis; **consumers are the other**. When a feature introduces
-something that several places must then adopt — a new schema type, a shared
+something several places must then adopt — a new schema type, a shared
 component, a field helper, a constant — introducing it is one PR, and **each
 place that starts using it is another**. Never bundle "add X" with "and convert
-the six places that will use X".
+the six places that will use X". Epic #3164 is the worked example: (1) add the
+`link` document and its Links sidebar section, (2) re-use it in the CTA module,
+(3) navigation and footer, (4) hero modules, (5) Portable Text, (6) retire the
+legacy shapes — six PRs, each independently reviewable and revertible.
 
-Epic #3164 is the worked example: (1) add the `link` document and its Links
-sidebar section, (2) re-use it in the CTA module, (3) navigation and footer,
-(4) hero modules, (5) Portable Text, (6) retire the legacy shapes. Six PRs, not
-one — each adoption is independently reviewable and independently revertible,
-and a problem with one does not block the other five.
-
-This axis compounds with the workspace rule rather than replacing it: an
-adopting PR that spans studio + service + web because a schema shape changed is
-still one PR, because splitting it further would red `type-check`.
+The axes compound: an adopting PR that spans studio + service + web because a
+schema shape changed is still one PR, because splitting it further would red
+`type-check`.
 
 ### Put the split to the user before starting
 
@@ -211,27 +179,25 @@ Before the first dispatch — and again whenever the answer changes mid-task —
 state plainly:
 
 - **Parts touched** — every workspace, not just the obvious one.
-- **Dependencies** — what must land before what, what can run in parallel.
-  Within one feature the layers never run in parallel: each is merged before
-  the next starts ("One layer at a time" above). Parallel here means
-  independent tickets, not the layers of one ticket.
+- **Dependencies** — what must land before what, and which independent tickets
+  can run in parallel; within one feature the layers never do ("One layer at a
+  time").
 - **Constraints** — migrations, human gates, anything that cannot be split.
-- **Copy** — every visible string on the public site the work adds or
-  rewords, including the copy a new `@blog/ui` text prop will carry once
-  `web` wires it. Give each string a recommended classification, Voice or
-  fixed, per "Check for Voice candidates" below, or write "none". The user's
-  approval of the split settles them, and they go into the ticket body
-  before dispatch.
+- **Copy** — every visible string on the public site the work adds or rewords,
+  including the copy a new `@blog/ui` text prop will carry once `web` wires it,
+  each with a recommended classification, Voice or fixed, per "Check for Voice
+  candidates" — or "none". The user's approval of the split settles them, and
+  they go into the ticket body before dispatch.
+- **Manual test** — whether the change alters what a page shows or how it
+  behaves; if so, its manual-test issue is filed with the tickets
+  (`develop-feature` §2, template in "Issue body template").
 - **Doubts** — including scope you suspect but have not yet confirmed.
 
 **If anything blocks, ask and wait for an answer.** Never proceed on an
 assumption, and never absorb newly-discovered scope silently. Discovering
-mid-task that a change reaches three more workspaces than the ticket said is
-precisely the moment to stop and ask — editing the ticket to match what you
-already built is backwards. Adopted 2026-09-15 after #3202 shipped as one PR
-spanning studio, service, web and db when the request had been a studio-only
-schema addition; the rename that dragged the other three in was approved, but
-its blast radius was never put to the user.
+mid-task that a change reaches more workspaces than the ticket said is the
+moment to stop and ask — editing the ticket to match what you already built is
+backwards.
 
 ### Reuse before you create
 
@@ -241,33 +207,33 @@ every app and package, not just the one being changed. A near-duplicate is the
 most expensive kind of mistake to find later, because nothing fails — both
 versions work.
 
-When you or a subagent notices something similar already exists and it is not
-obvious whether to extend it or add alongside it, that is **not** a judgement
-call to settle quietly. Investigate properly — who calls the existing one, what
-`SPEC.md` and the agent/skill docs say, what changing it would break — and if it
-is still unclear, ask. A subagent reporting "there was already an X, but I added
-a new one because…" is a flag to raise, not a decision to rubber-stamp.
+When something similar already exists and it is not obvious whether to extend
+it or add alongside it, that is **not** a judgement call to settle quietly.
+Investigate — who calls the existing one, what `SPEC.md` and the agent/skill
+docs say, what changing it would break — and if it is still unclear, ask. A
+subagent reporting "there was already an X, but I added a new one because…" is
+a flag to raise, not a decision to rubber-stamp.
 
 **A second copy moves to a shared folder in the change that would create it.**
 When a diff would add code that already exists elsewhere in the repo — a
-function, component, hook, test fake, fixture or builder — the diff moves it to
-the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one per
-file) and points every call site at it. Writing the second copy "for now" is a
-blocking review finding, whoever owns the files it lands in. The one limit is
-the layer contracts: `apps/web` and `apps/platform` share no code, so a match in
-the other app is reported, not extracted.
+function, component, hook, fixture or builder — the diff extracts it to its
+home and points every call site at it: a component →
+`react-component-practices` § Where a component lives; a helper, type or
+constant → `.claude/agents/config.md`; fixtures and test setup →
+`testing-practices` (a `vi.mock` factory moves at its third copy, not its
+second). Writing the second copy "for now" is a blocking review finding,
+whoever owns the files it lands in. The layer contracts are the limit:
+`apps/web` and `apps/platform` share no code, so a match in the other app is
+reported, not extracted.
 
 **Duplication that already existed is filed, not fixed inline.** When a diff
-finds two copies that were both on `main` before it and adds no third, the fix
-is a new shared file other tickets will plausibly touch, so the reviewer files
-it and the PR ships as is — unless extracting it is the ticket's own scope. The
-reason is parallel sessions: two of them extracting the same duplication
-converge on the same path _and_ name, because the conventions here determine
-both, and git reports an add/add conflict at merge. It happened twice on
-2026-09-18 (`packages/studio/src/testing/`'s field-lookup helpers, #3340 vs.
-#3248; `packages/service/src/shared/transformers/to-cta-buttons.ts`, #3249 vs.
-a concurrent session). When a collision happens anyway, **whatever is on `main`
-wins and the branch adopts it**, regardless of which was written first.
+finds two copies that were both on `main` before it and adds no third, the
+reviewer files it and the PR ships as is — unless extracting it is the ticket's
+own scope. Two parallel sessions extracting the same duplication converge on
+the same path _and_ name, because the conventions here determine both, and
+collide as an add/add conflict at merge. When a collision happens anyway,
+**whatever is on `main` wins and the branch adopts it**, regardless of which
+was written first.
 
 ### Examine before you change
 
@@ -276,8 +242,8 @@ orchestrator writing a ticket, a layer agent implementing one, `test-writer`
 adding coverage. Read:
 
 - the whole file you will change, not only the lines the ticket names;
-- its callers and what it calls, wherever the change touches a signature or
-  a behaviour;
+- its callers and what it calls, wherever the change touches a signature or a
+  behaviour;
 - the other files in its folder, where the same pattern usually repeats.
 
 Read them against this file's Conventions, the layer's own skill, and the
@@ -286,160 +252,116 @@ ticket itself. Then sort what you find:
 - **Mechanical drift in a file the diff already touches is fixed in the same
   change** — a comment that fails the comment test, a type `@blog/config`
   already exports, a dead import or export, a pattern a later convention
-  replaced. This is the steady-state rule comments already follow, applied
-  to every convention.
+  replaced. This is the steady-state rule comments already follow, applied to
+  every convention.
 - **Everything else is reported, not fixed** — drift in a file the diff does
   not touch, a behaviour change, a design call. It goes in the agent's
   **Examined** report section with `file:line`. The orchestrator lands it in
-  the same branch when it is the same layer and small ("Findings found
-  mid-work get fixed in the current work"), and otherwise puts it to the user
-  or files it. A diff never grows past its ticket silently.
-- **A ticket whose premise the code contradicts stops the work.** A moved
-  line reference is corrected without comment; a described behaviour that no
-  longer exists, or a fix another PR already made, is reported before
-  anything is built on it.
+  the same branch when it is the same layer and small ("Findings found mid-work
+  get fixed in the current work"), and otherwise puts it to the user or files
+  it. A diff never grows past its ticket silently.
+- **A ticket whose premise the code contradicts stops the work.** A moved line
+  reference is corrected without comment; a described behaviour that no longer
+  exists, or a fix another PR already made, is reported before anything is
+  built on it.
 
 Every implementing agent's report carries a required **Examined** section —
-what it read beyond the files it changed, what it fixed in passing, and what
-it found and left — so a skipped examination shows up in the report instead
-of passing silently. Adopted 2026-10-12, after a run of tickets in the admin
-design pass met code that had moved under them, and hand-written
-`T | undefined` types kept surviving next to every change.
+what it read beyond the files it changed, what it fixed in passing, and what it
+found and left — so a skipped examination shows up in the report instead of
+passing silently.
 
 ## Mid-task decisions land in the ticket/spec before work continues
 
-When a design/scope/behavior decision gets settled in conversation — the user
-answers a clarifying question, a discussion converges on an approach, a
-placement/UX call gets made — that decision is **not** real until it's written
-into the governing issue body or spec/plan doc. A decision that lives only in
-chat history is invisible to every subagent, which starts cold and knows only
-what its dispatch prompt (sourced from the ticket/spec) tells it — and it's
-just as invisible to the orchestrator's own future re-dispatches, which should
-be pulling fresh context from the ticket/spec, not from memory of the
-conversation. This is exactly how the newsletter-signup feature (#1044)
-shipped wrong the first time: the "does the form show site-wide or is it
-scoped/configurable" question was discussed and answered in chat, never
-written back into the ticket, and implementation proceeded from the original
-under-specified issue — landing it globally in the root layout, requiring a
-revert (#1196).
+When a design/scope/behaviour decision gets settled in conversation — the user
+answers a clarifying question, a discussion converges, a placement/UX call gets
+made — it is **not** real until it is written into the governing issue body or
+spec/plan doc. A decision that lives only in chat is invisible to every
+subagent, which starts cold from its dispatch prompt, and to the orchestrator's
+own later re-dispatches. (The newsletter signup shipped site-wide and was
+reverted because its "site-wide or scoped?" answer never left the chat.)
 
 **The sequence when a decision is reached mid-task:**
 
 1. If a subagent is currently dispatched against the now-stale plan, stop
-   relying on its output — interrupt/stop it if still running, or discard its
-   result if it completes before you can. Don't let work proceed from context
-   the decision just superseded.
+   relying on its output — interrupt it if still running, or discard its
+   result if it completes before you can.
 2. Update the governing issue body (`gh issue edit`) or spec/plan doc
    (`docs/superpowers/specs/*`) to state the decision plainly, before any
    further implementation.
-3. Only then dispatch (fresh, or resume) — and the dispatch prompt should
-   quote/point at the now-updated ticket/spec, not restate the decision from
-   the orchestrator's own recollection of the chat.
+3. Only then dispatch (fresh, or resume) — with a prompt that quotes or points
+   at the updated ticket/spec, not one restating the decision from memory of
+   the chat.
 
 This applies to decisions a subagent couldn't have made on its own (design,
-scope, placement, cross-cutting behavior) — not routine implementation
-details a layer agent is already trusted to decide per its skill.
+scope, placement, cross-cutting behaviour) — not routine implementation details
+a layer agent is already trusted to decide per its skill.
 
-**The mirror-image failure: don't let a subagent silently resolve an
-ambiguity instead of surfacing it.** The above covers a decision the user
-already made mid-task; this covers a decision the user hasn't made yet
-because the ticket itself is ambiguous or self-contradictory. When a
-dispatched subagent's report says anything like "the issue said X but I did Y
-because…" — it noticed a tension between the ticket's literal wording and
-what it built, picked an interpretation, and explained its reasoning — that
-is **not** a settled decision just because the reasoning sounds good. Stop,
-present the tension plainly to the user (what the ticket says vs. what got
-built vs. why), and get an explicit answer — before commit/push/PR, and
-especially before reusing that same unconfirmed interpretation as precedent
-for another ticket. This is exactly how issues #1251 and #1252 both shipped
-a plain `prefix?: ReactNode` prop when their acceptance criteria literally
-said "compound slot" (a specific, different, `mapCompoundSlots`-based pattern
-in this codebase) — the implementing agent flagged the deviation in its own
-report, the orchestrator read that reasoning and silently accepted it as
-correct, and then propagated the same unconfirmed call into a second ticket
-via "same pattern as #1251." The user only caught it after both PRs were
-open, by asking why the implementation didn't match the ticket. A subagent's
-self-reported judgment call is a flag to raise, not a decision to rubber-stamp.
+**The mirror-image failure: a subagent silently resolving an ambiguity.** A
+report saying anything like "the issue said X but I did Y because…" means the
+agent picked an interpretation of an ambiguous or self-contradictory ticket —
+**not** a settled decision, however good the reasoning sounds. Stop, put the
+tension to the user (what the ticket says vs. what got built vs. why), and get
+an explicit answer before commit/push/PR; never reuse the unconfirmed
+interpretation as precedent for another ticket. (Two tickets once shipped a
+plain `prefix?: ReactNode` prop where their criteria said "compound slot",
+the second copying the first's accepted deviation.) A subagent's self-reported
+judgment call is a flag to raise, not a decision to rubber-stamp.
 
 ## Use the scoped agents
 
-Delegate layer work to the matching subagent in `.claude/agents/`, in dependency
-order (`config → studio → service → ui → web` when config changes are involved,
-otherwise `studio → service → ui → web`):
-`config` (`packages/config`, `packages/utils`, `configs/*` — constants, route
-helpers, shared config packages, alias wiring, guards typegen output), `studio`
+Delegate layer work to the matching subagent in `.claude/agents/`, in
+dependency order (`config → studio → service → ui → web` when config changes
+are involved, otherwise `studio → service → ui → web`): `config`
+(`packages/config`, `packages/utils`, `configs/*` — constants, route helpers,
+shared config packages, alias wiring, guards typegen output), `studio`
 (schemas/typegen), `service` (Sanity data layer), `ui` (design system), `web`
-(frontend/SEO + composition).
+(frontend/SEO + composition). The other layer agents sit beside that chain;
+what each package owns is in "Layer contracts" above:
 
-`db` (`packages/db`, Neon/Drizzle relational data — Auth.js sessions,
-comments, ratings, bookmarks, subscribers, tenants, memberships, admins, site
-config, audit events, findings) is a **sibling to `service`, not a step in that chain** — it has no
-upstream layer of its own beyond `config`. Its consumers are the two apps plus
-`@blog/auth`, which binds the Auth.js adapter to its tables.
-Dispatch it whenever config/utils changes are settled and before the app work
-that composes its queries: `config → db → web` (parallel to, not blocking,
-`studio → service → ui`) when a feature touches both a Sanity-backed and a
-Neon-backed concern. See `.claude/agents/db.md`.
-
-`auth` (`packages/auth`, the shared Auth.js configuration — providers, the
-Drizzle adapter, session strategy, cookie options) is a **thin layer above
-`db`**, consumed only by the two apps: `config → db → auth → web`/`platform-app`.
-Dispatch it when any of those change. Never dispatch it for authorization —
-whether a signed-in user may see a page is each app's decision, made against an
-`admins` or `memberships` row. See `.claude/agents/auth.md`.
-
-`platform-app` (`apps/platform`, the operator/tenant admin panel — a separate Next.js
-app, its own deployment and domain) is a **sibling to `web`, not a step in the
-chain either**. Its only upstreams are `config`, `db`, and `auth`, so its
-dispatch order is `config → db → auth → platform-app`; it never waits on
-`studio`/`service`, which it does not consume. Base UI is installed and styled inside that app,
-and it owns its own presentational primitives too — do not route its
-components through the `ui` agent. The one exception is
-`site-preview/`, an ESLint-guarded directory allowed to
-import `@blog/ui` directly so the live theme preview renders the site's
-real components. See `.claude/agents/platform-app.md`.
-
-`insight` (`packages/insight`, the structured logger core — `createLogger`,
-`LOG_LEVEL`, and `sanitizeLogMessage`, its sole canonical implementation) is
-**independent, like `utils`** — depends on nothing, not a step in
-any chain. Both apps consume it through their own shared logger module, so
-dispatch `insight` only for changes to the logger core itself — a change to
-how an app _uses_ the logger belongs to `web`/`platform-app`. See
-`.claude/agents/insight.md`.
-
-`email` (`packages/email`, the single home for every email the product sends —
-the shared branded HTML shell, the canonical `escapeHtml`, and the typed
-`sendEmail` Resend transport) sits **low in the graph, upstream of `utils`
-only**, so both apps and `@blog/auth` can all consume it without a cycle. It is
-side-effecting (it owns the send call) but never logs, and never resolves
-tenants or fetches content — callers pass it resolved copy and URLs, the way
-`@blog/ui` takes props, which is what keeps it usable
-from an Auth.js callback that has no request context. Dispatch it for the email
-templates and transport themselves; a change to _which_ copy a caller passes
-belongs to that caller's layer. See `.claude/agents/email.md`.
+- **`db`** is a sibling to `service`, not a step in that chain — no upstream
+  beyond `config`. Dispatch it once config/utils changes are settled and before
+  the app work that composes its queries (`config → db → web`/`platform-app`).
+  When a feature touches both a Sanity-backed and a Neon-backed concern, the
+  `db` step takes its place in the split like any other layer — merged before
+  the next starts, never in parallel with `studio → service → ui` ("One layer
+  at a time"). See `.claude/agents/db.md`.
+- **`auth`** is a thin layer above `db`, consumed only by the two apps:
+  `config → db → auth → web`/`platform-app`. Never dispatch it for
+  authorization — whether a signed-in user may see a page is each app's
+  decision, made against an `admins` or `memberships` row.
+- **`platform-app`** is a sibling to `web`:
+  `config → db → auth → platform-app`, never waiting on `studio`/`service`,
+  which it does not consume. It owns its presentational and interactive
+  primitives on Base UI — never route its components through the `ui` agent
+  (the `site-preview/` exception is in "Layer contracts").
+- **`insight`** is independent, like `utils`. Dispatch it only for the logger
+  core itself; a change to how an app _uses_ the logger belongs to
+  `web`/`platform-app`.
+- **`email`** sits low, upstream of `utils` only. Dispatch it for the email
+  templates and transport; a change to _which_ copy a caller passes belongs to
+  that caller's layer.
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
-whole lifecycle, not just the first draft.** Every file that lives in a
-sub-agent's domain (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`/`email` per the map above) is
-written, changed, fixed, renamed, and reworked **by that sub-agent** — the
+whole lifecycle, not just the first draft.** Every file in a sub-agent's domain
+(`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`/`email`)
+is written, changed, fixed, renamed and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
 or hand-patch a layer's files because doing it itself feels faster. Handing a
-sub-agent pre-written stubs, or editing its files after it hands them back, both
-bypass the layer's skill conventions and break the delegation model. Describe
-structure in the prompt; never write it to disk first. (The one exception is
-a solo cloud session with no subagent tooling — see "Solo-session mode"
-under "Ticket priority & triage".)
+sub-agent pre-written stubs, or editing its files after it hands them back,
+both bypass the layer's skill conventions. Describe structure in the prompt;
+never write it to disk first. (The one exception is a solo cloud session with
+no subagent tooling — "Solo-session mode" under "Ticket priority & triage".)
 
 **What the orchestrator does with its own hands is exactly the work that falls
 OUTSIDE every sub-agent's scope:**
 
 - Governance/process docs it owns: `CLAUDE.md`, `.claude/**` (agents, skills,
-  hooks, settings), `SPEC.md`, `README.md`, `docs/**` (specs/plans).
+  hooks, settings), `SPEC.md`, `README.md`, `docs/**` (specs, plans, feature
+  pages).
 - The mechanical **scratchpad → branch assembly** of a sub-agent's _own_
-  exported output — a file copy, not authoring (see the worktree-teardown
-  handoff). Reconciling a trivial transfer conflict is fine; rewriting the
-  content is not — that goes back to the sub-agent.
+  exported output — a file copy, not authoring. Reconciling a trivial transfer
+  conflict is fine; rewriting the content goes back to the sub-agent.
 - `pnpm typegen` (it mutates generated files; `develop-feature` §5).
 - Orchestration itself: git, `gh`, the board (via `board-keeper`), dispatching
   agents, and running the delivery gates.
@@ -450,151 +372,115 @@ or `SendMessage` to continue the owning agent with its context intact), never a
 direct orchestrator edit.
 
 **Known failure mode — the "I'll just fix this one small thing myself" trap.**
-When a review turns up a blocking finding in a layer file, or a rename / knip /
-lint nit needs a two-line change, patching it inline _feels_ faster than
-re-dispatching the owning agent. That feeling is the rationalization this rule
-exists to stop: a two-line orchestrator edit to a `config`/`studio`/`service`/`ui`/
-`web`/`db`/`platform-app`/`auth`/`insight`/`email` file is still the orchestrator doing a sub-agent's job. Route the fix to
-the owning agent (dispatch, or `SendMessage` it), let it re-export, then
-re-verify and re-review. "Small", "mechanical", "the agent already did the hard
-part", and "it's a fix, not new code" are **not** exemptions — the only
-orchestrator-hand edits are the out-of-scope list above.
+When a review finding or a rename / knip / lint nit needs a two-line change in
+a layer file, patching it inline _feels_ faster than re-dispatching. It is
+still the orchestrator doing a sub-agent's job: route the fix to the owning
+agent (dispatch, or `SendMessage` it), let it re-export, then re-verify and
+re-review. "Small", "mechanical", "the agent already did the hard part" and
+"it's a fix, not new code" are **not** exemptions — the only orchestrator-hand
+edits are the out-of-scope list above.
 
-**Dispatch subagents in the background by default.** Every Agent-tool
-dispatch defaults to `run_in_background: true`. "The next step depends on
-this result" does **not** justify `run_in_background: false` — background
-dispatch preserves ordering too (the orchestrator resumes on notification,
-then runs the dependent step); foreground only costs the ability to respond
-to the user while it runs. Only the two exceptions below stay synchronous,
-each for its own stated reason:
+**Dispatch subagents in the background by default.** Every Agent-tool dispatch
+defaults to `run_in_background: true`. Background dispatch preserves ordering —
+the orchestrator resumes on the completion notification and runs the dependent
+step then — so "the next step depends on this result" does **not** justify
+`run_in_background: false`; foreground only costs the ability to answer the
+user while it runs. Exactly two dispatches stay synchronous, each for its own
+reason:
 
-- Gate 0 (`open-pull-request` skill): `board-keeper` with the
+- Gate 0 (`open-pull-request`): `board-keeper` with the
   `"starting work on #<n>"` trigger — the branch checkout right after it
-  depends on the issue (and, if any, its parent) actually being set to In
-  Progress first. **Starting parallel work on several sibling sub-issues at
-  once (e.g. dispatching multiple layer subagents in the same turn) is one
-  batched dispatch — `"starting work on #86, #87, #88, #89"` — never one
-  `board-keeper` dispatch per issue** (`board-keeper.md`'s Step 1d).
-- Gate 7 below: `gh pr create`, then set the board status — the PR URL isn't
-  reported until that board write is confirmed, so that one board-keeper
-  dispatch stays synchronous.
+  depends on the issue (and any parent) actually being In Progress first.
+  **Starting parallel work on several sibling sub-issues at once is one batched
+  dispatch — `"starting work on #86, #87, #88, #89"` — never one `board-keeper`
+  dispatch per issue** (`board-keeper.md` Step 1d).
+- Step 7 of the delivery gate sequence below (`open-pull-request` Gate 5):
+  `gh pr create`, then set the board status — the PR URL isn't reported until
+  that board write is confirmed.
 
-This list is exhaustive — every other dispatch (layer agents, `verify-runner`,
-`reviewer`, `a11y-reviewer`, `seo-auditor`, `ci-watcher`, ...) runs in the
-background. `verify-runner` before `reviewer` is **not** an exception:
-dispatch it with `run_in_background: true` like everything else — the
-orchestrator resumes on its completion notification and dispatches `reviewer`
-then, same ordering as a synchronous wait would have given, without blocking
-the ability to respond to the user in the meantime.
+Every other dispatch — layer agents, `verify-runner` (including right before
+`reviewer`), `reviewer`, `a11y-reviewer`, `seo-auditor`, `ci-watcher`, … —
+runs in the background.
+
+**Known failure mode — `run_in_background: false` on anything else.** The
+rationalization is always "I can't commit/report/move on until I know whether
+this passed". It is already rejected above: the ordering is identical either
+way, and a synchronous `reviewer` once left a live user message unanswerable
+until it returned. Before setting `false`, name which of the two exceptions
+applies. If none does, the answer is `true` — do not reopen the argument.
+
+**Completion arrives as a notification — never poll.** The harness delivers a
+`task-notification` the moment a background agent finishes; that, not a manual
+check, is the signal to read the result and run the dependent step. Never
+simulate a foreground wait (sleeping, re-dispatching the same check in a loop,
+re-reading the agent's output file). Until it arrives, keep answering the user
+and dispatching independent work.
 
 **`board-keeper` needs no `isolation` argument on the dispatch** — it carries
-`isolation: worktree` in its own frontmatter, and that line is load-bearing
-rather than decoration for an agent that never edits a file. A
-worktree-isolated session (any background job that ran `EnterWorktree`)
-refuses every command whose working directory resolves back to the shared
-checkout, which is exactly where a non-isolated subagent's Bash lands — so
-without it the dispatch returns having made zero board writes, and Gate 0 has
-to be done by hand. Full rationale in `.claude/agents/board-keeper.md`'s "Why
-this agent carries `isolation: worktree`" section; don't "simplify" the
-frontmatter by dropping it.
-
-**How completion is detected — no polling, no synchronous wait.** The
-orchestrator never needs to block on a background dispatch to learn its
-result, and must never invent one (sleeping, re-dispatching the same check
-in a loop, or repeatedly reading the agent's output file) to simulate a
-foreground wait. The harness delivers a `task-notification` automatically
-the moment a background agent finishes — that notification, not a manual
-check, is the signal to read the result and run the dependent step. Until it
-arrives, the orchestrator stays fully responsive: keep answering the user,
-keep dispatching other independent work, keep doing anything else that
-doesn't depend on the pending result. A background dispatch is "fire, stay
-unblocked, act on notification" — never "fire, then find some other way to
-wait."
-
-**Known failure mode — read this before typing `run_in_background: false`
-on a `verify-runner`/`reviewer`/`ci-watcher`/`board-keeper` call that isn't
-one of the two exceptions above.** The rationalization is always the same
-shape: "I can't commit/report/move on until I know whether this passed, so
-I'll just wait for it synchronously." That reasoning is explicitly rejected in the
-"Dispatch subagents in the background by default" paragraph above ("The next
-step depends on this result" does **not** justify `run_in_background:
-false`) — but it's easy to type the override anyway
-because it _feels_ like a real blocker in the moment, not a rationalization.
-It isn't: background dispatch means the harness resumes you on completion
-and you do the dependent step then — the ordering is identical either way.
-The only thing foreground costs you is the ability to answer the user while
-it runs, which is exactly the failure this note exists to prevent (a
-synchronous `reviewer` dispatch left no way to respond to a live user
-message until it returned, blocking a real conversation for no ordering
-benefit). Before setting `run_in_background: false` on anything, name which
-of the two exceptions above applies. If none does, the answer is `true`,
-full stop — do not reopen the "but I need the result" argument, it was
-already settled.
+`isolation: worktree` in its own frontmatter, and that line is load-bearing: a
+worktree-isolated session refuses every command whose working directory
+resolves back to the shared checkout, which is where a non-isolated subagent's
+Bash lands, so without it the dispatch makes zero board writes. Don't
+"simplify" the frontmatter by dropping it (`board-keeper.md` § "Why this agent
+carries `isolation: worktree`").
 
 ## The `@blog/ui` component index
 
 `packages/ui/COMPONENTS.md` is a generated index of every `@blog/ui` component
 — its purpose, props, and compound slots (`Header.Brand`, `PostCard.Media`, …)
 — produced by `scripts/gen-ui-index.mjs`. **Consult it before deciding a feature
-needs a new UI component:** it's the cheapest way to spot an existing component
-to reuse or extend, and the `explore`, `ui`, and `web` agents are pointed at it
-for the same reason (dispatch prompts can point there too). It's regenerated on
-staged `packages/ui` changes by the pre-commit hook and guarded in CI via
-`pnpm gen:ui-index:check` — drift (stale index), description coverage (every
-exported component/slot documented), and structural completeness (no component
-silently unindexed). Never hand-edit it; fix the source and regenerate. A future
-`apps/web` index would live alongside its code as `apps/web/COMPONENTS.md`.
+needs a new UI component:** it's the cheapest way to spot one to reuse or
+extend, and the `explore`, `ui` and `web` agents are pointed at it for the same
+reason. The pre-commit hook regenerates it on staged `packages/ui` changes, and
+`pnpm gen:ui-index:check` guards it in CI — drift, description coverage (every
+exported component/slot documented) and structural completeness (no component
+silently unindexed). Never hand-edit it; fix the source and regenerate.
 
 ## Use the skills
 
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).
 - `add-content-type` when a change spans more than one workspace.
 - `studio-schema-practices` when touching `packages/studio` schemas or migrations.
-- `react-component-practices` when writing or changing any React component
-  in `packages/ui`, `apps/web` or `apps/platform` — the shared rules the
-  layer skills below build on.
+- `react-component-practices` when writing or changing any React component in
+  `packages/ui`, `apps/web` or `apps/platform` — the shared rules the layer
+  skills below build on.
 - `ui-library-practices` when touching `packages/ui`.
 - `web-component-practices` when building or editing an interactive component in
   `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`
   with client state.
 - `platform-ui-practices` when building or changing any UI in `apps/platform`
-  — the admin design standard (type scale, cards, fields, spacing, states,
-  phones, copy), reusable blocks on Base UI, and the red flags to stop on.
-- `ui-storybook` when adding or editing stories in `packages/ui`.
-- `web-storybook` when adding or editing stories in `apps/web`.
+  — the admin design standard, reusable blocks on Base UI, and the red flags to
+  stop on.
+- `ui-storybook` / `web-storybook` when adding or editing stories in
+  `packages/ui` / `apps/web`.
 - `testing-practices` when adding/updating tests.
 - `seo-and-metadata` when changing routes, metadata, or feeds.
 - `code-review-practices` before every commit — applied by the `reviewer`
-  subagent at gate step 4 (see the delivery gate sequence below).
+  subagent at gate step 4.
 - `refactor-sweep` for an on-demand, layer-scoped cleanup audit (duplication,
-  dead code, convention drift) — no fixed cadence, run whenever asked, naming
-  the layer; surfaces findings as tracked issues rather than editing directly.
-- `open-pull-request` when shipping an issue: branch → work → PR → assign (push is human-gated).
-- `use-context7` before implementing against any library API you are not certain
-  of — resolves live, version-matched docs via the context7 MCP server. Use
-  whenever you hit a deprecation, an unfamiliar config format, or a CLI flag you
-  would otherwise guess at.
+  dead code, convention drift) — run when asked, naming the layer; it files
+  findings as issues rather than editing.
+- `open-pull-request` when shipping an issue: branch → work → PR (push and PR
+  are human-gated).
+- `use-context7` before implementing against any library API, config format or
+  CLI flag you are not certain of — live, version-matched docs instead of a
+  guess.
 - `superpowers:systematic-debugging` on any bug or failing test, before
   proposing a fix.
 - `superpowers:test-driven-development` for a bugfix: the owning layer agent
-  writes the failing regression test first, before the fix, then makes it
-  pass — pairs with this repo's own `testing-practices` for what a good test
-  looks like here. New-feature coverage instead comes from the `test-writer`
-  subagent's pass after implementation lands (`develop-feature` §3/§4); a
-  layer agent building new feature code does not pre-write its own tests.
+  writes the failing regression test first, then makes it pass. New-feature
+  coverage instead comes from the `test-writer` subagent's pass after
+  implementation lands (`develop-feature` §3/§4); a layer agent building new
+  feature code does not pre-write its own tests.
 - `superpowers:verification-before-completion` before any "done"/"fixed"/
-  "passing" claim — run the verification commands and confirm their output
-  first.
+  "passing" claim — run the verification commands and confirm their output.
 - `superpowers:writing-skills` when creating or editing anything under
   `.claude/skills/`.
-- `vercel:nextjs` for App Router / Server Components / Next.js API work in
-  `apps/web`.
-- `vercel:next-cache-components` for caching, ISR, or Partial Prerendering
-  work in `apps/web`.
+- `vercel:nextjs` and `vercel:next-cache-components` for App Router, Server
+  Component, caching, ISR or Partial Prerendering work in `apps/web`.
 - `vercel:react-best-practices` for performance work in `apps/web` or
-  `apps/platform` — request waterfalls, the RSC boundary, client bundle
-  size, re-renders. `react-component-practices` → "Vercel's React rules"
-  lists which of its rules apply and which this repo overrides.
+  `apps/platform` — `react-component-practices` → "Vercel's React rules" lists
+  which of its rules apply and which this repo overrides.
 - `vercel:deployments-cicd` when changing the deploy pipeline or
   `.github/workflows/` CI config.
 - `frontend-design:frontend-design` for visual design work in `packages/ui`
@@ -621,35 +507,25 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   - **Project-management state**: a `docs/superpowers/specs/*` or `plans/*`
     path, a roadmap phase, a `§4.2`-style section reference, an issue or PR
     number as narrative, or a "not wired up yet" note. Each is guaranteed to
-    become false — spec docs are deleted once shipped, phases get renumbered
-    mid-programme, and "nothing reads this yet" stops being true the moment
-    someone adds a caller, without the comment changing. All of it belongs in
-    the PR description, which is dated and discoverable via `git blame`. The
-    one exception is a `TODO:`/`FIXME:`, which may cite an issue number, in
-    its own comment block, because it points at open work rather than
-    narrating closed work.
+    become false; it belongs in the PR description, dated and discoverable via
+    `git blame`. The one exception is a `TODO:`/`FIXME:`, which may cite an
+    issue number, in its own comment block — it points at open work.
   - **The history or mechanism of a change.** State what is true now, not how
-    it came to be true. A comment that reads like a commit message is this
-    mistake: `basic-text-renderer.tsx` once explained how a link-resolution
-    bug had been fixed, when the fact a reader needed was simply that `url` is
-    already resolved for both link types.
+    it came to be true — a comment that reads like a commit message is this
+    mistake.
   - **A shared component's purpose tied to its first consumer.** `ActionGroup`
-    is general-purpose, but its doc comment described "a CTA module's
-    actions" — CTA is its first caller, not its scope. Describe the actual,
-    general contract.
+    is general-purpose, but its doc comment described "a CTA module's actions"
+    — CTA is its first caller, not its scope. Describe the general contract.
   - **Anything the name and signature already say.** "HeroProfileModule —
-    fetches module_heroProfile data and hands it to HeroProfileModuleView"
-    is the name, the return type and the one import, read back as prose. The
-    `Name — does X` form is banned outright: opening with the identifier is
-    the tell that what follows restates it. Same for "pure view for X", "the
-    web-side wiring for X", "renders nothing when …" — the `if` is right
-    there. **The test: if the comment could be regenerated from the name,
-    the parameter names and the return type, delete it.** This is the pattern
-    agents produce most, because every sibling already carries one.
-  - **A sibling's comment.** "Model on the nearest sibling" means its
-    structure and naming, never its comments — a sibling's doc block is
-    drift to delete, not a template to copy. Replicating it is how one
-    `XModule — fetches module_x` block became ten.
+    fetches module_heroProfile data and hands it to HeroProfileModuleView" is
+    the name, the return type and the one import, read back as prose. The
+    `Name — does X` form is banned outright, as are "pure view for X", "the
+    web-side wiring for X" and "renders nothing when …". **The test: if the
+    comment could be regenerated from the name, the parameter names and the
+    return type, delete it.** Agents produce this pattern most.
+  - **A sibling's comment.** "Model on the nearest sibling" means its structure
+    and naming, never its comments — a sibling's doc block is drift to delete,
+    not a template to copy.
 
   **The only comments allowed:**
 
@@ -659,11 +535,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
      a literal, so no route can import `CONTENT_ROUTE_REVALIDATE_SECONDS`).
   2. **A doc comment only where the name genuinely cannot carry the purpose**
      — one sentence, saying what it is _for_, above the export and nowhere
-     else. Not a default: a function or component with a descriptive name
-     gets none, and a name that needs a sentence to explain is usually the
-     thing to fix. Never how it works, and never which arguments or props it
-     reads; the type signature documents that and prose restating it goes
-     stale the moment a parameter changes.
+     else. A descriptive name gets none, and a name that needs a sentence is
+     usually the thing to fix. Never how it works or which arguments or props
+     it reads — the signature documents that.
 
   **The test, when you believe you have an exception — ask in order:**
 
@@ -678,192 +552,154 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 
   **This rule overrides "write code that reads like the surrounding code".**
   The repo's existing comment density is the drift being corrected, not the
-  standard to match. Nine `service` loaders repeating the same ISR tag-scope
-  rule in nine wordings are not permission to write a tenth.
-
-  **When you touch a file, delete the comments in it that fail the test — do
-  not shorten them.** A shortened comment that should not exist is still a
-  comment that should not exist; trimming is only for a comment that earns its
-  place but runs long. This is the steady-state mechanism: converging
-  file-by-file never collides with an open PR. The backlog it never caught up
-  with — measured 2026-09-19 at 673 doc blocks (421 of them four lines or
-  longer, 120 of the `Name — does X` form) and 671 line comments inside
-  function bodies, 13% of non-blank source — is cleared once by the
-  per-workspace sweep epic #3392 (`prio:later`, one `cloud-ok` ticket per
-  workspace, each pulled when that workspace has no PR in flight).
+  standard to match. **When you touch a file, delete the comments in it that
+  fail the test — do not shorten them**; trimming is only for a comment that
+  earns its place but runs long. Converging file by file is the steady-state
+  mechanism, and it never collides with an open PR.
 
 - All workspace source files live under `src/` within each package/app.
-  Exceptions: root-level config files required by their tool (`sanity.config.ts`,
-  `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the
-  package root.
+  Exceptions: root-level config files required by their tool
+  (`sanity.config.ts`, `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`,
+  etc.) stay at the package root.
 - **Absolute imports via per-workspace aliases.** Internal imports use the
   workspace's **own name** as the alias — `@blog/{pkg}/*` for packages
-  (`@blog/config`, `@blog/service`, `@blog/ui`), `@{app}/*` for apps
-  (`@web/*`, `@platform/*`). Same-directory `./` stays relative; **never**
+  (`@blog/config`, `@blog/service`, `@blog/ui`), `@{app}/*` for apps (`@web/*`,
+  `@platform/*`). Same-directory `./` stays relative; **never**
   parent-traversal `../`, and **never** a shared `#/`/`@/` (a shared prefix
   hijacks a dependency's identically-named alias across packages, and breaks
   the Turbopack build / cross-package type-check). Each workspace's
   `tsconfig.json` `paths` **and** `vitest.config.ts` alias declare its own
   alias **plus each dependency's** alias (e.g. `web` maps `@web`, `@blog/ui`,
   `@blog/service`, `@blog/config`). **When a workspace starts consuming a new
-  package, add that dependency's alias to the consumer's `tsconfig` + `vitest`**
-  — otherwise type-check/test/build fail. Unique per-workspace prefixes resolve
-  cleanly in tsc (`Bundler`), Next/Turbopack, Sanity's esbuild extract, and vitest.
+  package, add that dependency's alias to the consumer's `tsconfig` +
+  `vitest`** — otherwise type-check/test/build fail. Unique per-workspace
+  prefixes resolve cleanly in tsc (`Bundler`), Next/Turbopack, Sanity's esbuild
+  extract, and vitest.
 - TypeScript `strict`; no `any`. Server Components by default.
 - **Use `@blog/config`'s shared types; never spell one out by hand.** Write
-  `TMaybeUndefined<T>`, never `T | undefined` — in a prop, a return type, a
-  `useState` or a `createContext` alike. The same goes for `IWithClassName`,
+  `TMaybeUndefined<T>`, never `T | undefined`; `TMaybeNull<T>`, never
+  `T | null`; `TNullable<T>`, never `T | null | undefined` — in a prop, a
+  return type, a `useState` or a `createContext` alike. Derive a const's union
+  with `TValueOf<typeof C>` (`@blog/config/utils`), never
+  `(typeof C)[keyof typeof C]`. The same goes for `IWithClassName`,
   `IWithDataTestId`, `ILocalizedParams` and `ITenantLocalizedParams`. Before
-  writing a type, check `packages/config/src/types/` for one that already
-  says it, and add a missing one there rather than locally. Exempt are the
-  generated Sanity types and the workspaces below `@blog/config` in the
-  graph, which cannot import it: `@blog/utils`, `@blog/insight` and
-  `@blog/email`. The raw forms already in the repo are converted file by file
-  as each file is touched, the same steady-state rule as comments.
+  writing a type, check `packages/config/src/types/` for one that already says
+  it, and add a missing one there rather than locally. Exempt are the
+  generated Sanity types and the workspaces below `@blog/config` in the graph,
+  which cannot import it: `@blog/utils`, `@blog/insight` and `@blog/email`. The
+  raw forms already in the repo are converted file by file as each file is
+  touched, the same steady-state rule as comments. Where helpers and shared
+  constants live: `.claude/agents/config.md`.
+- **File size budgets, in non-blank lines:** a component `.tsx` 150, a hook
+  120, any other `.ts` 120. Exempt: `*-variants` files, registries and
+  catalogs (`icon-registry.ts`), Studio schema definitions, generated files,
+  tests and stories. A diff that touches an over-budget file extracts the part
+  it changes — not the whole file, and never as a sweep. Where the extracted
+  part goes in a React workspace: `react-component-practices` § Size and
+  splitting.
 - **Function style is decided per layer kind, and enforced by ESLint per
-  workspace.** The React layers export _values_ — a component is a const
-  holding a function — so `apps/web` and `packages/ui` use **arrow-function
-  consts** (`func-style: ['error', 'expression', { allowArrowFunctions: true }]`
-  in `configs/eslint/web.js`). `@blog/service` and `@blog/db` export
-  _operations_, where `export function getPostBySlug()` is the ordinary
-  Node/TypeScript idiom, so they keep **declarations**. The rule codifies what
-  the repo already looks like rather than imposing something new. Only
-  `apps/web`'s half is wired today; `apps/platform` (arrow) and `service`/`db`
-  (declaration) are tracked separately, so don't read an unenforced workspace
-  as licence to drift. The exceptions and the Next.js reserved-export carve-out
-  live in `.claude/agents/web.md` § "Function style".
-- **Key/value-pair consts are always both UPPERCASE** (key === uppercase value),
-  `as const`, and live in `@blog/config` (`constants/`). e.g.
+  workspace.** React layers export _values_ — a component is a const holding a
+  function — so they use **arrow-function consts**
+  (`func-style: ['error', 'expression', { allowArrowFunctions: true }]`).
+  `@blog/service`, `@blog/db` and `@blog/email` export _operations_, where
+  `export function getPostBySlug()` is the ordinary Node/TypeScript idiom, so
+  they keep **declarations**. Wired in `configs/eslint/`: `web.js`,
+  `platform.js` and `studio.js` (arrow); `service.js`, `db.js` and `email.js`
+  (declaration). `packages/ui` is arrow but not yet enforced — don't read that
+  as licence to drift. The exceptions and the Next.js reserved-export
+  carve-out: `.claude/agents/web.md` / `platform-app.md` § "Function style".
+- **Key/value-pair consts are always both UPPERCASE** (key === uppercase
+  value), `as const`, and live in `@blog/config` (`constants/`). e.g.
   `export const LINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
   The uppercase value is the stored/serialized value, so schema `options.list`
-  and migrations use it too; derive unions with `(typeof C)[keyof typeof C]`.
+  and migrations use it too; derive unions with `TValueOf<typeof C>`. Shape
+  and casing never change; two exceptions move only the home, both decided by
+  who reads the const — and a const a package reads never lives in an app:
 
-  **Two exceptions, both decided by who reads the const.**
+  - **An app's own vocabulary lives in that app.** A const read by exactly one
+    app and by no package lives in that app's `src/constants/`, one domain per
+    file, imported through the app's alias (`@platform/constants/preview` — the
+    preview mode and width only its preview frames read). The day a second
+    workspace needs one, it moves to `@blog/config` in the change that adds
+    that reader.
+  - **A storage layer's own vocabulary lives with that layer** — a const whose
+    values that layer persists, read _only_ by that layer and the app on top of
+    it; "only one app happens to use it today" is not enough. `@blog/db` owns
+    `TENANT_STATUS`, `TENANT_PLAN`, `MEMBERSHIP_ROLE`, `ADMIN_ROLE`,
+    `GRANTED_VIA` and `TENANT_PROVISIONING_*` on that basis.
 
-  **An app's own vocabulary lives in that app.** A const read by exactly one
-  app (`apps/web` or `apps/platform`) and by no package lives in that app's
-  `src/constants/`, one domain per file, imported through the app's alias
-  (`@platform/constants/preview`) — for example the platform's preview mode
-  and width, which only its preview frames read. The day a second
-  workspace needs one, it moves to `@blog/config` in the change that adds that
-  reader. Adopted 2026-10-10, after `@blog/config` had collected constants no
-  package and no other app ever read.
-
-  **A storage layer's own vocabulary lives with that layer** — a const whose
-  values that layer persists, read _only_ by that layer and the app on top of
-  it. Everything else stays in `@blog/config`, which remains the default.
-
-  `@blog/db` owns `TENANT_STATUS`, `TENANT_PLAN`, `MEMBERSHIP_ROLE`,
-  `ADMIN_ROLE`, `GRANTED_VIA` and `TENANT_PROVISIONING_*` on that basis.
-
-  **Reach is the test — not how the column is typed.** Those six are stored
-  three different ways (`pgEnum`, plain `text().$type<>()`, and a `jsonb` map
-  keyed by step) and it makes no difference. The counter-example is
-  `PRESET_ID` / `FONT_CHOICE` / `RADIUS_SCALE` / `DENSITY`: they _do_ back
-  `pgEnum` columns in `site-config.ts`, yet stay in `@blog/config` because
-  `packages/studio` reads all four and `apps/web` / `@blog/service` read some.
-  Backing a `pgEnum` neither qualifies a const nor disqualifies one.
-
-  **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` are a deliberate exception** and stay
-  in `@blog/config`. Only `db` and `apps/platform` read them today, so by reach
-  alone they would move — but auditing is a cross-cutting concern whose
-  vocabulary grows as more surfaces become auditable, and `audit_events`
-  stores both as plain `text().$type<>()` precisely so a new action never
-  needs a schema change. Pinning that vocabulary inside the storage layer
-  would put it behind the wrong door. Don't "fix" this by relocating them.
-
-  Where a const _does_ back a `pgEnum`, it and its column move together:
+  **Reach is the test — not how the column is typed.** Those six are stored as
+  a `pgEnum`, plain `text().$type<>()` and a `jsonb` map alike.
+  `PRESET_ID` / `FONT_CHOICE` / `RADIUS_SCALE` / `DENSITY` back `pgEnum`
+  columns in `site-config.ts` yet stay in `@blog/config`, because both apps
+  read all four and `packages/studio` reads `PRESET_ID`.
+  **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` deliberately stay in `@blog/config`**
+  although only `db` and `apps/platform` read them: auditing is cross-cutting,
+  its vocabulary grows as surfaces become auditable, and `audit_events` stores
+  both as plain text so a new action needs no schema change — don't relocate
+  them. Where a const _does_ back a `pgEnum`, it and its column move together:
   `Object.values(…)` builds the enum's value list, so reordering the const
-  silently reorders a Postgres enum. Confirm with `db:generate` that no
+  silently reorders a Postgres enum — confirm with `db:generate` that no
   migration appears.
-
-  Shape and casing rules are unchanged wherever a const lives; only the home
-  moves. For the storage-layer exception, "only one app happens to use it
-  today" is not enough — the layer has to be where the values are actually
-  persisted. A const a package reads never lives in an app.
 
 - `'use client'` never in `@blog/ui` (it stays pure and prop-driven). One
   component there, `Carousel`, is nonetheless client-only — it owns
   `useEmblaCarousel` — and carries no directive: the consumer declares the
-  boundary, the way `sanity-image`'s `SanityImage` works. The one
-  package that may carry it is `@blog/studio`, whose mount component is
-  irreducibly client-side; that exception is scoped to that component and does
-  not license the directive anywhere else in `packages/*`. In
-  `apps/web` it IS the right tool — add it at the _leaf boundary_ that
-  genuinely needs the client: React hooks (`useState`/`useEffect`), browser
-  APIs, event handlers, or wrapping a third-party component that uses hooks
-  internally (e.g. the `sanity-image` wrapper). Keep it as low in the tree as
-  possible, not on whole pages.
+  boundary, the way `sanity-image`'s `SanityImage` works. The one package that
+  may carry it is `@blog/studio`, whose mount component is irreducibly
+  client-side; that exception is scoped to that component and does not license
+  the directive anywhere else in `packages/*`. In `apps/web` it IS the right
+  tool — add it at the _leaf boundary_ that genuinely needs the client: React
+  hooks (`useState`/`useEffect`), browser APIs, event handlers, or wrapping a
+  third-party component that uses hooks internally (e.g. the `sanity-image`
+  wrapper). Keep it as low in the tree as possible, not on whole pages.
 - **Destructure a value into local bindings once, right after the point that
   settles its shape — then use those bindings, not repeated inline access.**
-  General practice, not just page components: whenever a function reads more
-  than one field of an object more than once — a fetched `service` result past
-  its null/`notFound` guard, a props object, a parsed config — destructure it
-  once near the top of the scope where the shape is settled, then reference
-  the local bindings for the rest of the function. Never repeat
-  `result.data.x`/`post.x`/`props.x` inline at each use site once the shape is
-  already known. Canonical case: a page/route component destructures its
-  fetched result right after the guard (`const { title, posts, currentPage,
-totalPages } = result.data;`) — but the same rule applies anywhere a shape
-  is read repeatedly. This keeps "we've already established this" visible in
-  one place instead of re-deriving or re-typing the same access path at every
-  usage.
-- **No bare `console.*` — log through the app's shared logger.** `apps/web`
-  and `apps/platform` each own one logger at `src/utils/logger/logger.ts`
-  (`createLogger({ service })` from `@blog/insight`); import it rather than
-  calling `createLogger` per module, or the `service` field that separates the
-  two apps' lines is lost. `service`, `db`, and `auth` never log at all —
-  they return the failure to the caller, and the app layer logs it once with
-  request context. The rule is declared as `no-console` in
-  `configs/eslint/base.js`, which also exempts tests; every other exemption is
-  layered in a per-workspace preset, because flat-config `files` globs resolve
-  against the consuming workspace and not the repo root — `insight.js` for the
-  logger itself, `db.js` for that package's `scripts/**` and
-  `drizzle.config.ts`, `web.js` for `e2e/**`, each being a place where stdout
-  _is_ the interface. Root and `packages/studio` scripts need no entry: they are
-  `.mjs`, outside the rule's `.ts`/`.tsx` scope.
-  Event names are static, lowercase and dot-namespaced; dynamic values go in
-  the context object, never interpolated into the name.
-  **Log the gap between what the user was told and what actually happened —
-  no gap, no log:** a specific, self-correctable message (a validation error,
-  a duplicate slug) is the whole truth and needs no line, while a deliberately
-  vague one hides the cause and must be logged. A `TResult` failure is not
-  automatically an `error` — branch on the `ERROR_CODE` and log only what a
-  human would act on. Full contract in `SPEC.md` §17.
+  Whenever a function reads more than one field of an object more than once —
+  a fetched `service` result past its null/`notFound` guard, a props object, a
+  parsed config — destructure it once near the top of the scope where the
+  shape is settled, and never repeat `result.data.x`/`post.x`/`props.x` inline
+  at each use site. Canonical case: a page/route component destructures its
+  fetched result right after the guard
+  (`const { title, posts, currentPage, totalPages } = result.data;`).
+- **No bare `console.*` — log through the app's shared logger** (see the
+  `@blog/insight` contract above; dropping it loses the `service` field that
+  separates the two apps' lines). `no-console` is declared in
+  `configs/eslint/base.js`, which exempts tests; each other exemption — the
+  logger itself, `@blog/db`'s `scripts/**` and `drizzle.config.ts`,
+  `apps/web`'s `e2e/**`, places where stdout _is_ the interface — lives in that
+  workspace's preset, because flat-config `files` globs resolve per consuming
+  workspace. Event names are static, lowercase and dot-namespaced; dynamic
+  values go in the context object, never into the name. **Log the gap between
+  what the user was told and what actually happened — no gap, no log:** a
+  specific, self-correctable message (a validation error, a duplicate slug) is
+  the whole truth and needs no line, while a deliberately vague one hides the
+  cause and must be logged. A `TResult` failure is not automatically an
+  `error` — branch on the `ERROR_CODE` and log only what a human would act on.
+  Full contract: `SPEC.md` §17.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass. A test file carries no
   comments at all — its `describe`/`it` titles are the documentation
-  (`testing-practices` → "What not to test").
-- **Never assert the source back at itself.** Declarative config (a field
-  list, an option list, a default), editor-facing copy (a `description`, a
-  label, a placeholder) and a `??` precedence are all the same mistake: the
-  expected value is a literal copied out of the file under test, so the only
-  change that can fail it is a deliberate edit. **A Tailwind class is the
-  same mistake, prop-driven or not** — `toHaveClass('hover:bg-…')` gated on
-  a prop is the variants map read back, and the case agents write most; the
-  `no-class-assertions` lint rule fails it in every `*.test.{ts,tsx}`, so a
-  styling-only change gets a story and `no-tests-needed`, never a test. **A
-  raw DOM query is the neighbouring mistake** — `container.querySelector`,
-  a node walk, queries destructured from `render()` — and
-  `testing-library/no-container`, `no-node-access` and
-  `prefer-screen-queries` fail those the same way, except a _chained_ walk
-  (`container.children[0]`), which only review catches; a roleless element gets
-  a fixed `data-testid` on the component and `screen.getByTestId`. **A
-  Studio schema definition gets no test at all** — not its validation,
-  limits, required, `hidden` or preview, which are the schema read back
-  too; only `schema-types/validation/`, the structure, input and preview
-  helpers, config, mount and migrations are tested there. One
-  rule, one home — `testing-practices` → "What not to test" and "Never drop
-  to a raw DOM query".
+  (`testing-practices` → "What not to test"). Test setup — `beforeEach`, render
+  helpers, `__mocks__/`, fixture builders — follows `testing-practices`.
+- **Never assert the source back at itself** — a field or option list, a
+  default, editor-facing copy, a `??` precedence, or a Tailwind class,
+  prop-driven or not (the `no-class-assertions` lint rule fails it): the
+  expected value is a literal copied from the file under test. A styling-only
+  change gets a story and `no-tests-needed`, never a test. Never drop to a raw
+  DOM query — a roleless element gets a fixed `data-testid` and
+  `screen.getByTestId`. A Studio schema definition gets no test at all. One
+  rule, one home: `testing-practices` → "What not to test" and "Never drop to
+  a raw DOM query".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.
-- **Never hand-edit the generated types.** `packages/config/src/sanity/generated/`
-  is deny-listed for Edit/MultiEdit/Write in `.claude/settings.json`, so an
-  attempt is blocked outright ("denied by your permission settings"). That is
-  not an obstacle to route around — a shell write (`echo >`, `sed -i`) is not
-  blocked, but it is still wrong: a hand-edit is silently undone by the next
-  `pnpm typegen` and caught by CI's typegen drift guard. If a generated type is
-  wrong, the **schema** in `packages/studio` is wrong — fix it there and regenerate.
+- **Never hand-edit the generated types.**
+  `packages/config/src/sanity/generated/` is deny-listed for
+  Edit/MultiEdit/Write in `.claude/settings.json`. That is not an obstacle to
+  route around: a shell write (`echo >`, `sed -i`) is not blocked but is still
+  wrong — the next `pnpm typegen` silently undoes it and CI's typegen drift
+  guard catches it. If a generated type is wrong, the **schema** in
+  `packages/studio` is wrong — fix it there and regenerate.
 - **Check for migrations.** Content is live in the `production` dataset, so any
   change that alters an _existing_ shape — renaming/removing/moving a field,
   renaming a `_type`, restructuring a document — orphans data unless existing
@@ -872,25 +708,25 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   documents/fields change, the `sanity/migrate` transform, dry-run → backup →
   human-gated run) — do not just change the schema. Additive, optional-only
   changes need no migration; say so explicitly. Use the tooling and workflow in
-  `packages/studio/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
-  Migrations against `production` are human-gated like `sanity deploy`.
+  `packages/studio/migrations/` (`README.md` +
+  `migrate:dry`/`migrate:run`/`dataset:export`). Migrations against
+  `production` are human-gated like `sanity deploy`.
 - **Check for `db` (Neon/Drizzle) migrations too.** Any change to a
   `packages/db/src/schema/*.ts` table needs a generated migration — a schema
-  edit never touches existing rows by itself. Workflow: `db:generate`
-  (produces the reviewable SQL diff — this step _is_ the dry-run, since
-  drizzle-kit never touches the database at generate time) → back up the
-  shared/production Neon branch first → human-gated apply, same production
-  gate as Sanity's. Full mechanism in `.claude/agents/db.md`'s "Migrations"
-  section. Never hand-edit a migration file once it has been applied
-  anywhere shared (dev or prod) — write a new corrective migration instead.
+  edit never touches existing rows by itself. Workflow: `db:generate` (the
+  reviewable SQL diff — this step _is_ the dry-run, since drizzle-kit never
+  touches the database at generate time) → back up the shared/production Neon
+  branch first → human-gated apply, same production gate as Sanity's. Full
+  mechanism in `.claude/agents/db.md`'s "Migrations" section. Never hand-edit a
+  migration file once it has been applied anywhere shared (dev or prod) —
+  write a new corrective migration instead.
 - **Check for Voice candidates.** Every visible string in the public site's
-  catalog (`packages/config/src/voice/site-messages.*.json`) sits on one of
-  two lists. `VOICE_FIELDS` strings are tenant-editable, per language, in
-  the platform's Voice page. `VOICE_FIXED_KEYS` strings are fixed and
-  translated by us. Which list a new or reworded string joins is the
-  **user's** decision, put to them in the plan's **Copy** line ("Say what it
-  touches before starting"). Neither the orchestrator nor a layer agent
-  settles it.
+  catalog (`packages/config/src/voice/site-messages.*.json`) sits on one of two
+  lists. `VOICE_FIELDS` strings are tenant-editable, per language, in the
+  platform's Voice page. `VOICE_FIXED_KEYS` strings are fixed and translated
+  by us. Which list a new or reworded string joins is the **user's** decision,
+  put to them in the plan's **Copy** line ("Say what it touches before
+  starting"). Neither the orchestrator nor a layer agent settles it.
   - Recommend Voice for page-level prose an editor writes in the site's own
     voice: an empty state, or the heading or supporting text of a page like
     the 404 or error page.
@@ -914,202 +750,139 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   `check:migration-index`, `gen:ui-index:check`), so it stops at the first
   failure and mirrors every required or gating CI check that has a local
   equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
-  part of the local loop — CI's `ci.yml` `build` job gates every PR; only
-  reproduce it locally when diagnosing an actual CI build failure
+  part of the local loop — CI's `ci.yml` `build` job gates every PR; reproduce
+  it locally only when diagnosing an actual CI build failure
   (`open-pull-request` Gate 5a).
-- **Edit-time format + lint feedback:** one checked-in `PostToolUse` hook
-  (`.claude/hooks/post-edit.sh`, which feeds the same stdin payload to
-  `post-edit-prettier.sh` then `post-edit-lint.sh` — a single entry in
-  `.claude/settings.json` since matching hooks otherwise run in parallel,
-  and a wrapper rather than an `&&` chain since the first script's stdin
-  read would starve the second) formats every edited/written file with
-  Prettier, then lints every `.ts`/`.tsx` file on the formatted content from
-  its own workspace and feeds errors — including layer-boundary violations —
-  straight back to the agent in the same turn, in a few seconds. Prettier
-  is silent and always exits 0 (formatting, not review); lint stays
-  report-only (never `--fix`); commit-time gates stay authoritative — and
-  lint-staged's ESLint pass is report-only as well, so a commit never
-  changes content beyond Prettier formatting and the reviewed diff is the
-  committed diff.
-- **Conventional commits, one concern per PR — mechanically enforced.**
-  `.husky/commit-msg` runs commitlint (`commitlint.config.mjs`) on every
-  local commit — the only place this is enforced, so a commit that bypasses
-  the hook (`--no-verify`, the GitHub web UI, a clone where `pnpm install`
-  has not yet run) is not caught anywhere else. Allowed types:
-  config-conventional's defaults (`build`, `chore`, `ci`, `docs`, `feat`,
-  `fix`, `perf`, `refactor`, `revert`, `style`, `test`) plus this repo's own
-  `tooling`; scope is free-form (component/area name) but must be
-  lower-case. Merge commits
-  (local or `Merge pull request #…`) are explicitly skipped; Dependabot's
-  `chore(deps): …` messages are not separately exempted — they pass because
-  they're already conventional.
+- **Edit-time format + lint feedback.** The checked-in `PostToolUse` hook
+  `.claude/hooks/post-edit.sh` feeds each edited/written file to
+  `post-edit-prettier.sh` then `post-edit-lint.sh`: Prettier formats it
+  (silent, always exits 0), then every `.ts`/`.tsx` file is linted from its own
+  workspace and errors — layer-boundary violations included — come straight
+  back to the agent in the same turn. Lint stays report-only (never `--fix`),
+  as does lint-staged's ESLint pass, so a commit never changes content beyond
+  Prettier formatting and the reviewed diff is the committed diff; commit-time
+  gates stay authoritative. Why it is one wrapper and not two hooks or an `&&`
+  chain: `docs/context/claude-code.md`.
+- **Conventional commits, one concern per PR.** `.husky/commit-msg` runs
+  commitlint (`commitlint.config.mjs`) on every local commit — the only
+  enforcement, so a commit that bypasses the hook (`--no-verify`, the GitHub
+  web UI, a clone where `pnpm install` has not run) is caught nowhere else.
+  Allowed types: config-conventional's defaults (`build`, `chore`, `ci`,
+  `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`) plus
+  this repo's `tooling`; scope is free-form (component/area name) but
+  lower-case. Merge commits are skipped; Dependabot's `chore(deps): …` passes
+  because it is already conventional.
 - **A PR body is a highlight list — 12 lines and 1200 characters, hard cap.**
-  One line of what this makes possible, one line per layer touched,
+  One line of what this makes possible, one line per layer touched, on the
+  completing PR the manual-test issue link (never with a closing keyword), and
   `Closes #<n>`. No code blocks, no per-file or per-function enumeration, no
   design-rationale sections, and **no test-plan checklist** — the gates already
-  require the checks to pass before commit and CI re-runs them on the PR, so a
-  hand-ticked copy proves nothing. Full contract and the exception list in
-  `open-pull-request`'s "PR body template" section.
-- **Per-layer PRs are required, not preferred** — see "Planning work — mandatory,
-  not advisory" above, which governs; this bullet carries the mechanics.
-  Split a multi-layer feature into separate PRs per
-  layer (`config → studio → service → ui → web` when config changes are involved,
-  otherwise `studio → service → ui → web`; dependency order) so each review stays
-  small and focused, **and ship them one at a time: a layer's PR is merged
-  before the next layer's work starts** ("One layer at a time" above). The
-  next layer branches from the `main` that contains the previous one. Never
-  branch it from the open PR — that is a stack, which only the user calls
-  for. **Split only when each layer's PR merges to `main` green
-  on its own** (typically additive changes). Keep it a single PR when a partial
-  merge would break the build — e.g. renaming a shared `_type` or generated
-  type that downstream consumes reds `type-check` until every layer lands.
-  **Only the completing PR includes `Closes #<n>`** — earlier layer PRs
-  reference the issue without an adjacent closing keyword (GitHub auto-closes
-  on the literal substring regardless of tense). See `open-pull-request`'s
-  "Scope: prefer per-layer PRs" and "PR body template" sections for the exact
-  wording rule and the board-Status gotcha if an issue is auto-closed
-  prematurely.
+  require the checks to pass and CI re-runs them, so a hand-ticked copy proves
+  nothing. Full contract: `open-pull-request` § "PR body template".
+- **Per-layer PRs are required** ("Planning work — mandatory, not advisory"
+  governs). **Only the completing PR includes `Closes #<n>`** — earlier layer
+  PRs reference the issue without an adjacent closing keyword, because GitHub
+  auto-closes on the literal substring regardless of tense. Exact wording rule
+  and the board-Status gotcha when an issue is auto-closed early:
+  `open-pull-request` § "Scope: prefer per-layer PRs" and "PR body template".
+- **Stacked PRs — only when the user asks, and then use `gh stack`.** The
+  orchestrator never opens a stack on its own initiative. When the user says
+  to, use the installed `github/gh-stack` extension (`init` / `add` / `submit`
+  / `sync`) rather than hand-rolling bases with `gh pr create --base`; `sync`
+  restacks when a lower PR merges, the step most easily forgotten by hand. A
+  stacked PR targets its predecessor, so intermediate states never land on
+  `main` — which relaxes "must merge green alone" **for every PR except the
+  bottom one**.
 
-- **Stacked PRs — only when the user asks, and then use `gh stack`.** A
-  stack is not the default way to ship a multi-layer feature; the default is
-  one layer merged before the next starts ("One layer at a time" above). The
-  orchestrator never opens a stack on its own initiative — it stacks when the
-  user says to. When they do, the `github/gh-stack`
-  extension is installed; use it (`init` / `add` / `submit` / `sync`) rather
-  than hand-rolling bases with `gh pr create --base`. `sync` restacks
-  automatically when a lower PR merges, which is the step most easily
-  forgotten by hand. A stacked PR targets its predecessor rather than `main`,
-  so intermediate states never land on `main` — which relaxes the "must merge
-  green alone" constraint above **for every PR except the bottom one**.
+  **The bottom PR decides whether the stack is viable.** It targets `main` and
+  inherits its ruleset in full, so a first layer that cannot compile alone
+  leaves the whole stack permanently `BLOCKED`. A rename-plus-consumers change
+  is stackable only if restructured expand/contract (add the new field, migrate
+  consumers above it, delete the old field last); otherwise it stays one PR.
+  Full mechanics — required-check triggers, collapsing a stack:
+  `open-pull-request` § "Stacked PRs".
 
-  **The bottom PR is the exception, and it is the one that decides whether
-  the stack is viable at all.** It targets `main`, so it inherits `main`'s
-  ruleset in full, required `Type-check` and `Build` included. A first layer
-  that cannot compile on its own therefore leaves the entire stack
-  permanently `BLOCKED` rather than merely red — nothing above it can merge,
-  because the bottom never can. That is what happened to the align-hoist
-  stack (#2689 → #2690 → #2691): the studio PR removed a field the service
-  layer still read, and had to be collapsed back into a single PR after the
-  fact.
-
-  So a rename-plus-consumers change is stackable only if its **bottom** PR is
-  green alone. Two ways to get there: keep it one PR (what the rule above
-  already prescribes), or restructure expand/contract so the bottom is purely
-  additive — add the new field, migrate the consumers in the PRs above it,
-  and delete the old field in a final PR. Absent one of those, the split buys
-  nothing and costs a rework.
-
-  **A stacked PR runs the full required suite, and that is load-bearing.**
-  All six workflows carrying required checks — `ci.yml`, `knip.yml`,
-  `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `hooks.yml` —
-  declare their `pull_request:` trigger with no `branches:`
-  filter, so a PR reports its checks whatever it is based on. Keep it that
-  way: each file scopes its own trigger, so re-adding `branches: [main]` to
-  any one of them silently removes that workflow's checks from every stacked
-  PR, and a _required_ check that never starts leaves the PR `BLOCKED`
-  forever instead of failing it. Stack only when a later PR genuinely cannot
-  compile without an earlier one; independent work gets its own branch off
-  `main` and avoids the restacking entirely. Full mechanics in
-  `open-pull-request`'s "Stacked PRs" section.
-
-  **Retargeting a PR's base does not re-run its checks — and CodeQL will be
-  missing entirely.** When a stack has to be collapsed, `gh pr edit --base
-main` fires no workflow. CodeQL runs here through GitHub's _default setup_
-  (there is no `codeql.yml`), which only analyzes PRs into the default
-  branch, so a PR that was previously based on a stack branch has none of its
-  three required contexts — `CodeQL`, `Analyze (actions)`,
-  `Analyze (javascript-typescript)` — and sits `BLOCKED` on checks that never
-  start. Closing and reopening does not trigger them either. Only a
-  `synchronize` does, i.e. a push to the head branch; `gh pr update-branch`
-  is the cleanest one, since it also clears any staleness against `main`.
-
-- **Spec sync:** any PR that changes architecture, layer contracts, env vars,
-  or the content model updates `SPEC.md` in the same PR.
+- **Spec sync:** a PR that changes architecture, layer contracts, data flow,
+  env vars or a cross-cutting rule updates `SPEC.md` — the architecture core —
+  in the same PR. A content-model change updates its feature page, plus any
+  `SPEC.md` §6 entry that still describes that shape.
+- **Feature docs:** `docs/features/<feature>.md` is the per-feature reference —
+  what it does, surfaces and routes, data (Sanity documents, Neon tables),
+  configuration and plan gating, constraints and invariants, dependencies,
+  entry points, tests and stories, related epics. A PR that changes a
+  feature's behaviour updates its page in the same PR; a feature with no page
+  yet gets one when a PR first changes it — on touch, never as a sweep. Every
+  ticket's `## Scope` carries a `Feature doc:` line.
 - **Design-doc retention:** a `docs/superpowers/specs/*`/`plans/*` doc is
-  "done" once its PR(s) merged **and** `SPEC.md` reflects the final shape —
-  **delete** it (both the spec and its paired plan, if one exists) in the
-  same PR that does that `SPEC.md` sync. `SPEC.md` is the durable record of
-  final behavior; a design doc's job ends once its decisions are reflected
-  there, so it doesn't linger as a second, driftable copy. See
-  `docs/README.md` for the live index.
+  "done" once its PR(s) merged **and** its final shape is in the feature page —
+  **delete** it, with its paired plan, in the PR that does that sync. The
+  design retires into its feature page, not into `SPEC.md`, which takes only
+  the architecture-core changes ("Spec sync"); it never lingers as a second,
+  driftable copy. `docs/README.md` is the live index; `docs/archive/` is frozen
+  — add nothing to it.
 
-  **A doc may also be retired early, before its work ships,** when the epic
-  it belongs to has been cut into self-contained tickets and the doc has
-  become a second copy of them. Move the cross-cutting shape (the parts no
-  single ticket owns) into the **epic issue body**, repoint every ticket and
-  every sibling doc at the epic, and delete the doc in that same change. The
-  epic body then states plainly that it is the design of record and that the
-  `SPEC.md` sync is owed by the epic's final PR — `SPEC.md` still only ever
-  describes built behaviour, so it is not written ahead of the work. Adopted
-  2026-09-09 for the page-composition epic (#2943), after the doc and its
-  tickets drifted apart repeatedly within one session; the drift, not the
-  doc's age, is the trigger. (Superseded 2026-07-27: earlier
-  revisions of this rule archived shipped docs into
-  `docs/archive/superpowers/{specs,plans}/` instead of deleting them — that
-  bucket is now frozen history, not an active destination; do not add new
-  entries to it.)
+  **A doc may also be retired early, before its work ships,** when its epic has
+  been cut into self-contained tickets and the doc has become a second copy of
+  them — the drift, not the doc's age, is the trigger. Move the cross-cutting
+  shape (the parts no single ticket owns) into the **epic issue body**, repoint
+  every ticket and sibling doc at the epic, and delete the doc in that same
+  change. The epic body then states that it is the design of record and that
+  the feature-page sync is owed by the epic's final PR — feature pages and
+  `SPEC.md` describe only built behaviour, so neither is written ahead of the
+  work.
 
-- **Docs sync:** [`docs/context/ci-automation.md`](docs/context/ci-automation.md)
-  documents every workflow in
-  `.github/workflows/` and the required status checks — a PR that adds or
-  changes a workflow updates that file in the same PR. Likewise a PR that
-  changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
-  [`docs/context/claude-code.md`](docs/context/claude-code.md).
+- **Docs sync:** a PR that adds or changes a workflow in `.github/workflows/`
+  or a required status check updates `docs/context/ci-automation.md` in the
+  same PR; a PR that changes agent tooling (`.claude/` hooks, agents, skills,
+  settings) updates `docs/context/claude-code.md`.
 - `.claude/skills/` is the single home for skills — edit one copy, no mirror.
 - **A rule added to a skill or agent guide for one app covers the other
-  too.** `apps/web` and `apps/platform` share every convention unless the
-  guide names a reason one of them differs (platform has no `modules/`, no
-  page builder, no SEO surface). When a rule lands in `web.md`, check
-  `platform-app.md` states the same thing, and the reverse. The same goes
-  for a shared skill whose examples name only one app.
+  too.** `apps/web` and `apps/platform` share every convention unless the guide
+  names a reason one of them differs (platform has no `modules/`, no page
+  builder, no SEO surface). When a rule lands in `web.md`, check
+  `platform-app.md` states the same thing, and the reverse. The same goes for a
+  shared skill whose examples name only one app.
 
 ## Reporting to the user
 
-**Default shape of a chat message: the outcome first, then at most a handful
-of lines.** Roughly 8 lines of prose is the budget for a routine status
-update; a genuinely complex decision can run longer, but it has to earn every
-line past that. The progress table the user asks for after each unit of work
-is exempt from the budget — it is the requested format, not prose.
+**Default shape of a chat message: the outcome first, then at most a handful of
+lines.** Roughly 8 lines of prose is the budget for a routine status update; a
+genuinely complex decision can run longer, but it has to earn every line past
+that. The progress table the user asks for after each unit of work is exempt —
+it is the requested format, not prose.
 
 **Six things bloat these messages. None of them are information the user
 lacks:**
 
 - **Restating a subagent's report.** The orchestrator's job is the
   _conclusion_ — "#2987 landed, service green" — not a prose retelling of what
-  the agent said it did. Never paraphrase a report section by section.
+  the agent said it did.
 - **Verification statistics.** "135 files / 730 tests, type-check green across
-  all 11 tasks, all three greps zero" is one word to the reader: green. Give
-  the numbers only when something failed, or when the user asked for them.
-- **Narrating abandoned paths and internal reasoning.** "I abandoned
-  55eb160cb rather than resolving its conflict — it was written against the
-  pre-#3001 shape…" describes work the user never sees and cannot act on.
-  Report the state that exists now.
+  all 11 tasks" is one word to the reader: green. Give numbers only when
+  something failed, or when the user asked for them.
+- **Narrating abandoned paths and internal reasoning.** Work the user never
+  sees and cannot act on. Report the state that exists now.
 - **Self-assessment and blame attribution.** "That came from my dispatch",
-  "it's my fault rather than its judgment", "that's the right behaviour" — the
-  user needs the decision, not a review of how it arose.
-- **Repeating unchanged state.** Board status, epic counts, and remaining
-  sub-issue lists get one mention when they _change_. Re-printing "epic #2943
-  In Progress with 8 sub-issues left" in consecutive messages is noise.
+  "that's the right behaviour" — the user needs the decision, not a review of
+  how it arose.
+- **Repeating unchanged state.** Board status, epic counts and remaining
+  sub-issue lists get one mention when they _change_.
 - **Bundling an unrelated ask into a status update.** A stray "also, should I
-  delete this label?" buried under a report either gets missed or derails the
-  thread. Hold it, or ask it on its own.
+  delete this label?" buried under a report gets missed or derails the thread.
+  Hold it, or ask it on its own.
 
 ### Reporting epic status
 
 **One format answers both triggers** — a PR on a tracked epic merging, and the
 user asking where an epic stands ("epic status", "where are we on #2943?",
-"what's left"). Same table either way; the only difference is the opening
-sentence, which names the merge when there was one and is dropped when there
-wasn't.
+"what's left"). Same table either way; the opening sentence names the merge
+when there was one and is dropped when there wasn't.
 
 **The report is exactly:** that sentence, then **one table** carrying every
-open ticket in the epic, grouped into three lanes by a band row. Nothing else
-— no board recap, no verification statistics, no retelling of the
-`board-keeper` report.
-
-Before answering a status question, dispatch `board-keeper` first (per "Board
-reconciliation" below, which already calls for this) so the table is built from
-a reconciled board rather than a stale one.
+open ticket in the epic, grouped into three lanes by a band row. Nothing else —
+no board recap, no verification statistics, no retelling of the `board-keeper`
+report. Before answering a status question, dispatch `board-keeper` first
+("Board reconciliation" below) so the table is built from a reconciled board.
 
 ```
 #2975 merged — the home page can now open with a heading instead of a hero.
@@ -1128,65 +901,37 @@ a reconciled board rather than a stale one.
 ```
 
 **Mark a 🔵 row `⛓ stack on <#>` when it can ride a `gh stack` on the row above
-it; leave it unmarked when it cannot.** The 🔵 lane is where stacking gets
-decided, because it is by definition the lane of tickets that depend on another
-— but dependency alone does not make a chain stackable. The test is the one in
-"Stacked PRs" below: the **bottom** PR targets `main` and must be green there
-on its own, so a chain whose first link cannot compile alone is sequential, and
-marking it `⛓` sends the whole stack into a permanent `BLOCKED` state. The
-marker is an offer to the user, not a plan: an unmarked or marked 🔵 row alike
-ships sequentially, merged before the next, unless the user says to stack it
-("One layer at a time" above).
+it.** Dependency alone does not make a chain stackable: the **bottom** PR must
+be green on `main` alone ("Stacked PRs"), so 2988 above — a rename that reds
+`type-check` until every consumer lands — is unmarked. A `⛓` is a compile
+claim, and an offer to the user, not a plan: marked or not, a 🔵 row ships
+sequentially unless the user says to stack it.
 
-That is why 2988 above is unmarked — a repo-wide rename reds `type-check` until
-every consumer lands, so it is one PR that waits, not a stack bottom. A `⛓`
-claim is a compile claim; hold it to the same "derive it, don't guess" standard
-as a `blocks` claim.
+**Lane order is fixed: 🟢 done, 🟡 parallel now, 🔵 next in order** — the
+actionable lane above the queue behind it, and within 🔵 a blocker above what it
+blocks. **The `Scope` column makes the 🟡 lane checkable:** tickets scoped `web`
+are parallel-safe only as separate files, so a 🟡 lane whose rows share a scope
+_and_ a file is a bug in the report. **Every dependency claim is derived** from
+what the tickets touch — a shared file, a renamed symbol, a consumed type — never
+from issue-number order; when unclear, say they are unordered, because a wrong
+"blocks" sends a parallel dispatch into a collision.
 
-**Lane order is fixed: 🟢 done, 🟡 parallel now, 🔵 next in order.** Parallel
-sits above next-in-order because it is the actionable lane — what can be
-dispatched this minute — while 🔵 is the queue behind it. Within 🔵, a blocker
-comes above what it blocks, so the lane reads top-down as the order to work in.
-
-**The `Scope` column is not decoration.** It is what makes the 🟡 lane
-checkable rather than asserted: six tickets all scoped `web` are parallel-safe
-only because they are separate files in the same layer, and seeing that stated
-is what prompts the check. A 🟡 lane whose rows share a scope _and_ a file is a
-bug in the report.
-
-**The three markers are the colour.** Terminal markdown has no colour
-primitive, raw ANSI escapes are not rendered, and neither is raw HTML — so
-`<td colspan>` is not available and a band row is a normal row with its label
-in the first cell and the rest empty. That is the closest achievable to a
-merged cell; don't reach for HTML to improve it, it renders as literal tags.
-Never substitute other emoji — the same mark must mean the same thing every
-time.
-
-**Why solid discs and not pictographs.** The obvious picks — `✅` done, `🔜`
-next, `⚡` parallel — fail on a dark terminal: `🔜` in particular is a dark
-navy glyph that all but disappears on black. The filled circles are one shape
-in three saturated hues, so they read at the same strength on any background
-and the only thing distinguishing them is the colour, which is the entire
-point. Don't "improve" them back into pictographs.
-
-**The dependency claim has to be real.** Derive it from what the tickets
-actually touch — a shared file, a renamed symbol, a type one consumes from the
-other — not from issue-number order or a guess. If two tickets' relationship
-is genuinely unclear, say they are unordered rather than inventing a sequence;
-a wrong "blocks" sends a parallel dispatch into a collision.
+**The three markers are the colour — never substitute other emoji.** Terminal
+markdown renders no colour, ANSI escapes or HTML, so a band row is a normal row
+with its label in the first cell and the rest empty (`<td colspan>` renders as
+literal tags). Solid discs, not pictographs: a glyph like `🔜` all but vanishes
+on a dark terminal, while one shape in three saturated hues reads the same on
+any background.
 
 **This table _is_ the progress table** the user asks for after each unit of
-work, in its epic-merge form — not a second artefact alongside it. Regenerate
-it live from `gh` every time; a pasted snapshot from an earlier turn is exactly
-the staleness the table exists to prevent.
+work. Regenerate it live from `gh` every time — a pasted snapshot from an
+earlier turn is exactly the staleness it exists to prevent.
 
 ### Asking the user a question
 
 **When a decision genuinely needs the user, ask it as a question — not as a
-brief.** State the recommendation first, then the single fact that could
-change it, then the question. A paragraph headed "the case for X" followed by
-a paragraph headed "the case for Y" is a memo the user has to read to extract a
-yes/no from; three lines get the same answer:
+brief.** State the recommendation first, then the single fact that could change
+it, then the question:
 
 ```
 I'd apply it to all five call sites — the other four are byte-identical and
@@ -1194,9 +939,9 @@ behaviour-preserving. Cost is four extra files on a prio:later ticket.
 All five, or home only?
 ```
 
-This does not license withholding a real tension — the "don't let a subagent
-silently resolve an ambiguity" rule above still stands, and surfacing one is
-mandatory. It governs the _length_ of the surfacing, not whether it happens.
+This does not license withholding a real tension — surfacing one stays
+mandatory ("Mid-task decisions" above). It governs the _length_ of the
+surfacing, not whether it happens.
 
 **One question per message.** If two decisions are pending, ask the blocking
 one and hold the other until it is answered.
@@ -1209,44 +954,34 @@ line look identical once they scroll past:
   if it turns out wrong.
 - ⬜ **Whenever** — a preference or a tidy-up; answering late costs nothing.
 
-Squares, not the discs the status lanes use — a 🟦 beside a 🔵 is the same hue
-in a near-identical shape and the two systems blur at terminal size. Red and
-orange are unused by the lanes, and white reads as neutral, so a question mark
-can never be mistaken for a status lane. Three levels is the whole scale: the
-only distinction that changes what the user does is whether they must answer
-now, before the next dispatch, or never really.
-
-**🟥 means work actually stops.** If the work carried on regardless, the
-question was not blocking — label it 🟧 and name the assumption. Mislabelling
-is how a glyph becomes decoration.
+Squares, not the status lanes' discs, so the two systems never blur at terminal
+size; red and orange are unused by the lanes. **🟥 means work actually stops.**
+If the work carried on regardless, the question was not blocking — label it 🟧
+and name the assumption.
 
 ### An open question is carried, not dropped
 
-A question asked once and then buried under later messages is worse than a
-verbose report: the work continues on an assumption the user never confirmed,
-and nothing on screen shows that it is outstanding. So until it is answered:
+A question asked once and then buried under later messages lets work continue
+on an assumption the user never confirmed, with nothing on screen showing it is
+outstanding. So until it is answered:
 
 - **Restate it as the last line of every message**, in one line, with its
-  glyph. Last line specifically — that is what sits directly above the user's
-  input box, and a question in the middle of a report is the one that gets
-  lost.
+  glyph — the last line is what sits directly above the user's input box.
 - **Never resolve it by picking the best option.** A reply that addresses
-  something else is not an answer to it; it stays open and stays carried. (The
-  standing rule against silently settling an ambiguity is what this enforces —
-  the carry line is what makes a breach visible rather than silent.)
-- **If work continued past it, say what was assumed** in that same restatement,
-  and whether the assumption is still cheap to reverse.
-- **Drop the carry line only when the user actually answers it**, or explicitly
-  waves it away. Nothing else clears it — not a topic change, not a new
-  instruction, not the question becoming awkward to keep repeating.
+  something else is not an answer; it stays open and stays carried.
+- **If work continued past it, say what was assumed** in that same
+  restatement, and whether the assumption is still cheap to reverse.
+- **Drop the carry line only when the user actually answers it**, or
+  explicitly waves it away — not on a topic change, a new instruction, or the
+  question becoming awkward to repeat.
 
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
-Every issue follows this exact order. **Committing is free (no approval needed); stop and wait for explicit user approval at the push and PR gates.**
-(In a solo cloud session, steps 1 and 7's board writes and step 4's
-`reviewer` dispatch are replaced as "Solo-session mode" under "Ticket
-priority & triage" describes — every other step, including both approval
-gates, is unchanged.)
+Every issue follows this exact order. **Committing is free (no approval
+needed); stop and wait for explicit user approval at the push and PR gates.**
+(In a solo cloud session, steps 1 and 7's board writes and step 4's `reviewer`
+dispatch are replaced as "Solo-session mode" describes — every other step,
+including both approval gates, is unchanged.)
 
 1. Set issue → In Progress on the board
 2. Checkout branch from `main`
@@ -1254,192 +989,128 @@ gates, is unchanged.)
    (`develop-feature` §5).
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
    full diff — fix blocking findings and re-dispatch until it returns
-   `APPROVE`. Never **push** without an `APPROVE` on the diff as it
-   stands; new changes invalidate a prior `APPROVE`, including a later merge
-   from `origin/main`.
+   `APPROVE`. Never **push** without an `APPROVE` on the diff as it stands; new
+   changes invalidate a prior `APPROVE`, including a later merge from
+   `origin/main`.
 
-   **A docs-only diff skips the `reviewer` and gets an inline identifier
-   check instead.** When the diff touches nothing outside `docs/**`,
-   `SPEC.md`, `README.md`, `CLAUDE.md` and `.claude/**/*.md`, the code-review
-   checklist has nothing to apply and the dispatch costs ~10 minutes and
-   ~150k tokens to re-derive context the orchestrator already holds. This
-   scope is deliberately narrower than "everything under `.claude/`" — a
-   `.sh`/`.js` file there (a hook, a guard script) is executable tooling
-   that drives every dispatch, not prose, and gets a `reviewer` dispatch
-   like any other code change; `.claude/hooks/**` and `scripts/*.sh` changes
-   also need the local `shellcheck` + guard-test pass in `develop-feature`
-   §5 before commit. What
-   those reviews actually caught — a fragment name that does not exist, a
-   helper cited by its pre-rename name, two copies of a decision that
-   disagree — is an identifier cross-check, so do that by hand before
-   committing: grep every code identifier, path and issue number the diff
-   names against `origin/main` and `gh`, and re-read any sibling doc the
-   change duplicates a decision into (`docs/BACKLOG.md`, an epic body).
-   State in the push ask that the diff was docs-only and identifier-checked.
-   Adopted 2026-09-16 after three spec reviews in one session, each ~10
-   minutes, whose only findings were of that kind.
+   **A docs-only diff skips the `reviewer` and gets an inline identifier check
+   instead.** Docs-only means nothing outside `docs/**`, `SPEC.md`,
+   `README.md`, `CLAUDE.md` and `.claude/**/*.md` — a `.sh`/`.js` file under
+   `.claude/` (a hook, a guard script) is executable tooling and gets a
+   `reviewer` like any code change, and `.claude/hooks/**` and `scripts/*.sh`
+   changes also need the local `shellcheck` + guard-test pass
+   (`develop-feature` §5). Identifier mismatches are all a docs review ever
+   catches, at ~10 minutes and ~150k tokens a dispatch, so check them by hand
+   before committing: grep every code identifier, path and issue number the
+   diff names against `origin/main` and `gh`, and re-read any sibling doc the
+   change duplicates a decision into (a feature page, `docs/BACKLOG.md`, an
+   epic body). State in the push ask that the diff was docs-only and
+   identifier-checked.
 
 5. **Commit** the reviewed work — no approval needed; committing is free (local
    and reversible). Don't push it yet.
-6. **Ask to push** — explicit approval required; separate question; wait for answer
-7. **Ask to open PR** — separate question, after push; wait for answer.
-   Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
-   on the board, and tag the PR `job:<session-name>` so concurrently running
-   background jobs stay tellable apart in the GitHub PR list
-   (`open-pull-request` Gate 5 — silently skipped in a foreground session,
-   which has no job id and no ambiguity to resolve, and not applicable to a
-   cloud session at all, which opens no PR from here; `board-keeper` deletes
-   the label once no open PR carries it) — do not report the PR URL until
-   the board update is done.
+6. **Ask to push** — explicit approval required; separate question; wait for
+   answer.
+7. **Ask to open PR** — separate question, after push; wait for answer. Once
+   approved: run `gh pr create`, then **immediately** set the issue → Code
+   Review on the board — do not report the PR URL until that update is done —
+   and tag the PR `job:<session-name>` so concurrent background jobs stay
+   tellable apart in the PR list: the session's slugified **name**, never its
+   id (`job:static-generation`, not `job:ab922b91`), skipped silently in a
+   foreground session and never applied in a cloud one (mechanics, including a
+   renamed session: `open-pull-request` Gate 5). The label identifies the job,
+   not the author — PRs are always opened by the orchestrator, never a
+   subagent. Then dispatch `ci-watcher` (background) to watch CI to completion,
+   and diagnose and fix any failure it reports (`open-pull-request` Gate 5a) —
+   a fix push still needs its own fresh push-approval ask, same as any push.
 
-   **Use the session's name, not its id.** Read it from
-   `$CLAUDE_JOB_DIR/state.json`'s `name` field and slugify it —
-   `job:static-generation`, never `job:ab922b91`. That name is what the
-   human sees in their own job list, so it is the only form that lets them
-   match a PR back to the job that opened it; a daemon hash identifies the
-   session to the machine and to nobody else. A job with no name is the one
-   case where the id is the fallback.
+8. **Remove the subagent worktrees you created** (no gate — just do it;
+   `worktree-agent-*` branches are never pushed, so nothing else sweeps them).
+   **The trigger is the push at step 6, not the PR** — a pushed branch is
+   recoverable, which is the entire safety condition. A layer-agent worktree
+   goes once its patch is landed on the `feat/` branch; the session's own
+   feature worktree stays until CI is green, so a Gate 5a fix has somewhere to
+   happen. The same pass deletes the scratchpad transfer buffers
+   (`.claude/scratchpad*/`) this session's agents exported into — after the
+   push, since an export can be the only surviving copy until then. Safety
+   checks: `develop-feature` step 8. Never delete uncommitted work, and:
 
-   The job id goes in the label's **description**, solely as the stable key
-   that survives a rename — it is machinery, not something a reader is meant
-   to use. A renamed session must find its existing label by that
-   description and `gh label edit --name` it, never create a second:
-   renaming propagates to every PR already carrying it, while a new label
-   leaves earlier PRs showing a name the session no longer has. Full
-   mechanics in `open-pull-request` Gate 5.
+   - **Only what _this session_ created.** Parallel jobs share
+     `.claude/worktrees/` and the scratchpad tree, so build the list from your
+     own dispatch record, never from `git worktree list` or a wildcard
+     `rm -rf` — a scratchpad has no lock file. A worktree with a lock file
+     (`$(git rev-parse --git-common-dir)/worktrees/<name>/locked`) is a live
+     session's: skip it, and never answer
+     `fatal: cannot remove a locked working tree` with `-f -f` or
+     `git worktree unlock`.
+   - **A worktree-isolated session exits its worktree first** — inside one,
+     `git -C <other worktree>` and `git worktree remove` are refused. Once the
+     branch is pushed and CI has settled, call `ExitWorktree` with
+     `action: "keep"`, then run this step unchanged, own worktree included. If
+     the job must end before the push, do **not** clean up: report the exact
+     worktree and scratchpad paths, and the next non-isolated session sweeps
+     them under the same ownership checks.
 
-   **The label identifies the background job that ran the work, not the
-   author: PRs are always opened by the orchestrator, never by a subagent.**
-   Every PR is authored by the repo owner's GitHub account, because `gh`
-   authenticates as them and there is no separate agent identity to
-   attribute one to.
-   Then dispatch `ci-watcher` (background) to watch CI to completion, and
-   diagnose and fix any failure it reports (`open-pull-request` Gate 5a) — a
-   fix push still needs its own fresh push-approval ask, same as any push.
+**Broad instructions ("go ahead", "keep going", "pick the next issue")
+authorize the work and commits — never the push or PR.** Those two gates always
+require fresh, explicit confirmation.
 
-8. **Remove the subagent worktrees you created** (no gate — just do it). Nothing
-   else will: the harness never auto-sweeps them because `worktree-agent-*`
-   branches are never pushed. Worktrees share the main checkout's
-   `node_modules` (`docs/context/claude-code.md`), but they still pile
-   up. **The trigger is the push at step 6, not the PR** — a pushed branch is
-   recoverable, which is the entire safety condition; a layer-agent worktree
-   goes even earlier, once its patch is landed on the `feat/` branch, while the
-   session's own feature worktree stays until CI is green so a Gate 5a fix has
-   somewhere to happen. See `develop-feature` step 8 for the safety checks, and
-   for why a post-merge "will discard N commits" refusal is usually a stale
-   local `main` rather than real work — never delete uncommitted work.
+**Board reconciliation (not a gate — no approval needed).** After step 7 opens a
+PR, and again after any PR merges, dispatch `board-keeper` with a targeted
+trigger (`"after PR #<n>"` / `"after merge of #<n>"`); it re-queries every
+status write, because board mutations fail silently. A targeted dispatch checks
+that one issue — append "...also reconcile the board" for a specific reason to
+look further, or dispatch it bare for a full sweep (when asked, at the start of
+a session, or before answering a project-status question). It never edits code
+and applies only safe, forward-only corrections; anything destructive (e.g.
+reopening a wrongly-closed issue) comes back in its report for you to act on.
+For an epic's PR, the user gets the table in "Reporting epic status", never a
+retelling of the report.
 
-   **Only the ones _this session_ created.** Several Claude jobs run in
-   parallel on this machine and share `.claude/worktrees/`, so
-   `git worktree list` shows other jobs' live worktrees too — build the
-   removal list from your own dispatch record, never from that listing.
-   Every live session/agent worktree carries a lock file
-   (`$(git rev-parse --git-common-dir)/worktrees/<name>/locked`) naming its
-   owner and pid; if it exists, the worktree is not yours to touch — skip it.
-   `git worktree remove` failing with `fatal: cannot remove a locked working
-tree` is that guard working, so never answer it with `-f -f` or
-   `git worktree unlock`: forcing it destroys a live session's uncommitted
-   work (it already cost #669's config agent its work once).
+**Never call `gh issue create` directly — creating an issue always goes through
+`board-keeper`.** Dispatch it with
+`"create issue: title=..., body=..., labels=...(, parent=#<n>)"`; it creates the
+issue, places it on the board, confirms status and labels, links any parent,
+and only then reports the number — one verified operation. Gather every field
+first — **title** (conventional-commit style), **body** (the template below),
+**labels including exactly one `prio:*`**, and the **parent issue number** for
+a sub-issue — asking the human for anything missing, since `board-keeper`
+cannot prompt. In the same pass, add `cloud-ok` when the ticket qualifies.
 
-   **The same pass clears the scratchpad transfer buffers** the agents
-   exported into (`.claude/scratchpad*/`, gitignored) — after the push, not
-   before it, since that export can be an agent's only surviving copy until
-   the work reaches the remote. Delete the exact directories this session
-   created. Parallel jobs share that tree too, and unlike a worktree a
-   scratchpad has **no lock file**: a wildcard `rm -rf` destroys another
-   running job's in-flight buffer with no error and no warning.
+**Read the body against the skills before dispatching it.** A ticket body is
+the whole brief for whoever executes it — a cloud session has no reviewer, and
+a layer agent's prompt is sourced from it — so anything it prescribes that a
+skill forbids ships exactly as written. Check every `## Scope` line and
+criterion against `testing-practices` → "What not to test" and "Comments
+default to zero":
 
-   **If this session is itself worktree-isolated, exit the worktree first —
-   none of the above can run from inside it.** A session that ran
-   `EnterWorktree` has every `git -C <other worktree>` and
-   `git worktree remove` refused, because both resolve to the shared
-   checkout; it also cannot remove its _own_ feature worktree while standing
-   in it. Once the branch is pushed and CI has settled, call `ExitWorktree`
-   with `action: "keep"` — the working directory returns to the shared
-   checkout and this whole step then runs unchanged, own worktree included.
-   If the job has to end before the push, do **not** clean up: report the
-   exact worktree and scratchpad paths it created, and the next non-isolated
-   session sweeps them under the same ownership checks. The refusal is the
-   guard working — never route around it.
-
-**Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work and commits — never the push or PR.** Those two gates always require fresh, explicit confirmation.
-
-**Board reconciliation (not a gate — no approval needed).** After step 7 opens
-a PR, and again after any PR merges, dispatch the `board-keeper` subagent
-(`.claude/agents/board-keeper.md`) with a targeted trigger (`"after PR
-#<n>"` / `"after merge of #<n>"`). Board mutations have silently failed
-before — it re-queries every status write it makes to confirm it actually
-stuck. This targeted dispatch does **not** sweep the rest of the board by
-default (routine PR/merge events are cheap, single-issue checks now,
-per `board-keeper.md`'s own "Input you receive" section) — append "...also
-reconcile the board" when you have a specific reason to check further, or
-dispatch it bare with no issue number for a full sweep on demand (e.g.
-whenever asked to "reconcile the board", at the start of a session, or
-before answering a project-status question). It never edits code and only
-applies safe, forward-only status corrections; anything that looks
-destructive (e.g. reopening a wrongly-closed issue) comes back in its report
-for you to act on.
-
-When the merged PR belongs to an epic, what the user gets back once that
-dispatch returns is the lane-banded table in "Reporting epic status" above —
-never a retelling of the board-keeper report. The same applies to the
-status-question dispatch mentioned above: reconcile first, then answer with
-that table.
-
-**Never call `gh issue create` directly — creating an issue always goes
-through `board-keeper`.** Dispatch it with `"create issue: title=..., body=...,
-labels=...(, parent=#<n>)"`; it creates the issue, places it on the board,
-confirms status and labels, links it to a parent if given, and only then
-reports the issue number back — creation and placement happen as one
-verified operation instead of two steps where the second could be skipped.
-Before dispatching, gather every required field — **title** (conventional-
-commit style), **body** (the sectioned template below), **at least one
-label including exactly one `prio:*` label** (the taxonomy and defaults in
-"Ticket priority & triage" below — `board-keeper` rejects a creation
-dispatch without one), and a **parent issue number** if this is a sub-issue
-of an existing tracking issue — asking the human for anything missing
-rather than guessing; `board-keeper` has no interactive-prompt tool, so
-this gathering only happens here, before dispatch, never inside it. In the
-same pass, check the ticket against the `cloud-ok` criteria (same section)
-and include that label when it qualifies — cloud-eligibility is assessed
-at creation, not discovered later.
-
-**Read the body against the skills before dispatching it.** A ticket body
-is the whole brief for whoever executes it — a cloud session has no
-reviewer and no orchestrator, and a layer agent's dispatch prompt is
-sourced from it — so anything the body prescribes that a skill forbids
-ships exactly as written. Before dispatch, check every `## Scope` line and
-acceptance criterion against `testing-practices` → "What not to test" and
-the "Comments default to zero" rule above:
-
-- **Acceptance criteria state behaviour, never a test's shape.** "Two
-  labels render the same minimum width from `sm` up" is a criterion;
-  "`action-group.test.tsx` — the classes per appearance" is an instruction
-  to write the class assertion `testing-practices` bans, and a cloud
-  session will write it.
+- **Acceptance criteria state behaviour, never a test's shape.** "Two labels
+  render the same minimum width from `sm` up" is a criterion;
+  "`action-group.test.tsx` — the classes per appearance" is an instruction to
+  write the class assertion `testing-practices` bans, and a cloud session will
+  write it.
 - **A styling-only change says so.** Spacing, sizing, tokens, borders and
-  layout have no unit-test surface: the body names the story that covers
-  the change, `## Scope` lists no test file, and the ticket carries
-  `no-tests-needed` from creation rather than the PR earning it later.
-- **The same check covers every other rule** a body can quietly
-  prescribe: any test of a Studio schema definition, a test that asserts
-  a constant's value back at itself, a `Name — does X` doc block, a hand-edit to
-  `packages/config/src/sanity/generated/`, a schema change with no
-  migration decision.
+  layout have no unit-test surface: the body names the story that covers the
+  change, `## Scope` lists no test file, and the ticket carries
+  `no-tests-needed` from creation.
+- **The same check covers every other rule** a body can quietly prescribe: any
+  test of a Studio schema definition, a test that asserts a constant's value
+  back at itself, a `Name — does X` doc block, a hand-edit to
+  `packages/config/src/sanity/generated/`, a schema change with no migration
+  decision.
 
-Adopted 2026-09-19 after #3413 shipped PR #3445 with two Tailwind-class
-assertions because its `cloud-ok` body told it to; deleting the tests fixed
-the PR and nothing else. A body that fails this check is rewritten before
-dispatch — never dispatched and corrected in review.
+A body that fails this check is rewritten before dispatch — never dispatched
+and corrected in review.
 
 ### Issue body template
 
 **An issue body is a work item in fixed sections, not a design document.** A
 ticket says why the work exists, what "done" means, and where the design lives
 — the design itself belongs in a `docs/superpowers/specs/*` doc while the work
-is in flight, and in `SPEC.md` once it ships.
+is in flight, and in its `docs/features/` page once it ships.
 
-A sub-issue, in this order and no other sections:
+A sub-issue (other than a manual-test issue, below), in this order and no other
+sections:
 
 ```
 ## Why
@@ -1447,6 +1118,7 @@ A sub-issue, in this order and no other sections:
 
 ## Scope
 - <layer>: <what changes>
+- Feature doc: docs/features/<feature>.md (update | create | none)
 
 ## Acceptance criteria
 - [ ] <observable outcome, not an implementation step>
@@ -1465,7 +1137,7 @@ since its sub-issues carry those:
 ## Why
 ## Shape        — the rule the epic establishes, ≤5 bullets
 ## Order        — what blocks what, and what can run in parallel
-## Done when    — the SPEC.md sections the final PR must update
+## Done when    — the feature pages (and any SPEC.md core sections) the final PR must update
 ## Design       — link to the spec doc
 ```
 
@@ -1473,218 +1145,195 @@ since its sub-issues carry those:
 🔵 lanes; writing it into the epic once is what lets that table be regenerated
 rather than re-derived.
 
+A manual-test issue — owed by any change that alters what a page shows or how
+it behaves, labelled `manual-test` plus the same `prio:*` as its
+implementation (when it is filed, linked and closed: `develop-feature` §2):
+
+```
+## What changed (user-visible)
+<what a reader, editor or operator now sees or does differently>
+
+## Seed
+<exact Sanity documents and fields to create or edit, per tenant and locale;
+platform settings, capability toggles and plan — or the seed command>
+
+## Steps
+1. <action> — expected: <one observable result>
+
+## Matrix
+- Viewports 390, 820, 1280; light and dark
+- Brand variants PRIMARY / SECONDARY / BRAND_PRIMARY, where a module is involved
+- Locales; signed in and out; Free and Growth, where plan-gated
+
+## Validation
+<invalid input, empty states, limits, error copy>
+
+## Regression watch
+<shared components and other modules/pages using what changed;
+caching/revalidation; SEO>
+
+## Accessibility
+<keyboard path, focus, accessible names, contrast>
+```
+
 **Never put these in an issue body:**
 
-- **A roll-up of sibling issues** — "Shipped: #2944, #2945, …", "Closed as
-  superseded: #2970–#2973". GitHub renders the sub-issue list natively with
-  live state; a hand-written copy is stale the day the next one merges.
+- **A roll-up of sibling issues** — "Shipped: #2944, #2945, …". GitHub renders
+  the sub-issue list natively with live state; a hand-written copy is stale the
+  day the next one merges.
 - **The design narrative** — field-order tables, migration transcripts,
   per-component walkthroughs, the reasoning behind a shape. That is the spec
-  doc's job, and `SPEC.md`'s afterwards.
+  doc's job, and the feature page's afterwards.
 - **Progress edits.** A body is written once. Status lives on the board, in the
   sub-issue list, and in the PRs; editing the body to record what has landed
   turns the ticket into a changelog.
 
-The `cloud-ok` criteria still apply and are not in tension with this: a
-`cloud-ok` ticket keeps its exact file list and verification commands, because
-those are `## Scope` and `## Verify`. What it drops is the design narrative,
-which a cloud session does not need in order to execute the criteria.
+A `cloud-ok` ticket keeps its exact file list and verification command, because
+those are `## Scope` and `## Verify`; what it drops is the design narrative,
+which a cloud session does not need to execute the criteria.
 
 **A feature spanning 2+ layers always gets an epic (parent) issue plus one
 sub-issue per layer — never a single flat issue covering multiple layers.**
-This mirrors "prefer per-layer PRs" one level earlier: ticket structure
-informs PR structure, not the other way around. Gather every sub-issue's
-title/body/labels up front, same as any other creation, then dispatch
-`board-keeper` once with the whole set — it creates the epic first, then
-each sub-issue with `parent=<epic-number>`, using its existing batch-dispatch
-support (one Step 1 pull covers the whole batch, not one per issue).
+Ticket structure informs PR structure, not the other way around. Gather every
+sub-issue's title/body/labels up front, then dispatch `board-keeper` once with
+the whole set — it creates the epic first, then each sub-issue with
+`parent=<epic-number>`, in one batch.
 
 ## Ticket priority & triage
 
 **Every open issue carries exactly one `prio:*` label**, set at creation
-(board-keeper rejects a creation dispatch without one):
+(`board-keeper` rejects a creation dispatch without one):
 
-- `prio:now` — blocks users (a live bug) or blocks the active epic. Work
-  this first, always.
-- `prio:next` — on the active feature path: the current epic's sub-issues,
-  or the next epic queued behind it.
-- `prio:later` — real, agreed work with no schedule. Pulled deliberately
-  (e.g. a cleanup-batch PR, a cloud-agent session), never by default.
+- `prio:now` — blocks users (a live bug) or blocks the active epic. Work this
+  first, always.
+- `prio:next` — on the active feature path: the current epic's sub-issues, or
+  the next epic queued behind it.
+- `prio:later` — real, agreed work with no schedule. Pulled deliberately (e.g.
+  a cleanup-batch PR, a cloud-agent session), never by default.
 - `prio:someday` — an idea or speculative cleanup; no commitment implied.
-  Supersedes the old `deferred` label for new issues. The 2026-09-02
-  backfill already applied `prio:someday` to every then-open `deferred`
-  issue, which keeps its old label alongside — don't churn them further.
+  Supersedes the old `deferred` label, which older issues keep alongside it —
+  don't churn them.
 
 **The pull rule:** work comes from `prio:now`, then the active epic's
-`prio:next` — never from `later`/`someday` unless the human explicitly asks
-for a cleanup pass. A growing `prio:later` pile is healthy (it's a backlog,
-not a queue); a growing `prio:now` pile is the signal to stop and re-triage.
+`prio:next` — never from `later`/`someday` unless the human explicitly asks for
+a cleanup pass. A growing `prio:later` pile is healthy (it's a backlog, not a
+queue); a growing `prio:now` pile is the signal to stop and re-triage.
 
-**Findings found mid-work get fixed in the current work, not ticketed.**
-When a reviewer finding, lint nit, or small cleanup surfaces during feature
-work and it touches the current branch's layers, route it to the owning
-layer agent and land it in the same branch/PR — the existing
-review-remediation loop. Filing a ticket is the fallback, not the default,
-and is reserved for findings that are genuinely out of scope: a different
-layer, a design decision, or a change big enough to need its own review.
-Ticketed findings default to `prio:later` (`prio:someday` if speculative);
-an agent-discovered finding earns `prio:now`/`prio:next` only when it's a
-user-facing bug or blocks a planned feature, and the dispatch creating it
-must say which. This is the guard against backlog inflation — every unit of
-work was minting 2-3 new tickets and the queue crowded out feature work.
+**Findings found mid-work get fixed in the current work, not ticketed.** A
+reviewer finding, lint nit or small cleanup that touches the current branch's
+layers goes to the owning layer agent and lands in the same branch/PR. Filing a
+ticket is the fallback, for findings genuinely out of scope: a different layer,
+a design decision, or a change big enough to need its own review. Ticketed
+findings default to `prio:later` (`prio:someday` if speculative); one earns
+`prio:now`/`prio:next` only as a user-facing bug or a blocker of a planned
+feature, and the creating dispatch must say which — otherwise every unit of
+work mints tickets that crowd out feature work.
 
 **`cloud-ok` marks a ticket safe to hand to a solo cloud agent session**
-(single context, no local multi-agent tooling). A ticket qualifies only
-when it is all of:
+(single context, no local multi-agent tooling). A ticket qualifies only when it
+is all of:
 
 - **single-layer** — one workspace, one owning agent's domain;
-- **self-contained** — the body alone carries exact files, acceptance
-  criteria, and the verification command (`pnpm verify`), assuming the
-  reader has only the ticket.
-
-  **Why `pnpm verify` and not just type-check/lint/test.** A cloud session
-  has no `gh` (see "Solo-session mode" below), so it cannot read a red check
-  after it pushes — a CI failure is invisible to it both before the push, if
-  the command isn't in the ticket, and after. Every command `pnpm verify`
-  chains runs locally, is deterministic, and gates a check that a
-  single-layer change can plausibly break — `knip` because any new exported
-  symbol in any workspace can trip it, `gen:ui-index:check` for
-  `packages/ui`, `check:turbo-env-sync` for env vars and `turbo.json`, and
-  the other three for the tag, client-graph and migration-index drifts a
-  scoped run used to miss. The rest of CI stays out of reach on
-  purpose: `build` is CI-only by the rule above, typegen drift needs
-  `pnpm typegen` (orchestrator-only, it mutates generated files), actionlint
-  / zizmor / shellcheck only fire on workflow or shell changes a `cloud-ok`
-  ticket shouldn't contain, and CodeQL / Dependency Review / Document
-  validation / Migrations / Vercel cannot run locally at all. That
-  irreducible tail is why a local session still owns the CI tail after a
-  cloud agent opens a PR;
-
-- **free of human gates** — no Sanity or Drizzle migration, no console
-  config, no production-dataset touch;
+- **self-contained** — the body alone carries exact files, acceptance criteria
+  and the verification command, `pnpm verify` (not a scoped
+  type-check/lint/test: a cloud session has no `gh` and cannot see a red check
+  after it pushes, and every gate `pnpm verify` chains runs locally). The
+  CI-only tail — `build`, typegen drift, workflow linters, CodeQL, Dependency
+  Review, Document validation, Migrations, Vercel — stays a local session's to
+  watch after a cloud agent opens a PR;
+- **free of human gates** — no Sanity or Drizzle migration, no console config,
+  no production-dataset touch;
 - **small** — roughly ≤5 files touched;
-- **outside `.claude/**`** — the GitHub Actions `@claude` runner refuses
-  every `Edit`/`Write` under `.claude/` as a sensitive path, independently
-  of `.claude/settings.json`'s allow-list. On 2026-09-19 four agent-tooling
-  tickets (#3355, #3358, #3359, #3361) each ran to completion, hit that
-  refusal, and left their `.claude/**` half for a local session — the
-  `cloud-ok` label had cost a run each and delivered nothing. Root
-  `CLAUDE.md` and `docs/**` are writable; a ticket whose scope names an
-  agent, skill or hook file is a local ticket.
+- **outside `.claude/**`** — the GitHub Actions `@claude` runner refuses every
+  `Edit`/`Write` under `.claude/` as a sensitive path, independently of
+  `.claude/settings.json`, so such a ticket runs to completion and delivers
+  nothing there. Root `CLAUDE.md` and `docs/**` are writable; a ticket whose
+  scope names an agent, skill or hook file is a local ticket.
 
-**Solo-session mode.** When running as a single cloud session — a Claude
-Code web/remote session, the same environment `board-keeper.md`'s
-preflight calls "web/remote" — with no parallel local jobs and no
-worktree/scratchpad tooling, two parts of the standard process are
-replaced, and nothing else:
+**Solo-session mode.** A single cloud session — a Claude Code web/remote
+session (`board-keeper.md`'s preflight), with no parallel local jobs and no
+worktree/scratchpad tooling — replaces exactly three things; everything else,
+including quality gates, conventional commits and the push/PR approval gates,
+still applies:
 
-- The mandatory subagent-delegation protocol ("Use the scoped agents") is
-  relaxed: implement directly, reading the owning layer's
-  `.claude/agents/<layer>.md` for its conventions first. This also
-  replaces the delivery gate sequence's step 4 (`reviewer` dispatch) with
-  applying the `code-review-practices` checklist as a self-review before
-  committing.
-- The delivery gate sequence's board writes (step 1's In Progress, step
-  7's Code Review) are replaced by the evidence protocol below — cloud
-  sessions cannot write the board at all.
-- Step 7's `job:<session-name>` PR label does not apply either, and has no
-  substitute. It exists to tell **concurrent local background jobs** apart
-  in the PR list; a cloud session is not one of those, has no job id, and
-  ships without the `gh` binary the labelling uses. Do not reach for an MCP
-  or REST equivalent — an unlabelled PR is the correct outcome here, not a
-  gap to close.
+- **Delegation is relaxed:** implement directly, reading the owning layer's
+  `.claude/agents/<layer>.md` first; step 4's `reviewer` dispatch becomes a
+  self-review against the `code-review-practices` checklist before committing.
+- **Board writes** (steps 1 and 7) are replaced by the evidence protocol below.
+- **The `job:<session-name>` PR label** does not apply and has no substitute —
+  it tells concurrent local jobs apart, and a cloud session has no job id and
+  no `gh`. Never reach for an MCP or REST equivalent.
 
-Everything else still applies — quality gates
-(`type-check`/`lint`/`test`), conventional commits, and the push/PR
-approval gates.
+**Cloud sessions never write the project board — they leave evidence it can be
+inferred from.** Projects v2 is GraphQL-only, and cloud sessions have no `gh`
+and that API blocked, so never attempt `gh project item-edit` or an equivalent.
+Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
 
-**Cloud sessions never write the project board — they leave evidence it can
-be inferred from instead.** Board status lives in Projects v2, which is
-GraphQL-only, and cloud sessions ship without `gh` and with that API
-blocked (`board-keeper.md`'s preflight documents both) — so a cloud agent
-must not attempt `gh project item-edit` or equivalent. Instead it signals
-status the way the board tooling already knows how to read
-(`board-keeper.md` Step 3's evidence table):
-
-- **Starting:** comment on the issue ("starting work in a cloud session"),
-  then rename the branch before the first push. A web/remote session starts
-  on a generated name like `claude/optimistic-noether-isuljn`, which carries
-  no issue number, so nothing can read it. Rename it to `<type>/<n>-<slug>`,
-  with the slug taken from the ticket title
-  (`git branch -m feat/3952-team-single-member` for "feat(studio): a Team
-  may have a single member"). A pushed branch with that name is the In Progress
-  signal. The GitHub Actions
-  `@claude` path can't control this: `claude-code-action` generates its own
-  branch as `claude/issue-<n>-<timestamp>`, which `board-keeper.md`'s Step 2
-  also recognizes as an In Progress signal.
+- **Starting:** comment on the issue ("starting work in a cloud session"), then
+  rename the branch before the first push. A web/remote session starts on a
+  generated name like `claude/optimistic-noether-isuljn`, which carries no
+  issue number; rename it to `<type>/<n>-<slug>`, the slug from the ticket
+  title (`git branch -m feat/3952-team-single-member` for "feat(studio): a Team
+  may have a single member"). A pushed branch with that name is the In
+  Progress signal. The GitHub Actions `@claude` path can't rename:
+  `claude-code-action` generates `claude/issue-<n>-<timestamp>`, which
+  `board-keeper.md` Step 2 also reads as In Progress.
 - **In review:** open the PR with the issue reference (`Closes #n` on the
-  completing PR only, per the per-layer-PR rule) — an open PR is the Code
-  Review signal. For the GitHub Actions `@claude` path, this is a
-  workflow-level default, not something each ticket has to ask for:
-  `claude.yml`'s `--append-system-prompt` tells every run to push and open
-  its own PR via `gh pr create` in the same pass. Before that instruction
-  existed, a run's default was to push a branch and leave only a "Create
-  PR" link in its comment, requiring a human to click it — if a link
-  appears instead of an opened PR, `gh pr create --head <branch>` opens one
-  from the already-pushed branch without needing a checkout.
+  completing PR only) — an open PR is the Code Review signal. On the `@claude`
+  path, `claude.yml`'s `--append-system-prompt` tells every run to push and
+  open its own PR via `gh pr create`; if a "Create PR" link appears instead,
+  `gh pr create --head <branch>` opens one from the pushed branch without a
+  checkout.
 - **Done:** the merged `Closes #n` PR is the Done signal; nothing extra.
 
-**The board updates itself from that evidence — no local session needed.**
+**The board updates itself from that evidence:**
 `.github/workflows/board-auto-sync.yml` moves issue `#n` to In Progress when a
-branch named for it is pushed, and to Code Review when its PR opens, and
-confirms each write. So a cloud session reports the evidence it left and
-stops there. It never tells the user the board is waiting on a local
-`board-keeper` run; that only catches up what the workflow can't see, such as
-a branch with a generated name.
+branch named for it is pushed and to Code Review when its PR opens. A cloud
+session reports the evidence it left and stops — never telling the user the
+board waits on a local `board-keeper` run, which only catches up what the
+workflow can't see (such as a generated branch name).
 
 ## Deployment
 
 **TEMPORARY (2026-09-04) — automatic deployments are OFF.** Nothing deploys on
-merge right now: `deploy-development.yml`'s `push: branches: [main]` trigger is
-commented out, and both Storybook projects carry
-`git.deploymentEnabled: false` (root `vercel.json` and `packages/ui/vercel.json`).
-This is a cost freeze on the Vercel metered-usage allowance, not a permanent
-change — restoring it is tracked in #2648.
-
-What this means for an agent:
+merge: `deploy-development.yml`'s `push: branches: [main]` trigger is commented
+out, and both Storybook projects carry `git.deploymentEnabled: false` (root
+`vercel.json` and `packages/ui/vercel.json`). It is a cost freeze on the Vercel
+metered-usage allowance, not a permanent change — restoring it is tracked in
+#2648. Until then:
 
 - **Don't report a merged PR as deployed, and don't treat a stale dev site as a
-  bug.** The dev environment intentionally lags `main` until someone dispatches
-  a deploy.
+  bug.** The dev environment lags `main` until someone dispatches a deploy.
 - **A merged Sanity or Drizzle migration is NOT live on dev** — the `migrate`
   and `migrate-db` jobs ride in `deploy-development.yml`, so they wait for the
-  manual dispatch too. This inverts the usual rule that a merged migration is
-  already applied to dev.
+  manual dispatch too.
 - **Deploying is still human-gated and still a push-class action.** The manual
   trigger is `gh workflow run deploy-development.yml` (or the Actions tab) for
-  the apps, and the Vercel dashboard's **Redeploy** button for either Storybook.
-  Ask before running any of them; never run `vercel` deploy commands directly
-  (see "Don't" below, which is unchanged).
+  the apps, and the Vercel dashboard's **Redeploy** button for either
+  Storybook. Ask before running any of them; never run `vercel` deploy
+  commands directly ("Don't" below).
 
-Full rationale, the per-surface table, and the re-enabling procedure are in
-[`docs/context/ci-automation.md`](docs/context/ci-automation.md)'s
-"Deployments are temporarily manual" section. **When re-enabling, uncomment the
-trigger — never leave it active behind an `if:` guard**, which corrupts the
-workflow's change-detection anchor and silently drops commits.
+Rationale, the per-surface table and the re-enabling procedure:
+`docs/context/ci-automation.md` § "Deployments are temporarily manual". **When
+re-enabling, uncomment the trigger — never leave it active behind an `if:`
+guard**, which corrupts the workflow's change-detection anchor and silently
+drops commits.
 
-The rest of this section describes the pipeline as it behaves normally, and as
-it will behave again once the freeze is lifted.
-
-Deploys are automated by the pipeline (see `docs/DEPLOY.md`, `SPEC.md` §13):
-merge to `main` → **development**; push a `vX.Y.Z` git tag → **production**
-(gated by a CI `verify` job). Dev deploys only the app(s) whose turbo graph the
-merge touched (`turbo-ignore`); a production tag always deploys both.
-The one-time environment setup (datasets, tokens, Vercel projects, GitHub
+Normally, deploys are automated by the pipeline (`docs/DEPLOY.md`, `SPEC.md`
+§13): merge to `main` → **development**; push a `vX.Y.Z` git tag →
+**production** (gated by a CI `verify` job). Dev deploys only the app(s) whose
+turbo graph the merge touched (`turbo-ignore`); a production tag always deploys
+both. The one-time environment setup (datasets, tokens, Vercel projects, GitHub
 secrets, webhooks, CORS) is human-gated console work in `docs/DEPLOY.md`.
-Cutting a release is `git tag vX.Y.Z && git push origin vX.Y.Z` — a
-push, so it stays under the push gate.
+Cutting a release is `git tag vX.Y.Z && git push origin vX.Y.Z` — a push, so it
+stays under the push gate.
 
 ## Don't
 
-- Run `sanity deploy` / Vercel deploys by hand (the pipeline owns them;
-  console setup is human-gated) — this includes the `vercel` plugin's
-  `/deploy` command, `deployment-expert` subagent, and `deploy_to_vercel`
-  MCP tool; `.claude/settings.json` denies the underlying `vercel --prod` /
+- Run `sanity deploy` / Vercel deploys by hand (the pipeline owns them; console
+  setup is human-gated) — this includes the `vercel` plugin's `/deploy`
+  command, `deployment-expert` subagent, and `deploy_to_vercel` MCP tool;
+  `.claude/settings.json` denies the underlying `vercel --prod` /
   `vercel deploy --prod` / `vercel promote` / `vercel rollback` commands and
   the MCP tool as a backstop, but treat `vercel:deployments-cicd` and the
   plugin's commands as read-only reasoning aids, never a way to trigger a
@@ -1695,4 +1344,5 @@ push, so it stays under the push gate.
   human-gated stance as `sanity deploy` and production content migrations
   (`.claude/agents/db.md`'s "Migrations" section); local/dev applies are fine.
 - Push or open a PR without explicit approval for that specific action.
-  (Committing needs no approval — commit freely as work reaches a coherent state.)
+  (Committing needs no approval — commit freely as work reaches a coherent
+  state.)

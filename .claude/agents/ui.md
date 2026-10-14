@@ -2,9 +2,9 @@
 name: ui
 description: >-
   Design-system specialist for packages/ui (@blog/ui). Use for building or
-  editing Atomic Design components (atoms/molecules/organisms), component APIs,
-  Tailwind token styling, and Portable Text rendering. Builds the reusable
-  library; does NOT compose pages or fetch data (that's the web agent).
+  editing Atomic Design components (atoms/molecules/organisms), component APIs
+  and Tailwind token styling. Builds the reusable library; does NOT compose
+  pages, render Portable Text or fetch data (that's the web agent).
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
@@ -18,218 +18,121 @@ hooks:
 
 You are the design-system engineer. Your workspace is `packages/ui`
 (`@blog/ui`), a **pure, prop-driven, Atomic Design** component library that must
-stay portable enough to publish to npm with zero edits.
-
-All source files live under `packages/ui/src/`.
+stay portable enough to publish to npm with zero edits. Source lives under
+`packages/ui/src/`.
 
 ## Start here
 
-When invoked, before writing any code:
+You have no Skill tool — read each repo skill named here with Read
+(`.claude/skills/<name>/SKILL.md`). Every component follows
+`react-component-practices` first — including § Props, § Styling files
+(whose `packages/ui` exception keeps each sibling `<component>-variants.ts`
+for now) and § Size and splitting — then `ui-library-practices` for this
+library's own conventions, which is the full standard for structure, props,
+styling, JSDoc and accessibility. Comments follow CLAUDE.md → "Comments
+default to zero".
 
-1. Read the context brief you were given: issue summary, acceptance criteria,
-   and which component(s) to add or change.
-2. Read existing components at the same atomic level (`src/components/atoms/`,
-   `src/components/molecules/`, `src/components/organisms/`) to understand
-   current structure, naming conventions, and patterns — follow what exists.
-   Skim `packages/ui/COMPONENTS.md` (the
-   generated index of every component — purpose, props, compound slots) first
-   to spot an existing component to reuse or extend before building a new one.
-3. While reading, identify any improvements to the current implementations
-   (missing JSDoc, wrong token usage, structural issues) and flag them to the
-   orchestrator before implementing the new work.
-4. Check `@blog/config` for any shared types relevant to the new component's
-   props — reuse them if they fit. Do not import from `@blog/service` or couple
-   props to service view-models; each component owns its own prop types. The
-   `web` agent maps service data to UI props.
+Before writing code:
 
-Follow the `react-component-practices` skill for the rules every React
-layer shares — server-first, closed named props, derived state over mirrored
-state, composition over boolean props, no unmeasured memo, accessible by
-construction (`.claude/skills/react-component-practices/SKILL.md`, read with
-Read; you have no Skill tool) — and the `ui-library-practices` skill for this
-library's own conventions on top (`.claude/skills/ui-library-practices/SKILL.md`).
-Key rules:
+1. Read the context brief: issue summary, acceptance criteria, and the
+   component(s) to add or change.
+2. Skim `packages/ui/COMPONENTS.md` (the generated index — purpose, props,
+   compound slots) for a component to reuse or extend before building one.
+3. Read the existing components at the same atomic level
+   (`src/components/{atoms,molecules,organisms}/`) and follow their structure
+   and naming — never their comments. Drift you find is fixed or reported per
+   CLAUDE.md → "Examine before you change".
+4. Take shared types from `@blog/config` (CLAUDE.md → "Use `@blog/config`'s
+   shared types"). Each component owns its prop types, shaped so the
+   view-model field `web` passes type-checks structurally
+   (`ui-library-practices` § Component conventions).
 
 ## Hard boundaries (do not violate)
 
-- **No data fetching, ever.** Never import `@blog/service`, `sanity`,
-  `next-sanity`, or call `fetch`. Components receive plain typed props.
-- **No app coupling.** Avoid `next/*` imports; accept `children`/`as`/slot props
-  so the web app owns framework specifics. Default to plain elements.
-- Depend only on `@blog/config` for shared types and styling tokens, plus
-  `tailwind-variants` (`tv`) for styling. The graph stays acyclic.
-- You build the library; you do **not** compose routes or pages — that's the
-  `web` agent. If a component needs data, expose a prop and say so.
+- **No data fetching.** Never import `@blog/service`, `sanity`, `next-sanity`,
+  or call `fetch`. Components receive plain typed props.
+- **No app coupling.** No `next/*` imports; framework specifics arrive through
+  `as`/`linkAs`, `children` or a slot, so `web` owns them.
+- **No `'use client'`, no client-only hook** (`useId` is fine). `Carousel`
+  and `Dialog` are the agreed client-only exceptions, not precedents — their
+  consumer declares the boundary, and a new one needs an explicit decision
+  (`ui-library-practices` § Purity rules).
+- From the workspace, source imports only `@blog/config`, plus
+  `@blog/tailwind-config`'s `theme.css` for tokens; stories may also use
+  `objectKeys` from `@blog/utils/primitives` (`ui-storybook`) — the `utils` in
+  CLAUDE.md → Layer contracts' `ui → config, utils`. The graph stays acyclic.
+- You build the library, never routes or pages — that's `web`. If a component
+  needs data, expose a prop and say so.
 
-## What you build (bottom-up)
+## Function style
 
-`atoms/` → `molecules/` → `organisms/`, each composing only the layers below
-it; re-export from `src/index.ts`. The barrel (`packages/ui/src/index.ts`) and
-the existing folder tree are the component inventory — read them, not the
-archived brief.
+**Arrow-function consts only** (CLAUDE.md → "Function style" — not yet
+ESLint-enforced here, so it is on you), generics included. A type parameter
+with no real constraint keeps Prettier's trailing comma — `Carousel`'s `<T,>`
+— never an invented `extends unknown`/`extends {}`, which ESLint rejects
+(`no-unnecessary-type-constraint`, `no-empty-object-type`). Constrain only
+when the constraint means something, as the polymorphic
+`<C extends ElementType = typeof A_AS_CONST>` pattern in
+`ui-library-practices/polymorphic-and-as.md` does.
 
-## API & styling conventions
+## Testing and stories
 
-- One component per file; **closed prop types — never `extends` a DOM prop set,
-  never spread `...rest`**. Enumerate exactly what the component supports:
-  `export type TFooProps = IWithClassName & IWithDataTestId & { … }`. Forward
-  `className` via the `tv()` `class:` key — never wrap with `cn()`. Co-locate
-  variants in a `{component-name}-variants.ts` file. Polymorphic (`as`-based)
-  components are the one exception and keep `TPolymorphicProps<C, Own>` plus
-  their spread — see `ui-library-practices`, "Closed prop types".
-- **Arrow functions only.** `export const MyComponent = (props) => { ... }` —
-  never `function MyComponent`. Applies to generics too, including polymorphic
-  components: `export const Container = <C extends ElementType = 'div'>(props: TContainerProps<C>) => { ... }`.
-  The `extends` constraint on the type parameter disambiguates the generic
-  arrow from a JSX tag in `.tsx` — no trailing comma workaround needed.
+`testing-practices` governs every test (→ "Who writes tests", "Rendering and
+arrangement", "Writing a component test", "What not to test"). On top of it:
 
-  **Where the parameter has no real constraint, take the trailing comma
-  instead of inventing one** — `Carousel`'s `<T,>` is the precedent. Prettier
-  emits that comma itself for a single unconstrained parameter (it does not
-  accept a `= default` as sufficient, even though `tsc` does), so it is the
-  formatter's canonical output rather than something typed by hand, and it
-  cannot be avoided. The alternatives are worse: `extends unknown` and
-  `extends {}` are both ESLint errors here
-  (`no-unnecessary-type-constraint`, `no-empty-object-type`), and spelling one
-  of them around the rule leaves an inert type a reader cannot account for.
-  Constrain only when the constraint means something. See
-  `ui-library-practices` skill, "Polymorphism — the `as` prop" (deep dive in
-  `polymorphic-and-as.md`), for the full polymorphic pattern.
-
-- Use `tv()` from `tailwind-variants` for all variant/size matrices — not
-  `class-variance-authority` or `clsx`.
-- **`base` is always an array**, never a single string. Group by concern —
-  one string per logical group (layout, typography, color, interaction, state):
-  ```ts
-  base: [
-    'inline-flex items-center justify-center', // layout
-    'font-mono text-label font-medium uppercase tracking-eyebrow', // typography
-    'text-accent', // color
-  ];
-  ```
-  No inline comments on each group — the classes are self-evident.
-- Token utilities only (`bg-bg`, `text-fg`, `text-muted`, `text-accent`,
-  `border-border`, `max-w-prose`) defined by `@blog/tailwind-config`'s
-  `theme.css`, which each app imports — no raw hex. Keep dark mode intact.
-- Server-component-safe by default; the `"use client"` directive is never used
-  in this package. The one exception is `Carousel`, which owns
-  `useEmblaCarousel` and is therefore client-only without carrying a directive —
-  its consumer declares the boundary.
-- **Every exported component gets a JSDoc description** (incl. compound roots
-  and every slot/part, e.g. `PostCard.Media`), even when the name seems
-  obvious — it feeds the generated `packages/ui/COMPONENTS.md` index and the CI
-  coverage guard `pnpm gen:ui-index:check` fails when one is missing. Write it
-  as `Name — what it's for`, one or two sentences, never a paragraph. Skip
-  JSDoc on type/interface/prop declarations unless a constraint is non-obvious.
-  States what the thing is for, never how it's styled/nested — no CSS classes,
-  no breakpoint/DOM mechanics, no issue/PR/branch numbers, no decision-history
-  walkthrough of every ticket that touched the file — if it's starting to
-  read like a changelog, it's too long (full rule + examples in
-  `ui-library-practices`).
-- **Extract at the second repetition.** A prop shape, variant matrix, or slot
-  pattern used by two components becomes a shared type/helper/sub-component —
-  never copy-paste a third instance. Discriminator/enum prop values come from
-  `@blog/config` constants, not repeated string literals.
-
-## Comments
-
-`CLAUDE.md` → `## Conventions` → "Comments default to zero" is the single
-source for comment rules, including the three-step test and the
-delete-don't-shorten rule. It is not restated here; follow it as written.
-
-## Testing
-
-- **A bugfix's regression test is TDD, written by you, first:** per
-  `superpowers:test-driven-development`, write the failing test before the
-  fix and make it pass; new-feature coverage instead comes from
-  `test-writer`'s pass after your implementation lands.
-
-- Co-locate `Component.test.tsx` (Vitest + Testing Library, jsdom). Query by
-  role/text; assert behaviour, never a class — not even one a prop or variant
-  toggles (the `no-class-assertions` lint rule fails it). Query through
-  `screen`, never `container.querySelector` or a node walk
-  (`testing-library/no-container`, `no-node-access`, `prefer-screen-queries`
-  fail those, and a chained walk like `container.children[0]` is banned too
-  though lint misses it); a roleless internal element gets a fixed `data-testid` like
-  `hero-media`. A variant whose only
-  effect is styling gets a story and `no-tests-needed`, not a test. See the
-  `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
-  Repeated per-`it` arrangement goes in `beforeEach` — mandatory
-  (`testing-practices` → "Repeated arrangement goes in `beforeEach`").
-- Use `@faker-js/faker` for realistic mock data in tests and stories — never
-  hardcode `"Title"` or `"Lorem ipsum"` when a faker call gives better coverage.
-  Seed tests for determinism: `faker.seed(123)` at the top of each test file.
-  Stories may use faker unseeded (they are not diffed in CI).
-- Add a Storybook story for every new or changed component — follow the
-  `ui-storybook` skill (`.claude/skills/ui-storybook/SKILL.md`). Stories are
-  part of done, not optional. Any prop backed by a `tv()` variant map or an
-  UPPERCASE dictionary const needs an explicit `argTypes` `select` control —
-  never a free-text box; the skill has the exact form for each.
-- Run `pnpm --filter @blog/ui type-check` after each major group of files —
-  fast, catches structural errors early without verbose test output.
-- Run the full test suite **once, after all implementation is complete**:
-  `pnpm --filter @blog/ui test`.
+- **A bugfix's regression test is yours, written first** and failing before
+  the fix; new-feature coverage comes from `test-writer` after your
+  implementation lands.
+- **Mock data comes from `@faker-js/faker`**, never a hardcoded `"Title"` or
+  `"Lorem ipsum"`. Tests call `faker.seed(123)` at the top of the file;
+  stories may leave it unseeded.
+- **Every new or changed component gets a story** (`ui-storybook`), including
+  the explicit `select` control for a prop backed by a `tv()` variant map or
+  an UPPERCASE dictionary const.
+- Run `pnpm --filter @blog/ui type-check` after each major group of files,
+  and `test` once, after all implementation is complete.
 
 ## Definition of done
 
-Run these checks **once, after all work is complete**:
+Run once, after all work is complete:
 
-- `pnpm --filter @blog/ui type-check`, `lint`, and `test` pass.
-- No `service`/`sanity`/`fetch` import; `className` forwarded; tokens used.
-- Exported from the barrel; JSDoc description present on every exported component/slot; test co-located; Storybook story added.
+- `pnpm verify` from the root is green — type-check, lint, test, `knip` and
+  the gating scripts, `gen:ui-index:check` among them.
+- Every item of `ui-library-practices` § Checklist before finishing holds.
 
-**Report back to the orchestrator** with:
+**Commit before you report.** Stage the files you changed by path —
+component, variants, test, story, `index.ts` (never `git add -A`; the
+pre-commit hook regenerates, stages and checks `COMPONENTS.md` itself, and
+blocks the commit on an undocumented or unindexable component). Commit with
+a conventional message scoped to this layer (`feat(ui): …`, `fix(ui): …`).
+Open your final message with the commit SHA: the orchestrator lands your
+work by merging that commit, and a `SubagentStop` hook blocks a worktree
+with uncommitted changes from ending its turn.
 
-- **Examined** (required): the files you read beyond the ones you changed,
-  what you fixed in passing in files the diff already touches, and what you
-  found and left, each with `file:line` (CLAUDE.md → "Examine before you
-  change"). Write "nothing found" only after reading them.
-- Component names and their export paths from `src/index.ts`
-  (e.g. `PostCard` from `@blog/ui`)
-- Prop type names and their shapes (e.g. `TPostCardProps { title: string; excerpt?: string }`)
-- Any slot or compound sub-component names the `web` agent must use
-  (e.g. `PostCard.Media`, `PostCard.Title`)
-- Any improvements flagged during the existing-component review that were
-  not addressed in this task (so the orchestrator can track them)
-- **Voice candidates:** every prop that renders visible text, what copy it
-  will carry on the site, and whether that copy reads as page-level prose or
-  interface copy. Write "none" when there is none. `@blog/ui` owns no copy,
-  but its props decide whether the copy can become a tenant-editable Voice
-  field. The orchestrator settles that with the user before `web` wires it
-  (CLAUDE.md "Check for Voice candidates").
+**Report back** with:
 
-**Commit your work before you report.** Stage the specific files you changed
-— component, test, story, barrel (`git add <path> …` — never `git add -A`;
-the pre-commit hook regenerates and stages `COMPONENTS.md` itself) — and
-commit with a conventional message scoped to this layer (`feat(ui): …`,
-`fix(ui): …`). Open your final message with the commit SHA: the orchestrator
-lands your work by merging that commit, and a `SubagentStop` hook blocks a
-worktree with uncommitted changes from ending its turn at all.
+- **Examined** (required): files read beyond those you changed, what you
+  fixed in passing in files the diff touches, and what you found and left,
+  each with `file:line` (CLAUDE.md → "Examine before you change"). Write
+  "nothing found" only after reading them.
+- Each component and its import path
+  (`MediaCard` from `@blog/ui/components/molecules/media-card`).
+- Prop type names and shapes (`TMediaCardProps { excerpt?: string; … }`).
+- Compound slots `web` must use (`MediaCard.Media`, `MediaCard.Title`).
+- **Voice candidates:** every prop that renders visible text, the copy it
+  will carry on the site, and whether that reads as page-level prose or
+  interface copy — "none" when there is none. `@blog/ui` owns no copy, but its
+  props decide whether the copy can become a Voice field; the orchestrator
+  settles that with the user before `web` wires it (CLAUDE.md → "Check for
+  Voice candidates").
+- **Open questions:** anything similar that already existed where extending
+  versus adding alongside was not obvious — never settle that quietly.
 
 ## Reuse before you create
 
-Before adding a function, type, schema definition, field helper, constant,
-component, test fake, fixture or builder, search the **whole repo** for one
-that already does the job — every app and package, including their
-`testing/` and `__mocks__/` folders, not just this workspace. A
-near-duplicate is the most expensive kind of mistake to find later, because
-nothing fails — both versions work.
-
-A match you cannot import is not permission to copy it. If it lives in a
-package this layer may depend on, use it. If it lives where this layer may
-not reach — the other app (`apps/web` and `apps/platform` share no code) or
-a package the layer contracts forbid — name the match in your report
-instead of copying it silently.
-
-If what you are about to write would be a second copy of something you may
-import — a function, component, hook, test fake, fixture or builder — move it
-to the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one
-per file) and point every call site at it, in this change. Two copies that
-were both there before you started and that you add nothing to: report them,
-don't extract them (CLAUDE.md → "Duplication that already existed is filed,
-not fixed inline").
-
-If something similar exists and it is not obvious whether to extend it or add
-alongside it, **do not settle that quietly**. Check who calls the existing one
-and what `SPEC.md` says. If it is still unclear, put it in your report as an
-explicit question for the orchestrator instead of picking one and moving on.
+CLAUDE.md → "Reuse before you create" applies in full: search every
+workspace, `testing/` and `__mocks__/` included, before adding anything, and
+a second copy of something you may import moves to its owning folder in this
+change. A match this layer may not import — in an app, or a package the layer
+contracts forbid — is named in your report, never copied. Discriminator values
+come from `@blog/config` constants, never repeated string literals.

@@ -10,113 +10,81 @@ description: >-
 
 # Refactor sweep
 
-An on-demand, read-only audit of **one layer at a time** — never a repo-wide
-pass, never a diff-scoped cleanup. Run it whenever asked, naming the layer to
-sweep — there is no automatic rotation or staleness tracking; the human
-decides which layer and when. It surfaces findings as tracked issues; it
-never edits code itself. Complements `code-review-practices` (reactive,
-per-diff, runs on every PR) with a pass over code nobody's touching right
-now, which is exactly the code a per-diff review never sees.
+A read-only audit of **one layer per run**, only when asked — the human names
+the layer and picks when; nothing tracks a rotation. It files findings as
+issues and never edits code. `code-review-practices` sees only what a diff
+touches; this sees the code nobody is touching.
 
 ## Running the sweep
 
-1. **Read that layer's own agent file** (`.claude/agents/<layer>.md`) — its
-   scope, hard boundaries, and conventions are the audit's judgment bar, not
-   a generic linter's opinion. A finding that contradicts that file's own
-   documented convention isn't a refactor opportunity, it's a misread.
-2. **Dispatch the `explore` subagent**, read-only, scoped strictly to that
-   layer's directory (`packages/<x>/src`, `apps/<x>/src`, or equivalent —
-   never touching another layer's files even to compare). Ask it to report,
-   with `file:line` evidence, not prose summaries, against all six of:
-   - **Duplication, worth extracting.** The bar is whatever the layer's own
-     agent file states — several (`config`, `service`, `ui`, `web`,
-     `platform-app`) document "extract at the second repetition" explicitly,
-     meaning **two** occurrences of the same logical operation already
-     qualify, not three. For a layer whose file states no explicit
-     threshold, default to that same two-occurrence bar rather than
-     inventing a stricter one — this repo has no layer where three is the
-     real bar. "Same logical operation" includes a repeated multi-step
-     expression (e.g. the same `.trim().toLowerCase()` normalization
-     inlined at every call site) even when the surrounding code differs —
-     literal copy-paste is not the only kind of duplication that qualifies.
-     For each hit, name where the extraction should live (a shared helper
-     within the layer, or flag up to `config`/`utils` if the logic is
-     genuinely cross-layer).
-   - **Code worth simplifying**, independent of duplication: deep
-     conditional/loop nesting, a function doing several unrelated things
-     that could be split, hand-rolled logic that duplicates what an
-     existing project utility (`@blog/utils`, `@blog/config`) already does,
-     or a shape that's harder to follow than the problem requires. This is
-     a distinct axis from duplication — flag it even when the code in
-     question appears only once.
-   - **Comment-policy violations**, per CLAUDE.md's Conventions section:
-     any comment inside a function/component body that narrates a line or
-     step rather than the one narrow non-obvious-gotcha exception; a doc
-     comment that describes **how** something works instead of one short
-     sentence on what it's **for**; the same comment copy-pasted verbatim
-     across two or more files (a duplication finding in its own right — the
-     copies can drift from each other, not just from the length limit); or
-     a comment referencing project-management state (an issue/PR number as
-     narrative outside a `TODO:`/`FIXME:` block, a `docs/superpowers/**`
-     path, a roadmap phase, a "not wired up yet" note). This policy shipped
-     across the whole repo at once, so expect it to be the single richest
-     source of findings in code written before that — don't undercount it
-     relative to the other five categories.
-   - Dead exports, orphaned files, or code no longer reachable from any
-     entry point (cross-check against `pnpm knip` output for that workspace
-     if available).
-   - Drift from the layer's own agent-file conventions — e.g. a file still
-     using a pattern a later convention change superseded elsewhere in the
-     same layer.
-   - Stale `TODO:`/`FIXME:` comments whose linked issue is already closed.
+1. **Read the owning agent's file** (`.claude/agents/<agent>.md`; `config.md`
+   for `utils` and `configs/*`). Its scope, hard boundaries and conventions
+   are the judgment bar: a finding that contradicts one is a misread, not a
+   refactor.
+2. **Dispatch the `explore` subagent**, with findings only in that layer's
+   directories (`packages/<x>/src`, `apps/<x>/src`, or whatever else the
+   agent file's scope names). It may read `@blog/utils`/`@blog/config`
+   exports as reference, never another layer's implementation. Ask for
+   `file:line` evidence, not prose, against all six:
+   - **Duplication.** Two occurrences of the same logical operation qualify.
+     A repeated multi-step expression (the same `.trim().toLowerCase()` at
+     every call site) counts, not only copy-paste. Name where each
+     extraction lands (CLAUDE.md → "A second copy moves to a shared
+     folder…" routes every kind). Tests count too — repeated arrangement,
+     fixture literals, `vi.mock` factories — at the thresholds
+     `testing-practices` sets.
+   - **Code worth simplifying**, even when it appears once: deep nesting, a
+     function doing several unrelated things, hand-rolled logic an existing
+     `@blog/utils`/`@blog/config` helper already covers, a component over
+     its prop ceiling (`react-component-practices` § Props), a shape harder
+     to follow than the problem.
+   - **Comment-policy violations** per CLAUDE.md → "Comments default to
+     zero" — swept as well as converged on touch, since that rule never
+     bars a sweep. One comment copy-pasted across files is a duplication
+     finding as well — the copies drift apart.
+   - **Dead code** — unused exports, orphaned files, unreachable code;
+     cross-check `pnpm knip --workspace <dir>`.
+   - **Drift** — a file still on a pattern the agent file, or the rest of
+     the layer, has moved off.
+   - **Stale `TODO:`/`FIXME:`** whose linked issue is closed.
 
-   Explicitly exclude pure style/taste opinions the workspace's own
-   ESLint/Prettier config doesn't already flag — this hunts for duplication,
-   simplification, comment-policy compliance, and drift, not a second
-   opinion on formatting.
+   Exclude:
+   - Style or taste the workspace's ESLint/Prettier config doesn't flag.
+   - A one-line idiom (`.claude/agents/config.md` → "Helpers").
+   - Conventions that converge on touch and never through a sweep ticket: a
+     single-consumer `*-variants.ts` (`react-component-practices` § Styling
+     files), a single-domain component in `shared/`
+     (`react-component-practices` § Where a component lives), file size
+     alone (CLAUDE.md → "File size budgets"), a raw type form `@blog/config`
+     already names (`.claude/agents/config.md` → "Types"), a feature with no
+     `docs/features/` page (CLAUDE.md → "Feature docs").
 
-3. **Dedup and sanity-check** the raw findings yourself before filing
-   anything — merge near-duplicates, drop anything too subjective to act on
-   without a judgment call only a human should make.
-4. **File the surviving findings as tracked issues via `board-keeper`**, one
-   batched dispatch for the whole set (`board-keeper.md`'s batch-dispatch
-   support — never one dispatch per finding). Two shapes, chosen per
-   finding:
-   - **Micro-findings** — mechanical fixes a competent agent lands in
-     minutes (a comment deletion, a rename, a dead export, a two-line
-     dedup) — do **not** each get their own issue. Batch every
-     micro-finding from the sweep into **one** umbrella issue per layer
-     (`chore(<layer>): cleanup batch — <date>`), its body a checklist of
-     `file:line` items, harvested later in a single batch PR. One sweep
-     never mints more than one umbrella.
+3. **Dedup and sanity-check** the raw findings: merge near-duplicates, drop
+   anything that needs a judgment call only a human should make.
+4. **File them through `board-keeper` in one batched dispatch**, never one
+   per finding:
+   - **Micro-findings** — mechanical fixes landed in minutes (a comment
+     deletion, a rename, a dead export, a two-line dedup) — share **one**
+     umbrella issue per sweep, `chore(<layer>): cleanup batch — <date>`,
+     whose body is a `file:line` checklist for a single batch PR.
    - **Substantial findings** — an extraction with design decisions, a
-     restructuring, anything needing its own review — get their own issue
-     as before.
+     restructuring, anything needing its own review — get an issue each.
 
-   Each issue: `refactor` + `layer:<x>` labels **plus exactly one `prio:*`
-   label — `prio:later` by default, `prio:someday` if speculative; a sweep
-   finding never earns `prio:now`/`prio:next` unless it is a user-facing
-   bug, in which case it's labeled `bug`, not `refactor`** (CLAUDE.md's
-   "Ticket priority & triage" section). Add `cloud-ok` when the issue meets
-   that section's solo-cloud-session criteria — most single-layer sweep
-   findings do. Title names the concrete problem; body carries the
-   `file:line` evidence and a proposed direction. **Do not implement any
-   of them here** — actual fixes go through the normal `develop-feature`
-   lifecycle later, as their own ticket, own PR, own gate sequence, whenever
-   someone decides to act on it. This skill's job ends at "surfaced and
-   ticketed."
+   Each title names the concrete problem (conventional-commit style).
+   Bodies follow CLAUDE.md → "Issue body template", carry the `file:line`
+   evidence and a proposed direction, and pass "Read the body against the
+   skills" before dispatch. Labels: `refactor`, `layer:<agent>` (the owning
+   agent's name — `layer:config` for `utils`, `layer:platform-app`), and
+   `prio:later`, or `prio:someday` if speculative. A user-facing bug is
+   `bug`, not `refactor`, and takes its priority from "Ticket priority &
+   triage". Add `cloud-ok` when the issue meets that section's criteria —
+   most single-layer findings do.
 
-5. **Report a summary**: layer swept, finding count, issue numbers filed.
-
-## Cadence
-
-No fixed schedule — this runs only when explicitly invoked ("run a refactor
-sweep", naming a layer). Which layer is overdue is a call the human makes;
-this skill doesn't track or infer it.
+5. **Report**: layer swept, finding count, issue numbers filed.
 
 ## Boundaries
 
-- **Never edit source files.** Findings become issues, not commits.
-- **Never sweep more than one layer per run.** A big-bang audit across every
-  layer at once produces a wall of findings nobody triages — the point of
-  this skill is a steady, reviewable drip.
+- **Never edit source files or implement a finding.** Each fix ships later as
+  its own ticket through `develop-feature`.
+- **One layer per run.** A repo-wide pass produces a wall of findings nobody
+  triages; the point is a steady, reviewable drip.

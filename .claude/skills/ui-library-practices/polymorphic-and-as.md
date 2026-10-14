@@ -1,31 +1,63 @@
 # Polymorphic `as` — Level 2 and anchor rules (`@blog/ui`)
 
-Reference for the `ui-library-practices` skill. SKILL.md covers the decision
-(Level 1 union by default). Read this when you actually need element-specific
-prop inference, or when an organism builds an anchor to hand into a slot.
+Reference for `ui-library-practices` § Polymorphism, which picks the level
+(Level 1 union by default). Read this when a component needs element-specific
+prop inference, or renders an anchor anywhere in its tree.
 
-> **These components are the one sanctioned exception to "Closed prop types."**
-> Everywhere else in `@blog/ui`, a component enumerates its props and never
-> spreads `...rest`. A Level 2 polymorphic component keeps
-> `TPolymorphicProps<C, OwnProps>` and its spread precisely because forwarding
-> the caller-chosen element's props is its contract — the props belong to an
-> element the component doesn't choose, so it cannot enumerate them. That
-> reasoning does not extend to a component that renders a fixed element:
-> "consumers might want to pass `aria-*`" is not a reason to reopen the
-> surface, it's a reason to name the prop. `Eyebrow` (`atoms/eyebrow`) chooses
-> its own element (`<p>` or `linkAs`-configured link) rather than exposing
-> `as`, so it's closed like any other atom, not part of this carve-out.
+## The closed-prop-types exception stops here
 
-## Level 2 — fully polymorphic (element-specific prop inference)
+A Level 2 component keeps `TPolymorphicProps<C, OwnProps>` and its `...rest`
+spread because the forwarded props belong to an element the caller chooses
+(SKILL.md § Closed prop types). The reasoning never extends to a component
+that renders a fixed element: "consumers might want `aria-*`" is a reason to
+name the prop, not to reopen the surface. `Eyebrow` (`atoms/eyebrow`) picks
+its own element — `<p>`, or a `linkAs` link when `href` is set — so it is
+closed like any other atom.
 
-When the component is a generic wrapper that should accept **any** element and
-expose _that element's_ props (`href` only when `as="a"`, `disabled` only when
-`as="button"`), use the shared `TPolymorphicProps<C, OwnProps>` generic from
-`@blog/config/react` — don't re-derive the mechanism per component. `Container`
-in `apps/web` is the reference consumer:
+## Level 2 — fully polymorphic
+
+For a wrapper that accepts **any** element and exposes _that_ element's props
+(`href` only when `as="a"`, `disabled` only when `as="button"`), import
+`TPolymorphicProps` from `@blog/config/react`
+(`packages/config/src/react/polymorphic.ts`) — never re-derive it. `ProseLink`
+(`atoms/prose-link`) is the minimal consumer; `NavLink`, `Tag`, `LinkButton`
+and `PopoverMenu.Item` follow the same shape:
 
 ```tsx
-// packages/config/src/react/polymorphic.ts (already built — import, don't rewrite)
+import {
+  A_AS_CONST,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
+import type { TPolymorphicProps } from '@blog/config/react';
+import type { ElementType } from 'react';
+
+import { proseLinkVariants } from './prose-link-variants';
+
+export type TProseLinkProps<C extends ElementType = typeof A_AS_CONST> =
+  TPolymorphicProps<C, IWithClassName & IWithDataTestId>;
+
+export const ProseLink = <C extends ElementType = typeof A_AS_CONST>({
+  as,
+  className,
+  dataTestId,
+  ...rest
+}: TProseLinkProps<C>) => {
+  const Component = as ?? A_AS_CONST;
+
+  return (
+    <Component
+      className={proseLinkVariants({ class: className })}
+      data-testid={dataTestId}
+      {...rest}
+    />
+  );
+};
+```
+
+The derivation, for reading the breakdown below (import it, never copy it):
+
+```ts
 export type TPolymorphicProps<
   C extends ElementType,
   OwnProps = object,
@@ -34,91 +66,47 @@ export type TPolymorphicProps<
 } & Omit<ComponentPropsWithoutRef<C>, keyof OwnProps | 'as'>;
 ```
 
-```tsx
-// apps/web/src/app/components/container.tsx
-import type { TPolymorphicProps } from '@blog/config/react';
-import type { ElementType } from 'react';
-
-import { containerVariants } from './container-variants';
-
-type TContainerOwnProps = { className?: string };
-
-export type TContainerProps<C extends ElementType = 'div'> = TPolymorphicProps<
-  C,
-  TContainerOwnProps
->;
-
-export const Container = <C extends ElementType = 'div'>({
-  as,
-  className,
-  ...rest
-}: TContainerProps<C>) => {
-  const Component = (as ?? 'div') as ElementType;
-  return (
-    <Component className={containerVariants({ class: className })} {...rest} />
-  );
-};
-```
-
-(Generic arrow components are fine in `.tsx` — the `extends` constraint on the
-type parameter disambiguates it from a JSX tag, so no `<C,>` trailing comma is
-needed.)
-
 Why each piece matters:
 
-- **`C extends ElementType = 'div'`** — `C` is inferred from `as`; the default
-  makes `<Container />` a `div` with no ceremony.
-- **`ComponentPropsWithoutRef<C>`** (inside `TPolymorphicProps`) — the
-  inference engine. `as="a"` makes `href` valid; `as="button"` makes `disabled`
-  valid instead.
-- **`Omit<…, keyof OwnProps | 'as'>`** — strips the element's own `className`/
-  `as` so the component's own prop typing wins and there's no key collision.
-  Add more own props to `TContainerOwnProps` and they're excluded automatically.
-- **`ComponentPropsWithoutRef`, not `WithRef`** — `TPolymorphicProps` is
-  deliberately built on `WithoutRef` for server-component-safe wrappers (refs
-  don't cross the RSC boundary). If a client component genuinely needs a ref,
-  don't reuse `TPolymorphicProps` — build a local variant with
-  `ComponentPropsWithRef<C>`; React 19's ref-as-prop forwards it through
-  `...rest` with no `forwardRef` wrapper.
-- **`as ElementType` cast** — the one unavoidable seam at the consumer's render
-  site (not inside the shared type): TS can't prove a generic-typed value is
-  safe to spread arbitrary props onto. One narrow cast per consumer is the
-  standard escape hatch.
-- **Why `@blog/config/react`, not the package root** — `@blog/config`'s root
-  barrel is framework-agnostic and consumed by `@blog/service`, which must
-  never import React. `TPolymorphicProps` lives behind a dedicated `./react`
-  subpath so it's opt-in and doesn't leak `@types/react` into `service`'s type
-  graph. Always import it as `@blog/config/react`, never re-export from root.
+- **`C extends ElementType = typeof A_AS_CONST`** — `C` is inferred from `as`;
+  the default (`A_AS_CONST`, `SPAN_AS_CONST` or `BUTTON_AS_CONST` from
+  `@blog/config`) makes a bare `<ProseLink />` an `<a>`. The `extends`
+  constraint also lets the generic arrow parse in `.tsx`, so no `<C,>`.
+- **`as ?? A_AS_CONST`** needs no `as ElementType` cast; don't add one.
+- **`ComponentPropsWithoutRef<C>`** (inside the generic) is the inference
+  engine: `as="a"` makes `href` valid, `as="button"` makes `disabled` valid.
+- **`Omit<…, keyof OwnProps | 'as'>`** lets the component's own props win over
+  the element's; every own prop added is excluded automatically.
+- **`WithoutRef`, deliberately** — refs don't cross the RSC boundary. A client
+  component that genuinely needs a ref builds a local variant on
+  `ComponentPropsWithRef<C>` instead of reusing `TPolymorphicProps`; React 19's
+  ref-as-prop forwards it through `...rest` with no `forwardRef`.
+- **`@blog/config/react`, never the root barrel** — the root is consumed by
+  `@blog/service`, which must not see React types. Never re-export the React
+  types from the root.
 
-## Any anchor a component builds itself — never a hardcoded `<a>`
+## Every anchor a component renders — never a hardcoded `<a>`
 
-This applies even when the anchor isn't the component's own root — e.g. an
-**organism that constructs a link to pass into another component's slot**
-(`PostsSection` building the `<a href={post.href}>` it hands to
-`PostCard.Title`). The organism is still rendering an anchor, so it still needs
-a `linkAs`/`as` prop (Level 1, `TAnchorElementType` from `@blog/config/react`
-— reuse it, don't redeclare the union) that defaults to `'a'`. A bare `<a>`
-baked into an organism is exactly as wrong as one baked into an atom; "it's
-just wrapping a slot's children" is not an exemption.
+The rule (SKILL.md § Polymorphism) covers anchors that aren't the component's
+root too: `Pagination`'s page links, `BookmarksList`'s per-row link, and a link
+an organism builds to hand into another component's slot. Each takes a
+`linkAs` prop typed `TAnchorElementType` (`@blog/config/react` — never
+redeclare the union), defaulting to `'a'`. "It only wraps a slot's children"
+is not an exemption.
 
 ```tsx
-// ❌ organism hardcodes the anchor; apps/web can never swap in next/link
-<PostCard.Title>
-  <a href={post.href} className="before:absolute before:inset-0">
-    {post.title}
-  </a>
-</PostCard.Title>;
+// ❌ hardcoded — apps/web can never swap in its router Link
+<a href={bookmark.href} className="underline">
+  {bookmark.filename}
+</a>;
 
-// ✅ polymorphic, defaults to 'a', styling lives in the variants file
-const Link = (linkAs ?? 'a') as ElementType;
-<PostCard.Title>
-  <Link href={post.href} className={s.titleLink()}>
-    {post.title}
-  </Link>
-</PostCard.Title>;
+// ✅ polymorphic, defaults to 'a', classes from a tv() slot
+const Component = linkAs ?? A_AS_CONST;
+<Component href={bookmark.href} className={filename()}>
+  {bookmark.filename}
+</Component>;
 ```
 
-Note `className={s.titleLink()}`, not an inline string — the "no inline
-Tailwind classes" rule applies to every element, including one-off classes
-like a full-card overlay (`before:absolute before:inset-0`). Give it its own
-named slot in `{component}-variants.ts`.
+A one-off class on that anchor (a full-card `before:absolute before:inset-0`
+overlay) is still a named slot in the component's `tv()`, never an inline
+string — SKILL.md § Styling.
