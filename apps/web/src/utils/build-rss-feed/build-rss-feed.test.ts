@@ -1,12 +1,16 @@
 /**
  * @vitest-environment jsdom
  */
+import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
+
 import { buildRssFeed, type TRssItem } from './build-rss-feed';
 
 const channel = {
   title: 'The Blog',
   description: 'Latest posts',
-  siteUrl: 'https://example.com',
+  link: 'https://example.com/nl',
+  language: 'nl',
+  feedUrl: 'https://example.com/nl/rss.xml',
 };
 
 const item: TRssItem = {
@@ -21,10 +25,36 @@ describe(buildRssFeed, () => {
     const xml = buildRssFeed(channel, [item]);
 
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
-    expect(xml).toContain('<rss version="2.0">');
     expect(xml).toContain('<title>The Blog</title>');
-    expect(xml).toContain('<link>https://example.com</link>');
+    expect(xml).toContain('<link>https://example.com/nl</link>');
     expect(xml).toContain('<description>Latest posts</description>');
+    expect(xml).toContain('<language>nl</language>');
+  });
+
+  it('links the channel to its own feed URL', () => {
+    const doc = new DOMParser().parseFromString(
+      buildRssFeed(channel, [item]),
+      'application/xml',
+    );
+    const selfLink = getRssSelfLink(doc);
+
+    expect(selfLink?.getAttribute('href')).toBe(
+      'https://example.com/nl/rss.xml',
+    );
+    expect(selfLink?.getAttribute('rel')).toBe('self');
+    expect(selfLink?.getAttribute('type')).toBe('application/rss+xml');
+  });
+
+  it("dates the build to the newest item's publication", () => {
+    const xml = buildRssFeed(channel, [
+      item,
+      { ...item, publishedAt: '2026-03-01T00:00:00Z' },
+      { ...item, publishedAt: '2025-12-01T00:00:00Z' },
+    ]);
+
+    expect(xml).toContain(
+      `<lastBuildDate>${new Date('2026-03-01T00:00:00Z').toUTCString()}</lastBuildDate>`,
+    );
   });
 
   it('renders each item with title, link, description and pubDate', () => {
@@ -52,18 +82,12 @@ describe(buildRssFeed, () => {
     expect(itemXml).not.toContain('<description>');
   });
 
-  it('omits the channel description element entirely when the channel has none', () => {
-    const xml = buildRssFeed({ ...channel, description: undefined }, [item]);
-    const channelXml = xml.slice(0, xml.indexOf('<item>'));
-
-    expect(channelXml).not.toContain('<description>');
-  });
-
-  it('produces an empty channel (no items) without throwing', () => {
+  it('produces an empty channel with no build date when there are no items', () => {
     const xml = buildRssFeed(channel, []);
 
-    expect(xml).toContain('<rss version="2.0">');
+    expect(xml).toContain('<channel>');
     expect(xml).not.toContain('<item>');
+    expect(xml).not.toContain('<lastBuildDate>');
   });
 
   it('is parseable as XML', () => {

@@ -4,6 +4,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TFeedPost } from '@blog/service';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
 
 const {
   getAllPublishedPostsMock,
@@ -57,6 +58,12 @@ const getFeed = async (locale: string = EN) => {
 
   return GET(request, { params: paramsFor(locale) });
 };
+
+const getFeedDocument = async (locale: string = EN) =>
+  new DOMParser().parseFromString(
+    await (await getFeed(locale)).text(),
+    'application/xml',
+  );
 
 const post: TFeedPost = {
   title: 'Hello & Welcome',
@@ -139,38 +146,70 @@ describe('GET /[locale]/rss.xml', () => {
     });
   });
 
-  it('falls back to a generic channel title when site settings fail', async () => {
+  it('falls back to a generic channel title and description when site settings fail', async () => {
     getSiteSettingsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
-    const response = await getFeed();
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const doc = await getFeedDocument();
 
     expect(doc.querySelector('channel > title')?.textContent).toBe('Blog');
-    expect(doc.querySelector('channel > description')).toBeNull();
+    expect(doc.querySelector('channel > description')?.textContent).toBe(
+      'The latest posts.',
+    );
   });
 
-  it('omits the channel description when the index page fails to load', async () => {
-    getIndexPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
-    const response = await getFeed();
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
-
-    expect(doc.querySelector('channel > description')).toBeNull();
-  });
-
-  it('omits the channel description when the index page has none authored', async () => {
+  it('describes the channel with the brand tagline when the index page has no description', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: { seo: { description: undefined } },
     });
-    const response = await getFeed();
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { name: 'My Blog', tagline: 'Notes · Essays' } },
+    });
+    const doc = await getFeedDocument();
 
-    expect(doc.querySelector('channel > description')).toBeNull();
+    expect(doc.querySelector('channel > description')?.textContent).toBe(
+      'Notes · Essays',
+    );
+  });
+
+  it('describes the channel with the brand tagline when the index page fails to load', async () => {
+    getIndexPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { name: 'My Blog', tagline: 'Notes · Essays' } },
+    });
+    const doc = await getFeedDocument();
+
+    expect(doc.querySelector('channel > description')?.textContent).toBe(
+      'Notes · Essays',
+    );
+  });
+
+  it('carries the language, home link and self link of an unprefixed default-language feed', async () => {
+    const doc = await getFeedDocument();
+
+    expect(doc.querySelector('channel > language')?.textContent).toBe('en');
+    expect(doc.querySelector('channel > link')?.textContent).toBe(
+      'https://example.com',
+    );
+    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(
+      'https://example.com/rss.xml',
+    );
+  });
+
+  it('carries the language, home link and self link of a prefixed feed', async () => {
+    const doc = await getFeedDocument(NL);
+
+    expect(doc.querySelector('channel > language')?.textContent).toBe('nl');
+    expect(doc.querySelector('channel > link')?.textContent).toBe(
+      'https://example.com/nl',
+    );
+    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(
+      'https://example.com/nl/rss.xml',
+    );
   });
 
   it('returns an empty feed (no items) when the posts fetch fails', async () => {

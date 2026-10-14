@@ -104,6 +104,7 @@
   },
   "rss": {
     "fallbackTitle": "Blog",
+    "fallbackDescription": "De nieuwste berichten.",
     "feedLinkLabel": "RSS-feed"
   },
   "authMenu": {

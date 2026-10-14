@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import { type ITenantLocalizedParams, routes } from '@blog/config';
 import {
   service,
   type TFeedPost,
@@ -67,7 +67,7 @@ export async function GET(
   if (!feed) {
     return new NextResponse(null, { status: 404 });
   }
-  const { tenant, siteUrl, toRssItem } = feed;
+  const { tenant, language, toLocalizedUrl, toRssItem } = feed;
 
   const result = await getAllTagPosts(slug, tenant);
 
@@ -75,9 +75,16 @@ export async function GET(
     notFound();
   }
 
+  const { title, description, posts } = result;
   const xml = buildRssFeed(
-    { title: result.title, description: result.description, siteUrl },
-    result.posts.map(toRssItem),
+    {
+      title,
+      description,
+      link: toLocalizedUrl(routes.home()),
+      language,
+      feedUrl: toLocalizedUrl(routes.tagRssFeed(slug)),
+    },
+    posts.map(toRssItem),
   );
 
   return new Response(xml, {
