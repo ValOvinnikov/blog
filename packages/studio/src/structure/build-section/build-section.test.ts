@@ -50,6 +50,30 @@ const makeMockBuilder = (kind: string, documentType?: string): TMockBuilder => {
 const callArgs = (builder: TMockBuilder, method: string) =>
   builder.calls.find((call) => call.method === method)?.args;
 
+const LANGUAGE_DATASET = [
+  { _id: 'en-page', _type: 'landingPage', language: 'EN' },
+  { _id: 'nl-page', _type: 'landingPage', language: 'NL' },
+  { _id: 'unset-page', _type: 'landingPage' },
+  {
+    _id: 'nl-child',
+    _type: 'landingPage',
+    language: 'NL',
+    parent: { _type: 'reference', _ref: 'nl-page' },
+  },
+  { _id: 'nl-post', _type: 'postPage', language: 'NL' },
+];
+
+const listedIds = async (list: TMockBuilder) => {
+  const [filter] = callArgs(list, 'filter') as [string];
+  const [params] = callArgs(list, 'params') as [Record<string, unknown>];
+  return (
+    await evaluate(parse(`*[${filter}]._id`), {
+      dataset: LANGUAGE_DATASET,
+      params,
+    })
+  ).get();
+};
+
 const makeMockStructureBuilder = (dataset: Record<string, unknown>[] = []) => ({
   context: {
     getClient: () => ({
@@ -541,6 +565,9 @@ describe(buildSections, () => {
       return { S, item: item! };
     };
 
+    const listOf = (languageItem: TMockBuilder) =>
+      callArgs(languageItem, 'child')?.[0] as TMockBuilder;
+
     const buildLanguageLists = (locales?: readonly TLocaleIsoCode[]) => {
       const { item } = buildLandingItem(locales);
       const list = callArgs(item, 'child')?.[0] as TMockBuilder;
@@ -555,12 +582,34 @@ describe(buildSections, () => {
       expect(documentList.kind).toBe('documentTypeList');
       expect(documentList.documentType).toBe('landingPage');
       expect(callArgs(documentList, 'title')).toEqual(['Landing Pages']);
-      expect(callArgs(documentList, 'filter')).toBeUndefined();
       expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
         [{ templateId: 'landingPage-NL' }],
       ]);
       expect(S.list).toHaveBeenCalledTimes(1);
       expect(S.divider).not.toHaveBeenCalled();
+    });
+
+    it('lists only default-language pages, and pages with no language, with one live language', async () => {
+      const { item } = buildLandingItem([LOCALE_ISO_CODES.NL]);
+
+      expect(
+        await listedIds(callArgs(item, 'child')?.[0] as TMockBuilder),
+      ).toEqual(['nl-page', 'unset-page', 'nl-child']);
+    });
+
+    it('lists the other language again once it is live', async () => {
+      const lists = buildLanguageLists([
+        LOCALE_ISO_CODES.EN,
+        LOCALE_ISO_CODES.NL,
+      ]);
+
+      expect(await listedIds(listOf(lists[0]!))).toEqual(['en-page']);
+      expect(await listedIds(listOf(lists.at(-1)!))).toEqual([
+        'en-page',
+        'nl-page',
+        'unset-page',
+        'nl-child',
+      ]);
     });
 
     it('keeps a list per language and all pages with two live languages', () => {
@@ -585,9 +634,6 @@ describe(buildSections, () => {
         'All pages',
       ]);
     });
-
-    const listOf = (languageItem: TMockBuilder) =>
-      callArgs(languageItem, 'child')?.[0] as TMockBuilder;
 
     it('lists every locale by its own name, then a divider, then all pages', () => {
       const lists = buildLanguageLists();
@@ -704,16 +750,11 @@ describe(buildSections, () => {
       expect(callArgs(allPagesList, 'child')).toBeUndefined();
     });
 
-    it('lists only top-level pages with one live language', () => {
+    it('lists only top-level default-language pages with one live language', async () => {
       const documentList = documentListOf(buildTreeItem([LOCALE_ISO_CODES.NL]));
 
       expect(documentList.kind).toBe('documentTypeList');
-      expect(callArgs(documentList, 'filter')).toEqual([
-        '_type == $type && !defined(parent)',
-      ]);
-      expect(callArgs(documentList, 'params')).toEqual([
-        { type: 'landingPage' },
-      ]);
+      expect(await listedIds(documentList)).toEqual(['nl-page', 'unset-page']);
       expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
         [{ templateId: 'landingPage-NL' }],
       ]);
