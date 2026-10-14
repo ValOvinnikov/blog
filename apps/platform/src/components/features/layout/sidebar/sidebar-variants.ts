@@ -25,12 +25,12 @@ export const sidebarVariants = tv({
     ],
     section: ['flex flex-col gap-1.5 px-3 pt-[14px]'],
     sectionLabel: [
-      'px-2.5 pb-1.5 text-[11px] font-bold tracking-[0.09em] text-admin-side-muted uppercase',
+      'px-2.5 pb-1.5 text-admin-11 font-bold tracking-[0.09em] text-admin-side-muted uppercase',
       'group-data-[collapsed=true]/shell:hidden',
     ],
     list: ['flex flex-col gap-0.5'],
     row: [
-      'group flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-[13px]',
+      'group flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-admin-13',
       'transition-colors duration-base ease-smooth',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',

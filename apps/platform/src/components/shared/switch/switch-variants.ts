@@ -5,7 +5,7 @@ export const switchVariants = tv({
   slots: {
     root: [
       'inline-flex min-h-11 cursor-pointer items-center gap-2 md:min-h-0',
-      'text-[13px] text-admin-text',
+      'text-admin-13 text-admin-text',
       ...HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES,
     ],
     track: [

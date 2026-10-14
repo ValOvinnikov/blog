@@ -13,8 +13,8 @@ export const tenantSwitcherVariants = tv({
     ],
     meta: ['flex min-w-0 flex-1 flex-col'],
     nameRow: ['flex min-w-0 items-center gap-1.5'],
-    name: ['min-w-0 flex-1 truncate text-[13px] font-semibold text-white'],
-    domain: ['truncate font-mono text-[11px] text-admin-faint'],
+    name: ['min-w-0 flex-1 truncate text-admin-13 font-semibold text-white'],
+    domain: ['truncate font-mono text-admin-11 text-admin-faint'],
     chev: ['rotate-90 text-admin-faint'],
     badge: ['shrink-0'],
     popup: [
@@ -29,9 +29,9 @@ export const tenantSwitcherVariants = tv({
     ],
     itemNameRow: ['flex min-w-0 items-center gap-1.5'],
     itemName: [
-      'min-w-0 flex-1 truncate text-[13px] font-medium text-admin-side-text',
+      'min-w-0 flex-1 truncate text-admin-13 font-medium text-admin-side-text',
     ],
-    itemDomain: ['font-mono text-[11px] text-admin-faint'],
+    itemDomain: ['font-mono text-admin-11 text-admin-faint'],
     itemBadge: ['shrink-0'],
   },
 });
