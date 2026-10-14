@@ -3,27 +3,25 @@ import {
   type TLanguageSwitcherStyle,
 } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import { useTranslations } from 'next-intl';
 
 import { languageSwitcherCardVariants } from './language-switcher-card-variants';
 
 export type TLanguageSwitcherCardProps = {
-  languageSwitcherStyle: TLanguageSwitcherStyle;
   hasMultipleLanguages: boolean;
-  onFieldChange: TLookFormFieldSetter;
-  hasUnsavedChanges: boolean;
 };
 
 export const LanguageSwitcherCard = ({
-  languageSwitcherStyle,
   hasMultipleLanguages,
-  onFieldChange,
-  hasUnsavedChanges,
 }: TLanguageSwitcherCardProps) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
+  const {
+    values: { languageSwitcherStyle },
+    updateField,
+  } = useLookForm();
   const t = useTranslations('lookForm');
   const { switcher, note } = languageSwitcherCardVariants();
 
@@ -38,9 +36,9 @@ export const LanguageSwitcherCard = ({
 
   return (
     <LookCard
+      card="languageSwitcher"
       title={languageSwitcherLabel}
       description={t('languageSwitcherDescription')}
-      hasUnsavedChanges={hasUnsavedChanges}
     >
       {hasMultipleLanguages ? (
         <SegmentedControl<TLanguageSwitcherStyle>
@@ -48,7 +46,7 @@ export const LanguageSwitcherCard = ({
           ariaLabel={languageSwitcherLabel}
           options={languageSwitcherOptions}
           value={languageSwitcherStyle}
-          onChange={(style) => onFieldChange('languageSwitcherStyle', style)}
+          onChange={(style) => updateField('languageSwitcherStyle', style)}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />

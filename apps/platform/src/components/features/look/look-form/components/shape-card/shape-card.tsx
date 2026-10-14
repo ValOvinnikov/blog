@@ -8,27 +8,17 @@ import {
 } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import { useTranslations } from 'next-intl';
 
-export type TShapeCardProps = {
-  radiusScale: TRadiusScale;
-  density: TDensity;
-  cardStyle: TCardStyle;
-  onFieldChange: TLookFormFieldSetter;
-  hasUnsavedChanges: boolean;
-};
-
-export const ShapeCard = ({
-  radiusScale,
-  density,
-  cardStyle,
-  onFieldChange,
-  hasUnsavedChanges,
-}: TShapeCardProps) => {
+export const ShapeCard = () => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
+  const {
+    values: { radiusScale, density, cardStyle },
+    updateField,
+  } = useLookForm();
   const t = useTranslations('lookForm');
 
   const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
@@ -52,9 +42,9 @@ export const ShapeCard = ({
 
   return (
     <LookCard
+      card="shape"
       title={t('shapeHeading')}
       description={t('shapeDescription')}
-      hasUnsavedChanges={hasUnsavedChanges}
     >
       <LookField
         label={radiusScaleLabel}
@@ -64,7 +54,7 @@ export const ShapeCard = ({
         <SegmentedControl<TRadiusScale>
           options={radiusOptions}
           value={radiusScale}
-          onChange={(scale) => onFieldChange('radiusScale', scale)}
+          onChange={(scale) => updateField('radiusScale', scale)}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />
@@ -78,7 +68,7 @@ export const ShapeCard = ({
         <SegmentedControl<TDensity>
           options={densityOptions}
           value={density}
-          onChange={(option) => onFieldChange('density', option)}
+          onChange={(option) => updateField('density', option)}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />
@@ -92,7 +82,7 @@ export const ShapeCard = ({
         <SegmentedControl<TCardStyle>
           options={cardStyleOptions}
           value={cardStyle}
-          onChange={(style) => onFieldChange('cardStyle', style)}
+          onChange={(style) => updateField('cardStyle', style)}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />

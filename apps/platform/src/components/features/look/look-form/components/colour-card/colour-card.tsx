@@ -1,33 +1,22 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import { buildAccentPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
 
 import { colourCardVariants } from './colour-card-variants';
 
-export type TColourCardProps = {
-  accentHue: number;
-  accentHueFieldId: string;
-  isAccentHueRejected: boolean;
-  logoHue: TMaybeUndefined<number>;
-  onFieldChange: TLookFormFieldSetter;
-  hasUnsavedChanges: boolean;
-};
-
-export const ColourCard = ({
-  accentHue,
-  accentHueFieldId,
-  isAccentHueRejected,
-  logoHue,
-  onFieldChange,
-  hasUnsavedChanges,
-}: TColourCardProps) => {
+export const ColourCard = () => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
+  const {
+    values: { accentHue, logoHue },
+    updateField,
+    accentHueFieldId,
+    isAccentHueRejected,
+  } = useLookForm();
   const t = useTranslations('lookForm');
   const tHue = useTranslations('logoHueField');
   const { hueField, swatch, hueValue } = colourCardVariants();
@@ -39,9 +28,9 @@ export const ColourCard = ({
 
   return (
     <LookCard
+      card="colour"
       title={t('colourHeading')}
       description={t('colourDescription')}
-      hasUnsavedChanges={hasUnsavedChanges}
     >
       <LookField
         label={accentHueLabel}
@@ -58,7 +47,7 @@ export const ColourCard = ({
             id={accentHueFieldId}
             ariaLabel={accentHueLabel}
             value={accentHue}
-            onChange={(value) => onFieldChange('accentHue', value)}
+            onChange={(value) => updateField('accentHue', value)}
             isDisabled={isArchived}
             aria-describedby={archivedDescribedBy}
           />
@@ -77,8 +66,7 @@ export const ColourCard = ({
         <LogoHueField
           accentHue={accentHue}
           logoHue={logoHue}
-          onChange={(hue) => onFieldChange('logoHue', hue)}
-          isDark={false}
+          onChange={(hue) => updateField('logoHue', hue)}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />

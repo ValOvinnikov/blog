@@ -18,12 +18,7 @@ describe(LogoHueField, () => {
 
   it('shows the follows-accent state, distinct from any explicit hue, when logoHue is unset', () => {
     render(
-      <LogoHueField
-        accentHue={250}
-        logoHue={undefined}
-        onChange={vi.fn()}
-        isDark={false}
-      />,
+      <LogoHueField accentHue={250} logoHue={undefined} onChange={vi.fn()} />,
     );
 
     expect(screen.getByText('follows accent')).toBeVisible();
@@ -34,14 +29,7 @@ describe(LogoHueField, () => {
   });
 
   it('shows the explicit hue value, distinguishable from following, once one is set', () => {
-    render(
-      <LogoHueField
-        accentHue={250}
-        logoHue={90}
-        onChange={vi.fn()}
-        isDark={false}
-      />,
-    );
+    render(<LogoHueField accentHue={250} logoHue={90} onChange={vi.fn()} />);
 
     expect(screen.getByText('hue 90°')).toBeVisible();
     expect(
@@ -56,7 +44,6 @@ describe(LogoHueField, () => {
         accentHue={200}
         logoHue={undefined}
         onChange={handleChange}
-        isDark={false}
       />,
     );
 
@@ -68,12 +55,7 @@ describe(LogoHueField, () => {
   it('switching follow back on reports undefined', async () => {
     const handleChange = vi.fn();
     render(
-      <LogoHueField
-        accentHue={200}
-        logoHue={90}
-        onChange={handleChange}
-        isDark={false}
-      />,
+      <LogoHueField accentHue={200} logoHue={90} onChange={handleChange} />,
     );
 
     await user.click(screen.getByRole('switch', { name: 'Follow accent hue' }));
@@ -87,7 +69,6 @@ describe(LogoHueField, () => {
         accentHue={200}
         logoHue={90}
         onChange={vi.fn()}
-        isDark={false}
         isDisabled={true}
         aria-describedby="archived-notice"
       />,

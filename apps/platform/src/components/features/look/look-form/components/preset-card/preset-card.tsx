@@ -1,40 +1,29 @@
-import { SIZE, type TPresetId } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Button } from '@platform/components/shared/button';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
-export type TPresetCardProps = {
-  preset: TPresetId;
-  onPresetChange: (preset: TPresetId) => void;
-  onReset: () => void;
-  isResetVisible: boolean;
-  hasUnsavedChanges: boolean;
-};
-
-export const PresetCard = ({
-  preset,
-  onPresetChange,
-  onReset,
-  isResetVisible,
-  hasUnsavedChanges,
-}: TPresetCardProps) => {
+export const PresetCard = () => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
+  const { values, changePreset, resetToPreset, isDivergedFromPreset } =
+    useLookForm();
   const t = useTranslations('lookForm');
 
   return (
     <LookCard
+      card="preset"
       title={t('presetLabel')}
       description={t('presetDescription')}
-      hasUnsavedChanges={hasUnsavedChanges}
       actions={
-        isResetVisible && (
+        isDivergedFromPreset && (
           <Button
             type="button"
             variant="secondary"
             size={SIZE.SM}
-            onClick={onReset}
+            onClick={resetToPreset}
             isDisabled={isArchived}
             aria-describedby={archivedDescribedBy}
           >
@@ -44,8 +33,8 @@ export const PresetCard = ({
       }
     >
       <PresetPicker
-        value={preset}
-        onChange={onPresetChange}
+        value={values.preset}
+        onChange={changePreset}
         isDisabled={isArchived}
         aria-describedby={archivedDescribedBy}
       />
