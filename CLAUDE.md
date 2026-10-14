@@ -3,8 +3,8 @@
 Guidance for working in this repo. `SPEC.md` is the architecture core — layer
 contracts, data flow, cross-cutting rules — and `docs/features/<feature>.md` is
 the per-feature reference ("Feature docs" under Conventions). Open work lives on
-the project board ("Ticket priority & triage"); `docs/BACKLOG.md` is the
-ticket-ready roadmap. `docs/archive/` is frozen history — never read it for
+the project board ("Ticket priority & triage"); `docs/ROADMAP.md` is the order
+the open epics ship in. `docs/archive/` is frozen history — never read it for
 current behaviour; when it disagrees with `SPEC.md`, the spec wins.
 
 ## What this is
@@ -1004,7 +1004,7 @@ including both approval gates, is unchanged.)
    catches, at ~10 minutes and ~150k tokens a dispatch, so check them by hand
    before committing: grep every code identifier, path and issue number the
    diff names against `origin/main` and `gh`, and re-read any sibling doc the
-   change duplicates a decision into (a feature page, `docs/BACKLOG.md`, an
+   change duplicates a decision into (a feature page, `docs/ROADMAP.md`, an
    epic body). State in the push ask that the diff was docs-only and
    identifier-checked.
 

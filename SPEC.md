@@ -2468,7 +2468,6 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   The production ones do not: they fail loudly on a missing Vercel token, org
   id or project id, because a skipped step reports green and a tag that shipped
   only one of the two apps would otherwise look like a complete release.
-- Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
 - Full topology detail (per-environment isolation rationale, dataset refresh
   workflow, tag-as-source-of-truth) is in [`docs/DEPLOY.md`](./docs/DEPLOY.md) —
   this section stays a summary to avoid drifting from that runbook.
@@ -2485,13 +2484,12 @@ inside the layer contracts above. Full roster and rationale for every piece:
 Multi-author dashboards, analytics beyond Vercel's built-in, a cross-tenant
 analytics dashboard, moving off Sanity, semantic search, and the
 AI/differentiator feature track (agent-native endpoints, publish-time
-generation — proposed in `docs/BACKLOG.md`). Each can be layered on without
+generation — idea epics on the board, listed in `docs/ROADMAP.md`). Each can be layered on without
 violating the contracts above. The platform's public front door — marketing
 site, self-serve signup, billing and trials — is planned but not built
 (epic #4840). **No longer out of scope:** comments, ratings,
 bookmarks, newsletter signup, and user auth — these are the actively-roadmapped
-M5 engagement layer (`docs/BACKLOG.md`'s "M5 — Engagement layer" section,
-epics #1039–#1044), built on the new `@blog/db` layer (§3, §4, §8).
+M5 engagement layer (epics #1039–#1044), built on the new `@blog/db` layer (§3, §4, §8).
 
 ## 16. Maintaining this document
 
@@ -2500,7 +2498,7 @@ epics #1039–#1044), built on the new `@blog/db` layer (§3, §4, §8).
   actually holds the detail that changed. Don't let a `docs/context/*.md` file
   drift out of sync with a summary here.
 - **Section numbers are stable** — other files (`.claude/agents/*.md`,
-  `docs/BACKLOG.md`, active plan docs, even code comments like
+  `docs/ROADMAP.md`, active plan docs, even code comments like
   `apps/web/playwright.config.ts`) cite sections by number. Never renumber an
   existing section when trimming or splitting it out; add or remove content
   within the section instead.

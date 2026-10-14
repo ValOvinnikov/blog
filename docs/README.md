@@ -29,7 +29,8 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
   shipped feature has a page; a PR that changes a feature updates its page,
   and one that adds a feature adds its page (`CLAUDE.md`'s "Feature docs"
   bullet).
-- **`docs/BACKLOG.md`** — ticket-ready roadmap.
+- **`docs/ROADMAP.md`** — the order the open epics ship in, open decisions,
+  and the release plan (Release 1 promote, Release 2 sell).
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
 - **`docs/design-reference/`** — design-system reference (HTML mockup +
   component specs + tokens), a separate concern from the specs/plans below.
