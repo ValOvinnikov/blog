@@ -2,18 +2,16 @@
 
 import { CONSENT_CATEGORY } from '@blog/config';
 import { ConsentPreferences } from '@blog/ui/components/molecules/consent-preferences';
-import {
-  useConsentChoices,
-  useConsentPreferences,
-} from '@web/context/consent-provider';
+import { useConsentPreferences } from '@web/context/consent-preferences-provider';
+import { useConsentStore } from '@web/hooks/use-consent-store';
 import { OPTIONAL_CONSENT_CATEGORIES } from '@web/utils/consent-cookie';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 export const ConsentPreferencesForm = () => {
   const t = useTranslations('consent');
-  const { granted, save } = useConsentChoices();
-  const { closePreferences } = useConsentPreferences();
+  const { granted, save } = useConsentStore();
+  const { close } = useConsentPreferences();
   const [values, setValues] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(
       OPTIONAL_CONSENT_CATEGORIES.map((category) => [
@@ -39,13 +37,11 @@ export const ConsentPreferencesForm = () => {
 
   const handleSave = () => {
     save(OPTIONAL_CONSENT_CATEGORIES.filter((category) => values[category]));
-    closePreferences();
+    close();
   };
 
   return (
     <ConsentPreferences
-      headingLevel={2}
-      heading={t('preferences.heading')}
       categories={categories}
       values={values}
       onCategoryChange={(id, checked) =>
@@ -54,7 +50,7 @@ export const ConsentPreferencesForm = () => {
       saveLabel={t('preferences.saveLabel')}
       onSave={handleSave}
       closeLabel={t('preferences.closeLabel')}
-      onClose={closePreferences}
+      onClose={close}
       dataTestId="consent-preferences"
     />
   );

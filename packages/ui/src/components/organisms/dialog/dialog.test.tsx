@@ -14,7 +14,7 @@ const openLabel = 'Open dialog';
 const fallbackLabel = 'Fallback';
 const actionLabel = 'Done';
 
-const Harness = ({ hidesOpenerOnClose = false }) => {
+const Harness = ({ hidesOpenerOnClose = false, hasCloseControl = true }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenerShown, setIsOpenerShown] = useState(true);
   const fallbackFocusRef = useRef<HTMLButtonElement>(null);
@@ -39,7 +39,7 @@ const Harness = ({ hidesOpenerOnClose = false }) => {
         onOpenChange={(nextIsOpen) => (nextIsOpen ? setIsOpen(true) : close())}
         heading={heading}
         headingLevel={2}
-        closeLabel={closeLabel}
+        closeLabel={hasCloseControl ? closeLabel : undefined}
         fallbackFocusRef={fallbackFocusRef}
       >
         <p>{body}</p>
@@ -115,5 +115,15 @@ describe(`<${Dialog.name}/>`, () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: fallbackLabel })).toHaveFocus();
+  });
+
+  it('offers no close control when no close label is given', async () => {
+    renderElement(<Harness hasCloseControl={false} />);
+    await user.click(screen.getByRole('button', { name: openLabel }));
+
+    expect(screen.getByRole('dialog', { name: heading })).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: closeLabel }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -1,29 +1,25 @@
 'use client';
 
-import { useConsentPreferences } from '@web/context/consent-provider';
+import { Dialog } from '@blog/ui/components/organisms/dialog';
+import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { useTranslations } from 'next-intl';
 
 import { ConsentPreferencesForm } from './components/consent-preferences-form/consent-preferences-form';
-import { consentPreferencesDialogVariants } from './consent-preferences-dialog-variants';
-import { useModalDialog } from './use-modal-dialog';
-
-const s = consentPreferencesDialogVariants();
 
 export const ConsentPreferencesDialog = () => {
   const t = useTranslations('consent.preferences');
-  const { isPreferencesOpen, closePreferences, settingsTriggerRef } =
-    useConsentPreferences();
-  const dialogRef = useModalDialog(isPreferencesOpen, settingsTriggerRef);
+  const { isOpen, open, close, settingsButtonRef } = useConsentPreferences();
 
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label={t('heading')}
-      onClose={closePreferences}
-      className={s.root()}
-      data-testid="consent-preferences-dialog"
+    <Dialog
+      isOpen={isOpen}
+      onOpenChange={(nextIsOpen) => (nextIsOpen ? open() : close())}
+      heading={t('heading')}
+      headingLevel={2}
+      fallbackFocusRef={settingsButtonRef}
+      dataTestId="consent-preferences-dialog"
     >
-      {isPreferencesOpen && <ConsentPreferencesForm />}
-    </dialog>
+      <ConsentPreferencesForm />
+    </Dialog>
   );
 };

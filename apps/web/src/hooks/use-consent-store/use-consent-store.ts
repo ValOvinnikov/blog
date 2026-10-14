@@ -10,7 +10,7 @@ import {
 import { readCookie } from '@web/utils/read-cookie';
 import { useSyncExternalStore } from 'react';
 
-export type TConsentStatus = 'unknown' | 'unanswered' | 'answered';
+type TConsentStatus = 'unknown' | 'unanswered' | 'answered';
 
 type TConsentSnapshot = {
   status: TConsentStatus;
