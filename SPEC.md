@@ -1168,9 +1168,11 @@ inline objects have no id to compare. It is offered on `page_home` and
 
 **Horizontal is capped at five items by a publishing rule, and the web layer
 still assumes it can be broken.** `orientation` (`TIMELINE_ORIENTATION`) is
-Vertical or Horizontal; Horizontal applies from `lg`, while phones and `md`
-always show the vertical line, decided in `lg:`-prefixed classes rather than any
-JS breakpoint. A custom rule rejects a Horizontal module holding more than
+Vertical or Horizontal; Horizontal applies wherever the timeline's own width
+gives every item at least 9rem, and falls back to the vertical line otherwise —
+a container query on that width, not a viewport breakpoint, so the same module
+stays horizontal in a landing page's sidebar column when its items fit. A
+custom rule rejects a Horizontal module holding more than
 `TIMELINE_HORIZONTAL_ITEM_CAP` items, so an author cannot publish one — but
 `apps/web` still falls back to Vertical above that count rather than trusting it,
 because legacy and API-written documents reach the view by paths Studio

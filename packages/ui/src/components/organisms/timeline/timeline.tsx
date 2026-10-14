@@ -6,7 +6,7 @@ import type {
   TTimelineOrientation,
 } from '@blog/config';
 import type { TCompoundChildren, TCompoundComponent } from '@blog/ui/lib/react';
-import type { ElementType } from 'react';
+import { Children, type CSSProperties, type ElementType } from 'react';
 
 import { TimelineBody } from './components/body/timeline-body';
 import { TimelineHeading } from './components/heading/timeline-heading';
@@ -38,20 +38,28 @@ const TimelineRoot = ({
   className,
   dataTestId,
 }: TTimelineProps) => {
-  const { root } = timelineVariants({
+  const { root, itemShare, list } = timelineVariants({
     orientation,
     itemAlignment,
     markerStyle,
   });
 
   return (
-    <ol
-      role="list"
+    <div
       className={root({ class: className })}
+      style={
+        {
+          '--timeline-items': Children.toArray(children).length,
+        } as CSSProperties
+      }
       data-testid={dataTestId}
     >
-      {children}
-    </ol>
+      <div className={itemShare()}>
+        <ol role="list" className={list()}>
+          {children}
+        </ol>
+      </div>
+    </div>
   );
 };
 
