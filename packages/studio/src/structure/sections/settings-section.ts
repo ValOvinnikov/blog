@@ -18,7 +18,6 @@ export const settingsSection: TStructureSection = {
       ],
     },
     {
-      dividerBefore: true,
       items: [{ schema: redirectSchema }],
     },
     {
