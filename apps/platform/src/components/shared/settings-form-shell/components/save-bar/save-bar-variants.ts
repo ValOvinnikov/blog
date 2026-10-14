@@ -7,7 +7,7 @@ export const saveBarVariants = tv({
       'flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between',
       'rounded-admin border p-3 shadow-admin-lg md:py-3 md:pr-3.5 md:pl-[18px]',
     ],
-    summary: ['inline-flex flex-wrap items-center gap-2.5 text-[14px]'],
+    summary: ['inline-flex flex-wrap items-center gap-2.5 text-admin-14'],
     dot: ['size-[9px] shrink-0 rounded-full bg-admin-warn'],
     count: ['font-semibold'],
     breakdown: ['text-admin-muted'],
@@ -18,7 +18,7 @@ export const saveBarVariants = tv({
     actions: ['grid grid-cols-2 gap-2 md:flex md:items-center'],
     shortcut: [
       'hidden md:inline',
-      'rounded-admin-control border border-admin-line px-1.5 py-0.5 font-mono text-[11px] text-admin-muted',
+      'rounded-admin-control border border-admin-line px-1.5 py-0.5 font-mono text-admin-11 text-admin-muted',
     ],
     button: ['justify-center'],
   },

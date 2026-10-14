@@ -9,7 +9,7 @@ export const logoHueFieldVariants = tv({
     ],
     tone: ['h-full w-1/3'],
     hueValue: [
-      'min-w-[92px] shrink-0 text-right text-[12.5px] tabular-nums text-admin-muted',
+      'min-w-[92px] shrink-0 text-right text-admin-12-5 tabular-nums text-admin-muted',
     ],
   },
   variants: {

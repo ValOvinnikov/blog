@@ -1,24 +1,27 @@
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Card } from '@platform/components/shared/card';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
+import type { TLookCardKey } from '@platform/utils/look-form-values/look-form-values';
 import type { ReactNode } from 'react';
 
 import { lookCardVariants } from './look-card-variants';
 
 export type TLookCardProps = {
+  card: TLookCardKey;
   title: string;
   description: string;
-  hasUnsavedChanges: boolean;
   actions?: ReactNode;
   children: ReactNode;
 };
 
 export const LookCard = ({
+  card,
   title,
   description,
-  hasUnsavedChanges,
   actions,
   children,
 }: TLookCardProps) => {
+  const { hasCardChanges } = useLookForm();
   const { title: titleSlot, body } = lookCardVariants();
 
   return (
@@ -27,7 +30,7 @@ export const LookCard = ({
         title={
           <span className={titleSlot()}>
             {title}
-            {hasUnsavedChanges && (
+            {hasCardChanges(card) && (
               <>
                 {' '}
                 <UnsavedDot />

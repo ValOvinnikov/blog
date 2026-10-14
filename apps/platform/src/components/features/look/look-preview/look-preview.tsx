@@ -1,34 +1,23 @@
 'use client';
 
-import type { TLanguageSwitcherStyle, TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config';
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
-import {
-  buildSitePreviewTheme,
-  type TSitePreviewThemeValues,
-} from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 export type TLookPreviewProps = {
-  tenantName: string;
-  theme: TSitePreviewThemeValues;
-  logoSrc: string | undefined;
   liveLocales: readonly TLocaleIsoCode[];
-  languageSwitcherStyle: TLanguageSwitcherStyle;
 };
 
-export const LookPreview = ({
-  tenantName,
-  theme,
-  logoSrc,
-  liveLocales,
-  languageSwitcherStyle,
-}: TLookPreviewProps) => {
+export const LookPreview = ({ liveLocales }: TLookPreviewProps) => {
+  const { tenantName, values } = useLookForm();
   const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
@@ -58,10 +47,10 @@ export const LookPreview = ({
     >
       <LookSample
         tenantName={tenantName}
-        logoSrc={logoSrc}
-        theme={buildSitePreviewTheme(theme, isDark)}
+        logoSrc={values.logo.url}
+        theme={buildSitePreviewTheme(values, isDark)}
         liveLocales={liveLocales}
-        languageSwitcherStyle={languageSwitcherStyle}
+        languageSwitcherStyle={values.languageSwitcherStyle}
       />
     </PreviewFrame>
   );

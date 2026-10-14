@@ -1,46 +1,58 @@
 import {
   CARD_STYLE,
   DENSITY,
-  FONT_CHOICE,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
 } from '@blog/config';
+import {
+  LookFormProvider,
+  type TLookFormContext,
+} from '@platform/components/features/look/look-form-provider';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import {
+  defaultLookFormValues,
+  type TLookFormValues,
+} from '@platform/utils/default-look-values/default-look-values';
 import userEvent from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
 
-const render = renderWithIntl;
+const renderPreview = (values: Partial<TLookFormValues> = {}) => {
+  const lookForm: TLookFormContext = {
+    tenantName: 'Acme Inc.',
+    values: {
+      ...defaultLookFormValues(),
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+      ...values,
+    },
+    updateField: vi.fn(),
+    hasCardChanges: () => false,
+    isDivergedFromPreset: false,
+    isAccentHueRejected: false,
+    accentHueFieldId: 'accent-hue',
+    repickKinds: [],
+    changePreset: vi.fn(),
+    resetToPreset: vi.fn(),
+  };
 
-const THEME = {
-  accentHue: 250,
-  logoHue: undefined,
-  headingFont: FONT_CHOICE.SPACE_GROTESK,
-  bodyFont: FONT_CHOICE.NEWSREADER,
-  radiusScale: RADIUS_SCALE.MD,
-  density: DENSITY.DEFAULT,
-  cardStyle: CARD_STYLE.ACCENT_BAR,
-};
-
-const BASE_PROPS = {
-  tenantName: 'Acme Inc.',
-  theme: THEME,
-  logoSrc: undefined,
-  liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
-  languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+  return renderWithIntl(
+    <LookFormProvider value={lookForm}>
+      <LookPreview liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]} />
+    </LookFormProvider>,
+  );
 };
 
 describe(LookPreview, () => {
   it('renders the tenant name and a real site Button primitive from the preview sample', () => {
-    render(<LookPreview {...BASE_PROPS} />);
+    renderPreview();
 
     expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 
   it('applies the accent hue as a live CSS custom property on the preview surface', () => {
-    render(<LookPreview {...BASE_PROPS} theme={{ ...THEME, accentHue: 28 }} />);
+    renderPreview({ accentHue: 28 });
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.55 0.17 28)',
@@ -48,16 +60,10 @@ describe(LookPreview, () => {
   });
 
   it('carries the radius scale and density onto the preview surface', () => {
-    render(
-      <LookPreview
-        {...BASE_PROPS}
-        theme={{
-          ...THEME,
-          radiusScale: RADIUS_SCALE.XL,
-          density: DENSITY.COMPACT,
-        }}
-      />,
-    );
+    renderPreview({
+      radiusScale: RADIUS_SCALE.XL,
+      density: DENSITY.COMPACT,
+    });
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--radius-md': '12px',
@@ -66,12 +72,7 @@ describe(LookPreview, () => {
   });
 
   it('carries the outlined card style onto the preview surface', () => {
-    render(
-      <LookPreview
-        {...BASE_PROPS}
-        theme={{ ...THEME, cardStyle: CARD_STYLE.OUTLINED }}
-      />,
-    );
+    renderPreview({ cardStyle: CARD_STYLE.OUTLINED });
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--item-border-width': '1px',
@@ -81,7 +82,7 @@ describe(LookPreview, () => {
 
   it('switches the preview between desktop and mobile widths', async () => {
     const user = userEvent.setup();
-    render(<LookPreview {...BASE_PROPS} />);
+    renderPreview();
 
     expect(screen.getByRole('button', { name: 'Desktop' })).toHaveAttribute(
       'aria-pressed',
@@ -98,7 +99,7 @@ describe(LookPreview, () => {
 
   it('re-derives the swatch color when the preview mode toggles to dark, independent of preset', async () => {
     const user = userEvent.setup();
-    render(<LookPreview {...BASE_PROPS} theme={{ ...THEME, accentHue: 28 }} />);
+    renderPreview({ accentHue: 28 });
 
     await user.click(screen.getByRole('button', { name: 'Dark' }));
 

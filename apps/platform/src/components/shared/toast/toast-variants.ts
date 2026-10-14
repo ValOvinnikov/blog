@@ -6,11 +6,11 @@ export const toastVariants = tv({
     root: [
       'pointer-events-auto flex max-w-[400px] items-center gap-[9px]',
       'rounded-admin bg-admin-text px-[14px] py-[11px]',
-      'text-[13px] text-white shadow-admin-lg',
+      'text-admin-13 text-white shadow-admin-lg',
       'transition-[opacity,transform] duration-[300ms] ease-out',
       'motion-reduce:transition-none',
     ],
-    glyph: ['shrink-0 text-[13px] leading-none font-bold'],
+    glyph: ['shrink-0 text-admin-13 leading-none font-bold'],
     spinner: [
       'inline-block size-3.5 shrink-0 animate-spin rounded-full',
       'border-2 border-white/30 border-t-white',

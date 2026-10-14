@@ -1,30 +1,19 @@
 import { BrandAssetField } from '@platform/components/features/look/brand-asset-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
-import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
-import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { brandCardVariants } from './brand-card-variants';
 
-export type TBrandCardProps = {
-  logo: TStagedImage;
-  favicon: TStagedImage;
-  repickKinds: readonly TBrandAssetKind[];
-  onFieldChange: TLookFormFieldSetter;
-  hasUnsavedChanges: boolean;
-};
-
-export const BrandCard = ({
-  logo,
-  favicon,
-  repickKinds,
-  onFieldChange,
-  hasUnsavedChanges,
-}: TBrandCardProps) => {
+export const BrandCard = () => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
+  const {
+    values: { logo, favicon },
+    updateField,
+    repickKinds,
+  } = useLookForm();
   const t = useTranslations('lookForm');
   const hintId = useId();
   const describedBy = [hintId, archivedDescribedBy].filter(Boolean).join(' ');
@@ -32,16 +21,16 @@ export const BrandCard = ({
 
   return (
     <LookCard
+      card="brand"
       title={t('brandHeading')}
       description={t('brandImagesDescription')}
-      hasUnsavedChanges={hasUnsavedChanges}
     >
       <div className={uploads()}>
         <div className={rows()}>
           <BrandAssetField
             kind="logo"
             image={logo}
-            onStage={(image) => onFieldChange('logo', image)}
+            onStage={(image) => updateField('logo', image)}
             isRepickNeeded={repickKinds.includes('logo')}
             isDisabled={isArchived}
             aria-describedby={describedBy}
@@ -49,7 +38,7 @@ export const BrandCard = ({
           <BrandAssetField
             kind="favicon"
             image={favicon}
-            onStage={(image) => onFieldChange('favicon', image)}
+            onStage={(image) => updateField('favicon', image)}
             isRepickNeeded={repickKinds.includes('favicon')}
             isDisabled={isArchived}
             aria-describedby={describedBy}

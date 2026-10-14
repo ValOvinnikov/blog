@@ -6,14 +6,14 @@ export const portableTextEditorToggleButtonVariants = tv({
       'inline-flex items-center justify-center',
       'rounded-admin-control border border-transparent px-2 py-1',
       'min-h-11 min-w-11 md:min-h-0 md:min-w-0',
-      'text-[12.5px] text-admin-text',
+      'text-admin-12-5 text-admin-text',
       'hover:bg-admin-line-2',
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
       'cursor-pointer',
     ],
     tooltip: [
       'rounded-admin-control bg-admin-text px-2 py-1',
-      'text-[11.5px] text-admin-surface shadow-admin-lg',
+      'text-admin-11-5 text-admin-surface shadow-admin-lg',
     ],
   },
   variants: {

@@ -5,6 +5,6 @@ export const tenantsTableVariants = tv({
     visuallyHidden: ['sr-only'],
     tname: ['flex items-center gap-2.5'],
     name: ['text-admin-text'],
-    domain: ['text-[12px] text-admin-muted'],
+    domain: ['text-admin-12 text-admin-muted'],
   },
 });

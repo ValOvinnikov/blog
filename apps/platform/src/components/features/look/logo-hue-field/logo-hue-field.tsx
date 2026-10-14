@@ -13,7 +13,6 @@ export type TLogoHueFieldProps = {
   accentHue: number;
   logoHue: TMaybeUndefined<number>;
   onChange: (logoHue: TMaybeUndefined<number>) => void;
-  isDark: boolean;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
@@ -27,14 +26,13 @@ export const LogoHueField = ({
   accentHue,
   logoHue,
   onChange,
-  isDark,
   isDisabled = false,
   'aria-describedby': ariaDescribedBy,
 }: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
   const follows = logoHue === undefined;
   const resolvedHue = logoHue ?? accentHue;
-  const tones = buildLogoPreviewTokens(resolvedHue, isDark);
+  const tones = buildLogoPreviewTokens(resolvedHue, false);
 
   const {
     root,

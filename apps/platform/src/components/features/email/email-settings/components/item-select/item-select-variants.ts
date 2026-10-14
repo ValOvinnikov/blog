@@ -9,8 +9,8 @@ export const itemSelectVariants = tv({
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
     ],
     value: ['flex min-w-0 flex-col leading-tight'],
-    valueName: ['truncate text-[13.5px] font-semibold text-admin-text'],
-    valueMeta: ['truncate text-[12px] text-admin-muted'],
+    valueName: ['truncate text-admin-13-5 font-semibold text-admin-text'],
+    valueMeta: ['truncate text-admin-12 text-admin-muted'],
     icon: ['shrink-0 text-admin-muted'],
     popup: [
       'max-h-[var(--available-height)] w-[min(20rem,calc(100vw-2rem))] min-w-[var(--anchor-width)] overflow-y-auto',
@@ -24,8 +24,8 @@ export const itemSelectVariants = tv({
     ],
     indicator: ['w-4 shrink-0 text-admin-brand'],
     itemText: ['flex min-w-0 flex-1 flex-col gap-0.5'],
-    itemName: ['text-[13.5px] text-admin-text'],
-    itemDescription: ['text-[12px] text-admin-muted'],
+    itemName: ['text-admin-13-5 text-admin-text'],
+    itemDescription: ['text-admin-12 text-admin-muted'],
     badge: ['shrink-0'],
   },
 });

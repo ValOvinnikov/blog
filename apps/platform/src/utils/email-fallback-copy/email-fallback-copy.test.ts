@@ -1,9 +1,16 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants/email-template-defaults';
 import { buildTestEmailDraft, EMAIL_BODY } from '@platform/testing/email-draft';
-import { withCopy } from '@platform/utils/email-draft/email-draft';
+import {
+  EMAIL_SENDER_ITEM,
+  withCopy,
+  withLogo,
+} from '@platform/utils/email-draft/email-draft';
 
-import { resolveFallbackCopy } from './email-fallback-copy';
+import {
+  resolveEmailPreview,
+  resolveFallbackCopy,
+} from './email-fallback-copy';
 
 const { EN, FR } = LOCALE_ISO_CODES;
 const { MAGIC_LINK, TENANT_INVITE } = EMAIL_TEMPLATE_TYPE;
@@ -38,5 +45,56 @@ describe('resolveFallbackCopy', () => {
     expect(
       resolveFallbackCopy(buildTestEmailDraft(), TENANT_INVITE, FR, EN),
     ).toEqual(EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.FR.TENANT_INVITE);
+  });
+});
+
+describe('resolveEmailPreview', () => {
+  it("previews the tenant's own subject and body", () => {
+    const draft = withCopy(
+      buildTestEmailDraft(),
+      { templateType: MAGIC_LINK, locale: FR },
+      { subject: 'Connexion', body: EMAIL_BODY },
+    );
+
+    expect(resolveEmailPreview(draft, MAGIC_LINK, FR, EN)).toMatchObject({
+      subject: 'Connexion',
+      body: EMAIL_BODY,
+    });
+  });
+
+  it('previews the fallback copy for a blank subject and body', () => {
+    const draft = withCopy(
+      buildTestEmailDraft(),
+      { templateType: TENANT_INVITE, locale: EN },
+      { subject: '   ', body: null },
+    );
+
+    expect(resolveEmailPreview(draft, TENANT_INVITE, EN, EN)).toMatchObject(
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.EN.TENANT_INVITE,
+    );
+  });
+
+  it("uses the template's own logo over the sender logo", () => {
+    const draft = withLogo(
+      withLogo(buildTestEmailDraft(), EMAIL_SENDER_ITEM, {
+        url: 'https://cdn.example/sender.png',
+      }),
+      MAGIC_LINK,
+      { url: 'https://cdn.example/sign-in.png' },
+    );
+
+    expect(resolveEmailPreview(draft, MAGIC_LINK, EN, EN).logo).toEqual({
+      url: 'https://cdn.example/sign-in.png',
+    });
+  });
+
+  it('falls back to the sender logo when the template has none', () => {
+    const draft = withLogo(buildTestEmailDraft(), EMAIL_SENDER_ITEM, {
+      url: 'https://cdn.example/sender.png',
+    });
+
+    expect(resolveEmailPreview(draft, TENANT_INVITE, EN, EN).logo).toEqual({
+      url: 'https://cdn.example/sender.png',
+    });
   });
 });

@@ -14,7 +14,7 @@ export const portableTextEditorVariants = tv({
       'min-h-[140px] w-full',
       FIELD_SURFACE_CLASSES,
       FIELD_FOCUS_CLASSES,
-      '[&_p]:relative [&_h2]:relative [&_p]:m-0 [&_h2]:m-0 [&_h2]:text-[16px] [&_h2]:font-semibold [&_h2]:font-admin [&_h2]:tracking-normal',
+      '[&_p]:relative [&_h2]:relative [&_p]:m-0 [&_h2]:m-0 [&_h2]:text-admin-16 [&_h2]:font-semibold [&_h2]:font-admin [&_h2]:tracking-normal',
       '[&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5',
       INVALID_SURFACE_CLASSES,
     ],

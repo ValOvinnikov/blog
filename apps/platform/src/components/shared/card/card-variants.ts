@@ -11,7 +11,7 @@ export const cardVariants = tv({
       'border-b border-admin-line-2 px-[18px] py-3.5',
     ],
     headerTitleGroup: ['min-w-0'],
-    headerDescription: ['mt-0.5 block text-[12.5px] text-admin-muted'],
+    headerDescription: ['mt-0.5 block text-admin-12-5 text-admin-muted'],
     headerActions: ['ml-auto flex items-center gap-2'],
     body: ['p-[18px]'],
     footer: [
