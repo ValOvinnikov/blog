@@ -133,5 +133,5 @@ module presets (#2803).
 
 - **A platform visual audit**: a styling and refactor sweep of
   `apps/platform`, owed after the Voice, Email and Look work.
-- **Shipping constraint**: CLAUDE.md requires `TMaybeNull` and `TNullable`,
-  which #5107 adds to `@blog/config`. The guidance branch merges after #5107.
+- **Work #5107 first**: CLAUDE.md requires `TMaybeNull` and `TNullable`, and
+  they do not exist in `@blog/config` until #5107 adds them.
