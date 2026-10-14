@@ -1,10 +1,9 @@
 'use client';
 
 import { ConsentBanner } from '@blog/ui/components/molecules/consent-banner';
-import {
-  useConsentChoices,
-  useConsentPreferences,
-} from '@web/context/consent-provider';
+import { CONSENT_STATUS } from '@web/constants/consent';
+import { useConsentPreferences } from '@web/context/consent-preferences-provider';
+import { useConsentStore } from '@web/hooks/use-consent-store';
 import { useTranslations } from 'next-intl';
 
 export interface IConsentBannerSlotProps {
@@ -13,10 +12,10 @@ export interface IConsentBannerSlotProps {
 
 export const ConsentBannerSlot = ({ isEnabled }: IConsentBannerSlotProps) => {
   const t = useTranslations('consent.banner');
-  const { status, acceptAll, rejectAll } = useConsentChoices();
-  const { openPreferences } = useConsentPreferences();
+  const { status, acceptAll, rejectAll } = useConsentStore();
+  const { open } = useConsentPreferences();
 
-  if (!isEnabled || status !== 'unanswered') return null;
+  if (!isEnabled || status !== CONSENT_STATUS.UNANSWERED) return null;
 
   return (
     <ConsentBanner
@@ -28,7 +27,7 @@ export const ConsentBannerSlot = ({ isEnabled }: IConsentBannerSlotProps) => {
       settingsLabel={t('settingsLabel')}
       onAccept={acceptAll}
       onReject={rejectAll}
-      onOpenSettings={openPreferences}
+      onOpenSettings={open}
       dataTestId="consent-banner"
     />
   );

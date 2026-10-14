@@ -1,12 +1,12 @@
 import userEvent from '@testing-library/user-event';
-import { useConsentPreferences } from '@web/context/consent-provider';
+import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
 
 import { CookieSettingsButton } from './cookie-settings-button';
 
 const PreferencesState = () => {
-  const { isPreferencesOpen } = useConsentPreferences();
-  return <p>{isPreferencesOpen ? 'Preferences open' : 'Preferences closed'}</p>;
+  const { isOpen } = useConsentPreferences();
+  return <p>{isOpen ? 'Preferences open' : 'Preferences closed'}</p>;
 };
 
 describe(`<${CookieSettingsButton.name}/>`, () => {
