@@ -1,6 +1,7 @@
 import { routes, type TLocaleIsoCode } from '@blog/config';
 import type { TTranslationMap } from '@blog/service';
 import { localeForPrefix } from '@web/i18n/routing';
+import { findListPage } from '@web/utils/find-list-page';
 import { findTranslatedPath } from '@web/utils/find-translated-path';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
@@ -12,17 +13,16 @@ type TSwitchLanguageTargetParams = {
   liveLocales: readonly TLocaleIsoCode[];
 };
 
-const LIST_PAGE_BY_SEGMENT = new Map<string, string>([
-  ['blog', routes.blogIndex()],
-  ['topics', routes.topics()],
-  ['tags', routes.tags()],
-]);
-
-const toFallbackHref = (pathname: string): string => {
+const toFallbackHref = (
+  pathname: string,
+  translationMap: TTranslationMap,
+  to: TLocaleIsoCode,
+): string => {
   const [first = '', second] = pathname.split('/').filter(Boolean);
-  const listPage = LIST_PAGE_BY_SEGMENT.get(first);
+  const listPage =
+    second === undefined ? undefined : findListPage(first, translationMap);
 
-  return listPage && second !== undefined ? listPage : routes.home();
+  return listPage?.languages.includes(to) ? listPage.href : routes.home();
 };
 
 const splitLanguagePrefix = (
@@ -58,7 +58,7 @@ export const toSwitchLanguageTarget = ({
       defaultLocale,
     }) ??
     toLocalizedPathname({
-      href: toFallbackHref(current.pathname),
+      href: toFallbackHref(current.pathname, translationMap, to),
       locale: to,
       defaultLocale,
     })

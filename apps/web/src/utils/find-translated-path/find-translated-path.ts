@@ -4,6 +4,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { service, type TTranslationMap } from '@blog/service';
+import { findListPage } from '@web/utils/find-list-page';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 type TFindTranslatedPathParams = {
@@ -70,6 +71,20 @@ const toTranslatablePage = (
   };
 };
 
+const toListPage = (pathname: string, translationMap: TTranslationMap) => {
+  if (pathname === routes.home()) {
+    return { href: routes.home(), languages: translationMap.homeLanguages };
+  }
+
+  const [first = '', ...rest] = pathname.split('/').filter(Boolean);
+  const isNumberedPostIndexPage =
+    first === POST_SEGMENT && rest.length === 2 && rest[0] === 'page';
+
+  return rest.length === 0 || isNumberedPostIndexPage
+    ? findListPage(first, translationMap)
+    : undefined;
+};
+
 /** `pathname` carries no language prefix; the result does, for `toLocale`. */
 export const findTranslatedPath = ({
   translationMap,
@@ -86,10 +101,11 @@ export const findTranslatedPath = ({
     });
   }
 
-  if (pathname === routes.home()) {
-    return translationMap.homeLanguages.includes(toLocale)
+  const listPage = toListPage(pathname, translationMap);
+  if (listPage) {
+    return listPage.languages.includes(toLocale)
       ? toLocalizedPathname({
-          href: routes.home(),
+          href: listPage.href,
           locale: toLocale,
           defaultLocale,
         })

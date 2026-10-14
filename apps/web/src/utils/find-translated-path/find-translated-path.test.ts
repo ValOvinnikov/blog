@@ -7,9 +7,9 @@ const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
 
 const translationMap: TTranslationMap = {
   homeLanguages: [EN, NL],
-  postIndexLanguages: [],
-  topicIndexLanguages: [],
-  tagIndexLanguages: [],
+  postIndexLanguages: [EN, NL],
+  topicIndexLanguages: [EN, NL],
+  tagIndexLanguages: [EN],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },
@@ -110,8 +110,27 @@ describe(findTranslatedPath, () => {
   });
 
   it('is undefined for a page outside the map', () => {
-    expect(find('/blog')).toBeUndefined();
     expect(find('/blog/about')).toBeUndefined();
+  });
+
+  it("finds another language's list page under its prefix", () => {
+    expect(find('/blog')).toBe('/nl/blog');
+    expect(find('/topics')).toBe('/nl/topics');
+  });
+
+  it('finds the default-language list page without a prefix', () => {
+    expect(find('/blog', NL, EN)).toBe('/blog');
+    expect(find('/topics', NL, EN)).toBe('/topics');
+  });
+
+  it('finds the first page of the blog list from a numbered blog list page', () => {
+    expect(find('/blog/page/2')).toBe('/nl/blog');
+  });
+
+  it('is undefined for a language without that list page', () => {
+    expect(find('/tags')).toBeUndefined();
+    expect(find('/blog', EN, FR)).toBeUndefined();
+    expect(find('/blog/page/2', EN, FR)).toBeUndefined();
   });
 
   it("finds another language's Home under its prefix", () => {
