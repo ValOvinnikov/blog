@@ -305,8 +305,6 @@
     "heading": "Uiterlijk",
     "subtitle": "Geef deze site een eigen stijl. De voorbeeldweergave toont je wijzigingen — niets is live tot je opslaat.",
     "resetButton": "Terugzetten naar voorinstelling",
-    "saveButton": "Wijzigingen opslaan",
-    "savingButton": "Opslaan…",
     "alertSuccess": "Uiterlijk opgeslagen.",
     "alertError": "Uiterlijk-instellingen konden niet worden opgeslagen. Probeer het opnieuw.",
     "presetLabel": "Voorinstelling",
@@ -441,8 +439,6 @@
   "emailForm": {
     "pageHeading": "E-mail",
     "pageSubtitle": "De e-mails die je lezers en team ontvangen. Laat een veld leeg om de standaard te gebruiken.",
-    "saveButton": "Wijzigingen opslaan",
-    "savingButton": "Opslaan…",
     "alertSuccess": "E-mailinstellingen opgeslagen.",
     "alertError": "Niet alle wijzigingen zijn opgeslagen — wat nog als ‘Niet opgeslagen’ is gemarkeerd, is niet opgeslagen. Probeer het opnieuw.",
     "senderItemLabel": "Afzender en voettekst",
@@ -533,8 +529,6 @@
     "fixedCopyNote": "Knoppen, menu’s en labels worden voor je vertaald en zijn op elke site hetzelfde, dus ze staan hier niet.",
     "editingLanguageNote": "Je bewerkt <strong>{language}</strong> — andere talen houden hun eigen tekst.",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# lijst} other {# lijsten}}} other {{total, plural, one {# veld} other {# velden}}}} · {customised, plural, =0 {alles standaard} other {# aangepast}}",
-    "saveButton": "Wijzigingen opslaan",
-    "savingButton": "Opslaan…",
     "alertSuccess": "Toon opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
@@ -866,8 +860,6 @@
   "featuresSettings": {
     "heading": "Functies",
     "description": "Zet de functies van je site aan of uit. Vergrendelde schakelaars vereisen het Growth-abonnement.",
-    "saveButton": "Wijzigingen opslaan",
-    "savingButton": "Opslaan…",
     "alertSuccess": "Functies opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "planLockedBadge": "Growth-abonnement",
@@ -911,8 +903,6 @@
   "languagesSettings": {
     "heading": "Talen",
     "description": "Kies in welke talen de site naast de standaardtaal wordt gepubliceerd.",
-    "saveButton": "Wijzigingen opslaan",
-    "savingButton": "Opslaan…",
     "alertSuccess": "Talen opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "switchOn": "Aan",
@@ -936,7 +926,9 @@
     "fieldsNeedAttention": "{count, plural, one {# veld vraagt aandacht} other {# velden vragen aandacht}}",
     "goToFirstField": "Naar het eerste veld",
     "shortcut": "⌘S / Ctrl+S",
-    "discard": "Verwerpen"
+    "discard": "Verwerpen",
+    "save": "Wijzigingen opslaan",
+    "saving": "Opslaan…"
   },
   "leavePageDialog": {
     "title": "Weggaan zonder op te slaan?",

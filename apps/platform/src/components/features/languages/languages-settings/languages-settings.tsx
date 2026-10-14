@@ -12,6 +12,7 @@ import { SettingsFormShell } from '@platform/components/shared/settings-form-she
 import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { useToast } from '@platform/context/toast-provider';
+import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
 import { additionalLocalesToSave } from '@platform/utils/additional-locales-to-save/additional-locales-to-save';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useRouter } from 'next/navigation';
@@ -30,10 +31,6 @@ export type TLanguagesSettingsProps = {
     live: TLocaleIsoCode[];
     limit: number;
   };
-  saveAction: (
-    tenantId: string,
-    additionalLocales: TLocaleIsoCode[],
-  ) => Promise<{ ok: boolean }>;
   savedAt?: Date;
   archivedAt?: Date;
 };
@@ -42,7 +39,6 @@ export const LanguagesSettings = ({
   tenantId,
   defaultLocale,
   locales,
-  saveAction,
   savedAt,
   archivedAt,
 }: TLanguagesSettingsProps) => {
@@ -61,7 +57,7 @@ export const LanguagesSettings = ({
     useFormSubmission<TLocaleIsoCode[], { ok: boolean }>({
       initialValues: savedLiveLocales,
       onSubmit: (liveLocales) =>
-        saveAction(
+        updateTenantLanguagesAction(
           tenantId,
           additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
         ),
@@ -113,16 +109,13 @@ export const LanguagesSettings = ({
     <SettingsFormShell
       title={t('heading')}
       description={t('description')}
-      saveButtonLabel={t('saveButton')}
-      savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
       onDiscard={() => setValues(savedLiveLocales)}
       changeCount={changeCount}
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
-      hasError={status === 'error'}
-      errorTitle={t('alertError')}
+      errorTitle={status === 'error' ? t('alertError') : undefined}
       draft={{
         tenantId,
         page: 'languages',

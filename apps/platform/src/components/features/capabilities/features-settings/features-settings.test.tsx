@@ -1,12 +1,18 @@
 import { CAPABILITY } from '@blog/config';
+import { updateFeaturesAction } from '@platform/server/settings-features/update-features-action';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import type { Mock } from 'vitest';
 
 import { FeaturesSettings } from './features-settings';
+
+vi.mock('@platform/server/settings-features/update-features-action', () => ({
+  updateFeaturesAction: vi.fn(),
+}));
+
+const updateFeaturesActionMock = vi.mocked(updateFeaturesAction);
 
 mockRouterRefresh();
 
@@ -34,18 +40,12 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
   consentBannerEnabled: false,
 };
 
-type TSaveAction = (
-  tenantId: string,
-  values: TSettingsFeaturesValues,
-) => Promise<{ ok: boolean }>;
-
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const setup = customRender(FeaturesSettings, {
   tenantId: 'tenant-1',
   entitledCapabilities: ALL_ENTITLED,
   initialValues: INITIAL_VALUES,
-  saveAction: vi.fn(),
 });
 
 describe(`<${FeaturesSettings.name}/>`, () => {
@@ -55,6 +55,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     refresh = mockRouterRefresh();
+    updateFeaturesActionMock.mockResolvedValue({ ok: true });
   });
 
   describe('with every capability entitled and the initial values', () => {
@@ -182,12 +183,9 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     });
   });
 
-  describe('with a saveAction that succeeds', () => {
-    let saveAction: Mock<TSaveAction>;
-
+  describe('with a save that succeeds', () => {
     beforeEach(() => {
-      saveAction = vi.fn<TSaveAction>().mockResolvedValue({ ok: true });
-      setup({ saveAction });
+      setup();
     });
 
     it('withdraws Save after a successful save, without a remount', async () => {
@@ -201,11 +199,11 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       );
     });
 
-    it('saves the current toggle state through saveAction', async () => {
+    it('saves the current toggle state', async () => {
       await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(saveAction).toHaveBeenCalledWith('tenant-1', {
+      expect(updateFeaturesActionMock).toHaveBeenCalledWith('tenant-1', {
         ...INITIAL_VALUES,
         bookmarksEnabled: false,
       });
@@ -221,14 +219,14 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   it('shows the saving state while the save is in flight', async () => {
-    let resolveAction: (value: { ok: boolean }) => void = () => {};
-    const saveAction = vi.fn(
+    let resolveAction: (value: { ok: true }) => void = () => {};
+    updateFeaturesActionMock.mockImplementation(
       () =>
-        new Promise<{ ok: boolean }>((resolve) => {
+        new Promise((resolve) => {
           resolveAction = resolve;
         }),
     );
-    setup({ saveAction });
+    setup();
 
     await user.click(screen.getByRole('switch', { name: 'Analytics' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -241,8 +239,8 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   it('shows an error alert and does not refresh when the save fails', async () => {
-    const saveAction = vi.fn().mockResolvedValue({ ok: false });
-    setup({ saveAction });
+    updateFeaturesActionMock.mockResolvedValue({ ok: false });
+    setup();
 
     await user.click(screen.getByRole('switch', { name: 'Analytics' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -252,11 +250,8 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   describe('archived tenant', () => {
-    let saveAction: Mock<TSaveAction>;
-
     beforeEach(() => {
-      saveAction = vi.fn<TSaveAction>().mockResolvedValue({ ok: true });
-      setup({ saveAction, archivedAt: ARCHIVED_AT });
+      setup({ archivedAt: ARCHIVED_AT });
     });
 
     it('shows an archived notice and offers no Save', () => {

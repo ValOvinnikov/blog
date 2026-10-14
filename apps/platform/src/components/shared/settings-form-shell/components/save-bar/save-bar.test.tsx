@@ -8,8 +8,6 @@ const baseProps: TSaveBarProps = {
   changeCount: 3,
   breakdown: '',
   invalidFields: { ids: [] },
-  saveButtonLabel: 'Save changes',
-  savingButtonLabel: 'Saving…',
   isPending: false,
   onSave: vi.fn(),
   onDiscard: vi.fn(),

@@ -3,7 +3,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import type { TVoiceListSamples } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
-import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
 import {
   defaultLookFormValues,
   toLookFormValues,
@@ -55,7 +54,6 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
           density,
           cardStyle,
         }}
-        saveAction={saveVoiceOverridesAction}
         savedAt={config?.updatedAt}
         archivedAt={tenant.deprovisionedAt ?? undefined}
       />

@@ -252,13 +252,14 @@ export const LookForm = ({
   ];
 
   const { columns, editPanel, previewPanel } = lookFormVariants();
+  const saveErrorTitle = brandImageError
+    ? uploadErrorText(brandImageError)
+    : t('alertError');
 
   return (
     <SettingsFormShell
       title={t('heading')}
       description={t('subtitle')}
-      saveButtonLabel={t('saveButton')}
-      savingButtonLabel={t('savingButton')}
       onSave={handleSave}
       onDiscard={handleDiscard}
       changeCount={changeCount}
@@ -269,10 +270,7 @@ export const LookForm = ({
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
-      hasError={status === 'error'}
-      errorTitle={
-        brandImageError ? uploadErrorText(brandImageError) : t('alertError')
-      }
+      errorTitle={status === 'error' ? saveErrorTitle : undefined}
       isWide={true}
       draft={{
         tenantId,

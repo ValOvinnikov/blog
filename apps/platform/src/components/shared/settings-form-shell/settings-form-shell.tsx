@@ -24,8 +24,6 @@ import {
 export type TSettingsFormShellProps<TValues> = {
   title: string;
   description: string;
-  saveButtonLabel: string;
-  savingButtonLabel: string;
   onSave: () => Promise<boolean>;
   onDiscard: () => void;
   changeCount: number;
@@ -34,8 +32,7 @@ export type TSettingsFormShellProps<TValues> = {
   isPending: boolean;
   archivedAt?: Date;
   archivedNoticeId: string;
-  hasError: boolean;
-  errorTitle: string;
+  errorTitle?: string;
   draft: TSettingsFormDraft<TValues>;
   isWide?: boolean;
   headerActions?: ReactNode;
@@ -50,8 +47,6 @@ const isSaveShortcut = (event: KeyboardEvent) =>
 export const SettingsFormShell = <TValues,>({
   title,
   description,
-  saveButtonLabel,
-  savingButtonLabel,
   onSave,
   onDiscard,
   changeCount,
@@ -60,7 +55,6 @@ export const SettingsFormShell = <TValues,>({
   isPending,
   archivedAt,
   archivedNoticeId,
-  hasError,
   errorTitle,
   draft,
   isWide = false,
@@ -157,7 +151,7 @@ export const SettingsFormShell = <TValues,>({
         <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
       )}
 
-      {hasError && (
+      {errorTitle && (
         <Alert type={ALERT_TYPE.ERROR} title={errorTitle} className={alert()} />
       )}
 
@@ -193,8 +187,6 @@ export const SettingsFormShell = <TValues,>({
           changeCount={changeCount}
           breakdown={breakdown}
           invalidFields={invalidFields}
-          saveButtonLabel={saveButtonLabel}
-          savingButtonLabel={savingButtonLabel}
           isPending={isPending}
           onSave={() => void handleSave()}
           onDiscard={handleDiscard}

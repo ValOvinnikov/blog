@@ -305,8 +305,6 @@
     "heading": "Look",
     "subtitle": "Theme this site. The preview shows your changes — nothing is live until you save.",
     "resetButton": "Reset to preset",
-    "saveButton": "Save changes",
-    "savingButton": "Saving…",
     "alertSuccess": "Look saved.",
     "alertError": "Couldn't save Look settings — try again.",
     "presetLabel": "Preset",
@@ -441,8 +439,6 @@
   "emailForm": {
     "pageHeading": "Email",
     "pageSubtitle": "The emails your readers and team receive. Leave a field blank to use the default.",
-    "saveButton": "Save changes",
-    "savingButton": "Saving…",
     "alertSuccess": "Saved email settings.",
     "alertError": "Couldn't save every change — the ones still marked Unsaved weren't saved. Try again.",
     "senderItemLabel": "Sender & footer",
@@ -533,8 +529,6 @@
     "fixedCopyNote": "Buttons, menus and labels are translated for you and stay the same on every site, so they aren't listed here.",
     "editingLanguageNote": "Editing <strong>{language}</strong> — other languages keep their own text.",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# list} other {# lists}}} other {{total, plural, one {# field} other {# fields}}}} · {customised, plural, =0 {all default} other {# customised}}",
-    "saveButton": "Save changes",
-    "savingButton": "Saving…",
     "alertSuccess": "Voice saved.",
     "alertError": "Couldn't save — try again.",
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
@@ -866,8 +860,6 @@
   "featuresSettings": {
     "heading": "Features",
     "description": "Turn your site's features on or off. Locked toggles require the Growth plan.",
-    "saveButton": "Save changes",
-    "savingButton": "Saving…",
     "alertSuccess": "Features saved.",
     "alertError": "Couldn't save — try again.",
     "planLockedBadge": "Growth plan",
@@ -911,8 +903,6 @@
   "languagesSettings": {
     "heading": "Languages",
     "description": "Choose which languages the site is published in, besides its default language.",
-    "saveButton": "Save changes",
-    "savingButton": "Saving…",
     "alertSuccess": "Languages saved.",
     "alertError": "Couldn't save — try again.",
     "switchOn": "On",
@@ -936,7 +926,9 @@
     "fieldsNeedAttention": "{count, plural, one {# field needs attention} other {# fields need attention}}",
     "goToFirstField": "Go to the first one",
     "shortcut": "⌘S / Ctrl+S",
-    "discard": "Discard"
+    "discard": "Discard",
+    "save": "Save changes",
+    "saving": "Saving…"
   },
   "leavePageDialog": {
     "title": "Leave without saving?",

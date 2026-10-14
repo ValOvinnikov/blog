@@ -215,8 +215,6 @@ export const EmailSettings = ({
     <SettingsFormShell
       title={t('pageHeading')}
       description={t('pageSubtitle')}
-      saveButtonLabel={t('saveButton')}
-      savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
       onDiscard={() => replaceDraft(() => saved)}
       changeCount={countEmailDraftChanges(saved, draft, liveLocales)}
@@ -241,8 +239,9 @@ export const EmailSettings = ({
         ids: senderNameError ? [senderNameInputId] : [],
         revealFirst: revealSenderName,
       }}
-      hasError={status === 'error' && !senderNameError}
-      errorTitle={t('alertError')}
+      errorTitle={
+        status === 'error' && !senderNameError ? t('alertError') : undefined
+      }
       isWide={true}
       headerActions={
         <>

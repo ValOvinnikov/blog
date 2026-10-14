@@ -1,9 +1,16 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LanguagesSettings } from './languages-settings';
+
+vi.mock('@platform/server/tenants/update-tenant-languages-action', () => ({
+  updateTenantLanguagesAction: vi.fn(),
+}));
+
+const updateTenantLanguagesActionMock = vi.mocked(updateTenantLanguagesAction);
 
 mockRouterRefresh();
 
@@ -13,7 +20,6 @@ const setup = customRender(LanguagesSettings, {
   tenantId: 'tenant-1',
   defaultLocale: EN,
   locales: { stored: [], live: [], limit: 2 },
-  saveAction: vi.fn(),
 });
 
 describe(`<${LanguagesSettings.name}/>`, () => {
@@ -57,15 +63,18 @@ describe(`<${LanguagesSettings.name}/>`, () => {
   });
 
   it('saves the chosen additional languages', async () => {
-    const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    setup({ saveAction });
+    updateTenantLanguagesActionMock.mockResolvedValue({ ok: true });
+    setup();
 
     await user.click(screen.getByRole('switch', { name: 'French' }));
     await user.click(screen.getByRole('switch', { name: 'Dutch' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
-      expect(saveAction).toHaveBeenCalledWith('tenant-1', [NL, FR]);
+      expect(updateTenantLanguagesActionMock).toHaveBeenCalledWith('tenant-1', [
+        NL,
+        FR,
+      ]);
     });
   });
 

@@ -21,8 +21,6 @@ export type TSaveBarProps = {
   changeCount: number;
   breakdown: string;
   invalidFields: TInvalidFields;
-  saveButtonLabel: string;
-  savingButtonLabel: string;
   isPending: boolean;
   onSave: () => void;
   onDiscard: () => void;
@@ -32,8 +30,6 @@ export const SaveBar = ({
   changeCount,
   breakdown,
   invalidFields,
-  saveButtonLabel,
-  savingButtonLabel,
   isPending,
   onSave,
   onDiscard,
@@ -106,10 +102,10 @@ export const SaveBar = ({
           variant="primary"
           onClick={onSave}
           isPending={isPending}
-          pendingLabel={savingButtonLabel}
+          pendingLabel={t('saving')}
           className={button()}
         >
-          {saveButtonLabel}
+          {t('save')}
         </Button>
       </div>
     </div>
