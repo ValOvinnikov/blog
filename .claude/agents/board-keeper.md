@@ -207,6 +207,14 @@ treat a placeholder you cannot match to a spec in the batch as an incomplete
 dispatch. Then run **one** Step 1 pull for the whole batch, not one per
 issue.
 
+**Pace every write.** GitHub throttles bursts of content creation (roughly 80
+writes a minute, 500 an hour) and watches rapid issue creation for abuse. Check
+`gh api rate_limit` before the first write, pause 2–3 seconds between writes
+(creates, edits, label and parent changes), and stop at the first 403, 429 or
+secondary-rate-limit response: report what was done and what remains, never
+retry in a loop. The orchestrator keeps a batch to about 25 entries and sends
+batches one after another, never in parallel.
+
 For each spec (on `NO_GH`/`NO_GRAPHQL`, the MCP path in "Tool preference"
 replaces items 1–3):
 
