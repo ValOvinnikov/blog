@@ -104,6 +104,7 @@
   },
   "rss": {
     "fallbackTitle": "Blog",
+    "fallbackDescription": "Las últimas publicaciones.",
     "feedLinkLabel": "Canal RSS"
   },
   "authMenu": {

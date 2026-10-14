@@ -2,8 +2,10 @@ import { escapeXml } from '@web/utils/escape-xml';
 
 export type TRssChannel = {
   title: string;
-  description?: string;
-  siteUrl: string;
+  description: string;
+  link: string;
+  language: string;
+  feedUrl: string;
 };
 
 export type TRssItem = {
@@ -14,8 +16,9 @@ export type TRssItem = {
   publishedAt: string;
 };
 
+const toRfc822 = (isoDate: string): string => new Date(isoDate).toUTCString();
+
 const toRssItemXml = (item: TRssItem): string => {
-  const pubDate = new Date(item.publishedAt).toUTCString();
   const descriptionLine = item.description
     ? `\n      <description>${escapeXml(item.description)}</description>`
     : '';
@@ -24,29 +27,39 @@ const toRssItemXml = (item: TRssItem): string => {
       <title>${escapeXml(item.title)}</title>
       <link>${escapeXml(item.link)}</link>
       <guid>${escapeXml(item.link)}</guid>${descriptionLine}
-      <pubDate>${pubDate}</pubDate>
+      <pubDate>${toRfc822(item.publishedAt)}</pubDate>
     </item>`;
 };
 
+const toLastBuildDateLine = (items: TRssItem[]): string => {
+  if (!items.length) {
+    return '';
+  }
+  const newest = Math.max(
+    ...items.map(({ publishedAt }) => Date.parse(publishedAt)),
+  );
+
+  return `\n    <lastBuildDate>${new Date(newest).toUTCString()}</lastBuildDate>`;
+};
+
 /**
- * Builds a valid RSS 2.0 XML string from a channel + its items. Every text
- * field is XML-escaped — callers pass raw CMS-authored strings (titles,
- * excerpts) straight through without pre-escaping.
+ * Every text field is XML-escaped — callers pass raw CMS-authored strings
+ * (titles, excerpts) straight through without pre-escaping.
  */
 export const buildRssFeed = (
   channel: TRssChannel,
   items: TRssItem[],
 ): string => {
   const itemsXml = items.map(toRssItemXml).join('\n');
-  const descriptionLine = channel.description
-    ? `\n    <description>${escapeXml(channel.description)}</description>`
-    : '';
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${escapeXml(channel.title)}</title>
-    <link>${escapeXml(channel.siteUrl)}</link>${descriptionLine}
+    <link>${escapeXml(channel.link)}</link>
+    <description>${escapeXml(channel.description)}</description>
+    <language>${escapeXml(channel.language)}</language>
+    <atom:link href="${escapeXml(channel.feedUrl)}" rel="self" type="application/rss+xml"/>${toLastBuildDateLine(items)}
 ${itemsXml}
   </channel>
 </rss>`;

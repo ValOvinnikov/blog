@@ -1,4 +1,4 @@
-import { routes, type TMaybeUndefined } from '@blog/config';
+import { LOCALE_BCP47_TAGS, routes, type TMaybeUndefined } from '@blog/config';
 import type { TFeedPost, TTenantSanityContext } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
@@ -9,7 +9,8 @@ import { hasLocale } from 'next-intl';
 
 export type TFeedContext = {
   tenant: TTenantSanityContext;
-  siteUrl: string;
+  language: string;
+  toLocalizedUrl: (href: string) => string;
   toRssItem: (post: TFeedPost) => TRssItem;
 };
 
@@ -28,13 +29,19 @@ export const getFeedContext = async (
   const { tenant } = hostTenant;
   const defaultLocale = tenant.defaultLocale ?? routing.defaultLocale;
   const siteUrl = (await getTenantBaseUrl()) ?? '';
+  const toLocalizedUrl = (href: string) => {
+    const pathname = toLocalizedPathname({ href, locale, defaultLocale });
+
+    return pathname === '/' ? siteUrl : `${siteUrl}${pathname}`;
+  };
 
   return {
     tenant: { ...tenant, locale },
-    siteUrl,
+    language: LOCALE_BCP47_TAGS[locale],
+    toLocalizedUrl,
     toRssItem: ({ title, slug, excerpt, publishedAt }) => ({
       title,
-      link: `${siteUrl}${toLocalizedPathname({ href: routes.post(slug), locale, defaultLocale })}`,
+      link: toLocalizedUrl(routes.post(slug)),
       description: excerpt,
       publishedAt,
     }),

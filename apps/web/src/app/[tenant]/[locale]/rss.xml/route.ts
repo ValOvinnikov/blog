@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import { type ITenantLocalizedParams, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { getFeedContext } from '@web/server/feed/get-feed-context/get-feed-context';
 import { buildRssFeed } from '@web/utils/build-rss-feed';
@@ -11,8 +11,8 @@ type TProps = {
 };
 
 /**
- * A site-settings failure falls back to a generic channel title: the feed
- * must not break on an unrelated global-content fetch.
+ * A site-settings failure falls back to a generic channel title and
+ * description: the feed must not break on an unrelated global-content fetch.
  */
 export async function GET(
   _request: Request,
@@ -23,7 +23,7 @@ export async function GET(
   if (!feed) {
     return new NextResponse(null, { status: 404 });
   }
-  const { tenant, siteUrl, toRssItem } = feed;
+  const { tenant, language, toLocalizedUrl, toRssItem } = feed;
 
   const [postsResult, siteSettingsResult, indexPageResult, t] =
     await Promise.all([
@@ -54,12 +54,19 @@ export async function GET(
       error: indexPageResult.error,
     });
   }
-  const description = indexPageResult.ok
-    ? indexPageResult.data?.seo.description
-    : undefined;
+  const description =
+    (indexPageResult.ok && indexPageResult.data?.seo.description) ||
+    (siteSettingsResult.ok && siteSettingsResult.data.brand.tagline) ||
+    t('fallbackDescription');
 
   const xml = buildRssFeed(
-    { title, description, siteUrl },
+    {
+      title,
+      description,
+      link: toLocalizedUrl(routes.home()),
+      language,
+      feedUrl: toLocalizedUrl(routes.rssFeed()),
+    },
     posts.map(toRssItem),
   );
 

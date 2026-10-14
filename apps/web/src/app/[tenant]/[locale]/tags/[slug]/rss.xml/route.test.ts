@@ -4,6 +4,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TFeedPost } from '@blog/service';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 import type { MockInstance } from 'vitest';
@@ -200,6 +201,24 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     );
     expect(doc.querySelector('item > link')?.textContent).toBe(
       'https://example.com/nl/blog/hello-welcome',
+    );
+  });
+
+  it('carries the language, home link and self link of the feed', async () => {
+    const response = await GET(new Request('https://example.com'), {
+      params: paramsFor(NL),
+    });
+    const doc = new DOMParser().parseFromString(
+      await response.text(),
+      'application/xml',
+    );
+
+    expect(doc.querySelector('channel > language')?.textContent).toBe('nl');
+    expect(doc.querySelector('channel > link')?.textContent).toBe(
+      'https://example.com/nl',
+    );
+    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(
+      'https://example.com/nl/tags/typescript/rss.xml',
     );
   });
 
