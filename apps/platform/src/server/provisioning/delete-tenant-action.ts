@@ -5,15 +5,15 @@ import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { logger } from '@platform/utils/logger/logger';
-import { z } from 'zod';
+import type { z } from 'zod';
 
+import {
+  confirmTenantInputSchema,
+  resolveConfirmedTenant,
+} from './resolve-confirmed-tenant';
 import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 
-const deleteTenantInputSchema = z.object({
-  confirm: z.string().trim().min(1),
-});
-
-export type TDeleteTenantInput = z.input<typeof deleteTenantInputSchema>;
+export type TDeleteTenantInput = z.input<typeof confirmTenantInputSchema>;
 
 export type TDeleteTenantResult = TTenantLifecycleResult<
   | 'confirmRequired'
@@ -24,12 +24,8 @@ export type TDeleteTenantResult = TTenantLifecycleResult<
 >;
 
 /**
- * The tenant status page's hard-delete control. Fetches the tenant to
- * validate `confirm` against its live name (not trusting the client) and to
- * carry `name` into the audit record; the archived precondition itself is
- * left to `queries.tenants.deleteTenant`'s own typed refusal rather than
- * re-checked here, since re-fetching just to duplicate a check the mutation
- * already makes atomically would only widen the race window.
+ * The archived precondition is left to `queries.tenants.deleteTenant`'s own
+ * atomic refusal; checking it here as well would only widen the race window.
  */
 export const deleteTenantAction = async (
   tenantId: string,
@@ -37,20 +33,16 @@ export const deleteTenantAction = async (
 ): Promise<TDeleteTenantResult> => {
   await requireSuperAdmin();
 
-  const parsed = deleteTenantInputSchema.safeParse(input);
+  const parsed = confirmTenantInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, reason: 'confirmRequired' };
   }
 
-  const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
-  if (!tenant) {
-    return { ok: false, reason: 'notFound' };
+  const resolved = await resolveConfirmedTenant(tenantId, parsed.data.confirm);
+  if (!resolved.ok) {
+    return resolved;
   }
-
-  const { confirm } = parsed.data;
-  if (confirm !== tenant.name) {
-    return { ok: false, reason: 'nameMismatch' };
-  }
+  const { tenant } = resolved;
 
   let result;
   try {
