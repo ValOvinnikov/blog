@@ -37,8 +37,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
-    headingLevel: 2,
-    heading: 'Manage cookie preferences',
     categories,
     values: initialValues,
     onCategoryChange: () => {},
@@ -69,8 +67,6 @@ const InteractiveDemo = () => {
 
   return (
     <ConsentPreferences
-      headingLevel={2}
-      heading="Manage cookie preferences"
       categories={categories}
       values={values}
       onCategoryChange={(id, checked) =>

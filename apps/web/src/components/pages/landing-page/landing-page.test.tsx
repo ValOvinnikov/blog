@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
 import { service } from '@blog/service';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -107,7 +107,10 @@ describe(`<${LandingPage.name}/>`, () => {
     it('redirects permanently when the missing path has moved', async () => {
       getRedirectMock.mockResolvedValueOnce({
         ok: true,
-        data: '/company/about',
+        data: {
+          destination: '/company/about',
+          status: REDIRECT_STATUS.PERMANENT,
+        },
       });
 
       await expect(setup()).rejects.toThrow('NEXT_REDIRECT');

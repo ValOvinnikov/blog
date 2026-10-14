@@ -200,8 +200,8 @@ Props: providerName: string · message: string · allowLabel: string · settings
 
 ### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
 
-The body of the cookie-consent preferences dialog; the caller owns the `<dialog>` itself.
-Props: headingLevel: THeadingLevel · heading: string · categories: IConsentCategory[] · values: Record<string, boolean> · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId, ( | { closeLabel?: never; onClose?: never } | {…)_
+The body of the cookie-consent preferences dialog; the caller's dialog supplies the heading.
+Props: categories: IConsentCategory[] · values: Record<string, boolean> · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId, ( | { closeLabel?: never; onClose?: never } | {…)_
 
 ### ImageWithCaption — `components/molecules/image-with-caption/image-with-caption.tsx`
 
@@ -388,7 +388,7 @@ Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · t
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 
 A modal window over the page, named by its heading; client-only, so the consumer declares the client boundary.
-Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel: string · fallbackFocusRef?: RefObject<HTMLElement | null> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel?: string · fallbackFocusRef?: RefObject<HTMLElement | null> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Footer — `components/organisms/footer/footer.tsx`
 

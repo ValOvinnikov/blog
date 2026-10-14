@@ -9,4 +9,5 @@ export const redirectsQuery = q
     source: sub.field('source').notNull(),
     destination: sub.field('destination').notNull(),
     isPrefix: sub.field('isPrefix').nullable(true),
+    status: sub.field('status').nullable(true),
   }));

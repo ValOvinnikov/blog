@@ -2,7 +2,7 @@ import { CAPABILITY, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { getSanityImageBaseUrl } from '@blog/service';
 import { ConsentBannerSlot } from '@web/components/shared/consent-banner-slot';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
-import { ConsentProvider } from '@web/context/consent-provider';
+import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import { ToastProvider } from '@web/context/toast-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
@@ -46,11 +46,11 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
         <SessionProvider>
           <ToastProvider>
             <VoiceRichProvider values={rich}>
-              <ConsentProvider>
+              <ConsentPreferencesProvider>
                 {children}
                 <ConsentBannerSlot isEnabled={isConsentBannerEnabled} />
                 <ConsentPreferencesDialog />
-              </ConsentProvider>
+              </ConsentPreferencesProvider>
             </VoiceRichProvider>
           </ToastProvider>
         </SessionProvider>
