@@ -12,6 +12,7 @@ import {
   SettingsFormShell,
   type TSettingsFormShellProps,
 } from './settings-form-shell';
+import type { TSettingsForm } from './use-settings-form';
 
 type TValues = { tagline: string; footer: string };
 
@@ -21,7 +22,7 @@ const draftFor = (
   values: TValues,
   savedValues: TValues = SAVED,
   onRestore: (values: TValues) => void = vi.fn(),
-): TSettingsFormShellProps<TValues>['draft'] => ({
+): TSettingsForm<TValues>['draft'] => ({
   tenantId: 'tenant-1',
   page: 'voice',
   values,
@@ -34,21 +35,38 @@ const draftFor = (
   onRestore,
 });
 
+const baseSave = vi.fn().mockResolvedValue(true);
+
+const formFor = (
+  overrides: Partial<TSettingsForm<TValues>> = {},
+): TSettingsForm<TValues> => ({
+  save: baseSave,
+  discard: vi.fn(),
+  changeCount: 0,
+  changesByLanguage: [],
+  invalidFields: undefined,
+  isPending: false,
+  isArchived: Boolean(overrides.archivedAt),
+  archivedAt: undefined,
+  archivedNoticeId: 'archived-notice',
+  draft: draftFor(SAVED),
+  ...overrides,
+});
+
 const baseProps: TSettingsFormShellProps<TValues> = {
   title: 'Features',
   description: 'Toggle capabilities for this tenant.',
-  onSave: vi.fn().mockResolvedValue(true),
-  onDiscard: vi.fn(),
-  changeCount: 0,
-  isPending: false,
-  archivedNoticeId: 'archived-notice',
-  draft: draftFor(SAVED),
+  form: formFor(),
   children: <p>tab body</p>,
 };
 
 const renderShell = (
+  form: Partial<TSettingsForm<TValues>> = {},
   overrides: Partial<TSettingsFormShellProps<TValues>> = {},
-) => renderWithIntl(<SettingsFormShell {...baseProps} {...overrides} />);
+) =>
+  renderWithIntl(
+    <SettingsFormShell {...baseProps} form={formFor(form)} {...overrides} />,
+  );
 
 const dispatchBeforeUnload = () => {
   const event = new Event('beforeunload', { cancelable: true });
@@ -76,11 +94,11 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('with no unsaved changes', () => {
-    let onSave: TSettingsFormShellProps<TValues>['onSave'];
+    let onSave: TSettingsForm<TValues>['save'];
 
     beforeEach(() => {
       onSave = vi.fn().mockResolvedValue(true);
-      renderShell({ onSave });
+      renderShell({ save: onSave });
     });
 
     it('shows no save status and offers no save bar', () => {
@@ -102,13 +120,13 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('with unsaved changes', () => {
-    let onSave: TSettingsFormShellProps<TValues>['onSave'];
-    let onDiscard: TSettingsFormShellProps<TValues>['onDiscard'];
+    let onSave: TSettingsForm<TValues>['save'];
+    let onDiscard: TSettingsForm<TValues>['discard'];
 
     beforeEach(() => {
       onSave = vi.fn().mockResolvedValue(true);
       onDiscard = vi.fn();
-      renderShell({ onSave, onDiscard, changeCount: 3 });
+      renderShell({ save: onSave, discard: onDiscard, changeCount: 3 });
     });
 
     it('shows the save bar with the change count in place of the saved status', () => {
@@ -163,13 +181,15 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       return (
         <SettingsFormShell
           {...baseProps}
-          changeCount={values.tagline === saved.tagline ? 0 : 1}
-          onSave={async () => {
-            setSaved(values);
-            return true;
-          }}
-          onDiscard={() => setValues(saved)}
-          draft={draftFor(values, saved)}
+          form={formFor({
+            changeCount: values.tagline === saved.tagline ? 0 : 1,
+            save: async () => {
+              setSaved(values);
+              return true;
+            },
+            discard: () => setValues(saved),
+            draft: draftFor(values, saved),
+          })}
         >
           <label>
             Tagline
@@ -225,7 +245,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
 
   it('does not save from the shortcut while a save is pending', () => {
     const onSave = vi.fn().mockResolvedValue(true);
-    renderShell({ onSave, changeCount: 1, isPending: true });
+    renderShell({ save: onSave, changeCount: 1, isPending: true });
 
     fireEvent.keyDown(window, { key: 's', ctrlKey: true });
 
@@ -255,7 +275,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   it('shows the error alert when an error title is set', () => {
-    renderShell({ errorTitle: 'Something went wrong — try again.' });
+    renderShell({}, { errorTitle: 'Something went wrong — try again.' });
 
     expect(screen.getByText('Something went wrong — try again.')).toBeVisible();
   });
@@ -323,7 +343,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       });
 
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
-      await waitFor(() => expect(baseProps.onSave).toHaveBeenCalled());
+      await waitFor(() => expect(baseSave).toHaveBeenCalled());
       unmount();
       renderShell();
 
@@ -376,7 +396,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       });
       const onSave = vi.fn().mockResolvedValue(true);
       const { unmount } = renderShell({
-        onSave,
+        save: onSave,
         changeCount: 1,
         draft: draftFor(EDITED),
       });

@@ -75,7 +75,6 @@ export const EmailSettings = ({
   const tSender = useTranslations('emailSettingsForm');
   const toast = useToast();
   const router = useRouter();
-  const archivedNoticeId = useId();
   const senderNameInputId = useId();
   const [selectedItem, setSelectedItem] =
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
@@ -87,22 +86,101 @@ export const EmailSettings = ({
   const { view, tabsProps, panelProps } = useViewTabs();
   const { sendTest, isSending } = useSendTestEmail(tenantId);
 
+  const revealSenderName = () => {
+    setSelectedItem(EMAIL_SENDER_ITEM);
+    tabsProps.onChange('edit');
+  };
+
+  const senderDraftFields = (
+    Object.keys(SENDER_FIELD_LABEL_KEYS) as (keyof TEmailSenderDraft)[]
+  ).map((field) => ({
+    id: field,
+    label: tSender(SENDER_FIELD_LABEL_KEYS[field]),
+    display: (values: TEmailDraft) => values.sender[field],
+  }));
+
+  const copyDraftFields = EMAIL_TEMPLATE_TYPES.flatMap((templateType) =>
+    liveLocales.flatMap((locale) => {
+      const template = tTemplate(`templateTypeLabel.${templateType}`);
+      const language = tLanguage(locale);
+      return [
+        {
+          id: `${templateType}.${locale}.subject`,
+          label: t('draftFieldLabel', {
+            template,
+            field: tTemplate('subjectLabel', { language }),
+          }),
+          display: (values: TEmailDraft) =>
+            values.copies[templateType][locale].subject,
+        },
+        {
+          id: `${templateType}.${locale}.body`,
+          label: t('draftFieldLabel', {
+            template,
+            field: tTemplate('bodyLabel', { language }),
+          }),
+          display: (values: TEmailDraft) =>
+            portableTextToPlainText(
+              values.copies[templateType][locale].body as Parameters<
+                typeof portableTextToPlainText
+              >[0],
+            ),
+        },
+      ];
+    }),
+  );
+
+  const bumpRevision = () => setRevision((current) => current + 1);
+
   const {
     values: draft,
     setValues: setDraft,
-    saved,
+    savedValues: saved,
     status,
-    isPending,
-    handleSubmit,
+    form,
     senderNameError,
     setSenderNameError,
   } = useEmailDraft({
     tenantId,
     initialDraft,
     liveLocales,
+    archivedAt,
+    senderNameInputId,
+    revealSenderName,
     onSaved: () => {
       toast.success({ message: t('alertSuccess') });
       router.refresh();
+    },
+    onDiscard: bumpRevision,
+    countChanges: (values, savedValues) =>
+      countEmailDraftChanges(savedValues, values, liveLocales),
+    countChangesByLanguage: (values, savedValues) =>
+      liveLocales.length > 1
+        ? [
+            {
+              language: t('allLanguagesChanges'),
+              count: countSharedChanges(savedValues, values),
+            },
+            ...liveLocales.map((locale) => ({
+              language: tLanguage(locale),
+              count: countLanguageChanges(savedValues, values, locale),
+            })),
+          ]
+        : [],
+    draft: {
+      tenantId,
+      page: 'email',
+      savedAt,
+      fields: [...senderDraftFields, ...copyDraftFields],
+      onRestore: (restored) => {
+        setSenderNameError(undefined);
+        setDraft((prev) => ({
+          ...restored,
+          senderLogo: prev.senderLogo,
+          templateLogos: prev.templateLogos,
+        }));
+        bumpRevision();
+      },
     },
   });
 
@@ -154,91 +232,11 @@ export const EmailSettings = ({
     };
   });
 
-  const senderDraftFields = (
-    Object.keys(SENDER_FIELD_LABEL_KEYS) as (keyof TEmailSenderDraft)[]
-  ).map((field) => ({
-    id: field,
-    label: tSender(SENDER_FIELD_LABEL_KEYS[field]),
-    display: (values: TEmailDraft) => values.sender[field],
-  }));
-
-  const copyDraftFields = EMAIL_TEMPLATE_TYPES.flatMap((templateType) =>
-    liveLocales.flatMap((locale) => {
-      const template = tTemplate(`templateTypeLabel.${templateType}`);
-      const language = tLanguage(locale);
-      return [
-        {
-          id: `${templateType}.${locale}.subject`,
-          label: t('draftFieldLabel', {
-            template,
-            field: tTemplate('subjectLabel', { language }),
-          }),
-          display: (values: TEmailDraft) =>
-            values.copies[templateType][locale].subject,
-        },
-        {
-          id: `${templateType}.${locale}.body`,
-          label: t('draftFieldLabel', {
-            template,
-            field: tTemplate('bodyLabel', { language }),
-          }),
-          display: (values: TEmailDraft) =>
-            portableTextToPlainText(
-              values.copies[templateType][locale].body as Parameters<
-                typeof portableTextToPlainText
-              >[0],
-            ),
-        },
-      ];
-    }),
-  );
-
-  const replaceDraft = (replace: (prev: TEmailDraft) => TEmailDraft) => {
-    setSenderNameError(undefined);
-    setDraft(replace);
-    setRevision((current) => current + 1);
-  };
-
-  const revealSenderName = () => {
-    setSelectedItem(EMAIL_SENDER_ITEM);
-    tabsProps.onChange('edit');
-  };
-
-  const restoreDraft = (restored: TEmailDraft) =>
-    replaceDraft((prev) => ({
-      ...restored,
-      senderLogo: prev.senderLogo,
-      templateLogos: prev.templateLogos,
-    }));
-
   return (
     <SettingsFormShell
       title={t('pageHeading')}
       description={t('pageSubtitle')}
-      onSave={handleSubmit}
-      onDiscard={() => replaceDraft(() => saved)}
-      changeCount={countEmailDraftChanges(saved, draft, liveLocales)}
-      changesByLanguage={
-        liveLocales.length > 1
-          ? [
-              {
-                language: t('allLanguagesChanges'),
-                count: countSharedChanges(saved, draft),
-              },
-              ...liveLocales.map((locale) => ({
-                language: tLanguage(locale),
-                count: countLanguageChanges(saved, draft, locale),
-              })),
-            ]
-          : []
-      }
-      isPending={isPending}
-      archivedAt={archivedAt}
-      archivedNoticeId={archivedNoticeId}
-      invalidFields={{
-        ids: senderNameError ? [senderNameInputId] : [],
-        revealFirst: revealSenderName,
-      }}
+      form={form}
       errorTitle={
         status === 'error' && !senderNameError ? t('alertError') : undefined
       }
@@ -264,15 +262,6 @@ export const EmailSettings = ({
           )}
         </>
       }
-      draft={{
-        tenantId,
-        page: 'email',
-        values: draft,
-        savedValues: saved,
-        savedAt,
-        fields: [...senderDraftFields, ...copyDraftFields],
-        onRestore: restoreDraft,
-      }}
     >
       <div className={root()}>
         <ViewTabs {...tabsProps} />
