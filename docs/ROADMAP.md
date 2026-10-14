@@ -32,14 +32,15 @@ Signup itself is Release 2.
 Launch epic: **#5085**. It carries, or depends on:
 
 1. **Production stand-up** (owner, console): Vercel projects, env, domains, the
-   old prod project retired or adopted, crons re-enabled.
+   old prod project retired or adopted, crons re-enabled, and the
+   Upstash Redis integration from the Vercel Marketplace (rate-limit counts).
 2. **Provisioning green on dev**: #4945, then #4947.
 3. **The platform tenant on dev, its pages authored**: #4948.
 4. **Lead capture**: the contact form chain #3667–#3674 under #1292. #3674 now
    reuses the launch epic's shared rate limiter and BotID setup. A CTA to an
    external form is the stopgap if the chain lags.
-5. **Abuse protection**: one rate limiter and BotID for server actions
-   (#5091, #5092), then newsletter limits (#5093). Magic-link limits are
+5. **Abuse protection**: one rate limiter, its counts in Redis so limits hold
+   across instances, and BotID for server actions (#5091, #5092), then newsletter limits (#5093). Magic-link limits are
    #4958.
 6. **Legal**: footer links and a privacy link (#5086, #5087, #3726), the
    consent banner's policy link (#5088, #5089), final legal pages (#5090).
