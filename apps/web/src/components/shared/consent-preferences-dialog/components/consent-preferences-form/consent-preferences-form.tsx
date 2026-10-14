@@ -1,7 +1,6 @@
 'use client';
 
-import { CONSENT_CATEGORY, SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
+import { CONSENT_CATEGORY } from '@blog/config';
 import { ConsentPreferences } from '@blog/ui/components/molecules/consent-preferences';
 import {
   useConsentChoices,
@@ -10,10 +9,6 @@ import {
 import { OPTIONAL_CONSENT_CATEGORIES } from '@web/utils/consent-cookie';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-
-import { consentPreferencesFormVariants } from './consent-preferences-form-variants';
-
-const s = consentPreferencesFormVariants();
 
 export const ConsentPreferencesForm = () => {
   const t = useTranslations('consent');
@@ -48,24 +43,19 @@ export const ConsentPreferencesForm = () => {
   };
 
   return (
-    <>
-      <ConsentPreferences
-        headingLevel={2}
-        heading={t('preferences.heading')}
-        categories={categories}
-        values={values}
-        onCategoryChange={(id, checked) =>
-          setValues((current) => ({ ...current, [id]: checked }))
-        }
-        saveLabel={t('preferences.saveLabel')}
-        onSave={handleSave}
-        dataTestId="consent-preferences"
-      />
-      <div className={s.closeRow()}>
-        <Button variant="ghost" size={SIZE.SM} onClick={closePreferences}>
-          {t('preferences.closeLabel')}
-        </Button>
-      </div>
-    </>
+    <ConsentPreferences
+      headingLevel={2}
+      heading={t('preferences.heading')}
+      categories={categories}
+      values={values}
+      onCategoryChange={(id, checked) =>
+        setValues((current) => ({ ...current, [id]: checked }))
+      }
+      saveLabel={t('preferences.saveLabel')}
+      onSave={handleSave}
+      closeLabel={t('preferences.closeLabel')}
+      onClose={closePreferences}
+      dataTestId="consent-preferences"
+    />
   );
 };
