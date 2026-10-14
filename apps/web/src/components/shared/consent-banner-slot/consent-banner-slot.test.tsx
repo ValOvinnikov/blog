@@ -1,5 +1,5 @@
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { useConsentPreferences } from '@web/context/consent-provider';
+import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import {
   customRender,
   renderElement,
@@ -15,8 +15,8 @@ const clearConsentCookie = () => {
 };
 
 const PreferencesState = () => {
-  const { isPreferencesOpen } = useConsentPreferences();
-  return <p>{isPreferencesOpen ? 'Preferences open' : 'Preferences closed'}</p>;
+  const { isOpen } = useConsentPreferences();
+  return <p>{isOpen ? 'Preferences open' : 'Preferences closed'}</p>;
 };
 
 let user: UserEvent;
