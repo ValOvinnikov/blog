@@ -15,7 +15,7 @@ export type TPricingCardFeaturesProps = IWithClassName &
 
 const s = pricingCardFeaturesVariants();
 
-/** The checklist of what a `PricingCard`'s tier includes; grows to fill the card's remaining height so `Actions` lines up across neighbouring cards. */
+/** The checklist of what a `PricingCard`'s tier includes. */
 export const PricingCardFeatures = ({
   items,
   className,

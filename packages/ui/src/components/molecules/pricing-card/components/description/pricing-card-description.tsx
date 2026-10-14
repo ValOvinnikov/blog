@@ -7,13 +7,13 @@ export type TPricingCardDescriptionProps = IWithClassName &
     children: ReactNode;
   };
 
-/** The one- or two-line summary of a `PricingCard`'s tier, below its `Name`. */
+/** The one- or two-line summary of a `PricingCard`'s tier. */
 export const PricingCardDescription = ({
   className,
   dataTestId,
   children,
 }: TPricingCardDescriptionProps) => (
-  <Text variant="card" className={className} dataTestId={dataTestId}>
+  <Text variant="supporting" className={className} dataTestId={dataTestId}>
     {children}
   </Text>
 );

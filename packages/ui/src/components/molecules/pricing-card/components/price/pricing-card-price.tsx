@@ -25,8 +25,12 @@ export const PricingCardPrice = ({
   dataTestId,
 }: TPricingCardPriceProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    {prefix && <span className={s.prefix()}>{prefix}</span>}
     <div className={s.headline()}>
+      {prefix && (
+        <>
+          <span className={s.prefix()}>{prefix}</span>{' '}
+        </>
+      )}
       <span className={s.amount()}>{amount}</span>
       {period && (
         <>
