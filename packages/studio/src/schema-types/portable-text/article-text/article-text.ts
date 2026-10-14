@@ -1,6 +1,15 @@
 import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
+import {
+  boldDecorator,
+  codeDecorator,
+  italicDecorator,
+  strikeThroughDecorator,
+  subscriptDecorator,
+  superscriptDecorator,
+  underlineDecorator,
+} from '@blog/studio/schema-types/portable-text/decorators/decorators';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const articleTextSchema = defineType({
@@ -21,6 +30,15 @@ export const articleTextSchema = defineType({
         { title: 'Quote', value: 'blockquote' },
       ],
       marks: {
+        decorators: [
+          boldDecorator,
+          italicDecorator,
+          codeDecorator,
+          underlineDecorator,
+          strikeThroughDecorator,
+          subscriptDecorator,
+          superscriptDecorator,
+        ],
         annotations: [{ type: linkRefSchema.name }],
       },
     }),

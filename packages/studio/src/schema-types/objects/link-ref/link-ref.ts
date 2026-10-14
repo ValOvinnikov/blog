@@ -1,4 +1,5 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { toToolbarIcon } from '@blog/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -7,7 +8,7 @@ export const linkRefSchema = defineType({
   title: 'Link',
   type: 'object',
   description: 'Points at a reusable link document.',
-  icon: Link2,
+  icon: toToolbarIcon(Link2),
   fields: [
     defineField({
       name: 'link',
