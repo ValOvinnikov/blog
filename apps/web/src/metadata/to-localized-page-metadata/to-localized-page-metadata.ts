@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS } from '@blog/config';
+import { LOCALE_OPEN_GRAPH_TAGS } from '@blog/config';
 import type { TSeoResolved } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { toMetadata, type TToMetadataOptions } from '@web/metadata/to-metadata';
@@ -35,14 +35,14 @@ export const toLocalizedPageMetadata = async (
     liveLocales,
   })
     .filter(({ language }) => language !== locale)
-    .map(({ language }) => LOCALE_BCP47_TAGS[language]);
+    .map(({ language }) => LOCALE_OPEN_GRAPH_TAGS[language]);
 
   return withLanguageAlternates(
     {
       ...metadata,
       openGraph: {
         ...metadata.openGraph,
-        locale: LOCALE_BCP47_TAGS[locale],
+        locale: LOCALE_OPEN_GRAPH_TAGS[locale],
         url: canonical,
         ...(alternateLocales.length > 0 && {
           alternateLocale: alternateLocales,

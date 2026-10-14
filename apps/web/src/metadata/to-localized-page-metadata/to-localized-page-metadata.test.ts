@@ -28,8 +28,8 @@ describe(toLocalizedPageMetadata, () => {
       ogType: 'website',
     });
 
-    expect(metadata.openGraph?.locale).toBe('en');
-    expect(metadata.openGraph?.alternateLocale).toEqual(['nl']);
+    expect(metadata.openGraph?.locale).toBe('en_US');
+    expect(metadata.openGraph?.alternateLocale).toEqual(['nl_NL']);
     expect(metadata.openGraph?.url).toBe('/topics');
   });
 
@@ -49,8 +49,8 @@ describe(toLocalizedPageMetadata, () => {
       ogType: 'article',
     });
 
-    expect(metadata.openGraph?.locale).toBe('nl');
-    expect(metadata.openGraph?.alternateLocale).toEqual(['en']);
+    expect(metadata.openGraph?.locale).toBe('nl_NL');
+    expect(metadata.openGraph?.alternateLocale).toEqual(['en_US']);
     expect(metadata.openGraph?.url).toBe('/nl/blog/mijn-artikel');
   });
 
@@ -61,7 +61,7 @@ describe(toLocalizedPageMetadata, () => {
       ogType: 'website',
     });
 
-    expect(metadata.openGraph?.locale).toBe('en');
+    expect(metadata.openGraph?.locale).toBe('en_US');
     expect(metadata.openGraph?.alternateLocale).toBeUndefined();
   });
 });
