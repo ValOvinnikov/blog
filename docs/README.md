@@ -23,9 +23,12 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
   - `rendering-caching-i18n.md` — ISR, the skim pipeline, i18n mechanics.
   - `seo-accessibility.md` — metadata, JSON-LD, breadcrumbs, a11y checklist.
   - `surfaces-and-routing.md` — routing conventions + per-surface layout history.
-- **`docs/features/<feature>.md`** — the per-feature reference (what it does,
-  surfaces, data, configuration, invariants, entry points). Created when a PR
-  first changes the feature (`CLAUDE.md`'s "Feature docs" bullet).
+- **`docs/features/`** — the feature catalogue: one `<feature>.md` per
+  feature (what it does, surfaces, data, configuration, invariants, entry
+  points), indexed by status and layers in `docs/features/README.md`. Every
+  shipped feature has a page; a PR that changes a feature updates its page,
+  and one that adds a feature adds its page (`CLAUDE.md`'s "Feature docs"
+  bullet).
 - **`docs/BACKLOG.md`** — ticket-ready roadmap.
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
 - **`docs/design-reference/`** — design-system reference (HTML mockup +

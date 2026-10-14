@@ -1,0 +1,83 @@
+---
+title: Reader sign-in
+status: built
+layers: [auth, db, email, web]
+code:
+  - packages/auth/src/**
+  - packages/db/src/schema/auth.ts
+  - apps/web/src/server/auth/**
+  - apps/web/src/app/api/auth/**
+  - apps/web/src/components/shared/auth-menu/**
+  - apps/web/src/hooks/use-oauth-error-param/**
+  - packages/email/src/templates/tenant/magic-link-email/**
+  - packages/email/src/templates/tenant/magic-link-invite-email/**
+epics: [4979, 4958, 4083]
+---
+
+# Reader sign-in
+
+## What it does
+
+A reader signs in to a public site from a popover in the header, with GitHub, Google or an emailed magic link. The session is a database session stored in Neon, and the identity behind it is one `users` row per email address, shared by every tenant site and by the platform. The magic-link email carries the tenant's brand, its authored copy and sender settings, in the reader's language.
+
+## Surfaces and routes
+
+- **Header** — `AuthMenu` renders only when the site has a reader account (see [reader-account](./reader-account.md)). It shows a spinner while the session loads, a "Sign in" popover when signed out, and an avatar menu (My bookmarks, Account settings, Sign out) when signed in.
+- **Sign-in popover** — one button per configured OAuth provider, then "Continue with email", which expands into an email field and a "check your inbox" state.
+- `/api/auth/*` — the Auth.js handlers (`GET`/`POST`).
+- There is no `/login` page. A failed OAuth callback redirects to `/` with `?error=`; `useOAuthErrorParam` reads it, strips it from the URL and the popover shows an inline error.
+- The platform builds its own `NextAuth()` from the same `buildAuthConfig` (see [platform-sign-in-and-onboarding](./platform-sign-in-and-onboarding.md)).
+
+## Data
+
+- Neon (Auth.js Drizzle adapter tables, column names fixed by the adapter): `users` (`id`, `name`, `email` unique, `emailVerified`, `image`), `accounts` (PK `provider` + `providerAccountId`, cascade on user delete), `sessions` (`sessionToken`, `userId`, `expires`), `verification_tokens` (the magic-link token).
+- No tenant column on any of them: a reader is global, and tenant scoping happens in the rows that reference `users` (bookmarks, memberships).
+- Magic-link copy comes from `email_templates` (`MAGIC_LINK`, or `TENANT_INVITE` when the address has a pending membership invite) and sender settings from `email_config`. Only subject and body fall back to `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE`; sender name, reply-to, logo and postal footer stay unset when not configured, and the from address is `MAGIC_LINK_FROM_ADDRESS`, else Resend's testing sender.
+- Nothing is cached; every session read is a database lookup.
+
+## Configuration
+
+- **Operator (env)** — an OAuth provider is registered only when both its id and secret are set; the header advertises exactly the registered set (`getEnabledOAuthProviderIds`). The magic-link provider is always registered.
+- **Owner (platform Email page)** — the magic-link and invite email subject, body, logo, sender name, reply-to and footer postal address (see [email](./email.md)).
+- **Plan / capability** — no capability of its own. The sign-in entry point exists only while bookmarks, comments or newsletter is enabled, so a `FREE` site shows no sign-in.
+- **Look** — the email brand follows the tenant's preset, accent and logo hue (`resolveTenantEmailBrand`). Popover copy is fixed (`authMenu.*`), not Voice.
+
+## Constraints and invariants
+
+- Session strategy is `database`; the `session` callback copies the adapter's `user.id` onto `session.user.id`, which every authorization lookup keys on.
+- `AUTH_COOKIE_DOMAIN` unset (the default) gives each origin its own session cookie, so each app is signed into separately. Setting it rewrites the whole `sessionToken` cookie definition.
+- The magic-link send never fails on a lookup: tenant identity, invite lookup and template/settings reads each degrade to neutral or default copy. A malformed stored reply-to is dropped.
+- The tenant is resolved from the magic-link URL's host. The email's language is the first segment of the `callbackUrl` path, matched only against the tenant's live locales, else the default locale; with no tenant behind the host it is the invited tenant's locale, else English.
+- `events.signIn` consumes every pending membership invite for the signed-in email, on either app. It swallows errors, since a throw would fail every sign-in.
+- `@blog/auth` never logs; `db` must never import it.
+- Magic-link sends are unlimited.
+
+## Dependencies
+
+- Layers: `auth` (config, providers), `db` (adapter tables, invites, email settings), `email` (templates, Resend transport), `config` (locales, template types), `web`.
+- Features: [reader-account](./reader-account.md), [bookmarks](./bookmarks.md), [email](./email.md), [tenant-access](./tenant-access.md) (invites), [languages](./languages.md), [plans-and-entitlements](./plans-and-entitlements.md).
+- Env: `AUTH_SECRET` (required), `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `MAGIC_LINK_FROM_ADDRESS` (falls back to Resend's testing sender), `AUTH_COOKIE_DOMAIN`, `RESEND_API_KEY`, `DATABASE_URL`.
+
+## Entry points
+
+- `packages/auth/src/config.ts` — `buildAuthConfig`
+- `packages/auth/src/providers/magic-link/magic-link-provider/magic-link-provider.ts`
+- `packages/auth/src/utils/oauth-providers/oauth-providers.ts`
+- `packages/auth/src/events/consume-pending-invites-on-sign-in.ts`
+- `apps/web/src/server/auth/auth.ts` — lazy `NextAuth()`, `pages.error: '/'`
+- `apps/web/src/components/shared/auth-menu/auth-menu.tsx`
+- `apps/web/src/components/shared/auth-menu/hooks/use-email-sign-in.ts`
+- `apps/web/src/components/shared/site-header/site-header.tsx`
+
+## Tests and stories
+
+- `packages/auth/src/**/*.test.ts` (config, providers, env, invite consumption).
+- `apps/web/src/components/shared/auth-menu/**/*.test.tsx`, `use-oauth-error-param.test.ts`.
+- `packages/email/src/templates/tenant/magic-link-*/**/*.test.ts`.
+- No story of its own; the header appears in `site-navigation.stories.tsx`.
+
+## Related
+
+- #4979 — epic: web and platform stay separate. Per-app session cookies and session rows, `AUTH_COOKIE_DOMAIN` retired, invites consumed only on the platform (#4982, #4983, #4986).
+- #4958 — magic-link send limits per email and IP, and terms acceptance on first sign-in.
+- #4083 — epic: per-tenant email usage tracking and a separate Resend account for tenant mail.
