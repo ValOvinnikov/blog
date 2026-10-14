@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import { evaluate, parse } from 'groq-js';
 import { FileText } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
@@ -39,7 +40,10 @@ const makeMockBuilder = (kind: string): TMockBuilder => {
 const callArgs = (builder: TMockBuilder, method: string) =>
   builder.calls.find((call) => call.method === method)?.args;
 
-const makeResolver = (dataset: Record<string, unknown>[]) => {
+const makeResolver = (
+  dataset: Record<string, unknown>[],
+  onlyLanguage?: TLocaleIsoCode,
+) => {
   const client = {
     fetch: async (query: string, params: Record<string, unknown>) =>
       (await evaluate(parse(query), { dataset, params })).get(),
@@ -55,6 +59,7 @@ const makeResolver = (dataset: Record<string, unknown>[]) => {
   const resolve = createPageTreeResolver(S as unknown as StructureBuilder, {
     name: 'page_landing',
     icon: FileText,
+    onlyLanguage,
   });
   return {
     client,
@@ -151,6 +156,43 @@ describe('createPageTreeResolver', () => {
 
     expect((await resolveChild('faq')).kind).toBe('document');
     expect((await resolveChild('modules')).kind).toBe('list');
+  });
+
+  describe('with one live language', () => {
+    const dutchFaq = { ...faq, _id: 'dutch-faq', language: 'NL' };
+    const englishFaq = { ...faq, _id: 'english-faq', language: 'EN' };
+
+    const sectionPageIds = async (
+      dataset: Record<string, unknown>[],
+      parentId: string,
+    ) => {
+      const { resolve: resolveInDutch } = makeResolver(
+        dataset,
+        LOCALE_ISO_CODES.NL,
+      );
+      const { filter, params } = callArgs(
+        sectionPagesOf(await resolveInDutch(parentId)),
+        'options',
+      )?.[0] as { filter: string; params: Record<string, unknown> };
+      return (
+        await evaluate(parse(`*[${filter}]._id`), { dataset, params })
+      ).get();
+    };
+
+    it('lists only section pages in that language or with no language', async () => {
+      expect(
+        await sectionPageIds([modules, faq, dutchFaq, englishFaq], 'modules'),
+      ).toEqual(['faq', 'dutch-faq']);
+    });
+
+    it('opens a page whose only children are in another language straight in the editor', async () => {
+      const { resolve: resolveInDutch } = makeResolver(
+        [modules, englishFaq],
+        LOCALE_ISO_CODES.NL,
+      );
+
+      expect((await resolveInDutch('modules')).kind).toBe('document');
+    });
   });
 
   it('wires the reset and increments actions the orderable list handles', async () => {

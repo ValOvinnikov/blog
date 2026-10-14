@@ -3,6 +3,7 @@ import {
   LOCALE_NATIVE_LABEL,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
 import { createPageTreeResolver } from '@blog/studio/structure/page-tree/page-tree';
@@ -39,7 +40,7 @@ export type TStructureSection = {
 };
 
 const requireSchemaField = <TValue>(
-  value: TValue | undefined,
+  value: TMaybeUndefined<TValue>,
   schemaName: string,
   field: string,
 ): TValue => {
@@ -64,11 +65,15 @@ const templateIdFor = (name: string, locale: TLocaleIsoCode) =>
 
 const topLevelOnly = (filter: string) => `${filter} && !defined(parent)`;
 
+const DEFAULT_LANGUAGE_FILTER = `_type == $type && coalesce(${LANGUAGE_FIELD}, $defaultLanguage) == $defaultLanguage`;
+
+type TPageTreeFactory = (onlyLanguage?: TLocaleIsoCode) => ChildResolver;
+
 const buildByLanguageItem = (
   S: StructureBuilder,
   { name, title, icon }: TPageItem,
   locales: readonly TLocaleIsoCode[],
-  pageTree?: ChildResolver,
+  createPageTree?: TPageTreeFactory,
 ): ListItemBuilder => {
   const languageList = (
     id: string,
@@ -99,6 +104,12 @@ const buildByLanguageItem = (
     const list = S.documentTypeList(name)
       .id(name)
       .title(title)
+      .filter(
+        createPageTree
+          ? topLevelOnly(DEFAULT_LANGUAGE_FILTER)
+          : DEFAULT_LANGUAGE_FILTER,
+      )
+      .params({ type: name, defaultLanguage: defaultLocale })
       .initialValueTemplates([
         S.initialValueTemplateItem(templateIdFor(name, defaultLocale)),
       ]);
@@ -107,15 +118,10 @@ const buildByLanguageItem = (
       .title(title)
       .id(name)
       .icon(icon)
-      .child(
-        pageTree
-          ? list
-              .filter(topLevelOnly('_type == $type'))
-              .params({ type: name })
-              .child(pageTree)
-          : list,
-      );
+      .child(createPageTree ? list.child(createPageTree(defaultLocale)) : list);
   }
+
+  const pageTree = createPageTree?.();
 
   return S.listItem()
     .title(title)
@@ -215,7 +221,7 @@ const buildGroupItem = (
       S,
       { name, title, icon },
       locales,
-      createPageTreeResolver(S, { name, icon }),
+      (onlyLanguage) => createPageTreeResolver(S, { name, icon, onlyLanguage }),
     );
   }
 
