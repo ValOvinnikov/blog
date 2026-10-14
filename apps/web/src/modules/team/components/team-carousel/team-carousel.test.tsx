@@ -15,7 +15,6 @@ const setup = customRender(TeamCarousel, {
   members,
   imageShape: CARD_IMAGE_SHAPE.CIRCLE,
   align: 'left',
-  imageSizes: '100vw',
   title: 'Meet the team',
   tone: BRAND_VARIANT.PRIMARY,
 });

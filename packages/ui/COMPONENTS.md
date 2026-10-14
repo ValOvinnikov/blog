@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_65 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_66 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -200,8 +200,8 @@ Props: providerName: string · message: string · allowLabel: string · settings
 
 ### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
 
-The body of the cookie-consent preferences dialog; the caller owns the `<dialog>` itself.
-Props: headingLevel: THeadingLevel · heading: string · categories: IConsentCategory[] · values: Record<string, boolean> · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId, ( | { closeLabel?: never; onClose?: never } | {…)_
+The body of the cookie-consent preferences dialog; the caller's dialog supplies the heading.
+Props: categories: IConsentCategory[] · values: Record<string, boolean> · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId, ( | { closeLabel?: never; onClose?: never } | {…)_
 
 ### ImageWithCaption — `components/molecules/image-with-caption/image-with-caption.tsx`
 
@@ -275,10 +275,10 @@ Slots:
 
 - **PricingCard.Badge** — The raised-tier callout pinned to the top edge of a highlighted `PricingCard`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Name** — The `<h3>` naming a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PricingCard.Description** — The one- or two-line summary of a `PricingCard`'s tier, below its `Name`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **PricingCard.Description** — The one- or two-line summary of a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself. Props: amount: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId, ( | { compareAt?: undefined; compareAtLabel?: n…)_
 - **PricingCard.Extra** — One smaller price line below a `PricingCard`'s headline `Price` (e.g. a one-time setup fee). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PricingCard.Features** — The checklist of what a `PricingCard`'s tier includes; grows to fill the card's remaining height so `Actions` lines up across neighbouring cards. Props: items: string[] _(extends IWithClassName, IWithDataTestId)_
+- **PricingCard.Features** — The checklist of what a `PricingCard`'s tier includes. Props: items: string[] _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Actions** — The stacked, full-width call-to-action slot of a `PricingCard`; the caller fills it with its own action buttons. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Footnote** — The small print at the foot of a `PricingCard` (e.g. tax or billing-cycle caveats). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
@@ -388,7 +388,7 @@ Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · t
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 
 A modal window over the page, named by its heading; client-only, so the consumer declares the client boundary.
-Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel: string · fallbackFocusRef?: RefObject<HTMLElement | null> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel?: string · fallbackFocusRef?: RefObject<HTMLElement | null> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Footer — `components/organisms/footer/footer.tsx`
 
@@ -439,6 +439,12 @@ Compound component:
 Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
+
+### PricingCardGrid — `components/organisms/pricing-card-grid/pricing-card-grid.tsx`
+
+Lays out a set of `PricingCard` tiers so their prices, features and actions line up across the row.
+Props: columns?: TPricingCardGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Variants: columns: 1|2|3|4
 
 ### Timeline — `components/organisms/timeline/timeline.tsx`
 

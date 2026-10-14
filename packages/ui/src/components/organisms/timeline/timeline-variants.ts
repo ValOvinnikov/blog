@@ -7,13 +7,23 @@ import { tv } from '@blog/ui/lib/styling';
 
 export const timelineVariants = tv({
   slots: {
-    root: ['relative flex flex-col', 'm-0 list-none p-0'],
+    root: ['w-full [--timeline-gap:--spacing(6)]'],
+    itemShare: ['w-full'],
+    list: [
+      'relative flex flex-col gap-x-(--timeline-gap)',
+      'm-0 list-none p-0',
+    ],
   },
   variants: {
     orientation: {
       [TIMELINE_ORIENTATION.VERTICAL]: {},
       [TIMELINE_ORIENTATION.HORIZONTAL]: {
-        root: ['lg:flex-row lg:items-start lg:gap-10'],
+        // One item's share of the width, so a single container threshold holds for any item count.
+        itemShare: ['@container/timeline w-[calc(100%/var(--timeline-items))]'],
+        list: [
+          'w-[calc(100%*var(--timeline-items))]',
+          '@min-[9rem]/timeline:flex-row @min-[9rem]/timeline:items-start',
+        ],
       },
     },
     itemAlignment: {
@@ -21,8 +31,12 @@ export const timelineVariants = tv({
       [CONTENT_ALIGNMENT.CENTER]: {},
     },
     markerStyle: {
-      [TIMELINE_MARKER_STYLE.NUMBERED]: {},
-      [TIMELINE_MARKER_STYLE.LABELLED]: {},
+      [TIMELINE_MARKER_STYLE.NUMBERED]: {
+        root: ['[--timeline-marker-track:--spacing(8)]'],
+      },
+      [TIMELINE_MARKER_STYLE.LABELLED]: {
+        root: ['[--timeline-marker-track:--spacing(12)]'],
+      },
     },
   },
   compoundVariants: [

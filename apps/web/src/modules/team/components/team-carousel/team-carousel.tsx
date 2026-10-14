@@ -10,7 +10,6 @@ export interface ITeamCarouselProps extends IWithClassName, IWithDataTestId {
   members: TTeamMember[];
   imageShape: TTeamModule['imageShape'];
   align: 'left' | 'center';
-  imageSizes: string;
   title: string;
   tone: TTeamModule['brandVariant'];
   contentAlignment?: ICarouselProps<TTeamMember>['contentAlignment'];
@@ -20,7 +19,6 @@ export const TeamCarousel = ({
   members,
   imageShape,
   align,
-  imageSizes,
   title,
   tone,
   contentAlignment,
@@ -30,12 +28,7 @@ export const TeamCarousel = ({
   <LabelledCarousel
     items={members}
     renderItem={({ item }) => (
-      <TeamMemberCard
-        member={item}
-        imageShape={imageShape}
-        align={align}
-        imageSizes={imageSizes}
-      />
+      <TeamMemberCard member={item} imageShape={imageShape} align={align} />
     )}
     getItemKey={({ item }) => item.id}
     title={title}

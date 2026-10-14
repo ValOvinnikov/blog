@@ -8,7 +8,7 @@ import {
 } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 
 import { Timeline } from './timeline';
 import { timelineVariants } from './timeline-variants';
@@ -25,6 +25,11 @@ const labelledItems = Array.from({ length: 3 }, () => ({
 }));
 
 const fourItems = Array.from({ length: 4 }, () => ({
+  heading: faker.company.catchPhrase(),
+  body: faker.lorem.sentence(),
+}));
+
+const fiveItems = Array.from({ length: 5 }, () => ({
   heading: faker.company.catchPhrase(),
   body: faker.lorem.sentence(),
 }));
@@ -63,10 +68,17 @@ const renderTimelineItems = (
     </Timeline.Item>
   ));
 
+const inSidebarColumn: Decorator = (Story) => (
+  <div className="max-w-[37.5rem] outline outline-dashed outline-divider">
+    <Story />
+  </div>
+);
+
 const meta = {
   title: 'Organisms/Timeline',
   component: Timeline,
   tags: ['autodocs'],
+  parameters: { layout: 'padded' },
   argTypes: {
     orientation: {
       control: 'select',
@@ -108,6 +120,16 @@ export const LabelledVertical: TStory = {
   },
 };
 
+export const NumberedVerticalCentered: TStory = {
+  args: {
+    itemAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: renderTimelineItems(numberedItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
+      itemAlignment: CONTENT_ALIGNMENT.CENTER,
+    }),
+  },
+};
+
 export const NumberedHorizontal: TStory = {
   args: {
     orientation: TIMELINE_ORIENTATION.HORIZONTAL,
@@ -116,6 +138,41 @@ export const NumberedHorizontal: TStory = {
       orientation: TIMELINE_ORIENTATION.HORIZONTAL,
     }),
   },
+};
+
+export const NumberedHorizontalCentered: TStory = {
+  args: {
+    orientation: TIMELINE_ORIENTATION.HORIZONTAL,
+    itemAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: renderTimelineItems(fourItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
+      orientation: TIMELINE_ORIENTATION.HORIZONTAL,
+      itemAlignment: CONTENT_ALIGNMENT.CENTER,
+    }),
+  },
+};
+
+export const NumberedHorizontalInSidebarColumn: TStory = {
+  ...NumberedHorizontal,
+  decorators: [inSidebarColumn],
+};
+
+export const NumberedHorizontalCenteredInSidebarColumn: TStory = {
+  ...NumberedHorizontalCentered,
+  decorators: [inSidebarColumn],
+};
+
+export const FiveStepsHorizontalInSidebarColumn: TStory = {
+  args: {
+    orientation: TIMELINE_ORIENTATION.HORIZONTAL,
+    itemAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: renderTimelineItems(fiveItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
+      orientation: TIMELINE_ORIENTATION.HORIZONTAL,
+      itemAlignment: CONTENT_ALIGNMENT.CENTER,
+    }),
+  },
+  decorators: [inSidebarColumn],
 };
 
 export const LabelledHorizontalCentered: TStory = {

@@ -14,7 +14,6 @@ const setup = customRender(TeamMemberCard, {
   member,
   imageShape: CARD_IMAGE_SHAPE.CIRCLE,
   align: 'left',
-  imageSizes: '100vw',
 });
 
 describe(`<${TeamMemberCard.name}/>`, () => {

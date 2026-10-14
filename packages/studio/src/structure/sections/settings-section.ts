@@ -1,3 +1,4 @@
+import { redirectSchema } from '@blog/studio/schema-types/documents/redirect/redirect';
 import { footerSettingsSchema } from '@blog/studio/schema-types/documents/settings/footer/footer';
 import { navigationSettingsSchema } from '@blog/studio/schema-types/documents/settings/navigation/navigation';
 import { siteSettingsSchema } from '@blog/studio/schema-types/documents/settings/site-settings/site-settings';
@@ -15,6 +16,9 @@ export const settingsSection: TStructureSection = {
         { schema: navigationSettingsSchema, mode: 'singleton' },
         { schema: footerSettingsSchema, mode: 'singleton' },
       ],
+    },
+    {
+      items: [{ schema: redirectSchema }],
     },
     {
       dividerBefore: true,

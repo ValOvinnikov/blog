@@ -1,7 +1,5 @@
 import { SIZE, type IWithClassName, type IWithDataTestId } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import type { THeadingLevel } from '@blog/ui/lib/react';
 
 import { ConsentCategoryRow } from './components/category-row/consent-category-row';
 import { consentPreferencesVariants } from './consent-preferences-variants';
@@ -15,8 +13,6 @@ export interface IConsentCategory {
 
 export type TConsentPreferencesProps = IWithClassName &
   IWithDataTestId & {
-    headingLevel: THeadingLevel;
-    heading: string;
     categories: IConsentCategory[];
     values: Record<string, boolean>;
     onCategoryChange: (id: string, checked: boolean) => void;
@@ -29,10 +25,8 @@ export type TConsentPreferencesProps = IWithClassName &
 
 const s = consentPreferencesVariants();
 
-/** The body of the cookie-consent preferences dialog; the caller owns the `<dialog>` itself. */
+/** The body of the cookie-consent preferences dialog; the caller's dialog supplies the heading. */
 export const ConsentPreferences = ({
-  headingLevel,
-  heading,
   categories,
   values,
   onCategoryChange,
@@ -44,9 +38,6 @@ export const ConsentPreferences = ({
   dataTestId,
 }: TConsentPreferencesProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <Heading level={headingLevel} size={SIZE.SM} className={s.heading()}>
-      {heading}
-    </Heading>
     <div className={s.list()}>
       {categories.map((category) => (
         <ConsentCategoryRow

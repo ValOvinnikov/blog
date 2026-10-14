@@ -1082,6 +1082,9 @@ export type Redirect = {
   source?: string;
   destination?: string;
   isPrefix?: boolean;
+  status?: 'PERMANENT' | 'TEMPORARY';
+  description?: string;
+  isAutomatic?: boolean;
 };
 
 export type Block_faq = {

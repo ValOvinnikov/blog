@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -16,6 +16,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const { EN, NL } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
+function permanent(destination: string) {
+  return { destination, status: REDIRECT_STATUS.PERMANENT };
+}
+
 const redirects = [
   { source: '/old-faq', destination: '/modules/faq', isPrefix: false },
   { source: '/old', destination: '/new', isPrefix: true },
@@ -30,18 +34,20 @@ describe('getRedirect', () => {
   });
 
   it('resolves an exact source to its destination', async () => {
-    await expect(getRedirect(['old-faq'], tenant)).resolves.toBe(
-      '/modules/faq',
+    await expect(getRedirect(['old-faq'], tenant)).resolves.toEqual(
+      permanent('/modules/faq'),
     );
   });
 
   it('rebases a path beneath a prefix source onto its destination', async () => {
-    await expect(getRedirect(['old', 'faq'], tenant)).resolves.toBe('/new/faq');
+    await expect(getRedirect(['old', 'faq'], tenant)).resolves.toEqual(
+      permanent('/new/faq'),
+    );
   });
 
   it('prefers the longest matching prefix', async () => {
-    await expect(getRedirect(['old', 'deep', 'page'], tenant)).resolves.toBe(
-      '/elsewhere/page',
+    await expect(getRedirect(['old', 'deep', 'page'], tenant)).resolves.toEqual(
+      permanent('/elsewhere/page'),
     );
   });
 
@@ -51,7 +57,9 @@ describe('getRedirect', () => {
       { source: '/old/faq', destination: '/help', isPrefix: false },
     ]);
 
-    await expect(getRedirect(['old', 'faq'], tenant)).resolves.toBe('/help');
+    await expect(getRedirect(['old', 'faq'], tenant)).resolves.toEqual(
+      permanent('/help'),
+    );
   });
 
   it('does not rebase paths beneath a source that is not a prefix', async () => {
@@ -65,12 +73,14 @@ describe('getRedirect', () => {
   });
 
   it('rebases onto the home page without doubling the slash', async () => {
-    await expect(getRedirect(['legacy', 'faq'], tenant)).resolves.toBe('/faq');
+    await expect(getRedirect(['legacy', 'faq'], tenant)).resolves.toEqual(
+      permanent('/faq'),
+    );
   });
 
   it('rebases a nested path onto a prefix destination', async () => {
-    await expect(getRedirect(['old', 'a', 'b'], tenant)).resolves.toBe(
-      '/new/a/b',
+    await expect(getRedirect(['old', 'a', 'b'], tenant)).resolves.toEqual(
+      permanent('/new/a/b'),
     );
   });
 
@@ -91,6 +101,53 @@ describe('getRedirect', () => {
     ]);
 
     await expect(getRedirect(['old'], tenant)).resolves.toBe(undefined);
+  });
+
+  it('reports the status of a temporary redirect', async () => {
+    mockRun.mockResolvedValue([
+      {
+        source: '/sale',
+        destination: '/offers',
+        isPrefix: false,
+        status: REDIRECT_STATUS.TEMPORARY,
+      },
+    ]);
+
+    await expect(getRedirect(['sale'], tenant)).resolves.toEqual({
+      destination: '/offers',
+      status: REDIRECT_STATUS.TEMPORARY,
+    });
+  });
+
+  it('reports a redirect with no status as permanent', async () => {
+    mockRun.mockResolvedValue([
+      {
+        source: '/sale',
+        destination: '/offers',
+        isPrefix: false,
+        status: null,
+      },
+    ]);
+
+    await expect(getRedirect(['sale'], tenant)).resolves.toEqual(
+      permanent('/offers'),
+    );
+  });
+
+  it('carries the status of a matched prefix redirect', async () => {
+    mockRun.mockResolvedValue([
+      {
+        source: '/old',
+        destination: '/new',
+        isPrefix: true,
+        status: REDIRECT_STATUS.TEMPORARY,
+      },
+    ]);
+
+    await expect(getRedirect(['old', 'faq'], tenant)).resolves.toEqual({
+      destination: '/new/faq',
+      status: REDIRECT_STATUS.TEMPORARY,
+    });
   });
 
   it('resolves undefined when no redirect matches', async () => {
@@ -120,6 +177,7 @@ describe('redirectsQuery', () => {
         source: '/old',
         destination: '/new',
         isPrefix: true,
+        status: REDIRECT_STATUS.TEMPORARY,
       },
       {
         _id: 'b',
@@ -136,6 +194,13 @@ describe('redirectsQuery', () => {
         locale: EN,
         defaultLocale: EN,
       }),
-    ).toEqual([{ source: '/old', destination: '/new', isPrefix: true }]);
+    ).toEqual([
+      {
+        source: '/old',
+        destination: '/new',
+        isPrefix: true,
+        status: REDIRECT_STATUS.TEMPORARY,
+      },
+    ]);
   });
 });

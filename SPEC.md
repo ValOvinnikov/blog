@@ -1168,9 +1168,11 @@ inline objects have no id to compare. It is offered on `page_home` and
 
 **Horizontal is capped at five items by a publishing rule, and the web layer
 still assumes it can be broken.** `orientation` (`TIMELINE_ORIENTATION`) is
-Vertical or Horizontal; Horizontal applies from `lg`, while phones and `md`
-always show the vertical line, decided in `lg:`-prefixed classes rather than any
-JS breakpoint. A custom rule rejects a Horizontal module holding more than
+Vertical or Horizontal; Horizontal applies wherever the timeline's own width
+gives every item at least 9rem, and falls back to the vertical line otherwise —
+a container query on that width, not a viewport breakpoint, so the same module
+stays horizontal in a landing page's sidebar column when its items fit. A
+custom rule rejects a Horizontal module holding more than
 `TIMELINE_HORIZONTAL_ITEM_CAP` items, so an author cannot publish one — but
 `apps/web` still falls back to Vertical above that count rather than trusting it,
 because legacy and API-written documents reach the view by paths Studio
@@ -1795,20 +1797,29 @@ costs convenience, never compliance.
   missing, unparseable or older-version value reads as unanswered, so bumping
   the version re-asks everyone. There is no server-side consent log, and no
   server code reads the cookie: pages stay static.
-- _Gate API (`apps/web`, client-side)._ `ConsentProvider` is mounted for every
-  tenant through the locale layout's client providers. It reads the cookie via
-  `useSyncExternalStore` and notifies every subscriber on each write, so
-  already-rendered content updates without a reload. `useConsent(category)`
-  returns `{ status, grant }`, where `status` is `unknown` (server render and
-  first paint), `granted`, `denied` or `unanswered`; the provider also exposes
-  `openPreferences()`. Features never read the cookie directly.
+- _Gate API (`apps/web`, client-side)._ Consent data lives in a module-level
+  store read through `useConsentStore()`, with no React context: it reads the
+  cookie via `useSyncExternalStore`, parses it once per cookie value, and
+  notifies every subscriber on each write, so already-rendered content updates
+  without a reload. It returns `{ status, granted, save, acceptAll, rejectAll }`,
+  where `status` is `UNKNOWN` (server render and first paint), `UNANSWERED` or
+  `ANSWERED`. `useConsent(category)` derives `{ status, grant }` from it, where
+  `status` is `UNKNOWN`, `GRANTED`, `DENIED` or `UNANSWERED`. The cookie's
+  `decodeConsent`/`encodeConsent` codec has the store as its only caller, so
+  features never read the cookie directly. Every status is a `CONSENT_STATUS`
+  value from `apps/web`'s `constants/consent.ts`. `ConsentPreferencesProvider`,
+  mounted for every tenant through the locale layout's client providers, holds
+  only the preferences dialog's open state (`isOpen`, `open`, `close`) and the
+  footer button it returns focus to.
 - _Banner._ Shown only when the tenant's `CONSENT_BANNER` capability is
-  enabled and the status is `unanswered`: a non-modal card with equal-weight
+  enabled and the status is `UNANSWERED`: a non-modal card with equal-weight
   Accept all / Reject all and a Settings action.
-- _Preferences._ A native `<dialog>` wrapping `@blog/ui`'s
-  `ConsentPreferences` — Necessary locked on, External media never pre-ticked.
-  The footer's "Cookie settings" button reopens it on every tenant, banner or
-  not, so withdrawing is as easy as granting.
+- _Preferences._ `@blog/ui`'s `Dialog` wrapping `ConsentPreferences` —
+  Necessary locked on, External media never pre-ticked, one Close beside Save.
+  Escape and a backdrop click close it without saving; closing returns focus to
+  the opener, or to the footer's "Cookie settings" button when the opener (the
+  banner) is gone. That button reopens it on every tenant, banner or not, so
+  withdrawing is as easy as granting.
 - _Copy._ The `consent.*` messages ship in every locale catalog and are
   fixed (`VOICE_FIXED_KEYS`): they state what the code enforces, and
   rewording the message would never re-ask visitors who consented under the
@@ -2159,15 +2170,24 @@ with no children it renders nothing. Its authored fields are `title`,
 `brandVariant`, an optional `headingBlock` (the one module whose heading is
 not required), `contentAlignment` and a wide `layout`.
 
-**Redirects.** A `redirect` document holds a language, a source path, a
-destination path and whether it is a prefix redirect; editors manage them in
-the Redirects sidebar section. Publishing a Landing page whose path changed
-(its slug or parent) creates one from the old path to the new — a prefix
-redirect when the page has descendants, so the whole subtree follows — while
-collapsing redirects that pointed at the old path and removing any whose
-source is now a live page. When a Landing path finds no page, the site checks
-redirects for that language (exact match, then the longest prefix, keeping
-the remaining path) and answers 301; otherwise it 404s. Redirects cover
+**Redirects.** A `redirect` document holds a language, a Source path, a
+Destination path, whether it is a prefix redirect, a status (Permanent or
+Temporary, default Permanent; a redirect with no status behaves as Permanent)
+and an optional editor-only Description; editors manage them under the
+Settings sidebar section. Publishing a Landing page whose path changed (its
+slug or parent) creates one from the old path to the new, marked
+`isAutomatic` and Permanent — a prefix redirect when the page has
+descendants, so the whole subtree follows — while collapsing redirects that
+pointed at the old path and removing any whose source is now a live page. An
+automatic redirect shows a notice naming the page that moved, and warns when
+its Source or Destination differs from the published value. Validation
+checks pages in the redirect's language: a Destination with no published page
+(a Landing page by its full parent chain, a post, topic or tag by slug, or a
+fixed route such as `/blog`) is an error that blocks publishing; a Source
+where a page is published is a warning, since the page wins. When a Landing
+path finds no page, the site checks redirects for that language (exact
+match, then the longest prefix, keeping the remaining path) and answers 308
+for Permanent or 307 for Temporary; otherwise it 404s. Redirects cover
 Landing paths only.
 
 Full mechanics:

@@ -6,9 +6,11 @@ import {
   SOCIAL_PLATFORMS,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { LandingPageLayout } from '@web/components/pages/landing-page/landing-page-layout';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeTeamMember } from '@web/testing/modules/team/fixtures';
+import { makeLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
@@ -272,9 +274,66 @@ export const SocialLinksAlignedAcrossRow: TStory = {
   },
 };
 
-export const TabletTwoPerRow: TStory = {
+export const TabletThreePerRow: TStory = {
   globals: { viewport: 'tablet' },
   args: SixMembers.args,
+};
+
+export const SquarePhotosWithBios: TStory = {
+  args: {
+    showBios: true,
+    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    members: [
+      ...members,
+      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
+      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
+    ].map((member) => ({ ...member, image: makeSanityImage(), bio })),
+  },
+};
+
+export const MobileSquarePhotosWithBios: TStory = {
+  globals: { viewport: 'mobile' },
+  args: SquarePhotosWithBios.args,
+};
+
+export const TabletSquarePhotosWithBios: TStory = {
+  globals: { viewport: 'tablet' },
+  args: SquarePhotosWithBios.args,
+};
+
+export const SquarePhotosCentreAligned: TStory = {
+  args: {
+    ...SquarePhotosWithBios.args,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    cardAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
+export const SquarePhotosNextToSidebar: TStory = {
+  globals: { viewport: 'desktop' },
+  args: SquarePhotosWithBios.args,
+  decorators: [
+    (Story) => (
+      <LandingPageLayout
+        topBlock={null}
+        sectionNavigation={makeLandingSectionNavigation()}
+      >
+        <Story />
+      </LandingPageLayout>
+    ),
+  ],
+};
+
+export const SquarePhotosInSixHundredPixelColumn: TStory = {
+  globals: { viewport: 'desktop' },
+  args: SquarePhotosWithBios.args,
+  decorators: [
+    (Story) => (
+      <div className="max-w-[600px]">
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export const TabletCarouselTwoPerView: TStory = {

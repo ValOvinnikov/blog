@@ -46,7 +46,7 @@ class and prop it shows; the sections after the recipes give the rules.
 
 - `root` is `flex flex-col gap-6`. `Text`'s default body variant (13.5px
   `admin-text`) is for primary content and values: a sentence, a count, a
-  name. `variant="muted"` is only for a description or a secondary line,
+  name. `variant="muted"` (12.5px) is only for a description or a secondary line,
   `supporting` only for `PageHeader`'s description: never pick either to get a
   size.
 - The card's purpose is `supportingText`, never a paragraph opening `Card.Body`.
@@ -203,10 +203,9 @@ from `useSettingsFormState()`:
   as `header`, with the content in its body. Choices are visible light-surface
   link rows, none pre-selected; dark sidebar components never sit on a light
   page.
-- Full-bleed is for the mounted Studio only. `ShellFrame` goes full-bleed on
-  the `studio` segment; `StudioMountView` wraps its archived and
-  not-provisioned states in `shellFrameVariants({ isFullBleed: false })`'s
-  `content` slot so they keep the page padding.
+- The Studio route is full-bleed in every state, and is the only route that
+  is: neither `ShellFrame` nor `StudioMountView` adds padding around the
+  mounted Studio or its archived and not-provisioned states.
 
 ## Cards
 
@@ -269,7 +268,8 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   `FONT_SIZE_TOKENS` in `utils/tv/tv.ts`, or tailwind-merge drops it as a
   colour. No arbitrary `text-[Npx]` and no size off the scale; the site's named
   sizes (`text-xs`, `text-sm`, `text-base`, `text-label`, `text-meta`, …)
-  never appear outside `site-preview/`.
+  never appear outside `site-preview/`. The font, preset and upload pickers'
+  specimen labels are artwork and exempt.
 - A site preview renders inside `SiteThemeFrame`, which applies the tenant's
   fonts through `--font-display-family` and `--font-body-family`; never set
   `--font-display`, `--font-read` or an inline `fontFamily`.
@@ -343,10 +343,10 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
 - An embedded edit panel outside the shell (today only the tenant details panel)
   calls `useUnsavedChangesGuard`, submits from a right-aligned `Card.Footer`,
   and shows its save error above the card.
-- `FormField` (hint, error) and `SettingRow` (description, lock reason) link
-  their descriptions to the control through Base UI `Field`. Never wire it per
-  call site: no `` `${id}-error` `` strings, no id'd span in `hint`, no ids
-  threaded past `SettingRow`.
+- `SettingRow` describes a Base UI control in its slot by its description and
+  lock reason, through `Field`. `FormField` links its hint and error to the
+  control itself; never wire them per call site (no `` `${id}-error` `` strings,
+  no id'd span in `hint`, no ids threaded past `SettingRow`).
 - Use the existing controls (`Switch`, `SegmentedControl` for a small
   either/or, `TextInput`, `Textarea`, `PortableTextEditor`, `AssetUploadField`,
   `PresetPicker`, `FontPicker`, `HueSlider`). A mode one of them lacks belongs
@@ -588,6 +588,9 @@ of them:
 | More code in a file over its size budget                                                                         | Extract the part you change first (`react-component-practices` § Size and splitting)                                              |
 | A feature component styling a Base UI part another page also uses                                                | A block at the level its consumers share (`react-component-practices` § Where a component lives), used from both                  |
 | A new prop on a component at seven (`FormField`, `FormTextInput`)                                                | Restructure first (`react-component-practices` § Props), or compose its parts, as `FormField` around `TextInput`                  |
+| A prop every caller fills the same way, derives one-to-one from another prop, or that only a test passes         | Own it inside the component (`useTranslations`, import the action, derive it); the test uses `vi.mock`                            |
+| Copying `useState` for open/value/error, `useTransition` and reset-on-close into another caller                  | One `use<Name>` hook; the component owns that state                                                                               |
+| Three booleans or handlers that configure one footer button or trigger                                           | A named `ReactNode` slot or a compound part                                                                                       |
 | `isArchived` + `archivedNoticeId` passed to every card under `SettingsFormShell`                                 | `useSettingsFormState()` in each card                                                                                             |
 | `const a = await x(); const b = await y();` where `y` doesn't use `a`                                            | `const [a, b] = await Promise.all([x(), y()])`                                                                                    |
 | `auth()` called directly, or a tenant query repeated in a layout or page                                         | The `cache()`-wrapped resolver: `getSession`, `requireAdmin`, `requireTenantById`, `resolveDashboardTenant`, `listSessionTenants` |

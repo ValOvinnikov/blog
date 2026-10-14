@@ -41,23 +41,35 @@ const PricingCardRoot = ({
   dataTestId,
 }: TPricingCardProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, PricingCardParts);
+  const {
+    Badge,
+    Name,
+    Description,
+    Price,
+    Extra,
+    Features,
+    Actions,
+    Footnote,
+  } = slots;
+  const s = pricingCardVariants({ isHighlighted });
 
   return (
-    <article
-      className={pricingCardVariants({ isHighlighted, class: className })}
-      data-testid={dataTestId}
-    >
-      {isHighlighted && slots.Badge}
-      {slots.Name}
-      {slots.Description}
-      {slots.Price}
-      {slots.Extra}
-      {unmatched.map((node, i) => (
-        <Fragment key={i}>{node}</Fragment>
-      ))}
-      {slots.Features}
-      {slots.Actions}
-      {slots.Footnote}
+    <article className={s.root({ class: className })} data-testid={dataTestId}>
+      {isHighlighted && Badge && <div className={s.highlight()}>{Badge}</div>}
+      {Name && <div className={s.name()}>{Name}</div>}
+      {Description && <div className={s.description()}>{Description}</div>}
+      {Price && <div className={s.price()}>{Price}</div>}
+      {(Extra || unmatched.length > 0) && (
+        <div className={s.extras()}>
+          {Extra}
+          {unmatched.map((node, i) => (
+            <Fragment key={i}>{node}</Fragment>
+          ))}
+        </div>
+      )}
+      {Features && <div className={s.features()}>{Features}</div>}
+      {Actions && <div className={s.actions()}>{Actions}</div>}
+      {Footnote && <div className={s.footnote()}>{Footnote}</div>}
     </article>
   );
 };
