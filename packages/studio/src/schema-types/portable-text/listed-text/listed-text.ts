@@ -1,5 +1,11 @@
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import {
+  boldDecorator,
+  italicDecorator,
+  subscriptDecorator,
+  superscriptDecorator,
+} from '@blog/studio/schema-types/portable-text/decorators/decorators';
+import {
   defineArrayMember,
   defineType,
   type BlockMarksDefinition,
@@ -12,8 +18,10 @@ export const listedTextStyles: BlockStyleDefinition[] = [
 
 export const listedTextMarks: BlockMarksDefinition = {
   decorators: [
-    { title: 'Bold', value: 'strong' },
-    { title: 'Italic', value: 'em' },
+    boldDecorator,
+    italicDecorator,
+    subscriptDecorator,
+    superscriptDecorator,
   ],
   annotations: [{ type: linkRefSchema.name }],
 };
