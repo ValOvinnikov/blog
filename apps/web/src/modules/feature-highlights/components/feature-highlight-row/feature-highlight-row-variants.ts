@@ -7,6 +7,8 @@ export const featureHighlightRowVariants = tv({
       'lg:grid-cols-2 lg:items-center lg:gap-12',
     ],
     media: [],
+    frame: ['w-full max-h-[min(20rem,40svh)] lg:max-h-none', 'lg:aspect-[4/3]'],
+    image: ['size-full object-cover'],
     text: ['flex flex-col items-start gap-4 text-left'],
     heading: [],
     body: [],
