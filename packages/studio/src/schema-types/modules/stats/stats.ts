@@ -3,6 +3,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { statSchema } from '@blog/studio/schema-types/objects/stat/stat';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
@@ -19,7 +20,7 @@ export const statsSchema = defineType({
   type: 'document',
   description:
     'A band of figures — signups, uptime, ratings — used to back up a claim with numbers.',
-  icon: ChartBar,
+  icon: textSizedIcon(ChartBar),
   fields: [
     titleField(),
     brandVariantField(),

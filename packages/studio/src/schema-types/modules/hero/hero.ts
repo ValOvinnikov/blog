@@ -7,6 +7,7 @@ import {
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { inlineLinkSchema } from '@blog/studio/schema-types/objects/inline-link/inline-link';
@@ -98,7 +99,7 @@ export const heroSchema = defineType({
   type: 'document',
   description:
     'A hero built around a featured post, pulling its image, heading, and excerpt, or letting each be overridden by hand.',
-  icon: Sparkles,
+  icon: textSizedIcon(Sparkles),
   deprecated: {
     reason:
       'Superseded by the Blog Hero module. Do not use this module for new content.',

@@ -8,6 +8,7 @@ import {
 } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
@@ -21,7 +22,7 @@ export const heroStatementSchema = defineType({
   type: 'document',
   description:
     'A full-width opening section for making one bold statement: a headline you write yourself, a supporting line, up to two actions and an optional image. Use it when the page needs a clear message and a call to action rather than featured content.',
-  icon: Quote,
+  icon: textSizedIcon(Quote),
   fieldsets: [...heroFieldsets],
   fields: [
     titleField(),

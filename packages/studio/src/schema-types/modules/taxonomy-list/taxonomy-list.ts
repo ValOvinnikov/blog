@@ -3,6 +3,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { showToggleField } from '@blog/studio/schema-types/fields/show-toggle-field/show-toggle-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -18,7 +19,7 @@ export const taxonomyListSchema = defineType({
   type: 'document',
   description:
     'A browsable list of topics or tags, each with its description and post count, so readers can explore the site by subject.',
-  icon: LayoutGrid,
+  icon: textSizedIcon(LayoutGrid),
   fieldsets: [
     {
       name: TERMS_FIELDSET,

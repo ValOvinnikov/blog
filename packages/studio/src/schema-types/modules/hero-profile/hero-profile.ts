@@ -6,6 +6,7 @@ import { heroMediaOrderSplitField } from '@blog/studio/schema-types/fields/hero-
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { showToggleField } from '@blog/studio/schema-types/fields/show-toggle-field/show-toggle-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
@@ -20,7 +21,7 @@ export const heroProfileSchema = defineType({
   type: 'document',
   description:
     'A hero built around a person — their photo and social profiles drawn from an author, alongside a heading and actions you write yourself. Use it to introduce a specific author or team member.',
-  icon: UserCircle,
+  icon: textSizedIcon(UserCircle),
   fieldsets: [...heroFieldsets],
   fields: [
     titleField(),

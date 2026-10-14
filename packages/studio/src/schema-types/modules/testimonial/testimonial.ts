@@ -6,6 +6,7 @@ import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignm
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -18,7 +19,7 @@ export const testimonialSchema = defineType({
   type: 'document',
   description:
     'Quotes from clients or readers, shown as a single spotlight quote or a set of cards — used as social proof.',
-  icon: MessageSquareQuote,
+  icon: textSizedIcon(MessageSquareQuote),
   fields: [
     titleField(),
     brandVariantField(),

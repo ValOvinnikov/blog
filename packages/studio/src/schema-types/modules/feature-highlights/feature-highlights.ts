@@ -4,6 +4,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { featureHighlightSchema } from '@blog/studio/schema-types/objects/feature-highlight/feature-highlight';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
@@ -16,7 +17,7 @@ export const featureHighlightsSchema = defineType({
   title: 'Feature Highlights',
   type: 'document',
   description: 'Two to six rows of image and text that alternate sides.',
-  icon: Rows3,
+  icon: textSizedIcon(Rows3),
   fields: [
     titleField(),
     brandVariantField(),

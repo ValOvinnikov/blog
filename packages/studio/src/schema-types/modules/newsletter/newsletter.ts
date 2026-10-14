@@ -4,6 +4,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { localizedMultilineTextField } from '@blog/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { variantField } from '@blog/studio/schema-types/fields/variant-field/variant-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { newsletterTrustCueSchema } from '@blog/studio/schema-types/objects/newsletter-trust-cue/newsletter-trust-cue';
@@ -27,7 +28,7 @@ export const newsletterSchema = defineType({
   type: 'document',
   description:
     'A section inviting readers to subscribe by email, with a heading, a line of copy and the signup form.',
-  icon: Mail,
+  icon: textSizedIcon(Mail),
   fields: [
     titleField(),
     brandVariantField(),

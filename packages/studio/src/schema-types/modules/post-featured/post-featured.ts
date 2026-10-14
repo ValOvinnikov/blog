@@ -10,6 +10,7 @@ import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -31,7 +32,7 @@ export const postFeaturedSchema = defineType({
   type: 'document',
   description:
     'A spotlight on up to three posts, with the first shown larger as the lead. Pin the posts yourself, or let it pick the newest ones marked Featured.',
-  icon: Pin,
+  icon: textSizedIcon(Pin),
   fieldsets: [
     {
       name: POSTS_FIELDSET,

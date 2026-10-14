@@ -4,6 +4,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -16,7 +17,7 @@ export const faqSchema = defineType({
   type: 'document',
   description:
     'The questions a visitor asks before getting in touch, gathered here with their answers.',
-  icon: MessageCircleQuestion,
+  icon: textSizedIcon(MessageCircleQuestion),
   fields: [
     titleField(),
     brandVariantField(),

@@ -5,6 +5,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -34,7 +35,7 @@ export const postLatestSchema = defineType({
   type: 'document',
   description:
     'A short list or carousel of the newest posts, used to surface recent content on any page.',
-  icon: Clock,
+  icon: textSizedIcon(Clock),
   fields: [
     titleField(),
     brandVariantField(),

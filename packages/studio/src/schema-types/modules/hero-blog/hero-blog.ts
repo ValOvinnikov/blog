@@ -13,6 +13,7 @@ import {
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
@@ -40,7 +41,7 @@ export const heroBlogSchema = defineType({
   type: 'document',
   description:
     'A hero built around one blog post — pinned or the newest featured — with its image, heading, and a link to read it.',
-  icon: Star,
+  icon: textSizedIcon(Star),
   fieldsets: [
     {
       name: FIELDSET_POST,

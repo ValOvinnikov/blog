@@ -1,6 +1,7 @@
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { localizedArticleTextField } from '@blog/studio/schema-types/fields/localized-article-text-field/localized-article-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateDefaultLanguageBlocksFilled } from '@blog/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
@@ -13,7 +14,7 @@ export const contentSchema = defineType({
   type: 'document',
   description:
     'A section of written content — headings, paragraphs, lists, images and code — for any page that needs prose between its other modules.',
-  icon: FileText,
+  icon: textSizedIcon(FileText),
   fields: [
     titleField(),
     brandVariantField(),

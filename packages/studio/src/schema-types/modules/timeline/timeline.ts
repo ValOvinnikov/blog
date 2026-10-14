@@ -7,6 +7,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { timelineItemSchema } from '@blog/studio/schema-types/objects/timeline-item/timeline-item';
@@ -22,7 +23,7 @@ export const timelineSchema = defineType({
   type: 'document',
   description:
     'A step-by-step process or a milestone history — items shown as points on one connected line, used to walk a reader through how something happens or has happened.',
-  icon: Milestone,
+  icon: textSizedIcon(Milestone),
   fields: [
     titleField(),
     brandVariantField(),

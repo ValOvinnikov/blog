@@ -7,6 +7,7 @@ import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-fi
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { imageShapeField } from '@blog/studio/schema-types/fields/image-shape-field/image-shape-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -20,7 +21,7 @@ export const featureListSchema = defineType({
   type: 'document',
   description:
     'A grid of feature cards, each with its own heading, text, and icon or image — used to summarize a set of capabilities or offerings.',
-  icon: Grid2x2,
+  icon: textSizedIcon(Grid2x2),
   fields: [
     titleField(),
     brandVariantField(),

@@ -15,6 +15,7 @@ import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-fi
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { variantField } from '@blog/studio/schema-types/fields/variant-field/variant-field';
 import { isNotVariant } from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
+import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import { ctaLayoutField } from '@blog/studio/schema-types/objects/cta-layout/cta-layout-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
@@ -33,7 +34,7 @@ export const ctaSchema = defineType({
   type: 'document',
   description:
     'A focused section that asks the reader to do one thing — subscribe, get in touch, read on — with a headline, a line of copy, up to two actions and an optional image.',
-  icon: Megaphone,
+  icon: textSizedIcon(Megaphone),
   fields: [
     titleField(),
     brandVariantField({
