@@ -1,16 +1,11 @@
 'use client';
 
-import {
-  EMAIL_TEMPLATE_TYPE,
-  portableTextToPlainText,
-  type TEmailTemplateType,
-  type TLocaleIsoCode,
-} from '@blog/config';
+import { portableTextToPlainText, type TLocaleIsoCode } from '@blog/config';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { EmailPreview } from '@platform/components/features/email/email-preview';
-import { EmailSenderEditor } from '@platform/components/features/email/email-sender-editor';
+import { EmailEditPane } from '@platform/components/features/email/email-settings/components/email-edit-pane';
 import { ItemSelect } from '@platform/components/features/email/email-settings/components/item-select';
-import { EmailTemplateEditor } from '@platform/components/features/email/email-template-editor';
+import { SendTestEmailButton } from '@platform/components/features/email/email-settings/components/send-test-email-button';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
@@ -18,8 +13,6 @@ import { useToast } from '@platform/context/toast-provider';
 import {
   EMAIL_SENDER_ITEM,
   EMAIL_TEMPLATE_TYPES,
-  withCopy,
-  withLogo,
   type TEmailDraft,
   type TEmailPageItem,
   type TEmailSenderDraft,
@@ -31,15 +24,13 @@ import {
   countSharedChanges,
   resolveItemStatus,
 } from '@platform/utils/email-draft-changes/email-draft-changes';
-import { resolveFallbackCopy } from '@platform/utils/email-fallback-copy/email-fallback-copy';
-import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { emailSettingsVariants } from './email-settings-variants';
 import { useEmailDraft } from './use-email-draft';
-import { useSendTestEmail } from './use-send-test-email';
+import { useEmailPreview } from './use-email-preview';
 
 const SENDER_FIELD_LABEL_KEYS = {
   senderName: 'senderNameLabel',
@@ -73,6 +64,7 @@ export const EmailSettings = ({
   const tTemplate = useTranslations('emailTemplateEditor');
   const tLanguage = useTranslations('languageNames');
   const tSender = useTranslations('emailSettingsForm');
+  const tPreview = useTranslations('emailPreview');
   const toast = useToast();
   const router = useRouter();
   const senderNameInputId = useId();
@@ -80,11 +72,7 @@ export const EmailSettings = ({
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
   const [revision, setRevision] = useState(0);
-  const [previewTemplate, setPreviewTemplate] = useState<TEmailTemplateType>(
-    EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-  );
   const { view, tabsProps, panelProps } = useViewTabs();
-  const { sendTest, isSending } = useSendTestEmail(tenantId);
 
   const revealSenderName = () => {
     setSelectedItem(EMAIL_SENDER_ITEM);
@@ -188,31 +176,25 @@ export const EmailSettings = ({
     view,
   });
 
+  const {
+    templateType: previewTemplate,
+    setTemplateType: setPreviewTemplate,
+    html: previewHtml,
+    subject: previewSubject,
+    body: previewBody,
+    hasUnsavedLogo,
+  } = useEmailPreview({
+    draft,
+    locale: selectedLocale,
+    defaultLocale,
+    brand,
+    brandName,
+  });
+
   const selectItem = (item: TEmailPageItem) => {
     setSelectedItem(item);
     if (item !== EMAIL_SENDER_ITEM) setPreviewTemplate(item);
   };
-
-  const previewCopy = draft.copies[previewTemplate][selectedLocale];
-  const previewFallback = resolveFallbackCopy(
-    draft,
-    previewTemplate,
-    selectedLocale,
-    defaultLocale,
-  );
-  const previewSubject = previewCopy.subject.trim() || previewFallback.subject;
-  const previewBody = previewCopy.body ?? previewFallback.body;
-  const previewLogo = draft.templateLogos[previewTemplate].url
-    ? draft.templateLogos[previewTemplate]
-    : draft.senderLogo;
-  const previewHtml = buildEmailTemplatePreviewHtml(previewTemplate, {
-    subject: previewSubject,
-    body: previewBody,
-    brand,
-    brandName,
-    logoImageUrl: previewLogo.url,
-    footerPostalAddress: draft.sender.footerPostalAddress.trim() || undefined,
-  });
 
   const items = [EMAIL_SENDER_ITEM, ...EMAIL_TEMPLATE_TYPES].map((item) => {
     const itemStatus = resolveItemStatus(saved, draft, item, selectedLocale);
@@ -266,67 +248,39 @@ export const EmailSettings = ({
       <div className={root()}>
         <ViewTabs {...tabsProps} />
         <div {...panelProps('edit')} className={editPane()}>
-          {selectedItem === EMAIL_SENDER_ITEM ? (
-            <EmailSenderEditor
-              sender={draft.sender}
-              logo={draft.senderLogo}
-              onSenderChange={(sender) => {
-                setSenderNameError(undefined);
-                setDraft((prev) => ({ ...prev, sender }));
-              }}
-              onLogoStage={(logo) =>
-                setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
-              }
-              senderNameInputId={senderNameInputId}
-              senderNameError={senderNameError}
-            />
-          ) : (
-            <EmailTemplateEditor
-              key={`${selectedItem}-${selectedLocale}-${revision}`}
-              templateType={selectedItem}
-              languageName={tLanguage(selectedLocale)}
-              copy={{
-                draft: draft.copies[selectedItem][selectedLocale],
-                saved: saved.copies[selectedItem][selectedLocale],
-                fallback: resolveFallbackCopy(
-                  draft,
-                  selectedItem,
-                  selectedLocale,
-                  defaultLocale,
-                ),
-              }}
-              logo={draft.templateLogos[selectedItem]}
-              onCopyChange={(copy) =>
-                setDraft((prev) =>
-                  withCopy(
-                    prev,
-                    { templateType: selectedItem, locale: selectedLocale },
-                    copy,
-                  ),
-                )
-              }
-              onLogoStage={(logo) =>
-                setDraft((prev) => withLogo(prev, selectedItem, logo))
-              }
-            />
-          )}
+          <EmailEditPane
+            item={selectedItem}
+            locale={selectedLocale}
+            defaultLocale={defaultLocale}
+            draft={draft}
+            saved={saved}
+            revision={revision}
+            senderNameInputId={senderNameInputId}
+            senderNameError={senderNameError}
+            onSenderChange={(sender) => {
+              setSenderNameError(undefined);
+              setDraft((prev) => ({ ...prev, sender }));
+            }}
+            onDraftChange={setDraft}
+          />
         </div>
         <div {...panelProps('preview')} className={previewPane()}>
           <EmailPreview
             html={previewHtml}
-            from={draft.sender.senderName.trim() || undefined}
-            replyTo={draft.sender.replyToAddress.trim() || undefined}
+            sender={draft.sender}
             subject={previewSubject}
-            onSendTest={() =>
-              sendTest({
-                templateType: previewTemplate,
-                subject: previewSubject,
-                body: previewBody,
-                sender: draft.sender,
-              })
+            actions={
+              <SendTestEmailButton
+                tenantId={tenantId}
+                email={{
+                  templateType: previewTemplate,
+                  subject: previewSubject,
+                  body: previewBody,
+                  sender: draft.sender,
+                }}
+              />
             }
-            isSendingTest={isSending}
-            hasUnsavedLogo={previewLogo.file !== undefined}
+            notes={hasUnsavedLogo && <p>{tPreview('unsavedLogoNote')}</p>}
           />
         </div>
       </div>

@@ -1,18 +1,17 @@
 import { PREVIEW_WIDTH } from '@platform/constants/preview';
-import { screen } from '@platform/testing/custom-render';
-import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
+import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailPreview } from './email-preview';
 
-const setup = customRenderInSettingsForm(EmailPreview, {
+const setup = customRender(EmailPreview, {
   html: '<p>Bonjour</p>',
-  from: 'Acme Co',
-  replyTo: 'hello@acme.example',
+  sender: {
+    senderName: 'Acme Co',
+    replyToAddress: 'hello@acme.example',
+    footerPostalAddress: '',
+  },
   subject: 'Connexion',
-  onSendTest: vi.fn(),
-  isSendingTest: false,
-  hasUnsavedLogo: false,
 });
 
 describe(`<${EmailPreview.name}/>`, () => {
@@ -30,8 +29,14 @@ describe(`<${EmailPreview.name}/>`, () => {
     expect(screen.getByText('Connexion')).toBeVisible();
   });
 
-  it('names the defaults when no sender or reply-to is set', () => {
-    setup({ from: undefined, replyTo: undefined });
+  it('names the defaults when the sender and reply-to are blank', () => {
+    setup({
+      sender: {
+        senderName: '  ',
+        replyToAddress: '',
+        footerPostalAddress: '',
+      },
+    });
 
     expect(screen.getByText('Default sender')).toBeVisible();
     expect(screen.getByText('No reply-to address')).toBeVisible();
@@ -47,28 +52,13 @@ describe(`<${EmailPreview.name}/>`, () => {
     expect(frame).toHaveAttribute('data-width', PREVIEW_WIDTH.MOBILE);
   });
 
-  it('sends a test on request', async () => {
-    const onSendTest = vi.fn();
-    setup({ onSendTest });
+  it('shows the actions and notes it is given', () => {
+    setup({
+      actions: <button type="button">Send</button>,
+      notes: <p>A note</p>,
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Send test to me' }));
-
-    expect(onSendTest).toHaveBeenCalledOnce();
-  });
-
-  it('offers no test send for an archived tenant', () => {
-    setup({}, { isArchived: true });
-
-    expect(
-      screen.getByRole('button', { name: 'Send test to me' }),
-    ).toBeDisabled();
-  });
-
-  it('says a staged logo is left out of the test', () => {
-    setup({ hasUnsavedLogo: true });
-
-    expect(
-      screen.getByText(/A logo you haven't saved yet isn't included/),
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Send' })).toBeVisible();
+    expect(screen.getByText('A note')).toBeVisible();
   });
 });

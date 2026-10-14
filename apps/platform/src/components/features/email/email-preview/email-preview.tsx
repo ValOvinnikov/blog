@@ -1,40 +1,32 @@
 'use client';
 
-import { ICONS, SIZE } from '@blog/config';
-import { EmailTemplatePreview } from '@platform/components/features/email/email-template-preview';
-import { Button } from '@platform/components/shared/button';
+import { EmailTemplatePreview } from '@platform/components/features/email/email-preview/components/email-template-preview';
 import { DetailList } from '@platform/components/shared/detail-list';
-import { Icon } from '@platform/components/shared/icon';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
-import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { emailPreviewVariants } from './email-preview-variants';
 
-export type TEmailPreviewProps = {
+type TEmailPreviewProps = {
   html: string;
-  from: string | undefined;
-  replyTo: string | undefined;
+  sender: TEmailSenderDraft;
   subject: string;
-  onSendTest: () => void;
-  isSendingTest: boolean;
-  hasUnsavedLogo: boolean;
+  actions?: ReactNode;
+  notes?: ReactNode;
 };
 
 export const EmailPreview = ({
   html,
-  from,
-  replyTo,
+  sender,
   subject,
-  onSendTest,
-  isSendingTest,
-  hasUnsavedLogo,
+  actions,
+  notes,
 }: TEmailPreviewProps) => {
   const t = useTranslations('emailPreview');
-  const { isArchived } = useSettingsFormState();
   const [width, setWidth] = useState<TPreviewWidth>(PREVIEW_WIDTH.DESKTOP);
   const { message, envelope } = emailPreviewVariants();
 
@@ -53,24 +45,11 @@ export const EmailPreview = ({
           ariaLabel={t('widthAriaLabel')}
         />
       }
-      actions={
-        <Button
-          type="button"
-          size={SIZE.SM}
-          variant="secondary"
-          onClick={onSendTest}
-          isDisabled={isArchived}
-          isPending={isSendingTest}
-          pendingLabel={t('sendingTest')}
-        >
-          <Icon name={ICONS.SEND} size={SIZE.SM} />
-          {t('sendTest')}
-        </Button>
-      }
+      actions={actions}
       notes={
         <>
           <p>{t('actionLockedNote')}</p>
-          {hasUnsavedLogo && <p>{t('unsavedLogoNote')}</p>}
+          {notes}
         </>
       }
     >
@@ -78,10 +57,10 @@ export const EmailPreview = ({
         <div className={envelope()}>
           <DetailList>
             <DetailList.Row label={t('fromLabel')}>
-              {from || t('defaultSender')}
+              {sender.senderName.trim() || t('defaultSender')}
             </DetailList.Row>
             <DetailList.Row label={t('replyToLabel')}>
-              {replyTo || t('noReplyTo')}
+              {sender.replyToAddress.trim() || t('noReplyTo')}
             </DetailList.Row>
             <DetailList.Row label={t('subjectLabel')}>{subject}</DetailList.Row>
           </DetailList>
