@@ -54,6 +54,11 @@ export const FullBleed: TStory = {
   args: { layout: IMAGE_LAYOUT.FULL_BLEED },
 };
 
+export const FullBleedWideDesktop: TStory = {
+  args: { layout: IMAGE_LAYOUT.FULL_BLEED, className: 'aspect-video w-full' },
+  globals: { viewport: 'wideDesktop' },
+};
+
 const wrappedCopy = (
   <p>
     Body text wraps around the floated image at the `lg` breakpoint and wider —
