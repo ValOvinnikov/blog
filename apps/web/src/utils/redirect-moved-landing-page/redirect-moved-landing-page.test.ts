@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
 import { service } from '@blog/service';
-import { permanentRedirect } from '@web/i18n/navigation';
+import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   DEFAULT_REQUEST_CONTEXT,
@@ -47,6 +47,28 @@ describe(redirectMovedLandingPage, () => {
       href: '/modules/faq',
       locale: LOCALE_ISO_CODES.NL,
     });
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('redirects temporarily when the redirect is temporary', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+    });
+    getRedirectMock.mockResolvedValueOnce({
+      ok: true,
+      data: { destination: '/offers', status: REDIRECT_STATUS.TEMPORARY },
+    });
+
+    await expect(redirectMovedLandingPage(MISSING, 'sale')).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(redirect).toHaveBeenCalledWith({
+      href: '/offers',
+      locale: LOCALE_ISO_CODES.NL,
+    });
+    expect(permanentRedirect).not.toHaveBeenCalled();
   });
 
   it('looks the redirect up by path segments with the tenant context', async () => {
