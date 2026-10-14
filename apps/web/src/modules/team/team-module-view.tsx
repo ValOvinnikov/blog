@@ -9,11 +9,7 @@ import { TeamMemberCard } from '@web/modules/team/components/team-member-card/te
 import { TeamSpotlight } from '@web/modules/team/components/team-spotlight/team-spotlight';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
-import {
-  CAROUSEL_IMAGE_SIZES,
-  GRID_IMAGE_SIZES,
-} from '@web/utils/module-image-sizes';
-import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
+import { toTeamGridColumns } from '@web/utils/to-team-grid-columns';
 
 import { teamModuleViewVariants } from './team-module-view-variants';
 
@@ -40,10 +36,9 @@ export const TeamModuleView = ({
   const isSpotlight = members.length === 1;
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
-  const baseColumns = toModuleGridColumns(members.length);
-  const columns = showBios && baseColumns === 4 ? 3 : baseColumns;
+  const columns = toTeamGridColumns(members.length, showBios);
   const lastIndex = members.length - 1;
-  const isLoneFromLg = isLoneLastInRow(members.length, columns);
+  const isLoneInRowOfThree = isLoneLastInRow(members.length, 3);
   const s = moduleGridActionsVariants({ align: contentAlignment });
   const v = teamModuleViewVariants({ columns });
 
@@ -72,30 +67,30 @@ export const TeamModuleView = ({
           members={members}
           imageShape={imageShape}
           align={cardAlign}
-          imageSizes={CAROUSEL_IMAGE_SIZES}
           title={headingBlock.heading}
           tone={brandVariant}
           contentAlignment={contentAlignment}
         />
       ) : (
-        <CardGrid
-          columns={columns}
-          className={v.grid()}
-          dataTestId={`${dataTestId}-grid`}
-        >
-          {members.map((member, index) => (
-            <TeamMemberCard
-              key={member.id}
-              member={member}
-              className={v.item({
-                isLoneFromLg: index === lastIndex && isLoneFromLg,
-              })}
-              imageShape={imageShape}
-              align={cardAlign}
-              imageSizes={GRID_IMAGE_SIZES[columns]}
-            />
-          ))}
-        </CardGrid>
+        <div className={v.gridContainer()}>
+          <CardGrid
+            columns={1}
+            className={v.grid()}
+            dataTestId={`${dataTestId}-grid`}
+          >
+            {members.map((member, index) => (
+              <TeamMemberCard
+                key={member.id}
+                member={member}
+                className={v.item({
+                  isLoneInRowOfThree: index === lastIndex && isLoneInRowOfThree,
+                })}
+                imageShape={imageShape}
+                align={cardAlign}
+              />
+            ))}
+          </CardGrid>
+        </div>
       )}
       {ctaButtons.length > 0 && (
         <div className={s.actions()}>
