@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { FIELD_CONTROL, FIELD_CONTROL_INVALID, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const textInputVariants = tv({
@@ -12,19 +12,11 @@ export const textInputVariants = tv({
       'pointer-events-none absolute inset-y-0 right-3 flex items-center',
       'font-mono text-copy text-brand-primary select-none',
     ],
-    input: [
-      'w-full rounded-sm border bg-surface px-3 py-2',
-      'font-mono text-copy text-text placeholder:text-subtle',
-      'transition-colors duration-base ease-smooth',
-      'border-field-boundary',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
-      'disabled:pointer-events-none disabled:border-border-strong disabled:bg-surface-2 disabled:text-muted disabled:placeholder:opacity-50',
-    ],
+    input: FIELD_CONTROL,
   },
   variants: {
     invalid: {
-      true: { input: ['border-error text-error', 'disabled:border-error'] },
+      true: { input: FIELD_CONTROL_INVALID },
     },
     hasLeadingIcon: {
       true: { input: ['pl-8'] },
