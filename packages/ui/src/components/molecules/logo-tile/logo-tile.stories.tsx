@@ -1,4 +1,9 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, type TBrandVariant } from '@blog/config';
+import {
+  BRAND_BAND_LABELS,
+  BrandBand,
+  focusLastLink,
+} from '@blog/ui/testing/brand-bands';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -42,21 +47,12 @@ export const Interactive: TStory = {
   },
 };
 
-const BRAND_BANDS = [
-  { className: 'bg-primary', tone: BRAND_VARIANT.PRIMARY },
-  { className: 'bg-secondary', tone: BRAND_VARIANT.SECONDARY },
-] as const;
-
 const OnEveryBand = (args: TLogoTileProps) => (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-    {BRAND_BANDS.map(({ className, tone }) => (
-      <div
-        key={tone}
-        className={className}
-        style={{ maxWidth: 240, padding: '1.5rem' }}
-      >
+    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
+      <BrandBand key={tone} tone={tone}>
         <LogoTile {...args} />
-      </div>
+      </BrandBand>
     ))}
   </div>
 );
@@ -71,6 +67,30 @@ export const InteractiveOnEveryBrandVariant: TStory = {
   args: Interactive.args,
   render: OnEveryBand,
 };
+
+const restingAndFocusedOn = (tone: TBrandVariant): TStory => ({
+  name: `Interactive on a ${BRAND_BAND_LABELS[tone]} band — at rest and focused`,
+  args: Interactive.args,
+  render: (args) => (
+    <BrandBand tone={tone}>
+      <LogoTile {...args} />
+      <LogoTile {...args} />
+    </BrandBand>
+  ),
+  play: focusLastLink,
+});
+
+export const InteractiveOnPrimaryBand = restingAndFocusedOn(
+  BRAND_VARIANT.PRIMARY,
+);
+
+export const InteractiveOnSecondaryBand = restingAndFocusedOn(
+  BRAND_VARIANT.SECONDARY,
+);
+
+export const InteractiveOnBrandPrimaryBand = restingAndFocusedOn(
+  BRAND_VARIANT.BRAND_PRIMARY,
+);
 
 const renderLogoTiles = (count: number) =>
   Array.from({ length: count }, (_, index) => (

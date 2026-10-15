@@ -1,5 +1,11 @@
+import { BRAND_VARIANT, type TBrandVariant } from '@blog/config';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
+import {
+  BRAND_BAND_LABELS,
+  BrandBand,
+  focusLastLink,
+} from '@blog/ui/testing/brand-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { TaxonomyCard } from './taxonomy-card';
@@ -114,6 +120,30 @@ export const WithNoPosts: TStory = {
     </TaxonomyCard>
   ),
 };
+
+const restingAndFocusedOn = (tone: TBrandVariant): TStory => ({
+  name: `On a ${BRAND_BAND_LABELS[tone]} band — at rest and focused`,
+  args: WithDescription.args,
+  render: (args) => (
+    <BrandBand tone={tone}>
+      <div style={{ width: 280 }}>
+        <TaxonomyCard {...args} />
+      </div>
+      <div style={{ width: 280 }}>
+        <TaxonomyCard {...args} />
+      </div>
+    </BrandBand>
+  ),
+  play: focusLastLink,
+});
+
+export const OnPrimaryBand = restingAndFocusedOn(BRAND_VARIANT.PRIMARY);
+
+export const OnSecondaryBand = restingAndFocusedOn(BRAND_VARIANT.SECONDARY);
+
+export const OnBrandPrimaryBand = restingAndFocusedOn(
+  BRAND_VARIANT.BRAND_PRIMARY,
+);
 
 export const Grid: TStory = {
   render: () => (
