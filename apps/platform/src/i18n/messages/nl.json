@@ -967,7 +967,9 @@
   },
   "leadsView": {
     "title": "Berichten",
-    "description": "Berichten via het contactformulier van je site, de nieuwste eerst. Elk bericht is bij binnenkomst ook naar jou gemaild."
+    "description": "Berichten via het contactformulier van je site, de nieuwste eerst. Elk bericht is bij binnenkomst ook naar jou gemaild.",
+    "downgradedTitle": "Contactformulier niet inbegrepen in je abonnement",
+    "downgradedDescription": "Het contactformulier is een Growth-functie, dus er komen geen nieuwe berichten meer binnen. De berichten die je al hebt ontvangen blijven hier bewaard en je kunt ze nog steeds verwijderen."
   },
   "leadsTable": {
     "columnReceived": "Ontvangen",

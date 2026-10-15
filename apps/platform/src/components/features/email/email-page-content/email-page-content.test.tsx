@@ -120,6 +120,28 @@ describe(`<${EmailPageContent.name}/>`, () => {
     expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
   });
 
+  it('hides the contact recipient field on a plan without the contact form', async () => {
+    await setup();
+
+    expect(
+      screen.queryByLabelText('Send contact messages to'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the stored contact recipient on a plan with the contact form', async () => {
+    getEmailConfigMock.mockResolvedValue({
+      senderName: 'Acme Co',
+      contactRecipient: 'leads@acme.example',
+      updatedAt: new Date(),
+    });
+
+    await setup({ tenant: { ...tenant, plan: 'GROWTH' } });
+
+    expect(screen.getByLabelText('Send contact messages to')).toHaveValue(
+      'leads@acme.example',
+    );
+  });
+
   it("shows each template's authored copy in the tenant's default language", async () => {
     await setup();
 

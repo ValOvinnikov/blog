@@ -1,8 +1,13 @@
 import { customRender, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { LeadsPagination } from './leads-pagination';
 
-const setup = customRender(LeadsPagination, { page: 2, totalPages: 3 });
+const setup = customRender(LeadsPagination, {
+  page: 2,
+  totalPages: 3,
+  pageHref: adminRoutes.dashboardLeads,
+});
 
 describe(`<${LeadsPagination.name}/>`, () => {
   it('renders nothing when everything fits on one page', () => {
@@ -23,6 +28,15 @@ describe(`<${LeadsPagination.name}/>`, () => {
       '/dashboard/leads?page=3',
     );
     expect(screen.getByText('Page 2 of 3')).toBeVisible();
+  });
+
+  it('links with whatever page address the caller builds', () => {
+    setup({ pageHref: (page) => `/tenants/t-1/leads?page=${page}` });
+
+    expect(screen.getByRole('link', { name: 'Next' })).toHaveAttribute(
+      'href',
+      '/tenants/t-1/leads?page=3',
+    );
   });
 
   it('disables Previous on the first page', () => {

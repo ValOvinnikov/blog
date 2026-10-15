@@ -967,7 +967,9 @@
   },
   "leadsView": {
     "title": "Leads",
-    "description": "Messages sent through your site's contact form, newest first. Each message was also emailed to you when it arrived."
+    "description": "Messages sent through your site's contact form, newest first. Each message was also emailed to you when it arrived.",
+    "downgradedTitle": "Contact form not included in your plan",
+    "downgradedDescription": "The contact form is a Growth feature, so new messages no longer arrive. The messages you already received are kept here, and you can still delete any of them."
   },
   "leadsTable": {
     "columnReceived": "Received",

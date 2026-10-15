@@ -1,7 +1,7 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -20,7 +20,7 @@ export const deleteLeadAction = async (
   const parsed = deleteLeadInputSchema.safeParse({ tenantId, id });
   if (!parsed.success) return { ok: false, reason: 'invalid' };
 
-  const { tenant } = await requireTenantMembership(parsed.data.tenantId);
+  const { tenant } = await requireTenantOwner(parsed.data.tenantId);
 
   try {
     const isDeleted = await queries.leads.deleteLead({

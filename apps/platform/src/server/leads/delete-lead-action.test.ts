@@ -1,4 +1,6 @@
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { deleteLeadAction } from './delete-lead-action';
@@ -31,6 +33,27 @@ describe(deleteLeadAction, () => {
       id: LEAD_ID,
     });
     expect(result).toEqual({ ok: true });
+  });
+
+  it('deletes nothing for an editor', async () => {
+    vi.mocked(requireTenantMembership).mockImplementationOnce(
+      async (tenantId) => ({
+        tenant: makeReadyTenant({ id: tenantId }),
+        membership: {
+          id: 'membership-2',
+          userId: 'user-2',
+          tenantId,
+          role: MEMBERSHIP_ROLE.EDITOR,
+          createdAt: new Date('2026-04-02T00:00:00.000Z'),
+        },
+      }),
+    );
+
+    await expect(deleteLeadAction(TENANT_ID, LEAD_ID)).rejects.toThrow(
+      'NEXT_NOT_FOUND',
+    );
+
+    expect(deleteLeadMock).not.toHaveBeenCalled();
   });
 
   it('rejects an id that is not a uuid without touching the gate or the database', async () => {

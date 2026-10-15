@@ -124,6 +124,7 @@ export const tenantNavSections = (
     look: adminRoutes.look(tenantId),
     voice: adminRoutes.voice(tenantId),
     features: adminRoutes.features(tenantId),
+    leads: adminRoutes.leads(tenantId),
     languages: adminRoutes.languages(tenantId),
     domain: adminRoutes.tenantDomain(tenantId),
     email: adminRoutes.email(tenantId),

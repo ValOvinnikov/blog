@@ -967,7 +967,9 @@
   },
   "leadsView": {
     "title": "Contactos",
-    "description": "Mensajes enviados a través del formulario de contacto de su sitio, los más recientes primero. Cada mensaje también se le envió por correo al recibirse."
+    "description": "Mensajes enviados a través del formulario de contacto de su sitio, los más recientes primero. Cada mensaje también se le envió por correo al recibirse.",
+    "downgradedTitle": "El formulario de contacto no está incluido en su plan",
+    "downgradedDescription": "El formulario de contacto es una función de Growth, por lo que ya no llegan mensajes nuevos. Los mensajes ya recibidos se conservan aquí y puede seguir eliminando cualquiera de ellos."
   },
   "leadsTable": {
     "columnReceived": "Recibido",

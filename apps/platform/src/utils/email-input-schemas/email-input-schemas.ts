@@ -64,7 +64,7 @@ export const emailSenderInputSchema = z.object({
     })
     .nullable(),
   replyToAddress: z.string().trim().email().nullable(),
-  contactRecipient: z.string().trim().email().nullable(),
+  contactRecipient: z.string().trim().email().nullable().optional(),
   footerPostalAddress: z
     .string()
     .trim()

@@ -4,9 +4,9 @@ import { TenantSwitcher } from '@platform/components/features/layout/tenant-swit
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
+import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
 import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
 import { dashboardNavSections } from '@platform/utils/nav-sections/nav-sections';
-import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 
 type TProps = {
@@ -25,9 +25,12 @@ type TProps = {
  */
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();
-  const { admin: sessionAdmin } = await listSessionTenants();
-  const { isSidebarInitiallyCollapsed, tNavSections, userName } =
-    await loadAdminShellChrome();
+  const [{ admin: sessionAdmin }, chrome, access] = await Promise.all([
+    listSessionTenants(),
+    loadAdminShellChrome(),
+    resolveTenantPageAccess(tenant, membership),
+  ]);
+  const { isSidebarInitiallyCollapsed, tNavSections, userName } = chrome;
 
   // A virtual membership is correct for authorization but never a correct
   // identity label, so the role chip shows the admin role behind it instead.
@@ -36,7 +39,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   return (
     <AdminShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
-      sections={dashboardNavSections(tNavSections, planPageAccess(tenant.plan))}
+      sections={dashboardNavSections(tNavSections, access)}
       switcher={
         tenants.length > 1 ? (
           <TenantSwitcher

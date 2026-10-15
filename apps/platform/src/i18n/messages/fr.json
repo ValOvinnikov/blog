@@ -967,7 +967,9 @@
   },
   "leadsView": {
     "title": "Messages reçus",
-    "description": "Messages envoyés via le formulaire de contact de votre site, les plus récents en premier. Chaque message vous a aussi été envoyé par e-mail à sa réception."
+    "description": "Messages envoyés via le formulaire de contact de votre site, les plus récents en premier. Chaque message vous a aussi été envoyé par e-mail à sa réception.",
+    "downgradedTitle": "Formulaire de contact non inclus dans votre offre",
+    "downgradedDescription": "Le formulaire de contact est une fonctionnalité Growth : plus aucun nouveau message n'arrive. Les messages déjà reçus sont conservés ici et vous pouvez toujours en supprimer."
   },
   "leadsTable": {
     "columnReceived": "Reçu",

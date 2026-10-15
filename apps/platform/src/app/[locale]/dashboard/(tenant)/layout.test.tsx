@@ -10,12 +10,14 @@ const {
   listMembershipsWithTenantsForUserMock,
   listTenantsMock,
   getAdminByUserIdMock,
+  listLeadsMock,
   cookiesMock,
   resolveIsSidebarCollapsedMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
+  listLeadsMock: vi.fn(),
   cookiesMock: vi.fn(),
   resolveIsSidebarCollapsedMock: vi.fn(),
 }));
@@ -36,6 +38,7 @@ vi.mock('@blog/db', async () => ({
       listTenants: listTenantsMock,
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
+    leads: { listLeads: listLeadsMock },
   },
 }));
 
@@ -85,6 +88,8 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     listTenantsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
+    listLeadsMock.mockReset();
+    listLeadsMock.mockResolvedValue({ leads: [], total: 0 });
     cookiesMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
@@ -94,6 +99,46 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       { membership: membership2, tenant: tenant2 },
     ]);
     mockCookie('tenant-2');
+  });
+
+  it('offers Leads on a plan with the contact form', async () => {
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'Leads' })).toHaveAttribute(
+      'href',
+      '/dashboard/leads',
+    );
+  });
+
+  it('hides Leads from a plan without the contact form and no stored leads', async () => {
+    mockCookie('tenant-1');
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: 'Leads' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps Leads for a downgraded owner who still has stored leads', async () => {
+    mockCookie('tenant-1');
+    listLeadsMock.mockResolvedValue({ leads: [], total: 3 });
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'Leads' })).toBeVisible();
+  });
+
+  it('hides Leads from an editor', async () => {
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership: { ...membership2, role: 'EDITOR' }, tenant: tenant2 },
+    ]);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: 'Leads' }),
+    ).not.toBeInTheDocument();
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {

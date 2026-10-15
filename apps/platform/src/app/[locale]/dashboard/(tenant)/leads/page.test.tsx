@@ -11,7 +11,9 @@ const {
   listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
   listLeadsMock,
+  listTenantsMock,
 } = vi.hoisted(() => ({
+  listTenantsMock: vi.fn(),
   listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   listLeadsMock: vi.fn(),
@@ -31,6 +33,7 @@ vi.mock('@blog/db', async () => ({
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
     leads: { listLeads: listLeadsMock },
+    tenants: { listTenants: listTenantsMock },
   },
 }));
 
@@ -43,6 +46,17 @@ const membership = {
   role: 'OWNER',
 };
 
+const useTenant = ({
+  plan = 'GROWTH',
+  role = 'OWNER',
+}: {
+  plan?: string;
+  role?: string;
+}) =>
+  listMembershipsWithTenantsForUserMock.mockResolvedValue([
+    { membership: { ...membership, role }, tenant: { id: 'tenant-1', plan } },
+  ]);
+
 const setup = customRenderAsync(DashboardLeadsPage, {
   searchParams: Promise.resolve({}),
 });
@@ -53,6 +67,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     listLeadsMock.mockReset();
+    listTenantsMock.mockReset();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -108,14 +123,46 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     );
   });
 
-  it('is not found on a plan without the contact form', async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: { id: 'tenant-1', plan: 'FREE' } },
-    ]);
+  it('is not found on a plan without the contact form and no stored leads', async () => {
+    useTenant({ plan: 'FREE' });
+    listLeadsMock.mockResolvedValue({ leads: [], total: 0 });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFound).toHaveBeenCalled();
+  });
+
+  it('keeps the page for a downgraded owner with stored leads, with the plan notice', async () => {
+    useTenant({ plan: 'FREE' });
+
+    await setup();
+
+    expect(
+      screen.getByText('Contact form not included in your plan'),
+    ).toBeVisible();
+    expect(screen.getByText('Ada Lovelace')).toBeVisible();
+  });
+
+  it('is not found for an editor', async () => {
+    useTenant({ role: 'EDITOR' });
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
     expect(listLeadsMock).not.toHaveBeenCalled();
+  });
+
+  it('opens for an operator on a tenant they have no membership in', async () => {
+    getAdminByUserIdMock.mockResolvedValue({
+      userId: 'user-1',
+      role: 'SUPERADMIN',
+    });
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
+    listTenantsMock.mockResolvedValue([{ id: 'tenant-9', plan: 'GROWTH' }]);
+
+    await setup();
+
+    expect(listLeadsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ tenantId: 'tenant-9' }),
+    );
   });
 });

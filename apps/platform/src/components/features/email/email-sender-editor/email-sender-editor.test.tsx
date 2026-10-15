@@ -83,6 +83,14 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
     });
   });
 
+  it('leaves the contact recipient out when the plan has no contact form', () => {
+    setup({ sender: { ...SENDER, contactRecipient: undefined } });
+
+    expect(
+      screen.queryByLabelText('Send contact messages to'),
+    ).not.toBeInTheDocument();
+  });
+
   it('shows a contact-recipient error against the field', () => {
     setup({ fieldErrors: { contactRecipient: 'contactRecipientInvalid' } });
 

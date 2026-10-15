@@ -77,22 +77,24 @@ export const EmailSenderEditor = ({
               onChange={(value) => updateField('replyToAddress', value)}
             />
           </FormField>
-          <FormField
-            label={t('contactRecipientLabel')}
-            hint={t('contactRecipientHint')}
-            error={
-              fieldErrors?.contactRecipient &&
-              t(`errors.${fieldErrors.contactRecipient}`)
-            }
-            control={{ ...control, id: fieldIds.contactRecipient }}
-          >
-            <TextInput
-              type="email"
-              placeholder={t('contactRecipientPlaceholder')}
-              value={sender.contactRecipient}
-              onChange={(value) => updateField('contactRecipient', value)}
-            />
-          </FormField>
+          {sender.contactRecipient !== undefined && (
+            <FormField
+              label={t('contactRecipientLabel')}
+              hint={t('contactRecipientHint')}
+              error={
+                fieldErrors?.contactRecipient &&
+                t(`errors.${fieldErrors.contactRecipient}`)
+              }
+              control={{ ...control, id: fieldIds.contactRecipient }}
+            >
+              <TextInput
+                type="email"
+                placeholder={t('contactRecipientPlaceholder')}
+                value={sender.contactRecipient}
+                onChange={(value) => updateField('contactRecipient', value)}
+              />
+            </FormField>
+          )}
           <FormField
             label={t('footerAddressLabel')}
             hint={t('footerAddressHint')}

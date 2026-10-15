@@ -3,6 +3,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { EmailSettings } from '@platform/components/features/email/email-settings';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { buildEmailDraft } from '@platform/utils/email-draft/email-draft';
+import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 
 export type TEmailPageContentProps = {
   tenant: TTenant;
@@ -23,7 +24,9 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       senderName: emailConfig?.senderName ?? '',
       replyToAddress: emailConfig?.replyToAddress ?? '',
       footerPostalAddress: emailConfig?.footerPostalAddress ?? '',
-      contactRecipient: emailConfig?.contactRecipient ?? '',
+      ...(planPageAccess(tenant.plan).leads && {
+        contactRecipient: emailConfig?.contactRecipient ?? '',
+      }),
     },
     senderLogoUrl: emailConfig?.logoAssetUrl,
     authored,

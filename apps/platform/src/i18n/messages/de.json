@@ -967,7 +967,9 @@
   },
   "leadsView": {
     "title": "Anfragen",
-    "description": "Nachrichten aus dem Kontaktformular Ihrer Website, die neuesten zuerst. Jede Nachricht wurde bei Eingang auch per E-Mail an Sie gesendet."
+    "description": "Nachrichten aus dem Kontaktformular Ihrer Website, die neuesten zuerst. Jede Nachricht wurde bei Eingang auch per E-Mail an Sie gesendet.",
+    "downgradedTitle": "Kontaktformular nicht im Tarif enthalten",
+    "downgradedDescription": "Das Kontaktformular ist eine Growth-Funktion, daher kommen keine neuen Nachrichten mehr an. Bereits eingegangene Nachrichten bleiben hier erhalten, und Sie können jede davon weiterhin löschen."
   },
   "leadsTable": {
     "columnReceived": "Eingegangen",

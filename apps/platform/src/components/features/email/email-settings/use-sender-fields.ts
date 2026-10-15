@@ -21,7 +21,7 @@ export const useSenderFields = () => {
   ).map((field) => ({
     id: field,
     label: t(SENDER_FIELD_LABEL_KEYS[field]),
-    display: (values: TEmailDraft) => values.sender[field],
+    display: (values: TEmailDraft) => values.sender[field] ?? '',
   }));
 
   return { senderFieldIds, senderDraftFields };

@@ -2,7 +2,6 @@ import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { Text } from '@platform/components/shared/text';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
 import { leadsPaginationVariants } from './leads-pagination-variants';
@@ -10,11 +9,13 @@ import { leadsPaginationVariants } from './leads-pagination-variants';
 export type TLeadsPaginationProps = {
   page: number;
   totalPages: number;
+  pageHref: (page: number) => string;
 };
 
 export const LeadsPagination = ({
   page,
   totalPages,
+  pageHref,
 }: TLeadsPaginationProps) => {
   const t = useTranslations('leadsPagination');
   const { root } = leadsPaginationVariants();
@@ -24,7 +25,7 @@ export const LeadsPagination = ({
   return (
     <nav className={root()} aria-label={t('ariaLabel')}>
       {page > 1 ? (
-        <LinkButton href={adminRoutes.dashboardLeads(page - 1)} size={SIZE.SM}>
+        <LinkButton href={pageHref(page - 1)} size={SIZE.SM}>
           {t('previous')}
         </LinkButton>
       ) : (
@@ -34,7 +35,7 @@ export const LeadsPagination = ({
       )}
       <Text variant="meta">{t('status', { page, totalPages })}</Text>
       {page < totalPages ? (
-        <LinkButton href={adminRoutes.dashboardLeads(page + 1)} size={SIZE.SM}>
+        <LinkButton href={pageHref(page + 1)} size={SIZE.SM}>
           {t('next')}
         </LinkButton>
       ) : (
