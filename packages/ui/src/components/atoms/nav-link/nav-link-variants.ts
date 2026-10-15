@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { LINK_UNDERLINE_EMPHASIS, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const navLinkVariants = tv({
@@ -15,7 +15,7 @@ export const navLinkVariants = tv({
   },
   variants: {
     isActive: {
-      true: { root: ['text-brand-primary'] },
+      true: { root: ['text-brand-primary', ...LINK_UNDERLINE_EMPHASIS] },
       false: { root: ['text-muted'] },
     },
     variant: {
