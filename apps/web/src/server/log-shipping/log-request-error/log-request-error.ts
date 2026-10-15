@@ -11,6 +11,6 @@ export const logRequestError: Instrumentation.onRequestError = (
     routePath: context.routePath,
     routeType: context.routeType,
     method: request.method,
-    path: request.path,
+    path: new URL(request.path, 'http://localhost').pathname,
   });
 };

@@ -29,4 +29,27 @@ describe(logRequestError, () => {
       }),
     );
   });
+
+  it('logs the path without its query string', async () => {
+    await logRequestError(
+      new Error('render failed'),
+      {
+        path: '/api/auth/callback?code=abc&token=secret',
+        method: 'GET',
+        headers: {},
+      },
+      {
+        routerKind: 'App Router',
+        routePath: '/api/auth/callback',
+        routeType: 'route',
+        renderSource: undefined,
+        revalidateReason: undefined,
+      },
+    );
+
+    expect(logger.error).toHaveBeenCalledWith(
+      'request.unhandled_error',
+      expect.objectContaining({ path: '/api/auth/callback' }),
+    );
+  });
 });
