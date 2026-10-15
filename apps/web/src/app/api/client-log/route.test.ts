@@ -165,15 +165,17 @@ describe('POST /api/client-log', () => {
     expect(loggedContext.url).toBe('/blog/hello');
   });
 
-  it('rate-limits a client that floods the endpoint', async () => {
+  it('accepts 20 reports per client per minute and refuses the 21st', async () => {
     const headers = { 'x-forwarded-for': '203.0.113.5' };
 
-    let lastResponse;
+    const statuses: number[] = [];
     for (let i = 0; i < 21; i += 1) {
-      lastResponse = await POST(postRequest(validPayload, { headers }));
+      statuses.push(
+        (await POST(postRequest(validPayload, { headers }))).status,
+      );
     }
 
-    expect(lastResponse?.status).toBe(429);
+    expect(statuses).toEqual([...Array<number>(20).fill(204), 429]);
   });
 
   it('tracks rate limiting per client key, not globally', async () => {
