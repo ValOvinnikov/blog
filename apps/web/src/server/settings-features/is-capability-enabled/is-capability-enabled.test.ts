@@ -23,7 +23,7 @@ vi.mock(
 
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {
-    FREE: ['RATINGS', 'CONSENT_BANNER', 'CONTACT_FORM'],
+    FREE: ['RATINGS', 'CONSENT_BANNER'],
     GROWTH: [
       'COMMENTS',
       'RATINGS',
@@ -82,9 +82,7 @@ describe(isCapabilityEnabled, () => {
     );
   });
 
-  it('enables the contact form on a FREE plan while its toggle is on, and disables it once toggled off', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'FREE' });
-
+  it('enables the contact form on GROWTH while its toggle is on, and disables it once toggled off', async () => {
     await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
       true,
     );
@@ -93,6 +91,14 @@ describe(isCapabilityEnabled, () => {
       ok: true,
       data: { ...ALL_ENABLED, [CAPABILITY.CONTACT_FORM]: false },
     });
+
+    await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
+      false,
+    );
+  });
+
+  it('disables the contact form on FREE even with its toggle on', async () => {
+    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'FREE' });
 
     await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
       false,

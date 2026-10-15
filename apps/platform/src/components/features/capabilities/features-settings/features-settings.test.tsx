@@ -30,7 +30,6 @@ const FREE_ENTITLED = [
   CAPABILITY.COMMENTS,
   CAPABILITY.RATINGS,
   CAPABILITY.BOOKMARKS,
-  CAPABILITY.CONTACT_FORM,
 ];
 
 const INITIAL_VALUES: TSettingsFeaturesValues = {
@@ -172,9 +171,12 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         screen.getByRole('switch', { name: 'Cookie consent banner' }),
       ).toHaveAttribute('data-disabled', '');
       expect(
+        screen.getByRole('switch', { name: 'Contact form' }),
+      ).toHaveAttribute('data-disabled', '');
+      expect(
         screen.getByRole('switch', { name: 'Bookmarks' }),
       ).not.toHaveAttribute('data-disabled');
-      expect(screen.getAllByText('Growth plan')).toHaveLength(2);
+      expect(screen.getAllByText('Growth plan')).toHaveLength(3);
     });
 
     it('describes a locked toggle by its description and plan lock, and an entitled one by its description alone', () => {

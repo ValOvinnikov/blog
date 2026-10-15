@@ -1752,7 +1752,7 @@ not a "match legacy behavior" default). Two gating layers stack on top of the te
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
-entitles `ratings`/`consentBanner`/`contactForm`; `GROWTH` entitles all seven:
+entitles `ratings`/`consentBanner`; `GROWTH` entitles all seven:
 `comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/`consentBanner`/
 `contactForm`).
 `comments` and `bookmarks` are `GROWTH`-only because each makes readers sign

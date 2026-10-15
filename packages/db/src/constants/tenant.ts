@@ -18,11 +18,7 @@ export type TTenantPlan = TValueOf<typeof TENANT_PLAN>;
 
 // The ceiling a tenant's own `settings_features` toggles can never exceed.
 export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
-  [TENANT_PLAN.FREE]: [
-    CAPABILITY.RATINGS,
-    CAPABILITY.CONSENT_BANNER,
-    CAPABILITY.CONTACT_FORM,
-  ],
+  [TENANT_PLAN.FREE]: [CAPABILITY.RATINGS, CAPABILITY.CONSENT_BANNER],
   [TENANT_PLAN.GROWTH]: [
     CAPABILITY.COMMENTS,
     CAPABILITY.RATINGS,

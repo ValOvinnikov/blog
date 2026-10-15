@@ -35,7 +35,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 ## Data
 
 - `tenants.plan` — required, the `tenant_plan` pgEnum built from `TENANT_PLAN`.
-- `PLAN_REGISTRY` (`@blog/db/constants`) — `FREE`: `RATINGS`, `CONSENT_BANNER`, `CONTACT_FORM`. `GROWTH`: all seven `CAPABILITY` keys (`COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`).
+- `PLAN_REGISTRY` (`@blog/db/constants`) — `FREE`: `RATINGS`, `CONSENT_BANNER`. `GROWTH`: all seven `CAPABILITY` keys (`COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`).
 - `PLAN_LOCALE_LIMIT` — languages per plan including the default: `FREE` 1, `GROWTH` 3.
 - `settings_features` — one row per tenant (unique `tenant_id`, cascade delete), seven `NOT NULL` boolean toggles. Provisioning writes no row; an absent row resolves to the tenant's current preset's `featureDefaults` (both presets: comments, ratings, bookmarks and contact form on; newsletter, analytics and consent banner off).
 - No price exists anywhere in the code.
@@ -45,7 +45,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 
 - **Operator** (any `admins` row) sets the plan through `createTenantAction` and `updateTenantDetailsAction`, both behind `requireAdmin`.
 - **Owner or operator** saves Features through `updateFeaturesAction`, behind `requireTenantMembership` (any member; an operator gets a virtual owner membership).
-- **Coming soon** — `COMMENTS`, `RATINGS` and `NEWSLETTER` carry `isComingSoon` in `CAPABILITY_TOGGLES`: shown with a "Coming soon" badge and no switch, and the save writes them off whatever the payload says. An owner can switch `BOOKMARKS`, `ANALYTICS`, `CONSENT_BANNER` and `CONTACT_FORM` on `GROWTH`, and only `CONSENT_BANNER` and `CONTACT_FORM` on `FREE`.
+- **Coming soon** — `COMMENTS`, `RATINGS` and `NEWSLETTER` carry `isComingSoon` in `CAPABILITY_TOGGLES`: shown with a "Coming soon" badge and no switch, and the save writes them off whatever the payload says. An owner can switch `BOOKMARKS`, `ANALYTICS`, `CONSENT_BANNER` and `CONTACT_FORM` on `GROWTH`, and only `CONSENT_BANNER` on `FREE`.
 - **Plan page access** (`planPageAccess`) — Languages when `PLAN_LOCALE_LIMIT` > 1; Email when the plan holds bookmarks, comments or newsletter; Subscribers with newsletter; Comments with comments; Team on any plan but `FREE`. The owner's sidebar omits the rest and their pages 404; the operator's `/tenants/{id}` view shows every entry and page whatever the plan.
 - **Not plan-gated** — Look, Voice, Domain, Studio, the Features page itself, modules and page types, team seats, AI takeaways.
 
@@ -95,4 +95,4 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - #4840 — epic: platform front door. Stripe webhooks drive `plan`, `TRIAL` and `PAST_DUE` statuses, pricing rendered from `PLAN_REGISTRY` plus a price source, `FREE`-only self-serve signup.
 - #2798 — epic: site templates, plan-layered (a Growth layer adds sections on upgrade).
 - #4083 — newsletter sending and per-plan email limits beside `PLAN_LOCALE_LIMIT`.
-- #3667 — `CONTACT_FORM` capability on every plan.
+- #3667 — `CONTACT_FORM` capability, `GROWTH` only.
