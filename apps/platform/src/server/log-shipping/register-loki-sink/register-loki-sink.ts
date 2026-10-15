@@ -23,6 +23,10 @@ export const registerLokiSink = (): boolean => {
 
   const push = createLokiSink({ url, user, token });
 
+  if (!push) {
+    return false;
+  }
+
   registerLogSink((line) => {
     waitUntil(push(line));
   });

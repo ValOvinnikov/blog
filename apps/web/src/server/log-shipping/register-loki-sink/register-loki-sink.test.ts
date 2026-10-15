@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { createLokiSink, registerLogSink } from '@blog/insight';
 import { waitUntil } from '@vercel/functions';
 import { env } from '@web/utils/env/env';
@@ -17,7 +18,7 @@ const VALID_ENV = {
   LOKI_TOKEN: 'glc_token',
 };
 
-const setEnv = (values: Record<string, string | undefined>): void => {
+const setEnv = (values: Record<string, TMaybeUndefined<string>>): void => {
   for (const key of Object.keys(env)) {
     delete (env as Record<string, unknown>)[key];
   }
@@ -62,6 +63,13 @@ describe(registerLokiSink, () => {
       expect(registerLogSink).not.toHaveBeenCalled();
     },
   );
+
+  it('registers nothing when the credentials cannot be encoded', () => {
+    vi.mocked(createLokiSink).mockReturnValue(undefined);
+
+    expect(registerLokiSink()).toBe(false);
+    expect(registerLogSink).not.toHaveBeenCalled();
+  });
 
   it('hands each pushed line to waitUntil', () => {
     registerLokiSink();

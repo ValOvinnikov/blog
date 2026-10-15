@@ -12,7 +12,7 @@ const LINE = {
 
 describe(createLokiSink, () => {
   let fetchMock: ReturnType<typeof vi.fn<typeof fetch>>;
-  let push: ReturnType<typeof createLokiSink>;
+  let push: NonNullable<ReturnType<typeof createLokiSink>>;
 
   const sentBody = (): unknown => {
     const [, init] = fetchMock.mock.calls[0] ?? [];
@@ -24,16 +24,31 @@ describe(createLokiSink, () => {
       .fn<typeof fetch>()
       .mockResolvedValue(new Response(null, { status: 204 }));
     vi.stubGlobal('fetch', fetchMock);
-    push = createLokiSink({
+    const sink = createLokiSink({
       url: PUSH_URL,
       user: '123456',
       token: 'glc_token',
     });
+    if (!sink) {
+      throw new Error('expected a sink');
+    }
+    push = sink;
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
+
+  it.each([
+    { user: '123\u201d', token: 'glc_token' },
+    { user: '123456', token: '\u201cglc_token\u201d' },
+  ])(
+    'creates no sink when the credentials cannot be encoded',
+    (credentials) => {
+      expect(createLokiSink({ url: PUSH_URL, ...credentials })).toBeUndefined();
+    },
+  );
 
   it('posts the line to the push URL with basic auth', async () => {
     await push(LINE);
@@ -82,5 +97,29 @@ describe(createLokiSink, () => {
     fetchMock.mockRejectedValue(new TypeError('fetch failed'));
 
     await expect(push(LINE)).resolves.toBeUndefined();
+  });
+
+  it('releases a push Loki never answers after five seconds, not before', async () => {
+    vi.useFakeTimers();
+    fetchMock.mockImplementation(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => {
+            reject(init.signal?.reason);
+          });
+        }),
+    );
+    let settled = false;
+
+    const pushed = push(LINE).then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(4_999);
+    const settledBeforeTimeout = settled;
+    await vi.advanceTimersByTimeAsync(1);
+    await pushed;
+
+    expect(settledBeforeTimeout).toBe(false);
+    expect(settled).toBe(true);
   });
 });
