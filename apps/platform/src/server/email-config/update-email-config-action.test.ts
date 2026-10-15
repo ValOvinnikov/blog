@@ -155,6 +155,33 @@ describe(updateEmailConfigAction, () => {
     );
   });
 
+  it('leaves the stored contact recipient untouched for an editor on a plan with the contact form', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValue({
+      tenant: makeReadyTenant({ id: 'tenant-1', plan: TENANT_PLAN.GROWTH }),
+      membership: {
+        id: 'membership-2',
+        userId: 'user-2',
+        tenantId: 'tenant-1',
+        role: MEMBERSHIP_ROLE.EDITOR,
+        createdAt: new Date('2026-04-02T00:00:00.000Z'),
+      },
+    });
+
+    await updateEmailConfigAction('tenant-1', VALID_INPUT);
+
+    expect(upsertEmailConfigMock).toHaveBeenCalledWith(
+      'tenant-1',
+      expect.objectContaining({ contactRecipient: undefined }),
+    );
+    expect(insertAuditEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        details: expect.not.objectContaining({
+          contactRecipient: 'leads@acme.example',
+        }),
+      }),
+    );
+  });
+
   it('saves a contact recipient and clears it again with null', async () => {
     await updateEmailConfigAction('tenant-1', VALID_INPUT);
     await updateEmailConfigAction('tenant-1', {

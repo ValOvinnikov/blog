@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { hasStoredLeads } from '@platform/server/leads/has-stored-leads';
 import {
   planPageAccess,
@@ -11,10 +11,10 @@ import {
 
 export const resolveTenantPageAccess = async (
   { id, plan }: TTenant,
-  { role }: TMembership,
+  membership: TMembership,
 ): Promise<TPlanPageAccess> => {
   const access = planPageAccess(plan);
-  if (role !== MEMBERSHIP_ROLE.OWNER) return { ...access, leads: false };
+  if (!isTenantOwner(membership)) return { ...access, leads: false };
   if (access.leads) return access;
 
   return { ...access, leads: await hasStoredLeads(id) };

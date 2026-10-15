@@ -3,13 +3,13 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+import { canEditContactRecipient } from '@platform/server/auth/can-edit-contact-recipient';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
   emailSenderInputSchema,
   SENDER_NAME_INVALID,
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { logger } from '@platform/utils/logger/logger';
-import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import type { z } from 'zod';
 
 export type TUpdateEmailConfigInput = z.input<typeof emailSenderInputSchema>;
@@ -42,8 +42,8 @@ export const updateEmailConfigAction = async (
       : { ok: false };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
-  const data = planPageAccess(tenant.plan).leads
+  const { tenant, membership } = await requireTenantMembership(tenantId);
+  const data = canEditContactRecipient(tenant, membership)
     ? parsed.data
     : { ...parsed.data, contactRecipient: undefined };
 

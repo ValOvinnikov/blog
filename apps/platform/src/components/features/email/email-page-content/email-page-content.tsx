@@ -1,21 +1,24 @@
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { EmailSettings } from '@platform/components/features/email/email-settings';
+import { canEditContactRecipient } from '@platform/server/auth/can-edit-contact-recipient';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { buildEmailDraft } from '@platform/utils/email-draft/email-draft';
-import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 
 export type TEmailPageContentProps = {
   tenant: TTenant;
 };
 
 export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
-  const [brand, emailConfig, templateLogoUrls, authored] = await Promise.all([
-    loadTenantEmailBrand(tenant.id),
-    queries.emailConfig.getEmailConfig(tenant.id),
-    queries.emailTemplates.listEmailTemplateLogoUrls(tenant.id),
-    queries.emailTemplates.listAuthoredEmailTemplates(tenant.id),
-  ]);
+  const [brand, emailConfig, templateLogoUrls, authored, { membership }] =
+    await Promise.all([
+      loadTenantEmailBrand(tenant.id),
+      queries.emailConfig.getEmailConfig(tenant.id),
+      queries.emailTemplates.listEmailTemplateLogoUrls(tenant.id),
+      queries.emailTemplates.listAuthoredEmailTemplates(tenant.id),
+      requireTenantMembership(tenant.id),
+    ]);
 
   const liveLocales = queries.tenants.selectLiveLocales(tenant);
 
@@ -24,7 +27,7 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       senderName: emailConfig?.senderName ?? '',
       replyToAddress: emailConfig?.replyToAddress ?? '',
       footerPostalAddress: emailConfig?.footerPostalAddress ?? '',
-      ...(planPageAccess(tenant.plan).leads && {
+      ...(canEditContactRecipient(tenant, membership) && {
         contactRecipient: emailConfig?.contactRecipient ?? '',
       }),
     },

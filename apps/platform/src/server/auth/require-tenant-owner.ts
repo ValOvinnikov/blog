@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { notFound } from 'next/navigation';
 
+import { isTenantOwner } from './is-tenant-owner';
 import {
   requireTenantMembership,
   type TTenantMembershipContext,
@@ -13,7 +13,7 @@ export const requireTenantOwner = async (
 ): Promise<TTenantMembershipContext> => {
   const context = await requireTenantMembership(tenantId);
 
-  if (context.membership.role !== MEMBERSHIP_ROLE.OWNER) {
+  if (!isTenantOwner(context.membership)) {
     notFound();
   }
 
