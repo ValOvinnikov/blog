@@ -538,8 +538,11 @@ describe(`<${LookForm.name}/>`, () => {
       setup({ archivedAt: ARCHIVED_AT });
 
       expect(
-        screen.getAllByRole('radio', { name: 'Space Grotesk' })[0],
-      ).toHaveAttribute('aria-disabled', 'true');
+        screen.getByRole('combobox', { name: 'Heading font' }),
+      ).toHaveAttribute('data-disabled');
+      expect(
+        screen.getByRole('combobox', { name: 'Body font' }),
+      ).toHaveAccessibleDescription(/This tenant is archived/);
       expect(screen.getByRole('button', { name: 'Small' })).toBeDisabled();
       expect(
         screen.getByRole('button', { name: 'Extra large' }),

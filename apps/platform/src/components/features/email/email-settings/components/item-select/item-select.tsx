@@ -1,8 +1,7 @@
 'use client';
 
-import { Select } from '@base-ui/react/select';
-import { ICONS, SIZE } from '@blog/config';
-import { Icon } from '@platform/components/shared/icon';
+import type { TMaybeUndefined } from '@blog/config';
+import { Select } from '@platform/components/shared/select';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TEmailPageItem } from '@platform/utils/email-draft/email-draft';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
@@ -13,7 +12,7 @@ import { itemSelectVariants } from './item-select-variants';
 type TEmailPageItemOption = {
   value: TEmailPageItem;
   label: string;
-  group: string | undefined;
+  group: TMaybeUndefined<string>;
   description: string;
   status: TEmailItemStatus;
   statusLabel: string;
@@ -33,15 +32,10 @@ export const ItemSelect = ({
   label,
 }: TItemSelectProps) => {
   const {
-    label: labelSlot,
     trigger,
     value,
     valueName,
     valueMeta,
-    icon,
-    popup,
-    item,
-    indicator,
     itemText,
     itemName,
     itemDescription,
@@ -50,14 +44,8 @@ export const ItemSelect = ({
   const selectedOption = items.find((option) => option.value === selected);
 
   return (
-    <Select.Root
-      value={selected}
-      onValueChange={(next) => {
-        if (next) onSelect(next);
-      }}
-    >
-      <Select.Label className={labelSlot()}>{label}</Select.Label>
-      <Select.Trigger className={trigger()}>
+    <Select value={selected} onChange={onSelect}>
+      <Select.Trigger ariaLabel={label} className={trigger()}>
         {selectedOption && (
           <span className={value()}>
             <span className={valueName()}>{selectedOption.label}</span>
@@ -68,46 +56,26 @@ export const ItemSelect = ({
             </span>
           </span>
         )}
-        <Select.Icon className={icon()}>
-          <Icon name={ICONS.CHEVRON_DOWN} size={SIZE.SM} />
-        </Select.Icon>
       </Select.Trigger>
-      <Select.Portal>
-        <Select.Positioner sideOffset={4} alignItemWithTrigger={false}>
-          <Select.Popup className={popup()}>
-            <Select.List>
-              {items.map((option) => (
-                <Select.Item
-                  key={option.value}
-                  value={option.value}
-                  className={item()}
-                >
-                  <span className={indicator()}>
-                    <Select.ItemIndicator>
-                      <Icon name={ICONS.CHECK} size={SIZE.SM} />
-                    </Select.ItemIndicator>
-                  </span>
-                  <span className={itemText()}>
-                    <Select.ItemText className={itemName()}>
-                      {option.label}
-                    </Select.ItemText>
-                    <span className={itemDescription()}>
-                      {option.description}
-                    </span>
-                  </span>
-                  <StatusBadge
-                    tone={fieldStatusTone(option.status)}
-                    hasDot={false}
-                    className={badge()}
-                  >
-                    {option.statusLabel}
-                  </StatusBadge>
-                </Select.Item>
-              ))}
-            </Select.List>
-          </Select.Popup>
-        </Select.Positioner>
-      </Select.Portal>
-    </Select.Root>
+      <Select.Popup>
+        {items.map((option) => (
+          <Select.Item key={option.value} value={option.value}>
+            <span className={itemText()}>
+              <Select.ItemText className={itemName()}>
+                {option.label}
+              </Select.ItemText>
+              <span className={itemDescription()}>{option.description}</span>
+            </span>
+            <StatusBadge
+              tone={fieldStatusTone(option.status)}
+              hasDot={false}
+              className={badge()}
+            >
+              {option.statusLabel}
+            </StatusBadge>
+          </Select.Item>
+        ))}
+      </Select.Popup>
+    </Select>
   );
 };

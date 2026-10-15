@@ -1,8 +1,7 @@
 'use client';
 
-import { Radio } from '@base-ui/react/radio';
-import { RadioGroup } from '@base-ui/react/radio-group';
 import type { TFontChoice } from '@blog/config';
+import { Select } from '@platform/components/shared/select';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { AriaAttributes } from 'react';
 
@@ -23,28 +22,31 @@ export const FontPicker = ({
   isDisabled,
   'aria-describedby': ariaDescribedBy,
 }: TFontPickerProps) => {
-  const { root, option, radioRoot, radioIndicator, name } =
-    fontPickerVariants();
+  const { value: valueSlot, itemName } = fontPickerVariants();
+  const selectedFont = FONT_OPTIONS[value];
 
   return (
-    <RadioGroup
-      aria-label={ariaLabel}
-      aria-describedby={ariaDescribedBy}
-      value={value}
-      onValueChange={(next) => onChange(next as TFontChoice)}
-      disabled={isDisabled}
-      className={root()}
-    >
-      {Object.values(FONT_OPTIONS).map((font) => (
-        <label key={font.value} className={option()}>
-          <Radio.Root value={font.value} className={radioRoot()}>
-            <Radio.Indicator className={radioIndicator()} />
-          </Radio.Root>
-          <span className={name()} style={{ fontFamily: font.fontFamily }}>
-            {font.label}
-          </span>
-        </label>
-      ))}
-    </RadioGroup>
+    <Select value={value} onChange={onChange} isDisabled={isDisabled}>
+      <Select.Trigger ariaLabel={ariaLabel} aria-describedby={ariaDescribedBy}>
+        <span
+          className={valueSlot()}
+          style={{ fontFamily: selectedFont.fontFamily }}
+        >
+          {selectedFont.label}
+        </span>
+      </Select.Trigger>
+      <Select.Popup>
+        {Object.values(FONT_OPTIONS).map((font) => (
+          <Select.Item key={font.value} value={font.value}>
+            <Select.ItemText
+              className={itemName()}
+              style={{ fontFamily: font.fontFamily }}
+            >
+              {font.label}
+            </Select.ItemText>
+          </Select.Item>
+        ))}
+      </Select.Popup>
+    </Select>
   );
 };

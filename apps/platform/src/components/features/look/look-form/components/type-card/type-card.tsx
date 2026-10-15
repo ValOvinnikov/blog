@@ -22,7 +22,7 @@ export const TypeCard = () => {
       title={t('typeHeading')}
       description={t('typeDescription')}
     >
-      <LookField label={headingFontLabel} isGroup={true}>
+      <LookField label={headingFontLabel}>
         <FontPicker
           value={headingFont}
           onChange={(font) => updateField('headingFont', font)}
@@ -31,7 +31,7 @@ export const TypeCard = () => {
         />
       </LookField>
 
-      <LookField label={bodyFontLabel} isGroup={true}>
+      <LookField label={bodyFontLabel}>
         <FontPicker
           value={bodyFont}
           onChange={(font) => updateField('bodyFont', font)}
