@@ -54,6 +54,7 @@ const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--info': '--brand-primary',
   '--code-fg': '--text',
   '--code-comment': '--text-muted',
+  '--field-boundary': '--border-emphasis',
 };
 
 // A scrim is tested over the brightest photo it can sit on, the worst case for light copy.
