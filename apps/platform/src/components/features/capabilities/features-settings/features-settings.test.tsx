@@ -23,12 +23,14 @@ const ALL_ENTITLED = [
   CAPABILITY.NEWSLETTER,
   CAPABILITY.ANALYTICS,
   CAPABILITY.CONSENT_BANNER,
+  CAPABILITY.CONTACT_FORM,
 ];
 
 const FREE_ENTITLED = [
   CAPABILITY.COMMENTS,
   CAPABILITY.RATINGS,
   CAPABILITY.BOOKMARKS,
+  CAPABILITY.CONTACT_FORM,
 ];
 
 const INITIAL_VALUES: TSettingsFeaturesValues = {
@@ -38,6 +40,7 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
   newsletterEnabled: false,
   analyticsEnabled: false,
   consentBannerEnabled: false,
+  contactFormEnabled: true,
 };
 
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
@@ -72,7 +75,10 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         'data-unchecked',
         '',
       );
-      expect(screen.getAllByRole('switch')).toHaveLength(3);
+      expect(
+        screen.getByRole('switch', { name: 'Contact form' }),
+      ).toHaveAttribute('data-checked', '');
+      expect(screen.getAllByRole('switch')).toHaveLength(4);
     });
 
     it('badges exactly the three unfinished capabilities "Coming soon"', () => {

@@ -71,6 +71,7 @@ describe(getSettingsFeaturesAndPreset, () => {
         newsletterEnabled: true,
         analyticsEnabled: false,
         consentBannerEnabled: false,
+        contactFormEnabled: true,
       },
       updatedAt: expect.any(Date),
       preset: undefined,

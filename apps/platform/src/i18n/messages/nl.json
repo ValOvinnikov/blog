@@ -871,7 +871,8 @@
       "BOOKMARKS": "Bladwijzers",
       "NEWSLETTER": "Nieuwsbrief",
       "ANALYTICS": "Analyse",
-      "CONSENT_BANNER": "Cookiemelding"
+      "CONSENT_BANNER": "Cookiemelding",
+      "CONTACT_FORM": "Contactformulier"
     },
     "toggleDescription": {
       "COMMENTS": "Laat lezers reageren op berichten.",
@@ -879,7 +880,8 @@
       "BOOKMARKS": "Laat lezers berichten bewaren om later te lezen.",
       "NEWSLETTER": "Toon het aanmeldformulier voor de nieuwsbrief op de site.",
       "ANALYTICS": "Schakel analysetracking op de site in.",
-      "CONSENT_BANNER": "Toon bezoekers een cookiemelding voordat niet-essentiële cookies of scripts worden geladen."
+      "CONSENT_BANNER": "Toon bezoekers een cookiemelding voordat niet-essentiële cookies of scripts worden geladen.",
+      "CONTACT_FORM": "Toon het contactformulier op de site."
     }
   },
   "languagePicker": {

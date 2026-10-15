@@ -871,7 +871,8 @@
       "BOOKMARKS": "Favoris",
       "NEWSLETTER": "Newsletter",
       "ANALYTICS": "Statistiques",
-      "CONSENT_BANNER": "Bannière de consentement aux cookies"
+      "CONSENT_BANNER": "Bannière de consentement aux cookies",
+      "CONTACT_FORM": "Formulaire de contact"
     },
     "toggleDescription": {
       "COMMENTS": "Permettre aux lecteurs de commenter les articles.",
@@ -879,7 +880,8 @@
       "BOOKMARKS": "Permettre aux lecteurs d'enregistrer des articles pour plus tard.",
       "NEWSLETTER": "Afficher le formulaire d'inscription à la newsletter sur le site.",
       "ANALYTICS": "Activer le suivi statistique sur le site.",
-      "CONSENT_BANNER": "Afficher aux visiteurs une bannière de consentement aux cookies avant le chargement des cookies ou scripts non essentiels."
+      "CONSENT_BANNER": "Afficher aux visiteurs une bannière de consentement aux cookies avant le chargement des cookies ou scripts non essentiels.",
+      "CONTACT_FORM": "Afficher le formulaire de contact sur le site."
     }
   },
   "languagePicker": {

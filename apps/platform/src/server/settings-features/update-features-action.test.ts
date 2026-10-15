@@ -55,6 +55,7 @@ const VALID_INPUT: TUpdateFeaturesInput = {
   newsletterEnabled: false,
   analyticsEnabled: false,
   consentBannerEnabled: true,
+  contactFormEnabled: true,
 };
 
 describe(updateFeaturesAction, () => {
@@ -130,6 +131,26 @@ describe(updateFeaturesAction, () => {
       bookmarksEnabled: false,
       analyticsEnabled: false,
     });
+  });
+
+  it('lets a FREE tenant switch the contact form off and back on', async () => {
+    const off = await updateFeaturesAction('tenant-1', {
+      ...VALID_INPUT,
+      contactFormEnabled: false,
+    });
+    const on = await updateFeaturesAction('tenant-1', VALID_INPUT);
+
+    expect(off).toEqual({ ok: true });
+    expect(on).toEqual({ ok: true });
+    expect(upsertSettingsFeaturesMock).toHaveBeenNthCalledWith(1, 'tenant-1', {
+      ...VALID_INPUT,
+      contactFormEnabled: false,
+    });
+    expect(upsertSettingsFeaturesMock).toHaveBeenNthCalledWith(
+      2,
+      'tenant-1',
+      VALID_INPUT,
+    );
   });
 
   it('allows a GROWTH tenant to enable the same capability', async () => {

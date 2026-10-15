@@ -21,6 +21,7 @@ describe('planPageAccess', () => {
     registry[TENANT_PLAN.FREE] = [
       CAPABILITY.RATINGS,
       CAPABILITY.CONSENT_BANNER,
+      CAPABILITY.CONTACT_FORM,
     ];
     registry[TENANT_PLAN.GROWTH] = [
       CAPABILITY.COMMENTS,
@@ -29,6 +30,7 @@ describe('planPageAccess', () => {
       CAPABILITY.NEWSLETTER,
       CAPABILITY.ANALYTICS,
       CAPABILITY.CONSENT_BANNER,
+      CAPABILITY.CONTACT_FORM,
     ];
   });
 

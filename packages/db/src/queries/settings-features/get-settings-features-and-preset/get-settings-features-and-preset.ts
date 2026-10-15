@@ -17,6 +17,7 @@ export type TSettingsFeatureToggles = Pick<
   | 'newsletterEnabled'
   | 'analyticsEnabled'
   | 'consentBannerEnabled'
+  | 'contactFormEnabled'
 >;
 
 export type TSettingsFeaturesAndPreset = {
@@ -37,6 +38,7 @@ export async function getSettingsFeaturesAndPreset(
         newsletterEnabled: settingsFeatures.newsletterEnabled,
         analyticsEnabled: settingsFeatures.analyticsEnabled,
         consentBannerEnabled: settingsFeatures.consentBannerEnabled,
+        contactFormEnabled: settingsFeatures.contactFormEnabled,
       },
       updatedAt: settingsFeatures.updatedAt,
       preset: siteConfig.preset,

@@ -1,0 +1,1 @@
+ALTER TABLE "settings_features" ADD COLUMN "contact_form_enabled" boolean DEFAULT true NOT NULL;

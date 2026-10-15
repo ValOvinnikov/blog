@@ -16,13 +16,13 @@ export const TENANT_PLAN = {
 
 export type TTenantPlan = TValueOf<typeof TENANT_PLAN>;
 
-// Which capabilities each plan entitles a tenant to — the hard ceiling a
-// tenant's own `settings_features` toggles can never exceed, regardless of
-// what the tenant would otherwise enable. Lives here rather than
-// `@blog/config` because it keys off `TENANT_PLAN`, which this package owns
-// (config sits below db in the dependency graph and cannot import it).
+// The ceiling a tenant's own `settings_features` toggles can never exceed.
 export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
-  [TENANT_PLAN.FREE]: [CAPABILITY.RATINGS, CAPABILITY.CONSENT_BANNER],
+  [TENANT_PLAN.FREE]: [
+    CAPABILITY.RATINGS,
+    CAPABILITY.CONSENT_BANNER,
+    CAPABILITY.CONTACT_FORM,
+  ],
   [TENANT_PLAN.GROWTH]: [
     CAPABILITY.COMMENTS,
     CAPABILITY.RATINGS,
@@ -30,6 +30,7 @@ export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
     CAPABILITY.NEWSLETTER,
     CAPABILITY.ANALYTICS,
     CAPABILITY.CONSENT_BANNER,
+    CAPABILITY.CONTACT_FORM,
   ],
 };
 

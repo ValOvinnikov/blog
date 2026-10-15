@@ -23,7 +23,7 @@ vi.mock(
 
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {
-    FREE: ['RATINGS', 'CONSENT_BANNER'],
+    FREE: ['RATINGS', 'CONSENT_BANNER', 'CONTACT_FORM'],
     GROWTH: [
       'COMMENTS',
       'RATINGS',
@@ -31,6 +31,7 @@ vi.mock('@blog/db', () => ({
       'NEWSLETTER',
       'ANALYTICS',
       'CONSENT_BANNER',
+      'CONTACT_FORM',
     ],
   },
 }));
@@ -42,6 +43,7 @@ const ALL_ENABLED = {
   [CAPABILITY.NEWSLETTER]: true,
   [CAPABILITY.ANALYTICS]: true,
   [CAPABILITY.CONSENT_BANNER]: true,
+  [CAPABILITY.CONTACT_FORM]: true,
 };
 
 describe(isCapabilityEnabled, () => {
@@ -76,6 +78,23 @@ describe(isCapabilityEnabled, () => {
     });
 
     await expect(isCapabilityEnabled(CAPABILITY.NEWSLETTER)).resolves.toBe(
+      false,
+    );
+  });
+
+  it('enables the contact form on a FREE plan while its toggle is on, and disables it once toggled off', async () => {
+    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'FREE' });
+
+    await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
+      true,
+    );
+
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
+      ok: true,
+      data: { ...ALL_ENABLED, [CAPABILITY.CONTACT_FORM]: false },
+    });
+
+    await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
       false,
     );
   });

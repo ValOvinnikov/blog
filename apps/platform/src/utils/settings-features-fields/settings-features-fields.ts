@@ -7,6 +7,7 @@ export type TSettingsFeaturesValues = {
   newsletterEnabled: boolean;
   analyticsEnabled: boolean;
   consentBannerEnabled: boolean;
+  contactFormEnabled: boolean;
 };
 
 export type TCapabilityToggle = {
@@ -34,6 +35,7 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
   },
   { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },
   { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
+  { capability: CAPABILITY.CONTACT_FORM, field: 'contactFormEnabled' },
 ];
 
 export const featureDefaultsToValues = (
