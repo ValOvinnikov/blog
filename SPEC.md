@@ -1958,6 +1958,8 @@ limiter's counts in Upstash Redis (`KV_REST_API_URL`/`KV_REST_API_TOKEN`), so a
 client's allowance holds whichever serverless instance serves it. Callers build
 their own limiter with `createRateLimiter` (`apps/web/src/server/rate-limit/`),
 with their own window and maximum; keys are scoped per limiter and per tenant.
+The tenant scope is the resolved tenant id. The one exception is
+`/api/client-log`, which resolves no tenant and scopes by the request host.
 Outside production a missing Redis config falls back to per-instance memory; on
 a `production` target it throws.
 
