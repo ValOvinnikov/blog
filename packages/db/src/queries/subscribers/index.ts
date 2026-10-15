@@ -7,3 +7,5 @@ export * from './unsubscribe-by-token';
 export * from './resend-confirmation';
 export * from './count-subscribers-for-tenant';
 export * from './delete-subscribers-for-tenant';
+export * from './claim-confirmation-send';
+export * from './release-confirmation-send';

@@ -100,6 +100,7 @@ export const VOICE_FIXED_KEYS = [
   'newsletterForm.errorInvalid',
   'newsletterForm.errorAlreadySubscribed',
   'newsletterForm.errorServer',
+  'newsletterForm.errorRateLimited',
   'newsletterForm.errorUnavailable',
   'newsletterConfirm.confirmedTitle',
   'newsletterConfirm.confirmedMessage',
