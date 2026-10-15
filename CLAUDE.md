@@ -79,7 +79,10 @@ graph is acyclic
   `react-server` condition. See `.claude/agents/studio.md`.
 - `@blog/insight` (`packages/insight`) holds the structured logger core —
   `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`, its sole canonical
-  implementation. It depends on nothing. `apps/web` and `apps/platform` each
+  implementation. It depends on nothing. The logger may ship its `error` and
+  `warn` lines to sinks registered at runtime (`registerLogSink`; the
+  `fetch`-only `createLokiSink` is the one it provides); a sink never throws
+  into the logging call and its failures are never logged. `apps/web` and `apps/platform` each
   expose one shared logger at `src/utils/logger/logger.ts` carrying their own
   `service` value, and import that rather than calling `createLogger` per
   module. `service`, `db` and `auth` never log — failures reach the caller and
