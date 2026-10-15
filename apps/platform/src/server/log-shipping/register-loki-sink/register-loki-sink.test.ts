@@ -64,6 +64,13 @@ describe(registerLokiSink, () => {
     },
   );
 
+  it('registers nothing when the credentials cannot be encoded', () => {
+    vi.mocked(createLokiSink).mockReturnValue(undefined);
+
+    expect(registerLokiSink()).toBe(false);
+    expect(registerLogSink).not.toHaveBeenCalled();
+  });
+
   it('hands each pushed line to waitUntil', () => {
     registerLokiSink();
     const sink = vi.mocked(registerLogSink).mock.calls[0]?.[0];

@@ -86,7 +86,10 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
 - **`createLokiSink({ url, user, token })`** posts one line per push to
   Loki's push API over global `fetch` with basic auth, `service` and `level`
   as stream labels, and returns a promise that always resolves (any status,
-  any network failure), so a caller can hand it to `waitUntil` safely. No
+  any network failure, a five-second timeout), so a caller can hand it to
+  `waitUntil` safely. Creating it never throws: credentials `btoa` cannot
+  encode return `undefined` instead of a sink, so the caller registers
+  nothing. No
   dependency: the package stays at zero runtime dependencies.
 - **`LOG_LEVEL`** lives here, not in `@blog/config` — this package depends
   on nothing. UPPERCASE keys, `as const`; the values stay lowercase because

@@ -6,6 +6,9 @@ export interface ILokiSinkOptions {
   token: string;
 }
 
+// Bounds how long a hung Loki can hold a function open through waitUntil.
+const PUSH_TIMEOUT_MS = 5_000;
+
 function toStreamLabels(line: TLogContext): Record<string, string> {
   const labels: Record<string, string> = {};
   for (const key of ['service', 'level'] as const) {
@@ -25,15 +28,32 @@ function toUnixNanoseconds(line: TLogContext): string {
   return `${millis}000000`;
 }
 
+function toBasicAuthorization(user: string, token: string): string | undefined {
+  try {
+    return `Basic ${btoa(`${user}:${token}`)}`;
+  } catch {
+    return undefined;
+  }
+}
+
 export function createLokiSink({
   url,
   user,
   token,
-}: ILokiSinkOptions): (line: TLogContext) => Promise<void> {
-  const authorization = `Basic ${btoa(`${user}:${token}`)}`;
+}: ILokiSinkOptions): ((line: TLogContext) => Promise<void>) | undefined {
+  const authorization = toBasicAuthorization(user, token);
 
-  return (line) =>
-    fetch(url, {
+  if (authorization === undefined) {
+    return undefined;
+  }
+
+  return (line) => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, PUSH_TIMEOUT_MS);
+
+    return fetch(url, {
       method: 'POST',
       headers: {
         Authorization: authorization,
@@ -47,8 +67,14 @@ export function createLokiSink({
           },
         ],
       }),
-    }).then(
-      () => undefined,
-      () => undefined,
-    );
+      signal: controller.signal,
+    })
+      .then(
+        () => undefined,
+        () => undefined,
+      )
+      .finally(() => {
+        clearTimeout(timeout);
+      });
+  };
 }

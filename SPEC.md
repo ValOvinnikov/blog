@@ -2653,9 +2653,12 @@ it writes to the console — to each sink registered with `registerLogSink`;
 `info` and `debug` never leave stdout. `createLokiSink` (push URL, user, write
 token) posts each line to Loki's push API with basic auth, labelled by
 `service` and `level`, and returns the push promise so a serverless function
-can be kept alive until it settles. A sink failure — a throw, a rejection, a
-non-2xx answer — never reaches the logging call and is never logged, so a Loki
-outage cannot cascade into the logs it would carry. Each app registers the sink
+can be kept alive until it settles; each push is aborted after five seconds, so
+a hung Loki cannot hold a function open. A sink failure — a throw, a rejection,
+a non-2xx answer, a timeout — never reaches the logging call and is never
+logged, so a Loki outage cannot cascade into the logs it would carry. Creating
+the sink never throws either: credentials that cannot be basic-auth encoded (a
+pasted smart quote) produce no sink, and the app starts with shipping off. Each app registers the sink
 from its server-only `instrumentation.ts`, never from `logger.ts`, which client
 components import, and only when its three optional server env vars are set
 (`LOKI_PUSH_URL`, `LOKI_USER`, `LOKI_TOKEN`), each push handed to Vercel's
