@@ -371,7 +371,7 @@ Variants: columns: 1|2|3|4
 
 Scrolls through a row of items, revealing more of them as the viewport widens.
 Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant · slideSize?: TCarouselVariants['slideSize'] · contentAlignment?: TCarouselVariants['alignment'] _(extends IWithClassName, IWithDataTestId)_
-Variants: slideSize: fraction|stepped|content · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
+Variants: slideSize: fraction|stepped|halvesThenThirds|content · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
 
 ### ContentModule — `components/organisms/content-module/content-module.tsx`
 

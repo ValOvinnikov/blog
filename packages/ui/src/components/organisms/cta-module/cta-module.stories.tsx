@@ -21,6 +21,13 @@ const image = (seed: string) => (
   />
 );
 
+const brightPhoto = (
+  <img
+    src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+    alt=""
+  />
+);
+
 // Stub — this package never constructs a link/button; the web layer would
 // pass its own `ActionGroup` output here.
 const PrimaryAndSecondary = (
@@ -189,6 +196,13 @@ export const BannerDefault: TStory = {
   },
 };
 
+export const BannerDefaultOverBrightPhoto: TStory = {
+  args: {
+    ...BannerDefault.args,
+    image: brightPhoto,
+  },
+};
+
 export const BannerNeutralTint: TStory = {
   args: {
     ...BannerDefault.args,
@@ -216,13 +230,7 @@ export const BannerAlignRight: TStory = {
       'A hands-on writing intensive. Small cohort, live feedback.',
     actions: PrimaryAndInlineLink,
     footnote: undefined,
-    // Fixed bright photo, not the random `image()` helper — the right-side scrim needs a reliably bright backdrop to demonstrate its contrast.
-    image: (
-      <img
-        src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-        alt=""
-      />
-    ),
+    image: brightPhoto,
   },
 };
 

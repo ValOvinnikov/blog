@@ -30,7 +30,7 @@ A visitor will be able to send the site's owner a message from a contact form pl
 
 ## Configuration
 
-- **Capability** — a new `CAPABILITY.CONTACT_FORM`, on every plan including `FREE` and on by default. An owner can switch it off on the Features page; the module is then omitted, as it is for a suspended tenant.
+- **Capability** — a new `CAPABILITY.CONTACT_FORM`, `GROWTH` only — every submission sends the owner a notification through Resend, as the newsletter does — and on by default. An owner can switch it off on the Features page; the module is then omitted, as it is for a suspended tenant.
 - **Owner or operator** — sets the recipient override on the Email page, reads and deletes leads.
 - **Editor** — places the module and writes the success message and privacy note in Studio.
 - **Voice** — the success message and privacy note are editor content in Sanity, not Voice fields; everything else is fixed.

@@ -14,6 +14,7 @@ describe(featureDefaultsToValues, () => {
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: true,
       [CAPABILITY.CONSENT_BANNER]: false,
+      [CAPABILITY.CONTACT_FORM]: true,
     };
 
     expect(featureDefaultsToValues(defaults)).toEqual({
@@ -23,6 +24,7 @@ describe(featureDefaultsToValues, () => {
       newsletterEnabled: false,
       analyticsEnabled: true,
       consentBannerEnabled: false,
+      contactFormEnabled: true,
     });
   });
 });
@@ -36,6 +38,7 @@ describe(clampToEntitlement, () => {
       newsletterEnabled: true,
       analyticsEnabled: true,
       consentBannerEnabled: true,
+      contactFormEnabled: true,
     };
 
     expect(
@@ -51,6 +54,7 @@ describe(clampToEntitlement, () => {
       newsletterEnabled: false,
       analyticsEnabled: false,
       consentBannerEnabled: false,
+      contactFormEnabled: false,
     });
   });
 
@@ -62,6 +66,7 @@ describe(clampToEntitlement, () => {
       newsletterEnabled: true,
       analyticsEnabled: false,
       consentBannerEnabled: true,
+      contactFormEnabled: true,
     };
 
     expect(
@@ -72,6 +77,7 @@ describe(clampToEntitlement, () => {
         CAPABILITY.NEWSLETTER,
         CAPABILITY.ANALYTICS,
         CAPABILITY.CONSENT_BANNER,
+        CAPABILITY.CONTACT_FORM,
       ]),
     ).toEqual(values);
   });

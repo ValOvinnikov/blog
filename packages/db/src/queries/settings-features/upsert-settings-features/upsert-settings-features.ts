@@ -14,6 +14,7 @@ export type TUpdateSettingsFeaturesInput = {
   newsletterEnabled?: boolean;
   analyticsEnabled?: boolean;
   consentBannerEnabled?: boolean;
+  contactFormEnabled?: boolean;
 };
 
 type TSettingsFeaturesWritable = Partial<typeof settingsFeatures.$inferInsert>;
@@ -40,6 +41,9 @@ function presentFields(
   }
   if (input.consentBannerEnabled !== undefined) {
     fields.consentBannerEnabled = input.consentBannerEnabled;
+  }
+  if (input.contactFormEnabled !== undefined) {
+    fields.contactFormEnabled = input.contactFormEnabled;
   }
 
   return fields;

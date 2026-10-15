@@ -1,4 +1,5 @@
 import {
+  SANITY_API_TIMEOUT_MS,
   SANITY_MANAGEMENT_API_BASE,
   sanityAccessRequest,
 } from '@blog/db/utils/sanity-management-client/sanity-management-client';
@@ -17,6 +18,7 @@ async function sanityManagementRequest<T>(
 ): Promise<T> {
   const response = await fetch(`${SANITY_MANAGEMENT_API_BASE}${path}`, {
     ...init,
+    signal: AbortSignal.timeout(SANITY_API_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -199,6 +201,10 @@ function sanityWebhooksApiBase(projectId: string): string {
   return `https://${projectId}.api.sanity.io/v2021-06-07`;
 }
 
+function webhooksUnauthorizedHint(projectId: string): string {
+  return `SANITY_MANAGEMENT_TOKEN is either invalid or not a member of project "${projectId}" — it is only an implicit administrator of projects it created itself. If this tenant points at a project created elsewhere (such as a shared dev project), add the token's robot to that project as administrator in Sanity Manage, or provision the tenant into its own project.`;
+}
+
 async function sanityWebhooksRequest<T>(
   projectId: string,
   path: string,
@@ -207,6 +213,7 @@ async function sanityWebhooksRequest<T>(
 ): Promise<T> {
   const response = await fetch(`${sanityWebhooksApiBase(projectId)}${path}`, {
     ...init,
+    signal: AbortSignal.timeout(SANITY_API_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -216,8 +223,10 @@ async function sanityWebhooksRequest<T>(
 
   if (!response.ok) {
     const body = await response.text().catch(() => '');
+    const hint =
+      response.status === 401 ? ` ${webhooksUnauthorizedHint(projectId)}` : '';
     throw new Error(
-      `Sanity Webhooks API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}`,
+      `Sanity Webhooks API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}${hint}`,
     );
   }
 

@@ -6,6 +6,7 @@ code:
   - apps/web/src/utils/report-client-error/**
   - apps/web/src/app/api/client-log/**
   - apps/web/src/server/client-log/**
+  - apps/web/src/server/rate-limit/**
 epics: []
 ---
 
@@ -37,7 +38,7 @@ When something fails in a reader's browser, such as an error boundary rendering 
 - **Server side** — a `.strict()` Zod schema rejects any extra key; `event` must match the static dot-namespaced pattern and is at most 80 characters.
 - The 8 KB payload cap is enforced while reading the request stream, not only from `Content-Length`.
 - Every field except `event` passes through `sanitizeLogMessage` (`event` is bounded by the event-name regex instead) and `url` loses its query and fragment before logging, whatever the browser already did.
-- The rate limit (20 requests per minute per client IP, at most 5000 tracked clients) lives in one serverless instance's memory; it is not a fleet-wide guarantee.
+- The rate limit is 20 requests per minute per client IP and request host, counted in Upstash Redis through the shared `createRateLimiter` factory, so it holds across instances. Without Redis outside production (local dev, tests, previews) it falls back to one instance's memory, capped at 5000 tracked clients.
 - The client caps and the schema caps are separate literals that must be kept equal by hand (a client module cannot import the server-only schema).
 - `window.onerror` and `unhandledrejection` are not captured.
 
@@ -45,19 +46,19 @@ When something fails in a reader's browser, such as an error boundary rendering 
 
 - Layers: `web` only; `@blog/insight` for `sanitizeLogMessage` and the logger core.
 - Features: [errors-and-404](./errors-and-404.md), [bookmarks](./bookmarks.md).
-- Env vars: none.
+- Env vars: `KV_REST_API_URL`, `KV_REST_API_TOKEN` (shared rate-limit store).
 
 ## Entry points
 
 - `apps/web/src/utils/report-client-error/report-client-error.ts`
 - `apps/web/src/app/api/client-log/route.ts`
 - `apps/web/src/server/client-log/client-log-schema/client-log-schema.ts`
-- `apps/web/src/server/client-log/client-log-rate-limiter/client-log-rate-limiter.ts`
+- `apps/web/src/server/rate-limit/rate-limiter/rate-limiter.ts`
 - `apps/web/src/utils/logger/logger.ts`
 
 ## Tests and stories
 
-- `report-client-error.test.ts`, `app/api/client-log/route.test.ts`, `client-log-schema.test.ts`, `client-log-rate-limiter.test.ts`.
+- `report-client-error.test.ts`, `app/api/client-log/route.test.ts`, `client-log-schema.test.ts`, `rate-limiter.test.ts`, `in-memory-rate-limit-store.test.ts`.
 - No stories.
 
 ## Related

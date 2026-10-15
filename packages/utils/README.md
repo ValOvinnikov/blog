@@ -17,7 +17,9 @@ logic it needs without inheriting framework baggage.
 ## Layout
 
 - `async/` — `safeAsync`, a result-wrapping helper for async calls (`TResult<T>`).
-- `color/` — `oklchToHex`, `wcagContrastRatio`, `WCAG_AA_CONTRAST_MIN`.
+- `color/` — `oklchToHex`, `wcagContrastRatio`, `WCAG_AA_CONTRAST_MIN`, and
+  `renderedContrastRatio`, which composites translucent layers and takes the
+  worse of CSS Color 4 gamut mapping and per-channel clipping.
 - `encryption/` — `encryptSecret` / `decryptSecret`.
 - `merge/` — `deepMergePartial`, `TDeepPartial<T>`.
 - `pagination/` — `toTotalPages`.

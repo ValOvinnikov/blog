@@ -871,7 +871,8 @@
       "BOOKMARKS": "Bookmarks",
       "NEWSLETTER": "Newsletter",
       "ANALYTICS": "Analytics",
-      "CONSENT_BANNER": "Cookie consent banner"
+      "CONSENT_BANNER": "Cookie consent banner",
+      "CONTACT_FORM": "Contact form"
     },
     "toggleDescription": {
       "COMMENTS": "Let readers leave comments on posts.",
@@ -879,7 +880,8 @@
       "BOOKMARKS": "Let readers save posts to read later.",
       "NEWSLETTER": "Show the newsletter signup form on the site.",
       "ANALYTICS": "Enable on-site analytics tracking.",
-      "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load."
+      "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load.",
+      "CONTACT_FORM": "Show the contact form on the site."
     }
   },
   "languagePicker": {

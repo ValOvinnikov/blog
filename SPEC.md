@@ -1390,8 +1390,9 @@ its image is a full-bleed background, so the copy needs a floor under it.
 `BRAND_PRIMARY`, `NEUTRAL_SCRIM_*` otherwise) and by `position` — the
 gradient's strongest stop always sits under wherever the Banner's copy
 renders from `sm` up, and centres below it, so on-image text stays legible
-whichever side it's on — and switches the copy to the `text-on-image`/
-`text-on-image-muted` tokens. `SPLIT` and `STACKED` ignore `tone` entirely.
+whichever side it's on; no copy sits past the mid stop, so below `lg` the
+gradients never fade to weak — and switches titles and running text alike
+to `text-on-image` (85% white fails 4.5:1 over the brand mid stop). `SPLIT` and `STACKED` ignore `tone` entirely.
 Both organisms compose one `bannerVariants` recipe
 (`packages/ui/src/lib/styling/banner.ts`), which owns the breakout, the
 scrims, the band padding and the min-height, so `Hero` and `CtaModule`
@@ -1738,21 +1739,23 @@ was taken down while its site kept serving from cache. See
 and [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
 **Feature-toggle layer** (Phase 4 of the configurability epic, #1285/#1289):
-`@blog/db`'s `settings_features` table (one row per tenant, six `NOT NULL`
+`@blog/db`'s `settings_features` table (one row per tenant, seven `NOT NULL`
 boolean columns — `commentsEnabled`/`ratingsEnabled`/`bookmarksEnabled`/
-`newsletterEnabled`/`analyticsEnabled`/`consentBannerEnabled`) holds the
+`newsletterEnabled`/`analyticsEnabled`/`consentBannerEnabled`/
+`contactFormEnabled`) holds the
 tenant's own on/off choice for each of `@blog/config`'s `CAPABILITY` keys. It
 is never eagerly seeded at tenant-provisioning time — like `site_config`, an
 absent row is resolved lazily at read time by falling back to the tenant's
 current preset's `PRESET_REGISTRY[preset].featureDefaults`
-(`comments`/`ratings`/`bookmarks` default on, `newsletter`/`analytics`/
+(`comments`/`ratings`/`bookmarks`/`contactForm` default on, `newsletter`/`analytics`/
 `consentBanner` default off — a deliberate opt-in posture for those three,
 not a "match legacy behavior" default). Two gating layers stack on top of the tenant toggle,
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
-entitles `ratings`/`consentBanner`; `GROWTH` entitles all six:
-`comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/`consentBanner`).
+entitles `ratings`/`consentBanner`; `GROWTH` entitles all seven:
+`comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/`consentBanner`/
+`contactForm`).
 `comments` and `bookmarks` are `GROWTH`-only because each makes readers sign
 in — magic-link email on a shared Resend quota — and comments will carry
 moderation cost.
@@ -1952,6 +1955,16 @@ canonical table in
 [`docs/context/environment-variables.md`](./docs/context/environment-variables.md)
 — includes the access conventions (validated entry points only, turbo strict
 env mode, cache-busting on shared config presets).
+
+**Rate limits are shared across instances.** `apps/web` keeps every rate
+limiter's counts in Upstash Redis (`KV_REST_API_URL`/`KV_REST_API_TOKEN`), so a
+client's allowance holds whichever serverless instance serves it. Callers build
+their own limiter with `createRateLimiter` (`apps/web/src/server/rate-limit/`),
+with their own window and maximum; keys are scoped per limiter and per tenant.
+The tenant scope is the resolved tenant id. The one exception is
+`/api/client-log`, which resolves no tenant and scopes by the request host.
+Outside production a missing Redis config falls back to per-instance memory; on
+a `production` target it throws.
 
 ## 8. Migrations & live data (core contract)
 
@@ -2726,6 +2739,17 @@ Two more utilities cover the item-level fills inside a band:
   the page's own divider. Every `bg-surface-2` root that can hold focusable
   content applies it — `MediaFrame`, `Aside`, `Panel.Header` and the
   `NewsletterSignup` COMPACT strip.
+
+A third inherited property, `--tint`, is the brand tint an element paints
+inside a band — interactive cards' hover and focus-within fill and the
+`MediaCard` icon tile, read through `bg-tint`. It has no `:root` default: the
+`@theme inline` colour falls back to `--brand-primary-muted`, so it resolves at
+the element. `surface-brand-primary` sets it to a 10% mix toward
+`--brand-primary`, so nothing tinted on a Brand primary band takes the band's
+own colour; Primary and Secondary bands keep `--brand-primary-muted`.
+`surface-tint` retargets `--ambient` to that tint, with the tinted bands'
+divider and field boundary, for a card whose own focus fill it is
+(`TaxonomyCard`).
 
 A surface painted with an image or a scrim rather than a flat token colour
 (`Hero` BANNER, `CtaModule` BANNER) sets neither: there is no single colour a

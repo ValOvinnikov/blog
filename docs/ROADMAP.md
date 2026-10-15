@@ -108,8 +108,8 @@ module presets (#2803).
   (SPEC.md).
 - **Prices**: Growth banded by subscriber count? Sell the newsletter before
   sending exists?
-- **Vendor plans**: Vercel Pro (Hobby forbids commercial use) and Resend Pro
-  timing.
+- **Vendor plans**: Resend Pro timing. Vercel is settled: the team is on paid
+  Pro, so commercial use is allowed.
 - **Legal drafting**: who writes the terms, privacy policy, DPA and
   sub-processor list.
 - **Support channel and status page** tooling.

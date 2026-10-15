@@ -55,6 +55,7 @@ const VALID_INPUT: TUpdateFeaturesInput = {
   newsletterEnabled: false,
   analyticsEnabled: false,
   consentBannerEnabled: true,
+  contactFormEnabled: false,
 };
 
 describe(updateFeaturesAction, () => {
@@ -130,6 +131,41 @@ describe(updateFeaturesAction, () => {
       bookmarksEnabled: false,
       analyticsEnabled: false,
     });
+  });
+
+  it('rejects switching the contact form on for a FREE tenant', async () => {
+    const result = await updateFeaturesAction('tenant-1', {
+      ...VALID_INPUT,
+      contactFormEnabled: true,
+    });
+
+    expect(result).toEqual({ ok: false });
+    expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
+  });
+
+  it('lets a GROWTH tenant switch the contact form on and back off', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: GROWTH_TENANT,
+      membership: { role: 'OWNER' },
+    });
+
+    const on = await updateFeaturesAction('tenant-2', {
+      ...VALID_INPUT,
+      contactFormEnabled: true,
+    });
+    const off = await updateFeaturesAction('tenant-2', VALID_INPUT);
+
+    expect(on).toEqual({ ok: true });
+    expect(off).toEqual({ ok: true });
+    expect(upsertSettingsFeaturesMock).toHaveBeenNthCalledWith(1, 'tenant-2', {
+      ...VALID_INPUT,
+      contactFormEnabled: true,
+    });
+    expect(upsertSettingsFeaturesMock).toHaveBeenNthCalledWith(
+      2,
+      'tenant-2',
+      VALID_INPUT,
+    );
   });
 
   it('allows a GROWTH tenant to enable the same capability', async () => {

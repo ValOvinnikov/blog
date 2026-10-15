@@ -29,6 +29,7 @@ describe('planPageAccess', () => {
       CAPABILITY.NEWSLETTER,
       CAPABILITY.ANALYTICS,
       CAPABILITY.CONSENT_BANNER,
+      CAPABILITY.CONTACT_FORM,
     ];
   });
 

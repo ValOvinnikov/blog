@@ -19,6 +19,7 @@ const updateFeaturesInputSchema = z.object({
   newsletterEnabled: z.boolean(),
   analyticsEnabled: z.boolean(),
   consentBannerEnabled: z.boolean(),
+  contactFormEnabled: z.boolean(),
 });
 
 export type TUpdateFeaturesInput = z.input<typeof updateFeaturesInputSchema>;
