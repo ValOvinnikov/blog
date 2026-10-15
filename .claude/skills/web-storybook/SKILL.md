@@ -28,8 +28,10 @@ pnpm --filter web storybook:build  # static build
 - `.storybook/preview.tsx` already gives every story what the real layout
   does: the `AppProviders` decorator (`@web/testing/providers` — next-intl and
   the `SanityImage` base URL, shared with `customRender`), `apps/web/index.css`
-  (the theme plus the `@source` for `packages/ui`), the CONSOLE preset's font
-  classes, and `layout: 'fullscreen'`. A story adds none of these; set
+  (the theme plus the `@source` for `packages/ui`), the site theme — the
+  `preset`, `accentHue` and `colorMode` toolbar globals
+  (`.storybook/with-site-theme.ts`), Console in light mode by default — and
+  `layout: 'fullscreen'`. A story adds none of these; set
   `parameters.layout: 'padded'` for a small component.
 
 Story format, `meta.args`, controls and `render` follow `ui-storybook` — the

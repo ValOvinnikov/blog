@@ -1,0 +1,88 @@
+name: Contrast
+
+# Renders every apps/web module story in each brand variant, theme, mode and
+# width and fails on a contrast regression against the shrink-only baseline
+# (apps/web/contrast/). On demand only — the platform Releases page
+# dispatches it on a tag — because a per-PR run would cost more billed minutes
+# than the rest of CI together. Never a required check. It checks out the ref
+# it was dispatched on and never one named by an input, so its caches stay
+# scoped to that ref.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contrast-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '24'
+  SHARD_COUNT: 4
+
+jobs:
+  storybook:
+    name: Build Storybook
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+          install-filter: web...
+
+      # Saved at the end of this job and restored by every shard: one build,
+      # shared through the run-scoped cache key below.
+      - name: Share the build with the shards
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/web/storybook-static
+          key: contrast-storybook-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Build Storybook
+        working-directory: apps/web
+        run: pnpm storybook:build
+
+  shard:
+    name: Contrast shard (${{ matrix.shard }}/4)
+    needs: storybook
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+          install-filter: web...
+
+      - name: Restore the Storybook build
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/web/storybook-static
+          key: contrast-storybook-${{ github.run_id }}-${{ github.run_attempt }}
+          fail-on-cache-miss: true
+
+      - name: Install Playwright browser (chromium)
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Contrast suite
+        working-directory: apps/web
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: pnpm test:contrast --shard="${SHARD}/${SHARD_COUNT}" --workers=4

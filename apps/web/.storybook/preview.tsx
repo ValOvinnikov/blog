@@ -1,18 +1,13 @@
 import '../index.css';
 
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
-import { resolveFontVariableClassName } from '@web/config/fonts';
 import { AppProviders } from '@web/testing/providers';
 
-// Must go on the root element, not a wrapper div: the `--font-*-family`
-// custom properties are read on `body`, which doesn't inherit them from a
-// descendant.
-const { headingFont, bodyFont } =
-  PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
-document.documentElement.classList.add(
-  ...resolveFontVariableClassName(headingFont, bodyFont).split(' '),
-);
+import {
+  SITE_THEME_GLOBAL_TYPES,
+  SITE_THEME_INITIAL_GLOBALS,
+  withSiteTheme,
+} from './with-site-theme';
 
 // `AppProviders` supplies the same `NextIntlClientProvider` +
 // `SanityImageBaseUrlProvider` stack `[tenant]/[locale]/layout.tsx` provides
@@ -25,7 +20,9 @@ const withProviders: Decorator = (storyFn) => (
 );
 
 const preview: Preview = {
-  decorators: [withProviders],
+  decorators: [withProviders, withSiteTheme],
+  globalTypes: SITE_THEME_GLOBAL_TYPES,
+  initialGlobals: SITE_THEME_INITIAL_GLOBALS,
   parameters: {
     controls: {
       matchers: {

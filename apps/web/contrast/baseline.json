@@ -1,0 +1,1211 @@
+{
+  "modules-ctamodule--banner | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-ctamodule--banner | PRIMARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner | PRIMARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-ctamodule--banner | SECONDARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner | SECONDARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-none | BRAND_PRIMARY | 1280px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-none | BRAND_PRIMARY | 390px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-none | PRIMARY | 1280px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-none | PRIMARY | 390px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-none | SECONDARY | 1280px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-none | SECONDARY | 390px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-xl | BRAND_PRIMARY | 1280px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-xl | BRAND_PRIMARY | 390px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-xl | PRIMARY | 1280px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-xl | PRIMARY | 390px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "editorial dark", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-xl | SECONDARY | 1280px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-ctamodule--banner-between-secondary-sections-spacing-xl | SECONDARY | 390px": {
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "editorial dark", "hue-130 light", "hue-190 light"],
+    "focus | section:nth-of-type(2) > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-190 light"]
+  },
+  "modules-faqmodule--center-aligned | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--center-aligned | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--center-aligned | SECONDARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--center-aligned | SECONDARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--default | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--default | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--default | SECONDARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--default | SECONDARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-actions | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-actions | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-actions | SECONDARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-actions | SECONDARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-rich-answer | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-rich-answer | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-rich-answer | SECONDARY | 1280px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(1) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"],
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(3) > h3 > button": ["editorial dark"]
+  },
+  "modules-faqmodule--with-rich-answer | SECONDARY | 390px": {
+    "focus | section > div > div > div:nth-of-type(2) > div:nth-of-type(2) > h3 > button": ["editorial dark"]
+  },
+  "modules-featurelistmodule--carousel | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--carousel | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--carousel-center-aligned | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--carousel-center-aligned | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--center-aligned | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--center-aligned | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--circle-images | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--circle-images | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--default | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--default | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--five-cards | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--five-cards | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--mixed-images-and-icons | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--mixed-images-and-icons | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--square-images | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--square-images | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--with-actions | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--with-actions | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--with-images | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-featurelistmodule--with-images | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-heroblogmodule--banner | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-heroblogmodule--banner | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-heroblogmodule--banner | PRIMARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-heroblogmodule--banner | PRIMARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-heroblogmodule--banner | SECONDARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-heroblogmodule--banner | SECONDARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-heroprofilemodule--banner | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(1) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "text | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-heroprofilemodule--banner | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(1) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "text | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "editorial light", "editorial dark", "hue-130 light", "hue-190 light"]
+  },
+  "modules-heroprofilemodule--banner | PRIMARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(1) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "text | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-heroprofilemodule--banner | PRIMARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(1) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "text | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "editorial light", "editorial dark", "hue-130 light", "hue-190 light"]
+  },
+  "modules-heroprofilemodule--banner | SECONDARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(1) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "text | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-heroprofilemodule--banner | SECONDARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(1) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(3) > ul > li:nth-of-type(2) > a": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "text | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(2) > a": ["console light", "editorial light", "editorial dark", "hue-130 light", "hue-190 light"]
+  },
+  "modules-herostatementmodule--banner | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-herostatementmodule--banner | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-herostatementmodule--banner | PRIMARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-herostatementmodule--banner | PRIMARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-herostatementmodule--banner | SECONDARY | 1280px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "editorial light", "hue-130 light", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "editorial light", "hue-130 light", "hue-190 light"]
+  },
+  "modules-herostatementmodule--banner | SECONDARY | 390px": {
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light"],
+    "focus | section > div > div > div > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-center | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-center | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-center | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-center | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-center | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-center | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-left | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-left | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-left | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-left | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-left | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--carousel-fits-left | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--center-aligned | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--center-aligned | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--center-aligned | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--center-aligned | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--center-aligned | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--center-aligned | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--default | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--default | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--default | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--default | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--default | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--default | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-only | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-only | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-only | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-only | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-only | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-only | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-with-single-tail | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--lead-with-single-tail | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--lead-with-single-tail | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-with-single-tail | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-with-single-tail | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--lead-with-single-tail | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--phone-carousel-overflows-center | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(3) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(3) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--phone-carousel-overflows-center | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--phone-carousel-overflows-center | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(3) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--phone-carousel-overflows-center | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--phone-carousel-overflows-center | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(3) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--phone-carousel-overflows-center | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--secondary | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--secondary | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--secondary | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--secondary | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--secondary | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--secondary | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--with-images | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--with-images | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postfeaturedmodule--with-images | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--with-images | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--with-images | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postfeaturedmodule--with-images | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(3) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(3) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--carousel | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--carousel | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(3) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(3) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel-fits-center | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--carousel-fits-center | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(2) > article > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--carousel-fits-center | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel-fits-center | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel-fits-center | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--carousel-fits-center | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(1) > article > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--center-aligned | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--center-aligned | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--center-aligned | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--center-aligned | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--center-aligned | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--center-aligned | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--default | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--default | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--default | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--default | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--default | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--default | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--secondary | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--secondary | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--secondary | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--secondary | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--secondary | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--secondary | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--with-images | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--with-images | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlatestmodule--with-images | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--with-images | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--with-images | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlatestmodule--with-images | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--center-aligned | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--center-aligned | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--center-aligned | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--center-aligned | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--center-aligned | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--center-aligned | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--default | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--default | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--default | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--default | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--default | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--default | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--secondary | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--secondary | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--secondary | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--secondary | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--secondary | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--secondary | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-images | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--with-images | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--with-images | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-images | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-images | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-images | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-pagination | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--with-pagination | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postlistmodule--with-pagination | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-pagination | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-pagination | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postlistmodule--with-pagination | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--center-aligned | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--center-aligned | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--center-aligned | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--center-aligned | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--center-aligned | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--center-aligned | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--default | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--default | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--default | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--default | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--default | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--default | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--secondary | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--secondary | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--secondary | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--secondary | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--secondary | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--secondary | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--with-images | BRAND_PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--with-images | BRAND_PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-postrelatedmodule--with-images | PRIMARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--with-images | PRIMARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--with-images | SECONDARY | 1280px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-postrelatedmodule--with-images | SECONDARY | 390px": {
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"],
+    "text | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--center-aligned | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--center-aligned | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--center-aligned | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--center-aligned | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--center-aligned | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--center-aligned | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--four-tiers-with-switch | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--four-tiers-with-switch | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--four-tiers-with-switch | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--four-tiers-with-switch | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--four-tiers-with-switch | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--four-tiers-with-switch | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--phone-stacked | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--phone-stacked | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--phone-stacked | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--phone-stacked | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--phone-stacked | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--phone-stacked | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--secondary | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--secondary | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--secondary | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--secondary | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--secondary | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--secondary | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--sidebar-column | BRAND_PRIMARY | 1280px": {
+    "focus | div > section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--sidebar-column | BRAND_PRIMARY | 390px": {
+    "focus | div > section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--sidebar-column | PRIMARY | 1280px": {
+    "focus | div > section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--sidebar-column | PRIMARY | 390px": {
+    "focus | div > section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--sidebar-column | SECONDARY | 1280px": {
+    "focus | div > section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--sidebar-column | SECONDARY | 390px": {
+    "focus | div > section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--tablet-two-by-two | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--tablet-two-by-two | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--tablet-two-by-two | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--tablet-two-by-two | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--tablet-two-by-two | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--tablet-two-by-two | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-phone | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-phone | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-phone | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-phone | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-phone | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-phone | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-with-switch | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-with-switch | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-with-switch | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-with-switch | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-with-switch | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--three-tiers-with-switch | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--two-tiers-with-switch | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--two-tiers-with-switch | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--two-tiers-with-switch | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--two-tiers-with-switch | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--two-tiers-with-switch | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--two-tiers-with-switch | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--with-footnote-and-actions | BRAND_PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--with-footnote-and-actions | BRAND_PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--with-footnote-and-actions | PRIMARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--with-footnote-and-actions | PRIMARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--with-footnote-and-actions | SECONDARY | 1280px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-pricingmodule--with-footnote-and-actions | SECONDARY | 390px": {
+    "focus | section > div > div:nth-of-type(2) > div > button:nth-of-type(2)": ["console light", "console dark", "editorial light", "editorial dark", "hue-130 light", "hue-130 dark", "hue-190 light", "hue-190 dark"]
+  },
+  "modules-sectionpagesmodule--default | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--default | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--mixed-title-only-and-summary | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(4) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(5) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(6) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--mixed-title-only-and-summary | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(4) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(5) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(6) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--secondary | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--secondary | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--title-only | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--title-only | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--with-images | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--with-images | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div:nth-of-type(2) > article:nth-of-type(3) > div:nth-of-type(2) > h3 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--without-heading | BRAND_PRIMARY | 1280px": {
+    "text-hover | section > div > div > article:nth-of-type(1) > div > h2 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div > article:nth-of-type(2) > div > h2 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div > article:nth-of-type(3) > div > h2 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  },
+  "modules-sectionpagesmodule--without-heading | BRAND_PRIMARY | 390px": {
+    "text-hover | section > div > div > article:nth-of-type(1) > div > h2 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div > article:nth-of-type(2) > div > h2 > a": ["console dark", "editorial dark", "hue-130 dark"],
+    "text-hover | section > div > div > article:nth-of-type(3) > div > h2 > a": ["console dark", "editorial dark", "hue-130 dark"]
+  }
+}

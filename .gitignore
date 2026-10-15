@@ -41,6 +41,7 @@ coverage/
 apps/web/playwright-report/
 apps/web/test-results/
 apps/web/blob-report/
+apps/web/contrast/.baseline-parts/
 
 # Deployment
 .vercel/

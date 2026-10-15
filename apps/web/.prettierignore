@@ -1,2 +1,5 @@
 node_modules
 .next
+
+# One line per element (contrast/helpers/baseline.ts formats it)
+contrast/baseline.json

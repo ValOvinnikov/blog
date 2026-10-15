@@ -32,6 +32,7 @@
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
     "e2e/**/*.ts",
+    "contrast/**/*.ts",
     "playwright.config.ts",
     "index.css.d.ts",
     // TS only loads global ambient .d.ts files via a program's own include,
