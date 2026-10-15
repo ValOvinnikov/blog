@@ -556,6 +556,9 @@ importers:
       '@blog/vitest-config':
         specifier: workspace:*
         version: link:../../configs/vitest
+      '@types/node':
+        specifier: ^26
+        version: 26.6.2
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.17
