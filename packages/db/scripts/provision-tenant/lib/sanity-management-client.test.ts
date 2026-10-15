@@ -59,6 +59,21 @@ describe(createSanityProject, () => {
       }),
     ).rejects.toThrow(/402/);
   });
+
+  it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'proj123' }), { status: 200 }),
+    );
+
+    await createSanityProject({
+      token: 'tok',
+      displayName: 'Acme',
+      organizationId: 'org-abc',
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
 });
 
 describe(createSanityDataset, () => {
@@ -99,6 +114,15 @@ describe(listSanityDatasets, () => {
       'https://api.sanity.io/v2021-06-07/projects/proj123/datasets',
     );
     expect(init.method ?? 'GET').toBe('GET');
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('explains project membership when the management token is unauthorized', async () => {
+    fetchMock.mockResolvedValue(new Response('Unauthorized', { status: 401 }));
+
+    await expect(
+      listSanityWebhooks({ token: 'tok', projectId: 'proj123' }),
+    ).rejects.toThrow(/401 .*not a member of project "proj123"/);
   });
 });
 
