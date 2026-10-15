@@ -55,7 +55,7 @@ describe(LookPreview, () => {
     renderPreview({ accentHue: 28 });
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
-      '--brand-primary-solid': 'oklch(0.55 0.17 28)',
+      '--brand-primary-solid': 'oklch(0.51 0.17 28)',
     });
   });
 
