@@ -1,6 +1,5 @@
 import { createTV } from 'tailwind-variants';
 
-/** Registers this project's custom Tailwind token names with tailwind-merge's classGroups so conflicts between them and Tailwind's built-ins resolve correctly. */
 const SPACING_TOKENS = [
   'gutter',
   'section',
@@ -40,6 +39,9 @@ export const tv = createTV({
               'title-section',
               'title-3xl',
               'post-title',
+              'prose-h2',
+              'prose-h3',
+              'prose-h4',
               'prose',
               'lead',
               'caption',
