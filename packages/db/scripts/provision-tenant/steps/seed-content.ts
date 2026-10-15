@@ -12,6 +12,7 @@ import { grantPropagationRetryOptions } from '../lib/grant-propagation-retry';
 import { retryWithBackoff } from '../lib/retry-with-backoff';
 
 import { buildStarterDocuments } from './starter-content';
+import type { TStarterDocumentUnion } from './starter-document';
 
 const SANITY_API_VERSION = '2024-01-01';
 
@@ -32,16 +33,12 @@ const defaultDeps: TSeedContentDeps = {
 const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 
 /**
- * Step 2 — seeds the tenant's starter content (`buildStarterDocuments` in
- * `starter-content.ts`) into its dataset, using an Editor-scoped Sanity
- * token minted for this run.
- *
  * Idempotency is derived from the dataset's own observed state — whether
  * `settings_site` already exists — not from `tenants.seededAt`, so an
  * emptied or recreated dataset is re-seeded on the next run rather than
- * skipped. `createOrReplace` (rather than `create`) also makes a single run
- * safe against a mid-run crash-and-retry that happens before seeding is
- * detectable this way.
+ * skipped. Each document is `createIfNotExists` under a fixed id, so a
+ * retry after a mid-run crash never overwrites a document the owner has
+ * since edited.
  */
 export async function seedTenantContent(
   tenant: TTenant,
@@ -85,7 +82,7 @@ export async function seedTenantContent(
 
     const transaction = client.transaction();
     for (const document of documents) {
-      transaction.createOrReplace(document);
+      transaction.createIfNotExists<TStarterDocumentUnion>(document);
     }
 
     await retryWithBackoff(() => transaction.commit(), retryOptions);

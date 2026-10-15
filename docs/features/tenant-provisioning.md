@@ -81,7 +81,7 @@ The workflow then verifies all of it. The admin polls each step's progress and o
   - `lastNotifiedOwnerElevationOutcome` and `deprovisioningSteps` (same shape as `provisioningSteps`).
 - **Core steps, in order:**
   1. `SANITY_PROJECT` creates the project and dataset, adds a CORS entry for the admin origin, and invites the owner as `viewer`.
-  2. `SEED_CONTENT` writes `settings_site`, `settings_navigation`, `settings_footer` and `page_home`. It runs only if `settings_site` is absent, using an `editor` token that is persisted on success and revoked on failure.
+  2. `SEED_CONTENT` writes `settings_site`, `settings_navigation`, `settings_footer`, `page_home` with its `template_home`, and `page_postIndex` with its `template_postIndex`. Each document is typed against the generated Sanity types and created with `createIfNotExists` under a fixed id, so a re-run never overwrites an owner's edits. It runs only if `settings_site` is absent, using an `editor` token that is persisted on success and revoked on failure.
   3. `PERSIST_TOKEN` mints a `viewer` read token.
   4. `MAP_DOMAIN` adds `primaryDomain` to the shared web project.
   5. `CREATE_WEBHOOK` points the webhook at `${WEB_APP_URL}/api/revalidate`.

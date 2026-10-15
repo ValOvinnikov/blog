@@ -56,7 +56,7 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 
 function createClientStub(
   transaction: {
-    createOrReplace: ReturnType<typeof vi.fn>;
+    createIfNotExists: ReturnType<typeof vi.fn>;
     commit: ReturnType<typeof vi.fn>;
   },
   options: { fetchResult?: string | null } = {},
@@ -85,7 +85,7 @@ beforeEach(() => {
 describe(seedTenantContent, () => {
   let tenant: TTenant;
   let commit: ReturnType<typeof vi.fn>;
-  let createOrReplace: ReturnType<typeof vi.fn>;
+  let createIfNotExists: ReturnType<typeof vi.fn>;
   let assetsUpload: ReturnType<typeof vi.fn>;
   let clientFetch: ReturnType<typeof vi.fn>;
   let createClient: TSeedContentDeps['createClient'];
@@ -96,12 +96,12 @@ describe(seedTenantContent, () => {
   beforeEach(() => {
     tenant = baseTenant();
     commit = vi.fn().mockResolvedValue(undefined);
-    createOrReplace = vi.fn();
+    createIfNotExists = vi.fn();
     ({
       assetsUpload,
       fetch: clientFetch,
       createClient,
-    } = createClientStub({ createOrReplace, commit }));
+    } = createClientStub({ createIfNotExists, commit }));
     mintWriteToken = vi
       .fn()
       .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
@@ -122,7 +122,7 @@ describe(seedTenantContent, () => {
     expect(clientFetch).toHaveBeenCalledWith(
       '*[_type == "settings_site"][0]._id',
     );
-    expect(createOrReplace).toHaveBeenCalledTimes(
+    expect(createIfNotExists).toHaveBeenCalledTimes(
       buildStarterDocuments(seededTenant).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
@@ -136,7 +136,7 @@ describe(seedTenantContent, () => {
 
   it('skips seeding when the dataset already has settings_site', async () => {
     const existingSiteClient = createClientStub(
-      { createOrReplace, commit },
+      { createIfNotExists, commit },
       { fetchResult: 'existing-settings-site-id' },
     );
 
@@ -150,7 +150,7 @@ describe(seedTenantContent, () => {
     expect(existingSiteClient.fetch).toHaveBeenCalledWith(
       '*[_type == "settings_site"][0]._id',
     );
-    expect(createOrReplace).not.toHaveBeenCalled();
+    expect(createIfNotExists).not.toHaveBeenCalled();
     expect(commit).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith({
@@ -200,7 +200,7 @@ describe(seedTenantContent, () => {
       }),
     );
     expect(assetsUpload).not.toHaveBeenCalled();
-    expect(createOrReplace).toHaveBeenCalledTimes(
+    expect(createIfNotExists).toHaveBeenCalledTimes(
       buildStarterDocuments(tenant).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
@@ -221,7 +221,7 @@ describe(seedTenantContent, () => {
       sleep: vi.fn().mockResolvedValue(undefined),
     });
 
-    const committedDocuments = createOrReplace.mock.calls.map(
+    const committedDocuments = createIfNotExists.mock.calls.map(
       ([document]) => document as Record<string, unknown>,
     );
     const site = committedDocuments.find(
