@@ -2,6 +2,7 @@ import {
   CAPABILITY,
   PRESET_REGISTRY,
   type TCapability,
+  type TMaybeUndefined,
   type TPresetId,
 } from '@blog/config';
 
@@ -12,18 +13,12 @@ type TSettingsFeaturesRow = {
   newsletterEnabled: boolean;
   analyticsEnabled: boolean;
   consentBannerEnabled: boolean;
+  contactFormEnabled: boolean;
 };
 
-/**
- * Builds the tenant's effective per-capability toggle state from a
- * `settings_features` row (or `undefined`, when no row exists yet) —
- * falls back whole to the given preset's own `featureDefaults`, the
- * `settings_features` counterpart to `toThemeTokens`'s `site_config`
- * fallback. `preset` is the tenant's *current* `site_config.preset`, not a
- * value cached at provisioning time.
- */
+/** `preset` is the tenant's current `site_config.preset`, not a value cached at provisioning time. */
 export const toEffectiveSettingsFeatures = (
-  row: TSettingsFeaturesRow | undefined,
+  row: TMaybeUndefined<TSettingsFeaturesRow>,
   preset: TPresetId,
 ): Record<TCapability, boolean> => {
   if (!row) return PRESET_REGISTRY[preset].featureDefaults;
@@ -35,5 +30,6 @@ export const toEffectiveSettingsFeatures = (
     [CAPABILITY.NEWSLETTER]: row.newsletterEnabled,
     [CAPABILITY.ANALYTICS]: row.analyticsEnabled,
     [CAPABILITY.CONSENT_BANNER]: row.consentBannerEnabled,
+    [CAPABILITY.CONTACT_FORM]: row.contactFormEnabled,
   };
 };

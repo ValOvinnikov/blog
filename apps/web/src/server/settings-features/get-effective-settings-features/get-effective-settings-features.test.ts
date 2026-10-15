@@ -74,6 +74,7 @@ describe(getEffectiveSettingsFeatures, () => {
         NEWSLETTER: false,
         ANALYTICS: false,
         CONSENT_BANNER: false,
+        CONTACT_FORM: true,
       },
     });
   });
@@ -90,6 +91,7 @@ describe(getEffectiveSettingsFeatures, () => {
         NEWSLETTER: false,
         ANALYTICS: false,
         CONSENT_BANNER: false,
+        CONTACT_FORM: true,
       },
     });
   });

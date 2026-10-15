@@ -20,6 +20,7 @@ describe(toEffectiveSettingsFeatures, () => {
         newsletterEnabled: true,
         analyticsEnabled: true,
         consentBannerEnabled: false,
+        contactFormEnabled: false,
       },
       PRESET_ID.CONSOLE,
     );
@@ -31,6 +32,7 @@ describe(toEffectiveSettingsFeatures, () => {
       [CAPABILITY.NEWSLETTER]: true,
       [CAPABILITY.ANALYTICS]: true,
       [CAPABILITY.CONSENT_BANNER]: false,
+      [CAPABILITY.CONTACT_FORM]: false,
     });
   });
 
@@ -43,6 +45,7 @@ describe(toEffectiveSettingsFeatures, () => {
         newsletterEnabled: false,
         analyticsEnabled: false,
         consentBannerEnabled: false,
+        contactFormEnabled: false,
       },
       PRESET_ID.EDITORIAL,
     );

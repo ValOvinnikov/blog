@@ -11,6 +11,7 @@ const CAPABILITY_LABEL: Readonly<Record<TCapability, string>> = {
   [CAPABILITY.NEWSLETTER]: 'Newsletter',
   [CAPABILITY.ANALYTICS]: 'Analytics',
   [CAPABILITY.CONSENT_BANNER]: 'Consent banner',
+  [CAPABILITY.CONTACT_FORM]: 'Contact form',
 };
 
 export const getMissingCapability = (

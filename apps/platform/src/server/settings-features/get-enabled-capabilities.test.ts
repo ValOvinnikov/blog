@@ -21,6 +21,7 @@ const allOn = {
   newsletterEnabled: true,
   analyticsEnabled: true,
   consentBannerEnabled: true,
+  contactFormEnabled: true,
 };
 
 describe(getEnabledCapabilities, () => {
@@ -71,5 +72,6 @@ describe(getEnabledCapabilities, () => {
 
     expect(result).not.toContain(CAPABILITY.NEWSLETTER);
     expect(result).toContain(CAPABILITY.RATINGS);
+    expect(result).not.toContain(CAPABILITY.CONTACT_FORM);
   });
 });

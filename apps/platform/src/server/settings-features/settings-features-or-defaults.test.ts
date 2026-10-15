@@ -27,6 +27,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
       newsletterEnabled: true,
       analyticsEnabled: false,
       consentBannerEnabled: true,
+      contactFormEnabled: false,
     };
     const updatedAt = new Date('2026-10-01T09:00:00.000Z');
     getSettingsFeaturesAndPresetMock.mockResolvedValue({
@@ -57,6 +58,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
         newsletterEnabled: false,
         analyticsEnabled: false,
         consentBannerEnabled: false,
+        contactFormEnabled: true,
       },
       savedAt: undefined,
     });
@@ -78,6 +80,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
         newsletterEnabled: false,
         analyticsEnabled: false,
         consentBannerEnabled: false,
+        contactFormEnabled: true,
       },
       savedAt: undefined,
     });

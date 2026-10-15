@@ -2,11 +2,8 @@ import { boolean, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { tenants } from './tenants';
 
-// One row per tenant — `tenantId` is unique so an upsert can target it
-// directly, mirroring `site_config`. Column defaults match `PRESET_REGISTRY`'s
-// `CONSOLE` `featureDefaults` (`@blog/config`) as a Postgres-level safety
-// net; the real source of truth for a newly-provisioned tenant's initial
-// values is the provisioning script, not these defaults.
+// Column defaults mirror `PRESET_REGISTRY`'s `CONSOLE` `featureDefaults`; a
+// tenant with no row reads its preset's defaults instead.
 export const settingsFeatures = pgTable('settings_features', {
   id: uuid('id').primaryKey().defaultRandom(),
   tenantId: uuid('tenant_id')
@@ -21,6 +18,7 @@ export const settingsFeatures = pgTable('settings_features', {
   consentBannerEnabled: boolean('consent_banner_enabled')
     .notNull()
     .default(false),
+  contactFormEnabled: boolean('contact_form_enabled').notNull().default(true),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()

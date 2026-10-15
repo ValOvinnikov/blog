@@ -23,6 +23,7 @@ const ALL_ENTITLED = [
   CAPABILITY.NEWSLETTER,
   CAPABILITY.ANALYTICS,
   CAPABILITY.CONSENT_BANNER,
+  CAPABILITY.CONTACT_FORM,
 ];
 
 const FREE_ENTITLED = [
@@ -38,6 +39,7 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
   newsletterEnabled: false,
   analyticsEnabled: false,
   consentBannerEnabled: false,
+  contactFormEnabled: true,
 };
 
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
@@ -72,7 +74,10 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         'data-unchecked',
         '',
       );
-      expect(screen.getAllByRole('switch')).toHaveLength(3);
+      expect(
+        screen.getByRole('switch', { name: 'Contact form' }),
+      ).toHaveAttribute('data-checked', '');
+      expect(screen.getAllByRole('switch')).toHaveLength(4);
     });
 
     it('badges exactly the three unfinished capabilities "Coming soon"', () => {
@@ -166,9 +171,12 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         screen.getByRole('switch', { name: 'Cookie consent banner' }),
       ).toHaveAttribute('data-disabled', '');
       expect(
+        screen.getByRole('switch', { name: 'Contact form' }),
+      ).toHaveAttribute('data-disabled', '');
+      expect(
         screen.getByRole('switch', { name: 'Bookmarks' }),
       ).not.toHaveAttribute('data-disabled');
-      expect(screen.getAllByText('Growth plan')).toHaveLength(2);
+      expect(screen.getAllByText('Growth plan')).toHaveLength(3);
     });
 
     it('describes a locked toggle by its description and plan lock, and an entitled one by its description alone', () => {
