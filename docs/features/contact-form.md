@@ -3,8 +3,11 @@ title: Contact form
 status: planned
 layers: [config, db, email, ui, platform, studio, service, web]
 code:
-  - packages/db/src/queries/memberships/get-tenant-owner-email/**
+  - packages/db/src/schema/leads.ts
+  - packages/db/src/queries/leads/**
+  - packages/db/src/queries/email-config/get-contact-recipient/**
   - packages/db/src/schema/email-config.ts
+  - packages/email/src/templates/tenant/contact-notification/**
 epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 ---
 
@@ -12,7 +15,7 @@ epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 
 ## What it does
 
-A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. None of it is built yet; the pieces it will reuse exist.
+A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. The capability, the data layer and the owner notification template are built; the form, module and platform pages are not.
 
 ## Surfaces and routes
 
@@ -22,8 +25,9 @@ A visitor will be able to send the site's owner a message from a contact form pl
 
 ## Data
 
-- Planned Neon `leads` table, a tenant-scoped sibling to `subscribers`, plus `email_config.contactRecipient` (nullable override). Both arrive by migration.
-- Recipient: the owner's sign-in email from `getTenantOwnerEmail` by default; the Email-page override when set. The address is never stored in Sanity, whose content is publicly readable.
+- Neon `leads` table, a tenant-scoped sibling to `subscribers`: `name`, `email`, `message`, `sourcePath` (the page the form sat on) and `createdAt`, indexed on `(tenantId, createdAt desc)` and cascade-deleted with its tenant. `createLead`, `listLeads` (newest first, paged, with the total) and `deleteLead` (never across tenants) are its queries.
+- `email_config.contactRecipient` — a nullable override, read and written through `getEmailConfig`/`upsertEmailConfig`.
+- Recipient: `getContactRecipient` returns the override when set, otherwise the owner's sign-in email from `getTenantOwnerEmail`. The address is never stored in Sanity, whose content is publicly readable.
 - `settings_contact` holds only `successMessage` (required, max 160) and an optional `privacyNote` (`paragraphText`, for the policy link). Field labels, the button and error messages are fixed product copy.
 - Fields are fixed: name, email and message, all required. No toggles, no consent checkbox; a privacy note links the policy.
 - Automatic expiry of old leads is a separate, planned retention job.
@@ -42,7 +46,7 @@ These are decided and must hold when it ships:
 - Spam protection is Vercel BotID (invisible, first-party, needs no consent banner), plus a honeypot and a soft per-IP rate limit of 5 sends per 10 minutes. A bot, a filled honeypot or a burst stores nothing and sends nothing.
 - The server action checks, in order: BotID, honeypot, rate limit, tenant active, field validation (name 1–100 characters, a valid email, message 10–5,000), then stores the lead and sends the email.
 - A new capability key breaks every `Record<TCapability, …>` until each has it, so the capability lands in config, db, web and platform together.
-- Delivery uses `@blog/email`'s `sendEmail` and branded shell with a new owner-notification template; `@blog/email` never logs, so the web server action logs a failed send.
+- Delivery uses `@blog/email`'s `sendEmail` with `buildContactNotificationEmail` on the tenant shell: subject "New message from {visitor}", the sender, a link to the page, the message quoted with its line breaks, a line that replying answers the visitor, and a link to the Leads list. Every visitor string is escaped. The caller sets `replyTo` to the visitor; `@blog/email` never logs, so the web server action logs a failed send.
 - A stored lead whose email fails still answers `sent`; the action logs the email failure once, since the lead is safe in the list.
 - A `Textarea` atom joins `TextInput` in `@blog/ui`; the form itself is composed in `apps/web`, not a `@blog/ui` organism.
 
@@ -55,16 +59,19 @@ These are decided and must hold when it ships:
 
 ## Entry points
 
-Nothing of the feature exists. The pieces it builds on:
+- `packages/db/src/schema/leads.ts` and `packages/db/src/queries/leads/` — lead storage
+- `packages/db/src/queries/email-config/get-contact-recipient/get-contact-recipient.ts` — recipient resolution
+- `packages/email/src/templates/tenant/contact-notification/contact-notification.ts` — the owner notification
+
+The pieces it builds on:
 
 - `packages/db/src/queries/memberships/get-tenant-owner-email/get-tenant-owner-email.ts`
-- `packages/db/src/schema/email-config.ts`
 - `packages/ui/src/components/atoms/text-input/text-input.tsx`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts` (`subscribeToNewsletterAction`, the public server action the contact action is modelled on)
 
 ## Tests and stories
 
-None for the feature. `get-tenant-owner-email.test.ts` covers the default recipient lookup.
+PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to. `contact-notification.test.ts` covers the subject, escaping and line breaks.
 
 ## Related
 

@@ -32,6 +32,7 @@ export const updateEmailConfigInputSchema = z.object({
     .max(FOOTER_ADDRESS_MAX)
     .nullable()
     .optional(),
+  contactRecipient: z.string().trim().email().nullable().optional(),
 });
 
 export type TUpdateEmailConfigInput = z.input<
@@ -53,6 +54,9 @@ function presentFields(
   }
   if (parsed.footerPostalAddress !== undefined) {
     fields.footerPostalAddress = parsed.footerPostalAddress;
+  }
+  if (parsed.contactRecipient !== undefined) {
+    fields.contactRecipient = parsed.contactRecipient;
   }
 
   return fields;

@@ -114,6 +114,19 @@ describe('proxy matcher', () => {
     expect(matcher.test('/.well-known/acme-challenge/token')).toBe(false);
   });
 
+  it('excludes BotID challenge and proxy paths', () => {
+    expect(
+      matcher.test(
+        '/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/a-4-a/c.js',
+      ),
+    ).toBe(false);
+    expect(
+      matcher.test(
+        '/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/fp',
+      ),
+    ).toBe(false);
+  });
+
   it('still matches other dotted multi-segment paths, so per-tag RSS keeps working', () => {
     expect(matcher.test('/tags/typescript/rss.xml')).toBe(true);
   });

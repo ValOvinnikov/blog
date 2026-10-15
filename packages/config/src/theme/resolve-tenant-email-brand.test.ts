@@ -1,4 +1,4 @@
-import { oklchToHex, wcagContrastRatio } from '@blog/utils/color';
+import { oklchToHex, renderedContrastRatio } from '@blog/utils/color';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 
@@ -6,22 +6,22 @@ import { resolveTenantEmailBrand } from './resolve-tenant-email-brand';
 
 vi.mock('@blog/utils/color', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/utils/color')>()),
-  wcagContrastRatio: vi.fn(),
+  renderedContrastRatio: vi.fn(),
 }));
 
-const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
+const mockedRenderedContrastRatio = vi.mocked(renderedContrastRatio);
 
 beforeEach(async () => {
   const actual =
     await vi.importActual<typeof import('@blog/utils/color')>(
       '@blog/utils/color',
     );
-  mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
+  mockedRenderedContrastRatio.mockImplementation(actual.renderedContrastRatio);
 });
 
 const expectedAccentAndLogoHex = (hue: number) => ({
-  brandPrimary: oklchToHex(0.53, 0.17, hue),
-  brandPrimarySolid: oklchToHex(0.55, 0.17, hue),
+  brandPrimary: oklchToHex(0.45, 0.17, hue),
+  brandPrimarySolid: oklchToHex(0.51, 0.17, hue),
   logo1: oklchToHex(0.52, 0.17, hue),
   logo2: oklchToHex(0.63, 0.16, hue),
   logo3: oklchToHex(0.73, 0.13, hue),
@@ -48,15 +48,15 @@ describe(resolveTenantEmailBrand, () => {
       logoHue: 274,
     });
 
-    expect(result.brandPrimary).toBe(oklchToHex(0.53, 0.17, 65));
-    expect(result.brandPrimarySolid).toBe(oklchToHex(0.55, 0.17, 65));
+    expect(result.brandPrimary).toBe(oklchToHex(0.45, 0.17, 65));
+    expect(result.brandPrimarySolid).toBe(oklchToHex(0.51, 0.17, 65));
     expect(result.logo1).toBe(oklchToHex(0.52, 0.17, 274));
     expect(result.logo2).toBe(oklchToHex(0.63, 0.16, 274));
     expect(result.logo3).toBe(oklchToHex(0.73, 0.13, 274));
   });
 
   it('falls back to the preset accentHue when the requested hue fails the AA guard', () => {
-    mockedWcagContrastRatio.mockReturnValue(1);
+    mockedRenderedContrastRatio.mockReturnValue(1);
     const editorialTokens = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
 
     const result = resolveTenantEmailBrand({

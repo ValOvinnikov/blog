@@ -163,6 +163,7 @@
     "errorInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
     "errorAlreadySubscribed": "Diese E-Mail-Adresse ist bereits angemeldet.",
     "errorServer": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "errorRateLimited": "Zu viele Versuche. Warten Sie ein paar Minuten und versuchen Sie es dann erneut.",
     "errorUnavailable": "Diese Website nimmt derzeit keine neuen Anmeldungen an."
   },
   "newsletterConfirm": {

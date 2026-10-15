@@ -5,6 +5,7 @@ export * from './bookmarks';
 export * from './email-config';
 export * from './email-templates';
 export * from './findings';
+export * from './leads';
 export * from './membership-invites';
 export * from './memberships';
 export * from './settings-features';

@@ -12,4 +12,9 @@ export {
   type TNewsletterConfirmationEmailInput,
   type TNewsletterConfirmationEmailContent,
 } from './newsletter-confirmation/newsletter-confirmation';
+export {
+  buildContactNotificationEmail,
+  type TContactNotificationEmailInput,
+  type TContactNotificationEmailContent,
+} from './contact-notification/contact-notification';
 export { type TTenantEmailIdentity } from './tenant-email-identity/tenant-email-identity';

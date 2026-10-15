@@ -135,6 +135,17 @@ describe(`<${NewsletterForm.name}/>`, () => {
       });
     });
 
+    it('tells the reader to wait when the server action resolves "rate-limited"', async () => {
+      subscribeToNewsletterActionMock.mockResolvedValue({
+        outcome: 'rate-limited',
+      });
+      await typeAndSubmit(user, email);
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Too many attempts. Wait a few minutes and try again.',
+      );
+    });
+
     it('shows a generic error when the server action resolves "server-error"', async () => {
       subscribeToNewsletterActionMock.mockResolvedValue({
         outcome: 'server-error',

@@ -12,7 +12,6 @@ export const NEUTRAL_RAMP_LIGHT = {
   '--field-boundary-tinted': { l: 0.58, c: 0.006, h: 250 },
   '--text': { l: 0.2, c: 0.01, h: 250 },
   '--text-muted': { l: 0.46, c: 0.01, h: 250 },
-  '--text-subtle': { l: 0.6, c: 0.008, h: 250 },
 } as const satisfies TOklchRamp;
 
 export const NEUTRAL_RAMP_DARK = {
@@ -27,7 +26,6 @@ export const NEUTRAL_RAMP_DARK = {
   '--field-boundary-tinted': { l: 0.59, c: 0.01, h: 250 },
   '--text': { l: 0.95, c: 0.004, h: 250 },
   '--text-muted': { l: 0.72, c: 0.008, h: 250 },
-  '--text-subtle': { l: 0.56, c: 0.008, h: 250 },
 } as const satisfies TOklchRamp;
 
 export const STATUS_RAMP_LIGHT = {

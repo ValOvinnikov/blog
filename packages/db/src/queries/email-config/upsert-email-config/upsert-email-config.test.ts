@@ -55,6 +55,24 @@ describe(upsertEmailConfig, () => {
     ).rejects.toThrow();
   });
 
+  it('stores and clears the contact recipient override', async () => {
+    const set = await upsertEmailConfig(tenantId, {
+      contactRecipient: 'leads@example.com',
+    });
+    const cleared = await upsertEmailConfig(tenantId, {
+      contactRecipient: null,
+    });
+
+    expect(set.contactRecipient).toBe('leads@example.com');
+    expect(cleared.contactRecipient).toBeUndefined();
+  });
+
+  it('rejects a malformed contact recipient', async () => {
+    await expect(
+      upsertEmailConfig(tenantId, { contactRecipient: 'not-an-email' }),
+    ).rejects.toThrow();
+  });
+
   it('rejects a tenantId with no matching tenants row', async () => {
     await expect(
       upsertEmailConfig('00000000-0000-0000-0000-000000000000', {

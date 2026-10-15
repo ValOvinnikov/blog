@@ -1,18 +1,21 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { emailConfig, type TEmailConfig } from '@blog/db/schema/email-config';
 import { eq } from 'drizzle-orm';
 
-// `logoAssetUrl`/`senderName`/`replyToAddress`/`footerPostalAddress` are
-// Postgres `null` when unset; mapped to `undefined` here so callers never
-// have to reason about two different "absent" representations.
 export type TEmailConfigResult = Omit<
   TEmailConfig,
-  'logoAssetUrl' | 'senderName' | 'replyToAddress' | 'footerPostalAddress'
+  | 'logoAssetUrl'
+  | 'senderName'
+  | 'replyToAddress'
+  | 'footerPostalAddress'
+  | 'contactRecipient'
 > & {
-  logoAssetUrl: string | undefined;
-  senderName: string | undefined;
-  replyToAddress: string | undefined;
-  footerPostalAddress: string | undefined;
+  logoAssetUrl: TMaybeUndefined<string>;
+  senderName: TMaybeUndefined<string>;
+  replyToAddress: TMaybeUndefined<string>;
+  footerPostalAddress: TMaybeUndefined<string>;
+  contactRecipient: TMaybeUndefined<string>;
 };
 
 export function toEmailConfigResult(row: TEmailConfig): TEmailConfigResult {
@@ -22,6 +25,7 @@ export function toEmailConfigResult(row: TEmailConfig): TEmailConfigResult {
     senderName: row.senderName ?? undefined,
     replyToAddress: row.replyToAddress ?? undefined,
     footerPostalAddress: row.footerPostalAddress ?? undefined,
+    contactRecipient: row.contactRecipient ?? undefined,
   };
 }
 

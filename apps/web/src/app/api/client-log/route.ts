@@ -1,14 +1,14 @@
+import type { TMaybeNull } from '@blog/config';
 import {
   clientLogSchema,
   sanitizeClientLogPayload,
 } from '@web/server/client-log/client-log-schema/client-log-schema';
+import { resolveClientKey } from '@web/server/rate-limit/client-key/client-key';
 import { createRateLimiter } from '@web/server/rate-limit/rate-limiter/rate-limiter';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 
-// ~8 KB — generous for the fixed field set (a capped message/stack/url/
-// user-agent adds up to well under this), tight enough that no single
-// report can carry a meaningfully large payload.
+// Well above the capped field set, small enough that no report carries a large payload.
 const MAX_PAYLOAD_BYTES = 8 * 1024;
 
 const clientLogRateLimiter = createRateLimiter({
@@ -17,32 +17,11 @@ const clientLogRateLimiter = createRateLimiter({
   maxRequests: 20,
 });
 
-const resolveClientKey = (request: Request): string => {
-  // Vercel overwrites `x-forwarded-for` on every request it proxies and
-  // does not forward an external caller's own value through, so this isn't
-  // spoofable from the browser on this platform (outside an Enterprise
-  // "trusted proxy" configuration this app doesn't use) — see
-  // https://vercel.com/docs/edge-network/headers/request-headers#x-forwarded-for.
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  const first = forwardedFor?.split(',')[0]?.trim();
-  if (first) return first;
-
-  return request.headers.get('x-real-ip') ?? 'unknown';
-};
-
-/**
- * Reads the request body incrementally, aborting as soon as more than
- * `maxBytes` has been read — returns `null` in that case. `Content-Length`
- * is caller-supplied and optional (a chunked-transfer request omits it
- * entirely), so the header check in `POST` below is only a cheap fast path;
- * this is what actually enforces the cap, since buffering the whole body via
- * `request.text()` first would already have done the expensive read this
- * function exists to avoid.
- */
+// `Content-Length` is optional and caller-supplied, so the cap is enforced while streaming.
 const readBodyWithinByteCap = async (
-  body: ReadableStream<Uint8Array> | null,
+  body: TMaybeNull<ReadableStream<Uint8Array>>,
   maxBytes: number,
-): Promise<string | null> => {
+): Promise<TMaybeNull<string>> => {
   if (!body) return '';
 
   const reader = body.getReader();
@@ -72,7 +51,7 @@ const readBodyWithinByteCap = async (
 export async function POST(request: Request): Promise<NextResponse> {
   const isLimited = await clientLogRateLimiter.isLimited({
     tenantKey: request.headers.get('host') ?? 'unknown',
-    clientKey: resolveClientKey(request),
+    clientKey: resolveClientKey(request.headers),
   });
   if (isLimited) {
     return NextResponse.json(

@@ -9,18 +9,17 @@ import {
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
 
-type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
+export type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
 
 export type TOklchRamp = Record<`--${string}`, TOklchStop>;
 
-// Lightness and chroma stay fixed across tenants so contrast ratios hold; only the hue varies.
 export const ACCENT_RAMP_LIGHT = {
-  '--brand-primary': { l: 0.53, c: 0.17 },
-  '--brand-primary-hover': { l: 0.47, c: 0.17 },
+  '--brand-primary': { l: 0.45, c: 0.17 },
+  '--brand-primary-hover': { l: 0.39, c: 0.17 },
   '--brand-primary-muted': { l: 0.95, c: 0.03 },
   '--brand-primary-contrast': { l: 0.99, c: 0, h: 0 },
-  '--brand-primary-solid': { l: 0.55, c: 0.17 },
-  '--brand-primary-solid-hover': { l: 0.49, c: 0.17 },
+  '--brand-primary-solid': { l: 0.51, c: 0.17 },
+  '--brand-primary-solid-hover': { l: 0.45, c: 0.17 },
 } as const satisfies TOklchRamp;
 
 export const ACCENT_RAMP_DARK = {

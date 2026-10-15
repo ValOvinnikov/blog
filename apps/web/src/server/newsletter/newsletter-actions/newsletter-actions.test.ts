@@ -17,6 +17,9 @@ const {
   resolveWritableTenantMock,
   getEmailConfigMock,
   getEmailTemplateMock,
+  claimConfirmationSendMock,
+  releaseConfirmationSendMock,
+  isSubscribeAttemptRefusedMock,
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
@@ -25,11 +28,18 @@ const {
   resolveWritableTenantMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
+  claimConfirmationSendMock: vi.fn(),
+  releaseConfirmationSendMock: vi.fn(),
+  isSubscribeAttemptRefusedMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
   queries: {
-    subscribers: { createPendingSubscriber: createPendingSubscriberMock },
+    subscribers: {
+      createPendingSubscriber: createPendingSubscriberMock,
+      claimConfirmationSend: claimConfirmationSendMock,
+      releaseConfirmationSend: releaseConfirmationSendMock,
+    },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
@@ -74,6 +84,10 @@ vi.mock(
   }),
 );
 
+vi.mock('@web/server/newsletter/subscribe-guard/subscribe-guard', () => ({
+  isSubscribeAttemptRefused: isSubscribeAttemptRefusedMock,
+}));
+
 vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
@@ -95,7 +109,10 @@ const subscriber = {
   unsubscribeToken: 'unsub-token-abc',
   subscribedAt: new Date('2026-01-01'),
   confirmedAt: null,
+  confirmationSentAt: null,
 };
+
+const CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
 
 const DEFAULT_BRAND = resolveTenantEmailBrand({
   preset: PRESET_ID.CONSOLE,
@@ -138,6 +155,9 @@ describe('subscribeToNewsletterAction', () => {
       body: [],
       logoAssetUrl: undefined,
     });
+    claimConfirmationSendMock.mockResolvedValue(CLAIMED_AT);
+    releaseConfirmationSendMock.mockResolvedValue(undefined);
+    isSubscribeAttemptRefusedMock.mockResolvedValue(false);
     ({ subscribeToNewsletterAction } = await import('./newsletter-actions'));
   });
 
@@ -203,6 +223,36 @@ describe('subscribeToNewsletterAction', () => {
     ).resolves.toEqual({ outcome: 'success' });
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('answers "success" without emailing again while the last confirmation is inside the cooldown', async () => {
+    createPendingSubscriberMock.mockResolvedValue({
+      ok: true,
+      data: { outcome: 'already-pending', subscriber },
+    });
+    claimConfirmationSendMock.mockResolvedValue(null);
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'success' });
+    expect(claimConfirmationSendMock).toHaveBeenCalledWith(
+      'sub-1',
+      15 * 60_000,
+    );
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns "rate-limited" without storing or sending when the attempt is refused', async () => {
+    isSubscribeAttemptRefusedMock.mockResolvedValue(true);
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'rate-limited' });
+    expect(isSubscribeAttemptRefusedMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(createPendingSubscriberMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
   });
 
   it('returns "already-subscribed" without sending an email for an active subscriber', async () => {
@@ -399,6 +449,17 @@ describe('subscribeToNewsletterAction', () => {
       ).resolves.toEqual({ outcome: 'server-error' });
       expect(errorSpy).toHaveBeenCalled();
       expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
+    });
+
+    it('gives back the cooldown claim when the confirmation email fails to send', async () => {
+      sendEmailMock.mockRejectedValue(new Error('resend down'));
+
+      await subscribeToNewsletterAction('reader@example.com');
+
+      expect(releaseConfirmationSendMock).toHaveBeenCalledWith(
+        'sub-1',
+        CLAIMED_AT,
+      );
     });
 
     it('still returns "success", logging, when marking the cookie throws after signup', async () => {

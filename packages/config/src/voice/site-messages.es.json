@@ -163,6 +163,7 @@
     "errorInvalid": "Introduzca un correo electrónico válido.",
     "errorAlreadySubscribed": "Ese correo electrónico ya está suscrito.",
     "errorServer": "Algo ha salido mal. Vuelva a intentarlo.",
+    "errorRateLimited": "Demasiados intentos. Espere unos minutos y vuelva a intentarlo.",
     "errorUnavailable": "Este sitio no acepta nuevas suscripciones en este momento."
   },
   "newsletterConfirm": {

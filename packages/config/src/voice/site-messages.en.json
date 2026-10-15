@@ -163,6 +163,7 @@
     "errorInvalid": "Enter a valid email address.",
     "errorAlreadySubscribed": "That email is already subscribed.",
     "errorServer": "Something went wrong. Please try again.",
+    "errorRateLimited": "Too many attempts. Wait a few minutes and try again.",
     "errorUnavailable": "This site isn't taking new subscriptions right now."
   },
   "newsletterConfirm": {

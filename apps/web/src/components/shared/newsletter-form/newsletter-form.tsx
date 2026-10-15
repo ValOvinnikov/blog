@@ -19,6 +19,7 @@ const ERROR_MESSAGE_KEYS = {
   'already-subscribed': 'errorAlreadySubscribed',
   unavailable: 'errorUnavailable',
   invalid: 'errorInvalid',
+  'rate-limited': 'errorRateLimited',
   'server-error': 'errorServer',
 } as const;
 
