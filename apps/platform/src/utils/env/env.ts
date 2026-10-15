@@ -41,6 +41,12 @@ export const env = createEnv({
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // @env-optional
     OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
+    // @env-optional
+    LOKI_PUSH_URL: z.string().min(1).optional(),
+    // @env-optional
+    LOKI_USER: z.string().min(1).optional(),
+    // @env-optional
+    LOKI_TOKEN: z.string().min(1).optional(),
     // Also signs the owner-invite confirmation token, not only Auth.js sessions.
     AUTH_SECRET: z.string().min(1),
   },
@@ -61,6 +67,9 @@ export const env = createEnv({
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
     OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
+    LOKI_PUSH_URL: process.env.LOKI_PUSH_URL,
+    LOKI_USER: process.env.LOKI_USER,
+    LOKI_TOKEN: process.env.LOKI_TOKEN,
     AUTH_SECRET: process.env.AUTH_SECRET,
   },
   emptyStringAsUndefined: true,
