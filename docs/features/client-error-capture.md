@@ -63,4 +63,4 @@ When something fails in a reader's browser, such as an error boundary rendering 
 
 ## Related
 
-- #1645 — Vercel log drain to Grafana Cloud Loki (server logs, including these reports).
+- #1645 — server error and warn lines shipped to Grafana Cloud Loki, including these reports.

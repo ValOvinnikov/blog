@@ -843,57 +843,65 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
       loading, so source these into the shell first:
       `set -a && source apps/web/.env.local && set +a`.
 
-### 8. Observability — log drain, alerts & uptime · Grafana Cloud + Vercel
+### 8. Observability — Loki, alerts & uptime · Grafana Cloud + Vercel
 
 Every server log line is the `@blog/insight` logger's single-line JSON —
 `service` (`web` or `platform`), `level`, `event`, `ts`, then the call's
 context fields. On its own, Vercel keeps those lines in each project's Runtime
-Logs, with a short history and nobody watching. This step drains production's
-lines into Grafana Cloud Loki and has Grafana email the operator on an error or
-an outage. The contract is `SPEC.md` §17 "Where logs land".
+Logs, with a short history and nobody watching. This step has each app push its
+`error` and `warn` lines straight to Grafana Cloud Loki and has Grafana email
+the operator on an error or an outage. There is **no Vercel log drain**: a
+drain sends Vercel's own JSON, which Loki's push API does not accept. The
+contract is `SPEC.md` §17 "Where logs land".
 
-**Credentials never enter the repo.** The Loki endpoint, its user and its
-write token live only in the Vercel drain's settings, and the Grafana account
-only in Grafana. None of it is a GitHub secret or an env var.
+**Credentials never enter the repo.** The Loki push URL, user and token are
+Vercel env vars on each project (8b), and the Grafana account lives only in
+Grafana. None of it is a GitHub secret.
 
 **Order.** The stack, the contact point and the alert rules can be set up any
-time. The production drain and the uptime checks wait for the production
+time. The production env vars and the uptime checks wait for the production
 stand-up (epic #5085). The rehearsal in 8e must pass before the production
-drain is turned on.
+env vars are set.
 
 #### 8a. Grafana Cloud stack
 
-- [ ] Create a Grafana Cloud stack and note its Loki endpoint and user id.
-- [ ] Create an access-policy token scoped to `logs:write` for the drain. Paste
-      it into the Vercel drain (8b) and nowhere else.
+- [ ] Create a Grafana Cloud stack and note its Loki push URL
+      (`https://<host>/loki/api/v1/push`) and its numeric user id.
+- [ ] Create an access-policy token scoped to `logs:write`. Paste it into the
+      Vercel projects (8b) and nowhere else.
 
-#### 8b. Vercel log drain — production only
+#### 8b. Vercel env vars — per project
 
-- [ ] Vercel → Team Settings → **Drains** → add a **Logs** drain pointing at the
-      stack's Loki endpoint, attached to `web-prod` and `platform-prod` (and
-      the worker's production project once #4954 lands).
-- [ ] **Environments: Production only.** Preview deployments send nothing.
-      `web-dev` and `platform-dev` are separate projects, so the rehearsal drain
-      in 8e does not touch this rule.
-- [ ] **Sampling: 100%.** Vercel samples by rate, not by level, so any lower
-      rate drops error lines at the same rate as noise.
+Set the three vars on **`web-prod` and `platform-prod`**, Production target
+only, so preview deployments send nothing. `web-dev` and `platform-dev` get them
+only for the rehearsal in 8e.
 
-**Cost.** Drain volume bills at $0.50/GB of uncompressed JSON against the Pro
-plan's monthly usage credit. Scoping to production is what keeps it inside
-that credit; check Vercel → Usage a week after turning the drain on.
+| Variable        | Value                            | Vercel type               |
+| --------------- | -------------------------------- | ------------------------- |
+| `LOKI_PUSH_URL` | the stack's push URL (8a)        | plain — **not** Sensitive |
+| `LOKI_USER`     | the stack's numeric user id (8a) | plain                     |
+| `LOKI_TOKEN`    | the `logs:write` token (8a)      | **Sensitive**             |
+
+- [ ] **`LOKI_PUSH_URL` must not be Sensitive.** The deploy workflows build
+      after `vercel pull`, which writes a Sensitive var as the literal
+      `[SENSITIVE]`; the sink then refuses to register because the value is
+      not a URL, and nothing ships. The URL is not a secret — the token is.
+- [ ] Redeploy each project after setting them; `instrumentation.ts` registers
+      the sink at server start, so a running deployment does not pick them up.
+
+With any of the three unset, an app logs to the console only and sends
+nothing. Each push is kept alive past the response by Vercel's `waitUntil`, so
+shipping a line never delays or fails a request.
 
 #### 8c. Querying in Loki
 
-Vercel wraps each line in its own JSON envelope, with the logger's line as the
-envelope's `message`, so a query parses twice before `event`, `level` and
-`service` become filterable fields:
+Each line arrives as the logger's own JSON, with `service` and `level` as
+stream labels, so one `json` stage makes `event` and the context fields
+filterable:
 
 ```logql
-{<drain stream selector>} | json | line_format "{{.message}}" | json | service="web" | level="error"
+{service="web", level="error"} | json
 ```
-
-Read the stream selector off the first line that arrives (Explore → Loki) —
-its labels depend on the drain, not on this repo.
 
 #### 8d. Alerts & uptime checks
 
@@ -908,17 +916,20 @@ its labels depend on the drain, not on this repo.
       `/api/auth/signin`. Alert after **two consecutive failures**, and send a
       resolve on recovery.
 
-#### 8e. Rehearsal — before the production drain
+#### 8e. Rehearsal — before the production env vars
 
 1. **Grafana alone.** The contact point's Test notification, then one
    hand-pushed error line in the logger's JSON shape through Loki's push API,
    repeated a few times, proving the fields parse, the rule fires and the burst
    sends one email.
-2. **A temporary drain on `web-dev` and `platform-dev`**, fed by a real error:
-   a well-formed report to the dev site's `/api/client-log`, which logs
-   `client_log.report_received` at `error` (a malformed body is rejected with a
-   400 and logs nothing). Remove the drain afterwards, or keep it if its cost
-   stays negligible.
+2. **The three vars on `web-dev` and `platform-dev`** (8b), redeployed, then a
+   real error from each: on web, a well-formed report to the dev site's
+   `/api/client-log`, which logs `client_log.report_received` at `error` (a
+   malformed body is rejected with a 400 and logs nothing); on platform, any
+   unhandled request error, which `onRequestError` logs as
+   `request.unhandled_error`. Confirm both lines arrive with their `service`
+   label. Unset the vars afterwards, or keep them if Loki's free-tier volume
+   allows.
 3. **Uptime checks on the development hosts**, including one deliberately
    failing path (a 404), confirming both the alert and the resolve. Repoint
    them at the apex and the platform host at launch.
