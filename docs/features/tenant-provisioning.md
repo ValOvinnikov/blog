@@ -81,10 +81,10 @@ The workflow then verifies all of it. The admin polls each step's progress and o
   - `lastNotifiedOwnerElevationOutcome` and `deprovisioningSteps` (same shape as `provisioningSteps`).
 - **Core steps, in order:**
   1. `SANITY_PROJECT` creates the project and dataset, adds a CORS entry for the admin origin, and invites the owner as `viewer`.
-  2. `SEED_CONTENT` writes `settings_site`, `settings_navigation`, `settings_footer` and `page_home`. It runs only if `settings_site` is absent, using an `editor` token that is persisted on success and revoked on failure.
+  2. `SEED_CONTENT` writes `settings_site`, `settings_navigation`, `settings_footer`, `page_home` with its `template_home`, and `page_postIndex` with its `template_postIndex`. Each document is typed against the generated Sanity types and created with `createIfNotExists` under a fixed id, so a re-run never overwrites an owner's edits. It runs only if `settings_site` is absent, using an `editor` token that is persisted on success and revoked on failure.
   3. `PERSIST_TOKEN` mints a `viewer` read token.
   4. `MAP_DOMAIN` adds `primaryDomain` to the shared web project.
-  5. `CREATE_WEBHOOK` points the webhook at `${WEB_APP_URL}/api/revalidate`.
+  5. `CREATE_WEBHOOK` lists the project's webhooks and creates one only when none targets `${WEB_APP_URL}/api/revalidate`. `webhookCreatedAt` is display-only and never skips the check, so a hook at an old URL, or one deleted in Sanity, is replaced on the next run.
   6. `VERIFY_CONTENT` re-checks the singletons, nav links, the home heading and SEO title, the webhook and the domain.
 - **Owner elevation:** `OWNER_ELEVATION` runs after the core steps and never changes the overall status. It records one of `ELEVATED`, `ALREADY_ADMINISTRATOR`, `PENDING_ACCEPTANCE`, `STALLED` (after 3 days) or `AMBIGUOUS_MEMBERSHIP`.
 - **Deprovisioning steps:** `REMOVE_DOMAIN`, `ARCHIVE_SANITY_PROJECT` (sets `isDisabledByUser`), `REVOKE_SANITY_TOKENS`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT` (`status` ARCHIVED plus `deprovisionedAt`), `PURGE_READER_DATA` (`subscribers`, `bookmarks`, `membership_invites`) and `INVALIDATE_TENANT_CACHE` (POST to `/api/revalidate-site-config`).
@@ -103,6 +103,8 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 
 - **Admission:** `beginTenantProvisioning` admits a run in one atomic `UPDATE … RETURNING`. It accepts a row that is not PROVISIONING, or one whose run is provably dead: a failed step since `startedAt`, a recorded finish, or no start recorded, or a start older than 30 minutes. A run admitted within the last 2 minutes is never treated as dead. A failed dispatch reverts the status.
 - **Overall status:** any FAILED step settles the status to FAILED. Only `VERIFY_CONTENT` finishing settles READY.
+- **Timeouts:** every Sanity management and Vercel call aborts after 30 seconds, so a hung call fails its step instead of stalling the run.
+- **Project membership:** `SANITY_MANAGEMENT_TOKEN` is an implicit administrator only of projects it created. A tenant row pointing at a project created elsewhere, such as the shared dev project, gets a 401 from the webhook API until the token's robot is added to that project as administrator; the step's error says so.
 - **Idempotency:** every step reads state it already created and resumes; the project id is persisted the moment it is minted, since Sanity cannot delete an orphan. A retry re-dispatches the whole workflow, not one step.
 - **No hard deletes:** deprovisioning only archives. It defaults to a dry run, and `confirm` must equal the tenant's name; the workflow checks that again. An already-deprovisioned tenant is skipped, so a failed cache purge is retried through `invalidate-tenant-cache.yml`.
 - **Delete:** delete refuses a tenant that is not archived. It hard-deletes the row and cascades. No Sanity token is passed, so the archived project is left in place.
