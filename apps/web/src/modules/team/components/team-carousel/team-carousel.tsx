@@ -35,7 +35,7 @@ export const TeamCarousel = ({
     tone={tone}
     contentAlignment={contentAlignment}
     className={className}
-    slideSize="stepped"
+    slideSize="halvesThenThirds"
     dataTestId={dataTestId}
   />
 );

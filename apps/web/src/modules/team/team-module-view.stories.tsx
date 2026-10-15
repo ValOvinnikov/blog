@@ -336,7 +336,17 @@ export const SquarePhotosInSixHundredPixelColumn: TStory = {
   ],
 };
 
-export const TabletCarouselTwoPerView: TStory = {
+export const MobileCarouselTwoPerView: TStory = {
+  globals: { viewport: 'mobile' },
+  args: { ...SixMembers.args, displayMode: DISPLAY_MODE.CAROUSEL },
+};
+
+export const TabletCarouselThreePerView: TStory = {
   globals: { viewport: 'tablet' },
+  args: { ...SixMembers.args, displayMode: DISPLAY_MODE.CAROUSEL },
+};
+
+export const DesktopCarouselThreePerView: TStory = {
+  globals: { viewport: 'desktop' },
   args: { ...SixMembers.args, displayMode: DISPLAY_MODE.CAROUSEL },
 };
