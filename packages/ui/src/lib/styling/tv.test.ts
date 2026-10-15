@@ -1,4 +1,21 @@
+import { tokensByCategory } from '@blog/ui/lib/design-tokens/token-registry';
+
 import { tv } from './tv';
+
+const TAILWIND_BUILT_IN_SIZES = [
+  'xs',
+  'sm',
+  'base',
+  'lg',
+  'xl',
+  '2xl',
+  '3xl',
+  '4xl',
+];
+
+const customSizeTokens = tokensByCategory.typography
+  .map(({ name }) => name)
+  .filter((name) => !TAILWIND_BUILT_IN_SIZES.includes(name));
 
 describe(tv, () => {
   it('resolves conflicting font-family utilities so the last one wins', () => {
@@ -51,4 +68,12 @@ describe(tv, () => {
       'tracking-tight-card',
     );
   });
+
+  it.each(customSizeTokens)(
+    'keeps a text-<color> utility alongside the theme size text-%s',
+    (name) => {
+      const styles = tv({ base: 'text-text' });
+      expect(styles({ class: `text-${name}` })).toBe(`text-text text-${name}`);
+    },
+  );
 });
