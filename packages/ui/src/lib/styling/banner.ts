@@ -4,10 +4,16 @@ import { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
 import { FULL_BLEED, MEDIA_MAX_WIDTH } from './full-bleed';
 import {
   BRAND_SCRIM_CENTER,
+  BRAND_SCRIM_CENTER_FROM_LG,
+  BRAND_SCRIM_LEFT_FROM_LG,
   BRAND_SCRIM_LEFT_FROM_SM,
+  BRAND_SCRIM_RIGHT_FROM_LG,
   BRAND_SCRIM_RIGHT_FROM_SM,
   NEUTRAL_SCRIM_CENTER,
+  NEUTRAL_SCRIM_CENTER_FROM_LG,
+  NEUTRAL_SCRIM_LEFT_FROM_LG,
   NEUTRAL_SCRIM_LEFT_FROM_SM,
+  NEUTRAL_SCRIM_RIGHT_FROM_LG,
   NEUTRAL_SCRIM_RIGHT_FROM_SM,
 } from './scrims';
 import { tv } from './tv';
@@ -32,7 +38,7 @@ export const bannerVariants = tv({
     block: [],
     actions: [],
     title: ['text-on-image'],
-    text: ['text-on-image-muted'],
+    text: ['text-on-image'],
   },
   variants: {
     tone: {
@@ -45,6 +51,7 @@ export const bannerVariants = tv({
       // Slotted copy styled for a photo (`*-on-image`) takes the surface's ink when there is none.
       false: {
         root: ['[--on-image:var(--text)] [--on-image-muted:var(--text-muted)]'],
+        text: ['text-on-image-muted'],
       },
     },
     position: {
@@ -126,32 +133,56 @@ export const bannerVariants = tv({
     {
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       position: CONTENT_ALIGNMENT.LEFT,
-      class: { overlay: [BRAND_SCRIM_CENTER, BRAND_SCRIM_LEFT_FROM_SM] },
+      class: {
+        overlay: [
+          BRAND_SCRIM_CENTER,
+          BRAND_SCRIM_LEFT_FROM_SM,
+          BRAND_SCRIM_LEFT_FROM_LG,
+        ],
+      },
     },
     {
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       position: CONTENT_ALIGNMENT.CENTER,
-      class: { overlay: [BRAND_SCRIM_CENTER] },
+      class: { overlay: [BRAND_SCRIM_CENTER, BRAND_SCRIM_CENTER_FROM_LG] },
     },
     {
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       position: CONTENT_ALIGNMENT.RIGHT,
-      class: { overlay: [BRAND_SCRIM_CENTER, BRAND_SCRIM_RIGHT_FROM_SM] },
+      class: {
+        overlay: [
+          BRAND_SCRIM_CENTER,
+          BRAND_SCRIM_RIGHT_FROM_SM,
+          BRAND_SCRIM_RIGHT_FROM_LG,
+        ],
+      },
     },
     {
       tone: NEUTRAL_TONES,
       position: CONTENT_ALIGNMENT.LEFT,
-      class: { overlay: [NEUTRAL_SCRIM_CENTER, NEUTRAL_SCRIM_LEFT_FROM_SM] },
+      class: {
+        overlay: [
+          NEUTRAL_SCRIM_CENTER,
+          NEUTRAL_SCRIM_LEFT_FROM_SM,
+          NEUTRAL_SCRIM_LEFT_FROM_LG,
+        ],
+      },
     },
     {
       tone: NEUTRAL_TONES,
       position: CONTENT_ALIGNMENT.CENTER,
-      class: { overlay: [NEUTRAL_SCRIM_CENTER] },
+      class: { overlay: [NEUTRAL_SCRIM_CENTER, NEUTRAL_SCRIM_CENTER_FROM_LG] },
     },
     {
       tone: NEUTRAL_TONES,
       position: CONTENT_ALIGNMENT.RIGHT,
-      class: { overlay: [NEUTRAL_SCRIM_CENTER, NEUTRAL_SCRIM_RIGHT_FROM_SM] },
+      class: {
+        overlay: [
+          NEUTRAL_SCRIM_CENTER,
+          NEUTRAL_SCRIM_RIGHT_FROM_SM,
+          NEUTRAL_SCRIM_RIGHT_FROM_LG,
+        ],
+      },
     },
     {
       position: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],

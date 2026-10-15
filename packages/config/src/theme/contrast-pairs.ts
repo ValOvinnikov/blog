@@ -29,13 +29,11 @@ const FIELD_SURFACES = [
   '--surface',
 ] as const satisfies readonly TThemeToken[];
 
-const IMAGE_SCRIMS = [
+const SCRIM_STOPS_UNDER_COPY = [
   '--scrim-brand-strong',
   '--scrim-brand-mid',
-  '--scrim-brand-weak',
   '--scrim-neutral-strong',
   '--scrim-neutral-mid',
-  '--scrim-neutral-weak',
 ] as const satisfies readonly TThemeToken[];
 
 const CODE_SURFACES = [
@@ -112,13 +110,7 @@ export const CONTRAST_PAIRS = {
   },
   ON_IMAGE: {
     foreground: '--on-image',
-    surfaces: IMAGE_SCRIMS,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  ON_IMAGE_MUTED: {
-    foreground: '--on-image-muted',
-    surfaces: IMAGE_SCRIMS,
+    surfaces: SCRIM_STOPS_UNDER_COPY,
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
