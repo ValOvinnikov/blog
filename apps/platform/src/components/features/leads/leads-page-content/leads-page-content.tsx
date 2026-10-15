@@ -1,5 +1,6 @@
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import { LeadsView } from '@platform/components/features/leads/leads-view';
 import { toLeadRow } from '@platform/utils/lead-row/lead-row';
 import {
@@ -28,11 +29,12 @@ export const LeadsPageContent = async ({
   if (page > totalPages) redirect(adminRoutes.dashboardLeads(totalPages));
 
   return (
-    <LeadsView
-      tenantId={tenant.id}
-      leads={leads.map(toLeadRow)}
-      page={page}
-      totalPages={totalPages}
-    />
+    <LeadsTenantProvider tenantId={tenant.id}>
+      <LeadsView
+        leads={leads.map(toLeadRow)}
+        page={page}
+        totalPages={totalPages}
+      />
+    </LeadsTenantProvider>
   );
 };

@@ -74,7 +74,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     expect(listLeadsMock).not.toHaveBeenCalled();
   });
 
-  it('sends a signed-in user with no membership to the pending workspace, reading no leads', async () => {
+  it('sends a user with no membership to the pending workspace', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');

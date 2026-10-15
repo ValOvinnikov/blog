@@ -8,11 +8,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { leadsTableVariants } from './leads-table-variants';
 
 export type TLeadsTableProps = {
-  tenantId: string;
   leads: TLeadRow[];
 };
 
-export const LeadsTable = ({ tenantId, leads }: TLeadsTableProps) => {
+export const LeadsTable = ({ leads }: TLeadsTableProps) => {
   const t = useTranslations('leadsTable');
   const tView = useTranslations('leadsView');
   const locale = useLocale();
@@ -57,11 +56,7 @@ export const LeadsTable = ({ tenantId, leads }: TLeadsTableProps) => {
             <span className={sourcePath()}>{lead.sourcePath}</span>
           </DataTableShell.Cell>
           <DataTableShell.Cell>
-            <DeleteLeadControl
-              tenantId={tenantId}
-              leadId={lead.id}
-              leadName={lead.name}
-            />
+            <DeleteLeadControl leadId={lead.id} leadName={lead.name} />
           </DataTableShell.Cell>
         </DataTableShell.Row>
       )}

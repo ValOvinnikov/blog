@@ -7,25 +7,19 @@ import { useTranslations } from 'next-intl';
 import { leadsViewVariants } from './leads-view-variants';
 
 export type TLeadsViewProps = {
-  tenantId: string;
   leads: TLeadRow[];
   page: number;
   totalPages: number;
 };
 
-export const LeadsView = ({
-  tenantId,
-  leads,
-  page,
-  totalPages,
-}: TLeadsViewProps) => {
+export const LeadsView = ({ leads, page, totalPages }: TLeadsViewProps) => {
   const t = useTranslations('leadsView');
   const { root } = leadsViewVariants();
 
   return (
     <div className={root()}>
       <PageHeader title={t('title')} description={t('description')} />
-      <LeadsTable tenantId={tenantId} leads={leads} />
+      <LeadsTable leads={leads} />
       <LeadsPagination page={page} totalPages={totalPages} />
     </div>
   );

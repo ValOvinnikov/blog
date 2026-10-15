@@ -1,7 +1,13 @@
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
+import {
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeLead } from '@platform/testing/leads/fixtures';
 import { toLeadRow } from '@platform/utils/lead-row/lead-row';
 import userEvent from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 
 import { LeadsTable } from './leads-table';
 
@@ -9,10 +15,12 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
   deleteLeadAction: vi.fn(),
 }));
 
-const setup = customRender(LeadsTable, {
-  tenantId: 'tenant-1',
-  leads: [toLeadRow(makeLead())],
-});
+const setup = (props: Partial<ComponentProps<typeof LeadsTable>> = {}) =>
+  renderWithIntl(
+    <LeadsTenantProvider tenantId="tenant-1">
+      <LeadsTable leads={[toLeadRow(makeLead())]} {...props} />
+    </LeadsTenantProvider>,
+  );
 
 describe(`<${LeadsTable.name}/>`, () => {
   it('shows the empty state for a tenant with no leads', () => {

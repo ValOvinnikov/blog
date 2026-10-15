@@ -1,4 +1,9 @@
-import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
+import {
+  renderWithIntl,
+  screen,
+  waitFor,
+} from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -12,11 +17,12 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
   deleteLeadAction: deleteLeadActionMock,
 }));
 
-const setup = customRender(DeleteLeadControl, {
-  tenantId: 'tenant-1',
-  leadId: 'lead-1',
-  leadName: 'Ada',
-});
+const setup = () =>
+  renderWithIntl(
+    <LeadsTenantProvider tenantId="tenant-1">
+      <DeleteLeadControl leadId="lead-1" leadName="Ada" />
+    </LeadsTenantProvider>,
+  );
 
 const openDialog = (user: UserEvent) =>
   user.click(

@@ -1,24 +1,24 @@
 'use client';
 
 import { SIZE } from '@blog/config';
+import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { deleteLeadAction } from '@platform/server/leads/delete-lead-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
 export type TDeleteLeadControlProps = {
-  tenantId: string;
   leadId: string;
   leadName: string;
 };
 
 export const DeleteLeadControl = ({
-  tenantId,
   leadId,
   leadName,
 }: TDeleteLeadControlProps) => {
   const t = useTranslations('deleteLeadControl');
   const router = useRouter();
+  const tenantId = useLeadsTenantId();
 
   const handleConfirm = async () => {
     const result = await deleteLeadAction(tenantId, leadId);
