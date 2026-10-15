@@ -193,13 +193,9 @@ export async function grantSanityProjectRole(input: {
   );
 }
 
-// Webhooks are documented against the project-scoped host
-// (`{projectId}.api.sanity.io`), unlike every endpoint above, which all work
-// against the generic `api.sanity.io` host — see
-// https://www.sanity.io/docs/http-reference/webhooks.
-function sanityWebhooksApiBase(projectId: string): string {
-  return `https://${projectId}.api.sanity.io/v2021-06-07`;
-}
+// The global host, as `@sanity/cli` calls it — the project-scoped host
+// answers a create with 2xx without creating a hook.
+const SANITY_WEBHOOKS_API_BASE = 'https://api.sanity.io/v2025-08-04';
 
 function webhooksUnauthorizedHint(projectId: string): string {
   return `SANITY_MANAGEMENT_TOKEN is either invalid or not a member of project "${projectId}" — it is only an implicit administrator of projects it created itself. If this tenant points at a project created elsewhere (such as a shared dev project), add the token's robot to that project as administrator in Sanity Manage, or provision the tenant into its own project.`;
@@ -207,12 +203,14 @@ function webhooksUnauthorizedHint(projectId: string): string {
 
 async function sanityWebhooksRequest<T>(
   projectId: string,
-  path: string,
   token: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(`${sanityWebhooksApiBase(projectId)}${path}`, {
+  const path = `/hooks/projects/${projectId}`;
+  // A followed redirect replays a POST as a GET, whose 2xx list reads as success.
+  const response = await fetch(`${SANITY_WEBHOOKS_API_BASE}${path}`, {
     ...init,
+    redirect: 'error',
     signal: AbortSignal.timeout(SANITY_API_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -240,11 +238,7 @@ export async function listSanityWebhooks(input: {
   token: string;
   projectId: string;
 }): Promise<TSanityWebhook[]> {
-  return sanityWebhooksRequest<TSanityWebhook[]>(
-    input.projectId,
-    `/hooks/projects/${input.projectId}`,
-    input.token,
-  );
+  return sanityWebhooksRequest<TSanityWebhook[]>(input.projectId, input.token);
 }
 
 export async function createSanityWebhook(input: {
@@ -255,9 +249,8 @@ export async function createSanityWebhook(input: {
   url: string;
   secret: string;
 }): Promise<TSanityWebhook> {
-  return sanityWebhooksRequest<TSanityWebhook>(
+  const created = await sanityWebhooksRequest<Partial<TSanityWebhook>>(
     input.projectId,
-    `/hooks/projects/${input.projectId}`,
     input.token,
     {
       method: 'POST',
@@ -268,8 +261,21 @@ export async function createSanityWebhook(input: {
         url: input.url,
         apiVersion: 'v2021-06-07',
         httpMethod: 'POST',
+        includeDrafts: false,
+        rule: {
+          on: ['create', 'update', 'delete'],
+          projection: '{_type, _id, "slug": slug.current}',
+        },
         secret: input.secret,
       }),
     },
   );
+
+  if (!created?.id || created.url !== input.url) {
+    throw new Error(
+      `Sanity Webhooks API: creating the webhook for project "${input.projectId}" returned no hook targeting ${input.url}.`,
+    );
+  }
+
+  return { id: created.id, url: created.url };
 }

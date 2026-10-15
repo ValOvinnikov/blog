@@ -80,9 +80,14 @@ describe(revalidateWebhookUrl, () => {
 describe(createTenantRevalidateWebhook, () => {
   it('creates the webhook when the marker is set but the existing hook targets an old URL', async () => {
     const tenant = baseTenant({ webhookCreatedAt: new Date() });
-    listSanityWebhooksMock.mockResolvedValue([
-      { id: 'hook0', url: 'https://old.example.com/api/revalidate' },
-    ]);
+    listSanityWebhooksMock
+      .mockResolvedValueOnce([
+        { id: 'hook0', url: 'https://old.example.com/api/revalidate' },
+      ])
+      .mockResolvedValueOnce([
+        { id: 'hook0', url: 'https://old.example.com/api/revalidate' },
+        { id: 'hook1', url: 'https://example.com/api/revalidate' },
+      ]);
 
     await createTenantRevalidateWebhook(tenant, env);
 
@@ -97,7 +102,11 @@ describe(createTenantRevalidateWebhook, () => {
 
   it('creates the webhook when the marker is set but the project has no hooks', async () => {
     const tenant = baseTenant({ webhookCreatedAt: new Date() });
-    listSanityWebhooksMock.mockResolvedValue([]);
+    listSanityWebhooksMock
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        { id: 'hook1', url: 'https://example.com/api/revalidate' },
+      ]);
 
     await createTenantRevalidateWebhook(tenant, env);
 
@@ -132,7 +141,11 @@ describe(createTenantRevalidateWebhook, () => {
     });
 
     it('creates the webhook and persists the marker when none exists yet', async () => {
-      listSanityWebhooksMock.mockResolvedValue([]);
+      listSanityWebhooksMock
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([
+          { id: 'hook1', url: 'https://example.com/api/revalidate' },
+        ]);
       createSanityWebhookMock.mockResolvedValue({
         id: 'hook1',
         url: 'https://example.com/api/revalidate',
@@ -173,9 +186,14 @@ describe(createTenantRevalidateWebhook, () => {
     });
 
     it('creates the webhook when existing webhooks point at different URLs', async () => {
-      listSanityWebhooksMock.mockResolvedValue([
-        { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
-      ]);
+      listSanityWebhooksMock
+        .mockResolvedValueOnce([
+          { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
+        ])
+        .mockResolvedValueOnce([
+          { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
+          { id: 'hook1', url: 'https://example.com/api/revalidate' },
+        ]);
       createSanityWebhookMock.mockResolvedValue({
         id: 'hook1',
         url: 'https://example.com/api/revalidate',
@@ -184,6 +202,19 @@ describe(createTenantRevalidateWebhook, () => {
       await createTenantRevalidateWebhook(tenant, env);
 
       expect(createSanityWebhookMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('throws naming the project, without persisting the marker, when the created hook is absent from a re-list', async () => {
+      listSanityWebhooksMock.mockResolvedValue([]);
+      createSanityWebhookMock.mockResolvedValue({
+        id: 'hook1',
+        url: 'https://example.com/api/revalidate',
+      });
+
+      await expect(createTenantRevalidateWebhook(tenant, env)).rejects.toThrow(
+        /proj123/,
+      );
+      expect(setTenantWebhookCreatedAtMock).not.toHaveBeenCalled();
     });
   });
 });
