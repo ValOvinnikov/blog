@@ -29,6 +29,12 @@ const FIELD_SURFACES = [
   '--surface',
 ] as const satisfies readonly TThemeToken[];
 
+const TINTED_FIELD_SURFACES = [
+  '--surface',
+  '--secondary',
+  '--brand-primary-muted',
+] as const satisfies readonly TThemeToken[];
+
 const SCRIM_STOPS_UNDER_COPY = [
   '--scrim-brand-strong',
   '--scrim-brand-mid',
@@ -107,6 +113,18 @@ export const CONTRAST_PAIRS = {
     surfaces: FIELD_SURFACES,
     role: CONTRAST_ROLE.UI_BOUNDARY,
     followsAccentHue: false,
+  },
+  FIELD_BOUNDARY: {
+    foreground: '--field-boundary',
+    surfaces: FIELD_SURFACES,
+    role: CONTRAST_ROLE.UI_BOUNDARY,
+    followsAccentHue: false,
+  },
+  FIELD_BOUNDARY_TINTED: {
+    foreground: '--field-boundary-tinted',
+    surfaces: TINTED_FIELD_SURFACES,
+    role: CONTRAST_ROLE.UI_BOUNDARY,
+    followsAccentHue: true,
   },
   ON_IMAGE: {
     foreground: '--on-image',
