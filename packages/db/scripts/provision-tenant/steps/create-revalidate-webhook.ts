@@ -13,6 +13,15 @@ export function revalidateWebhookUrl(webAppBaseUrl: string): string {
   return `${webAppBaseUrl}/api/revalidate`;
 }
 
+async function hasWebhookTargeting(
+  token: string,
+  projectId: string,
+  targetUrl: string,
+): Promise<boolean> {
+  const webhooks = await listSanityWebhooks({ token, projectId });
+  return webhooks.some((webhook) => webhook.url === targetUrl);
+}
+
 // Decides from the project's live hooks, never from `webhookCreatedAt`: a
 // hook at an old `WEB_APP_URL`, or one deleted in Sanity, must be replaced.
 export async function createTenantRevalidateWebhook(
@@ -25,29 +34,30 @@ export async function createTenantRevalidateWebhook(
     );
   }
 
+  const { sanityProjectId: projectId } = tenant;
+  const { sanityManagementToken: token } = env;
   const targetUrl = revalidateWebhookUrl(env.webAppBaseUrl);
 
-  const existingWebhooks = await listSanityWebhooks({
-    token: env.sanityManagementToken,
-    projectId: tenant.sanityProjectId,
-  });
+  const existedBefore = await hasWebhookTargeting(token, projectId, targetUrl);
 
-  const hasTargetWebhook = existingWebhooks.some(
-    (webhook) => webhook.url === targetUrl,
-  );
-
-  if (!hasTargetWebhook) {
+  if (!existedBefore) {
     await createSanityWebhook({
-      token: env.sanityManagementToken,
-      projectId: tenant.sanityProjectId,
+      token,
+      projectId,
       dataset: tenant.sanityDataset,
       name: WEBHOOK_NAME,
       url: targetUrl,
       secret: env.revalidateSecret,
     });
+
+    if (!(await hasWebhookTargeting(token, projectId, targetUrl))) {
+      throw new Error(
+        `createTenantRevalidateWebhook: Sanity accepted the webhook for project "${projectId}", but no webhook targeting ${targetUrl} is listed afterwards.`,
+      );
+    }
   }
 
-  if (!hasTargetWebhook || !tenant.webhookCreatedAt) {
+  if (!existedBefore || !tenant.webhookCreatedAt) {
     await setTenantWebhookCreatedAt(tenant.id, new Date());
   }
 }
