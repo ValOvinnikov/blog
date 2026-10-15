@@ -26,7 +26,7 @@ epics: [4083]
 
 ## What it does
 
-Every email the product sends is built and sent by `@blog/email`. Tenant-facing mail (sign-in link, team invite, newsletter confirmation) arrives in the tenant's own colours, name and logo, with subject and body copy the owner can rewrite per language. Operator alerts arrive in the platform's fixed look with fixed English copy. Owners edit their sender details and templates on the platform's Email page, preview them at desktop and mobile width, and send a test to themselves.
+Every email the product sends is built and sent by `@blog/email`. Tenant-facing mail (sign-in link, team invite, newsletter confirmation) arrives in the tenant's own colours, name and logo, with subject and body copy the owner can rewrite per language. Operator alerts arrive in the platform's fixed look with fixed English copy. The contact-form notification to a site's owner uses the tenant's look with fixed English copy, and is not an editable template. Owners edit their sender details and templates on the platform's Email page, preview them at desktop and mobile width, and send a test to themselves.
 
 ## Surfaces and routes
 
