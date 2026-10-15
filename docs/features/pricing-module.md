@@ -53,7 +53,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - Amounts are formatted with `Intl.NumberFormat` for the request locale and the site currency, dropping `.00`. An amount of 0 reads "Free" with no period.
 - The switch appears only when at least one tier has a `MONTH` price and at least one has a `YEAR` price; it opens on Monthly. On each tab a tier headlines that period's price and lists its non-recurring prices (one-time, hour, session) as extras; a tier with no price for the tab headlines its first price. Without the switch, each tier headlines its first price and lists the rest as extras.
 - Both panels are server-rendered; the client `PricingPeriodSwitch` (a `SegmentedControl`) only toggles `hidden`.
-- Grid columns come from the tier count: one tier is a centred narrow card, two sit side by side from `md`, three from `lg`, and four go two-up from `md` and four-up from `lg`; the cards are `PricingCard`s laid out by the module's own grid. `PricingCardGrid` exists in `@blog/ui` but the web module does not use it.
+- Each panel's `PricingCard`s sit in `@blog/ui`'s `PricingCardGrid`, with `columns` set to the tier count. It lines up prices, feature lists and actions row by row across tiers. Its columns step on the width of its own container, not the viewport, so tiers beside a sidebar keep a readable width. Stacked tiers are centred at a capped width.
 - A failed module or Site Settings fetch logs (`pricing_module.fetch_failed` / `pricing_module.site_settings_failed`) and renders nothing.
 
 ## Dependencies
