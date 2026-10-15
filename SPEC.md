@@ -2525,7 +2525,7 @@ M5 engagement layer (epics #1039–#1044), built on the new `@blog/db` layer (§
 The logger core is `@blog/insight` (`createLogger`, `LOG_LEVEL`) — a
 zero-dependency package at the base of the graph alongside `utils`.
 Each app owns **one** shared logger at `src/utils/logger/logger.ts`
-(`createLogger({ service: 'web' | 'admin' })`) and imports it; modules never
+(`createLogger({ service: 'web' | 'platform' })`) and imports it; modules never
 call `createLogger` themselves, because the `service` field is what separates
 the two apps' lines downstream. Output is single-line structured JSON to
 stdout — stdout is the transport, so there is no logging framework.
@@ -2644,8 +2644,19 @@ human is expected to act on, not exception noise.
 Server logs go to Vercel Runtime Logs, per project, with a build-time vs
 runtime split for static and ISR routes. `apps/web` captures client-side errors
 through its own `/api/client-log` endpoint rather than a third-party browser
-agent, to protect the Lighthouse budget on public pages. A drain to
-Grafana Cloud Loki is the intended destination and is not yet wired up.
+agent, to protect the Lighthouse budget on public pages.
+
+Production's lines also drain to Grafana Cloud Loki, where `event`, `level` and
+`service` are queryable fields. The drain is scoped to the production
+environment of each app's production project, so preview deployments send
+nothing, and it is unsampled, because Vercel samples by rate rather than by
+level. Grafana alerts the operator by email: one rule per app on error-level
+lines, grouped by event so a burst sends one email, and synthetic uptime checks
+on the apex home page and the platform host's sign-in page that alert after two
+consecutive failures and resolve on recovery. This is why `error` is reserved
+for what a human must act on — every error event emails the operator. The drain, the
+alerts and the credentials are console configuration, never repo content
+(`docs/DEPLOY.md` § "8. Observability").
 
 ## 18. `@blog/ui` prop contract
 

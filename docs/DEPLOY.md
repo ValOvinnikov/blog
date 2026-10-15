@@ -843,6 +843,86 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
       loading, so source these into the shell first:
       `set -a && source apps/web/.env.local && set +a`.
 
+### 8. Observability — log drain, alerts & uptime · Grafana Cloud + Vercel
+
+Every server log line is the `@blog/insight` logger's single-line JSON —
+`service` (`web` or `platform`), `level`, `event`, `ts`, then the call's
+context fields. On its own, Vercel keeps those lines in each project's Runtime
+Logs, with a short history and nobody watching. This step drains production's
+lines into Grafana Cloud Loki and has Grafana email the operator on an error or
+an outage. The contract is `SPEC.md` §17 "Where logs land".
+
+**Credentials never enter the repo.** The Loki endpoint, its user and its
+write token live only in the Vercel drain's settings, and the Grafana account
+only in Grafana. None of it is a GitHub secret or an env var.
+
+**Order.** The stack, the contact point and the alert rules can be set up any
+time. The production drain and the uptime checks wait for the production
+stand-up (epic #5085). The rehearsal in 8e must pass before the production
+drain is turned on.
+
+#### 8a. Grafana Cloud stack
+
+- [ ] Create a Grafana Cloud stack and note its Loki endpoint and user id.
+- [ ] Create an access-policy token scoped to `logs:write` for the drain. Paste
+      it into the Vercel drain (8b) and nowhere else.
+
+#### 8b. Vercel log drain — production only
+
+- [ ] Vercel → Team Settings → **Drains** → add a **Logs** drain pointing at the
+      stack's Loki endpoint, attached to `web-prod` and `platform-prod` (and
+      the worker's production project once #4954 lands).
+- [ ] **Environments: Production only.** Preview deployments send nothing.
+      `web-dev` and `platform-dev` are separate projects, so the rehearsal drain
+      in 8e does not touch this rule.
+- [ ] **Sampling: 100%.** Vercel samples by rate, not by level, so any lower
+      rate drops error lines at the same rate as noise.
+
+**Cost.** Drain volume bills at $0.50/GB of uncompressed JSON against the Pro
+plan's monthly usage credit. Scoping to production is what keeps it inside
+that credit; check Vercel → Usage a week after turning the drain on.
+
+#### 8c. Querying in Loki
+
+Vercel wraps each line in its own JSON envelope, with the logger's line as the
+envelope's `message`, so a query parses twice before `event`, `level` and
+`service` become filterable fields:
+
+```logql
+{<drain stream selector>} | json | line_format "{{.message}}" | json | service="web" | level="error"
+```
+
+Read the stream selector off the first line that arrives (Explore → Loki) —
+its labels depend on the drain, not on this repo.
+
+#### 8d. Alerts & uptime checks
+
+- [ ] **Contact point:** the operator's email. Send its **Test notification**.
+- [ ] **Error alert, one rule per app** (`service="web"`, `service="platform"`):
+      fires when the error-level count over the last 5 minutes is above zero,
+      grouped by `event`. The notification policy groups by `alertname`,
+      `service` and `event`, so a burst of one event sends one email, and the
+      first email arrives within 10 minutes of the line.
+- [ ] **Synthetic uptime checks** (Grafana Synthetic Monitoring, HTTP): the
+      apex home page `/` and the platform host's sign-in page
+      `/api/auth/signin`. Alert after **two consecutive failures**, and send a
+      resolve on recovery.
+
+#### 8e. Rehearsal — before the production drain
+
+1. **Grafana alone.** The contact point's Test notification, then one
+   hand-pushed error line in the logger's JSON shape through Loki's push API,
+   repeated a few times, proving the fields parse, the rule fires and the burst
+   sends one email.
+2. **A temporary drain on `web-dev` and `platform-dev`**, fed by a real error:
+   a well-formed report to the dev site's `/api/client-log`, which logs
+   `client_log.report_received` at `error` (a malformed body is rejected with a
+   400 and logs nothing). Remove the drain afterwards, or keep it if its cost
+   stays negligible.
+3. **Uptime checks on the development hosts**, including one deliberately
+   failing path (a 404), confirming both the alert and the resolve. Repoint
+   them at the apex and the platform host at launch.
+
 ---
 
 ## How a deploy happens (steady state)
