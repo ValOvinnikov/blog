@@ -16,7 +16,8 @@
     "languages": "Talen · Admin",
     "studio": "Studio · Admin",
     "findings": "Bevindingen · Admin",
-    "email": "E-mail · Admin"
+    "email": "E-mail · Admin",
+    "leads": "Berichten · Admin"
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
@@ -94,7 +95,8 @@
     "dangerZone": "Gevarenzone",
     "badgeComingSoon": "Binnenkort",
     "badgePlatform": "platform",
-    "features": "Functies"
+    "features": "Functies",
+    "leads": "Berichten"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -442,7 +444,7 @@
     "alertSuccess": "E-mailinstellingen opgeslagen.",
     "alertError": "Niet alle wijzigingen zijn opgeslagen — wat nog als ‘Niet opgeslagen’ is gemarkeerd, is niet opgeslagen. Probeer het opnieuw.",
     "senderItemLabel": "Afzender en voettekst",
-    "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
+    "senderItemDescription": "Naam, antwoordadres, ontvanger van contactberichten, postadres en logo, in elke taal hetzelfde.",
     "editingLabel": "Bewerken",
     "templateGroupLabel": "Sjabloon",
     "allLanguagesChanges": "Alle talen",
@@ -485,8 +487,12 @@
     "logoLabel": "E-maillogo",
     "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo.",
     "errors": {
-      "senderNameInvalid": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @."
-    }
+      "senderNameInvalid": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
+      "contactRecipientInvalid": "Vul een geldig e-mailadres in, of laat dit leeg."
+    },
+    "contactRecipientLabel": "Contactberichten sturen naar",
+    "contactRecipientHint": "Waar berichten uit het contactformulier van je site per e-mail naartoe gaan. Laat leeg om het inlog-e-mailadres van de eigenaar te gebruiken.",
+    "contactRecipientPlaceholder": "Inlog-e-mailadres van de eigenaar"
   },
   "emailLogoField": {
     "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",
@@ -958,5 +964,40 @@
   },
   "externalLinkButton": {
     "newTabHint": "(opent in nieuw tabblad)"
+  },
+  "leadsView": {
+    "title": "Berichten",
+    "description": "Berichten via het contactformulier van je site, de nieuwste eerst. Elk bericht is bij binnenkomst ook naar jou gemaild."
+  },
+  "leadsTable": {
+    "columnReceived": "Ontvangen",
+    "columnName": "Naam",
+    "columnEmail": "E-mail",
+    "columnMessage": "Bericht",
+    "columnPage": "Pagina",
+    "columnActions": "Acties",
+    "empty": "Nog geen berichten. Zodra iemand je contactformulier gebruikt, verschijnt het bericht hier."
+  },
+  "leadMessage": {
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen"
+  },
+  "leadsPagination": {
+    "ariaLabel": "Paginering",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "status": "Pagina {page} van {totalPages}"
+  },
+  "deleteLeadControl": {
+    "triggerButton": "Verwijderen",
+    "triggerAriaLabel": "Bericht van {name} verwijderen",
+    "dialogTitle": "Dit bericht verwijderen?",
+    "dialogDescription": "Het bericht van {name} wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "confirmButton": "Bericht verwijderen",
+    "confirmingButton": "Verwijderen…",
+    "errors": {
+      "notFound": "Dit bericht is al verwijderd.",
+      "failed": "Het bericht kon niet worden verwijderd. Probeer het opnieuw."
+    }
   }
 }

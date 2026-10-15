@@ -17,6 +17,7 @@ export type TEmailSenderDraft = {
   senderName: string;
   replyToAddress: string;
   footerPostalAddress: string;
+  contactRecipient: string;
 };
 
 export type TEmailCopyDraft = {
@@ -115,8 +116,13 @@ export const blankToNull = (value: string): string | null => {
   return trimmed === '' ? null : trimmed;
 };
 
-export const toSenderInput = (sender: TEmailSenderDraft) => ({
+export const toTestSenderInput = (sender: TEmailSenderDraft) => ({
   senderName: blankToNull(sender.senderName),
   replyToAddress: blankToNull(sender.replyToAddress),
   footerPostalAddress: blankToNull(sender.footerPostalAddress),
+});
+
+export const toSenderInput = (sender: TEmailSenderDraft) => ({
+  ...toTestSenderInput(sender),
+  contactRecipient: blankToNull(sender.contactRecipient),
 });

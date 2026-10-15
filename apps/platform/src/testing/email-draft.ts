@@ -21,7 +21,12 @@ export const EMAIL_BODY: TEmailTemplateBlock[] = [
 
 export const buildTestEmailDraft = (): TEmailDraft =>
   buildEmailDraft({
-    sender: { senderName: '', replyToAddress: '', footerPostalAddress: '' },
+    sender: {
+      senderName: '',
+      replyToAddress: '',
+      footerPostalAddress: '',
+      contactRecipient: '',
+    },
     senderLogoUrl: undefined,
     authored: [
       {

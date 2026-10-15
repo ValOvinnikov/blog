@@ -17,6 +17,7 @@ const SENDER_FIELDS = [
   'senderName',
   'replyToAddress',
   'footerPostalAddress',
+  'contactRecipient',
 ] as const satisfies (keyof TEmailSenderDraft)[];
 
 const isSenderFieldChanged =

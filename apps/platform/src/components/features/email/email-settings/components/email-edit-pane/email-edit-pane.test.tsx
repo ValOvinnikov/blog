@@ -17,7 +17,10 @@ const setup = customRenderInSettingsForm(EmailEditPane, {
   draft: DRAFT,
   saved: DRAFT,
   revision: 0,
-  senderNameInputId: 'sender-name',
+  senderFieldIds: {
+    senderName: 'sender-name',
+    contactRecipient: 'contact-recipient',
+  },
   onSenderChange: vi.fn(),
   onDraftChange: vi.fn(),
 });

@@ -12,7 +12,7 @@ export type TConfirmDialogTone = Extract<
 >;
 
 type TConfirmDialogContext = ReturnType<typeof useConfirmDialog> & {
-  expectedValue: string;
+  expectedValue: TMaybeUndefined<string>;
   tone: TConfirmDialogTone;
 };
 

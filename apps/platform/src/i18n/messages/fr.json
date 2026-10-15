@@ -16,7 +16,8 @@
     "languages": "Langues · Administration",
     "studio": "Studio · Administration",
     "findings": "Constats · Administration",
-    "email": "E-mail · Administration"
+    "email": "E-mail · Administration",
+    "leads": "Messages reçus · Administration"
   },
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
@@ -94,7 +95,8 @@
     "dangerZone": "Zone de danger",
     "badgeComingSoon": "Bientôt",
     "badgePlatform": "plateforme",
-    "features": "Fonctionnalités"
+    "features": "Fonctionnalités",
+    "leads": "Messages reçus"
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"
@@ -442,7 +444,7 @@
     "alertSuccess": "Paramètres d'e-mail enregistrés.",
     "alertError": "Certaines modifications n'ont pas été enregistrées — celles encore marquées « Non enregistré ». Veuillez réessayer.",
     "senderItemLabel": "Expéditeur et pied de page",
-    "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
+    "senderItemDescription": "Nom, adresse de réponse, destinataire des messages de contact, adresse postale et logo, identiques dans toutes les langues.",
     "editingLabel": "Modification",
     "templateGroupLabel": "Modèle",
     "allLanguagesChanges": "Toutes les langues",
@@ -485,8 +487,12 @@
     "logoLabel": "Logo des e-mails",
     "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo.",
     "errors": {
-      "senderNameInvalid": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @."
-    }
+      "senderNameInvalid": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
+      "contactRecipientInvalid": "Saisissez une adresse e-mail valide, ou laissez ce champ vide."
+    },
+    "contactRecipientLabel": "Envoyer les messages de contact à",
+    "contactRecipientHint": "L'adresse e-mail qui reçoit les messages du formulaire de contact de votre site. Laissez vide pour utiliser l'e-mail de connexion du propriétaire.",
+    "contactRecipientPlaceholder": "E-mail de connexion du propriétaire"
   },
   "emailLogoField": {
     "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",
@@ -958,5 +964,40 @@
   },
   "externalLinkButton": {
     "newTabHint": "(s'ouvre dans un nouvel onglet)"
+  },
+  "leadsView": {
+    "title": "Messages reçus",
+    "description": "Messages envoyés via le formulaire de contact de votre site, les plus récents en premier. Chaque message vous a aussi été envoyé par e-mail à sa réception."
+  },
+  "leadsTable": {
+    "columnReceived": "Reçu",
+    "columnName": "Nom",
+    "columnEmail": "E-mail",
+    "columnMessage": "Message",
+    "columnPage": "Page",
+    "columnActions": "Actions",
+    "empty": "Aucun message pour l'instant. Quand quelqu'un utilisera votre formulaire de contact, son message apparaîtra ici."
+  },
+  "leadMessage": {
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins"
+  },
+  "leadsPagination": {
+    "ariaLabel": "Pagination",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "status": "Page {page} sur {totalPages}"
+  },
+  "deleteLeadControl": {
+    "triggerButton": "Supprimer",
+    "triggerAriaLabel": "Supprimer le message de {name}",
+    "dialogTitle": "Supprimer ce message ?",
+    "dialogDescription": "Le message de {name} sera supprimé définitivement. Cette action est irréversible.",
+    "confirmButton": "Supprimer le message",
+    "confirmingButton": "Suppression…",
+    "errors": {
+      "notFound": "Ce message a déjà été supprimé.",
+      "failed": "Impossible de supprimer le message. Réessayez."
+    }
   }
 }

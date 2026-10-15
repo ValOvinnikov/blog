@@ -23,6 +23,7 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       senderName: emailConfig?.senderName ?? '',
       replyToAddress: emailConfig?.replyToAddress ?? '',
       footerPostalAddress: emailConfig?.footerPostalAddress ?? '',
+      contactRecipient: emailConfig?.contactRecipient ?? '',
     },
     senderLogoUrl: emailConfig?.logoAssetUrl,
     authored,

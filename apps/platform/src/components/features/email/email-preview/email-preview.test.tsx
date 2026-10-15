@@ -10,6 +10,7 @@ const setup = customRender(EmailPreview, {
     senderName: 'Acme Co',
     replyToAddress: 'hello@acme.example',
     footerPostalAddress: '',
+    contactRecipient: '',
   },
   subject: 'Connexion',
 });
@@ -35,6 +36,7 @@ describe(`<${EmailPreview.name}/>`, () => {
         senderName: '  ',
         replyToAddress: '',
         footerPostalAddress: '',
+        contactRecipient: '',
       },
     });
 

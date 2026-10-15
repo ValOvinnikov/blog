@@ -185,6 +185,7 @@ describe('tenantNavSections', () => {
 const EVERY_PAGE: TPlanPageAccess = {
   languages: true,
   email: true,
+  leads: true,
   subscribers: true,
   comments: true,
   team: true,
@@ -193,6 +194,7 @@ const EVERY_PAGE: TPlanPageAccess = {
 const NO_PAGE: TPlanPageAccess = {
   languages: false,
   email: false,
+  leads: false,
   subscribers: false,
   comments: false,
   team: false,
@@ -223,6 +225,7 @@ describe('dashboardNavSections', () => {
       'Look',
       'Voice',
       'Features',
+      'Leads',
       'Languages',
       'Domain',
       'Email',
@@ -244,6 +247,7 @@ describe('dashboardNavSections', () => {
   it.each([
     ['languages', 'Languages'],
     ['email', 'Email'],
+    ['leads', 'Leads'],
     ['subscribers', 'Subscribers'],
     ['comments', 'Comments'],
     ['team', 'Team'],
@@ -278,6 +282,7 @@ describe('dashboardNavSections', () => {
     expect(hrefOf('Look')).toBe('/dashboard/look');
     expect(hrefOf('Voice')).toBe('/dashboard/voice');
     expect(hrefOf('Features')).toBe('/dashboard/features');
+    expect(hrefOf('Leads')).toBe('/dashboard/leads');
     expect(hrefOf('Languages')).toBe('/dashboard/languages');
     expect(hrefOf('Domain')).toBe('/dashboard/domain');
     expect(hrefOf('Email')).toBe('/dashboard/email');

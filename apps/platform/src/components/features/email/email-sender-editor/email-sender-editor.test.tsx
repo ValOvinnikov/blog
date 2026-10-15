@@ -11,6 +11,7 @@ const SENDER = {
   senderName: 'Acme',
   replyToAddress: '',
   footerPostalAddress: '',
+  contactRecipient: '',
 };
 
 const setup = customRenderInSettingsForm(EmailSenderEditor, {
@@ -18,7 +19,10 @@ const setup = customRenderInSettingsForm(EmailSenderEditor, {
   logo: { url: undefined },
   onSenderChange: vi.fn(),
   onLogoStage: vi.fn(),
-  senderNameInputId: 'sender-name',
+  fieldIds: {
+    senderName: 'sender-name',
+    contactRecipient: 'contact-recipient',
+  },
 });
 
 describe(`<${EmailSenderEditor.name}/>`, () => {
@@ -58,10 +62,34 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
   });
 
   it('shows a sender-name error against the field', () => {
-    setup({ senderNameError: 'senderNameInvalid' });
+    setup({ fieldErrors: { senderName: 'senderNameInvalid' } });
 
     expect(screen.getByLabelText('Sender name')).toHaveAccessibleDescription(
       expect.stringContaining('not an email address'),
+    );
+  });
+
+  it('reports an edited contact recipient with the rest of the sender unchanged', async () => {
+    const onSenderChange = vi.fn();
+    setup({ onSenderChange });
+
+    await userEvent
+      .setup()
+      .type(screen.getByLabelText('Send contact messages to'), 'a');
+
+    expect(onSenderChange).toHaveBeenCalledWith({
+      ...SENDER,
+      contactRecipient: 'a',
+    });
+  });
+
+  it('shows a contact-recipient error against the field', () => {
+    setup({ fieldErrors: { contactRecipient: 'contactRecipientInvalid' } });
+
+    expect(
+      screen.getByLabelText('Send contact messages to'),
+    ).toHaveAccessibleDescription(
+      expect.stringContaining('Enter a valid email address'),
     );
   });
 

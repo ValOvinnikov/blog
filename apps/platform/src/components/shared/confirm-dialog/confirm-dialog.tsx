@@ -25,7 +25,7 @@ const ConfirmDialogParts = {
 } satisfies Record<string, ElementType>;
 
 type TConfirmDialogProps = {
-  expectedValue: string;
+  expectedValue?: string;
   onConfirm: TUseConfirmDialogArgs['onConfirm'];
   onConfirmed?: TUseConfirmDialogArgs['onConfirmed'];
   onOpenChange?: TUseConfirmDialogArgs['onOpenChange'];

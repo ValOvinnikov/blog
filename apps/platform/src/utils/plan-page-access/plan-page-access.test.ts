@@ -37,6 +37,7 @@ describe('planPageAccess', () => {
     expect(planPageAccess(TENANT_PLAN.FREE)).toEqual({
       languages: false,
       email: false,
+      leads: false,
       subscribers: false,
       comments: false,
       team: false,
@@ -47,20 +48,31 @@ describe('planPageAccess', () => {
     expect(planPageAccess(TENANT_PLAN.GROWTH)).toEqual({
       languages: true,
       email: true,
+      leads: true,
       subscribers: true,
       comments: true,
       team: true,
     });
   });
 
-  it.each([CAPABILITY.BOOKMARKS, CAPABILITY.COMMENTS, CAPABILITY.NEWSLETTER])(
-    'opens Email when the plan holds %s',
-    (capability) => {
-      withFreeCapabilities([capability]);
+  it('opens Leads only with the contact form', () => {
+    withFreeCapabilities([CAPABILITY.COMMENTS]);
+    expect(planPageAccess(TENANT_PLAN.FREE).leads).toBe(false);
 
-      expect(planPageAccess(TENANT_PLAN.FREE).email).toBe(true);
-    },
-  );
+    withFreeCapabilities([CAPABILITY.CONTACT_FORM]);
+    expect(planPageAccess(TENANT_PLAN.FREE).leads).toBe(true);
+  });
+
+  it.each([
+    CAPABILITY.BOOKMARKS,
+    CAPABILITY.COMMENTS,
+    CAPABILITY.NEWSLETTER,
+    CAPABILITY.CONTACT_FORM,
+  ])('opens Email when the plan holds %s', (capability) => {
+    withFreeCapabilities([capability]);
+
+    expect(planPageAccess(TENANT_PLAN.FREE).email).toBe(true);
+  });
 
   it('opens Subscribers only with newsletter and Comments only with comments', () => {
     withFreeCapabilities([CAPABILITY.NEWSLETTER]);

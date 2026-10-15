@@ -39,6 +39,7 @@ type TTenantNavHrefs = {
   look: string;
   voice: string;
   features: string;
+  leads?: string;
   languages: string;
   domain: string;
   email: string;
@@ -58,6 +59,13 @@ const configurationNavItems = (
     { label: t('look'), icon: ICONS.PALETTE, href: hrefs.look },
     { label: t('voice'), icon: ICONS.QUOTE, href: hrefs.voice },
     { label: t('features'), icon: ICONS.SETTINGS, href: hrefs.features },
+    ...(hrefs.leads
+      ? ifAccessible('leads', {
+          label: t('leads'),
+          icon: ICONS.SEND,
+          href: hrefs.leads,
+        })
+      : []),
     ...ifAccessible('languages', {
       label: t('languages'),
       icon: ICONS.BOOK,
@@ -90,6 +98,7 @@ const configurationNavItems = (
 export const EVERY_PLAN_PAGE: TPlanPageAccess = {
   languages: true,
   email: true,
+  leads: true,
   subscribers: true,
   comments: true,
   team: true,
@@ -168,6 +177,7 @@ export const dashboardNavSections = (
     look: adminRoutes.dashboardLook(),
     voice: adminRoutes.dashboardVoice(),
     features: adminRoutes.dashboardFeatures(),
+    leads: adminRoutes.dashboardLeads(),
     languages: adminRoutes.dashboardLanguages(),
     domain: adminRoutes.dashboardDomain(),
     email: adminRoutes.dashboardEmail(),

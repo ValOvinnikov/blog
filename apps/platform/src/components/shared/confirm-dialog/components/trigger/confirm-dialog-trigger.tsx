@@ -1,5 +1,6 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { Button } from '@platform/components/shared/button';
+import type { TButtonVariants } from '@platform/components/shared/button/button-variants';
 import { useConfirmDialogContext } from '@platform/components/shared/confirm-dialog/confirm-dialog-context';
 import { Text } from '@platform/components/shared/text';
 import { useId, type ReactNode } from 'react';
@@ -7,11 +8,15 @@ import { useId, type ReactNode } from 'react';
 export type TConfirmDialogTriggerProps = {
   children: ReactNode;
   disabledReason?: string;
+  size?: TButtonVariants['size'];
+  ariaLabel?: string;
 };
 
 export const ConfirmDialogTrigger = ({
   children,
   disabledReason,
+  size,
+  ariaLabel,
 }: TConfirmDialogTriggerProps) => {
   const { tone } = useConfirmDialogContext();
   const disabledReasonId = useId();
@@ -24,6 +29,8 @@ export const ConfirmDialogTrigger = ({
           <Button
             type="button"
             variant={tone}
+            size={size}
+            aria-label={ariaLabel}
             isAriaDisabled={isDisabled}
             aria-describedby={isDisabled ? disabledReasonId : undefined}
           />

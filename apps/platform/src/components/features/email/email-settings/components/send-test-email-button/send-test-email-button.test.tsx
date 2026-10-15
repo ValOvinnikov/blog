@@ -24,6 +24,7 @@ const setup = customRenderInSettingsForm(SendTestEmailButton, {
       senderName: 'Acme Co',
       replyToAddress: '',
       footerPostalAddress: '',
+      contactRecipient: '',
     },
   },
 });

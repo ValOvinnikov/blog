@@ -22,7 +22,7 @@ import { z } from 'zod';
 const sendTestEmailInputSchema = z.object({
   templateType: emailTemplateTypeSchema,
   copy: emailTemplateCopyInputSchema,
-  sender: emailSenderInputSchema,
+  sender: emailSenderInputSchema.omit({ contactRecipient: true }),
 });
 
 export type TSendTestEmailInput = z.input<typeof sendTestEmailInputSchema>;

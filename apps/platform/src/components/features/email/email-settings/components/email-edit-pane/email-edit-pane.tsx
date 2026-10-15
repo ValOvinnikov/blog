@@ -3,7 +3,7 @@
 import type { TLocaleIsoCode } from '@blog/config';
 import { EmailSenderEditor } from '@platform/components/features/email/email-sender-editor';
 import { EmailTemplateEditor } from '@platform/components/features/email/email-template-editor';
-import type { TSenderNameError } from '@platform/server/email-config/update-email-config-action';
+import type { TSenderFieldErrors } from '@platform/server/email-config/update-email-config-action';
 import {
   EMAIL_SENDER_ITEM,
   withCopy,
@@ -22,8 +22,8 @@ type TEmailEditPaneProps = {
   draft: TEmailDraft;
   saved: TEmailDraft;
   revision: number;
-  senderNameInputId: string;
-  senderNameError?: TSenderNameError;
+  senderFieldIds: { senderName: string; contactRecipient: string };
+  senderFieldErrors?: TSenderFieldErrors;
   onSenderChange: (sender: TEmailSenderDraft) => void;
   onDraftChange: (update: (draft: TEmailDraft) => TEmailDraft) => void;
 };
@@ -35,8 +35,8 @@ export const EmailEditPane = ({
   draft,
   saved,
   revision,
-  senderNameInputId,
-  senderNameError,
+  senderFieldIds,
+  senderFieldErrors,
   onSenderChange,
   onDraftChange,
 }: TEmailEditPaneProps) => {
@@ -51,8 +51,8 @@ export const EmailEditPane = ({
         onLogoStage={(logo) =>
           onDraftChange((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
         }
-        senderNameInputId={senderNameInputId}
-        senderNameError={senderNameError}
+        fieldIds={senderFieldIds}
+        fieldErrors={senderFieldErrors}
       />
     );
   }

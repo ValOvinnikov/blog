@@ -29,6 +29,7 @@ const VALID_INPUT: TUpdateEmailConfigInput = {
   senderName: 'Acme Co',
   replyToAddress: 'support@acme.example',
   footerPostalAddress: '123 Main St, Springfield',
+  contactRecipient: 'leads@acme.example',
 };
 
 describe(updateEmailConfigAction, () => {
@@ -98,6 +99,7 @@ describe(updateEmailConfigAction, () => {
       senderName: null,
       replyToAddress: null,
       footerPostalAddress: null,
+      contactRecipient: null,
     });
 
     expect(result).toEqual({ ok: true });
@@ -105,7 +107,41 @@ describe(updateEmailConfigAction, () => {
       senderName: null,
       replyToAddress: null,
       footerPostalAddress: null,
+      contactRecipient: null,
     });
+  });
+
+  it('rejects an invalid contact recipient with a field error, and writes nothing', async () => {
+    const result = await updateEmailConfigAction('tenant-1', {
+      ...VALID_INPUT,
+      contactRecipient: 'not-an-email',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { contactRecipient: 'contactRecipientInvalid' },
+    });
+    expect(requireTenantMembership).not.toHaveBeenCalled();
+    expect(upsertEmailConfigMock).not.toHaveBeenCalled();
+  });
+
+  it('saves a contact recipient and clears it again with null', async () => {
+    await updateEmailConfigAction('tenant-1', VALID_INPUT);
+    await updateEmailConfigAction('tenant-1', {
+      ...VALID_INPUT,
+      contactRecipient: null,
+    });
+
+    expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
+      1,
+      'tenant-1',
+      expect.objectContaining({ contactRecipient: 'leads@acme.example' }),
+    );
+    expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
+      2,
+      'tenant-1',
+      expect.objectContaining({ contactRecipient: null }),
+    );
   });
 
   it('reports failure instead of throwing when the write itself fails, and records no audit event', async () => {

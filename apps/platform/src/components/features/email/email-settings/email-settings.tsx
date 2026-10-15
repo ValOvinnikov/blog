@@ -15,7 +15,6 @@ import {
   EMAIL_TEMPLATE_TYPES,
   type TEmailDraft,
   type TEmailPageItem,
-  type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
 import {
   countCustomisedTemplates,
@@ -26,17 +25,12 @@ import {
 } from '@platform/utils/email-draft-changes/email-draft-changes';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 import { emailSettingsVariants } from './email-settings-variants';
 import { useEmailDraft } from './use-email-draft';
 import { useEmailPreview } from './use-email-preview';
-
-const SENDER_FIELD_LABEL_KEYS = {
-  senderName: 'senderNameLabel',
-  replyToAddress: 'replyToLabel',
-  footerPostalAddress: 'footerAddressLabel',
-} as const satisfies Record<keyof TEmailSenderDraft, string>;
+import { useSenderFields } from './use-sender-fields';
 
 export type TEmailSettingsProps = {
   tenantId: string;
@@ -63,11 +57,10 @@ export const EmailSettings = ({
   const tStatus = useTranslations('fieldStatus');
   const tTemplate = useTranslations('emailTemplateEditor');
   const tLanguage = useTranslations('languageNames');
-  const tSender = useTranslations('emailSettingsForm');
   const tPreview = useTranslations('emailPreview');
   const toast = useToast();
   const router = useRouter();
-  const senderNameInputId = useId();
+  const { senderFieldIds, senderDraftFields } = useSenderFields();
   const [selectedItem, setSelectedItem] =
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
@@ -78,14 +71,6 @@ export const EmailSettings = ({
     setSelectedItem(EMAIL_SENDER_ITEM);
     tabsProps.onChange('edit');
   };
-
-  const senderDraftFields = (
-    Object.keys(SENDER_FIELD_LABEL_KEYS) as (keyof TEmailSenderDraft)[]
-  ).map((field) => ({
-    id: field,
-    label: tSender(SENDER_FIELD_LABEL_KEYS[field]),
-    display: (values: TEmailDraft) => values.sender[field],
-  }));
 
   const copyDraftFields = EMAIL_TEMPLATE_TYPES.flatMap((templateType) =>
     liveLocales.flatMap((locale) => {
@@ -126,14 +111,14 @@ export const EmailSettings = ({
     savedValues: saved,
     status,
     form,
-    senderNameError,
-    setSenderNameError,
+    senderFieldErrors,
+    setSenderFieldErrors,
   } = useEmailDraft({
     tenantId,
     initialDraft,
     liveLocales,
     archivedAt,
-    senderNameInputId,
+    senderFieldIds,
     revealSenderName,
     onSaved: () => {
       toast.success({ message: t('alertSuccess') });
@@ -161,7 +146,7 @@ export const EmailSettings = ({
       savedAt,
       fields: [...senderDraftFields, ...copyDraftFields],
       onRestore: (restored) => {
-        setSenderNameError(undefined);
+        setSenderFieldErrors({});
         setDraft((prev) => ({
           ...restored,
           senderLogo: prev.senderLogo,
@@ -220,7 +205,9 @@ export const EmailSettings = ({
       description={t('pageSubtitle')}
       form={form}
       errorTitle={
-        status === 'error' && !senderNameError ? t('alertError') : undefined
+        status === 'error' && Object.keys(senderFieldErrors).length === 0
+          ? t('alertError')
+          : undefined
       }
       isWide={true}
       headerActions={
@@ -255,10 +242,10 @@ export const EmailSettings = ({
             draft={draft}
             saved={saved}
             revision={revision}
-            senderNameInputId={senderNameInputId}
-            senderNameError={senderNameError}
+            senderFieldIds={senderFieldIds}
+            senderFieldErrors={senderFieldErrors}
             onSenderChange={(sender) => {
-              setSenderNameError(undefined);
+              setSenderFieldErrors({});
               setDraft((prev) => ({ ...prev, sender }));
             }}
             onDraftChange={setDraft}
