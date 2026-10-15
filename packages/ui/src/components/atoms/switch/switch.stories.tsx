@@ -1,3 +1,4 @@
+import { SurfaceBands } from '@blog/ui/testing/surface-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
@@ -26,6 +27,17 @@ export const On: TStory = {
 
 export const Locked: TStory = {
   args: { isChecked: true, isLocked: true },
+};
+
+export const OnBands: TStory = {
+  render: (args) => (
+    <SurfaceBands>
+      <div className="flex gap-4">
+        <Switch {...args} isChecked={false} />
+        <Switch {...args} isChecked={true} />
+      </div>
+    </SurfaceBands>
+  ),
 };
 
 const InteractiveDemo = () => {

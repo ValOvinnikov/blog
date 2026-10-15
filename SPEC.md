@@ -2734,8 +2734,9 @@ inside a band — interactive cards' hover and focus-within fill and the
 the element. `surface-brand-primary` sets it to a 10% mix toward
 `--brand-primary`, so nothing tinted on a Brand primary band takes the band's
 own colour; Primary and Secondary bands keep `--brand-primary-muted`.
-`surface-tint` retargets `--ambient` to that tint for a card whose own focus
-fill it is (`TaxonomyCard`).
+`surface-tint` retargets `--ambient` to that tint, with the tinted bands'
+divider and field boundary, for a card whose own focus fill it is
+(`TaxonomyCard`).
 
 A surface painted with an image or a scrim rather than a flat token colour
 (`Hero` BANNER, `CtaModule` BANNER) sets neither: there is no single colour a

@@ -26,6 +26,10 @@ export const carouselVariants = tv({
         track: [CARD_GUTTER_OFFSET],
         slide: ['basis-[85%] sm:basis-1/2 lg:basis-1/3', CARD_GUTTER_START],
       },
+      halvesThenThirds: {
+        track: [CARD_GUTTER_OFFSET],
+        slide: ['basis-1/2 sm:basis-1/3', CARD_GUTTER_START],
+      },
       content: {
         track: ['-ml-6'],
         slide: ['basis-auto', 'pl-6'],

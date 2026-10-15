@@ -46,6 +46,9 @@
   --color-divider: var(
     --divider
   ); /* @role divider colour of the surface in scope */
+  --color-field-boundary: var(
+    --field-boundary
+  ); /* @role control boundary of the surface in scope */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
   --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
@@ -284,6 +287,10 @@
      inside it, with no per-component prop. */
   --ambient: var(--primary);
   --divider: var(--border);
+  /* 3:1 (WCAG 1.4.11) against --surface and against --secondary or
+     --brand-primary-muted at every accent hue, where --border-emphasis falls short. */
+  --field-boundary-tinted: oklch(0.58 0.006 250);
+  --field-boundary: var(--border-emphasis);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
   --text-subtle: oklch(0.6 0.008 250);
@@ -407,6 +414,8 @@
   --border-emphasis: oklch(
     0.55 0.01 250
   ); /* see :root comment — verified dark ratio 3.73:1 vs --primary-subtle */
+  --field-boundary-tinted: oklch(0.59 0.01 250);
+  --field-boundary: var(--border-emphasis);
   --text: oklch(0.95 0.004 250);
   --text-muted: oklch(0.72 0.008 250);
   --text-subtle: oklch(0.56 0.008 250);
@@ -514,6 +523,14 @@
   }
 }
 
+/* Unlayered so it beats `focus-visible:outline-none` in `@layer utilities`; forced colours drop ring box-shadows. */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
 @utility duration-fast {
   transition-duration: var(--duration-fast);
 }
@@ -552,6 +569,7 @@
 @utility surface-secondary {
   --ambient: var(--secondary);
   --divider: var(--border-strong);
+  --field-boundary: var(--field-boundary-tinted);
 }
 
 /* 10% lifts --tint off the band by ~1.13:1 light / ~1.16:1 dark while
@@ -559,6 +577,7 @@
 @utility surface-brand-primary {
   --ambient: var(--brand-primary-muted);
   --divider: var(--border-strong);
+  --field-boundary: var(--field-boundary-tinted);
   --tint: color-mix(
     in oklch,
     var(--brand-primary-muted),
@@ -569,6 +588,7 @@
 @utility surface-tint {
   --ambient: var(--tint, var(--brand-primary-muted));
   --divider: var(--border-strong);
+  --field-boundary: var(--field-boundary-tinted);
 }
 
 /* --border against --surface-2 (1.25:1 light / 1.21:1 dark) reads weaker than
