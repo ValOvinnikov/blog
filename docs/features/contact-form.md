@@ -3,7 +3,9 @@ title: Contact form
 status: planned
 layers: [config, db, email, ui, platform, studio, service, web]
 code:
-  - packages/db/src/queries/memberships/get-tenant-owner-email/**
+  - packages/db/src/schema/leads.ts
+  - packages/db/src/queries/leads/**
+  - packages/db/src/queries/email-config/get-contact-recipient/**
   - packages/db/src/schema/email-config.ts
 epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 ---
@@ -12,7 +14,7 @@ epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 
 ## What it does
 
-A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. None of it is built yet; the pieces it will reuse exist.
+A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. The capability and the data layer are built; the template, form, module and platform pages are not.
 
 ## Surfaces and routes
 
@@ -22,8 +24,9 @@ A visitor will be able to send the site's owner a message from a contact form pl
 
 ## Data
 
-- Planned Neon `leads` table, a tenant-scoped sibling to `subscribers`, plus `email_config.contactRecipient` (nullable override). Both arrive by migration.
-- Recipient: the owner's sign-in email from `getTenantOwnerEmail` by default; the Email-page override when set. The address is never stored in Sanity, whose content is publicly readable.
+- Neon `leads` table, a tenant-scoped sibling to `subscribers`: `name`, `email`, `message`, `sourcePath` (the page the form sat on) and `createdAt`, indexed on `(tenantId, createdAt desc)` and cascade-deleted with its tenant. `createLead`, `listLeads` (newest first, paged, with the total) and `deleteLead` (never across tenants) are its queries.
+- `email_config.contactRecipient` — a nullable override, read and written through `getEmailConfig`/`upsertEmailConfig`.
+- Recipient: `getContactRecipient` returns the override when set, otherwise the owner's sign-in email from `getTenantOwnerEmail`. The address is never stored in Sanity, whose content is publicly readable.
 - `settings_contact` holds only `successMessage` (required, max 160) and an optional `privacyNote` (`paragraphText`, for the policy link). Field labels, the button and error messages are fixed product copy.
 - Fields are fixed: name, email and message, all required. No toggles, no consent checkbox; a privacy note links the policy.
 - Automatic expiry of old leads is a separate, planned retention job.
@@ -55,16 +58,18 @@ These are decided and must hold when it ships:
 
 ## Entry points
 
-Nothing of the feature exists. The pieces it builds on:
+- `packages/db/src/schema/leads.ts` and `packages/db/src/queries/leads/` — lead storage
+- `packages/db/src/queries/email-config/get-contact-recipient/get-contact-recipient.ts` — recipient resolution
+
+The pieces it builds on:
 
 - `packages/db/src/queries/memberships/get-tenant-owner-email/get-tenant-owner-email.ts`
-- `packages/db/src/schema/email-config.ts`
 - `packages/ui/src/components/atoms/text-input/text-input.tsx`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts` (`subscribeToNewsletterAction`, the public server action the contact action is modelled on)
 
 ## Tests and stories
 
-None for the feature. `get-tenant-owner-email.test.ts` covers the default recipient lookup.
+PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to.
 
 ## Related
 

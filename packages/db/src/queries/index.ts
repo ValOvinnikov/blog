@@ -5,6 +5,7 @@ export * as bookmarks from './bookmarks';
 export * as emailConfig from './email-config';
 export * as emailTemplates from './email-templates';
 export * as findings from './findings';
+export * as leads from './leads';
 export * as membershipInvites from './membership-invites';
 export * as memberships from './memberships';
 export * as settingsFeatures from './settings-features';

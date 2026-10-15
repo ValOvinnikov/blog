@@ -39,6 +39,7 @@ describe(getEmailConfig, () => {
       senderName: undefined,
       replyToAddress: undefined,
       footerPostalAddress: undefined,
+      contactRecipient: undefined,
     });
   });
 
@@ -49,6 +50,7 @@ describe(getEmailConfig, () => {
       senderName: 'Acme Weekly',
       replyToAddress: 'support@example.com',
       footerPostalAddress: '123 Main St, Springfield',
+      contactRecipient: 'leads@example.com',
     });
 
     const result = await getEmailConfig(tenantId);
@@ -58,6 +60,7 @@ describe(getEmailConfig, () => {
       senderName: 'Acme Weekly',
       replyToAddress: 'support@example.com',
       footerPostalAddress: '123 Main St, Springfield',
+      contactRecipient: 'leads@example.com',
     });
   });
 });
