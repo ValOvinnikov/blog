@@ -1,12 +1,15 @@
 import type { Page } from '@playwright/test';
 
-type TChannel = {
-  on: (event: string, listener: () => void) => void;
-  off: (event: string, listener: () => void) => void;
-  emit: (event: string, payload: unknown) => void;
+type TStorybookWindow = Window & {
+  __STORYBOOK_ADDONS_CHANNEL__: {
+    on: (event: string, listener: () => void) => void;
+    emit: (event: string, payload: unknown) => void;
+  };
+  __STORYBOOK_PREVIEW__?: { currentRender?: { phase?: string } };
+  contrastRenderCount: number;
 };
 
-type TStorybookWindow = Window & { __STORYBOOK_ADDONS_CHANNEL__: TChannel };
+const RENDER_TIMEOUT_MS = 30_000;
 
 const FREEZE_MOTION_CSS = `*, *::before, *::after {
   animation-duration: 0s !important;
@@ -33,10 +36,14 @@ const settle = (page: Page) =>
 
 export const openStory = async (page: Page, storyId: string) => {
   await page.goto(`/iframe.html?id=${storyId}&viewMode=story`);
-  await page.waitForFunction(() =>
-    ['sb-show-main', 'sb-show-errordisplay'].some((name) =>
-      document.body.classList.contains(name),
-    ),
+  await page.waitForFunction(
+    () =>
+      ['completed', 'finished', 'errored'].includes(
+        (window as unknown as TStorybookWindow).__STORYBOOK_PREVIEW__
+          ?.currentRender?.phase ?? '',
+      ),
+    undefined,
+    { timeout: RENDER_TIMEOUT_MS },
   );
   if (
     await page.evaluate(() =>
@@ -45,6 +52,13 @@ export const openStory = async (page: Page, storyId: string) => {
   ) {
     throw new Error(`Story ${storyId} failed to render`);
   }
+  await page.evaluate(() => {
+    const storybook = window as unknown as TStorybookWindow;
+    storybook.contrastRenderCount = 0;
+    storybook.__STORYBOOK_ADDONS_CHANNEL__.on('storyRendered', () => {
+      storybook.contrastRenderCount += 1;
+    });
+  });
   await page.addStyleTag({ content: FREEZE_MOTION_CSS });
 };
 
@@ -55,19 +69,20 @@ export const updateStory = async (
   event: 'updateStoryArgs' | 'updateGlobals',
   payload: Record<string, unknown>,
 ) => {
-  await page.evaluate(
-    ([eventName, eventPayload]) =>
-      new Promise<void>((resolve) => {
-        const channel = (window as unknown as TStorybookWindow)
-          .__STORYBOOK_ADDONS_CHANNEL__;
-        const onRendered = () => {
-          channel.off('storyRendered', onRendered);
-          resolve();
-        };
-        channel.on('storyRendered', onRendered);
-        channel.emit(eventName, eventPayload);
-      }),
+  const renderCount = await page.evaluate(
+    ([eventName, eventPayload]) => {
+      const storybook = window as unknown as TStorybookWindow;
+      storybook.__STORYBOOK_ADDONS_CHANNEL__.emit(eventName, eventPayload);
+      return storybook.contrastRenderCount;
+    },
     [event, payload] as const,
+  );
+  await page.waitForFunction(
+    (previousCount) =>
+      (window as unknown as TStorybookWindow).contrastRenderCount >
+      previousCount,
+    renderCount,
+    { timeout: RENDER_TIMEOUT_MS },
   );
   await settle(page);
 };

@@ -298,13 +298,15 @@ neither Storybook.
   transparent, so text over a photo or scrim is measured against the pixels
   under it. Sanity CDN images are answered with a checked-in bright fixture
   photo.
-- **Baseline.** `apps/web/contrast/baseline.json` lists the failures `main`
-  carried when the job landed, one line per story, variant, width, theme,
-  mode, kind and element. A failure not on it fails the run and names all of
-  those; an entry that now passes fails it too, so the list can only shrink.
-  A fix deletes its lines. A deliberate reset reruns the suite with
-  `CONTRAST_UPDATE_BASELINE=1`, which rewrites the entries for the cases it
-  ran.
+- **Baseline.** `apps/web/contrast/baseline.json` holds the failures `main`
+  carried when the job landed: per story, variant and width, one line per
+  element and kind, listing the theme and mode pairs where it fails. A
+  failure not on it fails the run and names all of those; an entry that now
+  passes fails it too, so the list can only shrink. A fix deletes its
+  entries. A deliberate reset reruns the suite with
+  `CONTRAST_UPDATE_BASELINE=1`, which rewrites the cases it ran; the file is
+  Prettier-ignored because the suite writes it in that one-line-per-element
+  shape.
 - **Scope and shards.** `Contrast scope` diffs the PR's merge commit against
   its base. When nothing under `packages/ui`, `apps/web`,
   `packages/config/src/theme` or `configs/tailwind` changed, the shards are

@@ -2,9 +2,10 @@ import { BRAND_VARIANT } from '@blog/config/constants';
 import { expect, test } from '@playwright/test';
 
 import {
-  entriesForCase,
+  flattenCase,
   isUpdatingBaseline,
   readBaseline,
+  toFailureKey,
   writeBaselinePart,
 } from './helpers/baseline';
 import { installContrastProbe } from './helpers/contrast-probe';
@@ -28,9 +29,9 @@ const baseline = readBaseline();
 for (const storyId of listModuleStoryIds()) {
   for (const brandVariant of Object.values(BRAND_VARIANT)) {
     for (const width of VIEWPORT_WIDTHS) {
-      const casePrefix = `${storyId} | ${brandVariant} | ${width}px | `;
+      const caseKey = `${storyId} | ${brandVariant} | ${width}px`;
 
-      test(casePrefix.slice(0, -3), async ({ page }) => {
+      test(caseKey, async ({ page }) => {
         await page.setViewportSize({ width, height: VIEWPORT_HEIGHT });
         await page.addInitScript(installContrastProbe);
         await serveStorybookStatic(page);
@@ -46,7 +47,7 @@ for (const storyId of listModuleStoryIds()) {
 
         let globals = INITIAL_GLOBALS;
         const found: string[] = [];
-        const details: string[] = [];
+        const details = new Map<string, string>();
         for (const { name, preset, accentHue } of THEME_CASES) {
           for (const colorMode of COLOR_MODES) {
             const nextGlobals: TSiteThemeGlobals = {
@@ -59,26 +60,31 @@ for (const storyId of listModuleStoryIds()) {
               await updateStory(page, 'updateGlobals', { globals });
             }
             for (const failure of await measureState(page, cdp)) {
-              const key = `${casePrefix}${name} | ${colorMode} | ${failure.kind} | ${failure.path}`;
+              const key = toFailureKey(
+                `${name} ${colorMode}`,
+                `${failure.kind} | ${failure.path}`,
+              );
               if (found.includes(key)) continue;
               found.push(key);
-              details.push(
-                `${key} — ${failure.ratio.toFixed(2)}:1 < ${failure.minimum}:1 "${failure.snippet}"`,
+              details.set(
+                key,
+                `${caseKey} | ${key} — ${failure.ratio.toFixed(2)}:1 < ${failure.minimum}:1 "${failure.snippet}"`,
               );
             }
           }
         }
 
         if (isUpdatingBaseline()) {
-          writeBaselinePart(casePrefix, found);
+          writeBaselinePart(caseKey, found);
           return;
         }
-        const expected = entriesForCase(baseline, casePrefix);
-        const regressions = details.filter(
-          (detail) =>
-            !expected.some((entry) => detail.startsWith(`${entry} — `)),
-        );
-        const nowPassing = expected.filter((entry) => !found.includes(entry));
+        const expected = flattenCase(baseline[caseKey]);
+        const regressions = found
+          .filter((key) => !expected.includes(key))
+          .map((key) => details.get(key));
+        const nowPassing = expected
+          .filter((key) => !found.includes(key))
+          .map((key) => `${caseKey} | ${key}`);
         expect(
           regressions,
           'New contrast failures — fix them (or, for a deliberate baseline reset, rerun with CONTRAST_UPDATE_BASELINE=1)',

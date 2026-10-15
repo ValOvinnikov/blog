@@ -6,3 +6,6 @@ apps/cms/dist
 apps/cms/.sanity
 apps/web/.next
 packages/ui/storybook-static
+
+# One line per element (contrast/helpers/baseline.ts formats it)
+apps/web/contrast/baseline.json
