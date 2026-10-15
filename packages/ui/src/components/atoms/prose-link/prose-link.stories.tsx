@@ -37,6 +37,28 @@ export const InSentence: TStory = {
   ),
 };
 
+export const DescendersAndWrapping: TStory = {
+  name: 'Descenders and wrapping',
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      <p className="text-copy">
+        Read{' '}
+        <ProseLink {...args}>
+          typography, spacing, and quality-of-reading guidelines
+        </ProseLink>{' '}
+        before you publish.
+      </p>
+      <p className="max-w-56 text-copy">
+        This paragraph is narrow, so{' '}
+        <ProseLink {...args}>
+          a long link quietly spilling onto a second line
+        </ProseLink>{' '}
+        keeps its underline on both.
+      </p>
+    </div>
+  ),
+};
+
 export const AsRouterLink: TStory = {
   args: { as: MockLink },
 };

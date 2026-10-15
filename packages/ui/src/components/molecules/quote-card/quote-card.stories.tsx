@@ -153,6 +153,26 @@ export const LinkedVsUnlinkedName: TStory = {
   render: LinkedVsUnlinked,
 };
 
+const LONG_LINKED_NAME = 'Gregory Pippa Quigley-Yardley, Typography Group';
+
+const LinkedNameWithDescenders = (args: TQuoteCardProps) => (
+  <div style={{ maxWidth: 240 }}>
+    <QuoteCard {...args}>
+      <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+      <QuoteCard.Name>
+        <a href="https://example.com/case-studies/customer">
+          {LONG_LINKED_NAME}
+        </a>
+      </QuoteCard.Name>
+    </QuoteCard>
+  </div>
+);
+
+export const LinkedNameDescendersAndWrapping: TStory = {
+  name: 'Linked name — descenders and wrapping',
+  render: LinkedNameWithDescenders,
+};
+
 const OnEveryBand = (args: TQuoteCardProps) => (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
     {objectKeys(BRAND_BAND_LABELS).map((tone) => (
