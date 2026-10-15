@@ -14,25 +14,46 @@ export const LanguageCodes = ({
   entries,
   isInFooter = false,
 }: TLanguageCodesProps) => {
-  const { list, link } = languageCodesVariants({ isInFooter });
+  const { list } = languageCodesVariants({ isInFooter });
 
   return (
     <ul className={list()}>
-      {entries.map((entry) => (
-        <li key={entry.locale}>
-          <NavLink
-            href={entry.href}
-            lang={entry.lang}
-            hrefLang={entry.lang}
-            title={entry.label}
-            aria-label={entry.label}
-            isActive={entry.isCurrent}
-            className={link()}
-          >
-            {entry.code}
-          </NavLink>
-        </li>
-      ))}
+      {entries.map(({ locale, href, lang, label, code, isCurrent }) => {
+        const { link, label: labelClass } = languageCodesVariants({
+          isInFooter,
+          isCurrent,
+        });
+
+        return (
+          <li key={locale}>
+            {isCurrent ? (
+              <NavLink
+                as="span"
+                lang={lang}
+                title={label}
+                isActive={true}
+                aria-current="true"
+                className={link()}
+                dataTestId="language-code-current"
+              >
+                <span aria-hidden="true">{code}</span>
+                <span className={labelClass()}>{label}</span>
+              </NavLink>
+            ) : (
+              <NavLink
+                href={href}
+                lang={lang}
+                hrefLang={lang}
+                title={label}
+                aria-label={label}
+                className={link()}
+              >
+                {code}
+              </NavLink>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 };
