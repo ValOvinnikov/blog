@@ -37,6 +37,22 @@ export const Link: TStory = {
   args: { children: 'Read more', variant: 'link' },
 };
 
+export const LinkDescendersAndWrapping: TStory = {
+  name: 'Link — descenders and wrapping',
+  render: () => (
+    <div className="flex flex-col items-start gap-4">
+      <Button variant="link">
+        Display typography, spacing and quality guidelines
+      </Button>
+      <div className="max-w-48">
+        <Button variant="link">
+          Apply this styling quietly to every paragraph
+        </Button>
+      </div>
+    </div>
+  ),
+};
+
 export const Danger: TStory = {
   args: { children: 'delete account', variant: 'danger' },
 };

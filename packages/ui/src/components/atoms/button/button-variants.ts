@@ -1,5 +1,5 @@
 import { SIZE } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { LINK_UNDERLINE, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const buttonVariants = tv({
@@ -19,7 +19,10 @@ export const buttonVariants = tv({
         'border-transparent bg-brand-primary-solid text-brand-primary-contrast hover:bg-brand-primary-solid-hover',
       ghost:
         'border-border-strong bg-transparent text-text hover:border-brand-primary hover:text-brand-primary',
-      link: 'border-transparent bg-transparent text-brand-primary underline underline-offset-[3px] hover:text-brand-primary-hover hover:decoration-2',
+      link: [
+        ...LINK_UNDERLINE,
+        'border-transparent bg-transparent text-brand-primary hover:text-brand-primary-hover',
+      ],
       danger:
         'border-error/55 bg-transparent text-error hover:border-error hover:bg-error hover:text-primary',
     },

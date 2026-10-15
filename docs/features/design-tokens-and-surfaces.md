@@ -57,6 +57,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - **No `tone` prop, no context.** Everything stays server-renderable, and dark mode follows because the defaults are references.
 - **Radius by role, never by step.** Bounded cards use `rounded-card`, media frames `rounded-media`, and item cards the `item-card` utility's `--radius-item`. Controls and pills keep plain steps (`rounded-sm`, `rounded-full`).
 - **Item cards.** `item-card` draws a solid border from `--item-border-width`, a left accent from `--item-accent-width/color`, a `--surface` fill and `--item-shadow`. `ACCENT_BAR` (the static default) is square with a 2px brand bar; `OUTLINED` is a 1px hairline at `--radius-md`. Both have no shadow. `INTERACTIVE_ITEM_CARD` adds the `bg-tint` fill on hover and focus-within.
+- **Link underline.** Prose links, the `link` `Button` and a linked `QuoteCard.Name` draw one native `text-decoration` underline from `LINK_UNDERLINE` (`packages/ui/src/lib/styling/link-underline.ts`): a `0.2em` offset that clears descenders, 1px at rest and 2px on hover, with `text-decoration-skip-ink: auto`. `LINK_UNDERLINE_EMPHASIS` is the 2px weight on its own, for a current-page link. Callers set only the colour. Never a border or background image: those break on a wrapped link and vanish under forced colours.
 - **Elevation.** `shadow-card` is for raised cards (`Panel`, the highlighted `PricingCard`, the `CtaModule` card); `shadow-float` is for chrome above the page (`Toast`, `PopoverMenu`, `Dialog`).
 - **Dividers.** Dividers on secondary and brand bands use `border-strong`, which is decorative and below 3:1 on purpose. `--border-emphasis` (3.29:1 light, 3.73:1 dark against `primary-subtle`) is the token for a border that is the only indicator.
 - **Control boundaries.** An enabled `TextInput`'s border and an off `Switch`'s track use `field-boundary`, which reaches 3:1 (WCAG 1.4.11) against the `surface` field fill and against the band behind it on every brand variant, in both modes and at every accent hue: `border-emphasis` on page and card surfaces, and the darker (light) or lighter (dark) `--field-boundary-tinted` on secondary and brand bands, where `border-emphasis` falls short. A disabled `TextInput` drops to `border-strong`, since inactive controls are exempt.
@@ -81,6 +82,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - `packages/config/src/theme/accent-hue-guard.ts`
 - `packages/utils/src/color/oklch.ts`
 - `packages/ui/src/lib/styling/item-card.ts`
+- `packages/ui/src/lib/styling/link-underline.ts`
 - `apps/web/src/components/shared/section/section-variants.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.ts`
 - `apps/web/src/config/theme-script.ts`
@@ -92,7 +94,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - `packages/utils/src/color/oklch.test.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.test.ts` (Console parity with `theme.css`)
 - `packages/ui/src/lib/design-tokens/parse-theme-tokens.test.ts`, `token-registry.test.ts`
-- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, the `OnBands` stories of `TextInput` and `Switch` (`packages/ui/src/testing/surface-bands.tsx`), and every `@blog/ui` component's stories across the bands.
+- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, the `OnBands` stories of `TextInput` and `Switch`, the descenders-and-wrapping stories of `ProseLink`, `Button` and `QuoteCard` (`packages/ui/src/testing/surface-bands.tsx`), and every `@blog/ui` component's stories across the bands.
 
 ## Related
 
