@@ -283,7 +283,9 @@ neither Storybook.
   page (or the Actions tab). No pull request runs it, `ci.yml` has no contrast
   job, and it is not a required check: on a private repository a per-PR run
   would cost more billed minutes than the rest of CI together.
-- **Shape.** One job builds Storybook and shares it through a run-scoped
+- **Shape.** `Verify ref` accepts only a tag or a commit already on `main`,
+  since the run executes that code with cache write access, and pins its SHA
+  for the later jobs. One job then builds Storybook and shares it through a run-scoped
   cache key; four `Contrast shard` jobs restore it and each run a quarter of
   the suite.
 - **Matrix.** Every story under `apps/web/src/modules/`, in each brand
