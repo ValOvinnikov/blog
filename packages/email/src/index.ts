@@ -32,6 +32,9 @@ export {
   buildNewsletterConfirmationEmail,
   type TNewsletterConfirmationEmailInput,
   type TNewsletterConfirmationEmailContent,
+  buildContactNotificationEmail,
+  type TContactNotificationEmailInput,
+  type TContactNotificationEmailContent,
   type TTenantEmailIdentity,
 } from './templates/tenant';
 export { sendEmail, type TSendEmailInput } from './transport/send-email';

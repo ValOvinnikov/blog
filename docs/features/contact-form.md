@@ -7,6 +7,7 @@ code:
   - packages/db/src/queries/leads/**
   - packages/db/src/queries/email-config/get-contact-recipient/**
   - packages/db/src/schema/email-config.ts
+  - packages/email/src/templates/tenant/contact-notification/**
 epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 ---
 
@@ -14,7 +15,7 @@ epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 
 ## What it does
 
-A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. The capability and the data layer are built; the template, form, module and platform pages are not.
+A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. The capability, the data layer and the owner notification template are built; the form, module and platform pages are not.
 
 ## Surfaces and routes
 
@@ -45,7 +46,7 @@ These are decided and must hold when it ships:
 - Spam protection is Vercel BotID (invisible, first-party, needs no consent banner), plus a honeypot and a soft per-IP rate limit of 5 sends per 10 minutes. A bot, a filled honeypot or a burst stores nothing and sends nothing.
 - The server action checks, in order: BotID, honeypot, rate limit, tenant active, field validation (name 1–100 characters, a valid email, message 10–5,000), then stores the lead and sends the email.
 - A new capability key breaks every `Record<TCapability, …>` until each has it, so the capability lands in config, db, web and platform together.
-- Delivery uses `@blog/email`'s `sendEmail` and branded shell with a new owner-notification template; `@blog/email` never logs, so the web server action logs a failed send.
+- Delivery uses `@blog/email`'s `sendEmail` with `buildContactNotificationEmail` on the tenant shell: subject "New message from {visitor}", the sender, a link to the page, the message quoted with its line breaks, a line that replying answers the visitor, and a link to the Leads list. Every visitor string is escaped. The caller sets `replyTo` to the visitor; `@blog/email` never logs, so the web server action logs a failed send.
 - A stored lead whose email fails still answers `sent`; the action logs the email failure once, since the lead is safe in the list.
 - A `Textarea` atom joins `TextInput` in `@blog/ui`; the form itself is composed in `apps/web`, not a `@blog/ui` organism.
 
@@ -60,6 +61,7 @@ These are decided and must hold when it ships:
 
 - `packages/db/src/schema/leads.ts` and `packages/db/src/queries/leads/` — lead storage
 - `packages/db/src/queries/email-config/get-contact-recipient/get-contact-recipient.ts` — recipient resolution
+- `packages/email/src/templates/tenant/contact-notification/contact-notification.ts` — the owner notification
 
 The pieces it builds on:
 
@@ -69,7 +71,7 @@ The pieces it builds on:
 
 ## Tests and stories
 
-PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to.
+PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to. `contact-notification.test.ts` covers the subject, escaping and line breaks.
 
 ## Related
 
