@@ -1,3 +1,4 @@
+import { registerLogSink, type TLogSink } from '@blog/insight/sink/log-sink';
 import {
   LINE_SEPARATOR,
   PARAGRAPH_SEPARATOR,
@@ -344,6 +345,86 @@ describe(createLogger, () => {
         details: { cause: { message: string } };
       };
       expect(parsed.details.cause.message).toBe('null-proto boom');
+    });
+  });
+
+  describe('with a registered sink', () => {
+    let sink: ReturnType<typeof vi.fn<TLogSink>>;
+    let unregister: () => void;
+    let logger: ReturnType<typeof createLogger>;
+
+    beforeEach(() => {
+      vi.stubEnv('NODE_ENV', 'test');
+      sink = vi.fn<TLogSink>();
+      unregister = registerLogSink(sink);
+      logger = createLogger({ service: 'web' });
+    });
+
+    afterEach(() => {
+      unregister();
+    });
+
+    it('hands the sink the same error line it writes to the console', () => {
+      logger.error('request.failed', { status: 500 });
+
+      expect(sink).toHaveBeenCalledTimes(1);
+      expect(sink).toHaveBeenCalledWith(JSON.parse(captureCall(errorSpy)));
+    });
+
+    it('hands the sink the same warn line it writes to the console', () => {
+      logger.warn('retry.scheduled', { attempt: 2 });
+
+      expect(sink).toHaveBeenCalledTimes(1);
+      expect(sink).toHaveBeenCalledWith(JSON.parse(captureCall(warnSpy)));
+    });
+
+    it('never hands info or debug lines to the sink', () => {
+      logger.info('user.signed_in');
+      logger.debug('cache.hit');
+
+      expect(infoSpy).toHaveBeenCalledTimes(1);
+      expect(debugSpy).toHaveBeenCalledTimes(1);
+      expect(sink).not.toHaveBeenCalled();
+    });
+
+    it('stops handing lines to a sink once it is unregistered', () => {
+      unregister();
+      logger.error('request.failed');
+
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+      expect(sink).not.toHaveBeenCalled();
+    });
+
+    it('keeps the logging call silent when a sink throws', () => {
+      sink.mockImplementation(() => {
+        throw new Error('sink down');
+      });
+
+      expect(() => logger.error('request.failed')).not.toThrow();
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the logging call silent when a sink rejects', async () => {
+      sink.mockRejectedValue(new Error('sink down'));
+
+      expect(() => logger.warn('retry.scheduled')).not.toThrow();
+      await Promise.resolve();
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(errorSpy).not.toHaveBeenCalled();
+    });
+
+    it('still delivers to the next sink when an earlier one throws', () => {
+      const healthySink = vi.fn<TLogSink>();
+      const unregisterHealthy = registerLogSink(healthySink);
+      sink.mockImplementation(() => {
+        throw new Error('sink down');
+      });
+
+      logger.error('request.failed');
+      unregisterHealthy();
+
+      expect(healthySink).toHaveBeenCalledTimes(1);
     });
   });
 });

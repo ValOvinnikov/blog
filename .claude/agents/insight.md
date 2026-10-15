@@ -3,7 +3,8 @@ name: insight
 description: >-
   Structured-logging specialist for packages/insight (@blog/insight) — the
   observability domain's home: createLogger (synchronous, single-line JSON
-  log emission via console.*), LOG_LEVEL, and log-injection sanitization.
+  log emission via console.*), LOG_LEVEL, log sinks (registerLogSink and
+  the fetch-only Loki sink), and log-injection sanitization.
   Sits at the base of the dependency graph alongside @blog/utils
   — depends on nothing, framework-free. Consumed by both apps via their own shared
   logger module; service/db/auth never log at all.
@@ -35,8 +36,11 @@ align back. A new concern (event-name constants, a client-log contract type)
 gets its own top-level folder. Current shape:
 
 ```
-src/index.ts                       — export * from './logger'; export * from './utils';
+src/index.ts                       — export * from './logger'; export * from './sink'; export * from './utils';
 src/logger/{index,logger,logger.test}.ts
+src/logger/normalize-context.ts    — internal, not re-exported
+src/sink/index.ts                  — registerLogSink, TLogSink, createLokiSink
+src/sink/{log-sink,loki-sink,loki-sink.test}.ts
 src/utils/index.ts                 — export * from './sanitize-log-message';
 src/utils/sanitize-log-message/{index,sanitize-log-message,sanitize-log-message.test}.ts
 src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/testing/fixtures
@@ -72,6 +76,18 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
   line is unparseable — cap the stack, with a truncation marker, before it
   reaches `JSON.stringify`.
 - **`debug`** returns before doing any work in production.
+- **Sinks.** `registerLogSink(sink)` returns an unregister function. Every
+  `error` and `warn` line goes to each registered sink as the same object
+  written to the console; `info` and `debug` never do. The registry lives on
+  `globalThis` so an app's `instrumentation.ts` bundle and its route bundles
+  share it. A sink that throws or rejects never reaches the logging call and
+  is never logged — logging a sink failure would feed the sink its own
+  failure. With no sink registered the logger behaves exactly as before.
+- **`createLokiSink({ url, user, token })`** posts one line per push to
+  Loki's push API over global `fetch` with basic auth, `service` and `level`
+  as stream labels, and returns a promise that always resolves (any status,
+  any network failure), so a caller can hand it to `waitUntil` safely. No
+  dependency: the package stays at zero runtime dependencies.
 - **`LOG_LEVEL`** lives here, not in `@blog/config` — this package depends
   on nothing. UPPERCASE keys, `as const`; the values stay lowercase because
   log aggregators expect lowercase severity strings. Both are departures from
