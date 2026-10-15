@@ -3,6 +3,12 @@ import { oklchToHex } from '@blog/utils/color';
 import { PRESET_REGISTRY, type TPresetId } from '@blog/config/constants';
 
 import { isAccentHueAccessible } from './accent-hue-guard';
+import {
+  ACCENT_RAMP_LIGHT,
+  LOGO_RAMP_LIGHT,
+  type TOklchStop,
+} from './theme-declarations';
+import { NEUTRAL_RAMP_LIGHT } from './theme-ramps';
 
 export type TResolveTenantEmailBrandInput = {
   preset: TPresetId;
@@ -24,6 +30,9 @@ export type TTenantEmailBrand = {
   logo3: string;
 };
 
+const toHex = ({ l, c, h }: TOklchStop, hue: number): string =>
+  oklchToHex(l, c, h ?? hue);
+
 /**
  * Resolves a tenant's brand palette to literal hex for email, running the
  * same light-mode OKLCH recipes `apps/web` injects as CSS custom properties
@@ -41,16 +50,25 @@ export const resolveTenantEmailBrand = ({
   const resolvedLogoHue = logoHue ?? base.logoHue ?? resolvedAccentHue;
 
   return {
-    surface: oklchToHex(1, 0, 0),
-    surface2: oklchToHex(0.975, 0.003, 250),
-    border: oklchToHex(0.9, 0.004, 250),
-    text: oklchToHex(0.2, 0.01, 250),
-    textMuted: oklchToHex(0.46, 0.01, 250),
-    brandPrimary: oklchToHex(0.53, 0.17, resolvedAccentHue),
-    brandPrimarySolid: oklchToHex(0.55, 0.17, resolvedAccentHue),
-    brandPrimaryContrast: oklchToHex(0.99, 0, 0),
-    logo1: oklchToHex(0.52, 0.17, resolvedLogoHue),
-    logo2: oklchToHex(0.63, 0.16, resolvedLogoHue),
-    logo3: oklchToHex(0.73, 0.13, resolvedLogoHue),
+    surface: toHex(NEUTRAL_RAMP_LIGHT['--surface'], resolvedAccentHue),
+    surface2: toHex(NEUTRAL_RAMP_LIGHT['--surface-2'], resolvedAccentHue),
+    border: toHex(NEUTRAL_RAMP_LIGHT['--border'], resolvedAccentHue),
+    text: toHex(NEUTRAL_RAMP_LIGHT['--text'], resolvedAccentHue),
+    textMuted: toHex(NEUTRAL_RAMP_LIGHT['--text-muted'], resolvedAccentHue),
+    brandPrimary: toHex(
+      ACCENT_RAMP_LIGHT['--brand-primary'],
+      resolvedAccentHue,
+    ),
+    brandPrimarySolid: toHex(
+      ACCENT_RAMP_LIGHT['--brand-primary-solid'],
+      resolvedAccentHue,
+    ),
+    brandPrimaryContrast: toHex(
+      ACCENT_RAMP_LIGHT['--brand-primary-contrast'],
+      resolvedAccentHue,
+    ),
+    logo1: toHex(LOGO_RAMP_LIGHT['--logo-1'], resolvedLogoHue),
+    logo2: toHex(LOGO_RAMP_LIGHT['--logo-2'], resolvedLogoHue),
+    logo3: toHex(LOGO_RAMP_LIGHT['--logo-3'], resolvedLogoHue),
   };
 };

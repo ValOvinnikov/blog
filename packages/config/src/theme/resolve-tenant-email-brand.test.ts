@@ -1,4 +1,4 @@
-import { oklchToHex, wcagContrastRatio } from '@blog/utils/color';
+import { oklchToHex, renderedContrastRatio } from '@blog/utils/color';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 
@@ -6,17 +6,17 @@ import { resolveTenantEmailBrand } from './resolve-tenant-email-brand';
 
 vi.mock('@blog/utils/color', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/utils/color')>()),
-  wcagContrastRatio: vi.fn(),
+  renderedContrastRatio: vi.fn(),
 }));
 
-const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
+const mockedRenderedContrastRatio = vi.mocked(renderedContrastRatio);
 
 beforeEach(async () => {
   const actual =
     await vi.importActual<typeof import('@blog/utils/color')>(
       '@blog/utils/color',
     );
-  mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
+  mockedRenderedContrastRatio.mockImplementation(actual.renderedContrastRatio);
 });
 
 const expectedAccentAndLogoHex = (hue: number) => ({
@@ -56,7 +56,7 @@ describe(resolveTenantEmailBrand, () => {
   });
 
   it('falls back to the preset accentHue when the requested hue fails the AA guard', () => {
-    mockedWcagContrastRatio.mockReturnValue(1);
+    mockedRenderedContrastRatio.mockReturnValue(1);
     const editorialTokens = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
 
     const result = resolveTenantEmailBrand({

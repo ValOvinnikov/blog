@@ -36,7 +36,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - **`@theme`** — radius steps plus role radii (`--radius-card` → `--radius-md`, `--radius-media` → `--radius-lg`, `--radius-item` → `--item-radius`); containers; layout spacing (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, and the `band` step with its `sm`–`xl` ladder); the type scale (`title-*`, `prose-*`, `card-*`, `meta`, `label`, `code`, …); tracking; easing.
 - **`:root`, with `.dark` overrides** — page neutrals (`primary`, `primary-subtle`, `secondary`, `surface`, `surface-2`), borders (`border`, `border-strong`, `border-emphasis`), ink (`text`, `text-muted`, `text-subtle`), the brand ramp, `ring`, status colours, logo steps, shadows, durations, the on-image and scrim tokens, the five `--item-*` card properties, and `--ambient`/`--divider`/`--field-boundary`.
 - **`@blog/config` theme tables** (`theme-declarations.ts`) — `ACCENT_RAMP_LIGHT/DARK`, `LOGO_RAMP_LIGHT/DARK` and `IMAGE_SCRIM_RAMP` as OKLCH stops with fixed lightness and chroma, plus `RADIUS_DECLARATIONS`, `DENSITY_DECLARATIONS` and `CARD_STYLE_DECLARATIONS`. `formatOklchRamp` fills in the tenant's hue.
-- **Colour maths** — `@blog/utils/color`: `wcagContrastRatio` (culori, OKLCH in, no gamut mapping), `oklchToHex`, `WCAG_AA_CONTRAST_MIN` (4.5).
+- **Colour maths** — `@blog/utils/color`: `renderedContrastRatio` (culori, OKLCH in, the worse of gamut mapping and clipping into sRGB), `oklchToHex`, `WCAG_AA_CONTRAST_MIN` (4.5).
 
 ## Configuration
 
@@ -65,7 +65,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - `--text-subtle` measures under 4.5:1 on most surfaces. `theme.css` records it as accepted for low-emphasis metadata.
 - **Static defaults equal Console.** `theme.css`'s static values equal `buildThemeStyleBlock`'s Console output (`MD`, `DEFAULT`, `ACCENT_BAR`, hue 250), and a test reads `theme.css` for the radius, spacing, item-card and scrim tokens and checks the brand and logo ramps against fixed literals. Changing a static token means changing its declaration table too.
 - The platform preview re-derives `--radius-card`, `--radius-media` and `--radius-item`, because `@theme` derives them on `:root`.
-- Email cannot read CSS variables, so `resolveTenantEmailBrand` writes hex literals from its own copy of the light-mode recipes.
+- Email cannot read CSS variables, so `resolveTenantEmailBrand` converts the light-mode ramps (`NEUTRAL_RAMP_LIGHT`, `ACCENT_RAMP_LIGHT`, `LOGO_RAMP_LIGHT`) to hex literals; a ramp change reaches tenant emails with no other edit.
 - A consuming app adds its own tokens only for a dependency no other workspace uses (`apps/web/index.css`'s `--code-*` syntax colours). Shared tokens belong in `theme.css`.
 
 ## Dependencies
