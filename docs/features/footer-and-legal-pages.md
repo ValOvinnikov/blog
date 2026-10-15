@@ -44,7 +44,7 @@ The site footer closes every page with a copyright line, the site's social profi
 - A social profile holds no destination of its own — always a `link` document reference.
 - Footer order is fixed in code: social links, language switcher, cookie settings, RSS.
 - A failed site-settings read renders no footer. A failed footer read is logged (`footer.layout_fetch_failed`) and the footer renders with no social links and no switcher, and with the RSS link shown.
-- The footer's NavLinks, including the footer language codes, mark the current item with `aria-current="page"` and NavLink's active colour.
+- The footer's NavLinks, including the footer language codes, mark the current item with `aria-current="page"` and NavLink's active colour and underline.
 - `@blog/ui`'s `Footer` is a compound shell (`Footer.Nav`, `Footer.Copyright`) and stays prop-driven; `apps/web` composes the content.
 
 ## Dependencies

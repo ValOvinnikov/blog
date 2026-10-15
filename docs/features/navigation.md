@@ -43,7 +43,7 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 ## Constraints and invariants
 
 - A navigation item holds no label or destination of its own — always a `link` document reference. The list is flat (no nesting) and renders in the editor's order.
-- An item is current when its href equals the locale-stripped pathname, or the pathname is under it (`/blog` matches `/blog/post`); `/` matches only itself. The current link carries `aria-current="page"` and NavLink's active colour.
+- An item is current when its href equals the locale-stripped pathname, or the pathname is under it (`/blog` matches `/blog/post`); `/` matches only itself. The current link carries `aria-current="page"`, NavLink's active colour and a 2px underline in that colour, so it reads without the hue (WCAG 1.4.1). Hover changes only the colour, so it never looks current.
 - The mobile panel closes on every route change; `useMobileNavToggle` handles focus, Escape and outside-click dismissal, scoped to the navigation's own container.
 - `actions` stay in the bar at every width; `panelActions` move into the mobile panel below `lg`. With the switcher on, the switcher and the theme toggle are `panelActions`; with it off, the theme toggle is an `action`. The account menu is always an `action`.
 - The `<nav>` landmark is named by `PrimaryNavigation`'s default `ariaLabel`, `Primary`, in every language; the menu toggle's name is the catalog's `siteNavigation.toggleMenu`.
