@@ -16,7 +16,8 @@
     "languages": "Sprachen · Admin",
     "studio": "Studio · Admin",
     "findings": "Befunde · Admin",
-    "email": "E-Mail · Admin"
+    "email": "E-Mail · Admin",
+    "leads": "Anfragen · Admin"
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
@@ -94,7 +95,8 @@
     "dangerZone": "Gefahrenzone",
     "badgeComingSoon": "Demnächst",
     "badgePlatform": "Plattform",
-    "features": "Funktionen"
+    "features": "Funktionen",
+    "leads": "Anfragen"
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"
@@ -442,7 +444,7 @@
     "alertSuccess": "E-Mail-Einstellungen gespeichert.",
     "alertError": "Nicht alle Änderungen konnten gespeichert werden — was noch als „Nicht gespeichert“ markiert ist, wurde nicht gespeichert. Bitte erneut versuchen.",
     "senderItemLabel": "Absender & Fußzeile",
-    "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
+    "senderItemDescription": "Name, Antwortadresse, Empfänger für Kontaktnachrichten, Anschrift und Logo, in jeder Sprache gleich.",
     "editingLabel": "Bearbeiten",
     "templateGroupLabel": "Vorlage",
     "allLanguagesChanges": "Alle Sprachen",
@@ -485,8 +487,12 @@
     "logoLabel": "E-Mail-Logo",
     "logoHint": "Wird in jeder E-Mail und jeder Sprache verwendet. Eine Vorlage kann es mit einem eigenen Logo überschreiben.",
     "errors": {
-      "senderNameInvalid": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @."
-    }
+      "senderNameInvalid": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
+      "contactRecipientInvalid": "Geben Sie eine gültige E-Mail-Adresse ein oder lassen Sie das Feld leer."
+    },
+    "contactRecipientLabel": "Kontaktnachrichten senden an",
+    "contactRecipientHint": "Wohin Nachrichten aus dem Kontaktformular Ihrer Website per E-Mail gehen. Leer lassen, um die Anmelde-E-Mail des Inhabers zu verwenden.",
+    "contactRecipientPlaceholder": "Anmelde-E-Mail des Inhabers"
   },
   "emailLogoField": {
     "unsupportedType": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild — SVG und WebP werden von gängigen E-Mail-Programmen nicht unterstützt.",
@@ -958,5 +964,42 @@
   },
   "externalLinkButton": {
     "newTabHint": "(öffnet in neuem Tab)"
+  },
+  "leadsView": {
+    "title": "Anfragen",
+    "description": "Nachrichten aus dem Kontaktformular Ihrer Website, die neuesten zuerst. Jede Nachricht wurde bei Eingang auch per E-Mail an Sie gesendet.",
+    "downgradedTitle": "Kontaktformular nicht im Tarif enthalten",
+    "downgradedDescription": "Das Kontaktformular ist eine Growth-Funktion, daher kommen keine neuen Nachrichten mehr an. Bereits eingegangene Nachrichten bleiben hier erhalten, und Sie können jede davon weiterhin löschen."
+  },
+  "leadsTable": {
+    "columnReceived": "Eingegangen",
+    "columnName": "Name",
+    "columnEmail": "E-Mail",
+    "columnMessage": "Nachricht",
+    "columnPage": "Seite",
+    "columnActions": "Aktionen",
+    "empty": "Noch keine Nachrichten. Sobald jemand Ihr Kontaktformular nutzt, erscheint die Nachricht hier."
+  },
+  "leadMessage": {
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen"
+  },
+  "leadsPagination": {
+    "ariaLabel": "Seitennavigation",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "status": "Seite {page} von {totalPages}"
+  },
+  "deleteLeadControl": {
+    "triggerButton": "Löschen",
+    "triggerAriaLabel": "Nachricht von {name} löschen",
+    "dialogTitle": "Diese Nachricht löschen?",
+    "dialogDescription": "Die Nachricht von {name} wird endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    "confirmButton": "Nachricht löschen",
+    "confirmingButton": "Wird gelöscht…",
+    "errors": {
+      "notFound": "Diese Nachricht wurde bereits gelöscht.",
+      "failed": "Die Nachricht konnte nicht gelöscht werden. Versuchen Sie es erneut."
+    }
   }
 }

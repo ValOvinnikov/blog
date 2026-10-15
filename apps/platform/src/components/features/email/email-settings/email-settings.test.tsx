@@ -60,7 +60,12 @@ const { EN, FR } = LOCALE_ISO_CODES;
 const LIVE_LOCALES = [EN, FR];
 
 const INITIAL_DRAFT = buildEmailDraft({
-  sender: { senderName: '', replyToAddress: '', footerPostalAddress: '' },
+  sender: {
+    senderName: '',
+    replyToAddress: '',
+    footerPostalAddress: '',
+    contactRecipient: '',
+  },
   senderLogoUrl: undefined,
   authored: [
     {
@@ -417,6 +422,57 @@ describe(`<${EmailSettings.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByText(/not an email address/)).toBeVisible();
+  });
+
+  it('saves the contact recipient the owner types', async () => {
+    setup();
+
+    await user.type(
+      screen.getByLabelText('Send contact messages to'),
+      'leads@acme.example',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() =>
+      expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.objectContaining({ contactRecipient: 'leads@acme.example' }),
+      ),
+    );
+  });
+
+  it('clears a saved contact recipient by saving it empty', async () => {
+    setup({
+      initialDraft: {
+        ...INITIAL_DRAFT,
+        sender: { ...INITIAL_DRAFT.sender, contactRecipient: 'a@acme.example' },
+      },
+    });
+
+    await user.clear(screen.getByLabelText('Send contact messages to'));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() =>
+      expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.objectContaining({ contactRecipient: null }),
+      ),
+    );
+  });
+
+  it('shows the contact-recipient error the save returns', async () => {
+    updateEmailConfigActionMock.mockResolvedValue({
+      ok: false,
+      fieldErrors: { contactRecipient: 'contactRecipientInvalid' },
+    });
+    setup();
+
+    await user.type(screen.getByLabelText('Send contact messages to'), 'nope');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(
+      await screen.findByText(/Enter a valid email address/),
+    ).toBeVisible();
   });
 
   it('restores an unsaved translation after leaving the page, but not a staged logo', async () => {

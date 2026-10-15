@@ -3,6 +3,7 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+import { canEditContactRecipient } from '@platform/server/auth/can-edit-contact-recipient';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
   emailSenderInputSchema,
@@ -12,10 +13,22 @@ import { logger } from '@platform/utils/logger/logger';
 import type { z } from 'zod';
 
 export type TUpdateEmailConfigInput = z.input<typeof emailSenderInputSchema>;
-export type TSenderNameError = 'senderNameInvalid';
+export type TSenderFieldErrors = {
+  senderName?: 'senderNameInvalid';
+  contactRecipient?: 'contactRecipientInvalid';
+};
 
 export type TUpdateEmailConfigResult =
-  { ok: true } | { ok: false; fieldErrors?: { senderName?: TSenderNameError } };
+  { ok: true } | { ok: false; fieldErrors?: TSenderFieldErrors };
+
+const toFieldErrors = (error: z.ZodError): TSenderFieldErrors => ({
+  ...(error.issues.some((issue) => issue.message === SENDER_NAME_INVALID) && {
+    senderName: 'senderNameInvalid' as const,
+  }),
+  ...(error.issues.some((issue) => issue.path[0] === 'contactRecipient') && {
+    contactRecipient: 'contactRecipientInvalid' as const,
+  }),
+});
 
 export const updateEmailConfigAction = async (
   tenantId: string,
@@ -23,24 +36,25 @@ export const updateEmailConfigAction = async (
 ): Promise<TUpdateEmailConfigResult> => {
   const parsed = emailSenderInputSchema.safeParse(input);
   if (!parsed.success) {
-    const isSenderNameInvalid = parsed.error.issues.some(
-      (issue) => issue.message === SENDER_NAME_INVALID,
-    );
-    if (!isSenderNameInvalid) return { ok: false };
-
-    return { ok: false, fieldErrors: { senderName: 'senderNameInvalid' } };
+    const fieldErrors = toFieldErrors(parsed.error);
+    return Object.keys(fieldErrors).length > 0
+      ? { ok: false, fieldErrors }
+      : { ok: false };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant, membership } = await requireTenantMembership(tenantId);
+  const data = canEditContactRecipient(tenant, membership)
+    ? parsed.data
+    : { ...parsed.data, contactRecipient: undefined };
 
   try {
-    await queries.emailConfig.upsertEmailConfig(tenant.id, parsed.data);
+    await queries.emailConfig.upsertEmailConfig(tenant.id, data);
     await recordAuditEvent({
       logEvent: 'email_config.update_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
-      details: parsed.data,
+      details: data,
     });
     return { ok: true };
   } catch (error) {

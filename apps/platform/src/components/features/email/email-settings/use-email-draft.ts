@@ -9,7 +9,7 @@ import { clearEmailLogoAction } from '@platform/server/email/clear-email-logo-ac
 import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-action';
 import {
   updateEmailConfigAction,
-  type TSenderNameError,
+  type TSenderFieldErrors,
 } from '@platform/server/email-config/update-email-config-action';
 import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
 import {
@@ -37,7 +37,7 @@ type TUseEmailDraftArgs = Omit<
   tenantId: string;
   initialDraft: TEmailDraft;
   liveLocales: TLocaleIsoCode[];
-  senderNameInputId: string;
+  senderFieldIds: { senderName: string; contactRecipient: string };
   revealSenderName: () => void;
   onSaved: () => void;
 };
@@ -51,23 +51,29 @@ export const useEmailDraft = ({
   tenantId,
   initialDraft,
   liveLocales,
-  senderNameInputId,
+  senderFieldIds,
   revealSenderName,
   onSaved,
   onDiscard,
   ...settingsArgs
 }: TUseEmailDraftArgs) => {
-  const [senderNameError, setSenderNameError] = useState<TSenderNameError>();
+  const [senderFieldErrors, setSenderFieldErrors] =
+    useState<TSenderFieldErrors>({});
 
   const settings = useSettingsForm<TEmailDraft, { ok: boolean }>({
     ...settingsArgs,
     initialValues: initialDraft,
     invalidFields: () => ({
-      ids: senderNameError ? [senderNameInputId] : [],
+      ids: [
+        ...(senderFieldErrors.senderName ? [senderFieldIds.senderName] : []),
+        ...(senderFieldErrors.contactRecipient
+          ? [senderFieldIds.contactRecipient]
+          : []),
+      ],
       revealFirst: revealSenderName,
     }),
     onDiscard: () => {
-      setSenderNameError(undefined);
+      setSenderFieldErrors({});
       onDiscard?.();
     },
     onSuccess: onSaved,
@@ -104,9 +110,7 @@ export const useEmailDraft = ({
           tenantId,
           toSenderInput(draft.sender),
         );
-        setSenderNameError(
-          result.ok ? undefined : result.fieldErrors?.senderName,
-        );
+        setSenderFieldErrors(result.ok ? {} : (result.fieldErrors ?? {}));
         if (!result.ok) return finish(false);
         nextSaved = { ...nextSaved, sender: draft.sender };
       }
@@ -132,5 +136,5 @@ export const useEmailDraft = ({
     },
   });
 
-  return { ...settings, senderNameError, setSenderNameError };
+  return { ...settings, senderFieldErrors, setSenderFieldErrors };
 };

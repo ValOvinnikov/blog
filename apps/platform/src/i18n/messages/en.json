@@ -16,7 +16,8 @@
     "languages": "Languages · Admin",
     "studio": "Studio · Admin",
     "findings": "Findings · Admin",
-    "email": "Email · Admin"
+    "email": "Email · Admin",
+    "leads": "Leads · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -94,7 +95,8 @@
     "dangerZone": "Danger zone",
     "badgeComingSoon": "Coming soon",
     "badgePlatform": "platform",
-    "features": "Features"
+    "features": "Features",
+    "leads": "Leads"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -442,7 +444,7 @@
     "alertSuccess": "Saved email settings.",
     "alertError": "Couldn't save every change — the ones still marked Unsaved weren't saved. Try again.",
     "senderItemLabel": "Sender & footer",
-    "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
+    "senderItemDescription": "Name, reply-to, contact recipient, address and logo, the same in every language.",
     "editingLabel": "Editing",
     "templateGroupLabel": "Template",
     "allLanguagesChanges": "All languages",
@@ -485,8 +487,12 @@
     "logoLabel": "Email logo",
     "logoHint": "Used in every email, in every language. A template can override it with its own logo.",
     "errors": {
-      "senderNameInvalid": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @."
-    }
+      "senderNameInvalid": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
+      "contactRecipientInvalid": "Enter a valid email address, or leave this empty."
+    },
+    "contactRecipientLabel": "Send contact messages to",
+    "contactRecipientHint": "Where messages from your site's contact form are emailed. Leave empty to use the owner's sign-in email.",
+    "contactRecipientPlaceholder": "Owner's sign-in email"
   },
   "emailLogoField": {
     "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
@@ -958,5 +964,42 @@
   },
   "externalLinkButton": {
     "newTabHint": "(opens in new tab)"
+  },
+  "leadsView": {
+    "title": "Leads",
+    "description": "Messages sent through your site's contact form, newest first. Each message was also emailed to you when it arrived.",
+    "downgradedTitle": "Contact form not included in your plan",
+    "downgradedDescription": "The contact form is a Growth feature, so new messages no longer arrive. The messages you already received are kept here, and you can still delete any of them."
+  },
+  "leadsTable": {
+    "columnReceived": "Received",
+    "columnName": "Name",
+    "columnEmail": "Email",
+    "columnMessage": "Message",
+    "columnPage": "Page",
+    "columnActions": "Actions",
+    "empty": "No messages yet. When someone uses your contact form, their message will appear here."
+  },
+  "leadMessage": {
+    "showMore": "Show more",
+    "showLess": "Show less"
+  },
+  "leadsPagination": {
+    "ariaLabel": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "status": "Page {page} of {totalPages}"
+  },
+  "deleteLeadControl": {
+    "triggerButton": "Delete",
+    "triggerAriaLabel": "Delete the message from {name}",
+    "dialogTitle": "Delete this message?",
+    "dialogDescription": "The message from {name} will be permanently deleted. This can't be undone.",
+    "confirmButton": "Delete message",
+    "confirmingButton": "Deleting…",
+    "errors": {
+      "notFound": "This message was already deleted.",
+      "failed": "Couldn't delete the message. Try again."
+    }
   }
 }

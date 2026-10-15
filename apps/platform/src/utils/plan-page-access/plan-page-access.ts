@@ -9,6 +9,7 @@ import {
 export type TPlanPageAccess = {
   languages: boolean;
   email: boolean;
+  leads: boolean;
   subscribers: boolean;
   comments: boolean;
   team: boolean;
@@ -20,6 +21,7 @@ const EMAIL_SENDING_CAPABILITIES = [
   CAPABILITY.BOOKMARKS,
   CAPABILITY.COMMENTS,
   CAPABILITY.NEWSLETTER,
+  CAPABILITY.CONTACT_FORM,
 ];
 
 export const planPageAccess = (plan: TTenantPlan): TPlanPageAccess => {
@@ -30,6 +32,7 @@ export const planPageAccess = (plan: TTenantPlan): TPlanPageAccess => {
     email: EMAIL_SENDING_CAPABILITIES.some((capability) =>
       capabilities.includes(capability),
     ),
+    leads: capabilities.includes(CAPABILITY.CONTACT_FORM),
     subscribers: capabilities.includes(CAPABILITY.NEWSLETTER),
     comments: capabilities.includes(CAPABILITY.COMMENTS),
     team: plan !== TENANT_PLAN.FREE,

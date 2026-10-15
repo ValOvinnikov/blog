@@ -16,7 +16,8 @@
     "languages": "Idiomas · Administración",
     "studio": "Studio · Administración",
     "findings": "Incidencias · Administración",
-    "email": "Correo electrónico · Administración"
+    "email": "Correo electrónico · Administración",
+    "leads": "Contactos · Administración"
   },
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
@@ -94,7 +95,8 @@
     "dangerZone": "Zona de peligro",
     "badgeComingSoon": "Próximamente",
     "badgePlatform": "plataforma",
-    "features": "Funciones"
+    "features": "Funciones",
+    "leads": "Contactos"
   },
   "tenantLayout": {
     "scopeLabel": "Cliente"
@@ -442,7 +444,7 @@
     "alertSuccess": "Configuración del correo guardada.",
     "alertError": "No se guardaron todos los cambios: los que siguen marcados como «Sin guardar» no se guardaron. Vuelva a intentarlo.",
     "senderItemLabel": "Remitente y pie",
-    "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
+    "senderItemDescription": "Nombre, dirección de respuesta, destinatario de los mensajes de contacto, dirección postal y logotipo, iguales en todos los idiomas.",
     "editingLabel": "Editando",
     "templateGroupLabel": "Plantilla",
     "allLanguagesChanges": "Todos los idiomas",
@@ -485,8 +487,12 @@
     "logoLabel": "Logotipo del correo",
     "logoHint": "Se usa en todos los correos y en todos los idiomas. Una plantilla puede sustituirlo por su propio logotipo.",
     "errors": {
-      "senderNameInvalid": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @."
-    }
+      "senderNameInvalid": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",
+      "contactRecipientInvalid": "Introduzca una dirección de correo válida o deje este campo vacío."
+    },
+    "contactRecipientLabel": "Enviar mensajes de contacto a",
+    "contactRecipientHint": "Dónde se envían por correo los mensajes del formulario de contacto de su sitio. Déjelo vacío para usar el correo de inicio de sesión del propietario.",
+    "contactRecipientPlaceholder": "Correo de inicio de sesión del propietario"
   },
   "emailLogoField": {
     "unsupportedType": "Elija una imagen PNG, JPEG o GIF: los principales clientes de correo no admiten SVG ni WebP.",
@@ -958,5 +964,42 @@
   },
   "externalLinkButton": {
     "newTabHint": "(se abre en una pestaña nueva)"
+  },
+  "leadsView": {
+    "title": "Contactos",
+    "description": "Mensajes enviados a través del formulario de contacto de su sitio, los más recientes primero. Cada mensaje también se le envió por correo al recibirse.",
+    "downgradedTitle": "El formulario de contacto no está incluido en su plan",
+    "downgradedDescription": "El formulario de contacto es una función de Growth, por lo que ya no llegan mensajes nuevos. Los mensajes ya recibidos se conservan aquí y puede seguir eliminando cualquiera de ellos."
+  },
+  "leadsTable": {
+    "columnReceived": "Recibido",
+    "columnName": "Nombre",
+    "columnEmail": "Correo electrónico",
+    "columnMessage": "Mensaje",
+    "columnPage": "Página",
+    "columnActions": "Acciones",
+    "empty": "Todavía no hay mensajes. Cuando alguien use su formulario de contacto, su mensaje aparecerá aquí."
+  },
+  "leadMessage": {
+    "showMore": "Mostrar más",
+    "showLess": "Mostrar menos"
+  },
+  "leadsPagination": {
+    "ariaLabel": "Paginación",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "status": "Página {page} de {totalPages}"
+  },
+  "deleteLeadControl": {
+    "triggerButton": "Eliminar",
+    "triggerAriaLabel": "Eliminar el mensaje de {name}",
+    "dialogTitle": "¿Eliminar este mensaje?",
+    "dialogDescription": "El mensaje de {name} se eliminará de forma permanente. Esta acción no se puede deshacer.",
+    "confirmButton": "Eliminar mensaje",
+    "confirmingButton": "Eliminando…",
+    "errors": {
+      "notFound": "Este mensaje ya se había eliminado.",
+      "failed": "No se pudo eliminar el mensaje. Inténtelo de nuevo."
+    }
   }
 }

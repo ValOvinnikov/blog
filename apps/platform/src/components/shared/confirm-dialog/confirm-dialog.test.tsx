@@ -186,4 +186,36 @@ describe(ConfirmDialog, () => {
     expect(trigger).not.toHaveAttribute('aria-disabled');
     expect(trigger).not.toHaveAttribute('aria-describedby');
   });
+
+  describe('without an expected value', () => {
+    const setupUntyped = () =>
+      customRender(
+        () => (
+          <ConfirmDialog onConfirm={onConfirmMock}>
+            <ConfirmDialog.Trigger ariaLabel="Remove the item" size="SM">
+              Remove
+            </ConfirmDialog.Trigger>
+            <ConfirmDialog.Content
+              title="Remove this?"
+              description="Gone for good."
+              confirmButtonLabel="Confirm"
+              confirmingButtonLabel="Removing…"
+            />
+          </ConfirmDialog>
+        ),
+        {},
+      )();
+
+    it('asks for no typed value and confirms straight away', async () => {
+      setupUntyped();
+      await user.click(screen.getByRole('button', { name: 'Remove the item' }));
+
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+      expect(getConfirmButton()).toBeEnabled();
+
+      await user.click(getConfirmButton());
+
+      expect(onConfirmMock).toHaveBeenCalledWith('');
+    });
+  });
 });

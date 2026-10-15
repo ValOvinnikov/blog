@@ -5,7 +5,7 @@ import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { useToast } from '@platform/context/toast-provider';
 import { sendTestEmailAction } from '@platform/server/email/send-test-email-action';
 import {
-  toSenderInput,
+  toTestSenderInput,
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
 import { useTranslations } from 'next-intl';
@@ -34,7 +34,7 @@ export const useSendTestEmail = (tenantId: string) => {
       const result = await sendTestEmailAction(tenantId, {
         templateType,
         copy: { subject, body },
-        sender: toSenderInput(sender),
+        sender: toTestSenderInput(sender),
       });
       if (result.ok) {
         toast.success({ message: t('testSent', { email: result.to }) });

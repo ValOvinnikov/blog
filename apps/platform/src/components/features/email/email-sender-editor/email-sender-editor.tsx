@@ -6,7 +6,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import type { TSenderNameError } from '@platform/server/email-config/update-email-config-action';
+import type { TSenderFieldErrors } from '@platform/server/email-config/update-email-config-action';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
@@ -18,8 +18,8 @@ export type TEmailSenderEditorProps = {
   logo: TStagedImage;
   onSenderChange: (sender: TEmailSenderDraft) => void;
   onLogoStage: (logo: TStagedImage) => void;
-  senderNameInputId: string;
-  senderNameError?: TSenderNameError;
+  fieldIds: { senderName: string; contactRecipient: string };
+  fieldErrors?: TSenderFieldErrors;
 };
 
 export const EmailSenderEditor = ({
@@ -27,8 +27,8 @@ export const EmailSenderEditor = ({
   logo,
   onSenderChange,
   onLogoStage,
-  senderNameInputId,
-  senderNameError,
+  fieldIds,
+  fieldErrors,
 }: TEmailSenderEditorProps) => {
   const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
   const control = {
@@ -54,8 +54,10 @@ export const EmailSenderEditor = ({
           <FormField
             label={t('senderNameLabel')}
             hint={t('senderNameHint')}
-            error={senderNameError && t(`errors.${senderNameError}`)}
-            control={{ ...control, id: senderNameInputId }}
+            error={
+              fieldErrors?.senderName && t(`errors.${fieldErrors.senderName}`)
+            }
+            control={{ ...control, id: fieldIds.senderName }}
           >
             <TextInput
               placeholder={tPreview('defaultSender')}
@@ -75,6 +77,24 @@ export const EmailSenderEditor = ({
               onChange={(value) => updateField('replyToAddress', value)}
             />
           </FormField>
+          {sender.contactRecipient !== undefined && (
+            <FormField
+              label={t('contactRecipientLabel')}
+              hint={t('contactRecipientHint')}
+              error={
+                fieldErrors?.contactRecipient &&
+                t(`errors.${fieldErrors.contactRecipient}`)
+              }
+              control={{ ...control, id: fieldIds.contactRecipient }}
+            >
+              <TextInput
+                type="email"
+                placeholder={t('contactRecipientPlaceholder')}
+                value={sender.contactRecipient}
+                onChange={(value) => updateField('contactRecipient', value)}
+              />
+            </FormField>
+          )}
           <FormField
             label={t('footerAddressLabel')}
             hint={t('footerAddressHint')}

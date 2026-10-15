@@ -48,7 +48,9 @@ export const ConfirmDialogContent = ({
             type="button"
             variant={tone}
             onClick={confirm}
-            isDisabled={confirmValue !== expectedValue}
+            isDisabled={
+              expectedValue !== undefined && confirmValue !== expectedValue
+            }
             isPending={isPending}
             pendingLabel={confirmingButtonLabel}
           >
@@ -59,12 +61,14 @@ export const ConfirmDialogContent = ({
     >
       {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
 
-      <FormField
-        label={t('confirmLabel', { name: expectedValue })}
-        hint={t('confirmHint')}
-      >
-        <TextInput value={confirmValue} onChange={setConfirmValue} />
-      </FormField>
+      {expectedValue !== undefined && (
+        <FormField
+          label={t('confirmLabel', { name: expectedValue })}
+          hint={t('confirmHint')}
+        >
+          <TextInput value={confirmValue} onChange={setConfirmValue} />
+        </FormField>
+      )}
 
       {children}
     </AlertDialogShell>

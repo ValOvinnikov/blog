@@ -1,4 +1,6 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
@@ -34,6 +36,8 @@ vi.mock('@blog/db', async () => ({
 }));
 
 vi.mock('@platform/server/auth/auth');
+
+vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/email-config/update-email-config-action', () => ({
   updateEmailConfigAction: vi.fn(),
@@ -118,6 +122,47 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
     expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
+  });
+
+  it('hides the contact recipient field on a plan without the contact form', async () => {
+    await setup();
+
+    expect(
+      screen.queryByLabelText('Send contact messages to'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the stored contact recipient on a plan with the contact form', async () => {
+    getEmailConfigMock.mockResolvedValue({
+      senderName: 'Acme Co',
+      contactRecipient: 'leads@acme.example',
+      updatedAt: new Date(),
+    });
+
+    await setup({ tenant: { ...tenant, plan: 'GROWTH' } });
+
+    expect(screen.getByLabelText('Send contact messages to')).toHaveValue(
+      'leads@acme.example',
+    );
+  });
+
+  it('hides the contact recipient field from an editor', async () => {
+    vi.mocked(requireTenantMembership).mockImplementationOnce(async (id) => ({
+      tenant: makeReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
+      membership: {
+        id: 'membership-2',
+        userId: 'user-2',
+        tenantId: id,
+        role: MEMBERSHIP_ROLE.EDITOR,
+        createdAt: new Date('2026-04-02T00:00:00.000Z'),
+      },
+    }));
+
+    await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
+
+    expect(
+      screen.queryByLabelText('Send contact messages to'),
+    ).not.toBeInTheDocument();
   });
 
   it("shows each template's authored copy in the tenant's default language", async () => {

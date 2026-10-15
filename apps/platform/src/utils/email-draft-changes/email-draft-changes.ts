@@ -17,6 +17,7 @@ const SENDER_FIELDS = [
   'senderName',
   'replyToAddress',
   'footerPostalAddress',
+  'contactRecipient',
 ] as const satisfies (keyof TEmailSenderDraft)[];
 
 const isSenderFieldChanged =
@@ -116,7 +117,7 @@ export const resolveItemStatus = (
       return 'unsaved';
     }
     const isCustomised =
-      SENDER_FIELDS.some((field) => draft.sender[field] !== '') ||
+      SENDER_FIELDS.some((field) => Boolean(draft.sender[field])) ||
       draft.senderLogo.url !== undefined;
     return isCustomised ? 'customised' : 'default';
   }

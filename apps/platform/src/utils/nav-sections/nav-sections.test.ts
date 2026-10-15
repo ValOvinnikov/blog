@@ -97,6 +97,9 @@ describe('tenantNavSections', () => {
     expect(look?.href).toBe('/tenants/tenant-1/look');
     expect(voice?.href).toBe('/tenants/tenant-1/voice');
     expect(features?.href).toBe('/tenants/tenant-1/features');
+    expect(
+      configuration!.items.find((item) => item.label === 'Leads')?.href,
+    ).toBe('/tenants/tenant-1/leads');
     expect(domain?.href).toBe('/tenants/tenant-1/domain');
     expect(email?.href).toBe('/tenants/tenant-1/email');
     expect(look?.href).not.toBe(voice?.href);
@@ -148,13 +151,14 @@ describe('tenantNavSections', () => {
     expect(labels).not.toContain('later');
   });
 
-  it('lists the nine Configuration-section destinations, Look through Team, with no Studio', () => {
+  it('lists the ten Configuration destinations, Look through Team, with no Studio', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(configuration!.items.map((item) => item.label)).toEqual([
       'Look',
       'Voice',
       'Features',
+      'Leads',
       'Languages',
       'Domain',
       'Email',
@@ -185,6 +189,7 @@ describe('tenantNavSections', () => {
 const EVERY_PAGE: TPlanPageAccess = {
   languages: true,
   email: true,
+  leads: true,
   subscribers: true,
   comments: true,
   team: true,
@@ -193,6 +198,7 @@ const EVERY_PAGE: TPlanPageAccess = {
 const NO_PAGE: TPlanPageAccess = {
   languages: false,
   email: false,
+  leads: false,
   subscribers: false,
   comments: false,
   team: false,
@@ -223,6 +229,7 @@ describe('dashboardNavSections', () => {
       'Look',
       'Voice',
       'Features',
+      'Leads',
       'Languages',
       'Domain',
       'Email',
@@ -244,6 +251,7 @@ describe('dashboardNavSections', () => {
   it.each([
     ['languages', 'Languages'],
     ['email', 'Email'],
+    ['leads', 'Leads'],
     ['subscribers', 'Subscribers'],
     ['comments', 'Comments'],
     ['team', 'Team'],
@@ -278,6 +286,7 @@ describe('dashboardNavSections', () => {
     expect(hrefOf('Look')).toBe('/dashboard/look');
     expect(hrefOf('Voice')).toBe('/dashboard/voice');
     expect(hrefOf('Features')).toBe('/dashboard/features');
+    expect(hrefOf('Leads')).toBe('/dashboard/leads');
     expect(hrefOf('Languages')).toBe('/dashboard/languages');
     expect(hrefOf('Domain')).toBe('/dashboard/domain');
     expect(hrefOf('Email')).toBe('/dashboard/email');

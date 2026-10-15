@@ -1,5 +1,11 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  MEMBERSHIP_ROLE,
+  TENANT_PLAN,
+  type TTenantPlan,
+} from '@blog/db/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import {
@@ -29,10 +35,24 @@ const VALID_INPUT: TUpdateEmailConfigInput = {
   senderName: 'Acme Co',
   replyToAddress: 'support@acme.example',
   footerPostalAddress: '123 Main St, Springfield',
+  contactRecipient: 'leads@acme.example',
 };
+
+const mockTenantOnPlan = (plan: TTenantPlan) =>
+  vi.mocked(requireTenantMembership).mockResolvedValue({
+    tenant: makeReadyTenant({ id: 'tenant-1', plan }),
+    membership: {
+      id: 'membership-1',
+      userId: 'user-1',
+      tenantId: 'tenant-1',
+      role: MEMBERSHIP_ROLE.OWNER,
+      createdAt: new Date('2026-04-02T00:00:00.000Z'),
+    },
+  });
 
 describe(updateEmailConfigAction, () => {
   beforeEach(() => {
+    mockTenantOnPlan(TENANT_PLAN.GROWTH);
     upsertEmailConfigMock.mockReset();
     upsertEmailConfigMock.mockResolvedValue({});
     insertAuditEventMock.mockReset();
@@ -98,6 +118,7 @@ describe(updateEmailConfigAction, () => {
       senderName: null,
       replyToAddress: null,
       footerPostalAddress: null,
+      contactRecipient: null,
     });
 
     expect(result).toEqual({ ok: true });
@@ -105,7 +126,79 @@ describe(updateEmailConfigAction, () => {
       senderName: null,
       replyToAddress: null,
       footerPostalAddress: null,
+      contactRecipient: null,
     });
+  });
+
+  it('rejects an invalid contact recipient with a field error, and writes nothing', async () => {
+    const result = await updateEmailConfigAction('tenant-1', {
+      ...VALID_INPUT,
+      contactRecipient: 'not-an-email',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { contactRecipient: 'contactRecipientInvalid' },
+    });
+    expect(requireTenantMembership).not.toHaveBeenCalled();
+    expect(upsertEmailConfigMock).not.toHaveBeenCalled();
+  });
+
+  it('leaves the stored contact recipient untouched on a plan without the contact form', async () => {
+    mockTenantOnPlan(TENANT_PLAN.FREE);
+
+    await updateEmailConfigAction('tenant-1', VALID_INPUT);
+
+    expect(upsertEmailConfigMock).toHaveBeenCalledWith(
+      'tenant-1',
+      expect.objectContaining({ contactRecipient: undefined }),
+    );
+  });
+
+  it('leaves the stored contact recipient untouched when an editor saves', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValue({
+      tenant: makeReadyTenant({ id: 'tenant-1', plan: TENANT_PLAN.GROWTH }),
+      membership: {
+        id: 'membership-2',
+        userId: 'user-2',
+        tenantId: 'tenant-1',
+        role: MEMBERSHIP_ROLE.EDITOR,
+        createdAt: new Date('2026-04-02T00:00:00.000Z'),
+      },
+    });
+
+    await updateEmailConfigAction('tenant-1', VALID_INPUT);
+
+    expect(upsertEmailConfigMock).toHaveBeenCalledWith(
+      'tenant-1',
+      expect.objectContaining({ contactRecipient: undefined }),
+    );
+    expect(insertAuditEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        details: expect.not.objectContaining({
+          contactRecipient: 'leads@acme.example',
+        }),
+      }),
+    );
+  });
+
+  it('saves a contact recipient and clears it again with null', async () => {
+    await updateEmailConfigAction('tenant-1', VALID_INPUT);
+    await updateEmailConfigAction('tenant-1', {
+      ...VALID_INPUT,
+      contactRecipient: null,
+    });
+
+    expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
+      1,
+      'tenant-1',
+      expect.objectContaining({ contactRecipient: 'leads@acme.example' }),
+    );
+    expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
+      2,
+      'tenant-1',
+      expect.objectContaining({ contactRecipient: null }),
+    );
   });
 
   it('reports failure instead of throwing when the write itself fails, and records no audit event', async () => {
