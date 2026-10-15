@@ -62,6 +62,8 @@
     --brand-primary-muted
   ); /* @role tint / selection */
   /* prettier-ignore */
+  --color-tint: var(--tint, var(--brand-primary-muted)); /* @role brand tint of the surface in scope */
+  /* prettier-ignore */
   --color-brand-primary-contrast: var(--brand-primary-contrast); /* @role text on brand-primary-solid */
   /* Filled brand-primary surface (e.g. primary button). Kept distinct from
      --brand-primary so each mode can tune the fill independently: light mode
@@ -570,8 +572,21 @@
   --field-boundary: var(--field-boundary-tinted);
 }
 
+/* 10% lifts --tint off the band by ~1.13:1 light / ~1.16:1 dark while
+   brand-primary text on it holds ~4.05:1 / ~4.40:1. */
 @utility surface-brand-primary {
   --ambient: var(--brand-primary-muted);
+  --divider: var(--border-strong);
+  --field-boundary: var(--field-boundary-tinted);
+  --tint: color-mix(
+    in oklch,
+    var(--brand-primary-muted),
+    var(--brand-primary) 10%
+  );
+}
+
+@utility surface-tint {
+  --ambient: var(--tint, var(--brand-primary-muted));
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
 }

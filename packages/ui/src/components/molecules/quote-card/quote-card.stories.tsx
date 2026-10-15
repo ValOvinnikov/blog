@@ -3,6 +3,7 @@ import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { Carousel } from '@blog/ui/components/organisms/carousel';
+import { BRAND_BAND_LABELS, BrandBand } from '@blog/ui/testing/brand-bands';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -152,24 +153,14 @@ export const LinkedVsUnlinkedName: TStory = {
   render: LinkedVsUnlinked,
 };
 
-const BRAND_BANDS = [
-  { className: 'bg-primary', tone: BRAND_VARIANT.PRIMARY },
-  {
-    className: 'bg-secondary surface-secondary',
-    tone: BRAND_VARIANT.SECONDARY,
-  },
-] as const;
-
 const OnEveryBand = (args: TQuoteCardProps) => (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-    {BRAND_BANDS.map(({ className, tone }) => (
-      <div
-        key={className}
-        className={className}
-        style={{ maxWidth: 360, padding: '1.5rem' }}
-      >
-        <QuoteCard {...args} tone={tone} />
-      </div>
+    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
+      <BrandBand key={tone} tone={tone}>
+        <div style={{ maxWidth: 312 }}>
+          <QuoteCard {...args} tone={tone} />
+        </div>
+      </BrandBand>
     ))}
   </div>
 );
