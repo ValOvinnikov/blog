@@ -122,6 +122,66 @@ describe(createLogger, () => {
       expect(parsed.error.stack).toBe(error.stack);
     });
 
+    it('keeps the name of an Error, and its string digest and code', () => {
+      const error = Object.assign(new TypeError('render failed'), {
+        digest: 'DYNAMIC_SERVER_USAGE',
+        code: 'ERR_RENDER',
+      });
+
+      logger.error('request.unhandled_error', { error });
+
+      const parsed = JSON.parse(captureCall(errorSpy)) as {
+        error: { name: string; digest: string; code: string };
+      };
+      expect(parsed.error.name).toBe('TypeError');
+      expect(parsed.error.digest).toBe('DYNAMIC_SERVER_USAGE');
+      expect(parsed.error.code).toBe('ERR_RENDER');
+    });
+
+    it('leaves out a digest or code that is not a string', () => {
+      const error = Object.assign(new Error('boom'), {
+        digest: 42,
+        code: { nested: true },
+      });
+
+      logger.error('request.failed', { error });
+
+      const parsed = JSON.parse(captureCall(errorSpy)) as {
+        error: Record<string, unknown>;
+      };
+      expect('digest' in parsed.error).toBe(false);
+      expect('code' in parsed.error).toBe(false);
+    });
+
+    it('logs an Error without a digest or code as its name, message and stack', () => {
+      const error = new Error('boom');
+      error.stack = 'Error: boom\n  at short ()';
+
+      logger.error('request.failed', { error });
+
+      const parsed = JSON.parse(captureCall(errorSpy)) as {
+        error: Record<string, unknown>;
+      };
+      expect(parsed.error).toEqual({
+        name: 'Error',
+        message: 'boom',
+        stack: 'Error: boom\n  at short ()',
+      });
+    });
+
+    it('strips control characters from a digest', () => {
+      const error = Object.assign(new Error('boom'), {
+        digest: 'abc\ninjected',
+      });
+
+      logger.error('request.failed', { error });
+
+      const parsed = JSON.parse(captureCall(errorSpy)) as {
+        error: { digest: string };
+      };
+      expect(parsed.error.digest).toBe('abc injected');
+    });
+
     it('omits undefined context fields instead of emitting null', () => {
       logger.warn('event.name', { present: 'value', missing: undefined });
 

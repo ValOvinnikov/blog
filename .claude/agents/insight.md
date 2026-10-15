@@ -67,7 +67,8 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
 - **Reserved fields** (`level`/`event`/`ts`) spread in _after_ context, so a
   same-named context key can never spoof them.
 - **Context normalization stays total.** An `Error` anywhere in plain
-  objects or arrays becomes `{ message, stack }`, its message through
+  objects or arrays becomes `{ name, message, stack }`, plus its `digest`
+  and `code` when they are strings — all but the stack through
   `sanitizeLogMessage`; every string has U+2028/U+2029 neutralized, which
   `JSON.stringify` leaves raw; recursion is depth-bounded and cycle-safe,
   degrading to a marker instead of throwing; a non-plain object (a `Date`, a
