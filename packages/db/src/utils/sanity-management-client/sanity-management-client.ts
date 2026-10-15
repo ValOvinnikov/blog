@@ -9,6 +9,9 @@ export const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 // base every other endpoint in this file uses.
 const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
 
+// Fails a hung Sanity call instead of stalling a whole provisioning run.
+export const SANITY_API_TIMEOUT_MS = 30_000;
+
 export type TSanityDeleteResult = {
   outcome:
     | 'deleted'
@@ -157,6 +160,7 @@ export async function sanityAccessRequest<T>(
 ): Promise<T> {
   const response = await fetch(`${SANITY_ACCESS_API_BASE}${path}`, {
     ...init,
+    signal: AbortSignal.timeout(SANITY_API_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',

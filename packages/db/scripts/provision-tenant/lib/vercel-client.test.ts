@@ -33,6 +33,21 @@ describe(listVercelProjectDomains, () => {
     const [url] = fetchMock.mock.calls[0] as [string];
     expect(url).toBe('https://api.vercel.com/v9/projects/prj_1/domains');
   });
+
+  it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ domains: [] }), { status: 200 }),
+    );
+
+    await listVercelProjectDomains({
+      token: 'tok',
+      teamId: undefined,
+      projectId: 'prj_1',
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
 });
 
 describe(addVercelProjectDomain, () => {

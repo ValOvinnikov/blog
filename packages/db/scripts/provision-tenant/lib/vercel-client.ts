@@ -1,5 +1,6 @@
 // Vercel REST API — https://vercel.com/docs/rest-api.
 const VERCEL_API_BASE = 'https://api.vercel.com';
+const VERCEL_API_TIMEOUT_MS = 30_000;
 
 function withTeamId(path: string, teamId: string | undefined): string {
   if (!teamId) return path;
@@ -14,6 +15,7 @@ async function vercelRequest<T>(
 ): Promise<T> {
   const response = await fetch(`${VERCEL_API_BASE}${path}`, {
     ...init,
+    signal: AbortSignal.timeout(VERCEL_API_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
