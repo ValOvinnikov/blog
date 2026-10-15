@@ -86,4 +86,3 @@ The same "Actions" building block — `ctaButtons`, rendered by `ActionGroup` �
 
 - #5016 — one-entry skins: #5019 (the Background fields list the skin registry), #5021 (`CtaModule` card and Banner render `data-skin`; tone-keyed `bg-*`/`surface-*` pairs go), #5022 (`Section` renders its skin; `isOnDark` leaves `ActionGroup`).
 - #5028 — text roles: #5033 (CTA supporting text becomes INTRO, footnote becomes FOOTNOTE).
-- #4987 — accessible text and colour: #3076 (Banner copy AA-legible over a bright photo).

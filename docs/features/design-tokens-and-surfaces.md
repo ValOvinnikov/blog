@@ -12,7 +12,7 @@ code:
   - packages/ui/src/lib/design-tokens/**
   - packages/ui/index.css
   - apps/web/index.css
-epics: [4987, 4990, 4991, 4994, 4996, 4997, 3076, 4858]
+epics: [4987, 4990, 4991, 4994, 4996, 4997, 4858]
 ---
 
 # Design tokens and surfaces
@@ -99,5 +99,4 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - #4994 — text-field and switch boundaries reach 3:1 on every band (a field-boundary role token).
 - #4996 — label-size text at the owner's chosen readable floor.
 - #4997 — CI renders every module per band, theme and mode and fails on a contrast regression.
-- #3076 — banner copy stays AA over a bright photo (scrim tokens).
 - #4858 — card hover stays visible on a Brand primary band.

@@ -1390,8 +1390,9 @@ its image is a full-bleed background, so the copy needs a floor under it.
 `BRAND_PRIMARY`, `NEUTRAL_SCRIM_*` otherwise) and by `position` — the
 gradient's strongest stop always sits under wherever the Banner's copy
 renders from `sm` up, and centres below it, so on-image text stays legible
-whichever side it's on — and switches the copy to the `text-on-image`/
-`text-on-image-muted` tokens. `SPLIT` and `STACKED` ignore `tone` entirely.
+whichever side it's on; no copy sits past the mid stop, so below `lg` the
+gradients never fade to weak — and switches titles and running text alike
+to `text-on-image` (85% white fails 4.5:1 over the brand mid stop). `SPLIT` and `STACKED` ignore `tone` entirely.
 Both organisms compose one `bannerVariants` recipe
 (`packages/ui/src/lib/styling/banner.ts`), which owns the breakout, the
 scrims, the band padding and the min-height, so `Hero` and `CtaModule`
