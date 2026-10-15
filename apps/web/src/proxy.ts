@@ -238,5 +238,7 @@ export default async function proxy(
 }
 
 export const config = {
-  matcher: '/((?!api|_next|_vercel|icon|\\.well-known).*)',
+  // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
+  matcher:
+    '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b).*)',
 };
