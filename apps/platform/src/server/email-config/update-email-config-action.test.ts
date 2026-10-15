@@ -155,7 +155,7 @@ describe(updateEmailConfigAction, () => {
     );
   });
 
-  it('leaves the stored contact recipient untouched for an editor on a plan with the contact form', async () => {
+  it('leaves the stored contact recipient untouched when an editor saves', async () => {
     vi.mocked(requireTenantMembership).mockResolvedValue({
       tenant: makeReadyTenant({ id: 'tenant-1', plan: TENANT_PLAN.GROWTH }),
       membership: {

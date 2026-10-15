@@ -146,7 +146,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
     );
   });
 
-  it('hides the contact recipient field from an editor, even on a plan with the contact form', async () => {
+  it('hides the contact recipient field from an editor', async () => {
     vi.mocked(requireTenantMembership).mockImplementationOnce(async (id) => ({
       tenant: makeReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
       membership: {

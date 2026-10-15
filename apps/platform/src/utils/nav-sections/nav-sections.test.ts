@@ -151,7 +151,7 @@ describe('tenantNavSections', () => {
     expect(labels).not.toContain('later');
   });
 
-  it('lists the ten Configuration-section destinations, Look through Team, with no Studio', () => {
+  it('lists the ten Configuration destinations, Look through Team, with no Studio', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(configuration!.items.map((item) => item.label)).toEqual([
