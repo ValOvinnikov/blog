@@ -1,6 +1,6 @@
-// An em offset clears descenders at every font size, where a fixed 2px runs through them.
+// 0.4em clears descenders with the 2px hover line too, yet stays above the next line's ascenders at the tightest body leading (1.55).
 const UNDERLINE =
-  'underline underline-offset-[0.2em] [text-decoration-skip-ink:auto]';
+  'underline underline-offset-[0.4em] [text-decoration-skip-ink:auto]';
 
 export const LINK_UNDERLINE = [UNDERLINE, 'decoration-1 hover:decoration-2'];
 
