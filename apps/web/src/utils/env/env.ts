@@ -57,6 +57,12 @@ export const env = createEnv({
     // @env-optional
     KV_REST_API_TOKEN: z.string().min(1).optional(),
     // @env-optional
+    LOKI_PUSH_URL: z.string().min(1).optional(),
+    // @env-optional
+    LOKI_USER: z.string().min(1).optional(),
+    // @env-optional
+    LOKI_TOKEN: z.string().min(1).optional(),
+    // @env-optional
     VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
   },
   client: {
@@ -76,6 +82,9 @@ export const env = createEnv({
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
     KV_REST_API_URL: process.env.KV_REST_API_URL,
     KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
+    LOKI_PUSH_URL: process.env.LOKI_PUSH_URL,
+    LOKI_USER: process.env.LOKI_USER,
+    LOKI_TOKEN: process.env.LOKI_TOKEN,
     VERCEL_ENV: process.env.VERCEL_ENV,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
