@@ -24,7 +24,7 @@ describe(`<${ThemeScope.name}/>`, () => {
       'style[data-href="tenant-theme"]',
     );
     expect(style?.innerHTML).toContain(
-      '--brand-primary: oklch(0.53 0.17 250);',
+      '--brand-primary: oklch(0.45 0.17 250);',
     );
   });
 });

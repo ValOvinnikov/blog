@@ -51,9 +51,9 @@
   ); /* @role control boundary of the surface in scope */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
-  --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
+  --color-text-subtle: var(--text-muted); /* @role metadata / low emphasis */
   --color-muted: var(--text-muted); /* @role secondary body text (alias) */
-  --color-subtle: var(--text-subtle); /* @role metadata (alias) */
+  --color-subtle: var(--text-muted); /* @role metadata (alias) */
   --color-brand-primary: var(--brand-primary); /* @role links / interactive */
   --color-brand-primary-hover: var(
     --brand-primary-hover
@@ -293,22 +293,12 @@
   --field-boundary: var(--border-emphasis);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
-  --text-subtle: oklch(0.6 0.008 250);
-  /* --brand-primary's L was lowered from 0.58 (independently re-derived: old
-     value measured 4.15:1 vs --primary / 3.86:1 vs --primary-subtle, both
-     under the 4.5:1 AA minimum for normal text). At L=0.53 it measures
-     ~5.07:1 / ~4.72:1. --brand-primary-hover keeps the original -0.06 delta
-     below --brand-primary. */
-  --brand-primary: oklch(0.53 0.17 250);
-  --brand-primary-hover: oklch(0.47 0.17 250);
+  --brand-primary: oklch(0.45 0.17 250);
+  --brand-primary-hover: oklch(0.39 0.17 250);
   --brand-primary-muted: oklch(0.95 0.03 250);
   --brand-primary-contrast: oklch(0.99 0 0);
-  /* Filled-surface brand-primary — white text hits WCAG AA (~4.7:1) at this
-     lightness. Independent of --brand-primary by design (see comment above
-     `--color-brand-primary-solid` in the @theme inline block); unaffected by
-     --brand-primary's contrast fix. */
-  --brand-primary-solid: oklch(0.55 0.17 250);
-  --brand-primary-solid-hover: oklch(0.49 0.17 250);
+  --brand-primary-solid: oklch(0.51 0.17 250);
+  --brand-primary-solid-hover: oklch(0.45 0.17 250);
   --ring: var(--brand-primary);
   /* --info aliases --brand-primary rather than duplicating it: info conveys
      no success/failure valence, so it deliberately reuses the brand-primary
@@ -352,14 +342,7 @@
      stays a genuinely pale tint at the same visual weight as
      --brand-primary-muted (light --error-muted #ffe7e4 next to
      --brand-primary-muted's own #e0f1ff), not the medium-toned wash an
-     earlier L=0.64 revision produced.
-
-     SettingRow's description slot (text-subtle) also renders on
-     bg-error-muted, at ~3.3:1 light / ~3.0:1 dark — under 4.5:1. text-subtle
-     is used throughout this design system for low-emphasis metadata without
-     a strict AA bar (e.g. post-meta/breadcrumbs/pagination render it
-     directly on --primary at only ~3.8:1), so this is consistent with existing
-     precedent rather than a new gap and is left as-is. */
+     earlier L=0.64 revision produced. */
   --success: oklch(0.49 0.15 150);
   --warn: oklch(0.52 0.15 75);
   --error: oklch(0.53 0.2 25);
@@ -418,7 +401,6 @@
   --field-boundary: var(--border-emphasis);
   --text: oklch(0.95 0.004 250);
   --text-muted: oklch(0.72 0.008 250);
-  --text-subtle: oklch(0.56 0.008 250);
   --brand-primary: oklch(0.7 0.16 250);
   --brand-primary-hover: oklch(0.76 0.16 250);
   --brand-primary-muted: oklch(0.3 0.06 250);

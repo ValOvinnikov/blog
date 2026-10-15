@@ -60,12 +60,6 @@ export const CONTRAST_PAIRS = {
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
-  TEXT_SUBTLE: {
-    foreground: '--text-subtle',
-    surfaces: TEXT_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
   BRAND_PRIMARY: {
     foreground: '--brand-primary',
     surfaces: BANDS,

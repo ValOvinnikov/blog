@@ -41,12 +41,12 @@ describe('buildThemeStyleBlock', () => {
   it('reproduces the static Console defaults', () => {
     const css = buildThemeStyleBlock(CONSOLE_TOKENS);
 
-    expect(css).toContain('--brand-primary: oklch(0.53 0.17 250);');
-    expect(css).toContain('--brand-primary-hover: oklch(0.47 0.17 250);');
+    expect(css).toContain('--brand-primary: oklch(0.45 0.17 250);');
+    expect(css).toContain('--brand-primary-hover: oklch(0.39 0.17 250);');
     expect(css).toContain('--brand-primary-muted: oklch(0.95 0.03 250);');
     expect(css).toContain('--brand-primary-contrast: oklch(0.99 0 0);');
-    expect(css).toContain('--brand-primary-solid: oklch(0.55 0.17 250);');
-    expect(css).toContain('--brand-primary-solid-hover: oklch(0.49 0.17 250);');
+    expect(css).toContain('--brand-primary-solid: oklch(0.51 0.17 250);');
+    expect(css).toContain('--brand-primary-solid-hover: oklch(0.45 0.17 250);');
     expect(css).toContain('--logo-1: oklch(0.52 0.17 250);');
     expect(css).toContain('--logo-2: oklch(0.63 0.16 250);');
     expect(css).toContain('--logo-3: oklch(0.73 0.13 250);');
@@ -75,7 +75,7 @@ describe('buildThemeStyleBlock', () => {
       logoHue: 274,
     });
 
-    expect(css).toContain('--brand-primary: oklch(0.53 0.17 65);');
+    expect(css).toContain('--brand-primary: oklch(0.45 0.17 65);');
     expect(css).toContain('--brand-primary-muted: oklch(0.95 0.03 65);');
     expect(css).toContain('--logo-1: oklch(0.52 0.17 274);');
     expect(css).toContain('--logo-2: oklch(0.63 0.16 274);');
@@ -101,7 +101,7 @@ describe('buildThemeStyleBlock', () => {
       density: 'COMPACT',
     });
 
-    expect(css).toContain('--brand-primary: oklch(0.53 0.17 28);');
+    expect(css).toContain('--brand-primary: oklch(0.45 0.17 28);');
     expect(css).toContain('--logo-1: oklch(0.52 0.17 28);');
   });
 
