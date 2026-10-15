@@ -9,7 +9,7 @@ import {
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
 
-type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
+export type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
 
 export type TOklchRamp = Record<`--${string}`, TOklchStop>;
 

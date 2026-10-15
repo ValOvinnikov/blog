@@ -14,13 +14,6 @@ export function oklchToHex(l: number, c: number, h: number): string {
 /** WCAG 2 AA contrast-ratio floor for normal text. */
 export const WCAG_AA_CONTRAST_MIN = 4.5;
 
-export function wcagContrastRatio(
-  a: { l: number; c: number; h: number },
-  b: { l: number; c: number; h: number },
-): number {
-  return wcagContrast({ mode: 'oklch', ...a }, { mode: 'oklch', ...b });
-}
-
 export type TOklchColor = { l: number; c: number; h: number; alpha?: number };
 
 type TToSrgb = (color: TOklchColor) => Rgb;

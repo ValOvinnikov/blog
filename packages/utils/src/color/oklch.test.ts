@@ -2,7 +2,6 @@ import {
   oklchToHex,
   renderedContrastRatio,
   WCAG_AA_CONTRAST_MIN,
-  wcagContrastRatio,
 } from './oklch';
 
 describe('oklchToHex', () => {
@@ -16,35 +15,6 @@ describe('oklchToHex', () => {
 
   it('converts a high-chroma indigo stop to its hex', () => {
     expect(oklchToHex(0.58, 0.21, 274)).toBe('#5966f3');
-  });
-});
-
-describe('wcagContrastRatio', () => {
-  it('returns ~21:1 for black vs. white', () => {
-    const black = { l: 0, c: 0, h: 0 };
-    const white = { l: 1, c: 0, h: 0 };
-    expect(wcagContrastRatio(black, white)).toBeCloseTo(21, 0);
-  });
-
-  it('returns 1 for identical colors', () => {
-    const color = { l: 0.5, c: 0.1, h: 250 };
-    expect(wcagContrastRatio(color, color)).toBeCloseTo(1, 5);
-  });
-
-  it('passes AA for light-mode --text vs. --brand-primary-muted at console hue 250 (borderline)', () => {
-    const text = { l: 0.2, c: 0.01, h: 250 };
-    const brandPrimaryMuted = { l: 0.95, c: 0.03, h: 250 };
-    expect(wcagContrastRatio(text, brandPrimaryMuted)).toBeGreaterThanOrEqual(
-      WCAG_AA_CONTRAST_MIN,
-    );
-  });
-
-  it('passes AA for dark-mode --text vs. --brand-primary-muted at console hue 250', () => {
-    const text = { l: 0.95, c: 0.004, h: 250 };
-    const brandPrimaryMuted = { l: 0.3, c: 0.06, h: 250 };
-    expect(wcagContrastRatio(text, brandPrimaryMuted)).toBeGreaterThanOrEqual(
-      WCAG_AA_CONTRAST_MIN,
-    );
   });
 });
 
@@ -68,21 +38,18 @@ describe('renderedContrastRatio', () => {
     ).toBeCloseTo(11.45, 1);
   });
 
-  it('measures an out-of-gamut colour below its unclamped ratio', () => {
+  it('measures an out-of-gamut teal below the AA floor on white', () => {
     const outOfGamutTeal = { l: 0.53, c: 0.17, h: 190 };
 
     expect(renderedContrastRatio(outOfGamutTeal, [white])).toBeLessThan(
-      wcagContrastRatio(outOfGamutTeal, white),
+      WCAG_AA_CONTRAST_MIN,
     );
   });
 
-  it('matches the unclamped ratio for an in-gamut pair', () => {
+  it('measures an in-gamut pair at its plain ratio', () => {
     const text = { l: 0.2, c: 0.01, h: 250 };
     const surface = { l: 0.975, c: 0.003, h: 250 };
 
-    expect(renderedContrastRatio(text, [surface])).toBeCloseTo(
-      wcagContrastRatio(text, surface),
-      2,
-    );
+    expect(renderedContrastRatio(text, [surface])).toBeCloseTo(16.84, 2);
   });
 });
