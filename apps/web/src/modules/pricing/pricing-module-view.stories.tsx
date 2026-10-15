@@ -152,10 +152,26 @@ export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
 };
 
+export const SidebarColumn: TStory = {
+  args: { panels: panelsFor(tiers.slice(0, 3)) },
+  decorators: [
+    (Story) => (
+      <div className="max-w-[37.5rem]">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
 export const TabletTwoByTwo: TStory = {
   globals: { viewport: 'tablet' },
 };
 
 export const PhoneStacked: TStory = {
+  globals: { viewport: 'mobile' },
+};
+
+export const ThreeTiersPhone: TStory = {
+  args: { panels: panelsFor(tiers.slice(0, 3)) },
   globals: { viewport: 'mobile' },
 };

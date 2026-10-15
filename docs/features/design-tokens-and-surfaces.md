@@ -34,7 +34,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 
 - **`@theme inline`** — semantic colour utilities (`bg-surface`, `text-text-muted`, `border-divider`, `ring-offset-ambient`, `bg-brand-primary-solid`, status `success`/`warn`/`error`/`info` and their `-muted` tints, `on-image`), `shadow-card`, `shadow-float`, and the font stacks. Each emits `var(--…)` rather than a literal.
 - **`@theme`** — radius steps plus role radii (`--radius-card` → `--radius-md`, `--radius-media` → `--radius-lg`, `--radius-item` → `--item-radius`); containers; layout spacing (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, and the `band` step with its `sm`–`xl` ladder); the type scale (`title-*`, `prose-*`, `card-*`, `meta`, `label`, `code`, …); tracking; easing.
-- **`:root`, with `.dark` overrides** — page neutrals (`primary`, `primary-subtle`, `secondary`, `surface`, `surface-2`), borders (`border`, `border-strong`, `border-emphasis`), ink (`text`, `text-muted`, `text-subtle`), the brand ramp, `ring`, status colours, logo steps, shadows, durations, the on-image and scrim tokens, the five `--item-*` card properties, and `--ambient`/`--divider`.
+- **`:root`, with `.dark` overrides** — page neutrals (`primary`, `primary-subtle`, `secondary`, `surface`, `surface-2`), borders (`border`, `border-strong`, `border-emphasis`), ink (`text`, `text-muted`, `text-subtle`), the brand ramp, `ring`, status colours, logo steps, shadows, durations, the on-image and scrim tokens, the five `--item-*` card properties, and `--ambient`/`--divider`/`--field-boundary`.
 - **`@blog/config` theme tables** (`theme-declarations.ts`) — `ACCENT_RAMP_LIGHT/DARK`, `LOGO_RAMP_LIGHT/DARK` and `IMAGE_SCRIM_RAMP` as OKLCH stops with fixed lightness and chroma, plus `RADIUS_DECLARATIONS`, `DENSITY_DECLARATIONS` and `CARD_STYLE_DECLARATIONS`. `formatOklchRamp` fills in the tenant's hue.
 - **Colour maths** — `@blog/utils/color`: `wcagContrastRatio` (culori, OKLCH in, no gamut mapping), `oklchToHex`, `WCAG_AA_CONTRAST_MIN` (4.5).
 
@@ -46,9 +46,9 @@ Nothing is stored; these are static CSS and TypeScript tables.
 
 ## Constraints and invariants
 
-- **Surfaces set, components read.** `--ambient` (default `var(--primary)`, read by `ring-offset-ambient`) and `--divider` (default `var(--border)`, read by `border-divider`) are inherited. Four utilities retarget them:
-  - `surface-secondary`: ambient → `secondary`, divider → `border-strong`.
-  - `surface-brand-primary`: ambient → `brand-primary-muted`, divider → `border-strong`.
+- **Surfaces set, components read.** `--ambient` (default `var(--primary)`, read by `ring-offset-ambient`), `--divider` (default `var(--border)`, read by `border-divider`) and `--field-boundary` (default `var(--border-emphasis)`, read by `border-field-boundary`/`bg-field-boundary`) are inherited. Four utilities retarget them:
+  - `surface-secondary`: ambient → `secondary`, divider → `border-strong`, field boundary → `field-boundary-tinted`.
+  - `surface-brand-primary`: ambient → `brand-primary-muted`, divider → `border-strong`, field boundary → `field-boundary-tinted`.
   - `surface-card`: ambient → `surface`, divider → `border`.
   - `surface-nested`: ambient → `surface-2`, divider → `border-strong`.
 - **Who applies them.** `apps/web`'s `Section` per `brandVariant`; `CtaModule`, `Footer` and the banner styling; every `bg-surface` card root (`Panel`, `PricingCard`, `Toast`, the `PopoverMenu` panel, item cards); and the `bg-surface-2` roots that hold focusable content (`MediaFrame`, `Aside`, `Panel.Header`, the compact `NewsletterSignup`). Image and scrim surfaces set neither.
@@ -58,7 +58,9 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - **Item cards.** `item-card` draws a solid border from `--item-border-width`, a left accent from `--item-accent-width/color`, a `--surface` fill and `--item-shadow`. `ACCENT_BAR` (the static default) is square with a 2px brand bar; `OUTLINED` is a 1px hairline at `--radius-md`. Both have no shadow. `INTERACTIVE_ITEM_CARD` adds a `brand-primary-muted` tint on hover and focus-within.
 - **Elevation.** `shadow-card` is for raised cards (`Panel`, the highlighted `PricingCard`, the `CtaModule` card); `shadow-float` is for chrome above the page (`Toast`, `PopoverMenu`, `Dialog`).
 - **Dividers.** Dividers on secondary and brand bands use `border-strong`, which is decorative and below 3:1 on purpose. `--border-emphasis` (3.29:1 light, 3.73:1 dark against `primary-subtle`) is the token for a border that is the only indicator.
+- **Control boundaries.** An enabled `TextInput`'s border and an off `Switch`'s track use `field-boundary`, which reaches 3:1 (WCAG 1.4.11) against the `surface` field fill and against the band behind it on every brand variant, in both modes and at every accent hue: `border-emphasis` on page and card surfaces, and the darker (light) or lighter (dark) `--field-boundary-tinted` on secondary and brand bands, where `border-emphasis` falls short. A disabled `TextInput` drops to `border-strong`, since inactive controls are exempt.
 - **The accent and logo hues are the only tenant colour inputs.** Ramp lightness and chroma never vary, so a token pair's contrast depends on the hue alone. `isAccentHueAccessible` checks one pair (`--text` on `--brand-primary-muted`, both modes) and accepts every hue. No other token pair is checked automatically; the measured ratios live as comments in `theme.css`.
+- **Focus under forced colours.** Components draw focus as a `ring` and drop the outline with `focus-visible:outline-none`; Windows High Contrast discards the ring's box-shadow. An unlayered `@media (forced-colors: active)` rule in `theme.css` restores a 2px `Highlight` outline on every `:focus-visible`, on the site and in the admin. It must stay outside `@layer`, since any layered rule loses to `@layer utilities`. Outside forced colours it does nothing.
 - `--text-subtle` measures under 4.5:1 on most surfaces. `theme.css` records it as accepted for low-emphasis metadata.
 - **Static defaults equal Console.** `theme.css`'s static values equal `buildThemeStyleBlock`'s Console output (`MD`, `DEFAULT`, `ACCENT_BAR`, hue 250), and a test reads `theme.css` for the radius, spacing, item-card and scrim tokens and checks the brand and logo ramps against fixed literals. Changing a static token means changing its declaration table too.
 - The platform preview re-derives `--radius-card`, `--radius-media` and `--radius-item`, because `@theme` derives them on `:root`.
@@ -89,7 +91,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - `packages/utils/src/color/oklch.test.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.test.ts` (Console parity with `theme.css`)
 - `packages/ui/src/lib/design-tokens/parse-theme-tokens.test.ts`, `token-registry.test.ts`
-- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, and every `@blog/ui` component's stories across the bands.
+- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, the `OnBands` stories of `TextInput` and `Switch` (`packages/ui/src/testing/surface-bands.tsx`), and every `@blog/ui` component's stories across the bands.
 
 ## Related
 

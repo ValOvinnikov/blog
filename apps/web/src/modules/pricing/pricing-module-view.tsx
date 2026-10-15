@@ -1,5 +1,6 @@
 import type { TPricingModule } from '@blog/service';
 import { Text } from '@blog/ui/components/atoms/text';
+import { PricingCardGrid } from '@blog/ui/components/organisms/pricing-card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
@@ -31,15 +32,15 @@ export const PricingModuleView = ({
 }: IPricingModuleViewProps) => {
   const s = moduleGridActionsVariants({ align: contentAlignment });
   const tierCount = panels[0]?.cards.length ?? 0;
-  const count = TIER_COUNTS.find((value) => value === tierCount);
-  const v = pricingModuleViewVariants({ count, align: contentAlignment });
+  const columns = TIER_COUNTS.find((value) => value === tierCount);
+  const v = pricingModuleViewVariants({ align: contentAlignment });
 
   const renderCards = (panel: IPricingPanel) => (
-    <div className={v.grid()}>
+    <PricingCardGrid columns={columns}>
       {panel.cards.map((card) => (
         <PricingTierCard key={card.id} card={card} />
       ))}
-    </div>
+    </PricingCardGrid>
   );
 
   const switchPanels = panels.flatMap((panel) =>
