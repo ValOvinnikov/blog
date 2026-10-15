@@ -10,7 +10,7 @@ export const languageCodesVariants = tv({
       false: {
         list: ['gap-0.5 rounded-full border border-border-strong p-0.5'],
         link: [
-          'h-6 min-w-6 justify-center rounded-full px-1.5 text-label',
+          'h-6 min-w-6 justify-center rounded-full px-1.5 text-label no-underline',
           'aria-[current=page]:bg-brand-primary',
           'aria-[current=page]:text-brand-primary-contrast',
           'aria-[current=page]:hover:text-brand-primary-contrast',
