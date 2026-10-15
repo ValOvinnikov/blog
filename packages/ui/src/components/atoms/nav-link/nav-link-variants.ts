@@ -15,8 +15,12 @@ export const navLinkVariants = tv({
   },
   variants: {
     isActive: {
-      true: { root: ['text-brand-primary', ...LINK_UNDERLINE_EMPHASIS] },
+      true: { root: ['text-brand-primary'] },
       false: { root: ['text-muted'] },
+    },
+    currentStyle: {
+      underline: { root: [] },
+      weight: { root: [] },
     },
     variant: {
       plain: { root: [] },
@@ -27,7 +31,23 @@ export const navLinkVariants = tv({
       },
     },
   },
-  defaultVariants: { isActive: false, variant: 'plain' },
+  compoundVariants: [
+    {
+      isActive: true,
+      currentStyle: 'underline',
+      class: { root: LINK_UNDERLINE_EMPHASIS },
+    },
+    {
+      isActive: true,
+      currentStyle: 'weight',
+      class: { root: ['font-semibold'] },
+    },
+  ],
+  defaultVariants: {
+    isActive: false,
+    variant: 'plain',
+    currentStyle: 'underline',
+  },
 });
 
 export type TNavLinkVariants = VariantProps<typeof navLinkVariants>;
