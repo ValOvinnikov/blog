@@ -1,8 +1,8 @@
-import { isClientLogRateLimited } from '@web/server/client-log/client-log-rate-limiter/client-log-rate-limiter';
 import {
   clientLogSchema,
   sanitizeClientLogPayload,
 } from '@web/server/client-log/client-log-schema/client-log-schema';
+import { createRateLimiter } from '@web/server/rate-limit/rate-limiter/rate-limiter';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 
@@ -10,6 +10,12 @@ import { NextResponse } from 'next/server';
 // user-agent adds up to well under this), tight enough that no single
 // report can carry a meaningfully large payload.
 const MAX_PAYLOAD_BYTES = 8 * 1024;
+
+const clientLogRateLimiter = createRateLimiter({
+  name: 'client-log',
+  windowMs: 60_000,
+  maxRequests: 20,
+});
 
 const resolveClientKey = (request: Request): string => {
   // Vercel overwrites `x-forwarded-for` on every request it proxies and
@@ -62,25 +68,13 @@ const readBodyWithinByteCap = async (
   return Buffer.concat(chunks).toString('utf8');
 };
 
-/**
- * `POST /api/client-log` — the browser-side error reporter's
- * (`@web/utils/report-client-error`) sink: `error.tsx`/`global-error.tsx`
- * and the app's explicit client catches all report here via
- * `navigator.sendBeacon`/`fetch(..., { keepalive: true })`. This is the
- * app's first unauthenticated public write endpoint, so every layer here is
- * deliberately defensive: a strict, fixed-field Zod schema that rejects any
- * unknown key, a hard payload-size cap enforced on the stream itself (not
- * just the `Content-Length` header), an in-memory per-instance rate limiter
- * (see `isClientLogRateLimited`'s own doc comment for its cross-instance
- * limitation), and control-character sanitization on every string field
- * before it ever reaches the shared logger.
- *
- * `proxy.ts`'s matcher excludes `/api/**`, so no tenant/locale middleware
- * runs in front of this route.
- */
+// `proxy.ts`'s matcher excludes `/api/**`, so no tenant or locale resolution runs first.
 export async function POST(request: Request): Promise<NextResponse> {
-  const clientKey = resolveClientKey(request);
-  if (isClientLogRateLimited(clientKey)) {
+  const isLimited = await clientLogRateLimiter.isLimited({
+    tenantKey: request.headers.get('host') ?? 'unknown',
+    clientKey: resolveClientKey(request),
+  });
+  if (isLimited) {
     return NextResponse.json(
       { message: 'Too many requests.' },
       { status: 429 },
@@ -121,11 +115,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  // The static event name stays fixed regardless of what the client
-  // reports — the client-supplied `event` (already regex-bounded by the
-  // schema) rides along as a `clientEvent` context field instead of the
-  // log line's own `event`, so every report from this route groups under
-  // one name downstream rather than fragmenting by client-controlled input.
   const { event: clientEvent, ...context } = sanitizeClientLogPayload(
     parsed.data,
   );

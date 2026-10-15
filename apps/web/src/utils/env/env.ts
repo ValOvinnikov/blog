@@ -50,6 +50,14 @@ export const env = createEnv({
     // domain is configured.
     // @env-optional
     NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
+    // Injected by the Upstash Redis Marketplace integration; the rate limiter
+    // refuses to start without them when VERCEL_ENV is production.
+    // @env-optional
+    KV_REST_API_URL: z.string().url().optional(),
+    // @env-optional
+    KV_REST_API_TOKEN: z.string().min(1).optional(),
+    // @env-optional
+    VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
   },
   client: {
     // @env-optional
@@ -66,6 +74,9 @@ export const env = createEnv({
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     WEB_ANALYTICS_ENABLED: process.env.WEB_ANALYTICS_ENABLED,
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
+    KV_REST_API_URL: process.env.KV_REST_API_URL,
+    KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
+    VERCEL_ENV: process.env.VERCEL_ENV,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
