@@ -32,8 +32,8 @@ graph is acyclic
 - `@blog/db` is the only package importing the Neon/Drizzle SDKs — Postgres
   data: Auth.js users and sessions, tenants and their domains, memberships and
   invites, admins, site config, feature toggles, email config and templates,
-  subscribers, bookmarks, audit events and findings (comments and ratings are
-  planned; no tables exist yet). It never imports React or `@blog/service`
+  subscribers, bookmarks, contact-form leads, audit events and findings
+  (comments and ratings are planned; no tables exist yet). It never imports React or `@blog/service`
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
   by the two apps and `@blog/auth`**, which binds the Auth.js adapter to its
   tables. It imports no Sanity SDK, and its `src/` never imports
