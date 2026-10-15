@@ -10,6 +10,7 @@ code:
   - apps/web/src/modules/newsletter/**
   - apps/web/src/components/shared/newsletter-*/**
   - apps/web/src/server/newsletter/**
+  - apps/web/src/server/rate-limit/client-key/**
   - apps/web/src/app/api/newsletter/**
   - apps/web/src/utils/*newsletter-subscribed-cookie*/**
   - packages/db/src/schema/subscribers.ts
@@ -36,7 +37,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 ## Data
 
 - Sanity: `module_newsletter` documents; trust cues are `newsletterTrustCue` objects (localized `text`, max 40 characters). Loaded through `service.modules.newsletter.v1.getNewsletter`, ISR-tagged `modules:newsletter` and `module:<id>`.
-- Neon `subscribers`: `id`, `tenant_id` (cascade), `email` (normalized), `status` `pending` | `active`, `confirmation_token` and `unsubscribe_token` (unique random UUIDs), `subscribed_at`, `confirmed_at`. Unique (`tenant_id`, `email`). No user FK: a signed-out reader can subscribe, and the account section matches on the session's email.
+- Neon `subscribers`: `id`, `tenant_id` (cascade), `email` (normalized), `status` `pending` | `active`, `confirmation_token` and `unsubscribe_token` (unique random UUIDs), `subscribed_at`, `confirmed_at`, `confirmation_sent_at` (the last confirmation send, claimed atomically). Unique (`tenant_id`, `email`). No user FK: a signed-out reader can subscribe, and the account section matches on the session's email.
 - Unsubscribing deletes the row. Deprovisioning a tenant purges its subscribers.
 - Cookie `newsletter_subscribed` (one year, `SameSite=Lax`, not httpOnly) set on subscribe and cleared on account unsubscribe; `NewsletterSubscribedGate` hides every newsletter module while it is present, before hydration via an inline script.
 
@@ -44,13 +45,14 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 - **Editor (Studio)** — the module's content, variant, trust cues, alignment and layout, and where it is placed.
 - **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only and locked off as Coming soon; the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
-- **Voice** — the confirm and unsubscribe result-page copy is fixed (`newsletterConfirm.*`, `newsletterUnsubscribe.*`), as is the form copy.
+- **Voice** — the confirm and unsubscribe result-page copy is fixed (`newsletterConfirm.*`, `newsletterUnsubscribe.*`), as is the form copy, including the rate-limit message (`newsletterForm.errorRateLimited`).
 
 ## Constraints and invariants
 
 - Most restrictive wins: the module renders only when the plan includes `NEWSLETTER` and the toggle is on, and `subscribeToNewsletterAction` re-checks the capability and refuses with `unavailable`.
 - Subscribe and confirm write only through `resolveWritableTenant`; an inactive tenant gets the no-retry "unavailable" copy. Unsubscribe by link resolves the tenant without the active check, so it works for any tenant on any plan.
-- At most one row per tenant and email at a time (unsubscribing deletes it, so a later subscribe creates a new one); a repeat subscribe for a pending address resends the confirmation, an active one answers `already-subscribed` without email.
+- At most one row per tenant and email at a time (unsubscribing deletes it, so a later subscribe creates a new one); a repeat subscribe for a pending address resends the confirmation only when the last send is over 15 minutes old, and otherwise answers success without email. An active address answers `already-subscribed` without email. A failed send gives the cooldown back.
+- Abuse guards run before anything is stored: Vercel BotID (`checkBotId()`; a bot is refused and logged as `newsletter.subscribe_blocked`), then a per-IP limit of 5 attempts per 10 minutes per tenant, counted in the shared rate-limit store. Both refuse with `rate-limited` and store and send nothing. When the store errors, times out (2 seconds) or is unconfigured, sign-up fails closed with the same outcome and one `newsletter.subscribe_blocked` warn.
 - Confirmation flips `pending` to `active` in place; a second click shows the same confirmed page.
 - The GET unsubscribe page never deletes; only the POST does.
 - Link language comes from the subscribing page's locale, re-validated against the tenant's locales by `resolveNewsletterLinkLocale`.
@@ -60,7 +62,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 - Layers: `studio`, `service`, `ui` (`NewsletterSignup`), `web`, `db`, `email`, `platform`, `config` (`NEWSLETTER_VARIANT`, `CAPABILITY`).
 - Features: [module-system](./module-system.md), [plans-and-entitlements](./plans-and-entitlements.md), [email](./email.md), [reader-account](./reader-account.md), [languages](./languages.md), [rendering-and-caching](./rendering-and-caching.md).
-- Env: `NEWSLETTER_FROM_ADDRESS`, `RESEND_API_KEY`, `DATABASE_URL`.
+- Env: `NEWSLETTER_FROM_ADDRESS`, `RESEND_API_KEY`, `DATABASE_URL`, `KV_REST_API_URL` and `KV_REST_API_TOKEN` (shared rate-limit store).
 
 ## Entry points
 
@@ -69,6 +71,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `apps/web/src/modules/newsletter/newsletter-module.tsx`
 - `apps/web/src/components/shared/newsletter-form/newsletter-form.tsx`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`
+- `apps/web/src/server/newsletter/subscribe-guard/subscribe-guard.ts`, `apps/web/src/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send.ts`
 - `apps/web/src/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions.ts`
 - `apps/web/src/app/api/newsletter/confirm/route.ts`, `apps/web/src/app/api/newsletter/unsubscribe/route.ts`
 - `packages/db/src/queries/subscribers/`

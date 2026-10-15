@@ -163,6 +163,7 @@
     "errorInvalid": "Voer een geldig e-mailadres in.",
     "errorAlreadySubscribed": "Dit e-mailadres is al geabonneerd.",
     "errorServer": "Er is iets misgegaan. Probeer het opnieuw.",
+    "errorRateLimited": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.",
     "errorUnavailable": "Deze site neemt op dit moment geen nieuwe inschrijvingen aan."
   },
   "newsletterConfirm": {

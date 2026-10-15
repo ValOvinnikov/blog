@@ -1965,7 +1965,9 @@ with their own window and maximum; keys are scoped per limiter and per tenant.
 The tenant scope is the resolved tenant id. The one exception is
 `/api/client-log`, which resolves no tenant and scopes by the request host.
 Outside production a missing Redis config falls back to per-instance memory; on
-a `production` target it throws.
+a `production` target it throws. A limiter guarding a public action that sends email fails
+closed: when its store errors, times out or is unconfigured, the action refuses
+with its rate-limit outcome and stores and sends nothing.
 
 ## 8. Migrations & live data (core contract)
 
@@ -2314,11 +2316,8 @@ deduped by fingerprint and circuit-broken per page load) to
 `POST /api/client-log` — the app's first unauthenticated public write
 endpoint. That route enforces a `.strict()` Zod schema with a fixed field
 set (unknown keys rejected), a payload-size cap enforced on the request
-stream itself (not just the caller-supplied `Content-Length` header), and an
-in-memory rate limiter — the repo's only rate limiter today, and explicitly
-**per serverless instance**, not a cross-instance guarantee (a client whose
-requests land on different Vercel instances gets a fresh counter on each
-one). `window.onerror`/`unhandledrejection` are deliberately out of scope.
+stream itself (not just the caller-supplied `Content-Length` header), and a
+per-client rate limit shared across instances (§7). `window.onerror`/`unhandledrejection` are deliberately out of scope.
 
 ## 10. SEO & accessibility
 

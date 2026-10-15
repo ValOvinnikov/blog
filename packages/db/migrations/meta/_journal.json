@@ -288,6 +288,13 @@
       "when": 1792055131748,
       "tag": "0040_add_email_config_contact_recipient",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1792061726311,
+      "tag": "0041_add_subscribers_confirmation_sent_at",
+      "breakpoints": true
     }
   ]
 }

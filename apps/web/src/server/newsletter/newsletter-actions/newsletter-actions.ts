@@ -1,23 +1,20 @@
 'use server';
 
-import { CAPABILITY, routes, TENANT_WRITE_REFUSAL } from '@blog/config';
+import { CAPABILITY, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
-import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
+import { sendNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
-import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
-import { getSubscribedPageLocale } from '@web/server/newsletter/subscribed-page-locale/subscribed-page-locale';
+import { isSubscribeAttemptRefused } from '@web/server/newsletter/subscribe-guard/subscribe-guard';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
-import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
-import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
 export type TSubscribeResult =
   | { outcome: 'success' }
   | { outcome: 'already-subscribed' }
   | { outcome: 'invalid' }
+  | { outcome: 'rate-limited' }
   | { outcome: 'server-error' }
   | { outcome: 'unavailable' };
 
@@ -44,6 +41,10 @@ export const subscribeToNewsletterAction = async (
   }
 
   try {
+    if (await isSubscribeAttemptRefused(tenantId)) {
+      return { outcome: 'rate-limited' };
+    }
+
     const result = await queries.subscribers.createPendingSubscriber(
       tenantId,
       email,
@@ -61,44 +62,7 @@ export const subscribeToNewsletterAction = async (
       return { outcome: 'already-subscribed' };
     }
 
-    const siteUrl = (await getTenantBaseUrl()) ?? '';
-    const locale = await getSubscribedPageLocale();
-    const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(subscriber.confirmationToken, locale)}`;
-    const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(subscriber.unsubscribeToken, locale)}`;
-    const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
-
-    const {
-      subject,
-      body,
-      logoImageUrl,
-      footerPostalAddress,
-      fromAddress,
-      replyTo,
-    } = await resolveNewsletterEmailSettings(
-      tenantId,
-      env.NEWSLETTER_FROM_ADDRESS,
-      locale,
-    );
-
-    const { html, headers } = buildNewsletterConfirmationEmail({
-      subject,
-      body,
-      confirmationUrl,
-      unsubscribeUrl,
-      brand,
-      brandName,
-      logoImageUrl,
-      footerPostalAddress,
-    });
-
-    await sendEmail({
-      to: subscriber.email,
-      from: fromAddress,
-      subject,
-      html,
-      headers,
-      replyTo,
-    });
+    await sendNewsletterConfirmation(tenantId, subscriber);
 
     await markNewsletterSubscribedSafely();
     return { outcome: 'success' };

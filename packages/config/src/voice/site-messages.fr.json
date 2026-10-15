@@ -163,6 +163,7 @@
     "errorInvalid": "Saisissez une adresse e-mail valide.",
     "errorAlreadySubscribed": "Cette adresse e-mail est déjà abonnée.",
     "errorServer": "Une erreur s'est produite. Veuillez réessayer.",
+    "errorRateLimited": "Trop de tentatives. Patientez quelques minutes, puis réessayez.",
     "errorUnavailable": "Ce site n'accepte pas de nouvelles inscriptions pour le moment."
   },
   "newsletterConfirm": {
