@@ -2657,8 +2657,10 @@ can be kept alive until it settles. A sink failure — a throw, a rejection, a
 non-2xx answer — never reaches the logging call and is never logged, so a Loki
 outage cannot cascade into the logs it would carry. Each app registers the sink
 from its server-only `instrumentation.ts`, never from `logger.ts`, which client
-components import, and only when its three optional server env vars are set;
-unset, logging stays console-only. `instrumentation.ts`'s `onRequestError`
+components import, and only when its three optional server env vars are set
+(`LOKI_PUSH_URL`, `LOKI_USER`, `LOKI_TOKEN`), each push handed to Vercel's
+`waitUntil` so it outlives the response without delaying it; unset, logging
+stays console-only. `instrumentation.ts`'s `onRequestError`
 logs unhandled request errors through the same logger, so a render or route
 crash reaches Loki too.
 
