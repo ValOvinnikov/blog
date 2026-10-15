@@ -7,7 +7,7 @@ export const switchVariants = tv({
     ],
     input: ['peer sr-only'],
     track: [
-      'absolute inset-0 rounded-full bg-border-strong transition-colors duration-base ease-smooth',
+      'absolute inset-0 rounded-full bg-field-boundary transition-colors duration-base ease-smooth',
       'peer-checked:bg-brand-primary-solid',
       'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
       'peer-focus-visible:ring-2 peer-focus-visible:ring-brand-primary',

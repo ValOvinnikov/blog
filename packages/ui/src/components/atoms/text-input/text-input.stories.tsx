@@ -1,5 +1,6 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { SurfaceBands } from '@blog/ui/testing/surface-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
@@ -53,6 +54,16 @@ export const Disabled: TStory = {
 /** An empty disabled field still shows its placeholder, dimmed relative to an active field's. */
 export const DisabledEmpty: TStory = {
   args: { value: '', isDisabled: true },
+};
+
+export const OnBands: TStory = {
+  render: (args) => (
+    <SurfaceBands>
+      <TextInput {...args} />
+      <TextInput {...args} isInvalid={true} value="not-an-email" />
+      <TextInput {...args} isDisabled={true} value="you@example.com" />
+    </SurfaceBands>
+  ),
 };
 
 const InteractiveDemo = () => {
