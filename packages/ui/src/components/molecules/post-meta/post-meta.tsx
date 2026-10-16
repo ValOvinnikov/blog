@@ -1,12 +1,8 @@
-import {
-  A_AS_CONST,
-  type IWithClassName,
-  type IWithDataTestId,
-  SIZE,
-} from '@blog/config';
+import { type IWithClassName, type IWithDataTestId, SIZE } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { MetaSeparator } from '@blog/ui/components/atoms/meta-separator';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { type ReactNode } from 'react';
 
 import { postMetaVariants } from './post-meta-variants';
@@ -37,35 +33,27 @@ export const PostMeta = ({
   share,
   className,
   dataTestId,
-}: TPostMetaProps) => {
-  const LinkComponent = linkAs ?? A_AS_CONST;
-
-  return (
-    <div className={s.root({ class: className })} data-testid={dataTestId}>
-      <span className={s.author()}>
-        <Avatar
-          name={author.name}
-          alt=""
-          src={author.imageUrl}
-          size={SIZE.SM}
-        />
-        {author.href ? (
-          <LinkComponent href={author.href} className={s.authorName()}>
-            {author.name}
-          </LinkComponent>
-        ) : (
-          <span className={s.authorName()}>{author.name}</span>
-        )}
-      </span>
-      <MetaSeparator />
-      <time dateTime={publishedAt}>{formattedDate}</time>
-      {readingTime && (
-        <>
-          <MetaSeparator />
-          <span>{readingTime}</span>
-        </>
-      )}
-      {share && <div className={s.share()}>{share}</div>}
-    </div>
-  );
-};
+}: TPostMetaProps) => (
+  <div className={s.root({ class: className })} data-testid={dataTestId}>
+    <span className={s.author()}>
+      <Avatar name={author.name} alt="" src={author.imageUrl} size={SIZE.SM} />
+      <TextLink
+        href={author.href}
+        as={linkAs}
+        appearance="quiet"
+        className={s.authorName()}
+      >
+        {author.name}
+      </TextLink>
+    </span>
+    <MetaSeparator />
+    <time dateTime={publishedAt}>{formattedDate}</time>
+    {readingTime && (
+      <>
+        <MetaSeparator />
+        <span>{readingTime}</span>
+      </>
+    )}
+    {share && <div className={s.share()}>{share}</div>}
+  </div>
+);
