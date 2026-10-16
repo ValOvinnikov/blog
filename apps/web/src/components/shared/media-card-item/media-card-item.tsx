@@ -54,7 +54,7 @@ export const MediaCardItem = ({
       readingTime={item.readingTime}
     />
     <MediaCard.Title level={headingLevel}>
-      <MediaCard.Link href={item.href} linkAs={SmartLink}>
+      <MediaCard.Link href={item.href} as={SmartLink}>
         {item.title}
       </MediaCard.Link>
     </MediaCard.Title>

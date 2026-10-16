@@ -1,5 +1,5 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { CardLink } from '@blog/ui/components/atoms/card-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -14,7 +14,7 @@ import { logoTileVariants, type TLogoTileVariants } from './logo-tile-variants';
 const LogoTileParts = {
   Logo: LogoTileLogo,
   DarkLogo: LogoTileDarkLogo,
-  Link: CardLink,
+  Link: TextLink,
 } satisfies Record<string, ElementType>;
 
 export type TLogoTileProps = IWithClassName &
@@ -46,6 +46,7 @@ const LogoTileRoot = ({
       ))}
       {slots.Link &&
         cloneElement(slots.Link, {
+          isStretched: true,
           className: s.link({ class: slots.Link.props.className }),
         })}
     </div>
