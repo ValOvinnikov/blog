@@ -825,9 +825,9 @@ file` are all denied alike) — an earlier version only handled the
   by itself the whole stack is permanently `BLOCKED` and has to be collapsed
   into one PR. See `open-pull-request`'s "Stacked PRs" section.
 
-  A PR receives the full required suite whatever branch it targets. The six
+  A PR receives the full required suite whatever branch it targets. The five
   workflows behind the eleven required checks — `ci.yml` (Type-check, Lint,
-  Test, Build, Typegen, Migrations) plus `knip.yml`, `dependency-review.yml`,
+  Test, Build, Typegen, Migrations, Knip) plus `dependency-review.yml`,
   `zizmor.yml`, `actionlint.yml` and `hooks.yml` (one each) — each declare a
   bare `pull_request:` trigger with no `branches:` filter,
   which is what makes stacking usable. Keep it that way: each file scopes its
