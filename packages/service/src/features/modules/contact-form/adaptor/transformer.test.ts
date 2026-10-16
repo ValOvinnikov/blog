@@ -2,6 +2,7 @@ import {
   BRAND_VARIANT,
   CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
+  SPACING_SCALE,
 } from '@blog/config';
 import { makeRawContactFormModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawParagraphTextBlock } from '@blog/service/testing/shared/fixtures';
@@ -23,8 +24,8 @@ describe('toContactFormModule', () => {
       ],
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
       layout: {
-        spacingTop: 'SM',
-        spacingBottom: 'LG',
+        spacingTop: SPACING_SCALE.SM,
+        spacingBottom: SPACING_SCALE.LG,
         containerWidth: CONTAINER_WIDTH.WIDE,
         dividerTop: true,
         dividerBottom: false,
@@ -57,8 +58,8 @@ describe('toContactFormModule', () => {
       ],
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
       layout: {
-        spacingTop: 'SM',
-        spacingBottom: 'LG',
+        spacingTop: SPACING_SCALE.SM,
+        spacingBottom: SPACING_SCALE.LG,
         containerWidth: CONTAINER_WIDTH.WIDE,
         dividerTop: true,
         dividerBottom: false,
