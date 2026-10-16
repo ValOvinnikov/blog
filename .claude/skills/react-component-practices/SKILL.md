@@ -71,7 +71,7 @@ A domain is a module, a feature, a page, or a layout or app route.
   destructure (`{ size = SIZE.MD }`), never in a `??` deep in the body.
 - A closed set of values is typed from its source — `TValueOf<typeof C>` of a
   `@blog/config` const, or the `tv()` variants type
-  (`variant?: TNavLinkVariants['variant']`) — never a hand-written union.
+  (`variant?: TTextLinkVariants['variant']`) — never a hand-written union.
 - Props forwarded unchanged through two or more layers, or hand-bundled into
   a local object, become one object prop typed from their source. A view
   receives its view-model whole (`<CtaModuleView module={data} />`), never
@@ -157,7 +157,7 @@ A domain is a module, a feature, a page, or a layout or app route.
 - A separate `<name>-variants.ts`, or a recipe in
   `packages/ui/src/lib/styling/`, exists only once a second component imports
   it. Every importer counts: a compound-slot sibling, a consumer in another
-  workspace (`apps/web` importing `nav-link-variants` by path), an import
+  workspace (`apps/web` importing `text-link-variants` by path), an import
   through the `@blog/ui/lib/styling` barrel.
 - The change that adds the second consumer extracts the `tv()` into that file.
 - A diff that touches a component whose variants file has one consumer folds

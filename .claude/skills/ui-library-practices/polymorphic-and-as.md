@@ -20,8 +20,8 @@ For a wrapper that accepts **any** element and exposes _that_ element's props
 (`href` only when `as="a"`, `disabled` only when `as="button"`), import
 `TPolymorphicProps` from `@blog/config/react`
 (`packages/config/src/react/polymorphic.ts`) — never re-derive it. `Tag`
-(`atoms/tag`) is the minimal consumer; `NavLink`, `LinkButton` and
-`PopoverMenu.Item` follow the same shape:
+(`atoms/tag`) is the minimal consumer; `LinkButton` and `PopoverMenu.Item`
+follow the same shape:
 
 ```tsx
 import {
