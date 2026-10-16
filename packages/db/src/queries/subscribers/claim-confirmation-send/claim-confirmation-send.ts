@@ -3,7 +3,6 @@ import { getDb } from '@blog/db/client';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 
-// One conditional UPDATE, so concurrent submissions on any server instance claim a window at most once.
 export async function claimConfirmationSend(
   subscriberId: string,
   cooldownMs: number,

@@ -7,12 +7,10 @@ import { headers } from 'next/headers';
 
 const SUBSCRIBE_ATTEMPTS_PER_WINDOW = 5;
 const SUBSCRIBE_WINDOW_MS = 10 * 60_000;
-// Past this the store counts as down, and sign-up fails closed rather than hang the form.
 const RATE_LIMIT_STORE_TIMEOUT_MS = 2_000;
 
 type TRateLimiter = ReturnType<typeof createRateLimiter>;
 
-// Built on first use: a missing store config then refuses sign-ups instead of failing the module load.
 let subscribeRateLimiter: TMaybeUndefined<TRateLimiter>;
 
 const getSubscribeRateLimiter = (): TRateLimiter => {
@@ -52,14 +50,22 @@ const isRateLimited = async (tenantId: string): Promise<boolean> => {
   }
 };
 
-export const isSubscribeAttemptRefused = async (
-  tenantId: string,
-): Promise<boolean> => {
-  const { isBot } = await checkBotId();
-  if (isBot) {
-    logger.warn('newsletter.subscribe_blocked', { reason: 'bot' });
+const isBotOrUnverified = async (): Promise<boolean> => {
+  try {
+    const { isBot } = await checkBotId();
+    if (isBot) {
+      logger.warn('newsletter.subscribe_blocked', { reason: 'bot' });
+    }
+    return isBot;
+  } catch (error) {
+    logger.warn('newsletter.subscribe_blocked', {
+      reason: 'bot_check_unavailable',
+      error,
+    });
     return true;
   }
-
-  return isRateLimited(tenantId);
 };
+
+export const isSubscribeAttemptRefused = async (
+  tenantId: string,
+): Promise<boolean> => (await isBotOrUnverified()) || isRateLimited(tenantId);

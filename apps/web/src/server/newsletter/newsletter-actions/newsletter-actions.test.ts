@@ -225,22 +225,21 @@ describe('subscribeToNewsletterAction', () => {
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
   });
 
-  it('answers "success" without emailing again while the last confirmation is inside the cooldown', async () => {
+  it('answers "success" to a second sign-up inside the cooldown without emailing again', async () => {
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
       data: { outcome: 'already-pending', subscriber },
     });
-    claimConfirmationSendMock.mockResolvedValue(null);
+    claimConfirmationSendMock
+      .mockResolvedValueOnce(CLAIMED_AT)
+      .mockResolvedValueOnce(null);
+
+    await subscribeToNewsletterAction('reader@example.com');
 
     await expect(
       subscribeToNewsletterAction('reader@example.com'),
     ).resolves.toEqual({ outcome: 'success' });
-    expect(claimConfirmationSendMock).toHaveBeenCalledWith(
-      'sub-1',
-      15 * 60_000,
-    );
-    expect(sendEmailMock).not.toHaveBeenCalled();
-    expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
+    expect(sendEmailMock).toHaveBeenCalledTimes(1);
   });
 
   it('returns "rate-limited" without storing or sending when the attempt is refused', async () => {

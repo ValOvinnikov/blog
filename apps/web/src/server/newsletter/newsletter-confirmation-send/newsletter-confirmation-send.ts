@@ -53,7 +53,6 @@ const sendConfirmationEmail = async (
   });
 };
 
-// Sends at most one confirmation per subscriber per cooldown window, across server instances.
 export const sendNewsletterConfirmation = async (
   tenantId: string,
   subscriber: schema.TSubscriber,
