@@ -13,10 +13,10 @@ on:
   # retargeting when the base merges does not rescue it, because that fires
   # `edited` while this listens for `opened`/`synchronize`/`reopened`.
   #
-  # Running CI on every PR is cheap and avoids both deadlocks. The other five
-  # workflows carrying required checks (knip, dependency-review, zizmor,
-  # actionlint, hooks) declare their triggers independently and must stay
-  # unfiltered for the same reason.
+  # Running CI on every PR is cheap and avoids both deadlocks. The other four
+  # workflows carrying required checks (dependency-review, zizmor, actionlint,
+  # hooks) declare their triggers independently and must stay unfiltered for
+  # the same reason.
   pull_request:
 
 permissions:
@@ -80,6 +80,26 @@ jobs:
 
       - name: Lint
         run: pnpm lint
+
+  knip:
+    name: Knip
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # `--treat-config-hints-as-errors` fails on an ignore or entry in
+      # knip.json that no longer hides anything, so stale rules cannot rot
+      # into ones that hide real findings later. Never `--fix`.
+      - name: Knip
+        run: pnpm knip --reporter github-actions --treat-config-hints-as-errors
 
   test:
     name: Test
@@ -448,3 +468,29 @@ jobs:
         # missing client (service fetchers return an `ok: false` Result).
         env:
           SKIP_ENV_VALIDATION: 'true'
+
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - type-check
+      - lint
+      - knip
+      - test
+      - typegen
+      - ui-index
+      - turbo-env-sync
+      - revalidate-tags-sync
+      - client-graph
+      - required-env
+      - migration-index
+      - migrations
+      - build
+    # Without this a failed need skips the job, and a skipped check reads as
+    # passed; `!cancelled()` rather than `always()` so a superseded run stops.
+    if: ${{ !cancelled() }}
+    steps:
+      - name: Every needed job succeeded or was skipped
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1
