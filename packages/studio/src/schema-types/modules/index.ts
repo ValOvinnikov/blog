@@ -1,5 +1,6 @@
 import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 
+import { contactFormSchema } from './contact-form/contact-form';
 import { contentSchema } from './content/content';
 import { ctaSchema } from './cta/cta';
 import { faqSchema } from './faq/faq';
@@ -44,6 +45,7 @@ export const modules = [
   contentSchema,
   ctaSchema,
   newsletterSchema,
+  contactFormSchema,
   pricingSchema,
   sectionPagesSchema,
 ].map((schema) => ({ ...schema, icon: textSizedIcon(schema.icon) }));

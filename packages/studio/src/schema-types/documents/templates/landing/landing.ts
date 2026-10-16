@@ -1,6 +1,7 @@
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { contactFormSchema } from '@blog/studio/schema-types/modules/contact-form/contact-form';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { featureHighlightsSchema } from '@blog/studio/schema-types/modules/feature-highlights/feature-highlights';
@@ -54,6 +55,7 @@ export const landingTemplateSchema = defineType({
         timelineSchema.name,
         faqSchema.name,
         pricingSchema.name,
+        contactFormSchema.name,
         sectionPagesSchema.name,
       ],
     }),

@@ -2,6 +2,7 @@ import { CAPABILITY, type TCapability } from '@blog/config/constants';
 
 const CAPABILITY_BY_TYPE: Readonly<Record<string, TCapability>> = {
   module_newsletter: CAPABILITY.NEWSLETTER,
+  module_contactForm: CAPABILITY.CONTACT_FORM,
 };
 
 const CAPABILITY_LABEL: Readonly<Record<TCapability, string>> = {

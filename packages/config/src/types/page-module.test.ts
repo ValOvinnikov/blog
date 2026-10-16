@@ -30,6 +30,7 @@ describe('page module type unions', () => {
       | 'module_faq'
       | 'module_team'
       | 'module_pricing'
+      | 'module_contactForm'
     >();
   });
 
@@ -64,6 +65,7 @@ describe('page module type unions', () => {
       | 'module_faq'
       | 'module_team'
       | 'module_pricing'
+      | 'module_contactForm'
     >();
   });
 

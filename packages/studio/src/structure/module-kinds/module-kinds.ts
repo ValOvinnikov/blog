@@ -1,4 +1,5 @@
 import { modules } from '@blog/studio/schema-types/modules';
+import { contactFormSchema } from '@blog/studio/schema-types/modules/contact-form/contact-form';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
@@ -39,7 +40,7 @@ export const moduleKinds = [
   {
     name: 'conversion',
     title: 'Conversion',
-    modules: [ctaSchema, newsletterSchema, pricingSchema],
+    modules: [ctaSchema, newsletterSchema, contactFormSchema, pricingSchema],
   },
   {
     name: 'posts',

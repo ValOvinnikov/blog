@@ -64,6 +64,27 @@ export type InternationalizedArrayString = Array<
   } & InternationalizedArrayStringValue
 >;
 
+export type Module_contactForm = {
+  _id: string;
+  _type: 'module_contactForm';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  headingBlock?: ModuleHeadingBlock;
+  successMessage?: InternationalizedArrayString;
+  privacyNote?: InternationalizedArrayParagraphText;
+  contentAlignment?: 'LEFT' | 'CENTER';
+  layout?: Layout;
+};
+
+export type InternationalizedArrayParagraphText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayParagraphTextValue
+>;
+
 export type Module_newsletter = {
   _id: string;
   _type: 'module_newsletter';
@@ -671,12 +692,6 @@ export type TimelineItem = {
   heading?: InternationalizedArrayString;
   body?: InternationalizedArrayParagraphText;
 };
-
-export type InternationalizedArrayParagraphText = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayParagraphTextValue
->;
 
 export type Stat = {
   _type: 'stat';
@@ -1363,6 +1378,13 @@ export type Module_ctaReference = {
   [internalGroqTypeReferenceTo]?: 'module_cta';
 };
 
+export type Module_contactFormReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_contactForm';
+};
+
 export type Module_newsletterReference = {
   _ref: string;
   _type: 'reference';
@@ -1440,6 +1462,9 @@ export type Template_home = {
     | ({
         _key: string;
       } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_contactFormReference)
     | ({
         _key: string;
       } & Module_newsletterReference)
@@ -1974,6 +1999,9 @@ export type Template_landing = {
       } & Module_ctaReference)
     | ({
         _key: string;
+      } & Module_contactFormReference)
+    | ({
+        _key: string;
       } & Module_newsletterReference)
     | ({
         _key: string;
@@ -2179,6 +2207,8 @@ export type AllSanitySchemaTypes =
   | ModuleHeadingBlock
   | Module_pricing
   | InternationalizedArrayString
+  | Module_contactForm
+  | InternationalizedArrayParagraphText
   | Module_newsletter
   | InternationalizedArrayText
   | Module_cta
@@ -2220,7 +2250,6 @@ export type AllSanitySchemaTypes =
   | PricingFeature
   | PricingPrice
   | TimelineItem
-  | InternationalizedArrayParagraphText
   | Stat
   | PostTakeaways
   | Brand
@@ -2278,6 +2307,7 @@ export type AllSanitySchemaTypes =
   | Module_teamReference
   | Module_testimonialReference
   | Module_ctaReference
+  | Module_contactFormReference
   | Module_newsletterReference
   | Module_pricingReference
   | Module_postFeaturedReference
