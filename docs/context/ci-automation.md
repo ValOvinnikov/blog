@@ -146,8 +146,14 @@ check on nearly every PR. The same read-only `sanity documents validate`
 step now runs daily from `document-validation.yml` (table above) and stays
 out of the branch ruleset; `ci.yml` no longer contains it.
 
-**Document validation runs clean, including on `migrationState`.**
-`migrationState` (`packages/studio/scripts/migrate.mjs`'s single fixed-`_id`
+**Document validation fails on content, not code.** The CLI exits 1 when any
+document in the console dataset carries a schema error; warnings never fail
+the run. Hand-edited QA documents drift out of validity as the schema
+tightens, so a red run is a content ticket (fix the named documents in
+Studio), not a workflow change — read the failing step's output for the
+document IDs and field paths.
+
+**`migrationState` validates cleanly.** `migrationState` (`packages/studio/scripts/migrate.mjs`'s single fixed-`_id`
 migration ledger document) has a declared Studio schema type
 (`packages/studio/src/schema-types/documents/system/migration-state.ts`) so
 `sanity documents validate` recognizes it, while `sanity.config.ts` disables
