@@ -1,16 +1,17 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { FOCUS_RING, TRANSITION_COLORS, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const iconButtonVariants = tv({
   base: [
     'inline-grid size-[22px] place-items-center',
     'rounded-sm border border-transparent bg-transparent p-0',
-    'text-muted transition-colors duration-base ease-smooth',
+    'text-muted',
+    TRANSITION_COLORS,
     'hover:border-border-emphasis hover:bg-surface-2 hover:text-text',
     'cursor-pointer',
-    'focus-visible:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
+    'focus-visible:bg-surface-2',
+    FOCUS_RING,
     'hover:ring-offset-ambient',
     'disabled:pointer-events-none disabled:opacity-50',
     'aria-disabled:pointer-events-none aria-disabled:opacity-50',
@@ -21,7 +22,7 @@ export const iconButtonVariants = tv({
         'size-auto min-h-0 whitespace-nowrap',
         'rounded-sm border border-border-strong bg-surface px-3 py-1.5',
         'font-mono font-normal text-label text-text',
-        'transition-colors duration-base ease-smooth',
+        TRANSITION_COLORS,
         'hover:border-brand-primary hover:text-brand-primary',
       ],
       avatar: [
