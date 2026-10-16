@@ -1,7 +1,6 @@
 const POLYMORPHIC_ALLOWLIST = [
   'atoms/eyebrow/eyebrow.tsx',
   'atoms/nav-link/nav-link.tsx',
-  'atoms/prose-link/prose-link.tsx',
   'atoms/tag/tag.tsx',
   'molecules/link-button/link-button.tsx',
   'molecules/popover-menu/components/item/popover-menu-item.tsx',

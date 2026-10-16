@@ -19,35 +19,43 @@ closed like any other atom.
 For a wrapper that accepts **any** element and exposes _that_ element's props
 (`href` only when `as="a"`, `disabled` only when `as="button"`), import
 `TPolymorphicProps` from `@blog/config/react`
-(`packages/config/src/react/polymorphic.ts`) — never re-derive it. `ProseLink`
-(`atoms/prose-link`) is the minimal consumer; `NavLink`, `Tag`, `LinkButton`
-and `PopoverMenu.Item` follow the same shape:
+(`packages/config/src/react/polymorphic.ts`) — never re-derive it. `Tag`
+(`atoms/tag`) is the minimal consumer; `NavLink`, `LinkButton` and
+`PopoverMenu.Item` follow the same shape:
 
 ```tsx
 import {
-  A_AS_CONST,
+  SPAN_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
 import type { TPolymorphicProps } from '@blog/config/react';
 import type { ElementType } from 'react';
 
-import { proseLinkVariants } from './prose-link-variants';
+import { tagVariants, type TTagVariants } from './tag-variants';
 
-export type TProseLinkProps<C extends ElementType = typeof A_AS_CONST> =
-  TPolymorphicProps<C, IWithClassName & IWithDataTestId>;
+export type TTagProps<C extends ElementType = typeof SPAN_AS_CONST> =
+  TPolymorphicProps<
+    C,
+    IWithClassName & IWithDataTestId & Omit<TTagVariants, 'interactive'>
+  >;
 
-export const ProseLink = <C extends ElementType = typeof A_AS_CONST>({
+export const Tag = <C extends ElementType = typeof SPAN_AS_CONST>({
   as,
   className,
+  variant,
   dataTestId,
   ...rest
-}: TProseLinkProps<C>) => {
-  const Component = as ?? A_AS_CONST;
+}: TTagProps<C>) => {
+  const Component = as ?? SPAN_AS_CONST;
 
   return (
     <Component
-      className={proseLinkVariants({ class: className })}
+      className={tagVariants({
+        variant,
+        interactive: Boolean(as),
+        class: className,
+      })}
       data-testid={dataTestId}
       {...rest}
     />
@@ -70,9 +78,9 @@ Why each piece matters:
 
 - **`C extends ElementType = typeof A_AS_CONST`** — `C` is inferred from `as`;
   the default (`A_AS_CONST`, `SPAN_AS_CONST` or `BUTTON_AS_CONST` from
-  `@blog/config`) makes a bare `<ProseLink />` an `<a>`. The `extends`
+  `@blog/config`) makes a bare `<Tag />` a `<span>`. The `extends`
   constraint also lets the generic arrow parse in `.tsx`, so no `<C,>`.
-- **`as ?? A_AS_CONST`** needs no `as ElementType` cast; don't add one.
+- **`as ?? SPAN_AS_CONST`** needs no `as ElementType` cast; don't add one.
 - **`ComponentPropsWithoutRef<C>`** (inside the generic) is the inference
   engine: `as="a"` makes `href` valid, `as="button"` makes `disabled` valid.
 - **`Omit<…, keyof OwnProps | 'as'>`** lets the component's own props win over

@@ -18,7 +18,7 @@ code:
   - packages/service/src/shared/localization/get-localized-article-text/**
   - packages/service/src/shared/localization/get-localized-portable-text-block/**
   - packages/ui/src/components/atoms/prose/**
-  - packages/ui/src/components/atoms/prose-link/**
+  - packages/ui/src/components/atoms/text-link/**
   - packages/ui/src/components/atoms/inline-code/**
   - packages/ui/src/components/atoms/quote-block/**
   - packages/ui/src/components/molecules/aside/**
@@ -58,7 +58,7 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 
 - `articleText` has no H1, so the body never competes with the page title. A stored `h1` block still renders, as a level-2 heading without an anchor.
 - H2 and H3 render with `id={block._key}` and scroll margins that clear the sticky header and the mobile contents bar; the contents rail links to those ids (./reading-experience.md).
-- Marks: `code` → `InlineCode`, `sub`/`sup` → native elements, `linkRef` → `ProseLink` rendered as `SmartLink`. A link whose document was deleted renders its text unlinked. Bold, italic, underline and strike use `@portabletext/react` defaults.
+- Marks: `code` → `InlineCode`, `sub`/`sup` → native elements, `linkRef` → `TextLink` (`appearance="prose"`) rendered as `SmartLink`. A link whose document was deleted renders its text unlinked. Bold, italic, underline and strike use `@portabletext/react` defaults.
 - Blocks: `blockquote` → `QuoteBlock`; bullet and numbered lists → `ul`/`ol`.
 - `bodyImage` renders `ImageWithCaption` around `SanityImage` (1200px wide, lazy) and renders nothing without an asset. Floats apply from `lg` only, at 12rem; `FULL_BLEED` is wrapped in `data-full-bleed` so `proseMeasureCapSlot` leaves it uncapped.
 - `code` renders `CodeBlock`, which wraps `react-syntax-highlighter` (Prism) with line numbers, highlighted lines and `text` as the default language. It lives in `apps/web` because `@blog/ui` takes no third-party highlighter. The Studio code input does not offer a filename, so the filename caption only shows for data that carries one.
@@ -86,7 +86,7 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 - `apps/web/src/components/shared/portable-text/portable-text.test.tsx`, `code-block.test.tsx`, `code-block-syntax-theme.test.ts`; story `code-block.stories.tsx`.
 - `packages/service/src/shared/transformers/portable-text/*.test.ts`, `get-localized-portable-text-block.test.ts`.
 - `packages/studio/src/schema-types/portable-text/to-plain-text/to-plain-text.test.ts`.
-- `packages/ui`: tests and stories beside `prose`, `prose-link`, `inline-code`, `quote-block`, `aside`, `image-with-caption` and `heading`.
+- `packages/ui`: tests and stories beside `prose`, `text-link`, `inline-code`, `quote-block`, `aside`, `image-with-caption` and `heading`.
 
 ## Related
 
