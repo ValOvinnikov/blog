@@ -108,13 +108,11 @@ is not an exemption.
   {bookmark.filename}
 </a>;
 
-// ✅ polymorphic, defaults to 'a', classes from a tv() slot
-const Component = linkAs ?? A_AS_CONST;
-<Component href={bookmark.href} className={filename()}>
+// ✅ TextLink owns the look; linkAs passes through as its `as`
+<TextLink href={bookmark.href} as={linkAs} appearance="accent">
   {bookmark.filename}
-</Component>;
+</TextLink>;
 ```
 
-A one-off class on that anchor (a full-card `before:absolute before:inset-0`
-overlay) is still a named slot in the component's `tv()`, never an inline
-string — SKILL.md § Styling.
+A full-card overlay is `TextLink`'s `isStretched`, never a hand-written
+`before:absolute before:inset-0` class.
