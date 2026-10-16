@@ -997,12 +997,12 @@ the only fix that keeps brand colours and covers both. It is a plain optional
 service projects it like `image`, with its own dimensions, but with a nullable
 asset: an `imageDark` holding only leftover crop or hotspot data, or one whose
 asset cannot resolve, becomes `undefined` and the logo falls back to its main
-image — unlike the main image, it never costs the wall. `LogoTile` takes it as
-`darkLogo` plus `darkAspectRatio` and renders both logos, the regular one hidden
-under `.dark` and the dark one hidden outside it; `display: none` takes the hidden
-one out of the accessibility tree and tab order, so the name is announced and the
-link focused once. `apps/web` wraps each in the logo's link, and the dark one
-overrides `--logo-aspect` for itself so each is sized by its own ratio.
+image — unlike the main image, it never costs the wall. `apps/web` passes it as
+`LogoTile.DarkLogo` beside `LogoTile.Logo`, each with its own `aspectRatio`, and
+the tile shows the regular logo only outside `.dark` and the dark one only under
+it; `display: none` takes the hidden one out of the accessibility tree. A linked
+tile carries one `LogoTile.Link` overlay beside the logos, so the link is
+announced and focused once and the logo images inside it are decorative.
 
 **The wall is a wrapping flex row, not a grid.** `apps/web` composes
 `flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` is a fixed 192×88
@@ -2653,9 +2653,12 @@ it writes to the console — to each sink registered with `registerLogSink`;
 `info` and `debug` never leave stdout. `createLokiSink` (push URL, user, write
 token) posts each line to Loki's push API with basic auth, labelled by
 `service` and `level`, and returns the push promise so a serverless function
-can be kept alive until it settles. A sink failure — a throw, a rejection, a
-non-2xx answer — never reaches the logging call and is never logged, so a Loki
-outage cannot cascade into the logs it would carry. Each app registers the sink
+can be kept alive until it settles; each push is aborted after five seconds, so
+a hung Loki cannot hold a function open. A sink failure — a throw, a rejection,
+a non-2xx answer, a timeout — never reaches the logging call and is never
+logged, so a Loki outage cannot cascade into the logs it would carry. Creating
+the sink never throws either: credentials that cannot be basic-auth encoded (a
+pasted smart quote) produce no sink, and the app starts with shipping off. Each app registers the sink
 from its server-only `instrumentation.ts`, never from `logger.ts`, which client
 components import, and only when its three optional server env vars are set
 (`LOKI_PUSH_URL`, `LOKI_USER`, `LOKI_TOKEN`), each push handed to Vercel's
@@ -2664,13 +2667,15 @@ stays console-only. `instrumentation.ts`'s `onRequestError`
 logs unhandled request errors through the same logger, so a render or route
 crash reaches Loki too.
 
-Grafana alerts the operator by email: one rule per app on error-level lines,
-grouped by event so a burst sends one email, and synthetic uptime checks on the
-apex home page and the platform host's sign-in page that alert after two
-consecutive failures and resolve on recovery. This is why `error` is reserved
-for what a human must act on — every error event emails the operator. The
-Grafana stack, the alerts and the credentials are console configuration and
-Vercel env vars, never repo content (`docs/DEPLOY.md` § "8. Observability").
+Grafana alerts the operator by email, with an optional Slack contact point
+beside it: one rule per app on error-level lines, grouped by event so a burst
+sends one message, and synthetic uptime checks on the apex home page and the
+platform host's sign-in page, run from two probes, that alert when both fail
+the same run and resolve on recovery. This is why `error` is reserved for what
+a human must act on — every error event alerts the operator. The Grafana stack,
+the alerts, their thresholds and the credentials are console configuration and
+Vercel env vars, never repo content; `docs/DEPLOY.md` § "8d. Alerts & uptime
+checks" records the live setup.
 
 ## 18. `@blog/ui` prop contract
 

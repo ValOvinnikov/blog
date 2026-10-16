@@ -5,15 +5,15 @@ import {
 } from '@blog/config';
 import type { TSocialProfile } from '@blog/service';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
-import type { TNavLinkVariants } from '@blog/ui/components/atoms/nav-link/nav-link-variants';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
+import type { TTextLinkVariants } from '@blog/ui/components/atoms/text-link/text-link-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
 import { socialLinkOnDarkVariants } from './social-links-variants';
 
 export type TSocialLinkProps = TSocialProfile & {
-  variant?: TNavLinkVariants['variant'];
+  variant?: TTextLinkVariants['variant'];
   isOnDark?: boolean;
 };
 
@@ -25,24 +25,24 @@ export const SocialLink = ({
 }: TSocialLinkProps) => {
   const t = useTranslations('socialLinks');
   const platformLabel = SOCIAL_PLATFORM_LABEL[platform];
+  const label = t('linkAriaLabel', { platform: platformLabel });
 
   return (
-    <NavLink
+    <TextLink
+      appearance="nav"
       as={SmartLink}
       href={link.href}
       target={link.target}
       variant={variant}
       className={socialLinkOnDarkVariants({ isOnDark })}
-      icon={
-        <Icon
-          name={SOCIAL_PLATFORM_ICON[platform]}
-          size={SIZE.SM}
-          dataTestId={`social-icon-${platform}`}
-        />
-      }
-      hasLabel={false}
+      ariaLabel={label}
+      title={label}
     >
-      {t('linkAriaLabel', { platform: platformLabel })}
-    </NavLink>
+      <Icon
+        name={SOCIAL_PLATFORM_ICON[platform]}
+        size={SIZE.SM}
+        dataTestId={`social-icon-${platform}`}
+      />
+    </TextLink>
   );
 };

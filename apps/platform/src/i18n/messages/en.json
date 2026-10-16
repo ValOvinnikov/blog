@@ -170,7 +170,8 @@
     "TENANT_PROVISIONING": "Tenant provisioning",
     "RECHECK_TENANT_OWNERS": "Owner recheck",
     "DOMAIN_VERIFICATION": "Domain verification",
-    "SITE_CONFIG_REVALIDATION": "Site config revalidation"
+    "SITE_CONFIG_REVALIDATION": "Site config revalidation",
+    "CONTRAST_CHECK": "Contrast check"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Schema validation error",
@@ -178,7 +179,8 @@
     "OWNER_CHECK_STALLED": "Owner check stalled",
     "OWNER_CHECK_AMBIGUOUS": "Owner check ambiguous",
     "DOMAIN_NOT_ADDED": "Domain not added",
-    "REVALIDATION_FAILED": "Revalidation failed"
+    "REVALIDATION_FAILED": "Revalidation failed",
+    "CONTRAST_REGRESSION": "Contrast regression"
   },
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",
@@ -263,7 +265,11 @@
       "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
       "DELETED": "Tenant deleted",
-      "READER_DATA_PURGED": "Reader data purged"
+      "READER_DATA_PURGED": "Reader data purged",
+      "RELEASE_STARTED": "Release started",
+      "RELEASE_OVERRIDE": "Release gate overridden",
+      "CONTRAST_CHECK_STARTED": "Contrast check started",
+      "TENANT_MIGRATIONS_STARTED": "Tenant migrations started"
     }
   },
   "tenantDomainPage": {
@@ -673,6 +679,9 @@
     "startErrorArchived": "This tenant is archived; provisioning can't be started.",
     "startNoticeAlreadyInProgress": "A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.",
     "pollErrorWarning": "Couldn't refresh the latest status — retrying automatically.",
+    "queuedRunTitle": "Queued — the provisioning workflow is starting up",
+    "queuedRunBody": "Steps begin once the workflow picks up the run and finishes setting up, usually within a minute or two.",
+    "queuedRunElapsed": "{elapsed} waiting",
     "errorKind": {
       "permission": {
         "headline": "Missing permission to complete this step",

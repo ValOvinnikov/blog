@@ -67,7 +67,8 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
 - **Reserved fields** (`level`/`event`/`ts`) spread in _after_ context, so a
   same-named context key can never spoof them.
 - **Context normalization stays total.** An `Error` anywhere in plain
-  objects or arrays becomes `{ message, stack }`, its message through
+  objects or arrays becomes `{ name, message, stack }`, plus its `digest`
+  and `code` when they are strings — all but the stack through
   `sanitizeLogMessage`; every string has U+2028/U+2029 neutralized, which
   `JSON.stringify` leaves raw; recursion is depth-bounded and cycle-safe,
   degrading to a marker instead of throwing; a non-plain object (a `Date`, a
@@ -86,7 +87,10 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
 - **`createLokiSink({ url, user, token })`** posts one line per push to
   Loki's push API over global `fetch` with basic auth, `service` and `level`
   as stream labels, and returns a promise that always resolves (any status,
-  any network failure), so a caller can hand it to `waitUntil` safely. No
+  any network failure, a five-second timeout), so a caller can hand it to
+  `waitUntil` safely. Creating it never throws: credentials `btoa` cannot
+  encode return `undefined` instead of a sink, so the caller registers
+  nothing. No
   dependency: the package stays at zero runtime dependencies.
 - **`LOG_LEVEL`** lives here, not in `@blog/config` — this package depends
   on nothing. UPPERCASE keys, `as const`; the values stay lowercase because

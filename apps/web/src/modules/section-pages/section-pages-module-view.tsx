@@ -72,10 +72,7 @@ export const SectionPagesModuleView = ({
                 </MediaCard.Media>
               )}
               <MediaCard.Title level={headingBlock ? 3 : 2}>
-                <MediaCard.Link
-                  href={routes.landingPage(path)}
-                  linkAs={SmartLink}
-                >
+                <MediaCard.Link href={routes.landingPage(path)} as={SmartLink}>
                   {title}
                 </MediaCard.Link>
               </MediaCard.Title>

@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
+import type { TProvisioningRun } from '@blog/db/schema/tenants';
 import {
   act,
   fireEvent,
@@ -22,7 +23,8 @@ import { ProvisioningStatusView } from './provisioning-status-view';
 
 const render = renderWithIntl;
 
-const STEP_POLL_INTERVAL_MS = 4000;
+const STEP_POLL_INTERVAL_MS = 1500;
+const STEP_REVEAL_DWELL_MS = 800;
 
 const {
   retryProvisioningStepActionMock,
@@ -817,6 +819,7 @@ describe(ProvisioningStatusView, () => {
 
   describe('live polling', () => {
     beforeEach(() => {
+      vi.useRealTimers();
       vi.useFakeTimers();
     });
 
@@ -855,6 +858,9 @@ describe(ProvisioningStatusView, () => {
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
       });
 
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
@@ -898,12 +904,136 @@ describe(ProvisioningStatusView, () => {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
+      });
 
       expect(within(liveRegion).getByText('Complete')).toBeVisible();
+    });
+    it('shows a step that finished between two polls as running before it shows as complete', async () => {
+      const tenant = makeClientTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: idleProvisioningSteps(),
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const liveRegion = screen.getByTestId(
+        `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
+      });
+
+      expect(within(liveRegion).getByText('Running…')).toBeVisible();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
+      });
+
+      expect(within(liveRegion).getByText('Complete')).toBeVisible();
+    });
+
+    it('says the run is queued, with a wait that keeps counting, until the workflow starts it', async () => {
+      vi.setSystemTime(new Date('2026-10-15T13:00:05.000Z'));
+      const tenant = makeClientTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          run: { admittedAt: '2026-10-15T13:00:00.000Z' } as TProvisioningRun,
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.getByText('Queued — the provisioning workflow is starting up'),
+      ).toBeVisible();
+      expect(screen.getByTestId('queued-run-elapsed')).toHaveTextContent(
+        '0:05 waiting',
+      );
+      expect(
+        within(screen.getByTestId('run-status-live')).getByText('Starting…'),
+      ).toBeVisible();
+      expect(
+        within(
+          screen.getByTestId(
+            `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
+          ),
+        ).getByText('Queued'),
+      ).toBeInTheDocument();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+
+      expect(screen.getByTestId('queued-run-elapsed')).toHaveTextContent(
+        '1:05 waiting',
+      );
+    });
+
+    it('drops the queued notice once the workflow has started the run', async () => {
+      const tenant = makeClientTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          run: { admittedAt: '2026-10-15T13:00:00.000Z' } as TProvisioningRun,
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          run: { startedAt: '2026-10-15T13:01:00.000Z' },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      expect(
+        screen.queryByText('Queued — the provisioning workflow is starting up'),
+      ).not.toBeInTheDocument();
+      expect(
+        within(screen.getByTestId('run-status-live')).getByText('Running…'),
+      ).toBeVisible();
     });
   });
 
   describe('steps disclosure collapse', () => {
+    beforeEach(() => {
+      vi.useRealTimers();
+      vi.useFakeTimers();
+    });
+
     const stepsToggle = () =>
       within(screen.getByTestId('provisioning-steps')).getByRole('button', {
         name: /Steps/,
@@ -989,6 +1119,11 @@ describe(ProvisioningStatusView, () => {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
+      for (let reveal = 0; reveal < 11; reveal += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
+        });
+      }
 
       expect(disclosure).toHaveAttribute('aria-expanded', 'false');
 

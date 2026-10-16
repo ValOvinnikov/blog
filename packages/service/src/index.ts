@@ -9,6 +9,7 @@ import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
 import { createSiteSettingsService } from './features/global/site-settings';
 import { createTranslationMapService } from './features/global/translation-map';
+import { createContactFormModuleService } from './features/modules/contact-form';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createFaqModuleService } from './features/modules/faq';
@@ -66,6 +67,7 @@ export const service = {
     sectionPages: createSectionPagesModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
+    contactForm: createContactFormModuleService(),
     newsletter: createNewsletterModuleService(),
     taxonomyList: createTaxonomyListModuleService(),
     featureHighlights: createFeatureHighlightsModuleService(),
@@ -111,6 +113,7 @@ export type {
   TSectionPageCard,
   TSectionPagesModule,
 } from './features/modules/section-pages';
+export type { TContactFormModule } from './features/modules/contact-form';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { TFaqModule, TFaqQuestion } from './features/modules/faq';

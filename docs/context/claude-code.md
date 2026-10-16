@@ -825,9 +825,9 @@ file` are all denied alike) — an earlier version only handled the
   by itself the whole stack is permanently `BLOCKED` and has to be collapsed
   into one PR. See `open-pull-request`'s "Stacked PRs" section.
 
-  A PR receives the full required suite whatever branch it targets. The six
+  A PR receives the full required suite whatever branch it targets. The five
   workflows behind the eleven required checks — `ci.yml` (Type-check, Lint,
-  Test, Build, Typegen, Migrations) plus `knip.yml`, `dependency-review.yml`,
+  Test, Build, Typegen, Migrations, Knip) plus `dependency-review.yml`,
   `zizmor.yml`, `actionlint.yml` and `hooks.yml` (one each) — each declare a
   bare `pull_request:` trigger with no `branches:` filter,
   which is what makes stacking usable. Keep it that way: each file scopes its
@@ -836,17 +836,5 @@ file` are all denied alike) — an earlier version only handled the
   checks the PR then hangs on `BLOCKED` rather than failing. That is the same
   deadlock `ci.yml`'s header comment describes when explaining why it carries
   no `paths-ignore`.
-
-  CodeQL is not among the eleven and behaves differently in a way that
-  matters for stacks. It has no workflow file: it runs from GitHub's default
-  code-scanning setup and is enforced by a separate `code_scanning` ruleset
-  rule rather than as a required status check. Default setup analyzes pushes
-  to the default branch **and PRs targeting it**, reporting three contexts —
-  `CodeQL`, `Analyze (actions)`, `Analyze (javascript-typescript)`. A PR
-  based on a stack branch gets none of them, and retargeting it to `main`
-  does not create them, because a base change fires no workflow run and
-  neither does closing/reopening the PR. Only a `synchronize` (a push to the
-  head branch, e.g. `gh pr update-branch <n>`) does. Until then the PR sits
-  `BLOCKED` on analyses that never start.
 
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.

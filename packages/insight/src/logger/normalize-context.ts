@@ -18,8 +18,19 @@ const MAX_NORMALIZE_DEPTH = 5;
 const DEPTH_LIMIT_MARKER = '[MaxDepthExceeded]';
 const CIRCULAR_MARKER = '[Circular]';
 
+const ERROR_STRING_PROPERTIES = ['digest', 'code'] as const;
+
 function normalizeError(error: Error): TLogContext {
-  const normalized: TLogContext = { message: sanitizeLogMessage(error) };
+  const normalized: TLogContext = {
+    name: sanitizeLogMessage(error.name),
+    message: sanitizeLogMessage(error),
+  };
+  for (const property of ERROR_STRING_PROPERTIES) {
+    const value: unknown = Reflect.get(error, property);
+    if (typeof value === 'string') {
+      normalized[property] = sanitizeLogMessage(value);
+    }
+  }
   if (typeof error.stack === 'string') {
     normalized.stack = truncateStack(error.stack);
   }

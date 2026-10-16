@@ -1,5 +1,10 @@
 import { SIZE } from '@blog/config';
-import { LINK_UNDERLINE, tv } from '@blog/ui/lib/styling';
+import {
+  FOCUS_RING,
+  LINK_UNDERLINE,
+  TRANSITION_COLORS,
+  tv,
+} from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const buttonVariants = tv({
@@ -7,10 +12,9 @@ export const buttonVariants = tv({
     'inline-flex min-h-9 items-center justify-center',
     'rounded-sm border',
     'font-display font-medium',
-    'transition-colors duration-base ease-smooth',
+    TRANSITION_COLORS,
     'cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
+    FOCUS_RING,
     'disabled:pointer-events-none disabled:opacity-50',
   ],
   variants: {
@@ -19,10 +23,7 @@ export const buttonVariants = tv({
         'border-transparent bg-brand-primary-solid text-brand-primary-contrast hover:bg-brand-primary-solid-hover',
       ghost:
         'border-border-strong bg-transparent text-text hover:border-brand-primary hover:text-brand-primary',
-      link: [
-        ...LINK_UNDERLINE,
-        'border-transparent bg-transparent text-brand-primary hover:text-brand-primary-hover',
-      ],
+      link: 'border-transparent bg-transparent text-brand-primary hover:text-brand-primary-hover',
       danger:
         'border-error/55 bg-transparent text-error hover:border-error hover:bg-error hover:text-primary',
     },
@@ -36,7 +37,7 @@ export const buttonVariants = tv({
     {
       variant: 'link',
       size: [SIZE.SM, SIZE.MD, SIZE.LG],
-      class: 'min-h-6 px-0 py-0',
+      class: ['min-h-6 px-0 py-0', ...LINK_UNDERLINE],
     },
   ],
   defaultVariants: { variant: 'primary', size: SIZE.MD },

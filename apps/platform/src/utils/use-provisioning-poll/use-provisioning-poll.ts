@@ -1,68 +1,38 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import {
-  CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-  type TElevateTenantOwnerOutcome,
   type TTenantProvisioningStatus,
-  type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import type {
-  TProvisioningRun,
-  TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
+import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { useToast } from '@platform/context/toast-provider';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
-  classifyProvisioningError,
-  type TProvisioningErrorKind,
-} from '@platform/utils/provisioning-error/provisioning-error';
-import {
-  findFailedStep,
-  stepStatusesFor,
-  stepUpdatedAtFor,
-} from '@platform/utils/run-steps/run-steps';
+  provisioningViewState,
+  type TProvisioningViewState,
+} from '@platform/utils/provisioning-view-state/provisioning-view-state';
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect, useRef, useTransition } from 'react';
 
-const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
-  TENANT_PROVISIONING_STEP_STATUS.FAILED,
-  TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-  TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  TENANT_PROVISIONING_STEP_STATUS.DONE,
-];
-
-const STEP_POLL_INTERVAL_MS = 4000;
+// Short enough that a step lasting a couple of seconds is seen running.
+const STEP_POLL_INTERVAL_MS = 1500;
 // 25 minutes: outlasts the workflow's 20-minute job timeout plus runner pickup.
-const MAX_POLL_TICKS = 375;
+const MAX_POLL_TICKS = (25 * 60_000) / STEP_POLL_INTERVAL_MS;
 
 export type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
-export type TUseProvisioningPollResult = {
+export type TUseProvisioningPollResult = TProvisioningViewState & {
   dispatchNotice: TMaybeUndefined<TDispatchNoticeKind>;
   isDispatchPending: boolean;
   handleDispatch: () => void;
-  provisioningStatus: TTenantProvisioningStatus | null;
-  provisioningSteps: TTenantProvisioningState | null;
-  stepStatuses: TTenantProvisioningStepStatus[];
-  displayStepStatuses: TTenantProvisioningStepStatus[];
-  stepUpdatedAt: TMaybeUndefined<string>[];
-  provisioningRun: TMaybeUndefined<TProvisioningRun>;
-  allIdle: boolean;
-  isProvisioningRunning: boolean;
-  isOverallFailed: boolean;
-  displayOverallStatus: TTenantProvisioningStepStatus;
-  failedStepError: TMaybeUndefined<string>;
-  errorKind: TMaybeUndefined<TProvisioningErrorKind>;
-  ownerElevationOutcome: TMaybeUndefined<TElevateTenantOwnerOutcome>;
+  provisioningStatus: TMaybeNull<TTenantProvisioningStatus>;
+  provisioningSteps: TMaybeNull<TTenantProvisioningState>;
 };
 
 export const useProvisioningPoll = (
@@ -71,16 +41,18 @@ export const useProvisioningPoll = (
   const router = useRouter();
   const toast = useToast();
   const t = useTranslations('provisioningStatusView');
-  const pollErrorToastIdRef = useRef<string | null>(null);
+  const pollErrorToastIdRef = useRef<TMaybeNull<string>>(null);
   const [isDispatchPending, setIsDispatchPending] = useState(false);
   const [dispatchNotice, setDispatchNotice] =
     useState<TMaybeUndefined<TDispatchNoticeKind>>(undefined);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
-  const [polledProvisioningStatus, setPolledProvisioningStatus] =
-    useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
-  const [provisioningSteps, setProvisioningSteps] =
-    useState<TTenantProvisioningState | null>(tenant.provisioningSteps);
+  const [polledProvisioningStatus, setPolledProvisioningStatus] = useState<
+    TMaybeNull<TTenantProvisioningStatus>
+  >(tenant.provisioningStatus);
+  const [provisioningSteps, setProvisioningSteps] = useState<
+    TMaybeNull<TTenantProvisioningState>
+  >(tenant.provisioningSteps);
   const [pollTicks, setPollTicks] = useState(0);
   const isVisible = useDocumentVisible();
 
@@ -94,10 +66,12 @@ export const useProvisioningPoll = (
   const provisioningStatus = isDispatchPending
     ? TENANT_PROVISIONING_STATUS.PROVISIONING
     : polledProvisioningStatus;
-  const isProvisioningRunning =
-    provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING;
+  const viewState = provisioningViewState(
+    provisioningSteps,
+    provisioningStatus,
+  );
   const shouldPoll =
-    isProvisioningRunning && isVisible && pollTicks < MAX_POLL_TICKS;
+    viewState.isProvisioningRunning && isVisible && pollTicks < MAX_POLL_TICKS;
 
   useEffect(() => {
     if (!shouldPoll) {
@@ -139,52 +113,6 @@ export const useProvisioningPoll = (
     };
   }, [tenant.id, shouldPoll, toast, t]);
 
-  const stepStatuses = stepStatusesFor(
-    provisioningSteps,
-    CORE_PROVISIONING_STEPS,
-  );
-  const stepUpdatedAt = stepUpdatedAtFor(
-    provisioningSteps,
-    CORE_PROVISIONING_STEPS,
-  );
-  const provisioningRun = provisioningSteps?.run;
-  const allIdle = stepStatuses.every(
-    (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  );
-  const overallStepStatus =
-    OVERALL_STATUS_PRIORITY.find((candidate) =>
-      stepStatuses.includes(candidate),
-    ) ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
-
-  // A retry keeps the previous run's FAILED entries until the runner reaches them again.
-  const displayStepStatuses = isProvisioningRunning
-    ? stepStatuses.map((status) =>
-        status === TENANT_PROVISIONING_STEP_STATUS.FAILED
-          ? TENANT_PROVISIONING_STEP_STATUS.IDLE
-          : status,
-      )
-    : stepStatuses;
-
-  const isOverallFailed =
-    overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED &&
-    provisioningStatus === TENANT_PROVISIONING_STATUS.FAILED;
-  const failedStep = isOverallFailed
-    ? findFailedStep(stepStatuses, CORE_PROVISIONING_STEPS)
-    : undefined;
-  const failedStepError = failedStep
-    ? provisioningSteps?.[failedStep]?.error
-    : undefined;
-  const errorKind = isOverallFailed
-    ? classifyProvisioningError(failedStepError)
-    : undefined;
-
-  const ownerElevationOutcome =
-    provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
-
-  const displayOverallStatus = isProvisioningRunning
-    ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
-    : overallStepStatus;
-
   const handleDispatch = () => {
     setDispatchNotice(undefined);
     setIsDispatchPending(true);
@@ -210,21 +138,11 @@ export const useProvisioningPoll = (
   };
 
   return {
+    ...viewState,
     dispatchNotice,
     isDispatchPending,
     handleDispatch,
     provisioningStatus,
     provisioningSteps,
-    stepStatuses,
-    displayStepStatuses,
-    stepUpdatedAt,
-    provisioningRun,
-    allIdle,
-    isProvisioningRunning,
-    isOverallFailed,
-    displayOverallStatus,
-    failedStepError,
-    errorKind,
-    ownerElevationOutcome,
   };
 };

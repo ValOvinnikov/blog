@@ -1,5 +1,4 @@
 import {
-  A_AS_CONST,
   ICONS,
   SIZE,
   type IWithClassName,
@@ -7,6 +6,7 @@ import {
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
 
@@ -32,7 +32,6 @@ export const Breadcrumbs = ({
   className,
   dataTestId,
 }: TBreadcrumbsProps) => {
-  const LinkComponent = linkAs ?? A_AS_CONST;
   const lastIndex = items.length - 1;
 
   return (
@@ -54,15 +53,16 @@ export const Breadcrumbs = ({
 
           return (
             <li key={href} className={s.item({ isCurrent })}>
-              {isCurrent ? (
-                <span className={s.current()} aria-current="page" title={title}>
-                  {content}
-                </span>
-              ) : (
-                <LinkComponent href={href} className={s.link()} title={title}>
-                  {content}
-                </LinkComponent>
-              )}
+              <TextLink
+                href={isCurrent ? undefined : href}
+                as={linkAs}
+                appearance="quiet"
+                isCurrent={isCurrent}
+                title={title}
+                className={isCurrent ? s.current() : undefined}
+              >
+                {content}
+              </TextLink>
             </li>
           );
         })}

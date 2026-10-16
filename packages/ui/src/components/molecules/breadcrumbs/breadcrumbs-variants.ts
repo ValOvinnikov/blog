@@ -12,14 +12,7 @@ export const breadcrumbsVariants = tv({
       "[&:not(:first-child)]:before:content-['/']",
       '[&:not(:first-child)]:before:mr-1 [&:not(:first-child)]:before:text-subtle',
     ],
-    link: [
-      'text-subtle no-underline',
-      'transition-colors duration-base ease-smooth',
-      'hover:text-brand-primary',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
-    ],
-    current: ['block min-w-0 flex-1 truncate', 'text-text'],
+    current: ['block min-w-0 flex-1 truncate'],
     homeLabel: ['sr-only'],
   },
   variants: {

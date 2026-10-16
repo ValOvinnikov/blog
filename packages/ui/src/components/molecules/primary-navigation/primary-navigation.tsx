@@ -7,7 +7,7 @@ import {
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { Fragment, type ReactNode } from 'react';
 
 import { primaryNavigationVariants } from './primary-navigation-variants';
@@ -38,7 +38,7 @@ export type TPrimaryNavigationProps = IWithClassName &
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
   };
 
-/** Top-level `<nav>` landmark composing `NavLink` items with trailing `actions`, which stay in the bar, and `panelActions`, which move into the mobile panel below `lg`. */
+/** Top-level `<nav>` landmark whose trailing `actions` stay in the bar and whose `panelActions` move into the mobile panel below `lg`. */
 export const PrimaryNavigation = ({
   links,
   actions,
@@ -61,16 +61,18 @@ export const PrimaryNavigation = ({
 
   const renderLinks = (itemClassName?: string) =>
     links.map(({ href, label, isActive, target }) => (
-      <NavLink
+      <TextLink
         key={href}
+        appearance="nav"
         as={linkAs}
         href={href}
-        isActive={isActive}
+        isCurrent={isActive}
+        currentStyle="weight"
         target={target}
         className={itemClassName}
       >
         {label}
-      </NavLink>
+      </TextLink>
     ));
 
   return (

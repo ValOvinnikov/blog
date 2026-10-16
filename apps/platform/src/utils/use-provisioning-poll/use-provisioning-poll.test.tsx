@@ -16,9 +16,9 @@ import {
 
 import { useProvisioningPoll } from './use-provisioning-poll';
 
-const STEP_POLL_INTERVAL_MS = 4000;
+const STEP_POLL_INTERVAL_MS = 1500;
 const TOAST_EXIT_BUFFER_MS = 1000;
-const MAX_POLL_TICKS = 375;
+const MAX_POLL_TICKS = 1000;
 
 const {
   retryProvisioningStepActionMock,

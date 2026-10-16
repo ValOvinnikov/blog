@@ -110,15 +110,30 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
   });
 
   describe('compact codes', () => {
-    it('links the codes directly on desktop, named for screen readers', () => {
+    it('links the other codes directly on desktop, named for screen readers', () => {
       setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
 
       const desktop = screen.getByTestId('language-switcher-desktop');
-      const dutch = within(desktop).getByRole('link', { name: 'Nederlands' });
+      const french = within(desktop).getByRole('link', { name: 'Français' });
 
+      expect(french).toHaveTextContent('FR');
+      expect(french).toHaveAttribute('lang', 'fr');
+      expect(within(desktop).queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('shows the current code as text marked current, in its own language', () => {
+      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
+
+      const desktop = screen.getByTestId('language-switcher-desktop');
+      const dutch = within(desktop).getByTestId('language-code-current');
+
+      expect(
+        within(desktop).queryByRole('link', { name: 'Nederlands' }),
+      ).not.toBeInTheDocument();
       expect(dutch).toHaveTextContent('NL');
       expect(dutch).toHaveAttribute('aria-current', 'page');
-      expect(within(desktop).queryByRole('button')).not.toBeInTheDocument();
+      expect(dutch).toHaveAttribute('lang', 'nl');
+      expect(dutch).not.toHaveAttribute('href');
     });
 
     it('renders as the menu with more than four live languages', () => {
@@ -145,12 +160,15 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
       ).toHaveTextContent('Nederlands');
     });
 
-    it('lists compact codes inline', () => {
+    it('lists compact codes inline, linking all but the current one', () => {
       setup({ isInFooter: true, switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
 
       expect(
+        screen.getAllByRole('listitem').map((item) => item.textContent),
+      ).toEqual(['ENEnglish', 'NLNederlands', 'FRFrançais']);
+      expect(
         screen.getAllByRole('link').map((link) => link.textContent),
-      ).toEqual(['EN', 'NL', 'FR']);
+      ).toEqual(['ENEnglish', 'FRFrançais']);
     });
   });
 });

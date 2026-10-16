@@ -1,6 +1,6 @@
 import type { IPortableTextLinkMark } from '@blog/config';
 import { InlineCode } from '@blog/ui/components/atoms/inline-code';
-import { ProseLink } from '@blog/ui/components/atoms/prose-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import type {
   PortableTextMarkComponentProps,
   PortableTextReactComponents,
@@ -18,13 +18,14 @@ export const markComponents: PortableTextReactComponents['marks'] = {
     value: annotation,
   }: PortableTextMarkComponentProps<IPortableTextLinkMark>) =>
     annotation?.link ? (
-      <ProseLink
+      <TextLink
+        appearance="prose"
         as={SmartLink}
         href={annotation.link.href}
         target={annotation.link.target}
       >
         {children}
-      </ProseLink>
+      </TextLink>
     ) : (
       <>{children}</>
     ),

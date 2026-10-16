@@ -11,23 +11,7 @@ describe(FontPicker, () => {
     user = userEvent.setup();
   });
 
-  it('renders every closed-set font option by its real name', () => {
-    render(
-      <FontPicker
-        ariaLabel="Heading font"
-        value={FONT_CHOICE.SPACE_GROTESK}
-        onChange={vi.fn()}
-      />,
-    );
-
-    expect(screen.getByText('Space Grotesk')).toBeVisible();
-    expect(screen.getByText('Newsreader')).toBeVisible();
-    expect(screen.getByText('JetBrains Mono')).toBeVisible();
-    expect(screen.getByText('Fraunces')).toBeVisible();
-    expect(screen.getByText('Inter')).toBeVisible();
-  });
-
-  it("renders each option's name styled in its own resolved font family", () => {
+  it('shows the current font on the trigger, set in its own font family', () => {
     render(
       <FontPicker
         ariaLabel="Heading font"
@@ -36,14 +20,43 @@ describe(FontPicker, () => {
       />,
     );
 
+    const trigger = screen.getByRole('combobox', { name: 'Heading font' });
+    expect(trigger).toHaveTextContent('Fraunces');
     expect(screen.getByText('Fraunces')).toHaveStyle({
       fontFamily: 'mock-fraunces-font-family',
     });
   });
 
-  it('reports the newly picked font on click', async () => {
-    const handleChange = vi.fn();
+  it('lists every closed-set font by its real name, each in its own font family, marking the current one', async () => {
     render(
+      <FontPicker
+        ariaLabel="Heading font"
+        value={FONT_CHOICE.SPACE_GROTESK}
+        onChange={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('combobox', { name: 'Heading font' }));
+
+    expect(
+      await screen.findByRole('option', { name: 'Space Grotesk' }),
+    ).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('option', { name: 'Newsreader' })).toBeVisible();
+    expect(
+      screen.getByRole('option', { name: 'JetBrains Mono' }),
+    ).toBeVisible();
+    expect(screen.getByRole('option', { name: 'Inter' })).toBeVisible();
+    expect(screen.getByRole('option', { name: 'Fraunces' })).toHaveTextContent(
+      'Fraunces',
+    );
+    expect(
+      screen.getByText('Fraunces', { selector: '[role="option"] *' }),
+    ).toHaveStyle({ fontFamily: 'mock-fraunces-font-family' });
+  });
+
+  it('reports the font chosen from the list, and the trigger then shows it', async () => {
+    const handleChange = vi.fn();
+    const { rerender } = render(
       <FontPicker
         ariaLabel="Body font"
         value={FONT_CHOICE.NEWSREADER}
@@ -51,12 +64,43 @@ describe(FontPicker, () => {
       />,
     );
 
-    await user.click(screen.getByText('Inter'));
+    await user.click(screen.getByRole('combobox', { name: 'Body font' }));
+    await user.click(await screen.findByRole('option', { name: 'Inter' }));
 
     expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.INTER);
+
+    rerender(
+      <FontPicker
+        ariaLabel="Body font"
+        value={FONT_CHOICE.INTER}
+        onChange={handleChange}
+      />,
+    );
+
+    expect(
+      screen.getByRole('combobox', { name: 'Body font' }),
+    ).toHaveTextContent('Inter');
   });
 
-  it('disables every option and stops reporting clicks when isDisabled is true', async () => {
+  it('picks a font with the arrow keys and Enter', async () => {
+    const handleChange = vi.fn();
+    render(
+      <FontPicker
+        ariaLabel="Body font"
+        value={FONT_CHOICE.SPACE_GROTESK}
+        onChange={handleChange}
+      />,
+    );
+
+    screen.getByRole('combobox', { name: 'Body font' }).focus();
+    await user.keyboard('{ArrowDown}');
+    await screen.findByRole('listbox');
+    await user.keyboard('{ArrowDown}{Enter}');
+
+    expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.NEWSREADER);
+  });
+
+  it('is disabled and described by the given notice when isDisabled is true', async () => {
     const handleChange = vi.fn();
     render(
       <FontPicker
@@ -68,16 +112,12 @@ describe(FontPicker, () => {
       />,
     );
 
-    expect(screen.getByRole('radio', { name: 'Inter' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
-    expect(screen.getByRole('radiogroup')).toHaveAttribute(
-      'aria-describedby',
-      'archived-notice',
-    );
+    const trigger = screen.getByRole('combobox', { name: 'Body font' });
+    expect(trigger).toHaveAttribute('aria-describedby', 'archived-notice');
 
-    await user.click(screen.getByText('Inter'));
+    await user.click(trigger);
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(handleChange).not.toHaveBeenCalled();
   });
 });

@@ -99,7 +99,7 @@ export const FeatureListCard = ({
             href={item.link.href}
             target={item.link.target}
             ariaLabel={item.link.ariaLabel}
-            linkAs={SmartLink}
+            as={SmartLink}
           >
             {heading}
           </MediaCard.Link>

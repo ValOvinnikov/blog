@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES, type TVoicePortableText } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getVoiceRich } from './get-voice-rich';
@@ -120,9 +121,24 @@ describe(getVoiceRich, () => {
     expect(result[0]?.children[0]?.text).toBe('No posts yet.');
   });
 
-  it('forwards an explicitly supplied tenant to getSiteConfig', async () => {
-    await getVoiceRich('blogListEmpty', 'tenant-2');
+  it("reads the site config of the request context's tenant", async () => {
+    await getVoiceRich('blogListEmpty');
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-2');
+    expect(getSiteConfigMock).toHaveBeenCalledWith(
+      DEFAULT_REQUEST_CONTEXT.tenantId,
+    );
+  });
+
+  it('reads no tenant from the request headers when the route resolved no tenant', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      tenantId: undefined,
+    });
+
+    await getVoiceRich('blogListEmpty');
+
+    expect(getSiteConfigMock).toHaveBeenCalledWith(
+      UNRESOLVED_TENANT_PLACEHOLDER,
+    );
   });
 });

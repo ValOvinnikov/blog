@@ -66,7 +66,7 @@ export const TeamMemberCard = ({
       </MediaCard.Media>
       <MediaCard.Title level={3}>
         {member.profileUrl ? (
-          <MediaCard.Link href={member.profileUrl} linkAs={SmartLink}>
+          <MediaCard.Link href={member.profileUrl} as={SmartLink}>
             {member.name}
           </MediaCard.Link>
         ) : (

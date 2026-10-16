@@ -104,10 +104,12 @@ describe(LookSample, () => {
   it('shows every live language as a code with compact codes', () => {
     render(<LookSample {...BASE_PROPS} />);
 
-    expect(screen.getByRole('link', { name: 'English' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    const current = screen.getByTestId('sample-language-code-current');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current).toHaveTextContent('English');
+    expect(
+      screen.queryByRole('link', { name: 'English' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Français' })).toHaveTextContent(
       'FR',
     );

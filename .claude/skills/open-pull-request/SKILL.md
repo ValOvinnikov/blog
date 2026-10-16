@@ -55,8 +55,8 @@ gh stack sync                 # fetch, restack, force-push all       — Gate 3
   `gh pr edit <pr> --title "…" --body "…"` on each new PR per "PR body
   template", and Gate 5 for each.
 
-**Every stacked PR runs the full required suite** because the six workflows
-behind the required checks — `ci.yml`, `knip.yml`, `dependency-review.yml`,
+**Every stacked PR runs the full required suite** because the five workflows
+behind the required checks — `ci.yml`, `dependency-review.yml`,
 `zizmor.yml`, `actionlint.yml`, `hooks.yml` — declare a bare `pull_request:`
 trigger. Never add a `branches:` filter to one: a required check that never
 starts leaves the PR `BLOCKED` forever instead of failing it (`ci.yml`'s
@@ -68,11 +68,8 @@ header). The check list: `docs/context/ci-automation.md`.
    `gh pr edit <top> --base main`.
 2. Close the others as superseded, and move every stacked issue's
    `Closes #<n>` onto the survivor.
-3. Ask to push (Gate 3), then run `gh pr update-branch <top>`. CodeQL's
-   default setup analyzes only PRs into `main`, so the retargeted PR has none
-   of `CodeQL`, `Analyze (actions)` or `Analyze (javascript-typescript)`, and
-   a base change or close/reopen triggers nothing. Only a push to the head
-   branch does; `update-branch` is that push, and merges `main` in too.
+3. Ask to push (Gate 3), then run `gh pr update-branch <top>` to merge
+   `main` into the survivor.
 
 ## ABSOLUTE RULES — never violate
 

@@ -363,7 +363,7 @@ export const IconMedia: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href={featureHref}>{featureTitle}</a>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
         </MediaCard.Title>
       </>
     ),
@@ -380,12 +380,59 @@ export const IconPanelMedia: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.LG} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href={featureHref}>{featureTitle}</a>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
         </MediaCard.Title>
       </>
     ),
   },
 };
+
+const besideImageCard = (
+  shape: 'wide' | 'circle',
+  align: 'left' | 'center' = 'left',
+): TStory => ({
+  args: {
+    align,
+    excerpt: shortExcerpt,
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape={shape} iconPanel={true}>
+          <Icon name={ICONS.ROCKET} size={SIZE.LG} />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+  render: (args) => (
+    <div className="grid max-w-3xl grid-cols-2 gap-6">
+      <MediaCard {...args}>
+        <MediaCard.Media shape={shape}>
+          <img
+            src={shape === 'circle' ? faker.image.avatar() : picsum(800, 450)}
+            alt={imageAlt}
+            className="size-full object-cover"
+          />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
+        </MediaCard.Title>
+      </MediaCard>
+      <MediaCard {...args} />
+    </div>
+  ),
+});
+
+export const IconPanelBesideImage = besideImageCard('wide');
+
+export const IconPanelBesideImageCenterAligned = besideImageCard(
+  'wide',
+  'center',
+);
+
+export const IconPanelBesideCircleImage = besideImageCard('circle');
 
 const restingAndFocusedOn = (tone: TBrandVariant): TStory => ({
   name: `On a ${BRAND_BAND_LABELS[tone]} band — at rest and focused`,
@@ -476,7 +523,7 @@ export const CenterAligned: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href={featureHref}>{featureTitle}</a>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
         </MediaCard.Title>
       </>
     ),

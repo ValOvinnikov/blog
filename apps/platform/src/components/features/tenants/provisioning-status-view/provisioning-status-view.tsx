@@ -17,10 +17,12 @@ import { Text } from '@platform/components/shared/text';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
+import { useStagedStepStatuses } from '@platform/utils/use-staged-step-statuses/use-staged-step-statuses';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { DispatchNotice } from './components/dispatch-notice/dispatch-notice';
+import { QueuedRunNotice } from './components/queued-run-notice/queued-run-notice';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 
 type TProvisioningStatusViewProps = {
@@ -41,12 +43,15 @@ export const ProvisioningStatusView = ({
     provisioningRun,
     allIdle,
     isProvisioningRunning,
+    isAwaitingRunner,
     isOverallFailed,
     displayOverallStatus,
     failedStepError,
     errorKind,
   } = useProvisioningPoll(tenant);
   useRelativeTimeTick();
+  const { stagedStatuses, isRevealing } =
+    useStagedStepStatuses(displayStepStatuses);
 
   const isArchived = Boolean(tenant.deprovisionedAt);
   const archivedNoticeId = useId();
@@ -55,7 +60,7 @@ export const ProvisioningStatusView = ({
   const steps = CORE_PROVISIONING_STEPS.map((stepKey, index) => ({
     key: stepKey,
     title: t(`stepLabel.${stepKey}`),
-    status: displayStepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
+    status: stagedStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
     updatedAt: stepUpdatedAt[index],
   }));
 
@@ -91,8 +96,11 @@ export const ProvisioningStatusView = ({
         status={
           isOverallFailed
             ? TENANT_PROVISIONING_STEP_STATUS.FAILED
-            : displayOverallStatus
+            : isRevealing
+              ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
+              : displayOverallStatus
         }
+        isPreRun={isAwaitingRunner}
       />
       {retryButtonNode}
     </>
@@ -122,14 +130,19 @@ export const ProvisioningStatusView = ({
 
       {dispatchNotice && <DispatchNotice notice={dispatchNotice} />}
 
+      {isAwaitingRunner && (
+        <QueuedRunNotice admittedAt={provisioningRun?.admittedAt} />
+      )}
+
       <div className={cardsRow()}>
         <div data-testid="provisioning-steps">
           <RunStepsCard
             title={t('stepsCardTitle')}
             steps={steps}
-            isDone={
-              displayOverallStatus === TENANT_PROVISIONING_STEP_STATUS.DONE
-            }
+            isDone={stagedStatuses.every(
+              (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
+            )}
+            isPreRun={isAwaitingRunner}
           />
         </div>
 

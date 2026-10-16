@@ -99,9 +99,9 @@ src/components/molecules/media-card/
   and pass tests: a silent WCAG 2.5.3 failure for speech-input users. Put the
   **whole** name in one visually hidden `span` and `aria-hidden` the visible
   copy — never a hidden suffix beside visible text, because name computation
-  trims at element boundaries and drops a leading-space separator. `NavLink`
-  (`hasLabel={false}`), a link whose whole name is one `sr-only` span, is the
-  precedent.
+  trims at element boundaries and drops a leading-space separator. `TextLink`
+  without an `href`, which hides its visible copy and carries its whole name
+  in one `sr-only` span, is the precedent.
 
 - **Never format dates.** Locale lives in the app. Take `publishedAt` (ISO
   8601, for `<time dateTime>`) and `formattedDate` (pre-formatted in
@@ -244,6 +244,17 @@ Pick the **minimum** level:
 - **Every anchor a component builds itself takes a `linkAs`/`as` prop**
   (default `'a'`, typed `TAnchorElementType`) — never a hardcoded `<a>`,
   including one built to hand into another component's slot.
+- **A run of text that links is `TextLink`** (`atoms/text-link`), never a new
+  link atom and never a `tv()` slot that re-creates a link look. Pick its
+  `appearance` (`prose`, `nav`, `quiet`, `accent`). `isStretched` makes a
+  whole card the click target. `isCurrent` sets the current style and
+  `aria-current`. A look it lacks becomes a new `appearance` on `TextLink`. A
+  link that looks like a button is `LinkButton`.
+- **No `href` means plain text.** `TextLink` without an `href` renders a
+  `span` that Tab skips, with no hover. A current item or a missing
+  destination passes no `href`; it never branches between a link and a
+  `span`. A `TextLink` with no children must take `ariaLabel`, which its prop
+  type enforces.
 
 Level-2 derivation, the "why each piece matters" breakdown and the anchor
 before/after → **`polymorphic-and-as.md`**.

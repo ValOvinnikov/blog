@@ -75,6 +75,10 @@ neither.
     `DOCUMENT_VALIDATION` / `SCHEMA_VALIDATION_ERROR` (CRITICAL if any
     document has an error, else WARNING), and resolves it on a clean run.
     The other declared sources and kinds have no writer yet.
+  - The release actions (`RELEASE_STARTED`, `RELEASE_OVERRIDE`,
+    `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`), the `RELEASE`
+    target type and the `CONTRAST_CHECK` / `CONTRAST_REGRESSION` finding are
+    declared with no writer yet ([Platform releases](platform-releases.md)).
 - Pages read straight from Neon on each request; nothing is cached.
 
 ## Configuration
@@ -88,8 +92,8 @@ Nothing is configurable. Only admins (any role) see either record.
   lost audit write is logged at `error` under the caller's `logEvent` and
   swallowed, because `neon-http` cannot couple the two writes in a
   transaction.
-- An action is a bare verb and never reuses a `TENANT_STATUS` value. A run
-  spanning two systems records request then outcome: `CREATED` before
+- An action never reuses a `TENANT_STATUS` value. A run spanning two
+  systems records request then outcome: `CREATED` before
   `PROVISIONED`/`PROVISIONING_FAILED`, `DEPROVISION_REQUESTED` before
   `DEPROVISIONED`.
 - `AUDIT_ACTION` and `AUDIT_TARGET_TYPE` stay in `@blog/config` even though

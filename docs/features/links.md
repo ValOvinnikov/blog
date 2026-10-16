@@ -21,7 +21,7 @@ A link is authored once, as a `link` document — a label per language and exact
 
 ## Surfaces and routes
 
-- **Studio:** Blocks → Links lists the `link` documents. They are picked through `linkRef` (navigation items and the link annotation of `articleText`, `listedText` and `paragraphText`), `ctaButton` and `ctaSecondaryButton` (adding `variant` and `appearance`), `socialProfile` (adding `platform`), and plain references on `block_feature.link`, `block_testimonial.link`, `logoItem.link` and `person.profilePage`. A `link` document whose internal target lacks a live translation shows a notice naming those languages and saying their readers go to the default-language page.
+- **Studio:** Blocks → Links lists the `link` documents. They are picked through `linkRef` (navigation items and the link annotation of `articleText`, `listedText` and `paragraphText`), `ctaButton` and `ctaSecondaryButton` (adding `variant` and `appearance`), `socialProfile` (adding `platform`), and plain references on `block_feature.link`, `block_testimonial.link`, `logoItem.link` and `person.profilePage`. An internal link's page picker lists each page once — its default-language document, or one of its translations when it has none; the choice does not affect where readers land (see Resolution). A `link` document whose internal target lacks a live translation shows a notice naming those languages and saying their readers go to the default-language page.
 - **Public site:** no route of its own. Resolved links render through `SmartLink`.
 - **Platform:** none.
 
@@ -58,6 +58,7 @@ A link is authored once, as a `link` document — a label per language and exact
 ## Entry points
 
 - `packages/studio/src/schema-types/documents/link/link.ts`, `link-page-types.ts`
+- `packages/studio/src/schema-types/filters/one-page-per-translation-group.ts`
 - `packages/studio/src/schema-types/objects/link-ref/link-ref.ts`
 - `packages/service/src/shared/fragments/link/link-document.ts`
 - `packages/service/src/shared/transformers/link/to-link-document.ts`
@@ -72,6 +73,7 @@ A link is authored once, as a `link` document — a label per language and exact
 - `packages/service/src/shared/fragments/link/*.test.ts`, `packages/service/src/shared/transformers/link/*.test.ts`
 - `packages/config/src/routes.test.ts`
 - `packages/studio/src/schema-types/inputs/localization-notice-input/untranslated-target.test.ts`
+- `packages/studio/src/schema-types/filters/one-page-per-translation-group.test.ts`
 - `apps/web/src/components/shared/smart-link/smart-link.test.tsx`, `apps/web/src/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags.test.ts`
 - Stories: links render inside `apps/web/src/components/shared/action-group/action-group.stories.tsx`, `social-links/social-links.stories.tsx` and `site-navigation/site-navigation.stories.tsx`; `link` itself has none.
 

@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_67 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_65 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -47,11 +47,6 @@ Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 Accessible caption for a media element.
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
-### CardLink — `components/atoms/card-link/card-link.tsx`
-
-The one link that makes a whole item card its click target.
-Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-
 ### Eyebrow — `components/atoms/eyebrow/eyebrow.tsx`
 
 Small uppercase label displayed above a heading to provide contextual topic or section context.
@@ -92,22 +87,11 @@ Variants: ratio: video|square|portrait|classic · shape: rect|circle
 Decorative separator for inline metadata lists (e.g. "Author · Date · Read time").
 Props: separator?: string _(extends IWithClassName, IWithDataTestId)_
 
-### NavLink — `components/atoms/nav-link/nav-link.tsx`
-
-A chrome-level navigation link (header/footer nav items).
-Props: className?: string · isActive?: TNavLinkVariants['isActive'] · variant?: TNavLinkVariants['variant'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
-Variants: isActive: (boolean) · variant: plain|outlined
-
 ### Prose — `components/atoms/prose/prose.tsx`
 
 Typography wrapper for long-form body text.
 Props: size?: TProseVariants['size'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
-
-### ProseLink — `components/atoms/prose-link/prose-link.tsx`
-
-The accent/underline treatment for inline links inside Portable Text article body copy.
-Props: className?: string _(extends IWithDataTestId)_
 
 ### QuoteBlock — `components/atoms/quote-block/quote-block.tsx`
 
@@ -154,6 +138,12 @@ Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footn
 A pure, controlled single-line field.
 Props: value: string · onChange: (value: string) => void · ariaLabel: string · isInvalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · isRequired?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasLeadingIcon: (boolean) · hasTrailingIcon: (boolean)
+
+### TextLink — `components/atoms/text-link/text-link.tsx`
+
+A run of text that links somewhere, in the look its context calls for, and reads as plain text when there is nowhere to go.
+Props: href?: string · as?: TAnchorElementType · target?: '_blank' · title?: string · lang?: string · hrefLang?: string · appearance?: TTextLinkVariants['appearance'] · variant?: TTextLinkVariants['variant'] · currentStyle?: TTextLinkVariants['currentStyle'] · isCurrent?: boolean · isStretched?: boolean _(extends IWithClassName, IWithDataTestId, TTextLinkName)_
+Variants: appearance: prose|nav|quiet|accent · variant: plain|outlined · currentStyle: underline|weight · hasHref: (boolean) · isCurrent: (boolean) · isStretched: (boolean)
 
 ### Textarea — `components/atoms/textarea/textarea.tsx`
 
@@ -223,12 +213,14 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 ### LogoTile — `components/molecules/logo-tile/logo-tile.tsx`
 
 A fixed-size card that frames a single logo, so transparent and opaque-background assets sit inside identical bounds.
-Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] · aspectRatio?: number · darkLogo?: ReactNode · darkAspectRatio?: number _(extends IWithClassName, IWithDataTestId)_
+Props: isInteractive?: TLogoTileVariants['isInteractive'] · children?: TCompoundChildren<typeof LogoTileParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: isInteractive: (boolean)
 
 Slots:
 
-- **LogoTile.Link** — The link that makes a whole `LogoTile` its click target, wrapping the logo it names. Props: _(extends TCardLinkProps)_
+- **LogoTile.Logo** — The slot that sizes the tile's logo, by the asset's aspect ratio when one is given. Props: children: ReactNode · aspectRatio?: number _(extends IWithClassName, IWithDataTestId)_ · Variants: hasAspectRatio: (boolean)
+- **LogoTile.DarkLogo** — The slot for the logo asset made for dark backgrounds, shown in dark mode only. Props: _(extends TLogoTileLogoProps)_
+- **LogoTile.Link** — A run of text that links somewhere, in the look its context calls for, and reads as plain text when there is nowhere to go. Props: href?: string · as?: TAnchorElementType · target?: '_blank' · title?: string · lang?: string · hrefLang?: string · appearance?: TTextLinkVariants['appearance'] · variant?: TTextLinkVariants['variant'] · currentStyle?: TTextLinkVariants['currentStyle'] · isCurrent?: boolean · isStretched?: boolean _(extends IWithClassName, IWithDataTestId, TTextLinkName)_ · Variants: appearance: prose|nav|quiet|accent · variant: plain|outlined · currentStyle: underline|weight · hasHref: (boolean) · isCurrent: (boolean) · isStretched: (boolean)
 
 ### MediaCard — `components/molecules/media-card/media-card.tsx`
 
@@ -242,7 +234,7 @@ Slots:
 - **MediaCard.Meta** — Compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Title** — The heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
 - **MediaCard.Footer** — The byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **MediaCard.Link** — The one link that makes a whole item card its click target. Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Link** — The one link that makes the whole card its click target. Props: href: string · as?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Panel — `components/molecules/panel/panel.tsx`
 
@@ -290,7 +282,7 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark composing `NavLink` items with trailing `actions`, which stay in the bar, and `panelActions`, which move into the mobile panel below `lg`.
+Top-level `<nav>` landmark whose trailing `actions` stay in the bar and whose `panelActions` move into the mobile panel below `lg`.
 Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
 

@@ -144,6 +144,16 @@ such as a flag that changes behaviour while the field keeps its value.
 The export → dry-run → inspect → human-gated run workflow, and `lib/` for
 helpers a second migration needs: `migrations/README.md`.
 
+- **A migration that changes an existing shape ships in two releases —
+  expand, then contract.** A release migrates content before the new web is
+  deployed, and the web still live reads the old shape until that deploy
+  lands, so removing or renaming a shape in the same release breaks the live
+  site for that window and leaves no way back. **Expand** adds the new field or
+  value, copies the data across and keeps the old shape, so the deployed web
+  keeps working. **Contract** removes the old shape in a later release, once no
+  code reads it. The expand ticket files its contract follow-up, labelled
+  `prio:later`, when it is created. An additive, optional-only change needs no
+  migration and no contract step.
 - **Idempotency via a target-state guard, in the same style on every
   `documentTypes` branch.** Skip when the _target_ shape is present
   (`modules !== undefined`), not when the _source_ field is absent — a doc
