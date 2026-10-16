@@ -47,6 +47,7 @@ const LogoTileRoot = ({
       {slots.Link &&
         cloneElement(slots.Link, {
           isStretched: true,
+          appearance: 'quiet',
           className: s.link({ class: slots.Link.props.className }),
         })}
     </div>
