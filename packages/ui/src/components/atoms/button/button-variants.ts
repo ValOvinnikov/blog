@@ -23,7 +23,8 @@ export const buttonVariants = tv({
         'border-transparent bg-brand-primary-solid text-brand-primary-contrast hover:bg-brand-primary-solid-hover',
       ghost:
         'border-border-strong bg-transparent text-text hover:border-brand-primary hover:text-brand-primary',
-      link: 'border-transparent bg-transparent text-brand-primary hover:text-brand-primary-hover',
+      // Forced colours paint transparent borders, so the link drops its border there.
+      link: 'border-transparent bg-transparent text-brand-primary hover:text-brand-primary-hover forced-colors:border-0',
       danger:
         'border-error/55 bg-transparent text-error hover:border-error hover:bg-error hover:text-primary',
     },
