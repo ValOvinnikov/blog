@@ -85,8 +85,8 @@ A domain is a module, a feature, a page, or a layout or app route.
   every member of the props type: optional ones, `children`, `className`, and
   the members the `IWithClassName`/`IWithDataTestId` mixins add.
 - Exempt, and only these: the native-attribute primitives `Button`,
-  `IconButton` and `TextInput` in `@blog/ui`, and `Button` and `TextInput` in
-  `apps/platform`.
+  `IconButton`, `TextInput` and `TextLink` in `@blog/ui`, and `Button` and
+  `TextInput` in `apps/platform`.
 - A component at the ceiling takes no new prop until it is restructured — in
   the same PR or one before it.
 - Over the ceiling, or about to be, use the first step that fits:
