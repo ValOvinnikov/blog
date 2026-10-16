@@ -1,21 +1,8 @@
-import { HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const fontPickerVariants = tv({
   slots: {
-    root: ['flex flex-col gap-2'],
-    option: [
-      'flex cursor-pointer items-center gap-3 rounded-admin-control border-[1.5px] border-admin-line bg-admin-surface px-[13px] py-[11px]',
-      'transition-colors',
-      'has-[[data-checked]]:border-admin-brand has-[[data-checked]]:shadow-[0_0_0_3px_var(--admin-brand-weak)]',
-      ...HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES,
-    ],
-    radioRoot: [
-      'flex size-4 shrink-0 items-center justify-center rounded-full border-[1.5px] border-admin-control-line',
-      'data-[checked]:border-admin-brand',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
-    ],
-    radioIndicator: ['size-2 rounded-full bg-admin-brand'],
-    name: ['text-[17px] text-admin-text'],
+    value: ['truncate'],
+    itemName: ['text-admin-15 text-admin-text'],
   },
 });
