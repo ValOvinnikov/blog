@@ -58,6 +58,11 @@ export const SampleLanguageSwitcher = ({
               lang={LOCALE_BCP47_TAGS[locale]}
               isCurrent={locale === currentLocale}
               className={codeLink()}
+              dataTestId={
+                locale === currentLocale
+                  ? 'sample-language-code-current'
+                  : undefined
+              }
             >
               <span aria-hidden="true">{toCode(locale)}</span>
               <span className={codeLabel()}>{LOCALE_NATIVE_LABEL[locale]}</span>
