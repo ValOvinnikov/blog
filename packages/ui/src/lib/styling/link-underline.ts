@@ -3,6 +3,8 @@
 const UNDERLINE =
   'underline underline-offset-[0.4em] [text-decoration-skip-ink:auto] pb-[0.3em]';
 
-export const LINK_UNDERLINE = [UNDERLINE, 'decoration-1 hover:decoration-2'];
+export const LINK_UNDERLINE_AT_REST = [UNDERLINE, 'decoration-1'];
+
+export const LINK_UNDERLINE = [...LINK_UNDERLINE_AT_REST, 'hover:decoration-2'];
 
 export const LINK_UNDERLINE_EMPHASIS = [UNDERLINE, 'decoration-2'];
