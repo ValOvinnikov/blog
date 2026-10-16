@@ -11,7 +11,8 @@
     "./merge": "./src/merge/index.ts",
     "./pagination": "./src/pagination/index.ts",
     "./primitives": "./src/primitives/index.ts",
-    "./reading-time": "./src/reading-time/index.ts"
+    "./reading-time": "./src/reading-time/index.ts",
+    "./version": "./src/version/index.ts"
   },
   "scripts": {
     "lint": "eslint .",

@@ -22,6 +22,10 @@ const ACTIVITY_GLYPH: Record<TAuditAction, string> = {
   [AUDIT_ACTION.SETTINGS_UPDATED]: '⚙',
   [AUDIT_ACTION.DELETED]: '✕',
   [AUDIT_ACTION.READER_DATA_PURGED]: '🗑',
+  [AUDIT_ACTION.RELEASE_STARTED]: '⇪',
+  [AUDIT_ACTION.RELEASE_OVERRIDE]: '⚑',
+  [AUDIT_ACTION.CONTRAST_CHECK_STARTED]: '◐',
+  [AUDIT_ACTION.TENANT_MIGRATIONS_STARTED]: '⇄',
 };
 
 export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
