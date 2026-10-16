@@ -837,16 +837,4 @@ file` are all denied alike) — an earlier version only handled the
   deadlock `ci.yml`'s header comment describes when explaining why it carries
   no `paths-ignore`.
 
-  CodeQL is not among the ten and behaves differently in a way that
-  matters for stacks. It has no workflow file: it runs from GitHub's default
-  code-scanning setup and is enforced by a separate `code_scanning` ruleset
-  rule rather than as a required status check. Default setup analyzes pushes
-  to the default branch **and PRs targeting it**, reporting three contexts —
-  `CodeQL`, `Analyze (actions)`, `Analyze (javascript-typescript)`. A PR
-  based on a stack branch gets none of them, and retargeting it to `main`
-  does not create them, because a base change fires no workflow run and
-  neither does closing/reopening the PR. Only a `synchronize` (a push to the
-  head branch, e.g. `gh pr update-branch <n>`) does. Until then the PR sits
-  `BLOCKED` on analyses that never start.
-
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.

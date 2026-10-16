@@ -28,6 +28,7 @@ export * from './portable-text-block-type';
 export * from './preset';
 export * from './price-period';
 export * from './redirect';
+export * from './release';
 export * from './reserved-slug';
 export * from './size';
 export * from './taxonomy';

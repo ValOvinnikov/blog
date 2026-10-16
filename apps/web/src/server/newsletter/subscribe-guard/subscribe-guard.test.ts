@@ -74,6 +74,18 @@ describe('isSubscribeAttemptRefused', () => {
     expect(createRateLimiterMock).not.toHaveBeenCalled();
   });
 
+  it('refuses and logs, without counting against the address, when BotID errors', async () => {
+    const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
+    checkBotIdMock.mockRejectedValue(new Error('botid down'));
+
+    await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
+    expect(warnMock).toHaveBeenCalledWith(
+      'newsletter.subscribe_blocked',
+      expect.objectContaining({ reason: 'bot_check_unavailable' }),
+    );
+    expect(createRateLimiterMock).not.toHaveBeenCalled();
+  });
+
   it('refuses and logs when the rate-limit store errors', async () => {
     createRateLimiterMock.mockReturnValue({
       isLimited: vi.fn().mockRejectedValue(new Error('redis down')),

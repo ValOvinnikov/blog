@@ -108,6 +108,9 @@ Migrations, Zizmor, Actionlint, Knip, and Hooks (`Shellcheck + guard tests`).
 Everything else (Claude Code, Dependency scan, Document validation, Lighthouse
 CI, Playwright smoke) stays advisory: a red result there does not currently
 block a merge.
+The ruleset carries no `code_scanning` or `code_quality` rule and CodeQL's
+default setup is off: without GitHub Code Security a private repository
+produces no code-scanning results, so either rule would block every merge.
 Required workflows run on every PR without path filters **and without
 base-branch filters**, on purpose — a workflow skipped by either leaves its
 required checks pending forever, so it blocks the PR instead of reporting on
@@ -143,8 +146,14 @@ check on nearly every PR. The same read-only `sanity documents validate`
 step now runs daily from `document-validation.yml` (table above) and stays
 out of the branch ruleset; `ci.yml` no longer contains it.
 
-**Document validation runs clean, including on `migrationState`.**
-`migrationState` (`packages/studio/scripts/migrate.mjs`'s single fixed-`_id`
+**Document validation fails on content, not code.** The CLI exits 1 when any
+document in the console dataset carries a schema error; warnings never fail
+the run. Hand-edited QA documents drift out of validity as the schema
+tightens, so a red run is a content ticket (fix the named documents in
+Studio), not a workflow change — read the failing step's output for the
+document IDs and field paths.
+
+**`migrationState` validates cleanly.** `migrationState` (`packages/studio/scripts/migrate.mjs`'s single fixed-`_id`
 migration ledger document) has a declared Studio schema type
 (`packages/studio/src/schema-types/documents/system/migration-state.ts`) so
 `sanity documents validate` recognizes it, while `sanity.config.ts` disables
@@ -344,7 +353,6 @@ threshold at which it would have stayed out).
 | **Build** (required)                 | No routine mirror — `pnpm build` is CI-only by `CLAUDE.md`'s rule; run it locally only to reproduce an actual CI build failure (`open-pull-request` Gate 5a).                                                                                                                                                                                            |
 | **Shellcheck + guard tests** (Hooks) | No `pnpm` script. When the diff touches `.claude/hooks/**` or `scripts/*.sh`, run the shellcheck + guard-test block in `develop-feature` §5 by hand.                                                                                                                                                                                                     |
 | **Migrations** (required)            | None — needs the dataset. `pnpm migrate:dry` in `packages/studio` is the nearest rehearsal, and it also targets a live dataset.                                                                                                                                                                                                                          |
-| **CodeQL** (required)                | None — GitHub's default setup, runs only on PRs into `main`.                                                                                                                                                                                                                                                                                             |
 | **Dependency scan** (advisory)       | None — queries the OSV database over the network; run osv-scanner on `pnpm-lock.yaml` by hand to reproduce.                                                                                                                                                                                                                                              |
 | **Zizmor** (required)                | None — static analysis of the workflow files. Runs on every PR, but only a `.github/workflows/**` change can turn it red.                                                                                                                                                                                                                                |
 | **Actionlint** (required)            | None — same scope as Zizmor.                                                                                                                                                                                                                                                                                                                             |

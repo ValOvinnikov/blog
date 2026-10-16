@@ -61,7 +61,7 @@ so never guess which PR one maps to.
    need the branches).
    - `CONFLICTING` — stop; report no checks verdict. A conflicted PR has no
      merge ref, so the `pull_request` workflows carrying most required checks
-     never run; only differently-triggered checks (CodeQL, Vercel) report,
+     never run; only differently-triggered checks (Vercel) report,
      and `--watch` would call that partial set done. Say the PR needs a
      rebase; don't diagnose the conflict.
    - `UNKNOWN` — GitHub computes it asynchronously, so it is common right
@@ -80,15 +80,10 @@ so never guess which PR one maps to.
    the total. Must be present:
    - the 10 required status checks — Lint, Test, Type-check, Build, Typegen,
      Migrations, Knip, Zizmor, Actionlint, Shellcheck + guard tests
-     (`docs/context/ci-automation.md` "Required status checks on `main`");
-   - on a PR based on `main`, also `CodeQL`, `Analyze (actions)` and
-     `Analyze (javascript-typescript)` — the ruleset's code-scanning rule
-     requires them, and the PR stays BLOCKED without them. CodeQL's default
-     setup runs only on PRs into `main`, so their absence on a stacked PR is
-     expected.
+     (`docs/context/ci-automation.md` "Required status checks on `main`").
 
    A missing name means the suite silently under-triggered. The total varies,
-   roughly 22–27: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
+   roughly 19–24: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
    appear only on the run from when the PR was opened or reopened
    (`branch-created` as `skipping`) and drop off after the next push, and
    `Vercel – *` checks can register after the watch returns. Report the
@@ -116,11 +111,10 @@ Report with exactly this structure:
 - **Mergeability unresolved (step 1):** prefix whichever green report applies
   with `Mergeability was still UNKNOWN after one retry; proceeded to watch anyway.`
   — never standalone; you still have a real verdict.
-- **All green (step 3):** `27/27 checks passed; all 10 required + CodeQL present.`
-  (stacked PR: `…; all 10 required present; base <branch>, no CodeQL expected.`)
+- **All green (step 3):** `23/23 checks passed; all 10 required present.`
   — one line, plus the check names if few.
 - **Green but a required check absent (step 3):**
-  `22/22 checks passed, but <names> never ran — not a clean run.`
+  `19/19 checks passed, but <names> never ran — not a clean run.`
 - **Any failure (step 4)**, per failing check: its name; the run URL (from
   `gh run view`, or `https://github.com/ValOvinnikov/blog/actions/runs/<run-id>`);
   the raw `--log-failed` excerpt, handed back as data.

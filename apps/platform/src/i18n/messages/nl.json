@@ -170,7 +170,8 @@
     "TENANT_PROVISIONING": "Tenantinrichting",
     "RECHECK_TENANT_OWNERS": "Hercontrole eigenaar",
     "DOMAIN_VERIFICATION": "Domeinverificatie",
-    "SITE_CONFIG_REVALIDATION": "Hervalidatie siteconfiguratie"
+    "SITE_CONFIG_REVALIDATION": "Hervalidatie siteconfiguratie",
+    "CONTRAST_CHECK": "Contrastcontrole"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Schemavalidatiefout",
@@ -178,7 +179,8 @@
     "OWNER_CHECK_STALLED": "Eigenaarscontrole vastgelopen",
     "OWNER_CHECK_AMBIGUOUS": "Eigenaarscontrole onduidelijk",
     "DOMAIN_NOT_ADDED": "Domein niet toegevoegd",
-    "REVALIDATION_FAILED": "Hervalidatie mislukt"
+    "REVALIDATION_FAILED": "Hervalidatie mislukt",
+    "CONTRAST_REGRESSION": "Contrastregressie"
   },
   "ownerHomePage": {
     "description": "Uw site in één oogopslag. Alles hier is live.",
@@ -263,7 +265,11 @@
       "PROVISIONING_FAILED": "Inrichting mislukt",
       "SETTINGS_UPDATED": "Instellingen bijgewerkt",
       "DELETED": "Tenant verwijderd",
-      "READER_DATA_PURGED": "Lezersgegevens gewist"
+      "READER_DATA_PURGED": "Lezersgegevens gewist",
+      "RELEASE_STARTED": "Release gestart",
+      "RELEASE_OVERRIDE": "Releasecontrole overschreven",
+      "CONTRAST_CHECK_STARTED": "Contrastcontrole gestart",
+      "TENANT_MIGRATIONS_STARTED": "Tenantmigraties gestart"
     }
   },
   "tenantDomainPage": {

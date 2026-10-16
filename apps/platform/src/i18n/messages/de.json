@@ -170,7 +170,8 @@
     "TENANT_PROVISIONING": "Mandantenbereitstellung",
     "RECHECK_TENANT_OWNERS": "Inhaberprüfung",
     "DOMAIN_VERIFICATION": "Domainverifizierung",
-    "SITE_CONFIG_REVALIDATION": "Revalidierung der Website-Konfiguration"
+    "SITE_CONFIG_REVALIDATION": "Revalidierung der Website-Konfiguration",
+    "CONTRAST_CHECK": "Kontrastprüfung"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Schema-Validierungsfehler",
@@ -178,7 +179,8 @@
     "OWNER_CHECK_STALLED": "Inhaberprüfung ins Stocken geraten",
     "OWNER_CHECK_AMBIGUOUS": "Inhaberprüfung nicht eindeutig",
     "DOMAIN_NOT_ADDED": "Domain nicht hinzugefügt",
-    "REVALIDATION_FAILED": "Revalidierung fehlgeschlagen"
+    "REVALIDATION_FAILED": "Revalidierung fehlgeschlagen",
+    "CONTRAST_REGRESSION": "Kontrastregression"
   },
   "ownerHomePage": {
     "description": "Ihre Website auf einen Blick. Alles hier ist live.",
@@ -263,7 +265,11 @@
       "PROVISIONING_FAILED": "Bereitstellung fehlgeschlagen",
       "SETTINGS_UPDATED": "Einstellungen aktualisiert",
       "DELETED": "Mandant gelöscht",
-      "READER_DATA_PURGED": "Leserdaten gelöscht"
+      "READER_DATA_PURGED": "Leserdaten gelöscht",
+      "RELEASE_STARTED": "Release gestartet",
+      "RELEASE_OVERRIDE": "Release-Prüfung übergangen",
+      "CONTRAST_CHECK_STARTED": "Kontrastprüfung gestartet",
+      "TENANT_MIGRATIONS_STARTED": "Mandantenmigrationen gestartet"
     }
   },
   "tenantDomainPage": {

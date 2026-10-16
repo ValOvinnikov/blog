@@ -170,7 +170,8 @@
     "TENANT_PROVISIONING": "Provisionnement du locataire",
     "RECHECK_TENANT_OWNERS": "Revérification du propriétaire",
     "DOMAIN_VERIFICATION": "Vérification du domaine",
-    "SITE_CONFIG_REVALIDATION": "Revalidation de la configuration du site"
+    "SITE_CONFIG_REVALIDATION": "Revalidation de la configuration du site",
+    "CONTRAST_CHECK": "Vérification du contraste"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Erreur de validation du schéma",
@@ -178,7 +179,8 @@
     "OWNER_CHECK_STALLED": "Vérification du propriétaire bloquée",
     "OWNER_CHECK_AMBIGUOUS": "Vérification du propriétaire ambiguë",
     "DOMAIN_NOT_ADDED": "Domaine non ajouté",
-    "REVALIDATION_FAILED": "Échec de la revalidation"
+    "REVALIDATION_FAILED": "Échec de la revalidation",
+    "CONTRAST_REGRESSION": "Régression du contraste"
   },
   "ownerHomePage": {
     "description": "Votre site en un coup d'œil. Tout ce qui figure ici est en ligne.",
@@ -263,7 +265,11 @@
       "PROVISIONING_FAILED": "Échec du provisionnement",
       "SETTINGS_UPDATED": "Paramètres mis à jour",
       "DELETED": "Locataire supprimé",
-      "READER_DATA_PURGED": "Données des lecteurs purgées"
+      "READER_DATA_PURGED": "Données des lecteurs purgées",
+      "RELEASE_STARTED": "Publication lancée",
+      "RELEASE_OVERRIDE": "Contrôle de publication contourné",
+      "CONTRAST_CHECK_STARTED": "Vérification du contraste lancée",
+      "TENANT_MIGRATIONS_STARTED": "Migrations du locataire lancées"
     }
   },
   "tenantDomainPage": {
