@@ -2667,13 +2667,15 @@ stays console-only. `instrumentation.ts`'s `onRequestError`
 logs unhandled request errors through the same logger, so a render or route
 crash reaches Loki too.
 
-Grafana alerts the operator by email: one rule per app on error-level lines,
-grouped by event so a burst sends one email, and synthetic uptime checks on the
-apex home page and the platform host's sign-in page that alert after two
-consecutive failures and resolve on recovery. This is why `error` is reserved
-for what a human must act on — every error event emails the operator. The
-Grafana stack, the alerts and the credentials are console configuration and
-Vercel env vars, never repo content (`docs/DEPLOY.md` § "8. Observability").
+Grafana alerts the operator by email, with an optional Slack contact point
+beside it: one rule per app on error-level lines, grouped by event so a burst
+sends one message, and synthetic uptime checks on the apex home page and the
+platform host's sign-in page, run from two probes, that alert when both fail
+the same run and resolve on recovery. This is why `error` is reserved for what
+a human must act on — every error event alerts the operator. The Grafana stack,
+the alerts, their thresholds and the credentials are console configuration and
+Vercel env vars, never repo content; `docs/DEPLOY.md` § "8d. Alerts & uptime
+checks" records the live setup.
 
 ## 18. `@blog/ui` prop contract
 

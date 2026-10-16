@@ -913,7 +913,9 @@ filterable:
       contact point themselves, so they still deliver, but Synthetic
       Monitoring's alerts go through the policy tree — left at `empty`, an
       outage alert fires in Grafana and reaches no one.
-- [ ] **Error alert, one rule per app** (`service="web"`, `service="platform"`):
+- [ ] **Error alert, one rule per app**, each on the query below with its own
+      `service` label — `service="web"` as written, `service="platform"` in the
+      platform rule:
       `sum by (service, event) (count_over_time({service="web", level="error"} | json [5m]))`
       above zero, evaluated every minute, with **No data → OK** (otherwise
       every quiet window raises a `DatasourceNoData` alert). Each rule sets its
