@@ -45,7 +45,7 @@ An editor introduces a founder, a team, staff or contributors by picking existin
 - A card or spotlight without a photo shows an `Avatar` with the person's initials in the chosen shape.
 - A member with a profile page makes the card interactive and links their name; otherwise the name is plain text.
 - Square photos are requested at 384px (twice the `w-48` cap); circles use the shared circle size; the spotlight image is requested at 576px.
-- The carousel is the shared `LabelledCarousel`, named after the heading. It shows two cards per view under 640px and three from 640px up (`Carousel`'s `halvesThenThirds` slide size).
+- The carousel is the shared `LabelledCarousel`, named after the heading. It shows one card per view below a 480px viewport, two from 480px and three from 768px (`Carousel`'s `singleHalvesThirds` slide size).
 - A failed fetch logs `team_module.fetch_failed` and renders nothing.
 
 ## Dependencies
