@@ -18,6 +18,7 @@ import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
 } from '@blog/config';
+import type { TRawContactFormModule } from '@blog/service/features/modules/contact-form/adaptor/transformer';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
@@ -360,6 +361,22 @@ export function makeRawNewsletterModule(
     content: null,
     variant: NEWSLETTER_VARIANT.FULL,
     trustCues: null,
+    layout: null,
+    contentAlignment: null,
+    ...overrides,
+  };
+}
+
+export function makeRawContactFormModule(
+  overrides: Partial<TRawContactFormModule> = {},
+): TRawContactFormModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Get in touch', {
+      supportingText: 'Questions, ideas or work enquiries.',
+    }),
+    successMessage: "Thanks — I'll reply within two days.",
+    privacyNote: null,
     layout: null,
     contentAlignment: null,
     ...overrides,
