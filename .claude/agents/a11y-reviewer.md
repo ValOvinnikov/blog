@@ -76,7 +76,7 @@ disagree.
    come from a catalogue key (`aria-label={t('ariaLabel')}`). A component
    whose name is its own visible text plus props it already receives composes
    it in one `sr-only` span instead of taking an `ariaLabel` override (WCAG
-   2.5.3; `NavLink` is the precedent).
+   2.5.3; `apps/web`'s `LanguageCodes` is the precedent).
 2. **No date formatting in `@blog/ui`.** It takes `publishedAt` (ISO 8601) and
    `formattedDate` (pre-formatted in the app) and renders `<time dateTime>`
    only when both are present; `Intl.DateTimeFormat`/locale logic stays in
