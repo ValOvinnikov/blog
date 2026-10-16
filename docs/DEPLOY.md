@@ -906,15 +906,29 @@ filterable:
 #### 8d. Alerts & uptime checks
 
 - [ ] **Contact point:** the operator's email. Send its **Test notification**.
+      A Slack contact point (an incoming-webhook URL, kept only in Grafana) may
+      sit beside it.
+- [ ] **Default notification policy → the operator's contact point.** A new
+      stack's default policy sends to `empty`. The error rules below name their
+      contact point themselves, so they still deliver, but Synthetic
+      Monitoring's alerts go through the policy tree — left at `empty`, an
+      outage alert fires in Grafana and reaches no one.
 - [ ] **Error alert, one rule per app** (`service="web"`, `service="platform"`):
-      fires when the error-level count over the last 5 minutes is above zero,
-      grouped by `event`. The notification policy groups by `alertname`,
-      `service` and `event`, so a burst of one event sends one email, and the
-      first email arrives within 10 minutes of the line.
+      `sum by (service, event) (count_over_time({service="web", level="error"} | json [5m]))`
+      above zero, evaluated every minute, with **No data → OK** (otherwise
+      every quiet window raises a `DatasourceNoData` alert). Each rule sets its
+      own contact point and groups by `grafana_folder`, `alertname`, `service`
+      and `event`, so a burst of one event sends one message, and the first
+      arrives within 10 minutes of the line.
 - [ ] **Synthetic uptime checks** (Grafana Synthetic Monitoring, HTTP): the
       apex home page `/` and the platform host's sign-in page
-      `/api/auth/signin`. Alert after **two consecutive failures**, and send a
-      resolve on recovery.
+      `/api/auth/signin`. **2 probes, every 3 minutes**, alerting on **2
+      failures in 5 minutes** — both probes failing one run — and resolving on
+      recovery. The free tier allows 100k executions a month and every probe
+      run counts: two checks at this setting use about 60k, while the 1-minute
+      default with 2 probes uses about 89k per check. The check form's
+      **Execution** step shows the monthly estimate; the 5-minute **period** on
+      its **Alerting** step is the alert window, not the frequency.
 
 #### 8e. Rehearsal — before the production env vars
 
@@ -931,8 +945,9 @@ filterable:
    label. Unset the vars afterwards, or keep them if Loki's free-tier volume
    allows.
 3. **Uptime checks on the development hosts**, including one deliberately
-   failing path (a 404), confirming both the alert and the resolve. Repoint
-   them at the apex and the platform host at launch.
+   failing path (a 404), confirming both the alert and the resolve. Delete the
+   failing check afterwards — it counts against the free tier's executions —
+   and repoint the other two at the apex and the platform host at launch.
 
 ---
 
