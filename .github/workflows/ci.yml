@@ -404,7 +404,7 @@ jobs:
     # against the dataset — this never mutates data (`sanity migrations run`
     # defaults to dry mode; `--no-dry-run` is never used here). Actually
     # applying a migration to production stays human-gated. Document-schema
-    # validation against the live dataset lives in the scheduled
+    # validation against the live dataset lives in the
     # `document-validation.yml` workflow (advisory, not part of this required
     # check) — see that workflow's comment for why.
     env:
