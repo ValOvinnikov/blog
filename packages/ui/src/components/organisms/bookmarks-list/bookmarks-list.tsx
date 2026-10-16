@@ -1,9 +1,6 @@
-import {
-  A_AS_CONST,
-  type IWithClassName,
-  type IWithDataTestId,
-} from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import type { ReactNode } from 'react';
 
 import { bookmarksListVariants } from './bookmarks-list-variants';
@@ -34,13 +31,11 @@ export const BookmarksList = ({
   className,
   dataTestId,
 }: TBookmarksListProps) => {
-  const Component = linkAs ?? A_AS_CONST;
   const {
     root,
     list,
     row,
     date,
-    filename,
     hint: hintSlot,
     emptyMessage: emptyMessageSlot,
   } = bookmarksListVariants();
@@ -57,9 +52,9 @@ export const BookmarksList = ({
               <li key={bookmark.id} className={row()}>
                 {prefix}
                 <span className={date()}>{bookmark.formattedDate}</span>
-                <Component href={bookmark.href} className={filename()}>
+                <TextLink href={bookmark.href} as={linkAs} appearance="accent">
                   {bookmark.filename}
-                </Component>
+                </TextLink>
               </li>
             ))}
           </ul>
