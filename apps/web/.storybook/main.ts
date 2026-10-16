@@ -59,6 +59,10 @@ const config: StorybookConfig = {
         fileURLToPath(
           new URL('./mocks/newsletter-actions.ts', import.meta.url),
         ),
+      '@web/server/contact-form/contact-form-actions/contact-form-actions':
+        fileURLToPath(
+          new URL('./mocks/contact-form-actions.ts', import.meta.url),
+        ),
       // `IdentitySection`/`NewsletterSection` (the account-page section
       // wrappers) import this. Their folder's barrel also re-exports the
       // pure view alongside the wrapper, so any story that pulls the view

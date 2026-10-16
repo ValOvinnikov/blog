@@ -166,6 +166,20 @@
     "errorRateLimited": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.",
     "errorUnavailable": "Deze site neemt op dit moment geen nieuwe inschrijvingen aan."
   },
+  "contactForm": {
+    "nameLabel": "Naam",
+    "emailLabel": "E-mail",
+    "messageLabel": "Bericht",
+    "honeypotLabel": "Laat dit veld leeg",
+    "submitLabel": "Bericht versturen",
+    "submittingLabel": "Versturen…",
+    "successTitle": "Bericht verstuurd",
+    "errorName": "Vul je naam in, maximaal 100 tekens.",
+    "errorEmail": "Vul een geldig e-mailadres in.",
+    "errorMessage": "Schrijf een bericht van 10 tot 5.000 tekens.",
+    "errorBlocked": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.",
+    "errorServer": "Je bericht kon niet worden verstuurd. Probeer het over een minuut opnieuw; wat je schreef staat er nog."
+  },
   "newsletterConfirm": {
     "confirmedTitle": "Abonnement bevestigd",
     "confirmedMessage": "Uw abonnement is bevestigd. Bedankt voor uw aanmelding!",

@@ -166,6 +166,20 @@
     "errorRateLimited": "Too many attempts. Wait a few minutes and try again.",
     "errorUnavailable": "This site isn't taking new subscriptions right now."
   },
+  "contactForm": {
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "messageLabel": "Message",
+    "honeypotLabel": "Leave this field empty",
+    "submitLabel": "Send message",
+    "submittingLabel": "Sending…",
+    "successTitle": "Message sent",
+    "errorName": "Enter your name, up to 100 characters.",
+    "errorEmail": "Enter a valid email address.",
+    "errorMessage": "Write a message of 10 to 5,000 characters.",
+    "errorBlocked": "Too many attempts. Wait a few minutes and try again.",
+    "errorServer": "Your message couldn't be sent. Try again in a minute; what you wrote is still here."
+  },
   "newsletterConfirm": {
     "confirmedTitle": "Subscription confirmed",
     "confirmedMessage": "Your subscription is confirmed. Thanks for signing up!",
