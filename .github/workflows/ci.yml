@@ -13,10 +13,9 @@ on:
   # retargeting when the base merges does not rescue it, because that fires
   # `edited` while this listens for `opened`/`synchronize`/`reopened`.
   #
-  # Running CI on every PR is cheap and avoids both deadlocks. The other four
-  # workflows carrying required checks (dependency-review, zizmor, actionlint,
-  # hooks) declare their triggers independently and must stay unfiltered for
-  # the same reason.
+  # Running CI on every PR is cheap and avoids both deadlocks. The other three
+  # workflows carrying required checks (zizmor, actionlint, hooks) declare
+  # their triggers independently and must stay unfiltered for the same reason.
   pull_request:
 
 permissions:

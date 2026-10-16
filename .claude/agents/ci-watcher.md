@@ -78,10 +78,9 @@ so never guess which PR one maps to.
 
 3. **All green — check names before declaring victory.** Judge by names, not
    the total. Must be present:
-   - the 11 required status checks — Lint, Test, Type-check, Build, Typegen,
-     Migrations, Knip, Dependency Review, Zizmor, Actionlint, Shellcheck +
-     guard tests (`docs/context/ci-automation.md` "Required status checks on
-     `main`").
+   - the 10 required status checks — Lint, Test, Type-check, Build, Typegen,
+     Migrations, Knip, Zizmor, Actionlint, Shellcheck + guard tests
+     (`docs/context/ci-automation.md` "Required status checks on `main`").
 
    A missing name means the suite silently under-triggered. The total varies,
    roughly 19–24: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
@@ -112,7 +111,7 @@ Report with exactly this structure:
 - **Mergeability unresolved (step 1):** prefix whichever green report applies
   with `Mergeability was still UNKNOWN after one retry; proceeded to watch anyway.`
   — never standalone; you still have a real verdict.
-- **All green (step 3):** `24/24 checks passed; all 11 required present.`
+- **All green (step 3):** `23/23 checks passed; all 10 required present.`
   — one line, plus the check names if few.
 - **Green but a required check absent (step 3):**
   `19/19 checks passed, but <names> never ran — not a clean run.`
