@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_67 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_68 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -154,6 +154,12 @@ Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footn
 A pure, controlled single-line field.
 Props: value: string · onChange: (value: string) => void · ariaLabel: string · isInvalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · isRequired?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasLeadingIcon: (boolean) · hasTrailingIcon: (boolean)
+
+### TextLink — `components/atoms/text-link/text-link.tsx`
+
+A run of text that links somewhere, in the look its context calls for, and reads as plain text when there is nowhere to go.
+Props: href?: string · as?: TAnchorElementType · target?: '_blank' · title?: string · lang?: string · hrefLang?: string · appearance?: TTextLinkVariants['appearance'] · variant?: TTextLinkVariants['variant'] · currentStyle?: TTextLinkVariants['currentStyle'] · isCurrent?: boolean · isStretched?: boolean _(extends IWithClassName, IWithDataTestId, TTextLinkName)_
+Variants: appearance: prose|nav|quiet|accent · variant: plain|outlined · currentStyle: underline|weight · hasHref: (boolean) · isCurrent: (boolean) · isStretched: (boolean)
 
 ### Textarea — `components/atoms/textarea/textarea.tsx`
 
