@@ -1,9 +1,6 @@
-import {
-  A_AS_CONST,
-  type IWithClassName,
-  type IWithDataTestId,
-} from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 
 import { taxonomyCardPostsVariants } from './taxonomy-card-posts-variants';
 
@@ -34,8 +31,6 @@ export const TaxonomyCardPosts = ({
 }: TTaxonomyCardPostsProps) => {
   if (posts.length === 0) return null;
 
-  const LinkComponent = linkAs ?? A_AS_CONST;
-
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       {label && (
@@ -46,9 +41,14 @@ export const TaxonomyCardPosts = ({
       <ul aria-label={ariaLabel} className={s.list()}>
         {posts.map((post) => (
           <li key={post.id}>
-            <LinkComponent href={post.href} className={s.link()}>
+            <TextLink
+              href={post.href}
+              as={linkAs}
+              appearance="accent"
+              className={s.link()}
+            >
               {post.title}
-            </LinkComponent>
+            </TextLink>
           </li>
         ))}
       </ul>
