@@ -711,10 +711,21 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   migration? If yes, **surface a migration plan and prompt the user** (which
   documents/fields change, the `sanity/migrate` transform, dry-run → backup →
   human-gated run) — do not just change the schema. Additive, optional-only
-  changes need no migration; say so explicitly. Use the tooling and workflow in
+  changes need no migration and no contract step; say so explicitly.
+
+  **A migration that changes an existing shape ships in two releases —
+  expand, then contract.** A release migrates content before the new web is
+  deployed, and the web still live reads the old shape until that deploy
+  lands, so removing or renaming a shape in the same release breaks the live
+  site for that window and leaves no way back. **Expand** adds the new field or
+  value, copies the data across and keeps the old shape, so the deployed web
+  keeps working. **Contract** removes the old shape in a later release, once no
+  code reads it. The expand ticket files its contract follow-up, labelled
+  `prio:later`, when it is created. Use the tooling and workflow in
   `packages/studio/migrations/` (`README.md` +
   `migrate:dry`/`migrate:run`/`dataset:export`). Migrations against
   `production` are human-gated like `sanity deploy`.
+
 - **Check for `db` (Neon/Drizzle) migrations too.** Any change to a
   `packages/db/src/schema/*.ts` table needs a generated migration — a schema
   edit never touches existing rows by itself. Workflow: `db:generate` (the
