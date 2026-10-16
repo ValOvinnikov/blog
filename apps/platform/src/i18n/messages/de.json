@@ -679,6 +679,9 @@
     "startErrorArchived": "Dieser Mandant ist archiviert; die Bereitstellung kann nicht gestartet werden.",
     "startNoticeAlreadyInProgress": "Für diesen Mandanten läuft bereits eine Bereitstellung — diese Seite aktualisiert sich automatisch, sobald sie abgeschlossen ist.",
     "pollErrorWarning": "Der aktuelle Status konnte nicht abgerufen werden — neuer Versuch erfolgt automatisch.",
+    "queuedRunTitle": "In der Warteschlange – der Provisioning-Workflow startet",
+    "queuedRunBody": "Die Schritte beginnen, sobald der Workflow den Lauf übernommen und seine Einrichtung abgeschlossen hat, meist innerhalb von ein bis zwei Minuten.",
+    "queuedRunElapsed": "Wartet seit {elapsed}",
     "errorKind": {
       "permission": {
         "headline": "Fehlende Berechtigung für diesen Schritt",

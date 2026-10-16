@@ -679,6 +679,9 @@
     "startErrorArchived": "Este cliente está archivado; no se puede iniciar el aprovisionamiento.",
     "startNoticeAlreadyInProgress": "Ya hay un aprovisionamiento en curso para este cliente: esta página se actualizará automáticamente cuando termine.",
     "pollErrorWarning": "No se pudo actualizar el estado más reciente. Se reintentará automáticamente.",
+    "queuedRunTitle": "En cola: el flujo de aprovisionamiento se está iniciando",
+    "queuedRunBody": "Los pasos empiezan cuando el flujo de trabajo recoge la ejecución y termina de prepararse, normalmente en uno o dos minutos.",
+    "queuedRunElapsed": "{elapsed} en espera",
     "errorKind": {
       "permission": {
         "headline": "Falta un permiso para completar este paso",
