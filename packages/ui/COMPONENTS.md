@@ -50,7 +50,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### CardLink — `components/atoms/card-link/card-link.tsx`
 
 The one link that makes a whole item card its click target.
-Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' _(extends IWithClassName, IWithDataTestId, TCardLinkName)_
 
 ### Eyebrow — `components/atoms/eyebrow/eyebrow.tsx`
 
@@ -223,12 +223,14 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 ### LogoTile — `components/molecules/logo-tile/logo-tile.tsx`
 
 A fixed-size card that frames a single logo, so transparent and opaque-background assets sit inside identical bounds.
-Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] · aspectRatio?: number · darkLogo?: ReactNode · darkAspectRatio?: number _(extends IWithClassName, IWithDataTestId)_
+Props: isInteractive?: TLogoTileVariants['isInteractive'] · children?: TCompoundChildren<typeof LogoTileParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: isInteractive: (boolean)
 
 Slots:
 
-- **LogoTile.Link** — The link that makes a whole `LogoTile` its click target, wrapping the logo it names. Props: _(extends TCardLinkProps)_
+- **LogoTile.Logo** — The slot that sizes the tile's logo, by the asset's aspect ratio when one is given. Props: children: ReactNode · aspectRatio?: number _(extends IWithClassName, IWithDataTestId)_ · Variants: hasAspectRatio: (boolean)
+- **LogoTile.DarkLogo** — The slot for the logo asset made for dark backgrounds, shown in dark mode only. Props: _(extends TLogoTileLogoProps)_
+- **LogoTile.Link** — The one link that makes a whole item card its click target. Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' _(extends IWithClassName, IWithDataTestId, TCardLinkName)_
 
 ### MediaCard — `components/molecules/media-card/media-card.tsx`
 
@@ -242,7 +244,7 @@ Slots:
 - **MediaCard.Meta** — Compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Title** — The heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
 - **MediaCard.Footer** — The byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **MediaCard.Link** — The one link that makes a whole item card its click target. Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Link** — The one link that makes a whole item card its click target. Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' _(extends IWithClassName, IWithDataTestId, TCardLinkName)_
 
 ### Panel — `components/molecules/panel/panel.tsx`
 

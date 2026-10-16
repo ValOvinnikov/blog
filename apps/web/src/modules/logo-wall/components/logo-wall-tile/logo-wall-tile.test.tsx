@@ -1,3 +1,4 @@
+import type { ILink } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
@@ -7,6 +8,19 @@ import { LogoWallTile } from './logo-wall-tile';
 vi.mock('@web/i18n/navigation');
 
 const item = makeLogoItem();
+
+const link: ILink = {
+  label: 'Visit Acme Corp',
+  href: 'https://acme.example.com',
+  target: undefined,
+  platform: undefined,
+  ariaLabel: undefined,
+};
+
+const darkImage = makeSanityImage({
+  assetId: 'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
+  alt: item.name,
+});
 
 const setup = customRender(LogoWallTile, { logo: item });
 
@@ -25,33 +39,19 @@ describe(`<${LogoWallTile.name}/>`, () => {
     });
   });
 
-  it('wraps the logo in a link named by the company when the item has one', () => {
-    setup({
-      logo: makeLogoItem({
-        link: {
-          label: 'Visit Acme Corp',
-          href: 'https://acme.example.com',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
-      }),
-    });
+  it('names the link by the company when the item link has no ariaLabel', () => {
+    setup({ logo: makeLogoItem({ link }) });
 
-    const link = screen.getByRole('link', { name: item.name });
-    expect(link).toHaveAttribute('href', 'https://acme.example.com');
+    expect(screen.getByRole('link', { name: item.name })).toHaveAttribute(
+      'href',
+      'https://acme.example.com',
+    );
   });
 
   it('exposes the link under its ariaLabel override when the item link sets one', () => {
     setup({
       logo: makeLogoItem({
-        link: {
-          label: 'Visit Acme Corp',
-          href: 'https://acme.example.com',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: 'Visit the Acme Corp website',
-        },
+        link: { ...link, ariaLabel: 'Visit the Acme Corp website' },
       }),
     });
 
@@ -60,7 +60,13 @@ describe(`<${LogoWallTile.name}/>`, () => {
     ).toHaveAttribute('href', 'https://acme.example.com');
   });
 
-  it('pins the tile to the logo asset aspect ratio', () => {
+  it('renders the logo as decorative when the item has a link', () => {
+    setup({ logo: makeLogoItem({ link }) });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('pins the logo to the asset aspect ratio', () => {
     setup({
       logo: makeLogoItem({
         image: makeSanityImage({
@@ -71,7 +77,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
 
     expect(
       screen
-        .getByTestId('logo-wall-tile')
+        .getByTestId('logo-wall-tile-logo')
         .style.getPropertyValue('--logo-aspect'),
     ).toBe(String(2400 / 1260));
   });
@@ -85,7 +91,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
 
     expect(
       screen
-        .getByTestId('logo-wall-tile')
+        .getByTestId('logo-wall-tile-logo')
         .style.getPropertyValue('--logo-aspect'),
     ).toBe('');
   });
@@ -101,7 +107,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
 
     expect(
       screen
-        .getByTestId('logo-wall-tile')
+        .getByTestId('logo-wall-tile-logo')
         .style.getPropertyValue('--logo-aspect'),
     ).toBe('');
   });
@@ -117,43 +123,20 @@ describe(`<${LogoWallTile.name}/>`, () => {
 
     expect(
       screen
-        .getByTestId('logo-wall-tile')
+        .getByTestId('logo-wall-tile-logo')
         .style.getPropertyValue('--logo-aspect'),
     ).toBe('');
   });
 
   it('renders the dark-background logo alongside the regular one when the item has one', () => {
-    setup({
-      logo: makeLogoItem({
-        imageDark: makeSanityImage({
-          assetId:
-            'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
-          alt: item.name,
-        }),
-      }),
-    });
+    setup({ logo: makeLogoItem({ imageDark: darkImage }) });
 
     expect(screen.getAllByRole('img', { name: item.name })).toHaveLength(2);
   });
 
-  it('wraps the dark-background logo in the item link too', () => {
-    setup({
-      logo: makeLogoItem({
-        imageDark: makeSanityImage({
-          assetId:
-            'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
-          alt: item.name,
-        }),
-        link: {
-          label: 'Visit Acme Corp',
-          href: 'https://acme.example.com',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
-      }),
-    });
+  it('renders one link for a linked item with a dark-background logo', () => {
+    setup({ logo: makeLogoItem({ imageDark: darkImage, link }) });
 
-    expect(screen.getAllByRole('link', { name: item.name })).toHaveLength(2);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 });

@@ -997,12 +997,12 @@ the only fix that keeps brand colours and covers both. It is a plain optional
 service projects it like `image`, with its own dimensions, but with a nullable
 asset: an `imageDark` holding only leftover crop or hotspot data, or one whose
 asset cannot resolve, becomes `undefined` and the logo falls back to its main
-image — unlike the main image, it never costs the wall. `LogoTile` takes it as
-`darkLogo` plus `darkAspectRatio` and renders both logos, the regular one hidden
-under `.dark` and the dark one hidden outside it; `display: none` takes the hidden
-one out of the accessibility tree and tab order, so the name is announced and the
-link focused once. `apps/web` wraps each in the logo's link, and the dark one
-overrides `--logo-aspect` for itself so each is sized by its own ratio.
+image — unlike the main image, it never costs the wall. `apps/web` passes it as
+`LogoTile.DarkLogo` beside `LogoTile.Logo`, each with its own `aspectRatio`, and
+the tile shows the regular logo only outside `.dark` and the dark one only under
+it; `display: none` takes the hidden one out of the accessibility tree. A linked
+tile carries one `LogoTile.Link` overlay beside the logos, so the link is
+announced and focused once and the logo images inside it are decorative.
 
 **The wall is a wrapping flex row, not a grid.** `apps/web` composes
 `flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` is a fixed 192×88

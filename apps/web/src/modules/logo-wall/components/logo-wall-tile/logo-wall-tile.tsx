@@ -22,42 +22,41 @@ const toAspectRatio = (image: ISanityImage): TMaybeUndefined<number> => {
 };
 
 export const LogoWallTile = ({ logo }: ILogoWallTileProps) => {
-  const { image, imageDark, link } = logo;
+  const { name, image, imageDark, link } = logo;
+  const logoAlt = link ? '' : undefined;
 
-  const renderLogo = (logoImage: ISanityImage) => {
-    const sanityImage = (
-      <SanityImage
-        image={logoImage}
-        width={LOGO_IMAGE_WIDTH_PX}
-        height={LOGO_IMAGE_HEIGHT_PX}
-        mode="contain"
-        loading="lazy"
-      />
-    );
-
-    return link ? (
-      <LogoTile.Link
-        href={link.href}
-        target={link.target}
-        ariaLabel={link.ariaLabel}
-        linkAs={SmartLink}
-      >
-        {sanityImage}
-      </LogoTile.Link>
-    ) : (
-      sanityImage
-    );
-  };
+  const renderImage = (logoImage: ISanityImage) => (
+    <SanityImage
+      image={logoImage}
+      alt={logoAlt}
+      width={LOGO_IMAGE_WIDTH_PX}
+      height={LOGO_IMAGE_HEIGHT_PX}
+      mode="contain"
+      loading="lazy"
+    />
+  );
 
   return (
-    <LogoTile
-      isInteractive={Boolean(link)}
-      aspectRatio={toAspectRatio(image)}
-      darkLogo={imageDark && renderLogo(imageDark)}
-      darkAspectRatio={imageDark && toAspectRatio(imageDark)}
-      dataTestId="logo-wall-tile"
-    >
-      {renderLogo(image)}
+    <LogoTile isInteractive={Boolean(link)} dataTestId="logo-wall-tile">
+      <LogoTile.Logo
+        aspectRatio={toAspectRatio(image)}
+        dataTestId="logo-wall-tile-logo"
+      >
+        {renderImage(image)}
+      </LogoTile.Logo>
+      {imageDark && (
+        <LogoTile.DarkLogo aspectRatio={toAspectRatio(imageDark)}>
+          {renderImage(imageDark)}
+        </LogoTile.DarkLogo>
+      )}
+      {link && (
+        <LogoTile.Link
+          href={link.href}
+          target={link.target}
+          ariaLabel={link.ariaLabel ?? name}
+          linkAs={SmartLink}
+        />
+      )}
     </LogoTile>
   );
 };

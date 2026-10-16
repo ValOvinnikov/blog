@@ -24,6 +24,13 @@ describe(`<${CardLink.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('renders a childless overlay link named by ariaLabel', () => {
+    setup({ children: undefined, ariaLabel: 'Visit Acme' });
+    expect(
+      screen.getByRole('link', { name: 'Visit Acme' }),
+    ).toBeEmptyDOMElement();
+  });
+
   it('opens in a new tab when target is _blank', () => {
     setup({ target: '_blank' });
     expect(screen.getByRole('link')).toHaveAttribute('target', '_blank');

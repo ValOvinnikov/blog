@@ -8,14 +8,16 @@ import type { ReactNode } from 'react';
 
 import { cardLinkVariants } from './card-link-variants';
 
+type TCardLinkName =
+  | { children: ReactNode; ariaLabel?: string }
+  | { children?: never; ariaLabel: string };
+
 export type TCardLinkProps = IWithClassName &
   IWithDataTestId & {
     href: string;
     linkAs?: TAnchorElementType;
     target?: '_blank';
-    ariaLabel?: string;
-    children: ReactNode;
-  };
+  } & TCardLinkName;
 
 /** The one link that makes a whole item card its click target. */
 export const CardLink = ({

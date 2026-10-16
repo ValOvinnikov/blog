@@ -1,5 +1,4 @@
 import { tv } from '@blog/ui/lib/styling';
-import type { VariantProps } from 'tailwind-variants';
 
 export const logoTileLogoVariants = tv({
   base: 'contents',
@@ -14,16 +13,8 @@ export const logoTileLogoVariants = tv({
         '[&_img]:block [&_img]:max-h-9 [&_img]:w-auto [&_img]:max-w-full',
       ],
     },
-    visibleIn: {
-      all: [],
-      light: ['dark:hidden'],
-      dark: ['hidden dark:contents'],
-    },
   },
   defaultVariants: {
     hasAspectRatio: false,
-    visibleIn: 'all',
   },
 });
-
-export type TLogoTileLogoVariants = VariantProps<typeof logoTileLogoVariants>;

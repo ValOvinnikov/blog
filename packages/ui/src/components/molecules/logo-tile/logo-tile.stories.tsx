@@ -27,7 +27,11 @@ const meta = {
     },
   },
   args: {
-    children: <img src={LOGO_SRC} alt={LOGO_ALT} />,
+    children: (
+      <LogoTile.Logo>
+        <img src={LOGO_SRC} alt={LOGO_ALT} />
+      </LogoTile.Logo>
+    ),
   },
 } satisfies Meta<typeof LogoTile>;
 
@@ -39,11 +43,16 @@ export const Static: TStory = {};
 export const Interactive: TStory = {
   args: {
     isInteractive: true,
-    children: (
-      <LogoTile.Link href={faker.internet.url()}>
-        <img src={LOGO_SRC} alt={LOGO_ALT} />
-      </LogoTile.Link>
-    ),
+    children: [
+      <LogoTile.Logo key="logo">
+        <img src={LOGO_SRC} alt="" />
+      </LogoTile.Logo>,
+      <LogoTile.Link
+        key="link"
+        href={faker.internet.url()}
+        ariaLabel={LOGO_ALT}
+      />,
+    ],
   },
 };
 
@@ -95,10 +104,12 @@ export const InteractiveOnBrandPrimaryBand = restingAndFocusedOn(
 const renderLogoTiles = (count: number) =>
   Array.from({ length: count }, (_, index) => (
     <LogoTile key={index}>
-      <img
-        src={faker.image.urlPicsumPhotos({ width: 160, height: 80 })}
-        alt={faker.company.name()}
-      />
+      <LogoTile.Logo>
+        <img
+          src={faker.image.urlPicsumPhotos({ width: 160, height: 80 })}
+          alt={faker.company.name()}
+        />
+      </LogoTile.Logo>
     </LogoTile>
   ));
 
@@ -110,42 +121,38 @@ const WIDE_WORDMARK_SIZE = { width: 900, height: 180 };
 const SQUARE_MARK_SIZE = { width: 160, height: 160 };
 const OPAQUE_BACKGROUND_MARK_SIZE = { width: 64, height: 64 };
 
+const toAspectRatio = (
+  size: { width: number; height: number },
+  withAspectRatio: boolean,
+) => (withAspectRatio ? size.width / size.height : undefined);
+
 const renderMixedLogoShapes = (withAspectRatio: boolean) => [
-  <LogoTile
-    key="wide"
-    aspectRatio={
-      withAspectRatio
-        ? WIDE_WORDMARK_SIZE.width / WIDE_WORDMARK_SIZE.height
-        : undefined
-    }
-  >
-    <img
-      src={faker.image.urlPicsumPhotos(WIDE_WORDMARK_SIZE)}
-      alt={faker.company.name()}
-    />
+  <LogoTile key="wide">
+    <LogoTile.Logo
+      aspectRatio={toAspectRatio(WIDE_WORDMARK_SIZE, withAspectRatio)}
+    >
+      <img
+        src={faker.image.urlPicsumPhotos(WIDE_WORDMARK_SIZE)}
+        alt={faker.company.name()}
+      />
+    </LogoTile.Logo>
   </LogoTile>,
-  <LogoTile
-    key="square"
-    aspectRatio={
-      withAspectRatio
-        ? SQUARE_MARK_SIZE.width / SQUARE_MARK_SIZE.height
-        : undefined
-    }
-  >
-    <img
-      src={faker.image.urlPicsumPhotos(SQUARE_MARK_SIZE)}
-      alt={faker.company.name()}
-    />
+  <LogoTile key="square">
+    <LogoTile.Logo
+      aspectRatio={toAspectRatio(SQUARE_MARK_SIZE, withAspectRatio)}
+    >
+      <img
+        src={faker.image.urlPicsumPhotos(SQUARE_MARK_SIZE)}
+        alt={faker.company.name()}
+      />
+    </LogoTile.Logo>
   </LogoTile>,
-  <LogoTile
-    key="opaque-background"
-    aspectRatio={
-      withAspectRatio
-        ? OPAQUE_BACKGROUND_MARK_SIZE.width / OPAQUE_BACKGROUND_MARK_SIZE.height
-        : undefined
-    }
-  >
-    <img src={OPAQUE_BACKGROUND_LOGO_SRC} alt={faker.company.name()} />
+  <LogoTile key="opaque-background">
+    <LogoTile.Logo
+      aspectRatio={toAspectRatio(OPAQUE_BACKGROUND_MARK_SIZE, withAspectRatio)}
+    >
+      <img src={OPAQUE_BACKGROUND_LOGO_SRC} alt={faker.company.name()} />
+    </LogoTile.Logo>
   </LogoTile>,
 ];
 
@@ -188,21 +195,25 @@ const BLACK_WORDMARK_SIZE = { width: 260, height: 60 };
 const WHITE_WORDMARK_SIZE = { width: 300, height: 60 };
 const WORDMARK_NAME = 'Northwind';
 
+const renderWordmarks = (alt: string, isDark: boolean) => [
+  <LogoTile.Logo
+    key="logo"
+    aspectRatio={BLACK_WORDMARK_SIZE.width / BLACK_WORDMARK_SIZE.height}
+  >
+    <img src={wordmarkSrc('#111111', BLACK_WORDMARK_SIZE.width)} alt={alt} />
+  </LogoTile.Logo>,
+  isDark && (
+    <LogoTile.DarkLogo
+      key="dark-logo"
+      aspectRatio={WHITE_WORDMARK_SIZE.width / WHITE_WORDMARK_SIZE.height}
+    >
+      <img src={wordmarkSrc('#ffffff', WHITE_WORDMARK_SIZE.width)} alt={alt} />
+    </LogoTile.DarkLogo>
+  ),
+];
+
 const withDarkLogoArgs = {
-  aspectRatio: BLACK_WORDMARK_SIZE.width / BLACK_WORDMARK_SIZE.height,
-  children: (
-    <img
-      src={wordmarkSrc('#111111', BLACK_WORDMARK_SIZE.width)}
-      alt={WORDMARK_NAME}
-    />
-  ),
-  darkAspectRatio: WHITE_WORDMARK_SIZE.width / WHITE_WORDMARK_SIZE.height,
-  darkLogo: (
-    <img
-      src={wordmarkSrc('#ffffff', WHITE_WORDMARK_SIZE.width)}
-      alt={WORDMARK_NAME}
-    />
-  ),
+  children: renderWordmarks(WORDMARK_NAME, true),
 } satisfies Partial<TLogoTileProps>;
 
 export const WithDarkLogo: TStory = {
@@ -218,21 +229,25 @@ export const WithDarkLogoInDarkMode: TStory = {
 
 export const WithoutDarkLogoInDarkMode: TStory = {
   name: 'Without a dark-background logo — dark mode keeps the regular logo',
-  args: {
-    ...withDarkLogoArgs,
-    darkLogo: undefined,
-    darkAspectRatio: undefined,
-  },
+  args: { children: renderWordmarks(WORDMARK_NAME, false) },
   globals: { theme: 'dark' },
+};
+
+const interactiveWithDarkLogoArgs = {
+  isInteractive: true,
+  children: [
+    ...renderWordmarks('', true),
+    <LogoTile.Link key="link" href="#northwind" ariaLabel={WORDMARK_NAME} />,
+  ],
+} satisfies Partial<TLogoTileProps>;
+
+export const InteractiveWithDarkLogo: TStory = {
+  name: 'Interactive with a dark-background logo — one link over both logos',
+  args: interactiveWithDarkLogoArgs,
 };
 
 export const InteractiveWithDarkLogoInDarkMode: TStory = {
   name: 'Interactive with a dark-background logo — dark mode swaps the linked logo',
-  args: {
-    ...withDarkLogoArgs,
-    isInteractive: true,
-    children: <a href="#northwind">{withDarkLogoArgs.children}</a>,
-    darkLogo: <a href="#northwind">{withDarkLogoArgs.darkLogo}</a>,
-  },
+  args: interactiveWithDarkLogoArgs,
   globals: { theme: 'dark' },
 };
