@@ -12,6 +12,7 @@ code:
   - apps/platform/src/components/features/leads/**
   - apps/platform/src/server/leads/**
   - packages/studio/src/schema-types/modules/contact-form/**
+  - packages/service/src/features/modules/contact-form/**
 epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 ---
 
@@ -19,7 +20,7 @@ epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 
 ## What it does
 
-A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. The capability, the data layer, the owner notification template, the `Textarea` atom and the platform's Leads page and recipient field, and the Studio module are built; the module's loader and the public form are not.
+A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. The capability, the data layer, the owner notification template, the `Textarea` atom and the platform's Leads page and recipient field, the Studio module and its loader are built; the public form is not.
 
 ## Surfaces and routes
 
@@ -70,6 +71,7 @@ These are decided and must hold when it ships:
 - `apps/platform/src/app/[locale]/dashboard/(tenant)/leads/page.tsx` — the Leads page
 - `apps/platform/src/server/leads/delete-lead-action.ts` — the per-row delete
 - `apps/platform/src/server/auth/resolve-tenant-page-access.ts` — who reaches Leads, by role, plan and stored leads
+- `packages/service/src/features/modules/contact-form/adaptor/loader.ts` — `service.modules.contactForm.v1.getContactForm`: heading block, success message, privacy note (`undefined` when unset), brand variant, alignment and layout
 
 The pieces it builds on:
 
@@ -79,7 +81,7 @@ The pieces it builds on:
 
 ## Tests and stories
 
-PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to. `contact-notification.test.ts` covers the subject, escaping and line breaks. In `apps/platform`, the Leads page test and `resolve-tenant-page-access.test.ts` cover the role, plan and downgrade gates, `require-tenant-owner.test.ts` the owner check, `leads-table`, `leads-pagination` and `delete-lead-control` tests cover ordering, paging and the confirmed delete, `delete-lead-action.test.ts` the tenant scoping, and the email-settings and `update-email-config-action` tests the recipient's save and clear.
+PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to. `contact-notification.test.ts` covers the subject, escaping and line breaks. The module loader's `transformer.test.ts` and `loader.test.ts` cover a full document, an unset privacy note and the cache tags. In `apps/platform`, the Leads page test and `resolve-tenant-page-access.test.ts` cover the role, plan and downgrade gates, `require-tenant-owner.test.ts` the owner check, `leads-table`, `leads-pagination` and `delete-lead-control` tests cover ordering, paging and the confirmed delete, `delete-lead-action.test.ts` the tenant scoping, and the email-settings and `update-email-config-action` tests the recipient's save and clear.
 
 ## Related
 
