@@ -1,5 +1,10 @@
 import { SIZE } from '@blog/config';
-import { LINK_UNDERLINE, tv } from '@blog/ui/lib/styling';
+import {
+  FOCUS_RING,
+  LINK_UNDERLINE,
+  TRANSITION_COLORS,
+  tv,
+} from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const buttonVariants = tv({
@@ -7,10 +12,9 @@ export const buttonVariants = tv({
     'inline-flex min-h-9 items-center justify-center',
     'rounded-sm border',
     'font-display font-medium',
-    'transition-colors duration-base ease-smooth',
+    TRANSITION_COLORS,
     'cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
+    FOCUS_RING,
     'disabled:pointer-events-none disabled:opacity-50',
   ],
   variants: {
