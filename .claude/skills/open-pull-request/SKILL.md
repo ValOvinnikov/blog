@@ -68,11 +68,8 @@ header). The check list: `docs/context/ci-automation.md`.
    `gh pr edit <top> --base main`.
 2. Close the others as superseded, and move every stacked issue's
    `Closes #<n>` onto the survivor.
-3. Ask to push (Gate 3), then run `gh pr update-branch <top>`. CodeQL's
-   default setup analyzes only PRs into `main`, so the retargeted PR has none
-   of `CodeQL`, `Analyze (actions)` or `Analyze (javascript-typescript)`, and
-   a base change or close/reopen triggers nothing. Only a push to the head
-   branch does; `update-branch` is that push, and merges `main` in too.
+3. Ask to push (Gate 3), then run `gh pr update-branch <top>` to merge
+   `main` into the survivor.
 
 ## ABSOLUTE RULES — never violate
 

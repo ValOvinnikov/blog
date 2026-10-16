@@ -111,6 +111,9 @@ validation, Lighthouse CI, Playwright smoke) stays advisory: a red result
 there does not currently block a merge. Knip's production-graph job is
 advisory too, but never goes red at all — its step exits 0 and reports
 through annotations only.
+The ruleset carries no `code_scanning` or `code_quality` rule and CodeQL's
+default setup is off: without GitHub Code Security a private repository
+produces no code-scanning results, so either rule would block every merge.
 Required workflows run on every PR without path filters **and without
 base-branch filters**, on purpose — a workflow skipped by either leaves its
 required checks pending forever, so it blocks the PR instead of reporting on
@@ -347,7 +350,6 @@ threshold at which it would have stayed out).
 | **Build** (required)                 | No routine mirror — `pnpm build` is CI-only by `CLAUDE.md`'s rule; run it locally only to reproduce an actual CI build failure (`open-pull-request` Gate 5a).                                                                                                                                                                                            |
 | **Shellcheck + guard tests** (Hooks) | No `pnpm` script. When the diff touches `.claude/hooks/**` or `scripts/*.sh`, run the shellcheck + guard-test block in `develop-feature` §5 by hand.                                                                                                                                                                                                     |
 | **Migrations** (required)            | None — needs the dataset. `pnpm migrate:dry` in `packages/studio` is the nearest rehearsal, and it also targets a live dataset.                                                                                                                                                                                                                          |
-| **CodeQL** (required)                | None — GitHub's default setup, runs only on PRs into `main`.                                                                                                                                                                                                                                                                                             |
 | **Dependency Review** (required)     | None — reads the PR's dependency diff against GitHub's advisory database.                                                                                                                                                                                                                                                                                |
 | **Zizmor** (required)                | None — static analysis of the workflow files. Runs on every PR, but only a `.github/workflows/**` change can turn it red.                                                                                                                                                                                                                                |
 | **Actionlint** (required)            | None — same scope as Zizmor.                                                                                                                                                                                                                                                                                                                             |
