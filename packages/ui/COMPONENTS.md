@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_67 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_66 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -91,12 +91,6 @@ Variants: ratio: video|square|portrait|classic · shape: rect|circle
 
 Decorative separator for inline metadata lists (e.g. "Author · Date · Read time").
 Props: separator?: string _(extends IWithClassName, IWithDataTestId)_
-
-### NavLink — `components/atoms/nav-link/nav-link.tsx`
-
-A chrome-level navigation link (header/footer nav items).
-Props: className?: string · isActive?: TNavLinkVariants['isActive'] · variant?: TNavLinkVariants['variant'] · currentStyle?: TNavLinkVariants['currentStyle'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
-Variants: isActive: (boolean) · currentStyle: underline|weight · variant: plain|outlined
 
 ### Prose — `components/atoms/prose/prose.tsx`
 
@@ -293,7 +287,7 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark composing `NavLink` items with trailing `actions`, which stay in the bar, and `panelActions`, which move into the mobile panel below `lg`.
+Top-level `<nav>` landmark whose trailing `actions` stay in the bar and whose `panelActions` move into the mobile panel below `lg`.
 Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
 

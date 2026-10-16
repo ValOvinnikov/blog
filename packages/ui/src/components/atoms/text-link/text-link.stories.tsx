@@ -1,7 +1,6 @@
 import { ICONS, SIZE } from '@blog/config';
 import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
 import { BRAND_BAND_LABELS, BrandBand } from '@blog/ui/testing/brand-bands';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
@@ -137,52 +136,6 @@ export const Stretched: TStory = {
 
 const COMPARISONS: Array<{ name: string; today: ReactNode; next: ReactNode }> =
   [
-    {
-      name: 'nav',
-      today: <NavLink href="#">{LABEL}</NavLink>,
-      next: (
-        <TextLink href="#" appearance="nav">
-          {LABEL}
-        </TextLink>
-      ),
-    },
-    {
-      name: 'nav, current',
-      today: (
-        <NavLink href="#" isActive={true}>
-          {LABEL}
-        </NavLink>
-      ),
-      next: (
-        <TextLink href="#" appearance="nav" isCurrent={true}>
-          {LABEL}
-        </TextLink>
-      ),
-    },
-    {
-      name: 'nav, outlined',
-      today: (
-        <NavLink
-          href="#"
-          variant="outlined"
-          icon={<Icon name={ICONS.RSS} size={SIZE.SM} />}
-          hasLabel={false}
-        >
-          {LABEL}
-        </NavLink>
-      ),
-      next: (
-        <TextLink
-          href="#"
-          appearance="nav"
-          variant="outlined"
-          ariaLabel={LABEL}
-          title={LABEL}
-        >
-          <Icon name={ICONS.RSS} size={SIZE.SM} />
-        </TextLink>
-      ),
-    },
     {
       name: 'stretched',
       today: (

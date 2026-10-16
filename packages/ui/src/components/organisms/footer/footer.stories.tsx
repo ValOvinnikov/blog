@@ -1,6 +1,5 @@
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-import { NavLink } from '../../atoms/nav-link';
 
 import { Footer } from './footer';
 
@@ -12,9 +11,15 @@ const meta = {
     children: (
       <>
         <Footer.Nav>
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/about">About</NavLink>
-          <NavLink href="/contact">Contact</NavLink>
+          <TextLink appearance="nav" href="/">
+            Home
+          </TextLink>
+          <TextLink appearance="nav" href="/about">
+            About
+          </TextLink>
+          <TextLink appearance="nav" href="/contact">
+            Contact
+          </TextLink>
         </Footer.Nav>
         <Footer.Copyright title="My Blog" year={2027} />
       </>
