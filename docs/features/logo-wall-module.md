@@ -42,9 +42,9 @@ An editor shows a row of partner or client logos as social proof. Each logo sits
 
 - A wall holds 1–12 logos (Studio errors outside that range).
 - Content alignment allows Left and Center only; it aligns the heading, the tile row, the carousel and the actions.
-- Each tile is a `LogoTile`: a fixed 192×88px frame. The logo image inside it is sized by the asset's aspect ratio (`--logo-aspect`): 2.25rem (36px) tall, its width capped at the frame; without usable dimensions the image falls back to `max-h-9 w-auto max-w-full`. Images are requested at 360×72 in `contain` mode and lazy-loaded.
+- Each tile is a `LogoTile` built from its `Logo`, `DarkLogo` and `Link` parts: a fixed 192×88px frame. Each logo part is sized by the asset's aspect ratio (`--logo-aspect`): 2.25rem (36px) tall, its width capped at the frame; without usable dimensions the image falls back to `max-h-9 w-auto max-w-full`. Images are requested at 360×72 in `contain` mode and lazy-loaded.
 - With `imageDark` set, the tile renders both logos and shows one per colour mode; without it the one logo shows in both.
-- A linked tile is interactive and its accessible name is the company name, or the link's `ariaLabel` when set.
+- A linked tile is interactive: one `LogoTile.Link` overlays the whole tile, named by the link's `ariaLabel` or else the company name, and the logo images inside it are decorative (`alt=""`). An unlinked tile's images keep their alt text.
 - The carousel is the shared `LabelledCarousel`, named "<heading> carousel", with content-sized slides.
 - A failed fetch logs `logo_wall_module.fetch_failed` and renders nothing.
 

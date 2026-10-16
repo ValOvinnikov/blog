@@ -6,10 +6,14 @@ import { LogoTile } from './logo-tile';
 faker.seed(123);
 
 describe(`<${LogoTile.name}/>`, () => {
-  it('renders its child untouched', () => {
+  it('renders its logo', () => {
     const alt = faker.company.name();
     const setup = customRender(LogoTile, {
-      children: <img src={faker.image.url()} alt={alt} />,
+      children: (
+        <LogoTile.Logo>
+          <img src={faker.image.url()} alt={alt} />
+        </LogoTile.Logo>
+      ),
     });
 
     setup();
@@ -17,33 +21,24 @@ describe(`<${LogoTile.name}/>`, () => {
     expect(screen.getByRole('img', { name: alt })).toBeVisible();
   });
 
-  it('adds no link role of its own around a linked child', () => {
+  it('renders LogoTile.Link as the one link, named by its label', () => {
+    const href = faker.internet.url();
     const setup = customRender(LogoTile, {
-      children: (
-        <a href={faker.internet.url()}>
-          <img src={faker.image.url()} alt={faker.company.name()} />
-        </a>
-      ),
+      isInteractive: true,
+      children: [
+        <LogoTile.Logo key="logo">
+          <img src={faker.image.url()} alt="" />
+        </LogoTile.Logo>,
+        <LogoTile.DarkLogo key="dark-logo">
+          <img src={faker.image.url()} alt="" />
+        </LogoTile.DarkLogo>,
+        <LogoTile.Link key="link" href={href} ariaLabel="Visit Acme" />,
+      ],
     });
 
     setup();
 
     expect(screen.getAllByRole('link')).toHaveLength(1);
-  });
-
-  it('renders LogoTile.Link as the one link, named by its label', () => {
-    const href = faker.internet.url();
-    const setup = customRender(LogoTile, {
-      isInteractive: true,
-      children: (
-        <LogoTile.Link href={href} ariaLabel="Visit Acme">
-          <img src={faker.image.url()} alt="" />
-        </LogoTile.Link>
-      ),
-    });
-
-    setup();
-
     expect(screen.getByRole('link', { name: 'Visit Acme' })).toHaveAttribute(
       'href',
       href,
@@ -52,7 +47,11 @@ describe(`<${LogoTile.name}/>`, () => {
 
   it('adds no accessible name of its own', () => {
     const setup = customRender(LogoTile, {
-      children: <img src={faker.image.url()} alt={faker.company.name()} />,
+      children: (
+        <LogoTile.Logo>
+          <img src={faker.image.url()} alt={faker.company.name()} />
+        </LogoTile.Logo>
+      ),
       dataTestId: 'logo-tile',
     });
 
@@ -61,27 +60,34 @@ describe(`<${LogoTile.name}/>`, () => {
     expect(screen.getByTestId('logo-tile')).not.toHaveAccessibleName();
   });
 
-  it('renders a single logo when it has no dark-background logo', () => {
-    const setup = customRender(LogoTile, {
-      children: <img src={faker.image.url()} alt={faker.company.name()} />,
-    });
-
-    setup();
-
-    expect(screen.getAllByRole('img')).toHaveLength(1);
-  });
-
   it('renders both the regular and the dark-background logo, each named', () => {
     const regularAlt = faker.company.name();
     const darkAlt = faker.company.name();
     const setup = customRender(LogoTile, {
-      children: <img src={faker.image.url()} alt={regularAlt} />,
-      darkLogo: <img src={faker.image.url()} alt={darkAlt} />,
+      children: [
+        <LogoTile.Logo key="logo">
+          <img src={faker.image.url()} alt={regularAlt} />
+        </LogoTile.Logo>,
+        <LogoTile.DarkLogo key="dark-logo">
+          <img src={faker.image.url()} alt={darkAlt} />
+        </LogoTile.DarkLogo>,
+      ],
     });
 
     setup();
 
     expect(screen.getByRole('img', { name: regularAlt })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: darkAlt })).toBeInTheDocument();
+  });
+
+  it('keeps a child that is not one of its parts', () => {
+    const text = faker.company.name();
+    const setup = customRender(LogoTile, {
+      children: <span>{text}</span>,
+    });
+
+    setup();
+
+    expect(screen.getByText(text)).toBeVisible();
   });
 });
