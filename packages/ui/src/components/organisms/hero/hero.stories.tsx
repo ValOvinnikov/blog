@@ -9,11 +9,10 @@ import {
 } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { ShareLink } from '@blog/ui/components/molecules/share-link';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-import { NavLink } from '../../atoms/nav-link';
 
 import { Hero } from './hero';
 import { heroVariants } from './hero-variants';
@@ -28,7 +27,9 @@ const bannerContent = (alt: string) => (
       />
     </Hero.Media>
     <Hero.Cta>
-      <NavLink href="/posts/design-system">Read more</NavLink>
+      <TextLink appearance="nav" href="/posts/design-system">
+        Read more
+      </TextLink>
     </Hero.Cta>
   </>
 );
@@ -56,7 +57,9 @@ const profileContent = (
       </p>
     </Hero.Body>
     <Hero.Cta>
-      <NavLink href="/posts/design-system">Read more</NavLink>
+      <TextLink appearance="nav" href="/posts/design-system">
+        Read more
+      </TextLink>
     </Hero.Cta>
     <Hero.Social>
       <ul aria-label="Find Jane Doe elsewhere">
@@ -137,7 +140,9 @@ const meta = {
           />
         </Hero.Media>
         <Hero.Cta>
-          <NavLink href="/posts/design-system">Read more</NavLink>
+          <TextLink appearance="nav" href="/posts/design-system">
+            Read more
+          </TextLink>
         </Hero.Cta>
       </>
     ),
@@ -164,7 +169,9 @@ export const WithoutEyebrow: TStory = {
     eyebrow: undefined,
     children: (
       <Hero.Cta>
-        <NavLink href="/posts/design-system">Read more</NavLink>
+        <TextLink appearance="nav" href="/posts/design-system">
+          Read more
+        </TextLink>
       </Hero.Cta>
     ),
   },
@@ -174,7 +181,9 @@ export const WithoutImage: TStory = {
   args: {
     children: (
       <Hero.Cta>
-        <NavLink href="/posts/design-system">Read more</NavLink>
+        <TextLink appearance="nav" href="/posts/design-system">
+          Read more
+        </TextLink>
       </Hero.Cta>
     ),
   },
@@ -267,7 +276,9 @@ export const BannerWithBody: TStory = {
           </p>
         </Hero.Body>
         <Hero.Cta>
-          <NavLink href="/posts/design-system">Read more</NavLink>
+          <TextLink appearance="nav" href="/posts/design-system">
+            Read more
+          </TextLink>
         </Hero.Cta>
       </>
     ),
@@ -332,7 +343,9 @@ export const BannerToneSecondaryWideDesktop: TStory = {
 
 const bannerWithoutMediaContent = (
   <Hero.Cta>
-    <NavLink href="/posts/design-system">Read more</NavLink>
+    <TextLink appearance="nav" href="/posts/design-system">
+      Read more
+    </TextLink>
   </Hero.Cta>
 );
 
@@ -385,7 +398,9 @@ const bannerProfileContent = (hasMedia: boolean) => (
       </Hero.Media>
     )}
     <Hero.Cta>
-      <NavLink href="/posts/design-system">Read more</NavLink>
+      <TextLink appearance="nav" href="/posts/design-system">
+        Read more
+      </TextLink>
     </Hero.Cta>
     <Hero.Social>
       <ul aria-label="Find Jane Doe elsewhere">
@@ -567,8 +582,12 @@ export const CenteredActions: TStory = {
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
     children: (
       <Hero.Cta>
-        <NavLink href="/posts/design-system">Read more</NavLink>
-        <NavLink href="/about">About the author</NavLink>
+        <TextLink appearance="nav" href="/posts/design-system">
+          Read more
+        </TextLink>
+        <TextLink appearance="nav" href="/about">
+          About the author
+        </TextLink>
       </Hero.Cta>
     ),
   },
@@ -587,7 +606,9 @@ export const SplitSquarePortrait: TStory = {
           />
         </Hero.Media>
         <Hero.Cta>
-          <NavLink href="/posts/design-system">Read more</NavLink>
+          <TextLink appearance="nav" href="/posts/design-system">
+            Read more
+          </TextLink>
         </Hero.Cta>
       </>
     ),

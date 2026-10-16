@@ -10,6 +10,7 @@ export const sampleLanguageSwitcherVariants = tv({
       'aria-[current=page]:bg-brand-primary',
       'aria-[current=page]:text-brand-primary-contrast',
     ],
+    codeLabel: ['sr-only'],
     trigger: [
       'inline-flex shrink-0 items-center justify-center gap-1 rounded-full',
       'border border-border-strong bg-surface text-text',

@@ -99,9 +99,9 @@ src/components/molecules/media-card/
   and pass tests: a silent WCAG 2.5.3 failure for speech-input users. Put the
   **whole** name in one visually hidden `span` and `aria-hidden` the visible
   copy — never a hidden suffix beside visible text, because name computation
-  trims at element boundaries and drops a leading-space separator. `NavLink`
-  (`hasLabel={false}`), a link whose whole name is one `sr-only` span, is the
-  precedent.
+  trims at element boundaries and drops a leading-space separator. `TextLink`
+  without an `href`, which hides its visible copy and carries its whole name
+  in one `sr-only` span, is the precedent.
 
 - **Never format dates.** Locale lives in the app. Take `publishedAt` (ISO
   8601, for `<time dateTime>`) and `formattedDate` (pre-formatted in

@@ -1,5 +1,5 @@
 import type { TSocialProfile } from '@blog/service';
-import type { TNavLinkVariants } from '@blog/ui/components/atoms/nav-link/nav-link-variants';
+import type { TTextLinkVariants } from '@blog/ui/components/atoms/text-link/text-link-variants';
 import { useTranslations } from 'next-intl';
 
 import { SocialLink } from './social-link';
@@ -7,7 +7,7 @@ import { socialLinksVariants } from './social-links-variants';
 
 export type TSocialLinksProps = {
   profiles: TSocialProfile[];
-  variant?: TNavLinkVariants['variant'];
+  variant?: TTextLinkVariants['variant'];
   isOnDark?: boolean;
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import type { TLanguageEntry } from '@web/components/shared/language-switcher/to-language-entries';
 
 import { languageCodesVariants } from './language-codes-variants';
@@ -26,31 +26,19 @@ export const LanguageCodes = ({
 
         return (
           <li key={locale}>
-            {isCurrent ? (
-              <NavLink
-                as="span"
-                lang={lang}
-                title={label}
-                isActive={true}
-                aria-current="true"
-                className={link()}
-                dataTestId="language-code-current"
-              >
-                <span aria-hidden="true">{code}</span>
-                <span className={labelClass()}>{label}</span>
-              </NavLink>
-            ) : (
-              <NavLink
-                href={href}
-                lang={lang}
-                hrefLang={lang}
-                title={label}
-                aria-label={label}
-                className={link()}
-              >
-                {code}
-              </NavLink>
-            )}
+            <TextLink
+              appearance="nav"
+              href={isCurrent ? undefined : href}
+              lang={lang}
+              hrefLang={lang}
+              title={label}
+              isCurrent={isCurrent}
+              className={link()}
+              dataTestId={isCurrent ? 'language-code-current' : undefined}
+            >
+              <span aria-hidden="true">{code}</span>
+              <span className={labelClass()}>{label}</span>
+            </TextLink>
           </li>
         );
       })}

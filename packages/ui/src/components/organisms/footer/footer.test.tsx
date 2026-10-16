@@ -1,6 +1,5 @@
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
-
-import { NavLink } from '../../atoms/nav-link';
 
 import { Footer } from './footer';
 
@@ -29,8 +28,12 @@ describe(`<${Footer.name}/>`, () => {
     renderElement(
       <Footer>
         <Footer.Nav>
-          <NavLink href="/about">About</NavLink>
-          <NavLink href="/contact">Contact</NavLink>
+          <TextLink appearance="nav" href="/about">
+            About
+          </TextLink>
+          <TextLink appearance="nav" href="/contact">
+            Contact
+          </TextLink>
         </Footer.Nav>
       </Footer>,
     );
@@ -42,7 +45,9 @@ describe(`<${Footer.name}/>`, () => {
     renderElement(
       <Footer>
         <Footer.Nav>
-          <NavLink href="/about">About</NavLink>
+          <TextLink appearance="nav" href="/about">
+            About
+          </TextLink>
         </Footer.Nav>
       </Footer>,
     );

@@ -1,6 +1,5 @@
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
-
-import { NavLink } from '../../atoms/nav-link';
 
 import { Header } from './header';
 
@@ -18,8 +17,12 @@ describe(`<${Header.name}/>`, () => {
     renderElement(
       <Header>
         <Header.Nav>
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/blog">Blog</NavLink>
+          <TextLink appearance="nav" href="/">
+            Home
+          </TextLink>
+          <TextLink appearance="nav" href="/blog">
+            Blog
+          </TextLink>
         </Header.Nav>
       </Header>,
     );
@@ -31,7 +34,9 @@ describe(`<${Header.name}/>`, () => {
     renderElement(
       <Header>
         <Header.Nav>
-          <NavLink href="/blog">Blog</NavLink>
+          <TextLink appearance="nav" href="/blog">
+            Blog
+          </TextLink>
         </Header.Nav>
       </Header>,
     );
@@ -57,7 +62,9 @@ describe(`<${Header.name}/>`, () => {
       <Header>
         <Header.Brand>My Blog</Header.Brand>
         <Header.Nav>
-          <NavLink href="/">Home</NavLink>
+          <TextLink appearance="nav" href="/">
+            Home
+          </TextLink>
         </Header.Nav>
         <Header.Actions>
           <button>Menu</button>

@@ -1,6 +1,6 @@
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { NavLink } from '../../atoms/nav-link';
 import { ThemeToggle } from '../../atoms/theme-toggle';
 import { BrandLockup } from '../../molecules/brand-lockup';
 
@@ -15,11 +15,15 @@ const meta = {
       <>
         <Header.Brand>My Blog</Header.Brand>
         <Header.Nav>
-          <NavLink href="/" isActive={true}>
+          <TextLink appearance="nav" href="/" isCurrent={true}>
             Home
-          </NavLink>
-          <NavLink href="/blog">Blog</NavLink>
-          <NavLink href="/about">About</NavLink>
+          </TextLink>
+          <TextLink appearance="nav" href="/blog">
+            Blog
+          </TextLink>
+          <TextLink appearance="nav" href="/about">
+            About
+          </TextLink>
         </Header.Nav>
         <Header.Actions>
           <ThemeToggle isDark={false} onToggle={() => {}} />
@@ -53,10 +57,12 @@ export const WithBrandLockup: TStory = {
           </a>
         </Header.Brand>
         <Header.Nav>
-          <NavLink href="/" isActive={true}>
+          <TextLink appearance="nav" href="/" isCurrent={true}>
             Home
-          </NavLink>
-          <NavLink href="/blog">Blog</NavLink>
+          </TextLink>
+          <TextLink appearance="nav" href="/blog">
+            Blog
+          </TextLink>
         </Header.Nav>
         <Header.Actions>
           <ThemeToggle isDark={false} onToggle={() => {}} />
@@ -72,7 +78,9 @@ export const WithMobileTrigger: TStory = {
       <>
         <Header.Brand>My Blog</Header.Brand>
         <Header.Nav>
-          <NavLink href="/">Home</NavLink>
+          <TextLink appearance="nav" href="/">
+            Home
+          </TextLink>
         </Header.Nav>
         <Header.Actions>
           <button aria-label="Open menu">☰</button>

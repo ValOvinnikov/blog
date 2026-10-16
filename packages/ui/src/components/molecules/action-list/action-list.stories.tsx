@@ -1,4 +1,4 @@
-import { NavLink } from '@blog/ui/components/atoms/nav-link/nav-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -12,8 +12,12 @@ const meta = {
   args: {
     children: (
       <>
-        <NavLink href="/blog">{faker.lorem.words(2)}</NavLink>
-        <NavLink href="/about">{faker.lorem.words(2)}</NavLink>
+        <TextLink appearance="nav" href="/blog">
+          {faker.lorem.words(2)}
+        </TextLink>
+        <TextLink appearance="nav" href="/about">
+          {faker.lorem.words(2)}
+        </TextLink>
       </>
     ),
   },

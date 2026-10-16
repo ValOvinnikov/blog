@@ -14,7 +14,7 @@ const isProtocolRelative = (href: string) => href.startsWith('//');
  * Protocol-relative hrefs (`//host/path`) are the one case next-intl's
  * scheme check can't classify as external, so those render through plain
  * `next/link` instead. Works both as a direct link and as the `as`/`linkAs`
- * polymorphic target for `@blog/ui` components (`NavLink`, `LinkButton`,
+ * polymorphic target for `@blog/ui` components (`TextLink`, `LinkButton`,
  * `PrimaryNavigation`).
  *
  * @example
