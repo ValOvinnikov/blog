@@ -11,7 +11,7 @@ export const languageCodesVariants = tv({
       false: {
         list: ['gap-0.5 rounded-full border border-border-strong p-0.5'],
         link: [
-          'h-6 min-w-6 justify-center rounded-full px-1.5 text-label no-underline',
+          'h-6 min-w-6 justify-center rounded-full px-1.5 pb-0 text-label no-underline',
         ],
       },
       true: {
