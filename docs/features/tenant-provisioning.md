@@ -33,6 +33,8 @@ code:
   - apps/platform/src/components/features/tenants/tenant-details-*/**
   - apps/platform/src/utils/use-*provisioning-poll/**
   - apps/platform/src/utils/run-steps/**
+  - apps/platform/src/utils/provisioning-view-state/**
+  - apps/platform/src/utils/use-staged-step-statuses/**
   - apps/platform/src/utils/tenant-field-locks/**
   - apps/platform/src/app/**/provisioning/*.tsx
   - apps/platform/src/app/**/danger/*.tsx
@@ -63,7 +65,7 @@ The workflow then verifies all of it. The admin polls each step's progress and o
   - `/tenants` lists tenants, with an archived toggle.
   - `/tenants/new` is the add-tenant wizard.
   - `/tenants/{id}` shows an overview with a provisioning banner.
-  - `/tenants/{id}/provisioning` shows each step's status and the run.
+  - `/tenants/{id}/provisioning` shows each step's status and the run. Until the workflow starts the run, it says the run is queued and counts the wait. A step that finishes between two polls is still shown Running before it settles.
   - `/tenants/{id}/domain` shows DNS records and live Vercel verification.
 - **SUPERADMIN only:** `/tenants/{id}/danger` holds deprovision (with dry run), reactivate and delete.
 - **Owner:** `/dashboard/domain` shows the same domain view.
@@ -102,6 +104,7 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 ## Constraints and invariants
 
 - **Admission:** `beginTenantProvisioning` admits a run in one atomic `UPDATE … RETURNING`. It accepts a row that is not PROVISIONING, or one whose run is provably dead: a failed step since `startedAt`, a recorded finish, or no start recorded, or a start older than 30 minutes. A run admitted within the last 2 minutes is never treated as dead. A failed dispatch reverts the status.
+- **Queued run:** a run is queued while `run.admittedAt` is set and the status is PROVISIONING; the workflow's start replaces the `run` entry and drops it.
 - **Overall status:** any FAILED step settles the status to FAILED. Only `VERIFY_CONTENT` finishing settles READY.
 - **Timeouts:** every Sanity management and Vercel call aborts after 30 seconds, so a hung call fails its step instead of stalling the run.
 - **Project membership:** `SANITY_MANAGEMENT_TOKEN` is an implicit administrator only of projects it created. A tenant row pointing at a project created elsewhere, such as the shared dev project, gets a 401 from the webhook API until the token's robot is added to that project as administrator; the step's error says so.

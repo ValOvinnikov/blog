@@ -673,6 +673,9 @@
     "startErrorArchived": "Deze tenant is gearchiveerd; de inrichting kan niet worden gestart.",
     "startNoticeAlreadyInProgress": "Er loopt al een inrichting voor deze tenant — deze pagina wordt automatisch bijgewerkt zodra die klaar is.",
     "pollErrorWarning": "De laatste status kon niet worden opgehaald — er wordt automatisch opnieuw geprobeerd.",
+    "queuedRunTitle": "In de wachtrij — de provisioning-workflow start op",
+    "queuedRunBody": "De stappen beginnen zodra de workflow de run oppakt en klaar is met opstarten, meestal binnen een à twee minuten.",
+    "queuedRunElapsed": "{elapsed} aan het wachten",
     "errorKind": {
       "permission": {
         "headline": "Ontbrekende rechten om deze stap te voltooien",

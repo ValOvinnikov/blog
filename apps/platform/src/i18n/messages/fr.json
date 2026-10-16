@@ -673,6 +673,9 @@
     "startErrorArchived": "Ce locataire est archivé ; le provisionnement ne peut pas être démarré.",
     "startNoticeAlreadyInProgress": "Un provisionnement est déjà en cours pour ce locataire — cette page se mettra à jour automatiquement une fois celui-ci terminé.",
     "pollErrorWarning": "Impossible d'actualiser le dernier statut — nouvelle tentative automatique.",
+    "queuedRunTitle": "En file d’attente — le workflow de provisionnement démarre",
+    "queuedRunBody": "Les étapes commencent dès que le workflow prend en charge l’exécution et termine sa préparation, généralement en une à deux minutes.",
+    "queuedRunElapsed": "En attente depuis {elapsed}",
     "errorKind": {
       "permission": {
         "headline": "Autorisation manquante pour terminer cette étape",

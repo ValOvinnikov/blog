@@ -673,6 +673,9 @@
     "startErrorArchived": "This tenant is archived; provisioning can't be started.",
     "startNoticeAlreadyInProgress": "A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.",
     "pollErrorWarning": "Couldn't refresh the latest status — retrying automatically.",
+    "queuedRunTitle": "Queued — the provisioning workflow is starting up",
+    "queuedRunBody": "Steps begin once the workflow picks up the run and finishes setting up, usually within a minute or two.",
+    "queuedRunElapsed": "{elapsed} waiting",
     "errorKind": {
       "permission": {
         "headline": "Missing permission to complete this step",
