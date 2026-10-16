@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_68 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_67 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -103,11 +103,6 @@ Variants: isActive: (boolean) · currentStyle: underline|weight · variant: plai
 Typography wrapper for long-form body text.
 Props: size?: TProseVariants['size'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
-
-### ProseLink — `components/atoms/prose-link/prose-link.tsx`
-
-The accent/underline treatment for inline links inside Portable Text article body copy.
-Props: className?: string _(extends IWithDataTestId)_
 
 ### QuoteBlock — `components/atoms/quote-block/quote-block.tsx`
 

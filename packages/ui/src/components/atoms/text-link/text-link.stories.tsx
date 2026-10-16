@@ -2,7 +2,6 @@ import { ICONS, SIZE } from '@blog/config';
 import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NavLink } from '@blog/ui/components/atoms/nav-link';
-import { ProseLink } from '@blog/ui/components/atoms/prose-link';
 import { BRAND_BAND_LABELS, BrandBand } from '@blog/ui/testing/brand-bands';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
@@ -51,6 +50,28 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Prose: TStory = {};
+
+export const ProseDescendersAndWrapping: TStory = {
+  name: 'Prose, descenders and wrapping',
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      <p className="text-copy">
+        Read{' '}
+        <TextLink {...args}>
+          typography, spacing, and quality-of-reading guidelines
+        </TextLink>{' '}
+        before you publish.
+      </p>
+      <p className="max-w-56 text-copy">
+        This paragraph is narrow, so{' '}
+        <TextLink {...args}>
+          a long link quietly spilling onto a second line
+        </TextLink>{' '}
+        keeps its underline on both.
+      </p>
+    </div>
+  ),
+};
 
 export const Nav: TStory = { args: { appearance: 'nav' } };
 
@@ -116,11 +137,6 @@ export const Stretched: TStory = {
 
 const COMPARISONS: Array<{ name: string; today: ReactNode; next: ReactNode }> =
   [
-    {
-      name: 'prose',
-      today: <ProseLink href="#">{LABEL}</ProseLink>,
-      next: <TextLink href="#">{LABEL}</TextLink>,
-    },
     {
       name: 'nav',
       today: <NavLink href="#">{LABEL}</NavLink>,

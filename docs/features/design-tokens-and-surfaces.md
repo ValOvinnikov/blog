@@ -94,7 +94,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - `packages/utils/src/color/oklch.test.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.test.ts` (Console parity with `theme.css`)
 - `packages/ui/src/lib/design-tokens/parse-theme-tokens.test.ts`, `token-registry.test.ts`
-- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, the `OnBands` stories of `TextInput` and `Switch`, the descenders-and-wrapping stories of `ProseLink`, `Button` and `QuoteCard` (`packages/ui/src/testing/surface-bands.tsx`), and every `@blog/ui` component's stories across the bands.
+- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, the `OnBands` stories of `TextInput` and `Switch`, the descenders-and-wrapping stories of `TextLink`, `Button` and `QuoteCard` (`packages/ui/src/testing/surface-bands.tsx`), and every `@blog/ui` component's stories across the bands.
 
 ## Related
 
