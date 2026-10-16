@@ -2,21 +2,19 @@ import {
   ERROR_CODE,
   FINDING_STATUS,
   type TErrorCode,
-  type TFindingKind,
   type TFindingSeverity,
-  type TFindingSource,
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
+import {
+  buildDedupeKey,
+  type TDedupeKeyParts,
+} from '@blog/db/queries/findings/build-dedupe-key';
 import { findings, type TFinding } from '@blog/db/schema/findings';
 import type { TResult } from '@blog/utils';
 import { and, eq, sql } from 'drizzle-orm';
 
-export type TOpenFindingInput = {
-  tenantId?: string;
-  source: TFindingSource;
-  kind: TFindingKind;
+export type TOpenFindingInput = TDedupeKeyParts & {
   severity: TFindingSeverity;
-  identifier: string;
   details?: Record<string, unknown>;
 };
 
@@ -25,22 +23,6 @@ export type TOpenFindingResult = {
   isNewlyOpened: boolean;
 };
 
-function buildDedupeKey(
-  input: Pick<TOpenFindingInput, 'tenantId' | 'source' | 'kind' | 'identifier'>,
-): string {
-  return [
-    input.source,
-    input.kind,
-    input.tenantId ?? 'global',
-    input.identifier,
-  ].join(':');
-}
-
-// Opens a finding for a source/kind/tenant/identifier condition, or — if one
-// is already OPEN for that same condition — refreshes it in place instead of
-// inserting a duplicate. `isNewlyOpened` distinguishes the two outcomes: a
-// caller sweeping for a healthy→failing transition acts only when it's
-// `true`.
 export async function openFinding(
   input: TOpenFindingInput,
 ): Promise<TResult<TOpenFindingResult, TErrorCode>> {
