@@ -8,7 +8,7 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
@@ -44,24 +44,24 @@ export const SampleLanguageSwitcher = ({
       ? LANGUAGE_SWITCHER_STYLE.MENU_CODE
       : switcherStyle;
   const hasGlobe = resolvedStyle === LANGUAGE_SWITCHER_STYLE.MENU_GLOBE;
-  const { codeList, codeLink, trigger, caret } = sampleLanguageSwitcherVariants(
-    { hasGlobe },
-  );
+  const { codeList, codeLink, codeLabel, trigger, caret } =
+    sampleLanguageSwitcherVariants({ hasGlobe });
 
   if (resolvedStyle === LANGUAGE_SWITCHER_STYLE.CODES) {
     return (
       <ul className={codeList()}>
         {liveLocales.map((locale) => (
           <li key={locale}>
-            <NavLink
-              href="#"
+            <TextLink
+              appearance="nav"
+              href={locale === currentLocale ? undefined : '#'}
               lang={LOCALE_BCP47_TAGS[locale]}
-              aria-label={LOCALE_NATIVE_LABEL[locale]}
-              isActive={locale === currentLocale}
+              isCurrent={locale === currentLocale}
               className={codeLink()}
             >
-              {toCode(locale)}
-            </NavLink>
+              <span aria-hidden="true">{toCode(locale)}</span>
+              <span className={codeLabel()}>{LOCALE_NATIVE_LABEL[locale]}</span>
+            </TextLink>
           </li>
         ))}
       </ul>

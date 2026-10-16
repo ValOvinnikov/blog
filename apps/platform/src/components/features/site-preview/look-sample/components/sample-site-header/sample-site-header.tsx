@@ -4,7 +4,7 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config';
 import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/look-sample/components/sample-language-switcher';
 import { useTranslations } from 'next-intl';
 
@@ -33,10 +33,12 @@ export const SampleSiteHeader = ({
         <span className={brandName()}>{tenantName}</span>
       </div>
       <div className={nav()}>
-        <NavLink href="#" isActive={true}>
+        <TextLink appearance="nav" href="#" isCurrent={true}>
           {t('navPosts')}
-        </NavLink>
-        <NavLink href="#">{t('navAbout')}</NavLink>
+        </TextLink>
+        <TextLink appearance="nav" href="#">
+          {t('navAbout')}
+        </TextLink>
         <SampleLanguageSwitcher
           liveLocales={liveLocales}
           switcherStyle={languageSwitcherStyle}
