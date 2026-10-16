@@ -1,0 +1,104 @@
+name: Dependency scan
+
+on:
+  # Path-gated on purpose: this is not a required check, so a skipped run
+  # strands nothing, and a PR that changes no manifest or lockfile pays nothing.
+  pull_request:
+    paths:
+      - '**/package.json'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-scan:
+    name: Dependency scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: head
+          sparse-checkout: pnpm-lock.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Checkout PR base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          sparse-checkout: pnpm-lock.yaml
+          sparse-checkout-cone-mode: false
+
+      # osv-scanner exits 1 when it finds any advisory, so both scans continue
+      # on error; a scan that fails outright writes no results file, and the
+      # compare step fails on the missing file instead.
+      - name: Scan base lockfile
+        continue-on-error: true
+        uses: google/osv-scanner-action/osv-scanner-action@b1d267aea5211fa648d9d442fa64b90dbdcbdd36 # v2.7.0
+        with:
+          scan-args: |-
+            --format=json
+            --output-file=base-results.json
+            --lockfile=base/pnpm-lock.yaml
+
+      - name: Scan head lockfile
+        continue-on-error: true
+        uses: google/osv-scanner-action/osv-scanner-action@b1d267aea5211fa648d9d442fa64b90dbdcbdd36 # v2.7.0
+        with:
+          scan-args: |-
+            --format=json
+            --output-file=head-results.json
+            --lockfile=head/pnpm-lock.yaml
+
+      - name: Fail on new high-severity advisories
+        shell: python
+        run: |
+          import json
+          import sys
+
+          HIGH_CVSS = 7.0
+          HIGH_LABELS = {'HIGH', 'CRITICAL'}
+
+          def is_high(group, vulns):
+              try:
+                  if float(group.get('max_severity') or 0) >= HIGH_CVSS:
+                      return True
+              except ValueError:
+                  pass
+              return any(
+                  str(vulns.get(i, {}).get('database_specific', {}).get('severity', '')).upper() in HIGH_LABELS
+                  for i in group.get('ids', [])
+              )
+
+          def high_findings(path):
+              with open(path) as f:
+                  results = json.load(f).get('results') or []
+              found = {}
+              for result in results:
+                  for entry in result.get('packages') or []:
+                      pkg = entry['package']
+                      vulns = {v['id']: v for v in entry.get('vulnerabilities') or []}
+                      for group in entry.get('groups') or []:
+                          if is_high(group, vulns):
+                              key = (pkg['ecosystem'], pkg['name'], group['ids'][0])
+                              found[key] = (pkg['version'], group.get('max_severity') or '?', group['ids'])
+              return found
+
+          base = high_findings('base-results.json')
+          head = high_findings('head-results.json')
+          new = {k: v for k, v in head.items() if k not in base}
+
+          for (_, name, _), (version, severity, ids) in sorted(new.items()):
+              print(f'::error title=High-severity advisory::{name}@{version} ({severity}): {", ".join(ids)}')
+
+          print(f'{len(new)} new high-severity advisories ({len(head)} in head, {len(base)} in base).')
+          sys.exit(1 if new else 0)

@@ -825,10 +825,10 @@ file` are all denied alike) — an earlier version only handled the
   by itself the whole stack is permanently `BLOCKED` and has to be collapsed
   into one PR. See `open-pull-request`'s "Stacked PRs" section.
 
-  A PR receives the full required suite whatever branch it targets. The six
-  workflows behind the eleven required checks — `ci.yml` (Type-check, Lint,
-  Test, Build, Typegen, Migrations) plus `knip.yml`, `dependency-review.yml`,
-  `zizmor.yml`, `actionlint.yml` and `hooks.yml` (one each) — each declare a
+  A PR receives the full required suite whatever branch it targets. The five
+  workflows behind the ten required checks — `ci.yml` (Type-check, Lint,
+  Test, Build, Typegen, Migrations) plus `knip.yml`, `zizmor.yml`,
+  `actionlint.yml` and `hooks.yml` (one each) — each declare a
   bare `pull_request:` trigger with no `branches:` filter,
   which is what makes stacking usable. Keep it that way: each file scopes its
   own trigger, so re-adding `branches: [main]` to any one of them drops that
@@ -837,7 +837,7 @@ file` are all denied alike) — an earlier version only handled the
   deadlock `ci.yml`'s header comment describes when explaining why it carries
   no `paths-ignore`.
 
-  CodeQL is not among the eleven and behaves differently in a way that
+  CodeQL is not among the ten and behaves differently in a way that
   matters for stacks. It has no workflow file: it runs from GitHub's default
   code-scanning setup and is enforced by a separate `code_scanning` ruleset
   rule rather than as a required status check. Default setup analyzes pushes

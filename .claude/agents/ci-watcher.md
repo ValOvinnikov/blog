@@ -78,10 +78,9 @@ so never guess which PR one maps to.
 
 3. **All green — check names before declaring victory.** Judge by names, not
    the total. Must be present:
-   - the 11 required status checks — Lint, Test, Type-check, Build, Typegen,
-     Migrations, Knip, Dependency Review, Zizmor, Actionlint, Shellcheck +
-     guard tests (`docs/context/ci-automation.md` "Required status checks on
-     `main`");
+   - the 10 required status checks — Lint, Test, Type-check, Build, Typegen,
+     Migrations, Knip, Zizmor, Actionlint, Shellcheck + guard tests
+     (`docs/context/ci-automation.md` "Required status checks on `main`");
    - on a PR based on `main`, also `CodeQL`, `Analyze (actions)` and
      `Analyze (javascript-typescript)` — the ruleset's code-scanning rule
      requires them, and the PR stays BLOCKED without them. CodeQL's default
@@ -117,8 +116,8 @@ Report with exactly this structure:
 - **Mergeability unresolved (step 1):** prefix whichever green report applies
   with `Mergeability was still UNKNOWN after one retry; proceeded to watch anyway.`
   — never standalone; you still have a real verdict.
-- **All green (step 3):** `27/27 checks passed; all 11 required + CodeQL present.`
-  (stacked PR: `…; all 11 required present; base <branch>, no CodeQL expected.`)
+- **All green (step 3):** `27/27 checks passed; all 10 required + CodeQL present.`
+  (stacked PR: `…; all 10 required present; base <branch>, no CodeQL expected.`)
   — one line, plus the check names if few.
 - **Green but a required check absent (step 3):**
   `22/22 checks passed, but <names> never ran — not a clean run.`
