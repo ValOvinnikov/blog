@@ -40,50 +40,52 @@ export const TeamMemberCard = ({
   const s = teamMemberCardVariants({ shape: mediaShape, align });
 
   return (
-    <MediaCard
-      align={align}
-      isInteractive={Boolean(member.profileUrl)}
-      className={className}
-      dataTestId={dataTestId}
-    >
-      <MediaCard.Media shape={mediaShape} align={align} className={s.media()}>
-        {member.image ? (
-          <SanityImage
-            image={member.image}
-            width={imageSize}
-            height={imageSize}
-            loading="lazy"
-            className={s.image()}
-          />
-        ) : (
-          <Avatar
-            alt={member.name}
-            name={member.name}
-            shape={mediaShape}
-            className={teamMemberCardAvatarFallbackVariants()}
-          />
+    <div className={s.root({ class: className })}>
+      <MediaCard
+        align={align}
+        isInteractive={Boolean(member.profileUrl)}
+        className={s.card()}
+        dataTestId={dataTestId}
+      >
+        <MediaCard.Media shape={mediaShape} align={align} className={s.media()}>
+          {member.image ? (
+            <SanityImage
+              image={member.image}
+              width={imageSize}
+              height={imageSize}
+              loading="lazy"
+              className={s.image()}
+            />
+          ) : (
+            <Avatar
+              alt={member.name}
+              name={member.name}
+              shape={mediaShape}
+              className={teamMemberCardAvatarFallbackVariants()}
+            />
+          )}
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          {member.profileUrl ? (
+            <MediaCard.Link href={member.profileUrl} as={SmartLink}>
+              {member.name}
+            </MediaCard.Link>
+          ) : (
+            member.name
+          )}
+        </MediaCard.Title>
+        {member.role ? <p className={s.role()}>{member.role}</p> : null}
+        {member.bio && (
+          <div className={s.bio()}>
+            <PortableText value={member.bio} />
+          </div>
         )}
-      </MediaCard.Media>
-      <MediaCard.Title level={3}>
-        {member.profileUrl ? (
-          <MediaCard.Link href={member.profileUrl} as={SmartLink}>
-            {member.name}
-          </MediaCard.Link>
-        ) : (
-          member.name
+        {member.socialLinks.length > 0 && (
+          <MediaCard.Footer>
+            <SocialLinks profiles={member.socialLinks} variant="outlined" />
+          </MediaCard.Footer>
         )}
-      </MediaCard.Title>
-      {member.role ? <p className={s.role()}>{member.role}</p> : null}
-      {member.bio && (
-        <div className={s.bio()}>
-          <PortableText value={member.bio} />
-        </div>
-      )}
-      {member.socialLinks.length > 0 && (
-        <MediaCard.Footer>
-          <SocialLinks profiles={member.socialLinks} variant="outlined" />
-        </MediaCard.Footer>
-      )}
-    </MediaCard>
+      </MediaCard>
+    </div>
   );
 };

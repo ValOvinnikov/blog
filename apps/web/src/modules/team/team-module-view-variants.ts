@@ -3,7 +3,8 @@ import { tv } from 'tailwind-variants';
 export const teamModuleViewVariants = tv({
   slots: {
     gridContainer: ['@container'],
-    grid: ['@xl:grid-cols-2'],
+    // 27rem is the container a 480px viewport leaves after both page gutters.
+    grid: ['@min-[27rem]:grid-cols-2'],
     item: [],
   },
   variants: {
