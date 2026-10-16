@@ -1,14 +1,10 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import {
-  BRAND_BAND_LABELS,
-  BrandBand,
-  focusLastLink,
-} from '@blog/ui/testing/brand-bands';
+import { focusLastLink } from '@blog/ui/testing/brand-bands';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import type { AnchorHTMLAttributes } from 'react';
 
 import { TextLink } from './text-link';
 import { textLinkVariants } from './text-link-variants';
@@ -140,43 +136,4 @@ export const Stretched: TStory = {
 export const StretchedFocused: TStory = {
   ...Stretched,
   play: focusLastLink,
-};
-
-const COMPARISONS: Array<{ name: string; today: ReactNode; next: ReactNode }> =
-  [];
-
-const SideBySide = () => (
-  <div className="flex flex-col gap-6">
-    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
-      <BrandBand key={tone} tone={tone}>
-        <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-x-6 gap-y-3">
-          <span className="font-mono text-meta text-muted">
-            {BRAND_BAND_LABELS[tone]}
-          </span>
-          <span className="font-mono text-meta text-muted">Today</span>
-          <span className="font-mono text-meta text-muted">TextLink</span>
-          {COMPARISONS.map(({ name, today, next }) => (
-            <div key={name} className="contents">
-              <span className="font-mono text-meta text-muted">{name}</span>
-              <span>{today}</span>
-              <span>{next}</span>
-            </div>
-          ))}
-        </div>
-      </BrandBand>
-    ))}
-  </div>
-);
-
-export const ComparedWithTodaysAtomsLight: TStory = {
-  name: "Compared with today's atoms — light",
-  parameters: { layout: 'padded' },
-  render: SideBySide,
-};
-
-export const ComparedWithTodaysAtomsDark: TStory = {
-  name: "Compared with today's atoms — dark",
-  parameters: { layout: 'padded' },
-  globals: { theme: 'dark' },
-  render: SideBySide,
 };
