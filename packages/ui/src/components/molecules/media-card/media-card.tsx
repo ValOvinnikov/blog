@@ -1,5 +1,4 @@
 import { type IWithClassName, type IWithDataTestId } from '@blog/config';
-import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { Tag } from '@blog/ui/components/atoms/tag';
 import { CardMeta } from '@blog/ui/components/molecules/card-meta';
 import {
@@ -10,6 +9,7 @@ import {
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { MediaCardFooter } from './components/footer/media-card-footer';
+import { MediaCardLink } from './components/link/media-card-link';
 import { MediaCardMedia } from './components/media/media-card-media';
 import { MediaCardTitle } from './components/title/media-card-title';
 import {
@@ -26,7 +26,7 @@ const MediaCardSlotParts = {
 
 const MediaCardParts = {
   ...MediaCardSlotParts,
-  Link: CardLink,
+  Link: MediaCardLink,
 } satisfies Record<string, ElementType>;
 
 export type TMediaCardProps = IWithClassName &

@@ -50,11 +50,25 @@ export const textLinkVariants = tv({
       false: { root: [] },
     },
     isStretched: {
-      true: { root: ['before:absolute before:inset-0'] },
+      true: { root: ['before:absolute before:inset-0 before:rounded-item'] },
       false: { root: [] },
     },
   },
   compoundVariants: [
+    {
+      hasHref: true,
+      isStretched: true,
+      class: {
+        root: [
+          'focus-visible:ring-0 focus-visible:ring-offset-0',
+          // Important, or the unlayered forced-colours rule redraws the ring around the clamped title.
+          'focus-visible:outline-none!',
+          'focus-visible:before:outline-2 focus-visible:before:-outline-offset-2',
+          'focus-visible:before:outline-(--ring)',
+          'forced-colors:focus-visible:before:outline-[Highlight]',
+        ],
+      },
+    },
     {
       appearance: 'prose',
       hasHref: true,

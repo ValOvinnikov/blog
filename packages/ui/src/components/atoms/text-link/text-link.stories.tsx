@@ -1,7 +1,10 @@
 import { ICONS, SIZE } from '@blog/config';
-import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { BRAND_BAND_LABELS, BrandBand } from '@blog/ui/testing/brand-bands';
+import {
+  BRAND_BAND_LABELS,
+  BrandBand,
+  focusLastLink,
+} from '@blog/ui/testing/brand-bands';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -134,24 +137,13 @@ export const Stretched: TStory = {
   ],
 };
 
+export const StretchedFocused: TStory = {
+  ...Stretched,
+  play: focusLastLink,
+};
+
 const COMPARISONS: Array<{ name: string; today: ReactNode; next: ReactNode }> =
-  [
-    {
-      name: 'stretched',
-      today: (
-        <div className="relative">
-          <CardLink href="#">{LABEL}</CardLink>
-        </div>
-      ),
-      next: (
-        <div className="relative">
-          <TextLink href="#" appearance="quiet" isStretched={true}>
-            {LABEL}
-          </TextLink>
-        </div>
-      ),
-    },
-  ];
+  [];
 
 const SideBySide = () => (
   <div className="flex flex-col gap-6">

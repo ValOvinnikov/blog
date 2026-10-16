@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_66 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_65 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -46,11 +46,6 @@ Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 
 Accessible caption for a media element.
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-
-### CardLink — `components/atoms/card-link/card-link.tsx`
-
-The one link that makes a whole item card its click target.
-Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' _(extends IWithClassName, IWithDataTestId, TCardLinkName)_
 
 ### Eyebrow — `components/atoms/eyebrow/eyebrow.tsx`
 
@@ -225,7 +220,7 @@ Slots:
 
 - **LogoTile.Logo** — The slot that sizes the tile's logo, by the asset's aspect ratio when one is given. Props: children: ReactNode · aspectRatio?: number _(extends IWithClassName, IWithDataTestId)_ · Variants: hasAspectRatio: (boolean)
 - **LogoTile.DarkLogo** — The slot for the logo asset made for dark backgrounds, shown in dark mode only. Props: _(extends TLogoTileLogoProps)_
-- **LogoTile.Link** — The one link that makes a whole item card its click target. Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' _(extends IWithClassName, IWithDataTestId, TCardLinkName)_
+- **LogoTile.Link** — A run of text that links somewhere, in the look its context calls for, and reads as plain text when there is nowhere to go. Props: href?: string · as?: TAnchorElementType · target?: '_blank' · title?: string · lang?: string · hrefLang?: string · appearance?: TTextLinkVariants['appearance'] · variant?: TTextLinkVariants['variant'] · currentStyle?: TTextLinkVariants['currentStyle'] · isCurrent?: boolean · isStretched?: boolean _(extends IWithClassName, IWithDataTestId, TTextLinkName)_ · Variants: appearance: prose|nav|quiet|accent · variant: plain|outlined · currentStyle: underline|weight · hasHref: (boolean) · isCurrent: (boolean) · isStretched: (boolean)
 
 ### MediaCard — `components/molecules/media-card/media-card.tsx`
 
@@ -239,7 +234,7 @@ Slots:
 - **MediaCard.Meta** — Compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Title** — The heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
 - **MediaCard.Footer** — The byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **MediaCard.Link** — The one link that makes a whole item card its click target. Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' _(extends IWithClassName, IWithDataTestId, TCardLinkName)_
+- **MediaCard.Link** — The one link that makes the whole card its click target. Props: href: string · as?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Panel — `components/molecules/panel/panel.tsx`
 

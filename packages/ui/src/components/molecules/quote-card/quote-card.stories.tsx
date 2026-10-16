@@ -1,6 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { CardLink } from '@blog/ui/components/atoms/card-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { Carousel } from '@blog/ui/components/organisms/carousel';
 import { BRAND_BAND_LABELS, BrandBand } from '@blog/ui/testing/brand-bands';
@@ -64,7 +64,9 @@ export const Interactive: TStory = {
           <Avatar src={AVATAR_SRC} alt="" name={NAME} />
         </QuoteCard.Avatar>
         <QuoteCard.Name>
-          <CardLink href="#">{NAME}</CardLink>
+          <TextLink href="#" appearance="quiet" isStretched={true}>
+            {NAME}
+          </TextLink>
         </QuoteCard.Name>
       </>
     ),
