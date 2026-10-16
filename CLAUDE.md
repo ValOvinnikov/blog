@@ -1242,9 +1242,9 @@ is all of:
   and the verification command, `pnpm verify` (not a scoped
   type-check/lint/test: a cloud session has no `gh` and cannot see a red check
   after it pushes, and every gate `pnpm verify` chains runs locally). The
-  CI-only tail — `build`, typegen drift, workflow linters, CodeQL, Dependency
-  Review, Document validation, Migrations, Vercel — stays a local session's to
-  watch after a cloud agent opens a PR;
+  CI-only tail — `build`, typegen drift, workflow linters, Dependency Review,
+  Document validation, Migrations, Vercel — stays a local session's to watch
+  after a cloud agent opens a PR;
 - **free of human gates** — no Sanity or Drizzle migration, no console config,
   no production-dataset touch;
 - **small** — roughly ≤5 files touched;
