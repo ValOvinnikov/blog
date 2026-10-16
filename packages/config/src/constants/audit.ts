@@ -4,15 +4,11 @@ export const AUDIT_TARGET_TYPE = {
   TENANT: 'TENANT',
   SITE_CONFIG: 'SITE_CONFIG',
   SETTINGS_FEATURES: 'SETTINGS_FEATURES',
+  RELEASE: 'RELEASE',
 } as const;
 
 export type TAuditTargetType = TValueOf<typeof AUDIT_TARGET_TYPE>;
 
-// Bare verbs, not dot-namespaced with the entity (e.g. not `TENANT_ARCHIVED`)
-// — the `targetType` column already carries which entity a row is about, so
-// the action stays reusable across target types instead of being repeated
-// once per entity it could ever apply to.
-//
 // A lifecycle run spanning two systems gets one action per system, reading
 // request-then-outcome: `DEPROVISION_REQUESTED` is the platform app
 // dispatching the workflow, `DEPROVISIONED` is the CLI reporting the archive
@@ -29,6 +25,10 @@ export const AUDIT_ACTION = {
   SETTINGS_UPDATED: 'SETTINGS_UPDATED',
   DELETED: 'DELETED',
   READER_DATA_PURGED: 'READER_DATA_PURGED',
+  RELEASE_STARTED: 'RELEASE_STARTED',
+  RELEASE_OVERRIDE: 'RELEASE_OVERRIDE',
+  CONTRAST_CHECK_STARTED: 'CONTRAST_CHECK_STARTED',
+  TENANT_MIGRATIONS_STARTED: 'TENANT_MIGRATIONS_STARTED',
 } as const;
 
 export type TAuditAction = TValueOf<typeof AUDIT_ACTION>;

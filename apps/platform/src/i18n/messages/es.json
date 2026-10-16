@@ -170,7 +170,8 @@
     "TENANT_PROVISIONING": "Aprovisionamiento del cliente",
     "RECHECK_TENANT_OWNERS": "Revisión de propietarios",
     "DOMAIN_VERIFICATION": "Verificación del dominio",
-    "SITE_CONFIG_REVALIDATION": "Revalidación de la configuración del sitio"
+    "SITE_CONFIG_REVALIDATION": "Revalidación de la configuración del sitio",
+    "CONTRAST_CHECK": "Comprobación de contraste"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Error de validación del esquema",
@@ -178,7 +179,8 @@
     "OWNER_CHECK_STALLED": "Comprobación del propietario detenida",
     "OWNER_CHECK_AMBIGUOUS": "Comprobación del propietario ambigua",
     "DOMAIN_NOT_ADDED": "Dominio no añadido",
-    "REVALIDATION_FAILED": "Revalidación fallida"
+    "REVALIDATION_FAILED": "Revalidación fallida",
+    "CONTRAST_REGRESSION": "Regresión de contraste"
   },
   "ownerHomePage": {
     "description": "Su sitio de un vistazo. Todo lo que aparece aquí está en vivo.",
@@ -263,7 +265,11 @@
       "PROVISIONING_FAILED": "Aprovisionamiento fallido",
       "SETTINGS_UPDATED": "Configuración actualizada",
       "DELETED": "Cliente eliminado",
-      "READER_DATA_PURGED": "Datos de lectores purgados"
+      "READER_DATA_PURGED": "Datos de lectores purgados",
+      "RELEASE_STARTED": "Publicación iniciada",
+      "RELEASE_OVERRIDE": "Control de publicación omitido",
+      "CONTRAST_CHECK_STARTED": "Comprobación de contraste iniciada",
+      "TENANT_MIGRATIONS_STARTED": "Migraciones del cliente iniciadas"
     }
   },
   "tenantDomainPage": {

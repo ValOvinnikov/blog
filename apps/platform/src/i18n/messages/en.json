@@ -170,7 +170,8 @@
     "TENANT_PROVISIONING": "Tenant provisioning",
     "RECHECK_TENANT_OWNERS": "Owner recheck",
     "DOMAIN_VERIFICATION": "Domain verification",
-    "SITE_CONFIG_REVALIDATION": "Site config revalidation"
+    "SITE_CONFIG_REVALIDATION": "Site config revalidation",
+    "CONTRAST_CHECK": "Contrast check"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Schema validation error",
@@ -178,7 +179,8 @@
     "OWNER_CHECK_STALLED": "Owner check stalled",
     "OWNER_CHECK_AMBIGUOUS": "Owner check ambiguous",
     "DOMAIN_NOT_ADDED": "Domain not added",
-    "REVALIDATION_FAILED": "Revalidation failed"
+    "REVALIDATION_FAILED": "Revalidation failed",
+    "CONTRAST_REGRESSION": "Contrast regression"
   },
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",
@@ -263,7 +265,11 @@
       "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
       "DELETED": "Tenant deleted",
-      "READER_DATA_PURGED": "Reader data purged"
+      "READER_DATA_PURGED": "Reader data purged",
+      "RELEASE_STARTED": "Release started",
+      "RELEASE_OVERRIDE": "Release gate overridden",
+      "CONTRAST_CHECK_STARTED": "Contrast check started",
+      "TENANT_MIGRATIONS_STARTED": "Tenant migrations started"
     }
   },
   "tenantDomainPage": {
