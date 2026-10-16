@@ -9,6 +9,7 @@ type TNavLinkOwnProps = {
   className?: string;
   isActive?: TNavLinkVariants['isActive'];
   variant?: TNavLinkVariants['variant'];
+  currentStyle?: TNavLinkVariants['currentStyle'];
   hasLabel?: boolean;
 } & IWithIcon &
   IWithDataTestId;
@@ -20,6 +21,7 @@ export type TNavLinkProps<C extends ElementType = typeof A_AS_CONST> =
 export const NavLink = <C extends ElementType = typeof A_AS_CONST>({
   isActive = false,
   variant = 'plain',
+  currentStyle = 'underline',
   className,
   dataTestId,
   as,
@@ -29,7 +31,11 @@ export const NavLink = <C extends ElementType = typeof A_AS_CONST>({
   ...rest
 }: TNavLinkProps<C>) => {
   const Component = as ?? A_AS_CONST;
-  const { root, label } = navLinkVariants({ isActive, variant });
+  const { root, label } = navLinkVariants({
+    isActive,
+    variant,
+    currentStyle,
+  });
   const title =
     !hasLabel && typeof children === 'string' ? children : undefined;
 

@@ -17,6 +17,10 @@ const meta: Meta<typeof NavLink> = {
       control: 'select',
       options: ['plain', 'outlined'],
     },
+    currentStyle: {
+      control: 'select',
+      options: ['underline', 'weight'],
+    },
   },
 };
 export default meta;
@@ -27,6 +31,10 @@ export const Default: TStory = {};
 
 export const Active: TStory = {
   args: { isActive: true, children: 'Active link' },
+};
+
+export const ActiveWeight: TStory = {
+  args: { isActive: true, currentStyle: 'weight', children: 'Active link' },
 };
 
 export const Inactive: TStory = {

@@ -66,6 +66,7 @@ export const PrimaryNavigation = ({
         as={linkAs}
         href={href}
         isActive={isActive}
+        currentStyle="weight"
         target={target}
         className={itemClassName}
       >
