@@ -131,7 +131,7 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
         within(desktop).queryByRole('link', { name: 'Nederlands' }),
       ).not.toBeInTheDocument();
       expect(dutch).toHaveTextContent('NL');
-      expect(dutch).toHaveAttribute('aria-current', 'true');
+      expect(dutch).toHaveAttribute('aria-current', 'page');
       expect(dutch).toHaveAttribute('lang', 'nl');
       expect(dutch).not.toHaveAttribute('href');
     });
@@ -165,10 +165,10 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
 
       expect(
         screen.getAllByRole('listitem').map((item) => item.textContent),
-      ).toEqual(['EN', 'NLNederlands', 'FR']);
+      ).toEqual(['ENEnglish', 'NLNederlands', 'FRFrançais']);
       expect(
         screen.getAllByRole('link').map((link) => link.textContent),
-      ).toEqual(['EN', 'FR']);
+      ).toEqual(['ENEnglish', 'FRFrançais']);
     });
   });
 });

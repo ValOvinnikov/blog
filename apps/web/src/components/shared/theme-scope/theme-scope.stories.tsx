@@ -7,7 +7,7 @@ import {
   type TThemeTokens,
 } from '@blog/config';
 import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { Header } from '@blog/ui/components/organisms/header';
@@ -47,10 +47,12 @@ const meta = {
           My Blog
         </Header.Brand>
         <Header.Nav>
-          <NavLink href="/" isActive={true}>
+          <TextLink appearance="nav" href="/" isCurrent={true}>
             Home
-          </NavLink>
-          <NavLink href="/blog">Blog</NavLink>
+          </TextLink>
+          <TextLink appearance="nav" href="/blog">
+            Blog
+          </TextLink>
         </Header.Nav>
         <Header.Actions>
           <ThemeToggle isDark={false} onToggle={() => {}} />

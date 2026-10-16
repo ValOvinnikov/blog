@@ -1,7 +1,7 @@
 import { ICONS, routes, SIZE } from '@blog/config';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { Footer } from '@blog/ui/components/organisms/footer';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
@@ -56,16 +56,15 @@ export const SiteFooter = async () => {
         )}
         <CookieSettingsButton />
         {hasRssFeed && (
-          <NavLink
+          <TextLink
+            appearance="nav"
             as={SmartLink}
             href={routes.rssFeed()}
-            icon={
-              <Icon name={ICONS.RSS} size={SIZE.SM} dataTestId="rss-icon" />
-            }
-            hasLabel={false}
+            ariaLabel={t('feedLinkLabel')}
+            title={t('feedLinkLabel')}
           >
-            {t('feedLinkLabel')}
-          </NavLink>
+            <Icon name={ICONS.RSS} size={SIZE.SM} dataTestId="rss-icon" />
+          </TextLink>
         )}
       </Footer.Nav>
     </Footer>
