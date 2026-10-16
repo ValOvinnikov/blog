@@ -110,7 +110,7 @@ The local `Parts` const is the assembled export — `Object.assign(Root, Parts)`
 is the shape `scripts/gen-ui-index.mjs` follows to list slots. `children` and
 the resolver take the same map, or only the subset the root positions:
 `MediaCard` resolves `MediaCardSlotParts` and exports `Link` beside it
-(`{ ...MediaCardSlotParts, Link: CardLink }`), because the consumer nests the
+(`{ ...MediaCardSlotParts, Link: MediaCardLink }`), because the consumer nests the
 link inside `MediaCard.Title`.
 
 ## Rules

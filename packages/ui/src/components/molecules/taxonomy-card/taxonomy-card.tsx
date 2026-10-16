@@ -4,8 +4,8 @@ import {
   type IWithDataTestId,
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
-import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { Heading } from '@blog/ui/components/atoms/heading';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -63,14 +63,19 @@ const TaxonomyCardRoot = ({
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
       <Heading level={headingLevel} visual="card">
-        <CardLink href={href} linkAs={LinkComponent}>
+        <TextLink
+          href={href}
+          as={LinkComponent}
+          appearance="quiet"
+          isStretched={true}
+        >
           <span aria-hidden="true">{title}</span>
           <span className={s.accessibleName()}>
             {title}
             {accessibleNameSeparator}
             {postCountLabel}
           </span>
-        </CardLink>
+        </TextLink>
       </Heading>
       {description && <p className={s.description()}>{description}</p>}
       {posts}

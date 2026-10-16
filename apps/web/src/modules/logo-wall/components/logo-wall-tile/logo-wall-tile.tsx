@@ -54,7 +54,7 @@ export const LogoWallTile = ({ logo }: ILogoWallTileProps) => {
           href={link.href}
           target={link.target}
           ariaLabel={link.ariaLabel ?? name}
-          linkAs={SmartLink}
+          as={SmartLink}
         />
       )}
     </LogoTile>
