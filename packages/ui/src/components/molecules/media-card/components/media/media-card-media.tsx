@@ -24,17 +24,12 @@ export const MediaCardMedia = ({
   className,
   dataTestId,
   children,
-}: TMediaCardMediaProps) => (
-  <div
-    className={mediaCardMediaVariants({
-      isLead,
-      shape,
-      align,
-      iconPanel,
-      class: className,
-    })}
-    data-testid={dataTestId}
-  >
-    {children}
-  </div>
-);
+}: TMediaCardMediaProps) => {
+  const s = mediaCardMediaVariants({ isLead, shape, align, iconPanel });
+
+  return (
+    <div className={s.base({ class: className })} data-testid={dataTestId}>
+      {iconPanel ? <div className={s.tile()}>{children}</div> : children}
+    </div>
+  );
+};
