@@ -9,7 +9,7 @@ export const logoTileVariants = tv({
       'px-card-x py-card-y',
     ],
     lightLogo: ['contents dark:hidden'],
-    link: ['absolute inset-0 outline-none'],
+    link: ['absolute inset-0 before:rounded-media'],
   },
   variants: {
     isInteractive: {
@@ -17,8 +17,6 @@ export const logoTileVariants = tv({
         root: [
           INTERACTIVE_ITEM_CARD,
           'hover:border-border-strong dark:hover:border-border-emphasis',
-          'has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-primary',
-          'has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-ambient',
         ],
       },
       false: {},

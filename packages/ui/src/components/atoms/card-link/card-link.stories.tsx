@@ -1,3 +1,4 @@
+import { focusLastLink } from '@blog/ui/testing/brand-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { CardLink } from './card-link';
@@ -25,4 +26,9 @@ export const Default: TStory = {
 
 export const WithAriaLabel: TStory = {
   args: { href: '#', ariaLabel: 'Visit Acme', children: 'Acme' },
+};
+
+export const Focused: TStory = {
+  args: { href: '#', children: 'Hello World' },
+  play: focusLastLink,
 };

@@ -363,7 +363,7 @@ export const IconMedia: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href={featureHref}>{featureTitle}</a>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
         </MediaCard.Title>
       </>
     ),
@@ -380,7 +380,7 @@ export const IconPanelMedia: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.LG} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href={featureHref}>{featureTitle}</a>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
         </MediaCard.Title>
       </>
     ),
@@ -476,7 +476,7 @@ export const CenterAligned: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href={featureHref}>{featureTitle}</a>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
         </MediaCard.Title>
       </>
     ),
