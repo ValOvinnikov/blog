@@ -26,7 +26,7 @@ export const navLinkVariants = tv({
       plain: { root: [] },
       outlined: {
         root: [
-          'size-9 shrink-0 justify-center rounded-full border border-current',
+          'size-9 shrink-0 justify-center rounded-full border border-current pb-0',
         ],
       },
     },
