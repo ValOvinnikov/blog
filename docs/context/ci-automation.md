@@ -114,9 +114,13 @@ anything through; it only stops a draft from paying for minutes it cannot use.
 PR is marked ready.
 
 **Path outputs.** The `Changes` job checks out full history and diffs the PR
-head against its base (merge-base, triple-dot) with no install, setting three
+head against its base (merge-base, triple-dot) with no install, setting four
 `true`/`false` outputs:
 
+- `full` — anything in `turbo.json`'s `globalDependencies` (`configs/**`,
+  `.github/actions/setup/**`, `.nvmrc`, `pnpm-lock.yaml`, `turbo.json`) or a
+  root manifest (`package.json`, `pnpm-workspace.yaml`). Type-check, Lint and
+  Test drop `--affected` when it is set (see "Affected-only runs" below).
 - `studio` — `packages/studio/**`, `packages/config/**`, `packages/utils/**` or
   `pnpm-lock.yaml`: @blog/studio's turbo-affected set written out as paths. It
   is wider than `packages/studio/**` on purpose: schemas and migrations import
@@ -130,6 +134,36 @@ A docs-only PR sets none. With no pull-request base (a tag or a
 `workflow_call`) every output is set, so a gated check runs rather than skips
 and reads as passed. `Changes` is in `CI`'s `needs`, so a failure there fails
 the gate.
+
+**Affected-only runs.** Type-check, Lint and Test run
+`turbo run <task> --affected` with `TURBO_SCM_BASE` set to the PR's base SHA,
+so a PR that changes one package runs that package and its dependents (a
+`@blog/ui` change runs `ui`, `web` and `platform`; a `docs/**` change runs
+nothing). Three things keep that from running too little:
+
+- `turbo.json` declares `globalDependencies`, and turbo marks every package
+  affected when any of them changes, so a root config, setup-action, `.nvmrc`
+  or lockfile change runs every task. They also bust every task's cache — the
+  price of one rule instead of per-task `inputs` that each had to remember
+  which preset they read.
+- `full` from `Changes` drops `--affected` for the same paths independently,
+  so a root change runs the whole repo even if turbo's own detection misses
+  it, and a run with no PR base does the same.
+- The three jobs check out with `fetch-depth: 0`. Turbo needs every commit
+  from base to head; on a shallow clone it treats every package as changed,
+  which runs more, never less.
+
+`futureFlags.affectedUsingTaskInputs` was trialled and reverted: a README-only
+change inside a package still selected `build` (the default inputs include
+it), and the flag narrowed `lint` to the changed package alone, dropping its
+dependents, which the affected set is meant to include.
+
+**Build restores `apps/*/.next/cache`** through `actions/cache`, keyed on the
+lockfile and falling back to the newest entry. Turbo's `build` outputs exclude
+`.next/cache`, so without it a turbo cache miss compiles both apps from
+nothing. On `pull_request` a cache saves to the PR's ref, so later pushes to
+the same PR reuse it and a new PR starts cold.
+
 A pull request that edits `.github/**` can weaken the checks in `ci.yml`
 itself — drop a step, loosen an `if:`, or make a job exit 0 — and still go
 green, because the ruleset requires no approval. Workflow security is the one
@@ -197,7 +231,7 @@ revisited that call and declared the type instead, since the job being
 advisory doesn't make an avoidable warning worth carrying indefinitely.
 
 **The Test job caps turbo at two suites at a time** (#3364):
-`pnpm turbo run test --concurrency=2`, in the workflow only — the root
+`pnpm turbo run test --affected --concurrency=2`, in the workflow only — the root
 `pnpm test` script and `turbo.json` keep turbo's default of 10, so local runs
 are unchanged. At the default, every workspace's vitest spawns its own worker
 pool at once and the runner is oversubscribed: the symptom is a hook or test
@@ -562,6 +596,11 @@ skips regardless of affectedness. Turbo marks every dependent affected by any
 can neither reach the output nor break the build. A type-only file alongside
 any other change still builds. Allowlist mode needs no such carve-out:
 `packages/config` is not a trigger path, so it skips by construction.
+
+Affected mode also inherits `turbo.json`'s `globalDependencies`: a change to
+`configs/**`, the setup action, `.nvmrc`, the lockfile or `turbo.json` marks
+`@blog/ui` affected and builds `ui-library`, a Dependabot lockfile bump
+included.
 
 `scripts/vercel-ignore-affected.test.sh` pins all of this (see the Hooks row
 above); the script has no failing signal of its own, so a regression here is
