@@ -29,6 +29,10 @@ updates:
       # run. It's a deep transitive (build-tooling) dep; ignore it until an
       # upstream fix ships. Tracked in the transitive-overrides work (#220).
       - dependency-name: "elliptic"
+      # apps/platform's jsdom-commonjs alias pins jsdom 26.1 for its server-side
+      # SVG sanitiser: every later release pulls in an ESM-only dependency that
+      # Vercel's runtime refuses to require(). Never bump it.
+      - dependency-name: "jsdom-commonjs"
     open-pull-requests-limit: 5
     labels: ["tooling"]
 

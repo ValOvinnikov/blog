@@ -43,7 +43,14 @@ export const useFormSubmission = <TValues, TResult extends { ok: boolean }>({
   const handleSubmit = () =>
     new Promise<boolean>((resolve) => {
       startTransition(async () => {
-        const result = await onSubmit(values);
+        let result: TResult;
+        try {
+          result = await onSubmit(values);
+        } catch {
+          setStatus(FORM_STATUS.ERROR);
+          resolve(false);
+          return;
+        }
         setStatus(result.ok ? FORM_STATUS.SUCCESS : FORM_STATUS.ERROR);
         if (result.ok) {
           onSuccess?.(values, result);
