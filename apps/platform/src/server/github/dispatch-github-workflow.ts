@@ -1,8 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
-import { parseGitHubRepo } from './parse-github-repo';
+import { readGitHubCredentials } from './read-github-credentials';
 
 const DEFAULT_WORKFLOW_REF = 'main';
 const DISPATCH_TIMEOUT_MS = 5000;
@@ -29,17 +28,18 @@ export const dispatchGitHubWorkflow = async ({
   logEvents,
   logContext,
 }: TDispatchGitHubWorkflowInput): Promise<boolean> => {
-  const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
-  const repo = parseGitHubRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
+  const credentials = readGitHubCredentials();
 
-  if (!token || !repo) {
+  if (!credentials) {
     logger.error(logEvents.skipped, logContext);
     return false;
   }
 
+  const { token, owner, repo } = credentials;
+
   try {
     const response = await fetch(
-      `https://api.github.com/repos/${repo.owner}/${repo.repo}/actions/workflows/${workflowFile}/dispatches`,
+      `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflowFile}/dispatches`,
       {
         method: 'POST',
         headers: {
