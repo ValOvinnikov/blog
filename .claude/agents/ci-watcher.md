@@ -78,12 +78,12 @@ so never guess which PR one maps to.
 
 3. **All green — check names before declaring victory.** Judge by names, not
    the total. Must be present:
-   - the 10 required status checks — Lint, Test, Type-check, Build, Typegen,
-     Migrations, Knip, Zizmor, Actionlint, Shellcheck + guard tests
+   - the 8 required status checks — Lint, Test, Type-check, Build, Typegen,
+     Migrations, Knip, Workflow security
      (`docs/context/ci-automation.md` "Required status checks on `main`").
 
    A missing name means the suite silently under-triggered. The total varies,
-   roughly 19–24: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
+   roughly 17–22: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
    appear only on the run from when the PR was opened or reopened
    (`branch-created` as `skipping`) and drop off after the next push, and
    `Vercel – *` checks can register after the watch returns. Report the
