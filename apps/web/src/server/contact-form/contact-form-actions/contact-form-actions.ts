@@ -1,6 +1,11 @@
 'use server';
 
-import { CAPABILITY, type TMaybeUndefined } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  CAPABILITY,
+  type TActionResult,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { queries, type schema } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sendContactNotification } from '@web/server/contact-form/contact-notification-send/contact-notification-send';
@@ -22,15 +27,16 @@ export type TContactMessageInput = TContactMessageFields & {
   sourcePath: string;
 };
 
-export type TContactRefusal = 'blocked' | 'server-error';
+export type TContactRefusal =
+  typeof ACTION_OUTCOME.BLOCKED | typeof ACTION_OUTCOME.SERVER_ERROR;
 
-export type TSubmitContactResult =
-  | { outcome: 'sent' }
-  | { outcome: 'invalid'; invalidFields: TContactField[] }
-  | { outcome: TContactRefusal };
+export type TSubmitContactResult = TActionResult<
+  TContactRefusal,
+  TContactField
+>;
 
-const BLOCKED = { outcome: 'blocked' } as const;
-const SERVER_ERROR = { outcome: 'server-error' } as const;
+const BLOCKED = { outcome: ACTION_OUTCOME.BLOCKED } as const;
+const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
 
 const { isBotOrUnverified, isRateLimited } = createPublicWriteGuard({
   name: 'contact-form-submit',
@@ -93,7 +99,10 @@ export const submitContactMessage = async (
     message: asText(input.message),
   });
   if (!validation.ok) {
-    return { outcome: 'invalid', invalidFields: validation.invalidFields };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      invalidFields: validation.invalidFields,
+    };
   }
 
   const lead = await storeLead({
@@ -112,5 +121,5 @@ export const submitContactMessage = async (
     });
   }
 
-  return { outcome: 'sent' };
+  return { outcome: ACTION_OUTCOME.SUCCESS };
 };

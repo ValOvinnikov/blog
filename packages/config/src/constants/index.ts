@@ -1,3 +1,4 @@
+export * from './action-outcome';
 export * from './alert';
 export * from './audit';
 export * from './aside';

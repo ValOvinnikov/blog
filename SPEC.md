@@ -1343,7 +1343,7 @@ rate limit (5 per 10 minutes per address), the tenant and capability, and the
 fields (name 1–100 characters with line breaks folded, a valid email, message
 10–5,000), then stores a `leads` row and emails the recipient from
 `getContactRecipient` with Reply-To set to the visitor. A lead whose email
-fails still answers `sent`, and the failure is logged once. The visitor is never
+fails still answers `SUCCESS`, and the failure is logged once. The visitor is never
 emailed.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
@@ -2000,6 +2000,17 @@ BotID's `checkBotId()` (set up by `withBotId` in `next.config.ts` and
 Both checks fail closed: a BotID error or an unreachable store refuses the
 write and logs one warn under the action's `*_blocked` event. The contact form
 adds a honeypot field between the two.
+
+**Server-action results.** A server action returns a `TActionResult` from
+`@blog/config`, discriminated on `outcome`, whose values come from the
+UPPERCASE `ACTION_OUTCOME` const (`SUCCESS`, `INVALID`, `BLOCKED`,
+`RATE_LIMITED`, `UNAVAILABLE`, `SERVER_ERROR`). Every action can answer
+`SUCCESS`; one given a field union can answer `INVALID` with `invalidFields`;
+and each action names the refusals it may answer, so its form maps exactly
+those to copy (`satisfies Record<TRefusal, …>`). A `'use server'` file may
+export only async functions, so outcome objects and their vocabulary live in
+`@blog/config`, never beside the action. Form state on the client is the
+separate `FORM_STATUS` (`IDLE`, `SUBMITTING`, `SUCCESS`, `ERROR`).
 
 ## 8. Migrations & live data (core contract)
 

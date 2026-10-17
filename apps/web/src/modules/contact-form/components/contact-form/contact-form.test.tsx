@@ -1,3 +1,4 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
@@ -26,10 +27,15 @@ const PATHNAME = `/${faker.lorem.slug()}`;
 const setup = customRender(ContactForm, { successMessage: SUCCESS_MESSAGE });
 
 const fillAndSend = async (user: UserEvent) => {
-  await user.type(screen.getByRole('textbox', { name: 'Name' }), NAME);
-  await user.type(screen.getByRole('textbox', { name: 'Email' }), EMAIL);
-  await user.type(screen.getByRole('textbox', { name: 'Message' }), MESSAGE);
-  await user.click(screen.getByRole('button', { name: 'Send message' }));
+  const nameField = screen.getByRole('textbox', { name: 'Name' });
+  const emailField = screen.getByRole('textbox', { name: 'Email' });
+  const messageField = screen.getByRole('textbox', { name: 'Message' });
+  const sendButton = screen.getByRole('button', { name: 'Send message' });
+
+  await user.type(nameField, NAME);
+  await user.type(emailField, EMAIL);
+  await user.type(messageField, MESSAGE);
+  await user.click(sendButton);
 };
 
 describe(`<${ContactForm.name}/>`, () => {
@@ -41,7 +47,9 @@ describe(`<${ContactForm.name}/>`, () => {
   });
 
   it('sends the typed message with the page it was sent from', async () => {
-    submitContactMessageMock.mockResolvedValue({ outcome: 'sent' });
+    submitContactMessageMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     setup();
 
     await fillAndSend(user);
@@ -56,85 +64,95 @@ describe(`<${ContactForm.name}/>`, () => {
   });
 
   it('replaces the form with the success message once sent', async () => {
-    submitContactMessageMock.mockResolvedValue({ outcome: 'sent' });
+    submitContactMessageMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     setup();
 
     await fillAndSend(user);
 
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      SUCCESS_MESSAGE,
-    );
-    expect(screen.getByRole('heading', { name: 'Message sent' })).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Send message' }),
-    ).not.toBeInTheDocument();
+    const status = await screen.findByRole('status');
+    const heading = screen.getByRole('heading', { name: 'Message sent' });
+    const sendButton = screen.queryByRole('button', { name: 'Send message' });
+
+    expect(status).toHaveTextContent(SUCCESS_MESSAGE);
+    expect(heading).toBeVisible();
+    expect(sendButton).not.toBeInTheDocument();
   });
 
   it('shows the error and keeps what the visitor typed when the send fails', async () => {
-    submitContactMessageMock.mockResolvedValue({ outcome: 'server-error' });
+    submitContactMessageMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     setup();
 
     await fillAndSend(user);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      "Your message couldn't be sent.",
-    );
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(NAME);
-    expect(screen.getByRole('textbox', { name: 'Message' })).toHaveValue(
-      MESSAGE,
-    );
+    const alert = await screen.findByRole('alert');
+    const nameField = screen.getByRole('textbox', { name: 'Name' });
+    const messageField = screen.getByRole('textbox', { name: 'Message' });
+
+    expect(alert).toHaveTextContent("Your message couldn't be sent.");
+    expect(nameField).toHaveValue(NAME);
+    expect(messageField).toHaveValue(MESSAGE);
   });
 
-  it('shows the rate-limit message and keeps the input when the send is blocked', async () => {
-    submitContactMessageMock.mockResolvedValue({ outcome: 'blocked' });
+  it('shows the rate-limit message and keeps the input when blocked', async () => {
+    submitContactMessageMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.BLOCKED,
+    });
     setup();
 
     await fillAndSend(user);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Too many attempts.',
-    );
-    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue(EMAIL);
+    const alert = await screen.findByRole('alert');
+    const emailField = screen.getByRole('textbox', { name: 'Email' });
+
+    expect(alert).toHaveTextContent('Too many attempts.');
+    expect(emailField).toHaveValue(EMAIL);
   });
 
   it('names each invalid field without sending', async () => {
     setup();
+    const nameField = screen.getByRole('textbox', { name: 'Name' });
+    const emailField = screen.getByRole('textbox', { name: 'Email' });
+    const messageField = screen.getByRole('textbox', { name: 'Message' });
+    const sendButton = screen.getByRole('button', { name: 'Send message' });
 
-    await user.type(
-      screen.getByRole('textbox', { name: 'Message' }),
-      faker.string.alpha(9),
+    await user.type(messageField, faker.string.alpha(9));
+    await user.click(sendButton);
+
+    expect(nameField).toHaveAccessibleDescription(
+      'Enter your name, up to 100 characters.',
     );
-    await user.click(screen.getByRole('button', { name: 'Send message' }));
-
-    expect(
-      screen.getByRole('textbox', { name: 'Name' }),
-    ).toHaveAccessibleDescription('Enter your name, up to 100 characters.');
-    expect(
-      screen.getByRole('textbox', { name: 'Email' }),
-    ).toHaveAccessibleDescription('Enter a valid email address.');
-    expect(
-      screen.getByRole('textbox', { name: 'Message' }),
-    ).toHaveAccessibleDescription('Write a message of 10 to 5,000 characters.');
+    expect(emailField).toHaveAccessibleDescription(
+      'Enter a valid email address.',
+    );
+    expect(messageField).toHaveAccessibleDescription(
+      'Write a message of 10 to 5,000 characters.',
+    );
     expect(submitContactMessageMock).not.toHaveBeenCalled();
   });
 
   it('shows the field errors the server returns', async () => {
     submitContactMessageMock.mockResolvedValue({
-      outcome: 'invalid',
+      outcome: ACTION_OUTCOME.INVALID,
       invalidFields: ['email'],
     });
     setup();
 
     await fillAndSend(user);
 
-    expect(
-      await screen.findByText('Enter a valid email address.'),
-    ).toBeVisible();
+    const emailError = await screen.findByText('Enter a valid email address.');
+
+    expect(emailError).toBeVisible();
   });
 
   it('renders the privacy note under the send button', () => {
     setup({ privacyNote: PRIVACY_NOTE });
 
-    expect(screen.getByText(PRIVACY_NOTE)).toBeVisible();
+    const privacyNote = screen.getByText(PRIVACY_NOTE);
+
+    expect(privacyNote).toBeVisible();
   });
 });
