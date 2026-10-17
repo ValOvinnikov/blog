@@ -1,19 +1,22 @@
-import { FORM_STATUSES, CONTENT_ALIGNMENT, ICONS, SIZE } from '@blog/config';
+import { FORM_STATUS, CONTENT_ALIGNMENT, ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { objectKeys } from '@blog/utils/primitives';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
+faker.seed(123);
 
 const trustCues = [
   {
     icon: <Icon name={ICONS.SHIELD_CHECK} size={SIZE.SM} />,
-    label: 'No spam',
+    label: faker.lorem.words(2),
   },
   {
     icon: <Icon name={ICONS.CLOSE} size={SIZE.SM} />,
-    label: 'Unsubscribe in one line',
+    label: faker.lorem.words(3),
   },
 ];
 
@@ -29,7 +32,7 @@ const meta = {
     },
     status: {
       control: 'select',
-      options: FORM_STATUSES,
+      options: Object.values(FORM_STATUS),
     },
     headingLevel: {
       control: 'select',
@@ -40,15 +43,14 @@ const meta = {
     email: '',
     onChange: () => {},
     onSubmit: () => {},
-    status: 'idle',
-    heading: '$ subscribe --to weekly',
+    status: FORM_STATUS.IDLE,
+    heading: faker.lorem.words(3),
     headingId: 'newsletter-signup-full-heading',
-    supportingText:
-      'New posts on rendering, type systems and the occasional OKLCH rabbit hole. No spam; unsubscribe in one line.',
-    submitLabel: 'subscribe ↵',
-    emailAriaLabel: 'Email address',
-    placeholder: 'you@domain.dev',
-    successMessage: 'Almost there — check your inbox to confirm.',
+    supportingText: faker.lorem.sentences(2),
+    submitLabel: faker.lorem.word(),
+    emailAriaLabel: faker.lorem.words(2),
+    placeholder: faker.internet.email(),
+    successMessage: faker.lorem.sentence(),
   },
 } satisfies Meta<typeof NewsletterSignup.Full>;
 
@@ -58,18 +60,18 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Submitting: TStory = {
-  args: { status: 'submitting', email: 'reader@example.dev' },
+  args: { status: FORM_STATUS.SUBMITTING, email: faker.internet.email() },
 };
 
 export const Success: TStory = {
-  args: { status: 'success' },
+  args: { status: FORM_STATUS.SUCCESS },
 };
 
 export const Error: TStory = {
   args: {
-    status: 'error',
-    email: 'not-an-email',
-    errorMessage: 'That email is already subscribed.',
+    status: FORM_STATUS.ERROR,
+    email: faker.lorem.word(),
+    errorMessage: faker.lorem.sentence(),
     errorMessageId: 'newsletter-signup-full-error',
   },
 };

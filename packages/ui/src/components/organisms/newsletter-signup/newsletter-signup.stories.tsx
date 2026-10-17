@@ -1,6 +1,10 @@
+import { FORM_STATUS } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { NewsletterSignup } from './newsletter-signup';
+
+faker.seed(123);
 
 const meta = {
   title: 'Organisms/NewsletterSignup',
@@ -24,23 +28,23 @@ export const Overview: TStory = {
         email=""
         onChange={() => {}}
         onSubmit={() => {}}
-        status="idle"
-        heading="$ subscribe --to weekly"
-        supportingText="New posts on rendering, type systems and the occasional OKLCH rabbit hole. No spam; unsubscribe in one line."
-        submitLabel="subscribe ↵"
-        emailAriaLabel="Email address"
-        placeholder="you@domain.dev"
+        status={FORM_STATUS.IDLE}
+        heading={faker.lorem.words(3)}
+        supportingText={faker.lorem.sentences(2)}
+        submitLabel={faker.lorem.word()}
+        emailAriaLabel={faker.lorem.words(2)}
+        placeholder={faker.internet.email()}
       />
       <NewsletterSignup.Compact
         email=""
         onChange={() => {}}
         onSubmit={() => {}}
-        status="idle"
-        heading="subscribe --email"
+        status={FORM_STATUS.IDLE}
+        heading={faker.lorem.words(3)}
         prefix={<span aria-hidden="true">$</span>}
-        submitLabel="subscribe ↵"
-        emailAriaLabel="Email address"
-        placeholder="you@domain.dev"
+        submitLabel={faker.lorem.word()}
+        emailAriaLabel={faker.lorem.words(2)}
+        placeholder={faker.internet.email()}
       />
     </div>
   ),

@@ -5,6 +5,7 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   type TFormStatus,
+  FORM_STATUS,
 } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Heading } from '@blog/ui/components/atoms/heading';
@@ -64,7 +65,7 @@ export const NewsletterSignupFull = ({
   className,
   dataTestId,
 }: TNewsletterSignupFullProps) => {
-  const isSuccess = status === 'success';
+  const isSuccess = status === FORM_STATUS.SUCCESS;
   const hasTrustCues = trustCues !== undefined && trustCues.length > 0;
   const hasPitch = Boolean(heading || supportingText || hasTrustCues);
   const s = newsletterSignupVariants({ variant: 'full', align, hasPitch });

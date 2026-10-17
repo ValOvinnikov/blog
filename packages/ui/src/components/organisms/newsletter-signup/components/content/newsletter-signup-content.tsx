@@ -1,4 +1,4 @@
-import { ALERT_TYPE, type TFormStatus } from '@blog/config';
+import { ALERT_TYPE, type TFormStatus, FORM_STATUS } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Spinner } from '@blog/ui/components/atoms/spinner';
@@ -37,8 +37,8 @@ export const NewsletterSignupContent = ({
   inputPrompt,
   variant,
 }: TNewsletterSignupContentProps) => {
-  const isSubmitting = status === 'submitting';
-  const isError = status === 'error';
+  const isSubmitting = status === FORM_STATUS.SUBMITTING;
+  const isError = status === FORM_STATUS.ERROR;
   const s = newsletterSignupVariants({ variant });
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {

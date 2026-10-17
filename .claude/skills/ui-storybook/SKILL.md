@@ -164,9 +164,9 @@ argTypes: {
 },
 ```
 
-Name these consts in the plural (`HEADING_LEVELS`, `FORM_STATUSES`): they are
-lists passed straight to `options`, unlike the singular dictionary consts
-reached through `Object.values`. Where no such const exists, a literal array
+Name these consts in the plural (`HEADING_LEVELS`): they are lists passed
+straight to `options`, unlike the singular dictionary consts reached through
+`Object.values` (`options: Object.values(FORM_STATUS)`). Where no such const exists, a literal array
 is the fallback — matching the declared type exactly (`THeadingLevel` takes
 numbers, not `['1', '2', …]`). Never derive it with `objectKeys(headingTags)`:
 that record is keyed by numbers, `objectKeys` types the result as
