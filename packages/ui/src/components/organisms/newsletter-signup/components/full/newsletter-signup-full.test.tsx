@@ -35,16 +35,22 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     const supportingText = faker.lorem.sentence(8);
     setup({ heading, supportingText });
 
-    expect(screen.getByRole('heading', { name: heading })).toBeVisible();
-    expect(screen.getByText(supportingText)).toBeVisible();
+    const headingElement = screen.getByRole('heading', { name: heading });
+    const supportingTextElement = screen.getByText(supportingText);
+
+    expect(headingElement).toBeVisible();
+    expect(supportingTextElement).toBeVisible();
   });
 
   it('renders the heading as an h2 when headingLevel is omitted', () => {
     setup({ heading });
 
-    expect(
-      screen.getByRole('heading', { name: heading, level: 2 }),
-    ).toBeVisible();
+    const headingElement = screen.getByRole('heading', {
+      name: heading,
+      level: 2,
+    });
+
+    expect(headingElement).toBeVisible();
   });
 
   it.each([1, 3, 4] as const)(
@@ -52,34 +58,39 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     (headingLevel) => {
       setup({ heading, headingLevel });
 
-      expect(
-        screen.getByRole('heading', { name: heading, level: headingLevel }),
-      ).toBeVisible();
+      const headingElement = screen.getByRole('heading', {
+        name: heading,
+        level: headingLevel,
+      });
+
+      expect(headingElement).toBeVisible();
     },
   );
 
   it('assigns headingId to the heading element when provided', () => {
     setup({ heading, headingId: 'newsletter-full-heading' });
 
-    expect(screen.getByRole('heading', { name: heading })).toHaveAttribute(
-      'id',
-      'newsletter-full-heading',
-    );
+    const headingElement = screen.getByRole('heading', { name: heading });
+
+    expect(headingElement).toHaveAttribute('id', 'newsletter-full-heading');
   });
 
   it('renders the heading with no id when headingId is omitted', () => {
     setup({ heading });
 
-    expect(screen.getByRole('heading', { name: heading })).not.toHaveAttribute(
-      'id',
-    );
+    const headingElement = screen.getByRole('heading', { name: heading });
+
+    expect(headingElement).not.toHaveAttribute('id');
   });
 
   it('renders no heading when heading is omitted', () => {
     setup({ heading: undefined });
 
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: EMAIL_LABEL })).toBeVisible();
+    const headingElement = screen.queryByRole('heading');
+    const emailField = screen.getByRole('textbox', { name: EMAIL_LABEL });
+
+    expect(headingElement).not.toBeInTheDocument();
+    expect(emailField).toBeVisible();
   });
 
   it('renders the trust cues without a heading when heading is omitted', () => {
@@ -90,8 +101,11 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
       ],
     });
 
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(screen.getByText(FIRST_CUE)).toBeVisible();
+    const headingElement = screen.queryByRole('heading');
+    const cue = screen.getByText(FIRST_CUE);
+
+    expect(headingElement).not.toBeInTheDocument();
+    expect(cue).toBeVisible();
   });
 
   describe('with the default props', () => {
@@ -100,13 +114,15 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     });
 
     it('renders the chevron icon as the email field prompt', () => {
-      expect(
-        screen.getByTestId('newsletter-signup-input-prompt'),
-      ).toBeVisible();
+      const prompt = screen.getByTestId('newsletter-signup-input-prompt');
+
+      expect(prompt).toBeVisible();
     });
 
     it('renders no trust-cue row when trustCues is omitted', () => {
-      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+      const cueList = screen.queryByRole('list');
+
+      expect(cueList).not.toBeInTheDocument();
     });
   });
 
@@ -123,20 +139,29 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     ];
     setup({ trustCues });
 
-    expect(screen.getByText(FIRST_CUE)).toBeVisible();
-    expect(screen.getByText(SECOND_CUE)).toBeVisible();
+    const firstCue = screen.getByText(FIRST_CUE);
+    const secondCue = screen.getByText(SECOND_CUE);
+
+    expect(firstCue).toBeVisible();
+    expect(secondCue).toBeVisible();
   });
 
   it('shows the success message and hides the field on success', () => {
     const successMessage = faker.lorem.sentence();
     setup({ status: FORM_STATUS.SUCCESS, successMessage });
 
-    expect(screen.getByRole('status')).toHaveTextContent(successMessage);
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    const status = screen.getByRole('status');
+    const emailField = screen.queryByRole('textbox');
+
+    expect(status).toHaveTextContent(successMessage);
+    expect(emailField).not.toBeInTheDocument();
   });
 
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'newsletter-signup-full' });
-    expect(screen.getByTestId('newsletter-signup-full')).toBeVisible();
+
+    const root = screen.getByTestId('newsletter-signup-full');
+
+    expect(root).toBeVisible();
   });
 });

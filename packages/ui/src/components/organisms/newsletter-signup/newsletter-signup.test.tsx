@@ -24,16 +24,19 @@ describe('NewsletterSignup', () => {
     const setup = customRender(NewsletterSignup.Full, baseArgs);
     setup();
 
-    expect(
-      screen.getByRole('heading', { name: baseArgs.heading }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { name: baseArgs.heading });
+
+    expect(heading).toBeVisible();
   });
 
   it('wires Compact to the slim density with no heading landmark', () => {
     const setup = customRender(NewsletterSignup.Compact, baseArgs);
     setup();
 
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(screen.getByText(baseArgs.heading)).toBeVisible();
+    const heading = screen.queryByRole('heading');
+    const label = screen.getByText(baseArgs.heading);
+
+    expect(heading).not.toBeInTheDocument();
+    expect(label).toBeVisible();
   });
 });

@@ -40,27 +40,35 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     });
 
     it('renders as a slim strip with no heading element', () => {
-      expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-      expect(screen.getByText(HEADING)).toBeVisible();
-      expect(screen.getByRole('textbox', { name: EMAIL_LABEL })).toBeVisible();
+      const headingElement = screen.queryByRole('heading');
+      const label = screen.getByText(HEADING);
+      const emailField = screen.getByRole('textbox', { name: EMAIL_LABEL });
+
+      expect(headingElement).not.toBeInTheDocument();
+      expect(label).toBeVisible();
+      expect(emailField).toBeVisible();
     });
 
     it('renders the label with no id when headingId is omitted', () => {
-      expect(screen.getByText(HEADING)).not.toHaveAttribute('id');
+      const label = screen.getByText(HEADING);
+
+      expect(label).not.toHaveAttribute('id');
     });
 
     it('renders the prefix node as-is, ahead of the heading', () => {
       const prefix = screen.getByTestId('newsletter-signup-compact-prefix');
+      const label = screen.getByText(HEADING);
+
       expect(prefix).toHaveTextContent('$');
-      expect(prefix.compareDocumentPosition(screen.getByText(HEADING))).toBe(
+      expect(prefix.compareDocumentPosition(label)).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING,
       );
     });
 
     it('renders the chevron icon as the email field prompt', () => {
-      expect(
-        screen.getByTestId('newsletter-signup-input-prompt'),
-      ).toBeVisible();
+      const prompt = screen.getByTestId('newsletter-signup-input-prompt');
+
+      expect(prompt).toBeVisible();
     });
   });
 
@@ -68,34 +76,37 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     const heading = faker.lorem.sentence(3);
     setup({ heading });
 
-    expect(screen.getByText(heading)).toBeVisible();
+    const label = screen.getByText(heading);
+
+    expect(label).toBeVisible();
   });
 
   it('assigns headingId to the label element when provided', () => {
     setup({ headingId: 'newsletter-compact-heading' });
 
-    expect(screen.getByText(HEADING)).toHaveAttribute(
-      'id',
-      'newsletter-compact-heading',
-    );
+    const label = screen.getByText(HEADING);
+
+    expect(label).toHaveAttribute('id', 'newsletter-compact-heading');
   });
 
   it('renders neither label nor prefix when both are omitted', () => {
     setup({ heading: undefined, prefix: undefined });
 
-    expect(screen.queryByText(HEADING)).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId('newsletter-signup-compact-prefix'),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: EMAIL_LABEL })).toBeVisible();
+    const label = screen.queryByText(HEADING);
+    const prefix = screen.queryByTestId('newsletter-signup-compact-prefix');
+    const emailField = screen.getByRole('textbox', { name: EMAIL_LABEL });
+
+    expect(label).not.toBeInTheDocument();
+    expect(prefix).not.toBeInTheDocument();
+    expect(emailField).toBeVisible();
   });
 
   it('renders no prefix element when prefix is omitted', () => {
     setup({ prefix: undefined });
 
-    expect(
-      screen.queryByTestId('newsletter-signup-compact-prefix'),
-    ).not.toBeInTheDocument();
+    const prefix = screen.queryByTestId('newsletter-signup-compact-prefix');
+
+    expect(prefix).not.toBeInTheDocument();
   });
 
   describe('on success', () => {
@@ -104,20 +115,27 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     });
 
     it('shows the success message and hides the field on success', () => {
-      expect(screen.getByRole('status')).toHaveTextContent(successMessage);
-      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+      const status = screen.getByRole('status');
+      const emailField = screen.queryByRole('textbox');
+
+      expect(status).toHaveTextContent(successMessage);
+      expect(emailField).not.toBeInTheDocument();
     });
 
     it('keeps the prefix and heading visible on success', () => {
-      expect(
-        screen.getByTestId('newsletter-signup-compact-prefix'),
-      ).toBeVisible();
-      expect(screen.getByText(HEADING)).toBeVisible();
+      const prefix = screen.getByTestId('newsletter-signup-compact-prefix');
+      const label = screen.getByText(HEADING);
+
+      expect(prefix).toBeVisible();
+      expect(label).toBeVisible();
     });
   });
 
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'newsletter-signup-compact' });
-    expect(screen.getByTestId('newsletter-signup-compact')).toBeVisible();
+
+    const root = screen.getByTestId('newsletter-signup-compact');
+
+    expect(root).toBeVisible();
   });
 });
