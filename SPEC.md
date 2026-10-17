@@ -2407,9 +2407,10 @@ Full checklist:
 - Storybook stories are part of done for every new/changed `ui` component
   (`ui-storybook` skill) and for `web` compositions (`web-storybook` skill).
 - CI (required checks on PRs to `main`): Type-check, Lint, Test, Typegen,
-  Migrations (load + read-only dry-run), Build — plus four
-  required checks (Zizmor, Actionlint, Knip, Hooks) and several
-  advisory jobs (Test Presence, Claude Code Review, Dependency scan, Lighthouse
+  Migrations (load + read-only dry-run), Build, Knip — plus the required
+  Workflow security check (zizmor, actionlint, shellcheck and the hook guard
+  tests, in its own workflow so a PR editing `ci.yml` cannot switch it off)
+  and several advisory jobs (Test Presence, Claude Code Review, Dependency scan, Lighthouse
   CI, Playwright smoke). Full workflow-by-workflow breakdown:
   [`docs/context/ci-automation.md`](./docs/context/ci-automation.md).
 - Hooks: husky + lint-staged (report-only eslint + prettier on staged files;

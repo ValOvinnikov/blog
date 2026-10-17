@@ -4,7 +4,8 @@
 # Pins the cases hand-tested across #425's three review rounds — including
 # the bypasses found and fixed along the way (`git -C "quoted dir" commit`,
 # `pnpm --filter x exec -- git commit`) — so a future edit to the guard can't
-# silently reopen one. Run directly or via CI (`.github/workflows/hooks.yml`):
+# silently reopen one. Run directly or via CI
+# (`.github/workflows/workflow-security.yml`):
 #   bash .claude/hooks/read-only-agent-guard.test.sh
 set -u
 
