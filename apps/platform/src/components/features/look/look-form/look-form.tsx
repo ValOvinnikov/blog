@@ -1,6 +1,6 @@
 'use client';
 
-import type { TLocaleIsoCode } from '@blog/config';
+import { FORM_STATUS, type TLocaleIsoCode } from '@blog/config';
 import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
 import { ColourCard } from '@platform/components/features/look/look-form/components/colour-card';
 import { LanguageSwitcherCard } from '@platform/components/features/look/look-form/components/language-switcher-card';
@@ -58,7 +58,7 @@ export const LookForm = ({
       title={t('heading')}
       description={t('subtitle')}
       form={form}
-      errorTitle={status === 'error' ? saveErrorTitle : undefined}
+      errorTitle={status === FORM_STATUS.ERROR ? saveErrorTitle : undefined}
       isWide={true}
     >
       <ViewTabs {...tabsProps} />

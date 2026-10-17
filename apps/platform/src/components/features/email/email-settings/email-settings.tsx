@@ -1,6 +1,10 @@
 'use client';
 
-import { portableTextToPlainText, type TLocaleIsoCode } from '@blog/config';
+import {
+  portableTextToPlainText,
+  type TLocaleIsoCode,
+  FORM_STATUS,
+} from '@blog/config';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { EmailPreview } from '@platform/components/features/email/email-preview';
 import { EmailEditPane } from '@platform/components/features/email/email-settings/components/email-edit-pane';
@@ -205,7 +209,8 @@ export const EmailSettings = ({
       description={t('pageSubtitle')}
       form={form}
       errorTitle={
-        status === 'error' && Object.keys(senderFieldErrors).length === 0
+        status === FORM_STATUS.ERROR &&
+        Object.keys(senderFieldErrors).length === 0
           ? t('alertError')
           : undefined
       }

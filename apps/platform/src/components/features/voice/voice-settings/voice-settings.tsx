@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, FORM_STATUS } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
@@ -78,7 +78,9 @@ export const VoiceSettings = ({
       description={t('description')}
       form={form}
       errorTitle={
-        status === 'error' && !hasFieldErrors ? t('alertError') : undefined
+        status === FORM_STATUS.ERROR && !hasFieldErrors
+          ? t('alertError')
+          : undefined
       }
       headerActions={
         liveLocales.length > 1 && (

@@ -1,6 +1,6 @@
 'use client';
 
-import type { TCapability } from '@blog/config';
+import { FORM_STATUS, type TCapability } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import {
@@ -90,7 +90,7 @@ export const FeaturesSettings = ({
       title={t('heading')}
       description={t('description')}
       form={form}
-      errorTitle={status === 'error' ? t('alertError') : undefined}
+      errorTitle={status === FORM_STATUS.ERROR ? t('alertError') : undefined}
     >
       <Card>
         <Card.Header title={t('capabilitiesHeading')} />
