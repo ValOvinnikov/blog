@@ -8,6 +8,7 @@ export * as findings from './findings';
 export * as leads from './leads';
 export * as membershipInvites from './membership-invites';
 export * as memberships from './memberships';
+export * as migrations from './migrations';
 export * as settingsFeatures from './settings-features';
 export * as siteConfig from './site-config';
 export * as subscribers from './subscribers';
