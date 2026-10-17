@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE, FORM_STATUS } from '@blog/config';
+import { ACTION_OUTCOME, ALERT_TYPE, FORM_STATUS } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
@@ -22,8 +22,8 @@ const FIELD_MESSAGE_KEYS = {
 } as const;
 
 const REFUSAL_MESSAGE_KEYS = {
-  blocked: 'errorBlocked',
-  'server-error': 'errorServer',
+  [ACTION_OUTCOME.BLOCKED]: 'errorBlocked',
+  [ACTION_OUTCOME.SERVER_ERROR]: 'errorServer',
 } as const satisfies Record<TContactRefusal, string>;
 
 export type TContactFormProps = {

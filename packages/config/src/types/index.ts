@@ -1,5 +1,6 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 
+export * from './action-result';
 export * from './contrast-result';
 export * from './page-module';
 

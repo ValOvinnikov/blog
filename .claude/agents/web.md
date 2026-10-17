@@ -76,6 +76,9 @@ Before writing code:
   `usePathname`. No lint rule enforces this.
 - **Discriminators** (`_type` names, stored enum values) come from
   `@blog/config` constants, never repeated string literals.
+- **A server action returns a `TActionResult`** with outcomes from
+  `ACTION_OUTCOME`, never a hand-written outcome union — `SPEC.md`
+  § Server-action results.
 - Consuming a new workspace package: add it to `transpilePackages` in
   `next.config.ts`, besides the aliases CLAUDE.md → "Absolute imports"
   requires.

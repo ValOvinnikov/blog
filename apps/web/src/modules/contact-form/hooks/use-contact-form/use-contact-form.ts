@@ -1,4 +1,4 @@
-import { FORM_STATUS, type TFormStatus } from '@blog/config';
+import { ACTION_OUTCOME, FORM_STATUS, type TFormStatus } from '@blog/config';
 import {
   submitContactMessage,
   type TContactRefusal,
@@ -18,7 +18,9 @@ const EMPTY_FIELDS: TContactMessageFields = {
   message: '',
 };
 
-const SERVER_ERROR: TSubmitContactResult = { outcome: 'server-error' };
+const SERVER_ERROR: TSubmitContactResult = {
+  outcome: ACTION_OUTCOME.SERVER_ERROR,
+};
 
 export const useContactForm = () => {
   const pathname = usePathname();
@@ -50,13 +52,13 @@ export const useContactForm = () => {
       sourcePath: pathname ?? '/',
     }).catch(() => SERVER_ERROR);
 
-    if (result.outcome === 'sent') {
+    if (result.outcome === ACTION_OUTCOME.SUCCESS) {
       setStatus(FORM_STATUS.SUCCESS);
       return;
     }
 
     setStatus(FORM_STATUS.ERROR);
-    if (result.outcome === 'invalid') {
+    if (result.outcome === ACTION_OUTCOME.INVALID) {
       setInvalidFields(result.invalidFields);
       return;
     }

@@ -1,3 +1,4 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import type {
   TContactMessageInput,
   TSubmitContactResult,
@@ -10,6 +11,6 @@ export const submitContactMessage = async ({
   await new Promise((resolve) => setTimeout(resolve, 400));
 
   return message.includes('fail')
-    ? { outcome: 'server-error' }
-    : { outcome: 'sent' };
+    ? { outcome: ACTION_OUTCOME.SERVER_ERROR }
+    : { outcome: ACTION_OUTCOME.SUCCESS };
 };
