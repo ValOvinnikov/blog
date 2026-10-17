@@ -75,6 +75,14 @@ export const AvatarVariant: TStory = {
   },
 };
 
+export const Circle: TStory = {
+  args: {
+    variant: 'circle',
+    ariaLabel: 'Toggle navigation menu',
+    children: <Icon name={ICONS.MENU} size={SIZE.MD} />,
+  },
+};
+
 export const Control: TStory = {
   args: {
     variant: 'control',
