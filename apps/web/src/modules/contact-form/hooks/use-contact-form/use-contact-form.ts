@@ -10,7 +10,7 @@ import {
   validateContactMessage,
 } from '@web/utils/validate-contact-message/validate-contact-message';
 import { usePathname } from 'next/navigation';
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 
 const EMPTY_FIELDS: TContactMessageFields = {
   name: '',
@@ -29,6 +29,20 @@ export const useContactForm = () => {
   const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
   const [invalidFields, setInvalidFields] = useState<TContactField[]>([]);
   const [refusal, setRefusal] = useState<TContactRefusal>();
+  const [invalidSubmitCount, setInvalidSubmitCount] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (invalidSubmitCount === 0) return;
+    formRef.current
+      ?.querySelector<HTMLElement>('[aria-invalid="true"]')
+      ?.focus();
+  }, [invalidSubmitCount]);
+
+  const reportInvalid = (invalid: TContactField[]) => {
+    setInvalidFields(invalid);
+    setInvalidSubmitCount((count) => count + 1);
+  };
 
   const changeField = (field: TContactField) => (value: string) => {
     setFields((current) => ({ ...current, [field]: value }));
@@ -41,7 +55,7 @@ export const useContactForm = () => {
 
     const validation = validateContactMessage(fields);
     if (!validation.ok) {
-      setInvalidFields(validation.invalidFields);
+      reportInvalid(validation.invalidFields);
       return;
     }
 
@@ -59,13 +73,14 @@ export const useContactForm = () => {
 
     setStatus(FORM_STATUS.ERROR);
     if (result.outcome === ACTION_OUTCOME.INVALID) {
-      setInvalidFields(result.invalidFields);
+      reportInvalid(result.invalidFields);
       return;
     }
     setRefusal(result.outcome);
   };
 
   return {
+    formRef,
     fields,
     website,
     setWebsite,
