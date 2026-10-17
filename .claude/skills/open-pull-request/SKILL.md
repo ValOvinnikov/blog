@@ -55,9 +55,9 @@ gh stack sync                 # fetch, restack, force-push all       — Gate 3
   `gh pr edit <pr> --title "…" --body "…"` on each new PR per "PR body
   template", and Gate 5 for each.
 
-**Every stacked PR runs the full required suite** because the four workflows
-behind the required checks — `ci.yml`, `zizmor.yml`, `actionlint.yml`,
-`hooks.yml` — declare a bare `pull_request:`
+**Every stacked PR runs the full required suite** because the two workflows
+behind the required checks — `ci.yml` and `workflow-security.yml` — declare a
+bare `pull_request:`
 trigger. Never add a `branches:` filter to one: a required check that never
 starts leaves the PR `BLOCKED` forever instead of failing it (`ci.yml`'s
 header). The check list: `docs/context/ci-automation.md`.

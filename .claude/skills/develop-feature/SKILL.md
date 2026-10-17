@@ -234,8 +234,8 @@ local `build` either — reproduce a CI build failure only to diagnose it
 (`open-pull-request` Gate 5a).
 
 **A hook or script diff** (`.claude/hooks/**`, `scripts/*.sh`) also runs the
-`Shellcheck + guard tests` job of `.github/workflows/hooks.yml` locally before
-commit — that file is the source of truth if this list drifts:
+shellcheck and guard-test steps of `.github/workflows/workflow-security.yml`
+locally before commit — that file is the source of truth if this list drifts:
 
 ```
 shellcheck .claude/hooks/*.sh scripts/*.sh
