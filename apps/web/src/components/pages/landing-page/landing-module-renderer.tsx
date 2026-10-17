@@ -6,6 +6,7 @@ import type {
 } from '@blog/config';
 import type { TLandingSectionNavigation, TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
+import { ContactFormModule } from '@web/modules/contact-form/contact-form-module';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { FaqModule } from '@web/modules/faq/faq-module';
@@ -41,6 +42,7 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_content: ContentModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
+  module_contactForm: ContactFormModule,
   module_postLatest: PostLatestModule,
   module_taxonomyList: TaxonomyListModule,
   module_postFeatured: PostFeaturedModule,

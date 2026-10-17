@@ -11,6 +11,7 @@ code:
   - apps/web/src/components/shared/newsletter-*/**
   - apps/web/src/server/newsletter/**
   - apps/web/src/server/rate-limit/client-key/**
+  - apps/web/src/server/rate-limit/public-write-guard/**
   - apps/web/src/app/api/newsletter/**
   - apps/web/src/utils/*newsletter-subscribed-cookie*/**
   - packages/db/src/schema/subscribers.ts
@@ -71,7 +72,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `apps/web/src/modules/newsletter/newsletter-module.tsx`
 - `apps/web/src/components/shared/newsletter-form/newsletter-form.tsx`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`
-- `apps/web/src/server/newsletter/subscribe-guard/subscribe-guard.ts`, `apps/web/src/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send.ts`
+- `apps/web/src/server/newsletter/subscribe-guard/subscribe-guard.ts` (built on `apps/web/src/server/rate-limit/public-write-guard/public-write-guard.ts`), `apps/web/src/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send.ts`
 - `apps/web/src/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions.ts`
 - `apps/web/src/app/api/newsletter/confirm/route.ts`, `apps/web/src/app/api/newsletter/unsubscribe/route.ts`
 - `packages/db/src/queries/subscribers/`
