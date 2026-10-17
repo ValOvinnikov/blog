@@ -2,6 +2,8 @@ import { tv } from 'tailwind-variants';
 
 export const teamMemberCardVariants = tv({
   slots: {
+    root: ['@container/member h-full'],
+    card: [],
     media: [],
     image: ['size-full object-cover'],
     role: ['text-sm text-subtle'],
@@ -18,13 +20,25 @@ export const teamMemberCardVariants = tv({
       },
     },
     align: {
-      left: {},
+      left: {
+        card: ['@min-[30rem]/member:flex-row'],
+        media: ['@min-[30rem]/member:self-start @min-[30rem]/member:mb-card-y'],
+      },
       center: {},
     },
   },
   compoundVariants: [
-    { shape: 'square', align: 'left', class: { media: ['ml-card-x'] } },
+    {
+      shape: 'square',
+      align: 'left',
+      class: { media: ['ml-card-x @min-[30rem]/member:shrink-0'] },
+    },
     { shape: 'square', align: 'center', class: { media: ['mx-auto'] } },
+    {
+      shape: 'circle',
+      align: 'left',
+      class: { media: ['@min-[30rem]/member:mr-0'] },
+    },
   ],
 });
 

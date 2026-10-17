@@ -107,19 +107,19 @@ export const SteppedSlideSize: TStory = {
   },
 };
 
-// The slide basis steps at the real `sm:` breakpoint, so each width is pinned.
-export const HalvesThenThirdsOnPhone: TStory = {
-  args: { items: buildItems(8), slideSize: 'halvesThenThirds' },
+// The slide basis steps at real viewport breakpoints, so each width is pinned.
+export const SingleHalvesThirdsOnPhone: TStory = {
+  args: { items: buildItems(8), slideSize: 'singleHalvesThirds' },
   globals: { viewport: 'phone' },
 };
 
-export const HalvesThenThirdsOnTablet: TStory = {
-  args: { items: buildItems(8), slideSize: 'halvesThenThirds' },
+export const SingleHalvesThirdsOnTablet: TStory = {
+  args: { items: buildItems(8), slideSize: 'singleHalvesThirds' },
   globals: { viewport: 'tablet' },
 };
 
-export const HalvesThenThirdsOnDesktop: TStory = {
-  args: { items: buildItems(8), slideSize: 'halvesThenThirds' },
+export const SingleHalvesThirdsOnDesktop: TStory = {
+  args: { items: buildItems(8), slideSize: 'singleHalvesThirds' },
   globals: { viewport: 'desktop' },
 };
 

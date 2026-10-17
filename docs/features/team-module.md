@@ -40,11 +40,12 @@ An editor introduces a founder, a team, staff or contributors by picking existin
 
 - A team holds 1–12 people, each at most once.
 - A module with a single person always renders them as the spotlight; `displayMode` and `cardAlignment` do not apply to it.
-- Grid columns follow the shared `toModuleGridColumns` rule, capped at three when bios are shown (`toTeamGridColumns`); a lone last card in a row of three is centred.
+- Grid columns follow the shared `toModuleGridColumns` rule, capped at three when bios are shown (`toTeamGridColumns`); a lone last card in a row of three is centred. The grid is one column below a 480px viewport, two from 480px and three from about 768px (container queries on the grid, sized for a page without a sidebar).
+- A left-aligned card at least 30rem wide puts the photo beside the name, role, bio and social links (a container query on the card); narrower cards and centre-aligned cards stack.
 - A card or spotlight without a photo shows an `Avatar` with the person's initials in the chosen shape.
 - A member with a profile page makes the card interactive and links their name; otherwise the name is plain text.
 - Square photos are requested at 384px (twice the `w-48` cap); circles use the shared circle size; the spotlight image is requested at 576px.
-- The carousel is the shared `LabelledCarousel`, named after the heading. It shows two cards per view under 640px and three from 640px up (`Carousel`'s `halvesThenThirds` slide size).
+- The carousel is the shared `LabelledCarousel`, named after the heading. It shows one card per view below a 480px viewport, two from 480px and three from 768px (`Carousel`'s `singleHalvesThirds` slide size).
 - A failed fetch logs `team_module.fetch_failed` and renders nothing.
 
 ## Dependencies
