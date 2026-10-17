@@ -1,6 +1,6 @@
 ---
 title: Contact form
-status: planned
+status: built
 layers: [config, db, email, ui, platform, studio, service, web]
 code:
   - packages/db/src/schema/leads.ts
@@ -13,6 +13,10 @@ code:
   - apps/platform/src/server/leads/**
   - packages/studio/src/schema-types/modules/contact-form/**
   - packages/service/src/features/modules/contact-form/**
+  - apps/web/src/modules/contact-form/**
+  - apps/web/src/server/contact-form/**
+  - apps/web/src/server/rate-limit/public-write-guard/**
+  - apps/web/src/utils/validate-contact-message/**
 epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 ---
 
@@ -20,11 +24,11 @@ epics: [1292, 3661, 3667, 3668, 3669, 3670, 3671, 3672, 3673, 3674]
 
 ## What it does
 
-A visitor will be able to send the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path. The capability, the data layer, the owner notification template, the `Textarea` atom and the platform's Leads page and recipient field, the Studio module and its loader are built; the public form is not.
+A visitor sends the site's owner a message from a contact form placed on a page, without the owner publishing an email address. Each message is stored as a lead and emailed to the owner with Reply-To set to the visitor; the owner reads and deletes leads in the platform. It is the module catalogue's one module with a write path.
 
 ## Surfaces and routes
 
-- **Public site** — a planned `module_contactForm` placed on Home and Landing pages. After a successful send the success message replaces the form; errors show inline and keep what the visitor typed. The visitor gets no email.
+- **Public site** — `module_contactForm` on Home and Landing pages: the module heading above a 560px column, left or centred by `contentAlignment`, holding Name and Email side by side from `sm`, Message below, a hidden honeypot, a **Send message** button and the privacy note under it. While sending, the button reads "Sending…" and is disabled. A sent message replaces the whole form with "Message sent" and the module's success message. A field the visitor got wrong shows its own error under it; a refused or failed send shows one error above the button. Either way everything typed stays. The module is omitted when `CONTACT_FORM` is off or the tenant is not active. The visitor gets no email.
 - **Platform** — the **Leads** page at `/dashboard/leads`, listed in the sidebar after Features, for owners only (never editors). It shows when the plan has `CONTACT_FORM`, or when a downgraded tenant still has stored leads — then with a notice that the contact form is a Growth feature and existing messages are kept, and List and Delete still work. Otherwise there is no nav entry and the page 404s. Operators always see it at `/tenants/{id}/leads`. Leads are newest first, 25 per page through `?page=`; a page past the last redirects to the last one. Each row shows the received date and time (UTC), the name, the email as a `mailto:` link, the message clamped to two lines with Show more/less, and the page it came from. The page says each message was also emailed, and a tenant with none sees a one-sentence empty state. A per-row **Delete** asks for confirmation; there is no bulk delete and no editing. The action validates both ids, requires an owner or operator of the tenant, and deletes only within it, on any plan; it records no audit event.
 - **Platform, Email page** — "Send contact messages to" on the Sender & footer card, validated as an email and saved with the sender fields (not per language). Saving it empty clears the override, so the owner's sign-in email is used. Test sends ignore it. The field shows only to an owner or operator on a plan with `CONTACT_FORM`; otherwise the stored address is kept, and the save action ignores any value sent, so an editor can never redirect messages. The Email page is also open to a plan that has only the contact form.
 - **Studio** — `module_contactForm`, "Contact Form", under Modules → Conversion, allowed on `page_home` and `page_landing`: heading block, brand variant, success message, privacy note, alignment and layout. No CTA buttons (the send button is the action) and no field toggles. Like the Newsletter, it shows a warning when Contact form is off in Features.
@@ -43,14 +47,14 @@ A visitor will be able to send the site's owner a message from a contact form pl
 - **Capability** — a new `CAPABILITY.CONTACT_FORM`, `GROWTH` only — every submission sends the owner a notification through Resend, as the newsletter does — and on by default. An owner can switch it off on the Features page; the module is then omitted, as it is for a suspended tenant.
 - **Owner or operator** — sets the recipient override on the Email page, reads and deletes leads.
 - **Editor** — places the module and writes the success message and privacy note in Studio.
-- **Voice** — the success message and privacy note are editor content in Sanity, not Voice fields; everything else is fixed.
+- **Voice** — the success message and privacy note are editor content in Sanity, not Voice fields; everything else is fixed `contactForm.*` copy on `VOICE_FIXED_KEYS`.
+- **Env** — `PLATFORM_APP_URL` (`apps/web`, optional) is the admin panel's origin for the notification's "View all leads" link. Unset, the email still sends with an inert link and the send logs `contact_form.platform_url_missing`.
 
 ## Constraints and invariants
 
-These are decided and must hold when it ships:
-
 - Spam protection is Vercel BotID (invisible, first-party, needs no consent banner), plus a honeypot and a soft per-IP rate limit of 5 sends per 10 minutes. A bot, a filled honeypot or a burst stores nothing and sends nothing.
-- The server action checks, in order: BotID, honeypot, rate limit, tenant active, field validation (name 1–100 characters, a valid email, message 10–5,000), then stores the lead and sends the email.
+- The `submitContactMessage` server action checks, in order: BotID, honeypot, rate limit, tenant active and capability on, field validation (name 1–100 characters with line breaks folded to spaces, a valid email, message 10–5,000), then stores the lead and sends the email. It answers `sent`, `invalid` (with the invalid fields), `blocked` or `server-error`. A bot, a filled honeypot, a burst, an inactive tenant or a switched-off capability answer `blocked`, which the form shows as the rate-limit message. BotID and the rate limiter come from the shared `createPublicWriteGuard`, the newsletter's own guard, and fail closed: a BotID error or an unreachable or slow (2 seconds) store refuses the send and logs one `contact_form.submit_blocked` warn.
+- The source path is the page's pathname as the browser sent it, kept only when it is a local path of up to 2,048 characters, otherwise `/`. Fields that arrive as anything other than text count as empty.
 - A new capability key breaks every `Record<TCapability, …>` until each has it, so the capability lands in config, db, web and platform together.
 - Delivery uses `@blog/email`'s `sendEmail` with `buildContactNotificationEmail` on the tenant shell: subject "New message from {visitor}", the sender, a link to the page, the message quoted with its line breaks, a line that replying answers the visitor, and a link to the Leads list. Every visitor string is escaped. The caller sets `replyTo` to the visitor; `@blog/email` never logs, so the web server action logs a failed send.
 - A stored lead whose email fails still answers `sent`; the action logs the email failure once, since the lead is safe in the list.
@@ -60,8 +64,8 @@ These are decided and must hold when it ships:
 
 - Layers: `config` (capability), `db` (leads, recipient), `email` (template), `ui` (Textarea), `platform` (Leads, recipient), `studio` and `service` (module), `web` (form, server action, BotID).
 - Features: ./module-system.md, ./plans-and-entitlements.md, ./email.md, ./newsletter.md (the existing public write path it mirrors), ./tenant-access.md, ./footer-and-legal-pages.md (the privacy policy the note links to).
-- Unbuilt prerequisites: BotID setup (`withBotId`, `initBotId`) and a shared rate limiter at `apps/web/src/server/rate-limit/`; the action itself only calls `checkBotId()`.
-- Env vars: none of its own; Resend's existing `sendEmail` configuration.
+- BotID setup (`withBotId` in `next.config.ts`, `initBotId` in `instrumentation-client.ts`) and the shared rate limiter at `apps/web/src/server/rate-limit/`; the action itself only calls `checkBotId()`.
+- Env vars: `PLATFORM_APP_URL` for the leads link; otherwise the newsletter's `NEWSLETTER_FROM_ADDRESS` sender and Resend's existing `sendEmail` configuration.
 
 ## Entry points
 
@@ -72,6 +76,11 @@ These are decided and must hold when it ships:
 - `apps/platform/src/server/leads/delete-lead-action.ts` — the per-row delete
 - `apps/platform/src/server/auth/resolve-tenant-page-access.ts` — who reaches Leads, by role, plan and stored leads
 - `packages/service/src/features/modules/contact-form/adaptor/loader.ts` — `service.modules.contactForm.v1.getContactForm`: heading block, success message, privacy note (`undefined` when unset), brand variant, alignment and layout
+- `apps/web/src/modules/contact-form/contact-form-module.tsx` — the module, in `HOME_MAP` and `LANDING_MAP`
+- `apps/web/src/modules/contact-form/components/contact-form/contact-form.tsx` — the `'use client'` form, with its state in `hooks/use-contact-form/`
+- `apps/web/src/server/contact-form/contact-form-actions/contact-form-actions.ts` — `submitContactMessage`
+- `apps/web/src/server/contact-form/contact-notification-send/contact-notification-send.ts` — the owner notification send
+- `apps/web/src/utils/validate-contact-message/validate-contact-message.ts` — the field rules, shared by the form and the action
 
 The pieces it builds on:
 
@@ -81,7 +90,7 @@ The pieces it builds on:
 
 ## Tests and stories
 
-PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to. `contact-notification.test.ts` covers the subject, escaping and line breaks. The module loader's `transformer.test.ts` and `loader.test.ts` cover a full document, an unset privacy note and the cache tags. In `apps/platform`, the Leads page test and `resolve-tenant-page-access.test.ts` cover the role, plan and downgrade gates, `require-tenant-owner.test.ts` the owner check, `leads-table`, `leads-pagination` and `delete-lead-control` tests cover ordering, paging and the confirmed delete, `delete-lead-action.test.ts` the tenant scoping, and the email-settings and `update-email-config-action` tests the recipient's save and clear.
+PGlite query tests beside each `leads` query and `get-contact-recipient.test.ts`; `get-tenant-owner-email.test.ts` covers the owner lookup the recipient falls back to. `contact-notification.test.ts` covers the subject, escaping and line breaks. The module loader's `transformer.test.ts` and `loader.test.ts` cover a full document, an unset privacy note and the cache tags. In `apps/platform`, the Leads page test and `resolve-tenant-page-access.test.ts` cover the role, plan and downgrade gates, `require-tenant-owner.test.ts` the owner check, `leads-table`, `leads-pagination` and `delete-lead-control` tests cover ordering, paging and the confirmed delete, `delete-lead-action.test.ts` the tenant scoping, and the email-settings and `update-email-config-action` tests the recipient's save and clear. In `apps/web`, `contact-form-actions.test.ts` covers each outcome (bot, honeypot, rate limit, inactive tenant, capability off, invalid fields, a failed email still `sent`), `contact-notification-send.test.ts` the recipient, Reply-To and links, `validate-contact-message.test.ts` the field rules, `contact-form.test.tsx` the success swap and kept input, and `contact-form-module.test.tsx` the omission gates. `contact-form-module-view.stories.tsx` shows the module; a message containing "fail" shows the error state there.
 
 ## Related
 

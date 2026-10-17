@@ -1,22 +1,20 @@
 name: Document Validation
 
 # Checks every existing document in the console project's live dataset
-# against the current Studio schema. It used to be an advisory job inside
-# ci.yml, but content drifts out of validity independently of any PR's
-# diff, so it was red on 113 of the last 150 failed ci.yml runs and every
-# PR looked broken to `ci-watcher`. A daily schedule surfaces the same
-# drift without attaching it to unrelated PRs. Tenant datasets are covered
-# by validate-tenant-documents.yml, which this workflow never touches.
+# against the current Studio schema. Content drifts out of validity without a
+# commit, so this runs on demand and before a release rather than on a
+# schedule or per PR. Tenant datasets are covered by
+# validate-tenant-documents.yml, which this workflow never touches.
 on:
-  schedule:
-    - cron: '0 4 * * *'
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      SANITY_API_READ_TOKEN:
+        required: false
 
 permissions:
   contents: read
 
-# A Sanity read is cheap to repeat, but there is no reason to run two
-# validations of the same dataset at once — queue, don't overlap.
 concurrency:
   group: document-validation
   cancel-in-progress: false
@@ -24,8 +22,6 @@ concurrency:
 env:
   PNPM_VERSION: 11.21.0
   NODE_VERSION: '24'
-  # Same repo-level Variables ci.yml reads — the Studio/CLI config resolves
-  # the project/dataset from SANITY_STUDIO_* at load time.
   SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
   SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
 
@@ -46,15 +42,38 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      # Read-only: `sanity documents validate` downloads every document in the
-      # configured dataset and checks it against the Studio schema — it never
-      # writes. Same guard + token as ci.yml's Migrations dry-run step (a read
-      # scope is sufficient for validation, so no separate secret is needed).
-      # `--yes` skips the interactive confirmation prompt, which CI has no TTY
-      # for.
+      # `--yes` skips the confirmation prompt, which CI has no TTY for.
       - name: Validate documents against schema (read-only; requires SANITY_API_READ_TOKEN)
         if: ${{ env.SANITY_READ_TOKEN != '' }}
         working-directory: packages/studio
         env:
           SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
         run: pnpm exec sanity documents validate --yes
+
+  report-failure:
+    name: Report failure
+    needs: document-validation
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TITLE: 'Document validation is failing'
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
+    steps:
+      - name: Open or comment on the tracking issue
+        run: |
+          existing=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number,title \
+            --jq "map(select(.title == \"$TITLE\")) | first | .number // empty")
+          body="Document validation failed on the \`$DATASET\` dataset: $RUN_URL
+
+          Read the failing step's output for the document IDs and field paths, then fix those documents in Studio."
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$TITLE" --label bug --label prio:next --body "$body"
+          fi

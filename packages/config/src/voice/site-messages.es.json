@@ -166,6 +166,20 @@
     "errorRateLimited": "Demasiados intentos. Espere unos minutos y vuelva a intentarlo.",
     "errorUnavailable": "Este sitio no acepta nuevas suscripciones en este momento."
   },
+  "contactForm": {
+    "nameLabel": "Nombre",
+    "emailLabel": "Correo electrónico",
+    "messageLabel": "Mensaje",
+    "honeypotLabel": "Deje este campo vacío",
+    "submitLabel": "Enviar mensaje",
+    "submittingLabel": "Enviando…",
+    "successTitle": "Mensaje enviado",
+    "errorName": "Escriba su nombre, de hasta 100 caracteres.",
+    "errorEmail": "Introduzca una dirección de correo electrónico válida.",
+    "errorMessage": "Escriba un mensaje de entre 10 y 5000 caracteres.",
+    "errorBlocked": "Demasiados intentos. Espere unos minutos y vuelva a intentarlo.",
+    "errorServer": "No se ha podido enviar su mensaje. Vuelva a intentarlo en un minuto; lo que escribió sigue aquí."
+  },
   "newsletterConfirm": {
     "confirmedTitle": "Suscripción confirmada",
     "confirmedMessage": "Su suscripción está confirmada. ¡Gracias por registrarse!",
