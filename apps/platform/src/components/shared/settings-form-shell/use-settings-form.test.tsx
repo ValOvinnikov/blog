@@ -1,3 +1,5 @@
+import { FORM_STATUS } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import {
@@ -9,8 +11,8 @@ type TValues = { name: string };
 type TResult = { ok: boolean };
 type TArgs = TUseSettingsFormArgs<TValues, TResult>;
 
-const SAVED: TValues = { name: 'saved' };
-const EDITED: TValues = { name: 'edited' };
+const SAVED: TValues = { name: faker.person.fullName() };
+const EDITED: TValues = { name: faker.person.fullName() };
 
 const renderSettingsForm = (overrides: Partial<TArgs> = {}) =>
   renderHook(() =>
@@ -20,7 +22,11 @@ const renderSettingsForm = (overrides: Partial<TArgs> = {}) =>
       onSubmit: async () => ({ ok: true }),
       countChanges: (values, savedValues) =>
         values.name === savedValues.name ? 0 : 1,
-      draft: { tenantId: 'tenant-1', page: 'test', fields: [] },
+      draft: {
+        tenantId: faker.string.uuid(),
+        page: faker.lorem.word(),
+        fields: [],
+      },
       ...overrides,
     }),
   );
@@ -49,8 +55,9 @@ describe(useSettingsForm, () => {
     const onSuccess = vi.fn();
     const { result } = renderSettingsForm({ onSuccess });
 
-    expect(await editAndSave(result)).toBe(true);
+    const isSaved = await editAndSave(result);
 
+    expect(isSaved).toBe(true);
     await waitFor(() => expect(result.current.savedValues).toEqual(EDITED));
     expect(result.current.form.changeCount).toBe(0);
     expect(onSuccess).toHaveBeenCalledWith(EDITED, { ok: true });
@@ -61,15 +68,16 @@ describe(useSettingsForm, () => {
       onSubmit: async () => ({ ok: false }),
     });
 
-    expect(await editAndSave(result)).toBe(false);
+    const isSaved = await editAndSave(result);
 
+    expect(isSaved).toBe(false);
     expect(result.current.savedValues).toEqual(SAVED);
     expect(result.current.form.changeCount).toBe(1);
-    expect(result.current.status).toBe('error');
+    expect(result.current.status).toBe(FORM_STATUS.ERROR);
   });
 
   it('keeps saved values a save wrote for itself', async () => {
-    const UPLOADED: TValues = { name: 'edited (uploaded)' };
+    const UPLOADED: TValues = { name: faker.person.fullName() };
     const { result } = renderSettingsForm({
       onSubmit: async () => {
         result.current.setSavedValues(UPLOADED);
@@ -86,8 +94,9 @@ describe(useSettingsForm, () => {
     const onSubmit = vi.fn().mockResolvedValue({ ok: true });
     const { result } = renderSettingsForm({ onSubmit, canSave: () => false });
 
-    expect(await editAndSave(result)).toBe(false);
+    const isSaved = await editAndSave(result);
 
+    expect(isSaved).toBe(false);
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -103,20 +112,21 @@ describe(useSettingsForm, () => {
   });
 
   it('reports the invalid fields for the current values', () => {
+    const fieldId = faker.lorem.slug();
     const { result } = renderSettingsForm({
       invalidFields: ({ name }) => ({
-        ids: name === EDITED.name ? ['name-field'] : [],
+        ids: name === EDITED.name ? [fieldId] : [],
       }),
     });
 
     act(() => result.current.setValues(EDITED));
 
-    expect(result.current.form.invalidFields?.ids).toEqual(['name-field']);
+    expect(result.current.form.invalidFields?.ids).toEqual([fieldId]);
   });
 
   it('is archived when the tenant has an archive date', () => {
     const { result } = renderSettingsForm({
-      archivedAt: new Date('2026-08-26T00:00:00.000Z'),
+      archivedAt: faker.date.past(),
     });
 
     expect(result.current.isArchived).toBe(true);

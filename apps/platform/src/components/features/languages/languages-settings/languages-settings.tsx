@@ -4,6 +4,7 @@ import {
   ALERT_TYPE,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
+  FORM_STATUS,
 } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
@@ -131,7 +132,7 @@ export const LanguagesSettings = ({
       title={t('heading')}
       description={t('description')}
       form={form}
-      errorTitle={status === 'error' ? t('alertError') : undefined}
+      errorTitle={status === FORM_STATUS.ERROR ? t('alertError') : undefined}
     >
       <Card>
         <Card.Header title={t('defaultHeading')} />

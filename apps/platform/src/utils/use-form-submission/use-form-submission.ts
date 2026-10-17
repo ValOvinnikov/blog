@@ -1,13 +1,12 @@
 'use client';
 
+import { FORM_STATUS, type TFormStatus } from '@blog/config';
 import {
   useState,
   useTransition,
   type Dispatch,
   type SetStateAction,
 } from 'react';
-
-type TFormSubmissionStatus = 'idle' | 'success' | 'error';
 
 export type TUseFormSubmissionArgs<TValues, TResult extends { ok: boolean }> = {
   initialValues: TValues | (() => TValues);
@@ -18,7 +17,7 @@ export type TUseFormSubmissionArgs<TValues, TResult extends { ok: boolean }> = {
 export type TUseFormSubmissionResult<TValues> = {
   values: TValues;
   setValues: Dispatch<SetStateAction<TValues>>;
-  status: TFormSubmissionStatus;
+  status: TFormStatus;
   isPending: boolean;
   handleSubmit: () => Promise<boolean>;
 };
@@ -33,11 +32,11 @@ export const useFormSubmission = <TValues, TResult extends { ok: boolean }>({
   TResult
 >): TUseFormSubmissionResult<TValues> => {
   const [values, setValuesState] = useState<TValues>(initialValues);
-  const [status, setStatus] = useState<TFormSubmissionStatus>('idle');
+  const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
   const [isPending, startTransition] = useTransition();
 
   const setValues: Dispatch<SetStateAction<TValues>> = (update) => {
-    setStatus('idle');
+    setStatus(FORM_STATUS.IDLE);
     setValuesState(update);
   };
 
@@ -45,7 +44,7 @@ export const useFormSubmission = <TValues, TResult extends { ok: boolean }>({
     new Promise<boolean>((resolve) => {
       startTransition(async () => {
         const result = await onSubmit(values);
-        setStatus(result.ok ? 'success' : 'error');
+        setStatus(result.ok ? FORM_STATUS.SUCCESS : FORM_STATUS.ERROR);
         if (result.ok) {
           onSuccess?.(values, result);
         }
