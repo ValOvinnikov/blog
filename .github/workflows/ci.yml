@@ -119,28 +119,53 @@ jobs:
             echo "scripts=${scripts}"
           } | tee -a "${GITHUB_OUTPUT}"
 
-  type-check:
-    name: Type-check
+  # One install for every check that reads the source. Each step after setup
+  # runs even when an earlier one failed, so one run reports every failure;
+  # the step names are the job names they replaced.
+  verify:
+    name: Verify
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     needs: changes
-    timeout-minutes: 15
+    timeout-minutes: 30
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      FULL: ${{ needs.changes.outputs.full }}
+      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
-      # `--affected` reads history back to the base; a shallow clone runs everything.
+      # Full history serves turbo's `--affected` (a shallow clone runs
+      # everything), the format step's diff against the base, and Migration
+      # index, which reads the head commit and `origin/main` — this fetch,
+      # made with the job token, is what creates that ref.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - uses: ./.github/actions/setup
+        id: setup
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
+      # Only the files this pull request added or changed, so a file it did not
+      # touch never fails it. Prettier skips anything `.prettierignore` names
+      # even when passed explicitly, and `--ignore-unknown` skips file types it
+      # cannot parse.
+      - name: Format
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE_SHA}" ] || [ -z "${HEAD_SHA}" ]; then
+            echo "::notice::No pull-request base; nothing to diff against."
+            exit 0
+          fi
+          git diff --name-only --diff-filter=ACMR -z "${BASE_SHA}...${HEAD_SHA}" \
+            | xargs -0 --no-run-if-empty pnpm exec prettier --check --ignore-unknown --no-error-on-unmatched-pattern
+
       - name: Type-check
-        env:
-          FULL: ${{ needs.changes.outputs.full }}
-          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: |
           if [ "${FULL}" = 'true' ]; then
             pnpm turbo run type-check
@@ -148,28 +173,8 @@ jobs:
             pnpm turbo run type-check --affected
           fi
 
-  lint:
-    name: Lint
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    needs: changes
-    timeout-minutes: 15
-    steps:
-      # `--affected` reads history back to the base; a shallow clone runs everything.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
       - name: Lint
-        env:
-          FULL: ${{ needs.changes.outputs.full }}
-          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: |
           if [ "${FULL}" = 'true' ]; then
             pnpm turbo run lint
@@ -177,26 +182,108 @@ jobs:
             pnpm turbo run lint --affected
           fi
 
-  knip:
-    name: Knip
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
       # `--treat-config-hints-as-errors` fails on an ignore or entry in
       # knip.json that no longer hides anything, so stale rules cannot rot
       # into ones that hide real findings later. Never `--fix`.
       - name: Knip
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: pnpm knip --reporter github-actions --treat-config-hints-as-errors
+
+      # A `'use client'` module that can reach an `import 'server-only'` module
+      # fails `next build` under the `react-server` condition — and nothing
+      # else catches it, because every workspace aliases `@blog/<pkg>/*`
+      # straight to that package's `src/`, so a deep import resolves whether or
+      # not the package declares the subpath.
+      - name: Client graph
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: pnpm check:client-graph
+
+      # A tag passed to `isr(...)` in packages/service with no entry in
+      # apps/web's REVALIDATE_TAGS silently purges nothing on publish.
+      - name: Revalidate tags sync
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: pnpm check:revalidate-tags-sync
+
+      # Turbo strict env mode strips any var missing from the `build` task's
+      # `env` allowlist, so a var declared in an env.ts but not in turbo.json
+      # silently disappears at build time.
+      - name: Turbo env sync
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: pnpm check:turbo-env-sync
+
+      # Drift, structure (a component folder that produced no entry or a slot
+      # that did not resolve) and descriptions over packages/ui/COMPONENTS.md.
+      - name: UI index
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: pnpm gen:ui-index:check
+
+      # With no REQUIRED_ENV_ENVIRONMENT the script runs only its
+      # classification half; presence is the Required env matrix's.
+      - name: Required env classification
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: pnpm check:required-env
+
+      # Judged on the pull request's own journal: the merge result checked out
+      # here has already reconciled it with `main`'s.
+      - name: Migration index
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        env:
+          MIGRATION_INDEX_HEAD_REF: ${{ github.event.pull_request.head.sha || 'HEAD' }}
+        run: pnpm check:migration-index
+
+      # They import the repo's typescript, so they need this job's install
+      # rather than the install-free Workflow security workflow.
+      - name: Script helper tests
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: node --test scripts/*.test.mjs
+
+      # Drift guard: a schema change merged without `pnpm typegen` ships stale
+      # but self-consistent types that type-check cannot catch. Typegen is
+      # non-deterministic, so a mismatch gets three attempts before it counts
+      # as drift. The trap puts the committed output back however the step
+      # ends, so Build always compiles what the pull request committed.
+      - name: Typegen
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && needs.changes.outputs.studio == 'true' }}
+        run: |
+          set -euo pipefail
+          generated=packages/config/src/sanity/generated
+          trap 'git checkout HEAD -- "${generated}" && git clean -fdq -- "${generated}"' EXIT
+          for attempt in 1 2 3; do
+            (cd packages/studio && pnpm typegen)
+            if [ -z "$(git status --porcelain -- "${generated}")" ]; then
+              echo "Committed typegen output is current (attempt ${attempt})."
+              exit 0
+            fi
+            echo "Attempt ${attempt}: regenerated output differs from committed output."
+          done
+          echo '::group::typegen drift (regenerated vs committed)'
+          git status --porcelain -- "${generated}"
+          git --no-pager diff --color=never -- "${generated}"
+          echo '::endgroup::'
+          echo "::error::Committed generated types in ${generated} are stale. Run 'pnpm typegen' locally and commit the regenerated files."
+          exit 1
+
+      # turbo's outputs exclude .next/cache, so a turbo cache miss would
+      # otherwise recompile both apps from nothing. The restore key stops at
+      # the lockfile, so no fallback serves a cache built against other
+      # dependencies.
+      - name: Cache Next.js build cache
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/*/.next/cache
+          key: next-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/*/src/**') }}
+          restore-keys: |
+            next-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      # @blog/service validates its env at import time. CI has no Sanity env
+      # vars and the build does not fetch, so validation is skipped here; it
+      # still runs at deploy time on Vercel.
+      - name: Build
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        env:
+          SKIP_ENV_VALIDATION: 'true'
+        run: pnpm build
 
   test:
     name: Test
@@ -228,172 +315,6 @@ jobs:
           else
             pnpm turbo run test --affected --concurrency=2
           fi
-
-  typegen:
-    name: Typegen
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # Drift guard: regenerate schema.json + types.ts from the current
-      # schemas and require the committed output to match — a schema change
-      # merged without `pnpm typegen` ships stale (but self-consistent) types
-      # that type-check alone can't catch. Typegen is non-deterministic (see
-      # CLAUDE.md), so a mismatch gets up to 3 regeneration attempts before it
-      # counts as drift. Read-only: nothing is committed from CI.
-      - name: Typegen (verify committed output is current)
-        run: |
-          set -euo pipefail
-          generated=packages/config/src/sanity/generated
-          for attempt in 1 2 3; do
-            (cd packages/studio && pnpm typegen)
-            if [ -z "$(git status --porcelain -- "$generated")" ]; then
-              echo "Committed typegen output is current (attempt ${attempt})."
-              exit 0
-            fi
-            echo "Attempt ${attempt}: regenerated output differs from committed output."
-          done
-          echo '::group::typegen drift (regenerated vs committed)'
-          git status --porcelain -- "$generated"
-          git --no-pager diff --color=never -- "$generated"
-          echo '::endgroup::'
-          echo "::error::Committed generated types in ${generated} are stale. Run 'pnpm typegen' locally and commit the regenerated files."
-          exit 1
-
-  ui-index:
-    name: UI index
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # `--verify` runs three read-only guards over packages/ui/COMPONENTS.md
-      # (regenerated from the ui sources by scripts/gen-ui-index.mjs) in one
-      # parse: drift (committed index stale vs. the sources), structure (a
-      # component folder that produced no entry or a compound slot that didn't
-      # resolve — a silently-unindexed component), and descriptions (an exported
-      # component/slot with no JSDoc description). The pre-commit hook runs the
-      # same structure+description guards locally; this is the CI backstop.
-      # Nothing is committed.
-      - name: UI index (verify current, complete + documented)
-        run: pnpm gen:ui-index:check
-
-      # Fixture-based unit tests for the generator's props-resolution helpers
-      # (#1763). The drift guard above only catches a regression while the real
-      # component tree still happens to contain a component of each shape;
-      # these pin the behaviour against inline sources instead. They live in
-      # this job rather than workflow-security.yml because they import the
-      # repo's typescript, which only the pnpm-install jobs have.
-      - name: UI index (helper unit tests)
-        run: pnpm gen:ui-index:test
-
-  turbo-env-sync:
-    name: Turbo env sync
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # Turbo strict env mode strips any var not in the "build" task's "env"
-      # allowlist before running the build, so a var declared in an app's or
-      # a dependency package's env.ts but missing from turbo.json silently
-      # disappears at build time. Parses every relevant env.ts as a
-      # TypeScript AST and compares the declared keys against the allowlist.
-      # Read-only; nothing is committed.
-      - name: Turbo build env allowlist (web/platform in sync)
-        run: pnpm check:turbo-env-sync
-
-      # Fixture-based unit tests for the extraction + comparison helpers, same
-      # rationale as the UI index job above — they need the repo's typescript
-      # package, which only the pnpm-install jobs have.
-      - name: Turbo env sync (helper unit tests)
-        run: pnpm check:turbo-env-sync:test
-
-  revalidate-tags-sync:
-    name: Revalidate tags sync
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # apps/web's REVALIDATE_TAGS map (the revalidation webhook's `_type` →
-      # ISR tag lookup) is hand-synced against the `isr(...)` tag literals in
-      # packages/service/src loaders — a new tag added there with no matching
-      # entry silently purges nothing on publish. Parses every loader as a
-      # TypeScript AST and compares the extracted tag literals against
-      # REVALIDATE_TAGS's value union. Read-only; nothing is committed.
-      - name: REVALIDATE_TAGS covers every isr(...) tag literal
-        run: pnpm check:revalidate-tags-sync
-
-      # Fixture-based unit tests for the extraction + comparison helpers, same
-      # rationale as the UI index/turbo env sync jobs above — they need the
-      # repo's typescript package, which only the pnpm-install jobs have.
-      - name: Revalidate tags sync (helper unit tests)
-        run: pnpm check:revalidate-tags-sync:test
-
-  client-graph:
-    name: Client graph
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # A `'use client'` module that can reach an `import 'server-only'` module
-      # fails `next build` under the `react-server` condition — and nothing
-      # else catches it, because every workspace aliases `@blog/<pkg>/*`
-      # straight to that package's `src/`, so a deep import resolves whether or
-      # not the package declares the subpath. Walks each client entrypoint's
-      # runtime import graph and fails on any chain reaching `server-only`.
-      # Read-only; nothing is committed.
-      - name: No server-only code reachable from the client graph
-        run: pnpm check:client-graph
-
-      # Fixture-based unit tests for the directive/specifier/resolution
-      # helpers, same rationale as the sync jobs above — they need the repo's
-      # typescript package, which only the pnpm-install jobs have.
-      - name: Client graph (helper unit tests)
-        run: pnpm check:client-graph:test
 
   required-env:
     name: Required env (${{ matrix.environment }})
@@ -452,62 +373,6 @@ jobs:
           REQUIRED_ENV_PRESENT_VERCEL_PROJECT_ID_WEB: ${{ vars.VERCEL_PROJECT_ID_WEB != '' }}
         run: pnpm check:required-env
 
-      # Fixture-based unit tests for the extraction + classification helpers,
-      # same rationale as the jobs above. Pinned to one matrix leg because they
-      # read no environment context and would otherwise run identically twice.
-      - name: Required env (helper unit tests)
-        if: matrix.environment == 'development'
-        run: pnpm check:required-env:test
-
-  migration-index:
-    name: Migration index
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      # The only job here that pins the PR's own head rather than taking the
-      # default merge ref. The question this check asks is whether the commits
-      # on this branch claim an index `main` has already given to a different
-      # migration — a property of the branch, not of a merge result. The merge
-      # ref is the wrong artefact to ask it of: a merge that succeeds has
-      # already reconciled the two journals, and one that fails produces no
-      # merge ref to check out at all.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # The checkout above fetches only this PR's merge ref, so `origin/main`
-      # does not exist yet and the check below would have nothing to compare
-      # against. The explicit refspec is what creates the remote-tracking ref;
-      # a bare `git fetch origin main` only moves FETCH_HEAD. This repo is
-      # public, so the anonymous remote works without the credentials the
-      # checkout deliberately drops.
-      - name: Fetch main to compare against
-        run: git fetch --no-tags --depth=1 origin +refs/heads/main:refs/remotes/origin/main
-
-      # drizzle-kit numbers each migration sequentially from whatever is on
-      # main at `db:generate` time, so two branches generating concurrently
-      # both claim the same index. Nothing surfaces that until the second one
-      # merges and hits an add/add conflict on meta/<idx>_snapshot.json — long
-      # after CI went green, and a conflicted PR produces no merge ref, so its
-      # checks stop reporting entirely. Failing here keeps the fix at one
-      # cheap regenerate. Read-only; nothing is committed.
-      - name: Migration indices (no collision with main)
-        run: pnpm check:migration-index
-
-      # Fixture-based unit tests for the journal parsing + comparison helpers.
-      # Unlike the four jobs above these need no repo dependencies, but they
-      # stay beside the check they cover rather than moving to the
-      # install-free Hooks workflow.
-      - name: Migration index (helper unit tests)
-        run: pnpm check:migration-index:test
-
   migrations:
     name: Migrations
     if: ${{ !github.event.pull_request.draft }}
@@ -561,62 +426,16 @@ jobs:
             echo "::endgroup::"
           done
 
-  build:
-    name: Build
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    needs: [type-check, lint, test, typegen]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # turbo's outputs exclude .next/cache, so a turbo cache miss would
-      # otherwise recompile both apps from nothing.
-      - name: Cache Next.js build cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: apps/*/.next/cache
-          key: next-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            next-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
-            next-cache-${{ runner.os }}-
-
-      - name: Build
-        run: pnpm build
-        # @blog/service validates its env at import time (Zod via
-        # @t3-oss/env-core). CI has no Sanity env vars, so skip validation
-        # here — the build doesn't fetch, and real validation still runs at
-        # deploy time on Vercel where the vars are set. Pages tolerate a
-        # missing client (service fetchers return an `ok: false` Result).
-        env:
-          SKIP_ENV_VALIDATION: 'true'
-
   ci:
     name: CI
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs:
       - changes
-      - type-check
-      - lint
-      - knip
+      - verify
       - test
-      - typegen
-      - ui-index
-      - turbo-env-sync
-      - revalidate-tags-sync
-      - client-graph
       - required-env
-      - migration-index
       - migrations
-      - build
     # Without this a failed need skips the job, and a skipped check reads as
     # passed; `!cancelled()` rather than `always()` so a superseded run stops.
     if: ${{ !cancelled() }}
