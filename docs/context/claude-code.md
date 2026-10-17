@@ -826,9 +826,9 @@ file` are all denied alike) — an earlier version only handled the
   into one PR. See `open-pull-request`'s "Stacked PRs" section.
 
   A PR receives the full required suite whatever branch it targets. The two
-  workflows behind the eight required checks — `ci.yml` (Type-check, Lint,
-  Test, Build, Typegen, Migrations, Knip) and `workflow-security.yml`
-  (Workflow security) — each declare a
+  workflows behind the two required checks — `ci.yml` (`CI`, which gathers
+  every job in the file) and `workflow-security.yml` (`Workflow security`) —
+  each declare a
   bare `pull_request:` trigger with no `branches:` filter,
   which is what makes stacking usable. Keep it that way: each file scopes its
   own trigger, so re-adding `branches: [main]` to any one of them drops that
