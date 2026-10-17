@@ -1,4 +1,4 @@
-import { ICONS } from '@blog/config';
+import { ICONS, FORM_STATUS } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
@@ -7,14 +7,19 @@ import { NewsletterSignupFull } from './newsletter-signup-full';
 
 faker.seed(123);
 
+const SUBMIT_LABEL = faker.lorem.word();
+const EMAIL_LABEL = faker.lorem.words(2);
+const FIRST_CUE = faker.lorem.words(2);
+const SECOND_CUE = faker.lorem.words(3);
+
 const baseArgs = {
   email: '',
   onChange: vi.fn(),
   onSubmit: vi.fn(),
-  status: 'idle' as const,
+  status: FORM_STATUS.IDLE,
   heading: faker.lorem.sentence(3),
-  submitLabel: 'Subscribe',
-  emailAriaLabel: 'Email address',
+  submitLabel: SUBMIT_LABEL,
+  emailAriaLabel: EMAIL_LABEL,
 };
 
 const setup = customRender(NewsletterSignupFull, baseArgs);
@@ -74,21 +79,19 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     setup({ heading: undefined });
 
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
+    expect(screen.getByRole('textbox', { name: EMAIL_LABEL })).toBeVisible();
   });
 
   it('renders the trust cues without a heading when heading is omitted', () => {
     setup({
       heading: undefined,
       trustCues: [
-        { icon: <Icon name={ICONS.SHIELD_CHECK} />, label: 'No spam' },
+        { icon: <Icon name={ICONS.SHIELD_CHECK} />, label: FIRST_CUE },
       ],
     });
 
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(screen.getByText('No spam')).toBeVisible();
+    expect(screen.getByText(FIRST_CUE)).toBeVisible();
   });
 
   describe('with the default props', () => {
@@ -111,22 +114,22 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     const trustCues = [
       {
         icon: <Icon name={ICONS.SHIELD_CHECK} />,
-        label: 'No spam',
+        label: FIRST_CUE,
       },
       {
         icon: <Icon name={ICONS.X} />,
-        label: 'Unsubscribe in one line',
+        label: SECOND_CUE,
       },
     ];
     setup({ trustCues });
 
-    expect(screen.getByText('No spam')).toBeVisible();
-    expect(screen.getByText('Unsubscribe in one line')).toBeVisible();
+    expect(screen.getByText(FIRST_CUE)).toBeVisible();
+    expect(screen.getByText(SECOND_CUE)).toBeVisible();
   });
 
   it('shows the success message and hides the field on success', () => {
     const successMessage = faker.lorem.sentence();
-    setup({ status: 'success', successMessage });
+    setup({ status: FORM_STATUS.SUCCESS, successMessage });
 
     expect(screen.getByRole('status')).toHaveTextContent(successMessage);
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();

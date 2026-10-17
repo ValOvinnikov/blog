@@ -41,12 +41,3 @@ export interface ITenantLocalizedSlugParams extends ITenantLocalizedParams {
 export interface ITenantIdParams {
   tenantId: string;
 }
-
-export const FORM_STATUSES = [
-  'idle',
-  'submitting',
-  'success',
-  'error',
-] as const;
-
-export type TFormStatus = (typeof FORM_STATUSES)[number];

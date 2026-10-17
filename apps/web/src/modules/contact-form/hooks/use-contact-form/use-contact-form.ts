@@ -1,4 +1,4 @@
-import type { TFormStatus } from '@blog/config';
+import { FORM_STATUS, type TFormStatus } from '@blog/config';
 import {
   submitContactMessage,
   type TContactRefusal,
@@ -24,7 +24,7 @@ export const useContactForm = () => {
   const pathname = usePathname();
   const [fields, setFields] = useState(EMPTY_FIELDS);
   const [website, setWebsite] = useState('');
-  const [status, setStatus] = useState<TFormStatus>('idle');
+  const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
   const [invalidFields, setInvalidFields] = useState<TContactField[]>([]);
   const [refusal, setRefusal] = useState<TContactRefusal>();
 
@@ -43,7 +43,7 @@ export const useContactForm = () => {
       return;
     }
 
-    setStatus('submitting');
+    setStatus(FORM_STATUS.SUBMITTING);
     const result = await submitContactMessage({
       ...fields,
       website,
@@ -51,11 +51,11 @@ export const useContactForm = () => {
     }).catch(() => SERVER_ERROR);
 
     if (result.outcome === 'sent') {
-      setStatus('success');
+      setStatus(FORM_STATUS.SUCCESS);
       return;
     }
 
-    setStatus('error');
+    setStatus(FORM_STATUS.ERROR);
     if (result.outcome === 'invalid') {
       setInvalidFields(result.invalidFields);
       return;

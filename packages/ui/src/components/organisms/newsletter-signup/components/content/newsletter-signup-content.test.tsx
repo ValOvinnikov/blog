@@ -1,3 +1,4 @@
+import { FORM_STATUS } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
@@ -6,13 +7,16 @@ import { NewsletterSignupContent } from './newsletter-signup-content';
 
 faker.seed(123);
 
+const SUBMIT_LABEL = faker.lorem.word();
+const EMAIL_LABEL = faker.lorem.words(2);
+
 const baseArgs = {
   email: '',
   onChange: vi.fn(),
   onSubmit: vi.fn(),
-  submitLabel: 'Subscribe',
-  emailAriaLabel: 'Email address',
-  status: 'idle' as const,
+  submitLabel: SUBMIT_LABEL,
+  emailAriaLabel: EMAIL_LABEL,
+  status: FORM_STATUS.IDLE,
   inputPrompt: (
     <span data-testid="newsletter-signup-content-prompt" aria-hidden="true">
       $
@@ -21,7 +25,7 @@ const baseArgs = {
   variant: 'full' as const,
 };
 
-const errorMessage = 'That email is already subscribed.';
+const errorMessage = faker.lorem.sentence();
 
 const setup = customRender(NewsletterSignupContent, baseArgs);
 
@@ -32,14 +36,12 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('renders a labeled email field and submit button', () => {
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+      expect(screen.getByRole('textbox', { name: EMAIL_LABEL })).toBeVisible();
+      expect(screen.getByRole('button', { name: SUBMIT_LABEL })).toBeVisible();
     });
 
     it('associates the email field with its accessible label', () => {
-      expect(screen.getByLabelText('Email address')).toHaveAttribute(
+      expect(screen.getByLabelText(EMAIL_LABEL)).toHaveAttribute(
         'type',
         'email',
       );
@@ -52,10 +54,9 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('submits through a real submit control, not an onClick shortcut', () => {
-      expect(screen.getByRole('button', { name: 'Subscribe' })).toHaveAttribute(
-        'type',
-        'submit',
-      );
+      expect(
+        screen.getByRole('button', { name: SUBMIT_LABEL }),
+      ).toHaveAttribute('type', 'submit');
     });
   });
 
@@ -73,7 +74,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
       name: 'clicking the submit button',
       submit: async () => {
         await userEvent.click(
-          screen.getByRole('button', { name: 'Subscribe' }),
+          screen.getByRole('button', { name: SUBMIT_LABEL }),
         );
       },
     },
@@ -94,18 +95,18 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
 
   describe('while submitting', () => {
     beforeEach(() => {
-      setup({ status: 'submitting' });
+      setup({ status: FORM_STATUS.SUBMITTING });
     });
 
     it('disables the field and button and marks the button busy while submitting', () => {
       expect(screen.getByRole('textbox')).toBeDisabled();
-      const button = screen.getByRole('button', { name: 'Subscribe' });
+      const button = screen.getByRole('button', { name: SUBMIT_LABEL });
       expect(button).toBeDisabled();
       expect(button).toHaveAttribute('aria-busy', 'true');
     });
 
     it('shows the Spinner atom inside the button while submitting', () => {
-      const button = screen.getByRole('button', { name: 'Subscribe' });
+      const button = screen.getByRole('button', { name: SUBMIT_LABEL });
       expect(screen.getByTestId('newsletter-signup-spinner')).toBeVisible();
       expect(button).toContainElement(
         screen.getByTestId('newsletter-signup-spinner'),
@@ -114,7 +115,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
   });
 
   it('surfaces the error message inline and marks the field invalid', () => {
-    setup({ status: 'error', errorMessage });
+    setup({ status: FORM_STATUS.ERROR, errorMessage });
 
     expect(screen.getByRole('alert')).toHaveTextContent(errorMessage);
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
@@ -122,8 +123,8 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
 
   it('renders the error message without an icon', () => {
     setup({
-      status: 'error',
-      errorMessage: 'That email is already subscribed.',
+      status: FORM_STATUS.ERROR,
+      errorMessage,
     });
 
     expect(screen.getByRole('alert')).toBeVisible();
@@ -131,14 +132,14 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
   });
 
   it('does not render an error when status is not error', () => {
-    setup({ errorMessage: 'ignored while idle' });
+    setup({ errorMessage: faker.lorem.sentence() });
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('associates the email field with the error message via its accessible description', () => {
     setup({
-      status: 'error',
+      status: FORM_STATUS.ERROR,
       errorMessage,
       errorMessageId: 'newsletter-content-error',
     });

@@ -7,6 +7,7 @@ import {
   type TContentAlignment,
   type TFormStatus,
   type TMaybeUndefined,
+  FORM_STATUS,
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
@@ -41,7 +42,7 @@ export const NewsletterForm = ({
 }: TNewsletterFormProps) => {
   const t = useTranslations('newsletterForm');
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<TFormStatus>('idle');
+  const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
   const [errorMessage, setErrorMessage] =
     useState<TMaybeUndefined<string>>(undefined);
   const errorMessageId = useId();
@@ -49,30 +50,30 @@ export const NewsletterForm = ({
   const handleEmailChange = (value: string) => {
     setEmail(value);
 
-    if (status === 'error') {
-      setStatus('idle');
+    if (status === FORM_STATUS.ERROR) {
+      setStatus(FORM_STATUS.IDLE);
       setErrorMessage(undefined);
     }
   };
 
   const handleSubmit = async () => {
     if (!isValidEmail(email)) {
-      setStatus('error');
+      setStatus(FORM_STATUS.ERROR);
       setErrorMessage(t('errorInvalid'));
       return;
     }
 
-    setStatus('submitting');
+    setStatus(FORM_STATUS.SUBMITTING);
     setErrorMessage(undefined);
 
     const result = await subscribeToNewsletterAction(email);
 
     if (result.outcome === 'success') {
-      setStatus('success');
+      setStatus(FORM_STATUS.SUCCESS);
       return;
     }
 
-    setStatus('error');
+    setStatus(FORM_STATUS.ERROR);
     setErrorMessage(t(ERROR_MESSAGE_KEYS[result.outcome]));
   };
 

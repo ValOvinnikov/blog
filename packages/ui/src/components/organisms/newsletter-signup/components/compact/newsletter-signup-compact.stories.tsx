@@ -1,8 +1,11 @@
-import { CONTENT_ALIGNMENT, FORM_STATUSES } from '@blog/config';
+import { CONTENT_ALIGNMENT, FORM_STATUS } from '@blog/config';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import { objectKeys } from '@blog/utils/primitives';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
+faker.seed(123);
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Compact',
@@ -12,7 +15,7 @@ const meta = {
   argTypes: {
     status: {
       control: 'select',
-      options: FORM_STATUSES,
+      options: Object.values(FORM_STATUS),
     },
     align: {
       control: 'select',
@@ -23,14 +26,14 @@ const meta = {
     email: '',
     onChange: () => {},
     onSubmit: () => {},
-    status: 'idle',
-    heading: 'subscribe --email',
+    status: FORM_STATUS.IDLE,
+    heading: faker.lorem.words(2),
     headingId: 'newsletter-signup-compact-heading',
     prefix: <span aria-hidden="true">$</span>,
-    submitLabel: 'subscribe ↵',
-    emailAriaLabel: 'Email address',
-    placeholder: 'you@domain.dev',
-    successMessage: 'Almost there — check your inbox to confirm.',
+    submitLabel: faker.lorem.word(),
+    emailAriaLabel: faker.lorem.words(2),
+    placeholder: faker.internet.email(),
+    successMessage: faker.lorem.sentence(),
   },
 } satisfies Meta<typeof NewsletterSignup.Compact>;
 
@@ -40,18 +43,18 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Submitting: TStory = {
-  args: { status: 'submitting', email: 'reader@example.dev' },
+  args: { status: FORM_STATUS.SUBMITTING, email: faker.internet.email() },
 };
 
 export const Success: TStory = {
-  args: { status: 'success' },
+  args: { status: FORM_STATUS.SUCCESS },
 };
 
 export const Error: TStory = {
   args: {
-    status: 'error',
-    email: 'not-an-email',
-    errorMessage: 'Enter a valid email address.',
+    status: FORM_STATUS.ERROR,
+    email: faker.lorem.word(),
+    errorMessage: faker.lorem.sentence(),
     errorMessageId: 'newsletter-signup-compact-error',
   },
 };

@@ -1,3 +1,4 @@
+import { FORM_STATUS } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
@@ -5,19 +6,23 @@ import { NewsletterSignupCompact } from './newsletter-signup-compact';
 
 faker.seed(123);
 
+const HEADING = faker.lorem.words(2);
+const SUBMIT_LABEL = faker.lorem.word();
+const EMAIL_LABEL = faker.lorem.words(2);
+
 const baseArgs = {
   email: '',
   onChange: vi.fn(),
   onSubmit: vi.fn(),
-  status: 'idle' as const,
-  heading: 'subscribe --email',
+  status: FORM_STATUS.IDLE,
+  heading: HEADING,
   prefix: (
     <span data-testid="newsletter-signup-compact-prefix" aria-hidden="true">
       $
     </span>
   ),
-  submitLabel: 'Subscribe',
-  emailAriaLabel: 'Email address',
+  submitLabel: SUBMIT_LABEL,
+  emailAriaLabel: EMAIL_LABEL,
 };
 
 const setup = customRender(NewsletterSignupCompact, baseArgs);
@@ -36,22 +41,20 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
 
     it('renders as a slim strip with no heading element', () => {
       expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-      expect(screen.getByText('subscribe --email')).toBeVisible();
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
+      expect(screen.getByText(HEADING)).toBeVisible();
+      expect(screen.getByRole('textbox', { name: EMAIL_LABEL })).toBeVisible();
     });
 
     it('renders the label with no id when headingId is omitted', () => {
-      expect(screen.getByText('subscribe --email')).not.toHaveAttribute('id');
+      expect(screen.getByText(HEADING)).not.toHaveAttribute('id');
     });
 
     it('renders the prefix node as-is, ahead of the heading', () => {
       const prefix = screen.getByTestId('newsletter-signup-compact-prefix');
       expect(prefix).toHaveTextContent('$');
-      expect(
-        prefix.compareDocumentPosition(screen.getByText('subscribe --email')),
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(prefix.compareDocumentPosition(screen.getByText(HEADING))).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
     });
 
     it('renders the chevron icon as the email field prompt', () => {
@@ -71,7 +74,7 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
   it('assigns headingId to the label element when provided', () => {
     setup({ headingId: 'newsletter-compact-heading' });
 
-    expect(screen.getByText('subscribe --email')).toHaveAttribute(
+    expect(screen.getByText(HEADING)).toHaveAttribute(
       'id',
       'newsletter-compact-heading',
     );
@@ -80,13 +83,11 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
   it('renders neither label nor prefix when both are omitted', () => {
     setup({ heading: undefined, prefix: undefined });
 
-    expect(screen.queryByText('subscribe --email')).not.toBeInTheDocument();
+    expect(screen.queryByText(HEADING)).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('newsletter-signup-compact-prefix'),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
+    expect(screen.getByRole('textbox', { name: EMAIL_LABEL })).toBeVisible();
   });
 
   it('renders no prefix element when prefix is omitted', () => {
@@ -99,7 +100,7 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
 
   describe('on success', () => {
     beforeEach(() => {
-      setup({ status: 'success', successMessage });
+      setup({ status: FORM_STATUS.SUCCESS, successMessage });
     });
 
     it('shows the success message and hides the field on success', () => {
@@ -111,7 +112,7 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
       expect(
         screen.getByTestId('newsletter-signup-compact-prefix'),
       ).toBeVisible();
-      expect(screen.getByText('subscribe --email')).toBeVisible();
+      expect(screen.getByText(HEADING)).toBeVisible();
     });
   });
 

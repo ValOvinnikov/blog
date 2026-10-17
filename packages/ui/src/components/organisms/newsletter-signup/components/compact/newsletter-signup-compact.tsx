@@ -5,6 +5,7 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   type TFormStatus,
+  FORM_STATUS,
 } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Icon } from '@blog/ui/components/atoms/icon';
@@ -52,7 +53,7 @@ export const NewsletterSignupCompact = ({
   className,
   dataTestId,
 }: TNewsletterSignupCompactProps) => {
-  const isSuccess = status === 'success';
+  const isSuccess = status === FORM_STATUS.SUCCESS;
   const s = newsletterSignupVariants({ variant: 'compact', align });
 
   return (

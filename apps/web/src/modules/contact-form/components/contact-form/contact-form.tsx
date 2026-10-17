@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, FORM_STATUS } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
@@ -49,13 +49,13 @@ export const ContactForm = ({
   } = useContactForm();
   const s = contactFormVariants();
 
-  if (status === 'success') {
+  if (status === FORM_STATUS.SUCCESS) {
     return (
       <ContactFormSuccess title={t('successTitle')} message={successMessage} />
     );
   }
 
-  const isSubmitting = status === 'submitting';
+  const isSubmitting = status === FORM_STATUS.SUBMITTING;
 
   const fieldInput = (field: TContactField) => {
     const label = t(FIELD_MESSAGE_KEYS[field].label);

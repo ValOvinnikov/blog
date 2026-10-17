@@ -1,3 +1,4 @@
+import { FORM_STATUS } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
@@ -5,14 +6,17 @@ import { NewsletterSignup } from './newsletter-signup';
 
 faker.seed(123);
 
+const SUBMIT_LABEL = faker.lorem.word();
+const EMAIL_LABEL = faker.lorem.words(2);
+
 const baseArgs = {
   email: '',
   onChange: vi.fn(),
   onSubmit: vi.fn(),
-  status: 'idle' as const,
+  status: FORM_STATUS.IDLE,
   heading: faker.lorem.sentence(3),
-  submitLabel: 'Subscribe',
-  emailAriaLabel: 'Email address',
+  submitLabel: SUBMIT_LABEL,
+  emailAriaLabel: EMAIL_LABEL,
 };
 
 describe('NewsletterSignup', () => {
