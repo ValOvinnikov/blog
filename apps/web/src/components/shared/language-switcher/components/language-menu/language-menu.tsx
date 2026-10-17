@@ -57,7 +57,7 @@ export const LanguageMenu = ({
         variant={isInFooter ? undefined : 'bordered'}
         className={triggerClassName}
       >
-        {hasGlobe && <Icon name={ICONS.GLOBE} size={SIZE.SM} />}
+        {hasGlobe && <Icon name={ICONS.GLOBE} size={SIZE.MD} />}
         {isInFooter && current.label}
         {isHeaderPill && current.code}
         {(isInFooter || isHeaderPill) && (
