@@ -50,16 +50,20 @@ vi.mock(
 
 vi.mock('@web/utils/logger/logger');
 
-const TENANT_ID = '11111111-1111-4111-8111-111111111111';
+const TENANT_ID = faker.string.uuid();
+const NAME = faker.person.fullName();
+const EMAIL = faker.internet.email();
+const MESSAGE = faker.lorem.sentences(2);
+const SOURCE_PATH = `/${faker.lorem.slug()}`;
 
 const makeInput = (
   overrides: Partial<TContactMessageInput> = {},
 ): TContactMessageInput => ({
-  name: 'Priya Nair',
-  email: 'priya@example.com',
-  message: 'Could we talk about the relaunch next week?',
+  name: NAME,
+  email: EMAIL,
+  message: MESSAGE,
   website: '',
-  sourcePath: '/en/contact',
+  sourcePath: SOURCE_PATH,
   ...overrides,
 });
 
@@ -88,13 +92,13 @@ describe('submitContactMessage', () => {
 
     expect(createLeadMock).toHaveBeenCalledWith({
       tenantId: TENANT_ID,
-      name: 'Priya Nair',
-      email: 'priya@example.com',
-      message: 'Could we talk about the relaunch next week?',
-      sourcePath: '/en/contact',
+      name: NAME,
+      email: EMAIL,
+      message: MESSAGE,
+      sourcePath: SOURCE_PATH,
     });
     expect(sendContactNotificationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ tenantId: TENANT_ID, name: 'Priya Nair' }),
+      expect.objectContaining({ tenantId: TENANT_ID, name: NAME }),
     );
   });
 
@@ -110,7 +114,7 @@ describe('submitContactMessage', () => {
 
   it('blocks a filled honeypot without storing or sending', async () => {
     await expect(
-      submitContactMessage(makeInput({ website: 'https://spam.example' })),
+      submitContactMessage(makeInput({ website: faker.internet.url() })),
     ).resolves.toEqual({ outcome: 'blocked' });
     expect(isRateLimitedMock).not.toHaveBeenCalled();
     expect(createLeadMock).not.toHaveBeenCalled();
@@ -161,7 +165,11 @@ describe('submitContactMessage', () => {
   it('names every invalid field without storing or sending', async () => {
     await expect(
       submitContactMessage(
-        makeInput({ name: ' ', email: 'not-an-email', message: 'Too short' }),
+        makeInput({
+          name: ' ',
+          email: faker.lorem.word(),
+          message: faker.string.alpha(9),
+        }),
       ),
     ).resolves.toEqual({
       outcome: 'invalid',
@@ -177,16 +185,23 @@ describe('submitContactMessage', () => {
   });
 
   it('strips line breaks from the name before storing it', async () => {
-    await submitContactMessage(makeInput({ name: 'Priya\r\nBcc: x@y.z' }));
+    const firstName = faker.person.firstName();
+    const injected = `Bcc: ${faker.internet.email()}`;
+
+    await submitContactMessage(
+      makeInput({ name: `${firstName}\r\n${injected}` }),
+    );
 
     expect(createLeadMock).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Priya Bcc: x@y.z' }),
+      expect.objectContaining({ name: `${firstName} ${injected}` }),
     );
   });
 
   it('stores the site root when the source path is not a local path', async () => {
     await submitContactMessage(
-      makeInput({ sourcePath: '//evil.example/phish' }),
+      makeInput({
+        sourcePath: `//${faker.internet.domainName()}/${faker.lorem.slug()}`,
+      }),
     );
 
     expect(createLeadMock).toHaveBeenCalledWith(
@@ -195,7 +210,9 @@ describe('submitContactMessage', () => {
   });
 
   it('still answers sent and logs once when the notification email fails', async () => {
-    sendContactNotificationMock.mockRejectedValue(new Error('resend down'));
+    sendContactNotificationMock.mockRejectedValue(
+      new Error(faker.lorem.sentence()),
+    );
 
     await expect(submitContactMessage(makeInput())).resolves.toEqual({
       outcome: 'sent',
@@ -208,7 +225,7 @@ describe('submitContactMessage', () => {
   });
 
   it('answers server-error without emailing when the lead cannot be stored', async () => {
-    createLeadMock.mockRejectedValue(new Error('db down'));
+    createLeadMock.mockRejectedValue(new Error(faker.lorem.sentence()));
 
     await expect(submitContactMessage(makeInput())).resolves.toEqual({
       outcome: 'server-error',

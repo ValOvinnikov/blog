@@ -1,5 +1,7 @@
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
+import { usePathname } from 'next/navigation';
 
 import { ContactForm } from './contact-form';
 
@@ -12,19 +14,20 @@ vi.mock(
   () => ({ submitContactMessage: submitContactMessageMock }),
 );
 
-vi.mock('next/navigation', () => ({ usePathname: () => '/en/contact' }));
+vi.mock('next/navigation', () => ({ usePathname: vi.fn() }));
 
-const SUCCESS_MESSAGE = "Thanks, we'll reply within a working day.";
-const MESSAGE = 'Could we talk about the relaunch next week?';
+const SUCCESS_MESSAGE = faker.lorem.sentence();
+const NAME = faker.person.fullName();
+const EMAIL = faker.internet.email();
+const MESSAGE = faker.lorem.sentences(2);
+const PRIVACY_NOTE = faker.lorem.sentence();
+const PATHNAME = `/${faker.lorem.slug()}`;
 
 const setup = customRender(ContactForm, { successMessage: SUCCESS_MESSAGE });
 
 const fillAndSend = async (user: UserEvent) => {
-  await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Priya Nair');
-  await user.type(
-    screen.getByRole('textbox', { name: 'Email' }),
-    'priya@example.com',
-  );
+  await user.type(screen.getByRole('textbox', { name: 'Name' }), NAME);
+  await user.type(screen.getByRole('textbox', { name: 'Email' }), EMAIL);
   await user.type(screen.getByRole('textbox', { name: 'Message' }), MESSAGE);
   await user.click(screen.getByRole('button', { name: 'Send message' }));
 };
@@ -34,6 +37,7 @@ describe(`<${ContactForm.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+    vi.mocked(usePathname).mockReturnValue(PATHNAME);
   });
 
   it('sends the typed message with the page it was sent from', async () => {
@@ -43,11 +47,11 @@ describe(`<${ContactForm.name}/>`, () => {
     await fillAndSend(user);
 
     expect(submitContactMessageMock).toHaveBeenCalledWith({
-      name: 'Priya Nair',
-      email: 'priya@example.com',
+      name: NAME,
+      email: EMAIL,
       message: MESSAGE,
       website: '',
-      sourcePath: '/en/contact',
+      sourcePath: PATHNAME,
     });
   });
 
@@ -75,9 +79,7 @@ describe(`<${ContactForm.name}/>`, () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       "Your message couldn't be sent.",
     );
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
-      'Priya Nair',
-    );
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(NAME);
     expect(screen.getByRole('textbox', { name: 'Message' })).toHaveValue(
       MESSAGE,
     );
@@ -92,15 +94,16 @@ describe(`<${ContactForm.name}/>`, () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Too many attempts.',
     );
-    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue(
-      'priya@example.com',
-    );
+    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue(EMAIL);
   });
 
   it('names each invalid field without sending', async () => {
     setup();
 
-    await user.type(screen.getByRole('textbox', { name: 'Message' }), 'Hi');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Message' }),
+      faker.string.alpha(9),
+    );
     await user.click(screen.getByRole('button', { name: 'Send message' }));
 
     expect(
@@ -130,10 +133,8 @@ describe(`<${ContactForm.name}/>`, () => {
   });
 
   it('renders the privacy note under the send button', () => {
-    setup({ privacyNote: 'We only use your details to reply.' });
+    setup({ privacyNote: PRIVACY_NOTE });
 
-    expect(
-      screen.getByText('We only use your details to reply.'),
-    ).toBeVisible();
+    expect(screen.getByText(PRIVACY_NOTE)).toBeVisible();
   });
 });

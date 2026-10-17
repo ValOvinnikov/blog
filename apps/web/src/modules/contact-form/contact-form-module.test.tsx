@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
@@ -42,16 +43,19 @@ vi.mock(
 
 vi.mock('@web/utils/logger/logger');
 
-const HEADING = 'Tell us about your project';
+const HEADING = faker.company.catchPhrase();
+const TENANT_ID = faker.string.uuid();
 
-const setup = customRenderAsync(ContactFormModule, { id: 'contact-form-1' });
+const setup = customRenderAsync(ContactFormModule, {
+  id: faker.string.uuid(),
+});
 
 describe(`<${ContactFormModule.name}/>`, () => {
   beforeEach(() => {
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
+      id: TENANT_ID,
       status: 'ACTIVE',
       deprovisionedAt: null,
     } as never);
@@ -83,7 +87,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
 
   it('renders nothing for a suspended tenant', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
+      id: TENANT_ID,
       status: 'SUSPENDED',
       deprovisionedAt: null,
     } as never);
