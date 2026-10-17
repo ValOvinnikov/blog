@@ -1,15 +1,15 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": [
+    "configs/**",
+    ".github/actions/setup/**",
+    ".nvmrc",
+    "pnpm-lock.yaml",
+    "turbo.json"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/configs/tsconfig/*.json",
-        "$TURBO_ROOT$/configs/tailwind/*.ts",
-        "$TURBO_ROOT$/configs/tailwind/*.css",
-        "$TURBO_ROOT$/configs/next/*.ts"
-      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
         "NODE_ENV",
@@ -60,16 +60,12 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/configs/eslint/*.js"]
-    },
+    "lint": {},
     "type-check": {
-      "dependsOn": ["^type-check"],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/configs/tsconfig/*.json"]
+      "dependsOn": ["^type-check"]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/configs/vitest/*.ts"]
+      "dependsOn": ["^build"]
     },
     "test:watch": {
       "cache": false,
@@ -91,12 +87,6 @@
       "persistent": true
     },
     "storybook:build": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/configs/tsconfig/*.json",
-        "$TURBO_ROOT$/configs/tailwind/*.ts",
-        "$TURBO_ROOT$/configs/tailwind/*.css"
-      ],
       "outputs": ["storybook-static/**"],
       "passThroughEnv": ["SKIP_ENV_VALIDATION"]
     }
