@@ -1,7 +1,13 @@
 'use server';
 
-import { CAPABILITY, TENANT_WRITE_REFUSAL } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  CAPABILITY,
+  TENANT_WRITE_REFUSAL,
+  type TActionResult,
+} from '@blog/config';
 import { queries } from '@blog/db';
+import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { sendNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { isSubscribeAttemptRefused } from '@web/server/newsletter/subscribe-guard/subscribe-guard';
@@ -10,39 +16,43 @@ import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate'
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
 
+export type TSubscribeRefusal =
+  | typeof ACTION_OUTCOME.RATE_LIMITED
+  | typeof ACTION_OUTCOME.SERVER_ERROR
+  | typeof ACTION_OUTCOME.UNAVAILABLE;
+
 export type TSubscribeResult =
-  | { outcome: 'success' }
-  | { outcome: 'already-subscribed' }
-  | { outcome: 'invalid' }
-  | { outcome: 'rate-limited' }
-  | { outcome: 'server-error' }
-  | { outcome: 'unavailable' };
+  | TActionResult<TSubscribeRefusal, 'email'>
+  | { outcome: typeof NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED };
+
+const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
+const UNAVAILABLE = { outcome: ACTION_OUTCOME.UNAVAILABLE } as const;
 
 export const subscribeToNewsletterAction = async (
   email: string,
 ): Promise<TSubscribeResult> => {
   if (!isValidEmail(email)) {
-    return { outcome: 'invalid' };
+    return { outcome: ACTION_OUTCOME.INVALID, invalidFields: ['email'] };
   }
 
   const tenant = await resolveWritableTenant('newsletter.subscribe');
   if (!tenant.ok) {
     if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
       logger.warn('newsletter.subscribe_tenant_not_active');
-      return { outcome: 'unavailable' };
+      return UNAVAILABLE;
     }
-    return { outcome: 'server-error' };
+    return SERVER_ERROR;
   }
   const { tenantId } = tenant;
 
   if (!(await isCapabilityEnabled(CAPABILITY.NEWSLETTER))) {
     logger.warn('newsletter.subscribe_capability_disabled');
-    return { outcome: 'unavailable' };
+    return UNAVAILABLE;
   }
 
   try {
     if (await isSubscribeAttemptRefused(tenantId)) {
-      return { outcome: 'rate-limited' };
+      return { outcome: ACTION_OUTCOME.RATE_LIMITED };
     }
 
     const result = await queries.subscribers.createPendingSubscriber(
@@ -52,23 +62,23 @@ export const subscribeToNewsletterAction = async (
 
     if (!result.ok) {
       logger.error('newsletter.subscribe_failed', { error: result.error });
-      return { outcome: 'server-error' };
+      return SERVER_ERROR;
     }
 
     const { outcome, subscriber } = result.data;
 
     if (outcome === 'already-active') {
       await markNewsletterSubscribedSafely();
-      return { outcome: 'already-subscribed' };
+      return { outcome: NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED };
     }
 
     await sendNewsletterConfirmation(tenantId, subscriber);
 
     await markNewsletterSubscribedSafely();
-    return { outcome: 'success' };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('newsletter.subscribe_failed', { error });
-    return { outcome: 'server-error' };
+    return SERVER_ERROR;
   }
 };
 

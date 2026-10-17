@@ -1,22 +1,15 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import type { TSubscribeResult } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 
-/**
- * Storybook-only stand-in for the real `'use server'` action, which pulls
- * in `@blog/db` (a `server-only`-guarded module) — importing it into a
- * browser bundle throws immediately, so `NewsletterForm`'s story wiring
- * aliases this module in instead (`.storybook/main.ts`). Resolves
- * `success` for any address containing `fail`; every other address
- * resolves `success` after a short delay so the `submitting` state is
- * visible.
- */
+/** Answers `SERVER_ERROR` for an address containing `fail`, `SUCCESS` otherwise. */
 export const subscribeToNewsletterAction = async (
   email: string,
 ): Promise<TSubscribeResult> => {
   await new Promise((resolve) => setTimeout(resolve, 400));
 
   if (email.includes('fail')) {
-    return { outcome: 'server-error' };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 
-  return { outcome: 'success' };
+  return { outcome: ACTION_OUTCOME.SUCCESS };
 };

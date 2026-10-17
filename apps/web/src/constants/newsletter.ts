@@ -1,0 +1,3 @@
+export const NEWSLETTER_OUTCOME = {
+  ALREADY_SUBSCRIBED: 'ALREADY_SUBSCRIBED',
+} as const;

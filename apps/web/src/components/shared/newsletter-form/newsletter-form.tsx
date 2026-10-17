@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  ACTION_OUTCOME,
   ICONS,
   type IWithClassName,
   SIZE,
@@ -11,18 +12,25 @@ import {
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
-import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
+import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
+import {
+  subscribeToNewsletterAction,
+  type TSubscribeResult,
+} from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 const ERROR_MESSAGE_KEYS = {
-  'already-subscribed': 'errorAlreadySubscribed',
-  unavailable: 'errorUnavailable',
-  invalid: 'errorInvalid',
-  'rate-limited': 'errorRateLimited',
-  'server-error': 'errorServer',
-} as const;
+  [NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED]: 'errorAlreadySubscribed',
+  [ACTION_OUTCOME.UNAVAILABLE]: 'errorUnavailable',
+  [ACTION_OUTCOME.INVALID]: 'errorInvalid',
+  [ACTION_OUTCOME.RATE_LIMITED]: 'errorRateLimited',
+  [ACTION_OUTCOME.SERVER_ERROR]: 'errorServer',
+} as const satisfies Record<
+  Exclude<TSubscribeResult['outcome'], typeof ACTION_OUTCOME.SUCCESS>,
+  string
+>;
 
 const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
@@ -68,7 +76,7 @@ export const NewsletterForm = ({
 
     const result = await subscribeToNewsletterAction(email);
 
-    if (result.outcome === 'success') {
+    if (result.outcome === ACTION_OUTCOME.SUCCESS) {
       setStatus(FORM_STATUS.SUCCESS);
       return;
     }

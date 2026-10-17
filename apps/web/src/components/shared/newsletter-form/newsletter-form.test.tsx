@@ -1,5 +1,8 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
+import type { TSubscribeResult } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 import {
   customRender,
   renderElement,
@@ -26,15 +29,12 @@ const content = faker.lorem.sentences(2);
 const firstCue = faker.lorem.words(2);
 const secondCue = faker.lorem.words(3);
 
-const typeAndSubmit = async (
-  user: ReturnType<typeof userEvent.setup>,
-  email: string,
-) => {
-  await user.type(
-    screen.getByRole('textbox', { name: 'Email address' }),
-    email,
-  );
-  await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+const typeAndSubmit = async (user: UserEvent, typedEmail: string) => {
+  const emailField = screen.getByRole('textbox', { name: 'Email address' });
+  const subscribeButton = screen.getByRole('button', { name: 'Subscribe' });
+
+  await user.type(emailField, typedEmail);
+  await user.click(subscribeButton);
 };
 
 describe(`<${NewsletterForm.name}/>`, () => {
@@ -51,32 +51,35 @@ describe(`<${NewsletterForm.name}/>`, () => {
     });
 
     it('renders idle with a labeled field and submit button', () => {
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+      const emailField = screen.getByRole('textbox', { name: 'Email address' });
+      const subscribeButton = screen.getByRole('button', { name: 'Subscribe' });
+
+      expect(emailField).toBeVisible();
+      expect(subscribeButton).toBeVisible();
     });
 
     it('shows an inline error without calling the server action for a malformed email', async () => {
-      await typeAndSubmit(user, 'not-an-email');
+      await typeAndSubmit(user, faker.lorem.word());
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        'Enter a valid email address.',
-      );
+      const alert = await screen.findByRole('alert');
+
+      expect(alert).toHaveTextContent('Enter a valid email address.');
       expect(subscribeToNewsletterActionMock).not.toHaveBeenCalled();
     });
 
     it('associates the rendered error with the email field via its accessible description', async () => {
-      await typeAndSubmit(user, 'not-an-email');
-
+      await typeAndSubmit(user, faker.lorem.word());
       await screen.findByRole('alert');
-      expect(screen.getByRole('textbox')).toHaveAccessibleDescription(
+
+      const emailField = screen.getByRole('textbox');
+
+      expect(emailField).toHaveAccessibleDescription(
         'Enter a valid email address.',
       );
     });
 
     it('marks the button busy while the server action is in flight', async () => {
-      let resolveAction!: (result: { outcome: 'success' }) => void;
+      let resolveAction!: (result: TSubscribeResult) => void;
       subscribeToNewsletterActionMock.mockImplementation(
         () =>
           new Promise((resolve) => {
@@ -90,18 +93,23 @@ describe(`<${NewsletterForm.name}/>`, () => {
         expect(button).toHaveAttribute('aria-busy', 'true');
       });
 
-      resolveAction({ outcome: 'success' });
+      resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
 
       await waitFor(() => {
-        expect(screen.getByRole('status')).toBeVisible();
+        const status = screen.getByRole('status');
+        expect(status).toBeVisible();
       });
     });
 
-    it('shows the success message once the server action resolves "success"', async () => {
-      subscribeToNewsletterActionMock.mockResolvedValue({ outcome: 'success' });
+    it('shows the success message once the server action resolves SUCCESS', async () => {
+      subscribeToNewsletterActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       await typeAndSubmit(user, email);
 
-      expect(await screen.findByRole('status')).toHaveTextContent(
+      const status = await screen.findByRole('status');
+
+      expect(status).toHaveTextContent(
         'Almost there — check your inbox to confirm.',
       );
       expect(subscribeToNewsletterActionMock).toHaveBeenCalledWith(email);
@@ -110,88 +118,77 @@ describe(`<${NewsletterForm.name}/>`, () => {
     describe('when the email is already subscribed', () => {
       beforeEach(() => {
         subscribeToNewsletterActionMock.mockResolvedValue({
-          outcome: 'already-subscribed',
+          outcome: NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED,
         });
       });
 
-      it('shows the "already subscribed" error when the server action resolves "already-subscribed"', async () => {
+      it('shows the "already subscribed" error for ALREADY_SUBSCRIBED', async () => {
         await typeAndSubmit(user, email);
 
-        expect(await screen.findByRole('alert')).toHaveTextContent(
-          'That email is already subscribed.',
-        );
+        const alert = await screen.findByRole('alert');
+
+        expect(alert).toHaveTextContent('That email is already subscribed.');
       });
 
       it('clears a server-returned error once the reader edits the email', async () => {
         await typeAndSubmit(user, email);
         await screen.findByRole('alert');
+        const emailField = screen.getByRole('textbox', {
+          name: 'Email address',
+        });
 
-        await user.type(
-          screen.getByRole('textbox', { name: 'Email address' }),
-          'x',
-        );
+        await user.type(emailField, faker.string.alpha(1));
 
-        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+        const alert = screen.queryByRole('alert');
+        expect(alert).not.toBeInTheDocument();
       });
     });
 
-    it('tells the reader to wait when the server action resolves "rate-limited"', async () => {
-      subscribeToNewsletterActionMock.mockResolvedValue({
-        outcome: 'rate-limited',
-      });
-      await typeAndSubmit(user, email);
-
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+    it.each([
+      [
+        ACTION_OUTCOME.RATE_LIMITED,
         'Too many attempts. Wait a few minutes and try again.',
-      );
-    });
-
-    it('shows a generic error when the server action resolves "server-error"', async () => {
-      subscribeToNewsletterActionMock.mockResolvedValue({
-        outcome: 'server-error',
-      });
-      await typeAndSubmit(user, email);
-
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        'Something went wrong. Please try again.',
-      );
-    });
-
-    it('shows the unavailable message when the server action resolves "unavailable"', async () => {
-      subscribeToNewsletterActionMock.mockResolvedValue({
-        outcome: 'unavailable',
-      });
-      await typeAndSubmit(user, email);
-
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      ],
+      [ACTION_OUTCOME.SERVER_ERROR, 'Something went wrong. Please try again.'],
+      [
+        ACTION_OUTCOME.UNAVAILABLE,
         "This site isn't taking new subscriptions right now.",
-      );
-    });
+      ],
+    ])(
+      'shows its message when the server action resolves %s',
+      async (outcome, message) => {
+        subscribeToNewsletterActionMock.mockResolvedValue({ outcome });
+        await typeAndSubmit(user, email);
+
+        const alert = await screen.findByRole('alert');
+
+        expect(alert).toHaveTextContent(message);
+      },
+    );
 
     it('clears the inline validation error once the reader edits the email', async () => {
-      await typeAndSubmit(user, 'not-an-email');
+      await typeAndSubmit(user, faker.lorem.word());
       await screen.findByRole('alert');
+      const emailField = screen.getByRole('textbox', { name: 'Email address' });
 
-      await user.type(
-        screen.getByRole('textbox', { name: 'Email address' }),
-        'x',
-      );
+      await user.type(emailField, faker.string.alpha(1));
 
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      const alert = screen.queryByRole('alert');
+      expect(alert).not.toBeInTheDocument();
     });
 
     it('shows the error again when an invalid email is submitted a second time', async () => {
-      await typeAndSubmit(user, 'not-an-email');
+      await typeAndSubmit(user, faker.lorem.word());
       await screen.findByRole('alert');
+      const emailField = screen.getByRole('textbox', { name: 'Email address' });
+      const subscribeButton = screen.getByRole('button', { name: 'Subscribe' });
 
-      const input = screen.getByRole('textbox', { name: 'Email address' });
-      await user.clear(input);
-      await user.type(input, 'still-not-an-email');
-      await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+      await user.clear(emailField);
+      await user.type(emailField, faker.lorem.word());
+      await user.click(subscribeButton);
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        'Enter a valid email address.',
-      );
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent('Enter a valid email address.');
     });
   });
 
@@ -213,9 +210,9 @@ describe(`<${NewsletterForm.name}/>`, () => {
       throw new Error('Expected two rendered email fields and buttons.');
     }
 
-    await user.type(firstInput, 'not-an-email');
+    await user.type(firstInput, faker.lorem.word());
     await user.click(firstButton);
-    await user.type(secondInput, 'also-not-an-email');
+    await user.type(secondInput, faker.lorem.word());
     await user.click(secondButton);
 
     const alerts = await screen.findAllByRole('alert');
@@ -234,40 +231,48 @@ describe(`<${NewsletterForm.name}/>`, () => {
   it('renders no heading of its own', () => {
     setup();
 
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading');
+
+    expect(heading).not.toBeInTheDocument();
   });
 
   it('renders the content text in the full variant', () => {
     setup({ content });
 
-    expect(screen.getByText(content)).toBeVisible();
+    const contentText = screen.getByText(content);
+
+    expect(contentText).toBeVisible();
   });
 
   it('does not render the content text in the compact variant', () => {
     setup({ variant: 'compact', content });
 
-    expect(screen.queryByText(content)).not.toBeInTheDocument();
+    const contentText = screen.queryByText(content);
+
+    expect(contentText).not.toBeInTheDocument();
   });
 
   it('renders the CMS-authored trust cues for the full variant', () => {
     setup({ trustCues: [firstCue, secondCue] });
 
-    expect(screen.getByText(firstCue)).toBeVisible();
-    expect(screen.getByText(secondCue)).toBeVisible();
+    const firstCueText = screen.getByText(firstCue);
+    const secondCueText = screen.getByText(secondCue);
+
+    expect(firstCueText).toBeVisible();
+    expect(secondCueText).toBeVisible();
   });
 
-  it('renders no trust cues when trustCues is undefined (not authored)', () => {
-    setup({ trustCues: undefined });
+  it.each([
+    ['undefined (not authored)', undefined],
+    ['an empty array (author cleared it)', []],
+  ])('renders no trust cues when trustCues is %s', (_, trustCues) => {
+    setup({ trustCues });
 
-    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
-    expect(screen.queryByText(secondCue)).not.toBeInTheDocument();
-  });
+    const firstCueText = screen.queryByText(firstCue);
+    const secondCueText = screen.queryByText(secondCue);
 
-  it('renders no trust cues when trustCues is an empty array (author cleared it)', () => {
-    setup({ trustCues: [] });
-
-    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
-    expect(screen.queryByText(secondCue)).not.toBeInTheDocument();
+    expect(firstCueText).not.toBeInTheDocument();
+    expect(secondCueText).not.toBeInTheDocument();
   });
 
   it('does not render trust cues for the compact variant even when authored', () => {
@@ -276,7 +281,10 @@ describe(`<${NewsletterForm.name}/>`, () => {
       trustCues: [firstCue, secondCue],
     });
 
-    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
-    expect(screen.queryByText(secondCue)).not.toBeInTheDocument();
+    const firstCueText = screen.queryByText(firstCue);
+    const secondCueText = screen.queryByText(secondCue);
+
+    expect(firstCueText).not.toBeInTheDocument();
+    expect(secondCueText).not.toBeInTheDocument();
   });
 });
