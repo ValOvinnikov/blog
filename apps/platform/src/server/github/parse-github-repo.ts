@@ -1,13 +1,13 @@
 import type { TMaybeUndefined } from '@blog/config';
 
-export type TTenantProvisioningRepo = {
+export type TGitHubRepo = {
   owner: string;
   repo: string;
 };
 
-export const parseTenantProvisioningRepo = (
+export const parseGitHubRepo = (
   value: TMaybeUndefined<string>,
-): TMaybeUndefined<TTenantProvisioningRepo> => {
+): TMaybeUndefined<TGitHubRepo> => {
   if (!value) return undefined;
 
   const [owner, repo] = value.split('/');

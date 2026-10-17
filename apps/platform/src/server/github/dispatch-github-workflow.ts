@@ -1,9 +1,10 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
-import { parseTenantProvisioningRepo } from './tenant-provisioning-repo';
+import { parseGitHubRepo } from './parse-github-repo';
 
-const WORKFLOW_REF = 'main';
+const DEFAULT_WORKFLOW_REF = 'main';
 const DISPATCH_TIMEOUT_MS = 5000;
 
 type TDispatchGitHubWorkflowLogEvents = {
@@ -14,7 +15,8 @@ type TDispatchGitHubWorkflowLogEvents = {
 
 export type TDispatchGitHubWorkflowInput = {
   workflowFile: string;
-  inputs: Record<string, string | undefined>;
+  ref?: string;
+  inputs: Record<string, TMaybeUndefined<string>>;
   logEvents: TDispatchGitHubWorkflowLogEvents;
   logContext: Record<string, unknown>;
 };
@@ -22,12 +24,13 @@ export type TDispatchGitHubWorkflowInput = {
 /** Never throws: a missing token or repo, a non-2xx response or a network failure is logged and returns `false`. */
 export const dispatchGitHubWorkflow = async ({
   workflowFile,
+  ref = DEFAULT_WORKFLOW_REF,
   inputs,
   logEvents,
   logContext,
 }: TDispatchGitHubWorkflowInput): Promise<boolean> => {
   const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
-  const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
+  const repo = parseGitHubRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
 
   if (!token || !repo) {
     logger.error(logEvents.skipped, logContext);
@@ -45,7 +48,7 @@ export const dispatchGitHubWorkflow = async ({
           'X-GitHub-Api-Version': '2022-11-28',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ref: WORKFLOW_REF, inputs }),
+        body: JSON.stringify({ ref, inputs }),
         signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
       },
     );

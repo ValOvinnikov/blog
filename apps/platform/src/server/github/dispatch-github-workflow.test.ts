@@ -1,3 +1,5 @@
+import type { TMaybeUndefined } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -12,21 +14,30 @@ const loggerErrorMock = vi.mocked(logger.error);
 
 describe(dispatchGitHubWorkflow, () => {
   const fetchMock = vi.fn();
+  const token = `ghp_${faker.string.alphanumeric(36)}`;
+  const owner = faker.lorem.slug();
+  const repo = faker.lorem.slug();
+  const workflowFile = `${faker.lorem.slug()}.yml`;
+  const tenantId = faker.string.uuid();
 
-  const dispatch = (inputs: Record<string, string | undefined> = {}) =>
+  const dispatch = (
+    inputs: Record<string, TMaybeUndefined<string>> = {},
+    ref?: string,
+  ) =>
     dispatchGitHubWorkflow({
-      workflowFile: 'some-workflow.yml',
+      workflowFile,
+      ref,
       inputs,
       logEvents: { skipped: 'x.skipped', failed: 'x.failed', error: 'x.error' },
-      logContext: { tenantId: 'tenant-1' },
+      logContext: { tenantId },
     });
 
   beforeEach(() => {
     fetchMock.mockReset();
     loggerErrorMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
-    envMock.TENANT_PROVISIONING_GITHUB_TOKEN = 'ghp_token';
-    envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
+    envMock.TENANT_PROVISIONING_GITHUB_TOKEN = token;
+    envMock.TENANT_PROVISIONING_GITHUB_REPO = `${owner}/${repo}`;
   });
 
   it('skips the dispatch, logs it, and returns false when no token is configured', async () => {
@@ -35,9 +46,7 @@ describe(dispatchGitHubWorkflow, () => {
     const result = await dispatch();
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith('x.skipped', {
-      tenantId: 'tenant-1',
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith('x.skipped', { tenantId });
     expect(result).toBe(false);
   });
 
@@ -53,23 +62,20 @@ describe(dispatchGitHubWorkflow, () => {
   it('POSTs a workflow_dispatch built from the file and inputs, and returns true', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
-    const result = await dispatch({ tenantId: 'tenant-1' });
+    const result = await dispatch({ tenantId });
 
     expect(result).toBe(true);
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/some-workflow.yml/dispatches',
+      `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflowFile}/dispatches`,
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
-          Authorization: 'Bearer ghp_token',
+          Authorization: `Bearer ${token}`,
           Accept: 'application/vnd.github+json',
           'X-GitHub-Api-Version': '2022-11-28',
           'Content-Type': 'application/json',
         }),
-        body: JSON.stringify({
-          ref: 'main',
-          inputs: { tenantId: 'tenant-1' },
-        }),
+        body: JSON.stringify({ ref: 'main', inputs: { tenantId } }),
       }),
     );
   });
@@ -77,40 +83,54 @@ describe(dispatchGitHubWorkflow, () => {
   it('omits an undefined input from the dispatch body', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
-    await dispatch({ tenantId: 'tenant-1', environment: undefined });
+    await dispatch({ tenantId, environment: undefined });
 
     expect(fetchMock).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        body: JSON.stringify({
-          ref: 'main',
-          inputs: { tenantId: 'tenant-1' },
-        }),
+        body: JSON.stringify({ ref: 'main', inputs: { tenantId } }),
+      }),
+    );
+  });
+
+  it('dispatches against the given ref instead of main', async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    const ref = `release/v${faker.system.semver()}`;
+
+    await dispatch({ tenantId }, ref);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: JSON.stringify({ ref, inputs: { tenantId } }),
       }),
     );
   });
 
   it('logs the failure with the response status and returns false on a non-2xx', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
+    const responseStatus = faker.internet.httpStatusCode({
+      types: ['clientError', 'serverError'],
+    });
+    fetchMock.mockResolvedValue(new Response(null, { status: responseStatus }));
 
     const result = await dispatch();
 
     expect(result).toBe(false);
     expect(loggerErrorMock).toHaveBeenCalledWith('x.failed', {
-      tenantId: 'tenant-1',
-      responseStatus: 404,
+      tenantId,
+      responseStatus,
     });
   });
 
   it('logs the thrown error and returns false when the request itself fails', async () => {
-    const thrown = new Error('network down');
+    const thrown = new Error(faker.lorem.sentence());
     fetchMock.mockRejectedValue(thrown);
 
     const result = await dispatch();
 
     expect(result).toBe(false);
     expect(loggerErrorMock).toHaveBeenCalledWith('x.error', {
-      tenantId: 'tenant-1',
+      tenantId,
       error: thrown,
     });
   });
