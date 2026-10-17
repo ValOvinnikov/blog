@@ -26,13 +26,15 @@ that works out the release candidate from GitHub and the database.
 
 The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
-- the commits since that tag, newest first (none when HEAD is the tag);
+- the commits since that tag, newest first: at most the newest 100, with the
+  total count beside them (none when HEAD is the tag);
 - which `RELEASE_CHANGE` sets the changed files touch;
 - the migration summary: content migration folders added under
   `packages/studio/migrations`, the active, non-deprovisioned tenants plus the
   console project they run across, and the `packages/db/migrations` files added
   that the applied journal does not hold yet. A tenant whose own ledger lags
-  further behind is not read, so its figure is a lower bound;
+  further behind is not read, so its figure is a lower bound. A truncated file
+  list marks every count as a minimum (`isLowerBound`);
 - the contrast status: `GREEN` or `FAILED` from the stored result for HEAD,
   `RUNNING` while a `contrast.yml` run for HEAD is in progress, `DUE` when the
   candidate touches a rendering path and one changed since the last green run
@@ -71,8 +73,13 @@ values as plain `text`, so none of them needs a db migration:
   `notConfigured` (token or repo missing), `noReleaseTag`, `rateLimited`
   (logged at warn), `githubError` and `dbError`. A repository with no tag yet
   is not logged.
-- GitHub lists at most 300 changed files for a comparison; a truncated list
-  counts as touching every set, so a rendering change is never missed.
+- The reader pages GitHub's lists 100 at a time: a comparison's changed files
+  up to GitHub's 300-file limit, the pages holding its newest commits, and
+  every `v*` tag ref. Every request keeps its timeout, and a failed page fails
+  the read with a reason code.
+- At the 300-file limit the file list is truncated (`isFileListTruncated` on
+  the candidate): it counts as touching every set, so a rendering change is
+  never missed, and the migration counts are minimums.
 - A release version is exactly `vMAJOR.MINOR.PATCH` with no leading zeros,
   and versions order numerically (`v0.10.0` is greater than `v0.9.0`).
 

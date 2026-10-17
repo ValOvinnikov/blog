@@ -17,6 +17,13 @@ export type TReleaseMigrationSummary = {
   contentMigrations: number;
   tenants: number;
   dbMigrations: number;
+  isLowerBound: boolean;
+};
+
+type TSummariseReleaseMigrationsInput = {
+  files: TChangedFile[];
+  isFileListTruncated: boolean;
+  headSha: string;
 };
 
 // Content migrations also run against the console project, which is no tenant row.
@@ -50,10 +57,13 @@ const countDbMigrations = async (
 };
 
 /** A tenant whose own ledger lags further behind is not read, so `contentMigrations` is a lower bound for it. */
-export const summariseReleaseMigrations = async (
-  files: TChangedFile[],
-  headSha: string,
-): Promise<TReleaseResult<TReleaseMigrationSummary>> => {
+export const summariseReleaseMigrations = async ({
+  files,
+  isFileListTruncated,
+  headSha,
+}: TSummariseReleaseMigrationsInput): Promise<
+  TReleaseResult<TReleaseMigrationSummary>
+> => {
   const contentMigrations = countAddedContentMigrations(files);
 
   const [targets, dbMigrations] = await Promise.all([
@@ -71,6 +81,7 @@ export const summariseReleaseMigrations = async (
       contentMigrations,
       tenants: targets.data,
       dbMigrations: dbMigrations.data,
+      isLowerBound: isFileListTruncated,
     },
   };
 };

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import {
+  githubCompareJson,
   githubJson,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
@@ -55,8 +56,8 @@ describe(getReleaseCandidate, () => {
   let headSha: string;
 
   const compare = (base: string, files: TFile[], commits = [makeCommit()]) => {
-    github.respond(`/compare/${base}...${headSha}`, () =>
-      githubJson({ total_commits: commits.length, commits, files }),
+    github.respond(`/compare/${base}...${headSha}`, (path) =>
+      githubCompareJson(path, commits, files),
     );
   };
 
@@ -202,6 +203,7 @@ describe(getReleaseCandidate, () => {
       contentMigrations: 1,
       tenants: 3,
       dbMigrations: 1,
+      isLowerBound: false,
     });
   });
 
@@ -214,8 +216,24 @@ describe(getReleaseCandidate, () => {
       contentMigrations: 0,
       tenants: 0,
       dbMigrations: 0,
+      isLowerBound: false,
     });
     expect(listActiveTenantsMock).not.toHaveBeenCalled();
+  });
+
+  it('reports the change list as incomplete and the migration counts as minimums at the file limit', async () => {
+    compare(
+      lastTag,
+      Array.from({ length: 300 }, (_, index) => ({
+        filename: `apps/web/src/file-${index}.ts`,
+        status: 'modified',
+      })),
+    );
+
+    const { isFileListTruncated, migrations } = await candidate();
+
+    expect(isFileListTruncated).toBe(true);
+    expect(migrations.isLowerBound).toBe(true);
   });
 
   it('fails with noReleaseTag when the repository has no release tag yet', async () => {
