@@ -1,22 +1,24 @@
 name: CI
 
 on:
-  # Neither a `paths-ignore` nor a `branches:` filter here, on purpose.
-  # Build/Lint/Test/Type-check/Typegen are *required* status checks in the
-  # branch ruleset, and a required check that never starts sits "Pending"
-  # forever rather than failing — so anything that skips this workflow blocks
-  # the PR permanently instead of reporting on it.
+  # Neither a `paths-ignore` nor a `branches:` filter here, on purpose. `CI` is
+  # a required status check, and a required check that never starts sits
+  # "Pending" forever rather than failing — so anything that skips this
+  # workflow blocks the PR permanently instead of reporting on it.
   #
   # A path filter would do that to a PR touching only the ignored paths (e.g.
   # a `.claude/**` or docs-only PR). A base-branch filter would do it to a PR
   # based on anything but `main` — the normal shape of a stacked PR — and
   # retargeting when the base merges does not rescue it, because that fires
-  # `edited` while this listens for `opened`/`synchronize`/`reopened`.
+  # `edited`, which this does not listen for.
   #
-  # Running CI on every PR is cheap and avoids both deadlocks. The other
-  # workflow carrying a required check, workflow-security.yml, declares its
-  # trigger independently and must stay unfiltered for the same reason.
+  # The other workflow carrying a required check, workflow-security.yml,
+  # declares its trigger independently and must stay unfiltered for the same
+  # reason.
   pull_request:
+    # Every job but `CI` skips on a draft, so `ready_for_review` is what runs
+    # the full gate once a draft is marked ready.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
@@ -48,6 +50,7 @@ env:
 jobs:
   type-check:
     name: Type-check
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -65,6 +68,7 @@ jobs:
 
   lint:
     name: Lint
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -82,6 +86,7 @@ jobs:
 
   knip:
     name: Knip
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -102,6 +107,7 @@ jobs:
 
   test:
     name: Test
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -121,6 +127,7 @@ jobs:
 
   typegen:
     name: Typegen
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -160,6 +167,7 @@ jobs:
 
   ui-index:
     name: UI index
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -194,6 +202,7 @@ jobs:
 
   turbo-env-sync:
     name: Turbo env sync
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -223,6 +232,7 @@ jobs:
 
   revalidate-tags-sync:
     name: Revalidate tags sync
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -252,6 +262,7 @@ jobs:
 
   client-graph:
     name: Client graph
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -282,6 +293,7 @@ jobs:
 
   required-env:
     name: Required env (${{ matrix.environment }})
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Scoping the job to the environment is what lets it see which names that
@@ -345,6 +357,7 @@ jobs:
 
   migration-index:
     name: Migration index
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -393,6 +406,7 @@ jobs:
 
   migrations:
     name: Migrations
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Read-only guard against broken content migrations. Content is live in
@@ -445,6 +459,7 @@ jobs:
 
   build:
     name: Build
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     needs: [type-check, lint, test, typegen]
     timeout-minutes: 15
