@@ -38,6 +38,7 @@ export const ContactForm = ({
   const t = useTranslations('contactForm');
   const id = useId();
   const {
+    formRef,
     fields,
     website,
     setWebsite,
@@ -49,12 +50,7 @@ export const ContactForm = ({
   } = useContactForm();
   const s = contactFormVariants();
 
-  if (status === FORM_STATUS.SUCCESS) {
-    return (
-      <ContactFormSuccess title={t('successTitle')} message={successMessage} />
-    );
-  }
-
+  const isSent = status === FORM_STATUS.SUCCESS;
   const isSubmitting = status === FORM_STATUS.SUBMITTING;
 
   const fieldInput = (field: TContactField) => {
@@ -91,38 +87,57 @@ export const ContactForm = ({
   };
 
   return (
-    <form noValidate={true} onSubmit={submit} className={s.form()}>
-      {fieldInput('name')}
-      {fieldInput('email')}
-      {fieldInput('message')}
-      <div aria-hidden="true" className={s.honeypot()}>
-        <label htmlFor={`${id}-website`}>{t('honeypotLabel')}</label>
-        <input
-          id={`${id}-website`}
-          name="website"
-          tabIndex={-1}
-          autoComplete="off"
-          value={website}
-          onChange={(event) => setWebsite(event.target.value)}
-        />
+    <>
+      <div role="status">
+        {isSent && (
+          <ContactFormSuccess
+            title={t('successTitle')}
+            message={successMessage}
+          />
+        )}
       </div>
-      {refusal && (
-        <Alert
-          type={ALERT_TYPE.ERROR}
-          message={t(REFUSAL_MESSAGE_KEYS[refusal])}
-          className={s.fullWidth()}
-        />
-      )}
-      <div className={s.actions()}>
-        <Button
-          type="submit"
-          isDisabled={isSubmitting}
-          aria-busy={isSubmitting}
+      {!isSent && (
+        <form
+          ref={formRef}
+          noValidate={true}
+          onSubmit={submit}
+          className={s.form()}
         >
-          {isSubmitting ? t('submittingLabel') : t('submitLabel')}
-        </Button>
-        {privacyNote && <div className={s.privacyNote()}>{privacyNote}</div>}
-      </div>
-    </form>
+          {fieldInput('name')}
+          {fieldInput('email')}
+          {fieldInput('message')}
+          <div aria-hidden="true" className={s.honeypot()}>
+            <label htmlFor={`${id}-website`}>{t('honeypotLabel')}</label>
+            <input
+              id={`${id}-website`}
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
+            />
+          </div>
+          {refusal && (
+            <Alert
+              type={ALERT_TYPE.ERROR}
+              message={t(REFUSAL_MESSAGE_KEYS[refusal])}
+              className={s.fullWidth()}
+            />
+          )}
+          <div className={s.actions()}>
+            <Button
+              type="submit"
+              isDisabled={isSubmitting}
+              aria-busy={isSubmitting}
+            >
+              {isSubmitting ? t('submittingLabel') : t('submitLabel')}
+            </Button>
+            {privacyNote && (
+              <div className={s.privacyNote()}>{privacyNote}</div>
+            )}
+          </div>
+        </form>
+      )}
+    </>
   );
 };

@@ -14,7 +14,7 @@ export const ContactFormSuccess = ({
   const s = contactFormSuccessVariants();
 
   return (
-    <div role="status" className={s.root()}>
+    <div className={s.root()}>
       <Heading level={3} visual="card">
         {title}
       </Heading>

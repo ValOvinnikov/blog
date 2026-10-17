@@ -1,7 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { usePathname } from 'next/navigation';
 
 import { ContactForm } from './contact-form';
@@ -132,6 +132,44 @@ describe(`<${ContactForm.name}/>`, () => {
       'Write a message of 10 to 5,000 characters.',
     );
     expect(submitContactMessageMock).not.toHaveBeenCalled();
+  });
+
+  it('moves focus to the first invalid field in reading order', async () => {
+    setup();
+    const nameField = screen.getByRole('textbox', { name: 'Name' });
+    const emailField = screen.getByRole('textbox', { name: 'Email' });
+    const sendButton = screen.getByRole('button', { name: 'Send message' });
+
+    await user.type(emailField, faker.lorem.word());
+    await user.click(sendButton);
+
+    expect(nameField).toHaveFocus();
+  });
+
+  it('moves focus to the field the server rejects', async () => {
+    submitContactMessageMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.INVALID,
+      invalidFields: ['email'],
+    });
+    setup();
+
+    await fillAndSend(user);
+
+    const emailField = await screen.findByRole('textbox', { name: 'Email' });
+
+    await waitFor(() => expect(emailField).toHaveFocus());
+  });
+
+  it('announces the success message through a status region present before sending', async () => {
+    submitContactMessageMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
+    setup();
+    const status = screen.getByRole('status');
+
+    await fillAndSend(user);
+
+    await waitFor(() => expect(status).toHaveTextContent(SUCCESS_MESSAGE));
   });
 
   it('shows the field errors the server returns', async () => {
