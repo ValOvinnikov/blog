@@ -1,6 +1,8 @@
-import { CONTRAST_CHECK_OUTCOME, ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import { makePassingContrastResult } from '@blog/db/testing/findings/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { recordContrastResult } from '../record-contrast-result';
 
@@ -12,30 +14,30 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+function makeTag(): string {
+  return `v${faker.system.semver()}`;
+}
+
 afterEach(async () => {
   await db().delete(schema.findings);
 });
 
 describe(tagContrastFinding, () => {
   it('adds the release tag to the SHA’s contrast finding, keeping its result', async () => {
-    const run = {
-      sha: 'abc123',
-      outcome: CONTRAST_CHECK_OUTCOME.PASS,
-      failureCount: 0,
-      runUrl: 'https://github.com/example/runs/1',
-    };
+    const run = makePassingContrastResult();
+    const tag = makeTag();
     await recordContrastResult(run);
 
-    const result = await tagContrastFinding('abc123', 'v1.4.0');
+    const result = await tagContrastFinding(run.sha, tag);
 
     expect(result).toEqual({
       ok: true,
-      data: expect.objectContaining({ details: { ...run, tag: 'v1.4.0' } }),
+      data: expect.objectContaining({ details: { ...run, tag } }),
     });
   });
 
   it('reports DB_NOT_FOUND for a SHA with no contrast run', async () => {
-    expect(await tagContrastFinding('never-run', 'v1.4.0')).toEqual({
+    expect(await tagContrastFinding(faker.git.commitSha(), makeTag())).toEqual({
       ok: false,
       error: ERROR_CODE.DB_NOT_FOUND,
     });

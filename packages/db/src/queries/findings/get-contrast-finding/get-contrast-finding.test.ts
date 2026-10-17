@@ -1,6 +1,11 @@
-import { CONTRAST_CHECK_OUTCOME, FINDING_STATUS } from '@blog/config/constants';
+import { FINDING_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import {
+  makeContrastResult,
+  makePassingContrastResult,
+} from '@blog/db/testing/findings/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { recordContrastResult } from '../record-contrast-result';
 
@@ -18,32 +23,24 @@ afterEach(async () => {
 
 describe(getContrastFinding, () => {
   it('returns the result for a SHA whose run passed', async () => {
-    await recordContrastResult({
-      sha: 'abc123',
-      outcome: CONTRAST_CHECK_OUTCOME.PASS,
-      failureCount: 0,
-      runUrl: 'https://github.com/example/runs/1',
-    });
+    const passingRun = makePassingContrastResult();
+    await recordContrastResult(passingRun);
 
-    expect(await getContrastFinding('abc123')).toEqual(
+    expect(await getContrastFinding(passingRun.sha)).toEqual(
       expect.objectContaining({ status: FINDING_STATUS.RESOLVED }),
     );
   });
 
   it('returns the result for a SHA whose run failed', async () => {
-    await recordContrastResult({
-      sha: 'abc123',
-      outcome: CONTRAST_CHECK_OUTCOME.FAIL,
-      failureCount: 2,
-      runUrl: 'https://github.com/example/runs/1',
-    });
+    const failingRun = makeContrastResult();
+    await recordContrastResult(failingRun);
 
-    expect(await getContrastFinding('abc123')).toEqual(
+    expect(await getContrastFinding(failingRun.sha)).toEqual(
       expect.objectContaining({ status: FINDING_STATUS.OPEN }),
     );
   });
 
   it('returns undefined for a SHA with no run', async () => {
-    expect(await getContrastFinding('never-run')).toBeUndefined();
+    expect(await getContrastFinding(faker.git.commitSha())).toBeUndefined();
   });
 });

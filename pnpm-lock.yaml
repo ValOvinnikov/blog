@@ -632,6 +632,9 @@ importers:
       '@electric-sql/pglite':
         specifier: ^0.5.8
         version: 0.5.8
+      '@faker-js/faker':
+        specifier: ^10.5.0
+        version: 10.5.0
       '@types/node':
         specifier: ^26
         version: 26.6.2
