@@ -50,6 +50,10 @@ export const env = createEnv({
     // domain is configured.
     // @env-optional
     NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
+    // The admin panel's origin, for links in owner emails, which are inert
+    // without it.
+    // @env-optional
+    PLATFORM_APP_URL: z.string().url().optional(),
     // Injected by the Upstash Redis Marketplace integration; the rate limiter
     // refuses to start without them when VERCEL_ENV is production.
     // @env-optional
@@ -80,6 +84,7 @@ export const env = createEnv({
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     WEB_ANALYTICS_ENABLED: process.env.WEB_ANALYTICS_ENABLED,
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
+    PLATFORM_APP_URL: process.env.PLATFORM_APP_URL,
     KV_REST_API_URL: process.env.KV_REST_API_URL,
     KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
     LOKI_PUSH_URL: process.env.LOKI_PUSH_URL,

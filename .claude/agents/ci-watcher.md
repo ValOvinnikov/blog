@@ -78,12 +78,12 @@ so never guess which PR one maps to.
 
 3. **All green — check names before declaring victory.** Judge by names, not
    the total. Must be present:
-   - the 10 required status checks — Lint, Test, Type-check, Build, Typegen,
-     Migrations, Knip, Zizmor, Actionlint, Shellcheck + guard tests
+   - the 2 required status checks — `CI` and `Workflow security`
      (`docs/context/ci-automation.md` "Required status checks on `main`").
+     `CI` gathers every other `ci.yml` job, so a red job also turns it red.
 
    A missing name means the suite silently under-triggered. The total varies,
-   roughly 19–24: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
+   roughly 17–22: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
    appear only on the run from when the PR was opened or reopened
    (`branch-created` as `skipping`) and drop off after the next push, and
    `Vercel – *` checks can register after the watch returns. Report the
@@ -111,7 +111,7 @@ Report with exactly this structure:
 - **Mergeability unresolved (step 1):** prefix whichever green report applies
   with `Mergeability was still UNKNOWN after one retry; proceeded to watch anyway.`
   — never standalone; you still have a real verdict.
-- **All green (step 3):** `23/23 checks passed; all 10 required present.`
+- **All green (step 3):** `23/23 checks passed; both required present.`
   — one line, plus the check names if few.
 - **Green but a required check absent (step 3):**
   `19/19 checks passed, but <names> never ran — not a clean run.`

@@ -166,6 +166,20 @@
     "errorRateLimited": "Zu viele Versuche. Warten Sie ein paar Minuten und versuchen Sie es dann erneut.",
     "errorUnavailable": "Diese Website nimmt derzeit keine neuen Anmeldungen an."
   },
+  "contactForm": {
+    "nameLabel": "Name",
+    "emailLabel": "E-Mail",
+    "messageLabel": "Nachricht",
+    "honeypotLabel": "Dieses Feld leer lassen",
+    "submitLabel": "Nachricht senden",
+    "submittingLabel": "Wird gesendet …",
+    "successTitle": "Nachricht gesendet",
+    "errorName": "Geben Sie Ihren Namen ein, höchstens 100 Zeichen.",
+    "errorEmail": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "errorMessage": "Schreiben Sie eine Nachricht mit 10 bis 5.000 Zeichen.",
+    "errorBlocked": "Zu viele Versuche. Warten Sie ein paar Minuten und versuchen Sie es dann erneut.",
+    "errorServer": "Ihre Nachricht konnte nicht gesendet werden. Versuchen Sie es in einer Minute erneut – Ihr Text ist noch da."
+  },
   "newsletterConfirm": {
     "confirmedTitle": "Anmeldung bestätigt",
     "confirmedMessage": "Ihre Anmeldung ist bestätigt. Vielen Dank!",

@@ -13,9 +13,9 @@ on:
   # retargeting when the base merges does not rescue it, because that fires
   # `edited` while this listens for `opened`/`synchronize`/`reopened`.
   #
-  # Running CI on every PR is cheap and avoids both deadlocks. The other three
-  # workflows carrying required checks (zizmor, actionlint, hooks) declare
-  # their triggers independently and must stay unfiltered for the same reason.
+  # Running CI on every PR is cheap and avoids both deadlocks. The other
+  # workflow carrying a required check, workflow-security.yml, declares its
+  # trigger independently and must stay unfiltered for the same reason.
   pull_request:
 
 permissions:
@@ -187,8 +187,8 @@ jobs:
       # (#1763). The drift guard above only catches a regression while the real
       # component tree still happens to contain a component of each shape;
       # these pin the behaviour against inline sources instead. They live in
-      # this job rather than hooks.yml because they import the repo's
-      # typescript, which only the pnpm-install jobs have.
+      # this job rather than workflow-security.yml because they import the
+      # repo's typescript, which only the pnpm-install jobs have.
       - name: UI index (helper unit tests)
         run: pnpm gen:ui-index:test
 
@@ -404,7 +404,7 @@ jobs:
     # against the dataset — this never mutates data (`sanity migrations run`
     # defaults to dry mode; `--no-dry-run` is never used here). Actually
     # applying a migration to production stays human-gated. Document-schema
-    # validation against the live dataset lives in the scheduled
+    # validation against the live dataset lives in the
     # `document-validation.yml` workflow (advisory, not part of this required
     # check) — see that workflow's comment for why.
     env:

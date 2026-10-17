@@ -105,7 +105,7 @@ on the public site or the platform yet).
 | Page                                            | Status  | Layers                                                 | One-line purpose                                                                            |
 | ----------------------------------------------- | ------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
 | [Comments and ratings](comments-and-ratings.md) | planned | config, db, ui, web, platform, studio                  | Threaded, moderated comments and a 1–5 rating per reader per post.                          |
-| [Contact form](contact-form.md)                 | planned | config, db, email, ui, platform, studio, service, web  | A visitor messages the owner from a form; each message is stored as a lead and emailed.     |
+| [Contact form](contact-form.md)                 | built   | config, db, email, ui, platform, studio, service, web  | A visitor messages the owner from a form; each message is stored as a lead and emailed.     |
 | [Embed module](embed-module.md)                 | planned | config, studio, service, ui, web                       | Video, booking calendar or map embeds, loaded only after the visitor allows External media. |
 | [Location module](location-module.md)           | planned | studio, service, ui, web                               | Address, opening hours and a map, feeding `LocalBusiness` structured data.                  |
 | [Public front door](public-front-door.md)       | planned | config, db, auth, email, studio, web, platform, worker | A marketing site, self-serve signup and Stripe billing with trials for the platform.        |
