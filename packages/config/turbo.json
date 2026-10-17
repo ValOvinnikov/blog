@@ -3,12 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "test": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/configs/vitest/*.ts",
-        "$TURBO_ROOT$/configs/tailwind/theme.css",
-        "$TURBO_ROOT$/apps/web/index.css"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/apps/web/index.css"]
     }
   }
 }
