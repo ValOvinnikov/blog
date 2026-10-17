@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makeContactFormModule } from '@web/testing/modules/contact-form/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
@@ -21,14 +22,9 @@ const meta = {
     },
   },
   args: {
-    id: 'contact-form-1',
+    id: faker.string.uuid(),
     ...makeContactFormModule({
-      headingBlock: {
-        heading: 'Tell us about your project',
-        supportingText: 'A few lines is enough. We reply within a working day.',
-      },
-      successMessage: "Thanks, we'll reply within a working day.",
-      privacyNote: [portableTextBlock('We only use your details to reply.')],
+      privacyNote: [portableTextBlock(faker.lorem.sentence())],
     }),
   },
 } satisfies Meta<typeof ContactFormModuleView>;

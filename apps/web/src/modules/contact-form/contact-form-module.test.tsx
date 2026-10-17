@@ -1,3 +1,4 @@
+import { TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
@@ -21,8 +22,10 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@blog/db', () => ({
-  TENANT_STATUS: { ACTIVE: 'ACTIVE', SUSPENDED: 'SUSPENDED' },
+vi.mock('@blog/db', async () => ({
+  ...(await vi.importActual<typeof import('@blog/db/constants')>(
+    '@blog/db/constants',
+  )),
 }));
 
 vi.mock('@web/server/request-context/request-context');
@@ -56,7 +59,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: TENANT_ID,
-      status: 'ACTIVE',
+      status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
     } as never);
     getContactFormMock.mockResolvedValue({
@@ -88,7 +91,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
   it('renders nothing for a suspended tenant', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: TENANT_ID,
-      status: 'SUSPENDED',
+      status: TENANT_STATUS.SUSPENDED,
       deprovisionedAt: null,
     } as never);
 

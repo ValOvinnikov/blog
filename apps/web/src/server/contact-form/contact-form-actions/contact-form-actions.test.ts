@@ -1,3 +1,4 @@
+import { TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { logger } from '@web/utils/logger/logger';
 
@@ -29,8 +30,10 @@ vi.mock('@web/server/rate-limit/public-write-guard/public-write-guard', () => ({
   }),
 }));
 
-vi.mock('@blog/db', () => ({
-  TENANT_STATUS: { ACTIVE: 'ACTIVE', SUSPENDED: 'SUSPENDED' },
+vi.mock('@blog/db', async () => ({
+  ...(await vi.importActual<typeof import('@blog/db/constants')>(
+    '@blog/db/constants',
+  )),
   queries: { leads: { createLead: createLeadMock } },
 }));
 
@@ -74,7 +77,7 @@ describe('submitContactMessage', () => {
     isCapabilityEnabledMock.mockResolvedValue(true);
     resolveRequestTenantMock.mockResolvedValue({
       id: TENANT_ID,
-      status: 'ACTIVE',
+      status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
     });
     createLeadMock.mockImplementation(async (input) => ({
@@ -135,7 +138,7 @@ describe('submitContactMessage', () => {
   it('blocks a suspended tenant without storing or sending', async () => {
     resolveRequestTenantMock.mockResolvedValue({
       id: TENANT_ID,
-      status: 'SUSPENDED',
+      status: TENANT_STATUS.SUSPENDED,
       deprovisionedAt: null,
     });
 
