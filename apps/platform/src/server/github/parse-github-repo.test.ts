@@ -1,11 +1,13 @@
+import { faker } from '@faker-js/faker';
+
 import { parseGitHubRepo } from './parse-github-repo';
 
 describe(parseGitHubRepo, () => {
   it('splits an "owner/repo" value into its parts', () => {
-    expect(parseGitHubRepo('acme-org/acme-repo')).toEqual({
-      owner: 'acme-org',
-      repo: 'acme-repo',
-    });
+    const owner = faker.lorem.slug();
+    const repo = faker.lorem.slug();
+
+    expect(parseGitHubRepo(`${owner}/${repo}`)).toEqual({ owner, repo });
   });
 
   it('returns undefined when the value is undefined', () => {
@@ -13,6 +15,6 @@ describe(parseGitHubRepo, () => {
   });
 
   it('returns undefined for a value with no slash', () => {
-    expect(parseGitHubRepo('acme-repo')).toBeUndefined();
+    expect(parseGitHubRepo(faker.lorem.slug())).toBeUndefined();
   });
 });

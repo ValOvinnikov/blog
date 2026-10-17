@@ -179,6 +179,9 @@ importers:
       '@blog/vitest-config':
         specifier: workspace:*
         version: link:../../configs/vitest
+      '@faker-js/faker':
+        specifier: ^10.5.0
+        version: 10.5.0
       '@svgr/webpack':
         specifier: ^8.1.0
         version: 8.1.0(supports-color@8.1.1)(typescript@6.0.3)
