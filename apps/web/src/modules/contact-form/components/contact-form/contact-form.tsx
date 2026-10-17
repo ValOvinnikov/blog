@@ -8,6 +8,7 @@ import { Textarea } from '@blog/ui/components/atoms/textarea';
 import { ContactFormField } from '@web/modules/contact-form/components/contact-form-field/contact-form-field';
 import { ContactFormSuccess } from '@web/modules/contact-form/components/contact-form-success/contact-form-success';
 import { useContactForm } from '@web/modules/contact-form/hooks/use-contact-form/use-contact-form';
+import type { TContactRefusal } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
 import type { TContactField } from '@web/utils/validate-contact-message/validate-contact-message';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
@@ -23,7 +24,7 @@ const FIELD_MESSAGE_KEYS = {
 const REFUSAL_MESSAGE_KEYS = {
   blocked: 'errorBlocked',
   'server-error': 'errorServer',
-} as const;
+} as const satisfies Record<TContactRefusal, string>;
 
 export type TContactFormProps = {
   successMessage: string;

@@ -22,11 +22,12 @@ export type TContactMessageInput = TContactMessageFields & {
   sourcePath: string;
 };
 
+export type TContactRefusal = 'blocked' | 'server-error';
+
 export type TSubmitContactResult =
   | { outcome: 'sent' }
   | { outcome: 'invalid'; invalidFields: TContactField[] }
-  | { outcome: 'blocked' }
-  | { outcome: 'server-error' };
+  | { outcome: TContactRefusal };
 
 const BLOCKED = { outcome: 'blocked' } as const;
 const SERVER_ERROR = { outcome: 'server-error' } as const;

@@ -1,6 +1,7 @@
 import type { TFormStatus } from '@blog/config';
 import {
   submitContactMessage,
+  type TContactRefusal,
   type TSubmitContactResult,
 } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
 import {
@@ -10,8 +11,6 @@ import {
 } from '@web/utils/validate-contact-message/validate-contact-message';
 import { usePathname } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
-
-type TContactFormRefusal = 'blocked' | 'server-error';
 
 const EMPTY_FIELDS: TContactMessageFields = {
   name: '',
@@ -27,7 +26,7 @@ export const useContactForm = () => {
   const [website, setWebsite] = useState('');
   const [status, setStatus] = useState<TFormStatus>('idle');
   const [invalidFields, setInvalidFields] = useState<TContactField[]>([]);
-  const [refusal, setRefusal] = useState<TContactFormRefusal>();
+  const [refusal, setRefusal] = useState<TContactRefusal>();
 
   const changeField = (field: TContactField) => (value: string) => {
     setFields((current) => ({ ...current, [field]: value }));
