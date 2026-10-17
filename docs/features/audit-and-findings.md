@@ -76,9 +76,12 @@ neither.
     document has an error, else WARNING), and resolves it on a clean run.
     The other declared sources and kinds have no writer yet.
   - The release actions (`RELEASE_STARTED`, `RELEASE_OVERRIDE`,
-    `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`), the `RELEASE`
-    target type and the `CONTRAST_CHECK` / `CONTRAST_REGRESSION` finding are
-    declared with no writer yet ([Platform releases](platform-releases.md)).
+    `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`) and the `RELEASE`
+    target type are declared with no writer yet
+    ([Platform releases](platform-releases.md)).
+  - `recordContrastResult` writes one platform-wide `CONTRAST_CHECK` /
+    `CONTRAST_REGRESSION` finding per commit SHA, with the posted
+    `TContrastResultBody` as `details`. No caller uses it yet.
 - Pages read straight from Neon on each request; nothing is cached.
 
 ## Configuration
@@ -106,6 +109,15 @@ Nothing is configurable. Only admins (any role) see either record.
 - `resolveFinding` on a stale or already resolved id returns `DB_NOT_FOUND`,
   not a throw. A later failure opens a new row and keeps the resolved one as
   history.
+- A contrast finding is keyed by SHA, never by tenant, and a SHA has one
+  row. A failing run is OPEN and CRITICAL; a passing run is stored RESOLVED,
+  so it is the SHA's result without being listed as open. A re-run refreshes
+  that row (status, `resolvedAt`, `lastSeenAt`, `details`), so a pass closes
+  a failure and a later failure reopens it. `getContrastFinding` reads a
+  SHA's row in any status; `getLatestPassingContrastSha` returns the SHA of
+  the RESOLVED row with the newest `lastSeenAt`, or `undefined`.
+  `tagContrastFinding` adds the release tag to `details`, and a re-run
+  without a tag keeps it.
 - Findings are not an error tracker: runtime exceptions stay in the logs.
 - Finding details load on demand through `getFindingDetailsAction`, gated by
   `requireTenantById` and scoped to the finding's tenant.
@@ -132,6 +144,7 @@ Nothing is configurable. Only admins (any role) see either record.
 
 - `apps/platform/src/server/audit/record-audit-event.ts`
 - `packages/db/src/queries/findings/open-finding/open-finding.ts`
+- `packages/db/src/queries/findings/record-contrast-result/record-contrast-result.ts`
 - `packages/db/scripts/validate-tenant-documents/run.ts`
 - `apps/platform/src/app/[locale]/(operator)/findings/page.tsx`
 - `apps/platform/src/components/features/tenants/tenant-overview-view/tenant-overview-view.tsx`
