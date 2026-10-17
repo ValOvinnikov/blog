@@ -128,14 +128,14 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 - `packages/db/src/queries/tenants/create-tenant-draft/create-tenant-draft.ts`
 - `apps/platform/src/server/tenants/create-tenant-action.ts`
 - `apps/platform/src/server/provisioning/start-provisioning.ts`
-- `apps/platform/src/server/provisioning/dispatch-github-workflow.ts`
+- `apps/platform/src/server/github/dispatch-github-workflow.ts`
 - `apps/platform/src/utils/use-provisioning-poll/use-provisioning-poll.ts`
 
 ## Tests and stories
 
 - Co-located tests throughout `packages/db/scripts/**`, including `run.*.test.ts` sequencing suites.
 - `packages/db/src/queries/tenants/**` tests (PGlite).
-- `apps/platform/src/server/{provisioning,tenants}/*.test.ts`, `components/features/tenants/**/*.test.tsx` and the route `page.test.tsx` files.
+- `apps/platform/src/server/{provisioning,github,tenants}/*.test.ts`, `components/features/tenants/**/*.test.tsx` and the route `page.test.tsx` files.
 - `apps/platform` has no Storybook.
 
 ## Related

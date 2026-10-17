@@ -1,6 +1,5 @@
+import { dispatchGitHubWorkflow } from '@platform/server/github/dispatch-github-workflow';
 import { env } from '@platform/utils/env/env';
-
-import { dispatchGitHubWorkflow } from './dispatch-github-workflow';
 
 const WORKFLOW_FILE = 'provision-tenant.yml';
 

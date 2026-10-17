@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -13,9 +14,13 @@ const loggerErrorMock = vi.mocked(logger.error);
 describe(dispatchGitHubWorkflow, () => {
   const fetchMock = vi.fn();
 
-  const dispatch = (inputs: Record<string, string | undefined> = {}) =>
+  const dispatch = (
+    inputs: Record<string, TMaybeUndefined<string>> = {},
+    ref?: string,
+  ) =>
     dispatchGitHubWorkflow({
       workflowFile: 'some-workflow.yml',
+      ref,
       inputs,
       logEvents: { skipped: 'x.skipped', failed: 'x.failed', error: 'x.error' },
       logContext: { tenantId: 'tenant-1' },
@@ -84,6 +89,22 @@ describe(dispatchGitHubWorkflow, () => {
       expect.objectContaining({
         body: JSON.stringify({
           ref: 'main',
+          inputs: { tenantId: 'tenant-1' },
+        }),
+      }),
+    );
+  });
+
+  it('dispatches against the given ref instead of main', async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await dispatch({ tenantId: 'tenant-1' }, 'release/v1.2.0');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: JSON.stringify({
+          ref: 'release/v1.2.0',
           inputs: { tenantId: 'tenant-1' },
         }),
       }),
