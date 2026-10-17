@@ -7,9 +7,6 @@
     "pnpm-lock.yaml",
     "turbo.json"
   ],
-  "futureFlags": {
-    "affectedUsingTaskInputs": true
-  },
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
