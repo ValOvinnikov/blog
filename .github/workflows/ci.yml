@@ -48,6 +48,66 @@ env:
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
+  changes:
+    name: Changes
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      studio: ${{ steps.filter.outputs.studio }}
+      env-presence: ${{ steps.filter.outputs.env-presence }}
+      scripts: ${{ steps.filter.outputs.scripts }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # `studio` is @blog/studio's turbo-affected set (itself, its workspace
+      # dependencies config and utils, and the lockfile) written out as paths,
+      # so this job needs no install. It is wider than `packages/studio/**`
+      # because schemas and migrations import @blog/config: a constant changed
+      # there alone can stale the generated types or break a migration.
+      # With no pull-request base every output is set, so a gated check runs
+      # rather than skipping and reading as passed.
+      - name: Compute path outputs
+        id: filter
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          studio=false
+          env_presence=false
+          scripts=false
+          if [ -z "${BASE_SHA}" ] || [ -z "${HEAD_SHA}" ]; then
+            echo "::notice::No pull-request base; setting every output."
+            studio=true
+            env_presence=true
+            scripts=true
+          else
+            changed="$(git diff --name-only "${BASE_SHA}...${HEAD_SHA}")"
+            while IFS= read -r file; do
+              case "${file}" in
+                packages/studio/* | packages/config/* | packages/utils/* | pnpm-lock.yaml)
+                  studio=true ;;
+              esac
+              case "${file}" in
+                env.ts | */env.ts | */oauth-env.ts | .github/workflows/ci.yml | scripts/check-required-env*)
+                  env_presence=true ;;
+              esac
+              case "${file}" in
+                scripts/*.mjs)
+                  scripts=true ;;
+              esac
+            done <<< "${changed}"
+          fi
+          {
+            echo "studio=${studio}"
+            echo "env-presence=${env_presence}"
+            echo "scripts=${scripts}"
+          } | tee -a "${GITHUB_OUTPUT}"
+
   type-check:
     name: Type-check
     if: ${{ !github.event.pull_request.draft }}
@@ -488,6 +548,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs:
+      - changes
       - type-check
       - lint
       - knip
