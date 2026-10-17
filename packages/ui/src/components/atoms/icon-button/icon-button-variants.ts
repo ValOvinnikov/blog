@@ -36,6 +36,11 @@ export const iconButtonVariants = tv({
         'hover:border-brand-primary hover:bg-brand-primary-muted hover:text-brand-primary',
         'focus-visible:bg-transparent',
       ],
+      circle: [
+        'size-11 rounded-full',
+        'border border-border-strong bg-surface text-text',
+        'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
+      ],
     },
     tone: {
       [BRAND_VARIANT.PRIMARY]: [],

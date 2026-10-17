@@ -89,6 +89,7 @@ export const PrimaryNavigation = ({
       {mobileToggle && (
         <Fragment>
           <IconButton
+            variant="circle"
             ariaLabel={mobileToggle.ariaLabel}
             title={mobileToggle.ariaLabel}
             aria-expanded={mobileToggle.isOpen}
