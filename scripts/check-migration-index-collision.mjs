@@ -15,6 +15,11 @@
 // present on both sides under a different tag is a collision. Distinct
 // indices, and a branch that adds no migration at all, report nothing.
 //
+// The branch's journal is the working tree's, or the one committed at
+// `MIGRATION_INDEX_HEAD_REF` when set. CI checks out a pull request's merge
+// result, which has already reconciled the two journals, so it passes the
+// pull request's head SHA instead.
+//
 // Run with `pnpm check:migration-index`. Read-only; exits 1 on any collision.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, realpathSync } from 'node:fs';
@@ -26,6 +31,7 @@ const repoRoot = join(scriptDir, '..');
 
 export const JOURNAL_PATH = 'packages/db/migrations/meta/_journal.json';
 export const BASE_REF = 'origin/main';
+const HEAD_REF_VAR = 'MIGRATION_INDEX_HEAD_REF';
 
 export const RENUMBER_DOC = 'packages/db/README.md';
 export const RENUMBER_SECTION =
@@ -89,9 +95,15 @@ const main = () => {
     process.exit(1);
   }
 
-  const headTags = readJournalTags(
-    readFileSync(join(repoRoot, JOURNAL_PATH), 'utf8'),
-  );
+  const headRef = process.env[HEAD_REF_VAR];
+  if (headRef && !revExists(headRef)) {
+    console.error(`Cannot resolve ${HEAD_REF_VAR}=${headRef}.`);
+    process.exit(1);
+  }
+  const headJournal = headRef
+    ? showFileAtRef(headRef, JOURNAL_PATH)
+    : readFileSync(join(repoRoot, JOURNAL_PATH), 'utf8');
+  const headTags = headJournal ? readJournalTags(headJournal) : new Map();
   const baseJournal = showFileAtRef(BASE_REF, JOURNAL_PATH);
   const baseTags = baseJournal ? readJournalTags(baseJournal) : new Map();
 
