@@ -23,6 +23,7 @@ export type TReleaseCandidate = {
   lastTag: string;
   commits: TComparedCommit[];
   totalCommits: number;
+  isFileListTruncated: boolean;
   changes: TReleaseChanges;
   migrations: TReleaseMigrationSummary;
   contrastStatus: TContrastStatus;
@@ -47,7 +48,11 @@ export const getReleaseCandidate = async (): Promise<
   const changes = classifyReleaseChanges(files, isFileListTruncated);
 
   const [migrations, contrastStatus] = await Promise.all([
-    summariseReleaseMigrations(files, headSha.data),
+    summariseReleaseMigrations({
+      files,
+      isFileListTruncated,
+      headSha: headSha.data,
+    }),
     resolveContrastStatus({
       headSha: headSha.data,
       renderingChangedSinceTag: changes[RELEASE_CHANGE.RENDERING],
@@ -63,6 +68,7 @@ export const getReleaseCandidate = async (): Promise<
       lastTag: lastTag.data,
       commits,
       totalCommits,
+      isFileListTruncated,
       changes,
       migrations: migrations.data,
       contrastStatus: contrastStatus.data,

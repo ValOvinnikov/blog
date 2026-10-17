@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import {
   githubJson,
+  githubPage,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 
@@ -24,6 +25,27 @@ describe(getLatestReleaseTag, () => {
     );
 
     expect(await getLatestReleaseTag()).toEqual({ ok: true, data: 'v0.10.0' });
+  });
+
+  it('finds the greatest version among more tags than GitHub lists by default', async () => {
+    const tags = Array.from({ length: 40 }, (_, index) => `v1.${index}.0`);
+    github.respond('/git/matching-refs/tags/v', (path) =>
+      githubJson(githubPage(tagRefs(...tags), path)),
+    );
+
+    expect(await getLatestReleaseTag()).toEqual({ ok: true, data: 'v1.39.0' });
+  });
+
+  it('reads every page of release tags', async () => {
+    const tags = Array.from({ length: 150 }, (_, index) => `v2.${index}.0`);
+    github.respond('/git/matching-refs/tags/v', (path) =>
+      githubJson(githubPage(tagRefs(...tags), path)),
+    );
+
+    expect(await getLatestReleaseTag()).toEqual({
+      ok: true,
+      data: 'v2.149.0',
+    });
   });
 
   it('ignores tags that are not release versions', async () => {
