@@ -10,7 +10,7 @@ on:
   workflow_call:
     secrets:
       SANITY_API_READ_TOKEN:
-        required: false
+        required: true
 
 permissions:
   contents: read
@@ -33,6 +33,12 @@ jobs:
     env:
       SANITY_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
     steps:
+      - name: Require SANITY_API_READ_TOKEN
+        if: ${{ env.SANITY_READ_TOKEN == '' }}
+        run: |
+          echo "::error title=Missing secret::SANITY_API_READ_TOKEN is not set, so no documents were validated. Add the repository secret, or pass it from the calling workflow."
+          exit 1
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -43,8 +49,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       # `--yes` skips the confirmation prompt, which CI has no TTY for.
-      - name: Validate documents against schema (read-only; requires SANITY_API_READ_TOKEN)
-        if: ${{ env.SANITY_READ_TOKEN != '' }}
+      - name: Validate documents against schema (read-only)
         working-directory: packages/studio
         env:
           SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
@@ -75,5 +80,7 @@ jobs:
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$body"
           else
-            gh issue create --title "$TITLE" --label bug --label prio:next --body "$body"
+            # A missing label fails the whole create, so the report is retried unlabelled.
+            gh issue create --title "$TITLE" --label bug --label prio:next --body "$body" \
+              || gh issue create --title "$TITLE" --body "$body"
           fi
