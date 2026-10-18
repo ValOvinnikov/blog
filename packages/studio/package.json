@@ -51,7 +51,7 @@
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
     "@sanity/cli": "^7.7.1",
-    "@sanity/client": "^7.23.0",
+    "@sanity/client": "^8.9.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "catalog:",
