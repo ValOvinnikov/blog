@@ -15,6 +15,7 @@ export type TAdminShellProps = {
   switcher?: ReactNode;
   crumb: ReactNode;
   roleChip: TRoleChipProps;
+  notice?: ReactNode;
   isSidebarInitiallyCollapsed?: boolean;
   children: ReactNode;
 };
@@ -24,6 +25,7 @@ export const AdminShell = ({
   switcher,
   crumb,
   roleChip,
+  notice,
   isSidebarInitiallyCollapsed = false,
   children,
 }: TAdminShellProps) => {
@@ -39,6 +41,7 @@ export const AdminShell = ({
           switcher={switcher}
         />
       }
+      notice={notice}
     >
       {children}
     </ShellFrame>

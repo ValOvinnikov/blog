@@ -40,7 +40,16 @@ neither.
 
 - `/findings` (operator, `requireAdmin`): every OPEN finding, newest
   `lastSeenAt` first, with tenant (linking to `/tenants/{id}`, or marked
-  platform-wide), source, kind, severity and last-seen date.
+  platform-wide), source, kind, severity and last-seen date. A contrast
+  finding also shows its short commit SHA, its tag once released, the failure
+  count, a link to the workflow run and a link to `/releases`.
+- Operator banner (every page under `(operator)`, SUPERADMIN only): a
+  warning that a contrast check is due, linking to `/releases`, shown when
+  the release candidate's contrast status is `DUE`
+  ([Platform releases](platform-releases.md)). It streams in through
+  `Suspense` after the page, and renders nothing while loading, when contrast
+  is green or nothing rendering changed, or when GitHub or the db cannot be
+  read. ADMINs and MODERATORs never trigger the read.
 - `/tenants/{id}` overview: the Findings card (OPEN findings, with a
   disclosure that loads `details` on open) and the Recent activity card (the
   last five `TENANT` audit events: action, actor email, relative time).
@@ -81,7 +90,8 @@ neither.
     ([Platform releases](platform-releases.md)).
   - `recordContrastResult` writes one platform-wide `CONTRAST_CHECK` /
     `CONTRAST_REGRESSION` finding per commit SHA, with the posted
-    `TContrastResultBody` as `details`. No caller uses it yet.
+    `TContrastResultBody` as `details`. Its caller is the signed
+    `/api/internal/contrast-result` route.
 - Pages read straight from Neon on each request; nothing is cached.
 
 ## Configuration
@@ -119,6 +129,9 @@ Nothing is configurable. Only admins (any role) see either record.
   `tagContrastFinding` adds the release tag to `details`, and a re-run
   without a tag keeps it.
 - Findings are not an error tracker: runtime exceptions stay in the logs.
+- `listOpenFindings` never returns `details`, except a contrast finding's
+  result as `contrastResult` (null on every other source), because the
+  Findings page shows it inline.
 - Finding details load on demand through `getFindingDetailsAction`, gated by
   `requireTenantById` and scoped to the finding's tenant.
 - The document-validation sweep is advisory: it exits 1 on a systemic error
@@ -147,6 +160,8 @@ Nothing is configurable. Only admins (any role) see either record.
 - `packages/db/src/queries/findings/record-contrast-result/record-contrast-result.ts`
 - `packages/db/scripts/validate-tenant-documents/run.ts`
 - `apps/platform/src/app/[locale]/(operator)/findings/page.tsx`
+- `apps/platform/src/components/features/releases/contrast-due-banner/contrast-due-banner.tsx`
+- `apps/platform/src/server/releases/is-contrast-due.ts`
 - `apps/platform/src/components/features/tenants/tenant-overview-view/tenant-overview-view.tsx`
 
 ## Tests and stories
@@ -157,7 +172,9 @@ Nothing is configurable. Only admins (any role) see either record.
 - `apps/platform/src/server/audit/record-audit-event.test.ts`,
   `apps/platform/src/server/findings/get-finding-details-action.test.ts`, the
   findings page test, and the component tests beside the findings table,
-  view, card, details and recent-activity card. Fixtures live in
+  view, card, details, contrast-finding details and recent-activity card,
+  the contrast-due banner, `is-contrast-due.test.ts` and the operator
+  layout test. Fixtures live in
   `apps/platform/src/testing/`. No Storybook.
 
 ## Related

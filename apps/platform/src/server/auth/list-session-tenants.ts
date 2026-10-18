@@ -2,7 +2,6 @@ import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config/types';
 import { queries } from '@blog/db';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -11,6 +10,7 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
+import { isSuperAdmin } from './is-super-admin';
 import { requireSessionUserId } from './require-session-user-id';
 
 export type TSessionTenants = {
@@ -38,7 +38,7 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
     queries.memberships.listMembershipsWithTenantsForUser(userId),
   ]);
 
-  if (admin?.role === ADMIN_ROLE.SUPERADMIN) {
+  if (isSuperAdmin(admin)) {
     const tenants = await queries.tenants.listTenants({
       includeArchived: true,
     });

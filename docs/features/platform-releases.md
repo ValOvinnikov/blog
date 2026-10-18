@@ -14,6 +14,7 @@ code:
   - apps/platform/src/constants/release.ts
   - apps/platform/src/app/api/internal/contrast-result/**
   - apps/platform/src/server/internal-api/**
+  - apps/platform/src/components/features/releases/**
 epics: [5271]
 ---
 
@@ -24,8 +25,9 @@ epics: [5271]
 A SUPERADMIN will see the release candidate on a platform Releases page,
 run the contrast check and cut a production release from it. The page is not
 built yet. What exists is the shared vocabulary, the server-side reader that
-works out the release candidate from GitHub and the database, and the signed
-route the contrast workflow posts its result to.
+works out the release candidate from GitHub and the database, the signed
+route the contrast workflow posts its result to, and a contrast-due banner on
+the operator pages that links to `/releases`, which 404s until the page lands.
 
 The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
@@ -50,6 +52,12 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
   refreshes it, a `PASS` resolves it, which is what the candidate reader's
   contrast status then reports for that SHA.
+- The contrast-due banner at the top of every `(operator)` page, for
+  SUPERADMINs only, when the candidate's contrast status is `DUE`
+  (`isContrastDue`). It reads the candidate without the migration summary,
+  streams in after the page, and renders nothing on any GitHub or db failure.
+  Contrast findings on `/findings` are described in
+  [Audit events and findings](audit-and-findings.md).
 
 ## Data
 
@@ -113,7 +121,11 @@ values as plain `text`, so none of them needs a db migration:
 ## Entry points
 
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@blog/utils/version`).
-- `getReleaseCandidate` (`apps/platform/src/server/releases/`).
+- `getReleaseCandidate` and `isContrastDue`, both built on
+  `getCandidateComparison` (`apps/platform/src/server/releases/`).
+- `ContrastDueBanner`
+  (`apps/platform/src/components/features/releases/contrast-due-banner/`),
+  passed to `AdminShell`'s `notice` slot by the operator layout.
 
 ## Tests and stories
 

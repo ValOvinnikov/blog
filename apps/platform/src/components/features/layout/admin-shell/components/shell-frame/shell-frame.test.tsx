@@ -34,6 +34,23 @@ describe(ShellFrame, () => {
     expect(screen.getByText('Studio content')).toBeVisible();
   });
 
+  it('renders a notice above the page content', () => {
+    renderWithIntl(
+      <ShellFrame
+        sidebar={<p>Sidebar</p>}
+        topbar={<p>Topbar</p>}
+        notice={<p>Contrast check due</p>}
+      >
+        <p>Page content</p>
+      </ShellFrame>,
+    );
+
+    expect(screen.getByText('Contrast check due')).toBeVisible();
+    expect(screen.getByRole('main')).not.toContainElement(
+      screen.getByText('Contrast check due'),
+    );
+  });
+
   it('seeds the sidebar-collapse boundary from isSidebarInitiallyCollapsed', () => {
     renderWithIntl(
       <ShellFrame

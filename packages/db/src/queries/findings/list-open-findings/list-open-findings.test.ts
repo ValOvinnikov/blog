@@ -3,12 +3,13 @@ import {
   FINDING_SEVERITY,
   FINDING_SOURCE,
 } from '@blog/config/constants';
+import { openFinding } from '@blog/db/queries/findings/open-finding';
+import { recordContrastResult } from '@blog/db/queries/findings/record-contrast-result';
+import { resolveFinding } from '@blog/db/queries/findings/resolve-finding';
 import * as schema from '@blog/db/schema';
+import { makeContrastResult } from '@blog/db/testing/findings/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-
-import { openFinding } from '../open-finding';
-import { resolveFinding } from '../resolve-finding';
 
 import { listOpenFindings } from './list-open-findings';
 
@@ -93,6 +94,33 @@ describe(listOpenFindings, () => {
       ]),
     );
     expect(result.every((finding) => !('details' in finding))).toBe(true);
+  });
+
+  it('carries the contrast result on a contrast finding and on no other', async () => {
+    const failingRun = makeContrastResult({ tag: 'v1.2.0' });
+    await recordContrastResult(failingRun);
+    await openFinding({
+      source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+      kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
+      severity: FINDING_SEVERITY.INFO,
+      identifier: 'platform-wide',
+      details: { reason: 'two owners' },
+    });
+
+    const result = await listOpenFindings();
+
+    expect(result).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: FINDING_SOURCE.CONTRAST_CHECK,
+          contrastResult: failingRun,
+        }),
+        expect.objectContaining({
+          source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+          contrastResult: null,
+        }),
+      ]),
+    );
   });
 
   it('returns an empty array when nothing is open', async () => {

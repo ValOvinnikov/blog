@@ -1,5 +1,6 @@
 import { SIZE } from '@blog/config';
 import type { TOpenFinding } from '@blog/db/queries/findings';
+import { ContrastFindingDetails } from '@platform/components/features/findings/contrast-finding-details';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -34,6 +35,7 @@ export const FindingsTable = ({ findings }: TFindingsTableProps) => {
         { key: 'kind', label: t('columnKind') },
         { key: 'severity', label: t('columnSeverity') },
         { key: 'lastSeen', label: t('columnLastSeen') },
+        { key: 'details', label: t('columnDetails') },
       ]}
       renderRow={(finding) => (
         <DataTableShell.Row key={finding.id}>
@@ -61,6 +63,11 @@ export const FindingsTable = ({ findings }: TFindingsTableProps) => {
             <time dateTime={finding.lastSeenAt.toISOString()}>
               {formatDate(finding.lastSeenAt, locale)}
             </time>
+          </DataTableShell.Cell>
+          <DataTableShell.Cell>
+            {finding.contrastResult && (
+              <ContrastFindingDetails result={finding.contrastResult} />
+            )}
           </DataTableShell.Cell>
         </DataTableShell.Row>
       )}

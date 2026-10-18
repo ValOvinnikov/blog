@@ -1,5 +1,7 @@
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { usePathname } from '@platform/i18n/navigation';
 import { auth } from '@platform/server/auth/auth';
+import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { redirect, useParams } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -24,6 +26,10 @@ vi.mock('@blog/db', () => ({
 }));
 
 vi.mock('@platform/i18n/navigation');
+
+vi.mock('@platform/components/features/releases/contrast-due-banner', () => ({
+  ContrastDueBanner: () => <p>Contrast check due</p>,
+}));
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
@@ -61,16 +67,33 @@ describe(`<${OperatorLayout.name}/>`, () => {
   });
 
   it('renders the gated content for a signed-in admin', async () => {
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
+    getAdminByUserIdMock.mockResolvedValue(makeAdmin());
 
     await setup();
 
     expect(screen.getByText('content')).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
+
+  it('shows the contrast-due banner slot to a SUPERADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValue(
+      makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+    );
+
+    await setup();
+
+    expect(screen.getByText('Contrast check due')).toBeVisible();
+  });
+
+  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+    'never shows the contrast-due banner to an %s',
+    async (role) => {
+      getAdminByUserIdMock.mockResolvedValue(makeAdmin({ role }));
+
+      await setup();
+
+      expect(screen.getByText('content')).toBeVisible();
+      expect(screen.queryByText('Contrast check due')).not.toBeInTheDocument();
+    },
+  );
 });

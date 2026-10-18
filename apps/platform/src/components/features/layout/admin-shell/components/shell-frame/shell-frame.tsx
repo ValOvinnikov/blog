@@ -10,6 +10,7 @@ import { shellFrameVariants } from './shell-frame-variants';
 export type TShellFrameProps = {
   sidebar: ReactNode;
   topbar: ReactNode;
+  notice?: ReactNode;
   children: ReactNode;
   isSidebarInitiallyCollapsed?: boolean;
 };
@@ -18,12 +19,15 @@ export type TShellFrameProps = {
 export const ShellFrame = ({
   sidebar,
   topbar,
+  notice,
   children,
   isSidebarInitiallyCollapsed = false,
 }: TShellFrameProps) => {
   const segment = useSelectedLayoutSegment();
   const isFullBleed = segment === STUDIO_SEGMENT;
-  const { root, main, content } = shellFrameVariants({ isFullBleed });
+  const { root, main, noticeSlot, content } = shellFrameVariants({
+    isFullBleed,
+  });
 
   return (
     <div className={root()}>
@@ -33,6 +37,7 @@ export const ShellFrame = ({
         {sidebar}
         <div className={main()}>
           {topbar}
+          {notice && <div className={noticeSlot()}>{notice}</div>}
           <main className={content()}>{children}</main>
         </div>
       </SidebarCollapseProvider>
