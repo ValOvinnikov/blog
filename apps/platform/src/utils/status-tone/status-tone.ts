@@ -15,7 +15,9 @@ import {
 } from '@platform/constants/domain';
 import {
   CONTRAST_STATUS,
+  RELEASE_RUN_STATUS,
   type TContrastStatus,
+  type TReleaseRunStatus,
 } from '@platform/constants/release';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 
@@ -52,6 +54,13 @@ const CONTRAST_STATUS_TONE: Record<TContrastStatus, TBadgeTone> = {
   [CONTRAST_STATUS.RUNNING]: 'brand',
   [CONTRAST_STATUS.DUE]: 'warn',
   [CONTRAST_STATUS.NONE]: 'neutral',
+};
+
+const RELEASE_RUN_STATUS_TONE: Record<TReleaseRunStatus, TBadgeTone> = {
+  [RELEASE_RUN_STATUS.DISPATCHED]: 'neutral',
+  [RELEASE_RUN_STATUS.RUNNING]: 'brand',
+  [RELEASE_RUN_STATUS.SUCCEEDED]: 'ok',
+  [RELEASE_RUN_STATUS.FAILED]: 'bad',
 };
 
 const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {
@@ -100,3 +109,6 @@ export const fieldStatusTone = (status: TEmailItemStatus) =>
 
 export const contrastStatusTone = (status: TContrastStatus) =>
   CONTRAST_STATUS_TONE[status];
+
+export const releaseRunStatusTone = (status: TReleaseRunStatus) =>
+  RELEASE_RUN_STATUS_TONE[status];

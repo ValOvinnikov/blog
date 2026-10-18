@@ -1093,6 +1093,58 @@
     "githubUnavailable": "GitHub was niet bereikbaar. Probeer het zo opnieuw.",
     "startFailed": "De contrastcontrole kon niet worden gestart."
   },
+  "releaseCard": {
+    "title": "Release",
+    "description": "Maak een productierelease van de nieuwste commit op main.",
+    "started": "Release gestart.",
+    "runningHint": "Er loopt een release.",
+    "nothingToReleaseHint": "Er is niets veranderd sinds {lastTag}.",
+    "empty": "Er is nog geen release uitgevoerd.",
+    "unavailableTitle": "Releasestatus is niet beschikbaar",
+    "unavailableDescription": "GitHub was niet bereikbaar, dus de laatste releaserun wordt niet getoond."
+  },
+  "releaseRunStatus": {
+    "status": {
+      "DISPATCHED": "Aangevraagd",
+      "RUNNING": "Bezig",
+      "SUCCEEDED": "Geslaagd",
+      "FAILED": "Mislukt"
+    },
+    "explanation": {
+      "DISPATCHED": "GitHub heeft de release geaccepteerd en start hem zo.",
+      "RUNNING": "De release is bezig: de controles, de migraties, de tag en dan de deploy.",
+      "SUCCEEDED": "De release is klaar en productie is gedeployed.",
+      "FAILED": "De release is mislukt en de stappen na de fout zijn niet uitgevoerd."
+    },
+    "tenantMigrationFailedTitle": "Een tenantmigratie is mislukt",
+    "tenantMigrationFailedDescription": "De deploy is niet uitgevoerd, dus de live site is ongewijzigd. Probeer die tenant opnieuw met ‘Tenantmigraties uitvoeren’ op deze pagina.",
+    "viewRun": "Bekijk de run"
+  },
+  "startReleaseDialog": {
+    "trigger": "Release",
+    "overrideTrigger": "Release met override",
+    "title": "Releasen naar productie",
+    "description": "Dit controleert de nieuwste commit op main, voert de migraties uit, tagt hem en deployt hem naar productie.",
+    "overrideTitle": "De contrastcontrole is niet geslaagd",
+    "overrideDescription": "De weergave is veranderd en de contrastcontrole is niet geslaagd. Als je toch releast, wordt je reden bij je account vastgelegd.",
+    "versionLabel": "Versie",
+    "versionHint": "Hoger dan de laatste release, {lastTag}. Bijvoorbeeld v1.2.3.",
+    "migrations": "{contentMigrations, plural, =0 {Geen contentmigraties} one {# contentmigratie over {tenants, plural, one {# project} other {# projecten}}} other {# contentmigraties over {tenants, plural, one {# project} other {# projecten}}}}, {dbMigrations, plural, =0 {geen databasemigraties} one {# databasemigratie} other {# databasemigraties}}.",
+    "migrationsMinimum": "Minstens {contentMigrations, plural, =0 {geen contentmigraties} one {# contentmigratie over {tenants, plural, one {# project} other {# projecten}}} other {# contentmigraties over {tenants, plural, one {# project} other {# projecten}}}}, en minstens {dbMigrations, plural, =0 {geen databasemigraties} one {# databasemigratie} other {# databasemigraties}}.",
+    "reasonLabel": "Reden om toch te releasen",
+    "reasonHint": "Wordt met je naam in het auditlog opgeslagen.",
+    "confirm": "Release starten",
+    "confirming": "Bezig met starten…",
+    "fieldError": {
+      "VERSION_MALFORMED": "Voer een versie in zoals v1.2.3. De laatste release is {lastTag}.",
+      "VERSION_NOT_GREATER": "De versie moet hoger zijn dan de laatste release, {lastTag}.",
+      "REASON_REQUIRED": "Geef aan waarom je releast zonder geslaagde contrastcontrole."
+    },
+    "alreadyRunning": "Er loopt al een release.",
+    "githubUnavailable": "GitHub was niet bereikbaar, dus er is niets gestart. Probeer het zo opnieuw.",
+    "invalid": "Controleer de versie en de reden en probeer het opnieuw.",
+    "startFailed": "GitHub heeft de release niet geaccepteerd, dus er is niets gestart."
+  },
   "releaseUnavailable": {
     "title": "Releaseinformatie is niet beschikbaar",
     "retry": "Opnieuw proberen",

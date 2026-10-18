@@ -12,6 +12,7 @@ code:
   - apps/platform/src/server/github/**
   - apps/platform/src/server/releases/**
   - apps/platform/src/constants/release.ts
+  - apps/platform/src/utils/release-state/**
   - apps/platform/src/app/[locale]/(operator)/releases/**
   - apps/platform/src/components/features/releases/**
   - apps/platform/src/app/api/internal/contrast-result/**
@@ -23,13 +24,14 @@ epics: [5271]
 
 ## What it does
 
-A SUPERADMIN sees the release candidate on the platform Releases page and
-runs the contrast check from it; a contrast-due banner on the operator pages
-links there. Cutting a production release from the page is not built yet. What
+A SUPERADMIN sees the release candidate on the platform Releases page, runs
+the contrast check from it and cuts a production release by dispatching
+`release.yml`; a contrast-due banner on the operator pages links there. What
 exists is the shared vocabulary, the server-side reader that works out the
 release candidate from GitHub and the database, the signed route the contrast
-workflow posts its result to, the page, the contrast Server Action and the
-banner.
+workflow posts its result to, the page, the contrast and release Server
+Actions, the release run state and the banner. The `release.yml` workflow the
+Release button dispatches is built separately.
 
 The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
@@ -65,8 +67,11 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
     is set (GitHub lists at most 300 files);
   - the contrast status badge with a one-line explanation, a link to
     `/findings` when it is `FAILED`, and the Run contrast check button.
-  - When there are no commits since the tag only the summary and an empty
-    message show. A failed read shows an error notice with the reason and a
+  - the Release card: the Release button, its confirmation dialog and the
+    state of the newest `release.yml` run (below).
+  - When there are no commits since the tag only the summary, the empty
+    message and the Release card show, and the Release button is disabled
+    with "Nothing has changed since {lastTag}". A failed read shows an error notice with the reason and a
     Try again button, never earlier data. Loading is the `(operator)`
     segment's page skeleton.
 - Server Action `startContrastCheckAction`
@@ -86,6 +91,47 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   result. Once the server status differs it wins and the local state clears,
   so a later `DUE` or `NONE` never flips back; the next page load shows
   GitHub's status.
+- The Release card. The button reads Release when contrast is `GREEN` or
+  `NONE`, or no rendering path changed since the tag; otherwise it reads
+  Release with override, and the dialog asks for a reason the confirm button
+  waits on (`isReleaseOverrideRequired`). The dialog asks for the version,
+  hinted with the last tag, and states the migrations it runs: "N content
+  migrations across M projects, K database migrations", "No content
+  migrations, no database migrations" when there are none, and "At least …"
+  when the counts are a lower bound. The button is disabled with a reason
+  while a release is dispatched or running.
+- Server Action `startReleaseAction`
+  (`server/releases/start-release-action.ts`): `requireSuperAdmin`, validates
+  `{ version, overrideReason? }` with Zod (reason at most
+  `RELEASE_OVERRIDE_REASON_MAX_LENGTH`, trimmed), then re-reads the candidate
+  and the newest release run. It answers `UNAVAILABLE` when GitHub or the db
+  cannot be read; `REFUSED` with `RELEASE_RUNNING` while the newest run is
+  dispatched or running; `INVALID` with a `version` field error
+  (`VERSION_MALFORMED` or `VERSION_NOT_GREATER`, both carrying `lastTag`) for a
+  version that is not `vX.Y.Z` or not greater than the last tag; `INVALID`
+  with an `overrideReason` field error (`REASON_REQUIRED`) when an override is
+  required and the reason is blank; and `SERVER_ERROR` when the dispatch
+  fails, which the dialog reports as nothing started. Otherwise it dispatches
+  `release.yml` on `main` with inputs `version` and `override` (`"true"` or
+  `"false"`) and records `RELEASE_STARTED` (details: `headSha`,
+  `isOverride`), plus `RELEASE_OVERRIDE` (details: `headSha`,
+  `contrastStatus`, `reason`) when overridden, both on the `RELEASE` target
+  with the version as `targetId`. The events attest the dispatch request, not
+  the workflow's outcome, and are written only after a successful dispatch. A
+  reason sent when no override is required is ignored.
+- Release run state (`getReleaseRun`, `getReleaseRunAction`): the newest
+  `release.yml` run from the workflow runs API, read on page view and polled
+  every 10 seconds by the card while it is dispatched or running (paused
+  while the tab is hidden, capped at 90 minutes). Queued, waiting or pending
+  reads Dispatched, `in_progress` Running, `completed` with `success`
+  Succeeded, and any other conclusion Failed; each links to the run and shows
+  its title. A failed run whose failed jobs include `Migrate tenant content`
+  (`TENANT_MIGRATION_JOB_NAME`, the job `release.yml` calls) also says the
+  deploy did not run and points to Run tenant migrations for retrying that
+  tenant. Straight after a successful start the card shows Dispatched before
+  GitHub lists the run, and treats an older run as not yet its own. When a
+  polled run finishes the page refreshes. A failed read shows "Release status
+  is unavailable" in the card, never earlier data.
 - `POST /api/internal/contrast-result` — machine-only, Bearer
   `CONTRAST_RESULT_SECRET`. Records the posted result as the SHA's contrast
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
@@ -153,7 +199,8 @@ values as plain `text`, so none of them needs a db migration:
 - [Audit events and findings](audit-and-findings.md) — the two records
   releases write to; the contrast status reads the contrast finding for a SHA
   and the newest passing SHA.
-- GitHub's REST API (tags, branches, compare, contents, workflow runs) through
+- GitHub's REST API (tags, branches, compare, contents, workflow runs and
+  their jobs, workflow dispatch) through
   the existing `TENANT_PROVISIONING_GITHUB_TOKEN` and
   `TENANT_PROVISIONING_GITHUB_REPO`.
 - `drizzle.__drizzle_migrations`, drizzle-kit's applied journal, read by
@@ -164,7 +211,10 @@ values as plain `text`, so none of them needs a db migration:
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@blog/utils/version`).
 - `getReleaseCandidate` and `isContrastDue`, both built on
   `getCandidateComparison` (`apps/platform/src/server/releases/`).
-- `startContrastCheckAction` (`apps/platform/src/server/releases/`).
+- `startContrastCheckAction`, `startReleaseAction`, `getReleaseRun` and
+  `getReleaseRunAction` (`apps/platform/src/server/releases/`).
+- `isReleaseOverrideRequired` and `isReleaseRunActive`
+  (`apps/platform/src/utils/release-state/`).
 - `ReleasesView` (`apps/platform/src/components/features/releases/`).
 - `ContrastDueBanner`
   (`apps/platform/src/components/features/releases/contrast-due-banner/`),
@@ -178,6 +228,7 @@ values as plain `text`, so none of them needs a db migration:
   `apps/platform/src/components/features/releases/**/*.test.tsx`.
 - `apps/platform/src/server/releases/*.test.ts` and
   `apps/platform/src/server/github/*.test.ts`, against a stubbed GitHub.
+- `apps/platform/src/utils/release-state/release-state.test.ts`.
 - `packages/db/src/queries/migrations/**/*.test.ts`.
 
 ## Related

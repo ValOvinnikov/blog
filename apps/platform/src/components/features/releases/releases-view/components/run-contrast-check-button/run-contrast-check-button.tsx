@@ -2,10 +2,7 @@
 
 import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
-import {
-  RELEASE_REFUSAL,
-  type TReleaseRefusal,
-} from '@platform/constants/release';
+import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { useToast } from '@platform/context/toast-provider';
 import { startContrastCheckAction } from '@platform/server/releases/start-contrast-check-action';
 import { useRouter } from 'next/navigation';
@@ -14,7 +11,7 @@ import { useTransition } from 'react';
 
 const REFUSAL_KEYS = {
   [RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING]: 'alreadyRunning',
-} satisfies Record<TReleaseRefusal, string>;
+} satisfies Record<typeof RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING, string>;
 
 const failureKey = (
   result: Exclude<

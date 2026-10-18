@@ -1,7 +1,11 @@
 import { RELEASE_CHANGE } from '@blog/config';
-import { CONTRAST_STATUS } from '@platform/constants/release';
+import {
+  CONTRAST_STATUS,
+  RELEASE_RUN_STATUS,
+} from '@platform/constants/release';
 import type { TComparedCommit } from '@platform/server/github/compare-commits';
 import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
+import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 
 export const makeComparedCommit = (
   overrides: Partial<TComparedCommit> = {},
@@ -34,5 +38,16 @@ export const makeReleaseCandidate = (
     isLowerBound: false,
   },
   contrastStatus: CONTRAST_STATUS.NONE,
+  ...overrides,
+});
+
+export const makeReleaseRun = (
+  overrides: Partial<TReleaseRun> = {},
+): TReleaseRun => ({
+  status: RELEASE_RUN_STATUS.SUCCEEDED,
+  title: 'Release v1.4.0',
+  url: 'https://github.com/acme/blog/actions/runs/42',
+  createdAt: '2026-04-02T10:00:00.000Z',
+  isTenantMigrationFailed: false,
   ...overrides,
 });

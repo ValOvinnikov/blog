@@ -1093,6 +1093,58 @@
     "githubUnavailable": "No se pudo conectar con GitHub. Inténtalo de nuevo en un momento.",
     "startFailed": "No se pudo iniciar la comprobación de contraste."
   },
+  "releaseCard": {
+    "title": "Versión",
+    "description": "Publica en producción el último commit de main.",
+    "started": "Versión iniciada.",
+    "runningHint": "Hay una versión en curso.",
+    "nothingToReleaseHint": "No ha cambiado nada desde {lastTag}.",
+    "empty": "Todavía no se ha ejecutado ninguna versión.",
+    "unavailableTitle": "El estado de la versión no está disponible",
+    "unavailableDescription": "No se pudo contactar con GitHub, así que no se muestra la última ejecución."
+  },
+  "releaseRunStatus": {
+    "status": {
+      "DISPATCHED": "Solicitada",
+      "RUNNING": "En curso",
+      "SUCCEEDED": "Completada",
+      "FAILED": "Fallida"
+    },
+    "explanation": {
+      "DISPATCHED": "GitHub ha aceptado la versión y está a punto de iniciarla.",
+      "RUNNING": "La versión está en curso: las comprobaciones, las migraciones, la etiqueta y después el despliegue.",
+      "SUCCEEDED": "La versión ha terminado y producción está desplegada.",
+      "FAILED": "La versión ha fallado y los pasos posteriores al fallo no se ejecutaron."
+    },
+    "tenantMigrationFailedTitle": "Ha fallado la migración de un cliente",
+    "tenantMigrationFailedDescription": "El despliegue no se ejecutó, así que el sitio en vivo no ha cambiado. Reintenta ese cliente con «Ejecutar migraciones de clientes» en esta página.",
+    "viewRun": "Ver la ejecución"
+  },
+  "startReleaseDialog": {
+    "trigger": "Publicar",
+    "overrideTrigger": "Publicar con excepción",
+    "title": "Publicar en producción",
+    "description": "Comprueba el último commit de main, ejecuta sus migraciones, lo etiqueta y lo despliega en producción.",
+    "overrideTitle": "La comprobación de contraste no ha pasado",
+    "overrideDescription": "El renderizado ha cambiado y la comprobación de contraste no ha pasado. Si publicas igualmente, tu motivo queda registrado con tu cuenta.",
+    "versionLabel": "Versión",
+    "versionHint": "Mayor que la última versión, {lastTag}. Por ejemplo, v1.2.3.",
+    "migrations": "{contentMigrations, plural, =0 {Ninguna migración de contenido} one {# migración de contenido en {tenants, plural, one {# proyecto} other {# proyectos}}} other {# migraciones de contenido en {tenants, plural, one {# proyecto} other {# proyectos}}}}, {dbMigrations, plural, =0 {ninguna migración de base de datos} one {# migración de base de datos} other {# migraciones de base de datos}}.",
+    "migrationsMinimum": "Al menos {contentMigrations, plural, =0 {ninguna migración de contenido} one {# migración de contenido en {tenants, plural, one {# proyecto} other {# proyectos}}} other {# migraciones de contenido en {tenants, plural, one {# proyecto} other {# proyectos}}}}, y al menos {dbMigrations, plural, =0 {ninguna migración de base de datos} one {# migración de base de datos} other {# migraciones de base de datos}}.",
+    "reasonLabel": "Motivo para publicar igualmente",
+    "reasonHint": "Se guarda en el registro de auditoría con tu nombre.",
+    "confirm": "Iniciar versión",
+    "confirming": "Iniciando…",
+    "fieldError": {
+      "VERSION_MALFORMED": "Introduce una versión como v1.2.3. La última versión es {lastTag}.",
+      "VERSION_NOT_GREATER": "La versión debe ser mayor que la última, {lastTag}.",
+      "REASON_REQUIRED": "Indica por qué publicas sin una comprobación de contraste superada."
+    },
+    "alreadyRunning": "Ya hay una versión en curso.",
+    "githubUnavailable": "No se pudo contactar con GitHub, así que no se ha iniciado nada. Inténtalo de nuevo en un momento.",
+    "invalid": "Revisa la versión y el motivo e inténtalo de nuevo.",
+    "startFailed": "GitHub no aceptó la versión, así que no se ha iniciado nada."
+  },
   "releaseUnavailable": {
     "title": "La información de la versión no está disponible",
     "retry": "Reintentar",
