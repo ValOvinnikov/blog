@@ -2,6 +2,10 @@
 
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
+import {
+  FIELD_ERROR,
+  type TFieldErrorReason,
+} from '@web/constants/field-error';
 import { auth } from '@web/server/auth/auth';
 import { logger } from '@web/utils/logger/logger';
 
@@ -20,7 +24,8 @@ export type TUnlinkProviderResult = TActionResult<
 
 export type TUpdateDisplayNameResult = TActionResult<
   typeof ACTION_OUTCOME.SERVER_ERROR,
-  'name'
+  'name',
+  TFieldErrorReason
 >;
 
 const SUCCESS = { outcome: ACTION_OUTCOME.SUCCESS } as const;
@@ -56,7 +61,10 @@ export const updateDisplayNameAction = async (
 
   const trimmedName = name.trim();
   if (trimmedName.length === 0) {
-    return { outcome: ACTION_OUTCOME.INVALID, invalidFields: ['name'] };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { name: { reason: FIELD_ERROR.INVALID } },
+    };
   }
 
   try {
