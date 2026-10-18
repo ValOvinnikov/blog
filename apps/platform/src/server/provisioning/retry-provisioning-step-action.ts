@@ -1,23 +1,29 @@
 'use server';
 
+import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 
 import {
   startProvisioning,
-  type TStartProvisioningResult,
+  type TStartProvisioningRefusal,
 } from './start-provisioning';
 
-export type TRetryProvisioningStepResult =
-  TStartProvisioningResult | { outcome: 'archived' };
+export type TRetryProvisioningRefusal =
+  TStartProvisioningRefusal | typeof TENANT_REFUSAL.ARCHIVED;
+
+export type TRetryProvisioningStepResult = TActionResult<
+  typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
+  never,
+  never,
+  TRetryProvisioningRefusal
+>;
 
 /**
- * Backs both the status page's per-step Retry button and its all-idle Start
- * action — re-dispatches the whole workflow rather than a single step, since
- * every step is independently idempotent. The archived check below is the
- * same disabled-button-is-UX, server-check-is-enforcement split as the
- * tenant details save action; `beginTenantProvisioning`'s atomic guard is
- * likewise the real backstop against a concurrent double-dispatch.
+ * Re-dispatches the whole workflow rather than one step, since every step is
+ * idempotent; `beginTenantProvisioning`'s atomic guard, not the archived check,
+ * is what stops a concurrent double-dispatch.
  */
 export const retryProvisioningStepAction = async (
   tenantId: string,
@@ -28,10 +34,13 @@ export const retryProvisioningStepAction = async (
     includeArchived: true,
   });
   if (!tenant) {
-    return { outcome: 'not-found' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    };
   }
   if (tenant.deprovisionedAt) {
-    return { outcome: 'archived' };
+    return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
   }
 
   return startProvisioning(tenantId);

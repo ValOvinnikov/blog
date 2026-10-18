@@ -1,8 +1,10 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import {
   act,
   renderHookWithIntl,
@@ -43,7 +45,7 @@ describe(useProvisioningPoll, () => {
   beforeEach(() => {
     retryProvisioningStepActionMock.mockReset();
     retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: 'dispatched',
+      outcome: ACTION_OUTCOME.SUCCESS,
     });
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
@@ -669,7 +671,8 @@ describe(useProvisioningPoll, () => {
     it('reports a not-found dispatch error distinctly from a generic one', async () => {
       const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
-        outcome: 'not-found',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.NOT_FOUND,
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -678,14 +681,15 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.dispatchNotice).toBe('not-found');
+        expect(result.current.dispatchNotice).toBe(TENANT_REFUSAL.NOT_FOUND);
       });
     });
 
     it('reports an archived dispatch error distinctly from a generic one', async () => {
       const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
-        outcome: 'archived',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.ARCHIVED,
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -694,14 +698,14 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.dispatchNotice).toBe('archived');
+        expect(result.current.dispatchNotice).toBe(TENANT_REFUSAL.ARCHIVED);
       });
     });
 
     it('reports a generic dispatch error for a dispatch failure', async () => {
       const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
-        outcome: 'dispatch-error',
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -710,14 +714,15 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.dispatchNotice).toBe('other');
+        expect(result.current.dispatchNotice).toBe(ACTION_OUTCOME.SERVER_ERROR);
       });
     });
 
     it('reports already-in-progress distinctly from a real failure, and still refreshes', async () => {
       const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
-        outcome: 'already-in-progress',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -726,7 +731,9 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.dispatchNotice).toBe('already-in-progress');
+        expect(result.current.dispatchNotice).toBe(
+          TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+        );
       });
       expect(result.current.isDispatchPending).toBe(false);
     });

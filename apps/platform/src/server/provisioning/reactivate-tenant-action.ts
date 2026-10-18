@@ -49,22 +49,9 @@ export const reactivateTenantAction = async (
   }
   const { tenant } = resolved;
 
-  const { outcome } = await startProvisioning(tenantId);
-
-  if (outcome === 'already-in-progress') {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
-    };
-  }
-  if (outcome === 'not-found') {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.NOT_FOUND,
-    };
-  }
-  if (outcome === 'dispatch-error') {
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+  const started = await startProvisioning(tenantId);
+  if (started.outcome !== ACTION_OUTCOME.SUCCESS) {
+    return started;
   }
 
   await recordAuditEvent({

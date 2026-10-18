@@ -1,10 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import type { TProvisioningRun } from '@blog/db/schema/tenants';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import {
   act,
   fireEvent,
@@ -53,7 +54,7 @@ describe(ProvisioningStatusView, () => {
     user = userEvent.setup();
     retryProvisioningStepActionMock.mockReset();
     retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: 'dispatched',
+      outcome: ACTION_OUTCOME.SUCCESS,
     });
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
@@ -592,7 +593,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     let resolveDispatch: TMaybeUndefined<
-      (result: { outcome: 'dispatched' }) => void
+      (result: { outcome: typeof ACTION_OUTCOME.SUCCESS }) => void
     >;
     retryProvisioningStepActionMock.mockReturnValue(
       new Promise((resolve) => {
@@ -613,7 +614,7 @@ describe(ProvisioningStatusView, () => {
     expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
 
     await act(async () => {
-      resolveDispatch?.({ outcome: 'dispatched' });
+      resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
       await Promise.resolve();
     });
   });
@@ -623,7 +624,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     let resolveDispatch: TMaybeUndefined<
-      (result: { outcome: 'dispatched' }) => void
+      (result: { outcome: typeof ACTION_OUTCOME.SUCCESS }) => void
     >;
     retryProvisioningStepActionMock.mockReturnValue(
       new Promise((resolve) => {
@@ -644,7 +645,7 @@ describe(ProvisioningStatusView, () => {
     expect(within(liveRegion).getByText('Running…')).toBeVisible();
 
     await act(async () => {
-      resolveDispatch?.({ outcome: 'dispatched' });
+      resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
       await Promise.resolve();
     });
   });
@@ -654,7 +655,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: 'dispatch-error',
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
@@ -677,7 +678,8 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: 'not-found',
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
     });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
@@ -699,7 +701,8 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: 'already-in-progress',
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
     });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
@@ -800,7 +803,8 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: 'archived',
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ARCHIVED,
     });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,

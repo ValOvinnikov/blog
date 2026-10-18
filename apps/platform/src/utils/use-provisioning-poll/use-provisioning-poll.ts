@@ -1,14 +1,22 @@
 'use client';
 
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  type TMaybeNull,
+  type TMaybeUndefined,
+} from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
-import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
+import {
+  retryProvisioningStepAction,
+  type TRetryProvisioningRefusal,
+} from '@platform/server/provisioning/retry-provisioning-step-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   provisioningViewState,
@@ -25,7 +33,7 @@ const STEP_POLL_INTERVAL_MS = 1500;
 const MAX_POLL_TICKS = (25 * 60_000) / STEP_POLL_INTERVAL_MS;
 
 export type TDispatchNoticeKind =
-  'not-found' | 'archived' | 'already-in-progress' | 'other';
+  TRetryProvisioningRefusal | typeof ACTION_OUTCOME.SERVER_ERROR;
 
 export type TUseProvisioningPollResult = TProvisioningViewState & {
   dispatchNotice: TMaybeUndefined<TDispatchNoticeKind>;
@@ -120,16 +128,19 @@ export const useProvisioningPoll = (
     startTransition(async () => {
       const result = await retryProvisioningStepAction(tenant.id);
 
-      if (
-        result.outcome === 'dispatched' ||
-        result.outcome === 'already-in-progress'
-      ) {
+      const isRunUnderway =
+        result.outcome === ACTION_OUTCOME.SUCCESS ||
+        (result.outcome === ACTION_OUTCOME.REFUSED &&
+          result.reason === TENANT_REFUSAL.ALREADY_IN_PROGRESS);
+      if (isRunUnderway) {
         setPolledProvisioningStatus(TENANT_PROVISIONING_STATUS.PROVISIONING);
         router.refresh();
       }
-      if (result.outcome !== 'dispatched') {
+      if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
         setDispatchNotice(
-          result.outcome === 'dispatch-error' ? 'other' : result.outcome,
+          result.outcome === ACTION_OUTCOME.REFUSED
+            ? result.reason
+            : result.outcome,
         );
       }
 

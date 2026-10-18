@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { logger } from '@platform/utils/logger/logger';
 
 const {
@@ -56,7 +58,7 @@ describe('startProvisioning', () => {
     expect(beginTenantProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
     expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'dispatched' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('returns "already-in-progress" without dispatching or logging when a concurrent dispatch is reported', async () => {
@@ -70,7 +72,10 @@ describe('startProvisioning', () => {
     expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
     expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'already-in-progress' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+    });
   });
 
   it('returns "not-found" and logs when beginning provisioning fails otherwise', async () => {
@@ -86,7 +91,10 @@ describe('startProvisioning', () => {
       tenantId: 'tenant-1',
       error: 'DB_NOT_FOUND',
     });
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
   });
 
   it('reverts to the previous provisioning status and returns "dispatch-error" when the dispatch fails', async () => {
@@ -99,7 +107,7 @@ describe('startProvisioning', () => {
       'FAILED',
     );
     expect(loggerErrorMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'dispatch-error' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 
   it('logs when the revert after a failed dispatch also fails', async () => {
@@ -115,6 +123,6 @@ describe('startProvisioning', () => {
       tenantId: 'tenant-1',
       error: 'DB_NOT_FOUND',
     });
-    expect(result).toEqual({ outcome: 'dispatch-error' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 });
