@@ -387,8 +387,14 @@ export const IconPanelMedia: TStory = {
   },
 };
 
+const besideImageSrc = {
+  wide: () => picsum(800, 450),
+  square: () => picsum(800, 800),
+  circle: () => faker.image.avatar(),
+};
+
 const besideImageCard = (
-  shape: 'wide' | 'circle',
+  shape: keyof typeof besideImageSrc,
   align: 'left' | 'center' = 'left',
 ): TStory => ({
   args: {
@@ -397,7 +403,7 @@ const besideImageCard = (
     tags: undefined,
     children: (
       <>
-        <MediaCard.Media shape={shape} iconPanel={true}>
+        <MediaCard.Media shape={shape} align={align} iconPanel={true}>
           <Icon name={ICONS.ROCKET} size={SIZE.LG} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
@@ -409,9 +415,9 @@ const besideImageCard = (
   render: (args) => (
     <div className="grid max-w-3xl grid-cols-2 gap-6">
       <MediaCard {...args}>
-        <MediaCard.Media shape={shape}>
+        <MediaCard.Media shape={shape} align={align}>
           <img
-            src={shape === 'circle' ? faker.image.avatar() : picsum(800, 450)}
+            src={besideImageSrc[shape]()}
             alt={imageAlt}
             className="size-full object-cover"
           />
@@ -432,7 +438,14 @@ export const IconPanelBesideImageCenterAligned = besideImageCard(
   'center',
 );
 
+export const IconPanelBesideSquareImage = besideImageCard('square');
+
 export const IconPanelBesideCircleImage = besideImageCard('circle');
+
+export const IconPanelBesideCircleImageCenterAligned = besideImageCard(
+  'circle',
+  'center',
+);
 
 const restingAndFocusedOn = (tone: TBrandVariant): TStory => ({
   name: `On a ${BRAND_BAND_LABELS[tone]} band — at rest and focused`,
