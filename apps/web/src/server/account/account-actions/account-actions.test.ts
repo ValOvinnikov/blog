@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+
 import { deleteAccountAction } from './account-actions';
 
 const { authMock, deleteAccountMock } = vi.hoisted(() => ({
@@ -18,25 +20,31 @@ describe('deleteAccountAction', () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
-  it('returns { ok: false } without deleting when there is no session', async () => {
+  it('returns SERVER_ERROR without deleting when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(deleteAccountAction()).resolves.toEqual({ ok: false });
+    await expect(deleteAccountAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     expect(deleteAccountMock).not.toHaveBeenCalled();
   });
 
-  it('deletes the session user and returns { ok: true }', async () => {
+  it('deletes the session user and returns SUCCESS', async () => {
     deleteAccountMock.mockResolvedValue(undefined);
 
-    await expect(deleteAccountAction()).resolves.toEqual({ ok: true });
+    await expect(deleteAccountAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     expect(deleteAccountMock).toHaveBeenCalledWith('user-1');
   });
 
-  it('returns { ok: false } when the delete throws', async () => {
+  it('returns SERVER_ERROR when the delete throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     deleteAccountMock.mockRejectedValue(new Error('boom'));
 
-    await expect(deleteAccountAction()).resolves.toEqual({ ok: false });
+    await expect(deleteAccountAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
 
     errorSpy.mockRestore();
   });
