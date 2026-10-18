@@ -8,8 +8,8 @@ import {
   buildOwnerElevationAlertEmail,
   sendEmail,
 } from '@blog/email';
-import { isSecretMatch } from '@blog/utils';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
+import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { NextResponse } from 'next/server';
@@ -47,12 +47,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const authHeader = request.headers.get('authorization');
-  const providedSecret = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice('Bearer '.length)
-    : null;
-
-  if (!isSecretMatch(providedSecret, secret)) {
+  if (!hasBearerSecret(request, secret)) {
     return NextResponse.json(
       { message: 'Invalid or missing secret.' },
       { status: 401 },

@@ -12,6 +12,8 @@ code:
   - apps/platform/src/server/github/**
   - apps/platform/src/server/releases/**
   - apps/platform/src/constants/release.ts
+  - apps/platform/src/app/api/internal/contrast-result/**
+  - apps/platform/src/server/internal-api/**
 epics: [5271]
 ---
 
@@ -21,8 +23,9 @@ epics: [5271]
 
 A SUPERADMIN will see the release candidate on a platform Releases page,
 run the contrast check and cut a production release from it. The page is not
-built yet. What exists is the shared vocabulary, and the server-side reader
-that works out the release candidate from GitHub and the database.
+built yet. What exists is the shared vocabulary, the server-side reader that
+works out the release candidate from GitHub and the database, and the signed
+route the contrast workflow posts its result to.
 
 The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
@@ -42,7 +45,11 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
 ## Surfaces and routes
 
-None yet.
+- `POST /api/internal/contrast-result` — machine-only, Bearer
+  `CONTRAST_RESULT_SECRET`. Records the posted result as the SHA's contrast
+  finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
+  refreshes it, a `PASS` resolves it, which is what the candidate reader's
+  contrast status then reports for that SHA.
 
 ## Data
 
@@ -56,6 +63,8 @@ values as plain `text`, so none of them needs a db migration:
 
 ## Configuration
 
+- `CONTRAST_RESULT_SECRET` (platform env) — the ingest route's shared
+  secret; see `docs/context/environment-variables.md`.
 - `RELEASE_WATCHED_PATHS` (`@blog/config`) maps each `RELEASE_CHANGE`
   (`RENDERING`, `DB_MIGRATION`, `SANITY_MIGRATION`, `ENV`) to the path
   prefixes that count as that kind of change.
@@ -65,6 +74,13 @@ values as plain `text`, so none of them needs a db migration:
 
 ## Constraints and invariants
 
+- The contrast-result route answers 500 when `CONTRAST_RESULT_SECRET` is
+  unset (logged `contrast_result.secret_missing`), so it never runs
+  unauthenticated; 401 for a missing or wrong token (constant-time
+  `isSecretMatch`), recording nothing; 400 for a body that is not JSON or
+  fails the schema (a 40-character lowercase hex `sha`, `PASS`/`FAIL`, a
+  non-negative integer `failureCount`, a URL `runUrl`); 500 when the write
+  fails (logged `contrast_result.record_failed`); and 200 once recorded.
 - The `RENDERING` prefixes match the contrast workflow's scope
   (`packages/ui`, `apps/web`, `packages/config/src/theme`,
   `configs/tailwind`), so a change outside them never makes a contrast run
@@ -102,6 +118,7 @@ values as plain `text`, so none of them needs a db migration:
 ## Tests and stories
 
 - `packages/utils/src/version/release-version.test.ts`.
+- `apps/platform/src/app/api/internal/contrast-result/route.test.ts`.
 - `apps/platform/src/server/releases/*.test.ts` and
   `apps/platform/src/server/github/*.test.ts`, against a stubbed GitHub.
 - `packages/db/src/queries/migrations/**/*.test.ts`.
@@ -109,3 +126,6 @@ values as plain `text`, so none of them needs a db migration:
 ## Related
 
 - Epic #5271.
+- Console step (human): set `CONTRAST_RESULT_SECRET` byte-identically in the
+  `platform-dev` Vercel project and the `development` GitHub Environment, and
+  a fresh value in `platform-prod` and `Production`.

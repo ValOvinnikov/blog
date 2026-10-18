@@ -1,3 +1,4 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useRouter } from 'next/navigation';
@@ -61,7 +62,9 @@ describe(`<${DisplayNameControl.name}/>`, () => {
   });
 
   it('saves the edited name through toast.promise and refreshes the router on success', async () => {
-    updateDisplayNameActionMock.mockResolvedValue({ ok: true });
+    updateDisplayNameActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     const input = screen.getByRole('textbox', { name: 'Display name' });
     await user.clear(input);
     await user.type(input, 'New Name');
@@ -90,7 +93,9 @@ describe(`<${DisplayNameControl.name}/>`, () => {
   });
 
   it('does not refresh the router when the save fails', async () => {
-    updateDisplayNameActionMock.mockResolvedValue({ ok: false });
+    updateDisplayNameActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
