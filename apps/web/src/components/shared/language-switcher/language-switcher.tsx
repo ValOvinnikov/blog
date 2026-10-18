@@ -68,7 +68,7 @@ export const LanguageSwitcher = ({
       className={root()}
       data-testid={dataTestId}
     >
-      {isInFooter || resolvedStyle === LANGUAGE_SWITCHER_STYLE.MENU_CODE ? (
+      {isInFooter || resolvedStyle !== LANGUAGE_SWITCHER_STYLE.MENU_GLOBE ? (
         control
       ) : (
         <>

@@ -136,45 +136,47 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
   });
 
   describe('compact codes', () => {
-    it('links the other codes directly on desktop, named for screen readers', () => {
+    beforeEach(() => {
       setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
+    });
 
-      const desktop = screen.getByTestId('language-switcher-desktop');
-      const french = within(desktop).getByRole('link', { name: 'Français' });
+    it('links the other codes directly, named for screen readers', () => {
+      const french = screen.getByRole('link', { name: 'Français' });
 
       expect(french).toHaveTextContent('FR');
       expect(french).toHaveAttribute('lang', 'fr');
-      expect(within(desktop).queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('shows the codes at every width, with no menu for phones', () => {
+      expect(
+        screen.queryByTestId('language-switcher-mobile'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
     it('shows the current code as text marked current, in its own language', () => {
-      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
-
-      const desktop = screen.getByTestId('language-switcher-desktop');
-      const dutch = within(desktop).getByTestId('language-code-current');
+      const dutch = screen.getByTestId('language-code-current');
 
       expect(
-        within(desktop).queryByRole('link', { name: 'Nederlands' }),
+        screen.queryByRole('link', { name: 'Nederlands' }),
       ).not.toBeInTheDocument();
       expect(dutch).toHaveTextContent('NL');
       expect(dutch).toHaveAttribute('aria-current', 'page');
       expect(dutch).toHaveAttribute('lang', 'nl');
       expect(dutch).not.toHaveAttribute('href');
     });
+  });
 
-    it('renders as the menu with more than four live languages', () => {
-      setup({
-        switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-        liveLocales: [EN, NL, FR, DE, ES],
-      });
-
-      expect(
-        screen.queryByTestId('language-switcher-desktop'),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Language: Nederlands' }),
-      ).toHaveTextContent('NL');
+  it('renders compact codes as the menu with more than four live languages', () => {
+    setup({
+      switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+      liveLocales: [EN, NL, FR, DE, ES],
     });
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Language: Nederlands' }),
+    ).toHaveTextContent('NL');
   });
 
   describe('in the footer', () => {
