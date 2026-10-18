@@ -11,7 +11,7 @@ code:
   - apps/web/src/hooks/use-oauth-error-param/**
   - packages/email/src/templates/tenant/magic-link-email/**
   - packages/email/src/templates/tenant/magic-link-invite-email/**
-epics: [4979, 4958, 4083]
+epics: [4979, 4958, 4083, 5459]
 ---
 
 # Reader sign-in
@@ -22,7 +22,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 ## Surfaces and routes
 
-- **Header** — `AuthMenu` renders only when the site has a reader account (see [reader-account](./reader-account.md)). It shows a spinner while the session loads, a "Sign in" popover when signed out, and an avatar menu (My bookmarks, Account settings, Sign out) when signed in.
+- **Header** — `AuthMenu` renders only when the site has a reader account (see [reader-account](./reader-account.md)). Signed out, it is a round "Sign in" pill with a person glyph that opens the sign-in popover; signed in, the avatar sits in a round frame matching the other header controls and opens the account menu (My bookmarks, Account settings, Sign out). While the session loads it keeps the signed-out control's exact footprint, invisible, with only the "loading account status" announcement, so the header never moves as the session resolves.
 - **Sign-in popover** — one button per configured OAuth provider, then "Continue with email", which expands into an email field and a "check your inbox" state.
 - `/api/auth/*` — the Auth.js handlers (`GET`/`POST`).
 - There is no `/login` page. A failed OAuth callback redirects to `/` with `?error=`; `useOAuthErrorParam` reads it, strips it from the URL and the popover shows an inline error.

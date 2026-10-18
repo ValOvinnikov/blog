@@ -40,7 +40,7 @@ export const AccountMenu = ({
   image,
 }: TAccountMenuProps) => {
   const t = useTranslations('authMenu');
-  const { panel, avatar } = authMenuVariants();
+  const { panel, avatarFrame, avatar } = authMenuVariants();
   const { menuRoot, label, acctRow, accountName, accountEmail, signOutItem } =
     accountMenuVariants();
 
@@ -63,13 +63,13 @@ export const AccountMenu = ({
         panelId={panelId}
         onClick={toggle}
         variant="avatar"
-        className={avatar()}
+        className={avatarFrame()}
       >
         <Avatar
           src={avatarSrc}
           name={displayName}
           alt=""
-          size={SIZE.SM}
+          size={SIZE.MD}
           className={avatar()}
           onImageError={() => setImageFailed(true)}
         />

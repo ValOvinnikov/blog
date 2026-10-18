@@ -1,20 +1,18 @@
+import { HEADER_CONTROL } from '@blog/ui/lib/styling';
 import { tv } from 'tailwind-variants';
 
 export const headerControlVariants = tv({
   base: [
     'inline-flex shrink-0 items-center justify-center gap-1',
-    'border border-border-strong bg-surface text-text',
-    'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
+    HEADER_CONTROL,
   ],
   variants: {
     shape: {
-      square: ['size-11 px-0 lg:size-9'],
-      label: ['size-auto min-h-11 px-3 py-0 lg:min-h-9'],
-    },
-    isRound: {
-      true: ['rounded-full'],
-      false: ['rounded-sm'],
+      square: ['size-11 px-0 lg:size-9 pointer-coarse:size-11'],
+      label: [
+        'size-auto min-h-11 px-4 py-0 lg:min-h-9 pointer-coarse:min-h-11',
+      ],
     },
   },
-  defaultVariants: { shape: 'label', isRound: false },
+  defaultVariants: { shape: 'label' },
 });

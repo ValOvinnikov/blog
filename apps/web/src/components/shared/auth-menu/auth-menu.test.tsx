@@ -49,7 +49,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
-    it('shows a neutral loading status region while the session is resolving — not shaped like either the sign-in or account trigger', () => {
+    it('announces the loading status without exposing the sign-in label', () => {
       const status = screen.getByRole('status', {
         name: 'Loading account status',
       });
