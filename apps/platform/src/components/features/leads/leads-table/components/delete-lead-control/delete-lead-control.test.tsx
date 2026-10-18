@@ -1,4 +1,6 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
+import { LEAD_REFUSAL } from '@platform/constants/lead';
 import {
   renderWithIntl,
   screen,
@@ -37,7 +39,7 @@ describe(`<${DeleteLeadControl.name}/>`, () => {
     user = userEvent.setup();
     refresh = mockRouterRefresh();
     deleteLeadActionMock.mockReset();
-    deleteLeadActionMock.mockResolvedValue({ ok: true });
+    deleteLeadActionMock.mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('deletes nothing until the owner confirms', async () => {
@@ -62,7 +64,9 @@ describe(`<${DeleteLeadControl.name}/>`, () => {
   });
 
   it('keeps the dialog open with an error when the delete fails', async () => {
-    deleteLeadActionMock.mockResolvedValue({ ok: false, reason: 'failed' });
+    deleteLeadActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     setup();
     await openDialog(user);
 
@@ -75,7 +79,10 @@ describe(`<${DeleteLeadControl.name}/>`, () => {
   });
 
   it('refreshes a list that still shows a message already deleted elsewhere', async () => {
-    deleteLeadActionMock.mockResolvedValue({ ok: false, reason: 'notFound' });
+    deleteLeadActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: LEAD_REFUSAL.NOT_FOUND,
+    });
     setup();
     await openDialog(user);
 

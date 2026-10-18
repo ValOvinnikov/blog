@@ -1,4 +1,4 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { screen } from '@platform/testing/custom-render';
 import { EMAIL_BODY } from '@platform/testing/email-draft';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
@@ -36,7 +36,7 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     user = userEvent.setup();
     sendTestEmailActionMock.mockReset();
     sendTestEmailActionMock.mockResolvedValue({
-      ok: true,
+      outcome: ACTION_OUTCOME.SUCCESS,
       to: 'admin@example.com',
     });
   });
@@ -61,7 +61,9 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
   });
 
   it('says when the test could not be sent', async () => {
-    sendTestEmailActionMock.mockResolvedValue({ ok: false, reason: 'failed' });
+    sendTestEmailActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     setup();
 
     await user.click(screen.getByRole('button', { name: 'Send test to me' }));

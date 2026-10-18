@@ -1,6 +1,7 @@
 'use server';
 
 import { applyTenantSenderName } from '@blog/auth/providers/magic-link/apply-tenant-sender-name/apply-tenant-sender-name';
+import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { sendEmail } from '@blog/email';
@@ -27,8 +28,16 @@ const sendTestEmailInputSchema = z.object({
 
 export type TSendTestEmailInput = z.input<typeof sendTestEmailInputSchema>;
 export type TSendTestEmailResult =
-  | { ok: true; to: string }
-  | { ok: false; reason: 'invalid' | 'rate-limited' | 'failed' };
+  | Exclude<
+      TActionResult<
+        typeof ACTION_OUTCOME.RATE_LIMITED | typeof ACTION_OUTCOME.SERVER_ERROR,
+        keyof TSendTestEmailInput
+      >,
+      { outcome: typeof ACTION_OUTCOME.SUCCESS }
+    >
+  | { outcome: typeof ACTION_OUTCOME.SUCCESS; to: string };
+
+const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
 
 export const sendTestEmailAction = async (
   tenantId: string,
@@ -40,16 +49,18 @@ export const sendTestEmailAction = async (
     parsed.data.copy.subject === null ||
     parsed.data.copy.body === null
   ) {
-    return { ok: false, reason: 'invalid' };
+    return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
   const { tenant } = await requireTenantMembership(tenantId);
   const session = await auth();
   const userId = session?.user?.id;
   const to = session?.user?.email;
-  if (!userId || !to) return { ok: false, reason: 'failed' };
+  if (!userId || !to) return SERVER_ERROR;
 
-  if (!takeTestEmailSend(userId)) return { ok: false, reason: 'rate-limited' };
+  if (!takeTestEmailSend(userId)) {
+    return { outcome: ACTION_OUTCOME.RATE_LIMITED };
+  }
 
   const { templateType, sender } = parsed.data;
   const subject = parsed.data.copy.subject;
@@ -81,13 +92,13 @@ export const sendTestEmailAction = async (
       replyTo: sender.replyToAddress ?? undefined,
     });
 
-    return { ok: true, to };
+    return { outcome: ACTION_OUTCOME.SUCCESS, to };
   } catch (error) {
     logger.error('email_test.send_failed', {
       tenantId: tenant.id,
       templateType,
       error,
     });
-    return { ok: false, reason: 'failed' };
+    return SERVER_ERROR;
   }
 };

@@ -1,4 +1,4 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
@@ -90,7 +90,10 @@ describe(sendTestEmailAction, () => {
   it('emails the draft to the signed-in admin, marked as a test', async () => {
     const result = await sendTestEmailAction('tenant-1', INPUT);
 
-    expect(result).toEqual({ ok: true, to: 'admin@example.com' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      to: 'admin@example.com',
+    });
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -109,7 +112,7 @@ describe(sendTestEmailAction, () => {
     const result = await sendTestEmailAction('tenant-1', INPUT);
 
     expect(takeTestEmailSendMock).toHaveBeenCalledWith('admin-1');
-    expect(result).toEqual({ ok: false, reason: 'rate-limited' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -119,7 +122,10 @@ describe(sendTestEmailAction, () => {
       copy: { ...INPUT.copy, subject: null },
     });
 
-    expect(result).toEqual({ ok: false, reason: 'invalid' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
@@ -139,7 +145,10 @@ describe(sendTestEmailAction, () => {
       },
     });
 
-    expect(result).toEqual({ ok: false, reason: 'invalid' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -148,7 +157,7 @@ describe(sendTestEmailAction, () => {
 
     const result = await sendTestEmailAction('tenant-1', INPUT);
 
-    expect(result).toEqual({ ok: false, reason: 'failed' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       'email_test.send_failed',
       expect.objectContaining({ tenantId: 'tenant-1' }),
