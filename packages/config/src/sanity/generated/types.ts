@@ -417,7 +417,7 @@ export type Module_featureList = {
       _key: string;
     } & CtaButton
   >;
-  imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE';
+  imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE' | 'ICON';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardAlignment?: 'LEFT' | 'CENTER';

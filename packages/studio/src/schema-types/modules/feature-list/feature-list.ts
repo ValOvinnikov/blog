@@ -53,6 +53,7 @@ export const featureListSchema = defineType({
         CARD_IMAGE_SHAPE.WIDE,
         CARD_IMAGE_SHAPE.SQUARE,
         CARD_IMAGE_SHAPE.CIRCLE,
+        CARD_IMAGE_SHAPE.ICON,
       ],
       initialValue: CARD_IMAGE_SHAPE.WIDE,
       subject: 'card image',
