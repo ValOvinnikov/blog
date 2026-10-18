@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
-import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -116,8 +116,8 @@ describe('createTenantAction', () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { domain: { reason: 'domainInvalid' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID } },
     });
     expect(getUserByEmailMock).not.toHaveBeenCalled();
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -129,13 +129,11 @@ describe('createTenantAction', () => {
     const result = await createTenantAction(validInput);
 
     expect(result).toEqual({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        token: expect.any(String),
-      },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
+      email: 'owner@example.com',
+      token: expect.any(String),
     });
-    expect(result.fieldErrors).toBeUndefined();
     expect(createTenantDraftMock).not.toHaveBeenCalled();
     expect(signInMock).not.toHaveBeenCalled();
   });
@@ -150,11 +148,10 @@ describe('createTenantAction', () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        token: expect.any(String),
-      },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
+      email: 'owner@example.com',
+      token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
     expect(signInMock).not.toHaveBeenCalled();
@@ -169,11 +166,10 @@ describe('createTenantAction', () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        token: expect.any(String),
-      },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
+      email: 'owner@example.com',
+      token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
     expect(signInMock).not.toHaveBeenCalled();
@@ -263,8 +259,8 @@ describe('createTenantAction', () => {
     const result = await createTenantAction(validInput);
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { domain: { reason: 'domainTaken' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN } },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
@@ -275,8 +271,10 @@ describe('createTenantAction', () => {
     const result = await createTenantAction(validInput);
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { domain: { reason: 'domainAttachedElsewhere' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        domain: { reason: TENANT_FIELD_ERROR.DOMAIN_ATTACHED_ELSEWHERE },
+      },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
@@ -320,7 +318,7 @@ describe('createTenantAction', () => {
 
     const result = await createTenantAction(validInput);
 
-    expect(result).toEqual({ ok: false, error: 'createFailed' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
@@ -337,7 +335,7 @@ describe('createTenantAction', () => {
 
     const result = await createTenantAction(validInput);
 
-    expect(result).toEqual({ ok: false, error: 'createFailed' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(

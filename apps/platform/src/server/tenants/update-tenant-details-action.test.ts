@@ -1,8 +1,10 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
@@ -86,7 +88,10 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: false, error: 'notFound' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 
@@ -97,7 +102,10 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: false, error: 'archived' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ARCHIVED,
+    });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -109,8 +117,10 @@ describe('updateTenantDetailsAction', () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { primaryDomain: { reason: 'domainInvalid' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID },
+      },
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
@@ -122,8 +132,8 @@ describe('updateTenantDetailsAction', () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { ownerEmail: { reason: 'emailInvalid' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { ownerEmail: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID } },
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
@@ -137,7 +147,7 @@ describe('updateTenantDetailsAction', () => {
       ownerEmail: 'New-Owner@Example.com',
     });
 
-    expect(result).toEqual({ ok: true, tenant });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
     expect(updateTenantDetailsMock).toHaveBeenCalledWith('tenant-1', {
       ...validInput,
       ownerEmail: 'new-owner@example.com',
@@ -162,8 +172,10 @@ describe('updateTenantDetailsAction', () => {
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
+      },
     });
   });
 
@@ -173,8 +185,10 @@ describe('updateTenantDetailsAction', () => {
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { primaryDomain: { reason: 'domainInvalid' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID },
+      },
     });
   });
 
@@ -187,9 +201,12 @@ describe('updateTenantDetailsAction', () => {
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
     expect(result).toEqual({
-      ok: false,
+      outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {
-        primaryDomain: { reason: 'domainLocked', step: 'MAP_DOMAIN' },
+        primaryDomain: {
+          reason: TENANT_FIELD_ERROR.DOMAIN_LOCKED,
+          values: { step: 'MAP_DOMAIN' },
+        },
       },
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -202,7 +219,10 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: false, error: 'provisioningStarted' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.PROVISIONING_STARTED,
+    });
   });
 
   it('maps an owner-email-taken outcome onto an ownerEmail field error', async () => {
@@ -214,8 +234,10 @@ describe('updateTenantDetailsAction', () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { ownerEmail: { reason: 'ownerEmailTaken' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        ownerEmail: { reason: TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN },
+      },
     });
   });
 
@@ -229,7 +251,7 @@ describe('updateTenantDetailsAction', () => {
       ownerEmail: 'owner@example.com',
     });
 
-    expect(result).toEqual({ ok: true, tenant });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
     expect(updateTenantDetailsMock).toHaveBeenCalledWith('tenant-1', {
       ...validInput,
       name: 'Acme Renamed',
@@ -247,7 +269,10 @@ describe('updateTenantDetailsAction', () => {
       ownerEmail: 'new-owner@example.com',
     });
 
-    expect(result).toEqual({ ok: false, error: 'ownerAlreadyJoined' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
+    });
   });
 
   it('does not record an audit event for an owner-email-taken outcome', async () => {
@@ -283,7 +308,7 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: true, tenant });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
     expect(updateTenantDetailsMock).toHaveBeenCalledWith(
       'tenant-1',
       validInput,
@@ -313,7 +338,7 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: true, tenant });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.update_details_audit_failed',
       expect.objectContaining({
@@ -344,7 +369,7 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
-    expect(result).toEqual({ ok: false, error: 'saveFailed' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 
   it('rejects a language outside the supported list without saving', async () => {
@@ -354,8 +379,10 @@ describe('updateTenantDetailsAction', () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { locale: { reason: 'localeUnsupported' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        locale: { reason: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED },
+      },
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
@@ -373,7 +400,10 @@ describe('updateTenantDetailsAction', () => {
       locale: LOCALE_ISO_CODES.NL,
     });
 
-    expect(result).toEqual({ ok: false, error: 'localeIsAdditional' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.LOCALE_IS_ADDITIONAL,
+    });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 });

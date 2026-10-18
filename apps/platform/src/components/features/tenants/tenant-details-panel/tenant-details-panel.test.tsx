@@ -1,6 +1,7 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
 import {
   renderWithIntl,
@@ -138,7 +139,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('saves the edited values and refreshes on success, sending the unchanged owner email as an ordinary field', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ name: 'Acme Renamed' }),
       });
       const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
@@ -171,7 +172,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('submits the edited owner email value', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant(),
       });
       const tenant = makeClientTenant({ id: 'tenant-1' });
@@ -200,8 +201,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('shows a field error and does not refresh when saving fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
-        fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
+        },
       });
       const tenant = makeClientTenant();
       render(
@@ -227,10 +230,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it("associates a field's error with its input via aria-invalid and aria-describedby", async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
+        outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
-          name: { reason: 'nameRequired' },
-          primaryDomain: { reason: 'domainInvalid' },
+          name: { reason: TENANT_FIELD_ERROR.NAME_REQUIRED },
+          primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID },
         },
       });
       const tenant = makeClientTenant();
@@ -259,7 +262,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
       const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
@@ -286,8 +289,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('does not show a success alert when saving fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
-        fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
+        },
       });
       const tenant = makeClientTenant();
       render(
@@ -311,8 +316,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
-        error: 'provisioningStarted',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.PROVISIONING_STARTED,
       });
       const tenant = makeClientTenant();
       render(
@@ -336,8 +341,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('shows a distinct, non-generic message when the owner has already joined, and does not refresh', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
-        error: 'ownerAlreadyJoined',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
       });
       const tenant = makeClientTenant({ id: 'tenant-1' });
       render(
@@ -365,9 +370,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('shows a field-level error on owner email when the new address already has a pending invite', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
+        outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
-          ownerEmail: { reason: 'ownerEmailTaken' },
+          ownerEmail: { reason: TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN },
         },
       });
       const tenant = makeClientTenant();
@@ -445,7 +450,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('lets the operator correct the unlocked field that caused the failure and save it', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({
           id: 'tenant-1',
           primaryDomain: 'new-domain.example.com',
@@ -509,7 +514,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('saves the default language chosen from the supported list', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ locale: LOCALE_ISO_CODES.NL }),
       });
       render(
@@ -536,9 +541,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('surfaces a mismatched server-side lock as a field error on the still-enabled input', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
+        outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
-          primaryDomain: { reason: 'domainLocked', step: 'MAP_DOMAIN' },
+          primaryDomain: {
+            reason: TENANT_FIELD_ERROR.DOMAIN_LOCKED,
+            values: { step: 'MAP_DOMAIN' },
+          },
         },
       });
       const tenant = makeClientTenant({ id: 'tenant-1' });
@@ -723,7 +731,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('stays disabled and announces the pending state to assistive tech while a save is in flight, even with dirty values', async () => {
       let resolveAction: (value: {
-        ok: true;
+        outcome: typeof ACTION_OUTCOME.SUCCESS;
         tenant: ReturnType<typeof makeClientTenant>;
       }) => void = () => {};
       updateTenantDetailsActionMock.mockImplementation(
@@ -756,7 +764,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(screen.getByRole('status')).toHaveTextContent('Saving…');
 
       resolveAction({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
@@ -764,7 +772,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('returns to disabled after a successful save applies the refreshed tenant', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
       const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
@@ -1024,7 +1032,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('saves the edits before leaving on Save and leave', async () => {
-      updateTenantDetailsActionMock.mockResolvedValue({ ok: true });
+      updateTenantDetailsActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        tenant: makeClientTenant(),
+      });
       renderGuardedPanel();
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       await user.clear(nameInput);
@@ -1042,8 +1053,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('stays on the page with the save error shown when Save and leave fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
-        ok: false,
-        error: 'saveFailed',
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
       renderGuardedPanel();
       const nameInput = screen.getByRole('textbox', { name: 'Name' });

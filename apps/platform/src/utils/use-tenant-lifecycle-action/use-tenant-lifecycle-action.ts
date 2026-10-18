@@ -1,11 +1,8 @@
 'use client';
 
 import { ACTION_OUTCOME } from '@blog/config';
-import {
-  TENANT_FIELD_ERROR,
-  TENANT_REFUSAL,
-  type TTenantFieldErrorReason,
-} from '@platform/constants/tenant';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import type { TConfirmTenantFieldError } from '@platform/server/provisioning/resolve-confirmed-tenant';
 import type {
   TTenantLifecycleRefusal,
   TTenantLifecycleResult,
@@ -15,7 +12,7 @@ import { useTranslations } from 'next-intl';
 const FIELD_ERROR_KEYS = {
   [TENANT_FIELD_ERROR.CONFIRM_REQUIRED]: 'confirmRequired',
   [TENANT_FIELD_ERROR.NAME_MISMATCH]: 'nameMismatch',
-} satisfies Record<TTenantFieldErrorReason, string>;
+} satisfies Record<TConfirmTenantFieldError, string>;
 
 const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_FOUND]: 'notFound',

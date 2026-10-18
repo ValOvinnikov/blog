@@ -1,25 +1,18 @@
-import type { TTenantProvisioningStep } from '@blog/db/constants';
+import type { TFieldErrors } from '@blog/config';
+import type { TTenantFieldErrorReason } from '@platform/constants/tenant';
+import type { TConfirmTenantFieldError } from '@platform/server/provisioning/resolve-confirmed-tenant';
 import type { z } from 'zod';
 
-type TTenantFieldErrorReason =
-  | 'nameRequired'
-  | 'domainInvalid'
-  | 'domainTaken'
-  | 'domainAttachedElsewhere'
-  | 'emailInvalid'
-  | 'localeUnsupported'
-  | 'planUnsupported'
-  | 'ownerEmailTaken';
-
-export type TTenantFieldError =
-  | { reason: TTenantFieldErrorReason }
-  | { reason: 'domainLocked'; step: TTenantProvisioningStep };
+export type TTenantDetailsFieldError = Exclude<
+  TTenantFieldErrorReason,
+  TConfirmTenantFieldError
+>;
 
 export const toTenantFieldErrors = <TField extends string>(
   issues: z.ZodError['issues'],
-  reasonByField: Partial<Record<TField, TTenantFieldErrorReason>>,
-): Partial<Record<TField, TTenantFieldError>> => {
-  const fieldErrors: Partial<Record<TField, TTenantFieldError>> = {};
+  reasonByField: Partial<Record<TField, TTenantDetailsFieldError>>,
+): TFieldErrors<TField, TTenantDetailsFieldError> => {
+  const fieldErrors: TFieldErrors<TField, TTenantDetailsFieldError> = {};
   for (const { path } of issues) {
     const field = path[0] as TField;
     const reason = reasonByField[field];

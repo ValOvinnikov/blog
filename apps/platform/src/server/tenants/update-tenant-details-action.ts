@@ -1,18 +1,21 @@
 'use server';
 
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   DOMAIN_PATTERN,
   isLocaleIsoCode,
+  type TActionResult,
 } from '@blog/config';
 import { queries, TENANT_PLAN } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import {
   toTenantFieldErrors,
-  type TTenantFieldError,
+  type TTenantDetailsFieldError,
 } from '@platform/server/tenants/tenant-field-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -29,25 +32,26 @@ export type TUpdateTenantDetailsActionInput = z.input<
   typeof updateTenantDetailsInputSchema
 >;
 
-export type TUpdateTenantDetailsFieldErrors = Partial<
-  Record<keyof TUpdateTenantDetailsActionInput, TTenantFieldError>
+export type TUpdateTenantDetailsRefusal =
+  | typeof TENANT_REFUSAL.NOT_FOUND
+  | typeof TENANT_REFUSAL.ARCHIVED
+  | typeof TENANT_REFUSAL.LOCALE_IS_ADDITIONAL
+  | typeof TENANT_REFUSAL.PROVISIONING_STARTED
+  | typeof TENANT_REFUSAL.OWNER_ALREADY_JOINED;
+
+type TUpdateTenantDetailsFailure = Exclude<
+  TActionResult<
+    typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
+    keyof TUpdateTenantDetailsActionInput,
+    TTenantDetailsFieldError,
+    TUpdateTenantDetailsRefusal
+  >,
+  { outcome: typeof ACTION_OUTCOME.SUCCESS }
 >;
 
-export type TUpdateTenantDetailsError =
-  | 'notFound'
-  | 'archived'
-  | 'localeIsAdditional'
-  | 'provisioningStarted'
-  | 'ownerAlreadyJoined'
-  | 'saveFailed';
-
 export type TUpdateTenantDetailsActionResult =
-  | { ok: true; tenant: TTenant }
-  | {
-      ok: false;
-      error?: TUpdateTenantDetailsError;
-      fieldErrors?: TUpdateTenantDetailsFieldErrors;
-    };
+  | { outcome: typeof ACTION_OUTCOME.SUCCESS; tenant: TTenant }
+  | TUpdateTenantDetailsFailure;
 
 export const updateTenantDetailsAction = async (
   tenantId: string,
@@ -58,15 +62,15 @@ export const updateTenantDetailsAction = async (
   const parsed = updateTenantDetailsInputSchema.safeParse(input);
   if (!parsed.success) {
     return {
-      ok: false,
+      outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: toTenantFieldErrors<keyof TUpdateTenantDetailsActionInput>(
         parsed.error.issues,
         {
-          name: 'nameRequired',
-          primaryDomain: 'domainInvalid',
-          plan: 'planUnsupported',
-          locale: 'localeUnsupported',
-          ownerEmail: 'emailInvalid',
+          name: TENANT_FIELD_ERROR.NAME_REQUIRED,
+          primaryDomain: TENANT_FIELD_ERROR.DOMAIN_INVALID,
+          plan: TENANT_FIELD_ERROR.PLAN_UNSUPPORTED,
+          locale: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED,
+          ownerEmail: TENANT_FIELD_ERROR.EMAIL_INVALID,
         },
       ),
     };
@@ -76,16 +80,22 @@ export const updateTenantDetailsAction = async (
     includeArchived: true,
   });
   if (!tenant) {
-    return { ok: false, error: 'notFound' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    };
   }
   if (tenant.deprovisionedAt) {
-    return { ok: false, error: 'archived' };
+    return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
   }
   if (
     parsed.data.locale !== tenant.locale &&
     tenant.additionalLocales.includes(parsed.data.locale)
   ) {
-    return { ok: false, error: 'localeIsAdditional' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.LOCALE_IS_ADDITIONAL,
+    };
   }
 
   try {
@@ -103,36 +113,48 @@ export const updateTenantDetailsAction = async (
           targetId: tenantId,
           details: parsed.data,
         });
-        return { ok: true, tenant: result.tenant };
+        return { outcome: ACTION_OUTCOME.SUCCESS, tenant: result.tenant };
       case 'domain-taken':
         return {
-          ok: false,
-          fieldErrors: { primaryDomain: { reason: 'domainTaken' } },
+          outcome: ACTION_OUTCOME.INVALID,
+          fieldErrors: {
+            primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
+          },
         };
       case 'domain-invalid':
         return {
-          ok: false,
-          fieldErrors: { primaryDomain: { reason: 'domainInvalid' } },
+          outcome: ACTION_OUTCOME.INVALID,
+          fieldErrors: {
+            primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID },
+          },
         };
       case 'domain-locked':
         return {
-          ok: false,
+          outcome: ACTION_OUTCOME.INVALID,
           fieldErrors: {
             primaryDomain: {
-              reason: 'domainLocked',
-              step: result.blockingStep,
+              reason: TENANT_FIELD_ERROR.DOMAIN_LOCKED,
+              values: { step: result.blockingStep },
             },
           },
         };
       case 'provisioning-started':
-        return { ok: false, error: 'provisioningStarted' };
+        return {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: TENANT_REFUSAL.PROVISIONING_STARTED,
+        };
       case 'owner-email-taken':
         return {
-          ok: false,
-          fieldErrors: { ownerEmail: { reason: 'ownerEmailTaken' } },
+          outcome: ACTION_OUTCOME.INVALID,
+          fieldErrors: {
+            ownerEmail: { reason: TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN },
+          },
         };
       case 'owner-already-joined':
-        return { ok: false, error: 'ownerAlreadyJoined' };
+        return {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
+        };
       default: {
         const unhandledOutcome: never = result;
         throw new Error(
@@ -142,6 +164,6 @@ export const updateTenantDetailsAction = async (
     }
   } catch (error) {
     logger.error('tenants.update_details_failed', { tenantId, error });
-    return { ok: false, error: 'saveFailed' };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };
