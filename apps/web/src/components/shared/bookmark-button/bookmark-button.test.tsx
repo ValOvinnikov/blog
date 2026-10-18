@@ -1,3 +1,4 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { act, customRender, screen, waitFor } from '@web/testing/custom-render';
 
@@ -150,7 +151,9 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
       describe('when the write succeeds', () => {
         beforeEach(() => {
-          setBookmarkStatusMock.mockResolvedValue({ ok: true });
+          setBookmarkStatusMock.mockResolvedValue({
+            outcome: ACTION_OUTCOME.SUCCESS,
+          });
         });
 
         it('optimistically toggles on click, calls setBookmarkStatus with the new value, and shows a success toast', async () => {
@@ -202,8 +205,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
       describe('when the write fails', () => {
         beforeEach(() => {
           setBookmarkStatusMock.mockResolvedValue({
-            ok: false,
-            isUnavailable: false,
+            outcome: ACTION_OUTCOME.SERVER_ERROR,
           });
         });
 
@@ -248,8 +250,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
       it('shows the unavailable toast with no Retry action when the write is refused as unavailable', async () => {
         setBookmarkStatusMock.mockResolvedValue({
-          ok: false,
-          isUnavailable: true,
+          outcome: ACTION_OUTCOME.UNAVAILABLE,
         });
 
         await user.click(screen.getByRole('button', { name: 'Save post' }));
@@ -263,8 +264,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
       it('shows the unavailable toast when the undo write is refused as unavailable', async () => {
         setBookmarkStatusMock
-          .mockResolvedValueOnce({ ok: true })
-          .mockResolvedValueOnce({ ok: false, isUnavailable: true });
+          .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS })
+          .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.UNAVAILABLE });
 
         await user.click(screen.getByRole('button', { name: 'Save post' }));
         await waitFor(() => {
@@ -283,8 +284,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
       it('rolls back to the pre-undo committed state and shows an action-less error toast when the undo write fails', async () => {
         setBookmarkStatusMock
-          .mockResolvedValueOnce({ ok: true })
-          .mockResolvedValueOnce({ ok: false, isUnavailable: false });
+          .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS })
+          .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SERVER_ERROR });
 
         await user.click(screen.getByRole('button', { name: 'Save post' }));
         await waitFor(() => {
@@ -308,8 +309,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
       it('retries a failed save: re-invokes setBookmarkStatus with the same value and shows a success toast once it succeeds', async () => {
         setBookmarkStatusMock
-          .mockResolvedValueOnce({ ok: false, isUnavailable: false })
-          .mockResolvedValueOnce({ ok: true });
+          .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SERVER_ERROR })
+          .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS });
 
         await user.click(screen.getByRole('button', { name: 'Save post' }));
         await waitFor(() => {
@@ -340,7 +341,9 @@ describe(`<${BookmarkButton.name}/>`, () => {
     describe('with a bookmarked post', () => {
       beforeEach(async () => {
         getBookmarkStatusMock.mockResolvedValue(true);
-        setBookmarkStatusMock.mockResolvedValue({ ok: true });
+        setBookmarkStatusMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.SUCCESS,
+        });
         setup();
         await waitFor(() => {
           expect(
