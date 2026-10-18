@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { ACTION_OUTCOME } from '@blog/config';
+import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
   readImageUpload,
   type TImageFormat,
@@ -36,15 +38,33 @@ export const validateEmailLogoUpload = async (
   const { buffer, type, width, height } = read.image;
 
   if (type === 'svg') {
-    return { ok: false, error: { reason: 'emailLogoSvg' } };
+    return {
+      ok: false,
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
+      },
+    };
   }
   if (type === 'webp') {
-    return { ok: false, error: { reason: 'emailLogoWebp' } };
+    return {
+      ok: false,
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.EMAIL_LOGO_WEBP,
+      },
+    };
   }
 
   const format = type ? IMAGE_FORMAT_BY_DETECTED_TYPE[type] : undefined;
   if (!format) {
-    return { ok: false, error: { reason: 'emailLogoTypeUnsupported' } };
+    return {
+      ok: false,
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.EMAIL_LOGO_TYPE_UNSUPPORTED,
+      },
+    };
   }
 
   if (
@@ -54,7 +74,8 @@ export const validateEmailLogoUpload = async (
     return {
       ok: false,
       error: {
-        reason: 'imageTooLarge',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.IMAGE_TOO_LARGE,
         values: { size: EMAIL_LOGO_MAX_DIMENSION_PX },
       },
     };

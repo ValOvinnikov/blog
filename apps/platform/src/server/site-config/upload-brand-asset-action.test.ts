@@ -1,4 +1,5 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   DENSITY,
@@ -6,6 +7,7 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
+import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { env } from '@platform/utils/env/env';
@@ -118,7 +120,10 @@ describe(uploadBrandAssetAction, () => {
   it('re-resolves the tenant from the session before touching Blob or the db', async () => {
     validateBrandAssetUploadMock.mockResolvedValue({
       ok: false,
-      error: { reason: 'unreadableImage' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
+      },
     });
 
     await uploadBrandAssetAction(
@@ -137,7 +142,10 @@ describe(uploadBrandAssetAction, () => {
       makeFormData(null),
     );
 
-    expect(result).toEqual({ ok: false, error: { reason: 'fileMissing' } });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.FILE_MISSING,
+    });
     expect(putMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -145,7 +153,10 @@ describe(uploadBrandAssetAction, () => {
   it('returns the validation error and never calls Blob when validation fails', async () => {
     validateBrandAssetUploadMock.mockResolvedValue({
       ok: false,
-      error: { reason: 'brandImageTypeUnsupported' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED,
+      },
     });
 
     const result = await uploadBrandAssetAction(
@@ -155,8 +166,8 @@ describe(uploadBrandAssetAction, () => {
     );
 
     expect(result).toEqual({
-      ok: false,
-      error: { reason: 'brandImageTypeUnsupported' },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED,
     });
     expect(putMock).not.toHaveBeenCalled();
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -171,7 +182,7 @@ describe(uploadBrandAssetAction, () => {
     );
 
     expect(result).toEqual({
-      ok: true,
+      outcome: ACTION_OUTCOME.SUCCESS,
       url: 'https://example.blob.vercel-storage.com/logo-abc.png',
     });
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
@@ -219,7 +230,7 @@ describe(uploadBrandAssetAction, () => {
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
-    expect(result.ok).toBe(true);
+    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(delMock).toHaveBeenCalledWith(
       'https://example.blob.vercel-storage.com/logo-old.png',
       { token: 'test-token' },
@@ -235,10 +246,7 @@ describe(uploadBrandAssetAction, () => {
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
-    expect(result).toEqual({
-      ok: false,
-      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -252,10 +260,7 @@ describe(uploadBrandAssetAction, () => {
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
-    expect(result).toEqual({
-      ok: false,
-      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -270,8 +275,8 @@ describe(uploadBrandAssetAction, () => {
       );
 
       expect(result).toEqual({
-        ok: false,
-        error: { reason: 'uploadsNotConfigured' },
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.UPLOADS_NOT_CONFIGURED,
       });
       expect(validateBrandAssetUploadMock).not.toHaveBeenCalled();
       expect(putMock).not.toHaveBeenCalled();

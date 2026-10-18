@@ -1,6 +1,6 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
@@ -9,20 +9,17 @@ import {
   getBrandAssetUrl,
   setBrandAssetUrl,
 } from '@platform/server/site-config/brand-asset-store';
-import type { TUploadError } from '@platform/server/uploads/upload-error';
+import type { TClearUploadResult } from '@platform/server/uploads/upload-error';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { logger } from '@platform/utils/logger/logger';
 
-export type TClearBrandAssetResult =
-  { ok: true } | { ok: false; error: TUploadError };
-
 export const clearBrandAssetAction = async (
   tenantId: string,
   kind: TBrandAssetKind,
-): Promise<TClearBrandAssetResult> => {
+): Promise<TClearUploadResult> => {
   const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
@@ -31,7 +28,7 @@ export const clearBrandAssetAction = async (
 
   try {
     const previousUrl = await getBrandAssetUrl(tenant.id, targetKind);
-    if (!previousUrl) return { ok: true };
+    if (!previousUrl) return { outcome: ACTION_OUTCOME.SUCCESS };
 
     await setBrandAssetUrl(tenant.id, targetKind, null);
 
@@ -49,16 +46,13 @@ export const clearBrandAssetAction = async (
       details: { asset: targetKind, operation: 'clear' },
     });
 
-    return { ok: true };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('site_config.brand_asset_clear_failed', {
       tenantId: tenant.id,
       kind: targetKind,
       error,
     });
-    return {
-      ok: false,
-      error: { reason: 'removeFailed', values: { kind: targetKind } },
-    };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };

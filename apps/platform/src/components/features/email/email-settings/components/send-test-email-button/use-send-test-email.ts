@@ -1,9 +1,12 @@
 'use client';
 
-import type { TEmailTemplateType } from '@blog/config';
+import { ACTION_OUTCOME, type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { useToast } from '@platform/context/toast-provider';
-import { sendTestEmailAction } from '@platform/server/email/send-test-email-action';
+import {
+  sendTestEmailAction,
+  type TSendTestEmailResult,
+} from '@platform/server/email/send-test-email-action';
 import {
   toTestSenderInput,
   type TEmailSenderDraft,
@@ -19,10 +22,13 @@ export type TTestEmail = {
 };
 
 const FAILURE_MESSAGE_KEYS = {
-  invalid: 'testInvalid',
-  'rate-limited': 'testRateLimited',
-  failed: 'testFailed',
-} as const;
+  [ACTION_OUTCOME.INVALID]: 'testInvalid',
+  [ACTION_OUTCOME.RATE_LIMITED]: 'testRateLimited',
+  [ACTION_OUTCOME.SERVER_ERROR]: 'testFailed',
+} satisfies Record<
+  Exclude<TSendTestEmailResult['outcome'], typeof ACTION_OUTCOME.SUCCESS>,
+  string
+>;
 
 export const useSendTestEmail = (tenantId: string) => {
   const t = useTranslations('emailPreview');
@@ -36,10 +42,10 @@ export const useSendTestEmail = (tenantId: string) => {
         copy: { subject, body },
         sender: toTestSenderInput(sender),
       });
-      if (result.ok) {
+      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
         toast.success({ message: t('testSent', { email: result.to }) });
       } else {
-        toast.error({ message: t(FAILURE_MESSAGE_KEYS[result.reason]) });
+        toast.error({ message: t(FAILURE_MESSAGE_KEYS[result.outcome]) });
       }
     });
 
