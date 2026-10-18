@@ -282,8 +282,8 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark whose trailing `actions` stay in the bar and whose `panelActions` move into the mobile panel below `lg`.
-Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
+Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel.
+Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · drawerActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
 
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`

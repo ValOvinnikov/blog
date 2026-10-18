@@ -33,16 +33,18 @@ export type TPrimaryNavigationProps = IWithClassName &
     links: INavItem[];
     actions?: ReactNode;
     panelActions?: ReactNode;
+    drawerActions?: ReactNode;
     ariaLabel?: string;
     linkAs?: TAnchorElementType;
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
   };
 
-/** Top-level `<nav>` landmark whose trailing `actions` stay in the bar and whose `panelActions` move into the mobile panel below `lg`. */
+/** Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel. */
 export const PrimaryNavigation = ({
   links,
   actions,
   panelActions,
+  drawerActions,
   ariaLabel = 'Primary',
   className,
   dataTestId,
@@ -57,6 +59,7 @@ export const PrimaryNavigation = ({
     panelLink,
     barPanelActions,
     panelActionsRow,
+    drawerActionsRow,
   } = primaryNavigationVariants({ collapsible: Boolean(mobileToggle) });
 
   const renderLinks = (itemClassName?: string) =>
@@ -115,6 +118,14 @@ export const PrimaryNavigation = ({
                 data-testid="primary-navigation-panel-actions"
               >
                 {panelActions}
+              </div>
+            )}
+            {drawerActions && mobileToggle.isOpen && (
+              <div
+                className={drawerActionsRow()}
+                data-testid="primary-navigation-drawer-actions"
+              >
+                {drawerActions}
               </div>
             )}
           </div>

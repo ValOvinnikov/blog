@@ -11,7 +11,7 @@ code:
   - apps/web/src/components/shared/site-header/**
   - apps/web/src/components/shared/site-navigation/**
   - apps/web/src/hooks/use-mobile-nav-toggle/**
-epics: [4987, 4995, 4998]
+epics: [4987, 4995, 4998, 5459]
 ---
 
 # Navigation
@@ -46,6 +46,8 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 - An item is current when its href equals the public pathname — no tenant segment and no locale prefix, in prerendered HTML as on the client — or the pathname is under it (`/blog` matches `/blog/post`); `/` matches only itself. The current link carries `aria-current="page"` and the active colour of `TextLink`'s `nav` appearance, plus a cue that reads without the hue (WCAG 1.4.1): in the header and the mobile menu it is bold (`currentStyle="weight"`), while the footer navigation and footer language codes keep a 2px underline in that colour (the default). The `nav` appearance is monospaced, so the bold label keeps its width and switching pages never moves a header link. Hover changes only the colour, so it never looks current.
 - The mobile panel closes on every route change; `useMobileNavToggle` handles focus, Escape and outside-click dismissal, scoped to the navigation's own container.
 - `actions` stay in the bar at every width; `panelActions` move into the mobile panel below `lg`. With the switcher on, the switcher and the theme toggle are `panelActions`; with it off, the theme toggle is an `action`. The account menu is always an `action`.
+- `drawerActions` render only inside the open mobile panel, after the `panelActions` row behind their own divider, and never in the bar. Each drawer link row is at least 44px tall.
+- Controls are grouped by gap, never by divider: from `lg` the links sit 16px apart, then 24px to the `panelActions` group (8px apart inside it), then 24px to the `actions`; below `lg` every control in the bar sits 8px apart.
 - The `<nav>` landmark is named by `PrimaryNavigation`'s default `ariaLabel`, `Primary`, in every language; the menu toggle's name is the catalog's `siteNavigation.toggleMenu`.
 - A failed site-settings read renders no header; a failed navigation read is logged (`navigation.layout_fetch_failed`) and the header renders with no links and no switcher.
 - `@blog/ui`'s `Header`, `PrimaryNavigation` and `TextLink` stay prop-driven: `apps/web` passes resolved links, `linkAs={SmartLink}` and the mobile toggle state.
