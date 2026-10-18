@@ -2,11 +2,13 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   type ILink,
+  type TMaybeNull,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
+import type { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { userEvent, within } from 'storybook/test';
 
@@ -92,17 +94,38 @@ const headerControls = {
   actions: <AuthMenu oauthProviderIds={['github']} />,
 };
 
-const withSignedOutSession: NonNullable<TStory['decorators']> = [
+const withSession = (
+  session: TMaybeNull<Session>,
+): NonNullable<TStory['decorators']> => [
   (Story) => (
-    <SessionProvider session={null}>
+    <SessionProvider session={session}>
       <Story />
     </SessionProvider>
   ),
 ];
 
+const withSignedOutSession = withSession(null);
+
+const withSignedInSession = withSession({
+  user: { id: 'reader-1', name: 'Ada Lovelace', email: 'ada@example.com' },
+  expires: '2099-01-01',
+});
+
 export const HeaderControls: TStory = {
   globals: { viewport: 'desktop' },
   decorators: withSignedOutSession,
+  args: headerControls,
+};
+
+export const HeaderControlsSignedIn: TStory = {
+  globals: { viewport: 'desktop' },
+  decorators: withSignedInSession,
+  args: headerControls,
+};
+
+export const MobileHeaderControlsSignedIn: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedInSession,
   args: headerControls,
 };
 

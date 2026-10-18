@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, routes, SIZE } from '@blog/config';
+import { ICONS, routes, SIZE, type TMaybeNull } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { Text } from '@blog/ui/components/atoms/text';
@@ -17,20 +17,17 @@ export type TAccountMenuProps = {
   panelId: string;
   isOpen: boolean;
   toggle: () => void;
-  triggerRef: RefObject<HTMLButtonElement | null>;
-  panelRef: RefObject<HTMLDivElement | null>;
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
+  triggerRef: RefObject<TMaybeNull<HTMLButtonElement>>;
+  panelRef: RefObject<TMaybeNull<HTMLDivElement>>;
+  name?: TMaybeNull<string>;
+  email?: TMaybeNull<string>;
+  image?: TMaybeNull<string>;
 };
 
 /**
- * The title is a plain styled label, not a heading —
- * `role="menu"` doesn't own heading elements per the ARIA menu pattern, and
- * this panel renders ahead of every page's own `<h1>` in
- * `[tenant]/[locale]/layout.tsx`. Open/close state and refs come from the
- * parent's single `usePopover()` call — this component never calls
- * `usePopover()` itself.
+ * The title is a plain styled label, not a heading — `role="menu"` doesn't
+ * own heading elements per the ARIA menu pattern, and this panel renders
+ * ahead of every page's own `<h1>` in `[tenant]/[locale]/layout.tsx`.
  */
 export const AccountMenu = ({
   panelId,
@@ -43,28 +40,12 @@ export const AccountMenu = ({
   image,
 }: TAccountMenuProps) => {
   const t = useTranslations('authMenu');
-  const { panel } = authMenuVariants();
-  const {
-    menuRoot,
-    avatarTrigger,
-    label,
-    acctRow,
-    accountName,
-    accountEmail,
-    signOutItem,
-  } = accountMenuVariants();
+  const { panel, avatar } = authMenuVariants();
+  const { menuRoot, label, acctRow, accountName, accountEmail, signOutItem } =
+    accountMenuVariants();
 
   const displayName = name ?? email ?? '';
 
-  // Tracks a runtime `<img>` load failure (e.g. a stale/broken OAuth avatar
-  // URL) so both `Avatar` renders below fall back to initials together —
-  // they show the same underlying image, so one shared flag is correct.
-  // Reset whenever `image` itself changes, so a failure recorded against a
-  // previous session's URL never incorrectly persists against a new one —
-  // done during render (comparing against the last-seen `image`) rather than
-  // in a `useEffect`, per React's "adjusting state when a prop changes"
-  // guidance: an effect here would still commit the stale-initials render
-  // first, then re-render a second time to clear it.
   const [lastImage, setLastImage] = useState(image);
   const [imageFailed, setImageFailed] = useState(false);
   if (image !== lastImage) {
@@ -82,13 +63,14 @@ export const AccountMenu = ({
         panelId={panelId}
         onClick={toggle}
         variant="avatar"
-        className={avatarTrigger()}
+        className={avatar()}
       >
         <Avatar
           src={avatarSrc}
           name={displayName}
           alt=""
           size={SIZE.SM}
+          className={avatar()}
           onImageError={() => setImageFailed(true)}
         />
       </PopoverMenu.Trigger>

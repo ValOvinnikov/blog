@@ -12,12 +12,6 @@ import { authMenuVariants } from './auth-menu-variants';
 import { AccountMenu } from './components/account-menu/account-menu';
 import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
 
-/**
- * While the session is resolving it renders a neutral, non-interactive
- * spinner — shaped like neither the sign-in button nor the account avatar,
- * so whichever one mounts never flashes through the *other* state's shape
- * first.
- */
 export interface IAuthMenuProps {
   oauthProviderIds: readonly TOAuthProviderId[];
 }
@@ -32,9 +26,6 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
 
   if (sessionResult.status === 'loading') {
     return (
-      // `Spinner` owns the live-region semantics (`role="status"` +
-      // `aria-label`) itself — this wrapper only reserves the 32×32
-      // footprint of the sign-in button / avatar trigger it stands in for.
       <span className={statusIndicator()}>
         <Spinner size="LG" label={t('loadingAccountStatus')} />
       </span>
