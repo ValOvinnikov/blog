@@ -1,6 +1,11 @@
 'use server';
 
-import { routes, TENANT_WRITE_REFUSAL } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  routes,
+  TENANT_WRITE_REFUSAL,
+  type TActionResult,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { auth } from '@web/server/auth/auth';
@@ -14,31 +19,35 @@ import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
-type TSubscriptionWriteResult =
-  { ok: true } | { ok: false; isUnavailable: boolean };
+export type TUnsubscribeResult = TActionResult<
+  typeof ACTION_OUTCOME.SERVER_ERROR
+>;
+export type TResendConfirmationActionResult = TActionResult<
+  typeof ACTION_OUTCOME.UNAVAILABLE | typeof ACTION_OUTCOME.SERVER_ERROR
+>;
 
-export type TUnsubscribeResult = TSubscriptionWriteResult;
-export type TResendConfirmationActionResult = TSubscriptionWriteResult;
+const SUCCESS = { outcome: ACTION_OUTCOME.SUCCESS } as const;
+const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
 
 export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) return { ok: false, isUnavailable: false };
+  if (!userId) return SERVER_ERROR;
 
   const tenant = await resolveRequestTenant();
   if (!tenant) {
     logger.error('newsletter.unsubscribe_tenant_unresolved');
-    return { ok: false, isUnavailable: false };
+    return SERVER_ERROR;
   }
   const { id: tenantId } = tenant;
 
   try {
     await queries.subscribers.unsubscribe(tenantId, userId);
     await clearNewsletterSubscribedCookieSafely();
-    return { ok: true };
+    return SUCCESS;
   } catch (error) {
     logger.error('newsletter.unsubscribe_failed', { error });
-    return { ok: false, isUnavailable: false };
+    return SERVER_ERROR;
   }
 };
 
@@ -55,17 +64,17 @@ export const resendConfirmationAction =
     const session = await auth();
     const userId = session?.user?.id;
     const email = session?.user?.email;
-    if (!userId || !email) return { ok: false, isUnavailable: false };
+    if (!userId || !email) return SERVER_ERROR;
 
     const tenant = await resolveWritableTenant(
       'newsletter.resend_confirmation',
     );
     if (!tenant.ok) {
-      const isUnavailable = tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE;
-      if (isUnavailable) {
+      if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
         logger.warn('newsletter.resend_confirmation_tenant_not_active');
+        return { outcome: ACTION_OUTCOME.UNAVAILABLE };
       }
-      return { ok: false, isUnavailable };
+      return SERVER_ERROR;
     }
     const { tenantId } = tenant;
 
@@ -74,8 +83,7 @@ export const resendConfirmationAction =
         tenantId,
         userId,
       );
-      if (result.outcome === 'not-pending')
-        return { ok: false, isUnavailable: false };
+      if (result.outcome === 'not-pending') return SERVER_ERROR;
 
       const siteUrl = (await getTenantBaseUrl()) ?? '';
       const locale = await getSubscribedPageLocale();
@@ -113,9 +121,9 @@ export const resendConfirmationAction =
         headers,
         replyTo,
       });
-      return { ok: true };
+      return SUCCESS;
     } catch (error) {
       logger.error('newsletter.confirmation_resend_failed', { error });
-      return { ok: false, isUnavailable: false };
+      return SERVER_ERROR;
     }
   };
