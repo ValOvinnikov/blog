@@ -1,9 +1,10 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
   type TTenantPlan,
 } from '@blog/db/constants';
+import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -64,7 +65,7 @@ describe(updateEmailConfigAction, () => {
 
     expect(requireTenantMembership).toHaveBeenCalledWith('tenant-1');
     expect(upsertEmailConfigMock).toHaveBeenCalledWith('tenant-1', VALID_INPUT);
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('rejects an invalid reply-to address without ever calling the tenant gate', async () => {
@@ -73,7 +74,10 @@ describe(updateEmailConfigAction, () => {
       replyToAddress: 'not-an-email',
     });
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
@@ -93,8 +97,10 @@ describe(updateEmailConfigAction, () => {
       });
 
       expect(result).toEqual({
-        ok: false,
-        fieldErrors: { senderName: 'senderNameInvalid' },
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          senderName: { reason: EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID },
+        },
       });
       expect(requireTenantMembership).not.toHaveBeenCalled();
       expect(upsertEmailConfigMock).not.toHaveBeenCalled();
@@ -109,7 +115,7 @@ describe(updateEmailConfigAction, () => {
         senderName,
       });
 
-      expect(result).toEqual({ ok: true });
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     },
   );
 
@@ -121,7 +127,7 @@ describe(updateEmailConfigAction, () => {
       contactRecipient: null,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailConfigMock).toHaveBeenCalledWith('tenant-1', {
       senderName: null,
       replyToAddress: null,
@@ -137,8 +143,12 @@ describe(updateEmailConfigAction, () => {
     });
 
     expect(result).toEqual({
-      ok: false,
-      fieldErrors: { contactRecipient: 'contactRecipientInvalid' },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        contactRecipient: {
+          reason: EMAIL_SENDER_FIELD_ERROR.CONTACT_RECIPIENT_INVALID,
+        },
+      },
     });
     expect(requireTenantMembership).not.toHaveBeenCalled();
     expect(upsertEmailConfigMock).not.toHaveBeenCalled();
@@ -206,7 +216,7 @@ describe(updateEmailConfigAction, () => {
 
     const result = await updateEmailConfigAction('tenant-1', VALID_INPUT);
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
       'email_config.update_failed',
@@ -230,12 +240,12 @@ describe(updateEmailConfigAction, () => {
     });
   });
 
-  it('still returns ok when the audit write fails, and logs the failure', async () => {
+  it('still succeeds when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
     const result = await updateEmailConfigAction('tenant-1', VALID_INPUT);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {

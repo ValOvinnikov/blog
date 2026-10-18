@@ -1,14 +1,20 @@
 'use server';
 
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   LOCALE_ISO_CODES,
+  type TActionResult,
   type TEmailTemplateType,
   type TLocaleIsoCode,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
+import {
+  SETTINGS_REFUSAL,
+  type TSettingsRefusal,
+} from '@platform/constants/settings';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
@@ -21,8 +27,20 @@ import { z } from 'zod';
 export type TUpdateEmailTemplateInput = z.input<
   typeof emailTemplateCopyInputSchema
 >;
+
+type TUpdateEmailTemplateFailure = Exclude<
+  TActionResult<
+    typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
+    keyof TUpdateEmailTemplateInput,
+    never,
+    TSettingsRefusal
+  >,
+  { outcome: typeof ACTION_OUTCOME.SUCCESS }
+>;
+
 export type TUpdateEmailTemplateResult =
-  { ok: true; result: TEmailTemplateResult } | { ok: false };
+  | { outcome: typeof ACTION_OUTCOME.SUCCESS; result: TEmailTemplateResult }
+  | TUpdateEmailTemplateFailure;
 
 export const updateEmailTemplateAction = async (
   tenantId: string,
@@ -38,12 +56,15 @@ export const updateEmailTemplateAction = async (
     !parsedLocale.success ||
     !parsedInput.success
   ) {
-    return { ok: false };
+    return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
   const { tenant } = await requireTenantMembership(tenantId);
   if (!queries.tenants.selectLiveLocales(tenant).includes(parsedLocale.data)) {
-    return { ok: false };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.LOCALE_NOT_LIVE,
+    };
   }
 
   try {
@@ -63,7 +84,7 @@ export const updateEmailTemplateAction = async (
         locale: parsedLocale.data,
       },
     });
-    return { ok: true, result };
+    return { outcome: ACTION_OUTCOME.SUCCESS, result };
   } catch (error) {
     logger.error('email_templates.update_failed', {
       tenantId: tenant.id,
@@ -71,6 +92,6 @@ export const updateEmailTemplateAction = async (
       locale: parsedLocale.data,
       error,
     });
-    return { ok: false };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };

@@ -5,6 +5,7 @@ import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import type { TEmailSenderFieldErrorReason } from '@platform/constants/email-sender';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TSenderFieldErrors } from '@platform/server/email-config/update-email-config-action';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
@@ -12,6 +13,11 @@ import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 
 import { emailSenderEditorVariants } from './email-sender-editor-variants';
+
+const FIELD_ERROR_MESSAGE_KEY = {
+  SENDER_NAME_INVALID: 'senderNameInvalid',
+  CONTACT_RECIPIENT_INVALID: 'contactRecipientInvalid',
+} as const satisfies Record<TEmailSenderFieldErrorReason, string>;
 
 export type TEmailSenderEditorProps = {
   sender: TEmailSenderDraft;
@@ -55,7 +61,10 @@ export const EmailSenderEditor = ({
             label={t('senderNameLabel')}
             hint={t('senderNameHint')}
             error={
-              fieldErrors?.senderName && t(`errors.${fieldErrors.senderName}`)
+              fieldErrors?.senderName &&
+              t(
+                `errors.${FIELD_ERROR_MESSAGE_KEY[fieldErrors.senderName.reason]}`,
+              )
             }
             control={{ ...control, id: fieldIds.senderName }}
           >
@@ -83,7 +92,9 @@ export const EmailSenderEditor = ({
               hint={t('contactRecipientHint')}
               error={
                 fieldErrors?.contactRecipient &&
-                t(`errors.${fieldErrors.contactRecipient}`)
+                t(
+                  `errors.${FIELD_ERROR_MESSAGE_KEY[fieldErrors.contactRecipient.reason]}`,
+                )
               }
               control={{ ...control, id: fieldIds.contactRecipient }}
             >

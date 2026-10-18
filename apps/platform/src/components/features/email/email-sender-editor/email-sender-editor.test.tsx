@@ -1,3 +1,4 @@
+import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import { screen } from '@platform/testing/custom-render';
 import {
   ARCHIVED_NOTICE_TEXT,
@@ -62,7 +63,11 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
   });
 
   it('shows a sender-name error against the field', () => {
-    setup({ fieldErrors: { senderName: 'senderNameInvalid' } });
+    setup({
+      fieldErrors: {
+        senderName: { reason: EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID },
+      },
+    });
 
     expect(screen.getByLabelText('Sender name')).toHaveAccessibleDescription(
       expect.stringContaining('not an email address'),
@@ -92,7 +97,13 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
   });
 
   it('shows a contact-recipient error against the field', () => {
-    setup({ fieldErrors: { contactRecipient: 'contactRecipientInvalid' } });
+    setup({
+      fieldErrors: {
+        contactRecipient: {
+          reason: EMAIL_SENDER_FIELD_ERROR.CONTACT_RECIPIENT_INVALID,
+        },
+      },
+    });
 
     expect(
       screen.getByLabelText('Send contact messages to'),
