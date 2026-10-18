@@ -12,18 +12,19 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import {
   CIRCLE_IMAGE_SIZE,
+  ICON_IMAGE_SIZE,
   SQUARE_IMAGE_SIZE,
   WIDE_IMAGE_HEIGHT,
 } from '@web/utils/media-card-image-size';
 
 const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   TCardImageShape,
-  'wide' | 'square' | 'circle'
+  'wide' | 'square' | 'circle' | 'icon'
 > = {
   [CARD_IMAGE_SHAPE.WIDE]: 'wide',
   [CARD_IMAGE_SHAPE.SQUARE]: 'square',
   [CARD_IMAGE_SHAPE.CIRCLE]: 'circle',
-  [CARD_IMAGE_SHAPE.ICON]: 'square',
+  [CARD_IMAGE_SHAPE.ICON]: 'icon',
 };
 
 export interface IFeatureListCardProps extends IWithDataTestId {
@@ -51,6 +52,12 @@ export const FeatureListCard = ({
       : 'icon';
   const isIconPanel =
     !item.sanityImage && Boolean(item.icon) && mediaShape !== 'icon';
+  const fixedImageSize =
+    mediaShape === 'circle'
+      ? CIRCLE_IMAGE_SIZE
+      : mediaShape === 'icon'
+        ? ICON_IMAGE_SIZE
+        : undefined;
 
   return (
     <MediaCard
@@ -70,17 +77,12 @@ export const FeatureListCard = ({
         {item.sanityImage ? (
           <SanityImage
             image={item.sanityImage}
-            width={
-              mediaShape === 'circle' ? CIRCLE_IMAGE_SIZE : SQUARE_IMAGE_SIZE
-            }
+            width={fixedImageSize ?? SQUARE_IMAGE_SIZE}
             height={
-              mediaShape === 'circle'
-                ? CIRCLE_IMAGE_SIZE
-                : mediaShape === 'wide'
-                  ? WIDE_IMAGE_HEIGHT
-                  : SQUARE_IMAGE_SIZE
+              fixedImageSize ??
+              (mediaShape === 'wide' ? WIDE_IMAGE_HEIGHT : SQUARE_IMAGE_SIZE)
             }
-            sizes={mediaShape === 'circle' ? undefined : imageSizes}
+            sizes={fixedImageSize ? undefined : imageSizes}
             loading="lazy"
             className="size-full object-cover"
           />
