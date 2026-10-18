@@ -31,7 +31,7 @@
     "@blog/tailwind-config": "workspace:*",
     "@blog/ui": "workspace:*",
     "@blog/utils": "workspace:*",
-    "@portabletext/react": "^3.2.0",
+    "@portabletext/react": "^8.0.1",
     "@sanity/webhook": "^4.0.4",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@upstash/redis": "^1.39.0",
