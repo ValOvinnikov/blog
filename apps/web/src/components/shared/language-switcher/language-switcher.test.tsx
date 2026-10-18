@@ -35,6 +35,22 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
+  it('links to the public path on a prerendered tenant-scoped page', async () => {
+    vi.mocked(usePathname).mockReturnValue(
+      '/0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee/NL/modules/latest-posts',
+    );
+    setup();
+    await openMenu();
+    const menu = screen.getByRole('menu', { name: 'Language' });
+
+    expect(
+      within(menu).getByRole('menuitem', { name: 'Français' }),
+    ).toHaveAttribute(
+      'href',
+      '/api/switch-language?to=FR&from=%2Fnl%2Fmodules%2Flatest-posts',
+    );
+  });
+
   describe('menu with code', () => {
     beforeEach(() => {
       setup();

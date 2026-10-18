@@ -4,7 +4,7 @@ import type { ILink } from '@blog/config';
 import { PrimaryNavigation } from '@blog/ui/components/molecules/primary-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useMobileNavToggle } from '@web/hooks/use-mobile-nav-toggle';
-import { usePathname } from '@web/i18n/navigation';
+import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import { useTranslations } from 'next-intl';
 import { useEffect, useId, type ReactNode } from 'react';
 
@@ -24,19 +24,13 @@ const isNavItemActive = (pathname: string, href: string): boolean => {
   return pathname === href || pathname.startsWith(`${href}/`);
 };
 
-/**
- * Open/closed state, focus management, and Escape/outside-click dismissal
- * live in `useMobileNavToggle` — this component only supplies the real
- * accessible name and closes the panel whenever the route changes (so a nav
- * link click never leaves it open on the next page).
- */
 export const SiteNavigation = ({
   links,
   actions,
   panelActions,
 }: TSiteNavigationProps) => {
   const t = useTranslations('siteNavigation');
-  const pathname = usePathname();
+  const pathname = usePublicPathname();
   const panelId = useId();
   const { open, toggle, close, containerRef } = useMobileNavToggle(panelId);
 

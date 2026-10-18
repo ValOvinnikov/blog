@@ -75,6 +75,30 @@ describe(`<${SiteNavigation.name}/>`, () => {
     );
   });
 
+  it('marks the matching item active on a prerendered tenant-scoped path', () => {
+    vi.mocked(usePathname).mockReturnValue(
+      '/0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee/EN/blog/hello-world',
+    );
+    renderElement(<SiteNavigation links={links} />);
+
+    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('marks Home active on the prerendered tenant-scoped home path', () => {
+    vi.mocked(usePathname).mockReturnValue(
+      '/0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee/EN',
+    );
+    renderElement(<SiteNavigation links={links} />);
+
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
   it('does not match a path that merely shares the section prefix', () => {
     vi.mocked(usePathname).mockReturnValue('/blogging');
     renderElement(<SiteNavigation links={links} />);
