@@ -42,6 +42,8 @@ export const env = createEnv({
     // @env-optional
     OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-optional
+    CONTRAST_RESULT_SECRET: z.string().min(1).optional(),
+    // @env-optional
     LOKI_PUSH_URL: z.string().min(1).optional(),
     // @env-optional
     LOKI_USER: z.string().min(1).optional(),
@@ -67,6 +69,7 @@ export const env = createEnv({
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
     OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
+    CONTRAST_RESULT_SECRET: process.env.CONTRAST_RESULT_SECRET,
     LOKI_PUSH_URL: process.env.LOKI_PUSH_URL,
     LOKI_USER: process.env.LOKI_USER,
     LOKI_TOKEN: process.env.LOKI_TOKEN,
