@@ -65,7 +65,7 @@ export const useLookFormState = ({
     onDiscard: () => setRepickKinds([]),
     countChanges,
     canSave: ({ accentHue }) => isAccentHueAccessible(accentHue),
-    invalidFields: ({ accentHue }) => ({
+    invalidControls: ({ accentHue }) => ({
       ids: isAccentHueAccessible(accentHue) ? [] : [accentHueFieldId],
       revealFirst: revealInvalidField,
     }),

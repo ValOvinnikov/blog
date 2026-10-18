@@ -107,7 +107,7 @@ export const useVoiceDraft = ({
             count: countLanguageVoiceChanges(saved, draft, locale),
           }))
         : [],
-    invalidFields: () => ({
+    invalidControls: () => ({
       ids: errorsInOrder.map(({ fieldId }) =>
         voiceFieldInputId(fieldIdPrefix, fieldId),
       ),

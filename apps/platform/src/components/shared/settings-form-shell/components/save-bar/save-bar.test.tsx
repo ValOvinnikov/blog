@@ -7,7 +7,7 @@ import { SaveBar, type TSaveBarProps } from './save-bar';
 const baseProps: TSaveBarProps = {
   changeCount: 3,
   breakdown: '',
-  invalidFields: { ids: [] },
+  invalidControls: { ids: [] },
   isPending: false,
   onSave: vi.fn(),
   onDiscard: vi.fn(),
@@ -24,7 +24,7 @@ const BarWithHiddenField = () => {
       {isRevealed && <input id="field-heading" aria-label="Heading" />}
       <SaveBar
         {...baseProps}
-        invalidFields={{
+        invalidControls={{
           ids: ['field-heading'],
           revealFirst: () => setIsRevealed(true),
         }}
@@ -56,7 +56,7 @@ describe(`<${SaveBar.name}/>`, () => {
 
   describe('after a save with field errors', () => {
     beforeEach(() => {
-      renderBar({ invalidFields: { ids: ['field-heading', 'field-body'] } });
+      renderBar({ invalidControls: { ids: ['field-heading', 'field-body'] } });
     });
 
     it('counts the fields that need attention in place of the change count', () => {

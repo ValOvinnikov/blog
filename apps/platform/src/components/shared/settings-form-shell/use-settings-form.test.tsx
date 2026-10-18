@@ -111,17 +111,17 @@ describe(useSettingsForm, () => {
     expect(onDiscard).toHaveBeenCalledTimes(1);
   });
 
-  it('reports the invalid fields for the current values', () => {
+  it('reports the invalid controls for the current values', () => {
     const fieldId = faker.lorem.slug();
     const { result } = renderSettingsForm({
-      invalidFields: ({ name }) => ({
+      invalidControls: ({ name }) => ({
         ids: name === EDITED.name ? [fieldId] : [],
       }),
     });
 
     act(() => result.current.setValues(EDITED));
 
-    expect(result.current.form.invalidFields?.ids).toEqual([fieldId]);
+    expect(result.current.form.invalidControls?.ids).toEqual([fieldId]);
   });
 
   it('is archived when the tenant has an archive date', () => {

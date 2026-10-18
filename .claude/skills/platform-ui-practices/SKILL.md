@@ -83,7 +83,7 @@ Text fields, in a card under `SettingsFormShell` (`fields` is
   field; the component keeps the codes in state; it passes the translated
   `error`, which marks the field invalid;
   and `useSettingsForm` gets
-  `invalidFields: () => ({ ids: mastodonError ? [mastodonId] : [] })`.
+  `invalidControls: () => ({ ids: mastodonError ? [mastodonId] : [] })`.
 - Compose `FormField` around `TextInput`, as here: `FormTextInput` has no
   `isReadOnly` or `control` and is at seven props, so compose rather than add
   one. `FormField` gives its `TextInput` or `Textarea` the id, label, hint,
@@ -336,9 +336,9 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
 - Every text field is `FormTextInput`, or `FormField` around a control (the
   settings-fields recipe). `hint` is a plain string, never a sized `<span>` or a
   `<Text>`. A field's error is `FormField`'s inline `error`, never an `Alert` in
-  the field; `invalidFields.ids` names the focusable controls, in page order,
+  the field; `invalidControls.ids` names the focusable controls, in page order,
   one entry per invalid field. When the first one can be hidden (another
-  language, a collapsed row), `invalidFields.revealFirst` shows it before the
+  language, a collapsed row), `invalidControls.revealFirst` shows it before the
   save bar's link focuses it. A failure that belongs to no field is one
   `Alert` (ERROR) under the header.
 - An embedded edit panel outside the shell (today only the tenant details panel)
@@ -590,7 +590,7 @@ of them:
 | A second `h1`, or `<Heading level={1}>` in a page body                                                           | `PageHeader` `title`, once per page                                                                                               |
 | `<h2>`, `<h3>` or a `font-semibold` span as a section title                                                      | `Card.Header` `title`                                                                                                             |
 | `hint={<span className="text-admin-11-5 …">…</span>}`                                                            | `hint={t('…')}`                                                                                                                   |
-| A field with a format rule and no `error` or `invalidFields.ids` entry, or an entry naming a wrapper             | The settings-fields recipe's error path, all four parts, with the focusable control's own id                                      |
+| A field with a format rule and no `error` or `invalidControls.ids` entry, or an entry naming a wrapper           | The settings-fields recipe's error path, all four parts, with the focusable control's own id                                      |
 | ``aria-describedby={`${id}-error`}`` beside `FormField`, or ids threaded past `SettingRow`                       | Nothing at the call site; `Field` links them                                                                                      |
 | `<Alert>` inside a field for its validation error                                                                | `FormField` `error`                                                                                                               |
 | A switch blocked by the plan or a limit with no `lockedReason`                                                   | `isLocked` + a reason for every lock (settings-fields recipe)                                                                     |
