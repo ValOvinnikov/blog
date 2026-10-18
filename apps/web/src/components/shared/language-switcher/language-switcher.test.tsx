@@ -136,25 +136,31 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
   });
 
   describe('compact codes', () => {
-    beforeEach(() => {
-      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
-    });
-
     it('links the other codes directly, named for screen readers', () => {
+      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
+
       const french = screen.getByRole('link', { name: 'Français' });
 
       expect(french).toHaveTextContent('FR');
       expect(french).toHaveAttribute('lang', 'fr');
     });
 
-    it('shows the codes at every width, with no menu for phones', () => {
+    it('shows the codes at every width, with no phone menu', () => {
+      setup({
+        switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+        liveLocales: [EN, NL],
+      });
+
+      expect(screen.getByRole('link', { name: 'English' })).toBeVisible();
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
       expect(
         screen.queryByTestId('language-switcher-mobile'),
       ).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
     it('shows the current code as text marked current, in its own language', () => {
+      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
+
       const dutch = screen.getByTestId('language-code-current');
 
       expect(
@@ -165,18 +171,20 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
       expect(dutch).toHaveAttribute('lang', 'nl');
       expect(dutch).not.toHaveAttribute('href');
     });
-  });
 
-  it('renders compact codes as the menu with more than four live languages', () => {
-    setup({
-      switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-      liveLocales: [EN, NL, FR, DE, ES],
+    it('renders as the menu with more than four live languages', () => {
+      setup({
+        switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+        liveLocales: [EN, NL, FR, DE, ES],
+      });
+
+      expect(
+        screen.queryByTestId('language-code-current'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Language: Nederlands' }),
+      ).toHaveTextContent('NL');
     });
-
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Language: Nederlands' }),
-    ).toHaveTextContent('NL');
   });
 
   describe('in the footer', () => {

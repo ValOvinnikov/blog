@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { MAX_UPLOAD_BYTES } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -59,7 +61,8 @@ describe(validateBrandAssetUpload, () => {
     expect(result).toEqual({
       ok: false,
       error: {
-        reason: 'faviconNotSquare',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.FAVICON_NOT_SQUARE,
         values: { width: 64, height: 40 },
       },
     });
@@ -70,7 +73,13 @@ describe(validateBrandAssetUpload, () => {
 
     const result = await validateBrandAssetUpload(file, 'logo');
 
-    expect(result).toEqual({ ok: false, error: { reason: 'fileMissing' } });
+    expect(result).toEqual({
+      ok: false,
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.FILE_MISSING,
+      },
+    });
   });
 
   it('rejects a file over the size limit before reading its bytes', async () => {
@@ -80,7 +89,11 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'fileTooLarge', values: { limit: '1.0 MB' } },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
+        values: { limit: '1.0 MB' },
+      },
     });
   });
 
@@ -97,7 +110,10 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'brandImageTypeUnsupported' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED,
+      },
     });
   });
 
@@ -135,7 +151,8 @@ describe(validateBrandAssetUpload, () => {
     expect(result).toEqual({
       ok: false,
       error: {
-        reason: 'svgFaviconNotSquare',
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.SVG_FAVICON_NOT_SQUARE,
         values: { width: 100, height: 40 },
       },
     });
@@ -148,7 +165,10 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'unreadableImage' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
+      },
     });
   });
 
@@ -192,7 +212,10 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'unreadableImage' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
+      },
     });
   });
 
@@ -201,7 +224,11 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'imageTooSmall', values: { size: 32 } },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.IMAGE_TOO_SMALL,
+        values: { size: 32 },
+      },
     });
   });
 
@@ -216,7 +243,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
+      error: { outcome: ACTION_OUTCOME.SERVER_ERROR },
     });
     expect(logger.error).toHaveBeenCalledOnce();
     expect(logger.error).toHaveBeenCalledWith(

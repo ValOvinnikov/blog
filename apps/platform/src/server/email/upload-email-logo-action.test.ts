@@ -1,8 +1,10 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
 } from '@blog/config';
+import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { env } from '@platform/utils/env/env';
@@ -116,7 +118,7 @@ describe(uploadEmailLogoAction, () => {
     );
 
     expect(result).toEqual({
-      ok: true,
+      outcome: ACTION_OUTCOME.SUCCESS,
       url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
     });
     expect(putMock).toHaveBeenCalledWith(
@@ -142,7 +144,7 @@ describe(uploadEmailLogoAction, () => {
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
-    expect(result.ok).toBe(true);
+    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(putMock).toHaveBeenCalledWith(
       'tenants/tenant-1/email-logo-magic_link.png',
       VALID_ASSET.buffer,
@@ -161,7 +163,10 @@ describe(uploadEmailLogoAction, () => {
   it('returns the validation error and never calls Blob when validation fails', async () => {
     validateEmailLogoUploadMock.mockResolvedValue({
       ok: false,
-      error: { reason: 'emailLogoSvg' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
+      },
     });
 
     const result = await uploadEmailLogoAction(
@@ -171,8 +176,8 @@ describe(uploadEmailLogoAction, () => {
     );
 
     expect(result).toEqual({
-      ok: false,
-      error: { reason: 'emailLogoSvg' },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
     });
     expect(putMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -209,10 +214,7 @@ describe(uploadEmailLogoAction, () => {
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
-    expect(result).toEqual({
-      ok: false,
-      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -227,8 +229,8 @@ describe(uploadEmailLogoAction, () => {
       );
 
       expect(result).toEqual({
-        ok: false,
-        error: { reason: 'uploadsNotConfigured' },
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.UPLOADS_NOT_CONFIGURED,
       });
       expect(putMock).not.toHaveBeenCalled();
     } finally {

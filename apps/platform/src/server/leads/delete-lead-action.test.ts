@@ -1,4 +1,6 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -32,7 +34,7 @@ describe(deleteLeadAction, () => {
       tenantId: TENANT_ID,
       id: LEAD_ID,
     });
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('deletes nothing for an editor', async () => {
@@ -59,7 +61,10 @@ describe(deleteLeadAction, () => {
   it('rejects an id that is not a uuid without touching the gate or the database', async () => {
     const result = await deleteLeadAction(TENANT_ID, 'not-a-uuid');
 
-    expect(result).toEqual({ ok: false, reason: 'invalid' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembership).not.toHaveBeenCalled();
     expect(deleteLeadMock).not.toHaveBeenCalled();
   });
@@ -67,7 +72,10 @@ describe(deleteLeadAction, () => {
   it('rejects a tenant id that is not a uuid', async () => {
     const result = await deleteLeadAction('tenant-1', LEAD_ID);
 
-    expect(result).toEqual({ ok: false, reason: 'invalid' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(deleteLeadMock).not.toHaveBeenCalled();
   });
 
@@ -88,7 +96,10 @@ describe(deleteLeadAction, () => {
 
     const result = await deleteLeadAction(TENANT_ID, LEAD_ID);
 
-    expect(result).toEqual({ ok: false, reason: 'notFound' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: LEAD_REFUSAL.NOT_FOUND,
+    });
   });
 
   it('reports failure and logs when the delete throws', async () => {
@@ -96,7 +107,7 @@ describe(deleteLeadAction, () => {
 
     const result = await deleteLeadAction(TENANT_ID, LEAD_ID);
 
-    expect(result).toEqual({ ok: false, reason: 'failed' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       'leads.delete_failed',
       expect.objectContaining({

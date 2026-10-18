@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { MAX_EMAIL_LOGO_BYTES } from '@platform/utils/email-logo-limits/email-logo-limits';
 
 import { validateEmailLogoUpload } from './validate-email-logo';
@@ -106,7 +108,10 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'emailLogoSvg' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
+      },
     });
   });
 
@@ -115,7 +120,10 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'emailLogoWebp' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.EMAIL_LOGO_WEBP,
+      },
     });
   });
 
@@ -126,7 +134,11 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'fileTooLarge', values: { limit: '100 KB' } },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
+        values: { limit: '100 KB' },
+      },
     });
   });
 
@@ -135,7 +147,11 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'imageTooLarge', values: { size: 400 } },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.IMAGE_TOO_LARGE,
+        values: { size: 400 },
+      },
     });
   });
 
@@ -146,7 +162,10 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: false,
-      error: { reason: 'fileMissing' },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.FILE_MISSING,
+      },
     });
   });
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
@@ -11,7 +11,7 @@ import {
   setEmailLogoUrl,
 } from '@platform/server/email/email-logo-store';
 import { validateEmailLogoUpload } from '@platform/server/email/validate-email-logo';
-import type { TUploadError } from '@platform/server/uploads/upload-error';
+import type { TUploadResult } from '@platform/server/uploads/upload-error';
 import { buildEmailLogoBlobPath } from '@platform/utils/email-logo-blob-path/email-logo-blob-path';
 import {
   emailLogoTargetSchema,
@@ -20,14 +20,11 @@ import {
 import { logger } from '@platform/utils/logger/logger';
 import { put } from '@vercel/blob';
 
-export type TUploadEmailLogoResult =
-  { ok: true; url: string } | { ok: false; error: TUploadError };
-
 export const uploadEmailLogoAction = async (
   tenantId: string,
   target: TEmailLogoTarget,
   formData: FormData,
-): Promise<TUploadEmailLogoResult> => {
+): Promise<TUploadResult> => {
   const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedTarget = emailLogoTargetSchema.safeParse(target);
@@ -35,12 +32,12 @@ export const uploadEmailLogoAction = async (
   const logoTarget = parsedTarget.data;
 
   const upload = readUploadedFile(formData);
-  if (!upload.ok) return upload;
+  if (!upload.ok) return upload.error;
   const { file, token } = upload;
 
   const validation = await validateEmailLogoUpload(file);
   if (!validation.ok) {
-    return { ok: false, error: validation.error };
+    return validation.error;
   }
 
   const { buffer, contentType, extension } = validation.asset;
@@ -72,16 +69,13 @@ export const uploadEmailLogoAction = async (
       details: { target: logoTarget, operation: 'upload', url: blob.url },
     });
 
-    return { ok: true, url: blob.url };
+    return { outcome: ACTION_OUTCOME.SUCCESS, url: blob.url };
   } catch (error) {
     logger.error('email_logo.upload_failed', {
       tenantId: tenant.id,
       target: logoTarget,
       error,
     });
-    return {
-      ok: false,
-      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
-    };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };
