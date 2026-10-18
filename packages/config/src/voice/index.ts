@@ -4,6 +4,7 @@ export {
   SITE_MESSAGES_BY_LOCALE,
   type TSiteMessages,
 } from './site-messages';
+export * from './voice-field-error';
 export * from './voice-field-kind';
 export * from './voice-fields';
 export * from './voice-fixed-keys';

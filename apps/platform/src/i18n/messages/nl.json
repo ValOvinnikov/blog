@@ -561,7 +561,17 @@
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
     "draftFieldLabel": "{surface} — {field} ({language})",
-    "listRoute": "Getoond op {path}"
+    "listRoute": "Getoond op {path}",
+    "fieldError": {
+      "NOT_A_STRING": "Vul in dit veld tekst in.",
+      "NOT_RICH_TEXT": "Vul in dit veld tekst in.",
+      "LINE_BREAK": "Houd deze tekst op één regel.",
+      "TOO_LONG": "Gebruik maximaal {max} tekens.",
+      "MISSING_PLACEHOLDER": "Laat {count, plural, one {de tijdelijke aanduiding} other {de tijdelijke aanduidingen}} {placeholders} staan — de site vult {count, plural, one {die} other {ze}} in.",
+      "UNKNOWN_PLACEHOLDER": "Verwijder {count, plural, one {de onbekende tijdelijke aanduiding} other {de onbekende tijdelijke aanduidingen}} {placeholders}.",
+      "DISALLOWED_CONTENT": "Verwijder opmaak die dit veld niet ondersteunt.",
+      "INVALID_LINK_URL": "De link {url} is geen geldig webadres."
+    }
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Pagina niet gevonden",

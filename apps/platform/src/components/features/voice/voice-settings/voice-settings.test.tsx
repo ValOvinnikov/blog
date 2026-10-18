@@ -1,11 +1,11 @@
 import {
   ACTION_OUTCOME,
   SITE_MESSAGES_BY_LOCALE,
+  VOICE_FIELD_ERROR,
   type TVoicePortableText,
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
-import { VOICE_FIELD_ERROR } from '@platform/constants/voice';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
@@ -18,10 +18,15 @@ import userEvent from '@testing-library/user-event';
 
 import { VoiceSettings, type TVoiceSettingsProps } from './voice-settings';
 
-const rejected = (detail: string) => ({
-  reason: VOICE_FIELD_ERROR.REJECTED,
-  values: { detail },
-});
+const tooLong = {
+  reason: VOICE_FIELD_ERROR.TOO_LONG,
+  values: { max: 100 },
+};
+
+const missingName = {
+  reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+  values: { placeholders: '{name}', count: 1 },
+};
 
 vi.mock('@platform/server/site-config/save-voice-overrides-action', () => ({
   saveVoiceOverridesAction: vi.fn(),
@@ -473,7 +478,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrorsByLocale: {
           [EN]: {
-            notFoundHeading: rejected('Must be 100 characters or fewer.'),
+            notFoundHeading: tooLong,
           },
         },
       });
@@ -483,10 +488,10 @@ describe(`<${VoiceSettings.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
-        await screen.findByText('Must be 100 characters or fewer.'),
+        await screen.findByText('Use 100 characters or fewer.'),
       ).toBeVisible();
       expect(notFoundHeading()).toHaveAccessibleDescription(
-        /Must be 100 characters or fewer\./,
+        /Use 100 characters or fewer\./,
       );
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       const saveBar = screen.getByRole('region', { name: 'Unsaved changes' });
@@ -499,7 +504,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       await user.type(notFoundHeading(), '!');
 
       expect(
-        screen.queryByText('Must be 100 characters or fewer.'),
+        screen.queryByText('Use 100 characters or fewer.'),
       ).not.toBeInTheDocument();
     });
 
@@ -507,7 +512,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       saveVoiceOverridesActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrorsByLocale: {
-          [DE]: { tagEmpty: rejected('Missing required placeholder {name}.') },
+          [DE]: { tagEmpty: missingName },
         },
       });
       setupBilingual();
@@ -516,7 +521,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
-        await screen.findByText('Missing required placeholder {name}.'),
+        await screen.findByText(
+          'Keep the placeholder {name} — the site fills it in.',
+        ),
       ).toBeVisible();
       expect(
         within(card('Empty lists')).getByRole('textbox', { name: 'Tag page' }),
@@ -537,9 +544,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
             [EN]: {
-              notFoundHeading: rejected('Must be 100 characters or fewer.'),
+              notFoundHeading: tooLong,
             },
-            [DE]: { notFoundHeading: rejected('Höchstens 100 Zeichen.') },
+            [DE]: { notFoundHeading: tooLong },
           },
         });
         setupBilingual();
@@ -555,8 +562,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
             [EN]: {
-              blogListEmpty: rejected('Missing required placeholder.'),
-              notFoundHeading: rejected('Must be 100 characters or fewer.'),
+              blogListEmpty: missingName,
+              notFoundHeading: tooLong,
             },
           },
         });
@@ -574,8 +581,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
             [EN]: {
-              topicEmpty: rejected('Missing required placeholder {name}.'),
-              tagEmpty: rejected('Missing required placeholder {name}.'),
+              topicEmpty: missingName,
+              tagEmpty: missingName,
             },
           },
         });
@@ -599,7 +606,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
             [DE]: {
-              tagEmpty: rejected('Missing required placeholder {name}.'),
+              tagEmpty: missingName,
             },
           },
         });

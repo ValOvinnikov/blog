@@ -1,7 +1,11 @@
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  VOICE_FIELD_ERROR,
+} from '@blog/config';
 import { LOCALE_ISO_CODES, PRESET_ID } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import { VOICE_FIELD_ERROR } from '@platform/constants/voice';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
@@ -152,7 +156,10 @@ describe(saveVoiceOverridesAction, () => {
   it('returns the rejected fields per language without revalidating', async () => {
     const fieldErrorsByLocale = {
       [LOCALE_ISO_CODES.DE]: {
-        notFoundHeading: 'Must be 100 characters or fewer.',
+        notFoundHeading: {
+          reason: VOICE_FIELD_ERROR.TOO_LONG,
+          values: { max: 100 },
+        },
       },
     };
     upsertSiteConfigMock.mockResolvedValue({ ok: false, fieldErrorsByLocale });
@@ -164,14 +171,7 @@ describe(saveVoiceOverridesAction, () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrorsByLocale: {
-        [LOCALE_ISO_CODES.DE]: {
-          notFoundHeading: {
-            reason: VOICE_FIELD_ERROR.REJECTED,
-            values: { detail: 'Must be 100 characters or fewer.' },
-          },
-        },
-      },
+      fieldErrorsByLocale,
     });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(recordAuditEventMock).not.toHaveBeenCalled();

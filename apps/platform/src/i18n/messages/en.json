@@ -561,7 +561,17 @@
     "alertError": "Couldn't save — try again.",
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
     "draftFieldLabel": "{surface} — {field} ({language})",
-    "listRoute": "Shown at {path}"
+    "listRoute": "Shown at {path}",
+    "fieldError": {
+      "NOT_A_STRING": "Enter text in this field.",
+      "NOT_RICH_TEXT": "Enter text in this field.",
+      "LINE_BREAK": "Keep this on one line.",
+      "TOO_LONG": "Use {max} characters or fewer.",
+      "MISSING_PLACEHOLDER": "Keep {count, plural, one {the placeholder} other {the placeholders}} {placeholders} — the site fills {count, plural, one {it} other {them}} in.",
+      "UNKNOWN_PLACEHOLDER": "Remove {count, plural, one {the unknown placeholder} other {the unknown placeholders}} {placeholders}.",
+      "DISALLOWED_CONTENT": "Remove formatting this field doesn't support.",
+      "INVALID_LINK_URL": "The link {url} isn't a valid web address."
+    }
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Page not found",

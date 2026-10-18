@@ -1,3 +1,4 @@
+import { VOICE_FIELD_ERROR } from '@blog/config';
 import {
   CARD_STYLE,
   DENSITY,
@@ -296,7 +297,10 @@ describe('voice overrides — TEXT fields', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
-    ).toBeDefined();
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.TOO_LONG,
+      values: { max: 100 },
+    });
   });
 
   it('rejects a TEXT override containing a line break', async () => {
@@ -311,7 +315,9 @@ describe('voice overrides — TEXT fields', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
-    ).toMatch(/line break/i);
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.LINE_BREAK,
+    });
   });
 
   it('clears a previously-set TEXT override when resubmitted blank', async () => {
@@ -379,9 +385,12 @@ describe('voice overrides — MULTILINE fields', () => {
       }),
     );
 
-    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]).toHaveProperty(
-      SYNTHETIC_MULTILINE_FIELD_ID,
-    );
+    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]).toEqual({
+      [SYNTHETIC_MULTILINE_FIELD_ID]: {
+        reason: VOICE_FIELD_ERROR.TOO_LONG,
+        values: { max: SYNTHETIC_MULTILINE_FIELD_MAX },
+      },
+    });
   });
 });
 
@@ -426,7 +435,9 @@ describe('voice overrides — RICH fields', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toMatch(/mark/i);
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.DISALLOWED_CONTENT,
+    });
   });
 
   it('rejects rich text carrying a disallowed style', async () => {
@@ -443,7 +454,9 @@ describe('voice overrides — RICH fields', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toMatch(/style/i);
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.DISALLOWED_CONTENT,
+    });
   });
 
   it('rejects rich text whose link href does not pass sanitizeHref', async () => {
@@ -463,7 +476,10 @@ describe('voice overrides — RICH fields', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toMatch(/link/i);
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.INVALID_LINK_URL,
+      values: { url: 'javascript:alert(1)' },
+    });
   });
 
   it('clears a previously-set rich override when resubmitted empty', async () => {
@@ -559,7 +575,7 @@ describe('voice overrides — RICH fields accept a plain string', () => {
 
     expect(
       coerced.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toBe(
+    ).toEqual(
       authored.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
     );
   });
@@ -576,12 +592,12 @@ describe('voice overrides — RICH fields accept a plain string', () => {
       }),
     );
 
-    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toMatch(
-      /missing/i,
+    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toEqual(
+      {
+        reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+        values: { placeholders: '{name}', count: 1 },
+      },
     );
-    expect(
-      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty,
-    ).toContain('{name}');
   });
 
   it('still rejects a non-string, non-array value', async () => {
@@ -598,7 +614,9 @@ describe('voice overrides — RICH fields accept a plain string', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toBe('Must be rich text.');
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.NOT_RICH_TEXT,
+    });
   });
 
   it('trims a whitespace-padded string before storing it', async () => {
@@ -655,7 +673,10 @@ describe('voice overrides — RICH fields accept a plain string', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toBe('Must be 300 characters or fewer.');
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.TOO_LONG,
+      values: { max: 300 },
+    });
   });
 });
 
@@ -678,12 +699,12 @@ describe('voice overrides — placeholders', () => {
       }),
     );
 
-    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toMatch(
-      /missing/i,
+    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toEqual(
+      {
+        reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+        values: { placeholders: '{name}', count: 1 },
+      },
     );
-    expect(
-      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty,
-    ).toContain('{name}');
   });
 
   it('rejects a value carrying a placeholder token the registry does not declare', async () => {
@@ -698,10 +719,10 @@ describe('voice overrides — placeholders', () => {
 
     expect(
       result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
-    ).toMatch(/unknown/i);
-    expect(
-      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
-    ).toContain('{name}');
+    ).toEqual({
+      reason: VOICE_FIELD_ERROR.UNKNOWN_PLACEHOLDER,
+      values: { placeholders: '{name}', count: 1 },
+    });
   });
 
   it('accepts a value that includes every placeholder the registry declares', async () => {
@@ -760,8 +781,16 @@ describe('per-language voice overrides', () => {
     );
 
     expect(result.fieldErrorsByLocale).toEqual({
-      [LOCALE_ISO_CODES.EN]: { notFoundHeading: expect.any(String) },
-      [LOCALE_ISO_CODES.DE]: { topicEmpty: expect.any(String) },
+      [LOCALE_ISO_CODES.EN]: {
+        notFoundHeading: expect.objectContaining({
+          reason: VOICE_FIELD_ERROR.TOO_LONG,
+        }),
+      },
+      [LOCALE_ISO_CODES.DE]: {
+        topicEmpty: expect.objectContaining({
+          reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+        }),
+      },
     });
     expect(await db().select().from(schema.siteConfig)).toEqual([]);
   });

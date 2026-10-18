@@ -561,7 +561,17 @@
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
     "draftFieldLabel": "{surface} — {field} ({language})",
-    "listRoute": "Affichée sur {path}"
+    "listRoute": "Affichée sur {path}",
+    "fieldError": {
+      "NOT_A_STRING": "Saisissez du texte dans ce champ.",
+      "NOT_RICH_TEXT": "Saisissez du texte dans ce champ.",
+      "LINE_BREAK": "Gardez ce texte sur une seule ligne.",
+      "TOO_LONG": "Utilisez {max} caractères au maximum.",
+      "MISSING_PLACEHOLDER": "Conservez {count, plural, one {la variable} other {les variables}} {placeholders} — le site {count, plural, one {la remplit} other {les remplit}}.",
+      "UNKNOWN_PLACEHOLDER": "Supprimez {count, plural, one {la variable inconnue} other {les variables inconnues}} {placeholders}.",
+      "DISALLOWED_CONTENT": "Supprimez la mise en forme que ce champ ne prend pas en charge.",
+      "INVALID_LINK_URL": "Le lien {url} n'est pas une adresse web valide."
+    }
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Page introuvable",
