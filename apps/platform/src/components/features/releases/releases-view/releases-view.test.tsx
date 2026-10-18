@@ -14,9 +14,16 @@ vi.mock('@platform/i18n/navigation');
 vi.mock('@platform/server/releases/start-contrast-check-action', () => ({
   startContrastCheckAction: vi.fn(),
 }));
+vi.mock('@platform/server/releases/start-release-action', () => ({
+  startReleaseAction: vi.fn(),
+}));
+vi.mock('@platform/server/releases/get-release-run-action', () => ({
+  getReleaseRunAction: vi.fn(),
+}));
 
 const setup = customRender(ReleasesView, {
   result: { ok: true, data: makeReleaseCandidate() },
+  releaseRun: { ok: true, data: undefined },
 });
 
 describe(`<${ReleasesView.name}/>`, () => {
@@ -205,5 +212,55 @@ describe(`<${ReleasesView.name}/>`, () => {
 
     expect(screen.getByText(/too long to read in full/)).toBeVisible();
     expect(screen.queryByText('v1.4.0')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    CONTRAST_STATUS.DUE,
+    CONTRAST_STATUS.FAILED,
+    CONTRAST_STATUS.RUNNING,
+  ])(
+    'releases only with an override when rendering changed and contrast is %s',
+    (contrastStatus) => {
+      setup({
+        result: {
+          ok: true,
+          data: makeReleaseCandidate({
+            changes: {
+              [RELEASE_CHANGE.RENDERING]: true,
+              [RELEASE_CHANGE.DB_MIGRATION]: false,
+              [RELEASE_CHANGE.SANITY_MIGRATION]: false,
+              [RELEASE_CHANGE.ENV]: false,
+            },
+            contrastStatus,
+          }),
+        },
+      });
+
+      expect(
+        screen.getByRole('button', { name: 'Release with override' }),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole('button', { name: 'Release' }),
+      ).not.toBeInTheDocument();
+    },
+  );
+
+  it('releases without an override when contrast passed', () => {
+    setup({
+      result: {
+        ok: true,
+        data: makeReleaseCandidate({
+          changes: {
+            [RELEASE_CHANGE.RENDERING]: true,
+            [RELEASE_CHANGE.DB_MIGRATION]: false,
+            [RELEASE_CHANGE.SANITY_MIGRATION]: false,
+            [RELEASE_CHANGE.ENV]: false,
+          },
+          contrastStatus: CONTRAST_STATUS.GREEN,
+        }),
+      },
+    });
+
+    expect(screen.getByRole('button', { name: 'Release' })).toBeVisible();
   });
 });

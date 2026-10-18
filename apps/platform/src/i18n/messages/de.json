@@ -1093,6 +1093,58 @@
     "githubUnavailable": "GitHub war nicht erreichbar. Versuche es gleich noch einmal.",
     "startFailed": "Die Kontrastprüfung konnte nicht gestartet werden."
   },
+  "releaseCard": {
+    "title": "Release",
+    "description": "Erstelle ein Produktions-Release des neuesten Commits auf main.",
+    "started": "Release gestartet.",
+    "runningHint": "Ein Release läuft.",
+    "nothingToReleaseHint": "Seit {lastTag} hat sich nichts geändert.",
+    "empty": "Es ist noch kein Release gelaufen.",
+    "unavailableTitle": "Release-Status nicht verfügbar",
+    "unavailableDescription": "GitHub war nicht erreichbar, daher wird der letzte Release-Lauf nicht angezeigt."
+  },
+  "releaseRunStatus": {
+    "status": {
+      "DISPATCHED": "Angefordert",
+      "RUNNING": "Läuft",
+      "SUCCEEDED": "Erfolgreich",
+      "FAILED": "Fehlgeschlagen"
+    },
+    "explanation": {
+      "DISPATCHED": "GitHub hat das Release angenommen und startet es gleich.",
+      "RUNNING": "Das Release läuft: Prüfungen, Migrationen, Tag, dann das Deployment.",
+      "SUCCEEDED": "Das Release ist abgeschlossen und die Produktion ist deployt.",
+      "FAILED": "Das Release ist fehlgeschlagen, und die Schritte nach dem Fehler sind nicht gelaufen."
+    },
+    "tenantMigrationFailedTitle": "Eine Mandanten-Migration ist fehlgeschlagen",
+    "tenantMigrationFailedDescription": "Das Deployment ist nicht gelaufen, die Live-Seite ist unverändert. Wiederhole diesen Mandanten mit „Mandanten-Migrationen ausführen“ auf dieser Seite.",
+    "viewRun": "Lauf ansehen"
+  },
+  "startReleaseDialog": {
+    "trigger": "Release",
+    "overrideTrigger": "Release mit Override",
+    "title": "In die Produktion releasen",
+    "description": "Dies prüft den neuesten Commit auf main, führt seine Migrationen aus, taggt ihn und deployt ihn in die Produktion.",
+    "overrideTitle": "Die Kontrastprüfung ist nicht bestanden",
+    "overrideDescription": "Das Rendering hat sich geändert und die Kontrastprüfung ist nicht bestanden. Wenn du trotzdem releast, wird deine Begründung mit deinem Konto gespeichert.",
+    "versionLabel": "Version",
+    "versionHint": "Größer als das letzte Release, {lastTag}. Zum Beispiel v1.2.3.",
+    "migrations": "{contentMigrations, plural, =0 {Keine Inhaltsmigrationen} one {# Inhaltsmigration in {tenants, plural, one {# Projekt} other {# Projekten}}} other {# Inhaltsmigrationen in {tenants, plural, one {# Projekt} other {# Projekten}}}}, {dbMigrations, plural, =0 {keine Datenbankmigrationen} one {# Datenbankmigration} other {# Datenbankmigrationen}}.",
+    "migrationsMinimum": "Mindestens {contentMigrations, plural, =0 {keine Inhaltsmigrationen} one {# Inhaltsmigration in {tenants, plural, one {# Projekt} other {# Projekten}}} other {# Inhaltsmigrationen in {tenants, plural, one {# Projekt} other {# Projekten}}}} und mindestens {dbMigrations, plural, =0 {keine Datenbankmigrationen} one {# Datenbankmigration} other {# Datenbankmigrationen}}.",
+    "reasonLabel": "Begründung für das Release trotz allem",
+    "reasonHint": "Wird mit deinem Namen im Audit-Log gespeichert.",
+    "confirm": "Release starten",
+    "confirming": "Wird gestartet…",
+    "fieldError": {
+      "VERSION_MALFORMED": "Gib eine Version wie v1.2.3 ein. Das letzte Release ist {lastTag}.",
+      "VERSION_NOT_GREATER": "Die Version muss größer sein als das letzte Release, {lastTag}.",
+      "REASON_REQUIRED": "Begründe, warum du ohne bestandene Kontrastprüfung releast."
+    },
+    "alreadyRunning": "Es läuft bereits ein Release.",
+    "githubUnavailable": "GitHub war nicht erreichbar, daher wurde nichts gestartet. Versuche es gleich noch einmal.",
+    "invalid": "Prüfe Version und Begründung und versuche es erneut.",
+    "startFailed": "GitHub hat das Release nicht angenommen, daher wurde nichts gestartet."
+  },
   "releaseUnavailable": {
     "title": "Release-Informationen sind nicht verfügbar",
     "retry": "Erneut versuchen",

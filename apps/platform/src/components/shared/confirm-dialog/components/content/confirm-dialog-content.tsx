@@ -14,6 +14,7 @@ export type TConfirmDialogContentProps = {
   description: ReactNode;
   confirmButtonLabel: ReactNode;
   confirmingButtonLabel: string;
+  isConfirmDisabled?: boolean;
   children?: ReactNode;
 };
 
@@ -22,6 +23,7 @@ export const ConfirmDialogContent = ({
   description,
   confirmButtonLabel,
   confirmingButtonLabel,
+  isConfirmDisabled = false,
   children,
 }: TConfirmDialogContentProps) => {
   const t = useTranslations('confirmDialog');
@@ -49,7 +51,8 @@ export const ConfirmDialogContent = ({
             variant={tone}
             onClick={confirm}
             isDisabled={
-              expectedValue !== undefined && confirmValue !== expectedValue
+              isConfirmDisabled ||
+              (expectedValue !== undefined && confirmValue !== expectedValue)
             }
             isPending={isPending}
             pendingLabel={confirmingButtonLabel}
