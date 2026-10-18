@@ -1,3 +1,5 @@
+'use client';
+
 import { SIZE } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
@@ -11,6 +13,7 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { contrastStatusTone } from '@platform/utils/status-tone/status-tone';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 
 import { RunContrastCheckButton } from '../run-contrast-check-button/run-contrast-check-button';
 
@@ -24,7 +27,20 @@ export type TReleaseContrastCardProps = {
   status: TContrastStatus;
 };
 
-export const ReleaseContrastCard = ({ status }: TReleaseContrastCardProps) => {
+const SERVER_AUTHORITATIVE_STATUSES: TContrastStatus[] = [
+  CONTRAST_STATUS.RUNNING,
+  CONTRAST_STATUS.GREEN,
+  CONTRAST_STATUS.FAILED,
+];
+
+export const ReleaseContrastCard = ({
+  status: serverStatus,
+}: TReleaseContrastCardProps) => {
+  const [hasStarted, setHasStarted] = useState(false);
+  const status =
+    hasStarted && !SERVER_AUTHORITATIVE_STATUSES.includes(serverStatus)
+      ? CONTRAST_STATUS.RUNNING
+      : serverStatus;
   const t = useTranslations('releaseContrastCard');
   const { body } = releaseContrastCardVariants();
 
@@ -36,6 +52,7 @@ export const ReleaseContrastCard = ({ status }: TReleaseContrastCardProps) => {
         actions={
           <RunContrastCheckButton
             isRunning={status === CONTRAST_STATUS.RUNNING}
+            onStarted={() => setHasStarted(true)}
           />
         }
       />

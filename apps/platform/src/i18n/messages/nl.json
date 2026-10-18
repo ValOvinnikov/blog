@@ -1074,7 +1074,7 @@
   "runContrastCheckButton": {
     "label": "Contrastcontrole uitvoeren",
     "starting": "Starten…",
-    "started": "Contrastcontrole gestart. Het kan even duren voordat hij hier als bezig verschijnt.",
+    "started": "Contrastcontrole gestart.",
     "alreadyRunning": "Er loopt al een contrastcontrole.",
     "githubUnavailable": "GitHub was niet bereikbaar. Probeer het zo opnieuw.",
     "startFailed": "De contrastcontrole kon niet worden gestart."

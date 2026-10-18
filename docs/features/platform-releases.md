@@ -76,9 +76,11 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   when that fails), then records `CONTRAST_CHECK_STARTED` on the `RELEASE`
   target with the HEAD sha as `targetId`. The event attests the dispatch
   request, not the workflow's outcome, and is written only after a successful
-  dispatch. The button is disabled while the status is `RUNNING` and after a
-  start until the page reloads; GitHub can take a moment to list the new run,
-  so the status can lag the click.
+  dispatch. Once the action succeeds the contrast
+  card shows `RUNNING` client-side straight away, without polling, even before
+  GitHub lists the run, and the button stays disabled. A later server render
+  that reports `RUNNING`, `GREEN` or `FAILED` takes over; the next page load
+  shows GitHub's status.
 - `POST /api/internal/contrast-result` — machine-only, Bearer
   `CONTRAST_RESULT_SECRET`. Records the posted result as the SHA's contrast
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or

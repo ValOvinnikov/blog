@@ -9,7 +9,7 @@ import {
 } from '@platform/server/releases/start-contrast-check-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 
 const REFUSAL_KEYS = {
   [ACTION_OUTCOME.BLOCKED]: 'alreadyRunning',
@@ -19,23 +19,24 @@ const REFUSAL_KEYS = {
 
 export type TRunContrastCheckButtonProps = {
   isRunning: boolean;
+  onStarted: () => void;
 };
 
 export const RunContrastCheckButton = ({
   isRunning,
+  onStarted,
 }: TRunContrastCheckButtonProps) => {
   const t = useTranslations('runContrastCheckButton');
   const toast = useToast();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [hasStarted, setHasStarted] = useState(false);
 
   const handleClick = () => {
     startTransition(async () => {
       const result = await startContrastCheckAction();
 
       if (result.outcome === ACTION_OUTCOME.SUCCESS) {
-        setHasStarted(true);
+        onStarted();
         toast.success({ message: t('started') });
         router.refresh();
         return;
@@ -49,7 +50,7 @@ export const RunContrastCheckButton = ({
     <Button
       variant="primary"
       size={SIZE.SM}
-      isDisabled={isRunning || hasStarted}
+      isDisabled={isRunning}
       isPending={isPending}
       pendingLabel={t('starting')}
       onClick={handleClick}

@@ -1074,7 +1074,7 @@
   "runContrastCheckButton": {
     "label": "Run contrast check",
     "starting": "Starting…",
-    "started": "Contrast check started. It can take a moment to show as running here.",
+    "started": "Contrast check started.",
     "alreadyRunning": "A contrast check is already running.",
     "githubUnavailable": "GitHub could not be reached. Try again in a moment.",
     "startFailed": "The contrast check could not be started."

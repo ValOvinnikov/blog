@@ -1074,7 +1074,7 @@
   "runContrastCheckButton": {
     "label": "Lancer la vérification du contraste",
     "starting": "Démarrage…",
-    "started": "Vérification du contraste lancée. Elle peut mettre un instant à apparaître ici comme en cours.",
+    "started": "Vérification du contraste lancée.",
     "alreadyRunning": "Une vérification du contraste est déjà en cours.",
     "githubUnavailable": "GitHub est injoignable. Réessayez dans un instant.",
     "startFailed": "La vérification du contraste n'a pas pu être lancée."

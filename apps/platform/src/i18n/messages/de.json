@@ -1074,7 +1074,7 @@
   "runContrastCheckButton": {
     "label": "Kontrastprüfung starten",
     "starting": "Wird gestartet…",
-    "started": "Kontrastprüfung gestartet. Es kann einen Moment dauern, bis sie hier als laufend erscheint.",
+    "started": "Kontrastprüfung gestartet.",
     "alreadyRunning": "Eine Kontrastprüfung läuft bereits.",
     "githubUnavailable": "GitHub war nicht erreichbar. Versuche es gleich noch einmal.",
     "startFailed": "Die Kontrastprüfung konnte nicht gestartet werden."
