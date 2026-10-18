@@ -1,6 +1,6 @@
 'use client';
 
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, type TActionOutcome } from '@blog/config';
 import {
   useSettingsForm,
   type TUseSettingsFormArgs,
@@ -22,7 +22,7 @@ import type { TUploadErrorState } from '@platform/utils/use-upload-error-text/us
 import { useState } from 'react';
 
 type TUseLookSaveArgs = Omit<
-  TUseSettingsFormArgs<TLookFormValues, { ok: boolean }>,
+  TUseSettingsFormArgs<TLookFormValues, { outcome: TActionOutcome }>,
   'onSubmit'
 > & {
   tenantId: string;
@@ -34,18 +34,23 @@ export const useLookSave = ({
 }: TUseLookSaveArgs) => {
   const [brandImageError, setBrandImageError] = useState<TUploadErrorState>();
 
-  const settings = useSettingsForm<TLookFormValues, { ok: boolean }>({
+  const settings = useSettingsForm<
+    TLookFormValues,
+    { outcome: TActionOutcome }
+  >({
     ...settingsArgs,
     onSubmit: async (vals) => {
       const { savedValues, setSavedValues, setValues } = settings;
       const savedImages: Partial<Record<TBrandAssetKind, TStagedImage>> = {};
 
-      const finish = (ok: boolean) => {
+      const finish = (outcome: TActionOutcome) => {
         setSavedValues((prev) =>
-          ok ? { ...vals, ...savedImages } : { ...prev, ...savedImages },
+          outcome === ACTION_OUTCOME.SUCCESS
+            ? { ...vals, ...savedImages }
+            : { ...prev, ...savedImages },
         );
         setValues((prev) => ({ ...prev, ...savedImages }));
-        return { ok };
+        return { outcome };
       };
 
       setBrandImageError(undefined);
@@ -62,7 +67,7 @@ export const useLookSave = ({
             operation: result.operation,
             kind,
           });
-          return finish(false);
+          return finish(result.failure.outcome);
         }
         savedImages[kind] = result.image;
       }
@@ -78,7 +83,7 @@ export const useLookSave = ({
         cardStyle: vals.cardStyle,
         languageSwitcherStyle: vals.languageSwitcherStyle,
       });
-      return finish(outcome === ACTION_OUTCOME.SUCCESS);
+      return finish(outcome);
     },
   });
 

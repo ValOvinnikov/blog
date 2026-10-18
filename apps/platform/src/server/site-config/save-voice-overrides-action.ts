@@ -1,15 +1,23 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE, VOICE_FIELDS } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  VOICE_FIELDS,
+  type TLocalizedActionResult,
+  type TVoiceFieldId,
+} from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import type { TVoiceFieldErrorReason } from '@platform/constants/voice';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
 import { logger } from '@platform/utils/logger/logger';
-import type { TVoiceFieldErrorsByLocale } from '@platform/utils/voice-draft/voice-draft';
+import { toVoiceFieldFailures } from '@platform/utils/voice-field-errors/voice-field-errors';
 import { z } from 'zod';
 
 const voiceFieldIdSchema = z.enum(VOICE_FIELDS.map(({ id }) => id));
@@ -19,15 +27,20 @@ const voiceOverridesByLocaleSchema = z.partialRecord(
   z.partialRecord(voiceFieldIdSchema, z.unknown()),
 );
 
-export type TSaveVoiceOverridesResult =
-  { ok: true } | { ok: false; fieldErrorsByLocale?: TVoiceFieldErrorsByLocale };
+export type TSaveVoiceOverridesResult = TLocalizedActionResult<
+  typeof ACTION_OUTCOME.SERVER_ERROR,
+  TVoiceFieldId,
+  TVoiceFieldErrorReason
+>;
 
 export const saveVoiceOverridesAction = async (
   tenantId: string,
   overridesByLocale: TVoiceOverridesByLocaleInput,
 ): Promise<TSaveVoiceOverridesResult> => {
   const parsed = voiceOverridesByLocaleSchema.safeParse(overridesByLocale);
-  if (!parsed.success) return { ok: false };
+  if (!parsed.success) {
+    return { outcome: ACTION_OUTCOME.INVALID, fieldErrorsByLocale: {} };
+  }
 
   const { tenant } = await requireTenantMembership(tenantId);
 
@@ -46,7 +59,10 @@ export const saveVoiceOverridesAction = async (
     });
 
     if (!result.ok) {
-      return { ok: false, fieldErrorsByLocale: result.fieldErrorsByLocale };
+      return {
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrorsByLocale: toVoiceFieldFailures(result.fieldErrorsByLocale),
+      };
     }
 
     await revalidateSiteConfig(tenant.id);
@@ -58,12 +74,12 @@ export const saveVoiceOverridesAction = async (
       details: { voiceOverridesByLocale: parsed.data },
     });
 
-    return { ok: true };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('site_config.voice_save_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { ok: false };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };

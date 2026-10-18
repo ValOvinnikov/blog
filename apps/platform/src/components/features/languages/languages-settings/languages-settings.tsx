@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
   ALERT_TYPE,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
@@ -17,7 +16,10 @@ import {
 import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { useToast } from '@platform/context/toast-provider';
-import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
+import {
+  updateTenantLanguagesAction,
+  type TUpdateTenantLanguagesResult,
+} from '@platform/server/tenants/update-tenant-languages-action';
 import { additionalLocalesToSave } from '@platform/utils/additional-locales-to-save/additional-locales-to-save';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -62,16 +64,14 @@ export const LanguagesSettings = ({
     isArchived,
     archivedNoticeId,
     form,
-  } = useSettingsForm<TLocaleIsoCode[], { ok: boolean }>({
+  } = useSettingsForm<TLocaleIsoCode[], TUpdateTenantLanguagesResult>({
     initialValues: live,
     archivedAt,
-    onSubmit: async (liveLocales) => {
-      const { outcome } = await updateTenantLanguagesAction(
+    onSubmit: (liveLocales) =>
+      updateTenantLanguagesAction(
         tenantId,
         additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
-      );
-      return { ok: outcome === ACTION_OUTCOME.SUCCESS };
-    },
+      ),
     onSuccess: (liveLocales) => {
       setSavedLocales(
         additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),

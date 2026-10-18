@@ -1,6 +1,10 @@
 'use client';
 
-import type { TMaybeUndefined, TVoiceFieldId } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  type TMaybeUndefined,
+  type TVoiceFieldId,
+} from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { useSettingsForm } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
@@ -22,6 +26,7 @@ import {
   type TVoiceFieldError,
   type TVoiceFieldErrorsByLocale,
 } from '@platform/utils/voice-draft/voice-draft';
+import { toVoiceFieldMessages } from '@platform/utils/voice-field-errors/voice-field-errors';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
@@ -83,7 +88,10 @@ export const useVoiceDraft = ({
         tenantId,
         toVoiceOverridesInput(draft, liveLocales),
       );
-      const errors = result.ok ? {} : (result.fieldErrorsByLocale ?? {});
+      const errors =
+        result.outcome === ACTION_OUTCOME.INVALID
+          ? toVoiceFieldMessages(result.fieldErrorsByLocale)
+          : {};
       setFieldErrors(errors);
       const [firstSaveError] = voiceErrorsInOrder(
         errors,

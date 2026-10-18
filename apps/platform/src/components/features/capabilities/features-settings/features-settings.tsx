@@ -1,6 +1,6 @@
 'use client';
 
-import { ACTION_OUTCOME, FORM_STATUS, type TCapability } from '@blog/config';
+import { FORM_STATUS, type TCapability } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import {
@@ -10,7 +10,10 @@ import {
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Switch } from '@platform/components/shared/switch';
 import { useToast } from '@platform/context/toast-provider';
-import { updateFeaturesAction } from '@platform/server/settings-features/update-features-action';
+import {
+  updateFeaturesAction,
+  type TUpdateFeaturesResult,
+} from '@platform/server/settings-features/update-features-action';
 import {
   CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
@@ -52,14 +55,10 @@ export const FeaturesSettings = ({
     isArchived,
     archivedNoticeId,
     form,
-  } = useSettingsForm<TSettingsFeaturesValues, { ok: boolean }>({
+  } = useSettingsForm<TSettingsFeaturesValues, TUpdateFeaturesResult>({
     initialValues,
     archivedAt,
-    onSubmit: async (vals) => ({
-      ok:
-        (await updateFeaturesAction(tenantId, vals)).outcome ===
-        ACTION_OUTCOME.SUCCESS,
-    }),
+    onSubmit: (vals) => updateFeaturesAction(tenantId, vals),
     onSuccess: () => {
       toast.success({
         message: t('alertSuccess'),

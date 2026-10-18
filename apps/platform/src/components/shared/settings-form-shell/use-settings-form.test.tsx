@@ -1,4 +1,4 @@
-import { FORM_STATUS } from '@blog/config';
+import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
@@ -8,7 +8,7 @@ import {
 } from './use-settings-form';
 
 type TValues = { name: string };
-type TResult = { ok: boolean };
+type TResult = { outcome: TActionOutcome };
 type TArgs = TUseSettingsFormArgs<TValues, TResult>;
 
 const SAVED: TValues = { name: faker.person.fullName() };
@@ -19,7 +19,7 @@ const renderSettingsForm = (overrides: Partial<TArgs> = {}) =>
     useSettingsForm<TValues, TResult>({
       initialValues: SAVED,
       archivedAt: undefined,
-      onSubmit: async () => ({ ok: true }),
+      onSubmit: async () => ({ outcome: ACTION_OUTCOME.SUCCESS }),
       countChanges: (values, savedValues) =>
         values.name === savedValues.name ? 0 : 1,
       draft: {
@@ -60,12 +60,14 @@ describe(useSettingsForm, () => {
     expect(isSaved).toBe(true);
     await waitFor(() => expect(result.current.savedValues).toEqual(EDITED));
     expect(result.current.form.changeCount).toBe(0);
-    expect(onSuccess).toHaveBeenCalledWith(EDITED, { ok: true });
+    expect(onSuccess).toHaveBeenCalledWith(EDITED, {
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
   });
 
   it('keeps the saved values when the save fails', async () => {
     const { result } = renderSettingsForm({
-      onSubmit: async () => ({ ok: false }),
+      onSubmit: async () => ({ outcome: ACTION_OUTCOME.SERVER_ERROR }),
     });
 
     const isSaved = await editAndSave(result);
@@ -81,7 +83,7 @@ describe(useSettingsForm, () => {
     const { result } = renderSettingsForm({
       onSubmit: async () => {
         result.current.setSavedValues(UPLOADED);
-        return { ok: true };
+        return { outcome: ACTION_OUTCOME.SUCCESS };
       },
     });
 
@@ -91,7 +93,9 @@ describe(useSettingsForm, () => {
   });
 
   it('does not submit while the values cannot be saved', async () => {
-    const onSubmit = vi.fn().mockResolvedValue({ ok: true });
+    const onSubmit = vi
+      .fn()
+      .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
     const { result } = renderSettingsForm({ onSubmit, canSave: () => false });
 
     const isSaved = await editAndSave(result);
