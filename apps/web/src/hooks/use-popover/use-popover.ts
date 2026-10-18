@@ -6,6 +6,7 @@ import { useCallback, useRef } from 'react';
 export type TUsePopoverOptions = {
   trapFocus?: boolean;
   closeOnFocusOut?: boolean;
+  overlayId?: string;
 };
 
 /**
@@ -15,6 +16,7 @@ export type TUsePopoverOptions = {
 export const usePopover = ({
   trapFocus,
   closeOnFocusOut,
+  overlayId,
 }: TUsePopoverOptions = {}) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -27,6 +29,7 @@ export const usePopover = ({
     getPanel,
     trapFocus,
     closeOnFocusOut,
+    overlayId,
   });
 
   return { open, toggle, close, triggerRef, panelRef };

@@ -15,9 +15,7 @@ import { useCallback, useRef } from 'react';
  *
  * `containerRef` also doubles as `useDismissibleMenu`'s `getContainer`, so
  * the outside-click check treats anything inside the whole container —
- * including sibling elements sharing it, like the always-visible `actions`
- * slot — as "inside," matching this hook's original (pre-shared-core)
- * container-wide scoping.
+ * including the always-visible `actions` slot — as "inside".
  */
 export const useMobileNavToggle = (panelId: string) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,6 +41,7 @@ export const useMobileNavToggle = (panelId: string) => {
     getTrigger,
     getPanel,
     getContainer,
+    overlayId: panelId,
   });
 
   return { open, toggle, close, containerRef };

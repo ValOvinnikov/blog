@@ -3,6 +3,7 @@
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import { headerControlVariants } from '@web/components/shared/header-control';
+import { ACCOUNT_OVERLAY_ID } from '@web/context/header-overlay-provider';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
 import { useSession } from 'next-auth/react';
@@ -23,7 +24,9 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
   const panelId = useId();
-  const { open, toggle, triggerRef, panelRef } = usePopover();
+  const { open, toggle, triggerRef, panelRef } = usePopover({
+    overlayId: ACCOUNT_OVERLAY_ID,
+  });
   const { loading, loadingPlaceholder, loadingStatus, signInTrigger } =
     authMenuVariants();
 

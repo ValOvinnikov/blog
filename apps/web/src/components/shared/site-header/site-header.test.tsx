@@ -100,7 +100,7 @@ describe(SiteHeader, () => {
       ).toBeVisible();
     });
 
-    it('puts the language pill and theme toggle in the open phone menu panel, leaving account in the bar', async () => {
+    it('puts the language pill and theme toggle in the open phone menu panel, and the account entry in its own row after them', async () => {
       await userEvent.click(
         screen.getByRole('button', { name: 'Toggle navigation menu' }),
       );
@@ -115,7 +115,85 @@ describe(SiteHeader, () => {
       expect(
         within(panelRow).queryByRole('button', { name: 'Sign in' }),
       ).not.toBeInTheDocument();
+      expect(
+        within(
+          screen.getByTestId('primary-navigation-drawer-actions'),
+        ).getByRole('button', { name: 'Sign in' }),
+      ).toBeVisible();
     });
+
+    it('closes the open language menu when the sign-in panel opens', async () => {
+      const user = userEvent.setup();
+
+      await user.click(
+        screen.getAllByRole('button', { name: 'Language: English' })[0]!,
+      );
+      expect(screen.getByRole('menu', { name: 'Language' })).toBeVisible();
+
+      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+
+      expect(screen.getAllByRole('menu')).toHaveLength(1);
+      expect(
+        screen.getByRole('menu', { name: 'Sign in options' }),
+      ).toBeVisible();
+    });
+  });
+
+  describe('the phone menu account row', () => {
+    beforeEach(async () => {
+      await setup();
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Toggle navigation menu' }),
+      );
+    });
+
+    it('closes the menu and opens the sign-in panel with focus on its first item', async () => {
+      await userEvent.click(
+        within(
+          screen.getByTestId('primary-navigation-drawer-actions'),
+        ).getByRole('button', { name: 'Sign in' }),
+      );
+
+      expect(
+        screen.getByTestId('primary-navigation-mobile-panel'),
+      ).not.toBeVisible();
+      expect(
+        screen.getByRole('menuitem', { name: 'Continue with GitHub' }),
+      ).toHaveFocus();
+    });
+
+    it('returns focus to the bar control when Escape closes the panel', async () => {
+      await userEvent.click(
+        within(
+          screen.getByTestId('primary-navigation-drawer-actions'),
+        ).getByRole('button', { name: 'Sign in' }),
+      );
+      await userEvent.keyboard('{Escape}');
+
+      expect(
+        screen.queryByRole('menu', { name: 'Sign in options' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Sign in' })).toHaveFocus();
+    });
+  });
+
+  it('labels the phone menu account row "Account" for a signed-in reader', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { name: 'Ada Lovelace', email: 'ada@example.com' } },
+      status: 'authenticated',
+    });
+    await setup();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Toggle navigation menu' }),
+    );
+
+    expect(
+      within(screen.getByTestId('primary-navigation-drawer-actions')).getByRole(
+        'button',
+        { name: 'Account' },
+      ),
+    ).toBeVisible();
   });
 
   it('hides the language switcher when its toggle is off', async () => {

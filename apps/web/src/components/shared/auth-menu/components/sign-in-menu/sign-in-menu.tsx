@@ -60,6 +60,7 @@ export const SignInMenu = ({
     errorNotice,
     emailForm,
     emailFormActions,
+    sendButton,
     emailHint,
     emailSent,
   } = signInMenuVariants();
@@ -168,6 +169,7 @@ export const SignInMenu = ({
             <div className={emailFormActions()}>
               <Button
                 size={SIZE.SM}
+                className={sendButton()}
                 isDisabled={emailStep === 'submitting'}
                 onClick={handleEmailSubmit}
               >
