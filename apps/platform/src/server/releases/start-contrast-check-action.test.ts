@@ -1,7 +1,14 @@
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TMaybeNull,
+} from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
+import { makeAdmin } from '@platform/testing/admins/fixtures';
 import type { Session } from 'next-auth';
 
 const {
@@ -42,7 +49,7 @@ vi.mock('@blog/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 describe('startContrastCheckAction', () => {
   let startContrastCheckAction: (typeof import('./start-contrast-check-action'))['startContrastCheckAction'];
@@ -50,7 +57,9 @@ describe('startContrastCheckAction', () => {
 
   beforeEach(async () => {
     headSha = faker.git.commitSha();
-    requireSuperAdminMock.mockReset().mockResolvedValue({ role: 'SUPERADMIN' });
+    requireSuperAdminMock
+      .mockReset()
+      .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     authMock.mockReset().mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
     });

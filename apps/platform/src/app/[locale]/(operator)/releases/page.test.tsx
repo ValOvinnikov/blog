@@ -1,3 +1,5 @@
+import { ADMIN_ROLE } from '@blog/db/constants';
+import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeReleaseCandidate } from '@platform/testing/releases/fixtures';
 
@@ -26,7 +28,9 @@ const setup = customRenderAsync(ReleasesPage, {});
 
 describe(ReleasesPage, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue({ role: 'SUPERADMIN' });
+    requireSuperAdminMock
+      .mockReset()
+      .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     getReleaseCandidateMock.mockReset();
   });
 

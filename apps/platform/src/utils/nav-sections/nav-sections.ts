@@ -1,9 +1,10 @@
-import { ICONS } from '@blog/config';
-import { ADMIN_ROLE, type TAdminRole } from '@blog/db/constants';
+import { ICONS, type TMaybeUndefined } from '@blog/config';
+import type { TAdminRole } from '@blog/db/constants';
 import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
+import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type {
   TPlanPage,
@@ -33,7 +34,7 @@ export const operatorNavSections = (
         icon: ICONS.WARNING,
         href: adminRoutes.findings(),
       },
-      ...(role === ADMIN_ROLE.SUPERADMIN
+      ...(isSuperAdmin({ role })
         ? [
             {
               label: t('releases'),
@@ -225,7 +226,7 @@ const isNavItemFor = (href: string, pathname: string) =>
 export const navLabelForPathname = (
   sections: TSidebarNavSection[],
   pathname: string,
-): string | undefined =>
+): TMaybeUndefined<string> =>
   sections
     .flatMap((section) => section.items)
     .find(
