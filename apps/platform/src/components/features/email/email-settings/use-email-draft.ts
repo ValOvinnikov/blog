@@ -32,7 +32,7 @@ import { useState } from 'react';
 
 type TUseEmailDraftArgs = Omit<
   TUseSettingsFormArgs<TEmailDraft, { ok: boolean }>,
-  'initialValues' | 'onSubmit' | 'onSuccess' | 'invalidFields'
+  'initialValues' | 'onSubmit' | 'onSuccess' | 'invalidControls'
 > & {
   tenantId: string;
   initialDraft: TEmailDraft;
@@ -63,7 +63,7 @@ export const useEmailDraft = ({
   const settings = useSettingsForm<TEmailDraft, { ok: boolean }>({
     ...settingsArgs,
     initialValues: initialDraft,
-    invalidFields: () => ({
+    invalidControls: () => ({
       ids: [
         ...(senderFieldErrors.senderName ? [senderFieldIds.senderName] : []),
         ...(senderFieldErrors.contactRecipient

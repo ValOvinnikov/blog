@@ -1,13 +1,16 @@
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, RELEASE_CHANGE, type TMaybeUndefined } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
+import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 import type { TReleaseResult } from '@platform/server/releases/release-result';
+import { isReleaseOverrideRequired } from '@platform/utils/release-state/release-state';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
 import { ReleaseAreasCard } from './components/release-areas-card/release-areas-card';
+import { ReleaseCard } from './components/release-card/release-card';
 import { ReleaseCommits } from './components/release-commits/release-commits';
 import { ReleaseContrastCard } from './components/release-contrast-card/release-contrast-card';
 import { ReleaseSummaryCard } from './components/release-summary-card/release-summary-card';
@@ -21,9 +24,10 @@ const releasesViewVariants = tv({
 
 export type TReleasesViewProps = {
   result: TReleaseResult<TReleaseCandidate>;
+  releaseRun: TReleaseResult<TMaybeUndefined<TReleaseRun>>;
 };
 
-export const ReleasesView = ({ result }: TReleasesViewProps) => {
+export const ReleasesView = ({ result, releaseRun }: TReleasesViewProps) => {
   const t = useTranslations('releasesView');
   const { root } = releasesViewVariants();
 
@@ -75,6 +79,16 @@ export const ReleasesView = ({ result }: TReleasesViewProps) => {
           <ReleaseContrastCard status={contrastStatus} />
         </>
       )}
+      <ReleaseCard
+        lastTag={lastTag}
+        hasChanges={totalCommits > 0}
+        migrations={migrations}
+        isOverrideRequired={isReleaseOverrideRequired({
+          isRenderingChanged: changes[RELEASE_CHANGE.RENDERING],
+          contrastStatus,
+        })}
+        releaseRun={releaseRun}
+      />
     </div>
   );
 };

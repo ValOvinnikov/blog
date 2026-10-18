@@ -44,7 +44,7 @@ const formFor = (
   discard: vi.fn(),
   changeCount: 0,
   changesByLanguage: [],
-  invalidFields: undefined,
+  invalidControls: undefined,
   isPending: false,
   isArchived: Boolean(overrides.archivedAt),
   archivedAt: undefined,

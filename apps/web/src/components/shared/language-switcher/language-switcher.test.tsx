@@ -51,6 +51,16 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     );
   });
 
+  it('links from the unprefixed path on the default locale', async () => {
+    setup({ currentLocale: EN });
+    await openMenu('Language: English');
+    const menu = screen.getByRole('menu', { name: 'Language' });
+
+    expect(
+      within(menu).getByRole('menuitem', { name: 'Nederlands' }),
+    ).toHaveAttribute('href', '/api/switch-language?to=NL&from=%2Fblog');
+  });
+
   describe('menu with code', () => {
     beforeEach(() => {
       setup();

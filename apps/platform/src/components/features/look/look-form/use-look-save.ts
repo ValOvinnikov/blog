@@ -1,5 +1,6 @@
 'use client';
 
+import { ACTION_OUTCOME } from '@blog/config';
 import {
   useSettingsForm,
   type TUseSettingsFormArgs,
@@ -66,7 +67,7 @@ export const useLookSave = ({
         savedImages[kind] = result.image;
       }
 
-      const result = await updateLookAction(tenantId, {
+      const { outcome } = await updateLookAction(tenantId, {
         preset: vals.preset,
         accentHue: vals.accentHue,
         logoHue: vals.logoHue ?? null,
@@ -77,7 +78,7 @@ export const useLookSave = ({
         cardStyle: vals.cardStyle,
         languageSwitcherStyle: vals.languageSwitcherStyle,
       });
-      return finish(result.ok);
+      return finish(outcome === ACTION_OUTCOME.SUCCESS);
     },
   });
 

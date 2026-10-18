@@ -1,6 +1,6 @@
 'use client';
 
-import { FORM_STATUS, type TCapability } from '@blog/config';
+import { ACTION_OUTCOME, FORM_STATUS, type TCapability } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import {
@@ -55,7 +55,11 @@ export const FeaturesSettings = ({
   } = useSettingsForm<TSettingsFeaturesValues, { ok: boolean }>({
     initialValues,
     archivedAt,
-    onSubmit: (vals) => updateFeaturesAction(tenantId, vals),
+    onSubmit: async (vals) => ({
+      ok:
+        (await updateFeaturesAction(tenantId, vals)).outcome ===
+        ACTION_OUTCOME.SUCCESS,
+    }),
     onSuccess: () => {
       toast.success({
         message: t('alertSuccess'),

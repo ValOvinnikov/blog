@@ -3,6 +3,7 @@ name: Deploy Production
 on:
   push:
     tags: ['v*']
+  workflow_call:
 
 permissions:
   contents: read
@@ -22,36 +23,16 @@ env:
   # no `build` script — so these are a fallback rather than load-bearing.
   SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
   SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
-  # Vercel Remote Cache — lets verify replay task artifacts already built by PR
-  # CI instead of rebuilding. No-op until TURBO_TOKEN/TURBO_TEAM are configured.
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
-  # A tag can point at ANY commit with no PR gate, so re-run the full suite on
-  # the exact tagged commit before anything is promoted to production.
-  verify:
-    name: Verify
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Type-check
-        run: pnpm type-check
-      - name: Lint
-        run: pnpm lint
-      - name: Test
-        run: pnpm test
-      - name: Build
-        run: pnpm build
-        env:
-          SKIP_ENV_VALIDATION: 'true'
+  # Every deploy job needs this with no `if:` of its own, so a failed or
+  # skipped gate skips the deploy rather than letting it through.
+  full-gate:
+    name: Full gate
+    # Inherited rather than listed, as in full-gate.yml: ci.yml's Required env
+    # matrix checks every secret marked `@env-required`.
+    uses: ./.github/workflows/full-gate.yml # zizmor: ignore[secrets-inherit]
+    secrets: inherit
 
   # Apply any un-applied content migrations to production BEFORE new code is
   # served. `environment: production` gates this on the required reviewer (the
@@ -62,7 +43,7 @@ jobs:
   # backup that would make it recoverable skipped too.
   migrate:
     name: Migrate prod content
-    needs: verify
+    needs: full-gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -124,7 +105,7 @@ jobs:
   # Postgres), so only those two `need` this job below.
   migrate-db:
     name: Migrate prod database
-    needs: verify
+    needs: full-gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -221,7 +202,7 @@ jobs:
 
   deploy-web:
     name: Deploy prod web
-    needs: [verify, migrate, migrate-db]
+    needs: [full-gate, migrate, migrate-db]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
@@ -262,7 +243,7 @@ jobs:
 
   deploy-admin:
     name: Deploy prod admin
-    needs: [verify, migrate-db]
+    needs: [full-gate, migrate-db]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production

@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   CARD_STYLE,
@@ -12,6 +13,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -35,14 +37,19 @@ const updateLookInputSchema = z.object({
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;
-export type TUpdateLookResult = { ok: true } | { ok: false };
+export type TUpdateLookResult = TActionResult<
+  typeof ACTION_OUTCOME.SERVER_ERROR,
+  keyof TUpdateLookInput
+>;
 
 export const updateLookAction = async (
   tenantId: string,
   input: TUpdateLookInput,
 ): Promise<TUpdateLookResult> => {
   const parsed = updateLookInputSchema.safeParse(input);
-  if (!parsed.success) return { ok: false };
+  if (!parsed.success) {
+    return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
+  }
 
   const { tenant } = await requireTenantMembership(tenantId);
 
@@ -56,12 +63,12 @@ export const updateLookAction = async (
       targetId: tenant.id,
       details: parsed.data,
     });
-    return { ok: true };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('site_config.look_save_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { ok: false };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };

@@ -12,7 +12,7 @@ import { saveBarVariants } from './save-bar-variants';
 const FIELD_CONTROL =
   'input:not([type="hidden"]), select, textarea, button, [tabindex]:not([tabindex="-1"])';
 
-export type TInvalidFields = {
+export type TInvalidControls = {
   ids: string[];
   revealFirst?: () => void;
 };
@@ -20,7 +20,7 @@ export type TInvalidFields = {
 export type TSaveBarProps = {
   changeCount: number;
   breakdown: string;
-  invalidFields: TInvalidFields;
+  invalidControls: TInvalidControls;
   isPending: boolean;
   onSave: () => void;
   onDiscard: () => void;
@@ -29,15 +29,15 @@ export type TSaveBarProps = {
 export const SaveBar = ({
   changeCount,
   breakdown,
-  invalidFields,
+  invalidControls,
   isPending,
   onSave,
   onDiscard,
 }: TSaveBarProps) => {
   const t = useTranslations('saveBar');
-  const { ids: invalidFieldIds, revealFirst } = invalidFields;
-  const [firstInvalidFieldId] = invalidFieldIds;
-  const hasErrors = firstInvalidFieldId !== undefined;
+  const { ids: invalidControlIds, revealFirst } = invalidControls;
+  const [firstInvalidControlId] = invalidControlIds;
+  const hasErrors = firstInvalidControlId !== undefined;
   const {
     root,
     summary,
@@ -51,10 +51,10 @@ export const SaveBar = ({
   } = saveBarVariants({ hasErrors });
 
   const goToFirstField = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (firstInvalidFieldId === undefined) return;
+    if (firstInvalidControlId === undefined) return;
     event.preventDefault();
     if (revealFirst) flushSync(revealFirst);
-    const target = document.getElementById(firstInvalidFieldId);
+    const target = document.getElementById(firstInvalidControlId);
     target?.focus({ preventScroll: true });
     if (target && !target.contains(document.activeElement)) {
       target
@@ -71,10 +71,10 @@ export const SaveBar = ({
           <>
             <Icon name={ICONS.WARNING} />
             <span className={count()}>
-              {t('fieldsNeedAttention', { count: invalidFieldIds.length })}
+              {t('fieldsNeedAttention', { count: invalidControlIds.length })}
             </span>
             <a
-              href={`#${firstInvalidFieldId}`}
+              href={`#${firstInvalidControlId}`}
               onClick={goToFirstField}
               className={errorLink()}
             >

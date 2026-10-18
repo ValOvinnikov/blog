@@ -1093,6 +1093,58 @@
     "githubUnavailable": "GitHub est injoignable. Réessayez dans un instant.",
     "startFailed": "La vérification du contraste n'a pas pu être lancée."
   },
+  "releaseCard": {
+    "title": "Version",
+    "description": "Publiez en production le dernier commit de main.",
+    "started": "Version lancée.",
+    "runningHint": "Une version est en cours.",
+    "nothingToReleaseHint": "Rien n’a changé depuis {lastTag}.",
+    "empty": "Aucune version n’a encore été lancée.",
+    "unavailableTitle": "L’état de la version est indisponible",
+    "unavailableDescription": "GitHub est injoignable, la dernière exécution n’est donc pas affichée."
+  },
+  "releaseRunStatus": {
+    "status": {
+      "DISPATCHED": "Demandée",
+      "RUNNING": "En cours",
+      "SUCCEEDED": "Réussie",
+      "FAILED": "Échouée"
+    },
+    "explanation": {
+      "DISPATCHED": "GitHub a accepté la version et va la lancer.",
+      "RUNNING": "La version est en cours : les contrôles, les migrations, le tag, puis le déploiement.",
+      "SUCCEEDED": "La version est terminée et la production est déployée.",
+      "FAILED": "La version a échoué, et les étapes suivant l’échec n’ont pas été exécutées."
+    },
+    "tenantMigrationFailedTitle": "La migration d’un client a échoué",
+    "tenantMigrationFailedDescription": "Le déploiement n’a pas eu lieu, le site en ligne est donc inchangé. Relancez ce client avec « Lancer les migrations des clients » sur cette page.",
+    "viewRun": "Voir l’exécution"
+  },
+  "startReleaseDialog": {
+    "trigger": "Publier",
+    "overrideTrigger": "Publier avec dérogation",
+    "title": "Publier en production",
+    "description": "Cela contrôle le dernier commit de main, exécute ses migrations, le tague et le déploie en production.",
+    "overrideTitle": "Le contrôle de contraste n’est pas réussi",
+    "overrideDescription": "Le rendu a changé et le contrôle de contraste n’est pas réussi. Publier quand même enregistre votre motif avec votre compte.",
+    "versionLabel": "Version",
+    "versionHint": "Supérieure à la dernière version, {lastTag}. Par exemple v1.2.3.",
+    "migrations": "{contentMigrations, plural, =0 {Aucune migration de contenu} one {# migration de contenu sur {tenants, plural, one {# projet} other {# projets}}} other {# migrations de contenu sur {tenants, plural, one {# projet} other {# projets}}}}, {dbMigrations, plural, =0 {aucune migration de base de données} one {# migration de base de données} other {# migrations de base de données}}.",
+    "migrationsMinimum": "Au moins {contentMigrations, plural, =0 {aucune migration de contenu} one {# migration de contenu sur {tenants, plural, one {# projet} other {# projets}}} other {# migrations de contenu sur {tenants, plural, one {# projet} other {# projets}}}}, et au moins {dbMigrations, plural, =0 {aucune migration de base de données} one {# migration de base de données} other {# migrations de base de données}}.",
+    "reasonLabel": "Motif pour publier quand même",
+    "reasonHint": "Enregistré dans le journal d’audit avec votre nom.",
+    "confirm": "Lancer la version",
+    "confirming": "Lancement…",
+    "fieldError": {
+      "VERSION_MALFORMED": "Saisissez une version comme v1.2.3. La dernière version est {lastTag}.",
+      "VERSION_NOT_GREATER": "La version doit être supérieure à la dernière, {lastTag}.",
+      "REASON_REQUIRED": "Indiquez pourquoi vous publiez sans contrôle de contraste réussi."
+    },
+    "alreadyRunning": "Une version est déjà en cours.",
+    "githubUnavailable": "GitHub est injoignable, rien n’a donc été lancé. Réessayez dans un instant.",
+    "invalid": "Vérifiez la version et le motif, puis réessayez.",
+    "startFailed": "GitHub n’a pas accepté la version, rien n’a donc été lancé."
+  },
   "releaseUnavailable": {
     "title": "Les informations de version sont indisponibles",
     "retry": "Réessayer",

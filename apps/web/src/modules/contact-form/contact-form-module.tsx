@@ -1,5 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
+import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
@@ -13,7 +14,11 @@ export interface IContactFormModuleProps {
 }
 
 export const ContactFormModule = async ({ id }: IContactFormModuleProps) => {
-  const [{ sanityContext }, isEnabled, tenant] = await Promise.all([
+  const [
+    { sanityContext, locale, defaultLocale = routing.defaultLocale },
+    isEnabled,
+    tenant,
+  ] = await Promise.all([
     getRequestContext(),
     isCapabilityEnabled(CAPABILITY.CONTACT_FORM),
     resolveRequestTenant(),
@@ -33,5 +38,12 @@ export const ContactFormModule = async ({ id }: IContactFormModuleProps) => {
     return null;
   }
 
-  return <ContactFormModuleView id={id} {...result.data} />;
+  return (
+    <ContactFormModuleView
+      id={id}
+      currentLocale={locale}
+      defaultLocale={defaultLocale}
+      {...result.data}
+    />
+  );
 };

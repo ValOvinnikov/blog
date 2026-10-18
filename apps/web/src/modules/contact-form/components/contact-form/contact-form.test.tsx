@@ -1,9 +1,9 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { FIELD_ERROR } from '@web/constants/field-error';
+import { usePathname } from '@web/i18n/navigation';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
-import { usePathname } from 'next/navigation';
 
 import { ContactForm } from './contact-form';
 
@@ -16,7 +16,9 @@ vi.mock(
   () => ({ submitContactMessage: submitContactMessageMock }),
 );
 
-vi.mock('next/navigation', () => ({ usePathname: vi.fn() }));
+vi.mock('@web/i18n/navigation');
+
+const { EN, NL } = LOCALE_ISO_CODES;
 
 const SUCCESS_MESSAGE = faker.lorem.sentence();
 const NAME = faker.person.fullName();
@@ -25,7 +27,11 @@ const MESSAGE = faker.lorem.sentences(2);
 const PRIVACY_NOTE = faker.lorem.sentence();
 const PATHNAME = `/${faker.lorem.slug()}`;
 
-const setup = customRender(ContactForm, { successMessage: SUCCESS_MESSAGE });
+const setup = customRender(ContactForm, {
+  successMessage: SUCCESS_MESSAGE,
+  currentLocale: EN,
+  defaultLocale: EN,
+});
 
 const fillAndSend = async (user: UserEvent) => {
   const nameField = screen.getByRole('textbox', { name: 'Name' });
@@ -62,6 +68,22 @@ describe(`<${ContactForm.name}/>`, () => {
       website: '',
       sourcePath: PATHNAME,
     });
+  });
+
+  it('sends the public path with the locale prefix from a prerendered page', async () => {
+    submitContactMessageMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
+    vi.mocked(usePathname).mockReturnValue(
+      '/0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee/NL/contact',
+    );
+    setup({ currentLocale: NL });
+
+    await fillAndSend(user);
+
+    expect(submitContactMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sourcePath: '/nl/contact' }),
+    );
   });
 
   it('replaces the form with the success message once sent', async () => {

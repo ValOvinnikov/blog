@@ -1,48 +1,73 @@
-import type { TMaybeUndefined } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  type TFieldErrors,
+  type TMaybeUndefined,
+  type TReasonedFailure,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_REFUSAL,
+  type TTenantFieldErrorReason,
+  type TTenantRefusal,
+} from '@platform/constants/tenant';
 import { z } from 'zod';
-
-import type { TTenantLifecycleErrorReason } from './tenant-lifecycle-result';
 
 export const confirmTenantInputSchema = z.object({
   confirm: z.string().trim().min(1),
 });
 
+export type TConfirmTenantField = keyof z.input<
+  typeof confirmTenantInputSchema
+>;
+
 type TResolveConfirmedTenantOptions<
-  TPreconditionReason extends TTenantLifecycleErrorReason,
+  TPreconditionRefusal extends TTenantRefusal,
 > = {
-  precondition?: (tenant: TTenant) => TMaybeUndefined<TPreconditionReason>;
+  precondition?: (tenant: TTenant) => TMaybeUndefined<TPreconditionRefusal>;
 };
 
 export type TResolveConfirmedTenantResult<
-  TPreconditionReason extends TTenantLifecycleErrorReason,
+  TPreconditionRefusal extends TTenantRefusal,
 > =
-  | { ok: true; tenant: TTenant }
-  | { ok: false; reason: 'notFound' | 'nameMismatch' | TPreconditionReason };
+  | { outcome: typeof ACTION_OUTCOME.SUCCESS; tenant: TTenant }
+  | {
+      outcome: typeof ACTION_OUTCOME.INVALID;
+      fieldErrors: TFieldErrors<TConfirmTenantField, TTenantFieldErrorReason>;
+    }
+  | ({ outcome: typeof ACTION_OUTCOME.REFUSED } & TReasonedFailure<
+      typeof TENANT_REFUSAL.NOT_FOUND | TPreconditionRefusal
+    >);
 
 export const resolveConfirmedTenant = async <
-  TPreconditionReason extends TTenantLifecycleErrorReason = never,
+  TPreconditionRefusal extends TTenantRefusal = never,
 >(
   tenantId: string,
   confirm: string,
-  { precondition }: TResolveConfirmedTenantOptions<TPreconditionReason> = {},
-): Promise<TResolveConfirmedTenantResult<TPreconditionReason>> => {
+  { precondition }: TResolveConfirmedTenantOptions<TPreconditionRefusal> = {},
+): Promise<TResolveConfirmedTenantResult<TPreconditionRefusal>> => {
   const tenant = await queries.tenants.getTenantById(tenantId, {
     includeArchived: true,
   });
   if (!tenant) {
-    return { ok: false, reason: 'notFound' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    };
   }
 
-  const preconditionReason = precondition?.(tenant);
-  if (preconditionReason) {
-    return { ok: false, reason: preconditionReason };
+  const preconditionRefusal = precondition?.(tenant);
+  if (preconditionRefusal) {
+    return { outcome: ACTION_OUTCOME.REFUSED, reason: preconditionRefusal };
   }
 
   if (confirm !== tenant.name) {
-    return { ok: false, reason: 'nameMismatch' };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
+    };
   }
 
-  return { ok: true, tenant };
+  return { outcome: ACTION_OUTCOME.SUCCESS, tenant };
 };

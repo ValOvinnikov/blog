@@ -9,7 +9,6 @@ import {
 import {
   CONTRAST_WORKFLOW_FILE,
   RELEASE_REFUSAL,
-  type TReleaseRefusal,
 } from '@platform/constants/release';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -24,7 +23,7 @@ export type TStartContrastCheckResult = TActionResult<
   | typeof ACTION_OUTCOME.SERVER_ERROR,
   never,
   never,
-  TReleaseRefusal
+  typeof RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING
 >;
 
 /** The audit event attests the dispatch request, not the workflow's outcome. */

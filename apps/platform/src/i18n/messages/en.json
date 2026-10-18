@@ -1093,6 +1093,58 @@
     "githubUnavailable": "GitHub could not be reached. Try again in a moment.",
     "startFailed": "The contrast check could not be started."
   },
+  "releaseCard": {
+    "title": "Release",
+    "description": "Cut a production release of the latest commit on main.",
+    "started": "Release started.",
+    "runningHint": "A release is running.",
+    "nothingToReleaseHint": "Nothing has changed since {lastTag}.",
+    "empty": "No release has run yet.",
+    "unavailableTitle": "Release status is unavailable",
+    "unavailableDescription": "GitHub could not be reached, so the latest release run is not shown."
+  },
+  "releaseRunStatus": {
+    "status": {
+      "DISPATCHED": "Dispatched",
+      "RUNNING": "Running",
+      "SUCCEEDED": "Succeeded",
+      "FAILED": "Failed"
+    },
+    "explanation": {
+      "DISPATCHED": "GitHub has accepted the release and is about to start it.",
+      "RUNNING": "The release is running: the gate, the migrations, the tag, then the deploy.",
+      "SUCCEEDED": "The release finished and production is deployed.",
+      "FAILED": "The release failed, and the steps after the failure did not run."
+    },
+    "tenantMigrationFailedTitle": "A tenant migration failed",
+    "tenantMigrationFailedDescription": "The deploy did not run, so the live site is unchanged. Retry that tenant with Run tenant migrations on this page.",
+    "viewRun": "View the run"
+  },
+  "startReleaseDialog": {
+    "trigger": "Release",
+    "overrideTrigger": "Release with override",
+    "title": "Release to production",
+    "description": "This gates the latest commit on main, runs its migrations, tags it and deploys it to production.",
+    "overrideTitle": "The contrast check has not passed",
+    "overrideDescription": "Rendering changed and the contrast check has not passed. Releasing anyway records your reason against your account.",
+    "versionLabel": "Version",
+    "versionHint": "Greater than the last release, {lastTag}. For example v1.2.3.",
+    "migrations": "{contentMigrations, plural, =0 {No content migrations} one {# content migration across {tenants, plural, one {# project} other {# projects}}} other {# content migrations across {tenants, plural, one {# project} other {# projects}}}}, {dbMigrations, plural, =0 {no database migrations} one {# database migration} other {# database migrations}}.",
+    "migrationsMinimum": "At least {contentMigrations, plural, =0 {no content migrations} one {# content migration across {tenants, plural, one {# project} other {# projects}}} other {# content migrations across {tenants, plural, one {# project} other {# projects}}}}, and at least {dbMigrations, plural, =0 {no database migrations} one {# database migration} other {# database migrations}}.",
+    "reasonLabel": "Reason for releasing anyway",
+    "reasonHint": "Stored in the audit log with your name.",
+    "confirm": "Start release",
+    "confirming": "Starting…",
+    "fieldError": {
+      "VERSION_MALFORMED": "Enter a version like v1.2.3. The last release is {lastTag}.",
+      "VERSION_NOT_GREATER": "The version must be greater than the last release, {lastTag}.",
+      "REASON_REQUIRED": "Say why you are releasing without a passing contrast check."
+    },
+    "alreadyRunning": "A release is already running.",
+    "githubUnavailable": "GitHub could not be reached, so nothing was started. Try again in a moment.",
+    "invalid": "Check the version and the reason, then try again.",
+    "startFailed": "GitHub did not accept the release, so nothing was started."
+  },
   "releaseUnavailable": {
     "title": "Release information is unavailable",
     "retry": "Try again",

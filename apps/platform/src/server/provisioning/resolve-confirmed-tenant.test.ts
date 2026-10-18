@@ -1,3 +1,6 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+
 const { getTenantByIdMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
 }));
@@ -27,27 +30,33 @@ describe('resolveConfirmedTenant', () => {
     expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
       includeArchived: true,
     });
-    expect(result).toEqual({ ok: true, tenant });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
   });
 
   it('refuses an unknown tenant before running the precondition', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
-    const precondition = vi.fn(() => 'notDeprovisioned' as const);
+    const precondition = vi.fn(() => TENANT_REFUSAL.NOT_DEPROVISIONED);
 
     const result = await resolveConfirmedTenant('ghost', 'Acme', {
       precondition,
     });
 
     expect(precondition).not.toHaveBeenCalled();
-    expect(result).toEqual({ ok: false, reason: 'notFound' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
   });
 
   it('reports a failed precondition ahead of a name mismatch', async () => {
     const result = await resolveConfirmedTenant('tenant-1', 'wrong', {
-      precondition: () => 'notDeprovisioned',
+      precondition: () => TENANT_REFUSAL.NOT_DEPROVISIONED,
     });
 
-    expect(result).toEqual({ ok: false, reason: 'notDeprovisioned' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_DEPROVISIONED,
+    });
   });
 
   it('checks the name once the precondition passes', async () => {
@@ -55,6 +64,9 @@ describe('resolveConfirmedTenant', () => {
       precondition: () => undefined,
     });
 
-    expect(result).toEqual({ ok: false, reason: 'nameMismatch' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
+    });
   });
 });

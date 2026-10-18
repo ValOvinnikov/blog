@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { makeClientTenant } from '@platform/testing/tenants/fixtures';
@@ -28,7 +30,9 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     reactivateTenantActionMock.mockReset();
-    reactivateTenantActionMock.mockResolvedValue({ ok: true });
+    reactivateTenantActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     refreshMock.mockReset();
     mockRouterRefresh(refreshMock);
   });
@@ -77,8 +81,8 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
 
   it('shows the error message inline and never refreshes when the action fails', async () => {
     reactivateTenantActionMock.mockResolvedValue({
-      ok: false,
-      reason: 'alreadyInProgress',
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
     });
     setup();
 

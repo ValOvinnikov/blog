@@ -3,7 +3,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { useState, useTransition } from 'react';
 
-type TConfirmDialogActionResult = { ok: true } | { ok: false; error: string };
+type TConfirmDialogActionResult = { ok: true } | { ok: false; error?: string };
 
 export type TUseConfirmDialogArgs = {
   onConfirm: (confirmValue: string) => Promise<TConfirmDialogActionResult>;
