@@ -125,4 +125,23 @@ describe('sanitize-svg-markup module', () => {
     await freshSanitize('<svg viewBox="0 0 24 24"></svg>');
     expect(loadJsdom).toHaveBeenCalledOnce();
   });
+
+  it('retries loading the sanitiser after a failed load', async () => {
+    let attempts = 0;
+    vi.resetModules();
+    vi.doMock('jsdom-commonjs', async (importOriginal) => {
+      attempts += 1;
+      if (attempts === 1) {
+        throw new Error('jsdom failed to load');
+      }
+      return importOriginal();
+    });
+
+    const { sanitizeSvgMarkup: freshSanitize } =
+      await import('./sanitize-svg-markup');
+    const markup = '<svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z"/></svg>';
+
+    await expect(freshSanitize(markup)).rejects.toThrow();
+    await expect(freshSanitize(markup)).resolves.toContain('<path');
+  });
 });
