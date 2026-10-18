@@ -370,6 +370,46 @@ export const IconMedia: TStory = {
   },
 };
 
+const iconImageBesideIconTile = (align: 'left' | 'center'): TStory => ({
+  args: {
+    align,
+    excerpt: shortExcerpt,
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="icon" align={align}>
+          <Icon name={ICONS.ROCKET} size={SIZE.MD} />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+  render: (args) => (
+    <div className="grid max-w-3xl grid-cols-2 gap-6">
+      <MediaCard {...args}>
+        <MediaCard.Media shape="icon" align={align}>
+          <img
+            src={picsum(96, 96)}
+            alt={imageAlt}
+            className="size-full object-cover"
+          />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <MediaCard.Link href={featureHref}>{featureTitle}</MediaCard.Link>
+        </MediaCard.Title>
+      </MediaCard>
+      <MediaCard {...args} />
+    </div>
+  ),
+});
+
+export const IconImageBesideIconTile = iconImageBesideIconTile('left');
+
+export const IconImageBesideIconTileCenterAligned =
+  iconImageBesideIconTile('center');
+
 export const IconPanelMedia: TStory = {
   args: {
     excerpt: shortExcerpt,
