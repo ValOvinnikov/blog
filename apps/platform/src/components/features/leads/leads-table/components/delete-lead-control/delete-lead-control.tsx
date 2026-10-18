@@ -1,8 +1,9 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
+import { LEAD_REFUSAL } from '@platform/constants/lead';
 import { deleteLeadAction } from '@platform/server/leads/delete-lead-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -22,9 +23,11 @@ export const DeleteLeadControl = ({
 
   const handleConfirm = async () => {
     const result = await deleteLeadAction(tenantId, leadId);
-    if (result.ok) return { ok: true } as const;
+    if (result.outcome === ACTION_OUTCOME.SUCCESS) return { ok: true } as const;
 
-    const isGone = result.reason === 'notFound';
+    const isGone =
+      result.outcome === ACTION_OUTCOME.REFUSED &&
+      result.reason === LEAD_REFUSAL.NOT_FOUND;
     if (isGone) router.refresh();
     return {
       ok: false,

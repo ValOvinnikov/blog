@@ -1,4 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -122,7 +126,7 @@ describe(`<${EmailSettings.name}/>`, () => {
     clearEmailLogoActionMock.mockReset();
     sendTestEmailActionMock.mockReset();
     sendTestEmailActionMock.mockResolvedValue({
-      ok: true,
+      outcome: ACTION_OUTCOME.SUCCESS,
       to: 'admin@example.com',
     });
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
@@ -290,8 +294,7 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     it('says when the test limit is reached', async () => {
       sendTestEmailActionMock.mockResolvedValue({
-        ok: false,
-        reason: 'rate-limited',
+        outcome: ACTION_OUTCOME.RATE_LIMITED,
       });
 
       await user.click(screen.getByRole('button', { name: 'Send test to me' }));
