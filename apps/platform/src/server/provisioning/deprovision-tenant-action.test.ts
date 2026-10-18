@@ -1,4 +1,5 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
@@ -102,7 +103,10 @@ describe('deprovisionTenantAction', () => {
       dryRun: true,
     });
 
-    expect(result).toEqual({ ok: false, reason: 'nameMismatch' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
+    });
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -113,7 +117,10 @@ describe('deprovisionTenantAction', () => {
       dryRun: true,
     });
 
-    expect(result).toEqual({ ok: false, reason: 'notFound' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -127,7 +134,10 @@ describe('deprovisionTenantAction', () => {
       dryRun: true,
     });
 
-    expect(result).toEqual({ ok: false, reason: 'alreadyDeprovisioned' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_DEPROVISIONED,
+    });
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -137,7 +147,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: false,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchDeprovisioningWorkflowMock).toHaveBeenCalledWith({
       tenantId: 'tenant-1',
       confirm: 'Acme Inc.',
@@ -168,7 +178,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: false,
     });
 
-    expect(result).toEqual({ ok: false, reason: 'deprovisionFailed' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -178,7 +188,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: true,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -189,7 +199,7 @@ describe('deprovisionTenantAction', () => {
       dryRun: false,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'provisioning.deprovision_audit_failed',
       expect.objectContaining({

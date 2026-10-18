@@ -19,7 +19,10 @@ export type TDeleteTenantControlProps = {
 export const DeleteTenantControl = ({ tenant }: TDeleteTenantControlProps) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
-  const deleteTenant = useTenantLifecycleAction(deleteTenantAction);
+  const deleteTenant = useTenantLifecycleAction(
+    deleteTenantAction,
+    'deleteFailed',
+  );
   const { id, name } = tenant;
 
   const { cardBorder, cardHeader, cardTitle, content } =

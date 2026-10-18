@@ -1,4 +1,5 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
@@ -95,7 +96,10 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, reason: 'notFound' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
@@ -104,7 +108,10 @@ describe('deleteTenantAction', () => {
       confirm: 'wrong-name',
     });
 
-    expect(result).toEqual({ ok: false, reason: 'nameMismatch' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
+    });
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
@@ -114,7 +121,10 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, reason: 'notArchived' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_ARCHIVED,
+    });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -124,7 +134,10 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, reason: 'notFound' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -133,7 +146,7 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(deleteTenantMock).toHaveBeenCalledWith('tenant-1');
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'operator-1',
@@ -151,7 +164,7 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: false, reason: 'deleteFailed' });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.delete_failed',
@@ -168,7 +181,7 @@ describe('deleteTenantAction', () => {
       confirm: 'Acme Inc.',
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.delete_audit_failed',
       expect.objectContaining({

@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { makeClientTenant } from '@platform/testing/tenants/fixtures';
@@ -34,7 +36,9 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     deprovisionTenantActionMock.mockReset();
-    deprovisionTenantActionMock.mockResolvedValue({ ok: true });
+    deprovisionTenantActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     refreshMock.mockReset();
     mockRouterRefresh(refreshMock);
   });
@@ -119,8 +123,8 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
   it('shows the error message inline and never refreshes when the action fails', async () => {
     deprovisionTenantActionMock.mockResolvedValue({
-      ok: false,
-      reason: 'nameMismatch',
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
     });
     setup();
     const dialog = await openDialog(user);
