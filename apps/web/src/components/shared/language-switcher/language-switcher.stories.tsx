@@ -61,3 +61,8 @@ export const PhonePill: TStory = {
   globals: { viewport: 'mobile' },
   args: { switcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE },
 };
+
+export const PhoneCodes: TStory = {
+  globals: { viewport: 'mobile' },
+  args: { switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES, currentLocale: NL },
+};
