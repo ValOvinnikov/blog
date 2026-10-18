@@ -13,6 +13,7 @@ code:
   - apps/platform/src/server/releases/**
   - apps/platform/src/constants/release.ts
   - apps/platform/src/app/api/internal/contrast-result/**
+  - apps/platform/src/server/internal-api/**
 epics: [5271]
 ---
 
