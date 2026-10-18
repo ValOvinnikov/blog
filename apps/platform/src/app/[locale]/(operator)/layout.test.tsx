@@ -73,4 +73,28 @@ describe(`<${OperatorLayout.name}/>`, () => {
     expect(screen.getByText('content')).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
+
+  it('hides the Releases nav entry from an ADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: 'Releases' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the Releases nav entry to a SUPERADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      role: 'SUPERADMIN',
+    });
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'Releases' })).toHaveAttribute(
+      'href',
+      '/releases',
+    );
+  });
 });

@@ -1,4 +1,5 @@
 import { ICONS } from '@blog/config';
+import { ADMIN_ROLE, type TAdminRole } from '@blog/db/constants';
 import type {
   TSidebarNavItem,
   TSidebarNavSection,
@@ -12,6 +13,7 @@ import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
 
 export const operatorNavSections = (
   t: TLooseTranslator,
+  role: TAdminRole,
 ): TSidebarNavSection[] => [
   {
     label: t('platformLabel'),
@@ -31,6 +33,15 @@ export const operatorNavSections = (
         icon: ICONS.WARNING,
         href: adminRoutes.findings(),
       },
+      ...(role === ADMIN_ROLE.SUPERADMIN
+        ? [
+            {
+              label: t('releases'),
+              icon: ICONS.CHECK_SHEET,
+              href: adminRoutes.releases(),
+            },
+          ]
+        : []),
     ],
   },
 ];

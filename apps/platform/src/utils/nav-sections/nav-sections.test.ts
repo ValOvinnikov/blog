@@ -1,3 +1,4 @@
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import messages from '@platform/i18n/messages/en.json';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
@@ -18,7 +19,7 @@ const t = createTranslator({
 
 describe('operatorNavSections', () => {
   it('gives both Tenants and Add tenant real hrefs', () => {
-    const [platform] = operatorNavSections(t);
+    const [platform] = operatorNavSections(t, ADMIN_ROLE.ADMIN);
     const tenants = platform!.items.find((item) => item.label === 'Tenants');
     const addTenant = platform!.items.find(
       (item) => item.label === 'Add tenant',
@@ -30,12 +31,31 @@ describe('operatorNavSections', () => {
   });
 
   it('gives Findings a real href, unbadged', () => {
-    const [platform] = operatorNavSections(t);
+    const [platform] = operatorNavSections(t, ADMIN_ROLE.ADMIN);
     const findings = platform!.items.find((item) => item.label === 'Findings');
 
     expect(findings).toMatchObject({ href: '/findings' });
     expect(findings?.badge).toBeUndefined();
   });
+
+  it('gives a SUPERADMIN a Releases entry', () => {
+    const [platform] = operatorNavSections(t, ADMIN_ROLE.SUPERADMIN);
+
+    expect(
+      platform!.items.find((item) => item.label === 'Releases'),
+    ).toMatchObject({ href: '/releases' });
+  });
+
+  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+    'omits the Releases entry for a %s',
+    (role) => {
+      const [platform] = operatorNavSections(t, role);
+
+      expect(platform!.items.map((item) => item.label)).not.toContain(
+        'Releases',
+      );
+    },
+  );
 });
 
 describe('tenantNavSections', () => {
@@ -310,7 +330,7 @@ describe('dashboardNavSections', () => {
 describe('nav section icons', () => {
   it('has a registered glyph for every icon a nav item references', () => {
     const items = [
-      ...operatorNavSections(t),
+      ...operatorNavSections(t, ADMIN_ROLE.SUPERADMIN),
       ...tenantNavSections(t, 'tenant-1', 'Acme'),
       ...dashboardNavSections(t, EVERY_PAGE),
     ].flatMap((section) => section.items);

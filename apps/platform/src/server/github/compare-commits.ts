@@ -1,10 +1,9 @@
+import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import { z } from 'zod';
 
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
 
 const PER_PAGE = 100;
-// GitHub lists at most 300 changed files for a whole comparison.
-const COMPARE_FILE_LIMIT = 300;
 
 const compareSchema = z.object({
   total_commits: z.number(),
@@ -54,7 +53,7 @@ const fetchComparePage = (
   );
 
 const FILE_PAGES = Array.from(
-  { length: COMPARE_FILE_LIMIT / PER_PAGE },
+  { length: GITHUB_COMPARE_FILE_LIMIT / PER_PAGE },
   (_, index) => index + 1,
 );
 
@@ -107,7 +106,7 @@ export const compareCommits = async (
       commits: newestCommits.map(toComparedCommit),
       totalCommits: total_commits,
       files,
-      isFileListTruncated: files.length >= COMPARE_FILE_LIMIT,
+      isFileListTruncated: files.length >= GITHUB_COMPARE_FILE_LIMIT,
     },
   };
 };

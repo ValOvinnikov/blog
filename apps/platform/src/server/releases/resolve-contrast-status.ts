@@ -2,6 +2,7 @@ import { FINDING_STATUS, RELEASE_CHANGE } from '@blog/config';
 import { queries } from '@blog/db';
 import {
   CONTRAST_STATUS,
+  CONTRAST_WORKFLOW_FILE,
   type TContrastStatus,
 } from '@platform/constants/release';
 import { compareCommits } from '@platform/server/github/compare-commits';
@@ -13,8 +14,6 @@ import {
   toReleaseFailure,
   type TReleaseResult,
 } from './release-result';
-
-const CONTRAST_WORKFLOW_FILE = 'contrast.yml';
 
 type TResolveContrastStatusInput = {
   headSha: string;

@@ -13,6 +13,10 @@ import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
+import {
+  CONTRAST_STATUS,
+  type TContrastStatus,
+} from '@platform/constants/release';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 
 type TBadgeTone = NonNullable<TStatusBadgeProps['tone']>;
@@ -41,6 +45,14 @@ const DOMAIN_VERIFICATION_TONE: Record<TDomainVerificationStatus, TBadgeTone> =
     [DOMAIN_VERIFICATION_STATUS.VERIFIED]: 'ok',
     [DOMAIN_VERIFICATION_STATUS.ERROR]: 'warn',
   };
+
+const CONTRAST_STATUS_TONE: Record<TContrastStatus, TBadgeTone> = {
+  [CONTRAST_STATUS.GREEN]: 'ok',
+  [CONTRAST_STATUS.FAILED]: 'bad',
+  [CONTRAST_STATUS.RUNNING]: 'brand',
+  [CONTRAST_STATUS.DUE]: 'warn',
+  [CONTRAST_STATUS.NONE]: 'neutral',
+};
 
 const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {
   [FINDING_SEVERITY.INFO]: 'neutral',
@@ -85,3 +97,6 @@ export const sanityValidationMarkerTone = (
 
 export const fieldStatusTone = (status: TEmailItemStatus) =>
   FIELD_STATUS_TONE[status];
+
+export const contrastStatusTone = (status: TContrastStatus) =>
+  CONTRAST_STATUS_TONE[status];

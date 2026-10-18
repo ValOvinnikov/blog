@@ -1,0 +1,146 @@
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { auth } from '@platform/server/auth/auth';
+import type { Session } from 'next-auth';
+
+const {
+  requireSuperAdminMock,
+  getBranchHeadShaMock,
+  isWorkflowRunActiveMock,
+  dispatchContrastWorkflowMock,
+  insertAuditEventMock,
+} = vi.hoisted(() => ({
+  requireSuperAdminMock: vi.fn(),
+  getBranchHeadShaMock: vi.fn(),
+  isWorkflowRunActiveMock: vi.fn(),
+  dispatchContrastWorkflowMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
+}));
+
+vi.mock('@platform/server/auth/require-super-admin', () => ({
+  requireSuperAdmin: requireSuperAdminMock,
+}));
+
+vi.mock('@platform/server/auth/auth');
+
+vi.mock('@platform/utils/logger/logger');
+
+vi.mock('@platform/server/github/get-branch-head-sha', () => ({
+  getBranchHeadSha: getBranchHeadShaMock,
+}));
+
+vi.mock('@platform/server/github/is-workflow-run-active', () => ({
+  isWorkflowRunActive: isWorkflowRunActiveMock,
+}));
+
+vi.mock('./dispatch-contrast-workflow', () => ({
+  dispatchContrastWorkflow: dispatchContrastWorkflowMock,
+}));
+
+vi.mock('@blog/db', () => ({
+  queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
+}));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+
+describe('startContrastCheckAction', () => {
+  let startContrastCheckAction: (typeof import('./start-contrast-check-action'))['startContrastCheckAction'];
+  let headSha: string;
+
+  beforeEach(async () => {
+    headSha = faker.git.commitSha();
+    requireSuperAdminMock.mockReset().mockResolvedValue({ role: 'SUPERADMIN' });
+    authMock.mockReset().mockResolvedValue({
+      user: { id: 'operator-1', email: 'operator@example.com' },
+    });
+    getBranchHeadShaMock.mockReset().mockResolvedValue({
+      ok: true,
+      data: headSha,
+    });
+    isWorkflowRunActiveMock.mockReset().mockResolvedValue({
+      ok: true,
+      data: false,
+    });
+    dispatchContrastWorkflowMock.mockReset().mockResolvedValue(true);
+    insertAuditEventMock.mockReset().mockResolvedValue({ id: 'event-1' });
+    ({ startContrastCheckAction } =
+      await import('./start-contrast-check-action'));
+  });
+
+  it('requires a super-admin before dispatching anything', async () => {
+    requireSuperAdminMock.mockImplementation(() => {
+      throw new Error('NEXT_NOT_FOUND');
+    });
+
+    await expect(startContrastCheckAction()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('dispatches the workflow and records who started it against the commit', async () => {
+    const result = await startContrastCheckAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(dispatchContrastWorkflowMock).toHaveBeenCalledOnce();
+    expect(insertAuditEventMock).toHaveBeenCalledWith({
+      actorId: 'operator-1',
+      actorEmail: 'operator@example.com',
+      action: AUDIT_ACTION.CONTRAST_CHECK_STARTED,
+      targetType: AUDIT_TARGET_TYPE.RELEASE,
+      targetId: headSha,
+      details: undefined,
+    });
+  });
+
+  it('is blocked, dispatching and recording nothing, while a run is in progress', async () => {
+    isWorkflowRunActiveMock.mockResolvedValue({ ok: true, data: true });
+
+    const result = await startContrastCheckAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
+    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('is unavailable when the head commit cannot be read', async () => {
+    getBranchHeadShaMock.mockResolvedValue({
+      ok: false,
+      reason: 'githubError',
+    });
+
+    const result = await startContrastCheckAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
+    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+  });
+
+  it('is unavailable when the active run status cannot be read', async () => {
+    isWorkflowRunActiveMock.mockResolvedValue({
+      ok: false,
+      reason: 'rateLimited',
+    });
+
+    const result = await startContrastCheckAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
+    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+  });
+
+  it('records no audit event when the dispatch fails', async () => {
+    dispatchContrastWorkflowMock.mockResolvedValue(false);
+
+    const result = await startContrastCheckAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('still succeeds when the audit write is lost', async () => {
+    insertAuditEventMock.mockRejectedValue(new Error('connection lost'));
+
+    expect(await startContrastCheckAction()).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
+  });
+});

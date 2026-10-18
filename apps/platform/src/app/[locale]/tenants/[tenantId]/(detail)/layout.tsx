@@ -32,7 +32,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
     <AdminShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={[
-        ...operatorNavSections(tNavSections),
+        ...operatorNavSections(tNavSections, admin.role),
         ...tenantNavSections(tNavSections, tenant.id, tenant.name),
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}

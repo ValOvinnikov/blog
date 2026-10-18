@@ -1,5 +1,6 @@
 'use client';
 
+import { ADMIN_ROLE } from '@blog/db/constants';
 import {
   Breadcrumbs,
   type TBreadcrumbItem,
@@ -17,7 +18,10 @@ export const OperatorBreadcrumb = () => {
   const t = useTranslations('navSections');
   const tTopbar = useTranslations('topbar');
 
-  const leafLabel = navLabelForPathname(operatorNavSections(t), pathname);
+  const leafLabel = navLabelForPathname(
+    operatorNavSections(t, ADMIN_ROLE.SUPERADMIN),
+    pathname,
+  );
 
   const items: TBreadcrumbItem[] = [
     { label: t('platformLabel') },

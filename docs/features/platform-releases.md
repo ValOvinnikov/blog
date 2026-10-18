@@ -1,6 +1,6 @@
 ---
 title: Platform releases
-status: planned
+status: partial
 layers: [config, utils, db, platform-app]
 code:
   - packages/config/src/constants/release.ts
@@ -12,6 +12,8 @@ code:
   - apps/platform/src/server/github/**
   - apps/platform/src/server/releases/**
   - apps/platform/src/constants/release.ts
+  - apps/platform/src/app/[locale]/(operator)/releases/**
+  - apps/platform/src/components/features/releases/**
   - apps/platform/src/app/api/internal/contrast-result/**
   - apps/platform/src/server/internal-api/**
 epics: [5271]
@@ -21,11 +23,12 @@ epics: [5271]
 
 ## What it does
 
-A SUPERADMIN will see the release candidate on a platform Releases page,
-run the contrast check and cut a production release from it. The page is not
-built yet. What exists is the shared vocabulary, the server-side reader that
-works out the release candidate from GitHub and the database, and the signed
-route the contrast workflow posts its result to.
+A SUPERADMIN sees the release candidate on the platform Releases page and
+runs the contrast check from it. Cutting a production release from the page is
+not built yet. What exists is the shared vocabulary, the server-side reader that
+works out the release candidate from GitHub and the database, the signed
+route the contrast workflow posts its result to, the page and the contrast
+Server Action.
 
 The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
@@ -45,6 +48,37 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
 ## Surfaces and routes
 
+- `/releases` (`(operator)` group) — SUPERADMIN only. `releases/layout.tsx`
+  and the page both call `requireSuperAdmin`, so an ADMIN or MODERATOR gets
+  the same 404 as a missing page, and the Platform nav lists Releases for a
+  SUPERADMIN only (`operatorNavSections(t, role)`). The page shows:
+  - the last tag, the latest commit and the count of commits since the tag;
+  - the commits table (short sha, first line of the message, author, date),
+    with a note "showing the newest N of M" when fewer commits are listed
+    than `totalCommits`;
+  - the touched areas (UI and rendering, database migrations, Sanity
+    migrations, environment variables), each Touched or Not touched, with the
+    migration counts beside the two migration areas. When
+    `migrations.isLowerBound` is set each count reads "At least N";
+  - a warning that the change list is incomplete when `isFileListTruncated`
+    is set (GitHub lists at most 300 files);
+  - the contrast status badge with a one-line explanation, a link to
+    `/findings` when it is `FAILED`, and the Run contrast check button.
+  - When there are no commits since the tag only the summary and an empty
+    message show. A failed read shows an error notice with the reason and a
+    Try again button, never earlier data. Loading is the `(operator)`
+    segment's page skeleton.
+- Server Action `startContrastCheckAction`
+  (`server/releases/start-contrast-check-action.ts`): `requireSuperAdmin`,
+  reads `main`'s HEAD, answers `BLOCKED` when a `contrast.yml` run for it is
+  already active and `UNAVAILABLE` when GitHub cannot be read, dispatches
+  `contrast.yml` on `main` through `dispatchGitHubWorkflow` (`SERVER_ERROR`
+  when that fails), then records `CONTRAST_CHECK_STARTED` on the `RELEASE`
+  target with the HEAD sha as `targetId`. The event attests the dispatch
+  request, not the workflow's outcome, and is written only after a successful
+  dispatch. The button is disabled while the status is `RUNNING` and after a
+  start until the page reloads; GitHub can take a moment to list the new run,
+  so the status can lag the click.
 - `POST /api/internal/contrast-result` — machine-only, Bearer
   `CONTRAST_RESULT_SECRET`. Records the posted result as the SHA's contrast
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
@@ -87,12 +121,14 @@ values as plain `text`, so none of them needs a db migration:
   due.
 - The candidate reader never throws. A failure is a reason code:
   `notConfigured` (token or repo missing), `noReleaseTag`, `rateLimited`
-  (logged at warn), `githubError` and `dbError`. A repository with no tag yet
+  (logged at warn), `githubError`, `tagListIncomplete` and `dbError`. A repository with no tag yet
   is not logged.
 - The reader pages GitHub's lists 100 at a time: a comparison's changed files
   up to GitHub's 300-file limit, the pages holding its newest commits, and
-  every `v*` tag ref. Every request keeps its timeout, and a failed page fails
-  the read with a reason code.
+  every `v*` tag ref up to 10 pages (1000 tags). Every request keeps its
+  timeout, and a failed page fails the read with a reason code. A tag list
+  still full at the page cap is reported as `tagListIncomplete`, never as a
+  different latest tag.
 - At the 300-file limit the file list is truncated (`isFileListTruncated` on
   the candidate): it counts as touching every set, so a rendering change is
   never missed, and the migration counts are minimums.
@@ -114,11 +150,15 @@ values as plain `text`, so none of them needs a db migration:
 
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@blog/utils/version`).
 - `getReleaseCandidate` (`apps/platform/src/server/releases/`).
+- `startContrastCheckAction` (`apps/platform/src/server/releases/`).
+- `ReleasesView` (`apps/platform/src/components/features/releases/`).
 
 ## Tests and stories
 
 - `packages/utils/src/version/release-version.test.ts`.
 - `apps/platform/src/app/api/internal/contrast-result/route.test.ts`.
+- `apps/platform/src/app/[locale]/(operator)/releases/*.test.tsx` and
+  `apps/platform/src/components/features/releases/**/*.test.tsx`.
 - `apps/platform/src/server/releases/*.test.ts` and
   `apps/platform/src/server/github/*.test.ts`, against a stubbed GitHub.
 - `packages/db/src/queries/migrations/**/*.test.ts`.

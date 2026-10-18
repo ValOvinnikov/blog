@@ -17,7 +17,8 @@
     "studio": "Studio · Administration",
     "findings": "Constats · Administration",
     "email": "E-mail · Administration",
-    "leads": "Messages reçus · Administration"
+    "leads": "Messages reçus · Administration",
+    "releases": "Versions · Admin"
   },
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
@@ -96,7 +97,8 @@
     "badgeComingSoon": "Bientôt",
     "badgePlatform": "plateforme",
     "features": "Fonctionnalités",
-    "leads": "Messages reçus"
+    "leads": "Messages reçus",
+    "releases": "Versions"
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"
@@ -1009,6 +1011,85 @@
     "errors": {
       "notFound": "Ce message a déjà été supprimé.",
       "failed": "Impossible de supprimer le message. Réessayez."
+    }
+  },
+  "releasesView": {
+    "title": "Versions",
+    "description": "Ce que contient la prochaine version et si son rendu a été vérifié.",
+    "incompleteTitle": "La liste des changements est incomplète",
+    "incompleteDescription": "GitHub liste au plus {limit, number} fichiers modifiés par comparaison : chaque zone compte donc comme touchée et chaque nombre de migrations est un minimum."
+  },
+  "releaseSummaryCard": {
+    "title": "Version candidate",
+    "description": "Le dernier commit de main, comparé à la dernière version.",
+    "lastTag": "Dernière version",
+    "headCommit": "Dernier commit",
+    "commitsSinceTag": "Depuis la dernière version",
+    "commitCount": "{count, plural, one {# commit} other {# commits}}"
+  },
+  "releaseCommits": {
+    "ariaLabel": "Commits depuis {tag}",
+    "empty": "Aucun commit depuis {tag}. Main est à la dernière version.",
+    "newestOnly": "Affichage des {shown, number} commits les plus récents sur {total, number}.",
+    "columnCommit": "Commit",
+    "columnMessage": "Message",
+    "columnAuthor": "Auteur",
+    "columnDate": "Date"
+  },
+  "releaseAreasCard": {
+    "title": "Zones touchées",
+    "description": "Les parties du code que cette version modifie.",
+    "touched": "Touchée",
+    "untouched": "Non touchée",
+    "area": {
+      "RENDERING": "UI et rendu",
+      "DB_MIGRATION": "Migrations de base de données",
+      "SANITY_MIGRATION": "Migrations Sanity",
+      "ENV": "Variables d'environnement"
+    },
+    "dbMigrations": "{count, plural, one {# migration à appliquer} other {# migrations à appliquer}}",
+    "dbMigrationsMinimum": "Au moins {count, plural, one {# migration à appliquer} other {# migrations à appliquer}}",
+    "sanityMigrations": "{count, plural, one {# migration} other {# migrations}} sur {tenants, plural, one {# projet} other {# projets}}",
+    "sanityMigrationsMinimum": "Au moins {count, plural, one {# migration} other {# migrations}} sur {tenants, plural, one {# projet} other {# projets}}"
+  },
+  "releaseContrastCard": {
+    "title": "Vérification du contraste",
+    "description": "Si le rendu de cette version a été vérifié contre les régressions de contraste.",
+    "status": {
+      "GREEN": "Réussie",
+      "FAILED": "Échouée",
+      "RUNNING": "En cours",
+      "DUE": "À faire",
+      "NONE": "Inutile"
+    },
+    "explanation": {
+      "GREEN": "Le dernier commit a réussi la vérification du contraste.",
+      "FAILED": "La vérification du contraste a trouvé des régressions dans le dernier commit.",
+      "RUNNING": "Une vérification du contraste est en cours pour le dernier commit.",
+      "DUE": "Le rendu a changé depuis la dernière vérification réussie. Lancez-la avant de publier.",
+      "NONE": "Cette version ne change rien de ce que couvre la vérification du contraste."
+    },
+    "viewFinding": "Voir le constat"
+  },
+  "runContrastCheckButton": {
+    "label": "Lancer la vérification du contraste",
+    "starting": "Démarrage…",
+    "started": "Vérification du contraste lancée. Elle peut mettre un instant à apparaître ici comme en cours.",
+    "alreadyRunning": "Une vérification du contraste est déjà en cours.",
+    "githubUnavailable": "GitHub est injoignable. Réessayez dans un instant.",
+    "startFailed": "La vérification du contraste n'a pas pu être lancée."
+  },
+  "releaseUnavailable": {
+    "title": "Les informations de version sont indisponibles",
+    "retry": "Réessayer",
+    "retrying": "Nouvel essai…",
+    "reason": {
+      "notConfigured": "L'accès à GitHub n'est pas configuré pour cette application.",
+      "noReleaseTag": "Le dépôt n'a pas encore de tag de version, il n'y a donc rien à comparer.",
+      "rateLimited": "GitHub limite les requêtes. Réessayez dans quelques minutes.",
+      "githubError": "GitHub est injoignable ou a répondu par une erreur.",
+      "tagListIncomplete": "La liste des tags de version est trop longue pour être lue en entier : la dernière version ne peut pas être déterminée.",
+      "dbError": "La base de données n'a pas pu être lue."
     }
   }
 }
