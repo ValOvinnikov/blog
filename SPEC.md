@@ -2534,9 +2534,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   which stays claimed by the CI-gated main site deploy) with the same
   Git-integration/PR-preview setup. See
   [`docs/DEPLOY.md`](./docs/DEPLOY.md)'s Storybook section.
-- Deploys are CI-gated behind a `verify` job (type-check/lint/test/build) on
-  the exact commit being deployed; the development deploy steps no-op green
-  until the one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.
+- Deploys are CI-gated on the exact commit being deployed — development behind
+  a `verify` job (type-check/lint/test/build), production behind the full gate
+  (`full-gate.yml`), which a failed or skipped run never lets through. The
+  development deploy steps no-op green until the one-time console setup
+  ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.
   The production ones do not: they fail loudly on a missing Vercel token, org
   id or project id, because a skipped step reports green and a tag that shipped
   only one of the two apps would otherwise look like a complete release.
