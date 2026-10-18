@@ -56,6 +56,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Language' })).toBeVisible();
   });
 
+  it('renders no drawerActions when there is no mobile toggle', () => {
+    setup({ drawerActions: <button type="button">Sign in</button> });
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('forwards target to the anchor when provided on a link', () => {
     const externalHref = faker.internet.url();
     const externalLabel = faker.lorem.words(2);
@@ -183,6 +190,38 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
 
       expect(
         screen.queryByTestId('primary-navigation-panel-actions'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('shows drawerActions after the panelActions row in the open panel', () => {
+      setup({
+        panelActions: <button type="button">Language</button>,
+        drawerActions: <button type="button">Sign in</button>,
+        mobileToggle: { isOpen: true, onToggle: () => {}, ariaLabel, panelId },
+      });
+
+      const drawerActions = screen.getByTestId(
+        'primary-navigation-drawer-actions',
+      );
+      expect(
+        within(drawerActions).getByRole('button', { name: 'Sign in' }),
+      ).toBeVisible();
+      expect(
+        screen
+          .getByTestId('primary-navigation-panel-actions')
+          .compareDocumentPosition(drawerActions) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
+    it('leaves drawerActions out of the closed panel and the bar', () => {
+      setup({
+        drawerActions: <button type="button">Sign in</button>,
+        mobileToggle: { isOpen: false, onToggle: () => {}, ariaLabel, panelId },
+      });
+
+      expect(
+        screen.queryByRole('button', { name: 'Sign in' }),
       ).not.toBeInTheDocument();
     });
 
