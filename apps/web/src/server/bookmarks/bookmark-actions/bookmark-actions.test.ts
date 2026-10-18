@@ -1,4 +1,4 @@
-import { TENANT_WRITE_REFUSAL } from '@blog/config';
+import { ACTION_OUTCOME, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import type { MockInstance } from 'vitest';
 
@@ -96,40 +96,37 @@ describe('setBookmarkStatus', () => {
     errorSpy.mockRestore();
   });
 
-  it('returns a refusal without writing when there is no session', async () => {
+  it('returns SERVER_ERROR without writing when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(addBookmarkMock).not.toHaveBeenCalled();
     expect(removeBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('returns a refusal without writing when no tenant resolves', async () => {
+  it('returns SERVER_ERROR without writing when no tenant resolves', async () => {
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
     });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(addBookmarkMock).not.toHaveBeenCalled();
     expect(removeBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('flags the refusal unavailable without writing when the tenant is not ACTIVE', async () => {
+  it('returns UNAVAILABLE without writing when the tenant is not ACTIVE', async () => {
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.INACTIVE,
     });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
-      ok: false,
-      isUnavailable: true,
+      outcome: ACTION_OUTCOME.UNAVAILABLE,
     });
     expect(addBookmarkMock).not.toHaveBeenCalled();
     expect(removeBookmarkMock).not.toHaveBeenCalled();
@@ -139,18 +136,17 @@ describe('setBookmarkStatus', () => {
     addBookmarkMock.mockResolvedValue({ ok: true, data: {} });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
-      ok: true,
+      outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(addBookmarkMock).toHaveBeenCalledWith(TENANT_ID, 'user-1', 'post-1');
     expect(removeBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('returns a refusal when addBookmark resolves a typed failure', async () => {
+  it('returns SERVER_ERROR when addBookmark resolves a typed failure', async () => {
     addBookmarkMock.mockResolvedValue({ ok: false, error: 'DB_NOT_FOUND' });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
   });
 
@@ -158,7 +154,7 @@ describe('setBookmarkStatus', () => {
     removeBookmarkMock.mockResolvedValue(undefined);
 
     await expect(setBookmarkStatus('post-1', false)).resolves.toEqual({
-      ok: true,
+      outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(removeBookmarkMock).toHaveBeenCalledWith(
       TENANT_ID,
@@ -168,12 +164,11 @@ describe('setBookmarkStatus', () => {
     expect(addBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('returns a refusal when the write throws', async () => {
+  it('returns SERVER_ERROR when the write throws', async () => {
     addBookmarkMock.mockRejectedValue(new Error('boom'));
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
   });
 });

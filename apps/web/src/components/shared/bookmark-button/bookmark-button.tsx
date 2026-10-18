@@ -1,5 +1,6 @@
 'use client';
 
+import { ACTION_OUTCOME } from '@blog/config';
 import { BookmarkToggle } from '@blog/ui/components/atoms/bookmark-toggle';
 import { useToast } from '@web/context/toast-provider';
 import {
@@ -64,10 +65,14 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
 
     startTransition(async () => {
       const result = await setBookmarkStatus(postId, reverted);
-      if (!result.ok) {
+      if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
         setIsBookmarked(committedValue);
         toast.error({
-          message: t(result.isUnavailable ? 'errorUnavailable' : 'error'),
+          message: t(
+            result.outcome === ACTION_OUTCOME.UNAVAILABLE
+              ? 'errorUnavailable'
+              : 'error',
+          ),
         });
         return;
       }
@@ -81,9 +86,9 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
 
     startTransition(async () => {
       const result = await setBookmarkStatus(postId, next);
-      if (!result.ok) {
+      if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
         setIsBookmarked(!next);
-        if (result.isUnavailable) {
+        if (result.outcome === ACTION_OUTCOME.UNAVAILABLE) {
           toast.error({ message: t('errorUnavailable') });
           return;
         }
