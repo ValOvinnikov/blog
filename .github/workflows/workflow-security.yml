@@ -4,6 +4,7 @@ on:
   # Never path- or branch-filtered: this check is required, and a skipped
   # required check sits "Pending" forever instead of failing (see ci.yml).
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -35,7 +36,7 @@ jobs:
 
       - name: Zizmor
         # --format=sarif always exits 0; --format=github keeps zizmor's
-        # non-zero exit on findings. Accepted findings live in .github/zizmor.yml.
+        # non-zero exit on findings. Accepted findings carry an inline `zizmor: ignore`.
         run: uvx "zizmor@${ZIZMOR_VERSION}" --format=github .github/workflows/ .github/actions/
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
