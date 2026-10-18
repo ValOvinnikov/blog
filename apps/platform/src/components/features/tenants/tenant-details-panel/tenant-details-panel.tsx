@@ -12,14 +12,8 @@ import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
-import { useToast } from '@platform/context/toast-provider';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import {
-  updateTenantDetailsAction,
-  type TUpdateTenantDetailsError,
-  type TUpdateTenantDetailsFieldErrors,
-} from '@platform/server/tenants/update-tenant-details-action';
 import {
   ALL_FIELD_KEYS,
   lockAllFields,
@@ -27,7 +21,6 @@ import {
   type TTenantFieldLocks,
 } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState, useTransition } from 'react';
 
@@ -38,6 +31,7 @@ import {
   type TTenantDetailsValues,
 } from './tenant-details-values';
 import { useLockStateChange } from './use-lock-state-change';
+import { useTenantDetailsSave } from './use-tenant-details-save';
 
 export type TTenantDetailsPanelProps = {
   tenant: TClientTenant;
@@ -63,17 +57,15 @@ export const TenantDetailsPanel = ({
   const tSteps = useTranslations('provisioningStatusView');
   const tLanguage = useTranslations('languageNames');
   const fieldErrorText = useTenantFieldErrorText();
-  const toast = useToast();
-  const router = useRouter();
   const panelId = useId();
   const baselineValues = tenantDetailsValuesOf(tenant, ownerEmail);
   const [renderedTenant, setRenderedTenant] = useState(tenant);
   const [renderedOwnerEmail, setRenderedOwnerEmail] = useState(ownerEmail);
   const [values, setValues] = useState<TTenantDetailsValues>(baselineValues);
-  const [fieldErrors, setFieldErrors] =
-    useState<TUpdateTenantDetailsFieldErrors>({});
-  const [formError, setFormError] =
-    useState<TMaybeUndefined<TUpdateTenantDetailsError>>(undefined);
+  const { fieldErrors, formError, save, clearErrors } = useTenantDetailsSave(
+    tenant.id,
+    values,
+  );
   const [isPending, startTransition] = useTransition();
   const isArchived = Boolean(tenant.deprovisionedAt);
 
@@ -123,23 +115,6 @@ export const TenantDetailsPanel = ({
     setValues((prev) => ({ ...prev, [key]: nextValue }));
   };
 
-  const save = async (): Promise<boolean> => {
-    setFormError(undefined);
-    setFieldErrors({});
-
-    const result = await updateTenantDetailsAction(tenant.id, values);
-    if (!result.ok) {
-      setFieldErrors(result.fieldErrors ?? {});
-      setFormError(result.error);
-      return false;
-    }
-    toast.success({
-      message: t('alertSuccess'),
-    });
-    router.refresh();
-    return true;
-  };
-
   const handleSave = () => {
     startTransition(async () => {
       await save();
@@ -148,8 +123,7 @@ export const TenantDetailsPanel = ({
 
   const discard = () => {
     setValues(baselineValues);
-    setFieldErrors({});
-    setFormError(undefined);
+    clearErrors();
   };
 
   useUnsavedChangesGuard(

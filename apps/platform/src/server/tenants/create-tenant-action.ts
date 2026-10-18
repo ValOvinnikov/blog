@@ -1,8 +1,16 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE, DOMAIN_PATTERN } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DOMAIN_PATTERN,
+  type TActionResult,
+  type TReasonedFailure,
+} from '@blog/config';
 import { queries, TENANT_PLAN } from '@blog/db';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { signIn } from '@platform/server/auth/auth';
@@ -15,7 +23,7 @@ import {
 } from '@platform/server/tenants/owner-invite-token';
 import {
   toTenantFieldErrors,
-  type TTenantFieldError,
+  type TTenantDetailsFieldError,
 } from '@platform/server/tenants/tenant-field-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -32,16 +40,18 @@ const createTenantInputSchema = z.object({
 
 export type TCreateTenantInput = z.input<typeof createTenantInputSchema>;
 
-export type TCreateTenantFieldErrors = Partial<
-  Record<keyof TCreateTenantInput, TTenantFieldError>
->;
+export type TOwnerInviteConfirmation = { email: string; token: string };
 
-export type TCreateTenantResult = {
-  ok: false;
-  error?: 'createFailed';
-  fieldErrors?: TCreateTenantFieldErrors;
-  ownerInviteConfirmation?: { email: string; token: string };
-};
+export type TCreateTenantResult =
+  | TActionResult<
+      typeof ACTION_OUTCOME.SERVER_ERROR,
+      keyof TCreateTenantInput,
+      TTenantDetailsFieldError
+    >
+  | ({ outcome: typeof ACTION_OUTCOME.REFUSED } & TReasonedFailure<
+      typeof TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED
+    > &
+      TOwnerInviteConfirmation);
 
 export const createTenantAction = async (
   input: TCreateTenantInput,
@@ -51,14 +61,14 @@ export const createTenantAction = async (
   const parsed = createTenantInputSchema.safeParse(input);
   if (!parsed.success) {
     return {
-      ok: false,
+      outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: toTenantFieldErrors<keyof TCreateTenantInput>(
         parsed.error.issues,
         {
-          name: 'nameRequired',
-          domain: 'domainInvalid',
-          plan: 'planUnsupported',
-          ownerEmail: 'emailInvalid',
+          name: TENANT_FIELD_ERROR.NAME_REQUIRED,
+          domain: TENANT_FIELD_ERROR.DOMAIN_INVALID,
+          plan: TENANT_FIELD_ERROR.PLAN_UNSUPPORTED,
+          ownerEmail: TENANT_FIELD_ERROR.EMAIL_INVALID,
         },
       ),
     };
@@ -70,11 +80,10 @@ export const createTenantAction = async (
   const owner = await queries.users.getUserByEmail(ownerEmail);
   if (!owner && !verifyOwnerInviteToken(ownerEmail, confirmOwnerInviteToken)) {
     return {
-      ok: false,
-      ownerInviteConfirmation: {
-        email: ownerEmail,
-        token: createOwnerInviteToken(ownerEmail),
-      },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
+      email: ownerEmail,
+      token: createOwnerInviteToken(ownerEmail),
     };
   }
 
@@ -85,15 +94,17 @@ export const createTenantAction = async (
 
   if (existingDomain) {
     return {
-      ok: false,
-      fieldErrors: { domain: { reason: 'domainTaken' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN } },
     };
   }
 
   if (domainAvailability === DOMAIN_AVAILABILITY.IN_USE) {
     return {
-      ok: false,
-      fieldErrors: { domain: { reason: 'domainAttachedElsewhere' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        domain: { reason: TENANT_FIELD_ERROR.DOMAIN_ATTACHED_ELSEWHERE },
+      },
     };
   }
 
@@ -114,13 +125,13 @@ export const createTenantAction = async (
         domain,
         error: result.error,
       });
-      return { ok: false, error: 'createFailed' };
+      return { outcome: ACTION_OUTCOME.SERVER_ERROR };
     }
 
     tenantId = result.data.id;
   } catch (error) {
     logger.error('tenants.create_draft_failed', { domain, error });
-    return { ok: false, error: 'createFailed' };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 
   await recordAuditEvent({

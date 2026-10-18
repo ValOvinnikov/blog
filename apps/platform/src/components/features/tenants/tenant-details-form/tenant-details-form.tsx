@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
+import { ALERT_TYPE, SIZE } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -10,16 +10,12 @@ import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
 import { TextInput } from '@platform/components/shared/text-input';
-import {
-  createTenantAction,
-  type TCreateTenantFieldErrors,
-  type TCreateTenantResult,
-} from '@platform/server/tenants/create-tenant-action';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import { tenantDetailsFormVariants } from './tenant-details-form-variants';
+import { useCreateTenantSubmit } from './use-create-tenant-submit';
 
 type TFormValues = {
   name: string;
@@ -35,20 +31,18 @@ const INITIAL_VALUES: TFormValues = {
   ownerEmail: '',
 };
 
-type TOwnerInviteConfirmation = NonNullable<
-  TCreateTenantResult['ownerInviteConfirmation']
->;
-
 export const TenantDetailsForm = () => {
   const t = useTranslations('tenantDetailsForm');
   const fieldErrorText = useTenantFieldErrorText();
   const [values, setValues] = useState<TFormValues>(INITIAL_VALUES);
-  const [fieldErrors, setFieldErrors] = useState<TCreateTenantFieldErrors>({});
-  const [formError, setFormError] =
-    useState<TMaybeUndefined<TCreateTenantResult['error']>>(undefined);
-  const [ownerInviteConfirmation, setOwnerInviteConfirmation] =
-    useState<TOwnerInviteConfirmation | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const {
+    fieldErrors,
+    isCreateFailed,
+    ownerInviteConfirmation,
+    clearOwnerInviteConfirmation,
+    isPending,
+    submit,
+  } = useCreateTenantSubmit();
 
   const {
     root,
@@ -66,24 +60,11 @@ export const TenantDetailsForm = () => {
   ) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     if (key === 'ownerEmail') {
-      setOwnerInviteConfirmation(null);
+      clearOwnerInviteConfirmation();
     }
   };
 
-  const handleSubmit = () => {
-    setFormError(undefined);
-    setFieldErrors({});
-
-    startTransition(async () => {
-      const result = await createTenantAction({
-        ...values,
-        confirmOwnerInviteToken: ownerInviteConfirmation?.token,
-      });
-      setFieldErrors(result.fieldErrors ?? {});
-      setFormError(result.error);
-      setOwnerInviteConfirmation(result.ownerInviteConfirmation ?? null);
-    });
-  };
+  const handleSubmit = () => submit(values);
 
   const planOptions = [
     { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
@@ -99,8 +80,8 @@ export const TenantDetailsForm = () => {
 
   return (
     <div className={root()}>
-      {formError && (
-        <Alert type={ALERT_TYPE.ERROR} title={t(`errors.${formError}`)} />
+      {isCreateFailed && (
+        <Alert type={ALERT_TYPE.ERROR} title={t('errors.createFailed')} />
       )}
 
       <div className={cardWrap()}>

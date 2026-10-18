@@ -9,7 +9,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
-  type TTenantFieldErrorReason,
   type TTenantRefusal,
 } from '@platform/constants/tenant';
 import { z } from 'zod';
@@ -21,6 +20,10 @@ export const confirmTenantInputSchema = z.object({
 export type TConfirmTenantField = keyof z.input<
   typeof confirmTenantInputSchema
 >;
+
+export type TConfirmTenantFieldError =
+  | typeof TENANT_FIELD_ERROR.CONFIRM_REQUIRED
+  | typeof TENANT_FIELD_ERROR.NAME_MISMATCH;
 
 type TResolveConfirmedTenantOptions<
   TPreconditionRefusal extends TTenantRefusal,
@@ -34,7 +37,7 @@ export type TResolveConfirmedTenantResult<
   | { outcome: typeof ACTION_OUTCOME.SUCCESS; tenant: TTenant }
   | {
       outcome: typeof ACTION_OUTCOME.INVALID;
-      fieldErrors: TFieldErrors<TConfirmTenantField, TTenantFieldErrorReason>;
+      fieldErrors: TFieldErrors<TConfirmTenantField, TConfirmTenantFieldError>;
     }
   | ({ outcome: typeof ACTION_OUTCOME.REFUSED } & TReasonedFailure<
       typeof TENANT_REFUSAL.NOT_FOUND | TPreconditionRefusal

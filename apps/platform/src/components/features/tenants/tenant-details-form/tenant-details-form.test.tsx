@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import {
   renderWithIntl,
   screen,
@@ -48,10 +50,14 @@ const mockOwnerInviteConfirmation = (overrides: {
   token?: string;
 }) => {
   createTenantActionMock.mockResolvedValueOnce({
-    ok: false,
-    ownerInviteConfirmation: overrides,
+    outcome: ACTION_OUTCOME.REFUSED,
+    reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
+    ...overrides,
   });
-  createTenantActionMock.mockResolvedValueOnce({ ok: false });
+  createTenantActionMock.mockResolvedValueOnce({
+    outcome: ACTION_OUTCOME.INVALID,
+    fieldErrors: {},
+  });
 };
 
 describe(`<${TenantDetailsForm.name}/>`, () => {
@@ -60,7 +66,10 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     createTenantActionMock.mockReset();
-    createTenantActionMock.mockResolvedValue({ ok: false });
+    createTenantActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     render(<TenantDetailsForm />);
   });
 
@@ -93,8 +102,8 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
   it('shows a field-level error returned from the Server Action', async () => {
     createTenantActionMock.mockResolvedValue({
-      ok: false,
-      fieldErrors: { ownerEmail: { reason: 'emailInvalid' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { ownerEmail: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID } },
     });
 
     await fillValidForm(user);
@@ -105,8 +114,8 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
   it('marks the field with a returned error invalid and describes it by that error', async () => {
     createTenantActionMock.mockResolvedValue({
-      ok: false,
-      fieldErrors: { ownerEmail: { reason: 'emailInvalid' } },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { ownerEmail: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID } },
     });
 
     await fillValidForm(user);
@@ -121,7 +130,9 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   });
 
   it('shows a full-form loading overlay with a "Beginning provisioning…" label for the initial submit', async () => {
-    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    let resolveAction: (value: {
+      outcome: typeof ACTION_OUTCOME.SERVER_ERROR;
+    }) => void = () => {};
     createTenantActionMock.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -144,7 +155,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       'inert',
     );
 
-    resolveAction({ ok: false });
+    resolveAction({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     await waitFor(() =>
       expect(
         screen.queryByRole('status', { name: 'Beginning provisioning…' }),
@@ -153,13 +164,14 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   });
 
   it('shows an "Inviting owner…" pending label for the owner-invite confirmation submit', async () => {
-    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    let resolveAction: (value: {
+      outcome: typeof ACTION_OUTCOME.SERVER_ERROR;
+    }) => void = () => {};
     createTenantActionMock.mockResolvedValueOnce({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        token: 'confirmation-token',
-      },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
+      email: 'owner@example.com',
+      token: 'confirmation-token',
     });
     createTenantActionMock.mockImplementationOnce(
       () =>
@@ -179,7 +191,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       screen.getByRole('button', { name: 'Inviting owner…' }),
     ).toBeDisabled();
 
-    resolveAction({ ok: false });
+    resolveAction({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     await waitFor(() =>
       expect(
         screen.queryByRole('status', { name: 'Inviting owner…' }),
@@ -189,11 +201,10 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
   it('shows a soft owner-invite confirmation, not a blocking error, for an unregistered owner email', async () => {
     createTenantActionMock.mockResolvedValue({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        token: 'confirmation-token',
-      },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
+      email: 'owner@example.com',
+      token: 'confirmation-token',
     });
 
     await fillValidForm(user);
@@ -327,8 +338,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
   it('shows a general error returned from the Server Action', async () => {
     createTenantActionMock.mockResolvedValue({
-      ok: false,
-      error: 'createFailed',
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
 
     await fillValidForm(user);
