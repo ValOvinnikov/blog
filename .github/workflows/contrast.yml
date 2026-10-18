@@ -6,7 +6,8 @@ name: Contrast
 # dispatches it on a tag — because a per-PR run would cost more billed minutes
 # than the rest of CI together. Never a required check. It checks out the ref
 # it was dispatched on and never one named by an input, so its caches stay
-# scoped to that ref.
+# scoped to that ref. The report job posts the outcome, pass or fail, to the
+# platform's /api/internal/contrast-result route.
 on:
   workflow_dispatch:
 
@@ -85,4 +86,72 @@ jobs:
         working-directory: apps/web
         env:
           SHARD: ${{ matrix.shard }}
-        run: pnpm test:contrast --shard="${SHARD}/${SHARD_COUNT}" --workers=4
+          PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/contrast-report.json
+        run: pnpm test:contrast --shard="${SHARD}/${SHARD_COUNT}" --workers=4 --reporter=github,dot,json
+
+      - name: Upload the shard report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: contrast-report-${{ matrix.shard }}
+          path: ${{ runner.temp }}/contrast-report.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  report:
+    name: Report to the platform
+    needs: [storybook, shard]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: development
+    steps:
+      # A failed Storybook build leaves no shard reports; the run still posts a FAIL.
+      - name: Download the shard reports
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: contrast-report-*
+          path: ${{ runner.temp }}/contrast-reports
+
+      - name: Post the result
+        env:
+          ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
+          CONTRAST_RESULT_SECRET: ${{ secrets.CONTRAST_RESULT_SECRET }}
+          SHARD_RESULT: ${{ needs.shard.result }}
+          REPORTS_DIR: ${{ runner.temp }}/contrast-reports
+          SHA: ${{ github.sha }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          : "${ADMIN_APP_BASE_URL:?ADMIN_APP_BASE_URL is not set in the development environment}"
+          : "${CONTRAST_RESULT_SECRET:?CONTRAST_RESULT_SECRET is not set in the development environment}"
+
+          shopt -s nullglob
+          reports=("${REPORTS_DIR}"/*/contrast-report.json)
+          failure_count=0
+          if (( ${#reports[@]} > 0 )); then
+            failure_count=$(jq -s 'map(.stats.unexpected) | add' "${reports[@]}")
+          fi
+          outcome=FAIL
+          if [[ "${SHARD_RESULT}" == success ]]; then outcome=PASS; fi
+          tag=""
+          if [[ "${REF_TYPE}" == tag ]]; then tag="${REF_NAME}"; fi
+
+          body=$(jq -n \
+            --arg sha "${SHA}" \
+            --arg outcome "${outcome}" \
+            --argjson failureCount "${failure_count}" \
+            --arg runUrl "${RUN_URL}" \
+            --arg tag "${tag}" \
+            '{sha: $sha, outcome: $outcome, failureCount: $failureCount, runUrl: $runUrl}
+              + (if $tag == "" then {} else {tag: $tag} end)')
+          echo "Posting ${body}"
+
+          curl --fail-with-body --silent --show-error --max-time 30 \
+            --request POST "${ADMIN_APP_BASE_URL}/api/internal/contrast-result" \
+            --header "Authorization: Bearer ${CONTRAST_RESULT_SECRET}" \
+            --header 'Content-Type: application/json' \
+            --data "${body}"
