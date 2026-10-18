@@ -1,6 +1,11 @@
 'use client';
 
-import { FORM_STATUS, type TFormStatus } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  FORM_STATUS,
+  type TActionOutcome,
+  type TFormStatus,
+} from '@blog/config';
 import {
   useState,
   useTransition,
@@ -8,7 +13,10 @@ import {
   type SetStateAction,
 } from 'react';
 
-export type TUseFormSubmissionArgs<TValues, TResult extends { ok: boolean }> = {
+export type TUseFormSubmissionArgs<
+  TValues,
+  TResult extends { outcome: TActionOutcome },
+> = {
   initialValues: TValues | (() => TValues);
   onSubmit: (values: TValues) => Promise<TResult>;
   onSuccess?: (values: TValues, result: TResult) => void;
@@ -23,7 +31,10 @@ export type TUseFormSubmissionResult<TValues> = {
 };
 
 // Any `setValues` call clears a previous save's status, so an edit made after an alert shows dismisses it.
-export const useFormSubmission = <TValues, TResult extends { ok: boolean }>({
+export const useFormSubmission = <
+  TValues,
+  TResult extends { outcome: TActionOutcome },
+>({
   initialValues,
   onSubmit,
   onSuccess,
@@ -51,11 +62,12 @@ export const useFormSubmission = <TValues, TResult extends { ok: boolean }>({
           resolve(false);
           return;
         }
-        setStatus(result.ok ? FORM_STATUS.SUCCESS : FORM_STATUS.ERROR);
-        if (result.ok) {
+        const isSuccess = result.outcome === ACTION_OUTCOME.SUCCESS;
+        setStatus(isSuccess ? FORM_STATUS.SUCCESS : FORM_STATUS.ERROR);
+        if (isSuccess) {
           onSuccess?.(values, result);
         }
-        resolve(result.ok);
+        resolve(isSuccess);
       });
     });
 

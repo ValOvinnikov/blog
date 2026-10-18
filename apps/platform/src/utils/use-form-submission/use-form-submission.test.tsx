@@ -1,4 +1,4 @@
-import { FORM_STATUS } from '@blog/config';
+import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { useFormSubmission } from './use-form-submission';
 
 type TValues = { name: string };
-type TResult = { ok: boolean };
+type TResult = { outcome: TActionOutcome };
 
 type THarnessProps = {
   onOutcome?: (isSaved: boolean) => void;
@@ -67,7 +67,9 @@ describe(useFormSubmission, () => {
     render(
       <Harness
         initialValues={{ name: INITIAL_NAME }}
-        onSubmit={vi.fn().mockResolvedValue({ ok: true })}
+        onSubmit={vi
+          .fn()
+          .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS })}
       />,
     );
 
@@ -84,7 +86,9 @@ describe(useFormSubmission, () => {
     render(
       <Harness
         initialValues={buildInitialValues}
-        onSubmit={vi.fn().mockResolvedValue({ ok: true })}
+        onSubmit={vi
+          .fn()
+          .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS })}
       />,
     );
 
@@ -94,7 +98,9 @@ describe(useFormSubmission, () => {
   });
 
   it('sets status to success and calls onSuccess with the submitted values', async () => {
-    const onSubmit = vi.fn().mockResolvedValue({ ok: true });
+    const onSubmit = vi
+      .fn()
+      .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
     const onSuccess = vi.fn();
     render(
       <Harness
@@ -113,11 +119,16 @@ describe(useFormSubmission, () => {
 
     expect(status).toHaveTextContent(FORM_STATUS.SUCCESS);
     expect(onSubmit).toHaveBeenCalledWith({ name: EDITED_NAME });
-    expect(onSuccess).toHaveBeenCalledWith({ name: EDITED_NAME }, { ok: true });
+    expect(onSuccess).toHaveBeenCalledWith(
+      { name: EDITED_NAME },
+      { outcome: ACTION_OUTCOME.SUCCESS },
+    );
   });
 
   it('sets status to error and does not call onSuccess when the submit fails', async () => {
-    const onSubmit = vi.fn().mockResolvedValue({ ok: false });
+    const onSubmit = vi
+      .fn()
+      .mockResolvedValue({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     const onSuccess = vi.fn();
     render(
       <Harness
@@ -159,7 +170,9 @@ describe(useFormSubmission, () => {
   });
 
   it('clears a shown status back to idle as soon as the values change again', async () => {
-    const onSubmit = vi.fn().mockResolvedValue({ ok: true });
+    const onSubmit = vi
+      .fn()
+      .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
     render(
       <Harness initialValues={{ name: INITIAL_NAME }} onSubmit={onSubmit} />,
     );
@@ -176,8 +189,8 @@ describe(useFormSubmission, () => {
   });
 
   it.each([
-    [true, { ok: true }],
-    [false, { ok: false }],
+    [true, { outcome: ACTION_OUTCOME.SUCCESS }],
+    [false, { outcome: ACTION_OUTCOME.SERVER_ERROR }],
   ])(
     'resolves the submit with %s once the save settles',
     async (isSaved, result) => {

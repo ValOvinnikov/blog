@@ -1,6 +1,7 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { LOCALE_ISO_CODES, PRESET_ID } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import { VOICE_FIELD_ERROR } from '@platform/constants/voice';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
@@ -120,7 +121,10 @@ describe(saveVoiceOverridesAction, () => {
         payload as TVoiceOverridesByLocaleInput,
       );
 
-      expect(result).toEqual({ ok: false });
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrorsByLocale: {},
+      });
       expect(getSiteConfigOrDefaultsMock).not.toHaveBeenCalled();
       expect(upsertSiteConfigMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).not.toHaveBeenCalled();
@@ -128,7 +132,7 @@ describe(saveVoiceOverridesAction, () => {
     },
   );
 
-  it('returns ok:false and logs when the upsert throws', async () => {
+  it('reports a server error and logs when the upsert throws', async () => {
     upsertSiteConfigMock.mockRejectedValue(new Error('db down'));
 
     const result = await saveVoiceOverridesAction(
@@ -136,7 +140,7 @@ describe(saveVoiceOverridesAction, () => {
       overridesByLocale,
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'site_config.voice_save_failed',
       expect.objectContaining({ tenantId: 'tenant-1' }),
@@ -158,18 +162,28 @@ describe(saveVoiceOverridesAction, () => {
       overridesByLocale,
     );
 
-    expect(result).toEqual({ ok: false, fieldErrorsByLocale });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrorsByLocale: {
+        [LOCALE_ISO_CODES.DE]: {
+          notFoundHeading: {
+            reason: VOICE_FIELD_ERROR.REJECTED,
+            values: { detail: 'Must be 100 characters or fewer.' },
+          },
+        },
+      },
+    });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(recordAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('returns ok:true and revalidates once on a successful save', async () => {
+  it('succeeds and revalidates once on a successful save', async () => {
     const result = await saveVoiceOverridesAction(
       'tenant-1',
       overridesByLocale,
     );
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 

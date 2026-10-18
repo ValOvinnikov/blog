@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TActionOutcome, TMaybeUndefined } from '@blog/config';
 import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useId, useState } from 'react';
@@ -15,7 +15,10 @@ type TSettingsFormDraftConfig<TValues> = Omit<
   onRestore?: (values: TValues) => void;
 };
 
-export type TUseSettingsFormArgs<TValues, TResult extends { ok: boolean }> = {
+export type TUseSettingsFormArgs<
+  TValues,
+  TResult extends { outcome: TActionOutcome },
+> = {
   initialValues: TValues;
   archivedAt: TMaybeUndefined<Date>;
   onSubmit: (values: TValues) => Promise<TResult>;
@@ -44,7 +47,10 @@ export type TSettingsForm<TValues> = {
   draft: TSettingsFormDraft<TValues>;
 };
 
-export const useSettingsForm = <TValues, TResult extends { ok: boolean }>({
+export const useSettingsForm = <
+  TValues,
+  TResult extends { outcome: TActionOutcome },
+>({
   initialValues,
   archivedAt,
   onSubmit,

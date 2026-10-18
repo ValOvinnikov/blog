@@ -1,6 +1,10 @@
 'use client';
 
-import { ACTION_OUTCOME, type TLocaleIsoCode } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  type TActionOutcome,
+  type TLocaleIsoCode,
+} from '@blog/config';
 import {
   useSettingsForm,
   type TUseSettingsFormArgs,
@@ -31,7 +35,7 @@ import { persistStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useState } from 'react';
 
 type TUseEmailDraftArgs = Omit<
-  TUseSettingsFormArgs<TEmailDraft, { ok: boolean }>,
+  TUseSettingsFormArgs<TEmailDraft, { outcome: TActionOutcome }>,
   'initialValues' | 'onSubmit' | 'onSuccess' | 'invalidControls'
 > & {
   tenantId: string;
@@ -60,7 +64,7 @@ export const useEmailDraft = ({
   const [senderFieldErrors, setSenderFieldErrors] =
     useState<TSenderFieldErrors>({});
 
-  const settings = useSettingsForm<TEmailDraft, { ok: boolean }>({
+  const settings = useSettingsForm<TEmailDraft, { outcome: TActionOutcome }>({
     ...settingsArgs,
     initialValues: initialDraft,
     invalidControls: () => ({
@@ -82,10 +86,10 @@ export const useEmailDraft = ({
       let nextSaved = saved;
       let nextDraft = draft;
 
-      const finish = (ok: boolean) => {
+      const finish = (outcome: TActionOutcome) => {
         setSavedValues(nextSaved);
         setValues(nextDraft);
-        return { ok };
+        return { outcome };
       };
 
       for (const target of listLogoChanges(saved, draft)) {
@@ -99,7 +103,7 @@ export const useEmailDraft = ({
             uploadEmailLogoAction(tenantId, logoTarget, formData),
           clear: () => clearEmailLogoAction(tenantId, logoTarget),
         });
-        if (!result.ok) return finish(false);
+        if (!result.ok) return finish(result.failure.outcome);
 
         nextSaved = withLogo(nextSaved, target, result.image);
         nextDraft = withLogo(nextDraft, target, result.image);
@@ -113,7 +117,9 @@ export const useEmailDraft = ({
         setSenderFieldErrors(
           result.outcome === ACTION_OUTCOME.INVALID ? result.fieldErrors : {},
         );
-        if (result.outcome !== ACTION_OUTCOME.SUCCESS) return finish(false);
+        if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+          return finish(result.outcome);
+        }
         nextSaved = { ...nextSaved, sender: draft.sender };
       }
 
@@ -127,14 +133,16 @@ export const useEmailDraft = ({
           change.locale,
           { subject: trimmedSubject, body },
         );
-        if (result.outcome !== ACTION_OUTCOME.SUCCESS) return finish(false);
+        if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+          return finish(result.outcome);
+        }
 
         const savedCopy = { subject: trimmedSubject ?? '', body };
         nextSaved = withCopy(nextSaved, change, savedCopy);
         nextDraft = withCopy(nextDraft, change, savedCopy);
       }
 
-      return finish(true);
+      return finish(ACTION_OUTCOME.SUCCESS);
     },
   });
 

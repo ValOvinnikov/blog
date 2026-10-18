@@ -1,6 +1,11 @@
-import { SITE_MESSAGES_BY_LOCALE, type TVoicePortableText } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  SITE_MESSAGES_BY_LOCALE,
+  type TVoicePortableText,
+} from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
+import { VOICE_FIELD_ERROR } from '@platform/constants/voice';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
@@ -12,6 +17,11 @@ import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent from '@testing-library/user-event';
 
 import { VoiceSettings, type TVoiceSettingsProps } from './voice-settings';
+
+const rejected = (detail: string) => ({
+  reason: VOICE_FIELD_ERROR.REJECTED,
+  values: { detail },
+});
 
 vi.mock('@platform/server/site-config/save-voice-overrides-action', () => ({
   saveVoiceOverridesAction: vi.fn(),
@@ -407,7 +417,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
   describe('saving', () => {
     it('leaves every untouched rich field exactly as stored, in every language', async () => {
-      saveVoiceOverridesActionMock.mockResolvedValue({ ok: true });
+      saveVoiceOverridesActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       setupBilingual();
 
       await user.clear(notFoundHeading());
@@ -428,7 +440,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('shows a toast and refreshes after a successful save', async () => {
       const refresh = mockRouterRefresh();
-      saveVoiceOverridesActionMock.mockResolvedValue({ ok: true });
+      saveVoiceOverridesActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       setup();
 
       await user.type(notFoundHeading(), 'Lost');
@@ -440,7 +454,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('shows an error alert and does not refresh when the save fails', async () => {
       const refresh = mockRouterRefresh();
-      saveVoiceOverridesActionMock.mockResolvedValue({ ok: false });
+      saveVoiceOverridesActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
       setup();
 
       await user.type(notFoundHeading(), 'Lost');
@@ -454,9 +470,11 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('shows a rejected field inline and counts it on the save bar until edited', async () => {
       saveVoiceOverridesActionMock.mockResolvedValue({
-        ok: false,
+        outcome: ACTION_OUTCOME.INVALID,
         fieldErrorsByLocale: {
-          [EN]: { notFoundHeading: 'Must be 100 characters or fewer.' },
+          [EN]: {
+            notFoundHeading: rejected('Must be 100 characters or fewer.'),
+          },
         },
       });
       setup();
@@ -487,9 +505,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('switches to the language and opens the list that holds a rejected field', async () => {
       saveVoiceOverridesActionMock.mockResolvedValue({
-        ok: false,
+        outcome: ACTION_OUTCOME.INVALID,
         fieldErrorsByLocale: {
-          [DE]: { tagEmpty: 'Missing required placeholder {name}.' },
+          [DE]: { tagEmpty: rejected('Missing required placeholder {name}.') },
         },
       });
       setupBilingual();
@@ -516,10 +534,12 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('counts a field rejected in two languages once per language', async () => {
         saveVoiceOverridesActionMock.mockResolvedValue({
-          ok: false,
+          outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
-            [EN]: { notFoundHeading: 'Must be 100 characters or fewer.' },
-            [DE]: { notFoundHeading: 'Höchstens 100 Zeichen.' },
+            [EN]: {
+              notFoundHeading: rejected('Must be 100 characters or fewer.'),
+            },
+            [DE]: { notFoundHeading: rejected('Höchstens 100 Zeichen.') },
           },
         });
         setupBilingual();
@@ -532,11 +552,11 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('goes to the first rejected field in page order', async () => {
         saveVoiceOverridesActionMock.mockResolvedValue({
-          ok: false,
+          outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
             [EN]: {
-              blogListEmpty: 'Missing required placeholder.',
-              notFoundHeading: 'Must be 100 characters or fewer.',
+              blogListEmpty: rejected('Missing required placeholder.'),
+              notFoundHeading: rejected('Must be 100 characters or fewer.'),
             },
           },
         });
@@ -551,11 +571,11 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('opens an earlier rejected list in place of the open one', async () => {
         saveVoiceOverridesActionMock.mockResolvedValue({
-          ok: false,
+          outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
             [EN]: {
-              topicEmpty: 'Missing required placeholder {name}.',
-              tagEmpty: 'Missing required placeholder {name}.',
+              topicEmpty: rejected('Missing required placeholder {name}.'),
+              tagEmpty: rejected('Missing required placeholder {name}.'),
             },
           },
         });
@@ -576,9 +596,11 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('returns to the language that holds the first rejected field', async () => {
         saveVoiceOverridesActionMock.mockResolvedValue({
-          ok: false,
+          outcome: ACTION_OUTCOME.INVALID,
           fieldErrorsByLocale: {
-            [DE]: { tagEmpty: 'Missing required placeholder {name}.' },
+            [DE]: {
+              tagEmpty: rejected('Missing required placeholder {name}.'),
+            },
           },
         });
         setupBilingual();
