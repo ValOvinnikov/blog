@@ -1,3 +1,4 @@
+import { HEADER_CONTROL_FRAME } from '@blog/ui/lib/styling';
 import { tv } from 'tailwind-variants';
 
 export const languageCodesVariants = tv({
@@ -10,7 +11,8 @@ export const languageCodesVariants = tv({
     isInFooter: {
       false: {
         list: [
-          'items-center gap-0.5 rounded-full border border-border-strong p-0.5',
+          HEADER_CONTROL_FRAME,
+          'items-center gap-0.5 p-[5px] pointer-coarse:p-[9px]',
         ],
         link: [
           'h-6 min-w-6 justify-center rounded-full px-1.5 pb-0 text-label no-underline',
@@ -34,6 +36,7 @@ export const languageCodesVariants = tv({
         link: [
           'bg-brand-primary text-brand-primary-contrast',
           'hover:text-brand-primary-contrast',
+          'forced-colors:outline forced-colors:outline-1 forced-colors:-outline-offset-1 forced-colors:outline-[Highlight]',
         ],
       },
     },

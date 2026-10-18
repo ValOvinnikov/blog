@@ -8,6 +8,7 @@ import { Text } from '@blog/ui/components/atoms/text';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
+import { SignInLabel } from '@web/components/shared/auth-menu/components/sign-in-label/sign-in-label';
 import { useEmailSignIn } from '@web/components/shared/auth-menu/hooks/use-email-sign-in';
 import { headerControlVariants } from '@web/components/shared/header-control';
 import { signIn } from 'next-auth/react';
@@ -50,7 +51,7 @@ export const SignInMenu = ({
     emailFormRef,
     handleEmailSubmit,
   } = useEmailSignIn(isOpen);
-  const { panel } = authMenuVariants();
+  const { panel, signInTrigger } = authMenuVariants();
   const {
     label,
     providerPrompt,
@@ -94,12 +95,9 @@ export const SignInMenu = ({
         panelId={panelId}
         onClick={toggle}
         variant="bordered"
-        className={headerControlVariants({
-          isRound: true,
-          class: 'lg:rounded-sm',
-        })}
+        className={headerControlVariants({ class: signInTrigger() })}
       >
-        {t('signIn')}
+        <SignInLabel />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
         ref={panelRef}
