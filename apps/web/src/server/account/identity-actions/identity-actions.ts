@@ -1,84 +1,69 @@
 'use server';
 
+import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
 import { logger } from '@web/utils/logger/logger';
 
-// The two sign-in methods `ProviderLinkControl` can unlink — mirrors
-// `@blog/db`'s own `TLinkableProvider` (email link has no `accounts` row to
-// delete, so it's deliberately excluded here too). Kept as a local literal
-// union rather than importing the db package's type through the `queries`
-// namespace, matching this file tree's other action modules.
 export type TLinkableProvider = 'github' | 'google';
 
 const LINKABLE_PROVIDERS: readonly TLinkableProvider[] = ['github', 'google'];
 
-// `provider: TLinkableProvider` on `unlinkProviderAction` below is only a
-// compile-time constraint — a `'use server'` action's underlying endpoint
-// can be invoked directly (bypassing the client bundle and TypeScript
-// entirely), so an attacker can pass an arbitrary string at runtime.
-// Re-validating here, before `provider` is used anywhere, means every
-// downstream use — logged or passed to the db call — operates on a value
-// that's actually one of the two known literals.
+// A server action's endpoint can be called directly with any string, so the parameter type alone does not guard it.
 const isLinkableProvider = (value: string): value is TLinkableProvider => {
   return (LINKABLE_PROVIDERS as readonly string[]).includes(value);
 };
 
-export type TUnlinkProviderResult =
-  { ok: true } | { ok: false; reason: 'last-method' | 'unknown' };
+export type TUnlinkProviderResult = TActionResult<
+  typeof ACTION_OUTCOME.BLOCKED | typeof ACTION_OUTCOME.SERVER_ERROR
+>;
 
-export type TUpdateDisplayNameResult = { ok: true } | { ok: false };
+export type TUpdateDisplayNameResult = TActionResult<
+  typeof ACTION_OUTCOME.SERVER_ERROR,
+  'name'
+>;
 
-/**
- * `ProviderLinkControl`'s "unlink" server write. Reads the session itself
- * rather than trusting a caller-supplied `userId`.
- * `queries.account.unlinkProvider` atomically rejects with `'last-method'`
- * if `provider` is the reader's last remaining linked sign-in method; that
- * outcome is surfaced distinctly rather than folded into a generic failure,
- * so the client can show a specific error even if the UI's own last-method
- * guard raced a concurrent unlink from another tab.
- */
+const SUCCESS = { outcome: ACTION_OUTCOME.SUCCESS } as const;
+const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
+
 export const unlinkProviderAction = async (
   provider: TLinkableProvider,
 ): Promise<TUnlinkProviderResult> => {
-  if (!isLinkableProvider(provider)) return { ok: false, reason: 'unknown' };
+  if (!isLinkableProvider(provider)) return SERVER_ERROR;
 
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) return { ok: false, reason: 'unknown' };
+  if (!userId) return SERVER_ERROR;
 
   try {
     const result = await queries.account.unlinkProvider(userId, provider);
     if (result.outcome === 'last-method') {
-      return { ok: false, reason: 'last-method' };
+      return { outcome: ACTION_OUTCOME.BLOCKED };
     }
-    return { ok: true };
+    return SUCCESS;
   } catch (error) {
     logger.error('account.provider_unlink_failed', { provider, error });
-    return { ok: false, reason: 'unknown' };
+    return SERVER_ERROR;
   }
 };
 
-/**
- * `DisplayNameControl`'s server write. `queries.account.updateDisplayName`
- * performs no validation of its own, so this trims `name` and rejects an
- * empty result before ever reaching the database.
- */
 export const updateDisplayNameAction = async (
   name: string,
 ): Promise<TUpdateDisplayNameResult> => {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) return { ok: false };
+  if (!userId) return SERVER_ERROR;
 
   const trimmedName = name.trim();
-  if (trimmedName.length === 0) return { ok: false };
+  if (trimmedName.length === 0) {
+    return { outcome: ACTION_OUTCOME.INVALID, invalidFields: ['name'] };
+  }
 
   try {
     await queries.account.updateDisplayName(userId, trimmedName);
-    return { ok: true };
+    return SUCCESS;
   } catch (error) {
     logger.error('account.display_name_update_failed', { error });
-    return { ok: false };
+    return SERVER_ERROR;
   }
 };
