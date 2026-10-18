@@ -5,7 +5,7 @@ import type { TLanguageChangeCount } from '@platform/utils/format-language-chang
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useId, useState } from 'react';
 
-import type { TInvalidFields } from './components/save-bar/save-bar';
+import type { TInvalidControls } from './components/save-bar/save-bar';
 import type { TSettingsFormDraft } from './use-settings-draft';
 
 type TSettingsFormDraftConfig<TValues> = Omit<
@@ -26,7 +26,7 @@ export type TUseSettingsFormArgs<TValues, TResult extends { ok: boolean }> = {
     values: TValues,
     savedValues: TValues,
   ) => TLanguageChangeCount[];
-  invalidFields?: (values: TValues) => TInvalidFields;
+  invalidControls?: (values: TValues) => TInvalidControls;
   canSave?: (values: TValues) => boolean;
   draft: TSettingsFormDraftConfig<TValues>;
 };
@@ -36,7 +36,7 @@ export type TSettingsForm<TValues> = {
   discard: () => void;
   changeCount: number;
   changesByLanguage: TLanguageChangeCount[];
-  invalidFields: TMaybeUndefined<TInvalidFields>;
+  invalidControls: TMaybeUndefined<TInvalidControls>;
   isPending: boolean;
   isArchived: boolean;
   archivedAt: TMaybeUndefined<Date>;
@@ -52,7 +52,7 @@ export const useSettingsForm = <TValues, TResult extends { ok: boolean }>({
   onDiscard,
   countChanges,
   countChangesByLanguage,
-  invalidFields,
+  invalidControls,
   canSave,
   draft,
 }: TUseSettingsFormArgs<TValues, TResult>) => {
@@ -83,7 +83,7 @@ export const useSettingsForm = <TValues, TResult extends { ok: boolean }>({
     discard,
     changeCount: countChanges(values, savedValues),
     changesByLanguage: countChangesByLanguage?.(values, savedValues) ?? [],
-    invalidFields: invalidFields?.(values),
+    invalidControls: invalidControls?.(values),
     isPending,
     isArchived,
     archivedAt,

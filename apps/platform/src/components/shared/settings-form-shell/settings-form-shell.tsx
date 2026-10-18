@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
-import { SaveBar, type TInvalidFields } from './components/save-bar/save-bar';
+import { SaveBar, type TInvalidControls } from './components/save-bar/save-bar';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
 import { useSettingsDraft } from './use-settings-draft';
 import type { TSettingsForm } from './use-settings-form';
@@ -26,7 +26,7 @@ export type TSettingsFormShellProps<TValues> = {
   children: ReactNode;
 };
 
-const NO_INVALID_FIELDS: TInvalidFields = { ids: [] };
+const NO_INVALID_CONTROLS: TInvalidControls = { ids: [] };
 
 const isSaveShortcut = (event: KeyboardEvent) =>
   (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's';
@@ -45,7 +45,7 @@ export const SettingsFormShell = <TValues,>({
     discard,
     changeCount,
     changesByLanguage,
-    invalidFields = NO_INVALID_FIELDS,
+    invalidControls = NO_INVALID_CONTROLS,
     isPending,
     isArchived,
     archivedAt,
@@ -177,7 +177,7 @@ export const SettingsFormShell = <TValues,>({
         <SaveBar
           changeCount={changeCount}
           breakdown={breakdown}
-          invalidFields={invalidFields}
+          invalidControls={invalidControls}
           isPending={isPending}
           onSave={() => void handleSave()}
           onDiscard={handleDiscard}
