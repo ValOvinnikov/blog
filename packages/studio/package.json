@@ -41,7 +41,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "sanity": "^6.19.0",
-    "sanity-plugin-internationalized-array": "^5.3.2",
+    "sanity-plugin-internationalized-array": "^5.3.5",
     "sanity-plugin-media": "^6.3.5",
     "styled-components": "^6.1.15"
   },
