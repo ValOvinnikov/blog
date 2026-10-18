@@ -61,6 +61,8 @@ export const LanguageSwitcher = ({
       />
     );
   const { root, desktopOnly, mobileOnly } = languageSwitcherVariants();
+  const hasPhoneFallbackMenu =
+    !isInFooter && resolvedStyle === LANGUAGE_SWITCHER_STYLE.MENU_GLOBE;
 
   return (
     <nav
@@ -68,9 +70,7 @@ export const LanguageSwitcher = ({
       className={root()}
       data-testid={dataTestId}
     >
-      {isInFooter || resolvedStyle === LANGUAGE_SWITCHER_STYLE.MENU_CODE ? (
-        control
-      ) : (
+      {hasPhoneFallbackMenu ? (
         <>
           <div
             className={desktopOnly()}
@@ -85,6 +85,8 @@ export const LanguageSwitcher = ({
             />
           </div>
         </>
+      ) : (
+        control
       )}
     </nav>
   );
