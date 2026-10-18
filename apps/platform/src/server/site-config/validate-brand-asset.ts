@@ -27,12 +27,12 @@ const IMAGE_FORMAT_BY_DETECTED_TYPE: Record<string, TImageFormat> = {
  * derives its width/height from the root `width`/`height` or `viewBox`
  * aspect ratio, which is what a browser tab renders the favicon at.
  */
-const validateSvgAsset = (
+const validateSvgAsset = async (
   buffer: Buffer,
   kind: TBrandAssetKind,
   format: TImageFormat,
-): TImageUploadValidationResult => {
-  const sanitized = sanitizeSvgMarkup(buffer.toString('utf-8'));
+): Promise<TImageUploadValidationResult> => {
+  const sanitized = await sanitizeSvgMarkup(buffer.toString('utf-8'));
   if (!sanitized) {
     return { ok: false, error: { reason: 'unreadableImage' } };
   }

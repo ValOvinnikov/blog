@@ -1,10 +1,7 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
-import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-
-const purify = createDOMPurify(new JSDOM('').window);
+import type { DOMPurify, ElementHook, NodeHook } from 'dompurify';
 
 const URI_BEARING_ATTRIBUTES = ['href', 'xlink:href', 'src'];
 
@@ -21,7 +18,7 @@ const stripUnsafeCssUrlReferences = (value: string): string => {
 };
 
 // Narrows every URI attribute and CSS `url(...)` to a fragment or `data:` URI; a global `ALLOWED_URI_REGEXP` would also strip numeric attributes.
-purify.addHook('afterSanitizeAttributes', (node) => {
+const narrowAttributeReferences: ElementHook = (node) => {
   for (const attrName of URI_BEARING_ATTRIBUTES) {
     const value = node.getAttribute(attrName);
     if (value && !isSameDocumentOrInlineReference(value)) {
@@ -46,16 +43,34 @@ purify.addHook('afterSanitizeAttributes', (node) => {
       node.removeAttribute(attr.name);
     }
   }
-});
+};
 
 // DOMPurify's scheme check never reaches a `<style>` element's `url(...)` rules.
-purify.addHook('afterSanitizeElements', (node) => {
+const narrowStyleElementReferences: NodeHook = (node) => {
   if (node.nodeName?.toLowerCase() === 'style' && node.textContent) {
     node.textContent = stripUnsafeCssUrlReferences(node.textContent);
   }
-});
+};
 
-export const sanitizeSvgMarkup = (markup: string): TMaybeUndefined<string> => {
+// Imported on first use: jsdom must stay off the load path of the page's other server actions.
+const createPurify = async (): Promise<DOMPurify> => {
+  const [{ default: createDOMPurify }, { JSDOM }] = await Promise.all([
+    import('dompurify'),
+    import('jsdom-commonjs'),
+  ]);
+  const purify = createDOMPurify(new JSDOM('').window);
+  purify.addHook('afterSanitizeAttributes', narrowAttributeReferences);
+  purify.addHook('afterSanitizeElements', narrowStyleElementReferences);
+  return purify;
+};
+
+let purifyPromise: TMaybeUndefined<Promise<DOMPurify>>;
+
+export const sanitizeSvgMarkup = async (
+  markup: string,
+): Promise<TMaybeUndefined<string>> => {
+  purifyPromise ??= createPurify();
+  const purify = await purifyPromise;
   const clean = purify.sanitize(markup, {
     USE_PROFILES: { svg: true, svgFilters: true },
     FORBID_TAGS: ['script', 'foreignObject'],

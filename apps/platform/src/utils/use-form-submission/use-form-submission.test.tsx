@@ -136,6 +136,28 @@ describe(useFormSubmission, () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
+  it('sets status to error and resolves false when the submit throws', async () => {
+    const onSubmit = vi.fn().mockRejectedValue(new Error(faker.lorem.words()));
+    const onSuccess = vi.fn();
+    const onOutcome = vi.fn();
+    render(
+      <Harness
+        initialValues={{ name: INITIAL_NAME }}
+        onSubmit={onSubmit}
+        onSuccess={onSuccess}
+        onOutcome={onOutcome}
+      />,
+    );
+    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+
+    await user.click(submitButton);
+
+    await waitFor(() => expect(onOutcome).toHaveBeenCalledWith(false));
+    const status = screen.getByTestId('status');
+    expect(status).toHaveTextContent(FORM_STATUS.ERROR);
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
   it('clears a shown status back to idle as soon as the values change again', async () => {
     const onSubmit = vi.fn().mockResolvedValue({ ok: true });
     render(

@@ -20,6 +20,8 @@ export default createNextConfig({
     },
   },
   transpilePackages: ['@blog/ui'],
+  // Turbopack cannot bundle jsdom, and Next externalises it only under its own name, not this alias.
+  serverExternalPackages: ['jsdom-commonjs'],
   images: {
     // Matches the CSP `img-src` allowance above: a public-access Vercel
     // Blob store's pathname is per-store, not fixed, hence the wildcard

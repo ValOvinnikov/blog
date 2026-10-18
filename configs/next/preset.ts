@@ -45,7 +45,7 @@ const buildSecurityHeaders = (contentSecurityPolicy: string) => [
 
 export type TNextConfigOverrides = Pick<
   NextConfig,
-  'transpilePackages' | 'images' | 'experimental'
+  'transpilePackages' | 'serverExternalPackages' | 'images' | 'experimental'
 > & {
   contentSecurityPolicy: string;
 };
