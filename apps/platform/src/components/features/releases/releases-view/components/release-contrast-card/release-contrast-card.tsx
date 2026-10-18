@@ -1,6 +1,6 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -27,18 +27,18 @@ export type TReleaseContrastCardProps = {
   status: TContrastStatus;
 };
 
-const SERVER_AUTHORITATIVE_STATUSES: TContrastStatus[] = [
-  CONTRAST_STATUS.RUNNING,
-  CONTRAST_STATUS.GREEN,
-  CONTRAST_STATUS.FAILED,
-];
-
 export const ReleaseContrastCard = ({
   status: serverStatus,
 }: TReleaseContrastCardProps) => {
-  const [hasStarted, setHasStarted] = useState(false);
+  const [startedFrom, setStartedFrom] =
+    useState<TMaybeUndefined<TContrastStatus>>();
+
+  if (startedFrom !== undefined && serverStatus !== startedFrom) {
+    setStartedFrom(undefined);
+  }
+
   const status =
-    hasStarted && !SERVER_AUTHORITATIVE_STATUSES.includes(serverStatus)
+    startedFrom !== undefined && serverStatus === startedFrom
       ? CONTRAST_STATUS.RUNNING
       : serverStatus;
   const t = useTranslations('releaseContrastCard');
@@ -52,7 +52,7 @@ export const ReleaseContrastCard = ({
         actions={
           <RunContrastCheckButton
             isRunning={status === CONTRAST_STATUS.RUNNING}
-            onStarted={() => setHasStarted(true)}
+            onStarted={() => setStartedFrom(serverStatus)}
           />
         }
       />

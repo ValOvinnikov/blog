@@ -78,9 +78,12 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   request, not the workflow's outcome, and is written only after a successful
   dispatch. Once the action succeeds the contrast
   card shows `RUNNING` client-side straight away, without polling, even before
-  GitHub lists the run, and the button stays disabled. A later server render
-  that reports `RUNNING`, `GREEN` or `FAILED` takes over; the next page load
-  shows GitHub's status.
+  GitHub lists the run, and the button stays disabled. It remembers the server
+  status the start happened from and shows `RUNNING` while the server status
+  still equals it, so a rerun from `GREEN` or `FAILED` replaces the stale
+  result. Once the server status differs it wins and the local state clears,
+  so a later `DUE` or `NONE` never flips back; the next page load shows
+  GitHub's status.
 - `POST /api/internal/contrast-result` — machine-only, Bearer
   `CONTRAST_RESULT_SECRET`. Records the posted result as the SHA's contrast
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
