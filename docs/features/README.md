@@ -25,7 +25,7 @@ on the public site or the platform yet).
 | [Audit events and findings](audit-and-findings.md)                    | partial | db, platform, config                      | An append-only log of who did what to a tenant, and open/resolved conditions an operator should act on.                 |
 | [Operator alerts](operator-alerts.md)                                 | built   | platform, email, db, config               | Emails SUPERADMINs when a background job finds a tenant needing a human, such as stuck Sanity access.                   |
 | [Cross-tenant migrations](cross-tenant-migrations.md)                 | built   | studio, db                                | Runs content migrations for the one shared schema against every tenant's Sanity project.                                |
-| [Platform releases](platform-releases.md)                             | planned | config, utils                             | A SUPERADMIN sees the release candidate, runs the contrast check and cuts a production release.                         |
+| [Platform releases](platform-releases.md)                             | partial | config, utils                             | A SUPERADMIN sees the release candidate, runs the contrast check and cuts a production release.                         |
 
 ## Look, copy and languages
 

@@ -245,6 +245,21 @@ describe(getReleaseCandidate, () => {
     });
   });
 
+  it('fails with tagListIncomplete when the tag list never stops paging', async () => {
+    github.respond('/git/matching-refs/tags/v', () =>
+      githubJson(
+        Array.from({ length: 100 }, (_, index) => ({
+          ref: `refs/tags/v1.${index}.0`,
+        })),
+      ),
+    );
+
+    expect(await getReleaseCandidate()).toEqual({
+      ok: false,
+      reason: 'tagListIncomplete',
+    });
+  });
+
   it('fails with notConfigured when the token is missing', async () => {
     github.unsetToken();
 

@@ -17,7 +17,8 @@
     "studio": "Studio · Administración",
     "findings": "Incidencias · Administración",
     "email": "Correo electrónico · Administración",
-    "leads": "Contactos · Administración"
+    "leads": "Contactos · Administración",
+    "releases": "Versiones · Admin"
   },
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
@@ -96,7 +97,8 @@
     "badgeComingSoon": "Próximamente",
     "badgePlatform": "plataforma",
     "features": "Funciones",
-    "leads": "Contactos"
+    "leads": "Contactos",
+    "releases": "Versiones"
   },
   "tenantLayout": {
     "scopeLabel": "Cliente"
@@ -1023,6 +1025,85 @@
     "errors": {
       "notFound": "Este mensaje ya se había eliminado.",
       "failed": "No se pudo eliminar el mensaje. Inténtelo de nuevo."
+    }
+  },
+  "releasesView": {
+    "title": "Versiones",
+    "description": "Qué contiene la próxima versión y si se ha comprobado su renderizado.",
+    "incompleteTitle": "La lista de cambios está incompleta",
+    "incompleteDescription": "GitHub muestra como máximo {limit, number} archivos modificados por comparación, así que todas las áreas cuentan como afectadas y cada recuento de migraciones es un mínimo."
+  },
+  "releaseSummaryCard": {
+    "title": "Candidata a versión",
+    "description": "El último commit de main, medido frente a la última versión.",
+    "lastTag": "Última versión",
+    "headCommit": "Último commit",
+    "commitsSinceTag": "Desde la última versión",
+    "commitCount": "{count, plural, one {# commit} other {# commits}}"
+  },
+  "releaseCommits": {
+    "ariaLabel": "Commits desde {tag}",
+    "empty": "No hay commits desde {tag}. Main está en la última versión.",
+    "newestOnly": "Se muestran los {shown, number} commits más recientes de {total, number}.",
+    "columnCommit": "Commit",
+    "columnMessage": "Mensaje",
+    "columnAuthor": "Autor",
+    "columnDate": "Fecha"
+  },
+  "releaseAreasCard": {
+    "title": "Áreas afectadas",
+    "description": "Las partes del código que cambia esta versión.",
+    "touched": "Afectada",
+    "untouched": "Sin cambios",
+    "area": {
+      "RENDERING": "UI y renderizado",
+      "DB_MIGRATION": "Migraciones de base de datos",
+      "SANITY_MIGRATION": "Migraciones de Sanity",
+      "ENV": "Variables de entorno"
+    },
+    "dbMigrations": "{count, plural, one {# migración por aplicar} other {# migraciones por aplicar}}",
+    "dbMigrationsMinimum": "Al menos {count, plural, one {# migración por aplicar} other {# migraciones por aplicar}}",
+    "sanityMigrations": "{count, plural, one {# migración} other {# migraciones}} en {tenants, plural, one {# proyecto} other {# proyectos}}",
+    "sanityMigrationsMinimum": "Al menos {count, plural, one {# migración} other {# migraciones}} en {tenants, plural, one {# proyecto} other {# proyectos}}"
+  },
+  "releaseContrastCard": {
+    "title": "Comprobación de contraste",
+    "description": "Si se ha comprobado que el renderizado de esta versión no empeora el contraste.",
+    "status": {
+      "GREEN": "Superada",
+      "FAILED": "Fallida",
+      "RUNNING": "En curso",
+      "DUE": "Pendiente",
+      "NONE": "No necesaria"
+    },
+    "explanation": {
+      "GREEN": "El último commit superó la comprobación de contraste.",
+      "FAILED": "La comprobación de contraste encontró regresiones en el último commit.",
+      "RUNNING": "Se está ejecutando una comprobación de contraste para el último commit.",
+      "DUE": "El renderizado cambió desde la última comprobación superada. Ejecútala antes de publicar.",
+      "NONE": "Esta versión no cambia nada de lo que cubre la comprobación de contraste."
+    },
+    "viewFinding": "Ver el hallazgo"
+  },
+  "runContrastCheckButton": {
+    "label": "Ejecutar comprobación de contraste",
+    "starting": "Iniciando…",
+    "started": "Comprobación de contraste iniciada.",
+    "alreadyRunning": "Ya hay una comprobación de contraste en curso.",
+    "githubUnavailable": "No se pudo conectar con GitHub. Inténtalo de nuevo en un momento.",
+    "startFailed": "No se pudo iniciar la comprobación de contraste."
+  },
+  "releaseUnavailable": {
+    "title": "La información de la versión no está disponible",
+    "retry": "Reintentar",
+    "retrying": "Reintentando…",
+    "reason": {
+      "notConfigured": "El acceso a GitHub no está configurado para esta aplicación.",
+      "noReleaseTag": "El repositorio aún no tiene ninguna etiqueta de versión, así que no hay nada con lo que comparar.",
+      "rateLimited": "GitHub está limitando las solicitudes. Inténtalo de nuevo en unos minutos.",
+      "githubError": "No se pudo conectar con GitHub o respondió con un error.",
+      "tagListIncomplete": "La lista de etiquetas de versión es demasiado larga para leerla entera, así que no se puede determinar la última versión.",
+      "dbError": "No se pudo leer la base de datos."
     }
   }
 }

@@ -17,7 +17,8 @@
     "studio": "Studio · Admin",
     "findings": "Findings · Admin",
     "email": "Email · Admin",
-    "leads": "Leads · Admin"
+    "leads": "Leads · Admin",
+    "releases": "Releases · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -96,7 +97,8 @@
     "badgeComingSoon": "Coming soon",
     "badgePlatform": "platform",
     "features": "Features",
-    "leads": "Leads"
+    "leads": "Leads",
+    "releases": "Releases"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -1023,6 +1025,85 @@
     "errors": {
       "notFound": "This message was already deleted.",
       "failed": "Couldn't delete the message. Try again."
+    }
+  },
+  "releasesView": {
+    "title": "Releases",
+    "description": "What the next release contains, and whether its rendering has been checked.",
+    "incompleteTitle": "The change list is incomplete",
+    "incompleteDescription": "GitHub lists at most {limit, number} changed files for a comparison, so every area counts as touched and each migration count is a minimum."
+  },
+  "releaseSummaryCard": {
+    "title": "Release candidate",
+    "description": "The latest commit on main, measured against the last release.",
+    "lastTag": "Last release",
+    "headCommit": "Latest commit",
+    "commitsSinceTag": "Since the last release",
+    "commitCount": "{count, plural, one {# commit} other {# commits}}"
+  },
+  "releaseCommits": {
+    "ariaLabel": "Commits since {tag}",
+    "empty": "No commits since {tag}. Main is at the last release.",
+    "newestOnly": "Showing the newest {shown, number} of {total, number} commits.",
+    "columnCommit": "Commit",
+    "columnMessage": "Message",
+    "columnAuthor": "Author",
+    "columnDate": "Date"
+  },
+  "releaseAreasCard": {
+    "title": "Touched areas",
+    "description": "The parts of the codebase this release changes.",
+    "touched": "Touched",
+    "untouched": "Not touched",
+    "area": {
+      "RENDERING": "UI and rendering",
+      "DB_MIGRATION": "Database migrations",
+      "SANITY_MIGRATION": "Sanity migrations",
+      "ENV": "Environment variables"
+    },
+    "dbMigrations": "{count, plural, one {# migration to apply} other {# migrations to apply}}",
+    "dbMigrationsMinimum": "At least {count, plural, one {# migration to apply} other {# migrations to apply}}",
+    "sanityMigrations": "{count, plural, one {# migration} other {# migrations}} across {tenants, plural, one {# project} other {# projects}}",
+    "sanityMigrationsMinimum": "At least {count, plural, one {# migration} other {# migrations}} across {tenants, plural, one {# project} other {# projects}}"
+  },
+  "releaseContrastCard": {
+    "title": "Contrast check",
+    "description": "Whether this release's rendering has been checked for contrast regressions.",
+    "status": {
+      "GREEN": "Passed",
+      "FAILED": "Failed",
+      "RUNNING": "Running",
+      "DUE": "Due",
+      "NONE": "Not needed"
+    },
+    "explanation": {
+      "GREEN": "The latest commit passed the contrast check.",
+      "FAILED": "The contrast check found regressions in the latest commit.",
+      "RUNNING": "A contrast check is running for the latest commit.",
+      "DUE": "Rendering changed since the last passing check. Run it before releasing.",
+      "NONE": "This release changes nothing the contrast check covers."
+    },
+    "viewFinding": "View the finding"
+  },
+  "runContrastCheckButton": {
+    "label": "Run contrast check",
+    "starting": "Starting…",
+    "started": "Contrast check started.",
+    "alreadyRunning": "A contrast check is already running.",
+    "githubUnavailable": "GitHub could not be reached. Try again in a moment.",
+    "startFailed": "The contrast check could not be started."
+  },
+  "releaseUnavailable": {
+    "title": "Release information is unavailable",
+    "retry": "Try again",
+    "retrying": "Retrying…",
+    "reason": {
+      "notConfigured": "GitHub access isn't configured for this app.",
+      "noReleaseTag": "The repository has no release tag yet, so there is nothing to compare against.",
+      "rateLimited": "GitHub is rate limiting requests. Try again in a few minutes.",
+      "githubError": "GitHub could not be reached or answered with an error.",
+      "tagListIncomplete": "The release tag list is too long to read in full, so the latest release can't be determined.",
+      "dbError": "The database could not be read."
     }
   }
 }

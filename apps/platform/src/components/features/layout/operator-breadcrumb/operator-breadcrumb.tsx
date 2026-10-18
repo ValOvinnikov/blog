@@ -1,5 +1,6 @@
 'use client';
 
+import type { TAdminRole } from '@blog/db/constants';
 import {
   Breadcrumbs,
   type TBreadcrumbItem,
@@ -12,12 +13,16 @@ import {
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
-export const OperatorBreadcrumb = () => {
+export type TOperatorBreadcrumbProps = {
+  role: TAdminRole;
+};
+
+export const OperatorBreadcrumb = ({ role }: TOperatorBreadcrumbProps) => {
   const pathname = usePathname();
   const t = useTranslations('navSections');
   const tTopbar = useTranslations('topbar');
 
-  const leafLabel = navLabelForPathname(operatorNavSections(t), pathname);
+  const leafLabel = navLabelForPathname(operatorNavSections(t, role), pathname);
 
   const items: TBreadcrumbItem[] = [
     { label: t('platformLabel') },

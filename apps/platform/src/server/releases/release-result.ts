@@ -2,13 +2,16 @@ import type { TGitHubFailureReason } from '@platform/server/github/fetch-github'
 import { logger } from '@platform/utils/logger/logger';
 
 export type TReleaseCandidateFailureReason =
-  Exclude<TGitHubFailureReason, 'notFound'> | 'noReleaseTag' | 'dbError';
+  | Exclude<TGitHubFailureReason, 'notFound'>
+  | 'noReleaseTag'
+  | 'tagListIncomplete'
+  | 'dbError';
 
 export type TReleaseResult<T> =
   { ok: true; data: T } | { ok: false; reason: TReleaseCandidateFailureReason };
 
 export const toReleaseFailure = (
-  reason: TGitHubFailureReason,
+  reason: TGitHubFailureReason | 'tagListIncomplete',
 ): { ok: false; reason: TReleaseCandidateFailureReason } => ({
   ok: false,
   reason: reason === 'notFound' ? 'githubError' : reason,

@@ -17,7 +17,8 @@
     "studio": "Studio · Admin",
     "findings": "Befunde · Admin",
     "email": "E-Mail · Admin",
-    "leads": "Anfragen · Admin"
+    "leads": "Anfragen · Admin",
+    "releases": "Releases · Admin"
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
@@ -96,7 +97,8 @@
     "badgeComingSoon": "Demnächst",
     "badgePlatform": "Plattform",
     "features": "Funktionen",
-    "leads": "Anfragen"
+    "leads": "Anfragen",
+    "releases": "Releases"
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"
@@ -1023,6 +1025,85 @@
     "errors": {
       "notFound": "Diese Nachricht wurde bereits gelöscht.",
       "failed": "Die Nachricht konnte nicht gelöscht werden. Versuchen Sie es erneut."
+    }
+  },
+  "releasesView": {
+    "title": "Releases",
+    "description": "Was das nächste Release enthält und ob sein Rendering geprüft wurde.",
+    "incompleteTitle": "Die Änderungsliste ist unvollständig",
+    "incompleteDescription": "GitHub listet pro Vergleich höchstens {limit, number} geänderte Dateien auf. Deshalb gilt jeder Bereich als betroffen, und jede Migrationsanzahl ist ein Mindestwert."
+  },
+  "releaseSummaryCard": {
+    "title": "Release-Kandidat",
+    "description": "Der neueste Commit auf main, gemessen am letzten Release.",
+    "lastTag": "Letztes Release",
+    "headCommit": "Neuester Commit",
+    "commitsSinceTag": "Seit dem letzten Release",
+    "commitCount": "{count, plural, one {# Commit} other {# Commits}}"
+  },
+  "releaseCommits": {
+    "ariaLabel": "Commits seit {tag}",
+    "empty": "Keine Commits seit {tag}. Main steht auf dem letzten Release.",
+    "newestOnly": "Angezeigt werden die neuesten {shown, number} von {total, number} Commits.",
+    "columnCommit": "Commit",
+    "columnMessage": "Nachricht",
+    "columnAuthor": "Autor",
+    "columnDate": "Datum"
+  },
+  "releaseAreasCard": {
+    "title": "Betroffene Bereiche",
+    "description": "Die Teile der Codebasis, die dieses Release ändert.",
+    "touched": "Betroffen",
+    "untouched": "Nicht betroffen",
+    "area": {
+      "RENDERING": "UI und Rendering",
+      "DB_MIGRATION": "Datenbankmigrationen",
+      "SANITY_MIGRATION": "Sanity-Migrationen",
+      "ENV": "Umgebungsvariablen"
+    },
+    "dbMigrations": "{count, plural, one {# Migration anzuwenden} other {# Migrationen anzuwenden}}",
+    "dbMigrationsMinimum": "Mindestens {count, plural, one {# Migration anzuwenden} other {# Migrationen anzuwenden}}",
+    "sanityMigrations": "{count, plural, one {# Migration} other {# Migrationen}} in {tenants, plural, one {# Projekt} other {# Projekten}}",
+    "sanityMigrationsMinimum": "Mindestens {count, plural, one {# Migration} other {# Migrationen}} in {tenants, plural, one {# Projekt} other {# Projekten}}"
+  },
+  "releaseContrastCard": {
+    "title": "Kontrastprüfung",
+    "description": "Ob das Rendering dieses Releases auf Kontrastverschlechterungen geprüft wurde.",
+    "status": {
+      "GREEN": "Bestanden",
+      "FAILED": "Fehlgeschlagen",
+      "RUNNING": "Läuft",
+      "DUE": "Fällig",
+      "NONE": "Nicht nötig"
+    },
+    "explanation": {
+      "GREEN": "Der neueste Commit hat die Kontrastprüfung bestanden.",
+      "FAILED": "Die Kontrastprüfung hat Verschlechterungen im neuesten Commit gefunden.",
+      "RUNNING": "Für den neuesten Commit läuft eine Kontrastprüfung.",
+      "DUE": "Das Rendering hat sich seit der letzten bestandenen Prüfung geändert. Führe sie vor dem Release aus.",
+      "NONE": "Dieses Release ändert nichts, was die Kontrastprüfung abdeckt."
+    },
+    "viewFinding": "Befund ansehen"
+  },
+  "runContrastCheckButton": {
+    "label": "Kontrastprüfung starten",
+    "starting": "Wird gestartet…",
+    "started": "Kontrastprüfung gestartet.",
+    "alreadyRunning": "Eine Kontrastprüfung läuft bereits.",
+    "githubUnavailable": "GitHub war nicht erreichbar. Versuche es gleich noch einmal.",
+    "startFailed": "Die Kontrastprüfung konnte nicht gestartet werden."
+  },
+  "releaseUnavailable": {
+    "title": "Release-Informationen sind nicht verfügbar",
+    "retry": "Erneut versuchen",
+    "retrying": "Neuer Versuch…",
+    "reason": {
+      "notConfigured": "Der GitHub-Zugriff ist für diese App nicht konfiguriert.",
+      "noReleaseTag": "Das Repository hat noch kein Release-Tag, daher gibt es nichts zu vergleichen.",
+      "rateLimited": "GitHub begrenzt die Anfragen. Versuche es in ein paar Minuten erneut.",
+      "githubError": "GitHub war nicht erreichbar oder hat mit einem Fehler geantwortet.",
+      "tagListIncomplete": "Die Liste der Release-Tags ist zu lang, um sie vollständig zu lesen, daher lässt sich das neueste Release nicht bestimmen.",
+      "dbError": "Die Datenbank konnte nicht gelesen werden."
     }
   }
 }

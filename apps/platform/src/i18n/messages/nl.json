@@ -17,7 +17,8 @@
     "studio": "Studio · Admin",
     "findings": "Bevindingen · Admin",
     "email": "E-mail · Admin",
-    "leads": "Berichten · Admin"
+    "leads": "Berichten · Admin",
+    "releases": "Releases · Admin"
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
@@ -96,7 +97,8 @@
     "badgeComingSoon": "Binnenkort",
     "badgePlatform": "platform",
     "features": "Functies",
-    "leads": "Berichten"
+    "leads": "Berichten",
+    "releases": "Releases"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -1023,6 +1025,85 @@
     "errors": {
       "notFound": "Dit bericht is al verwijderd.",
       "failed": "Het bericht kon niet worden verwijderd. Probeer het opnieuw."
+    }
+  },
+  "releasesView": {
+    "title": "Releases",
+    "description": "Wat de volgende release bevat en of de weergave is gecontroleerd.",
+    "incompleteTitle": "De wijzigingenlijst is onvolledig",
+    "incompleteDescription": "GitHub toont per vergelijking hooguit {limit, number} gewijzigde bestanden, dus elk gebied telt als geraakt en elk aantal migraties is een minimum."
+  },
+  "releaseSummaryCard": {
+    "title": "Releasekandidaat",
+    "description": "De nieuwste commit op main, afgezet tegen de laatste release.",
+    "lastTag": "Laatste release",
+    "headCommit": "Nieuwste commit",
+    "commitsSinceTag": "Sinds de laatste release",
+    "commitCount": "{count, plural, one {# commit} other {# commits}}"
+  },
+  "releaseCommits": {
+    "ariaLabel": "Commits sinds {tag}",
+    "empty": "Geen commits sinds {tag}. Main staat op de laatste release.",
+    "newestOnly": "De nieuwste {shown, number} van {total, number} commits worden getoond.",
+    "columnCommit": "Commit",
+    "columnMessage": "Bericht",
+    "columnAuthor": "Auteur",
+    "columnDate": "Datum"
+  },
+  "releaseAreasCard": {
+    "title": "Geraakte gebieden",
+    "description": "De delen van de codebase die deze release wijzigt.",
+    "touched": "Geraakt",
+    "untouched": "Niet geraakt",
+    "area": {
+      "RENDERING": "UI en weergave",
+      "DB_MIGRATION": "Databasemigraties",
+      "SANITY_MIGRATION": "Sanity-migraties",
+      "ENV": "Omgevingsvariabelen"
+    },
+    "dbMigrations": "{count, plural, one {# migratie toe te passen} other {# migraties toe te passen}}",
+    "dbMigrationsMinimum": "Minstens {count, plural, one {# migratie toe te passen} other {# migraties toe te passen}}",
+    "sanityMigrations": "{count, plural, one {# migratie} other {# migraties}} voor {tenants, plural, one {# project} other {# projecten}}",
+    "sanityMigrationsMinimum": "Minstens {count, plural, one {# migratie} other {# migraties}} voor {tenants, plural, one {# project} other {# projecten}}"
+  },
+  "releaseContrastCard": {
+    "title": "Contrastcontrole",
+    "description": "Of de weergave van deze release is gecontroleerd op contrastverslechtering.",
+    "status": {
+      "GREEN": "Geslaagd",
+      "FAILED": "Mislukt",
+      "RUNNING": "Bezig",
+      "DUE": "Nog te doen",
+      "NONE": "Niet nodig"
+    },
+    "explanation": {
+      "GREEN": "De nieuwste commit heeft de contrastcontrole doorstaan.",
+      "FAILED": "De contrastcontrole vond verslechteringen in de nieuwste commit.",
+      "RUNNING": "Er loopt een contrastcontrole voor de nieuwste commit.",
+      "DUE": "De weergave is gewijzigd sinds de laatste geslaagde controle. Voer hem uit voor je released.",
+      "NONE": "Deze release wijzigt niets wat de contrastcontrole dekt."
+    },
+    "viewFinding": "Bekijk de bevinding"
+  },
+  "runContrastCheckButton": {
+    "label": "Contrastcontrole uitvoeren",
+    "starting": "Starten…",
+    "started": "Contrastcontrole gestart.",
+    "alreadyRunning": "Er loopt al een contrastcontrole.",
+    "githubUnavailable": "GitHub was niet bereikbaar. Probeer het zo opnieuw.",
+    "startFailed": "De contrastcontrole kon niet worden gestart."
+  },
+  "releaseUnavailable": {
+    "title": "Releaseinformatie is niet beschikbaar",
+    "retry": "Opnieuw proberen",
+    "retrying": "Opnieuw proberen…",
+    "reason": {
+      "notConfigured": "Toegang tot GitHub is voor deze app niet ingesteld.",
+      "noReleaseTag": "De repository heeft nog geen releasetag, dus er is niets om mee te vergelijken.",
+      "rateLimited": "GitHub beperkt het aantal verzoeken. Probeer het over een paar minuten opnieuw.",
+      "githubError": "GitHub was niet bereikbaar of antwoordde met een fout.",
+      "tagListIncomplete": "De lijst met releasetags is te lang om helemaal te lezen, dus de nieuwste release is niet te bepalen.",
+      "dbError": "De database kon niet worden gelezen."
     }
   }
 }

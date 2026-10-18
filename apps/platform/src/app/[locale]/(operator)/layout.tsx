@@ -31,8 +31,8 @@ export default async function OperatorLayout({ children }: TProps) {
   return (
     <AdminShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
-      sections={operatorNavSections(tNavSections)}
-      crumb={<OperatorBreadcrumb />}
+      sections={operatorNavSections(tNavSections, admin.role)}
+      crumb={<OperatorBreadcrumb role={admin.role} />}
       roleChip={{
         name: userName,
         role: admin.role,

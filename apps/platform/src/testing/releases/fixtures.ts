@@ -1,0 +1,38 @@
+import { RELEASE_CHANGE } from '@blog/config';
+import { CONTRAST_STATUS } from '@platform/constants/release';
+import type { TComparedCommit } from '@platform/server/github/compare-commits';
+import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
+
+export const makeComparedCommit = (
+  overrides: Partial<TComparedCommit> = {},
+): TComparedCommit => ({
+  sha: 'abcdef0123456789abcdef0123456789abcdef01',
+  message: 'feat(web): add a thing\n\nLonger body',
+  authorName: 'Jane Doe',
+  authoredAt: '2026-04-02T10:00:00.000Z',
+  ...overrides,
+});
+
+export const makeReleaseCandidate = (
+  overrides: Partial<TReleaseCandidate> = {},
+): TReleaseCandidate => ({
+  headSha: '1234567abcdef1234567abcdef1234567abcdef',
+  lastTag: 'v1.4.0',
+  commits: [makeComparedCommit()],
+  totalCommits: 1,
+  isFileListTruncated: false,
+  changes: {
+    [RELEASE_CHANGE.RENDERING]: false,
+    [RELEASE_CHANGE.DB_MIGRATION]: false,
+    [RELEASE_CHANGE.SANITY_MIGRATION]: false,
+    [RELEASE_CHANGE.ENV]: false,
+  },
+  migrations: {
+    contentMigrations: 0,
+    tenants: 0,
+    dbMigrations: 0,
+    isLowerBound: false,
+  },
+  contrastStatus: CONTRAST_STATUS.NONE,
+  ...overrides,
+});

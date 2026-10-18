@@ -1,3 +1,4 @@
+import type { TMaybeNull } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { usePathname } from '@platform/i18n/navigation';
 import { auth } from '@platform/server/auth/auth';
@@ -31,7 +32,7 @@ vi.mock('@platform/components/features/releases/contrast-due-banner', () => ({
   ContrastDueBanner: () => <p>Contrast check due</p>,
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(OperatorLayout, {
   children: <div>content</div>,
@@ -75,6 +76,41 @@ describe(`<${OperatorLayout.name}/>`, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
+  it('hides the Releases nav entry from an ADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValue(
+      makeAdmin({ role: ADMIN_ROLE.ADMIN }),
+    );
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: 'Releases' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('puts Releases in the breadcrumb only for a SUPERADMIN', async () => {
+    vi.mocked(usePathname).mockReturnValue('/releases');
+    getAdminByUserIdMock.mockResolvedValue(
+      makeAdmin({ role: ADMIN_ROLE.ADMIN }),
+    );
+
+    await setup();
+
+    expect(screen.queryByText('Releases')).not.toBeInTheDocument();
+  });
+
+  it('shows the Releases nav entry to a SUPERADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValue(
+      makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+    );
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'Releases' })).toHaveAttribute(
+      'href',
+      '/releases',
+    );
+  });
   it('shows the contrast-due banner slot to a SUPERADMIN', async () => {
     getAdminByUserIdMock.mockResolvedValue(
       makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),

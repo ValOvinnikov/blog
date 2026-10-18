@@ -48,6 +48,19 @@ describe(getLatestReleaseTag, () => {
     });
   });
 
+  it('reports the read as incomplete when the list is still full at the page cap', async () => {
+    const fullPage = Array.from({ length: 100 }, (_, index) => `v3.${index}.0`);
+    github.respond('/git/matching-refs/tags/v', () =>
+      githubJson(tagRefs(...fullPage)),
+    );
+
+    expect(await getLatestReleaseTag()).toEqual({
+      ok: false,
+      reason: 'tagListIncomplete',
+    });
+    expect(github.fetchMock).toHaveBeenCalledTimes(10);
+  });
+
   it('ignores tags that are not release versions', async () => {
     github.respond('/git/matching-refs/tags/v', () =>
       githubJson(tagRefs('v1.0.0', 'v2-beta', 'very-old')),
