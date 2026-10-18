@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import type { Session } from 'next-auth';
 
@@ -93,12 +94,15 @@ describe('startContrastCheckAction', () => {
     });
   });
 
-  it('is blocked, dispatching and recording nothing, while a run is in progress', async () => {
+  it('refuses, dispatching and recording nothing, while a run is in progress', async () => {
     isWorkflowRunActiveMock.mockResolvedValue({ ok: true, data: true });
 
     const result = await startContrastCheckAction();
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
+    });
     expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });

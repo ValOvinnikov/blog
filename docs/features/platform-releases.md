@@ -70,10 +70,11 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
     segment's page skeleton.
 - Server Action `startContrastCheckAction`
   (`server/releases/start-contrast-check-action.ts`): `requireSuperAdmin`,
-  reads `main`'s HEAD, answers `BLOCKED` when a `contrast.yml` run for it is
-  already active and `UNAVAILABLE` when GitHub cannot be read, dispatches
-  `contrast.yml` on `main` through `dispatchGitHubWorkflow` (`SERVER_ERROR`
-  when that fails), then records `CONTRAST_CHECK_STARTED` on the `RELEASE`
+  reads `main`'s HEAD, answers `REFUSED` with reason `CONTRAST_CHECK_RUNNING`
+  (`RELEASE_REFUSAL`) when a `contrast.yml` run for it is already active,
+  answers `UNAVAILABLE` when GitHub cannot be read, dispatches `contrast.yml`
+  on `main` through `dispatchGitHubWorkflow` (`SERVER_ERROR` when that
+  fails), then records `CONTRAST_CHECK_STARTED` on the `RELEASE`
   target with the HEAD sha as `targetId`. The event attests the dispatch
   request, not the workflow's outcome, and is written only after a successful
   dispatch. Once the action succeeds the contrast

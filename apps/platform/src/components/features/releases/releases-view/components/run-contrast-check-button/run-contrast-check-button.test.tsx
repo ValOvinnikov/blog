@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -53,9 +54,10 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
     await waitFor(() => expect(onStarted).toHaveBeenCalledOnce());
   });
 
-  it('does not tell its parent when the action is blocked', async () => {
+  it('does not tell its parent when the action is refused', async () => {
     startContrastCheckActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.BLOCKED,
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
     });
     const onStarted = vi.fn();
     setup({ onStarted });
@@ -76,9 +78,10 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
     ).toBeDisabled();
   });
 
-  it('says a check is already running when the action is blocked', async () => {
+  it('says a check is already running when the action is refused', async () => {
     startContrastCheckActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.BLOCKED,
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
     });
     setup();
 
@@ -90,6 +93,23 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
       await screen.findByText('A contrast check is already running.'),
     ).toBeVisible();
     expect(refresh).not.toHaveBeenCalled();
+  });
+
+  it('says GitHub could not be reached when the action is unavailable', async () => {
+    startContrastCheckActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.UNAVAILABLE,
+    });
+    setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Run contrast check' }),
+    );
+
+    expect(
+      await screen.findByText(
+        'GitHub could not be reached. Try again in a moment.',
+      ),
+    ).toBeVisible();
   });
 
   it('says the check could not be started when the dispatch fails', async () => {

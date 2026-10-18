@@ -2,20 +2,33 @@
 
 import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
-import { useToast } from '@platform/context/toast-provider';
 import {
-  startContrastCheckAction,
-  type TStartContrastCheckRefusal,
-} from '@platform/server/releases/start-contrast-check-action';
+  RELEASE_REFUSAL,
+  type TReleaseRefusal,
+} from '@platform/constants/release';
+import { useToast } from '@platform/context/toast-provider';
+import { startContrastCheckAction } from '@platform/server/releases/start-contrast-check-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
 const REFUSAL_KEYS = {
-  [ACTION_OUTCOME.BLOCKED]: 'alreadyRunning',
-  [ACTION_OUTCOME.UNAVAILABLE]: 'githubUnavailable',
-  [ACTION_OUTCOME.SERVER_ERROR]: 'startFailed',
-} satisfies Record<TStartContrastCheckRefusal, string>;
+  [RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING]: 'alreadyRunning',
+} satisfies Record<TReleaseRefusal, string>;
+
+const failureKey = (
+  result: Exclude<
+    Awaited<ReturnType<typeof startContrastCheckAction>>,
+    { outcome: typeof ACTION_OUTCOME.SUCCESS }
+  >,
+) => {
+  if (result.outcome === ACTION_OUTCOME.REFUSED) {
+    return REFUSAL_KEYS[result.reason];
+  }
+  return result.outcome === ACTION_OUTCOME.UNAVAILABLE
+    ? 'githubUnavailable'
+    : 'startFailed';
+};
 
 export type TRunContrastCheckButtonProps = {
   isRunning: boolean;
@@ -42,7 +55,7 @@ export const RunContrastCheckButton = ({
         return;
       }
 
-      toast.error({ message: t(REFUSAL_KEYS[result.outcome]) });
+      toast.error({ message: t(failureKey(result)) });
     });
   };
 

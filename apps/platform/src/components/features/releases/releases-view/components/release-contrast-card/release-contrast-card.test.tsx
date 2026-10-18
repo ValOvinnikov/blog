@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import { CONTRAST_STATUS } from '@platform/constants/release';
+import { CONTRAST_STATUS, RELEASE_REFUSAL } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -87,10 +87,16 @@ describe(`<${ReleaseContrastCard.name}/>`, () => {
     expect(screen.queryByText('Running')).not.toBeInTheDocument();
   });
 
-  it.each([ACTION_OUTCOME.BLOCKED, ACTION_OUTCOME.SERVER_ERROR])(
-    'leaves the status unchanged when the start answers %s',
-    async (outcome) => {
-      startContrastCheckActionMock.mockResolvedValue({ outcome });
+  it.each([
+    {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
+    },
+    { outcome: ACTION_OUTCOME.SERVER_ERROR },
+  ])(
+    'leaves the status unchanged when the start answers $outcome',
+    async (result) => {
+      startContrastCheckActionMock.mockResolvedValue(result);
       setup();
 
       await start();
