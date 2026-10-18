@@ -1,37 +1,13 @@
 name: Playwright Smoke
 
-# Minimal launch-hardening smoke suite (#275): home render + one real
-# post-detail render, both asserting a 200 response and zero console errors
-# (apps/web/e2e/*.spec.ts, config in apps/web/playwright.config.ts). Runs
-# against a real, already-deployed `SMOKE_URL` on push to main (post-merge)
-# — never a locally built app in CI — because this repo has no per-PR
-# preview deploys for web by design: Vercel's native Git auto-deploy is
-# disabled (apps/web/vercel.json, git.deploymentEnabled: false, #445/#446;
-# see SPEC.md §13).
-#
-# No-op (green) until the repo Variable SMOKE_URL is set — mirrors
-# lighthouse.yml's guarded-step pattern exactly (both wait on the same
-# open question: how a preview/smoke URL is produced per PR). Point
-# SMOKE_URL at any already-live origin to smoke-test — a Vercel preview URL
-# once one exists, or the existing dev/production site in the meantime. This
-# job is safe to add to the branch ruleset's required checks at any time —
-# it stays green until SMOKE_URL is configured, so marking it required now
-# doesn't block merges; promoting it is a separate, human-gated
-# branch-ruleset decision, same as lighthouse.yml's advisory note.
-#
-# Moved off every-PR-push to merge-to-main-only, same reasoning as
-# lighthouse.yml: structurally a no-op on PRs anyway (no per-PR preview URL
-# exists), so a PR-push trigger bought no signal. `workflow_dispatch` keeps
-# a manual trigger available.
+# Dispatch-only: there is no per-PR preview deploy to smoke, and every step is
+# skipped until the repo Variable SMOKE_URL names a live origin.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
-# A subsequent push to main supersedes the running job for the same ref.
 concurrency:
   group: playwright-smoke-${{ github.ref }}
   cancel-in-progress: true
@@ -44,10 +20,6 @@ jobs:
     env:
       PNPM_VERSION: 11.21.0
       NODE_VERSION: '24'
-      # One full origin — the preview/smoke URL to run `e2e/*.spec.ts`
-      # against. A repo Variable (not a Secret): a smoke-test origin isn't
-      # sensitive, and this keeps the value inspectable in run logs, same as
-      # LIGHTHOUSE_URLS in lighthouse.yml.
       SMOKE_URL: ${{ vars.SMOKE_URL }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -59,8 +31,6 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      # Guarded on SMOKE_URL so the job is inert (green) until #275's
-      # preview-URL mechanism exists; see the workflow header comment above.
       - name: Install Playwright browser (chromium)
         if: ${{ env.SMOKE_URL != '' }}
         working-directory: apps/web
