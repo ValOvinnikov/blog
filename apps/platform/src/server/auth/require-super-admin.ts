@@ -1,9 +1,9 @@
 import 'server-only';
 
-import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { notFound } from 'next/navigation';
 
+import { isSuperAdmin } from './is-super-admin';
 import { requireAdmin } from './require-admin';
 
 /**
@@ -17,7 +17,7 @@ import { requireAdmin } from './require-admin';
 export const requireSuperAdmin = async (): Promise<TAdmin> => {
   const admin = await requireAdmin();
 
-  if (admin.role !== ADMIN_ROLE.SUPERADMIN) {
+  if (!isSuperAdmin(admin)) {
     notFound();
   }
 

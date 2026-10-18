@@ -1,7 +1,7 @@
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { OperatorBreadcrumb } from '@platform/components/features/layout/operator-breadcrumb';
 import { ContrastDueBanner } from '@platform/components/features/releases/contrast-due-banner';
+import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
 import { operatorNavSections } from '@platform/utils/nav-sections/nav-sections';
@@ -39,7 +39,7 @@ export default async function OperatorLayout({ children }: TProps) {
         scope: tNavSections('platformLabel'),
       }}
       notice={
-        admin.role === ADMIN_ROLE.SUPERADMIN && (
+        isSuperAdmin(admin) && (
           <Suspense fallback={null}>
             <ContrastDueBanner />
           </Suspense>
