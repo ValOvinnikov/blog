@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makeContactFormModule } from '@web/testing/modules/contact-form/fixtures';
@@ -23,6 +27,8 @@ const meta = {
   },
   args: {
     id: faker.string.uuid(),
+    currentLocale: LOCALE_ISO_CODES.EN,
+    defaultLocale: LOCALE_ISO_CODES.EN,
     ...makeContactFormModule({
       privacyNote: [portableTextBlock(faker.lorem.sentence())],
     }),
