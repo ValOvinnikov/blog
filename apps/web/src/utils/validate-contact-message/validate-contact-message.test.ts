@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { FIELD_ERROR } from '@web/constants/field-error';
 
 import { validateContactMessage } from './validate-contact-message';
 
@@ -32,23 +33,19 @@ describe('validateContactMessage', () => {
   });
 
   it.each([
-    ['an empty name', { name: '   ' }, ['name']],
-    ['a 101-character name', { name: faker.string.alpha(101) }, ['name']],
-    [
-      'a malformed email',
-      { email: `${faker.internet.username()}@` },
-      ['email'],
-    ],
-    ['a 9-character message', { message: faker.string.alpha(9) }, ['message']],
+    ['an empty name', { name: '   ' }, 'name'],
+    ['a 101-character name', { name: faker.string.alpha(101) }, 'name'],
+    ['a malformed email', { email: `${faker.internet.username()}@` }, 'email'],
+    ['a 9-character message', { message: faker.string.alpha(9) }, 'message'],
     [
       'a 5,001-character message',
       { message: faker.string.alpha(5_001) },
-      ['message'],
+      'message',
     ],
-  ])('rejects %s', (_, overrides, invalidFields) => {
+  ] as const)('rejects %s', (_, overrides, field) => {
     expect(validateContactMessage({ ...VALID, ...overrides })).toEqual({
       ok: false,
-      invalidFields,
+      fieldErrors: { [field]: { reason: FIELD_ERROR.INVALID } },
     });
   });
 

@@ -10,8 +10,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "next": "^16.3.6",
-    "next-intl": "^4.13.2"
+    "next": "^16.4.1",
+    "next-intl": "^4.14.9"
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",

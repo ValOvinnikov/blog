@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { FIELD_ERROR } from '@web/constants/field-error';
 import { logger } from '@web/utils/logger/logger';
 
 import {
@@ -191,7 +192,11 @@ describe('submitContactMessage', () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
-      invalidFields: ['name', 'email', 'message'],
+      fieldErrors: {
+        name: { reason: FIELD_ERROR.INVALID },
+        email: { reason: FIELD_ERROR.INVALID },
+        message: { reason: FIELD_ERROR.INVALID },
+      },
     });
     expect(createLeadMock).not.toHaveBeenCalled();
   });
@@ -203,7 +208,7 @@ describe('submitContactMessage', () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
-      invalidFields: ['name'],
+      fieldErrors: { name: { reason: FIELD_ERROR.INVALID } },
     });
   });
 

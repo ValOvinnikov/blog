@@ -8,6 +8,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { FIELD_ERROR } from '@web/constants/field-error';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
@@ -178,7 +179,7 @@ describe('subscribeToNewsletterAction', () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
-      invalidFields: ['email'],
+      fieldErrors: { email: { reason: FIELD_ERROR.INVALID } },
     });
     expect(createPendingSubscriberMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();

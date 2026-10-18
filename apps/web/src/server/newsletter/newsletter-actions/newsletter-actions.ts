@@ -7,6 +7,10 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import {
+  FIELD_ERROR,
+  type TFieldErrorReason,
+} from '@web/constants/field-error';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { sendNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
@@ -22,7 +26,7 @@ export type TSubscribeRefusal =
   | typeof ACTION_OUTCOME.UNAVAILABLE;
 
 export type TSubscribeResult =
-  | TActionResult<TSubscribeRefusal, 'email'>
+  | TActionResult<TSubscribeRefusal, 'email', TFieldErrorReason>
   | { outcome: typeof NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED };
 
 const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
@@ -32,7 +36,10 @@ export const subscribeToNewsletterAction = async (
   email: string,
 ): Promise<TSubscribeResult> => {
   if (!isValidEmail(email)) {
-    return { outcome: ACTION_OUTCOME.INVALID, invalidFields: ['email'] };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { email: { reason: FIELD_ERROR.INVALID } },
+    };
   }
 
   const tenant = await resolveWritableTenant('newsletter.subscribe');

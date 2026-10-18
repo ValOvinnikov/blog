@@ -1,14 +1,21 @@
 'use server';
 
-import { TENANT_WRITE_REFUSAL } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  TENANT_WRITE_REFUSAL,
+  type TActionResult,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 
-export type TSetBookmarkResult =
-  { ok: true } | { ok: false; isUnavailable: boolean };
+export type TSetBookmarkResult = TActionResult<
+  typeof ACTION_OUTCOME.UNAVAILABLE | typeof ACTION_OUTCOME.SERVER_ERROR
+>;
+
+const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
 
 export const getBookmarkStatus = async (postId: string): Promise<boolean> => {
   const session = await auth();
@@ -27,15 +34,15 @@ export const setBookmarkStatus = async (
 ): Promise<TSetBookmarkResult> => {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) return { ok: false, isUnavailable: false };
+  if (!userId) return SERVER_ERROR;
 
   const tenant = await resolveWritableTenant('bookmark.set');
   if (!tenant.ok) {
-    const isUnavailable = tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE;
-    if (isUnavailable) {
+    if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
       logger.warn('bookmark.tenant_not_active', { postId });
+      return { outcome: ACTION_OUTCOME.UNAVAILABLE };
     }
-    return { ok: false, isUnavailable };
+    return SERVER_ERROR;
   }
   const { tenantId } = tenant;
 
@@ -51,14 +58,14 @@ export const setBookmarkStatus = async (
           postId,
           error: result.error,
         });
-        return { ok: false, isUnavailable: false };
+        return SERVER_ERROR;
       }
     } else {
       await queries.bookmarks.removeBookmark(tenantId, userId, postId);
     }
-    return { ok: true };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('bookmark.update_failed', { postId, error });
-    return { ok: false, isUnavailable: false };
+    return SERVER_ERROR;
   }
 };

@@ -49,7 +49,11 @@ export const featureListSchema = defineType({
     }),
     ctaButtonsField(),
     imageShapeField({
-      values: Object.values(CARD_IMAGE_SHAPE),
+      values: [
+        CARD_IMAGE_SHAPE.WIDE,
+        CARD_IMAGE_SHAPE.SQUARE,
+        CARD_IMAGE_SHAPE.CIRCLE,
+      ],
       initialValue: CARD_IMAGE_SHAPE.WIDE,
       subject: 'card image',
     }),

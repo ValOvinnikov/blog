@@ -8,6 +8,7 @@ import {
 } from '@blog/config';
 import { queries, type schema } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import type { TFieldErrorReason } from '@web/constants/field-error';
 import { sendContactNotification } from '@web/server/contact-form/contact-notification-send/contact-notification-send';
 import { createPublicWriteGuard } from '@web/server/rate-limit/public-write-guard/public-write-guard';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
@@ -32,7 +33,8 @@ export type TContactRefusal =
 
 export type TSubmitContactResult = TActionResult<
   TContactRefusal,
-  TContactField
+  TContactField,
+  TFieldErrorReason
 >;
 
 const BLOCKED = { outcome: ACTION_OUTCOME.BLOCKED } as const;
@@ -101,7 +103,7 @@ export const submitContactMessage = async (
   if (!validation.ok) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
-      invalidFields: validation.invalidFields,
+      fieldErrors: validation.fieldErrors,
     };
   }
 

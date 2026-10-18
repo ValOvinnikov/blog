@@ -89,12 +89,7 @@
       // Next.js plugin still contributes the app-router entries.
       // (packages/ui needs no such entry: its `./*` package.json export makes
       // the wrapper reachable as public API, so knip already sees it as used.)
-      // The contrast suite's global teardown is named by a path string in its
-      // Playwright config, which knip cannot follow.
-      "entry": [
-        "src/testing/custom-render.tsx",
-        "contrast/helpers/merge-baseline-parts.ts"
-      ],
+      "entry": ["src/testing/custom-render.tsx"],
       "project": [
         "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,mdx,css}!",
         "!src/testing/**!",

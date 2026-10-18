@@ -78,7 +78,9 @@ Before writing code:
   `@blog/config` constants, never repeated string literals.
 - **A server action returns a `TActionResult`** with outcomes from
   `ACTION_OUTCOME`, never a hand-written outcome union — `SPEC.md`
-  § Server-action results.
+  § Server-action results. Invalid input answers `INVALID` with
+  `fieldErrors`, one `{ reason }` per field; a field with one rule sends
+  `FIELD_ERROR.INVALID` (`@web/constants/field-error`).
 - Consuming a new workspace package: add it to `transpilePackages` in
   `next.config.ts`, besides the aliases CLAUDE.md → "Absolute imports"
   requires.
