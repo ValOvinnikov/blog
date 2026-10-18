@@ -1,3 +1,4 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 
@@ -80,7 +81,9 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
   });
 
   it('runs the delete through toast.promise with loading/success/error messages, deletes, signs out, and redirects home', async () => {
-    deleteAccountActionMock.mockResolvedValue({ ok: true });
+    deleteAccountActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     await armAndClickDelete(user);
 
     await waitFor(() => {
@@ -98,7 +101,9 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
   });
 
   it('marks the delete button aria-busy while the delete is pending, and clears it once settled', async () => {
-    let resolveDelete!: (result: { ok: true }) => void;
+    let resolveDelete!: (result: {
+      outcome: typeof ACTION_OUTCOME.SUCCESS;
+    }) => void;
     deleteAccountActionMock.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -112,7 +117,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
       expect(button).toHaveAttribute('aria-busy', 'true');
     });
 
-    resolveDelete({ ok: true });
+    resolveDelete({ outcome: ACTION_OUTCOME.SUCCESS });
 
     await waitFor(() => {
       expect(button).toHaveAttribute('aria-busy', 'false');
@@ -120,7 +125,9 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
   });
 
   it('does not sign out when the delete fails, and the rejection surfaces through toast.promise', async () => {
-    deleteAccountActionMock.mockResolvedValue({ ok: false });
+    deleteAccountActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     await armAndClickDelete(user);
 
     await waitFor(() => {
