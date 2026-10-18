@@ -1,0 +1,79 @@
+name: Migrate Production Content
+
+# Called by deploy-production.yml on a tag push and by release.yml, so the
+# console project migrates the same way on both paths.
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'The commit whose migrations run — blank runs the triggering commit'
+        type: string
+        default: ''
+      label:
+        description: 'Names the backup artifact — the release tag or version'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-production-content
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '24'
+
+jobs:
+  # A missing SANITY_MIGRATE_TOKEN fails this job rather than skipping its
+  # steps: an inert-but-green job would let the deploy ship new code against
+  # un-migrated content, with the backup skipped too.
+  migrate:
+    name: Migrate prod content
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: production
+      # Content mutations need an Editor (write) token; a deploy-scoped token
+      # gets "permission update required" on a real migration run.
+      # Least-privilege: a dedicated migrate token.
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_MIGRATE_TOKEN }}
+      BACKUP_LABEL: ${{ inputs.label }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      # A backup on the ephemeral runner is not a backup — export the dataset and
+      # upload it as an artifact BEFORE any mutation, so a bad migration is
+      # recoverable.
+      - name: Back up production dataset
+        working-directory: packages/studio
+        run: |
+          set -euo pipefail
+          # Checked here rather than in an `if:`, because a skipped step reports
+          # green and a release that migrated nothing would look successful.
+          : "${SANITY_AUTH_TOKEN:?empty — set the SANITY_MIGRATE_TOKEN secret on the production environment}"
+          pnpm dataset:export "${RUNNER_TEMP}/prod-${BACKUP_LABEL}.tar.gz"
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sanity-prod-backup-${{ inputs.label }}
+          path: ${{ runner.temp }}/prod-${{ inputs.label }}.tar.gz
+          retention-days: 30
+          if-no-files-found: error
+      # Runs only un-applied migrations, recorded in the migrationState
+      # ledger, so a second run is a no-op.
+      - name: Apply pending migrations
+        working-directory: packages/studio
+        run: |
+          set -euo pipefail
+          : "${SANITY_AUTH_TOKEN:?empty — set the SANITY_MIGRATE_TOKEN secret on the production environment}"
+          pnpm migrate:deploy --yes

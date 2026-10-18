@@ -1,0 +1,120 @@
+name: Migrate Production Database
+
+# Called by deploy-production.yml on a tag push and by release.yml, so the
+# production database migrates the same way on both paths.
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'The commit whose migrations run — blank runs the triggering commit'
+        type: string
+        default: ''
+      label:
+        description: 'Names the backup artifact — the release tag or version'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-production-database
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '24'
+
+jobs:
+  # A missing DATABASE_URL_UNPOOLED fails this job rather than skipping its
+  # steps: an inert-but-green job would let the deploy ship new code against
+  # an un-migrated schema, with the pg_dump backup skipped too.
+  migrate-db:
+    name: Migrate prod database
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+      # A bare hostname, never a full connection string.
+      PRODUCTION_DB_HOST: ${{ vars.PRODUCTION_DB_HOST }}
+      BACKUP_LABEL: ${{ inputs.label }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      # Inverse of deploy-development.yml's migrate-db guard (#2057): dev
+      # fails when its secret resolves to the PRODUCTION host, so this job
+      # fails when its own secret resolves to anything ELSE — a production
+      # release must never migrate the wrong Neon branch. Runs before
+      # setup/backup/migrate so a mis-set secret fails loudly and fast,
+      # before anything touches the db. Uses node's URL parser rather than a
+      # regex, same reasoning as the dev guard: a literal `@` or `:` in the
+      # password can't fool the host extraction, and an unparseable
+      # connection string fails the job instead of silently skipping the
+      # check.
+      - name: Guard against a mis-set production target
+        run: |
+          set -euo pipefail
+          # Checked here rather than in an `if:`, because a skipped step reports
+          # green and a release that migrated nothing would look successful.
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the production environment}"
+          if [ -z "${PRODUCTION_DB_HOST:-}" ]; then
+            echo "::error::PRODUCTION_DB_HOST is unset — refusing to migrate without the production-host guard in place. Set it as a repo-level Variable (see docs/DEPLOY.md)." >&2
+            exit 1
+          fi
+          # A bare hostname is letters/digits/dots/hyphens only — a scheme,
+          # '@', ':', or '/' means someone pasted a full connection string.
+          if ! [[ "$PRODUCTION_DB_HOST" =~ ^[A-Za-z0-9.-]+$ ]]; then
+            echo "::error::PRODUCTION_DB_HOST does not look like a bare hostname — it may hold a full connection string. Expected only the host portion (e.g. ep-xxxx.us-east-2.aws.neon.tech). Check the repo-level Variable." >&2
+            exit 1
+          fi
+          host=$(node -e "console.log(new URL(process.env.DATABASE_URL_UNPOOLED).hostname)") || {
+            echo "::error::could not parse a host out of DATABASE_URL_UNPOOLED — check the production Environment's secret is a valid connection string." >&2
+            exit 1
+          }
+          if [ "$host" != "$PRODUCTION_DB_HOST" ]; then
+            echo "::error::production migrate-db resolved to a host ($host) that does NOT match the production Neon branch (${PRODUCTION_DB_HOST}) — refusing to migrate. Check the production Environment's DATABASE_URL_UNPOOLED secret." >&2
+            exit 1
+          fi
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      # A backup on the ephemeral runner is not a backup — pg_dump the
+      # production Neon branch and upload it as an artifact BEFORE any
+      # mutation, mirroring the Sanity job's dataset-export-before-mutate
+      # step above. Custom format (-Fc, via --format=custom) so it restores
+      # with `pg_restore` against a fresh Neon branch if a migration needs
+      # to be undone. `pg_dump` refuses to dump from a server newer than
+      # itself, and Ubuntu's default `postgresql-client` package trails
+      # Neon's Postgres major version, so the PGDG apt repo installs a
+      # client matching the server. The runner image's preinstalled v16
+      # client owns the unversioned `pg_dump` on `PATH` as a real binary,
+      # not a Debian alternatives symlink, so installing v17 alongside it
+      # doesn't repoint `pg_dump` — the versioned binary under
+      # `/usr/lib/postgresql/17/bin/` has to be invoked explicitly.
+      - name: Back up production database
+        run: |
+          set -euo pipefail
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the production environment}"
+          PG_VERSION=17
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get update -y
+          sudo apt-get install -y "postgresql-client-${PG_VERSION}"
+          "/usr/lib/postgresql/${PG_VERSION}/bin/pg_dump" "$DATABASE_URL_UNPOOLED" --format=custom --file="${RUNNER_TEMP}/prod-db-${BACKUP_LABEL}.dump"
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: db-prod-backup-${{ inputs.label }}
+          path: ${{ runner.temp }}/prod-db-${{ inputs.label }}.dump
+          retention-days: 30
+          if-no-files-found: error
+      # drizzle-kit's journal skips migrations already applied.
+      - name: Apply pending db migrations
+        run: |
+          set -euo pipefail
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the production environment}"
+          pnpm --filter @blog/db db:migrate

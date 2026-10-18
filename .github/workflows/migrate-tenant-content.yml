@@ -22,9 +22,11 @@ name: Migrate Tenant Content
 #     too low-ceremony a trigger for a run that mutates customer content
 #     across every tenant project at once. Defaults to `production` and can
 #     optionally scope to one tenant via `tenantId`.
-#   - `workflow_call`, for another workflow migrating a single tenant (e.g.
-#     right after it finishes provisioning), the same shape
-#     validate-tenant-documents.yml already exposes.
+#   - `workflow_call`, for release.yml migrating every tenant before a
+#     production deploy, or another workflow migrating a single tenant.
+#
+# A production run exports each tenant dataset just before migrating it and
+# uploads the exports as one artifact.
 on:
   push:
     branches: [main]
@@ -43,13 +45,19 @@ on:
   workflow_call:
     inputs:
       tenantId:
-        description: "The tenant's id to migrate"
-        required: true
+        description: "Limit this run to one tenant's id — leave blank to migrate every in-scope tenant"
+        required: false
         type: string
+        default: ''
       environment:
         description: 'Which GitHub Environment this run resolves its credentials from'
         required: true
         type: string
+      ref:
+        description: 'The commit whose migrations run — blank runs the triggering commit'
+        required: false
+        type: string
+        default: ''
     secrets:
       TENANT_REGISTRY_DATABASE_URL:
         required: true
@@ -83,8 +91,10 @@ jobs:
     name: Detect changes
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # Only a push's detection supersedes an older one; a release's run must
+    # never be cancelled by a merge landing while it migrates.
     concurrency:
-      group: migrate-tenant-content-changes
+      group: migrate-tenant-content-changes-${{ github.event_name == 'push' && 'push' || github.run_id }}
       cancel-in-progress: true
     outputs:
       studio: ${{ steps.studio.outputs.changed }}
@@ -153,6 +163,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.ref }}
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
@@ -171,9 +182,24 @@ jobs:
         # `env` and reference the shell variable instead.
         env:
           TENANT_ID: ${{ inputs.tenantId }}
+          TENANT_EXPORT_DIR: ${{ (github.event_name != 'push' && (inputs.environment || 'production') == 'production') && format('{0}/tenant-exports', runner.temp) || '' }}
         run: |
+          set -euo pipefail
+          if [ -n "$TENANT_EXPORT_DIR" ]; then
+            mkdir -p "$TENANT_EXPORT_DIR"
+          fi
           if [ -n "$TENANT_ID" ]; then
             pnpm --filter @blog/db db:migrate-tenant-content -- --tenant-id="$TENANT_ID"
           else
             pnpm --filter @blog/db db:migrate-tenant-content
           fi
+      # Uploaded even when a tenant failed, so the exports taken before the
+      # failure stay recoverable.
+      - name: Upload tenant dataset exports
+        if: ${{ !cancelled() && github.event_name != 'push' && (inputs.environment || 'production') == 'production' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: tenant-content-exports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/tenant-exports
+          retention-days: 30
+          if-no-files-found: warn

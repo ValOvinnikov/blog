@@ -1,0 +1,159 @@
+name: Release
+
+run-name: Release ${{ inputs.version }}
+
+# Dispatched from the platform's Releases page. A tag pushed with
+# GITHUB_TOKEN triggers no other workflow, so this calls the deploy itself.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The release tag, vX.Y.Z, greater than the latest tag'
+        required: true
+        type: string
+      sha:
+        description: 'The candidate commit on main the operator reviewed'
+        required: false
+        type: string
+      override:
+        description: 'Released without a green contrast run, by an audited override'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      sha: ${{ steps.check.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - name: Check version and candidate commit
+        id: check
+        env:
+          VERSION: ${{ inputs.version }}
+          SHA: ${{ inputs.sha }}
+          OVERRIDE: ${{ inputs.override }}
+          DISPATCH_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          # The workflow file itself comes from the dispatched ref, so a branch
+          # could otherwise run an edited copy of this release.
+          if [ "${DISPATCH_REF}" != 'refs/heads/main' ]; then
+            echo "::error::Release must be dispatched on main, not '${DISPATCH_REF}'."
+            exit 1
+          fi
+          if ! [[ "${VERSION}" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Version '${VERSION}' is not vX.Y.Z."
+            exit 1
+          fi
+          if ! [[ "${SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::A full 40-character candidate sha is required; releasing main's HEAD in its place could ship an unreviewed commit."
+            exit 1
+          fi
+          if ! git cat-file -e "${SHA}^{commit}" 2>/dev/null || ! git merge-base --is-ancestor "${SHA}" HEAD; then
+            echo "::error::Commit ${SHA} is not on main."
+            exit 1
+          fi
+          latest="$(git tag --list 'v*' --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)"
+          if [ -n "${latest}" ]; then
+            highest="$(printf '%s\n%s\n' "${latest#v}" "${VERSION#v}" | sort -V | tail -n 1)"
+            if [ "${VERSION#v}" = "${latest#v}" ] || [ "${highest}" != "${VERSION#v}" ]; then
+              echo "::error::Version ${VERSION} is not greater than the latest tag ${latest}."
+              exit 1
+            fi
+          fi
+          {
+            echo "### Release ${VERSION}"
+            echo "- Commit: \`${SHA}\`"
+            echo "- Latest tag: ${latest:-none}"
+            echo "- Contrast override: ${OVERRIDE}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+          {
+            echo "version=${VERSION}"
+            echo "sha=${SHA}"
+          } >> "${GITHUB_OUTPUT}"
+
+  full-gate:
+    name: Full gate
+    needs: validate
+    # Inherited rather than listed, as in full-gate.yml: ci.yml's Required env
+    # matrix checks every secret marked `@env-required`.
+    uses: ./.github/workflows/full-gate.yml # zizmor: ignore[secrets-inherit]
+    with:
+      ref: ${{ needs.validate.outputs.sha }}
+    secrets: inherit
+
+  migrate-db:
+    name: Migrate prod database
+    needs: [validate, full-gate]
+    uses: ./.github/workflows/migrate-production-database.yml # zizmor: ignore[secrets-inherit]
+    with:
+      ref: ${{ needs.validate.outputs.sha }}
+      label: ${{ needs.validate.outputs.version }}
+    secrets: inherit
+
+  migrate-content:
+    name: Migrate prod content
+    needs: [validate, migrate-db]
+    uses: ./.github/workflows/migrate-production-content.yml # zizmor: ignore[secrets-inherit]
+    with:
+      ref: ${{ needs.validate.outputs.sha }}
+      label: ${{ needs.validate.outputs.version }}
+    secrets: inherit
+
+  migrate-tenants:
+    name: Migrate tenant content
+    needs: [validate, migrate-db]
+    uses: ./.github/workflows/migrate-tenant-content.yml
+    with:
+      environment: production
+      ref: ${{ needs.validate.outputs.sha }}
+    secrets:
+      TENANT_REGISTRY_DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+
+  tag:
+    name: Tag release
+    needs: [validate, migrate-content, migrate-tenants]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Create the tag on the gated commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ needs.validate.outputs.version }}
+          SHA: ${{ needs.validate.outputs.sha }}
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/${REPOSITORY}/git/refs" \
+            -f "ref=refs/tags/${VERSION}" \
+            -f "sha=${SHA}"
+
+  deploy:
+    name: Deploy production
+    needs: [validate, tag]
+    # Inherited rather than listed: the deploy's own full gate needs every
+    # secret the Required env matrix checks.
+    uses: ./.github/workflows/deploy-production.yml # zizmor: ignore[secrets-inherit]
+    with:
+      tag: ${{ needs.validate.outputs.version }}
+    secrets: inherit

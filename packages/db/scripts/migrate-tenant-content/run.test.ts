@@ -20,9 +20,12 @@ const { getTenantSanityWriteCredentialsMock } = vi.hoisted(() => ({
 const { isTenantMigrationLedgerEmptyMock } = vi.hoisted(() => ({
   isTenantMigrationLedgerEmptyMock: vi.fn(),
 }));
-const { runTenantMigrationDeployMock } = vi.hoisted(() => ({
-  runTenantMigrationDeployMock: vi.fn(),
-}));
+const { runTenantMigrationDeployMock, exportTenantDatasetMock } = vi.hoisted(
+  () => ({
+    runTenantMigrationDeployMock: vi.fn(),
+    exportTenantDatasetMock: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/db/queries/tenants', () => ({
   listActiveTenants: listActiveTenantsMock,
@@ -32,8 +35,9 @@ vi.mock('@blog/db/queries/tenants', () => ({
 vi.mock('./lib/read-tenant-migration-ledger', () => ({
   isTenantMigrationLedgerEmpty: isTenantMigrationLedgerEmptyMock,
 }));
-vi.mock('./lib/run-tenant-migration-deploy', () => ({
+vi.mock('./lib/run-tenant-migrate-script', () => ({
   runTenantMigrationDeploy: runTenantMigrationDeployMock,
+  exportTenantDataset: exportTenantDatasetMock,
 }));
 
 function tenant(id: string, name: string): TTenant {
@@ -82,6 +86,8 @@ beforeEach(() => {
     );
   isTenantMigrationLedgerEmptyMock.mockReset().mockReturnValue(false);
   runTenantMigrationDeployMock.mockReset();
+  exportTenantDatasetMock.mockReset();
+  vi.unstubAllEnvs();
 });
 
 describe(runMigration, () => {
@@ -183,6 +189,51 @@ describe(runMigration, () => {
       expect(runTenantMigrationDeployMock).toHaveBeenCalledWith(
         expect.objectContaining({ backfill: true }),
       );
+    });
+
+    it('migrates without exporting when no export directory is set', async () => {
+      await runMigration();
+
+      expect(exportTenantDatasetMock).not.toHaveBeenCalled();
+      expect(runTenantMigrationDeployMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('exports the tenant dataset before migrating it when an export directory is set', async () => {
+      vi.stubEnv('TENANT_EXPORT_DIR', '/tmp/exports');
+      const calls: string[] = [];
+      exportTenantDatasetMock.mockImplementation(() => calls.push('export'));
+      runTenantMigrationDeployMock.mockImplementation(() =>
+        calls.push('deploy'),
+      );
+
+      await runMigration();
+
+      expect(exportTenantDatasetMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          projectId: 'proj-t1',
+          dataset: 'production',
+        }),
+        '/tmp/exports/t1.tar.gz',
+      );
+      expect(calls).toEqual(['export', 'deploy']);
+    });
+
+    it('does not migrate a tenant whose export failed, and counts it as an error', async () => {
+      vi.stubEnv('TENANT_EXPORT_DIR', '/tmp/exports');
+      exportTenantDatasetMock.mockImplementation(() => {
+        throw new Error('export failed');
+      });
+
+      const summary = await runMigration();
+
+      expect(summary).toEqual({
+        checked: 1,
+        migrated: 0,
+        backfilled: 0,
+        skipped: 0,
+        errors: 1,
+      });
+      expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
     });
 
     it('tallies a tenant with no Sanity write credentials yet as skipped', async () => {
