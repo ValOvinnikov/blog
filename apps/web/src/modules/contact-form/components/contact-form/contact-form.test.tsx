@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { FIELD_ERROR } from '@web/constants/field-error';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { usePathname } from 'next/navigation';
 
@@ -149,7 +150,7 @@ describe(`<${ContactForm.name}/>`, () => {
   it('moves focus to the field the server rejects', async () => {
     submitContactMessageMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.INVALID,
-      invalidFields: ['email'],
+      fieldErrors: { email: { reason: FIELD_ERROR.INVALID } },
     });
     setup();
 
@@ -175,7 +176,7 @@ describe(`<${ContactForm.name}/>`, () => {
   it('shows the field errors the server returns', async () => {
     submitContactMessageMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.INVALID,
-      invalidFields: ['email'],
+      fieldErrors: { email: { reason: FIELD_ERROR.INVALID } },
     });
     setup();
 

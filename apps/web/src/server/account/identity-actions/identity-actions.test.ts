@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { FIELD_ERROR } from '@web/constants/field-error';
 import type { MockInstance } from 'vitest';
 
 import type * as TIdentityActions from './identity-actions';
@@ -110,7 +111,7 @@ describe('updateDisplayNameAction', () => {
   it('returns INVALID for the name without updating when the trimmed name is empty', async () => {
     await expect(updateDisplayNameAction('   ')).resolves.toEqual({
       outcome: ACTION_OUTCOME.INVALID,
-      invalidFields: ['name'],
+      fieldErrors: { name: { reason: FIELD_ERROR.INVALID } },
     });
     expect(updateDisplayNameMock).not.toHaveBeenCalled();
   });

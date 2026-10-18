@@ -50,6 +50,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 ## Constraints and invariants
 
+- A malformed email answers `INVALID` with `fieldErrors` for `email` before any tenant lookup, write or send.
 - Most restrictive wins: the module renders only when the plan includes `NEWSLETTER` and the toggle is on, and `subscribeToNewsletterAction` re-checks the capability and refuses with `UNAVAILABLE`.
 - Subscribe and confirm write only through `resolveWritableTenant`; an inactive tenant gets the no-retry "unavailable" copy. Unsubscribe by link resolves the tenant without the active check, so it works for any tenant on any plan.
 - At most one row per tenant and email at a time (unsubscribing deletes it, so a later subscribe creates a new one); a repeat subscribe for a pending address resends the confirmation only when the last send is over 15 minutes old, and otherwise answers `SUCCESS` without email. An active address answers `ALREADY_SUBSCRIBED` without email. A failed send gives the cooldown back.

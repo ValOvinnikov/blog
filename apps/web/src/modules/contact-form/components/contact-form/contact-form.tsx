@@ -43,7 +43,7 @@ export const ContactForm = ({
     website,
     setWebsite,
     status,
-    invalidFields,
+    fieldErrors,
     refusal,
     changeField,
     submit,
@@ -55,7 +55,7 @@ export const ContactForm = ({
 
   const fieldInput = (field: TContactField) => {
     const label = t(FIELD_MESSAGE_KEYS[field].label);
-    const isInvalid = invalidFields.includes(field);
+    const isInvalid = fieldErrors[field] !== undefined;
     const inputProps = {
       id: `${id}-${field}`,
       value: fields[field],

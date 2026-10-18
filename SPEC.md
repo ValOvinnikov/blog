@@ -2004,8 +2004,9 @@ adds a honeypot field between the two.
 **Server-action results.** A server action returns a `TActionResult` from
 `@blog/config`, discriminated on `outcome`, whose values come from the
 UPPERCASE `ACTION_OUTCOME` const (`SUCCESS`, `INVALID`, `BLOCKED`,
-`RATE_LIMITED`, `UNAVAILABLE`, `SERVER_ERROR`). Every action can answer
-`SUCCESS`; one given a field union can answer `INVALID` with `invalidFields`;
+`RATE_LIMITED`, `UNAVAILABLE`, `REFUSED`, `SERVER_ERROR`). Every action can
+answer `SUCCESS`; one given a field union can answer `INVALID` with
+`fieldErrors`;
 and each action names the refusals it may answer, so its form maps exactly
 those to copy (`satisfies Record<TRefusal, …>`). A `'use server'` file may
 export only async functions, so outcome objects and their vocabulary live in
@@ -2013,10 +2014,10 @@ export only async functions, so outcome objects and their vocabulary live in
 separate `FORM_STATUS` (`IDLE`, `SUBMITTING`, `SUCCESS`, `ERROR`).
 
 An outcome may carry extras its action declares. `SUCCESS` may carry the
-action's payload (an uploaded file's `url`, the saved record). `INVALID` names
-its fields either as `invalidFields` (one rule per field, as on the public
-site) or as `fieldErrors`, a `{ reason, values? }` per field, where a field can
-fail more than one way; per-locale input uses `fieldErrorsByLocale`.
+action's payload (an uploaded file's `url`, the saved record). `INVALID`
+carries `fieldErrors`, a `{ reason, values? }` per invalid field, in both apps
+— a field with one rule sends one reason code; per-locale input uses
+`TLocalizedActionResult`, whose `INVALID` carries `fieldErrorsByLocale`.
 `ACTION_OUTCOME.REFUSED` is the refusal about the thing acted on rather than
 the input — not found, archived, already in progress — and carries one
 `reason`, with `values` for the message's ICU placeholders. Reasons are codes

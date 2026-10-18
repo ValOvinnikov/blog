@@ -6,6 +6,7 @@ import {
 } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
 import {
   type TContactField,
+  type TContactFieldErrors,
   type TContactMessageFields,
   validateContactMessage,
 } from '@web/utils/validate-contact-message/validate-contact-message';
@@ -27,7 +28,7 @@ export const useContactForm = () => {
   const [fields, setFields] = useState(EMPTY_FIELDS);
   const [website, setWebsite] = useState('');
   const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
-  const [invalidFields, setInvalidFields] = useState<TContactField[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<TContactFieldErrors>({});
   const [refusal, setRefusal] = useState<TContactRefusal>();
   const [invalidSubmitCount, setInvalidSubmitCount] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
@@ -39,14 +40,14 @@ export const useContactForm = () => {
       ?.focus();
   }, [invalidSubmitCount]);
 
-  const reportInvalid = (invalid: TContactField[]) => {
-    setInvalidFields(invalid);
+  const reportInvalid = (invalid: TContactFieldErrors) => {
+    setFieldErrors(invalid);
     setInvalidSubmitCount((count) => count + 1);
   };
 
   const changeField = (field: TContactField) => (value: string) => {
     setFields((current) => ({ ...current, [field]: value }));
-    setInvalidFields((current) => current.filter((item) => item !== field));
+    setFieldErrors((current) => ({ ...current, [field]: undefined }));
   };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -55,7 +56,7 @@ export const useContactForm = () => {
 
     const validation = validateContactMessage(fields);
     if (!validation.ok) {
-      reportInvalid(validation.invalidFields);
+      reportInvalid(validation.fieldErrors);
       return;
     }
 
@@ -73,7 +74,7 @@ export const useContactForm = () => {
 
     setStatus(FORM_STATUS.ERROR);
     if (result.outcome === ACTION_OUTCOME.INVALID) {
-      reportInvalid(result.invalidFields);
+      reportInvalid(result.fieldErrors);
       return;
     }
     setRefusal(result.outcome);
@@ -85,7 +86,7 @@ export const useContactForm = () => {
     website,
     setWebsite,
     status,
-    invalidFields,
+    fieldErrors,
     refusal,
     changeField,
     submit,
