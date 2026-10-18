@@ -41,7 +41,7 @@ Architecture rationale lives in `SPEC.md` §13 and
 | Deploy trigger         | push/merge to `main`              | push git tag `v*`                  |
 | Web deploy             | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
 | Admin deploy           | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
-| CI gate before deploy  | `verify` job on `main`            | `verify` job on the `v*` tag       |
+| CI gate before deploy  | `verify` job on `main`            | Full gate on the `v*` tag          |
 | Revalidation webhook   | dev → dev site                    | prod → prod site                   |
 
 > **Project name vs. hostname.** The Vercel _projects_ are named `web-dev`/`web-prod` and `platform-dev`/`platform-prod`; the _hostnames_ they serve are `blog-dev.{your-hosting}` and `admin-dev.{your-hosting}` (and the apex plus `admin.{your-hosting}` in production). The gap is deliberate and it widened when the projects were renamed off their `blog-` prefix (#2426): the product is no longer a blog, but the hostnames are live DNS records wired into OAuth callback registrations, so renaming them is separate work with its own checklist — not a side effect of tidying project names. Both forms appear in this file on purpose: `vercel link` and the project settings use the project name, while anything you visit in a browser uses the hostname. The two Storybook projects follow the same split — `ui-library` happens to match its `ui-library.{your_hosting}` hostname, while `web-ui-library`'s intended hostname, `web-storybook.{your_hosting}`, is not attached to it yet and does not resolve.
@@ -1043,10 +1043,12 @@ There are **no PR preview deployments** — deploys happen only on merge to
 
 `.github/workflows/deploy-production.yml`:
 
-1. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
-   tagged commit, so a red commit can never be promoted — even if you tag the
-   wrong SHA.
-2. **`migrate`** (`environment: production`, `needs: verify`) — exports a backup
+1. **`full-gate`** calls `full-gate.yml` on the tagged commit — every CI gate,
+   Workflow security and Dependency scan, with no path skipping — so a red
+   commit can never be promoted, even if you tag the wrong SHA. Every later job
+   needs it, so a failed or skipped gate blocks the release. The workflow also
+   takes `workflow_call`, so another workflow calling it gets the same gate.
+2. **`migrate`** (`environment: production`, `needs: full-gate`) — exports a backup
    of the production dataset (uploaded as a 30-day artifact) **before** any
    mutation, then runs `migrate:deploy --yes` to apply only the un-applied
    content migrations (dry → run → record in the `migrationState` ledger,
@@ -1056,7 +1058,7 @@ There are **no PR preview deployments** — deploys happen only on merge to
    conditional, not the job, so a silently inert `migrate` still satisfies
    `deploy-web`'s `needs` and the release would ship new code against
    un-migrated content — with the dataset backup skipped too.
-3. **`migrate-db`** (`environment: production`, `needs: verify`) — the same
+3. **`migrate-db`** (`environment: production`, `needs: full-gate`) — the same
    idea as `migrate` above, for the separate `@blog/db` (Drizzle/Neon)
    relational store: `pg_dump`s the production Neon branch and uploads it as
    a 30-day artifact **before** any mutation, then runs
@@ -1081,8 +1083,8 @@ There are **no PR preview deployments** — deploys happen only on merge to
    is a deliberate full release, so both apps deploy — there is no change
    detection on the production side.
 
-`deploy-web` `needs: [verify,
-migrate, migrate-db]`; `deploy-admin` `needs: [verify, migrate-db]` — so **new
+`deploy-web` `needs: [full-gate,
+migrate, migrate-db]`; `deploy-admin` `needs: [full-gate, migrate-db]` — so **new
 code is never served before pending migrations run**; a failed or
 reviewer-rejected `migrate`/`migrate-db` skips the deploy(s) that depend on
 it, leaving the old code serving the old (un-migrated) data.
