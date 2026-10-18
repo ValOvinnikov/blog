@@ -2012,6 +2012,19 @@ export only async functions, so outcome objects and their vocabulary live in
 `@blog/config`, never beside the action. Form state on the client is the
 separate `FORM_STATUS` (`IDLE`, `SUBMITTING`, `SUCCESS`, `ERROR`).
 
+An outcome may carry extras its action declares. `SUCCESS` may carry the
+action's payload (an uploaded file's `url`, the saved record). `INVALID` names
+its fields either as `invalidFields` (one rule per field, as on the public
+site) or as `fieldErrors`, a `{ reason, values? }` per field, where a field can
+fail more than one way; per-locale input uses `fieldErrorsByLocale`.
+`ACTION_OUTCOME.REFUSED` is the refusal about the thing acted on rather than
+the input — not found, archived, already in progress — and carries one
+`reason`, with `values` for the message's ICU placeholders. Reasons are codes
+from UPPERCASE key/value consts, never display text; the client maps each to
+its catalogue key with a `satisfies Record<…>` map. An action that only reads
+(a status poll, a details fetch) returns its data, and sign-out returns
+nothing; neither is a `TActionResult`.
+
 ## 8. Migrations & live data (core contract)
 
 Content is live in the `production` dataset. Schema and content are decoupled:

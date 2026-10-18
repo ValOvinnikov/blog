@@ -79,6 +79,58 @@ Before writing code:
 - **Never edit outside `apps/platform`.** Implement your side and report the
   change another layer needs.
 
+### Server-action results
+
+Every mutating Server Action returns a `TActionResult` discriminated on
+`outcome` (`SPEC.md` § Server-action results) — never an `ok` boolean, never a
+lowercase or kebab-case code. A read-only action (a status poll, a details
+fetch) returns its data, and `signOutAction` returns nothing. Which outcome a
+failure answers:
+
+| The failure                                                                  | Outcome        | Extras                                                      |
+| ---------------------------------------------------------------------------- | -------------- | ----------------------------------------------------------- |
+| Input the user can correct, including a typed confirmation name              | `INVALID`      | `fieldErrors` (or `fieldErrorsByLocale` for Voice)          |
+| Input that fails parsing with no field to name                               | `INVALID`      | `fieldErrors: {}` — the form shows its generic invalid copy |
+| The thing acted on refuses: not found, archived, in progress, an upload rule | `REFUSED`      | `reason`, plus `values` for ICU placeholders                |
+| A throttle                                                                   | `RATE_LIMITED` | none                                                        |
+| An unexpected failure: a write, a dispatch, a blob upload                    | `SERVER_ERROR` | none — the form knows which action and target it called     |
+
+Reason codes are UPPERCASE key/value consts in `src/constants/`, one domain
+per file (`TENANT_FIELD_ERROR`, `TENANT_REFUSAL`, `UPLOAD_REFUSAL`, …); they
+move to `@blog/config` only when a second workspace reads one. The client maps
+each code to its existing catalogue key with a `satisfies Record<…>` map, so
+the catalogues do not change.
+
+A field error (`create-tenant-action.ts`):
+
+```ts
+return {
+  outcome: ACTION_OUTCOME.INVALID,
+  fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN } },
+};
+```
+
+A refusal reason (`delete-tenant-action.ts`):
+
+```ts
+return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_ARCHIVED };
+```
+
+An upload error (`upload-brand-asset-action.ts`):
+
+```ts
+return {
+  outcome: ACTION_OUTCOME.REFUSED,
+  reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
+  values: { limit },
+};
+```
+
+Something the client needs to continue, other than message values, sits
+beside `reason` on the same variant — `create-tenant-action.ts`'s owner-invite
+`token` — and a success payload sits on `SUCCESS`
+(`{ outcome: ACTION_OUTCOME.SUCCESS, url }`).
+
 ### Logging
 
 CLAUDE.md → "No bare `console.*`" and `SPEC.md` §17 govern. On top of them:
@@ -87,12 +139,15 @@ CLAUDE.md → "No bare `console.*`" and `SPEC.md` §17 govern. On top of them:
   secret's value (log whether it was configured) or a response body (log its
   status code).
 - Levels: `SPEC.md` §17 → "Levels" (an expected, user-correctable outcome is a
-  return value, never an `error` line). Trimmed from
+  return value, never an `error` line). Modelled on
   `server/tenants/create-tenant-action.ts`:
 
 ```ts
 if (existingDomain) {
-  return { ok: false, fieldErrors: { domain: { reason: 'domainTaken' } } };
+  return {
+    outcome: ACTION_OUTCOME.INVALID,
+    fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN } },
+  };
 }
 
 const result = await queries.tenants.createTenantDraft({
@@ -101,7 +156,7 @@ const result = await queries.tenants.createTenantDraft({
 });
 if (!result.ok) {
   logger.error('tenants.create_draft_failed', { domain, error: result.error });
-  return { ok: false, error: 'createFailed' };
+  return { outcome: ACTION_OUTCOME.SERVER_ERROR };
 }
 ```
 
