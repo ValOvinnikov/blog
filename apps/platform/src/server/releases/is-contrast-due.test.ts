@@ -1,3 +1,4 @@
+import { FINDING_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import {
   githubCompareJson,
@@ -69,7 +70,9 @@ describe(isContrastDue, () => {
     });
 
     it('is not due when HEAD already has a passing run', async () => {
-      getContrastFindingMock.mockResolvedValue({ status: 'RESOLVED' });
+      getContrastFindingMock.mockResolvedValue({
+        status: FINDING_STATUS.RESOLVED,
+      });
 
       expect(await isContrastDue()).toBe(false);
     });
