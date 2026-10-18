@@ -20,7 +20,10 @@ export const ReactivateTenantControl = ({
 }: TReactivateTenantControlProps) => {
   const t = useTranslations('reactivateTenantControl');
   const router = useRouter();
-  const reactivateTenant = useTenantLifecycleAction(reactivateTenantAction);
+  const reactivateTenant = useTenantLifecycleAction(
+    reactivateTenantAction,
+    'reactivateFailed',
+  );
   const { id, name } = tenant;
 
   const { content } = reactivateTenantControlVariants();

@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
 import { makeClientTenant } from '@platform/testing/tenants/fixtures';
@@ -27,7 +29,9 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     deleteTenantActionMock.mockReset();
-    deleteTenantActionMock.mockResolvedValue({ ok: true });
+    deleteTenantActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     pushMock.mockReset();
     mockRouter({ push: pushMock });
     setup();
@@ -90,8 +94,8 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
 
     it('shows the error inline and never navigates when the action fails', async () => {
       deleteTenantActionMock.mockResolvedValue({
-        ok: false,
-        reason: 'nameMismatch',
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
       });
       await user.type(
         screen.getByRole('textbox', { name: /type "acme inc\."/i }),
@@ -102,6 +106,23 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
 
       expect(
         await screen.findByText("Doesn't match the tenant's name."),
+      ).toBeVisible();
+      expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it('shows the delete failure inline when the action reports a server error', async () => {
+      deleteTenantActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      await user.type(
+        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
+        'Acme Inc.',
+      );
+
+      await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+
+      expect(
+        await screen.findByText("Couldn't delete the tenant — try again."),
       ).toBeVisible();
       expect(pushMock).not.toHaveBeenCalled();
     });

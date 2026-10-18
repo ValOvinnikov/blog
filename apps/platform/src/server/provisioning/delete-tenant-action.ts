@@ -1,7 +1,8 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { logger } from '@platform/utils/logger/logger';
@@ -16,11 +17,7 @@ import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 export type TDeleteTenantInput = z.input<typeof confirmTenantInputSchema>;
 
 export type TDeleteTenantResult = TTenantLifecycleResult<
-  | 'confirmRequired'
-  | 'notFound'
-  | 'nameMismatch'
-  | 'notArchived'
-  | 'deleteFailed'
+  typeof TENANT_REFUSAL.NOT_FOUND | typeof TENANT_REFUSAL.NOT_ARCHIVED
 >;
 
 /**
@@ -35,11 +32,14 @@ export const deleteTenantAction = async (
 
   const parsed = confirmTenantInputSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, reason: 'confirmRequired' };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.CONFIRM_REQUIRED } },
+    };
   }
 
   const resolved = await resolveConfirmedTenant(tenantId, parsed.data.confirm);
-  if (!resolved.ok) {
+  if (resolved.outcome !== ACTION_OUTCOME.SUCCESS) {
     return resolved;
   }
   const { tenant } = resolved;
@@ -49,15 +49,21 @@ export const deleteTenantAction = async (
     result = await queries.tenants.deleteTenant(tenantId);
   } catch (error) {
     logger.error('tenants.delete_failed', { tenantId, error });
-    return { ok: false, reason: 'deleteFailed' };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 
   if (result.outcome === 'not-found') {
-    return { ok: false, reason: 'notFound' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    };
   }
 
   if (result.outcome === 'not-archived') {
-    return { ok: false, reason: 'notArchived' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_ARCHIVED,
+    };
   }
 
   await recordAuditEvent({
@@ -68,5 +74,5 @@ export const deleteTenantAction = async (
     details: { name: tenant.name },
   });
 
-  return { ok: true };
+  return { outcome: ACTION_OUTCOME.SUCCESS };
 };

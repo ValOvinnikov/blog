@@ -1,6 +1,7 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { z } from 'zod';
@@ -21,11 +22,7 @@ export type TDeprovisionTenantInput = z.input<
 >;
 
 export type TDeprovisionTenantResult = TTenantLifecycleResult<
-  | 'confirmRequired'
-  | 'notFound'
-  | 'alreadyDeprovisioned'
-  | 'nameMismatch'
-  | 'deprovisionFailed'
+  typeof TENANT_REFUSAL.NOT_FOUND | typeof TENANT_REFUSAL.ALREADY_DEPROVISIONED
 >;
 
 /**
@@ -40,15 +37,18 @@ export const deprovisionTenantAction = async (
 
   const parsed = deprovisionTenantInputSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, reason: 'confirmRequired' };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.CONFIRM_REQUIRED } },
+    };
   }
 
   const { confirm, dryRun } = parsed.data;
   const resolved = await resolveConfirmedTenant(tenantId, confirm, {
     precondition: ({ deprovisionedAt }) =>
-      deprovisionedAt ? 'alreadyDeprovisioned' : undefined,
+      deprovisionedAt ? TENANT_REFUSAL.ALREADY_DEPROVISIONED : undefined,
   });
-  if (!resolved.ok) {
+  if (resolved.outcome !== ACTION_OUTCOME.SUCCESS) {
     return resolved;
   }
   const { tenant } = resolved;
@@ -60,7 +60,7 @@ export const deprovisionTenantAction = async (
   });
 
   if (!dispatched) {
-    return { ok: false, reason: 'deprovisionFailed' };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 
   if (!dryRun) {
@@ -73,5 +73,5 @@ export const deprovisionTenantAction = async (
     });
   }
 
-  return { ok: true };
+  return { outcome: ACTION_OUTCOME.SUCCESS };
 };

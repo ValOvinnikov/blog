@@ -24,7 +24,10 @@ export const DeprovisionTenantControl = ({
 }: TDeprovisionTenantControlProps) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
-  const deprovisionTenant = useTenantLifecycleAction(deprovisionTenantAction);
+  const deprovisionTenant = useTenantLifecycleAction(
+    deprovisionTenantAction,
+    'deprovisionFailed',
+  );
   const [isDryRun, setIsDryRun] = useState(true);
   const { id, name } = tenant;
 

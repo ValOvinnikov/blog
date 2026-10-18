@@ -1,6 +1,7 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import type { z } from 'zod';
@@ -15,12 +16,9 @@ import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 export type TReactivateTenantInput = z.input<typeof confirmTenantInputSchema>;
 
 export type TReactivateTenantResult = TTenantLifecycleResult<
-  | 'confirmRequired'
-  | 'notFound'
-  | 'notDeprovisioned'
-  | 'nameMismatch'
-  | 'alreadyInProgress'
-  | 'reactivateFailed'
+  | typeof TENANT_REFUSAL.NOT_FOUND
+  | typeof TENANT_REFUSAL.NOT_DEPROVISIONED
+  | typeof TENANT_REFUSAL.ALREADY_IN_PROGRESS
 >;
 
 /**
@@ -36,14 +34,17 @@ export const reactivateTenantAction = async (
 
   const parsed = confirmTenantInputSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, reason: 'confirmRequired' };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.CONFIRM_REQUIRED } },
+    };
   }
 
   const resolved = await resolveConfirmedTenant(tenantId, parsed.data.confirm, {
     precondition: ({ deprovisionedAt }) =>
-      deprovisionedAt ? undefined : 'notDeprovisioned',
+      deprovisionedAt ? undefined : TENANT_REFUSAL.NOT_DEPROVISIONED,
   });
-  if (!resolved.ok) {
+  if (resolved.outcome !== ACTION_OUTCOME.SUCCESS) {
     return resolved;
   }
   const { tenant } = resolved;
@@ -51,13 +52,19 @@ export const reactivateTenantAction = async (
   const { outcome } = await startProvisioning(tenantId);
 
   if (outcome === 'already-in-progress') {
-    return { ok: false, reason: 'alreadyInProgress' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+    };
   }
   if (outcome === 'not-found') {
-    return { ok: false, reason: 'notFound' };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    };
   }
   if (outcome === 'dispatch-error') {
-    return { ok: false, reason: 'reactivateFailed' };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 
   await recordAuditEvent({
@@ -68,5 +75,5 @@ export const reactivateTenantAction = async (
     details: { name: tenant.name },
   });
 
-  return { ok: true };
+  return { outcome: ACTION_OUTCOME.SUCCESS };
 };

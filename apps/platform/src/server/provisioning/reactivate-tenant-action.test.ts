@@ -1,4 +1,5 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { notFound } from 'next/navigation';
 
 const {
@@ -87,7 +88,7 @@ describe('reactivateTenantAction', () => {
         details: { name: 'Acme' },
       }),
     );
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('rejects an empty confirmation without reading the tenant', async () => {
@@ -95,7 +96,10 @@ describe('reactivateTenantAction', () => {
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ ok: false, reason: 'confirmRequired' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.CONFIRM_REQUIRED } },
+    });
   });
 
   it("rejects a confirmation that doesn't match the tenant's live name", async () => {
@@ -105,7 +109,10 @@ describe('reactivateTenantAction', () => {
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(recordAuditEventMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ ok: false, reason: 'nameMismatch' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
+    });
   });
 
   it('refuses a tenant that is not deprovisioned', async () => {
@@ -119,7 +126,10 @@ describe('reactivateTenantAction', () => {
     });
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ ok: false, reason: 'notDeprovisioned' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_DEPROVISIONED,
+    });
   });
 
   it('refuses an unknown tenant id', async () => {
@@ -128,16 +138,28 @@ describe('reactivateTenantAction', () => {
     const result = await reactivateTenantAction('ghost', { confirm: 'Acme' });
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ ok: false, reason: 'notFound' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
   });
 
   it.each([
-    ['already-in-progress', 'alreadyInProgress'],
-    ['not-found', 'notFound'],
-    ['dispatch-error', 'reactivateFailed'],
+    [
+      'already-in-progress',
+      {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+      },
+    ],
+    [
+      'not-found',
+      { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
+    ],
+    ['dispatch-error', { outcome: ACTION_OUTCOME.SERVER_ERROR }],
   ])(
     'records nothing and refuses when provisioning reports %s',
-    async (outcome, reason) => {
+    async (outcome, expected) => {
       startProvisioningMock.mockResolvedValue({ outcome });
 
       const result = await reactivateTenantAction('tenant-1', {
@@ -145,7 +167,7 @@ describe('reactivateTenantAction', () => {
       });
 
       expect(recordAuditEventMock).not.toHaveBeenCalled();
-      expect(result).toEqual({ ok: false, reason });
+      expect(result).toEqual(expected);
     },
   );
 });
