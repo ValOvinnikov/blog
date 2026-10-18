@@ -143,3 +143,28 @@ export const MobilePanelLanguageMenuOpen: TStory = {
     );
   },
 };
+
+export const MobilePanelCompactCodes: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedOutSession,
+  args: {
+    ...headerControls,
+    panelActions: (
+      <>
+        <LanguageSwitcher
+          liveLocales={[EN, NL, FR]}
+          currentLocale={NL}
+          defaultLocale={EN}
+          switcherStyle={LANGUAGE_SWITCHER_STYLE.CODES}
+        />
+        <ThemeToggleButton />
+      </>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
+    );
+  },
+};
