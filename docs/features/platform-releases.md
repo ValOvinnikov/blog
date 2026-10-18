@@ -24,11 +24,12 @@ epics: [5271]
 ## What it does
 
 A SUPERADMIN sees the release candidate on the platform Releases page and
-runs the contrast check from it. Cutting a production release from the page is
-not built yet. What exists is the shared vocabulary, the server-side reader that
-works out the release candidate from GitHub and the database, the signed
-route the contrast workflow posts its result to, the page and the contrast
-Server Action.
+runs the contrast check from it; a contrast-due banner on the operator pages
+links there. Cutting a production release from the page is not built yet. What
+exists is the shared vocabulary, the server-side reader that works out the
+release candidate from GitHub and the database, the signed route the contrast
+workflow posts its result to, the page, the contrast Server Action and the
+banner.
 
 The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
@@ -90,6 +91,12 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
   refreshes it, a `PASS` resolves it, which is what the candidate reader's
   contrast status then reports for that SHA.
+- The contrast-due banner at the top of every `(operator)` page, for
+  SUPERADMINs only, when the candidate's contrast status is `DUE`
+  (`isContrastDue`). It reads the candidate without the migration summary,
+  streams in after the page, and renders nothing on any GitHub or db failure.
+  Contrast findings on `/findings` are described in
+  [Audit events and findings](audit-and-findings.md).
 
 ## Data
 
@@ -155,9 +162,13 @@ values as plain `text`, so none of them needs a db migration:
 ## Entry points
 
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@blog/utils/version`).
-- `getReleaseCandidate` (`apps/platform/src/server/releases/`).
+- `getReleaseCandidate` and `isContrastDue`, both built on
+  `getCandidateComparison` (`apps/platform/src/server/releases/`).
 - `startContrastCheckAction` (`apps/platform/src/server/releases/`).
 - `ReleasesView` (`apps/platform/src/components/features/releases/`).
+- `ContrastDueBanner`
+  (`apps/platform/src/components/features/releases/contrast-due-banner/`),
+  passed to `AdminShell`'s `notice` slot by the operator layout.
 
 ## Tests and stories
 

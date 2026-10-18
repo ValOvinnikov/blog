@@ -28,7 +28,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   const membership = await queries.memberships.getMembership(userId, tenantId);
   const authorized = membership
     ? true
-    : (await isSuperAdmin(userId)) &&
+    : isSuperAdmin(await queries.admins.getAdminByUserId(userId)) &&
       (await queries.tenants.listTenantsByIds([tenantId])).length > 0;
 
   if (!authorized) {

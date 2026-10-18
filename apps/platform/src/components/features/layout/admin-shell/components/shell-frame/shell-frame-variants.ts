@@ -7,6 +7,11 @@ export const shellFrameVariants = tv({
       '[html:has(&)]:scroll-pt-admin-topbar',
     ],
     main: ['flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip'],
+    // Spacing sits on the children, so a streamed notice that renders nothing leaves no gap.
+    noticeSlot: [
+      'mx-auto w-full max-w-[1180px] px-4 md:px-[26px]',
+      '*:my-4 md:*:mt-[26px]',
+    ],
     content: ['flex-1'],
   },
   variants: {

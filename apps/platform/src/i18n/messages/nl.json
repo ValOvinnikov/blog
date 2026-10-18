@@ -145,8 +145,22 @@
     "columnKind": "Soort",
     "columnSeverity": "Ernst",
     "columnLastSeen": "Laatst gezien",
+    "columnDetails": "Details",
     "noTenant": "— platformbreed",
     "empty": "Geen openstaande bevindingen. Alles is in orde."
+  },
+  "contrastFindingDetails": {
+    "commit": "Commit <code>{sha}</code>",
+    "tag": "Tag {tag}",
+    "failures": "{count, plural, =0 {Geen fouten} one {# fout} other {# fouten}}",
+    "viewRun": "Run bekijken",
+    "viewRunLabel": "Contrastrun voor commit {sha} bekijken (opent in nieuw tabblad)",
+    "openReleases": "Releases openen"
+  },
+  "contrastDueBanner": {
+    "title": "Contrastcontrole nodig",
+    "description": "De weergave is gewijzigd sinds de laatste geslaagde contrastcontrole. Voer er een uit vóór de volgende release.",
+    "openReleases": "Releases openen"
   },
   "findingsCard": {
     "title": "Openstaande bevindingen",

@@ -1,11 +1,6 @@
-import 'server-only';
-
-import { queries } from '@blog/db';
+import type { TNullable } from '@blog/config/types';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import type { TAdmin } from '@blog/db/schema/admins';
 
-/** Narrower than `requireTenantMembership`, which admits any `admins` row: only a SUPERADMIN passes. */
-export const isSuperAdmin = async (userId: string): Promise<boolean> => {
-  const admin = await queries.admins.getAdminByUserId(userId);
-
-  return admin?.role === ADMIN_ROLE.SUPERADMIN;
-};
+export const isSuperAdmin = (admin: TNullable<Pick<TAdmin, 'role'>>): boolean =>
+  admin?.role === ADMIN_ROLE.SUPERADMIN;

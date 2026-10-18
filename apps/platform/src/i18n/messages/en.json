@@ -145,8 +145,22 @@
     "columnKind": "Kind",
     "columnSeverity": "Severity",
     "columnLastSeen": "Last seen",
+    "columnDetails": "Details",
     "noTenant": "— platform-wide",
     "empty": "No open findings. Everything's healthy."
+  },
+  "contrastFindingDetails": {
+    "commit": "Commit <code>{sha}</code>",
+    "tag": "Tag {tag}",
+    "failures": "{count, plural, =0 {No failures} one {# failure} other {# failures}}",
+    "viewRun": "View run",
+    "viewRunLabel": "View the contrast run for commit {sha} (opens in new tab)",
+    "openReleases": "Open Releases"
+  },
+  "contrastDueBanner": {
+    "title": "Contrast check due",
+    "description": "Rendering has changed since the last passing contrast check. Run one before the next release.",
+    "openReleases": "Open Releases"
   },
   "findingsCard": {
     "title": "Open findings",

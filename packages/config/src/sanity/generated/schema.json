@@ -2726,6 +2726,10 @@
             {
               "type": "string",
               "value": "CIRCLE"
+            },
+            {
+              "type": "string",
+              "value": "ICON"
             }
           ]
         },
