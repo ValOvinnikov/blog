@@ -1,7 +1,7 @@
 'use client';
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ICONS, SIZE, type TIconName } from '@blog/config';
+import { ICONS, SIZE, type TIconName, type TMaybeNull } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { Text } from '@blog/ui/components/atoms/text';
@@ -20,19 +20,16 @@ export type TSignInMenuProps = {
   panelId: string;
   isOpen: boolean;
   toggle: () => void;
-  triggerRef: RefObject<HTMLButtonElement | null>;
-  panelRef: RefObject<HTMLDivElement | null>;
-  oauthError: string | null;
+  triggerRef: RefObject<TMaybeNull<HTMLButtonElement>>;
+  panelRef: RefObject<TMaybeNull<HTMLDivElement>>;
+  oauthError: TMaybeNull<string>;
   oauthProviderIds: readonly TOAuthProviderId[];
 };
 
 /**
  * The title is a plain styled label, not a heading — `role="menu"` doesn't
  * own heading elements per the ARIA menu pattern, and this panel renders
- * ahead of every page's own `<h1>` in `[tenant]/[locale]/layout.tsx`. The
- * email sub-flow's state machine lives in `useEmailSignIn`; open/close state
- * and refs come from the parent's single `usePopover()` call — this
- * component never calls `usePopover()` itself.
+ * ahead of every page's own `<h1>` in `[tenant]/[locale]/layout.tsx`.
  */
 export const SignInMenu = ({
   panelId,
@@ -97,7 +94,10 @@ export const SignInMenu = ({
         panelId={panelId}
         onClick={toggle}
         variant="bordered"
-        className={headerControlVariants()}
+        className={headerControlVariants({
+          isRound: true,
+          class: 'lg:rounded-sm',
+        })}
       >
         {t('signIn')}
       </PopoverMenu.Trigger>
