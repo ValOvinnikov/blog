@@ -1,22 +1,17 @@
-export type TUploadError =
-  | {
-      reason:
-        | 'uploadsNotConfigured'
-        | 'fileMissing'
-        | 'unreadableImage'
-        | 'unrecognizedTarget'
-        | 'brandImageTypeUnsupported'
-        | 'emailLogoSvg'
-        | 'emailLogoWebp'
-        | 'emailLogoTypeUnsupported';
-    }
-  | { reason: 'fileTooLarge'; values: { limit: string } }
-  | { reason: 'imageTooSmall' | 'imageTooLarge'; values: { size: number } }
-  | {
-      reason: 'faviconNotSquare' | 'svgFaviconNotSquare';
-      values: { width: number; height: number };
-    }
-  | {
-      reason: 'uploadFailed' | 'removeFailed';
-      values: { kind: 'logo' | 'favicon' };
-    };
+import type { ACTION_OUTCOME, TActionResult } from '@blog/config';
+import type { TUploadRefusal } from '@platform/constants/upload';
+
+export type TClearUploadResult = TActionResult<
+  typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
+  never,
+  never,
+  TUploadRefusal
+>;
+
+export type TUploadFailure = Exclude<
+  TClearUploadResult,
+  { outcome: typeof ACTION_OUTCOME.SUCCESS }
+>;
+
+export type TUploadResult =
+  { outcome: typeof ACTION_OUTCOME.SUCCESS; url: string } | TUploadFailure;

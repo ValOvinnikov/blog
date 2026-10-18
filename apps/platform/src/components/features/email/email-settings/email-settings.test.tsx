@@ -1,4 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -305,7 +309,7 @@ describe(`<${EmailSettings.name}/>`, () => {
   describe('the sender logo', () => {
     beforeEach(async () => {
       uploadEmailLogoActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         url: 'https://example.blob.vercel-storage.com/email-logo.png',
       });
       setup();

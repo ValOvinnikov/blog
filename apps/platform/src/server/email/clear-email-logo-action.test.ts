@@ -1,4 +1,5 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
@@ -85,7 +86,7 @@ describe(clearEmailLogoAction, () => {
 
     const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -93,7 +94,7 @@ describe(clearEmailLogoAction, () => {
   it('clears the tenant email logo and deletes the blob', async () => {
     const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailConfigMock).toHaveBeenCalledWith('tenant-1', {
       logoAssetUrl: null,
     });
@@ -115,7 +116,7 @@ describe(clearEmailLogoAction, () => {
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -143,10 +144,7 @@ describe(clearEmailLogoAction, () => {
 
     const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });
 
-    expect(result).toEqual({
-      ok: false,
-      error: { reason: 'removeFailed', values: { kind: 'logo' } },
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 

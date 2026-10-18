@@ -7,7 +7,6 @@ import {
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
-import type { TUploadError } from '@platform/server/uploads/upload-error';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
@@ -18,6 +17,7 @@ import {
   persistStagedImage,
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
+import type { TUploadErrorState } from '@platform/utils/use-upload-error-text/use-upload-error-text';
 import { useState } from 'react';
 
 type TUseLookSaveArgs = Omit<
@@ -31,7 +31,7 @@ export const useLookSave = ({
   tenantId,
   ...settingsArgs
 }: TUseLookSaveArgs) => {
-  const [brandImageError, setBrandImageError] = useState<TUploadError>();
+  const [brandImageError, setBrandImageError] = useState<TUploadErrorState>();
 
   const settings = useSettingsForm<TLookFormValues, { ok: boolean }>({
     ...settingsArgs,
@@ -56,7 +56,11 @@ export const useLookSave = ({
           clear: () => clearBrandAssetAction(tenantId, kind),
         });
         if (!result.ok) {
-          setBrandImageError(result.error);
+          setBrandImageError({
+            failure: result.failure,
+            operation: result.operation,
+            kind,
+          });
           return finish(false);
         }
         savedImages[kind] = result.image;

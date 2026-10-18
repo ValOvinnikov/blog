@@ -1,4 +1,5 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   DENSITY,
@@ -102,7 +103,7 @@ describe(clearBrandAssetAction, () => {
 
     const result = await clearBrandAssetAction('tenant-1', 'logo');
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
       ...THEME_FIELDS,
       logoAssetUrl: null,
@@ -136,7 +137,7 @@ describe(clearBrandAssetAction, () => {
   it('is a no-op success when the field is already empty, and records no audit event', async () => {
     const result = await clearBrandAssetAction('tenant-1', 'favicon');
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     expect(delMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -152,10 +153,7 @@ describe(clearBrandAssetAction, () => {
 
     const result = await clearBrandAssetAction('tenant-1', 'favicon');
 
-    expect(result).toEqual({
-      ok: false,
-      error: { reason: 'removeFailed', values: { kind: 'favicon' } },
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 

@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { ACTION_OUTCOME } from '@blog/config';
+import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
   readImageUpload,
   type TImageFormat,
@@ -38,10 +40,16 @@ const validateSvgAsset = async (
     sanitized = await sanitizeSvgMarkup(buffer.toString('utf-8'));
   } catch (error) {
     logger.error('site_config.svg_sanitize_failed', { kind, error });
-    return { ok: false, error: { reason: 'uploadFailed', values: { kind } } };
+    return { ok: false, error: { outcome: ACTION_OUTCOME.SERVER_ERROR } };
   }
   if (!sanitized) {
-    return { ok: false, error: { reason: 'unreadableImage' } };
+    return {
+      ok: false,
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
+      },
+    };
   }
   const sanitizedBuffer = Buffer.from(sanitized, 'utf-8');
 
@@ -50,13 +58,23 @@ const validateSvgAsset = async (
     try {
       dimensions = imageSize(sanitizedBuffer);
     } catch {
-      return { ok: false, error: { reason: 'unreadableImage' } };
+      return {
+        ok: false,
+        error: {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
+        },
+      };
     }
     const { width, height } = dimensions;
     if (width !== height) {
       return {
         ok: false,
-        error: { reason: 'svgFaviconNotSquare', values: { width, height } },
+        error: {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: UPLOAD_REFUSAL.SVG_FAVICON_NOT_SQUARE,
+          values: { width, height },
+        },
       };
     }
   }
@@ -85,7 +103,13 @@ export const validateBrandAssetUpload = async (
 
   const format = type ? IMAGE_FORMAT_BY_DETECTED_TYPE[type] : undefined;
   if (!format) {
-    return { ok: false, error: { reason: 'brandImageTypeUnsupported' } };
+    return {
+      ok: false,
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED,
+      },
+    };
   }
 
   if (type === 'svg') {
@@ -96,20 +120,32 @@ export const validateBrandAssetUpload = async (
   if (width < bounds.min || height < bounds.min) {
     return {
       ok: false,
-      error: { reason: 'imageTooSmall', values: { size: bounds.min } },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.IMAGE_TOO_SMALL,
+        values: { size: bounds.min },
+      },
     };
   }
   if (width > bounds.max || height > bounds.max) {
     return {
       ok: false,
-      error: { reason: 'imageTooLarge', values: { size: bounds.max } },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.IMAGE_TOO_LARGE,
+        values: { size: bounds.max },
+      },
     };
   }
 
   if (kind === 'favicon' && width !== height) {
     return {
       ok: false,
-      error: { reason: 'faviconNotSquare', values: { width, height } },
+      error: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.FAVICON_NOT_SQUARE,
+        values: { width, height },
+      },
     };
   }
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
@@ -11,7 +11,7 @@ import {
   setBrandAssetUrl,
 } from '@platform/server/site-config/brand-asset-store';
 import { validateBrandAssetUpload } from '@platform/server/site-config/validate-brand-asset';
-import type { TUploadError } from '@platform/server/uploads/upload-error';
+import type { TUploadResult } from '@platform/server/uploads/upload-error';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
@@ -19,15 +19,12 @@ import {
 import { logger } from '@platform/utils/logger/logger';
 import { put } from '@vercel/blob';
 
-export type TUploadBrandAssetResult =
-  { ok: true; url: string } | { ok: false; error: TUploadError };
-
 // `kind` is re-validated although the client only sends one of two literals: a Server Action is a public endpoint.
 export const uploadBrandAssetAction = async (
   tenantId: string,
   kind: TBrandAssetKind,
   formData: FormData,
-): Promise<TUploadBrandAssetResult> => {
+): Promise<TUploadResult> => {
   const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
@@ -35,12 +32,12 @@ export const uploadBrandAssetAction = async (
   const targetKind = parsedKind.data;
 
   const upload = readUploadedFile(formData);
-  if (!upload.ok) return upload;
+  if (!upload.ok) return upload.error;
   const { file, token } = upload;
 
   const validation = await validateBrandAssetUpload(file, targetKind);
   if (!validation.ok) {
-    return { ok: false, error: validation.error };
+    return validation.error;
   }
 
   const { buffer, contentType, extension } = validation.asset;
@@ -73,16 +70,13 @@ export const uploadBrandAssetAction = async (
       details: { asset: targetKind, operation: 'upload', url: blob.url },
     });
 
-    return { ok: true, url: blob.url };
+    return { outcome: ACTION_OUTCOME.SUCCESS, url: blob.url };
   } catch (error) {
     logger.error('site_config.brand_asset_upload_failed', {
       tenantId: tenant.id,
       kind: targetKind,
       error,
     });
-    return {
-      ok: false,
-      error: { reason: 'uploadFailed', values: { kind: targetKind } },
-    };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };

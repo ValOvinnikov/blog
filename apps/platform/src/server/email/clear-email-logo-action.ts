@@ -1,6 +1,6 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
@@ -9,20 +9,17 @@ import {
   getEmailLogoUrl,
   setEmailLogoUrl,
 } from '@platform/server/email/email-logo-store';
-import type { TUploadError } from '@platform/server/uploads/upload-error';
+import type { TClearUploadResult } from '@platform/server/uploads/upload-error';
 import {
   emailLogoTargetSchema,
   type TEmailLogoTarget,
 } from '@platform/utils/email-logo-target/email-logo-target';
 import { logger } from '@platform/utils/logger/logger';
 
-export type TClearEmailLogoResult =
-  { ok: true } | { ok: false; error: TUploadError };
-
 export const clearEmailLogoAction = async (
   tenantId: string,
   target: TEmailLogoTarget,
-): Promise<TClearEmailLogoResult> => {
+): Promise<TClearUploadResult> => {
   const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedTarget = emailLogoTargetSchema.safeParse(target);
@@ -31,7 +28,7 @@ export const clearEmailLogoAction = async (
 
   try {
     const previousUrl = await getEmailLogoUrl(tenant.id, logoTarget);
-    if (!previousUrl) return { ok: true };
+    if (!previousUrl) return { outcome: ACTION_OUTCOME.SUCCESS };
 
     await setEmailLogoUrl(tenant.id, logoTarget, null);
 
@@ -48,16 +45,13 @@ export const clearEmailLogoAction = async (
       details: { target: logoTarget, operation: 'clear' },
     });
 
-    return { ok: true };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('email_logo.clear_failed', {
       tenantId: tenant.id,
       target: logoTarget,
       error,
     });
-    return {
-      ok: false,
-      error: { reason: 'removeFailed', values: { kind: 'logo' } },
-    };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };

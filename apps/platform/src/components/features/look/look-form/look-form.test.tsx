@@ -1,4 +1,5 @@
 import {
+  ACTION_OUTCOME,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -8,6 +9,8 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
+import { UPLOAD_REFUSAL } from '@platform/constants/upload';
+import type { TUploadResult } from '@platform/server/uploads/upload-error';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -85,11 +88,13 @@ describe(`<${LookForm.name}/>`, () => {
     isAccentHueAccessibleMock.mockReturnValue(true);
     uploadBrandAssetActionMock.mockReset();
     uploadBrandAssetActionMock.mockResolvedValue({
-      ok: true,
+      outcome: ACTION_OUTCOME.SUCCESS,
       url: UPLOADED_LOGO_URL,
     });
     clearBrandAssetActionMock.mockReset();
-    clearBrandAssetActionMock.mockResolvedValue({ ok: true });
+    clearBrandAssetActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
   });
 
@@ -642,7 +647,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('locks the edit panel while a save is running', async () => {
-      let resolveUpload: (value: { ok: true; url: string }) => void = () => {};
+      let resolveUpload: (value: TUploadResult) => void = () => {};
       uploadBrandAssetActionMock.mockImplementation(
         () =>
           new Promise((resolve) => {
@@ -658,7 +663,10 @@ describe(`<${LookForm.name}/>`, () => {
         'inert',
       );
 
-      resolveUpload({ ok: true, url: UPLOADED_LOGO_URL });
+      resolveUpload({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        url: UPLOADED_LOGO_URL,
+      });
       await waitFor(() => {
         expect(screen.getByTestId('look-form-edit-panel')).not.toHaveAttribute(
           'inert',
@@ -667,7 +675,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('keeps an edit made while the logo uploads as an unsaved change', async () => {
-      let resolveUpload: (value: { ok: true; url: string }) => void = () => {};
+      let resolveUpload: (value: TUploadResult) => void = () => {};
       uploadBrandAssetActionMock.mockImplementation(
         () =>
           new Promise((resolve) => {
@@ -681,7 +689,10 @@ describe(`<${LookForm.name}/>`, () => {
       await screen.findByRole('button', { name: 'Saving…' });
       screen.getByRole('slider', { name: 'Accent hue' }).focus();
       await user.keyboard('{ArrowRight}');
-      resolveUpload({ ok: true, url: UPLOADED_LOGO_URL });
+      resolveUpload({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        url: UPLOADED_LOGO_URL,
+      });
 
       await waitFor(() => {
         expect(
@@ -739,8 +750,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('fails the save with the upload error and keeps the draft when the upload fails', async () => {
       uploadBrandAssetActionMock.mockResolvedValue({
-        ok: false,
-        error: { reason: 'uploadFailed', values: { kind: 'logo' } },
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
       setup();
 
@@ -757,6 +767,44 @@ describe(`<${LookForm.name}/>`, () => {
         await screen.findByRole('button', { name: 'Save changes' }),
       ).toBeEnabled();
       expect(screen.getByText('hue 251°')).toBeVisible();
+    });
+
+    it('fails the save with the refusal message when the upload is refused', async () => {
+      uploadBrandAssetActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
+        values: { limit: '4 MB' },
+      });
+      setup();
+
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'That file is too large — the limit is 4 MB.',
+      );
+      expect(updateLookActionMock).not.toHaveBeenCalled();
+    });
+
+    it('fails the save with the remove message when clearing the favicon fails', async () => {
+      clearBrandAssetActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      setup({
+        initialValues: {
+          ...defaultLookFormValues(),
+          favicon: { url: SAVED_LOGO_URL },
+        },
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Remove' }));
+      await user.click(
+        await screen.findByRole('button', { name: 'Save changes' }),
+      );
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        "Couldn't remove the favicon — try again.",
+      );
     });
 
     it('restores a draft without its staged logo and asks for it to be picked again', async () => {
