@@ -23,6 +23,7 @@ const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   [CARD_IMAGE_SHAPE.WIDE]: 'wide',
   [CARD_IMAGE_SHAPE.SQUARE]: 'square',
   [CARD_IMAGE_SHAPE.CIRCLE]: 'circle',
+  [CARD_IMAGE_SHAPE.ICON]: 'square',
 };
 
 export interface IFeatureListCardProps extends IWithDataTestId {
