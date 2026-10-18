@@ -143,8 +143,22 @@
     "columnKind": "Type",
     "columnSeverity": "Gravité",
     "columnLastSeen": "Dernière détection",
+    "columnDetails": "Détails",
     "noTenant": "— toute la plateforme",
     "empty": "Aucun constat ouvert. Tout fonctionne correctement."
+  },
+  "contrastFindingDetails": {
+    "commit": "Commit <code>{sha}</code>",
+    "tag": "Tag {tag}",
+    "failures": "{count, plural, =0 {Aucun échec} one {# échec} other {# échecs}}",
+    "viewRun": "Voir l'exécution",
+    "viewRunLabel": "Voir l'exécution de contraste du commit {sha} (s'ouvre dans un nouvel onglet)",
+    "openReleases": "Ouvrir Releases"
+  },
+  "contrastDueBanner": {
+    "title": "Vérification du contraste à faire",
+    "description": "Le rendu a changé depuis la dernière vérification du contraste réussie. Lancez-en une avant la prochaine release.",
+    "openReleases": "Ouvrir Releases"
   },
   "findingsCard": {
     "title": "Constats ouverts",

@@ -143,8 +143,22 @@
     "columnKind": "Tipo",
     "columnSeverity": "Gravedad",
     "columnLastSeen": "Última detección",
+    "columnDetails": "Detalles",
     "noTenant": "— toda la plataforma",
     "empty": "No hay incidencias abiertas. Todo funciona correctamente."
+  },
+  "contrastFindingDetails": {
+    "commit": "Commit <code>{sha}</code>",
+    "tag": "Etiqueta {tag}",
+    "failures": "{count, plural, =0 {Sin fallos} one {# fallo} other {# fallos}}",
+    "viewRun": "Ver ejecución",
+    "viewRunLabel": "Ver la ejecución de contraste del commit {sha} (se abre en una pestaña nueva)",
+    "openReleases": "Abrir Releases"
+  },
+  "contrastDueBanner": {
+    "title": "Comprobación de contraste pendiente",
+    "description": "El renderizado ha cambiado desde la última comprobación de contraste superada. Ejecuta una antes del próximo release.",
+    "openReleases": "Abrir Releases"
   },
   "findingsCard": {
     "title": "Incidencias abiertas",

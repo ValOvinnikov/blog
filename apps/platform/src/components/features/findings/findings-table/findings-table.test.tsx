@@ -1,4 +1,5 @@
 import {
+  CONTRAST_CHECK_OUTCOME,
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
@@ -61,6 +62,36 @@ describe(FindingsTable, () => {
 
     expect(screen.getByText('— platform-wide')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('shows the commit and run of a platform-wide contrast finding', () => {
+    render(
+      <FindingsTable
+        findings={[
+          makeFinding({
+            tenantId: null,
+            tenantName: null,
+            source: FINDING_SOURCE.CONTRAST_CHECK,
+            kind: FINDING_KIND.CONTRAST_REGRESSION,
+            contrastResult: {
+              sha: 'abcdef0123456789abcdef0123456789abcdef01',
+              outcome: CONTRAST_CHECK_OUTCOME.FAIL,
+              failureCount: 1,
+              runUrl: 'https://github.com/acme/blog/actions/runs/7',
+            },
+          }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('— platform-wide')).toBeVisible();
+    expect(screen.getByText('abcdef0')).toBeVisible();
+    expect(screen.getByText('1 failure')).toBeVisible();
+    expect(
+      screen.getByRole('link', {
+        name: 'View the contrast run for commit abcdef0 (opens in new tab)',
+      }),
+    ).toHaveAttribute('href', 'https://github.com/acme/blog/actions/runs/7');
   });
 
   it('renders a healthy empty state instead of an empty table when there are no open findings', () => {

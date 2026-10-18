@@ -25,6 +25,10 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@platform/i18n/navigation');
 
+vi.mock('@platform/components/features/releases/contrast-due-banner', () => ({
+  ContrastDueBanner: () => <p>Contrast check due</p>,
+}));
+
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(OperatorLayout, {
@@ -73,4 +77,34 @@ describe(`<${OperatorLayout.name}/>`, () => {
     expect(screen.getByText('content')).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
+
+  it('shows the contrast-due banner slot to a SUPERADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'SUPERADMIN',
+      createdAt: new Date(),
+    });
+
+    await setup();
+
+    expect(screen.getByText('Contrast check due')).toBeVisible();
+  });
+
+  it.each(['ADMIN', 'MODERATOR'])(
+    'never shows the contrast-due banner to an %s',
+    async (role) => {
+      getAdminByUserIdMock.mockResolvedValue({
+        id: 'admin-1',
+        userId: 'user-1',
+        role,
+        createdAt: new Date(),
+      });
+
+      await setup();
+
+      expect(screen.getByText('content')).toBeVisible();
+      expect(screen.queryByText('Contrast check due')).not.toBeInTheDocument();
+    },
+  );
 });

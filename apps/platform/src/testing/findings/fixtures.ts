@@ -22,6 +22,7 @@ export const makeFinding = (
     lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
     resolvedAt: null,
     tenantName: 'Acme Inc.',
+    contrastResult: null,
     ...overrides,
   };
 };
