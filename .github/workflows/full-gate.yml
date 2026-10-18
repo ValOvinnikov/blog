@@ -1,0 +1,60 @@
+name: Full gate
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+    # Inherited rather than listed: the Required env matrix checks every
+    # secret marked `@env-required`, and a list here would drift from it.
+    uses: ./.github/workflows/ci.yml # zizmor: ignore[secrets-inherit]
+    with:
+      full: true
+    secrets: inherit
+
+  workflow-security:
+    name: Workflow security
+    uses: ./.github/workflows/workflow-security.yml
+
+  dependency-scan:
+    name: Dependency scan
+    uses: ./.github/workflows/dependency-scan.yml
+    with:
+      full: true
+
+  full-gate:
+    name: Full gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - ci
+      - workflow-security
+      - dependency-scan
+    # Unlike the pull-request `CI` aggregator, a skipped need fails here: a
+    # release commit has no path to skip a gate on.
+    if: ${{ !cancelled() }}
+    steps:
+      - name: Every gate succeeded
+        env:
+          CI_RESULT: ${{ needs.ci.result }}
+          WORKFLOW_SECURITY: ${{ needs.workflow-security.result }}
+          DEPENDENCY_SCAN: ${{ needs.dependency-scan.result }}
+        run: |
+          status=0
+          for gate in CI_RESULT WORKFLOW_SECURITY DEPENDENCY_SCAN; do
+            result="${!gate}"
+            if [ "${result}" != 'success' ]; then
+              echo "::error::${gate} did not succeed in the full gate (result: '${result:-none}')."
+              status=1
+            fi
+          done
+          exit "${status}"

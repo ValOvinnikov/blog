@@ -7,6 +7,13 @@ on:
     paths:
       - '**/package.json'
       - 'pnpm-lock.yaml'
+  # The full gate has no base to compare against, so with `full` every high or
+  # critical advisory in the lockfile fails the scan.
+  workflow_call:
+    inputs:
+      full:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -21,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout PR head
+      - name: Checkout head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -30,6 +37,7 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Checkout PR base
+        if: ${{ !inputs.full }}
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -42,6 +50,7 @@ jobs:
       # on error; a scan that fails outright writes no results file, and the
       # compare step fails on the missing file instead.
       - name: Scan base lockfile
+        if: ${{ !inputs.full }}
         continue-on-error: true
         uses: google/osv-scanner-action/osv-scanner-action@b1d267aea5211fa648d9d442fa64b90dbdcbdd36 # v2.7.0
         with:
@@ -61,8 +70,11 @@ jobs:
 
       - name: Fail on new high-severity advisories
         shell: python
+        env:
+          FULL: ${{ inputs.full }}
         run: |
           import json
+          import os
           import sys
 
           HIGH_CVSS = 7.0
@@ -93,7 +105,7 @@ jobs:
                               found[key] = (pkg['version'], group.get('max_severity') or '?', group['ids'])
               return found
 
-          base = high_findings('base-results.json')
+          base = {} if os.environ['FULL'] == 'true' else high_findings('base-results.json')
           head = high_findings('head-results.json')
           new = {k: v for k, v in head.items() if k not in base}
 
