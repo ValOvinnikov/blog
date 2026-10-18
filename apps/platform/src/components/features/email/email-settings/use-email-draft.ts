@@ -1,6 +1,6 @@
 'use client';
 
-import type { TLocaleIsoCode } from '@blog/config';
+import { ACTION_OUTCOME, type TLocaleIsoCode } from '@blog/config';
 import {
   useSettingsForm,
   type TUseSettingsFormArgs,
@@ -110,8 +110,10 @@ export const useEmailDraft = ({
           tenantId,
           toSenderInput(draft.sender),
         );
-        setSenderFieldErrors(result.ok ? {} : (result.fieldErrors ?? {}));
-        if (!result.ok) return finish(false);
+        setSenderFieldErrors(
+          result.outcome === ACTION_OUTCOME.INVALID ? result.fieldErrors : {},
+        );
+        if (result.outcome !== ACTION_OUTCOME.SUCCESS) return finish(false);
         nextSaved = { ...nextSaved, sender: draft.sender };
       }
 
@@ -125,7 +127,7 @@ export const useEmailDraft = ({
           change.locale,
           { subject: trimmedSubject, body },
         );
-        if (!result.ok) return finish(false);
+        if (result.outcome !== ACTION_OUTCOME.SUCCESS) return finish(false);
 
         const savedCopy = { subject: trimmedSubject ?? '', body };
         nextSaved = withCopy(nextSaved, change, savedCopy);

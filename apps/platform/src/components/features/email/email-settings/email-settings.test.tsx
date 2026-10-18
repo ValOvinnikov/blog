@@ -3,6 +3,7 @@ import {
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -119,9 +120,13 @@ describe(`<${EmailSettings.name}/>`, () => {
     user = userEvent.setup();
     refresh = mockRouterRefresh();
     updateEmailTemplateActionMock.mockReset();
-    updateEmailTemplateActionMock.mockResolvedValue({ ok: true });
+    updateEmailTemplateActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     updateEmailConfigActionMock.mockReset();
-    updateEmailConfigActionMock.mockResolvedValue({ ok: true });
+    updateEmailConfigActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     uploadEmailLogoActionMock.mockReset();
     clearEmailLogoActionMock.mockReset();
     sendTestEmailActionMock.mockReset();
@@ -256,7 +261,9 @@ describe(`<${EmailSettings.name}/>`, () => {
     });
 
     it('keeps the edit unsaved when the save fails', async () => {
-      updateEmailTemplateActionMock.mockResolvedValue({ ok: false });
+      updateEmailTemplateActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
 
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -377,8 +384,12 @@ describe(`<${EmailSettings.name}/>`, () => {
 
       beforeEach(async () => {
         updateEmailConfigActionMock.mockResolvedValue({
-          ok: false,
-          fieldErrors: { senderName: 'senderNameInvalid' },
+          outcome: ACTION_OUTCOME.INVALID,
+          fieldErrors: {
+            senderName: {
+              reason: EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID,
+            },
+          },
         });
         setup();
         await user.type(screen.getByLabelText('Sender name'), 'a@b');
@@ -416,8 +427,10 @@ describe(`<${EmailSettings.name}/>`, () => {
 
   it('shows the sender-name error the save returns', async () => {
     updateEmailConfigActionMock.mockResolvedValue({
-      ok: false,
-      fieldErrors: { senderName: 'senderNameInvalid' },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        senderName: { reason: EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID },
+      },
     });
     setup();
 
@@ -465,8 +478,12 @@ describe(`<${EmailSettings.name}/>`, () => {
 
   it('shows the contact-recipient error the save returns', async () => {
     updateEmailConfigActionMock.mockResolvedValue({
-      ok: false,
-      fieldErrors: { contactRecipient: 'contactRecipientInvalid' },
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        contactRecipient: {
+          reason: EMAIL_SENDER_FIELD_ERROR.CONTACT_RECIPIENT_INVALID,
+        },
+      },
     });
     setup();
 

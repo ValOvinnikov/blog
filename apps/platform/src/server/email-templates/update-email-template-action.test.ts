@@ -1,9 +1,11 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { logger } from '@platform/utils/logger/logger';
@@ -120,7 +122,10 @@ describe(updateEmailTemplateAction, () => {
       VALID_INPUT,
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.LOCALE_NOT_LIVE,
+    });
     expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
   });
 
@@ -132,7 +137,10 @@ describe(updateEmailTemplateAction, () => {
       VALID_INPUT,
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
@@ -151,7 +159,7 @@ describe(updateEmailTemplateAction, () => {
       VALID_INPUT,
       LOCALE_ISO_CODES.EN,
     );
-    expect(result.ok).toBe(true);
+    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
   });
 
   it('rejects an unrecognized template type without ever calling the tenant gate', async () => {
@@ -162,7 +170,10 @@ describe(updateEmailTemplateAction, () => {
       VALID_INPUT,
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
@@ -174,7 +185,10 @@ describe(updateEmailTemplateAction, () => {
       { ...VALID_INPUT, subject: '' },
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
@@ -203,7 +217,7 @@ describe(updateEmailTemplateAction, () => {
       input,
     );
 
-    expect(result.ok).toBe(true);
+    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -249,7 +263,10 @@ describe(updateEmailTemplateAction, () => {
         input,
       );
 
-      expect(result).toEqual({ ok: false });
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {},
+      });
       expect(requireTenantMembershipMock).not.toHaveBeenCalled();
       expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
     },
@@ -303,7 +320,10 @@ describe(updateEmailTemplateAction, () => {
       input,
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
     expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
   });
@@ -318,7 +338,7 @@ describe(updateEmailTemplateAction, () => {
       { subject: null, body: null },
     );
 
-    expect(result.ok).toBe(true);
+    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -341,7 +361,7 @@ describe(updateEmailTemplateAction, () => {
       VALID_INPUT,
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 

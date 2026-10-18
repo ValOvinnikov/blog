@@ -1,7 +1,17 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+  type TFieldErrors,
+} from '@blog/config';
 import { queries } from '@blog/db';
+import {
+  EMAIL_SENDER_FIELD_ERROR,
+  type TEmailSenderFieldErrorReason,
+} from '@platform/constants/email-sender';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { canEditContactRecipient } from '@platform/server/auth/can-edit-contact-recipient';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -13,20 +23,27 @@ import { logger } from '@platform/utils/logger/logger';
 import type { z } from 'zod';
 
 export type TUpdateEmailConfigInput = z.input<typeof emailSenderInputSchema>;
-export type TSenderFieldErrors = {
-  senderName?: 'senderNameInvalid';
-  contactRecipient?: 'contactRecipientInvalid';
-};
+type TSenderField = 'senderName' | 'contactRecipient';
 
-export type TUpdateEmailConfigResult =
-  { ok: true } | { ok: false; fieldErrors?: TSenderFieldErrors };
+export type TSenderFieldErrors = TFieldErrors<
+  TSenderField,
+  TEmailSenderFieldErrorReason
+>;
+
+export type TUpdateEmailConfigResult = TActionResult<
+  typeof ACTION_OUTCOME.SERVER_ERROR,
+  TSenderField,
+  TEmailSenderFieldErrorReason
+>;
 
 const toFieldErrors = (error: z.ZodError): TSenderFieldErrors => ({
   ...(error.issues.some((issue) => issue.message === SENDER_NAME_INVALID) && {
-    senderName: 'senderNameInvalid' as const,
+    senderName: { reason: EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID },
   }),
   ...(error.issues.some((issue) => issue.path[0] === 'contactRecipient') && {
-    contactRecipient: 'contactRecipientInvalid' as const,
+    contactRecipient: {
+      reason: EMAIL_SENDER_FIELD_ERROR.CONTACT_RECIPIENT_INVALID,
+    },
   }),
 });
 
@@ -36,10 +53,10 @@ export const updateEmailConfigAction = async (
 ): Promise<TUpdateEmailConfigResult> => {
   const parsed = emailSenderInputSchema.safeParse(input);
   if (!parsed.success) {
-    const fieldErrors = toFieldErrors(parsed.error);
-    return Object.keys(fieldErrors).length > 0
-      ? { ok: false, fieldErrors }
-      : { ok: false };
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: toFieldErrors(parsed.error),
+    };
   }
 
   const { tenant, membership } = await requireTenantMembership(tenantId);
@@ -56,12 +73,12 @@ export const updateEmailConfigAction = async (
       targetId: tenant.id,
       details: data,
     });
-    return { ok: true };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('email_config.update_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { ok: false };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };
