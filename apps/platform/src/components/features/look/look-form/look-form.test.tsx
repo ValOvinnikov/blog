@@ -1,4 +1,5 @@
 import {
+  ACTION_OUTCOME,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -8,6 +9,7 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
+import type { TUpdateLookResult } from '@platform/server/site-config/update-look-action';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -80,7 +82,9 @@ describe(`<${LookForm.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     updateLookActionMock.mockReset();
-    updateLookActionMock.mockResolvedValue({ ok: true });
+    updateLookActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     isAccentHueAccessibleMock.mockReset();
     isAccentHueAccessibleMock.mockReturnValue(true);
     uploadBrandAssetActionMock.mockReset();
@@ -284,7 +288,7 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('marks Save busy while the save is in flight', async () => {
-    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    let resolveAction: (value: TUpdateLookResult) => void = () => {};
     updateLookActionMock.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -301,11 +305,13 @@ describe(`<${LookForm.name}/>`, () => {
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
     expect(saveButton).toBeDisabled();
 
-    resolveAction({ ok: true });
+    resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('shows an error alert when the save fails', async () => {
-    updateLookActionMock.mockResolvedValue({ ok: false });
+    updateLookActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     setup();
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();

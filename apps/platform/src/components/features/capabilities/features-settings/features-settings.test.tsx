@@ -1,5 +1,8 @@
-import { CAPABILITY } from '@blog/config';
-import { updateFeaturesAction } from '@platform/server/settings-features/update-features-action';
+import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
+import {
+  updateFeaturesAction,
+  type TUpdateFeaturesResult,
+} from '@platform/server/settings-features/update-features-action';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -57,7 +60,9 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     refresh = mockRouterRefresh();
-    updateFeaturesActionMock.mockResolvedValue({ ok: true });
+    updateFeaturesActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
   });
 
   describe('with every capability entitled and the initial values', () => {
@@ -227,7 +232,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   it('shows the saving state while the save is in flight', async () => {
-    let resolveAction: (value: { ok: true }) => void = () => {};
+    let resolveAction: (value: TUpdateFeaturesResult) => void = () => {};
     updateFeaturesActionMock.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -243,11 +248,13 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       await screen.findByRole('button', { name: 'Saving…' }),
     ).toBeDisabled();
 
-    resolveAction({ ok: true });
+    resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('shows an error alert and does not refresh when the save fails', async () => {
-    updateFeaturesActionMock.mockResolvedValue({ ok: false });
+    updateFeaturesActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
     setup();
 
     await user.click(screen.getByRole('switch', { name: 'Analytics' }));

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  ACTION_OUTCOME,
   ALERT_TYPE,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
@@ -64,11 +65,13 @@ export const LanguagesSettings = ({
   } = useSettingsForm<TLocaleIsoCode[], { ok: boolean }>({
     initialValues: live,
     archivedAt,
-    onSubmit: (liveLocales) =>
-      updateTenantLanguagesAction(
+    onSubmit: async (liveLocales) => {
+      const { outcome } = await updateTenantLanguagesAction(
         tenantId,
         additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
-      ),
+      );
+      return { ok: outcome === ACTION_OUTCOME.SUCCESS };
+    },
     onSuccess: (liveLocales) => {
       setSavedLocales(
         additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),

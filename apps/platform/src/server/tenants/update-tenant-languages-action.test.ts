@@ -1,9 +1,11 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   ERROR_CODE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -66,7 +68,7 @@ describe(updateTenantLanguagesAction, () => {
 
     const result = await updateTenantLanguagesAction('tenant-1', [NL, FR]);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(setTenantAdditionalLocalesMock).toHaveBeenCalledWith('tenant-1', [
       NL,
       FR,
@@ -84,7 +86,10 @@ describe(updateTenantLanguagesAction, () => {
   it('rejects a language outside the supported list without saving', async () => {
     const result = await updateTenantLanguagesAction('tenant-1', ['xx']);
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(setTenantAdditionalLocalesMock).not.toHaveBeenCalled();
   });
 
@@ -96,11 +101,44 @@ describe(updateTenantLanguagesAction, () => {
 
     const result = await updateTenantLanguagesAction('tenant-1', [NL, FR]);
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+    });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerWarnMock).toHaveBeenCalledWith(
       'tenants.update_languages_rejected',
       expect.objectContaining({ error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED }),
     );
+  });
+
+  it('reports the default language among the additional ones as invalid input', async () => {
+    setTenantAdditionalLocalesMock.mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED,
+    });
+
+    const result = await updateTenantLanguagesAction('tenant-1', [NL]);
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses a save for a tenant that no longer exists, without a warning', async () => {
+    setTenantAdditionalLocalesMock.mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_NOT_FOUND,
+    });
+
+    const result = await updateTenantLanguagesAction('tenant-1', [NL]);
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.NOT_FOUND,
+    });
+    expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 });

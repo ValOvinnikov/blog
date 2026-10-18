@@ -1,4 +1,5 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -87,7 +88,7 @@ describe(updateFeaturesAction, () => {
       'tenant-1',
       VALID_INPUT,
     );
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
@@ -102,7 +103,10 @@ describe(updateFeaturesAction, () => {
       commentsEnabled: 'yes' as unknown as boolean,
     });
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
@@ -112,7 +116,10 @@ describe(updateFeaturesAction, () => {
       analyticsEnabled: true,
     });
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+    });
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -125,7 +132,7 @@ describe(updateFeaturesAction, () => {
       analyticsEnabled: false,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1', {
       ...VALID_INPUT,
       bookmarksEnabled: false,
@@ -139,7 +146,10 @@ describe(updateFeaturesAction, () => {
       contactFormEnabled: true,
     });
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+    });
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
@@ -155,8 +165,8 @@ describe(updateFeaturesAction, () => {
     });
     const off = await updateFeaturesAction('tenant-2', VALID_INPUT);
 
-    expect(on).toEqual({ ok: true });
-    expect(off).toEqual({ ok: true });
+    expect(on).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(off).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSettingsFeaturesMock).toHaveBeenNthCalledWith(1, 'tenant-2', {
       ...VALID_INPUT,
       contactFormEnabled: true,
@@ -179,7 +189,7 @@ describe(updateFeaturesAction, () => {
       analyticsEnabled: true,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-2', {
       ...VALID_INPUT,
       analyticsEnabled: true,
@@ -199,7 +209,7 @@ describe(updateFeaturesAction, () => {
       newsletterEnabled: true,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
       'tenant-2',
       VALID_INPUT,
@@ -212,7 +222,7 @@ describe(updateFeaturesAction, () => {
       newsletterEnabled: true,
     });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
       'tenant-1',
       VALID_INPUT,
@@ -224,7 +234,7 @@ describe(updateFeaturesAction, () => {
 
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -242,12 +252,12 @@ describe(updateFeaturesAction, () => {
     });
   });
 
-  it('still returns ok when the audit write fails, and logs the failure', async () => {
+  it('still succeeds when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'settings_features.update_audit_failed',
       expect.objectContaining({
