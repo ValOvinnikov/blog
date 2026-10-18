@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # JS/TS deps across the whole pnpm workspace (root + all packages/apps)
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
@@ -13,6 +12,10 @@ updates:
         patterns: ['storybook', '@storybook/*']
       vitest:
         patterns: ['vitest*', '@vitejs/*']
+      # Must stay last: a dependency joins the first group it matches.
+      minor-and-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
     ignore:
       # Storybook 8 -> 10 is a coordinated migration (all @storybook/* + the
       # storybook core + eslint-plugin-storybook + .storybook config move
@@ -36,9 +39,13 @@ updates:
     open-pull-requests-limit: 5
     labels: ['tooling']
 
-  # GitHub Actions themselves — auto-bumps pinned SHAs from #156
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
+    groups:
+      github-actions:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+    open-pull-requests-limit: 5
     labels: ['tooling']

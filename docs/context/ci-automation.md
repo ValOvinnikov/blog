@@ -490,6 +490,20 @@ tail after any PR opens: `ci-watcher` reports them, and a red one is
 diagnosed from the run log rather than reproduced (`open-pull-request` Gate
 5a).
 
+## Dependabot groups
+
+`.github/dependabot.yml` bumps npm and GitHub Actions weekly, each capped at
+five open pull requests. npm minor and patch bumps arrive as one
+`minor-and-patch` pull request per run, except that `eslint`, `storybook` and
+`vitest` keep their own groups, which carry majors too. Actions minor and
+patch bumps arrive as one `github-actions` pull request. Every other major
+bump, in either ecosystem, arrives on its own.
+
+A dependency joins the first group whose patterns match, so the catch-all
+stays last. One catch-all also means one bad bump holds up the rest of the
+group: when its pull request goes red, find the offender, add a temporary
+`ignore` for it, and let the next run regroup the others.
+
 ## The Vercel CLI pin tracks the pinned Node version
 
 Both deploy workflows pin the CLI by exact version (`VERCEL_CLI_VERSION`, run
