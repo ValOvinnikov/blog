@@ -83,6 +83,59 @@ export const Circle: TStory = {
   },
 };
 
+export const CircleStates: TStory = {
+  name: 'Circle — rest, open and focus',
+  render: () => (
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      <IconButton variant="circle" ariaLabel="Rest" title="Rest">
+        <Icon name={ICONS.MENU} size={SIZE.MD} />
+      </IconButton>
+      <IconButton
+        variant="circle"
+        ariaLabel="Open"
+        title="Open"
+        aria-expanded={true}
+      >
+        <Icon name={ICONS.CLOSE} size={SIZE.MD} />
+      </IconButton>
+      <IconButton variant="circle" ariaLabel="Focus" title="Focus">
+        <Icon name={ICONS.MENU} size={SIZE.MD} />
+      </IconButton>
+    </div>
+  ),
+  play: ({ canvasElement }) => {
+    within(canvasElement).getByRole('button', { name: 'Focus' }).focus();
+  },
+};
+
+export const CircleRestyledByTokens: TStory = {
+  name: 'Circle — restyled by the header-control tokens',
+  render: () => (
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      <div
+        style={{
+          ['--header-control-border' as string]: 'transparent',
+          ['--header-control-fill' as string]: 'var(--border)',
+        }}
+      >
+        <IconButton variant="circle" ariaLabel="Soft" title="Soft">
+          <Icon name={ICONS.MENU} size={SIZE.MD} />
+        </IconButton>
+      </div>
+      <div
+        style={{
+          ['--header-control-border' as string]: 'transparent',
+          ['--header-control-fill' as string]: 'transparent',
+        }}
+      >
+        <IconButton variant="circle" ariaLabel="Plain" title="Plain">
+          <Icon name={ICONS.MENU} size={SIZE.MD} />
+        </IconButton>
+      </div>
+    </div>
+  ),
+};
+
 export const Control: TStory = {
   args: {
     variant: 'control',
