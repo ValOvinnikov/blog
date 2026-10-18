@@ -1,4 +1,5 @@
 import {
+  ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   CARD_STYLE,
@@ -91,7 +92,7 @@ describe(updateLookAction, () => {
 
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', VALID_INPUT);
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
@@ -106,7 +107,10 @@ describe(updateLookAction, () => {
       accentHue: 999,
     });
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
@@ -116,7 +120,10 @@ describe(updateLookAction, () => {
       cardStyle: 'SHADOWED' as TUpdateLookInput['cardStyle'],
     });
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
@@ -125,7 +132,10 @@ describe(updateLookAction, () => {
 
     const result = await updateLookAction('tenant-1', VALID_INPUT);
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
@@ -134,7 +144,7 @@ describe(updateLookAction, () => {
 
     const result = await updateLookAction('tenant-1', VALID_INPUT);
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
@@ -152,12 +162,12 @@ describe(updateLookAction, () => {
     });
   });
 
-  it('still returns ok when the audit write fails, and logs the failure', async () => {
+  it('still succeeds when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
     const result = await updateLookAction('tenant-1', VALID_INPUT);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'site_config.look_audit_failed',
       expect.objectContaining({

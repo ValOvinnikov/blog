@@ -1,7 +1,16 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+} from '@blog/config';
 import { PLAN_REGISTRY, queries } from '@blog/db';
+import {
+  SETTINGS_REFUSAL,
+  type TSettingsRefusal,
+} from '@platform/constants/settings';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -23,19 +32,26 @@ const updateFeaturesInputSchema = z.object({
 });
 
 export type TUpdateFeaturesInput = z.input<typeof updateFeaturesInputSchema>;
-export type TUpdateFeaturesResult = { ok: true } | { ok: false };
+export type TUpdateFeaturesResult = TActionResult<
+  typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
+  keyof TUpdateFeaturesInput,
+  never,
+  TSettingsRefusal
+>;
 
 /**
- * The Features tab's save action. A "Coming soon" capability is always
- * written off; any other toggle exceeding `PLAN_REGISTRY[tenant.plan]`
- * rejects the whole save rather than silently dropping just that field.
+ * A "Coming soon" capability is always written off; any other toggle exceeding
+ * `PLAN_REGISTRY[tenant.plan]` rejects the whole save rather than silently
+ * dropping just that field.
  */
 export const updateFeaturesAction = async (
   tenantId: string,
   input: TUpdateFeaturesInput,
 ): Promise<TUpdateFeaturesResult> => {
   const parsed = updateFeaturesInputSchema.safeParse(input);
-  if (!parsed.success) return { ok: false };
+  if (!parsed.success) {
+    return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
+  }
 
   const { tenant } = await requireTenantMembership(tenantId);
   const values = withComingSoonOff(parsed.data);
@@ -51,7 +67,10 @@ export const updateFeaturesAction = async (
       plan: tenant.plan,
       capabilities: outOfPlan.map(({ capability }) => capability),
     });
-    return { ok: false };
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+    };
   }
 
   try {
@@ -64,12 +83,12 @@ export const updateFeaturesAction = async (
       targetId: tenant.id,
       details: values,
     });
-    return { ok: true };
+    return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {
     logger.error('settings_features.update_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { ok: false };
+    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 };
