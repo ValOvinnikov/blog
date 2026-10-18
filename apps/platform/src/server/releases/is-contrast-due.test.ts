@@ -59,17 +59,26 @@ describe(isContrastDue, () => {
     getLatestPassingContrastShaMock.mockReset().mockResolvedValue(undefined);
   });
 
-  it('is due when a rendering path changed and no run has passed', async () => {
-    compare([renderingFile]);
+  describe('when a rendering path changed', () => {
+    beforeEach(() => {
+      compare([renderingFile]);
+    });
 
-    expect(await isContrastDue()).toBe(true);
-  });
+    it('is due when no run has passed', async () => {
+      expect(await isContrastDue()).toBe(true);
+    });
 
-  it('is not due when HEAD already has a passing run', async () => {
-    compare([renderingFile]);
-    getContrastFindingMock.mockResolvedValue({ status: 'RESOLVED' });
+    it('is not due when HEAD already has a passing run', async () => {
+      getContrastFindingMock.mockResolvedValue({ status: 'RESOLVED' });
 
-    expect(await isContrastDue()).toBe(false);
+      expect(await isContrastDue()).toBe(false);
+    });
+
+    it('is not due when the findings read fails', async () => {
+      getContrastFindingMock.mockRejectedValue(new Error('db down'));
+
+      expect(await isContrastDue()).toBe(false);
+    });
   });
 
   it('is not due when nothing rendering changed', async () => {
@@ -86,13 +95,6 @@ describe(isContrastDue, () => {
 
   it('is not due when the GitHub token is unset', async () => {
     github.unsetToken();
-
-    expect(await isContrastDue()).toBe(false);
-  });
-
-  it('is not due when the findings read fails', async () => {
-    compare([renderingFile]);
-    getContrastFindingMock.mockRejectedValue(new Error('db down'));
 
     expect(await isContrastDue()).toBe(false);
   });
