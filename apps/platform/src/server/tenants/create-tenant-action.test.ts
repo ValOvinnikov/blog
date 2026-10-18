@@ -1,5 +1,6 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -80,7 +81,9 @@ describe('createTenantAction', () => {
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
     startProvisioningMock.mockReset();
-    startProvisioningMock.mockResolvedValue({ outcome: 'dispatched' });
+    startProvisioningMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     signInMock.mockReset();
     signInMock.mockResolvedValue({ ok: true });
     getUserByEmailMock.mockReset();
@@ -370,10 +373,17 @@ describe('createTenantAction', () => {
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
-  it.each(['already-in-progress', 'not-found', 'dispatch-error'])(
-    'still redirects to the status page when provisioning reports %s',
-    async (outcome) => {
-      startProvisioningMock.mockResolvedValue({ outcome });
+  it.each([
+    {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+    },
+    { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
+    { outcome: ACTION_OUTCOME.SERVER_ERROR },
+  ])(
+    'still redirects to the status page when provisioning returns %o',
+    async (started) => {
+      startProvisioningMock.mockResolvedValue(started);
 
       await expect(createTenantAction(validInput)).rejects.toThrow(
         'NEXT_REDIRECT',

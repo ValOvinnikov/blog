@@ -5,9 +5,11 @@ import {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
   type TTenantFieldErrorReason,
-  type TTenantRefusal,
 } from '@platform/constants/tenant';
-import type { TTenantLifecycleResult } from '@platform/server/provisioning/tenant-lifecycle-result';
+import type {
+  TTenantLifecycleRefusal,
+  TTenantLifecycleResult,
+} from '@platform/server/provisioning/tenant-lifecycle-result';
 import { useTranslations } from 'next-intl';
 
 const FIELD_ERROR_KEYS = {
@@ -21,14 +23,14 @@ const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_DEPROVISIONED]: 'notDeprovisioned',
   [TENANT_REFUSAL.ALREADY_IN_PROGRESS]: 'alreadyInProgress',
   [TENANT_REFUSAL.NOT_ARCHIVED]: 'notArchived',
-} satisfies Record<TTenantRefusal, string>;
+} satisfies Record<TTenantLifecycleRefusal, string>;
 
 type TServerErrorKey =
   'deprovisionFailed' | 'reactivateFailed' | 'deleteFailed';
 
 export const useTenantLifecycleAction = <
   TArgs extends unknown[],
-  TRefusal extends TTenantRefusal,
+  TRefusal extends TTenantLifecycleRefusal,
 >(
   action: (...args: TArgs) => Promise<TTenantLifecycleResult<TRefusal>>,
   serverErrorKey: TServerErrorKey,

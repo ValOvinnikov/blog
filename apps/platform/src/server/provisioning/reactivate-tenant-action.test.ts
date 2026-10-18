@@ -50,7 +50,9 @@ describe('reactivateTenantAction', () => {
       role: 'SUPERADMIN',
     });
     startProvisioningMock.mockReset();
-    startProvisioningMock.mockResolvedValue({ outcome: 'dispatched' });
+    startProvisioningMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(ARCHIVED_TENANT);
     recordAuditEventMock.mockReset();
@@ -145,29 +147,23 @@ describe('reactivateTenantAction', () => {
   });
 
   it.each([
-    [
-      'already-in-progress',
-      {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
-      },
-    ],
-    [
-      'not-found',
-      { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
-    ],
-    ['dispatch-error', { outcome: ACTION_OUTCOME.SERVER_ERROR }],
+    {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+    },
+    { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
+    { outcome: ACTION_OUTCOME.SERVER_ERROR },
   ])(
-    'records nothing and refuses when provisioning reports %s',
-    async (outcome, expected) => {
-      startProvisioningMock.mockResolvedValue({ outcome });
+    'records nothing and returns the provisioning result %o',
+    async (started) => {
+      startProvisioningMock.mockResolvedValue(started);
 
       const result = await reactivateTenantAction('tenant-1', {
         confirm: 'Acme',
       });
 
       expect(recordAuditEventMock).not.toHaveBeenCalled();
-      expect(result).toEqual(expected);
+      expect(result).toEqual(started);
     },
   );
 });

@@ -1,3 +1,5 @@
+import { ACTION_OUTCOME } from '@blog/config';
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { notFound, redirect } from 'next/navigation';
 
 const { requireSuperAdminMock, startProvisioningMock, getTenantByIdMock } =
@@ -33,7 +35,9 @@ describe('retryProvisioningStepAction', () => {
       role: 'SUPERADMIN',
     });
     startProvisioningMock.mockReset();
-    startProvisioningMock.mockResolvedValue({ outcome: 'dispatched' });
+    startProvisioningMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
@@ -67,19 +71,24 @@ describe('retryProvisioningStepAction', () => {
     expect(startProvisioningMock).not.toHaveBeenCalled();
   });
 
-  it.each(['dispatched', 'already-in-progress', 'not-found', 'dispatch-error'])(
-    'starts provisioning and returns its %s outcome',
-    async (outcome) => {
-      startProvisioningMock.mockResolvedValue({ outcome });
-
-      const result = await retryProvisioningStepAction('tenant-1');
-
-      expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
-      expect(result).toEqual({ outcome });
+  it.each([
+    { outcome: ACTION_OUTCOME.SUCCESS },
+    {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
     },
-  );
+    { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
+    { outcome: ACTION_OUTCOME.SERVER_ERROR },
+  ])('starts provisioning and returns its result %o', async (started) => {
+    startProvisioningMock.mockResolvedValue(started);
 
-  it('returns "not-found" without starting provisioning when the tenant does not exist', async () => {
+    const result = await retryProvisioningStepAction('tenant-1');
+
+    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+    expect(result).toEqual(started);
+  });
+
+  it('refuses as not found without starting provisioning when the tenant does not exist', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
     const result = await retryProvisioningStepAction('ghost');
@@ -88,7 +97,10 @@ describe('retryProvisioningStepAction', () => {
       includeArchived: true,
     });
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_FOUND,
+    });
   });
 
   it('rejects a start/retry against an archived tenant server-side, without starting provisioning', async () => {
@@ -100,6 +112,9 @@ describe('retryProvisioningStepAction', () => {
     const result = await retryProvisioningStepAction('tenant-1');
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'archived' });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ARCHIVED,
+    });
   });
 });

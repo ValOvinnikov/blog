@@ -1,4 +1,4 @@
-import { AUDIT_TARGET_TYPE } from '@blog/config';
+import { ACTION_OUTCOME, AUDIT_TARGET_TYPE } from '@blog/config';
 import { FINDING_STATUS } from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -92,7 +92,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     retryProvisioningStepActionMock.mockReset();
     retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: 'dispatched',
+      outcome: ACTION_OUTCOME.SUCCESS,
     });
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
