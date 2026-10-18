@@ -67,6 +67,29 @@ describe(`<${FeatureListCard.name}/>`, () => {
     expect(screen.getByTestId('feature-card-icon')).toBeVisible();
   });
 
+  describe('with the Icon image shape', () => {
+    it('renders the image without an icon panel', () => {
+      setup({
+        imageShape: CARD_IMAGE_SHAPE.ICON,
+        item: makeFeatureListItem({ sanityImage: makeSanityImage() }),
+      });
+
+      expect(screen.getByRole('img')).toBeVisible();
+      expect(
+        screen.queryByTestId('feature-card-icon-panel'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders the icon in the small tile, not a panel, when another card in the module has an image', () => {
+      setup({ imageShape: CARD_IMAGE_SHAPE.ICON, hasAnyImage: true });
+
+      expect(screen.getByTestId('feature-card-icon')).toBeVisible();
+      expect(
+        screen.queryByTestId('feature-card-icon-panel'),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   it('wraps the whole card title in a link named by the title when the item has one', () => {
     setup({
       item: makeFeatureListItem({
