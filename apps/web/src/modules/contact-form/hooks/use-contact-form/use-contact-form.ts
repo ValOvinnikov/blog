@@ -1,16 +1,22 @@
-import { ACTION_OUTCOME, FORM_STATUS, type TFormStatus } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  FORM_STATUS,
+  type TFormStatus,
+  type TLocaleIsoCode,
+} from '@blog/config';
+import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import {
   submitContactMessage,
   type TContactRefusal,
   type TSubmitContactResult,
 } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
+import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import {
   type TContactField,
   type TContactFieldErrors,
   type TContactMessageFields,
   validateContactMessage,
 } from '@web/utils/validate-contact-message/validate-contact-message';
-import { usePathname } from 'next/navigation';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
 
 const EMPTY_FIELDS: TContactMessageFields = {
@@ -23,8 +29,20 @@ const SERVER_ERROR: TSubmitContactResult = {
   outcome: ACTION_OUTCOME.SERVER_ERROR,
 };
 
-export const useContactForm = () => {
-  const pathname = usePathname();
+export type TContactFormLocales = {
+  currentLocale: TLocaleIsoCode;
+  defaultLocale: TLocaleIsoCode;
+};
+
+export const useContactForm = ({
+  currentLocale,
+  defaultLocale,
+}: TContactFormLocales) => {
+  const sourcePath = toLocalizedPathname({
+    href: usePublicPathname(),
+    locale: currentLocale,
+    defaultLocale,
+  });
   const [fields, setFields] = useState(EMPTY_FIELDS);
   const [website, setWebsite] = useState('');
   const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
@@ -64,7 +82,7 @@ export const useContactForm = () => {
     const result = await submitContactMessage({
       ...fields,
       website,
-      sourcePath: pathname ?? '/',
+      sourcePath,
     }).catch(() => SERVER_ERROR);
 
     if (result.outcome === ACTION_OUTCOME.SUCCESS) {
