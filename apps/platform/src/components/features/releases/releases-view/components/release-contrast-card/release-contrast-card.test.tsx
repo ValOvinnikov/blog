@@ -75,7 +75,7 @@ describe(`<${ReleaseContrastCard.name}/>`, () => {
     expect(screen.queryByText('Running')).not.toBeInTheDocument();
   });
 
-  it('does not flip back to Running when a later server status returns to the start status', async () => {
+  it('does not flip back to Running when the server returns to the start status', async () => {
     const { rerender } = setup();
     await start();
     await screen.findByText('Running');
