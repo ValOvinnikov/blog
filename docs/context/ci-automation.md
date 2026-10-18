@@ -126,13 +126,21 @@ head against its base (merge-base, triple-dot) with no install, setting four
   is wider than `packages/studio/**` on purpose: schemas and migrations import
   `@blog/config`, so a constant changed there alone can stale the generated
   types or break a migration.
-- `env-presence` — any `env.ts` or `oauth-env.ts`, `.github/workflows/ci.yml`,
-  or `scripts/check-required-env*`.
-- `scripts` — any `scripts/*.mjs`, for the `*:test` helper suites.
+- `env-presence` — any `env.ts` or `oauth-env.ts`, or
+  `scripts/check-required-env*`.
+- `scripts` — anything under `scripts/` (the `.mjs` guards and their tests, and
+  the `.sh` scripts and their `.test.sh`) or `.claude/hooks/`.
 
-A docs-only PR sets none. With no pull-request base (a tag or a
-`workflow_call`) every output is set, so a gated check runs rather than skips
-and reads as passed. `Changes` is in `CI`'s `needs`, so a failure there fails
+A docs-only or `apps/web`-only PR sets none. A change to `.github/workflows/ci.yml`
+sets every output, so a workflow edit runs every gated job. With no
+pull-request base (a tag or a `workflow_call`) every output is set too, so a
+gated check runs rather than skips and reads as passed.
+
+**What each output gates.** `studio` gates Verify's Typegen step and the
+Migrations job; `env-presence` gates the Required env matrix, which stays its
+own job so the environment secrets reach only it; `scripts` gates Verify's
+Script helper tests step. A skipped job reads as success to `CI`, which fails
+only on a `failure` or `cancelled` need. `Changes` is in `CI`'s `needs`, so a failure there fails
 the gate.
 
 **Affected-only runs.** Verify's Type-check and Lint steps and the Test job run
@@ -198,8 +206,9 @@ The step names are the job names they replaced, in this order:
   check needs no anonymous fetch and keeps working on a private repository.
   The error names both migrations and points at "Renumbering a migration that
   collides with `main`" in `packages/db/README.md`.
-- **Script helper tests** — `node --test scripts/*.test.mjs`, the
-  fixture-based suites beside each guard script. They import the repo's
+- **Script helper tests** — only when `Changes` sets `scripts`.
+  `node --test scripts/*.test.mjs`, the fixture-based suites beside each guard
+  script. They import the repo's
   `typescript`, so they need this job's install.
 - **Typegen** — only when `Changes` sets `studio`. Regenerates `schema.json`
   and `types.ts` up to three times (typegen is non-deterministic) and fails if
