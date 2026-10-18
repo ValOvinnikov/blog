@@ -44,6 +44,7 @@ export const ICONS = {
   GLOBE: 'GLOBE',
   STUDIO: 'STUDIO',
   COMMENT: 'COMMENT',
+  USER: 'USER',
   USERS: 'USERS',
   CODE: 'CODE',
   LAYERS: 'LAYERS',

@@ -129,6 +129,8 @@ import ThreadsComponent from '@blog/ui/assets/icons/threads.svg';
 import ThreadsUrl from '@blog/ui/assets/icons/threads.svg?url';
 import TrendingUpComponent from '@blog/ui/assets/icons/trending-up.svg';
 import TrendingUpUrl from '@blog/ui/assets/icons/trending-up.svg?url';
+import UserComponent from '@blog/ui/assets/icons/user.svg';
+import UserUrl from '@blog/ui/assets/icons/user.svg?url';
 import UsersComponent from '@blog/ui/assets/icons/users.svg';
 import UsersUrl from '@blog/ui/assets/icons/users.svg?url';
 import WarningComponent from '@blog/ui/assets/icons/warning.svg';
@@ -207,6 +209,7 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.GLOBE]: { component: GlobeComponent, url: GlobeUrl },
   [ICONS.STUDIO]: { component: StudioComponent, url: StudioUrl },
   [ICONS.COMMENT]: { component: CommentComponent, url: CommentUrl },
+  [ICONS.USER]: { component: UserComponent, url: UserUrl },
   [ICONS.USERS]: { component: UsersComponent, url: UsersUrl },
   [ICONS.CODE]: { component: CodeComponent, url: CodeUrl },
   [ICONS.LAYERS]: { component: LayersComponent, url: LayersUrl },
