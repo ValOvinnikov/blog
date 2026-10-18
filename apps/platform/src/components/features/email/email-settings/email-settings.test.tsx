@@ -308,7 +308,7 @@ describe(`<${EmailSettings.name}/>`, () => {
   describe('the sender logo', () => {
     beforeEach(async () => {
       uploadEmailLogoActionMock.mockResolvedValue({
-        ok: true,
+        outcome: ACTION_OUTCOME.SUCCESS,
         url: 'https://example.blob.vercel-storage.com/email-logo.png',
       });
       setup();
