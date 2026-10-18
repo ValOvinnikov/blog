@@ -49,6 +49,10 @@
   --color-field-boundary: var(
     --field-boundary
   ); /* @role control boundary of the surface in scope */
+  /* prettier-ignore */
+  --color-header-control: var(--header-control-border); /* @role header control resting border */
+  /* prettier-ignore */
+  --color-header-control-fill: var(--header-control-fill); /* @role header control resting fill */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
   --color-text-subtle: var(--text-muted); /* @role metadata / low emphasis */
@@ -382,6 +386,9 @@
   --item-accent-width: 2px;
   --item-accent-color: var(--brand-primary);
   --item-shadow: none;
+
+  --header-control-border: var(--border-strong);
+  --header-control-fill: var(--surface);
 }
 
 .dark {

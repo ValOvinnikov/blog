@@ -9,10 +9,11 @@ code:
   - packages/config/src/theme/accent-hue-guard*.ts
   - packages/utils/src/color/**
   - packages/ui/src/lib/styling/item-card.ts
+  - packages/ui/src/lib/styling/header-control.ts
   - packages/ui/src/lib/design-tokens/**
   - packages/ui/index.css
   - apps/web/index.css
-epics: [4987, 4990, 4991, 4994, 4996, 4997, 4858]
+epics: [4987, 4990, 4991, 4994, 4996, 4997, 4858, 5459]
 ---
 
 # Design tokens and surfaces
@@ -34,7 +35,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 
 - **`@theme inline`** — semantic colour utilities (`bg-surface`, `text-text-muted`, `border-divider`, `ring-offset-ambient`, `bg-brand-primary-solid`, status `success`/`warn`/`error`/`info` and their `-muted` tints, `on-image`), `shadow-card`, `shadow-float`, and the font stacks. Each emits `var(--…)` rather than a literal.
 - **`@theme`** — radius steps plus role radii (`--radius-card` → `--radius-md`, `--radius-media` → `--radius-lg`, `--radius-item` → `--item-radius`); containers; layout spacing (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, and the `band` step with its `sm`–`xl` ladder); the type scale (`title-*`, `prose-*`, `card-*`, `meta`, `label`, `code`, …); tracking; easing.
-- **`:root`, with `.dark` overrides** — page neutrals (`primary`, `primary-subtle`, `secondary`, `surface`, `surface-2`), borders (`border`, `border-strong`, `border-emphasis`), ink (`text`, `text-muted`), the brand ramp, `ring`, status colours, logo steps, shadows, durations, the on-image and scrim tokens, the five `--item-*` card properties, and `--ambient`/`--divider`/`--field-boundary`.
+- **`:root`, with `.dark` overrides** — page neutrals (`primary`, `primary-subtle`, `secondary`, `surface`, `surface-2`), borders (`border`, `border-strong`, `border-emphasis`), ink (`text`, `text-muted`), the brand ramp, `ring`, status colours, logo steps, shadows, durations, the on-image and scrim tokens, the five `--item-*` card properties, the two header-control properties (`--header-control-border` → `--border-strong`, `--header-control-fill` → `--surface`, with no `.dark` copy), and `--ambient`/`--divider`/`--field-boundary`.
 - **`@blog/config` theme tables** (`theme-declarations.ts`) — `ACCENT_RAMP_LIGHT/DARK`, `LOGO_RAMP_LIGHT/DARK` and `IMAGE_SCRIM_RAMP` as OKLCH stops with fixed lightness and chroma, plus `RADIUS_DECLARATIONS`, `DENSITY_DECLARATIONS` and `CARD_STYLE_DECLARATIONS`. `formatOklchRamp` fills in the tenant's hue.
 - **Colour maths** — `@blog/utils/color`: `renderedContrastRatio` (culori, OKLCH in, the worse of gamut mapping and clipping into sRGB), `oklchToHex`, `WCAG_AA_CONTRAST_MIN` (4.5).
 
@@ -59,6 +60,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - **Item cards.** `item-card` draws a solid border from `--item-border-width`, a left accent from `--item-accent-width/color`, a `--surface` fill and `--item-shadow`. `ACCENT_BAR` (the static default) is square with a 2px brand bar; `OUTLINED` is a 1px hairline at `--radius-md`. Both have no shadow. `INTERACTIVE_ITEM_CARD` adds the `bg-tint` fill on hover and focus-within.
 - **Link underline.** Prose links, the `link` `Button` and a linked `QuoteCard.Name` draw one native `text-decoration` underline from `LINK_UNDERLINE` (`packages/ui/src/lib/styling/link-underline.ts`): a `0.2em` offset that clears descenders, 1px at rest and 2px on hover, with `text-decoration-skip-ink: auto`. `LINK_UNDERLINE_EMPHASIS` is the 2px weight on its own, for a current-page link. Callers set only the colour. Never a border or background image: those break on a wrapped link and vanish under forced colours.
 - **Elevation.** `shadow-card` is for raised cards (`Panel`, the highlighted `PricingCard`, the `CtaModule` card); `shadow-float` is for chrome above the page (`Toast`, `PopoverMenu`, `Dialog`).
+- **Header controls.** `HEADER_CONTROL_FRAME` (`packages/ui/src/lib/styling/header-control.ts`) is a round 1px frame whose resting border and fill are `border-header-control` and `bg-header-control-fill`. `HEADER_CONTROL` adds ink text, a brand border and content on hover and while `aria-expanded`, a focus ring that leaves the fill unchanged, and a `Highlight` outline on hover and open in forced colours. IconButton's `circle` is built on it. Restyling every header control means setting the two properties, never changing a class.
 - **Dividers.** Dividers on secondary and brand bands use `border-strong`, which is decorative and below 3:1 on purpose. `--border-emphasis` (3.29:1 light, 3.73:1 dark against `primary-subtle`) is the token for a border that is the only indicator.
 - **Control boundaries.** An enabled `TextInput`'s border and an off `Switch`'s track use `field-boundary`, which reaches 3:1 (WCAG 1.4.11) against the `surface` field fill and against the band behind it on every brand variant, in both modes and at every accent hue: `border-emphasis` on page and card surfaces, and the darker (light) or lighter (dark) `--field-boundary-tinted` on secondary and brand bands, where `border-emphasis` falls short. A disabled `TextInput` drops to `border-strong`, since inactive controls are exempt.
 - **The accent and logo hues are the only tenant colour inputs.** Ramp lightness and chroma never vary, so a token pair's contrast depends on the hue alone. `isAccentHueAccessible` checks one pair (`--text` on `--brand-primary-muted`, both modes) and accepts every hue. Every other checked pair, the field boundary included, is registered in `CONTRAST_PAIRS` (`packages/config/src/theme/contrast-pairs.ts`) with its role minimum; `contrast-check.test.ts` measures each one on every surface it lists, in both modes and at every hue, and fails `pnpm verify` on any shortfall not recorded in `contrast-known-failures.ts`.
@@ -82,6 +84,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - `packages/config/src/theme/accent-hue-guard.ts`
 - `packages/utils/src/color/oklch.ts`
 - `packages/ui/src/lib/styling/item-card.ts`
+- `packages/ui/src/lib/styling/header-control.ts`
 - `packages/ui/src/lib/styling/link-underline.ts`
 - `apps/web/src/components/shared/section/section-variants.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.ts`

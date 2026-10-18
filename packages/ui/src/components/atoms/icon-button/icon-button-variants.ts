@@ -1,5 +1,10 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { FOCUS_RING, TRANSITION_COLORS, tv } from '@blog/ui/lib/styling';
+import {
+  FOCUS_RING,
+  HEADER_CONTROL,
+  TRANSITION_COLORS,
+  tv,
+} from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const iconButtonVariants = tv({
@@ -36,11 +41,7 @@ export const iconButtonVariants = tv({
         'hover:border-brand-primary hover:bg-brand-primary-muted hover:text-brand-primary',
         'focus-visible:bg-transparent',
       ],
-      circle: [
-        'size-11 rounded-full',
-        'border border-border-strong bg-surface text-text',
-        'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
-      ],
+      circle: ['size-11', HEADER_CONTROL],
     },
     tone: {
       [BRAND_VARIANT.PRIMARY]: [],
