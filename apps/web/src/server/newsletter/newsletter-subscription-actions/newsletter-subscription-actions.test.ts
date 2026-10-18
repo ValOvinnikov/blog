@@ -1,4 +1,5 @@
 import {
+  ACTION_OUTCOME,
   PRESET_ID,
   resolveTenantEmailBrand,
   TENANT_WRITE_REFUSAL,
@@ -120,23 +121,21 @@ describe('unsubscribeAction', () => {
     errorSpy.mockRestore();
   });
 
-  it('returns { ok: false } without unsubscribing when there is no session', async () => {
+  it('returns SERVER_ERROR without unsubscribing when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(unsubscribeAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(unsubscribeMock).not.toHaveBeenCalled();
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without unsubscribing when no tenant resolves', async () => {
+  it('returns SERVER_ERROR without unsubscribing when no tenant resolves', async () => {
     resolveRequestTenantMock.mockResolvedValue(undefined);
 
     await expect(unsubscribeAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(unsubscribeMock).not.toHaveBeenCalled();
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
@@ -147,34 +146,39 @@ describe('unsubscribeAction', () => {
     async (status) => {
       resolveRequestTenantMock.mockResolvedValue({ id: TENANT_ID, status });
 
-      await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
+      await expect(unsubscribeAction()).resolves.toEqual({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     },
   );
 
-  it('unsubscribes the session user, clears the cookie, and returns { ok: true }', async () => {
-    await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
+  it('unsubscribes the session user, clears the cookie, and returns SUCCESS', async () => {
+    await expect(unsubscribeAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns { ok: false }, logs and keeps the cookie when the db write throws', async () => {
+  it('returns SERVER_ERROR, logs and keeps the cookie when the db write throws', async () => {
     unsubscribeMock.mockRejectedValue(new Error('boom'));
 
     await expect(unsubscribeAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(errorSpy).toHaveBeenCalled();
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
   });
 
-  it('still returns { ok: true }, logging, when clearing the cookie throws', async () => {
+  it('still returns SUCCESS, logging, when clearing the cookie throws', async () => {
     clearNewsletterSubscribedCookieMock.mockRejectedValue(
       new Error('cookie store down'),
     );
 
-    await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
+    await expect(unsubscribeAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining('newsletter.subscribed_cookie_clear_failed'),
     );
@@ -224,57 +228,55 @@ describe('resendConfirmationAction', () => {
       await import('./newsletter-subscription-actions'));
   });
 
-  it('returns { ok: false } without resending when there is no session', async () => {
+  it('returns SERVER_ERROR without resending when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(resendConfirmationAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without resending when the session has no email', async () => {
+  it('returns SERVER_ERROR without resending when the session has no email', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
 
     await expect(resendConfirmationAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without resending when no tenant resolves', async () => {
+  it('returns SERVER_ERROR without resending when no tenant resolves', async () => {
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
     });
 
     await expect(resendConfirmationAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without resending when the tenant is not ACTIVE, flagged unavailable', async () => {
+  it('returns UNAVAILABLE without resending when the tenant is not ACTIVE', async () => {
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.INACTIVE,
     });
 
     await expect(resendConfirmationAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: true,
+      outcome: ACTION_OUTCOME.UNAVAILABLE,
     });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('resends the confirmation email to the session email and returns { ok: true }', async () => {
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+  it('resends the confirmation email to the session email and returns SUCCESS', async () => {
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -311,23 +313,21 @@ describe('resendConfirmationAction', () => {
     );
   });
 
-  it('returns { ok: false } without sending when the db reports not-pending', async () => {
+  it('returns SERVER_ERROR without sending when the db reports not-pending', async () => {
     resendConfirmationMock.mockResolvedValue({ outcome: 'not-pending' });
 
     await expect(resendConfirmationAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } and logs when sending the confirmation email throws', async () => {
+  it('returns SERVER_ERROR and logs when sending the confirmation email throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     sendEmailMock.mockRejectedValue(new Error('resend down'));
 
     await expect(resendConfirmationAction()).resolves.toEqual({
-      ok: false,
-      isUnavailable: false,
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
@@ -365,7 +365,9 @@ describe('resendConfirmationAction', () => {
       footerPostalAddress: undefined,
     });
 
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({ replyTo: undefined }),
     );
@@ -385,7 +387,9 @@ describe('resendConfirmationAction', () => {
     it('still sends the confirmation email when the email settings lookup rejects', async () => {
       getEmailConfigMock.mockRejectedValue(new Error('db down'));
 
-      await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+      await expect(resendConfirmationAction()).resolves.toEqual({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({ to: 'val@icloud.com' }),
       );
@@ -394,7 +398,9 @@ describe('resendConfirmationAction', () => {
     it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
       getEmailTemplateMock.mockRejectedValue(new Error('db down'));
 
-      await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+      await expect(resendConfirmationAction()).resolves.toEqual({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
           to: 'val@icloud.com',

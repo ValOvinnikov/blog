@@ -5,7 +5,7 @@ import {
   type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
 } from '@blog/config';
-import { usePathname } from '@web/i18n/navigation';
+import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import { useTranslations } from 'next-intl';
 
 import { LanguageCodes } from './components/language-codes/language-codes';
@@ -33,7 +33,7 @@ export const LanguageSwitcher = ({
   dataTestId,
 }: TLanguageSwitcherProps) => {
   const t = useTranslations('languageSwitcher');
-  const pathname = usePathname();
+  const pathname = usePublicPathname();
 
   if (liveLocales.length < 2) {
     return null;

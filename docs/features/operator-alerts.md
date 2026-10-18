@@ -4,6 +4,7 @@ status: built
 layers: [platform, email, db, config]
 code:
   - apps/platform/src/app/api/internal/operator-alert/**
+  - apps/platform/src/server/internal-api/**
   - apps/platform/src/server/email/resolve-operator-alert-from-address.ts
   - apps/platform/src/components/features/tenants/email-alerts-banner/**
   - packages/config/src/constants/operator-alert.ts

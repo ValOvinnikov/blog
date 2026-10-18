@@ -1,6 +1,11 @@
 import { MAX_UPLOAD_BYTES } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { logger } from '@platform/utils/logger/logger';
 
+import { sanitizeSvgMarkup } from './sanitize-svg-markup';
 import { validateBrandAssetUpload } from './validate-brand-asset';
+
+vi.mock('@platform/utils/logger/logger');
+vi.mock('./sanitize-svg-markup', { spy: true });
 
 const buildPngBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(33);
@@ -198,5 +203,28 @@ describe(validateBrandAssetUpload, () => {
       ok: false,
       error: { reason: 'imageTooSmall', values: { size: 32 } },
     });
+  });
+
+  it('logs once and reports an upload failure when sanitising throws', async () => {
+    const cause = new Error('sanitiser unavailable');
+    vi.mocked(sanitizeSvgMarkup).mockRejectedValueOnce(cause);
+
+    const result = await validateBrandAssetUpload(
+      svgFile('<svg viewBox="0 0 24 24"></svg>'),
+      'logo',
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      error: { reason: 'uploadFailed', values: { kind: 'logo' } },
+    });
+    expect(logger.error).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledWith(
+      'site_config.svg_sanitize_failed',
+      {
+        kind: 'logo',
+        error: cause,
+      },
+    );
   });
 });

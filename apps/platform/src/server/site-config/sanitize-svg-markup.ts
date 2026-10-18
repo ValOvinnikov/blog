@@ -69,7 +69,10 @@ let purifyPromise: TMaybeUndefined<Promise<DOMPurify>>;
 export const sanitizeSvgMarkup = async (
   markup: string,
 ): Promise<TMaybeUndefined<string>> => {
-  purifyPromise ??= createPurify();
+  purifyPromise ??= createPurify().catch((error: unknown) => {
+    purifyPromise = undefined;
+    throw error;
+  });
   const purify = await purifyPromise;
   const clean = purify.sanitize(markup, {
     USE_PROFILES: { svg: true, svgFilters: true },

@@ -1,3 +1,4 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useRouter } from 'next/navigation';
@@ -84,7 +85,9 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     it('runs unsubscribeAction through toast.promise and refreshes the router on success', async () => {
-      unsubscribeActionMock.mockResolvedValue({ ok: true });
+      unsubscribeActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       await user.click(screen.getByRole('button', { name: 'Unsubscribe' }));
 
       await waitFor(() => {
@@ -106,8 +109,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
 
     it('does not refresh the router when the action fails', async () => {
       unsubscribeActionMock.mockResolvedValue({
-        ok: false,
-        isUnavailable: false,
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
       await user.click(screen.getByRole('button', { name: 'Unsubscribe' }));
 
@@ -123,7 +125,9 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     it('marks the button aria-busy while the action is pending, and clears it once settled', async () => {
-      let resolveAction!: (result: { ok: true }) => void;
+      let resolveAction!: (result: {
+        outcome: typeof ACTION_OUTCOME.SUCCESS;
+      }) => void;
       unsubscribeActionMock.mockImplementation(
         () =>
           new Promise((resolve) => {
@@ -137,7 +141,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
         expect(button).toHaveAttribute('aria-busy', 'true');
       });
 
-      resolveAction({ ok: true });
+      resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
 
       await waitFor(() => {
         expect(button).toHaveAttribute('aria-busy', 'false');
@@ -157,7 +161,9 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     it('runs resendConfirmationAction through toast.promise and refreshes the router on success', async () => {
-      resendConfirmationActionMock.mockResolvedValue({ ok: true });
+      resendConfirmationActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
       await user.click(
         screen.getByRole('button', { name: 'Resend confirmation' }),
       );
@@ -181,8 +187,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
 
     it('toasts the unavailable copy for the "resend" action when it is refused as unavailable', async () => {
       resendConfirmationActionMock.mockResolvedValue({
-        ok: false,
-        isUnavailable: true,
+        outcome: ACTION_OUTCOME.UNAVAILABLE,
       });
       await user.click(
         screen.getByRole('button', { name: 'Resend confirmation' }),

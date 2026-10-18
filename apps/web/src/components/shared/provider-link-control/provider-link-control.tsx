@@ -1,6 +1,6 @@
 'use client';
 
-import { routes } from '@blog/config';
+import { ACTION_OUTCOME, routes } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { useToast } from '@web/context/toast-provider';
 import {
@@ -17,20 +17,7 @@ export type TProviderLinkControlProps = {
   action: 'link' | 'unlink';
 };
 
-/**
- * **"link"**: Auth.js v5 treats a provider-scoped `signIn(provider)` call
- * made from an *already-authenticated* session as an account-link rather
- * than a fresh sign-in, so `redirectTo` is pinned to `routes.account()` to
- * land back here once the provider round-trip completes and
- * `IdentitySection` re-fetches `getLinkedProviders` on the fresh page load.
- *
- * **"unlink"**: mirrors `NewsletterSubscriptionControl`'s pattern. The
- * server's atomic last-method guard can still reject even though
- * `IdentitySection` only renders this control when its own last-method
- * check passes (a concurrent unlink from another tab could invalidate that
- * check between render and click), so the error toast's message
- * distinguishes `reason: 'last-method'` from any other failure.
- */
+// signIn(provider) from an already-authenticated session links the provider to that account instead of signing in afresh.
 export const ProviderLinkControl = ({
   provider,
   action,
@@ -54,7 +41,9 @@ export const ProviderLinkControl = ({
         await toast.promise(
           (async () => {
             const result = await unlinkProviderAction(provider);
-            if (!result.ok) throw new Error(result.reason);
+            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+              throw new Error(result.outcome);
+            }
             return result;
           })(),
           {
@@ -62,15 +51,14 @@ export const ProviderLinkControl = ({
             success: { message: t('unlinkToastSuccessMessage') },
             error: (error: unknown) => ({
               message:
-                error instanceof Error && error.message === 'last-method'
+                error instanceof Error &&
+                error.message === ACTION_OUTCOME.BLOCKED
                   ? t('unlinkLastMethodError')
                   : t('unlinkError'),
             }),
           },
         );
       } catch {
-        // Already surfaced via the `toast.promise` error branch above —
-        // swallow here so a failed unlink doesn't refresh the section below.
         return;
       }
 

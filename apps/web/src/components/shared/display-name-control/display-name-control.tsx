@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, SIZE } from '@blog/config';
+import { ACTION_OUTCOME, ICONS, SIZE, type TNullable } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
@@ -15,24 +15,10 @@ import { displayNameControlVariants } from './display-name-control-variants';
 
 export type TDisplayNameControlProps = {
   initialName: string;
-  email?: string | null;
-  image?: string | null;
+  email?: TNullable<string>;
+  image?: TNullable<string>;
 };
 
-/**
- * Only the editable `TextInput` strictly requires the client boundary, but
- * `Avatar`/`Button` ride along with it as part of the same control-slot
- * composition. Mirrors `NewsletterSubscriptionControl`'s save pattern;
- * `router.refresh()` on success re-runs `IdentitySection`'s server-side
- * session read so other session-derived UI (e.g. the header's account menu)
- * picks up the new name on next navigation.
- *
- * Renders its own explicit two-row wrapper rather than relying on
- * `SettingRow`'s generic control-slot stacking: `Avatar` + `TextInput` share
- * one row with the input taking the remaining flex space, and the "save"
- * `Button` sits on its own full-width row below on mobile, inline at the end
- * of the row again from `md:` up.
- */
 export const DisplayNameControl = ({
   initialName,
   email,
@@ -56,7 +42,9 @@ export const DisplayNameControl = ({
         await toast.promise(
           (async () => {
             const result = await updateDisplayNameAction(name);
-            if (!result.ok) throw new Error('Failed to update display name');
+            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+              throw new Error('Failed to update display name');
+            }
             return result;
           })(),
           {
@@ -66,7 +54,6 @@ export const DisplayNameControl = ({
           },
         );
       } catch {
-        // Already surfaced via the `toast.promise` error branch above.
         return;
       }
 

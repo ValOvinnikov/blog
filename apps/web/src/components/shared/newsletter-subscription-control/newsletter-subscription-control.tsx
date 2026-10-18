@@ -1,5 +1,6 @@
 'use client';
 
+import { ACTION_OUTCOME } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { useToast } from '@web/context/toast-provider';
 import {
@@ -40,8 +41,8 @@ export const NewsletterSubscriptionControl = ({
             const result = isUnsubscribe
               ? await unsubscribeAction()
               : await resendConfirmationAction();
-            if (!result.ok) {
-              isUnavailable = result.isUnavailable;
+            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+              isUnavailable = result.outcome === ACTION_OUTCOME.UNAVAILABLE;
               throw new Error(`Failed to ${action}`);
             }
             return result;
@@ -50,11 +51,7 @@ export const NewsletterSubscriptionControl = ({
             loading: { message: t(loadingMessageKey) },
             success: { message: t(successMessageKey) },
             error: () => ({
-              message: t(
-                isUnavailable && !isUnsubscribe
-                  ? 'resendUnavailable'
-                  : errorMessageKey,
-              ),
+              message: t(isUnavailable ? 'resendUnavailable' : errorMessageKey),
             }),
           },
         );

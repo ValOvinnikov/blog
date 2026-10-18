@@ -1,6 +1,6 @@
 'use client';
 
-import { routes } from '@blog/config';
+import { ACTION_OUTCOME, routes } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { useToast } from '@web/context/toast-provider';
@@ -15,11 +15,6 @@ export type TDeleteAccountControlProps = {
   handle: string;
 };
 
-/**
- * Slotted into `SettingRow.children` as the sole client boundary; `deleteAccountAction`
- * returns a `Result` so it's wrapped to throw for `toast.promise`'s error branch, and only
- * the success path signs the reader out.
- */
 export const DeleteAccountControl = ({
   handle,
 }: TDeleteAccountControlProps) => {
@@ -37,7 +32,9 @@ export const DeleteAccountControl = ({
         await toast.promise(
           (async () => {
             const result = await deleteAccountAction();
-            if (!result.ok) throw new Error('Failed to delete account');
+            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+              throw new Error('Failed to delete account');
+            }
             return result;
           })(),
           {
@@ -47,8 +44,6 @@ export const DeleteAccountControl = ({
           },
         );
       } catch {
-        // Already surfaced via the `toast.promise` error branch above —
-        // swallow here so a failed delete doesn't sign the reader out below.
         return;
       }
 

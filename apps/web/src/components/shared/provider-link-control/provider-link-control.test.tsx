@@ -1,3 +1,4 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useRouter } from 'next/navigation';
@@ -118,7 +119,9 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     });
 
     it('runs unlinkProviderAction through toast.promise and refreshes the router on success', async () => {
-      unlinkProviderActionMock.mockResolvedValue({ ok: true });
+      unlinkProviderActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
 
       await user.click(screen.getByRole('button', { name: 'Unlink' }));
 
@@ -140,8 +143,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
 
     it('does not refresh the router when unlinking fails generically', async () => {
       unlinkProviderActionMock.mockResolvedValue({
-        ok: false,
-        reason: 'unknown',
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
 
       await user.click(screen.getByRole('button', { name: 'Unlink' }));
@@ -159,15 +161,14 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
 
       const [, messages] = toastPromiseMock.mock
         .calls[0] as unknown as TToastPromiseCallArgs;
-      expect(messages.error(new Error('unknown')).message).toBe(
-        "Couldn't unlink. Try again.",
-      );
+      expect(
+        messages.error(new Error(ACTION_OUTCOME.SERVER_ERROR)).message,
+      ).toBe("Couldn't unlink. Try again.");
     });
 
     it('surfaces a distinct message when the server rejects the last remaining method', async () => {
       unlinkProviderActionMock.mockResolvedValue({
-        ok: false,
-        reason: 'last-method',
+        outcome: ACTION_OUTCOME.BLOCKED,
       });
 
       await user.click(screen.getByRole('button', { name: 'Unlink' }));
@@ -178,7 +179,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
 
       const [, messages] = toastPromiseMock.mock
         .calls[0] as unknown as TToastPromiseCallArgs;
-      expect(messages.error(new Error('last-method')).message).toBe(
+      expect(messages.error(new Error(ACTION_OUTCOME.BLOCKED)).message).toBe(
         "That's your only remaining sign-in method — link another before unlinking this one.",
       );
       expect(routerRefreshMock).not.toHaveBeenCalled();
