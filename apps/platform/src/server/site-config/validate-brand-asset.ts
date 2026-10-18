@@ -11,6 +11,7 @@ import {
   maxUploadMbLabel,
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { logger } from '@platform/utils/logger/logger';
 import { imageSize } from 'image-size';
 
 import { sanitizeSvgMarkup } from './sanitize-svg-markup';
@@ -32,7 +33,13 @@ const validateSvgAsset = async (
   kind: TBrandAssetKind,
   format: TImageFormat,
 ): Promise<TImageUploadValidationResult> => {
-  const sanitized = await sanitizeSvgMarkup(buffer.toString('utf-8'));
+  let sanitized;
+  try {
+    sanitized = await sanitizeSvgMarkup(buffer.toString('utf-8'));
+  } catch (error) {
+    logger.error('site_config.svg_sanitize_failed', { kind, error });
+    return { ok: false, error: { reason: 'uploadFailed', values: { kind } } };
+  }
   if (!sanitized) {
     return { ok: false, error: { reason: 'unreadableImage' } };
   }
