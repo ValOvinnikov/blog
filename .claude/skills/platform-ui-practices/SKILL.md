@@ -79,8 +79,9 @@ Text fields, in a card under `SettingsFormShell` (`fields` is
 
 - **A field with a format rule (a URL, a handle, a length) has its error path,
   all four parts:** the Server Action validates it and returns
-  `{ ok: false, fieldErrors }`, a code per field; the component keeps the codes
-  in state; it passes the translated `error`, which marks the field invalid;
+  `{ outcome: ACTION_OUTCOME.INVALID, fieldErrors }`, a `{ reason }` code per
+  field; the component keeps the codes in state; it passes the translated
+  `error`, which marks the field invalid;
   and `useSettingsForm` gets
   `invalidFields: () => ({ ids: mastodonError ? [mastodonId] : [] })`.
 - Compose `FormField` around `TextInput`, as here: `FormTextInput` has no
@@ -533,6 +534,31 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 The catalogue rules (no literal in JSX, five locales, Server Actions return
 codes) are in `.claude/agents/platform-app.md` → "Copy and navigation". On top
 of them:
+
+- **A form branches on `outcome` and maps codes to catalogue keys.** Every
+  mutating action returns one shape, a `TActionResult`; which outcome each
+  failure answers is the table in `platform-app.md` → "Server-action results".
+  The form maps each reason code to its catalogue key with a
+  `satisfies Record<…>` map, so a new code fails `type-check` until it has
+  copy:
+
+  ```tsx
+  const UPLOAD_REFUSAL_KEYS = {
+    [UPLOAD_REFUSAL.FILE_TOO_LARGE]: 'fileTooLarge',
+    // …one entry per UPLOAD_REFUSAL value
+  } satisfies Record<TUploadRefusal, string>;
+
+  const t = useTranslations('uploadErrors');
+  const result = await uploadBrandAssetAction(tenantId, kind, formData);
+  switch (result.outcome) {
+    case ACTION_OUTCOME.SUCCESS:
+      return setUrl(result.url);
+    case ACTION_OUTCOME.REFUSED:
+      return setError(t(UPLOAD_REFUSAL_KEYS[result.reason], result.values));
+    case ACTION_OUTCOME.SERVER_ERROR:
+      return setError(t('uploadFailed', { kind }));
+  }
+  ```
 
 - Placeholders and `sr-only` text are catalogue keys too. No literal in JSX,
   including `'(opens in new tab)'`, `'https://…'` and `'°'`.
