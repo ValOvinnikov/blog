@@ -30,17 +30,67 @@ describe(LookSample, () => {
     staticDarkRamp.remove();
   });
 
-  it('renders the tenant name and a @blog/ui Button primitive', () => {
-    render(<LookSample {...BASE_PROPS} />);
+  describe('with the default values', () => {
+    beforeEach(() => {
+      render(<LookSample {...BASE_PROPS} />);
+    });
 
-    expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
-  });
+    it('renders the tenant name and a @blog/ui Button primitive', () => {
+      expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
+      expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+    });
 
-  it('keeps the sample out of the tab order and the page outline', () => {
-    render(<LookSample {...BASE_PROPS} />);
+    it('keeps the sample out of the tab order and the page outline', () => {
+      expect(screen.getByTestId('look-sample-tokens')).toHaveAttribute('inert');
+    });
 
-    expect(screen.getByTestId('look-sample-tokens')).toHaveAttribute('inert');
+    it('renders one linked and one static item card beside an outlined card', () => {
+      expect(
+        screen.getByRole('link', { name: 'Notes from the harbour' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', {
+          level: 4,
+          name: 'Charting the next season',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole('link', { name: 'Charting the next season' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
+      ).toBeVisible();
+    });
+
+    it('opens with a header carrying the brand and two nav links', () => {
+      expect(screen.getByRole('banner')).toHaveTextContent('Acme Inc.');
+      expect(screen.getByRole('link', { name: 'Posts' })).toBeVisible();
+      expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
+    });
+
+    it('shows the theme toggle and a Sign in pill when the site has reader accounts', () => {
+      expect(
+        screen.getByRole('button', { name: 'Switch to dark theme' }),
+      ).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Sign in' })).toHaveTextContent(
+        'Sign in',
+      );
+    });
+
+    it('shows every live language as a code with compact codes', () => {
+      const current = screen.getByTestId('sample-language-code-current');
+      expect(current).toHaveAttribute('aria-current', 'page');
+      expect(current).toHaveTextContent('English');
+      expect(
+        screen.queryByRole('link', { name: 'English' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Français' })).toHaveTextContent(
+        'FR',
+      );
+      expect(
+        screen.queryByRole('button', { name: 'Language: English' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('resolves the tenant accent rather than the static dark ramp in dark mode', () => {
@@ -71,45 +121,6 @@ describe(LookSample, () => {
     expect(screen.getByRole('img', { name: 'Acme Inc.' })).toHaveAttribute(
       'src',
       'https://cdn.example.com/logo.svg',
-    );
-  });
-
-  it('renders one linked and one static item card beside an outlined card', () => {
-    render(<LookSample {...BASE_PROPS} />);
-
-    expect(
-      screen.getByRole('link', { name: 'Notes from the harbour' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', {
-        level: 4,
-        name: 'Charting the next season',
-      }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'Charting the next season' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
-    ).toBeVisible();
-  });
-
-  it('opens with a header carrying the brand and two nav links', () => {
-    render(<LookSample {...BASE_PROPS} />);
-
-    expect(screen.getByRole('banner')).toHaveTextContent('Acme Inc.');
-    expect(screen.getByRole('link', { name: 'Posts' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
-  });
-
-  it('shows the theme toggle and a Sign in pill when the site has reader accounts', () => {
-    render(<LookSample {...BASE_PROPS} />);
-
-    expect(
-      screen.getByRole('button', { name: 'Switch to dark theme' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveTextContent(
-      'Sign in',
     );
   });
 
@@ -159,23 +170,6 @@ describe(LookSample, () => {
     expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Sign in' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('shows every live language as a code with compact codes', () => {
-    render(<LookSample {...BASE_PROPS} />);
-
-    const current = screen.getByTestId('sample-language-code-current');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current).toHaveTextContent('English');
-    expect(
-      screen.queryByRole('link', { name: 'English' }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Français' })).toHaveTextContent(
-      'FR',
-    );
-    expect(
-      screen.queryByRole('button', { name: 'Language: English' }),
     ).not.toBeInTheDocument();
   });
 

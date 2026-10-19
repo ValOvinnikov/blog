@@ -111,63 +111,268 @@ describe(`<${LookForm.name}/>`, () => {
     vi.restoreAllMocks();
   });
 
-  it(
-    'renders the current preset and accent hue from the given initial values',
-    { timeout: 15000 },
-    () => {
+  describe('with the default values', () => {
+    beforeEach(() => {
       setup();
+    });
 
-      expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-        'aria-checked',
-        'true',
-      );
-      expect(screen.getByText('hue 250°')).toBeVisible();
-    },
-  );
-
-  it('groups the settings into Preset, Colour, Type, Shape, Brand and Language switcher cards', () => {
-    setup();
-
-    for (const name of [
-      'Preset',
-      'Colour',
-      'Type',
-      'Shape',
-      'Brand',
-      'Language switcher',
-    ]) {
-      expect(screen.getByRole('heading', { level: 2, name })).toBeVisible();
-    }
-  });
-
-  it('marks only the card holding an unsaved change', async () => {
-    setup();
-
-    screen.getByRole('slider', { name: 'Accent hue' }).focus();
-    await user.keyboard('{ArrowRight}');
-
-    expect(
-      screen.getByRole('heading', { name: 'Colour Unsaved' }),
-    ).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Type' })).toBeVisible();
-  });
-
-  it('switches between the Edit and Preview tabs', async () => {
-    setup();
-
-    const editTab = within(
-      screen.getByRole('tablist', { name: 'Edit or preview' }),
-    ).getByRole('tab', { name: 'Edit' });
-    const previewTab = screen.getByRole('tab', { name: 'Preview' });
-    expect(editTab).toHaveAttribute('aria-selected', 'true');
-
-    await user.click(previewTab);
-
-    expect(previewTab).toHaveAttribute('aria-selected', 'true');
-    expect(editTab).toHaveAttribute('aria-selected', 'false');
-    expect(screen.getByRole('tabpanel', { name: 'Preview' })).toContainElement(
-      screen.getByTestId('look-sample-tokens'),
+    it(
+      'renders the current preset and accent hue from the given initial values',
+      { timeout: 15000 },
+      () => {
+        expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
+          'aria-checked',
+          'true',
+        );
+        expect(screen.getByText('hue 250°')).toBeVisible();
+      },
     );
+
+    it('groups the settings into Preset, Colour, Type, Shape, Brand and Language switcher cards', () => {
+      for (const name of [
+        'Preset',
+        'Colour',
+        'Type',
+        'Shape',
+        'Brand',
+        'Language switcher',
+      ]) {
+        expect(screen.getByRole('heading', { level: 2, name })).toBeVisible();
+      }
+    });
+
+    it('marks only the card holding an unsaved change', async () => {
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+
+      expect(
+        screen.getByRole('heading', { name: 'Colour Unsaved' }),
+      ).toBeVisible();
+      expect(screen.getByRole('heading', { name: 'Type' })).toBeVisible();
+    });
+
+    it('switches between the Edit and Preview tabs', async () => {
+      const editTab = within(
+        screen.getByRole('tablist', { name: 'Edit or preview' }),
+      ).getByRole('tab', { name: 'Edit' });
+      const previewTab = screen.getByRole('tab', { name: 'Preview' });
+      expect(editTab).toHaveAttribute('aria-selected', 'true');
+
+      await user.click(previewTab);
+
+      expect(previewTab).toHaveAttribute('aria-selected', 'true');
+      expect(editTab).toHaveAttribute('aria-selected', 'false');
+      expect(
+        screen.getByRole('tabpanel', { name: 'Preview' }),
+      ).toContainElement(screen.getByTestId('look-sample-tokens'));
+    });
+
+    it("describes each Look control with its field's hint", () => {
+      expect(
+        screen.getByRole('slider', { name: 'Accent hue' }),
+      ).toHaveAccessibleDescription(/Colours links/);
+      expect(
+        screen.getByRole('switch', { name: 'Follow accent hue' }),
+      ).toHaveAccessibleDescription(/Tints your wordmark/);
+      expect(
+        screen.getByRole('group', { name: 'Radius scale' }),
+      ).toHaveAccessibleDescription('Corner roundness across every surface.');
+    });
+
+    it('names the logo hue group with its optional tag', () => {
+      expect(
+        screen.getByRole('group', { name: 'Logo hue optional' }),
+      ).toBeVisible();
+    });
+
+    it('describes both brand uploads with one shared hint', () => {
+      const hint = 'Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.';
+      expect(
+        screen.getByRole('button', { name: 'Upload logo' }),
+      ).toHaveAccessibleDescription(hint);
+      expect(
+        screen.getByRole('button', { name: 'Upload favicon' }),
+      ).toHaveAccessibleDescription(hint);
+    });
+
+    it("choosing a preset resets every one of that preset's defaults", async () => {
+      await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+
+      expect(screen.getByText('hue 28°')).toBeVisible();
+    });
+
+    it('saves the current form state through updateLookAction', async () => {
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateLookActionMock).toHaveBeenCalledWith('tenant-1', {
+          preset: PRESET_ID.CONSOLE,
+          accentHue: 251,
+          logoHue: null,
+          headingFont: FONT_CHOICE.SPACE_GROTESK,
+          bodyFont: FONT_CHOICE.NEWSREADER,
+          radiusScale: RADIUS_SCALE.MD,
+          density: DENSITY.DEFAULT,
+          cardStyle: CARD_STYLE.ACCENT_BAR,
+          headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+          languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+        });
+      });
+    });
+
+    it('saves the chosen header buttons style and marks Shape unsaved', async () => {
+      await user.click(screen.getByRole('button', { name: 'Soft' }));
+
+      expect(
+        screen.getByRole('heading', { name: 'Shape Unsaved' }),
+      ).toBeVisible();
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateLookActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          expect.objectContaining({
+            headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+          }),
+        );
+      });
+    });
+
+    it('describes each header buttons option', () => {
+      expect(
+        screen.getByRole('button', { name: 'Plain' }),
+      ).toHaveAccessibleDescription('No outline until hovered');
+    });
+
+    it('saves the chosen language switcher style', async () => {
+      await user.click(screen.getByRole('button', { name: 'Compact codes' }));
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateLookActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          expect.objectContaining({
+            languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+          }),
+        );
+      });
+    });
+
+    it('shows a save-confirmation toast once the save resolves', async () => {
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByText('Look saved.')).toBeVisible();
+    });
+
+    it('offers Save changes only once the form is dirty', async () => {
+      expect(
+        screen.queryByRole('button', { name: 'Save changes' }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeEnabled();
+    });
+
+    it('hides Reset to preset while every preset-controlled value matches the preset', () => {
+      expect(
+        screen.queryByRole('button', { name: 'Reset to preset' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('discards unsaved changes back to the saved values', async () => {
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+      await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+      expect(screen.getByText('hue 250°')).toBeVisible();
+      expect(
+        screen.queryByRole('button', { name: 'Save changes' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('hides the save bar once the save resolves', async () => {
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByText('All changes saved')).toBeVisible();
+      expect(
+        screen.queryByRole('button', { name: 'Save changes' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('previews a changed radius scale and density before saving', async () => {
+      await user.click(screen.getByRole('button', { name: 'Extra large' }));
+      await user.click(screen.getByRole('button', { name: 'Compact' }));
+
+      expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+        '--radius-md': '12px',
+        '--spacing-card-x': '0.75rem',
+      });
+    });
+
+    it('previews and saves the outlined card style', async () => {
+      await user.click(
+        within(screen.getByRole('group', { name: 'Card style' })).getByRole(
+          'button',
+          { name: 'Outlined' },
+        ),
+      );
+
+      expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+        '--item-border-width': '1px',
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateLookActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          expect.objectContaining({ cardStyle: CARD_STYLE.OUTLINED }),
+        );
+      });
+    });
+
+    it("choosing a preset applies that preset's card style", async () => {
+      await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+
+      expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+        '--item-border-width': '1px',
+      });
+    });
+
+    it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
+      const slider = screen.getByRole('slider', { name: 'Accent hue' });
+      slider.focus();
+      await user.keyboard('{ArrowRight}');
+      expect(screen.getByText('hue 251°')).toBeVisible();
+
+      await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
+
+      expect(screen.getByText('hue 250°')).toBeVisible();
+    });
+
+    it('leaves every Look control enabled for a non-archived tenant', () => {
+      expect(
+        screen.getByRole('radio', { name: 'Console' }),
+      ).not.toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeEnabled();
+      expect(
+        screen.getByRole('switch', { name: 'Follow accent hue' }),
+      ).not.toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Upload logo' })).toBeEnabled();
+      expect(screen.getByRole('button', { name: 'Small' })).toBeEnabled();
+    });
   });
 
   it('drops the tab panels on desktop, where the view tabs are hidden', () => {
@@ -181,40 +386,6 @@ describe(`<${LookForm.name}/>`, () => {
     expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
   });
 
-  it("describes each Look control with its field's hint", () => {
-    setup();
-
-    expect(
-      screen.getByRole('slider', { name: 'Accent hue' }),
-    ).toHaveAccessibleDescription(/Colours links/);
-    expect(
-      screen.getByRole('switch', { name: 'Follow accent hue' }),
-    ).toHaveAccessibleDescription(/Tints your wordmark/);
-    expect(
-      screen.getByRole('group', { name: 'Radius scale' }),
-    ).toHaveAccessibleDescription('Corner roundness across every surface.');
-  });
-
-  it('names the logo hue group with its optional tag', () => {
-    setup();
-
-    expect(
-      screen.getByRole('group', { name: 'Logo hue optional' }),
-    ).toBeVisible();
-  });
-
-  it('describes both brand uploads with one shared hint', () => {
-    setup();
-
-    const hint = 'Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.';
-    expect(
-      screen.getByRole('button', { name: 'Upload logo' }),
-    ).toHaveAccessibleDescription(hint);
-    expect(
-      screen.getByRole('button', { name: 'Upload favicon' }),
-    ).toHaveAccessibleDescription(hint);
-  });
-
   it("choosing a preset doesn't clear an already-saved brand image", async () => {
     setup({
       initialValues: {
@@ -226,66 +397,6 @@ describe(`<${LookForm.name}/>`, () => {
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
     expect(screen.getByAltText('Current logo')).toBeVisible();
-  });
-
-  it("choosing a preset resets every one of that preset's defaults", async () => {
-    setup();
-
-    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
-
-    expect(screen.getByText('hue 28°')).toBeVisible();
-  });
-
-  it('saves the current form state through updateLookAction', async () => {
-    setup();
-
-    screen.getByRole('slider', { name: 'Accent hue' }).focus();
-    await user.keyboard('{ArrowRight}');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateLookActionMock).toHaveBeenCalledWith('tenant-1', {
-        preset: PRESET_ID.CONSOLE,
-        accentHue: 251,
-        logoHue: null,
-        headingFont: FONT_CHOICE.SPACE_GROTESK,
-        bodyFont: FONT_CHOICE.NEWSREADER,
-        radiusScale: RADIUS_SCALE.MD,
-        density: DENSITY.DEFAULT,
-        cardStyle: CARD_STYLE.ACCENT_BAR,
-        headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
-        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-      });
-    });
-  });
-
-  it('saves the chosen header buttons style and marks Shape unsaved', async () => {
-    setup();
-
-    await user.click(screen.getByRole('button', { name: 'Soft' }));
-
-    expect(
-      screen.getByRole('heading', { name: 'Shape Unsaved' }),
-    ).toBeVisible();
-
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateLookActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        expect.objectContaining({
-          headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
-        }),
-      );
-    });
-  });
-
-  it('describes each header buttons option', () => {
-    setup();
-
-    expect(
-      screen.getByRole('button', { name: 'Plain' }),
-    ).toHaveAccessibleDescription('No outline until hovered');
   });
 
   it('resets the header buttons style with the rest of the preset', async () => {
@@ -306,22 +417,6 @@ describe(`<${LookForm.name}/>`, () => {
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('saves the chosen language switcher style', async () => {
-    setup();
-
-    await user.click(screen.getByRole('button', { name: 'Compact codes' }));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateLookActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        expect.objectContaining({
-          languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-        }),
-      );
-    });
-  });
-
   it('shows a note instead of the language switcher choice with one live language', () => {
     setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
@@ -333,16 +428,6 @@ describe(`<${LookForm.name}/>`, () => {
     expect(
       screen.queryByRole('button', { name: 'Compact codes' }),
     ).not.toBeInTheDocument();
-  });
-
-  it('shows a save-confirmation toast once the save resolves', async () => {
-    setup();
-
-    screen.getByRole('slider', { name: 'Accent hue' }).focus();
-    await user.keyboard('{ArrowRight}');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    expect(await screen.findByText('Look saved.')).toBeVisible();
   });
 
   it('marks Save busy while the save is in flight', async () => {
@@ -381,28 +466,6 @@ describe(`<${LookForm.name}/>`, () => {
     );
   });
 
-  it('offers Save changes only once the form is dirty', async () => {
-    setup();
-
-    expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
-
-    screen.getByRole('slider', { name: 'Accent hue' }).focus();
-    await user.keyboard('{ArrowRight}');
-
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled();
-  });
-
-  it('hides Reset to preset while every preset-controlled value matches the preset', () => {
-    setup();
-
-    expect(
-      screen.queryByRole('button', { name: 'Reset to preset' }),
-    ).not.toBeInTheDocument();
-  });
-
   it('offers Reset to preset for saved values that differ from the preset, with no unsaved edits', async () => {
     setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
 
@@ -415,32 +478,6 @@ describe(`<${LookForm.name}/>`, () => {
     expect(screen.getByText('hue 250°')).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Reset to preset' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('discards unsaved changes back to the saved values', async () => {
-    setup();
-
-    screen.getByRole('slider', { name: 'Accent hue' }).focus();
-    await user.keyboard('{ArrowRight}');
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
-
-    expect(screen.getByText('hue 250°')).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('hides the save bar once the save resolves', async () => {
-    setup();
-
-    screen.getByRole('slider', { name: 'Accent hue' }).focus();
-    await user.keyboard('{ArrowRight}');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    expect(await screen.findByText('All changes saved')).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();
   });
 
@@ -500,65 +537,6 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('previews a changed radius scale and density before saving', async () => {
-    setup();
-
-    await user.click(screen.getByRole('button', { name: 'Extra large' }));
-    await user.click(screen.getByRole('button', { name: 'Compact' }));
-
-    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
-      '--radius-md': '12px',
-      '--spacing-card-x': '0.75rem',
-    });
-  });
-
-  it('previews and saves the outlined card style', async () => {
-    setup();
-
-    await user.click(
-      within(screen.getByRole('group', { name: 'Card style' })).getByRole(
-        'button',
-        { name: 'Outlined' },
-      ),
-    );
-
-    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
-      '--item-border-width': '1px',
-    });
-
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateLookActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        expect.objectContaining({ cardStyle: CARD_STYLE.OUTLINED }),
-      );
-    });
-  });
-
-  it("choosing a preset applies that preset's card style", async () => {
-    setup();
-
-    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
-
-    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
-      '--item-border-width': '1px',
-    });
-  });
-
-  it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
-    setup();
-
-    const slider = screen.getByRole('slider', { name: 'Accent hue' });
-    slider.focus();
-    await user.keyboard('{ArrowRight}');
-    expect(screen.getByText('hue 251°')).toBeVisible();
-
-    await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
-
-    expect(screen.getByText('hue 250°')).toBeVisible();
-  });
-
   it('resets to the preset in the draft only, so Discard brings the saved values back', async () => {
     setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
 
@@ -574,56 +552,57 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   describe('archived tenant', () => {
-    it('shows an archived notice and offers no Save', () => {
-      setup({ archivedAt: ARCHIVED_AT });
+    describe('with only the archive date', () => {
+      beforeEach(() => {
+        setup({ archivedAt: ARCHIVED_AT });
+      });
 
-      expectArchivedOffersNoSave();
-    });
+      it('shows an archived notice and offers no Save', () => {
+        expectArchivedOffersNoSave();
+      });
 
-    it('disables every Look control', () => {
-      setup({ archivedAt: ARCHIVED_AT });
+      it('disables every Look control', () => {
+        expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
+          'aria-disabled',
+          'true',
+        );
+        expect(
+          screen.getByRole('radio', { name: 'Editorial' }),
+        ).toHaveAttribute('aria-disabled', 'true');
+        expect(
+          screen.getByRole('slider', { name: 'Accent hue' }),
+        ).toBeDisabled();
+        expect(
+          screen.getByRole('switch', { name: 'Follow accent hue' }),
+        ).toBeDisabled();
+        expect(
+          screen.getByRole('button', { name: 'Upload logo' }),
+        ).toBeDisabled();
+        expect(
+          screen.getByRole('button', { name: 'Upload favicon' }),
+        ).toBeDisabled();
+      });
 
-      expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-        'aria-disabled',
-        'true',
-      );
-      expect(screen.getByRole('radio', { name: 'Editorial' })).toHaveAttribute(
-        'aria-disabled',
-        'true',
-      );
-      expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeDisabled();
-      expect(
-        screen.getByRole('switch', { name: 'Follow accent hue' }),
-      ).toBeDisabled();
-      expect(
-        screen.getByRole('button', { name: 'Upload logo' }),
-      ).toBeDisabled();
-      expect(
-        screen.getByRole('button', { name: 'Upload favicon' }),
-      ).toBeDisabled();
-    });
-
-    it('disables the Type and Shape controls', () => {
-      setup({ archivedAt: ARCHIVED_AT });
-
-      expect(
-        screen.getByRole('combobox', { name: 'Heading font' }),
-      ).toHaveAttribute('data-disabled');
-      expect(
-        screen.getByRole('combobox', { name: 'Body font' }),
-      ).toHaveAccessibleDescription(/This tenant is archived/);
-      expect(screen.getByRole('button', { name: 'Small' })).toBeDisabled();
-      expect(
-        screen.getByRole('button', { name: 'Extra large' }),
-      ).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
-      expect(
-        within(screen.getByRole('group', { name: 'Card style' })).getByRole(
-          'button',
-          { name: 'Outlined' },
-        ),
-      ).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Soft' })).toBeDisabled();
+      it('disables the Type and Shape controls', () => {
+        expect(
+          screen.getByRole('combobox', { name: 'Heading font' }),
+        ).toHaveAttribute('data-disabled');
+        expect(
+          screen.getByRole('combobox', { name: 'Body font' }),
+        ).toHaveAccessibleDescription(/This tenant is archived/);
+        expect(screen.getByRole('button', { name: 'Small' })).toBeDisabled();
+        expect(
+          screen.getByRole('button', { name: 'Extra large' }),
+        ).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
+        expect(
+          within(screen.getByRole('group', { name: 'Card style' })).getByRole(
+            'button',
+            { name: 'Outlined' },
+          ),
+        ).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Soft' })).toBeDisabled();
+      });
     });
 
     it('describes a rejected accent hue with both the archived notice and the error', () => {
@@ -647,21 +626,6 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('leaves every Look control enabled for a non-archived tenant', () => {
-    setup();
-
-    expect(screen.getByRole('radio', { name: 'Console' })).not.toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
-    expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeEnabled();
-    expect(
-      screen.getByRole('switch', { name: 'Follow accent hue' }),
-    ).not.toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Small' })).toBeEnabled();
-  });
-
   it('restores unsaved Look changes after leaving the page, keeping the current brand images', async () => {
     const { unmount } = setup();
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
@@ -681,39 +645,63 @@ describe(`<${LookForm.name}/>`, () => {
     expect(screen.getByText('hue 28°')).toBeVisible();
     expect(screen.getByAltText('Current logo')).toBeVisible();
   });
+  it('drops a draft saved before the header buttons style existed', () => {
+    const olderValues = Object.fromEntries(
+      Object.entries(defaultLookFormValues()).filter(
+        ([key]) => key !== 'headerControlStyle',
+      ),
+    );
+    writeSettingsDraft(
+      settingsDraftStorageKey({ tenantId: 'tenant-1', page: 'look' }),
+      {
+        values: { ...olderValues, accentHue: 260 },
+        baseline: olderValues,
+        takenAt: new Date().toISOString(),
+      },
+    );
+    setup();
+
+    expect(
+      screen.queryByRole('button', { name: /^Restore/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('hue 250°')).toBeVisible();
+  });
+
   describe('brand images', () => {
-    it('stages a picked logo as an unsaved change without uploading it', async () => {
-      setup();
+    describe('with the default values', () => {
+      beforeEach(() => {
+        setup();
+      });
 
-      await pickLogo(user);
+      it('stages a picked logo as an unsaved change without uploading it', async () => {
+        await pickLogo(user);
 
-      expect(
-        screen.getByRole('heading', { name: 'Brand Unsaved' }),
-      ).toBeVisible();
-      expect(screen.getByAltText('Current logo')).toHaveAttribute(
-        'src',
-        'blob:staged-logo',
-      );
-      expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
-    });
+        expect(
+          screen.getByRole('heading', { name: 'Brand Unsaved' }),
+        ).toBeVisible();
+        expect(screen.getByAltText('Current logo')).toHaveAttribute(
+          'src',
+          'blob:staged-logo',
+        );
+        expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
+      });
 
-    it('uploads a staged logo on Save, then saves the rest of the look', async () => {
-      setup();
+      it('uploads a staged logo on Save, then saves the rest of the look', async () => {
+        await pickLogo(user);
+        await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      await pickLogo(user);
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-      expect(await screen.findByText('All changes saved')).toBeVisible();
-      expect(uploadBrandAssetActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        'logo',
-        expect.any(FormData),
-      );
-      expect(updateLookActionMock).toHaveBeenCalled();
-      expect(screen.getByAltText('Current logo')).toHaveAttribute(
-        'src',
-        expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
-      );
+        expect(await screen.findByText('All changes saved')).toBeVisible();
+        expect(uploadBrandAssetActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          'logo',
+          expect.any(FormData),
+        );
+        expect(updateLookActionMock).toHaveBeenCalled();
+        expect(screen.getByAltText('Current logo')).toHaveAttribute(
+          'src',
+          expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
+        );
+      });
     });
 
     it('locks the edit panel while a save is running', async () => {
@@ -875,28 +863,6 @@ describe(`<${LookForm.name}/>`, () => {
       expect(await screen.findByRole('alert')).toHaveTextContent(
         "Couldn't remove the favicon — try again.",
       );
-    });
-
-    it('drops a draft saved before the header buttons style existed', () => {
-      const olderValues = Object.fromEntries(
-        Object.entries(defaultLookFormValues()).filter(
-          ([key]) => key !== 'headerControlStyle',
-        ),
-      );
-      writeSettingsDraft(
-        settingsDraftStorageKey({ tenantId: 'tenant-1', page: 'look' }),
-        {
-          values: { ...olderValues, accentHue: 260 },
-          baseline: olderValues,
-          takenAt: new Date().toISOString(),
-        },
-      );
-      setup();
-
-      expect(
-        screen.queryByRole('button', { name: /^Restore/ }),
-      ).not.toBeInTheDocument();
-      expect(screen.getByText('hue 250°')).toBeVisible();
     });
 
     it('restores a draft without its staged logo and asks for it to be picked again', async () => {

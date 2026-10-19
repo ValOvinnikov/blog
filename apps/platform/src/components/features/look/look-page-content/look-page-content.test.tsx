@@ -34,14 +34,13 @@ const setup = customRenderAsync(LookPageContent, { tenant });
 describe(`<${LookPageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
+    getSiteConfigMock.mockResolvedValue(undefined);
     selectLiveLocalesMock.mockReturnValue(['EN']);
     getEnabledCapabilitiesMock.mockReset();
     getEnabledCapabilitiesMock.mockResolvedValue([]);
   });
 
   it('renders Console defaults when the tenant has no saved site_config row yet', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup();
 
     expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
@@ -50,6 +49,35 @@ describe(`<${LookPageContent.name}/>`, () => {
       'aria-checked',
       'true',
     );
+  });
+
+  it('previews Sign in when a reader feature is on', async () => {
+    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.BOOKMARKS]);
+
+    await setup();
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  });
+
+  it('previews no Sign in when only non-reader features are on', async () => {
+    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.ANALYTICS]);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('passes the archived date through for a deprovisioned tenant', async () => {
+    await setup({
+      tenant: {
+        ...tenant,
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      },
+    });
+
+    expectArchivedOffersNoSave();
   });
 
   it("renders the tenant's saved site_config row when one exists", async () => {
@@ -78,38 +106,5 @@ describe(`<${LookPageContent.name}/>`, () => {
       'true',
     );
     expect(screen.getByText('hue 28°')).toBeVisible();
-  });
-
-  it('previews Sign in when a reader feature is on', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.BOOKMARKS]);
-
-    await setup();
-
-    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
-  });
-
-  it('previews no Sign in when only non-reader features are on', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.ANALYTICS]);
-
-    await setup();
-
-    expect(
-      screen.queryByRole('button', { name: 'Sign in' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('passes the archived date through for a deprovisioned tenant', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
-    await setup({
-      tenant: {
-        ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
-      },
-    });
-
-    expectArchivedOffersNoSave();
   });
 });
