@@ -19,8 +19,11 @@ export const authMenuVariants = tv({
       'lg:group-hover:text-current lg:group-aria-expanded:text-current',
     ],
     signInText: ['hidden lg:inline'],
-    loading: ['inline-flex shrink-0'],
-    loadingPlaceholder: ['lg:invisible [&>*]:invisible'],
+    slot: [
+      'inline-grid shrink-0 items-center justify-items-end',
+      '[&>*]:col-start-1 [&>*]:row-start-1',
+    ],
+    footprint: [],
     loadingStatus: ['sr-only'],
     avatarFrame: [
       HEADER_CONTROL,
@@ -30,4 +33,11 @@ export const authMenuVariants = tv({
     ],
     avatar: ['size-10 text-sm lg:size-8 lg:text-xs pointer-coarse:size-10'],
   },
+  variants: {
+    isPlaceholder: {
+      true: { footprint: ['[&>*]:invisible'] },
+      false: { footprint: ['invisible'] },
+    },
+  },
+  defaultVariants: { isPlaceholder: false },
 });

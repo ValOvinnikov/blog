@@ -323,6 +323,13 @@ describe(`<${AuthMenu.name}/>`, () => {
       ).toHaveAttribute('href', '/account');
     });
 
+    it('exposes the account menu as the only button, with no hidden Sign in control', () => {
+      expect(screen.getAllByRole('button')).toHaveLength(1);
+      expect(
+        screen.queryByRole('button', { name: 'Sign in' }),
+      ).not.toBeInTheDocument();
+    });
+
     it('renders a plain "Account" label — not a heading', async () => {
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
