@@ -1,11 +1,5 @@
-import { CAPABILITY } from '@blog/config';
+import { READER_ACCOUNT_CAPABILITIES } from '@blog/config';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-
-const READER_ACCOUNT_CAPABILITIES = [
-  CAPABILITY.BOOKMARKS,
-  CAPABILITY.COMMENTS,
-  CAPABILITY.NEWSLETTER,
-] as const;
 
 export const isReaderAccountEnabled = async (): Promise<boolean> => {
   const enabled = await Promise.all(

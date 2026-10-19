@@ -5,6 +5,8 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
+  HEADER_CONTROL_STYLE,
+  HEADER_CONTROL_STYLE_DECLARATIONS,
   IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
@@ -30,6 +32,7 @@ export const buildThemeStyleBlock = ({
   radiusScale,
   density,
   cardStyle = CARD_STYLE.ACCENT_BAR,
+  headerControlStyle = HEADER_CONTROL_STYLE.OUTLINED,
 }: TThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
 
@@ -41,6 +44,7 @@ export const buildThemeStyleBlock = ({
       ...RADIUS_DECLARATIONS[radiusScale],
       ...DENSITY_DECLARATIONS[density],
       ...CARD_STYLE_DECLARATIONS[cardStyle],
+      ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
     })}
 }
 .dark {

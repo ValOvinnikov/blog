@@ -4,6 +4,7 @@ import {
   PRESET_REGISTRY,
   type TCardStyle,
   type TFontChoice,
+  type THeaderControlStyle,
   type TPresetId,
   type TRadiusScale,
   type TDensity,
@@ -19,13 +20,18 @@ type TThemeTokensRow = {
   radiusScale: TRadiusScale;
   density: TDensity;
   cardStyle: TCardStyle;
+  headerControlStyle: THeaderControlStyle;
 };
 
 export const toThemeTokens = (
   row: TThemeTokensRow | undefined,
 ): TThemeTokens => {
   const preset = row?.preset ?? PRESET_ID.CONSOLE;
-  const { themeTokens: base, cardStyle } = PRESET_REGISTRY[preset];
+  const {
+    themeTokens: base,
+    cardStyle,
+    headerControlStyle,
+  } = PRESET_REGISTRY[preset];
 
   const requestedAccentHue = row?.accentHue ?? base.accentHue;
   const accentHue = isAccentHueAccessible(requestedAccentHue)
@@ -40,5 +46,6 @@ export const toThemeTokens = (
     radiusScale: row?.radiusScale ?? base.radiusScale,
     density: row?.density ?? base.density,
     cardStyle: row?.cardStyle ?? cardStyle,
+    headerControlStyle: row?.headerControlStyle ?? headerControlStyle,
   };
 };

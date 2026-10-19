@@ -1,5 +1,6 @@
 import {
   CARD_STYLE,
+  HEADER_CONTROL_STYLE,
   isAccentHueAccessible,
   PRESET_ID,
   PRESET_REGISTRY,
@@ -29,6 +30,7 @@ describe(toThemeTokens, () => {
       ...consoleTokens,
       logoHue: consoleTokens.accentHue,
       cardStyle: CARD_STYLE.ACCENT_BAR,
+      headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
     });
   });
 
@@ -41,6 +43,8 @@ describe(toThemeTokens, () => {
       radiusScale: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.radiusScale,
       density: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.density,
       cardStyle: PRESET_REGISTRY[PRESET_ID.EDITORIAL].cardStyle,
+      headerControlStyle:
+        PRESET_REGISTRY[PRESET_ID.EDITORIAL].headerControlStyle,
     });
 
     const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
@@ -48,6 +52,7 @@ describe(toThemeTokens, () => {
       ...editorial.themeTokens,
       logoHue: editorial.themeTokens.accentHue,
       cardStyle: editorial.cardStyle,
+      headerControlStyle: editorial.headerControlStyle,
     });
   });
 
@@ -60,9 +65,25 @@ describe(toThemeTokens, () => {
       radiusScale: 'MD',
       density: 'DEFAULT',
       cardStyle: CARD_STYLE.OUTLINED,
+      headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
     });
 
     expect(result.cardStyle).toBe(CARD_STYLE.OUTLINED);
+  });
+
+  it("keeps the row's header control style over its preset's", () => {
+    const result = toThemeTokens({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 250,
+      headingFont: 'SPACE_GROTESK',
+      bodyFont: 'NEWSREADER',
+      radiusScale: 'MD',
+      density: 'DEFAULT',
+      cardStyle: CARD_STYLE.ACCENT_BAR,
+      headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+    });
+
+    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.SOFT);
   });
 
   it('resolves accentHue and logoHue independently (Indigo reproduction)', () => {
@@ -75,6 +96,7 @@ describe(toThemeTokens, () => {
       radiusScale: 'MD',
       density: 'DEFAULT',
       cardStyle: CARD_STYLE.ACCENT_BAR,
+      headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
     });
 
     expect(result.accentHue).toBe(65);
@@ -92,6 +114,7 @@ describe(toThemeTokens, () => {
       radiusScale: 'SM',
       density: 'COMPACT',
       cardStyle: CARD_STYLE.ACCENT_BAR,
+      headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
     });
 
     const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;

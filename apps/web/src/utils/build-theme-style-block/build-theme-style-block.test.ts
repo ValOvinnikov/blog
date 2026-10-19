@@ -157,6 +157,49 @@ describe('buildThemeStyleBlock', () => {
     expect(read('--item-radius')).toMatch(/^var\(--radius-/);
   });
 
+  it('reproduces theme.css header control tokens for the outlined style', () => {
+    const themeCss = readFileSync(
+      createRequire(import.meta.url).resolve('@blog/tailwind-config/theme.css'),
+      'utf8',
+    );
+    const headerControlDeclarations = themeCss.match(
+      /--header-control-[\w-]+: [^;]+;/g,
+    );
+
+    expect(headerControlDeclarations?.length).toBeGreaterThan(0);
+
+    const outlinedCss = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      headerControlStyle: 'OUTLINED',
+    });
+    const unsetCss = buildThemeStyleBlock(CONSOLE_TOKENS);
+
+    headerControlDeclarations?.forEach((declaration) => {
+      expect(outlinedCss).toContain(declaration);
+      expect(unsetCss).toContain(declaration);
+    });
+  });
+
+  it('gives soft header controls a grey fill and no outline', () => {
+    const css = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      headerControlStyle: 'SOFT',
+    });
+
+    expect(css).toContain('--header-control-border: transparent;');
+    expect(css).toContain('--header-control-fill: var(--border);');
+  });
+
+  it('gives plain header controls neither fill nor outline', () => {
+    const css = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      headerControlStyle: 'PLAIN',
+    });
+
+    expect(css).toContain('--header-control-border: transparent;');
+    expect(css).toContain('--header-control-fill: transparent;');
+  });
+
   it('reproduces theme.css on-image and brand scrim tokens at the Console accent hue', () => {
     const themeCss = readFileSync(
       createRequire(import.meta.url).resolve('@blog/tailwind-config/theme.css'),
@@ -224,6 +267,7 @@ describe('buildThemeStyleBlock', () => {
     expect(darkBlock).not.toContain('--radius');
     expect(darkBlock).not.toContain('--spacing-');
     expect(darkBlock).not.toContain('--item-');
+    expect(darkBlock).not.toContain('--header-control-');
     expect(darkBlock).not.toContain('--scrim-');
     expect(darkBlock).not.toContain('--on-image');
   });
