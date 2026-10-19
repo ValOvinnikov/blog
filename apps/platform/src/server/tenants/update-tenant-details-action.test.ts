@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -29,6 +30,8 @@ vi.mock('@platform/server/auth/require-admin', () => ({
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/site-config/revalidate-site-config');
+
 vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
@@ -44,6 +47,7 @@ vi.mock('@blog/db', async () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
 const validInput = {
   name: 'Acme',
@@ -313,6 +317,25 @@ describe('updateTenantDetailsAction', () => {
       'tenant-1',
       validInput,
     );
+  });
+
+  it('refreshes the public site for the tenant after a successful update', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: 'updated',
+      tenant: makeTenant(),
+    });
+
+    await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(revalidateSiteConfigMock).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('does not refresh the public site when the update is rejected', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
+
+    await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('records a SETTINGS_UPDATED audit event for the tenant with the operator as actor', async () => {

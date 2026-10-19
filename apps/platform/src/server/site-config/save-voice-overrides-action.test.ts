@@ -7,19 +7,18 @@ import {
 import { LOCALE_ISO_CODES, PRESET_ID } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
 const {
   getSiteConfigOrDefaultsMock,
   upsertSiteConfigMock,
-  revalidateSiteConfigMock,
   loggerErrorMock,
   recordAuditEventMock,
 } = vi.hoisted(() => ({
   getSiteConfigOrDefaultsMock: vi.fn(),
   upsertSiteConfigMock: vi.fn(),
-  revalidateSiteConfigMock: vi.fn(),
   loggerErrorMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
 }));
@@ -30,9 +29,7 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
 }));
 
-vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
-  revalidateSiteConfig: revalidateSiteConfigMock,
-}));
+vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/server/site-config/site-config-or-defaults', () => ({
   getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
@@ -69,6 +66,8 @@ const savedTheme = {
   radiusScale: 'SM',
   density: 'COMPACT',
 };
+
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
 describe(saveVoiceOverridesAction, () => {
   beforeEach(() => {

@@ -13,6 +13,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
@@ -106,6 +107,7 @@ export const updateTenantDetailsAction = async (
 
     switch (result.outcome) {
       case 'updated':
+        await revalidateSiteConfig(tenantId);
         await recordAuditEvent({
           logEvent: 'tenants.update_details_audit_failed',
           action: AUDIT_ACTION.SETTINGS_UPDATED,
