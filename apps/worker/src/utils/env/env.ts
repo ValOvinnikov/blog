@@ -3,11 +3,11 @@ import { z } from 'zod';
 
 export const env = createEnv({
   server: {
-    // @env-required: development, production
+    // @env-optional
     SANITY_MANAGEMENT_TOKEN: z.string().min(1).optional(),
-    // @env-required: development, production
+    // @env-optional
     SANITY_ORGANIZATION_ID: z.string().min(1).optional(),
-    // @env-required: development, production
+    // @env-optional
     VERCEL_TOKEN: z.string().min(1).optional(),
     // @env-optional
     VERCEL_TEAM_ID: z.string().min(1).optional(),
@@ -15,9 +15,9 @@ export const env = createEnv({
     // @env-required: development, production
     VERCEL_PROJECT_ID_WEB: z.string().min(1).optional(),
     // The Sanity CORS origin every tenant project allows.
-    // @env-required: development, production
+    // @env-optional
     ADMIN_APP_BASE_URL: z.string().url().optional(),
-    // @env-required: development, production
+    // @env-optional
     TENANT_SANITY_DATASET: z.string().min(1).optional(),
     // @env-required: development, production
     WEB_APP_URL: z.string().url().optional(),
@@ -25,7 +25,7 @@ export const env = createEnv({
     // @env-required: development, production
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
     // Shared with `apps/platform`, which signs every enqueue request with it.
-    // @env-required: development, production
+    // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
   },
   runtimeEnv: {
