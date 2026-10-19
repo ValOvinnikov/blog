@@ -12,6 +12,9 @@ code:
   - apps/platform/src/server/auth/require-session-user-id.ts
   - apps/platform/src/server/auth/resolve-home-href*
   - apps/platform/src/server/auth/sign-out-action*
+  - apps/platform/src/app/*/page.tsx
+  - apps/platform/src/proxy.ts
+  - apps/platform/src/utils/requested-path/**
 epics: [4840, 4960, 4979, 4982, 4958, 4949]
 ---
 
@@ -29,11 +32,15 @@ that creates a Free site.
 
 Today:
 
-- `adminRoutes.signIn()` is `/api/auth/signin`, Auth.js's default, unbranded
-  page. Every gate without a session redirects there with no `callbackUrl`,
-  so a fresh sign-in returns to `/`. `/` sits in the `requireAdmin`-gated
-  `(operator)` group: an admin is redirected to `/tenants`, a non-admin gets a
-  404 there, whose link sends them to `/dashboard`.
+- `adminRoutes.signIn(callbackUrl)` is `/api/auth/signin`, Auth.js's default,
+  unbranded page, always with an explicit `callbackUrl` (`/` by default), so
+  Auth.js never falls back to a stale callback-url cookie. A session gate
+  passes the page the visitor asked for, which `src/proxy.ts` records in the
+  `x-admin-requested-path` request header; a sign-in therefore lands on that
+  page, by email link, GitHub or Google alike.
+- `/` redirects by `resolveHomeHref`: an admin to `/tenants`, anyone else to
+  `/dashboard`, a signed-out visitor to sign-in.
+- A signed-in user opening the sign-in page is redirected to `/`.
 - Providers come from `@blog/auth`: GitHub and Google when their credentials
   are set, and the email magic link always.
 - `/sign-in-error`: Auth.js's `pages.error`, public and in the panel's own
@@ -43,7 +50,8 @@ Today:
 - `/workspace-pending`: a session-gated dead end for a signed-in user with no
   membership, with "Try again" (to `/dashboard`) and "Sign out".
 - Sign-out (account menu, or the button on pre-shell pages) runs
-  `signOutAction` and returns to the sign-in page.
+  `signOutAction` and returns to the sign-in page, whose next sign-in lands on
+  `/`.
 
 Decided:
 
@@ -74,7 +82,7 @@ Decided:
 
 ## Constraints and invariants
 
-- Today `resolveHomeHref` only picks a dead end's link: `/tenants` for an
+- Today `resolveHomeHref` picks a dead end's link and `/`'s redirect: `/tenants` for an
   admin, `/dashboard` for anyone else. `/dashboard` with no membership
   redirects to `/workspace-pending`.
 - Decided: after sign-in, `resolveHomeHref` routes by role (operators to

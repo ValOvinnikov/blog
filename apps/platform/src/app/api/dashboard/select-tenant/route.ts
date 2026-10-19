@@ -2,6 +2,7 @@ import { queries } from '@blog/db';
 import { auth } from '@platform/server/auth/auth';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
+import { toRequestedPath } from '@platform/utils/requested-path/requested-path';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { NextResponse } from 'next/server';
 
@@ -14,7 +15,9 @@ export async function GET(request: Request): Promise<NextResponse> {
   const userId = session?.user?.id;
 
   if (!userId) {
-    return NextResponse.redirect(new URL(adminRoutes.signIn(), url));
+    return NextResponse.redirect(
+      new URL(adminRoutes.signIn(toRequestedPath(url)), url),
+    );
   }
 
   const tenantId = url.searchParams.get('tenantId');

@@ -23,7 +23,7 @@ describe(SignInErrorPage, () => {
     ).toBeVisible();
     expect(
       screen.getByRole('link', { name: 'Get a new sign-in link' }),
-    ).toHaveAttribute('href', '/api/auth/signin');
+    ).toHaveAttribute('href', '/api/auth/signin?callbackUrl=%2F');
   });
 
   it.each(['Configuration', 'AccessDenied', undefined])(
@@ -44,7 +44,7 @@ describe(SignInErrorPage, () => {
       ).toBeVisible();
       expect(
         screen.getByRole('link', { name: 'Back to sign-in' }),
-      ).toHaveAttribute('href', '/api/auth/signin');
+      ).toHaveAttribute('href', '/api/auth/signin?callbackUrl=%2F');
     },
   );
 });
