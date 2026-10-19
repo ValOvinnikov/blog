@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
 import type {
   TSanityLoginProvider,
   TSanityProjectRole,
@@ -24,10 +24,9 @@ export const tenantOwnerAccessColumns = {
 };
 
 type TTenantOwnerAccessRow = {
-  [K in keyof TTenantOwnerAccess]: Exclude<
-    TTenantOwnerAccess[K],
-    undefined
-  > | null;
+  [K in keyof TTenantOwnerAccess]: TMaybeNull<
+    Exclude<TTenantOwnerAccess[K], undefined>
+  >;
 };
 
 export function toTenantOwnerAccess(

@@ -1,5 +1,11 @@
 import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
+  WORKER_PROVISIONING_STEP,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -206,14 +212,19 @@ describe(updateProvisioningStep, () => {
   it('adds a worker unit step alongside the existing steps', async () => {
     const result = await updateProvisioningStep({
       tenantId,
-      step: 'ENSURE_INFRASTRUCTURE',
-      status: 'DONE',
+      step: WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE,
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     });
 
     if (!result.ok) throw new Error('expected ok:true');
     expect(result.data.provisioningSteps).toMatchObject({
-      ENSURE_INFRASTRUCTURE: { status: 'DONE', updatedAt: NOW },
-      SANITY_PROJECT: { status: 'IDLE' },
+      [WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        updatedAt: NOW,
+      },
+      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      },
     });
   });
 

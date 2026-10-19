@@ -1,8 +1,13 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import { SANITY_LOGIN_PROVIDER, SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import { getTenantOwnerAccess } from '@blog/db/queries/tenants/get-tenant-owner-access';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  makeTenantOwnerAccess,
+  toTenantOwnerAccessColumns,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { setTenantOwnerAccess } from './set-tenant-owner-access';
 
@@ -12,6 +17,8 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+const MISSING_TENANT_ID = '00000000-0000-0000-0000-000000000000';
+
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
@@ -19,84 +26,79 @@ afterEach(async () => {
 describe(setTenantOwnerAccess, () => {
   it('writes owner access that reads back unchanged', async () => {
     const { id } = await insertTestTenant(db());
+    const ownerAccess = makeTenantOwnerAccess();
 
-    await setTenantOwnerAccess(id, {
-      sanityInviteId: 'invite-1',
-      inviteSentAt: new Date('2026-10-01T09:00:00.000Z'),
-      sanityRole: 'VIEWER',
-    });
+    await setTenantOwnerAccess(id, ownerAccess);
 
-    expect(await getTenantOwnerAccess(id)).toEqual({
-      sanityInviteId: 'invite-1',
-      inviteSentAt: new Date('2026-10-01T09:00:00.000Z'),
-      inviteAcceptedAt: undefined,
-      sanityUserId: undefined,
-      loginProvider: undefined,
-      sanityRole: 'VIEWER',
-    });
+    expect(await getTenantOwnerAccess(id)).toEqual(ownerAccess);
   });
 
   it('keeps fields the input leaves out', async () => {
-    const { id } = await insertTestTenant(db(), {
-      ownerSanityInviteId: 'invite-1',
-      ownerSanityRole: 'VIEWER',
-    });
+    const { sanityInviteId, inviteSentAt } = makeTenantOwnerAccess();
+    const { id } = await insertTestTenant(
+      db(),
+      toTenantOwnerAccessColumns({
+        sanityInviteId,
+        inviteSentAt,
+        sanityRole: SANITY_PROJECT_ROLE.VIEWER,
+      }),
+    );
+    const { inviteAcceptedAt, sanityUserId } = makeTenantOwnerAccess();
 
     const result = await setTenantOwnerAccess(id, {
-      inviteAcceptedAt: new Date('2026-10-01T09:30:00.000Z'),
-      sanityUserId: 'user-1',
-      loginProvider: 'GOOGLE',
-      sanityRole: 'ADMINISTRATOR',
+      inviteAcceptedAt,
+      sanityUserId,
+      loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+      sanityRole: SANITY_PROJECT_ROLE.ADMINISTRATOR,
     });
 
     expect(result).toEqual({
       ok: true,
       data: {
-        sanityInviteId: 'invite-1',
-        inviteSentAt: undefined,
-        inviteAcceptedAt: new Date('2026-10-01T09:30:00.000Z'),
-        sanityUserId: 'user-1',
-        loginProvider: 'GOOGLE',
-        sanityRole: 'ADMINISTRATOR',
+        sanityInviteId,
+        inviteSentAt,
+        inviteAcceptedAt,
+        sanityUserId,
+        loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+        sanityRole: SANITY_PROJECT_ROLE.ADMINISTRATOR,
       },
     });
   });
 
   it('clears a field set to null', async () => {
-    const { id } = await insertTestTenant(db(), {
-      ownerSanityInviteId: 'invite-1',
-      ownerInviteAcceptedAt: new Date('2026-10-01T09:30:00.000Z'),
-    });
+    const { id } = await insertTestTenant(
+      db(),
+      toTenantOwnerAccessColumns(makeTenantOwnerAccess()),
+    );
+    const { sanityInviteId } = makeTenantOwnerAccess();
 
-    await setTenantOwnerAccess(id, {
-      sanityInviteId: 'invite-2',
-      inviteAcceptedAt: null,
-    });
+    await setTenantOwnerAccess(id, { sanityInviteId, inviteAcceptedAt: null });
 
     expect(await getTenantOwnerAccess(id)).toMatchObject({
-      sanityInviteId: 'invite-2',
+      sanityInviteId,
       inviteAcceptedAt: undefined,
     });
   });
 
   it('leaves every owner access field untouched given an empty input', async () => {
-    const { id } = await insertTestTenant(db(), {
-      ownerSanityInviteId: 'invite-1',
-    });
+    const ownerAccess = makeTenantOwnerAccess();
+    const { id } = await insertTestTenant(
+      db(),
+      toTenantOwnerAccessColumns(ownerAccess),
+    );
 
-    const result = await setTenantOwnerAccess(id, {});
-
-    expect(result).toMatchObject({
+    expect(await setTenantOwnerAccess(id, {})).toEqual({
       ok: true,
-      data: { sanityInviteId: 'invite-1' },
+      data: ownerAccess,
     });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
-    const result = await setTenantOwnerAccess(
-      '00000000-0000-0000-0000-000000000000',
-      { sanityUserId: 'user-1' },
-    );
+    const { sanityUserId } = makeTenantOwnerAccess();
+
+    const result = await setTenantOwnerAccess(MISSING_TENANT_ID, {
+      sanityUserId,
+    });
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });

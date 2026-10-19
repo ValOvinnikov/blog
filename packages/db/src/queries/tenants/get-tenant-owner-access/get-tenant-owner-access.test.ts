@@ -1,6 +1,10 @@
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  makeTenantOwnerAccess,
+  toTenantOwnerAccessColumns,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { getTenantOwnerAccess } from './get-tenant-owner-access';
 
@@ -9,6 +13,8 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+
+const MISSING_TENANT_ID = '00000000-0000-0000-0000-000000000000';
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -29,28 +35,16 @@ describe(getTenantOwnerAccess, () => {
   });
 
   it('reads the stored owner access', async () => {
-    const { id } = await insertTestTenant(db(), {
-      ownerSanityInviteId: 'invite-1',
-      ownerInviteSentAt: new Date('2026-10-01T09:00:00.000Z'),
-      ownerInviteAcceptedAt: new Date('2026-10-01T09:30:00.000Z'),
-      ownerSanityUserId: 'user-1',
-      ownerLoginProvider: 'GITHUB',
-      ownerSanityRole: 'ADMINISTRATOR',
-    });
+    const ownerAccess = makeTenantOwnerAccess();
+    const { id } = await insertTestTenant(
+      db(),
+      toTenantOwnerAccessColumns(ownerAccess),
+    );
 
-    expect(await getTenantOwnerAccess(id)).toEqual({
-      sanityInviteId: 'invite-1',
-      inviteSentAt: new Date('2026-10-01T09:00:00.000Z'),
-      inviteAcceptedAt: new Date('2026-10-01T09:30:00.000Z'),
-      sanityUserId: 'user-1',
-      loginProvider: 'GITHUB',
-      sanityRole: 'ADMINISTRATOR',
-    });
+    expect(await getTenantOwnerAccess(id)).toEqual(ownerAccess);
   });
 
   it('returns undefined for a tenant id that does not exist', async () => {
-    expect(
-      await getTenantOwnerAccess('00000000-0000-0000-0000-000000000000'),
-    ).toBeUndefined();
+    expect(await getTenantOwnerAccess(MISSING_TENANT_ID)).toBeUndefined();
   });
 });
