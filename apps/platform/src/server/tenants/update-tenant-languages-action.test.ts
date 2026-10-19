@@ -8,6 +8,7 @@ import {
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
@@ -25,6 +26,8 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/site-config/revalidate-site-config');
+
 vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
@@ -40,6 +43,7 @@ const requireTenantMembershipMock = vi.mocked<
 >(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerWarnMock = vi.mocked(logger.warn);
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
 const { NL, FR } = LOCALE_ISO_CODES;
 
@@ -83,6 +87,14 @@ describe(updateTenantLanguagesAction, () => {
     );
   });
 
+  it('refreshes the public site for the tenant after saving', async () => {
+    setTenantAdditionalLocalesMock.mockResolvedValue({ ok: true, data: [NL] });
+
+    await updateTenantLanguagesAction('tenant-1', [NL]);
+
+    expect(revalidateSiteConfigMock).toHaveBeenCalledWith('tenant-1');
+  });
+
   it('rejects a language outside the supported list without saving', async () => {
     const result = await updateTenantLanguagesAction('tenant-1', ['xx']);
 
@@ -106,6 +118,7 @@ describe(updateTenantLanguagesAction, () => {
       reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(loggerWarnMock).toHaveBeenCalledWith(
       'tenants.update_languages_rejected',
       expect.objectContaining({ error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED }),

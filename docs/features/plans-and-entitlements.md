@@ -56,7 +56,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - A downgrade deletes nothing. Toggles are clamped on read: on the site, in Studio (`getEnabledCapabilities`) and in the Features page's initial values. Because that page loads the clamped values, the owner's next save writes out-of-plan toggles off, and after an upgrade they have to be switched on again.
 - Languages: the live set is the default plus the first `limit − 1` stored additional languages. `setTenantAdditionalLocales` refuses to add a locale past the limit (`DB_LOCALE_LIMIT_EXCEEDED`) but lets a downgraded tenant keep or reorder its stored ones.
 - A reader account exists only while bookmarks, comments or newsletter is enabled, so a `FREE` site has none.
-- A plan change does not call the revalidation route. The site picks it up within 3600s, or at the tenant's next Look, Voice or Features save; the platform and Studio see it at once.
+- Saving a tenant's details (plan, default language, domain) or its additional languages calls the revalidation route, so the site serves the change on its next load. A failed call is logged and does not fail the save; the site then catches up within 3600s.
 - `PLAN_REGISTRY` lives in `@blog/db` because it keys off `TENANT_PLAN`, which `db` owns and `config` cannot import.
 - `TENANT_PLAN` backs a pgEnum: reordering it reorders the enum, and a new plan needs a migration plus entries in both `Record<TTenantPlan, …>` maps.
 - A new capability means a `CAPABILITY` key, every `Record<TCapability, …>` map, a `settings_features` column with its migration, a `CAPABILITY_TOGGLES` row and the mapping in `to-effective-settings-features`.

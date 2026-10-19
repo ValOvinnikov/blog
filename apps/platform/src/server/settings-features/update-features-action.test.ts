@@ -2,6 +2,7 @@ import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
@@ -11,13 +12,8 @@ import {
   type TUpdateFeaturesInput,
 } from './update-features-action';
 
-const {
-  upsertSettingsFeaturesMock,
-  revalidateSiteConfigMock,
-  insertAuditEventMock,
-} = vi.hoisted(() => ({
+const { upsertSettingsFeaturesMock, insertAuditEventMock } = vi.hoisted(() => ({
   upsertSettingsFeaturesMock: vi.fn(),
-  revalidateSiteConfigMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
 }));
 
@@ -25,9 +21,7 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
-  revalidateSiteConfig: revalidateSiteConfigMock,
-}));
+vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/utils/logger/logger');
 
@@ -58,6 +52,8 @@ const VALID_INPUT: TUpdateFeaturesInput = {
   consentBannerEnabled: true,
   contactFormEnabled: false,
 };
+
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
 describe(updateFeaturesAction, () => {
   beforeEach(() => {
