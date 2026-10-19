@@ -133,6 +133,25 @@ export const MobileHeaderControlsSignedIn: TStory = {
   args: headerControls,
 };
 
+export const AccountMenuLongEmail: TStory = {
+  globals: { viewport: 'desktop' },
+  decorators: withSession({
+    user: {
+      id: 'reader-2',
+      name: 'Augusta Ada King, Countess of Lovelace',
+      email: 'augusta.ada.king.countess.of.lovelace@analytical-engines.org',
+    },
+    expires: '2099-01-01',
+  }),
+  args: headerControls,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Account menu' }),
+    );
+  },
+};
+
 export const MobilePanelLanguageMenuOpen: TStory = {
   globals: { viewport: 'mobile' },
   decorators: withSignedOutSession,
