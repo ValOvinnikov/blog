@@ -5,6 +5,7 @@ import {
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
+  type TWorkerProvisioningStep,
 } from '@blog/db/constants';
 import {
   tenants,
@@ -16,7 +17,7 @@ import { eq, sql } from 'drizzle-orm';
 
 export type TUpdateProvisioningStepInput = {
   tenantId: string;
-  step: TTenantProvisioningStep;
+  step: TTenantProvisioningStep | TWorkerProvisioningStep;
   status: TTenantProvisioningStepStatus;
   error?: string;
   detail?: TElevateTenantOwnerOutcome;

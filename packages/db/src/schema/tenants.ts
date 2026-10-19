@@ -1,16 +1,22 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import {
+  SITE_TYPE,
   TENANT_PLAN,
   TENANT_STATUS,
   type TDeprovisioningStep,
   type TElevateTenantOwnerOutcome,
+  type TSanityLoginProvider,
+  type TSanityProjectRole,
+  type TSiteType,
   type TTenantPlan,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
   type TTenantStatus,
+  type TWorkerProvisioningStep,
 } from '@blog/db/constants';
 import {
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -32,6 +38,11 @@ export const localeCodeEnum = pgEnum(
 export const tenantStatusEnum = pgEnum(
   'tenant_status',
   Object.values(TENANT_STATUS) as [TTenantStatus, ...TTenantStatus[]],
+);
+
+export const siteTypeEnum = pgEnum(
+  'site_type',
+  Object.values(SITE_TYPE) as [TSiteType, ...TSiteType[]],
 );
 
 export type TProvisioningStepState = {
@@ -64,7 +75,10 @@ export type TProvisioningRun = {
 export type TTenantProvisioningState = Record<
   TTenantProvisioningStep,
   TProvisioningStepState
-> & { run?: TProvisioningRun };
+> &
+  Partial<Record<TWorkerProvisioningStep, TProvisioningStepState>> & {
+    run?: TProvisioningRun;
+  };
 
 export type TDeprovisioningStepState = {
   status: TTenantProvisioningStepStatus;
@@ -78,8 +92,6 @@ export type TDeprovisioningRun = {
   workflowRunUrl?: string;
 };
 
-// Keyed by every `DEPROVISIONING_STEP` UPPERCASE constant, plus the reserved
-// lowercase `run` key, mirroring `TTenantProvisioningState`.
 export type TTenantDeprovisioningState = Record<
   TDeprovisioningStep,
   TDeprovisioningStepState
@@ -123,9 +135,6 @@ export const tenants = pgTable('tenants', {
   provisioningStatus: text(
     'provisioning_status',
   ).$type<TTenantProvisioningStatus>(),
-  // Map of every `TENANT_PROVISIONING_STEP` key to its own progress, plus
-  // the current provisioning run's own metadata under `run` — see
-  // `TTenantProvisioningState` above.
   provisioningSteps:
     jsonb('provisioning_steps').$type<TTenantProvisioningState>(),
   // Outcome last actually communicated to operators, written by
@@ -140,8 +149,6 @@ export const tenants = pgTable('tenants', {
     'last_notified_owner_elevation_outcome',
   ).$type<TElevateTenantOwnerOutcome>(),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
-  // Set once provisioning creates the Sanity webhook pointing at apps/web's
-  // shared revalidation endpoint. Nullable: unset until that step runs.
   webhookCreatedAt: timestamp('webhook_created_at', { mode: 'date' }),
   // Set once `scripts/deprovision-tenant` finishes tearing a tenant's infra
   // down (alongside `status` moving to ARCHIVED). The row is archived, never
@@ -156,6 +163,18 @@ export const tenants = pgTable('tenants', {
   deprovisioningSteps: jsonb(
     'deprovisioning_steps',
   ).$type<TTenantDeprovisioningState>(),
+  siteType: siteTypeEnum('site_type'),
+  siteTemplateVersion: integer('site_template_version'),
+  ownerSanityInviteId: text('owner_sanity_invite_id'),
+  ownerInviteSentAt: timestamp('owner_invite_sent_at', { mode: 'date' }),
+  ownerInviteAcceptedAt: timestamp('owner_invite_accepted_at', {
+    mode: 'date',
+  }),
+  ownerSanityUserId: text('owner_sanity_user_id'),
+  ownerLoginProvider: text(
+    'owner_login_provider',
+  ).$type<TSanityLoginProvider>(),
+  ownerSanityRole: text('owner_sanity_role').$type<TSanityProjectRole>(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()

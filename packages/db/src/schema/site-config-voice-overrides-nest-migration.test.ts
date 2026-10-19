@@ -18,7 +18,6 @@ import { eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/pglite';
 
 import { siteConfig } from './site-config';
-import { tenants } from './tenants';
 
 const NEST_MIGRATION = '0037_nest_voice_overrides_by_locale.sql';
 
@@ -42,16 +41,15 @@ async function seedTenantWithOverrides(
   locale: TLocaleIsoCode,
   voiceOverrides: Record<string, unknown>,
 ) {
-  const [tenant] = await db
-    .insert(tenants)
-    .values({
-      name: `tenant-${locale}`,
-      primaryDomain: `${locale}.example.com`,
-      locale,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
+  const { rows } = await db.execute<{ id: string }>(sql`
+    INSERT INTO tenants (name, primary_domain, locale, plan, status)
+    VALUES (
+      ${`tenant-${locale}`}, ${`${locale}.example.com`}, ${locale},
+      ${TENANT_PLAN.FREE}, ${TENANT_STATUS.ACTIVE}
+    )
+    RETURNING id
+  `);
+  const [tenant] = rows;
   if (!tenant) throw new Error('failed to seed a tenant row');
 
   await db.execute(sql`

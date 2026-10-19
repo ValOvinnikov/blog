@@ -203,6 +203,20 @@ describe(updateProvisioningStep, () => {
     });
   });
 
+  it('adds a worker unit step alongside the existing steps', async () => {
+    const result = await updateProvisioningStep({
+      tenantId,
+      step: 'ENSURE_INFRASTRUCTURE',
+      status: 'DONE',
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps).toMatchObject({
+      ENSURE_INFRASTRUCTURE: { status: 'DONE', updatedAt: NOW },
+      SANITY_PROJECT: { status: 'IDLE' },
+    });
+  });
+
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await updateProvisioningStep({
       tenantId: '00000000-0000-0000-0000-000000000000',

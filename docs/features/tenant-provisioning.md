@@ -81,6 +81,9 @@ The workflow then verifies all of it. The admin polls each step's progress and o
   - `provisioningSteps` is jsonb, one entry per step (IDLE / RUNNING / DONE / FAILED with error and `updatedAt`), plus a `run` entry: `startedAt`, `finishedAt`, `admittedAt`, `registry` and `workflowRunUrl`.
   - Artifacts: `sanityProjectId`, `sanityDataset`, both encrypted tokens, `seededAt` and `webhookCreatedAt`.
   - `lastNotifiedOwnerElevationOutcome` and `deprovisioningSteps` (same shape as `provisioningSteps`).
+  - `siteType` (`SITE_TYPE`: BLOG, PORTFOLIO, PERSONAL, DOCS, BLANK, BUSINESS, PRODUCT; a `site_type` pgEnum, null for tenants created before signup) and `siteTemplateVersion`.
+  - Owner Studio access: `ownerSanityInviteId`, `ownerInviteSentAt`, `ownerInviteAcceptedAt`, `ownerSanityUserId`, `ownerLoginProvider` (`SANITY_LOGIN_PROVIDER`) and `ownerSanityRole` (`SANITY_PROJECT_ROLE`), read and written through `getTenantOwnerAccess` / `setTenantOwnerAccess`.
+  - `provisioningSteps` also accepts the `apps/worker` unit keys (`WORKER_PROVISIONING_STEP`: `ENSURE_INFRASTRUCTURE`, `INVITE_OWNER`, `APPLY_SITE_TEMPLATE`, `VERIFY_TENANT`, `ENSURE_OWNER_ACCESS`, `VALIDATE_DOCUMENTS`), present only once a worker run reports them.
 - **Core steps, in order:**
   1. `SANITY_PROJECT` creates the project and dataset, adds a CORS entry for the admin origin, and invites the owner as `viewer`.
   2. `SEED_CONTENT` writes `settings_site`, `settings_navigation`, `settings_footer`, `page_home` with its `template_home`, and `page_postIndex` with its `template_postIndex`. Each document is typed against the generated Sanity types and created with `createIfNotExists` under a fixed id, so a re-run never overwrites an owner's edits. It runs only if `settings_site` is absent, using an `editor` token that is persisted on success and revoked on failure.
