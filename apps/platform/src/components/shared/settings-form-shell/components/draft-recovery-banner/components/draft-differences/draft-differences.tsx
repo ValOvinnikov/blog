@@ -1,4 +1,4 @@
-import type { TDraftDifference } from '@platform/components/shared/settings-form-shell/use-settings-draft';
+import type { TDraftDifference } from '@platform/utils/settings-draft-offer/settings-draft-offer';
 import { useTranslations } from 'next-intl';
 
 import { draftDifferencesVariants } from './draft-differences-variants';

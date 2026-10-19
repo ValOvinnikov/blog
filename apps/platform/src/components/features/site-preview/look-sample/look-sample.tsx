@@ -2,6 +2,7 @@ import {
   SIZE,
   type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
+  type TMaybeUndefined,
 } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
@@ -17,10 +18,12 @@ import { lookSampleVariants } from './look-sample-variants';
 
 export type TLookSampleProps = {
   tenantName: string;
-  logoSrc: string | undefined;
+  logoSrc: TMaybeUndefined<string>;
   theme: TSitePreviewTheme;
   liveLocales: readonly TLocaleIsoCode[];
   languageSwitcherStyle: TLanguageSwitcherStyle;
+  hasReaderAccounts: boolean;
+  isNarrow?: boolean;
 };
 
 export const LookSample = ({
@@ -29,6 +32,8 @@ export const LookSample = ({
   theme,
   liveLocales,
   languageSwitcherStyle,
+  hasReaderAccounts,
+  isNarrow = false,
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
@@ -45,6 +50,9 @@ export const LookSample = ({
         logoSrc={logoSrc}
         liveLocales={liveLocales}
         languageSwitcherStyle={languageSwitcherStyle}
+        hasReaderAccounts={hasReaderAccounts}
+        isNarrow={isNarrow}
+        isDark={theme.isDark}
       />
       <Heading level={3} visual="preview">
         {t('sampleHeading')}

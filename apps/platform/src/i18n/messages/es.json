@@ -365,6 +365,18 @@
       "ACCENT_BAR": "Barra de acento",
       "OUTLINED": "Con contorno"
     },
+    "headerControlStyleLabel": "Botones de la cabecera",
+    "headerControlStyleDescription": "Los botones de idioma, tema, menú e Iniciar sesión, en cualquier tamaño de pantalla.",
+    "headerControlStyleOptionLabel": {
+      "OUTLINED": "Con contorno",
+      "SOFT": "Suave",
+      "PLAIN": "Sencillo"
+    },
+    "headerControlStyleOptionDescription": {
+      "OUTLINED": "Un contorno fino alrededor de cada botón",
+      "SOFT": "Un relleno gris, sin contorno",
+      "PLAIN": "Sin contorno hasta pasar el cursor"
+    },
     "languageSwitcherLabel": "Selector de idioma",
     "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",
     "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
@@ -378,7 +390,7 @@
     "typeHeading": "Tipografía",
     "typeDescription": "Cada fuente se muestra con su propio estilo.",
     "shapeHeading": "Forma",
-    "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas.",
+    "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas y los botones de la cabecera.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
@@ -407,7 +419,11 @@
     "previewWidthAriaLabel": "Ancho de la vista previa",
     "navPosts": "Entradas",
     "navAbout": "Acerca de",
-    "switcherMenuAriaLabel": "Idioma: {language}"
+    "switcherMenuAriaLabel": "Idioma: {language}",
+    "signIn": "Iniciar sesión",
+    "themeToggleDark": "Cambiar al tema oscuro",
+    "themeToggleLight": "Cambiar al tema claro",
+    "menuButton": "Menú"
   },
   "assetUploadField": {
     "remove": "Quitar",

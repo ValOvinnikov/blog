@@ -39,11 +39,11 @@ epics: [4987, 4991, 4992, 4993, 4999, 4960]
 
 ## What it does
 
-The Look page is where a tenant owner styles their public site without touching code. They pick a preset (Console or Editorial), then adjust the accent hue, the logo-mark hue, the heading and body fonts, corner radius, density, card style and the language-switcher style, and upload a logo and favicon. A live preview shows the result in light or dark and at desktop or phone width before saving. One save restyles every page of the site, and the accent and logo hues also colour the tenant's emails.
+The Look page is where a tenant owner styles their public site without touching code. They pick a preset (Console or Editorial), then adjust the accent hue, the logo-mark hue, the heading and body fonts, corner radius, density, card style, the header buttons style and the language-switcher style, and upload a logo and favicon. A live preview shows the result in light or dark and at desktop or phone width before saving. One save restyles every page of the site, and the accent and logo hues also colour the tenant's emails.
 
 ## Surfaces and routes
 
-- **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape, Brand and Language switcher cards. Not plan-gated.
+- **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape (radius, density, card style, header buttons), Brand and Language switcher cards. Not plan-gated.
 - **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style.
 - **Email** — `resolveTenantEmailBrand` turns the preset, accent hue and logo hue into hex colours for the magic-link, newsletter and test emails.
 - No Studio surface: the theme is not Sanity content.
@@ -59,16 +59,18 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Configuration
 
 - Any tenant member, and any operator (as a virtual owner), can save. An archived tenant's form is read-only.
-- Picking a preset re-seeds the accent hue, fonts, radius, density and card style from `PRESET_REGISTRY` and clears the logo hue. The language-switcher style and brand images are kept. "Reset" appears once any value diverges from the preset.
+- Picking a preset re-seeds the accent hue, fonts, radius, density, card style and header buttons style from `PRESET_REGISTRY` and clears the logo hue. The language-switcher style and brand images are kept. "Reset" appears once any value diverges from the preset.
 - The five fonts are allowed in either role; each has a heading and a body loader in `apps/web`.
 - The language-switcher control appears only when the tenant has more than one live language.
-- Unsaved edits persist as a draft in `localStorage`, keyed by tenant and page under `platform.settings-draft.v1`. Staged image files cannot survive a reload, so a restored draft asks for them again.
+- Unsaved edits persist as a draft in `localStorage`, keyed by tenant and page under `platform.settings-draft.v1`. Staged image files cannot survive a reload, so a restored draft asks for them again. A draft missing a field the form now has is dropped, not offered.
+- The preview's sample header is signed out and at rest. At desktop width it shows the nav links, the language switcher in the tenant's style, the 36px theme circle and, when the site has a reader account (`READER_ACCOUNT_CAPABILITIES`, after plan clamping), the Sign in pill. At Mobile width it shows the brand, the person circle (reader accounts only) and the menu circle. Every control is drawn from `@blog/ui`'s `HEADER_CONTROL` recipe, so the header buttons style restyles them all at once.
 - Reach: every page of the tenant's site, its emails, and the platform's own Voice specimens (through `theme-preview-tokens`). Plans do not gate any Look field.
 
 ## Constraints and invariants
 
 - The resolved theme is never partial. `toThemeTokens` fills every gap from the row's preset, and a missing row or failed fetch falls back to `CONSOLE`.
 - Accent and logo ramps are declared in both `:root` and `.dark`. Radius, density, card style, header control style and the image-scrim ramp go in `:root` only (see [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)).
+- A header buttons style changes only the resting border and fill. Outlined frames each control with `--border-strong` on `--surface`; Soft fills it with `--border` and no outline; Plain shows neither until hovered, so a Plain codes pill is carried by its brand-filled current chip. Geometry, hover, open, focus and forced colours are the same in every style, and every style combines with every language-switcher style. No style's resting cue reaches 3:1; each control is identified by its glyph or label, which WCAG 1.4.11 accepts.
 - The public site resolves the stored header control style through `toThemeTokens` (falling back to the preset's) and `buildThemeStyleBlock` spreads `HEADER_CONTROL_STYLE_DECLARATIONS` into `:root`, so every header control follows it on the next render after a save (the existing `site-config:<id>` tag). Hover and open draw a brand outline in every style.
 - `theme.css`'s static values equal what `buildThemeStyleBlock` emits for the Console preset; `build-theme-style-block.test.ts` reads `theme.css` for the radius, spacing, item-card, header-control and scrim tokens, and checks the brand and logo ramps against fixed literals.
 - Accent-hue guard: the form blocks saving and `updateLookAction` refuses a hue that `isAccentHueAccessible` rejects. The site and emails replace such a stored hue with the preset's. The guard checks one pair, `--text` on `--brand-primary-muted` in both modes at 4.5:1, which every hue from 0 to 360 passes. So the refusal never fires today, and the other accent-dependent pairs (button labels, links on grey bands) are not checked.
@@ -110,6 +112,7 @@ The Look page is where a tenant owner styles their public site without touching 
 
 ## Related
 
+- #5459 — epic: header controls are one round family, and the Look page sets how they're framed.
 - #4987 — epic: accessible text and colour on the public site. It retunes the ramps and rebuilds the hue guard.
 - #4991 — brand and metadata colours reach AA at every accent hue.
 - #4992 — the accent-hue guard checks every accent pair and names the ones that fail.

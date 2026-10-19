@@ -81,6 +81,7 @@ export const useLookSave = ({
         radiusScale: vals.radiusScale,
         density: vals.density,
         cardStyle: vals.cardStyle,
+        headerControlStyle: vals.headerControlStyle,
         languageSwitcherStyle: vals.languageSwitcherStyle,
       });
       return finish(outcome);

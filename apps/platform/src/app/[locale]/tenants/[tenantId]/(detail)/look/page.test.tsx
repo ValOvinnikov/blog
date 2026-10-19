@@ -1,3 +1,4 @@
+import type { TMaybeNull } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -15,6 +16,8 @@ const { getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/settings-features/get-enabled-capabilities');
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
@@ -27,7 +30,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(LookPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),

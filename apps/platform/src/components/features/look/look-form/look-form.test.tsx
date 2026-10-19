@@ -3,6 +3,7 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_CONTROL_STYLE,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
@@ -20,6 +21,10 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import {
+  settingsDraftStorageKey,
+  writeSettingsDraft,
+} from '@platform/utils/settings-draft-storage/settings-draft-storage';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -76,6 +81,7 @@ const setup = customRender(LookForm, {
   tenantName: 'Acme Inc.',
   initialValues: defaultLookFormValues(),
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
+  hasReaderAccounts: true,
 });
 
 describe(`<${LookForm.name}/>`, () => {
@@ -247,9 +253,57 @@ describe(`<${LookForm.name}/>`, () => {
         radiusScale: RADIUS_SCALE.MD,
         density: DENSITY.DEFAULT,
         cardStyle: CARD_STYLE.ACCENT_BAR,
+        headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
         languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       });
     });
+  });
+
+  it('saves the chosen header buttons style and marks Shape unsaved', async () => {
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Soft' }));
+
+    expect(
+      screen.getByRole('heading', { name: 'Shape Unsaved' }),
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => {
+      expect(updateLookActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.objectContaining({
+          headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+        }),
+      );
+    });
+  });
+
+  it('describes each header buttons option', () => {
+    setup();
+
+    expect(
+      screen.getByRole('button', { name: 'Plain' }),
+    ).toHaveAccessibleDescription('No outline until hovered');
+  });
+
+  it('resets the header buttons style with the rest of the preset', async () => {
+    setup({
+      initialValues: {
+        ...defaultLookFormValues(),
+        headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+      },
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
+
+    expect(
+      within(screen.getByRole('group', { name: 'Header buttons' })).getByRole(
+        'button',
+        { name: 'Outlined' },
+      ),
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('saves the chosen language switcher style', async () => {
@@ -461,7 +515,12 @@ describe(`<${LookForm.name}/>`, () => {
   it('previews and saves the outlined card style', async () => {
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Outlined' }));
+    await user.click(
+      within(screen.getByRole('group', { name: 'Card style' })).getByRole(
+        'button',
+        { name: 'Outlined' },
+      ),
+    );
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--item-border-width': '1px',
@@ -558,7 +617,13 @@ describe(`<${LookForm.name}/>`, () => {
         screen.getByRole('button', { name: 'Extra large' }),
       ).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Outlined' })).toBeDisabled();
+      expect(
+        within(screen.getByRole('group', { name: 'Card style' })).getByRole(
+          'button',
+          { name: 'Outlined' },
+        ),
+      ).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Soft' })).toBeDisabled();
     });
 
     it('describes a rejected accent hue with both the archived notice and the error', () => {
@@ -810,6 +875,28 @@ describe(`<${LookForm.name}/>`, () => {
       expect(await screen.findByRole('alert')).toHaveTextContent(
         "Couldn't remove the favicon — try again.",
       );
+    });
+
+    it('drops a draft saved before the header buttons style existed', () => {
+      const olderValues = Object.fromEntries(
+        Object.entries(defaultLookFormValues()).filter(
+          ([key]) => key !== 'headerControlStyle',
+        ),
+      );
+      writeSettingsDraft(
+        settingsDraftStorageKey({ tenantId: 'tenant-1', page: 'look' }),
+        {
+          values: { ...olderValues, accentHue: 260 },
+          baseline: olderValues,
+          takenAt: new Date().toISOString(),
+        },
+      );
+      setup();
+
+      expect(
+        screen.queryByRole('button', { name: /^Restore/ }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText('hue 250°')).toBeVisible();
     });
 
     it('restores a draft without its staged logo and asks for it to be picked again', async () => {

@@ -1,12 +1,15 @@
 'use client';
 
 import {
+  toDraftOffer,
+  type TSettingsDraftField,
+} from '@platform/utils/settings-draft-offer/settings-draft-offer';
+import {
   clearSettingsDraft,
   readSettingsDraft,
   settingsDraftStorageKey,
   writeSettingsDraft,
   type TSettingsDraftKey,
-  type TStoredSettingsDraft,
 } from '@platform/utils/settings-draft-storage/settings-draft-storage';
 import {
   useEffect,
@@ -15,12 +18,6 @@ import {
   useSyncExternalStore,
 } from 'react';
 
-type TSettingsDraftField<TValues> = {
-  id: string;
-  label: string;
-  display: (values: TValues) => string;
-};
-
 export type TSettingsFormDraft<TValues> = TSettingsDraftKey & {
   values: TValues;
   savedValues: TValues;
@@ -28,61 +25,6 @@ export type TSettingsFormDraft<TValues> = TSettingsDraftKey & {
   fields: TSettingsDraftField<TValues>[];
   onRestore: (values: TValues) => void;
 };
-
-export type TDraftDifference = {
-  id: string;
-  label: string;
-  saved: string;
-  draft: string;
-};
-
-type TDraftOffer<TValues> = {
-  values: TValues;
-  takenAt: Date;
-  changeCount: number;
-  differences: TDraftDifference[];
-};
-
-// A draft written before a field was added or reshaped can't be displayed
-// for every field; it is dropped rather than restored half-formed.
-const toOffer = <TValues>(
-  stored: TStoredSettingsDraft,
-  savedValues: TValues,
-  fields: TSettingsDraftField<TValues>[],
-): TDraftOffer<TValues> | null => {
-  const draftValues = stored.values as TValues;
-  const baselineValues = stored.baseline as TValues;
-
-  try {
-    const rows = fields.map(({ id, label, display }) => ({
-      id,
-      label,
-      saved: display(savedValues),
-      draft: display(draftValues),
-      baseline: display(baselineValues),
-    }));
-    if (rows.some(({ draft, baseline }) => !isString(draft, baseline))) {
-      return null;
-    }
-
-    const changed = rows.filter(({ saved, draft }) => saved !== draft);
-    if (changed.length === 0) return null;
-
-    return {
-      values: draftValues,
-      takenAt: new Date(stored.takenAt),
-      changeCount: changed.length,
-      differences: changed
-        .filter(({ saved, baseline }) => saved !== baseline)
-        .map(({ id, label, saved, draft }) => ({ id, label, saved, draft })),
-    };
-  } catch {
-    return null;
-  }
-};
-
-const isString = (...candidates: unknown[]) =>
-  candidates.every((candidate) => typeof candidate === 'string');
 
 const subscribeToNothing = () => () => {};
 
@@ -103,7 +45,7 @@ export const useSettingsDraft = <TValues>(
   const [isOfferSettled, setIsOfferSettled] = useState(false);
   const offer =
     isHydrated && !isOfferSettled && storedOnArrival
-      ? toOffer(storedOnArrival, savedValues, fields)
+      ? toDraftOffer(storedOnArrival, savedValues, fields)
       : null;
   const isOfferPending = offer !== null;
   const valuesSnapshot = JSON.stringify(values);

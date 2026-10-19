@@ -3,12 +3,14 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   CARD_STYLE,
+  HEADER_CONTROL_STYLE,
   DENSITY,
   FONT_CHOICE,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  type TMaybeNull,
 } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -46,7 +48,7 @@ vi.mock('@blog/db', () => ({
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const isAccentHueAccessibleMock = vi.mocked(isAccentHueAccessible);
 
@@ -60,6 +62,7 @@ const VALID_INPUT: TUpdateLookInput = {
   density: DENSITY.COMPACT,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
   cardStyle: CARD_STYLE.OUTLINED,
+  headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
 };
 
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);

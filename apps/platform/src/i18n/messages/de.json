@@ -365,6 +365,18 @@
       "ACCENT_BAR": "Akzentleiste",
       "OUTLINED": "Umrandet"
     },
+    "headerControlStyleLabel": "Header-Schaltflächen",
+    "headerControlStyleDescription": "Die Schaltflächen für Sprache, Design, Menü und Anmelden, auf jeder Bildschirmgröße.",
+    "headerControlStyleOptionLabel": {
+      "OUTLINED": "Umrandet",
+      "SOFT": "Weich",
+      "PLAIN": "Schlicht"
+    },
+    "headerControlStyleOptionDescription": {
+      "OUTLINED": "Ein dünner Rahmen um jede Schaltfläche",
+      "SOFT": "Eine graue Füllung, kein Rahmen",
+      "PLAIN": "Kein Rahmen bis zum Überfahren"
+    },
     "languageSwitcherLabel": "Sprachauswahl",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
     "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
@@ -378,7 +390,7 @@
     "typeHeading": "Schrift",
     "typeDescription": "Jede Schrift wird in ihrem eigenen Schnitt gezeigt.",
     "shapeHeading": "Form",
-    "shapeDescription": "Ecken, Abstände und wie Karten gerahmt sind.",
+    "shapeDescription": "Ecken, Abstände und wie Karten und Header-Schaltflächen gerahmt sind.",
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild"
@@ -407,7 +419,11 @@
     "previewWidthAriaLabel": "Vorschaubreite",
     "navPosts": "Beiträge",
     "navAbout": "Über uns",
-    "switcherMenuAriaLabel": "Sprache: {language}"
+    "switcherMenuAriaLabel": "Sprache: {language}",
+    "signIn": "Anmelden",
+    "themeToggleDark": "Zum dunklen Design wechseln",
+    "themeToggleLight": "Zum hellen Design wechseln",
+    "menuButton": "Menü"
   },
   "assetUploadField": {
     "remove": "Entfernen",

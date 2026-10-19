@@ -13,6 +13,7 @@ const BASE_PROPS = {
   theme: SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+  hasReaderAccounts: true,
 };
 
 describe(LookSample, () => {
@@ -99,6 +100,66 @@ describe(LookSample, () => {
     expect(screen.getByRole('banner')).toHaveTextContent('Acme Inc.');
     expect(screen.getByRole('link', { name: 'Posts' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
+  });
+
+  it('shows the theme toggle and a Sign in pill when the site has reader accounts', () => {
+    render(<LookSample {...BASE_PROPS} />);
+
+    expect(
+      screen.getByRole('button', { name: 'Switch to dark theme' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveTextContent(
+      'Sign in',
+    );
+  });
+
+  it('offers the light theme from a dark preview', () => {
+    render(
+      <LookSample
+        {...BASE_PROPS}
+        theme={{ ...SITE_PREVIEW_THEME, isDark: true }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Switch to light theme' }),
+    ).toBeVisible();
+  });
+
+  it('shows no Sign in when the site has no reader accounts', () => {
+    render(<LookSample {...BASE_PROPS} hasReaderAccounts={false} />);
+
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the brand, the person circle and the menu button on a narrow preview', () => {
+    render(<LookSample {...BASE_PROPS} isNarrow={true} />);
+
+    const header = screen.getByRole('banner');
+    expect(header).toHaveTextContent('Acme Inc.');
+    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveTextContent(
+      '',
+    );
+    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'Posts' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('sample-language-code-current'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the narrow bar to the brand and the menu button without reader accounts', () => {
+    render(
+      <LookSample {...BASE_PROPS} isNarrow={true} hasReaderAccounts={false} />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows every live language as a code with compact codes', () => {

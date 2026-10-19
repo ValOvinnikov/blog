@@ -5,6 +5,7 @@ import {
   type TCardStyle,
   type TDensity,
   type TFontChoice,
+  type THeaderControlStyle,
   type TLanguageSwitcherStyle,
   type TMaybeUndefined,
   type TPresetId,
@@ -22,6 +23,7 @@ export type TLookFormValues = {
   radiusScale: TRadiusScale;
   density: TDensity;
   cardStyle: TCardStyle;
+  headerControlStyle: THeaderControlStyle;
   languageSwitcherStyle: TLanguageSwitcherStyle;
   logo: TStagedImage;
   favicon: TStagedImage;
@@ -34,8 +36,11 @@ export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
 
 /** The Console defaults `build-theme-style-block.ts` also falls back to before any theme is saved. */
 export const defaultLookFormValues = (): TLookFormValues => {
-  const { themeTokens: consoleTokens, cardStyle } =
-    PRESET_REGISTRY[PRESET_ID.CONSOLE];
+  const {
+    themeTokens: consoleTokens,
+    cardStyle,
+    headerControlStyle,
+  } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 
   return {
     preset: PRESET_ID.CONSOLE,
@@ -46,6 +51,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     radiusScale: consoleTokens.radiusScale,
     density: consoleTokens.density,
     cardStyle,
+    headerControlStyle,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     logo: { url: undefined },
     favicon: { url: undefined },
@@ -64,6 +70,7 @@ export const toLookFormValues = (
     radiusScale: siteConfig.radiusScale,
     density: siteConfig.density,
     cardStyle: siteConfig.cardStyle,
+    headerControlStyle: siteConfig.headerControlStyle,
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,
     logo: { url: siteConfig.logoAssetUrl },
     favicon: { url: siteConfig.faviconAssetUrl },

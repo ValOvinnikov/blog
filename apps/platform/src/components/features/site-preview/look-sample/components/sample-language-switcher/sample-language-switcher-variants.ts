@@ -1,10 +1,9 @@
+import { HEADER_CONTROL, HEADER_CONTROL_FRAME } from '@blog/ui/lib/styling';
 import { tv } from '@platform/utils/tv/tv';
 
 export const sampleLanguageSwitcherVariants = tv({
   slots: {
-    codeList: [
-      'flex items-center gap-0.5 rounded-full border border-border-strong p-0.5',
-    ],
+    codeList: [HEADER_CONTROL_FRAME, 'flex items-center gap-0.5 p-[5px]'],
     codeLink: [
       'h-6 min-w-6 justify-center rounded-full px-1.5 text-label',
       'aria-[current=page]:bg-brand-primary',
@@ -12,8 +11,8 @@ export const sampleLanguageSwitcherVariants = tv({
     ],
     codeLabel: ['sr-only'],
     trigger: [
-      'inline-flex shrink-0 items-center justify-center gap-1 rounded-full',
-      'border border-border-strong bg-surface text-text',
+      HEADER_CONTROL,
+      'inline-flex shrink-0 items-center justify-center gap-1',
     ],
     caret: ['size-3'],
   },

@@ -365,6 +365,18 @@
       "ACCENT_BAR": "Barre d'accent",
       "OUTLINED": "À contour"
     },
+    "headerControlStyleLabel": "Boutons d'en-tête",
+    "headerControlStyleDescription": "Les boutons de langue, de thème, de menu et Se connecter, sur toutes les tailles d'écran.",
+    "headerControlStyleOptionLabel": {
+      "OUTLINED": "À contour",
+      "SOFT": "Doux",
+      "PLAIN": "Simple"
+    },
+    "headerControlStyleOptionDescription": {
+      "OUTLINED": "Un fin contour autour de chaque bouton",
+      "SOFT": "Un fond gris, sans contour",
+      "PLAIN": "Aucun contour avant le survol"
+    },
     "languageSwitcherLabel": "Sélecteur de langue",
     "languageSwitcherDescription": "L'apparence du sélecteur de langue sur ordinateur, dans l'en-tête et le pied de page.",
     "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
@@ -378,7 +390,7 @@
     "typeHeading": "Typographie",
     "typeDescription": "Chaque police s'affiche dans son propre style.",
     "shapeHeading": "Forme",
-    "shapeDescription": "Coins, espacement et encadrement des cartes.",
+    "shapeDescription": "Coins, espacement et encadrement des cartes et des boutons d'en-tête.",
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image"
@@ -407,7 +419,11 @@
     "previewWidthAriaLabel": "Largeur de l'aperçu",
     "navPosts": "Articles",
     "navAbout": "À propos",
-    "switcherMenuAriaLabel": "Langue : {language}"
+    "switcherMenuAriaLabel": "Langue : {language}",
+    "signIn": "Se connecter",
+    "themeToggleDark": "Passer au thème sombre",
+    "themeToggleLight": "Passer au thème clair",
+    "menuButton": "Menu"
   },
   "assetUploadField": {
     "remove": "Supprimer",

@@ -365,6 +365,18 @@
       "ACCENT_BAR": "Accentbalk",
       "OUTLINED": "Omlijnd"
     },
+    "headerControlStyleLabel": "Headerknoppen",
+    "headerControlStyleDescription": "De knoppen voor taal, thema, menu en Inloggen, op elk schermformaat.",
+    "headerControlStyleOptionLabel": {
+      "OUTLINED": "Omlijnd",
+      "SOFT": "Zacht",
+      "PLAIN": "Kaal"
+    },
+    "headerControlStyleOptionDescription": {
+      "OUTLINED": "Een dunne rand om elke knop",
+      "SOFT": "Een grijze vulling, geen rand",
+      "PLAIN": "Geen rand tot je eroverheen beweegt"
+    },
     "languageSwitcherLabel": "Taalkeuze",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
     "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
@@ -378,7 +390,7 @@
     "typeHeading": "Lettertype",
     "typeDescription": "Elk lettertype wordt in zijn eigen stijl getoond.",
     "shapeHeading": "Vorm",
-    "shapeDescription": "Hoeken, ruimte en hoe kaarten zijn omlijst.",
+    "shapeDescription": "Hoeken, ruimte en hoe kaarten en headerknoppen zijn omlijst.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding"
@@ -407,7 +419,11 @@
     "previewWidthAriaLabel": "Breedte voorbeeld",
     "navPosts": "Berichten",
     "navAbout": "Over",
-    "switcherMenuAriaLabel": "Taal: {language}"
+    "switcherMenuAriaLabel": "Taal: {language}",
+    "signIn": "Inloggen",
+    "themeToggleDark": "Overschakelen naar donker thema",
+    "themeToggleLight": "Overschakelen naar licht thema",
+    "menuButton": "Menu"
   },
   "assetUploadField": {
     "remove": "Verwijderen",

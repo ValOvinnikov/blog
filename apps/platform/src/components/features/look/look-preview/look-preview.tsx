@@ -14,14 +14,19 @@ import { useState } from 'react';
 
 export type TLookPreviewProps = {
   liveLocales: readonly TLocaleIsoCode[];
+  hasReaderAccounts: boolean;
 };
 
-export const LookPreview = ({ liveLocales }: TLookPreviewProps) => {
+export const LookPreview = ({
+  liveLocales,
+  hasReaderAccounts,
+}: TLookPreviewProps) => {
   const { tenantName, values } = useLookForm();
   const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
   const [width, setWidth] = useState<TPreviewWidth>(PREVIEW_WIDTH.DESKTOP);
+  const isNarrow = width === PREVIEW_WIDTH.MOBILE;
 
   const widthOptions: { value: TPreviewWidth; label: string }[] = [
     { value: PREVIEW_WIDTH.DESKTOP, label: t('widthDesktop') },
@@ -31,7 +36,7 @@ export const LookPreview = ({ liveLocales }: TLookPreviewProps) => {
   return (
     <PreviewFrame
       ariaLabel={tPreview('livePreviewHeading')}
-      isNarrow={width === PREVIEW_WIDTH.MOBILE}
+      isNarrow={isNarrow}
       widthControl={
         // Below 27.5rem the stage leaves the frame no wider than its 390px mobile width.
         <SegmentedControl
@@ -51,6 +56,8 @@ export const LookPreview = ({ liveLocales }: TLookPreviewProps) => {
         theme={buildSitePreviewTheme(values, isDark)}
         liveLocales={liveLocales}
         languageSwitcherStyle={values.languageSwitcherStyle}
+        hasReaderAccounts={hasReaderAccounts}
+        isNarrow={isNarrow}
       />
     </PreviewFrame>
   );
