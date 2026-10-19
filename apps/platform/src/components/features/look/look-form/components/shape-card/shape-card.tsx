@@ -1,9 +1,11 @@
 import {
   CARD_STYLE,
   DENSITY,
+  HEADER_CONTROL_STYLE,
   RADIUS_SCALE,
   type TCardStyle,
   type TDensity,
+  type THeaderControlStyle,
   type TRadiusScale,
 } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
@@ -16,7 +18,7 @@ import { useTranslations } from 'next-intl';
 export const ShapeCard = () => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const {
-    values: { radiusScale, density, cardStyle },
+    values: { radiusScale, density, cardStyle, headerControlStyle },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
@@ -36,9 +38,18 @@ export const ShapeCard = () => {
     label: t(`cardStyleOptionLabel.${style}`),
   }));
 
+  const headerControlStyleOptions = Object.values(HEADER_CONTROL_STYLE).map(
+    (style) => ({
+      value: style,
+      label: t(`headerControlStyleOptionLabel.${style}`),
+      description: t(`headerControlStyleOptionDescription.${style}`),
+    }),
+  );
+
   const radiusScaleLabel = t('radiusScaleLabel');
   const densityLabel = t('densityLabel');
   const cardStyleLabel = t('cardStyleLabel');
+  const headerControlStyleLabel = t('headerControlStyleLabel');
 
   return (
     <LookCard
@@ -83,6 +94,20 @@ export const ShapeCard = () => {
           options={cardStyleOptions}
           value={cardStyle}
           onChange={(style) => updateField('cardStyle', style)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
+        />
+      </LookField>
+
+      <LookField
+        label={headerControlStyleLabel}
+        hint={t('headerControlStyleDescription')}
+        isGroup={true}
+      >
+        <SegmentedControl<THeaderControlStyle>
+          options={headerControlStyleOptions}
+          value={headerControlStyle}
+          onChange={(style) => updateField('headerControlStyle', style)}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />

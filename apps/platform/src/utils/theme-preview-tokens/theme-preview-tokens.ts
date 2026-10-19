@@ -4,6 +4,7 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
+  HEADER_CONTROL_STYLE_DECLARATIONS,
   HUE_MAX,
   HUE_MIN,
   LOGO_RAMP_DARK,
@@ -12,6 +13,7 @@ import {
   type TCardStyle,
   type TDensity,
   type TFontChoice,
+  type THeaderControlStyle,
   type TMaybeUndefined,
   type TRadiusScale,
   type TThemeDeclarations,
@@ -36,35 +38,41 @@ export const buildLogoPreviewTokens = (hue: number, isDark: boolean) => {
   return formatOklchRamp(isDark ? LOGO_RAMP_DARK : LOGO_RAMP_LIGHT, hue);
 };
 
-const buildShapePreviewTokens = (
-  radiusScale: TRadiusScale,
-  density: TDensity,
-  cardStyle: TCardStyle,
-): TThemeDeclarations => {
+type TShapePreviewValues = {
+  radiusScale: TRadiusScale;
+  density: TDensity;
+  cardStyle: TCardStyle;
+  headerControlStyle: THeaderControlStyle;
+};
+
+const buildShapePreviewTokens = ({
+  radiusScale,
+  density,
+  cardStyle,
+  headerControlStyle,
+}: TShapePreviewValues): TThemeDeclarations => {
   return {
     ...RADIUS_DECLARATIONS[radiusScale],
     ...DENSITY_DECLARATIONS[density],
     ...CARD_STYLE_DECLARATIONS[cardStyle],
+    ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
     ...DERIVED_RADIUS_DECLARATIONS,
   };
 };
 
-export type TThemePreviewValues = {
+export type TThemePreviewValues = TShapePreviewValues & {
   accentHue: number;
   logoHue: TMaybeUndefined<number>;
-  radiusScale: TRadiusScale;
-  density: TDensity;
-  cardStyle: TCardStyle;
 };
 
 export const buildThemePreviewStyle = (
-  { accentHue, logoHue, radiusScale, density, cardStyle }: TThemePreviewValues,
+  { accentHue, logoHue, ...shape }: TThemePreviewValues,
   isDark: boolean,
 ): CSSProperties =>
   ({
     ...buildAccentPreviewTokens(accentHue, isDark),
     ...buildLogoPreviewTokens(logoHue ?? accentHue, isDark),
-    ...buildShapePreviewTokens(radiusScale, density, cardStyle),
+    ...buildShapePreviewTokens(shape),
   }) as CSSProperties;
 
 export type TSitePreviewThemeValues = TThemePreviewValues & {

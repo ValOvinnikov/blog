@@ -1,4 +1,4 @@
-import { PRESET_ID } from '@blog/config';
+import { CAPABILITY, PRESET_ID } from '@blog/config';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -6,10 +6,12 @@ import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
-const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
-  getSiteConfigMock: vi.fn(),
-  selectLiveLocalesMock: vi.fn(),
-}));
+const { getSiteConfigMock, selectLiveLocalesMock, getEnabledCapabilitiesMock } =
+  vi.hoisted(() => ({
+    getSiteConfigMock: vi.fn(),
+    selectLiveLocalesMock: vi.fn(),
+    getEnabledCapabilitiesMock: vi.fn(),
+  }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -21,6 +23,10 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
+  getEnabledCapabilities: getEnabledCapabilitiesMock,
+}));
+
 const tenant = makeReadyTenant();
 
 const setup = customRenderAsync(LookPageContent, { tenant });
@@ -28,12 +34,13 @@ const setup = customRenderAsync(LookPageContent, { tenant });
 describe(`<${LookPageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
+    getSiteConfigMock.mockResolvedValue(undefined);
     selectLiveLocalesMock.mockReturnValue(['EN']);
+    getEnabledCapabilitiesMock.mockReset();
+    getEnabledCapabilitiesMock.mockResolvedValue([]);
   });
 
   it('renders Console defaults when the tenant has no saved site_config row yet', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup();
 
     expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
@@ -42,6 +49,35 @@ describe(`<${LookPageContent.name}/>`, () => {
       'aria-checked',
       'true',
     );
+  });
+
+  it('previews Sign in when a reader feature is on', async () => {
+    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.BOOKMARKS]);
+
+    await setup();
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  });
+
+  it('previews no Sign in when only non-reader features are on', async () => {
+    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.ANALYTICS]);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('passes the archived date through for a deprovisioned tenant', async () => {
+    await setup({
+      tenant: {
+        ...tenant,
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      },
+    });
+
+    expectArchivedOffersNoSave();
   });
 
   it("renders the tenant's saved site_config row when one exists", async () => {
@@ -70,18 +106,5 @@ describe(`<${LookPageContent.name}/>`, () => {
       'true',
     );
     expect(screen.getByText('hue 28°')).toBeVisible();
-  });
-
-  it('passes the archived date through for a deprovisioned tenant', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
-    await setup({
-      tenant: {
-        ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
-      },
-    });
-
-    expectArchivedOffersNoSave();
   });
 });

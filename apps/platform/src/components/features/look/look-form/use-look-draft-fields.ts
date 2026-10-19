@@ -67,6 +67,12 @@ export const useLookDraftFields = () => {
         t(`cardStyleOptionLabel.${cardStyle}`),
     },
     {
+      id: 'headerControlStyle',
+      label: t('headerControlStyleLabel'),
+      display: ({ headerControlStyle }: TLookFormValues) =>
+        t(`headerControlStyleOptionLabel.${headerControlStyle}`),
+    },
+    {
       id: 'languageSwitcherStyle',
       label: t('languageSwitcherLabel'),
       display: ({ languageSwitcherStyle }: TLookFormValues) =>

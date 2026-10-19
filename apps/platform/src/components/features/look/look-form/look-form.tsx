@@ -23,6 +23,7 @@ export type TLookFormProps = {
   tenantName: string;
   initialValues: TLookFormValues;
   liveLocales: readonly TLocaleIsoCode[];
+  hasReaderAccounts: boolean;
   savedAt?: Date;
   archivedAt?: Date;
 };
@@ -32,6 +33,7 @@ export const LookForm = ({
   tenantName,
   initialValues,
   liveLocales,
+  hasReaderAccounts,
   savedAt,
   archivedAt,
 }: TLookFormProps) => {
@@ -84,7 +86,10 @@ export const LookForm = ({
             {...panelProps('preview')}
             className={previewPanel({ isActive: view === 'preview' })}
           >
-            <LookPreview liveLocales={liveLocales} />
+            <LookPreview
+              liveLocales={liveLocales}
+              hasReaderAccounts={hasReaderAccounts}
+            />
           </div>
         </div>
       </LookFormProvider>

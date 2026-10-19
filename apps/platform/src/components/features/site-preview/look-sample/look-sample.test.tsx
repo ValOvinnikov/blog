@@ -13,6 +13,7 @@ const BASE_PROPS = {
   theme: SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+  hasReaderAccounts: true,
 };
 
 describe(LookSample, () => {
@@ -29,17 +30,67 @@ describe(LookSample, () => {
     staticDarkRamp.remove();
   });
 
-  it('renders the tenant name and a @blog/ui Button primitive', () => {
-    render(<LookSample {...BASE_PROPS} />);
+  describe('with the default values', () => {
+    beforeEach(() => {
+      render(<LookSample {...BASE_PROPS} />);
+    });
 
-    expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
-  });
+    it('renders the tenant name and a @blog/ui Button primitive', () => {
+      expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
+      expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+    });
 
-  it('keeps the sample out of the tab order and the page outline', () => {
-    render(<LookSample {...BASE_PROPS} />);
+    it('keeps the sample out of the tab order and the page outline', () => {
+      expect(screen.getByTestId('look-sample-tokens')).toHaveAttribute('inert');
+    });
 
-    expect(screen.getByTestId('look-sample-tokens')).toHaveAttribute('inert');
+    it('renders one linked and one static item card beside an outlined card', () => {
+      expect(
+        screen.getByRole('link', { name: 'Notes from the harbour' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', {
+          level: 4,
+          name: 'Charting the next season',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole('link', { name: 'Charting the next season' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
+      ).toBeVisible();
+    });
+
+    it('opens with a header carrying the brand and two nav links', () => {
+      expect(screen.getByRole('banner')).toHaveTextContent('Acme Inc.');
+      expect(screen.getByRole('link', { name: 'Posts' })).toBeVisible();
+      expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
+    });
+
+    it('shows the theme toggle and a Sign in pill when the site has reader accounts', () => {
+      expect(
+        screen.getByRole('button', { name: 'Switch to dark theme' }),
+      ).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Sign in' })).toHaveTextContent(
+        'Sign in',
+      );
+    });
+
+    it('shows every live language as a code with compact codes', () => {
+      const current = screen.getByTestId('sample-language-code-current');
+      expect(current).toHaveAttribute('aria-current', 'page');
+      expect(current).toHaveTextContent('English');
+      expect(
+        screen.queryByRole('link', { name: 'English' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Français' })).toHaveTextContent(
+        'FR',
+      );
+      expect(
+        screen.queryByRole('button', { name: 'Language: English' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('resolves the tenant accent rather than the static dark ramp in dark mode', () => {
@@ -73,48 +124,52 @@ describe(LookSample, () => {
     );
   });
 
-  it('renders one linked and one static item card beside an outlined card', () => {
-    render(<LookSample {...BASE_PROPS} />);
-
-    expect(
-      screen.getByRole('link', { name: 'Notes from the harbour' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', {
-        level: 4,
-        name: 'Charting the next season',
-      }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'Charting the next season' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
-    ).toBeVisible();
-  });
-
-  it('opens with a header carrying the brand and two nav links', () => {
-    render(<LookSample {...BASE_PROPS} />);
-
-    expect(screen.getByRole('banner')).toHaveTextContent('Acme Inc.');
-    expect(screen.getByRole('link', { name: 'Posts' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
-  });
-
-  it('shows every live language as a code with compact codes', () => {
-    render(<LookSample {...BASE_PROPS} />);
-
-    const current = screen.getByTestId('sample-language-code-current');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current).toHaveTextContent('English');
-    expect(
-      screen.queryByRole('link', { name: 'English' }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Français' })).toHaveTextContent(
-      'FR',
+  it('offers the light theme from a dark preview', () => {
+    render(
+      <LookSample
+        {...BASE_PROPS}
+        theme={{ ...SITE_PREVIEW_THEME, isDark: true }}
+      />,
     );
+
     expect(
-      screen.queryByRole('button', { name: 'Language: English' }),
+      screen.getByRole('button', { name: 'Switch to light theme' }),
+    ).toBeVisible();
+  });
+
+  it('shows no Sign in when the site has no reader accounts', () => {
+    render(<LookSample {...BASE_PROPS} hasReaderAccounts={false} />);
+
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the brand, the person circle and the menu button on a narrow preview', () => {
+    render(<LookSample {...BASE_PROPS} isNarrow={true} />);
+
+    const header = screen.getByRole('banner');
+    expect(header).toHaveTextContent('Acme Inc.');
+    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveTextContent(
+      '',
+    );
+    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'Posts' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('sample-language-code-current'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the narrow bar to the brand and the menu button without reader accounts', () => {
+    render(
+      <LookSample {...BASE_PROPS} isNarrow={true} hasReaderAccounts={false} />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
     ).not.toBeInTheDocument();
   });
 

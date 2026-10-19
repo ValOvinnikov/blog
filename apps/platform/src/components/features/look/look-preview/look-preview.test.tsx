@@ -18,7 +18,10 @@ import userEvent from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
 
-const renderPreview = (values: Partial<TLookFormValues> = {}) => {
+const renderPreview = (
+  values: Partial<TLookFormValues> = {},
+  hasReaderAccounts = true,
+) => {
   const lookForm: TLookFormContext = {
     tenantName: 'Acme Inc.',
     values: {
@@ -38,7 +41,10 @@ const renderPreview = (values: Partial<TLookFormValues> = {}) => {
 
   return renderWithIntl(
     <LookFormProvider value={lookForm}>
-      <LookPreview liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]} />
+      <LookPreview
+        liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
+        hasReaderAccounts={hasReaderAccounts}
+      />
     </LookFormProvider>,
   );
 };
@@ -95,6 +101,18 @@ describe(LookPreview, () => {
       'aria-pressed',
       'true',
     );
+  });
+
+  it('shows the phone header bar in the mobile preview', async () => {
+    const user = userEvent.setup();
+    renderPreview();
+
+    await user.click(screen.getByRole('button', { name: 'Mobile' }));
+
+    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'Posts' }),
+    ).not.toBeInTheDocument();
   });
 
   it('re-derives the swatch color when the preview mode toggles to dark, independent of preset', async () => {

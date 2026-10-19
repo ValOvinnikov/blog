@@ -10,7 +10,11 @@ export const applyPresetDefaults = (
   preset: TPresetId,
   current: TLookFormValues,
 ): TLookFormValues => {
-  const { themeTokens: tokens, cardStyle } = PRESET_REGISTRY[preset];
+  const {
+    themeTokens: tokens,
+    cardStyle,
+    headerControlStyle,
+  } = PRESET_REGISTRY[preset];
 
   return {
     preset,
@@ -21,6 +25,7 @@ export const applyPresetDefaults = (
     radiusScale: tokens.radiusScale,
     density: tokens.density,
     cardStyle,
+    headerControlStyle,
     languageSwitcherStyle: current.languageSwitcherStyle,
     logo: current.logo,
     favicon: current.favicon,
@@ -31,7 +36,7 @@ export const CARD_FIELDS = {
   preset: ['preset'],
   colour: ['accentHue', 'logoHue'],
   type: ['headingFont', 'bodyFont'],
-  shape: ['radiusScale', 'density', 'cardStyle'],
+  shape: ['radiusScale', 'density', 'cardStyle', 'headerControlStyle'],
   brand: ['logo', 'favicon'],
   languageSwitcher: ['languageSwitcherStyle'],
 } as const satisfies Record<string, readonly (keyof TLookFormValues)[]>;

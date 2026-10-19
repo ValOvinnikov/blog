@@ -1,3 +1,10 @@
+import {
+  CARD_STYLE,
+  DENSITY,
+  HEADER_CONTROL_STYLE,
+  HEADER_CONTROL_STYLE_DECLARATIONS,
+  RADIUS_SCALE,
+} from '@blog/config';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
@@ -62,15 +69,39 @@ describe(accentHueGradient, () => {
   });
 });
 
+const SHAPE_VALUES = {
+  radiusScale: RADIUS_SCALE.SM,
+  density: DENSITY.COMPACT,
+  cardStyle: CARD_STYLE.OUTLINED,
+  headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+};
+
 describe('buildThemePreviewStyle', () => {
+  it.each(Object.values(HEADER_CONTROL_STYLE))(
+    'carries the %s header control tokens onto the preview',
+    (headerControlStyle) => {
+      const style = buildThemePreviewStyle(
+        {
+          ...SHAPE_VALUES,
+          accentHue: 28,
+          logoHue: undefined,
+          headerControlStyle,
+        },
+        false,
+      );
+
+      expect(style).toMatchObject(
+        HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+      );
+    },
+  );
+
   it('colours the logo ramp from the accent hue when no logo hue is set', () => {
     const style = buildThemePreviewStyle(
       {
+        ...SHAPE_VALUES,
         accentHue: 28,
         logoHue: undefined,
-        radiusScale: 'SM',
-        density: 'COMPACT',
-        cardStyle: 'OUTLINED',
       },
       false,
     );
@@ -81,11 +112,9 @@ describe('buildThemePreviewStyle', () => {
   it('switches every ramp to its dark values in dark mode', () => {
     const style = buildThemePreviewStyle(
       {
+        ...SHAPE_VALUES,
         accentHue: 250,
         logoHue: 120,
-        radiusScale: 'SM',
-        density: 'COMPACT',
-        cardStyle: 'OUTLINED',
       },
       true,
     );

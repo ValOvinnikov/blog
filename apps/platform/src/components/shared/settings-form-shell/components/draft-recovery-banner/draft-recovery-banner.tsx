@@ -8,7 +8,7 @@ import {
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Disclosure } from '@platform/components/shared/disclosure';
-import type { TDraftDifference } from '@platform/components/shared/settings-form-shell/use-settings-draft';
+import type { TDraftDifference } from '@platform/utils/settings-draft-offer/settings-draft-offer';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
