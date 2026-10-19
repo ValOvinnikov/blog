@@ -20,7 +20,7 @@ logic does not belong here.
 - **Depends on:** `@blog/db` (the adapter tables — `users`, `accounts`,
   `sessions`, `verificationTokens`), `next-auth`, `@auth/drizzle-adapter`
 - **Consumed by:** `apps/web`, `apps/platform` — each constructs its own
-  `NextAuth()` instance from `buildAuthConfig()` so it keeps its own
+  `NextAuth()` instance from `buildAuthConfig(app)` so it keeps its own
   `auth`/`handlers` bound to its own runtime
 - **Never imports:** React components, `@blog/ui`, `@blog/service`, or a
   Sanity SDK; and is never imported by `@blog/db` (the tables live in `db`,
@@ -28,7 +28,7 @@ logic does not belong here.
 
 ## Layout
 
-- `src/config.ts` — `buildAuthConfig()`, which returns the `NextAuthConfig`:
+- `src/config.ts` — `buildAuthConfig(app)`, which returns the `NextAuthConfig`:
   the `DrizzleAdapter` bound to `@blog/db`'s adapter tables, the `database`
   session strategy, and the `session` callback
 - `src/providers/magic-link/` — the hand-rolled Auth.js Email (magic-link)

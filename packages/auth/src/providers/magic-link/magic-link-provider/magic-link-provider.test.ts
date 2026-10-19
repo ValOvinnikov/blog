@@ -1,5 +1,6 @@
 import { resolveTenantEmailBrand } from '@blog/config';
 import {
+  AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
   PRESET_ID,
@@ -73,7 +74,7 @@ describe(buildMagicLinkProvider, () => {
       logoAssetUrl: undefined,
     });
     sendEmailMock.mockReset().mockResolvedValue(undefined);
-    provider = buildMagicLinkProvider();
+    provider = buildMagicLinkProvider(AUTH_APP.SITE);
   });
 
   it('identifies itself as the email provider', () => {
@@ -107,6 +108,7 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it('sends invite-flavored copy when the identifier has a pending invite', async () => {
+    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
     findPendingInviteByEmailMock.mockResolvedValue([
       { id: 'invite-1', tenantId: 'tenant-1' },
     ]);
@@ -142,7 +144,34 @@ describe(buildMagicLinkProvider, () => {
     );
   });
 
+  it("sends a site's own sign-in email to an address with a pending invite", async () => {
+    findPendingInviteByEmailMock.mockResolvedValue([
+      { id: 'invite-1', tenantId: 'tenant-1' },
+    ]);
+    listTenantsByIdsMock.mockResolvedValue([
+      { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.EN },
+    ]);
+
+    await provider.sendVerificationRequest({
+      identifier: 'invited@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: MAGIC_LINK_DEFAULTS.subject,
+        html: expect.not.stringContaining('Acme Blog'),
+      }),
+    );
+  });
+
   it('falls back to the generic copy and still delivers when the invite lookup throws', async () => {
+    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
     findPendingInviteByEmailMock.mockRejectedValue(new Error('db error'));
 
     await provider.sendVerificationRequest({
@@ -208,6 +237,7 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it("writes an invite sent from a tenant-less host in the invited tenant's default language", async () => {
+    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
     findPendingInviteByEmailMock.mockResolvedValue([
       { id: 'invite-1', tenantId: 'tenant-1' },
     ]);

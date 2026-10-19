@@ -83,8 +83,10 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   `string` and `undefined` at runtime, which `tsc` cannot catch. Any session
   field an app needs belongs here. The augmentation is ambient: each
   consumer's `tsconfig.json` `include`s `packages/auth/src/**/*.d.ts`.
-- **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`).
-  Auth.js wraps each event in its own try/catch and only logs an
+- **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`),
+  registered for `PLATFORM` only; a site sign-in never acts on platform
+  invites, and the magic-link provider picks the invite template only for
+  `PLATFORM` too. Auth.js wraps each event in its own try/catch and only logs an
   `EventError`, so a failure never reaches the user and the work is lost
   until the next sign-in: keep handlers best-effort and idempotent.
 

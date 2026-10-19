@@ -44,11 +44,11 @@ describe(buildAuthConfig, () => {
     delete process.env['AUTH_GOOGLE_SECRET'];
   });
 
-  describe('with the default environment', () => {
+  describe('for a site with the default environment', () => {
     let config: NextAuthConfig;
 
     beforeEach(() => {
-      config = buildAuthConfig();
+      config = buildAuthConfig(AUTH_APP.SITE);
     });
 
     it('uses the database session strategy', () => {
@@ -68,10 +68,6 @@ describe(buildAuthConfig, () => {
       expect(config.cookies).toBeUndefined();
     });
 
-    it('uses the Drizzle adapter as it is', () => {
-      expect(config.adapter).toBe(drizzleAdapterStub);
-    });
-
     it('always includes the magic-link email provider', () => {
       expect(providerIdsOf(config)).toEqual(expect.arrayContaining(['email']));
     });
@@ -86,12 +82,12 @@ describe(buildAuthConfig, () => {
       expect(config.callbacks?.session).toEqual(expect.any(Function));
     });
 
-    it('exposes a signIn event that consumes pending membership invites', async () => {
-      const user = { id: 'user-1', email: 'owner@example.com' };
+    it('leaves pending membership invites alone on sign-in', async () => {
+      await config.events?.signIn?.({
+        user: { id: 'user-1', email: 'owner@example.com' },
+      });
 
-      await config.events?.signIn?.({ user });
-
-      expect(consumePendingInvitesOnSignInMock).toHaveBeenCalledWith({ user });
+      expect(consumePendingInvitesOnSignInMock).not.toHaveBeenCalled();
     });
   });
 
@@ -104,7 +100,7 @@ describe(buildAuthConfig, () => {
       process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig();
+      const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
       expect(config.cookies).toBeUndefined();
     });
@@ -112,7 +108,7 @@ describe(buildAuthConfig, () => {
     it('reads the secret from AUTH_SECRET', async () => {
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig();
+      const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
       expect(config.secret).toBe('test-secret');
     });
@@ -128,7 +124,7 @@ describe(buildAuthConfig, () => {
         process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
         const freshBuildAuthConfig = await importBuildAuthConfig();
 
-        const config = freshBuildAuthConfig();
+        const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
         expect(providerIdsOf(config)).toEqual(
           expect.arrayContaining(['github', 'google']),
@@ -138,7 +134,7 @@ describe(buildAuthConfig, () => {
       it('omits GitHub when only one of its credential pair is set', async () => {
         const freshBuildAuthConfig = await importBuildAuthConfig();
 
-        const config = freshBuildAuthConfig();
+        const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
         expect(providerIdsOf(config)).not.toContain('github');
       });
@@ -150,6 +146,15 @@ describe(buildAuthConfig, () => {
       const config = buildAuthConfig(AUTH_APP.PLATFORM);
 
       expect(config.adapter).not.toBe(drizzleAdapterStub);
+    });
+
+    it('consumes pending membership invites on sign-in', async () => {
+      const user = { id: 'user-1', email: 'owner@example.com' };
+      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+
+      await config.events?.signIn?.({ user });
+
+      expect(consumePendingInvitesOnSignInMock).toHaveBeenCalledWith({ user });
     });
 
     it('names every cookie apart from the default Auth.js cookies', () => {
@@ -189,6 +194,12 @@ describe(buildAuthConfig, () => {
   });
 
   describe('for a site', () => {
+    it('scopes its sessions to sites', () => {
+      const config = buildAuthConfig(AUTH_APP.SITE);
+
+      expect(config.adapter).not.toBe(drizzleAdapterStub);
+    });
+
     it('keeps the default Auth.js cookies', () => {
       const config = buildAuthConfig(AUTH_APP.SITE);
 

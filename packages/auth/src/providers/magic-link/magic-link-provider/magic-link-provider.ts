@@ -12,8 +12,10 @@ import {
 } from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
 import { env } from '@blog/auth/utils/env/env';
 import {
+  AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
+  type TAuthApp,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
@@ -24,7 +26,7 @@ import {
 } from '@blog/email';
 import type { EmailConfig } from 'next-auth/providers/email';
 
-export function buildMagicLinkProvider(): EmailConfig {
+export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);
 
   return {
@@ -34,13 +36,10 @@ export function buildMagicLinkProvider(): EmailConfig {
     from,
     async sendVerificationRequest({ identifier, url }) {
       const { host } = new URL(url);
-      let inviteTenants: TPendingInviteTenant[] = [];
-      try {
-        inviteTenants = await findPendingInviteTenants(identifier);
-      } catch {
-        // A failed lookup must not block delivery: it degrades to the
-        // generic copy, the same as finding no pending invite.
-      }
+      const inviteTenants =
+        app === AUTH_APP.PLATFORM
+          ? await findPendingInviteTenantsOrNone(identifier)
+          : [];
       const tenantNames = inviteTenants.map(({ name }) => name);
       const tenantIdentity = await resolveTenantEmailIdentity(host);
       const isInvite = tenantNames.length > 0;
@@ -89,6 +88,17 @@ export function buildMagicLinkProvider(): EmailConfig {
       });
     },
   };
+}
+
+async function findPendingInviteTenantsOrNone(
+  identifier: string,
+): Promise<TPendingInviteTenant[]> {
+  try {
+    return await findPendingInviteTenants(identifier);
+  } catch {
+    // A failed lookup must not block delivery: it degrades to the generic copy.
+    return [];
+  }
 }
 
 // With no tenant behind the host, an invite is written in the invited

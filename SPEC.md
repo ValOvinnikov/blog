@@ -112,8 +112,10 @@ reading, page canvas elevation) are documented in full in
   email-magic-link sign-in against `@blog/db`'s adapter tables (database
   session strategy). The magic-link provider (`sendVerificationRequest`)
   lives in `@blog/auth`, which builds its email through `@blog/email`'s
-  per-template builders and sends through its transport directly — `buildAuthConfig()` takes no arguments,
-  and neither app carries a send transport of its own. It writes each email
+  per-template builders and sends through its transport directly — `buildAuthConfig(app)` takes only the
+  calling app, and neither app carries a send transport of its own. Only the
+  platform's sign-in email uses the invite template, and only a platform
+  sign-in consumes pending membership invites. It writes each email
   in the recipient's language: on a tenant's host, the first segment of the
   link's return-to path when it is one of the tenant's live languages, else
   the tenant's default language; on a tenant-less host (the platform), an
@@ -174,10 +176,10 @@ configuration they share, so the two never maintain it separately. Sharing the
 builder never shares a session: every `sessions` row records the app that
 issued it, and an app that passes its `AUTH_APP` value reads another app's
 session as no session. `apps/platform` passes `PLATFORM` and names its cookies
-apart, so each app is signed into independently. `apps/web` does not pass one
-yet: its rows take the column's `SITE` default, and it does not yet refuse a
-platform session. The identity behind both is still one `users` row per
-person.
+apart; `apps/web` passes `SITE` and keeps Auth.js's default cookie names. So
+each app accepts only the sessions it issued and is signed into independently,
+while the identity behind both is still one `users` row per person — one
+reader account spans every site.
 Full contract and migration mechanism: `.claude/agents/db.md`.
 
 **Tenant scoping in `@blog/db`.** Every engagement table a tenant's readers

@@ -81,7 +81,7 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
   - Membership roles never gate anything: only OWNER is ever written, and nothing reads EDITOR or READER.
 - **Admins get a virtual OWNER membership.** Any `admins` row passes `requireTenantMembership` on any tenant through a virtual membership. Its id starts with `admin-virtual:`, so it can never pass as a foreign key. Call `isVirtualAdminMembership` before showing `membership.role`; the role chip shows the admin role instead.
 - **Invite consumption is atomic.** The claim stamps `consumedAt` only if it is still null. A failed membership insert resets it, and an existing membership is returned as-is.
-- **Invites are consumed best-effort, in both apps.** `@blog/auth`'s `events.signIn` consumes invites on sign-in to either app, because both apps share `buildAuthConfig()`. A failure is swallowed and retried on the next sign-in.
+- **Invites are consumed best-effort, in the admin only.** `@blog/auth`'s `events.signIn` consumes invites on sign-in to the admin; signing in as a reader on a site leaves them pending. A failure is swallowed and retried on the next admin sign-in.
 - **Platform access is not Studio access.** Studio rights come from the tenant's Sanity project ACL. The owner is invited as `viewer` and raised to `administrator` by owner elevation ([embedded studio](./embedded-studio.md)).
 - **Site sign-in is separate.** A public site's readers sign in through the same `users` table, but `memberships` never gate anything in `apps/web` ([reader auth](./reader-auth.md)).
 

@@ -78,9 +78,9 @@ Decided:
 - Decided: the Sanity project is created at Create site, never at signup.
 - Today the admin builds Auth.js with `AUTH_APP.PLATFORM`: its cookies carry
   their own names, each session it creates is stamped `PLATFORM` in
-  `sessions.app`, and a session stamped otherwise reads as signed out. The
-  invite-consuming sign-in event still runs in both apps. Decided: invite side
-  effects run only in the admin.
+  `sessions.app`, and a session stamped otherwise reads as signed out. Invite
+  side effects run only here: the invite-consuming sign-in event and the
+  invite email template.
 
 ## Dependencies
 

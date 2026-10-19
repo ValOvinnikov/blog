@@ -13,7 +13,7 @@ import type { NextAuthConfig } from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-export function buildAuthConfig(app?: TAuthApp): NextAuthConfig {
+export function buildAuthConfig(app: TAuthApp): NextAuthConfig {
   const githubCredentials = getOAuthProviderCredentials('github');
   const googleCredentials = getOAuthProviderCredentials('google');
   const adapter = DrizzleAdapter(getDb(), {
@@ -26,7 +26,7 @@ export function buildAuthConfig(app?: TAuthApp): NextAuthConfig {
   const useSecureCookies = process.env.NODE_ENV === 'production';
 
   return {
-    adapter: app ? scopeAdapterToApp(adapter, app) : adapter,
+    adapter: scopeAdapterToApp(adapter, app),
     session: { strategy: 'database' },
     secret: env.AUTH_SECRET,
     ...(app === AUTH_APP.PLATFORM && {
@@ -40,13 +40,15 @@ export function buildAuthConfig(app?: TAuthApp): NextAuthConfig {
         user: { ...session.user, id: user.id },
       }),
     },
-    events: {
-      signIn: ({ user }) => consumePendingInvitesOnSignIn({ user }),
-    },
+    ...(app === AUTH_APP.PLATFORM && {
+      events: {
+        signIn: ({ user }) => consumePendingInvitesOnSignIn({ user }),
+      },
+    }),
     providers: [
       ...(githubCredentials ? [GitHub(githubCredentials)] : []),
       ...(googleCredentials ? [Google(googleCredentials)] : []),
-      buildMagicLinkProvider(),
+      buildMagicLinkProvider(app),
     ],
   };
 }
