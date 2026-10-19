@@ -212,13 +212,14 @@
       "exportDescription": "Laden Sie Ihr Profil und Ihre Lesezeichen als ein JSON-Archiv herunter.",
       "exportButton": "Export anfordern",
       "deleteLabel": "Konto löschen",
-      "deleteDescription": "Unwiderruflich. Ihr Profil und Ihre Lesezeichen werden gelöscht und alle Sitzungen beendet. Geben Sie Ihren Benutzernamen ein, um die Schaltfläche zu aktivieren.",
+      "deleteDescription": "Unwiderruflich. Ihr Profil und Ihre Lesezeichen auf allen Websites werden gelöscht und alle Sitzungen beendet. Geben Sie Ihren Benutzernamen ein, um die Schaltfläche zu aktivieren.",
       "deleteConfirmAriaLabel": "Geben Sie Ihren Benutzernamen ein, um das Löschen zu bestätigen",
       "deleteConfirmPlaceholder": "Zum Bestätigen {handle} eingeben",
       "deleteButton": "Konto löschen",
       "deleteToastLoadingMessage": "Ihr Konto wird gelöscht…",
       "deleteToastSuccessMessage": "Ihr Konto wurde gelöscht.",
-      "deleteError": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+      "deleteError": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+      "deletePlatformRoleError": "Dieses Konto verwaltet eine Website auf der Plattform und kann daher hier nicht gelöscht werden. Bitten Sie zuerst das Plattform-Team, die Website zu übergeben."
     },
     "newsletter": {
       "heading": "Newsletter",

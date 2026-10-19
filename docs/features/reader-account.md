@@ -37,7 +37,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 - Neon: `users` (`name`, `email`, `emailVerified`, `image`), `accounts` (one row per linked OAuth provider), `bookmarks`, `subscribers`.
 - The email-link method has no `accounts` row; it counts as linked when `users.emailVerified` is set.
 - Export: the profile (`users` row) plus this tenant's bookmarks (`postId`, `createdAt`), newest first.
-- Delete: removes the `users` row; `accounts`, `sessions`, `bookmarks` (on every tenant), `memberships` and `admins` cascade, and `admins.granted_by` pointing at the user is set to NULL. `subscribers` rows are keyed by email, not user, and stay.
+- Delete: removes the `users` row; `accounts`, `sessions`, `bookmarks` (on every tenant) and non-owner `memberships` cascade, and `admins.granted_by` pointing at the user is set to NULL. `subscribers` rows are keyed by email, not user, and stay. A user holding an OWNER membership or an `admins` row is refused (`DB_HOLDS_PLATFORM_ROLE` → `BLOCKED`) and nothing is deleted; the control shows its own message for that.
 - Nothing is cached.
 
 ## Configuration
@@ -55,7 +55,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 - The display name is trimmed and an empty name is refused.
 - The typed confirmation is a client-side guard; the server action requires only a session. Only a successful delete signs the reader out.
 - Export and delete are ungated by capability, but `/account` itself is not, so a reader on a site whose reader features are off cannot reach them there.
-- One `users` row serves every tenant and the platform: deleting on one site deletes the identity everywhere, including that person's site ownership (`memberships`) and platform-admin access (`admins`). `deleteAccount` does not guard against either.
+- One `users` row serves every tenant and the platform: deleting on one site deletes the identity everywhere, which the delete description states. `deleteAccount` refuses a tenant owner or platform admin in the same statement as the delete, so no deletion from a site leaves a tenant without an owner or the platform without its admins.
 
 ## Dependencies
 

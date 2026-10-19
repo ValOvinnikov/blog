@@ -212,13 +212,14 @@
       "exportDescription": "Téléchargez votre profil et vos favoris dans une seule archive JSON.",
       "exportButton": "Demander l'export",
       "deleteLabel": "Supprimer le compte",
-      "deleteDescription": "Irréversible. Votre profil et vos favoris sont effacés et toutes vos sessions sont fermées. Saisissez votre identifiant pour activer le bouton.",
+      "deleteDescription": "Irréversible. Votre profil et vos favoris sur tous les sites sont effacés et toutes vos sessions sont fermées. Saisissez votre identifiant pour activer le bouton.",
       "deleteConfirmAriaLabel": "Saisissez votre identifiant pour confirmer la suppression",
       "deleteConfirmPlaceholder": "Saisissez {handle} pour confirmer",
       "deleteButton": "Supprimer le compte",
       "deleteToastLoadingMessage": "Suppression de votre compte…",
       "deleteToastSuccessMessage": "Votre compte a été supprimé.",
-      "deleteError": "Votre compte n'a pas pu être supprimé. Veuillez réessayer."
+      "deleteError": "Votre compte n'a pas pu être supprimé. Veuillez réessayer.",
+      "deletePlatformRoleError": "Ce compte gère un site sur la plateforme et ne peut donc pas être supprimé ici. Demandez d'abord à l'équipe de la plateforme de transférer le site."
     },
     "newsletter": {
       "heading": "Newsletter",

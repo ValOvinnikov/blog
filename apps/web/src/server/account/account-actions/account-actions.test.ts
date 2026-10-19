@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, ERROR_CODE } from '@blog/config';
 
 import { deleteAccountAction } from './account-actions';
 
@@ -30,12 +30,23 @@ describe('deleteAccountAction', () => {
   });
 
   it('deletes the session user and returns SUCCESS', async () => {
-    deleteAccountMock.mockResolvedValue(undefined);
+    deleteAccountMock.mockResolvedValue({ ok: true, data: undefined });
 
     await expect(deleteAccountAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(deleteAccountMock).toHaveBeenCalledWith('user-1');
+  });
+
+  it('returns BLOCKED when the account holds a platform role', async () => {
+    deleteAccountMock.mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE,
+    });
+
+    await expect(deleteAccountAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.BLOCKED,
+    });
   });
 
   it('returns SERVER_ERROR when the delete throws', async () => {
