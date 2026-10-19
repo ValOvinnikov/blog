@@ -40,15 +40,21 @@ vi.mock('@blog/db/queries/memberships', () => ({
   getTenantOwnerEmail: getTenantOwnerEmailMock,
 }));
 
-vi.mock('../lib/sanity-management-client', () => ({
+vi.mock('@blog/db/utils/sanity-management-client/sanity-project-setup', () => ({
   createSanityProject: createSanityProjectMock,
   createSanityDataset: createSanityDatasetMock,
   addSanityCorsOrigin: addSanityCorsOriginMock,
-  createSanityProjectInvite: createSanityProjectInviteMock,
   listSanityDatasets: listSanityDatasetsMock,
   listSanityCorsOrigins: listSanityCorsOriginsMock,
-  listSanityProjectInvites: listSanityProjectInvitesMock,
 }));
+
+vi.mock(
+  '@blog/db/utils/sanity-management-client/sanity-project-access',
+  () => ({
+    createSanityProjectInvite: createSanityProjectInviteMock,
+    listSanityProjectInvites: listSanityProjectInvitesMock,
+  }),
+);
 
 const env: TProvisionEnv = {
   sanityManagementToken: 'mgmt-token',
@@ -410,8 +416,8 @@ describe(createTenantSanityProject, () => {
 
       it('does not re-invite when a retry finds the owner still pending, exercising the real invite-list parsing against a mocked fetch', async () => {
         const actual = await vi.importActual<
-          typeof import('../lib/sanity-management-client')
-        >('../lib/sanity-management-client');
+          typeof import('@blog/db/utils/sanity-management-client/sanity-project-access')
+        >('@blog/db/utils/sanity-management-client/sanity-project-access');
         listSanityProjectInvitesMock.mockImplementation(
           actual.listSanityProjectInvites,
         );

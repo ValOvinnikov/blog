@@ -10,7 +10,7 @@ const { archiveSanityProjectMock } = vi.hoisted(() => ({
 }));
 
 vi.mock(
-  '@blog/db/utils/sanity-management-client/sanity-management-client',
+  '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
   () => ({
     archiveSanityProject: archiveSanityProjectMock,
   }),

@@ -1,6 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { tenants } from '@blog/db/schema/tenants';
-import { deleteSanityProject } from '@blog/db/utils/sanity-management-client/sanity-management-client';
+import { deleteSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
 import { eq } from 'drizzle-orm';
 
 // What happened to the tenant's still-existing (archived by deprovisioning)

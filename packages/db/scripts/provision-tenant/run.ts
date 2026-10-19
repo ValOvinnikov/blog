@@ -26,7 +26,7 @@ import {
 } from '@blog/db/constants';
 import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-management-client';
+import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
