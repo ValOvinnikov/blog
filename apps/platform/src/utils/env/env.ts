@@ -41,7 +41,7 @@ export const env = createEnv({
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // @env-optional
     OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
-    // @env-optional
+    // @env-required: development
     CONTRAST_RESULT_SECRET: z.string().min(1).optional(),
     // @env-optional
     LOKI_PUSH_URL: z.string().min(1).optional(),
