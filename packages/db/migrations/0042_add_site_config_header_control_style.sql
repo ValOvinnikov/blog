@@ -1,0 +1,2 @@
+CREATE TYPE "public"."header_control_style" AS ENUM('OUTLINED', 'SOFT', 'PLAIN');--> statement-breakpoint
+ALTER TABLE "site_config" ADD COLUMN "header_control_style" "header_control_style" DEFAULT 'OUTLINED' NOT NULL;

@@ -1,4 +1,8 @@
-import { CARD_STYLE, COLOR_SCHEME } from '@blog/config/constants';
+import {
+  CARD_STYLE,
+  COLOR_SCHEME,
+  HEADER_CONTROL_STYLE,
+} from '@blog/config/constants';
 
 import { findContrastFailures } from './contrast-check';
 import { KNOWN_CONTRAST_FAILURES } from './contrast-known-failures';
@@ -7,6 +11,7 @@ import { measureContrast } from './contrast-tokens';
 const LIGHT_ACCENT_BAR = {
   scheme: COLOR_SCHEME.LIGHT,
   cardStyle: CARD_STYLE.ACCENT_BAR,
+  headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
   hue: 250,
 };
 
@@ -30,6 +35,24 @@ describe(measureContrast, () => {
         cardStyle: CARD_STYLE.OUTLINED,
       }),
     ).toBe(measureContrast('--border', '--surface', LIGHT_ACCENT_BAR));
+  });
+
+  it('resolves the header control fill from the header control style', () => {
+    expect(
+      measureContrast('--text', '--header-control-fill', {
+        ...LIGHT_ACCENT_BAR,
+        headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+      }),
+    ).toBe(measureContrast('--text', '--border', LIGHT_ACCENT_BAR));
+  });
+
+  it('measures a transparent header control against the page background', () => {
+    expect(
+      measureContrast('--text', '--header-control-fill', {
+        ...LIGHT_ACCENT_BAR,
+        headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+      }),
+    ).toBe(measureContrast('--text', '--primary', LIGHT_ACCENT_BAR));
   });
 
   it('measures the accent ramp at the hue it is given', () => {
