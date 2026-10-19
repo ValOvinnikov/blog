@@ -1,9 +1,14 @@
 import { CAPABILITY } from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features';
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 
 import {
   isCapabilityEnabled,
@@ -24,20 +29,9 @@ vi.mock(
   }),
 );
 
-vi.mock('@blog/db', () => ({
-  PLAN_REGISTRY: {
-    FREE: ['RATINGS', 'CONSENT_BANNER'],
-    GROWTH: [
-      'COMMENTS',
-      'RATINGS',
-      'BOOKMARKS',
-      'NEWSLETTER',
-      'ANALYTICS',
-      'CONSENT_BANNER',
-      'CONTACT_FORM',
-    ],
-  },
-}));
+vi.mock('@blog/db', () => vi.importActual('@blog/db/constants'));
+
+const OTHER_TENANT_ID = faker.string.uuid();
 
 const ALL_ENABLED = {
   [CAPABILITY.COMMENTS]: true,
@@ -53,7 +47,10 @@ describe(isCapabilityEnabled, () => {
   beforeEach(() => {
     vi.mocked(getTenantPlan).mockReset();
     vi.mocked(getEffectiveSettingsFeatures).mockReset();
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
+    vi.mocked(getTenantPlan).mockResolvedValue({
+      ok: true,
+      data: TENANT_PLAN.GROWTH,
+    });
     vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
       ok: true,
       data: ALL_ENABLED,
@@ -67,7 +64,10 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('disables a capability the plan does not entitle, even when the toggle is on', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'FREE' });
+    vi.mocked(getTenantPlan).mockResolvedValue({
+      ok: true,
+      data: TENANT_PLAN.FREE,
+    });
 
     await expect(isCapabilityEnabled(CAPABILITY.NEWSLETTER)).resolves.toBe(
       false,
@@ -101,7 +101,10 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('disables the contact form on FREE even with its toggle on', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'FREE' });
+    vi.mocked(getTenantPlan).mockResolvedValue({
+      ok: true,
+      data: TENANT_PLAN.FREE,
+    });
 
     await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
       false,
@@ -143,8 +146,10 @@ describe(isCapabilityEnabled, () => {
   it("reads both entitlements for the request context's tenant", async () => {
     await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
 
-    expect(getTenantPlan).toHaveBeenCalledWith('tenant-1');
-    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantPlan).toHaveBeenCalledWith(DEFAULT_TENANT_ID);
+    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith(
+      DEFAULT_TENANT_ID,
+    );
   });
 
   it('reads the unresolved-tenant placeholder, never undefined, when the request has no tenant', async () => {
@@ -165,11 +170,11 @@ describe(isCapabilityEnabled, () => {
     vi.mocked(getRequestContext).mockClear();
 
     await expect(
-      isCapabilityEnabledForTenant('tenant-2', CAPABILITY.CONTACT_FORM),
+      isCapabilityEnabledForTenant(OTHER_TENANT_ID, CAPABILITY.CONTACT_FORM),
     ).resolves.toBe(true);
 
     expect(getRequestContext).not.toHaveBeenCalled();
-    expect(getTenantPlan).toHaveBeenCalledWith('tenant-2');
-    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith('tenant-2');
+    expect(getTenantPlan).toHaveBeenCalledWith(OTHER_TENANT_ID);
+    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith(OTHER_TENANT_ID);
   });
 });
