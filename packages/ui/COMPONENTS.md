@@ -154,7 +154,8 @@ Variants: invalid: (boolean)
 ### ThemeToggle — `components/atoms/theme-toggle/theme-toggle.tsx`
 
 A pure, controlled theme-switch button.
-Props: isDark: boolean · onToggle: () => void · isMounted?: boolean · lightLabel?: string · darkLabel?: string _(extends IWithClassName, IWithDataTestId)_
+Props: isDark: boolean · onToggle: () => void · isIconFromThemeClass?: boolean · lightLabel?: string · darkLabel?: string _(extends IWithClassName, IWithDataTestId)_
+Variants: isIconFromThemeClass: (boolean)
 
 ## Molecules
 

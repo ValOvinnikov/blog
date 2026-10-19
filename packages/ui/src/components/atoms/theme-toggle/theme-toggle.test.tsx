@@ -51,15 +51,22 @@ describe(`<${ThemeToggle.name}/>`, () => {
     );
   });
 
-  it('renders the placeholder and no icon when isMounted is false', () => {
-    setup({ isMounted: false });
-    expect(screen.queryByTestId('theme-toggle-icon')).not.toBeInTheDocument();
-    expect(screen.getByTestId('theme-toggle-placeholder')).toBeVisible();
+  it('renders only the moon icon when isDark is false', () => {
+    setup();
+    expect(screen.getByTestId('theme-toggle-moon')).toBeInTheDocument();
+    expect(screen.queryByTestId('theme-toggle-sun')).not.toBeInTheDocument();
   });
 
-  it('renders the icon when isMounted is true', () => {
-    setup({ isMounted: true });
-    expect(screen.getByTestId('theme-toggle-icon')).toBeVisible();
+  it('renders only the sun icon when isDark is true', () => {
+    setup({ isDark: true });
+    expect(screen.getByTestId('theme-toggle-sun')).toBeInTheDocument();
+    expect(screen.queryByTestId('theme-toggle-moon')).not.toBeInTheDocument();
+  });
+
+  it('renders both icons when the theme class picks the icon', () => {
+    setup({ isIconFromThemeClass: true });
+    expect(screen.getByTestId('theme-toggle-sun')).toBeInTheDocument();
+    expect(screen.getByTestId('theme-toggle-moon')).toBeInTheDocument();
   });
 });
 
