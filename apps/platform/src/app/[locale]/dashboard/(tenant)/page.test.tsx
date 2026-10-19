@@ -39,7 +39,10 @@ vi.mock('@platform/server/provisioning/get-domain-verification-status', () => ({
   getDomainVerificationStatus: getDomainVerificationStatusMock,
 }));
 
-vi.mock('next/headers', () => ({ cookies: cookiesMock }));
+vi.mock('next/headers', () => ({
+  cookies: cookiesMock,
+  headers: async () => new Headers(),
+}));
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
@@ -75,7 +78,7 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
+    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();
   });
 
