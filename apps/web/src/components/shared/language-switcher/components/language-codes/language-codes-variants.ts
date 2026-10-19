@@ -1,5 +1,4 @@
-import { HEADER_CONTROL_FRAME } from '@blog/ui/lib/styling';
-import { tv } from 'tailwind-variants';
+import { HEADER_CONTROL_FRAME, tv } from '@blog/ui/lib/styling';
 
 export const languageCodesVariants = tv({
   slots: {

@@ -1,4 +1,4 @@
-import { tv } from 'tailwind-variants';
+import { tv } from '@blog/ui/lib/styling';
 
 export const actionGroupVariants = tv({
   base: ['sm:min-w-32'],

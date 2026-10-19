@@ -1,5 +1,5 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
-import { tv } from 'tailwind-variants';
+import { tv } from '@blog/ui/lib/styling';
 
 export const logoWallModuleViewVariants = tv({
   base: ['flex flex-wrap gap-6'],
