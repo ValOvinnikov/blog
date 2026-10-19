@@ -5,6 +5,7 @@ import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { useToast } from '@web/context/toast-provider';
 import { deleteAccountAction } from '@web/server/account/account-actions/account-actions';
+import { encodeClearedSignedInHint } from '@web/utils/signed-in-hint-cookie';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
@@ -53,6 +54,7 @@ export const DeleteAccountControl = ({
         return;
       }
 
+      document.cookie = encodeClearedSignedInHint();
       await signOut({ callbackUrl: routes.home() });
     });
   };

@@ -19,11 +19,15 @@ export const authMenuVariants = tv({
       'lg:group-hover:text-current lg:group-aria-expanded:text-current',
     ],
     signInText: ['hidden lg:inline'],
-    slot: [
-      'inline-grid shrink-0 items-center justify-items-end',
-      '[&>*]:col-start-1 [&>*]:row-start-1',
+    slot: ['inline-flex shrink-0'],
+    // Tailwind needs literal class names, so `data-signed-in` repeats SIGNED_IN_HINT_ATTRIBUTE.
+    signedOutFootprint: ['inline-flex [[data-signed-in]_&]:hidden'],
+    signedInFootprint: ['inline-flex [:root:not([data-signed-in])_&]:hidden'],
+    emptyOutline: ['[&>*]:invisible'],
+    reveal: [
+      'inline-flex shrink-0',
+      'motion-safe:transition-opacity motion-safe:duration-fast motion-safe:starting:opacity-0',
     ],
-    footprint: [],
     loadingStatus: ['sr-only'],
     avatarFrame: [
       HEADER_CONTROL,
@@ -33,11 +37,4 @@ export const authMenuVariants = tv({
     ],
     avatar: ['size-10 text-sm lg:size-8 lg:text-xs pointer-coarse:size-10'],
   },
-  variants: {
-    isPlaceholder: {
-      true: { footprint: ['[&>*]:invisible'] },
-      false: { footprint: ['invisible'] },
-    },
-  },
-  defaultVariants: { isPlaceholder: false },
 });

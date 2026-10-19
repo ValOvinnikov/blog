@@ -28,6 +28,9 @@ const setLocationSearch = (search: string) => {
   window.history.replaceState(null, '', `/${search}`);
 };
 
+const hasSignedInHint = () =>
+  document.cookie.split('; ').includes('signed_in_hint=1');
+
 describe(`<${AuthMenu.name}/>`, () => {
   let user: UserEvent;
 
@@ -37,6 +40,7 @@ describe(`<${AuthMenu.name}/>`, () => {
     signInMock.mockReset();
     signOutMock.mockReset();
     setLocationSearch('');
+    document.cookie = 'signed_in_hint=; Max-Age=0; Path=/';
   });
 
   describe('while the session is resolving', () => {
@@ -226,6 +230,13 @@ describe(`<${AuthMenu.name}/>`, () => {
       });
     });
 
+    it('forgets a remembered sign-in once the session resolves signed out', () => {
+      document.cookie = 'signed_in_hint=1; Path=/';
+      setup();
+
+      expect(hasSignedInHint()).toBe(false);
+    });
+
     it('renders only the GitHub button when only GitHub is enabled', async () => {
       setup({ oauthProviderIds: ['github'] });
 
@@ -343,6 +354,17 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
 
       expect(signOutMock).toHaveBeenCalled();
+    });
+
+    it('remembers the sign-in for the next page load', () => {
+      expect(hasSignedInHint()).toBe(true);
+    });
+
+    it('forgets the remembered sign-in when Sign out is clicked', async () => {
+      await user.click(screen.getByRole('button', { name: 'Account menu' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+
+      expect(hasSignedInHint()).toBe(false);
     });
   });
 });

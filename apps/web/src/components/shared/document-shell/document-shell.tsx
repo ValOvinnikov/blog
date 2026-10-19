@@ -1,5 +1,6 @@
 import '../../../../index.css';
 
+import { signedInHintBootstrapScript } from '@web/config/signed-in-hint-script';
 import { themeBootstrapScript } from '@web/config/theme-script';
 import type { ReactNode } from 'react';
 
@@ -19,6 +20,9 @@ export const DocumentShell = ({ lang, children }: TDocumentShellProps) => (
     <head>
       <link rel="preconnect" href={SANITY_IMAGE_CDN_ORIGIN} />
       <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      <script
+        dangerouslySetInnerHTML={{ __html: signedInHintBootstrapScript }}
+      />
     </head>
     <body>{children}</body>
   </html>
