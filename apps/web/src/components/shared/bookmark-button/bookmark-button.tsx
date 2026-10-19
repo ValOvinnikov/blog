@@ -56,7 +56,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
     };
   }, [sessionResult.status, postId]);
 
-  if (sessionResult.status === 'unauthenticated') return null;
+  if (sessionResult.status !== 'authenticated' || !isResolved) return null;
 
   const performUndo = (committedValue: boolean) => {
     const reverted = !committedValue;
@@ -127,9 +127,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
         onToggle={handleToggle}
         label={isBookmarked ? t('saved') : t('save')}
         ariaLabel={isBookmarked ? t('removeAriaLabel') : t('saveAriaLabel')}
-        isDisabled={
-          sessionResult.status === 'loading' || !isResolved || isPending
-        }
+        isDisabled={isPending}
       />
     </span>
   );

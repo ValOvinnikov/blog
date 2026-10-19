@@ -68,15 +68,12 @@ describe(`<${BookmarkButton.name}/>`, () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('renders a disabled, not-pressed toggle while the session is resolving', () => {
+  it('renders nothing while the session is resolving', () => {
     useSessionMock.mockReturnValue({ data: null, status: 'loading' });
 
     setup();
 
-    const button = screen.getByRole('button', { name: 'Save post' });
-    expect(button).toBeDisabled();
-    expect(button).toHaveAttribute('aria-pressed', 'false');
-    expect(button).toHaveTextContent('Save');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   describe('when authenticated', () => {
@@ -87,12 +84,12 @@ describe(`<${BookmarkButton.name}/>`, () => {
       });
     });
 
-    it('stays disabled once authenticated until the initial bookmark status resolves', () => {
+    it('renders nothing until the initial bookmark status resolves', () => {
       getBookmarkStatusMock.mockReturnValue(new Promise(() => {}));
 
       setup();
 
-      expect(screen.getByRole('button', { name: 'Save post' })).toBeDisabled();
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
     it('reflects the resolved bookmark status once it loads, then becomes interactive', async () => {
