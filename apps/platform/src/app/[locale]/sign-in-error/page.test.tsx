@@ -10,20 +10,23 @@ describe(SignInErrorPage, () => {
   it('explains a used or expired sign-in link and offers a new one', async () => {
     await setup({ searchParams: Promise.resolve({ error: 'Verification' }) });
 
-    expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: 'This sign-in link no longer works',
-      }),
-    ).toBeVisible();
-    expect(
-      screen.getByText(
-        'Each sign-in link works once and expires after a while. This one has already been used or has expired. Ask for a new one to sign in.',
-      ),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'Get a new sign-in link' }),
-    ).toHaveAttribute('href', '/api/auth/signin?callbackUrl=%2F');
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'This sign-in link no longer works',
+    });
+    const description = screen.getByText(
+      'Each sign-in link works once and expires after a while. This one has already been used or has expired. Ask for a new one to sign in.',
+    );
+    const newLinkLink = screen.getByRole('link', {
+      name: 'Get a new sign-in link',
+    });
+
+    expect(heading).toBeVisible();
+    expect(description).toBeVisible();
+    expect(newLinkLink).toHaveAttribute(
+      'href',
+      '/api/auth/signin?callbackUrl=%2F',
+    );
   });
 
   it.each(['Configuration', 'AccessDenied', undefined])(
@@ -31,20 +34,21 @@ describe(SignInErrorPage, () => {
     async (error) => {
       await setup({ searchParams: Promise.resolve({ error }) });
 
-      expect(
-        screen.getByRole('heading', {
-          level: 1,
-          name: "We couldn't sign you in",
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByText(
-          'Something went wrong while signing you in. Go back to sign-in and try again.',
-        ),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('link', { name: 'Back to sign-in' }),
-      ).toHaveAttribute('href', '/api/auth/signin?callbackUrl=%2F');
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: "We couldn't sign you in",
+      });
+      const description = screen.getByText(
+        'Something went wrong while signing you in. Go back to sign-in and try again.',
+      );
+      const backLink = screen.getByRole('link', { name: 'Back to sign-in' });
+
+      expect(heading).toBeVisible();
+      expect(description).toBeVisible();
+      expect(backLink).toHaveAttribute(
+        'href',
+        '/api/auth/signin?callbackUrl=%2F',
+      );
     },
   );
 });

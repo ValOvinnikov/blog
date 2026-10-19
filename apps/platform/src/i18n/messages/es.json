@@ -7,7 +7,7 @@
     "voice": "Voz · Administración",
     "selectTenant": "Elija un espacio de trabajo · Administración",
     "workspacePending": "Espacio de trabajo no listo · Administración",
-    "signInError": "Problema al iniciar sesión · Administración",
+    "signInError": "Problema al iniciar sesión",
     "addTenant": "Añadir cliente · Administración",
     "tenantOverview": "Resumen del cliente · Administración",
     "tenantProvisioning": "Aprovisionamiento · Administración",

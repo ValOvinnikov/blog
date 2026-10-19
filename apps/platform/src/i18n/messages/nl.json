@@ -7,7 +7,7 @@
     "voice": "Toon · Admin",
     "selectTenant": "Kies een werkruimte · Admin",
     "workspacePending": "Werkruimte niet klaar · Admin",
-    "signInError": "Probleem bij inloggen · Admin",
+    "signInError": "Probleem bij inloggen",
     "addTenant": "Tenant toevoegen · Admin",
     "tenantOverview": "Tenantoverzicht · Admin",
     "tenantProvisioning": "Inrichting · Admin",

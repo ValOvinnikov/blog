@@ -7,7 +7,7 @@
     "voice": "Tonalität · Admin",
     "selectTenant": "Arbeitsbereich wählen · Admin",
     "workspacePending": "Arbeitsbereich nicht bereit · Admin",
-    "signInError": "Problem bei der Anmeldung · Admin",
+    "signInError": "Problem bei der Anmeldung",
     "addTenant": "Mandant hinzufügen · Admin",
     "tenantOverview": "Mandantenübersicht · Admin",
     "tenantProvisioning": "Bereitstellung · Admin",

@@ -7,7 +7,7 @@
     "voice": "Voix · Administration",
     "selectTenant": "Choisir un espace de travail · Administration",
     "workspacePending": "Espace de travail pas encore prêt · Administration",
-    "signInError": "Problème de connexion · Administration",
+    "signInError": "Problème de connexion",
     "addTenant": "Ajouter un locataire · Administration",
     "tenantOverview": "Aperçu du locataire · Administration",
     "tenantProvisioning": "Provisionnement · Administration",

@@ -7,7 +7,7 @@
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
     "workspacePending": "Workspace not ready · Admin",
-    "signInError": "Sign-in problem · Admin",
+    "signInError": "Sign-in problem",
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
     "tenantProvisioning": "Provisioning · Admin",
