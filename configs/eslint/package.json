@@ -14,7 +14,8 @@
     "./studio": "./studio.js",
     "./auth": "./auth.js",
     "./platform": "./platform.js",
-    "./email": "./email.js"
+    "./email": "./email.js",
+    "./worker": "./worker.js"
   },
   "scripts": {
     "test": "node --test"
