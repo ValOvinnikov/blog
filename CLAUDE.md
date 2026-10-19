@@ -49,12 +49,10 @@ graph is acyclic
 - `@blog/auth` holds the Auth.js configuration both apps pass to their own
   `NextAuth()` call — providers, the Drizzle adapter, session strategy, cookie
   options. It sits above `db` (which owns the adapter tables) and **`db` must
-  never import it**. Sharing it is what lets a session issued by one app be
-  accepted by the other; two independently maintained configs drift silently.
-  It does not by itself make one sign-in _span_ both origins — that is
-  `AUTH_COOKIE_DOMAIN`, deliberately left unset, so each origin is signed into
-  separately (`docs/context/environment-variables.md`). See
-  `.claude/agents/auth.md`.
+  never import it**. One shared builder, never a shared session: two
+  independently maintained configs drift silently, so both apps build from
+  `buildAuthConfig(app)`, and each app names its own cookies and reads another
+  app's session as no session. See `.claude/agents/auth.md`.
 - `apps/platform` is a separate Next.js app (its own deployment and domain) for
   the operator/tenant admin panel — it consumes `db`, `auth`, `config`, `utils`
   and `@blog/studio`, and **never Sanity or `@blog/service` directly**: it

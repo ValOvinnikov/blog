@@ -1,17 +1,14 @@
 import 'server-only';
 
 import { buildAuthConfig } from '@blog/auth';
+import { AUTH_APP } from '@blog/config/constants';
 import NextAuth from 'next-auth';
 import { cache } from 'react';
 
-// Config is a function — Auth.js v5's lazy-initialization form — so
-// `buildAuthConfig`'s `DrizzleAdapter(getDb(), …)`, and therefore
-// `getDb()`'s `neon(DATABASE_URL)` construction, is deferred to the first
-// real request instead of running at module-import time, which would
-// otherwise crash Next's build-time "Collecting page data" step against a
-// `DATABASE_URL` that's legitimately unset in CI. Same reasoning as
-// `apps/web/src/server/auth/auth.ts`.
-const { handlers, auth, signIn, signOut } = NextAuth(() => buildAuthConfig());
+// Lazy so `getDb()` waits for the first request; at import it breaks the build, where `DATABASE_URL` is unset.
+const { handlers, auth, signIn, signOut } = NextAuth(() =>
+  buildAuthConfig(AUTH_APP.PLATFORM),
+);
 
 /** Server Components and gates read the session through this; `auth()` is a database lookup on every call. */
 export const getSession = cache(() => auth());

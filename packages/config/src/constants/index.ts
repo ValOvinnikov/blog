@@ -1,6 +1,7 @@
 export * from './action-outcome';
 export * from './alert';
 export * from './audit';
+export * from './auth-app';
 export * from './aside';
 export * from './brand-tagline';
 export * from './cache';

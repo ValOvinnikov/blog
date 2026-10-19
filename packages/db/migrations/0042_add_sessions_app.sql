@@ -1,0 +1,1 @@
+ALTER TABLE "sessions" ADD COLUMN "app" text DEFAULT 'SITE' NOT NULL;

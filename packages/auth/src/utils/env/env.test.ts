@@ -3,7 +3,6 @@ export {};
 const ENV_KEYS = [
   'AUTH_SECRET',
   'MAGIC_LINK_FROM_ADDRESS',
-  'AUTH_COOKIE_DOMAIN',
   'SKIP_ENV_VALIDATION',
 ] as const;
 
@@ -47,18 +46,15 @@ describe('env', () => {
       const { env } = await importEnv();
 
       expect(env.MAGIC_LINK_FROM_ADDRESS).toBeUndefined();
-      expect(env.AUTH_COOKIE_DOMAIN).toBeUndefined();
     });
 
     it('exposes configured credentials by their exact env var names', async () => {
       process.env['MAGIC_LINK_FROM_ADDRESS'] = 'Sign in <sign-in@example.com>';
-      process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
 
       const { env } = await importEnv();
 
       expect(env.AUTH_SECRET).toBe('test-secret');
       expect(env.MAGIC_LINK_FROM_ADDRESS).toBe('Sign in <sign-in@example.com>');
-      expect(env.AUTH_COOKIE_DOMAIN).toBe('.example.com');
     });
   });
 
