@@ -29,12 +29,15 @@ vi.mock(
 );
 vi.mock(
   '@worker/utils/db-provisioning-steps/db-provisioning-steps',
-  async (importOriginal) => ({
-    ...(await importOriginal<
-      typeof import('@worker/utils/db-provisioning-steps/db-provisioning-steps')
-    >()),
-    seedTenantContent: vi.fn(),
-  }),
+  async (importOriginal) =>
+    (
+      await import('@worker/testing/db-provisioning-steps/fake-db-provisioning-steps')
+    ).withFakeProvisioningSteps(
+      await importOriginal<
+        typeof import('@worker/utils/db-provisioning-steps/db-provisioning-steps')
+      >(),
+      ['seedTenantContent'],
+    ),
 );
 vi.mock('workflow', async (importOriginal) => ({
   ...(await importOriginal<typeof import('workflow')>()),
