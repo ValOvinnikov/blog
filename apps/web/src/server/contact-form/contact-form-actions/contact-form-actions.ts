@@ -11,7 +11,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import type { TFieldErrorReason } from '@web/constants/field-error';
 import { sendContactNotification } from '@web/server/contact-form/contact-notification-send/contact-notification-send';
 import { createPublicWriteGuard } from '@web/server/rate-limit/public-write-guard/public-write-guard';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { isCapabilityEnabledForTenant } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
@@ -59,7 +59,8 @@ const toSourcePath = (sourcePath: string): string =>
     : '/';
 
 const isContactFormOpen = async (tenant: TTenant): Promise<boolean> =>
-  isTenantActive(tenant) && isCapabilityEnabled(CAPABILITY.CONTACT_FORM);
+  isTenantActive(tenant) &&
+  isCapabilityEnabledForTenant(tenant.id, CAPABILITY.CONTACT_FORM);
 
 const storeLead = async (
   input: queries.leads.TCreateLeadInput,

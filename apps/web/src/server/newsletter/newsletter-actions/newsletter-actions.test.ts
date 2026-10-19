@@ -7,10 +7,10 @@ import {
   resolveTenantEmailBrand,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getLocale } from 'next-intl/server';
 import type { MockInstance } from 'vitest';
@@ -27,6 +27,8 @@ const {
   claimConfirmationSendMock,
   releaseConfirmationSendMock,
   isSubscribeAttemptRefusedMock,
+  getTenantPlanMock,
+  getEffectiveSettingsFeaturesMock,
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
@@ -38,9 +40,14 @@ const {
   claimConfirmationSendMock: vi.fn(),
   releaseConfirmationSendMock: vi.fn(),
   isSubscribeAttemptRefusedMock: vi.fn(),
+  getTenantPlanMock: vi.fn(),
+  getEffectiveSettingsFeaturesMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await vi.importActual<typeof import('@blog/db/constants')>(
+    '@blog/db/constants',
+  )),
   queries: {
     subscribers: {
       createPendingSubscriber: createPendingSubscriberMock,
@@ -85,10 +92,13 @@ vi.mock(
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
 vi.mock(
-  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
-  () => ({
-    isCapabilityEnabled: vi.fn(),
-  }),
+  '@web/server/settings-features/get-tenant-plan/get-tenant-plan',
+  () => ({ getTenantPlan: getTenantPlanMock }),
+);
+
+vi.mock(
+  '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features',
+  () => ({ getEffectiveSettingsFeatures: getEffectiveSettingsFeaturesMock }),
 );
 
 vi.mock('@web/server/newsletter/subscribe-guard/subscribe-guard', () => ({
@@ -112,7 +122,6 @@ vi.mock('@web/utils/env/env', () => ({
 }));
 
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
-const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
 
 const subscriber = {
   id: faker.string.uuid(),
@@ -151,8 +160,13 @@ describe('subscribeToNewsletterAction', () => {
     markNewsletterSubscribedMock.mockReset();
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue(SITE_URL);
-    isCapabilityEnabledMock.mockReset();
-    isCapabilityEnabledMock.mockResolvedValue(true);
+    getTenantPlanMock.mockReset();
+    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.GROWTH });
+    getEffectiveSettingsFeaturesMock.mockReset();
+    getEffectiveSettingsFeaturesMock.mockResolvedValue({
+      ok: true,
+      data: { [CAPABILITY.NEWSLETTER]: true },
+    });
     resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
@@ -205,6 +219,14 @@ describe('subscribeToNewsletterAction', () => {
       }),
     );
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("gates on the resolved tenant's capability without a request context", async () => {
+    const result = await subscribeToNewsletterAction(EMAIL);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(getTenantPlanMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getEffectiveSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID);
   });
 
   it('sends confirm and unsubscribe links carrying the language the reader subscribed in', async () => {
@@ -380,13 +402,23 @@ describe('subscribeToNewsletterAction', () => {
     });
 
     it('returns UNAVAILABLE without storing or emailing when the capability is off', async () => {
-      isCapabilityEnabledMock.mockResolvedValue(false);
+      getEffectiveSettingsFeaturesMock.mockResolvedValue({
+        ok: true,
+        data: { [CAPABILITY.NEWSLETTER]: false },
+      });
       const result = await subscribeToNewsletterAction(EMAIL);
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
-      expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
-        CAPABILITY.NEWSLETTER,
-      );
+      expect(createPendingSubscriberMock).not.toHaveBeenCalled();
+      expect(sendEmailMock).not.toHaveBeenCalled();
+      expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
+    });
+
+    it('returns UNAVAILABLE without storing when the plan does not entitle the newsletter', async () => {
+      getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.FREE });
+      const result = await subscribeToNewsletterAction(EMAIL);
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
       expect(createPendingSubscriberMock).not.toHaveBeenCalled();
       expect(sendEmailMock).not.toHaveBeenCalled();
       expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();

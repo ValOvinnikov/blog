@@ -15,7 +15,7 @@ import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { sendNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { isSubscribeAttemptRefused } from '@web/server/newsletter/subscribe-guard/subscribe-guard';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { isCapabilityEnabledForTenant } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
@@ -52,7 +52,7 @@ export const subscribeToNewsletterAction = async (
   }
   const { tenantId } = tenant;
 
-  if (!(await isCapabilityEnabled(CAPABILITY.NEWSLETTER))) {
+  if (!(await isCapabilityEnabledForTenant(tenantId, CAPABILITY.NEWSLETTER))) {
     logger.warn('newsletter.subscribe_capability_disabled');
     return UNAVAILABLE;
   }
