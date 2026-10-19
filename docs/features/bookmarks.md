@@ -24,7 +24,7 @@ A signed-in reader saves a post for later with a toggle in the post header and f
 
 ## Surfaces and routes
 
-- **Post page** — `BookmarkButtonGate` in the article header renders `BookmarkButton` when the `BOOKMARKS` capability is on. The button renders nothing for a signed-out reader and stays disabled until the session and the post's saved state have loaded.
+- **Post page** — `BookmarkButtonGate` in the article header renders `BookmarkButton` when the `BOOKMARKS` capability is on. The button renders nothing for a signed-out reader, and for a signed-in one appears only once the session and the post's saved state have loaded, already in its final state.
 - `/[locale]/bookmarks` — `force-dynamic`. 404 when the site has no reader account; a signed-out visitor is redirected home. Lists title, date and link per post, with an empty state when there are none.
 - **Header avatar menu** — "My bookmarks" links here (see [reader-auth](./reader-auth.md)).
 - No platform or Studio surface.
