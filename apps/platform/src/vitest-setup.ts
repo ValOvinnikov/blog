@@ -62,6 +62,10 @@ vi.mock('next/navigation', async () => {
   };
 });
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn(async () => new Headers()),
+}));
+
 // Unsaved settings drafts persist in localStorage, so one test's draft would
 // otherwise be offered for restore in the next.
 beforeEach(() => {

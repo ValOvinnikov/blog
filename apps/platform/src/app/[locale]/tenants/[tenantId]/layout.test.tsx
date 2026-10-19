@@ -47,7 +47,7 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
+    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
   });
 
   it('404s when the signed-in user has no admins row', async () => {

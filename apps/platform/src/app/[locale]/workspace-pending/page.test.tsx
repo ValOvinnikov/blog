@@ -21,7 +21,7 @@ describe(`<${WorkspacePendingPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
+    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
   });
 
   it('renders the heading and description for a signed-in user', async () => {

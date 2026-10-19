@@ -63,7 +63,7 @@ describe(`<${DashboardVoicePage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
+    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
