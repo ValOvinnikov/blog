@@ -7,6 +7,7 @@
     "voice": "Voz · Administración",
     "selectTenant": "Elija un espacio de trabajo · Administración",
     "workspacePending": "Espacio de trabajo no listo · Administración",
+    "signInError": "Problema al iniciar sesión",
     "addTenant": "Añadir cliente · Administración",
     "tenantOverview": "Resumen del cliente · Administración",
     "tenantProvisioning": "Aprovisionamiento · Administración",
@@ -24,6 +25,14 @@
     "heading": "Su espacio de trabajo aún no está listo",
     "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó.",
     "tryAgain": "Volver a intentarlo"
+  },
+  "signInErrorPage": {
+    "linkSpentHeading": "Este enlace de inicio de sesión ya no funciona",
+    "linkSpentDescription": "Cada enlace de inicio de sesión funciona una sola vez y caduca pasado un tiempo. Este ya se ha usado o ha caducado. Pide uno nuevo para iniciar sesión.",
+    "requestNewLink": "Obtener un nuevo enlace de inicio de sesión",
+    "heading": "No hemos podido iniciar tu sesión",
+    "description": "Algo ha fallado al iniciar sesión. Vuelve al inicio de sesión e inténtalo de nuevo.",
+    "backToSignIn": "Volver al inicio de sesión"
   },
   "notFoundPage": {
     "heading": "Página no encontrada",

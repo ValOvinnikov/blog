@@ -7,6 +7,7 @@
     "voice": "Voix · Administration",
     "selectTenant": "Choisir un espace de travail · Administration",
     "workspacePending": "Espace de travail pas encore prêt · Administration",
+    "signInError": "Problème de connexion",
     "addTenant": "Ajouter un locataire · Administration",
     "tenantOverview": "Aperçu du locataire · Administration",
     "tenantProvisioning": "Provisionnement · Administration",
@@ -24,6 +25,14 @@
     "heading": "Votre espace de travail n'est pas encore prêt",
     "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste.",
     "tryAgain": "Réessayer"
+  },
+  "signInErrorPage": {
+    "linkSpentHeading": "Ce lien de connexion ne fonctionne plus",
+    "linkSpentDescription": "Chaque lien de connexion ne fonctionne qu'une fois et expire au bout d'un moment. Celui-ci a déjà été utilisé ou a expiré. Demandez-en un nouveau pour vous connecter.",
+    "requestNewLink": "Obtenir un nouveau lien de connexion",
+    "heading": "Nous n'avons pas pu vous connecter",
+    "description": "Un problème est survenu lors de la connexion. Revenez à la page de connexion et réessayez.",
+    "backToSignIn": "Retour à la connexion"
   },
   "notFoundPage": {
     "heading": "Page introuvable",

@@ -7,6 +7,7 @@
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
     "workspacePending": "Workspace not ready · Admin",
+    "signInError": "Sign-in problem",
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
     "tenantProvisioning": "Provisioning · Admin",
@@ -24,6 +25,14 @@
     "heading": "Your workspace isn't ready yet",
     "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening.",
     "tryAgain": "Try again"
+  },
+  "signInErrorPage": {
+    "linkSpentHeading": "This sign-in link no longer works",
+    "linkSpentDescription": "Each sign-in link works once and expires after a while. This one has already been used or has expired. Ask for a new one to sign in.",
+    "requestNewLink": "Get a new sign-in link",
+    "heading": "We couldn't sign you in",
+    "description": "Something went wrong while signing you in. Go back to sign-in and try again.",
+    "backToSignIn": "Back to sign-in"
   },
   "notFoundPage": {
     "heading": "Page not found",

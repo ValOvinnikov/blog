@@ -16,6 +16,7 @@ export const adminRoutes = {
   // Always explicit: without it Auth.js returns to its callback-url cookie, which sign-out leaves on this page.
   signIn: (callbackUrl = '/') =>
     `${SIGN_IN_PATH}?${new URLSearchParams({ callbackUrl })}`,
+  signInError: () => '/sign-in-error',
   workspacePending: () => '/workspace-pending',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',
