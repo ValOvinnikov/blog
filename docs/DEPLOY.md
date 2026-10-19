@@ -164,8 +164,8 @@ uncontrolled, until #445 replaced it with this file.
 _saving_ config is the one surface a pre-merge preview would genuinely help
 review) and deliberately left disabled: each preview gets its own
 `*.vercel.app` hostname, and signing in on one would mean registering that
-exact callback URL with both the GitHub and Google OAuth apps — neither
-supports wildcards — for every branch, and the admin accepts only sessions it issued itself. A preview you can't sign
+exact callback URL with Google and creating a whole new GitHub OAuth App
+(one callback each) — neither supports wildcards — for every branch, and the admin accepts only sessions it issued itself. A preview you can't sign
 in to can't be reviewed, so previews would cost a standing OAuth chore and a
 new grant of preview database access while delivering nothing. Admin changes
 are reviewed on `admin-dev.{your-hosting}`, which deploys automatically on
@@ -433,16 +433,23 @@ not fully functional until they are set:
 
 `apps/platform` hosts sign-in too — its URL can be shared as a link or typed
 directly, which is why it carries the full provider set rather than a
-session-reader subset. The **GitHub and Google OAuth applications therefore
-need the admin origin's callback URL added** alongside the existing web one:
+session-reader subset. The two providers register callbacks differently:
 
-- [ ] `https://admin.{your-hosting}/api/auth/callback/github`
-- [ ] `https://admin.{your-hosting}/api/auth/callback/google`
-- [ ] Same two for `https://admin-dev.{your-hosting}`.
+- **Google** — one OAuth client takes several redirect URIs, so add the admin
+  origin's callback to the client the web projects already use:
+  - [ ] `https://admin.{your-hosting}/api/auth/callback/google`
+  - [ ] `https://admin-dev.{your-hosting}/api/auth/callback/google`
+- **GitHub** — an OAuth App takes exactly **one** callback URL and rejects any
+  other host, so each origin needs its own OAuth App. Create one per admin
+  origin and set its `AUTH_GITHUB_ID` / `_SECRET` on that platform project
+  only, leaving the web projects' values untouched:
+  - [ ] `platform-prod` — callback `https://admin.{your-hosting}/api/auth/callback/github`
+  - [ ] `platform-dev` — callback `https://admin-dev.{your-hosting}/api/auth/callback/github`
 
 Without these, OAuth from admin fails at the provider with a redirect-URI
 mismatch — before it ever reaches our code, so nothing in this repo can
-detect or report it.
+detect or report it. On GitHub it reads "The redirect_uri is not associated
+with this application."
 
 ### 4. GitHub Actions — environment-scoped variables & secrets
 
