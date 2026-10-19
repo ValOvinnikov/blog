@@ -12,7 +12,7 @@ name: Board Auto-Sync
 #
 # Gated to the repo owner and claude[bot], same posture as claude.yml: a PR
 # body's "Closes #n" is otherwise attacker-controllable input, and without
-# this gate any contributor opening any PR against this public repo could
+# this gate any contributor opening any PR against this repo could
 # move an arbitrary issue to Code Review on the board. claude[bot] is safe to
 # admit because claude.yml only runs it for the owner, on owner-authored
 # issues; without it the @claude runner's own branches never move the board.
@@ -42,7 +42,7 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           if [ -z "$GH_PAT" ]; then
-            echo "::error::GH_PAT secret is not set — this workflow needs a classic PAT scoped public_repo + project (the default GITHUB_TOKEN cannot write Projects v2). See docs/context/ci-automation.md."
+            echo "::error::GH_PAT secret is not set — this workflow needs a classic PAT scoped repo + project (the default GITHUB_TOKEN cannot write Projects v2). See docs/context/ci-automation.md."
             exit 1
           fi
 
@@ -81,7 +81,7 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           if [ -z "$GH_PAT" ]; then
-            echo "::error::GH_PAT secret is not set — this workflow needs a classic PAT scoped public_repo + project (the default GITHUB_TOKEN cannot write Projects v2). See docs/context/ci-automation.md."
+            echo "::error::GH_PAT secret is not set — this workflow needs a classic PAT scoped repo + project (the default GITHUB_TOKEN cannot write Projects v2). See docs/context/ci-automation.md."
             exit 1
           fi
 

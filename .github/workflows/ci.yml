@@ -353,9 +353,8 @@ jobs:
     # Scoping the job to the environment is what lets it see which names that
     # environment provides without any token: the `secrets`/`vars` contexts
     # resolve to that environment's own entries merged over the repo-level
-    # ones. Listing environment secrets through the API would instead need
-    # repo-admin scope, which neither the default GITHUB_TOKEN nor the
-    # `public_repo + project` GH_PAT has.
+    # ones. Listing environment secrets through the API would instead need a
+    # repo-admin token, which the default GITHUB_TOKEN never is.
     environment: ${{ matrix.environment }}
     strategy:
       fail-fast: false

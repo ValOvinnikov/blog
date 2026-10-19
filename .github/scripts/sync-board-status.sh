@@ -3,8 +3,8 @@
 # Moves one issue's Blog Build board item to a target Status, forward-only.
 # Usage: sync-board-status.sh <issue-number> <"In Progress"|"Code Review">
 #
-# Requires GH_TOKEN in the environment, a classic PAT scoped public_repo +
-# project (the default GITHUB_TOKEN cannot write Projects v2).
+# Requires GH_TOKEN in the environment, a classic PAT scoped repo + project
+# (the default GITHUB_TOKEN cannot write Projects v2).
 #
 # SC2016 is disabled file-wide: the single-quoted GraphQL query strings below
 # use GraphQL's own $variable syntax deliberately — double-quoting would let
