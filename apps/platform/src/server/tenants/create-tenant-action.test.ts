@@ -4,6 +4,7 @@ import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -106,6 +107,7 @@ describe('createTenantAction', () => {
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
     loggerWarnMock.mockReset();
+    Object.assign(env, { TENANT_ROOT_DOMAIN: undefined });
     ({ createTenantAction } = await import('./create-tenant-action'));
   });
 
@@ -263,6 +265,47 @@ describe('createTenantAction', () => {
       fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN } },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['admin.example.com', TENANT_FIELD_ERROR.SLUG_RESERVED],
+    ['www.example.com', TENANT_FIELD_ERROR.SLUG_RESERVED],
+  ])(
+    'rejects %s under the tenant root domain with its slug reason',
+    async (domain, reason) => {
+      Object.assign(env, { TENANT_ROOT_DOMAIN: 'example.com' });
+
+      const result = await createTenantAction({ ...validInput, domain });
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: { domain: { reason } },
+      });
+      expect(createTenantDraftMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a slug another tenant holds under the tenant root domain', async () => {
+    Object.assign(env, { TENANT_ROOT_DOMAIN: 'example.com' });
+    getTenantByDomainMock.mockResolvedValue({ id: 'existing-tenant' });
+
+    const result = await createTenantAction(validInput);
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
+    });
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts a reserved-looking label on a custom domain', async () => {
+    Object.assign(env, { TENANT_ROOT_DOMAIN: 'example.com' });
+
+    await expect(
+      createTenantAction({ ...validInput, domain: 'admin.acme.com' }),
+    ).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(createTenantDraftMock).toHaveBeenCalled();
   });
 
   it('returns a field error and blocks creation when another project uses the domain', async () => {

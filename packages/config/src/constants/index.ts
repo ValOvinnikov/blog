@@ -33,6 +33,7 @@ export * from './price-period';
 export * from './redirect';
 export * from './release';
 export * from './reserved-slug';
+export * from './reserved-subdomain';
 export * from './size';
 export * from './taxonomy';
 export * from './tenant-write-refusal';

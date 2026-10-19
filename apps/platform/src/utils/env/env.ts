@@ -1,3 +1,4 @@
+import { DOMAIN_PATTERN } from '@blog/config';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
@@ -29,6 +30,13 @@ export const env = createEnv({
     // @env-optional
     TENANT_PROVISIONING_DATASET: z
       .enum(['development', 'production'])
+      .optional(),
+    // @env-optional
+    TENANT_ROOT_DOMAIN: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .regex(DOMAIN_PATTERN)
       .optional(),
     // @env-optional
     VERCEL_API_TOKEN: z.string().min(1).optional(),
@@ -64,6 +72,7 @@ export const env = createEnv({
     TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE:
       process.env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE,
     TENANT_PROVISIONING_DATASET: process.env.TENANT_PROVISIONING_DATASET,
+    TENANT_ROOT_DOMAIN: process.env.TENANT_ROOT_DOMAIN,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
