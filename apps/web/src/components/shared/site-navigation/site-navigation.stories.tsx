@@ -5,9 +5,10 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { AuthMenu } from '@web/components/shared/auth-menu';
+import { AccountRow, AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
+import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import type { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { userEvent, within } from 'storybook/test';
@@ -91,6 +92,7 @@ const headerControls = {
       <ThemeToggleButton />
     </>
   ),
+  drawerActions: <AccountRow />,
   actions: <AuthMenu oauthProviderIds={['github']} />,
 };
 
@@ -99,7 +101,9 @@ const withSession = (
 ): NonNullable<TStory['decorators']> => [
   (Story) => (
     <SessionProvider session={session}>
-      <Story />
+      <HeaderOverlayProvider>
+        <Story />
+      </HeaderOverlayProvider>
     </SessionProvider>
   ),
 ];
@@ -165,6 +169,24 @@ export const MobilePanelCompactCodes: TStory = {
     const canvas = within(canvasElement);
     await userEvent.click(
       canvas.getByRole('button', { name: /Toggle navigation menu/ }),
+    );
+  },
+};
+
+export const MobileSignInSheetOpen: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedOutSession,
+  args: headerControls,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
+    );
+    const drawerActions = await canvas.findByTestId(
+      'primary-navigation-drawer-actions',
+    );
+    await userEvent.click(
+      within(drawerActions).getByRole('button', { name: 'Sign in' }),
     );
   },
 };

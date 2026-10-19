@@ -14,6 +14,7 @@ type TSiteNavigationProps = {
   links: ILink[];
   actions?: ReactNode;
   panelActions?: ReactNode;
+  drawerActions?: ReactNode;
 };
 
 const isNavItemActive = (pathname: string, href: string): boolean => {
@@ -28,6 +29,7 @@ export const SiteNavigation = ({
   links,
   actions,
   panelActions,
+  drawerActions,
 }: TSiteNavigationProps) => {
   const t = useTranslations('siteNavigation');
   const pathname = usePublicPathname();
@@ -52,6 +54,7 @@ export const SiteNavigation = ({
         links={items}
         actions={actions}
         panelActions={panelActions}
+        drawerActions={drawerActions}
         linkAs={SmartLink}
         mobileToggle={{
           isOpen: open,

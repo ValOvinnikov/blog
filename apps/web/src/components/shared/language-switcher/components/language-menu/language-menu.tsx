@@ -28,7 +28,9 @@ export const LanguageMenu = ({
 }: TLanguageMenuProps) => {
   const t = useTranslations('languageSwitcher');
   const panelId = useId();
-  const { open, toggle, close, triggerRef, panelRef } = usePopover();
+  const { open, toggle, close, triggerRef, panelRef } = usePopover({
+    overlayId: isInFooter ? undefined : panelId,
+  });
   const current = entries.find((entry) => entry.isCurrent) ?? entries[0];
   const hasGlobe = menuStyle === LANGUAGE_SWITCHER_STYLE.MENU_GLOBE;
   const isHeaderPill = !isInFooter && !hasGlobe;

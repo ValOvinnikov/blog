@@ -1,16 +1,27 @@
 import { HEADER_CONTROL } from '@blog/ui/lib/styling';
 import { tv } from 'tailwind-variants';
 
+export const SHEET_BELOW_LG = [
+  'max-lg:fixed max-lg:inset-x-gutter max-lg:mt-0 max-lg:w-auto max-lg:max-w-none',
+  'max-lg:top-[calc(var(--site-header-height,4.5rem)+0.5rem)]',
+  'max-lg:max-h-[calc(100dvh-var(--site-header-height,4.5rem)-1rem)] max-lg:overflow-y-auto',
+].join(' ');
+
 export const authMenuVariants = tv({
   slots: {
     // A max-width alone is not enough: an absolute panel shrink-fits and wraps its items.
-    panel: ['w-80 max-w-[calc(100vw-2rem)]'],
-    signInTrigger: ['group gap-1.5 pl-3 pr-4'],
-    signInGlyph: [
-      'text-muted group-hover:text-current group-aria-expanded:text-current',
+    panel: ['w-80 max-w-[calc(100vw-2rem)]', SHEET_BELOW_LG],
+    signInTrigger: [
+      'group gap-1.5 size-11 px-0',
+      'lg:size-auto lg:pl-3 lg:pr-4',
     ],
+    signInGlyph: [
+      'lg:size-4 lg:text-muted',
+      'lg:group-hover:text-current lg:group-aria-expanded:text-current',
+    ],
+    signInText: ['hidden lg:inline'],
     loading: ['inline-flex shrink-0'],
-    loadingPlaceholder: ['invisible'],
+    loadingPlaceholder: ['lg:invisible [&>*]:invisible'],
     loadingStatus: ['sr-only'],
     avatarFrame: [
       HEADER_CONTROL,

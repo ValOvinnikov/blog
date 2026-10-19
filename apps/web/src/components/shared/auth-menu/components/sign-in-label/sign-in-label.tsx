@@ -5,12 +5,12 @@ import { useTranslations } from 'next-intl';
 
 export const SignInLabel = () => {
   const t = useTranslations('authMenu');
-  const { signInGlyph } = authMenuVariants();
+  const { signInGlyph, signInText } = authMenuVariants();
 
   return (
     <>
-      <Icon name={ICONS.USER} size={SIZE.SM} className={signInGlyph()} />
-      {t('signIn')}
+      <Icon name={ICONS.USER} size={SIZE.MD} className={signInGlyph()} />
+      <span className={signInText()}>{t('signIn')}</span>
     </>
   );
 };

@@ -1,19 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import type { TMaybeNull } from '@blog/config';
+import { useOverlayOpenState } from '@web/hooks/use-overlay-open-state';
+import { useCallback, useEffect } from 'react';
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const getFocusables = (panel: HTMLElement | null) =>
+const getFocusables = (panel: TMaybeNull<HTMLElement>) =>
   Array.from(panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
 
 export type TDismissibleMenuAccessors = {
-  getTrigger: () => HTMLElement | null;
-  getPanel: () => HTMLElement | null;
-  getContainer?: () => HTMLElement | null;
+  getTrigger: () => TMaybeNull<HTMLElement>;
+  getPanel: () => TMaybeNull<HTMLElement>;
+  getContainer?: () => TMaybeNull<HTMLElement>;
   trapFocus?: boolean;
   closeOnFocusOut?: boolean;
+  overlayId?: string;
 };
 
 export const useDismissibleMenu = ({
@@ -22,13 +25,14 @@ export const useDismissibleMenu = ({
   getContainer,
   trapFocus = true,
   closeOnFocusOut = false,
+  overlayId,
 }: TDismissibleMenuAccessors) => {
-  const [open, setOpenState] = useState(false);
+  const [open, setOpenState] = useOverlayOpenState(overlayId);
 
   const close = useCallback(() => {
     setOpenState(false);
     getTrigger()?.focus();
-  }, [getTrigger]);
+  }, [getTrigger, setOpenState]);
 
   const toggle = () => {
     if (open) {
@@ -134,7 +138,7 @@ export const useDismissibleMenu = ({
     if (!panel) return;
 
     const handleFocusOut = (event: FocusEvent) => {
-      const next = event.relatedTarget as Node | null;
+      const next = event.relatedTarget as TMaybeNull<Node>;
 
       if (
         next === null ||
@@ -152,7 +156,7 @@ export const useDismissibleMenu = ({
     return () => {
       panel.removeEventListener('focusout', handleFocusOut);
     };
-  }, [open, closeOnFocusOut, getPanel, getTrigger]);
+  }, [open, closeOnFocusOut, getPanel, getTrigger, setOpenState]);
 
   return { open, toggle, close };
 };
