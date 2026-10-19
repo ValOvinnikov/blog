@@ -5,22 +5,25 @@ marketing page. Status lives on the project board and in each epic's sub-issue
 list; this page holds only the order, the decisions still open, and why. Written
 2026-10-14 from a platform inspection (WCAG, typography, skins, module
 flexibility, file structure, docs, tiers, board, release readiness and every
-module × brand variant × preset × mode combination).
+module × brand variant × preset × mode combination); refreshed 2026-10-18.
 
 ## Where things stand
 
 - **No production environment for today's product.** `web-prod` still runs
   v0.3.0 (2026-08-12), `platform-prod` has no env vars, and production deploys
   are paused. Standing it up is console work for the owner, not a ticket.
-- **Provisioning has been red since 2026-09-14.** The last four runs failed at
-  the content check (#4945, #4947).
-- **Contrast fails widely.** Across 21 modules × 3 brand variants × 2 presets ×
-  light/dark, 15 of 126 Console cells pass; the SECONDARY band fails in light
-  mode in every module. Causes and fixes: epic #4987.
-- **Nothing protects the email-sending forms.** Newsletter sign-up and
-  magic-link sign-in have no bot or rate limits, on a shared 100-a-day Resend
-  quota.
-- **No legal pages, footer links or backups.**
+- **Release 1's code is in, apart from the decision-gated chains.**
+  Provisioning is green and the platform tenant is on dev (#4945–#4948); the
+  contact form and Leads list shipped (#1292); the shared Redis rate limiter,
+  BotID and newsletter limits protect the email forms (#5091–#5093);
+  logging ships to Grafana Loki with alerts (#1645); the Release-1
+  accessibility fixes merged.
+- **Production deploy testing is deferred** (owner, 2026-10-18), so
+  `release.yml` (#5281) and the commit-pinned Release button (#5502) wait.
+- **Contrast still fails widely outside the Release-1 fixes.** The rest is
+  epic #4987.
+- **No legal pages, footer links or backups** — each chain waits on an owner
+  decision below. Magic-link sign-in limits (#4958) are still open.
 
 ## Release 1 — start promoting
 
@@ -29,28 +32,21 @@ its own tenants row, Sanity project and Look, on the apex and `www` through
 `tenant_domains`. It needs no new app and no platform code on tenant requests.
 Signup itself is Release 2.
 
-Launch epic: **#5085**. It carries, or depends on:
+Launch epic: **#5085**. Done: provisioning (#4945–#4948), lead capture (#1292), abuse protection
+(#5091–#5093), observability (#1645), module QA (#5098–#5100, #4858) and
+forced colours (#5129). Left:
 
-1. **Production stand-up** (owner, console): Vercel projects, env, domains, the
+1. **Production stand-up** (owner, console), deferred: Vercel projects, env, domains, the
    old prod project retired or adopted, crons re-enabled, and the
    Upstash Redis integration from the Vercel Marketplace (rate-limit counts).
-2. **Provisioning green on dev**: #4945, then #4947.
-3. **The platform tenant on dev, its pages authored**: #4948.
-4. **Lead capture**: the contact form chain #3667–#3674 under #1292. #3674 now
-   reuses the launch epic's shared rate limiter and BotID setup. A CTA to an
-   external form is the stopgap if the chain lags.
-5. **Abuse protection**: one rate limiter, its counts in Redis so limits hold
-   across instances, and BotID for server actions (#5091, #5092), then newsletter limits (#5093). Magic-link limits are
-   #4958.
-6. **Legal**: footer links and a privacy link (#5086, #5087, #3726), the
+   Production error shipping and uptime checks (#5349) go live with it.
+2. **Legal**: footer links and a privacy link (#5086, #5087, #3726), the
    consent banner's policy link (#5088, #5089), final legal pages (#5090).
-7. **Backups and restore**: #5094–#5096. **Observability**: #1645 (log drain
-   and alerts).
-8. **Module QA**: pricing grid #5098, Team carousel #5099/#5100, Lighthouse on
-   the marketing pages #5097, #4858 card hover on Brand primary bands.
-9. **Accessibility, Release-1 subset of #4987**: brand text on bands, primary
-   button hues, `text-subtle`, banners and scrims, card focus, forced colours
-   (#5129).
+   Waits on the legal-pages and drafting decisions.
+3. **Backups and restore**: #5094–#5096. Waits on the backup-storage decision.
+4. **Lighthouse on the marketing pages**: #5097, after the apex cutover.
+5. **Magic-link limits**: #4958.
+6. **Manual tests** still open on the board.
 
 **Modules the marketing pages need.**
 
@@ -61,6 +57,15 @@ Launch epic: **#5085**. It carries, or depends on:
 | Later  | stats, team, timeline, location, newsletter (unusable until sending exists, #4083)                                    |
 
 Every module needs the accessibility fixes above, whatever its column.
+
+## Alongside the releases
+
+| Epic      | What it delivers                                                                                                                                                             |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **#5251** | CI: one required `CI` aggregator and `Workflow security`, path-gated jobs, a reusable full gate. Left: private-repo workflows (#5270), then taking the repo private (#5269). |
+| **#5271** | Releases from the platform: Releases page, contrast run and Findings are on dev. Left: `release.yml` (#5281) and the commit-pinned Release button (#5502), deferred.         |
+| **#5459** | Header controls: one round family, then a per-site header control style on the Look page. Steps 1–4 merged; phones (#5464) in progress, then stored style #5465–#5467.       |
+| **#5385** | One vocabulary for form status and server-action results. Left: Voice validation reason codes (#5508).                                                                       |
 
 ## Release 2 — start selling
 
@@ -100,8 +105,6 @@ module presets (#2803).
 
 ## Open decisions
 
-- **Lead capture for Release 1**: wait for the #1292 chain, or ship the
-  external-form stopgap.
 - **Old production project** (`web-prod` v0.3.0, Sanity `7fuqzuyl`): retire it,
   or adopt it as tenant one. This blocks the apex cutover.
 - **Admin host name**: `platform.<domain>` (#4840) or `admin.<domain>`
@@ -133,5 +136,5 @@ module presets (#2803).
 
 - **A platform visual audit**: a styling and refactor sweep of
   `apps/platform`, owed after the Voice, Email and Look work.
-- **Work #5107 first**: CLAUDE.md requires `TMaybeNull` and `TNullable`, and
-  they do not exist in `@blog/config` until #5107 adds them.
+- **Production deploy testing** (owner, 2026-10-18): #5281, #5502 and #5264
+  wait until it starts.
