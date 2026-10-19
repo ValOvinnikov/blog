@@ -1,11 +1,16 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import { AUTH_APP } from '@blog/config/constants';
 import { schema } from '@blog/db';
 import type { NextAuthConfig } from 'next-auth';
 
 import { buildAuthConfig } from './config';
 
+const { drizzleAdapterStub } = vi.hoisted(() => ({
+  drizzleAdapterStub: {},
+}));
+
 vi.mock('@auth/drizzle-adapter', () => ({
-  DrizzleAdapter: vi.fn(() => ({})),
+  DrizzleAdapter: vi.fn(() => drizzleAdapterStub),
 }));
 
 const { consumePendingInvitesOnSignInMock } = vi.hoisted(() => ({
@@ -32,6 +37,7 @@ describe(buildAuthConfig, () => {
   afterEach(() => {
     delete process.env['AUTH_SECRET'];
     delete process.env['AUTH_COOKIE_DOMAIN'];
+    vi.unstubAllEnvs();
     delete process.env['AUTH_GITHUB_ID'];
     delete process.env['AUTH_GITHUB_SECRET'];
     delete process.env['AUTH_GOOGLE_ID'];
@@ -62,6 +68,10 @@ describe(buildAuthConfig, () => {
       expect(config.cookies).toBeUndefined();
     });
 
+    it('uses the Drizzle adapter as it is', () => {
+      expect(config.adapter).toBe(drizzleAdapterStub);
+    });
+
     it('always includes the magic-link email provider', () => {
       expect(providerIdsOf(config)).toEqual(expect.arrayContaining(['email']));
     });
@@ -90,22 +100,13 @@ describe(buildAuthConfig, () => {
       process.env['AUTH_SECRET'] = 'test-secret';
     });
 
-    it('scopes the session cookie to AUTH_COOKIE_DOMAIN when it is set', async () => {
+    it('ignores AUTH_COOKIE_DOMAIN', async () => {
       process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
       const config = freshBuildAuthConfig();
 
-      expect(config.cookies?.sessionToken).toEqual({
-        name: '__Secure-authjs.session-token',
-        options: {
-          httpOnly: true,
-          sameSite: 'lax',
-          path: '/',
-          secure: true,
-          domain: '.example.com',
-        },
-      });
+      expect(config.cookies).toBeUndefined();
     });
 
     it('reads the secret from AUTH_SECRET', async () => {
@@ -141,6 +142,57 @@ describe(buildAuthConfig, () => {
 
         expect(providerIdsOf(config)).not.toContain('github');
       });
+    });
+  });
+
+  describe('for the platform', () => {
+    it('scopes its sessions to the platform', () => {
+      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+
+      expect(config.adapter).not.toBe(drizzleAdapterStub);
+    });
+
+    it('names every cookie apart from the default Auth.js cookies', () => {
+      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+
+      expect(config.cookies?.sessionToken?.name).not.toBe(
+        'authjs.session-token',
+      );
+      expect(Object.keys(config.cookies ?? {})).toEqual(
+        expect.arrayContaining([
+          'sessionToken',
+          'callbackUrl',
+          'csrfToken',
+          'pkceCodeVerifier',
+          'state',
+          'nonce',
+        ]),
+      );
+    });
+
+    it('keeps the secure cookie prefixes in production', () => {
+      vi.stubEnv('NODE_ENV', 'production');
+
+      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+
+      expect(config.useSecureCookies).toBe(true);
+      expect(config.cookies?.sessionToken?.name).toMatch(/^__Secure-/);
+      expect(config.cookies?.csrfToken?.name).toMatch(/^__Host-/);
+    });
+
+    it('drops the secure cookie prefixes outside production', () => {
+      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+
+      expect(config.useSecureCookies).toBe(false);
+      expect(config.cookies?.sessionToken?.name).not.toMatch(/^__/);
+    });
+  });
+
+  describe('for a site', () => {
+    it('keeps the default Auth.js cookies', () => {
+      const config = buildAuthConfig(AUTH_APP.SITE);
+
+      expect(config.cookies).toBeUndefined();
     });
   });
 });

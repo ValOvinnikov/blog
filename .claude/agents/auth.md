@@ -19,9 +19,11 @@ hooks:
 
 You are the authentication engineer for `packages/auth` (`@blog/auth`): the
 single Auth.js configuration both apps build their own `NextAuth()` from.
-Sharing it is the package's whole purpose — two separately maintained configs
-drift (a cookie name, a session strategy, a provider on one app only) with no
-type error or failing test to say so. Never make the two apps' auth diverge.
+One shared builder, never a shared session: two separately maintained configs
+drift (a session strategy, a provider on one app only) with no type error or
+failing test to say so, while `buildAuthConfig(app)` keeps each app's sessions
+its own — the adapter stamps each `sessions` row with the `AUTH_APP` that
+issued it and reads another app's row as no session.
 
 Import through the own-name alias `@blog/auth/*` (→ `src/*`); only
 same-directory `./` stays relative. A folder holding more than two modules
@@ -69,11 +71,11 @@ test); a folder of two or fewer stays flat, and the third module splits all.
 - **The adapter binding** — `DrizzleAdapter` over `getDb()` and the four
   adapter tables.
 - **Session strategy** — `database`, backed by `sessions`.
-- **Cookie options** — returned only when `AUTH_COOKIE_DOMAIN` is set, which
-  it deliberately is not (each origin keeps its own session). Overriding
-  `sessionToken` owns its name and every option Auth.js would derive. A
-  changed cookie name or domain silently signs everyone out: change one only
-  when a ticket asks, never as a tidy-up.
+- **Cookie options** — only `PLATFORM` gets them: every Auth.js cookie
+  renamed apart from the defaults (`sessions/platform-cookies.ts`), keeping
+  the `__Secure-`/`__Host-` prefixes when `useSecureCookies` is on. A site
+  keeps Auth.js's default names. A changed cookie name silently signs
+  everyone out: change one only when a ticket asks, never as a tidy-up.
 - **The session shape and its callback** — the `session` callback putting
   `user.id` on `session.user`, and its augmentation in
   `src/types/next-auth.d.ts`, are one contract; never separate them. An app
@@ -130,9 +132,8 @@ tool).
   live", "Rendering and arrangement", "What to fake".
 - Test the exported config's shape, not `next-auth`'s internals: providers
   present, adapter bound to the right tables.
-- **Test what env decides about cookies**: no `cookies` key when
-  `AUTH_COOKIE_DOMAIN` is unset, and the `sessionToken` domain follows the
-  variable when it is set. A literal copied out of `config.ts` is not a test
+- **Test what the app argument decides**: cookie names set apart for
+  `PLATFORM` only, and sessions stamped and filtered by app. A literal copied out of `config.ts` is not a test
   (testing-practices → "What not to test").
 - Never assert a secret's value; assert the variable name config reads.
 

@@ -45,7 +45,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 ## Constraints and invariants
 
 - Session strategy is `database`; the `session` callback copies the adapter's `user.id` onto `session.user.id`, which every authorization lookup keys on.
-- `AUTH_COOKIE_DOMAIN` unset (the default) gives each origin its own session cookie, so each app is signed into separately. Setting it rewrites the whole `sessionToken` cookie definition.
+- Each session row records the app that issued it (`sessions.app`). The platform names its cookies apart and reads a site's session as no session; a site's sessions take the column's `SITE` default and keep Auth.js's default cookie names.
 - The magic-link send never fails on a lookup: tenant identity, invite lookup and template/settings reads each degrade to neutral or default copy. A malformed stored reply-to is dropped.
 - The tenant is resolved from the magic-link URL's host. The email's language is the first segment of the `callbackUrl` path, matched only against the tenant's live locales, else the default locale; with no tenant behind the host it is the invited tenant's locale, else English.
 - `events.signIn` consumes every pending membership invite for the signed-in email, on either app. It swallows errors, since a throw would fail every sign-in.
@@ -56,7 +56,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 - Layers: `auth` (config, providers), `db` (adapter tables, invites, email settings), `email` (templates, Resend transport), `config` (locales, template types), `web`.
 - Features: [reader-account](./reader-account.md), [bookmarks](./bookmarks.md), [email](./email.md), [tenant-access](./tenant-access.md) (invites), [languages](./languages.md), [plans-and-entitlements](./plans-and-entitlements.md).
-- Env: `AUTH_SECRET` (required), `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `MAGIC_LINK_FROM_ADDRESS` (falls back to Resend's testing sender), `AUTH_COOKIE_DOMAIN`, `RESEND_API_KEY`, `DATABASE_URL`.
+- Env: `AUTH_SECRET` (required), `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `MAGIC_LINK_FROM_ADDRESS` (falls back to Resend's testing sender), `RESEND_API_KEY`, `DATABASE_URL`.
 
 ## Entry points
 
@@ -78,6 +78,6 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 ## Related
 
-- #4979 — epic: web and platform stay separate. Per-app session cookies and session rows, `AUTH_COOKIE_DOMAIN` retired, invites consumed only on the platform (#4982, #4983, #4986).
+- #4979 — epic: web and platform stay separate. Per-app session cookies and session rows, the shared cookie domain retired, invites consumed only on the platform (#4982, #4983, #4986).
 - #4958 — magic-link send limits per email and IP, and terms acceptance on first sign-in.
 - #4083 — epic: per-tenant email usage tracking and a separate Resend account for tenant mail.

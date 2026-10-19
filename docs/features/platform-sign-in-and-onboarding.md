@@ -76,11 +76,11 @@ Decided:
   `/tenants`, members to `/dashboard`, no membership to `/onboarding`), and
   invited users with a membership never see the wizard.
 - Decided: the Sanity project is created at Create site, never at signup.
-- Today `@blog/auth` gives both apps the same cookie names, a session row does
-  not record which app issued it, and the invite-consuming sign-in event runs
-  in both apps. Decided: each app gets its own cookie names, sessions are
-  stamped with the issuing app, `AUTH_COOKIE_DOMAIN` is retired, and invite
-  side effects run only in the admin.
+- Today the admin builds Auth.js with `AUTH_APP.PLATFORM`: its cookies carry
+  their own names, each session it creates is stamped `PLATFORM` in
+  `sessions.app`, and a session stamped otherwise reads as signed out. The
+  invite-consuming sign-in event still runs in both apps. Decided: invite side
+  effects run only in the admin.
 
 ## Dependencies
 

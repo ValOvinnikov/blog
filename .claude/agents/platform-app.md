@@ -208,10 +208,12 @@ Tailwind in this app: `tabs`, `slider`, `switch`, `select`, `radio-group`,
 ## Auth and access
 
 Both sections sit behind an Auth.js session built from `@blog/auth`'s shared
-config, passed to this app's own `NextAuth()`. Never redefine providers, the
-adapter or the session strategy here — a config that diverges from `apps/web`'s
-breaks silently. This app hosts sign-in too, so a user may arrive here
-directly.
+builder, `buildAuthConfig(AUTH_APP.PLATFORM)`, passed to this app's own
+`NextAuth()`. One shared builder, never a shared session: this app's cookies
+carry their own names and a session `apps/web` issued reads as signed out, so
+an admin signs in here on their own. Never redefine providers, the adapter or
+the session strategy here — a config that diverges from `apps/web`'s breaks
+silently.
 
 The session authenticates; it does not authorize:
 

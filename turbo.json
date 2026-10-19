@@ -40,7 +40,6 @@
         "LOKI_TOKEN",
         "VERCEL_ENV",
         "MAGIC_LINK_FROM_ADDRESS",
-        "AUTH_COOKIE_DOMAIN",
         "TENANT_TOKEN_ENCRYPTION_KEY",
         "WEB_APP_URL",
         "VERCEL_API_TOKEN",

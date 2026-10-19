@@ -1,3 +1,4 @@
+import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
 import {
   integer,
   pgTable,
@@ -6,19 +7,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-// Auth.js (NextAuth v5) Drizzle adapter tables — the exact column shape
-// `@auth/drizzle-adapter`'s Postgres adapter (`PostgresDrizzleAdapter`)
-// requires at runtime (verified against its `src/lib/pg.ts` `defineTables`
-// default schema, package v1.11.3). `apps/web` wires the adapter itself,
-// passing this schema in (`DrizzleAdapter(db, { usersTable: schema.users,
-// accountsTable: schema.accounts, sessionsTable: schema.sessions,
-// verificationTokensTable: schema.verificationTokens })`) — column names are
-// load-bearing (the adapter reads them by these exact keys), so they are not
-// renamed/reshaped to this repo's usual conventions.
-//
-// `authenticator` (WebAuthn/passkey) is intentionally omitted — this repo
-// ships exactly three sign-in methods (GitHub, Google, email magic link),
-// none of which need it.
+// Column names are load-bearing: `@auth/drizzle-adapter` reads them by these exact keys.
 export const users = pgTable('users', {
   id: text('id')
     .primaryKey()
@@ -59,10 +48,9 @@ export const sessions = pgTable('sessions', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   expires: timestamp('expires', { mode: 'date' }).notNull(),
+  app: text('app').notNull().$type<TAuthApp>().default(AUTH_APP.SITE),
 });
 
-// Required by Auth.js's Email provider (the magic-link sign-in method, D13)
-// — it stores/verifies the one-time sign-in token here.
 export const verificationTokens = pgTable(
   'verification_tokens',
   {
