@@ -7,13 +7,13 @@ import {
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 
-import { themeTogglePlaceholderVariants } from './theme-toggle-variants';
+import { themeToggleVariants } from './theme-toggle-variants';
 
 export type TThemeToggleProps = IWithClassName &
   IWithDataTestId & {
     isDark: boolean;
     onToggle: () => void;
-    isMounted?: boolean;
+    isIconFromThemeClass?: boolean;
     lightLabel?: string;
     darkLabel?: string;
   };
@@ -24,11 +24,12 @@ export const ThemeToggle = ({
   dataTestId,
   isDark,
   onToggle,
-  isMounted = true,
+  isIconFromThemeClass = false,
   lightLabel = 'Switch to light theme',
   darkLabel = 'Switch to dark theme',
 }: TThemeToggleProps) => {
   const label = isDark ? lightLabel : darkLabel;
+  const { sun, moon } = themeToggleVariants({ isIconFromThemeClass });
 
   return (
     <IconButton
@@ -38,25 +39,20 @@ export const ThemeToggle = ({
       dataTestId={dataTestId}
       className={className}
     >
-      {isMounted ? (
-        isDark ? (
-          <Icon
-            name={ICONS.SUN}
-            size={SIZE.MD}
-            dataTestId="theme-toggle-icon"
-          />
-        ) : (
-          <Icon
-            name={ICONS.MOON}
-            size={SIZE.MD}
-            dataTestId="theme-toggle-icon"
-          />
-        )
-      ) : (
-        <span
-          className={themeTogglePlaceholderVariants()}
-          aria-hidden="true"
-          data-testid="theme-toggle-placeholder"
+      {(isIconFromThemeClass || isDark) && (
+        <Icon
+          name={ICONS.SUN}
+          size={SIZE.MD}
+          className={sun()}
+          dataTestId="theme-toggle-sun"
+        />
+      )}
+      {(isIconFromThemeClass || !isDark) && (
+        <Icon
+          name={ICONS.MOON}
+          size={SIZE.MD}
+          className={moon()}
+          dataTestId="theme-toggle-moon"
         />
       )}
     </IconButton>

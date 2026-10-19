@@ -1,5 +1,16 @@
 import { tv } from '@blog/ui/lib/styling';
 
-export const themeTogglePlaceholderVariants = tv({
-  base: ['block h-[18px] w-[18px]'],
+export const themeToggleVariants = tv({
+  slots: {
+    sun: '',
+    moon: '',
+  },
+  variants: {
+    isIconFromThemeClass: {
+      true: {
+        sun: 'hidden dark:block',
+        moon: 'dark:hidden',
+      },
+    },
+  },
 });

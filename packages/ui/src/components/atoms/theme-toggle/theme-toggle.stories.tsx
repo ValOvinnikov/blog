@@ -26,6 +26,6 @@ export const CustomLabels: TStory = {
   args: { isDark: false, darkLabel: 'Dark mode', lightLabel: 'Light mode' },
 };
 
-export const Unmounted: TStory = {
-  args: { isDark: false, isMounted: false },
+export const IconFromThemeClass: TStory = {
+  args: { isDark: false, isIconFromThemeClass: true },
 };
