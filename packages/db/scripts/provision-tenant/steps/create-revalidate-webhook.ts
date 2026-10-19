@@ -1,11 +1,11 @@
 import { setTenantWebhookCreatedAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-
-import type { TProvisionEnv } from '../lib/env';
 import {
   createSanityWebhook,
   listSanityWebhooks,
-} from '../lib/sanity-management-client';
+} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
+
+import type { TProvisionEnv } from '../lib/env';
 
 const WEBHOOK_NAME = 'web-revalidate (provisioned)';
 

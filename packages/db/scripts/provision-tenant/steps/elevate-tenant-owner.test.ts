@@ -13,10 +13,13 @@ const { listSanityProjectAclMock, grantSanityProjectRoleMock } = vi.hoisted(
   }),
 );
 
-vi.mock('../lib/sanity-management-client', () => ({
-  listSanityProjectAcl: listSanityProjectAclMock,
-  grantSanityProjectRole: grantSanityProjectRoleMock,
-}));
+vi.mock(
+  '@blog/db/utils/sanity-management-client/sanity-project-access',
+  () => ({
+    listSanityProjectAcl: listSanityProjectAclMock,
+    grantSanityProjectRole: grantSanityProjectRoleMock,
+  }),
+);
 
 const env: TProvisionEnv = {
   sanityManagementToken: 'mgmt-token',

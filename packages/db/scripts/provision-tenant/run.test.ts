@@ -53,7 +53,7 @@ vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
 }));
 vi.mock(
-  '@blog/db/utils/sanity-management-client/sanity-management-client',
+  '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
   () => ({
     unarchiveSanityProject: unarchiveSanityProjectMock,
   }),

@@ -1,6 +1,6 @@
 import { setTenantSanityToken } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { createSanityRobotToken } from '@blog/db/utils/sanity-management-client/sanity-management-client';
+import { createSanityRobotToken } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import { SANITY_READ_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 
 import type { TProvisionEnv } from '../lib/env';

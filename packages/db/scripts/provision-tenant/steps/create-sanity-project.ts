@@ -1,18 +1,20 @@
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { setTenantSanityProject } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
-
-import type { TProvisionEnv } from '../lib/env';
+import {
+  createSanityProjectInvite,
+  listSanityProjectInvites,
+} from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
-  createSanityProjectInvite,
   listSanityCorsOrigins,
   listSanityDatasets,
-  listSanityProjectInvites,
-} from '../lib/sanity-management-client';
+} from '@blog/db/utils/sanity-management-client/sanity-project-setup';
+import { sanitizeLogMessage } from '@blog/insight';
+
+import type { TProvisionEnv } from '../lib/env';
 
 export type TCreateSanityProjectResult = {
   sanityProjectId: string;

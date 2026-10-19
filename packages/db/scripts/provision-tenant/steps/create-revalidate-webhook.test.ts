@@ -20,7 +20,7 @@ vi.mock('@blog/db/queries/tenants', () => ({
   setTenantWebhookCreatedAt: setTenantWebhookCreatedAtMock,
 }));
 
-vi.mock('../lib/sanity-management-client', () => ({
+vi.mock('@blog/db/utils/sanity-management-client/sanity-webhooks', () => ({
   listSanityWebhooks: listSanityWebhooksMock,
   createSanityWebhook: createSanityWebhookMock,
 }));

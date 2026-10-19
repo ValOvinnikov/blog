@@ -3,12 +3,12 @@ import {
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-
-import type { TProvisionEnv } from '../lib/env';
 import {
   grantSanityProjectRole,
   listSanityProjectAcl,
-} from '../lib/sanity-management-client';
+} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+
+import type { TProvisionEnv } from '../lib/env';
 
 const OWNER_ELEVATION_ROLE = 'administrator';
 

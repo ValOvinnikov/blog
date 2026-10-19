@@ -3,7 +3,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
-} from '@blog/db/utils/sanity-management-client/sanity-management-client';
+} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { createClient } from '@sanity/client';
 
