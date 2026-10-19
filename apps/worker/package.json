@@ -1,0 +1,40 @@
+{
+  "name": "worker",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "next dev -p 3002",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@blog/config": "workspace:*",
+    "@blog/db": "workspace:*",
+    "@blog/insight": "workspace:*",
+    "@sanity/client": "^8.9.0",
+    "@t3-oss/env-nextjs": "^0.13.11",
+    "next": "^16.4.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "workflow": "5.2.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
+    "@blog/prettier-config": "workspace:*",
+    "@blog/tsconfig": "workspace:*",
+    "@blog/vitest-config": "workspace:*",
+    "@types/node": "^26",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
