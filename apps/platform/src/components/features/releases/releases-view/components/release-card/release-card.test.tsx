@@ -10,9 +10,18 @@ import userEvent from '@testing-library/user-event';
 
 import { ReleaseCard } from './release-card';
 
-const { startReleaseActionMock, getReleaseRunActionMock } = vi.hoisted(() => ({
-  startReleaseActionMock: vi.fn(),
-  getReleaseRunActionMock: vi.fn(),
+const { startReleaseActionMock, getReleaseRunActionMock, releaseSwitch } =
+  vi.hoisted(() => ({
+    startReleaseActionMock: vi.fn(),
+    getReleaseRunActionMock: vi.fn(),
+    releaseSwitch: { isEnabled: true },
+  }));
+
+vi.mock('@platform/constants/release', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@platform/constants/release')>()),
+  get IS_PRODUCTION_RELEASE_ENABLED() {
+    return releaseSwitch.isEnabled;
+  },
 }));
 
 vi.mock('@platform/server/releases/start-release-action', () => ({
@@ -36,6 +45,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
 
   beforeEach(() => {
     refresh = mockRouterRefresh();
+    releaseSwitch.isEnabled = true;
     startReleaseActionMock
       .mockReset()
       .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -99,6 +109,17 @@ describe(`<${ReleaseCard.name}/>`, () => {
       'true',
     );
     expect(screen.getByText('A release is running.')).toBeVisible();
+  });
+
+  it('disables the Release button while production releases are paused', () => {
+    releaseSwitch.isEnabled = false;
+    setup();
+
+    expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByText('Production releases are paused.')).toBeVisible();
   });
 
   it('has nothing to release when no commit landed since the last tag', () => {

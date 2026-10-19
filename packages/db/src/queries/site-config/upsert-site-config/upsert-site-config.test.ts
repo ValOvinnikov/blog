@@ -3,6 +3,7 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_CONTROL_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   PRESET_ID,
@@ -240,6 +241,43 @@ describe(upsertSiteConfig, () => {
 
     await expect(
       upsertSiteConfig(tenantId, { ...baseInput, cardStyle }),
+    ).rejects.toThrow();
+  });
+
+  it('gives a new config the outlined header control style', async () => {
+    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
+
+    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.OUTLINED);
+  });
+
+  it('stores a chosen header control style', async () => {
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+      }),
+    );
+
+    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.SOFT);
+  });
+
+  it('keeps the header control style when a later save omits it', async () => {
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+    });
+
+    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
+
+    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.PLAIN);
+  });
+
+  it('rejects an unknown header control style', async () => {
+    const headerControlStyle =
+      'GHOST' as TUpdateSiteConfigInput['headerControlStyle'];
+
+    await expect(
+      upsertSiteConfig(tenantId, { ...baseInput, headerControlStyle }),
     ).rejects.toThrow();
   });
 

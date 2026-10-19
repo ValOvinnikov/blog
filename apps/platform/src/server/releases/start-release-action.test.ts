@@ -25,6 +25,7 @@ const {
   resolveContrastStatusMock,
   dispatchReleaseWorkflowMock,
   insertAuditEventMock,
+  releaseSwitch,
 } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
   getCandidateComparisonMock: vi.fn(),
@@ -32,6 +33,14 @@ const {
   resolveContrastStatusMock: vi.fn(),
   dispatchReleaseWorkflowMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
+  releaseSwitch: { isEnabled: true },
+}));
+
+vi.mock('@platform/constants/release', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@platform/constants/release')>()),
+  get IS_PRODUCTION_RELEASE_ENABLED() {
+    return releaseSwitch.isEnabled;
+  },
 }));
 
 vi.mock('@platform/server/auth/require-super-admin', () => ({
@@ -82,6 +91,7 @@ describe('startReleaseAction', () => {
 
   beforeEach(async () => {
     headSha = faker.git.commitSha();
+    releaseSwitch.isEnabled = true;
     requireSuperAdminMock
       .mockReset()
       .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
@@ -119,6 +129,20 @@ describe('startReleaseAction', () => {
 
     expect(getCandidateComparisonMock).not.toHaveBeenCalled();
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses while production releases are paused, reading, dispatching and recording nothing', async () => {
+    releaseSwitch.isEnabled = false;
+
+    const result = await startReleaseAction({ version: 'v1.5.0' });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.RELEASES_PAUSED,
+    });
+    expect(getCandidateComparisonMock).not.toHaveBeenCalled();
+    expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('dispatches the release without an override and records who started it', async () => {

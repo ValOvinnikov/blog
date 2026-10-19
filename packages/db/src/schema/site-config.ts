@@ -3,12 +3,14 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_CONTROL_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
   type TCardStyle,
   type TDensity,
   type TFontChoice,
+  type THeaderControlStyle,
   type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
   type TPresetId,
@@ -59,6 +61,14 @@ export const cardStyleEnum = pgEnum(
   Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]],
 );
 
+export const headerControlStyleEnum = pgEnum(
+  'header_control_style',
+  Object.values(HEADER_CONTROL_STYLE) as [
+    THeaderControlStyle,
+    ...THeaderControlStyle[],
+  ],
+);
+
 export type TVoiceOverrideValue = string | TVoicePortableText;
 
 export type TVoiceOverrides = Record<string, TVoiceOverrideValue>;
@@ -87,6 +97,9 @@ export const siteConfig = pgTable('site_config', {
   cardStyle: cardStyleEnum('card_style')
     .notNull()
     .default(CARD_STYLE.ACCENT_BAR),
+  headerControlStyle: headerControlStyleEnum('header_control_style')
+    .notNull()
+    .default(HEADER_CONTROL_STYLE.OUTLINED),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverridesByLocale: jsonb('voice_overrides')

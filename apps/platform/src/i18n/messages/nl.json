@@ -1108,6 +1108,7 @@
     "description": "Maak een productierelease van de nieuwste commit op main.",
     "started": "Release gestart.",
     "runningHint": "Er loopt een release.",
+    "pausedHint": "Productiereleases zijn gepauzeerd.",
     "nothingToReleaseHint": "Er is niets veranderd sinds {lastTag}.",
     "empty": "Er is nog geen release uitgevoerd.",
     "unavailableTitle": "Releasestatus is niet beschikbaar",
@@ -1151,6 +1152,7 @@
       "REASON_REQUIRED": "Geef aan waarom je releast zonder geslaagde contrastcontrole."
     },
     "alreadyRunning": "Er loopt al een release.",
+    "releasesPaused": "Productiereleases zijn gepauzeerd.",
     "githubUnavailable": "GitHub was niet bereikbaar, dus er is niets gestart. Probeer het zo opnieuw.",
     "invalid": "Controleer de versie en de reden en probeer het opnieuw.",
     "startFailed": "GitHub heeft de release niet geaccepteerd, dus er is niets gestart."
