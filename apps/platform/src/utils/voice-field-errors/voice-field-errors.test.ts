@@ -1,49 +1,35 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { VOICE_FIELD_ERROR } from '@platform/constants/voice';
+import { LOCALE_ISO_CODES, VOICE_FIELD_ERROR } from '@blog/config';
 
-import {
-  toVoiceFieldFailures,
-  toVoiceFieldMessages,
-} from './voice-field-errors';
+import { toVoiceFieldMessages } from './voice-field-errors';
 
 const { EN, DE } = LOCALE_ISO_CODES;
 
-describe(toVoiceFieldFailures, () => {
-  it('turns each rejected field into a REJECTED failure carrying its message', () => {
-    expect(
-      toVoiceFieldFailures({
-        [DE]: { notFoundHeading: 'Höchstens 100 Zeichen.' },
-      }),
-    ).toEqual({
-      [DE]: {
-        notFoundHeading: {
-          reason: VOICE_FIELD_ERROR.REJECTED,
-          values: { detail: 'Höchstens 100 Zeichen.' },
-        },
-      },
-    });
-  });
-});
-
 describe(toVoiceFieldMessages, () => {
   it('gives back the message for each failed field, language by language', () => {
+    const toMessage = vi.fn(() => 'Use 100 characters or fewer.');
+
     expect(
-      toVoiceFieldMessages({
-        [EN]: {
-          tagEmpty: {
-            reason: VOICE_FIELD_ERROR.REJECTED,
-            values: { detail: 'Missing required placeholder {name}.' },
+      toVoiceFieldMessages(
+        {
+          [DE]: {
+            notFoundHeading: {
+              reason: VOICE_FIELD_ERROR.TOO_LONG,
+              values: { max: 100 },
+            },
           },
         },
-      }),
-    ).toEqual({ [EN]: { tagEmpty: 'Missing required placeholder {name}.' } });
+        toMessage,
+      ),
+    ).toEqual({ [DE]: { notFoundHeading: 'Use 100 characters or fewer.' } });
+    expect(toMessage).toHaveBeenCalledWith({
+      reason: VOICE_FIELD_ERROR.TOO_LONG,
+      values: { max: 100 },
+    });
   });
 
-  it('leaves out a failure that carries no message', () => {
-    expect(
-      toVoiceFieldMessages({
-        [EN]: { tagEmpty: { reason: VOICE_FIELD_ERROR.REJECTED } },
-      }),
-    ).toEqual({ [EN]: {} });
+  it('leaves out a language with no failures', () => {
+    expect(toVoiceFieldMessages({ [EN]: {} }, () => 'unused')).toEqual({
+      [EN]: {},
+    });
   });
 });

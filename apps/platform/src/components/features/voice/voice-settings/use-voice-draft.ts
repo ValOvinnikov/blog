@@ -90,7 +90,9 @@ export const useVoiceDraft = ({
       );
       const errors =
         result.outcome === ACTION_OUTCOME.INVALID
-          ? toVoiceFieldMessages(result.fieldErrorsByLocale)
+          ? toVoiceFieldMessages(result.fieldErrorsByLocale, (failure) =>
+              t(`fieldError.${failure.reason}`, failure.values),
+            )
           : {};
       setFieldErrors(errors);
       const [firstSaveError] = voiceErrorsInOrder(

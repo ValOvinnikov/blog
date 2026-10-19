@@ -6,18 +6,17 @@ import {
   AUDIT_TARGET_TYPE,
   VOICE_FIELDS,
   type TLocalizedActionResult,
+  type TVoiceFieldErrorReason,
   type TVoiceFieldId,
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import type { TVoiceFieldErrorReason } from '@platform/constants/voice';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
 import { logger } from '@platform/utils/logger/logger';
-import { toVoiceFieldFailures } from '@platform/utils/voice-field-errors/voice-field-errors';
 import { z } from 'zod';
 
 const voiceFieldIdSchema = z.enum(VOICE_FIELDS.map(({ id }) => id));
@@ -61,7 +60,7 @@ export const saveVoiceOverridesAction = async (
     if (!result.ok) {
       return {
         outcome: ACTION_OUTCOME.INVALID,
-        fieldErrorsByLocale: toVoiceFieldFailures(result.fieldErrorsByLocale),
+        fieldErrorsByLocale: result.fieldErrorsByLocale,
       };
     }
 

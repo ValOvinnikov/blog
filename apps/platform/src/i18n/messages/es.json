@@ -561,7 +561,17 @@
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",
     "draftFieldLabel": "{surface} — {field} ({language})",
-    "listRoute": "Se muestra en {path}"
+    "listRoute": "Se muestra en {path}",
+    "fieldError": {
+      "NOT_A_STRING": "Escriba texto en este campo.",
+      "NOT_RICH_TEXT": "Escriba texto en este campo.",
+      "LINE_BREAK": "Mantenga este texto en una sola línea.",
+      "TOO_LONG": "Use {max} caracteres como máximo.",
+      "MISSING_PLACEHOLDER": "Conserve {count, plural, one {el marcador} other {los marcadores}} {placeholders}: el sitio {count, plural, one {lo rellena} other {los rellena}}.",
+      "UNKNOWN_PLACEHOLDER": "Elimine {count, plural, one {el marcador desconocido} other {los marcadores desconocidos}} {placeholders}.",
+      "DISALLOWED_CONTENT": "Elimine el formato que este campo no admite.",
+      "INVALID_LINK_URL": "El enlace {url} no es una dirección web válida."
+    }
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Página no encontrada",

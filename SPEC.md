@@ -1682,7 +1682,8 @@ placeholders and length cap, alongside the neutral catalog
 (`SITE_MESSAGES_BY_LOCALE`). Everything else reads it rather than keeping a
 list of its own: `@blog/db` generates the override validation from it (a
 `RICH` value is checked against `VOICE_PORTABLE_TEXT_SCHEMA` — bold, italic
-and links only — and a failure returns per-language `fieldErrorsByLocale`),
+and links only — and a failure returns per-language `fieldErrorsByLocale`
+of `VOICE_FIELD_ERROR` reason codes),
 `apps/web`'s `resolveTenantMessages` sets every override at its registry path
 (a `RICH` one projected to plain text, since a message leaf must be a string),
 and the platform's Voice page renders one control per field. That catalog is

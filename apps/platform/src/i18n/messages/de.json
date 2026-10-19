@@ -561,7 +561,17 @@
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
     "draftFieldLabel": "{surface} — {field} ({language})",
-    "listRoute": "Angezeigt unter {path}"
+    "listRoute": "Angezeigt unter {path}",
+    "fieldError": {
+      "NOT_A_STRING": "Geben Sie in diesem Feld Text ein.",
+      "NOT_RICH_TEXT": "Geben Sie in diesem Feld Text ein.",
+      "LINE_BREAK": "Schreiben Sie diesen Text in eine Zeile.",
+      "TOO_LONG": "Verwenden Sie höchstens {max} Zeichen.",
+      "MISSING_PLACEHOLDER": "Platzhalter {placeholders} beibehalten — die Website setzt den Wert ein.",
+      "UNKNOWN_PLACEHOLDER": "{count, plural, one {Unbekannten Platzhalter} other {Unbekannte Platzhalter}} {placeholders} entfernen.",
+      "DISALLOWED_CONTENT": "Entfernen Sie Formatierungen, die dieses Feld nicht unterstützt.",
+      "INVALID_LINK_URL": "Der Link {url} ist keine gültige Webadresse."
+    }
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Seite nicht gefunden",
