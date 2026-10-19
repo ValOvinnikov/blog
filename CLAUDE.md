@@ -21,22 +21,23 @@ ui → config, utils (no Sanity/fetch)        configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, email
 config → utils (OKLCH maths behind the shared contrast guard)
 insight → nothing (base of graph, like utils)
-email → utils (sits low; both apps and auth consume it)
+email → utils (sits low; the apps and auth consume it)
+worker → db, config, utils, insight, email, @sanity/client (imported by nothing)
 graph is acyclic
 ```
 
 - `@blog/ui` is pure and prop-driven — never imports `service`/`sanity`/`fetch`.
 - `@blog/service` is the only request-path package importing the Sanity SDKs;
   never imports React. (`@blog/studio` is the Studio and schema owner;
-  `@blog/db`'s provisioning exception is below.)
+  `@blog/db`'s provisioning exception and `apps/worker` are below.)
 - `@blog/db` is the only package importing the Neon/Drizzle SDKs — Postgres
   data: Auth.js users and sessions, tenants and their domains, memberships and
   invites, admins, site config, feature toggles, email config and templates,
   subscribers, bookmarks, contact-form leads, audit events and findings
   (comments and ratings are planned; no tables exist yet). It never imports React or `@blog/service`
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
-  by the two apps and `@blog/auth`**, which binds the Auth.js adapter to its
-  tables. It imports no Sanity SDK, and its `src/` never imports
+  by the three apps (`web`, `platform`, `worker`) and `@blog/auth`**, which
+  binds the Auth.js adapter to its tables. It imports no Sanity SDK, and its `src/` never imports
   `@blog/insight` — logging is the apps' job. Two scoped exceptions, both in
   standalone CLI tools outside the request path (`SPEC.md` §4):
   `packages/db/scripts/provision-tenant/` uses `@sanity/client` to seed a new
@@ -67,6 +68,16 @@ graph is acyclic
   tenant's real site with `@blog/ui` so the live theme preview cannot drift
   from `apps/web` — an ESLint guard confines `@blog/ui` imports under
   `apps/platform` to that directory. See `.claude/agents/platform-app.md`.
+- `apps/worker` is a third, non-public app (its own Vercel project) that runs
+  tenant provisioning as Vercel Workflow durable runs, enqueued by
+  `apps/platform` with a shared secret. It consumes `db`, `config`, `utils`,
+  `insight`, `email` and `@sanity/client` — a third importer of `@blog/db`
+  and, off the request path, of a Sanity SDK — and **nothing imports it**. It
+  never imports React, `@blog/ui`, `@blog/service`, `@blog/auth` or
+  `@blog/studio`, and it alone holds the provisioning secrets
+  (`SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, the registry
+  `DATABASE_URL`, `SANITY_REVALIDATE_SECRET`, `VERCEL_TOKEN`). See
+  `.claude/agents/worker.md`.
 - `@blog/studio` (`packages/studio`) is the Sanity Studio: schema types (the
   source of truth for every content shape), desk structure, content migrations,
   and a `StudioMount` component that takes plain strings (`projectId`,
@@ -116,8 +127,8 @@ what actually changed.
 ### Split by workspace, always
 
 **The main workspaces are the unit of work: `studio`, `service`, `ui`, `web`,
-`platform`.** Plan every non-trivial task as one chunk per workspace, and ship
-one PR per chunk. The supporting packages — `config`, `utils`, `db`, `auth`,
+`platform`, `worker`.** Plan every non-trivial task as one chunk per workspace,
+and ship one PR per chunk. The supporting packages — `config`, `utils`, `db`, `auth`,
 `insight`, `email` — get no chunk of their own by default: a small change to one
 rides along in the PR of whichever main workspace needs it.
 
@@ -337,6 +348,10 @@ what each package owns is in "Layer contracts" above:
   which it does not consume. It owns its presentational and interactive
   primitives on Base UI — never route its components through the `ui` agent
   (the `site-preview/` exception is in "Layer contracts").
+- **`worker`** is a sibling to `platform-app`: `config → db → worker`, never
+  waiting on `studio`/`service`/`ui`/`auth`, which it does not consume. A
+  change to what the admin panel enqueues is `platform-app` work; the run
+  itself is `worker` work.
 - **`insight`** is independent, like `utils`. Dispatch it only for the logger
   core itself; a change to how an app _uses_ the logger belongs to
   `web`/`platform-app`.
@@ -346,7 +361,7 @@ what each package owns is in "Layer contracts" above:
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file in a sub-agent's domain
-(`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`/`email`)
+(`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`worker`/`auth`/`insight`/`email`)
 is written, changed, fixed, renamed and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author

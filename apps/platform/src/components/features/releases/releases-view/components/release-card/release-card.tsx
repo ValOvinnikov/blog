@@ -4,7 +4,10 @@ import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { Text } from '@platform/components/shared/text';
-import { RELEASE_RUN_STATUS } from '@platform/constants/release';
+import {
+  IS_PRODUCTION_RELEASE_ENABLED,
+  RELEASE_RUN_STATUS,
+} from '@platform/constants/release';
 import { useToast } from '@platform/context/toast-provider';
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 import type { TReleaseResult } from '@platform/server/releases/release-result';
@@ -37,11 +40,13 @@ export const ReleaseCard = ({
   const { run, isUnavailable, isDispatchPending, isActive, markStarted } =
     useReleaseRun(releaseRun);
 
-  const disabledReason = isActive
-    ? t('runningHint')
-    : !hasChanges
-      ? t('nothingToReleaseHint', { lastTag })
-      : undefined;
+  const disabledReason = !IS_PRODUCTION_RELEASE_ENABLED
+    ? t('pausedHint')
+    : isActive
+      ? t('runningHint')
+      : !hasChanges
+        ? t('nothingToReleaseHint', { lastTag })
+        : undefined;
 
   const handleStarted = (startedAt: number) => {
     markStarted(startedAt);

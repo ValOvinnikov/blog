@@ -8,6 +8,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import {
+  IS_PRODUCTION_RELEASE_ENABLED,
   RELEASE_FIELD_ERROR,
   RELEASE_OVERRIDE_REASON_MAX_LENGTH,
   RELEASE_REFUSAL,
@@ -44,7 +45,8 @@ export type TStartReleaseResult = TActionResult<
   | typeof ACTION_OUTCOME.SERVER_ERROR,
   'version' | 'overrideReason',
   TReleaseFieldError,
-  typeof RELEASE_REFUSAL.RELEASE_RUNNING
+  | typeof RELEASE_REFUSAL.RELEASE_RUNNING
+  | typeof RELEASE_REFUSAL.RELEASES_PAUSED
 >;
 
 /** The audit events attest the dispatch request, not the workflow's outcome. */
@@ -52,6 +54,12 @@ export const startReleaseAction = async (
   input: TStartReleaseInput,
 ): Promise<TStartReleaseResult> => {
   await requireSuperAdmin();
+  if (!IS_PRODUCTION_RELEASE_ENABLED) {
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.RELEASES_PAUSED,
+    };
+  }
 
   const parsed = startReleaseInputSchema.safeParse(input);
   if (!parsed.success) {

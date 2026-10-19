@@ -54,23 +54,21 @@ async function seedTenantWithOverrides(
     .returning();
   if (!tenant) throw new Error('failed to seed a tenant row');
 
-  await db.insert(siteConfig).values({
-    tenantId: tenant.id,
-    preset: PRESET_ID.EDITORIAL,
-    accentHue: 28,
-    headingFont: FONT_CHOICE.FRAUNCES,
-    bodyFont: FONT_CHOICE.INTER,
-    radiusScale: RADIUS_SCALE.SM,
-    density: DENSITY.COMPACT,
-    voiceOverridesByLocale: sql`${JSON.stringify(voiceOverrides)}::jsonb`,
-  });
+  await db.execute(sql`
+    INSERT INTO site_config
+      (tenant_id, preset, accent_hue, heading_font, body_font, radius_scale, density, voice_overrides)
+    VALUES (
+      ${tenant.id}, ${PRESET_ID.EDITORIAL}, 28, ${FONT_CHOICE.FRAUNCES}, ${FONT_CHOICE.INTER},
+      ${RADIUS_SCALE.SM}, ${DENSITY.COMPACT}, ${JSON.stringify(voiceOverrides)}::jsonb
+    )
+  `);
 
   return tenant.id;
 }
 
 async function readVoiceOverrides(db: TDb, tenantId: string) {
   const [row] = await db
-    .select()
+    .select({ voiceOverridesByLocale: siteConfig.voiceOverridesByLocale })
     .from(siteConfig)
     .where(eq(siteConfig.tenantId, tenantId));
   if (!row) throw new Error('expected a site_config row');
