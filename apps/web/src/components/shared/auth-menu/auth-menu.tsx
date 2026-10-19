@@ -1,8 +1,6 @@
 'use client';
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { headerControlVariants } from '@web/components/shared/header-control';
 import { ACCOUNT_OVERLAY_ID } from '@web/context/header-overlay-provider';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
@@ -12,7 +10,7 @@ import { useId } from 'react';
 
 import { authMenuVariants } from './auth-menu-variants';
 import { AccountMenu } from './components/account-menu/account-menu';
-import { SignInLabel } from './components/sign-in-label/sign-in-label';
+import { AccountSlot } from './components/account-slot/account-slot';
 import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
 
 export interface IAuthMenuProps {
@@ -27,12 +25,11 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
   const { open, toggle, triggerRef, panelRef } = usePopover({
     overlayId: ACCOUNT_OVERLAY_ID,
   });
-  const { loading, loadingPlaceholder, loadingStatus, signInTrigger } =
-    authMenuVariants();
+  const { loadingStatus } = authMenuVariants();
 
   if (sessionResult.status === 'loading') {
     return (
-      <span className={loading()}>
+      <AccountSlot isPlaceholder={true}>
         <span
           role="status"
           aria-label={t('loadingAccountStatus')}
@@ -40,19 +37,7 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
         >
           {t('loadingAccountStatus')}
         </span>
-        <span aria-hidden="true">
-          <IconButton
-            variant="bordered"
-            ariaLabel={t('signIn')}
-            isInert={true}
-            className={headerControlVariants({
-              class: [signInTrigger(), loadingPlaceholder()],
-            })}
-          >
-            <SignInLabel />
-          </IconButton>
-        </span>
-      </span>
+      </AccountSlot>
     );
   }
 
@@ -60,16 +45,18 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
     const { name, email, image } = sessionResult.data.user ?? {};
 
     return (
-      <AccountMenu
-        panelId={panelId}
-        isOpen={open}
-        toggle={toggle}
-        triggerRef={triggerRef}
-        panelRef={panelRef}
-        name={name}
-        email={email}
-        image={image}
-      />
+      <AccountSlot>
+        <AccountMenu
+          panelId={panelId}
+          isOpen={open}
+          toggle={toggle}
+          triggerRef={triggerRef}
+          panelRef={panelRef}
+          name={name}
+          email={email}
+          image={image}
+        />
+      </AccountSlot>
     );
   }
 
