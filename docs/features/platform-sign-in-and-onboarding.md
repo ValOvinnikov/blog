@@ -5,6 +5,7 @@ layers: [platform, auth, db, email, config, worker]
 code:
   - apps/platform/src/app/api/auth/**
   - apps/platform/src/app/*/workspace-pending/**
+  - apps/platform/src/app/*/sign-in-error/**
   - apps/platform/src/components/features/layout/workspace-pending-view/**
   - apps/platform/src/components/features/layout/sign-out-button/**
   - apps/platform/src/server/auth/auth.ts
@@ -35,6 +36,10 @@ Today:
   404 there, whose link sends them to `/dashboard`.
 - Providers come from `@blog/auth`: GitHub and Google when their credentials
   are set, and the email magic link always.
+- `/sign-in-error`: Auth.js's `pages.error`, public and in the panel's own
+  styling. A `Verification` error (a magic link already used or expired) says
+  so and links to sign-in for a new link; any other error gets a plain message
+  and a link back to sign-in.
 - `/workspace-pending`: a session-gated dead end for a signed-in user with no
   membership, with "Try again" (to `/dashboard`) and "Sign out".
 - Sign-out (account menu, or the button on pre-shell pages) runs
@@ -101,12 +106,14 @@ Decided:
 - `apps/platform/src/server/auth/require-session-user-id.ts`
 - `apps/platform/src/server/auth/resolve-home-href.ts`
 - `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
+- `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
 
 ## Tests and stories
 
 - `apps/platform/src/server/auth/resolve-home-href.test.ts`,
-  `sign-out-action.test.ts`, and the view tests beside
+  `sign-out-action.test.ts`, `sign-in-error/page.test.tsx`, and the view
+  tests beside
   `workspace-pending-view` and `sign-out-button`.
 - No Storybook in `apps/platform`.
 

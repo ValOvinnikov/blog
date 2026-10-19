@@ -11,6 +11,7 @@ export const STUDIO_SEGMENT = 'studio';
  */
 export const adminRoutes = {
   signIn: () => '/api/auth/signin',
+  signInError: () => '/sign-in-error',
   workspacePending: () => '/workspace-pending',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',

@@ -7,6 +7,7 @@
     "voice": "Tonalität · Admin",
     "selectTenant": "Arbeitsbereich wählen · Admin",
     "workspacePending": "Arbeitsbereich nicht bereit · Admin",
+    "signInError": "Problem bei der Anmeldung · Admin",
     "addTenant": "Mandant hinzufügen · Admin",
     "tenantOverview": "Mandantenübersicht · Admin",
     "tenantProvisioning": "Bereitstellung · Admin",
@@ -24,6 +25,14 @@
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
     "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt.",
     "tryAgain": "Erneut versuchen"
+  },
+  "signInErrorPage": {
+    "linkSpentHeading": "Dieser Anmeldelink funktioniert nicht mehr",
+    "linkSpentDescription": "Jeder Anmeldelink funktioniert nur einmal und läuft nach einiger Zeit ab. Dieser wurde bereits verwendet oder ist abgelaufen. Fordern Sie einen neuen an, um sich anzumelden.",
+    "requestNewLink": "Neuen Anmeldelink anfordern",
+    "heading": "Anmeldung fehlgeschlagen",
+    "description": "Bei der Anmeldung ist etwas schiefgelaufen. Kehren Sie zur Anmeldung zurück und versuchen Sie es erneut.",
+    "backToSignIn": "Zurück zur Anmeldung"
   },
   "notFoundPage": {
     "heading": "Seite nicht gefunden",
