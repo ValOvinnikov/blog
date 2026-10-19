@@ -1,6 +1,8 @@
+import { CARD_STYLE, CARD_STYLE_DECLARATIONS } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { LinkButton } from '@blog/ui/components/molecules/link-button';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { CSSProperties } from 'react';
 
 import { PricingCard } from './pricing-card';
 
@@ -31,9 +33,24 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-export const Default: TStory = {};
+const renderInEachCardStyle: TStory['render'] = (args) => (
+  <div style={{ display: 'grid', gap: '1.5rem' }}>
+    {Object.values(CARD_STYLE).map((cardStyle) => (
+      <div
+        key={cardStyle}
+        style={CARD_STYLE_DECLARATIONS[cardStyle] as CSSProperties}
+      >
+        <p>{cardStyle}</p>
+        <PricingCard {...args} />
+      </div>
+    ))}
+  </div>
+);
+
+export const Default: TStory = { render: renderInEachCardStyle };
 
 export const Highlighted: TStory = {
+  render: renderInEachCardStyle,
   args: {
     isHighlighted: true,
     children: (
