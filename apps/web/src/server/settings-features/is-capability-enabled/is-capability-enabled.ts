@@ -11,17 +11,16 @@ import { logger } from '@web/utils/logger/logger';
  * the tenant's plan entitles it (`PLAN_REGISTRY`) *and* its own effective
  * `settings_features` toggle is on. Every failure path — no tenant
  * resolved, a fetch error — resolves `false` rather than throwing, so a
- * render site can gate on this with a plain `if` and a capability simply
- * omits rather than breaking the page.
+ * caller can gate on this with a plain `if` and a capability simply omits
+ * rather than breaking the page.
  */
-export const isCapabilityEnabled = async (
+export const isCapabilityEnabledForTenant = async (
+  tenantId: string,
   capability: TCapability,
 ): Promise<boolean> => {
-  const { tenantId } = await getRequestContext();
-  const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [planResult, featuresResult] = await Promise.all([
-    getTenantPlan(tenant),
-    getEffectiveSettingsFeatures(tenant),
+    getTenantPlan(tenantId),
+    getEffectiveSettingsFeatures(tenantId),
   ]);
 
   if (!planResult.ok) {
@@ -44,4 +43,15 @@ export const isCapabilityEnabled = async (
   if (!plan || !features) return false;
 
   return PLAN_REGISTRY[plan].includes(capability) && features[capability];
+};
+
+/** Server actions run outside the `[tenant]/[locale]` layout, so they gate with `isCapabilityEnabledForTenant` instead. */
+export const isCapabilityEnabled = async (
+  capability: TCapability,
+): Promise<boolean> => {
+  const { tenantId } = await getRequestContext();
+  return isCapabilityEnabledForTenant(
+    tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
+    capability,
+  );
 };

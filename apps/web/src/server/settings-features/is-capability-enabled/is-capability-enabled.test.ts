@@ -5,7 +5,10 @@ import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
-import { isCapabilityEnabled } from './is-capability-enabled';
+import {
+  isCapabilityEnabled,
+  isCapabilityEnabledForTenant,
+} from './is-capability-enabled';
 
 vi.mock(
   '@web/server/settings-features/get-tenant-plan/get-tenant-plan',
@@ -156,5 +159,17 @@ describe(isCapabilityEnabled, () => {
     expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith(
       UNRESOLVED_TENANT_PLACEHOLDER,
     );
+  });
+
+  it('reads both entitlements for the tenant it is given, without the request context', async () => {
+    vi.mocked(getRequestContext).mockClear();
+
+    await expect(
+      isCapabilityEnabledForTenant('tenant-2', CAPABILITY.CONTACT_FORM),
+    ).resolves.toBe(true);
+
+    expect(getRequestContext).not.toHaveBeenCalled();
+    expect(getTenantPlan).toHaveBeenCalledWith('tenant-2');
+    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith('tenant-2');
   });
 });

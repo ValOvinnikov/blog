@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
@@ -15,14 +15,16 @@ const {
   createLeadMock,
   sendContactNotificationMock,
   resolveRequestTenantMock,
-  isCapabilityEnabledMock,
+  getTenantPlanMock,
+  getEffectiveSettingsFeaturesMock,
 } = vi.hoisted(() => ({
   isBotOrUnverifiedMock: vi.fn(),
   isRateLimitedMock: vi.fn(),
   createLeadMock: vi.fn(),
   sendContactNotificationMock: vi.fn(),
   resolveRequestTenantMock: vi.fn(),
-  isCapabilityEnabledMock: vi.fn(),
+  getTenantPlanMock: vi.fn(),
+  getEffectiveSettingsFeaturesMock: vi.fn(),
 }));
 
 vi.mock('@web/server/rate-limit/public-write-guard/public-write-guard', () => ({
@@ -49,8 +51,13 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
 }));
 
 vi.mock(
-  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
-  () => ({ isCapabilityEnabled: isCapabilityEnabledMock }),
+  '@web/server/settings-features/get-tenant-plan/get-tenant-plan',
+  () => ({ getTenantPlan: getTenantPlanMock }),
+);
+
+vi.mock(
+  '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features',
+  () => ({ getEffectiveSettingsFeatures: getEffectiveSettingsFeaturesMock }),
 );
 
 vi.mock('@web/utils/logger/logger');
@@ -76,7 +83,11 @@ describe('submitContactMessage', () => {
   beforeEach(() => {
     isBotOrUnverifiedMock.mockResolvedValue(false);
     isRateLimitedMock.mockResolvedValue(false);
-    isCapabilityEnabledMock.mockResolvedValue(true);
+    getTenantPlanMock.mockResolvedValue({ ok: true, data: 'GROWTH' });
+    getEffectiveSettingsFeaturesMock.mockResolvedValue({
+      ok: true,
+      data: { [CAPABILITY.CONTACT_FORM]: true },
+    });
     resolveRequestTenantMock.mockResolvedValue({
       id: TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
@@ -107,6 +118,14 @@ describe('submitContactMessage', () => {
     expect(sendContactNotificationMock).toHaveBeenCalledWith(
       expect.objectContaining({ tenantId: TENANT_ID, name: NAME }),
     );
+  });
+
+  it("gates on the resolved tenant's capability without a request context", async () => {
+    const result = await submitContactMessage(makeInput());
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(getTenantPlanMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getEffectiveSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID);
   });
 
   it('blocks a bot without storing or sending', async () => {
@@ -160,8 +179,22 @@ describe('submitContactMessage', () => {
     expect(createLeadMock).not.toHaveBeenCalled();
   });
 
+  it('blocks when the plan does not entitle the contact form', async () => {
+    getTenantPlanMock.mockResolvedValue({ ok: true, data: 'FREE' });
+
+    const result = await submitContactMessage(makeInput());
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.BLOCKED,
+    });
+    expect(createLeadMock).not.toHaveBeenCalled();
+  });
+
   it('blocks when the contact form capability is off', async () => {
-    isCapabilityEnabledMock.mockResolvedValue(false);
+    getEffectiveSettingsFeaturesMock.mockResolvedValue({
+      ok: true,
+      data: { [CAPABILITY.CONTACT_FORM]: false },
+    });
 
     const result = await submitContactMessage(makeInput());
 
