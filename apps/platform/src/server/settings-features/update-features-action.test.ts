@@ -15,10 +15,12 @@ const {
   upsertSettingsFeaturesMock,
   revalidateSiteConfigMock,
   insertAuditEventMock,
+  getSettingsFeaturesOrDefaultsMock,
 } = vi.hoisted(() => ({
   upsertSettingsFeaturesMock: vi.fn(),
   revalidateSiteConfigMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
+  getSettingsFeaturesOrDefaultsMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
@@ -30,6 +32,11 @@ vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
 }));
 
 vi.mock('@platform/utils/logger/logger');
+
+vi.mock(
+  '@platform/server/settings-features/settings-features-or-defaults',
+  () => ({ getSettingsFeaturesOrDefaults: getSettingsFeaturesOrDefaultsMock }),
+);
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -59,6 +66,11 @@ const VALID_INPUT: TUpdateFeaturesInput = {
   contactFormEnabled: false,
 };
 
+const ALL_OFF: TUpdateFeaturesInput = {
+  ...VALID_INPUT,
+  consentBannerEnabled: false,
+};
+
 describe(updateFeaturesAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
@@ -76,6 +88,11 @@ describe(updateFeaturesAction, () => {
     revalidateSiteConfigMock.mockResolvedValue(undefined);
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
+    getSettingsFeaturesOrDefaultsMock.mockReset();
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: ALL_OFF,
+      savedAt: undefined,
+    });
     loggerErrorMock.mockReset();
     loggerWarnMock.mockReset();
   });
@@ -138,6 +155,89 @@ describe(updateFeaturesAction, () => {
       bookmarksEnabled: false,
       analyticsEnabled: false,
     });
+  });
+
+  it('keeps the stored out-of-plan toggles when a downgraded FREE tenant saves', async () => {
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: {
+        ...ALL_OFF,
+        bookmarksEnabled: true,
+        analyticsEnabled: true,
+        contactFormEnabled: true,
+      },
+      savedAt: new Date('2026-10-01T00:00:00Z'),
+    });
+
+    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1', {
+      ...VALID_INPUT,
+      bookmarksEnabled: true,
+      analyticsEnabled: true,
+      contactFormEnabled: true,
+    });
+  });
+
+  it('writes a stored "Coming soon" toggle off for a downgraded FREE tenant', async () => {
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: { ...ALL_OFF, commentsEnabled: true, newsletterEnabled: true },
+      savedAt: new Date('2026-10-01T00:00:00Z'),
+    });
+
+    await updateFeaturesAction('tenant-1', VALID_INPUT);
+
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      'tenant-1',
+      VALID_INPUT,
+    );
+  });
+
+  it('refuses a downgraded FREE tenant switching an out-of-plan toggle on, and writes nothing', async () => {
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: { ...ALL_OFF, bookmarksEnabled: true },
+      savedAt: new Date('2026-10-01T00:00:00Z'),
+    });
+
+    const result = await updateFeaturesAction('tenant-1', {
+      ...VALID_INPUT,
+      bookmarksEnabled: true,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+    });
+    expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
+  });
+
+  it("writes a GROWTH tenant's submitted toggles over the stored ones", async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: GROWTH_TENANT,
+      membership: { role: 'OWNER' },
+    });
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: { ...ALL_OFF, bookmarksEnabled: true, analyticsEnabled: true },
+      savedAt: new Date('2026-10-01T00:00:00Z'),
+    });
+
+    await updateFeaturesAction('tenant-2', VALID_INPUT);
+
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      'tenant-2',
+      VALID_INPUT,
+    );
+  });
+
+  it('reports failure instead of throwing when reading the stored toggles fails', async () => {
+    getSettingsFeaturesOrDefaultsMock.mockRejectedValue(
+      new Error('db unavailable'),
+    );
+
+    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
   it('rejects switching the contact form on for a FREE tenant', async () => {
