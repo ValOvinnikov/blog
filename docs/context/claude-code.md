@@ -58,7 +58,7 @@ contracts:
     auditing is a separate concern from logging, and a false record is worse
     than a missing one.
   - `worker` — `apps/worker`, a third, non-public app that runs tenant
-    provisioning as Vercel Workflow (4.x) durable runs the admin panel
+    provisioning as Vercel Workflow (5.x, pinned exactly) durable runs the admin panel
     enqueues with a shared secret. A sibling to `platform-app`
     (`config → db → worker`): it consumes `db`, `config`, `utils`, `insight`,
     `email` and `@sanity/client`, is imported by nothing, and alone holds the
