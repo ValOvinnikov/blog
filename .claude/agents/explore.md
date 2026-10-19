@@ -29,6 +29,7 @@ cost more context than it saved and failed, even if the content was correct.
 apps/
   web        Next.js frontend: routes, SEO, i18n, composition         (web)
   platform   Next.js admin panel: separate deploy, mounts Studio      (platform-app)
+  worker     Tenant provisioning runs: non-public, Vercel Workflow    (worker)
 packages/
   studio     Sanity Studio library: schema, desk, migrations          (@blog/studio)
   config     Constants, shared types, generated Sanity types, routes  (@blog/config)
