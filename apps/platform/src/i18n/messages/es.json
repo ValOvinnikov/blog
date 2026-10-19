@@ -1108,6 +1108,7 @@
     "description": "Publica en producción el último commit de main.",
     "started": "Versión iniciada.",
     "runningHint": "Hay una versión en curso.",
+    "pausedHint": "Las versiones en producción están en pausa.",
     "nothingToReleaseHint": "No ha cambiado nada desde {lastTag}.",
     "empty": "Todavía no se ha ejecutado ninguna versión.",
     "unavailableTitle": "El estado de la versión no está disponible",
@@ -1151,6 +1152,7 @@
       "REASON_REQUIRED": "Indica por qué publicas sin una comprobación de contraste superada."
     },
     "alreadyRunning": "Ya hay una versión en curso.",
+    "releasesPaused": "Las versiones en producción están en pausa.",
     "githubUnavailable": "No se pudo contactar con GitHub, así que no se ha iniciado nada. Inténtalo de nuevo en un momento.",
     "invalid": "Revisa la versión y el motivo e inténtalo de nuevo.",
     "startFailed": "GitHub no aceptó la versión, así que no se ha iniciado nada."

@@ -1108,6 +1108,7 @@
     "description": "Erstelle ein Produktions-Release des neuesten Commits auf main.",
     "started": "Release gestartet.",
     "runningHint": "Ein Release läuft.",
+    "pausedHint": "Produktions-Releases sind pausiert.",
     "nothingToReleaseHint": "Seit {lastTag} hat sich nichts geändert.",
     "empty": "Es ist noch kein Release gelaufen.",
     "unavailableTitle": "Release-Status nicht verfügbar",
@@ -1151,6 +1152,7 @@
       "REASON_REQUIRED": "Begründe, warum du ohne bestandene Kontrastprüfung releast."
     },
     "alreadyRunning": "Es läuft bereits ein Release.",
+    "releasesPaused": "Produktions-Releases sind pausiert.",
     "githubUnavailable": "GitHub war nicht erreichbar, daher wurde nichts gestartet. Versuche es gleich noch einmal.",
     "invalid": "Prüfe Version und Begründung und versuche es erneut.",
     "startFailed": "GitHub hat das Release nicht angenommen, daher wurde nichts gestartet."

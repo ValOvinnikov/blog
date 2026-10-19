@@ -4,7 +4,12 @@ import type { TStartReleaseResult } from '@platform/server/releases/start-releas
 
 const REFUSAL_KEYS = {
   [RELEASE_REFUSAL.RELEASE_RUNNING]: 'alreadyRunning',
-} satisfies Record<typeof RELEASE_REFUSAL.RELEASE_RUNNING, string>;
+  [RELEASE_REFUSAL.RELEASES_PAUSED]: 'releasesPaused',
+} satisfies Record<
+  | typeof RELEASE_REFUSAL.RELEASE_RUNNING
+  | typeof RELEASE_REFUSAL.RELEASES_PAUSED,
+  string
+>;
 
 type TReleaseFailure = Exclude<
   TStartReleaseResult,
