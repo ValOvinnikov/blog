@@ -29,6 +29,7 @@ const TURBO_JSON_FILE = join(repoRoot, 'turbo.json');
 
 const WEB_ENV_FILE = join(repoRoot, 'apps/web/src/utils/env/env.ts');
 const PLATFORM_ENV_FILE = join(repoRoot, 'apps/platform/src/utils/env/env.ts');
+const WORKER_ENV_FILE = join(repoRoot, 'apps/worker/src/utils/env/env.ts');
 const SERVICE_ENV_FILE = join(
   repoRoot,
   'packages/service/src/utils/env/env.ts',
@@ -94,7 +95,16 @@ export const extractEnvKeys = (sf) => {
 // point at the specific runtime-only call site that proves it; the safe
 // default for everything else is turbo.json's build env array, since being
 // allow-listed there is harmless even for a build that never sets the var.
-export const RUNTIME_ONLY_EXCLUDED_VARS = new Set([]);
+export const RUNTIME_ONLY_EXCLUDED_VARS = new Set([
+  // apps/worker: read only in the POST /api/provision handler body
+  // (WORKER_ENQUEUE_SECRET) and in provision-env.ts, called from workflow steps.
+  'ADMIN_APP_BASE_URL',
+  'SANITY_MANAGEMENT_TOKEN',
+  'SANITY_ORGANIZATION_ID',
+  'TENANT_SANITY_DATASET',
+  'VERCEL_TOKEN',
+  'WORKER_ENQUEUE_SECRET',
+]);
 
 export const APPS = [
   {
@@ -102,6 +112,7 @@ export const APPS = [
     files: [WEB_ENV_FILE, SERVICE_ENV_FILE, DB_ENV_FILE, AUTH_ENV_FILE],
   },
   { label: 'platform', files: [PLATFORM_ENV_FILE, DB_ENV_FILE, AUTH_ENV_FILE] },
+  { label: 'worker', files: [WORKER_ENV_FILE, DB_ENV_FILE] },
 ];
 
 export const collectDeclaredVars = (files, parseFn = (f) => parse(f)) => {
@@ -167,7 +178,7 @@ const main = () => {
   }
 
   console.log(
-    "turbo.json's build env allowlist covers every declared build-time env var (web/platform).",
+    "turbo.json's build env allowlist covers every declared build-time env var (web/platform/worker).",
   );
 };
 

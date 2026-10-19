@@ -31,6 +31,7 @@ ignoredOptionalDependencies:
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
+  cbor-extract: false
   esbuild: true
   sharp: true
   unrs-resolver: true
