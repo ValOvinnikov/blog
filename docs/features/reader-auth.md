@@ -32,7 +32,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 - Neon (Auth.js Drizzle adapter tables, column names fixed by the adapter): `users` (`id`, `name`, `email` unique, `emailVerified`, `image`), `accounts` (PK `provider` + `providerAccountId`, cascade on user delete), `sessions` (`sessionToken`, `userId`, `expires`), `verification_tokens` (the magic-link token).
 - No tenant column on any of them: a reader is global, and tenant scoping happens in the rows that reference `users` (bookmarks, memberships).
-- Magic-link copy comes from `email_templates` (`MAGIC_LINK`, or `TENANT_INVITE` when the address has a pending membership invite) and sender settings from `email_config`. Only subject and body fall back to `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE`; sender name, reply-to, logo and postal footer stay unset when not configured, and the from address is `MAGIC_LINK_FROM_ADDRESS`, else Resend's testing sender.
+- Magic-link copy comes from `email_templates` (`MAGIC_LINK` on a site, always — a pending membership invite never changes a site's email; the platform uses `TENANT_INVITE` for an invited address) and sender settings from `email_config`. Only subject and body fall back to `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE`; sender name, reply-to, logo and postal footer stay unset when not configured, and the from address is `MAGIC_LINK_FROM_ADDRESS`, else Resend's testing sender.
 - Nothing is cached; every session read is a database lookup.
 
 ## Configuration
@@ -45,10 +45,10 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 ## Constraints and invariants
 
 - Session strategy is `database`; the `session` callback copies the adapter's `user.id` onto `session.user.id`, which every authorization lookup keys on.
-- Each session row records the app that issued it (`sessions.app`). The platform names its cookies apart and reads a site's session as no session; a site's sessions take the column's `SITE` default and keep Auth.js's default cookie names.
+- Each session row records the app that issued it (`sessions.app`). Each app reads the other's session as no session: the platform names its cookies apart, and a site stamps its sessions `SITE` and keeps Auth.js's default cookie names.
 - The magic-link send never fails on a lookup: tenant identity, invite lookup and template/settings reads each degrade to neutral or default copy. A malformed stored reply-to is dropped.
 - The tenant is resolved from the magic-link URL's host. The email's language is the first segment of the `callbackUrl` path, matched only against the tenant's live locales, else the default locale; with no tenant behind the host it is the invited tenant's locale, else English.
-- `events.signIn` consumes every pending membership invite for the signed-in email, on either app. It swallows errors, since a throw would fail every sign-in.
+- A site registers no `events.signIn`: a reader's sign-in leaves pending membership invites pending, for the next admin sign-in to consume.
 - `@blog/auth` never logs; `db` must never import it.
 - Magic-link sends are unlimited.
 
