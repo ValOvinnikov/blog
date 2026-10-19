@@ -21,7 +21,7 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.134.0",
+    "@anthropic-ai/sdk": "^0.135.0",
     "@blog/auth": "workspace:*",
     "@blog/config": "workspace:*",
     "@blog/db": "workspace:*",

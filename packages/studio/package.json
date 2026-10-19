@@ -34,7 +34,7 @@
     "@sanity/document-internationalization": "^6.2.42",
     "@sanity/language-filter": "^5.0.22",
     "@sanity/orderable-document-list": "^2.0.28",
-    "@sanity/ui": "^4.4.5",
+    "@sanity/ui": "^4.4.9",
     "@sanity/vision": "^6.19.0",
     "lexorank": "^1.0.5",
     "lucide-react": "^1.57.0",
