@@ -67,6 +67,11 @@ D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.funct
 D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
 D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
 
+# A query inline in expect (testing-practices "Writing a component test" →
+# "Name the element"). Run over every test file the diff touches, not only
+# the added lines: a touched file is converted whole.
+D | awk '/^\+\+\+ b\//{f=substr($0,7)} f ~ /\.test\.tsx?$/{print f}' | sort -u | xargs -r grep -nE 'expect\((await )?screen\.|expect\($' 2>/dev/null
+
 # Faking our own components, or reading a fake's arguments (testing-practices
 # → "What to fake"). A vi.mock of our own component is allowed only in a
 # *-module-renderer.test.tsx or a route file's test under src/app/. A
@@ -204,6 +209,12 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   "Where tests live", "Rendering and arrangement", "What to fake"; repetition
   already on `main` that the diff adds nothing to is filed (`CLAUDE.md`
   "Duplication that already existed is filed, not fixed inline").
+- A `screen` query inside `expect(…)` in any test file the diff creates or
+  touches is **blocking** — the asserted element is a named `const` first,
+  and a touched file is converted whole (→ `testing-practices` "Name the
+  element, then assert on the name"). `expect($` hits need a look: a
+  multi-line `expect(` wrapping a query is the same finding, one wrapping a
+  mock is not.
 - A bug fix has a regression test that failed before the fix.
 - Suite labels: a component takes ``describe(`<${Component.name}/>`, …)``,
   anything else the bare symbol. The common miss is a bare symbol on a
