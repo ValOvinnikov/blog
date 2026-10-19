@@ -28,7 +28,9 @@ describe(resolveHomeHref, () => {
   it('links to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(resolveHomeHref()).resolves.toBe('/api/auth/signin');
+    await expect(resolveHomeHref()).resolves.toBe(
+      '/api/auth/signin?callbackUrl=%2F',
+    );
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 

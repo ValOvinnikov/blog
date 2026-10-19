@@ -1,10 +1,14 @@
-export {};
+import { NextRequest } from 'next/server';
 
-vi.mock('next-intl/middleware', () => ({
-  default: vi.fn(),
+const { handleI18nRoutingMock } = vi.hoisted(() => ({
+  handleI18nRoutingMock: vi.fn(),
 }));
 
-const { config } = await import('./proxy');
+vi.mock('next-intl/middleware', () => ({
+  default: vi.fn(() => handleI18nRoutingMock),
+}));
+
+const { config, default: proxy } = await import('./proxy');
 
 const buildMatcherRegExp = () => {
   return new RegExp(`^${config.matcher}$`);
@@ -49,5 +53,30 @@ describe('proxy matcher', () => {
     expect(matcher.test('/_vercel/insights')).toBe(false);
     expect(matcher.test('/favicon.ico')).toBe(false);
     expect(matcher.test('/robots.txt')).toBe(false);
+  });
+});
+
+describe(proxy, () => {
+  it('records the requested page for the sign-in gate, then routes the locale', () => {
+    const request = new NextRequest(
+      'https://admin.example.com/dashboard/leads?page=2',
+    );
+
+    proxy(request);
+
+    expect(request.headers.get('x-admin-requested-path')).toBe(
+      '/dashboard/leads?page=2',
+    );
+    expect(handleI18nRoutingMock).toHaveBeenCalledWith(request);
+  });
+
+  it('overwrites a requested path the client sent itself', () => {
+    const request = new NextRequest('https://admin.example.com/tenants', {
+      headers: { 'x-admin-requested-path': 'https://evil.example.com' },
+    });
+
+    proxy(request);
+
+    expect(request.headers.get('x-admin-requested-path')).toBe('/tenants');
   });
 });

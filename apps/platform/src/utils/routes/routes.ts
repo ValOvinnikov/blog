@@ -5,12 +5,17 @@
  */
 export const STUDIO_SEGMENT = 'studio';
 
+export const SIGN_IN_PATH = '/api/auth/signin';
+
 /**
  * Single source of truth for apps/platform's own URL construction — never build
  * these paths inline elsewhere.
  */
 export const adminRoutes = {
-  signIn: () => '/api/auth/signin',
+  home: () => '/',
+  // Always explicit: without it Auth.js returns to its callback-url cookie, which sign-out leaves on this page.
+  signIn: (callbackUrl = '/') =>
+    `${SIGN_IN_PATH}?${new URLSearchParams({ callbackUrl })}`,
   workspacePending: () => '/workspace-pending',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',

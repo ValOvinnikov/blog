@@ -44,7 +44,7 @@ describe(requireTenantOwner, () => {
       'NEXT_REDIRECT',
     );
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
+    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
   });
 
   it('404s for a signed-in user with no membership in the tenant', async () => {

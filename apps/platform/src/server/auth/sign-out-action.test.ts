@@ -8,6 +8,8 @@ describe(signOutAction, () => {
   it('signs the session out and sends the user to sign-in', async () => {
     await signOutAction();
 
-    expect(signOut).toHaveBeenCalledWith({ redirectTo: '/api/auth/signin' });
+    expect(signOut).toHaveBeenCalledWith({
+      redirectTo: '/api/auth/signin?callbackUrl=%2F',
+    });
   });
 });
