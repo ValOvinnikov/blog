@@ -13,10 +13,13 @@ const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
 const STEP = TENANT_PROVISIONING_STEP.CREATE_WEBHOOK;
 
 vi.mock('@worker/utils/logger/logger');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/db/queries/tenants')>()),
-  updateProvisioningStep: vi.fn(),
-}));
+vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+  (
+    await import('@worker/testing/tenants-queries/fake-tenants-queries')
+  ).withFakeTenantsQueries(
+    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
+  ),
+);
 vi.mock('workflow', async (importOriginal) => ({
   ...(await importOriginal<typeof import('workflow')>()),
   getStepMetadata: vi.fn(),

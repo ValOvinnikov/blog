@@ -1,18 +1,16 @@
-import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import { ERROR_CODE } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
 } from '@blog/db/constants';
 import {
   getTenantById,
   reactivateTenant,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import {
   createTenantRevalidateWebhook,
   createTenantSanityProject,
@@ -23,23 +21,25 @@ import { FatalError, getStepMetadata } from 'workflow';
 
 import { ensureInfrastructure } from './ensure-infrastructure';
 
-const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
+const TENANT_ID = TEST_TENANT_ID;
 const CTX = { runId: 'run-1' };
 
 vi.mock('@worker/utils/logger/logger');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/db/queries/tenants')>()),
-  getTenantById: vi.fn(),
-  reactivateTenant: vi.fn(),
-  updateProvisioningStep: vi.fn(),
-}));
+vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+  (
+    await import('@worker/testing/tenants-queries/fake-tenants-queries')
+  ).withFakeTenantsQueries(
+    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
+  ),
+);
 vi.mock(
   '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
   () => ({ unarchiveSanityProject: vi.fn() }),
 );
-vi.mock('@worker/utils/provision-env/provision-env', () => ({
-  getProvisionEnv: () => ({ sanityManagementToken: 'management-token' }),
-}));
+vi.mock(
+  '@worker/utils/provision-env/provision-env',
+  () => import('@worker/testing/provision-env/fake-provision-env'),
+);
 vi.mock(
   '@worker/utils/db-provisioning-steps/db-provisioning-steps',
   async (importOriginal) => ({
@@ -56,40 +56,6 @@ vi.mock('workflow', async (importOriginal) => ({
   ...(await importOriginal<typeof import('workflow')>()),
   getStepMetadata: vi.fn(),
 }));
-
-function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: TENANT_ID,
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: null,
-    sanityDataset: null,
-    sanityReadTokenEncrypted: null,
-    sanityWriteTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    additionalLocales: [],
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: null,
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    deprovisioningSteps: null,
-    siteType: null,
-    siteTemplateVersion: null,
-    ownerSanityInviteId: null,
-    ownerInviteSentAt: null,
-    ownerInviteAcceptedAt: null,
-    ownerSanityUserId: null,
-    ownerLoginProvider: null,
-    ownerSanityRole: null,
-    createdAt: new Date(0),
-    updatedAt: new Date(0),
-    ...overrides,
-  };
-}
 
 function atAttempt(attempt: number): void {
   vi.mocked(getStepMetadata).mockReturnValue({

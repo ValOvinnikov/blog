@@ -1,4 +1,4 @@
-import { createHmac } from 'node:crypto';
+import { signEnqueuePayload } from '@worker/testing/enqueue/sign-enqueue-request';
 
 import { isValidEnqueueSignature } from './enqueue-signature';
 
@@ -7,10 +7,7 @@ const NOW = 1_700_000_000_000;
 const BODY = '{"tenantId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b"}';
 
 function sign(secret: string, timestamp: string, rawBody: string): string {
-  const digest = createHmac('sha256', secret)
-    .update(`${timestamp}.${rawBody}`)
-    .digest('hex');
-  return `sha256=${digest}`;
+  return signEnqueuePayload({ secret, timestamp, rawBody });
 }
 
 function validate(

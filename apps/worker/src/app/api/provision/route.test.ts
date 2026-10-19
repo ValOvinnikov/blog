@@ -1,25 +1,22 @@
-import { createHmac } from 'node:crypto';
-
-import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import { ERROR_CODE } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
 } from '@blog/db/constants';
 import {
   beginTenantProvisioning,
   finishProvisioningRun,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { signEnqueuePayload } from '@worker/testing/enqueue/sign-enqueue-request';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { start } from 'workflow/api';
 
 import { POST } from './route';
 
 const SECRET = 'enqueue-secret';
-const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
+const TENANT_ID = TEST_TENANT_ID;
 
 const mockEnv = vi.hoisted(() => ({
   WORKER_ENQUEUE_SECRET: 'enqueue-secret' as string | undefined,
@@ -31,59 +28,29 @@ vi.mock('@worker/workflows/provision-tenant', () => ({
   provisionTenant: vi.fn(),
 }));
 vi.mock('workflow/api', () => ({ start: vi.fn() }));
-vi.mock('@blog/db/queries/tenants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/db/queries/tenants')>()),
-  beginTenantProvisioning: vi.fn(),
-  updateProvisioningStep: vi.fn(),
-  finishProvisioningRun: vi.fn(),
-}));
-
-function makeTenant(): TTenant {
-  return {
-    id: TENANT_ID,
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: null,
-    sanityDataset: null,
-    sanityReadTokenEncrypted: null,
-    sanityWriteTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    additionalLocales: [],
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: null,
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    deprovisioningSteps: null,
-    siteType: null,
-    siteTemplateVersion: null,
-    ownerSanityInviteId: null,
-    ownerInviteSentAt: null,
-    ownerInviteAcceptedAt: null,
-    ownerSanityUserId: null,
-    ownerLoginProvider: null,
-    ownerSanityRole: null,
-    createdAt: new Date(0),
-    updatedAt: new Date(0),
-  };
-}
+vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+  (
+    await import('@worker/testing/tenants-queries/fake-tenants-queries')
+  ).withFakeTenantsQueries(
+    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
+  ),
+);
 
 function signedRequest(
   rawBody: string,
   overrides: { secret?: string; timestamp?: number } = {},
 ): Request {
   const { secret = SECRET, timestamp = Date.now() } = overrides;
-  const digest = createHmac('sha256', secret)
-    .update(`${timestamp}.${rawBody}`)
-    .digest('hex');
+  const signature = signEnqueuePayload({
+    secret,
+    timestamp: String(timestamp),
+    rawBody,
+  });
   return new Request('https://worker.example.com/api/provision', {
     method: 'POST',
     headers: {
       'x-worker-timestamp': String(timestamp),
-      'x-worker-signature': `sha256=${digest}`,
+      'x-worker-signature': signature,
     },
     body: rawBody,
   });

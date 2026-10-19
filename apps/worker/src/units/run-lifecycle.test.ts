@@ -17,12 +17,13 @@ const CTX = { runId: 'run-1' };
 
 vi.mock('@worker/utils/logger/logger');
 vi.mock('@blog/db/queries/audit-events', () => ({ insertAuditEvent: vi.fn() }));
-vi.mock('@blog/db/queries/tenants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/db/queries/tenants')>()),
-  startProvisioningRun: vi.fn(),
-  finishProvisioningRun: vi.fn(),
-  setTenantProvisioningStatus: vi.fn(),
-}));
+vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+  (
+    await import('@worker/testing/tenants-queries/fake-tenants-queries')
+  ).withFakeTenantsQueries(
+    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
+  ),
+);
 
 function recordedActions(): string[] {
   return vi.mocked(insertAuditEvent).mock.calls.map(([event]) => event.action);
