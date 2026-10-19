@@ -245,6 +245,31 @@ never reads state, props, handlers or markup shape.
 - **Presence is `.toBeVisible()`; absence is `screen.queryBy*` +
   `.not.toBeInTheDocument()`.** Never `.toBeInTheDocument()` for presence
   (hidden still passes), never `getBy*` for absence (it throws first).
+- **Name the element, then assert on the name.** Every queried element an
+  `expect` checks is first bound to a `const` named for what it is, and
+  `expect` takes that const — never a `screen` query inline. Absence and
+  async read the same way:
+
+  ```tsx
+  const heading = screen.getByRole('heading', {
+    level: 1,
+    name: 'This sign-in link no longer works',
+  });
+  expect(heading).toBeVisible(); // ✅
+
+  const subscribeButton = screen.queryByRole('button', { name: 'Subscribe' });
+  expect(subscribeButton).not.toBeInTheDocument(); // ✅
+
+  const confirmation = await screen.findByText('Check your inbox');
+  expect(confirmation).toBeVisible(); // ✅
+
+  expect(screen.getByRole('heading', { level: 1 })).toBeVisible(); // ❌
+  ```
+
+  **A test file you create or touch is converted whole** — every inline
+  query assertion in it, not only the lines your change edits. Files the
+  change does not touch stay as they are.
+
 - **Interaction is `userEvent`, set up in `beforeEach`** (`user =
 userEvent.setup()`), then `await user.click(…)`, `user.type(…)`,
   `user.keyboard('{Escape}')`. `fireEvent` only for an event `userEvent`
@@ -290,10 +315,11 @@ describe(`<${SubscribeForm.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Subscribe' }));
 
-    expect(await screen.findByText('Check your inbox')).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Subscribe' }),
-    ).not.toBeInTheDocument();
+    const confirmation = await screen.findByText('Check your inbox');
+    const subscribeButton = screen.queryByRole('button', { name: 'Subscribe' });
+
+    expect(confirmation).toBeVisible();
+    expect(subscribeButton).not.toBeInTheDocument();
   });
 });
 ```
@@ -425,6 +451,8 @@ have a test? Report gaps rather than leaving them silent.
       no network, no real time.
 - [ ] Fixtures from `testing/` builders, no duplicated literals.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
+- [ ] Every asserted element is a named `const`; no `screen` query inside
+      `expect(…)` anywhere in a file the change creates or touches.
 - [ ] Every `it` title is behaviour, 80 characters or fewer.
 - [ ] No arrangement repeated across `it`s; no prop bag rendered 3+ times.
 - [ ] Migrations: transform correctness + idempotency.
