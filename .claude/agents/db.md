@@ -69,8 +69,12 @@ importer rule in the last bullet is not lint-enforced.
   `scripts/provision-tenant/` imports `@sanity/client` to seed and verify
   starter content (the data API), under its own ESLint override. The
   Management API calls (project, dataset, CORS, webhook, tokens) use plain
-  `fetch`, in `scripts/provision-tenant/lib/` and
-  `src/utils/sanity-management-client/`, and import no SDK.
+  `fetch`, all in `src/utils/sanity-management-client/`, and import no SDK.
+  **Temporary importer exception:** `apps/worker` imports
+  `scripts/provision-tenant/steps/*` and its pure `lib/` helpers in place
+  through its `@blog/db-provisioning/*` alias, never the CLI's `lib/env.ts`,
+  `run.ts` or `report-*` helpers. A change there must keep both drivers
+  green until #4961 moves the steps into the worker and removes the alias.
 - **Never log — return or throw to the caller.** No `console.*`, and `src/`
   never imports `@blog/insight`. An expected failure returns
   `TResult<T, TErrorCode>` (`@blog/utils`) with an `ERROR_CODE.DB_*` code; an
