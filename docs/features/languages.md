@@ -66,7 +66,7 @@ A tenant's site is published in one or more languages from a curated list — En
 - A request for a supported language the tenant does not serve redirects to the same path in the default language; its content stays published.
 - An unprefixed request redirects to a translation only when the tenant has two or more live languages, the method is `GET`/`HEAD`, the client is not a crawler, the preferred language (the `NEXT_LOCALE` cookie, else `Accept-Language`) is not the default, and the translation map has that page in it. Crawlers always get the default language.
 - `localeDetection` is off and `localePrefix` is `as-needed`. Fixed path segments (`/blog`, `/topics`, `/tags`) are not translated.
-- `NEXT_LOCALE` is written by `/api/switch-language` and, because `buildTenantRouting` leaves next-intl's own locale cookie on, by next-intl's middleware on page requests.
+- `NEXT_LOCALE` is written only by `/api/switch-language`. `buildTenantRouting` sets `localeCookie: false`, so no page request — a first visit, a link into another language, a page with no translation — changes the remembered language.
 - A page with no document in the requested language is a 404; a missing Home, blog, topics or tags list page in a non-default language redirects to the default language's home page instead. The switch goes to the current page's translation, else that language's list page for a post, topic or tag page, else that language's Home.
 - A missing field-level value falls back to the default language, field by field; a missing translation never blocks publishing. With fewer than two live languages Studio hides the language machinery entirely, including the switcher toggles.
 - All in-app links go through `SmartLink`, which prefixes the current language. A language outside `LOCALE_ISO_CODES` (another script, right-to-left) is a project, not a list entry.
@@ -89,7 +89,7 @@ A tenant's site is published in one or more languages from a curated list — En
 
 ## Tests and stories
 
-- `apps/web`: `src/proxy.test.ts`, `src/i18n/request.test.ts`, `app/api/switch-language/route.test.ts`, `components/shared/language-switcher/language-switcher.test.tsx`, and tests beside the `find-translated-path`, `language-cookie`, `match-accept-language` and `to-switch-language-target` utils.
+- `apps/web`: `src/proxy.test.ts`, `src/i18n/request.test.ts`, `src/i18n/routing.test.ts`, `app/api/switch-language/route.test.ts`, `components/shared/language-switcher/language-switcher.test.tsx`, and tests beside the `find-translated-path`, `language-cookie`, `match-accept-language` and `to-switch-language-target` utils.
 - `packages/service/src/shared/localization/**/*.test.ts`; `packages/db/src/queries/tenants/{get-tenant-live-locales,set-tenant-additional-locales}/*.test.ts`; `packages/studio/src/schema-types/inputs/localization-notice-input/*.test.ts`, `packages/studio/src/structure/locales/order-locales.test.ts`.
 - `apps/platform`: `components/features/languages/languages-settings/languages-settings.test.tsx`, `server/tenants/update-tenant-languages-action.test.ts`.
 - Story: `apps/web/src/components/shared/language-switcher/language-switcher.stories.tsx`.
