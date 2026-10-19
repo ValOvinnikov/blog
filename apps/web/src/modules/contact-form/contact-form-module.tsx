@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
@@ -14,14 +15,15 @@ export interface IContactFormModuleProps {
 }
 
 export const ContactFormModule = async ({ id }: IContactFormModuleProps) => {
-  const [
-    { sanityContext, locale, defaultLocale = routing.defaultLocale },
-    isEnabled,
-    tenant,
-  ] = await Promise.all([
-    getRequestContext(),
+  const {
+    tenantId,
+    sanityContext,
+    locale,
+    defaultLocale = routing.defaultLocale,
+  } = await getRequestContext();
+  const [isEnabled, tenant] = await Promise.all([
     isCapabilityEnabled(CAPABILITY.CONTACT_FORM),
-    resolveRequestTenant(),
+    resolveRequestTenant(tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER),
   ]);
   if (!isEnabled || !tenant || !isTenantActive(tenant)) return null;
 

@@ -2,6 +2,7 @@ import { TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeContactFormModule } from '@web/testing/modules/contact-form/fixtures';
@@ -110,5 +111,26 @@ describe(`<${ContactFormModule.name}/>`, () => {
     expect(
       screen.queryByRole('heading', { name: HEADING }),
     ).not.toBeInTheDocument();
+  });
+
+  it("resolves the request context's tenant", async () => {
+    await setup();
+
+    expect(resolveRequestTenant).toHaveBeenCalledWith(
+      DEFAULT_REQUEST_CONTEXT.tenantId,
+    );
+  });
+
+  it('reads no tenant from the request headers when the route resolved no tenant', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      tenantId: undefined,
+    });
+
+    await setup();
+
+    expect(resolveRequestTenant).toHaveBeenCalledWith(
+      UNRESOLVED_TENANT_PLACEHOLDER,
+    );
   });
 });
