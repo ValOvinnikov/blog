@@ -57,6 +57,16 @@ contracts:
     via `recordAuditEvent`, gated on the mutation actually having succeeded —
     auditing is a separate concern from logging, and a false record is worse
     than a missing one.
+  - `worker` — `apps/worker`, a third, non-public app that runs tenant
+    provisioning as Vercel Workflow (4.x) durable runs the admin panel
+    enqueues with a shared secret. A sibling to `platform-app`
+    (`config → db → worker`): it consumes `db`, `config`, `utils`, `insight`,
+    `email` and `@sanity/client`, is imported by nothing, and alone holds the
+    provisioning secrets. Its guide carries the unit contract — idempotency
+    decided from what exists in Sanity and Vercel, create-if-missing seeding
+    with fixed ids, a timeout on every external call, concurrency on
+    `beginTenantProvisioning`'s row guard — because each is a failure that
+    passes every test until a run is retried.
   - `email` owns `packages/email` (`@blog/email`) — the single home for every
     email the product sends: the shared branded HTML shell, the canonical
     `escapeHtml`, and the typed `sendEmail` Resend transport. It sits low in
