@@ -3,6 +3,7 @@ import { CAPABILITY } from '@blog/config';
 import {
   clampToEntitlement,
   featureDefaultsToValues,
+  keepStoredOutOfPlan,
 } from './settings-features-fields';
 
 describe(featureDefaultsToValues, () => {
@@ -80,5 +81,44 @@ describe(clampToEntitlement, () => {
         CAPABILITY.CONTACT_FORM,
       ]),
     ).toEqual(values);
+  });
+});
+
+describe(keepStoredOutOfPlan, () => {
+  it('takes every out-of-plan toggle from the stored values, leaving entitled ones as submitted', () => {
+    const submitted = {
+      commentsEnabled: true,
+      ratingsEnabled: false,
+      bookmarksEnabled: false,
+      newsletterEnabled: false,
+      analyticsEnabled: false,
+      consentBannerEnabled: true,
+      contactFormEnabled: false,
+    };
+    const stored = {
+      commentsEnabled: false,
+      ratingsEnabled: true,
+      bookmarksEnabled: true,
+      newsletterEnabled: false,
+      analyticsEnabled: true,
+      consentBannerEnabled: false,
+      contactFormEnabled: true,
+    };
+
+    expect(
+      keepStoredOutOfPlan(submitted, stored, [
+        CAPABILITY.COMMENTS,
+        CAPABILITY.RATINGS,
+        CAPABILITY.CONSENT_BANNER,
+      ]),
+    ).toEqual({
+      commentsEnabled: true,
+      ratingsEnabled: false,
+      bookmarksEnabled: true,
+      newsletterEnabled: false,
+      analyticsEnabled: true,
+      consentBannerEnabled: true,
+      contactFormEnabled: true,
+    });
   });
 });

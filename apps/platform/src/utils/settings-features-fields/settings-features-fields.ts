@@ -62,6 +62,20 @@ export const clampToEntitlement = (
   return clamped;
 };
 
+export const keepStoredOutOfPlan = (
+  values: TSettingsFeaturesValues,
+  stored: TSettingsFeaturesValues,
+  entitledCapabilities: TCapability[],
+): TSettingsFeaturesValues => {
+  const kept = { ...values };
+  for (const { capability, field } of CAPABILITY_TOGGLES) {
+    if (!entitledCapabilities.includes(capability)) {
+      kept[field] = stored[field];
+    }
+  }
+  return kept;
+};
+
 export const withComingSoonOff = (
   values: TSettingsFeaturesValues,
 ): TSettingsFeaturesValues => {
