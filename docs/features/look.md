@@ -68,8 +68,9 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Constraints and invariants
 
 - The resolved theme is never partial. `toThemeTokens` fills every gap from the row's preset, and a missing row or failed fetch falls back to `CONSOLE`.
-- Accent and logo ramps are declared in both `:root` and `.dark`. Radius, density, card style and the image-scrim ramp go in `:root` only (see [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)).
-- `theme.css`'s static values equal what `buildThemeStyleBlock` emits for the Console preset; `build-theme-style-block.test.ts` reads `theme.css` for the radius, spacing, item-card and scrim tokens, and checks the brand and logo ramps against fixed literals.
+- Accent and logo ramps are declared in both `:root` and `.dark`. Radius, density, card style, header control style and the image-scrim ramp go in `:root` only (see [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)).
+- The public site resolves the stored header control style through `toThemeTokens` (falling back to the preset's) and `buildThemeStyleBlock` spreads `HEADER_CONTROL_STYLE_DECLARATIONS` into `:root`, so every header control follows it on the next render after a save (the existing `site-config:<id>` tag). Hover and open draw a brand outline in every style.
+- `theme.css`'s static values equal what `buildThemeStyleBlock` emits for the Console preset; `build-theme-style-block.test.ts` reads `theme.css` for the radius, spacing, item-card, header-control and scrim tokens, and checks the brand and logo ramps against fixed literals.
 - Accent-hue guard: the form blocks saving and `updateLookAction` refuses a hue that `isAccentHueAccessible` rejects. The site and emails replace such a stored hue with the preset's. The guard checks one pair, `--text` on `--brand-primary-muted` in both modes at 4.5:1, which every hue from 0 to 360 passes. So the refusal never fires today, and the other accent-dependent pairs (button labels, links on grey bands) are not checked.
 - The logo hue is unguarded; it colours only the generated three-layer brand mark.
 - `ACCENT_BAR` item cards stay square whatever the radius; only `OUTLINED` follows the radius scale.

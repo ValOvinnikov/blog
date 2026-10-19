@@ -11,3 +11,9 @@ export const CAPABILITY = {
 } as const;
 
 export type TCapability = TValueOf<typeof CAPABILITY>;
+
+export const READER_ACCOUNT_CAPABILITIES = [
+  CAPABILITY.BOOKMARKS,
+  CAPABILITY.COMMENTS,
+  CAPABILITY.NEWSLETTER,
+] as const satisfies readonly TCapability[];
