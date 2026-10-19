@@ -22,6 +22,7 @@ export const buildTenantRouting = (
     defaultLocale,
     localePrefix: { mode: 'as-needed', prefixes: LOCALE_PREFIXES },
     localeDetection: false,
+    localeCookie: false,
   });
 
 export const routing = buildTenantRouting(

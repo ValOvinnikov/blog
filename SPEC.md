@@ -2136,8 +2136,11 @@ the others do (`/nl/over`). `proxy.ts` resolves the language into the
 `[tenant]/[locale]` segment, redirects a switched-off prefix to the default
 language, and on an unprefixed URL only redirects by browser language (or the
 remembered `NEXT_LOCALE` cookie) when the page has a translation in that
-language. Fixed path segments from code (`/blog`, `/topics`, `/tags`) are not
-translated. Crawlers send no browser language and always get the default
+language. Only the language switcher remembers a language: its
+`/api/switch-language` route is the one writer of `NEXT_LOCALE`, and web's
+routing sets `localeCookie: false`, so opening a page — a first visit, a link
+into another language, a page with no translation — never changes it. Fixed
+path segments from code (`/blog`, `/topics`, `/tags`) are not translated. Crawlers send no browser language and always get the default
 language.
 
 **The admin's language.** `apps/platform` follows the browser's language on
