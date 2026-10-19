@@ -1,5 +1,4 @@
-import { HEADER_CONTROL } from '@blog/ui/lib/styling';
-import { tv } from 'tailwind-variants';
+import { HEADER_CONTROL, tv } from '@blog/ui/lib/styling';
 
 export const SHEET_BELOW_LG = [
   'max-lg:fixed max-lg:inset-x-gutter max-lg:mt-0 max-lg:w-auto max-lg:max-w-none',

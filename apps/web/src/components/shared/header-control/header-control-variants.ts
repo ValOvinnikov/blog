@@ -1,5 +1,4 @@
-import { HEADER_CONTROL } from '@blog/ui/lib/styling';
-import { tv } from 'tailwind-variants';
+import { HEADER_CONTROL, tv } from '@blog/ui/lib/styling';
 
 export const headerControlVariants = tv({
   base: [

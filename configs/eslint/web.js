@@ -28,6 +28,13 @@ const sanityRestrictedGroup = {
     'apps/web must not talk to Sanity directly — fetch through @blog/service.',
 };
 
+const configuredTvPath = {
+  name: 'tailwind-variants',
+  importNames: ['tv', 'createTV'],
+  message:
+    "Import tv from '@blog/ui/lib/styling' — the unconfigured tailwind-merge drops the repo's custom size and spacing tokens.",
+};
+
 const webTestingRestrictedGroup = {
   group: ['@web/testing', '@web/testing/*', '**/testing/**'],
   message:
@@ -71,7 +78,7 @@ export default [
       'no-restricted-imports': [
         'error',
         {
-          paths: [noVitestGlobalsImportPath],
+          paths: [noVitestGlobalsImportPath, configuredTvPath],
           patterns: [sanityRestrictedGroup, webTestingRestrictedGroup],
         },
       ],
@@ -86,7 +93,7 @@ export default [
       'no-restricted-imports': [
         'error',
         {
-          paths: [noVitestGlobalsImportPath],
+          paths: [noVitestGlobalsImportPath, configuredTvPath],
           patterns: [sanityRestrictedGroup],
         },
       ],

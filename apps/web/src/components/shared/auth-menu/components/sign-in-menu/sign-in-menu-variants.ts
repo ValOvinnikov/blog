@@ -1,5 +1,5 @@
+import { tv } from '@blog/ui/lib/styling';
 import { SHEET_BELOW_LG } from '@web/components/shared/auth-menu/auth-menu-variants';
-import { tv } from 'tailwind-variants';
 
 export const signInMenuVariants = tv({
   slots: {

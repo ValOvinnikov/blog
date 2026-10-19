@@ -1,4 +1,4 @@
-import { tv } from 'tailwind-variants';
+import { tv } from '@blog/ui/lib/styling';
 
 export const socialLinksVariants = tv({
   base: ['flex flex-wrap gap-2 list-none'],

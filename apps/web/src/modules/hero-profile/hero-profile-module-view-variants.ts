@@ -1,4 +1,4 @@
-import { tv } from 'tailwind-variants';
+import { tv } from '@blog/ui/lib/styling';
 
 export const heroProfileAvatarVariants = tv({
   base: ['size-24 rounded-full object-cover sm:size-32'],

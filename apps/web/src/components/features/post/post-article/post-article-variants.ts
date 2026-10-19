@@ -1,5 +1,5 @@
+import { tv } from '@blog/ui/lib/styling';
 import { proseMeasureCapSlot } from '@web/components/shared/portable-text/config/full-bleed';
-import { tv } from 'tailwind-variants';
 
 export const postArticleVariants = tv({
   slots: {
