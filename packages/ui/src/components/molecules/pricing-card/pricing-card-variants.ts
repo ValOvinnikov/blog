@@ -7,7 +7,7 @@ export const pricingCardVariants = tv({
       'relative grid grid-rows-[repeat(5,auto)_1fr_repeat(2,auto)]',
       // Inside `PricingCardGrid` (matched by its `data-pricing-card-grid`) the card adopts the grid's rows, so neighbouring tiers line up.
       'in-data-pricing-card-grid:row-span-8 in-data-pricing-card-grid:grid-rows-subgrid in-data-pricing-card-grid:mb-6',
-      'rounded-card border border-border bg-surface surface-card',
+      'item-card surface-card',
       'px-card-x py-card-y',
     ],
     highlight: ['row-start-1 h-4'],
@@ -22,7 +22,12 @@ export const pricingCardVariants = tv({
   },
   variants: {
     isHighlighted: {
-      true: { root: ['border-brand-primary shadow-card'] },
+      true: {
+        root: [
+          'border-brand-primary',
+          '[--item-border-width:1px] [--item-accent-color:var(--brand-primary)] [--item-shadow:var(--shadow-card)]',
+        ],
+      },
       false: {},
     },
   },
