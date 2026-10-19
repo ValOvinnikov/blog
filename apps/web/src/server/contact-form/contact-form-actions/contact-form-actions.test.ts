@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { logger } from '@web/utils/logger/logger';
@@ -83,7 +83,7 @@ describe('submitContactMessage', () => {
   beforeEach(() => {
     isBotOrUnverifiedMock.mockResolvedValue(false);
     isRateLimitedMock.mockResolvedValue(false);
-    getTenantPlanMock.mockResolvedValue({ ok: true, data: 'GROWTH' });
+    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.GROWTH });
     getEffectiveSettingsFeaturesMock.mockResolvedValue({
       ok: true,
       data: { [CAPABILITY.CONTACT_FORM]: true },
@@ -180,7 +180,7 @@ describe('submitContactMessage', () => {
   });
 
   it('blocks when the plan does not entitle the contact form', async () => {
-    getTenantPlanMock.mockResolvedValue({ ok: true, data: 'FREE' });
+    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.FREE });
 
     const result = await submitContactMessage(makeInput());
 

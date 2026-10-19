@@ -7,6 +7,7 @@ import {
   resolveTenantEmailBrand,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
@@ -160,7 +161,7 @@ describe('subscribeToNewsletterAction', () => {
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue(SITE_URL);
     getTenantPlanMock.mockReset();
-    getTenantPlanMock.mockResolvedValue({ ok: true, data: 'GROWTH' });
+    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.GROWTH });
     getEffectiveSettingsFeaturesMock.mockReset();
     getEffectiveSettingsFeaturesMock.mockResolvedValue({
       ok: true,
@@ -414,7 +415,7 @@ describe('subscribeToNewsletterAction', () => {
     });
 
     it('returns UNAVAILABLE without storing when the plan does not entitle the newsletter', async () => {
-      getTenantPlanMock.mockResolvedValue({ ok: true, data: 'FREE' });
+      getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.FREE });
       const result = await subscribeToNewsletterAction(EMAIL);
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
