@@ -5,34 +5,37 @@ import { headerControlVariants } from '@web/components/shared/header-control';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-export interface IAccountSlotProps {
-  isPlaceholder?: boolean;
+export interface IAccountPlaceholderProps {
   children: ReactNode;
 }
 
-/** Holds the header's account control at the Sign in trigger's width, the widest state, so resolving the session never shifts the bar. */
-export const AccountSlot = ({
-  isPlaceholder = false,
-  children,
-}: IAccountSlotProps) => {
+/** Holds the header's account slot at the width of the reader's last known sign-in state until the session resolves. */
+export const AccountPlaceholder = ({ children }: IAccountPlaceholderProps) => {
   const t = useTranslations('authMenu');
-  const { slot, footprint, signInTrigger } = authMenuVariants({
-    isPlaceholder,
-  });
+  const {
+    slot,
+    signedOutFootprint,
+    signedInFootprint,
+    emptyOutline,
+    signInTrigger,
+  } = authMenuVariants();
 
   return (
     <span className={slot()}>
-      <span aria-hidden="true">
+      <span aria-hidden="true" className={signedOutFootprint()}>
         <IconButton
           variant="bordered"
           ariaLabel={t('signIn')}
           isInert={true}
           className={headerControlVariants({
-            class: [signInTrigger(), footprint()],
+            class: [signInTrigger(), emptyOutline()],
           })}
         >
           <SignInLabel />
         </IconButton>
+      </span>
+      <span aria-hidden="true" className={signedInFootprint()}>
+        <span className={headerControlVariants({ shape: 'square' })} />
       </span>
       {children}
     </span>

@@ -10,26 +10,28 @@ import { useId } from 'react';
 
 import { authMenuVariants } from './auth-menu-variants';
 import { AccountMenu } from './components/account-menu/account-menu';
-import { AccountSlot } from './components/account-slot/account-slot';
+import { AccountPlaceholder } from './components/account-placeholder/account-placeholder';
 import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
+import { useSignedInHint } from './hooks/use-signed-in-hint';
 
 export interface IAuthMenuProps {
   oauthProviderIds: readonly TOAuthProviderId[];
 }
 
 export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
-  const sessionResult = useSession();
+  const { status, data } = useSession();
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover({
     overlayId: ACCOUNT_OVERLAY_ID,
   });
-  const { loadingStatus } = authMenuVariants();
+  const { loadingStatus, reveal } = authMenuVariants();
+  useSignedInHint(status, data?.expires);
 
-  if (sessionResult.status === 'loading') {
+  if (status === 'loading') {
     return (
-      <AccountSlot isPlaceholder={true}>
+      <AccountPlaceholder>
         <span
           role="status"
           aria-label={t('loadingAccountStatus')}
@@ -37,15 +39,15 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
         >
           {t('loadingAccountStatus')}
         </span>
-      </AccountSlot>
+      </AccountPlaceholder>
     );
   }
 
-  if (sessionResult.status === 'authenticated') {
-    const { name, email, image } = sessionResult.data.user ?? {};
+  if (status === 'authenticated') {
+    const { name, email, image } = data.user ?? {};
 
     return (
-      <AccountSlot>
+      <span className={reveal()}>
         <AccountMenu
           panelId={panelId}
           isOpen={open}
@@ -56,19 +58,21 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
           email={email}
           image={image}
         />
-      </AccountSlot>
+      </span>
     );
   }
 
   return (
-    <SignInMenu
-      panelId={panelId}
-      isOpen={open}
-      toggle={toggle}
-      triggerRef={triggerRef}
-      panelRef={panelRef}
-      oauthError={oauthError}
-      oauthProviderIds={oauthProviderIds}
-    />
+    <span className={reveal()}>
+      <SignInMenu
+        panelId={panelId}
+        isOpen={open}
+        toggle={toggle}
+        triggerRef={triggerRef}
+        panelRef={panelRef}
+        oauthError={oauthError}
+        oauthProviderIds={oauthProviderIds}
+      />
+    </span>
   );
 };

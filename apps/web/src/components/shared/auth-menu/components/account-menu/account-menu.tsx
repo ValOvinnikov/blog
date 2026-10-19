@@ -7,6 +7,7 @@ import { Text } from '@blog/ui/components/atoms/text';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { encodeClearedSignedInHint } from '@web/utils/signed-in-hint-cookie';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useState, type RefObject } from 'react';
@@ -125,7 +126,10 @@ export const AccountMenu = ({
           {t('accountSettings')}
         </PopoverMenu.Item>
         <PopoverMenu.Item
-          onClick={() => signOut()}
+          onClick={() => {
+            document.cookie = encodeClearedSignedInHint();
+            void signOut();
+          }}
           className={signOutItem()}
           icon={<Icon name={ICONS.POWER} size={SIZE.SM} />}
         >
