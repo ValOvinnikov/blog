@@ -2,6 +2,10 @@ import type { TValueOf } from '@blog/config/utils';
 
 import { type TCapability, CAPABILITY } from './capability';
 import { type TCardStyle, CARD_STYLE } from './card-style';
+import {
+  type THeaderControlStyle,
+  HEADER_CONTROL_STYLE,
+} from './header-control-style';
 
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
@@ -62,11 +66,13 @@ export type TThemeTokens = {
   radiusScale: TRadiusScale;
   density: TDensity;
   cardStyle?: TCardStyle;
+  headerControlStyle?: THeaderControlStyle;
 };
 
 export type TPresetBundle = {
   themeTokens: TThemeTokens;
   cardStyle: TCardStyle;
+  headerControlStyle: THeaderControlStyle;
   featureDefaults: Record<TCapability, boolean>;
 };
 
@@ -80,6 +86,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       density: DENSITY.DEFAULT,
     },
     cardStyle: CARD_STYLE.ACCENT_BAR,
+    headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
@@ -99,6 +106,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       density: DENSITY.COMPACT,
     },
     cardStyle: CARD_STYLE.OUTLINED,
+    headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,

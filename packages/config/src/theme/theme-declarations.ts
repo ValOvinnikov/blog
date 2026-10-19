@@ -1,9 +1,11 @@
 import {
   CARD_STYLE,
   DENSITY,
+  HEADER_CONTROL_STYLE,
   RADIUS_SCALE,
   type TCardStyle,
   type TDensity,
+  type THeaderControlStyle,
   type TRadiusScale,
 } from '@blog/config/constants';
 
@@ -122,6 +124,24 @@ export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
     '--item-accent-width': '1px',
     '--item-accent-color': 'var(--border)',
     '--item-shadow': 'none',
+  },
+};
+
+export const HEADER_CONTROL_STYLE_DECLARATIONS: Record<
+  THeaderControlStyle,
+  TThemeDeclarations
+> = {
+  [HEADER_CONTROL_STYLE.OUTLINED]: {
+    '--header-control-border': 'var(--border-strong)',
+    '--header-control-fill': 'var(--surface)',
+  },
+  [HEADER_CONTROL_STYLE.SOFT]: {
+    '--header-control-border': 'transparent',
+    '--header-control-fill': 'var(--border)',
+  },
+  [HEADER_CONTROL_STYLE.PLAIN]: {
+    '--header-control-border': 'transparent',
+    '--header-control-fill': 'transparent',
   },
 };
 

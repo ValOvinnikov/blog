@@ -4,6 +4,7 @@ import {
   COLOR_SCHEME,
   type TCardStyle,
   type TColorScheme,
+  type THeaderControlStyle,
 } from '@blog/config/constants';
 
 import type { TThemeToken } from './contrast-pairs';
@@ -11,6 +12,7 @@ import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
   CARD_STYLE_DECLARATIONS,
+  HEADER_CONTROL_STYLE_DECLARATIONS,
   IMAGE_SCRIM_RAMP,
   type TOklchRamp,
 } from './theme-declarations';
@@ -28,6 +30,7 @@ export type TContrastContext = {
   scheme: TColorScheme;
   hue: number;
   cardStyle: TCardStyle;
+  headerControlStyle: THeaderControlStyle;
 };
 
 const SCHEME_RAMPS: Record<TColorScheme, TOklchRamp> = {
@@ -57,18 +60,27 @@ const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--field-boundary': '--border-emphasis',
 };
 
+// A transparent header control shows the header's own band.
+const TRANSPARENT_SURFACE: TThemeToken = '--primary';
+
 // A scrim is tested over the brightest photo it can sit on, the worst case for light copy.
 const PHOTO_BACKDROP: TOklchColor = { l: 1, c: 0, h: 0 };
 
 const resolveStop = (
   token: TThemeToken,
-  { scheme, cardStyle }: Omit<TContrastContext, 'hue'>,
+  context: Omit<TContrastContext, 'hue'>,
 ): TOklchRamp[TThemeToken] => {
-  const cardStyleValue = CARD_STYLE_DECLARATIONS[cardStyle][token];
+  const { scheme, cardStyle, headerControlStyle } = context;
+  const styleValue =
+    CARD_STYLE_DECLARATIONS[cardStyle][token] ??
+    HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle][token];
+  if (styleValue === 'transparent') {
+    return resolveStop(TRANSPARENT_SURFACE, context);
+  }
   const alias =
     TOKEN_ALIASES[token] ??
-    (cardStyleValue?.match(/^var\((--[\w-]+)\)$/)?.[1] as TThemeToken);
-  if (alias) return resolveStop(alias, { scheme, cardStyle });
+    (styleValue?.match(/^var\((--[\w-]+)\)$/)?.[1] as TThemeToken);
+  if (alias) return resolveStop(alias, context);
 
   const stop = SCHEME_RAMPS[scheme][token];
   if (!stop) throw new Error(`No ${scheme} value registered for ${token}`);

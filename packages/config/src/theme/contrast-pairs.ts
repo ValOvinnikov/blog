@@ -144,6 +144,18 @@ export const CONTRAST_PAIRS = {
     role: CONTRAST_ROLE.DECORATIVE,
     followsAccentHue: true,
   },
+  HEADER_CONTROL_TEXT: {
+    foreground: '--text',
+    surfaces: ['--header-control-fill'],
+    role: CONTRAST_ROLE.TEXT,
+    followsAccentHue: true,
+  },
+  HEADER_CONTROL_BRAND: {
+    foreground: '--brand-primary',
+    surfaces: ['--header-control-fill'],
+    role: CONTRAST_ROLE.TEXT,
+    followsAccentHue: true,
+  },
   SELECTION: {
     foreground: '--brand-primary',
     surfaces: ['--brand-primary-muted'],
