@@ -4,6 +4,7 @@ import {
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
+  HEADER_CONTROL_STYLE,
   HUE_MAX,
   HUE_MIN,
   PRESET_ID,
@@ -11,6 +12,7 @@ import {
   RADIUS_SCALE,
   type TCardStyle,
   type TDensity,
+  type THeaderControlStyle,
   type TLanguageSwitcherStyle,
   type TFontChoice,
   type TLocaleIsoCode,
@@ -76,6 +78,14 @@ export const updateSiteConfigInputSchema = z.object({
   cardStyle: z
     .enum(Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]])
     .optional(),
+  headerControlStyle: z
+    .enum(
+      Object.values(HEADER_CONTROL_STYLE) as [
+        THeaderControlStyle,
+        ...THeaderControlStyle[],
+      ],
+    )
+    .optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
@@ -99,6 +109,9 @@ function presentOptionalFields(
     fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
   }
   if (parsed.cardStyle !== undefined) fields.cardStyle = parsed.cardStyle;
+  if (parsed.headerControlStyle !== undefined) {
+    fields.headerControlStyle = parsed.headerControlStyle;
+  }
   if (parsed.logoAssetUrl !== undefined) {
     fields.logoAssetUrl = parsed.logoAssetUrl;
   }
@@ -150,12 +163,14 @@ export async function upsertSiteConfig(
     density: parsed.density,
   };
   const optional = presentOptionalFields(parsed);
+  const presetBundle = PRESET_REGISTRY[parsed.preset];
 
   const [row] = await db
     .insert(siteConfig)
     .values({
       tenantId,
-      cardStyle: PRESET_REGISTRY[parsed.preset].cardStyle,
+      cardStyle: presetBundle.cardStyle,
+      headerControlStyle: presetBundle.headerControlStyle,
       ...required,
       ...optional,
       ...(voicePatch && { voiceOverridesByLocale: voicePatch }),

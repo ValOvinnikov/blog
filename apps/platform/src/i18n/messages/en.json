@@ -1108,6 +1108,7 @@
     "description": "Cut a production release of the latest commit on main.",
     "started": "Release started.",
     "runningHint": "A release is running.",
+    "pausedHint": "Production releases are paused.",
     "nothingToReleaseHint": "Nothing has changed since {lastTag}.",
     "empty": "No release has run yet.",
     "unavailableTitle": "Release status is unavailable",
@@ -1151,6 +1152,7 @@
       "REASON_REQUIRED": "Say why you are releasing without a passing contrast check."
     },
     "alreadyRunning": "A release is already running.",
+    "releasesPaused": "Production releases are paused.",
     "githubUnavailable": "GitHub could not be reached, so nothing was started. Try again in a moment.",
     "invalid": "Check the version and the reason, then try again.",
     "startFailed": "GitHub did not accept the release, so nothing was started."

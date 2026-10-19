@@ -12,17 +12,16 @@ import {
 } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
 import { updateLookAction, type TUpdateLookInput } from './update-look-action';
 
-const { upsertSiteConfigMock, revalidateSiteConfigMock, insertAuditEventMock } =
-  vi.hoisted(() => ({
-    upsertSiteConfigMock: vi.fn(),
-    revalidateSiteConfigMock: vi.fn(),
-    insertAuditEventMock: vi.fn(),
-  }));
+const { upsertSiteConfigMock, insertAuditEventMock } = vi.hoisted(() => ({
+  upsertSiteConfigMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
+}));
 
 vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/config')>()),
@@ -33,9 +32,7 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
-  revalidateSiteConfig: revalidateSiteConfigMock,
-}));
+vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/utils/logger/logger');
 
@@ -64,6 +61,8 @@ const VALID_INPUT: TUpdateLookInput = {
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
   cardStyle: CARD_STYLE.OUTLINED,
 };
+
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
 describe(updateLookAction, () => {
   beforeEach(() => {

@@ -13,10 +13,12 @@ import {
 } from '@platform/constants/settings';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
 import {
   CAPABILITY_TOGGLES,
+  keepStoredOutOfPlan,
   withComingSoonOff,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { z } from 'zod';
@@ -40,9 +42,9 @@ export type TUpdateFeaturesResult = TActionResult<
 >;
 
 /**
- * A "Coming soon" capability is always written off; any other toggle exceeding
- * `PLAN_REGISTRY[tenant.plan]` rejects the whole save rather than silently
- * dropping just that field.
+ * A "Coming soon" capability is always written off. Switching on a toggle
+ * outside `PLAN_REGISTRY[tenant.plan]` rejects the whole save; otherwise an
+ * out-of-plan toggle keeps its stored value, so a downgrade loses nothing.
  */
 export const updateFeaturesAction = async (
   tenantId: string,
@@ -74,14 +76,18 @@ export const updateFeaturesAction = async (
   }
 
   try {
-    await queries.settingsFeatures.upsertSettingsFeatures(tenant.id, values);
+    const { values: stored } = await getSettingsFeaturesOrDefaults(tenant.id);
+    const toWrite = withComingSoonOff(
+      keepStoredOutOfPlan(values, stored, entitled),
+    );
+    await queries.settingsFeatures.upsertSettingsFeatures(tenant.id, toWrite);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: 'settings_features.update_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
       targetId: tenant.id,
-      details: values,
+      details: toWrite,
     });
     return { outcome: ACTION_OUTCOME.SUCCESS };
   } catch (error) {

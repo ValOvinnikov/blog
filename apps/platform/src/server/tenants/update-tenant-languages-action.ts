@@ -15,6 +15,7 @@ import {
 } from '@platform/constants/settings';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -69,6 +70,7 @@ export const updateTenantLanguagesAction = async (
         : INVALID_LANGUAGES;
     }
 
+    await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: 'tenants.update_languages_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,

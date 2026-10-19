@@ -1,5 +1,5 @@
 {
-  "id": "dce699f2-921e-450a-abb3-c1da43b132bc",
+  "id": "1834c643-7d4e-4265-b0bd-78d6301dc0a3",
   "prevId": "2a17f25b-d292-4402-bdb4-736b041be90e",
   "version": "7",
   "dialect": "postgresql",
@@ -289,13 +289,6 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
-        },
-        "app": {
-          "name": "app",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'SITE'"
         }
       },
       "indexes": {},
@@ -1234,6 +1227,14 @@
           "notNull": true,
           "default": "'ACCENT_BAR'"
         },
+        "header_control_style": {
+          "name": "header_control_style",
+          "type": "header_control_style",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'OUTLINED'"
+        },
         "logo_asset_url": {
           "name": "logo_asset_url",
           "type": "text",
@@ -1626,6 +1627,11 @@
         "FRAUNCES",
         "INTER"
       ]
+    },
+    "public.header_control_style": {
+      "name": "header_control_style",
+      "schema": "public",
+      "values": ["OUTLINED", "SOFT", "PLAIN"]
     },
     "public.language_switcher_style": {
       "name": "language_switcher_style",

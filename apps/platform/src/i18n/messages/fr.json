@@ -1108,6 +1108,7 @@
     "description": "Publiez en production le dernier commit de main.",
     "started": "Version lancée.",
     "runningHint": "Une version est en cours.",
+    "pausedHint": "Les mises en production sont en pause.",
     "nothingToReleaseHint": "Rien n’a changé depuis {lastTag}.",
     "empty": "Aucune version n’a encore été lancée.",
     "unavailableTitle": "L’état de la version est indisponible",
@@ -1151,6 +1152,7 @@
       "REASON_REQUIRED": "Indiquez pourquoi vous publiez sans contrôle de contraste réussi."
     },
     "alreadyRunning": "Une version est déjà en cours.",
+    "releasesPaused": "Les mises en production sont en pause.",
     "githubUnavailable": "GitHub est injoignable, rien n’a donc été lancé. Réessayez dans un instant.",
     "invalid": "Vérifiez la version et le motif, puis réessayez.",
     "startFailed": "GitHub n’a pas accepté la version, rien n’a donc été lancé."

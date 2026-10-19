@@ -212,13 +212,14 @@
       "exportDescription": "Descargue su perfil y sus guardados en un único archivo JSON.",
       "exportButton": "Solicitar exportación",
       "deleteLabel": "Eliminar cuenta",
-      "deleteDescription": "Irreversible. Su perfil y sus guardados se borran y se cierran todas las sesiones. Escriba su nombre de usuario para activar el botón.",
+      "deleteDescription": "Irreversible. Su perfil y sus guardados en todos los sitios se borran y se cierran todas las sesiones. Escriba su nombre de usuario para activar el botón.",
       "deleteConfirmAriaLabel": "Escriba su nombre de usuario para confirmar la eliminación",
       "deleteConfirmPlaceholder": "Escriba {handle} para confirmar",
       "deleteButton": "Eliminar cuenta",
       "deleteToastLoadingMessage": "Eliminando su cuenta…",
       "deleteToastSuccessMessage": "Su cuenta se ha eliminado.",
-      "deleteError": "No se pudo eliminar su cuenta. Vuelva a intentarlo."
+      "deleteError": "No se pudo eliminar su cuenta. Vuelva a intentarlo.",
+      "deletePlatformRoleError": "Esta cuenta gestiona un sitio en la plataforma, por lo que no se puede eliminar aquí. Pida primero al equipo de la plataforma que transfiera el sitio."
     },
     "newsletter": {
       "heading": "Boletín",

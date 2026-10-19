@@ -31,13 +31,29 @@ describe('admin language detection', () => {
     );
   });
 
-  it('prefers the language cookie over the browser language', async () => {
+  it("ignores the public site's language cookie", async () => {
     expect(
       await resolveLocale({
-        'accept-language': 'nl',
-        cookie: `NEXT_LOCALE=${LOCALE_ISO_CODES.FR}`,
+        'accept-language': 'en',
+        cookie: `NEXT_LOCALE=${LOCALE_ISO_CODES.NL}`,
       }),
-    ).toBe(LOCALE_ISO_CODES.FR);
+    ).toBe(LOCALE_ISO_CODES.EN);
+  });
+
+  it.each([
+    ['a prefixed path', 'https://admin.example.com/nl/tenants', {}],
+    ['a missing browser language', 'https://admin.example.com/tenants', {}],
+    [
+      'an unsupported cookie value',
+      'https://admin.example.com/tenants',
+      { 'accept-language': 'de', cookie: 'NEXT_LOCALE=pt' },
+    ],
+  ])('sets no language cookie on %s', async (_, url, headers) => {
+    const response = await createMiddleware(routing)(
+      new NextRequest(url, { headers }),
+    );
+
+    expect(response.cookies.get('NEXT_LOCALE')).toBeUndefined();
   });
 
   it('keeps the URL unprefixed', async () => {

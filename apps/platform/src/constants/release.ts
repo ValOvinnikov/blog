@@ -14,6 +14,8 @@ export const CONTRAST_WORKFLOW_FILE = 'contrast.yml';
 
 export const RELEASE_WORKFLOW_FILE = 'release.yml';
 
+export const IS_PRODUCTION_RELEASE_ENABLED = false;
+
 // The job name inside migrate-tenant-content.yml, which release.yml calls.
 export const TENANT_MIGRATION_JOB_NAME = 'Migrate tenant content';
 
@@ -24,6 +26,7 @@ export const RELEASE_OVERRIDE_REASON_MAX_LENGTH = 500;
 export const RELEASE_REFUSAL = {
   CONTRAST_CHECK_RUNNING: 'CONTRAST_CHECK_RUNNING',
   RELEASE_RUNNING: 'RELEASE_RUNNING',
+  RELEASES_PAUSED: 'RELEASES_PAUSED',
 } as const;
 
 export const RELEASE_FIELD_ERROR = {

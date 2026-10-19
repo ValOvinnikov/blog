@@ -100,8 +100,16 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   migrations, no database migrations" when there are none, and "At least …"
   when the counts are a lower bound. The button is disabled with a reason
   while a release is dispatched or running.
+- Production releases are paused until production deploys are tested:
+  `IS_PRODUCTION_RELEASE_ENABLED` (`apps/platform/src/constants/release.ts`)
+  is `false`, so the Release button is disabled with "Production releases are
+  paused." ahead of every other reason, and `startReleaseAction` refuses.
+  Run contrast check is unaffected. Setting the constant to `true` switches
+  releases on.
 - Server Action `startReleaseAction`
-  (`server/releases/start-release-action.ts`): `requireSuperAdmin`, validates
+  (`server/releases/start-release-action.ts`): `requireSuperAdmin`, answers
+  `REFUSED` with `RELEASES_PAUSED` while `IS_PRODUCTION_RELEASE_ENABLED` is
+  `false`, before reading, dispatching or recording anything, validates
   `{ version, overrideReason? }` with Zod (reason at most
   `RELEASE_OVERRIDE_REASON_MAX_LENGTH`, trimmed), then re-reads the candidate
   and the newest release run. It answers `UNAVAILABLE` when GitHub or the db

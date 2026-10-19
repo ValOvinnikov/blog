@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { IToastPromiseMessages } from '@web/context/toast-provider/toast-store';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 
 import { DeleteAccountControl } from './delete-account-control';
@@ -8,7 +9,12 @@ const { signOutMock, deleteAccountActionMock, toastPromiseMock } = vi.hoisted(
   () => ({
     signOutMock: vi.fn(),
     deleteAccountActionMock: vi.fn(),
-    toastPromiseMock: vi.fn((promise: Promise<unknown>) => promise),
+    toastPromiseMock: vi.fn<
+      (
+        promise: Promise<unknown>,
+        messages: IToastPromiseMessages<unknown>,
+      ) => Promise<unknown>
+    >((promise) => promise),
   }),
 );
 
@@ -29,6 +35,14 @@ vi.mock('@web/context/toast-provider', () => ({
   }),
 }));
 
+const errorMessageFor = (outcome: string) => {
+  const [, messages] = toastPromiseMock.mock.calls[0] ?? [];
+  const error = messages?.error;
+  return typeof error === 'function'
+    ? error(new Error(outcome)).message
+    : error?.message;
+};
+
 const setup = customRender(DeleteAccountControl, { handle: 'val' });
 
 const armAndClickDelete = async (user: ReturnType<typeof userEvent.setup>) => {
@@ -47,7 +61,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
   beforeEach(() => {
     signOutMock.mockReset();
     deleteAccountActionMock.mockReset();
-    toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
+    toastPromiseMock.mockImplementation((promise) => promise);
     user = userEvent.setup();
     setup();
   });
@@ -96,7 +110,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
       loading: { message: 'Deleting your account…' },
       success: { message: 'Your account has been deleted.' },
-      error: { message: "Couldn't delete your account. Try again." },
+      error: expect.any(Function),
     });
   });
 
@@ -139,5 +153,28 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
       ).toHaveAttribute('aria-busy', 'false');
     });
     expect(signOutMock).not.toHaveBeenCalled();
+    expect(errorMessageFor(ACTION_OUTCOME.SERVER_ERROR)).toBe(
+      "Couldn't delete your account. Try again.",
+    );
+  });
+
+  it('explains the refusal and does not sign out when the account holds a platform role', async () => {
+    deleteAccountActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.BLOCKED,
+    });
+    await armAndClickDelete(user);
+
+    await waitFor(() => {
+      expect(toastPromiseMock).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Delete account' }),
+      ).toHaveAttribute('aria-busy', 'false');
+    });
+    expect(signOutMock).not.toHaveBeenCalled();
+    expect(errorMessageFor(ACTION_OUTCOME.BLOCKED)).toBe(
+      "This account manages a site on the platform, so it can't be deleted here. Ask the platform team to hand the site over first.",
+    );
   });
 });

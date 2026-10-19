@@ -65,6 +65,7 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.privacy.deleteToastLoadingMessage',
   'accountPage.privacy.deleteToastSuccessMessage',
   'accountPage.privacy.deleteError',
+  'accountPage.privacy.deletePlatformRoleError',
   'accountPage.newsletter.unsubscribeToastLoadingMessage',
   'accountPage.newsletter.unsubscribeToastSuccessMessage',
   'accountPage.newsletter.unsubscribeError',
