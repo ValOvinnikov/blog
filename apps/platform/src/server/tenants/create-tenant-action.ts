@@ -17,6 +17,7 @@ import { signIn } from '@platform/server/auth/auth';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { checkDomainAvailability } from '@platform/server/provisioning/check-domain-availability';
 import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
+import { checkTenantDomainSlug } from '@platform/server/tenants/check-tenant-slug';
 import {
   createOwnerInviteToken,
   verifyOwnerInviteToken,
@@ -84,6 +85,14 @@ export const createTenantAction = async (
       reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
       email: ownerEmail,
       token: createOwnerInviteToken(ownerEmail),
+    };
+  }
+
+  const slugError = await checkTenantDomainSlug(domain);
+  if (slugError) {
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { domain: { reason: slugError } },
     };
   }
 
