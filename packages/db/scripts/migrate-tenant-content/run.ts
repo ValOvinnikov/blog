@@ -1,23 +1,7 @@
-/**
- * Tenant content-migration fan-out entrypoint — runs `migrate.mjs deploy`
- * against every in-scope tenant's own Sanity project/dataset, authenticated
- * with that tenant's own persisted write token (env-overridden per
- * invocation — see `lib/run-tenant-migration-deploy.ts`). A tenant whose
- * `migrationState` ledger has never recorded an applied migration is
- * backfilled instead of replayed — see `lib/read-tenant-migration-ledger.ts`
- * for why replaying migrations written for older document shapes against
- * such a tenant is unsafe.
- *
- * Invoked only by `.github/workflows/migrate-tenant-content.yml` — an
- * automatic sweep on merge to `main`, a `workflow_dispatch` (optionally
- * scoped to one tenant via `--tenant-id=<uuid>`), or a `workflow_call` from
- * another workflow migrating a single tenant — never run by hand against a
- * shared/production tenant registry outside that workflow.
- *
- * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
- * resolve to a no-op outside Next.js's own build, same trick
- * `provision-tenant/run.ts` relies on.
- */
+// `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
+// resolve to a no-op outside Next.js's own build.
+
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { TENANT_STATUS } from '@blog/db/constants';
@@ -30,7 +14,10 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { isTenantMigrationLedgerEmpty } from './lib/read-tenant-migration-ledger';
-import { runTenantMigrationDeploy } from './lib/run-tenant-migration-deploy';
+import {
+  exportTenantDataset,
+  runTenantMigrationDeploy,
+} from './lib/run-tenant-migrate-script';
 
 const TENANT_ID_FLAG = '--tenant-id=';
 
@@ -75,6 +62,14 @@ async function migrateOne(
   }
 
   try {
+    const exportDir = process.env['TENANT_EXPORT_DIR'];
+    if (exportDir) {
+      console.log(
+        `migrate-tenant-content: exporting tenant "${tenant.id}" dataset before migrating it.`,
+      );
+      exportTenantDataset(credentials, join(exportDir, `${tenant.id}.tar.gz`));
+    }
+
     const backfill = isTenantMigrationLedgerEmpty(credentials);
     if (backfill) {
       console.log(
@@ -119,16 +114,11 @@ async function migrateCandidates(
   return summary;
 }
 
-// Exported for direct testing of the sweep logic without also exercising
-// tenant enumeration.
 export async function runMigration(): Promise<TMigrateSummary> {
   const candidates = await listActiveTenants();
   return migrateCandidates(candidates);
 }
 
-// Exported for direct testing of the single-tenant path — used by an
-// operator's scoped `workflow_dispatch` and by a caller migrating one
-// freshly provisioned tenant.
 export async function runMigrationForTenant(
   tenantId: string,
 ): Promise<TMigrateSummary> {
@@ -136,10 +126,6 @@ export async function runMigrationForTenant(
   return migrateCandidates(tenant ? [tenant] : []);
 }
 
-// Exported for direct testing of the exit-code decision. `errors` means a
-// tenant's migration deploy itself failed to run (a CLI/network failure, or
-// a failed migration mid-deploy) — `migrated`/`backfilled`/`skipped` are all
-// expected, successful outcomes and never count here.
 export function hasSystemicFailures(summary: TMigrateSummary): boolean {
   return summary.errors > 0;
 }
@@ -164,9 +150,7 @@ async function main(): Promise<void> {
   }
 }
 
-// Only auto-run when this file is the CLI entrypoint (`tsx run.ts`) — guards
-// against `main()` firing as an import side effect when a test imports
-// `runMigration` from this same module.
+// Keeps `main()` from running as a side effect when a test imports this module.
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href

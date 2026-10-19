@@ -3,6 +3,11 @@ name: Full gate
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      # Blank gates the commit the run was triggered on.
+      ref:
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -19,17 +24,21 @@ jobs:
     uses: ./.github/workflows/ci.yml # zizmor: ignore[secrets-inherit]
     with:
       full: true
+      ref: ${{ inputs.ref }}
     secrets: inherit
 
   workflow-security:
     name: Workflow security
     uses: ./.github/workflows/workflow-security.yml
+    with:
+      ref: ${{ inputs.ref }}
 
   dependency-scan:
     name: Dependency scan
     uses: ./.github/workflows/dependency-scan.yml
     with:
       full: true
+      ref: ${{ inputs.ref }}
 
   full-gate:
     name: Full gate

@@ -1,4 +1,7 @@
-import { runTenantMigrationDeploy } from './run-tenant-migration-deploy';
+import {
+  exportTenantDataset,
+  runTenantMigrationDeploy,
+} from './run-tenant-migrate-script';
 
 const { execFileSyncMock } = vi.hoisted(() => ({ execFileSyncMock: vi.fn() }));
 
@@ -51,5 +54,23 @@ describe(runTenantMigrationDeploy, () => {
     expect(() =>
       runTenantMigrationDeploy({ ...params, backfill: false }),
     ).toThrow(error);
+  });
+});
+
+describe(exportTenantDataset, () => {
+  it("exports the tenant's own dataset to the given destination", () => {
+    exportTenantDataset(params, '/tmp/exports/t1.tar.gz');
+
+    expect(execFileSyncMock).toHaveBeenCalledWith(
+      'node',
+      ['scripts/migrate.mjs', 'export', '/tmp/exports/t1.tar.gz'],
+      expect.objectContaining({
+        env: expect.objectContaining({
+          SANITY_STUDIO_PROJECT_ID: 'proj-1',
+          SANITY_STUDIO_DATASET: 'production',
+          SANITY_AUTH_TOKEN: 'write-token',
+        }),
+      }),
+    );
   });
 });
