@@ -212,13 +212,14 @@
       "exportDescription": "Download uw profiel en bladwijzers als één JSON-archief.",
       "exportButton": "Export aanvragen",
       "deleteLabel": "Account verwijderen",
-      "deleteDescription": "Onomkeerbaar. Uw profiel en bladwijzers worden gewist en alle sessies worden afgemeld. Typ uw gebruikersnaam om de knop te activeren.",
+      "deleteDescription": "Onomkeerbaar. Uw profiel en bladwijzers op elke site worden gewist en alle sessies worden afgemeld. Typ uw gebruikersnaam om de knop te activeren.",
       "deleteConfirmAriaLabel": "Typ uw gebruikersnaam om het verwijderen te bevestigen",
       "deleteConfirmPlaceholder": "Typ {handle} om te bevestigen",
       "deleteButton": "Account verwijderen",
       "deleteToastLoadingMessage": "Uw account wordt verwijderd…",
       "deleteToastSuccessMessage": "Uw account is verwijderd.",
-      "deleteError": "Uw account kon niet worden verwijderd. Probeer het opnieuw."
+      "deleteError": "Uw account kon niet worden verwijderd. Probeer het opnieuw.",
+      "deletePlatformRoleError": "Dit account beheert een site op het platform en kan daarom hier niet worden verwijderd. Vraag eerst het platformteam om de site over te dragen."
     },
     "newsletter": {
       "heading": "Nieuwsbrief",

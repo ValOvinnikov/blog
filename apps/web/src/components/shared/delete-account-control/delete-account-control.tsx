@@ -33,14 +33,20 @@ export const DeleteAccountControl = ({
           (async () => {
             const result = await deleteAccountAction();
             if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-              throw new Error('Failed to delete account');
+              throw new Error(result.outcome);
             }
             return result;
           })(),
           {
             loading: { message: t('deleteToastLoadingMessage') },
             success: { message: t('deleteToastSuccessMessage') },
-            error: { message: t('deleteError') },
+            error: (error: unknown) => ({
+              message:
+                error instanceof Error &&
+                error.message === ACTION_OUTCOME.BLOCKED
+                  ? t('deletePlatformRoleError')
+                  : t('deleteError'),
+            }),
           },
         );
       } catch {

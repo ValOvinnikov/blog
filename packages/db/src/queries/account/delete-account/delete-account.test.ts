@@ -1,5 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  ADMIN_ROLE,
+  GRANTED_VIA,
+  MEMBERSHIP_ROLE,
+  TENANT_PLAN,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
@@ -60,13 +66,20 @@ async function seedUserWithRelatedRows(userId: string): Promise<void> {
     .values({ tenantId, userId, postId: 'post-1' });
 }
 
+async function findUser(userId: string) {
+  return db().select().from(schema.users).where(eq(schema.users.id, userId));
+}
+
 describe(deleteAccount, () => {
   beforeEach(async () => {
     await seedUserWithRelatedRows('user-1');
   });
 
   it('deletes the users row', async () => {
-    await deleteAccount('user-1');
+    await expect(deleteAccount('user-1')).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
 
     const remainingUsers = await db()
       .select()
@@ -115,6 +128,59 @@ describe(deleteAccount, () => {
   });
 
   it('is a no-op when the user does not exist', async () => {
-    await expect(deleteAccount('missing-user')).resolves.toBeUndefined();
+    await expect(deleteAccount('missing-user')).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+  });
+
+  it('deletes a user whose only memberships are below owner', async () => {
+    await db()
+      .insert(schema.memberships)
+      .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.EDITOR });
+
+    await expect(deleteAccount('user-1')).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+    expect(await findUser('user-1')).toEqual([]);
+  });
+
+  it('refuses a tenant owner and keeps the account and its membership', async () => {
+    await db()
+      .insert(schema.memberships)
+      .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.OWNER });
+
+    await expect(deleteAccount('user-1')).resolves.toEqual({
+      ok: false,
+      error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE,
+    });
+    expect(await findUser('user-1')).toHaveLength(1);
+    expect(
+      await db()
+        .select()
+        .from(schema.memberships)
+        .where(eq(schema.memberships.userId, 'user-1')),
+    ).toHaveLength(1);
+  });
+
+  it('refuses a platform admin and keeps the account and its admins row', async () => {
+    await db().insert(schema.admins).values({
+      userId: 'user-1',
+      role: ADMIN_ROLE.SUPERADMIN,
+      grantedVia: GRANTED_VIA.BREAK_GLASS,
+    });
+
+    await expect(deleteAccount('user-1')).resolves.toEqual({
+      ok: false,
+      error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE,
+    });
+    expect(await findUser('user-1')).toHaveLength(1);
+    expect(
+      await db()
+        .select()
+        .from(schema.admins)
+        .where(eq(schema.admins.userId, 'user-1')),
+    ).toHaveLength(1);
   });
 });
