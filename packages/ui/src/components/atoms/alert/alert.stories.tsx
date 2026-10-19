@@ -58,3 +58,18 @@ export const WithoutIcon: TStory = {
     message: 'Enter a valid email address.',
   },
 };
+
+export const WrappedMessage: TStory = {
+  args: {
+    type: ALERT_TYPE.ERROR,
+    message:
+      "Your message couldn't be sent. Try again in a minute; what you wrote is still here.",
+  },
+  decorators: [
+    (Story) => (
+      <div className="max-w-80">
+        <Story />
+      </div>
+    ),
+  ],
+};

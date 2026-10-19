@@ -3,7 +3,7 @@ import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const alertVariants = tv({
-  base: ['flex w-full items-center gap-2', 'font-mono text-copy'],
+  base: ['flex w-full items-start gap-2 [&>svg]:h-lh', 'font-mono text-copy'],
   variants: {
     type: {
       [ALERT_TYPE.SUCCESS]: ['text-success'],
