@@ -5,8 +5,9 @@ export const accountMenuVariants = tv({
     menuRoot: ['flex flex-col items-center'],
     label: ['mb-3'],
     acctRow: ['mb-2 flex items-center gap-2 border-b border-border pb-3'],
-    accountName: ['font-mono text-copy text-text'],
-    accountEmail: ['font-mono text-meta text-subtle'],
+    accountText: ['min-w-0 flex-1'],
+    accountName: ['truncate font-mono text-meta text-text'],
+    accountEmail: ['truncate font-mono text-meta text-subtle'],
     signOutItem: ['text-error'],
   },
 });

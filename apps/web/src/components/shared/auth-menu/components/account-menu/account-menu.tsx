@@ -41,8 +41,15 @@ export const AccountMenu = ({
 }: TAccountMenuProps) => {
   const t = useTranslations('authMenu');
   const { panel, avatarFrame, avatar } = authMenuVariants();
-  const { menuRoot, label, acctRow, accountName, accountEmail, signOutItem } =
-    accountMenuVariants();
+  const {
+    menuRoot,
+    label,
+    acctRow,
+    accountText,
+    accountName,
+    accountEmail,
+    signOutItem,
+  } = accountMenuVariants();
 
   const displayName = name ?? email ?? '';
 
@@ -92,9 +99,15 @@ export const AccountMenu = ({
             size={SIZE.SM}
             onImageError={() => setImageFailed(true)}
           />
-          <div>
-            <p className={accountName()}>{displayName}</p>
-            {email && <p className={accountEmail()}>{email}</p>}
+          <div className={accountText()}>
+            <p className={accountName()} title={displayName}>
+              {displayName}
+            </p>
+            {email && (
+              <p className={accountEmail()} title={email}>
+                {email}
+              </p>
+            )}
           </div>
         </div>
         <PopoverMenu.Item
