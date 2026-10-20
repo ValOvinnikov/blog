@@ -6,6 +6,7 @@ import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
 import { buttonVariants, type TButtonVariants } from './button-variants';
 
 export type TButtonProps = {
+  id?: string;
   variant?: TButtonVariants['variant'];
   size?: TButtonVariants['size'];
   type?: 'button' | 'submit' | 'reset';
@@ -26,6 +27,7 @@ export type TButtonProps = {
 };
 
 export const Button = ({
+  id,
   variant,
   size,
   type = 'button',
@@ -60,6 +62,7 @@ export const Button = ({
   return (
     <>
       <button
+        id={id}
         type={type}
         disabled={isDisabled || isPending}
         aria-disabled={isAriaDisabled || undefined}

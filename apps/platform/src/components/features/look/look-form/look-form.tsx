@@ -1,6 +1,6 @@
 'use client';
 
-import { FORM_STATUS, type TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config';
 import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
 import { ColourCard } from '@platform/components/features/look/look-form/components/colour-card';
 import { LanguageSwitcherCard } from '@platform/components/features/look/look-form/components/language-switcher-card';
@@ -12,7 +12,6 @@ import { LookPreview } from '@platform/components/features/look/look-preview';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import { useUploadErrorText } from '@platform/utils/use-upload-error-text/use-upload-error-text';
 import { useTranslations } from 'next-intl';
 
 import { lookFormVariants } from './look-form-variants';
@@ -39,28 +38,22 @@ export const LookForm = ({
 }: TLookFormProps) => {
   const { view, tabsProps, panelProps } = useViewTabs();
   const t = useTranslations('lookForm');
-  const uploadErrorText = useUploadErrorText();
-  const { lookForm, status, isPending, form, brandImageError } =
-    useLookFormState({
-      tenantId,
-      tenantName,
-      initialValues,
-      savedAt,
-      archivedAt,
-      revealInvalidField: () => tabsProps.onChange('edit'),
-    });
+  const { lookForm, isPending, form } = useLookFormState({
+    tenantId,
+    tenantName,
+    initialValues,
+    savedAt,
+    archivedAt,
+    revealInvalidField: () => tabsProps.onChange('edit'),
+  });
 
   const { columns, editPanel, previewPanel } = lookFormVariants();
-  const saveErrorTitle = brandImageError
-    ? uploadErrorText(brandImageError)
-    : t('alertError');
 
   return (
     <SettingsFormShell
       title={t('heading')}
       description={t('subtitle')}
       form={form}
-      errorTitle={status === FORM_STATUS.ERROR ? saveErrorTitle : undefined}
       isWide={true}
     >
       <ViewTabs {...tabsProps} />

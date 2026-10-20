@@ -80,6 +80,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - Fonts are self-hosted woff2 files in both apps, with no Google Fonts fetch. Only the Console pair and the mono font preload on the site.
 - Brand images: PNG, JPEG, WebP or SVG. The logo may be up to 4 MB and 32–4000px; the favicon up to 1 MB, 16–512px and square. The server sniffs the real bytes and sanitises SVG; the client check is a convenience only.
 - Images upload before the Look save. The upload and clear actions do not revalidate the site; the `updateLookAction` call that follows does.
+- A failed image upload or clear stops the save: its message shows under that picker, which is marked invalid and takes focus, and the save bar reads "Not saved" with a link to it. Any other save failure is announced beside Save.
 - The public site's header logo is `logo_asset_url` and its favicon is `favicon_asset_url`, each falling back to the platform's default three-layer mark when unset. The Studio's Site Settings brand logo is not a source for either. A logo that fails to load in the browser, or a favicon the icon route cannot fetch within 5s, also falls back to the default mark, so a broken upload never breaks the page. Both follow a save on the next render after `site-config:<id>` expires, subject to browser favicon caching.
 - Every save writes an audit event (`SETTINGS_UPDATED` on `SITE_CONFIG`).
 

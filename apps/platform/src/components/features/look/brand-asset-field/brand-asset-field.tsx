@@ -4,6 +4,7 @@ import { ALERT_TYPE, SIZE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import {
   AssetUploadField,
+  type TAssetUploadControl,
   type TAssetUploadSpec,
 } from '@platform/components/shared/asset-upload-field';
 import {
@@ -13,7 +14,6 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
-import type { AriaAttributes } from 'react';
 
 import { brandAssetFieldVariants } from './brand-asset-field-variants';
 
@@ -22,8 +22,8 @@ export type TBrandAssetFieldProps = {
   image: TStagedImage;
   onStage: (image: TStagedImage) => void;
   isRepickNeeded?: boolean;
-  isDisabled?: boolean;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
+  control?: TAssetUploadControl;
+  error?: string;
 };
 
 export const BrandAssetField = ({
@@ -31,8 +31,8 @@ export const BrandAssetField = ({
   image,
   onStage,
   isRepickNeeded = false,
-  isDisabled = false,
-  'aria-describedby': ariaDescribedBy,
+  control,
+  error,
 }: TBrandAssetFieldProps) => {
   const t = useTranslations('brandAssetField');
   const tLook = useTranslations('lookForm');
@@ -59,8 +59,8 @@ export const BrandAssetField = ({
         image={image}
         onStage={onStage}
         asset={asset}
-        isDisabled={isDisabled}
-        aria-describedby={ariaDescribedBy}
+        control={control}
+        error={error}
       />
       {isRepickNeeded && (
         <Alert type={ALERT_TYPE.WARNING} title={t(`${kind}.pickAgain`)} />

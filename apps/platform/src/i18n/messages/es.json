@@ -994,6 +994,7 @@
     "unsavedChanges": "{count, plural, one {# cambio sin guardar} other {# cambios sin guardar}}",
     "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
     "goToFirstField": "Ir al primero",
+    "notSaved": "No guardado",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Descartar",
     "save": "Guardar cambios",

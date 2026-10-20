@@ -6,21 +6,13 @@ import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
-import {
-  createStagingHandlers,
-  type TStagedImage,
-} from '@platform/utils/staged-image/staged-image';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import {
-  type AriaAttributes,
-  type ChangeEvent,
-  useId,
-  useRef,
-  useState,
-} from 'react';
+import { useId, useRef } from 'react';
 
 import { assetUploadFieldVariants } from './asset-upload-field-variants';
+import { useAssetFileChoice } from './use-asset-file-choice';
 
 export type TAssetUploadSpec = {
   kind: TBrandAssetKind | TEmailLogoKind;
@@ -30,14 +22,20 @@ export type TAssetUploadSpec = {
   stagedBadgeLabel?: string;
 };
 
+export type TAssetUploadControl = {
+  id?: string;
+  isDisabled?: boolean;
+  describedBy?: string;
+};
+
 export type TAssetUploadFieldProps = {
   label: string;
   hint?: string;
   image: TStagedImage;
   onStage: (image: TStagedImage) => void;
   asset: TAssetUploadSpec;
-  isDisabled?: boolean;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
+  control?: TAssetUploadControl;
+  error?: string;
 };
 
 const getFileName = ({ url, file }: TStagedImage): TMaybeUndefined<string> => {
@@ -53,21 +51,23 @@ export const AssetUploadField = ({
   image,
   onStage,
   asset,
-  isDisabled = false,
-  'aria-describedby': ariaDescribedBy,
+  control = {},
+  error,
 }: TAssetUploadFieldProps) => {
   const { kind, size, acceptedMimeTypes, validateFile, stagedBadgeLabel } =
     asset;
+  const { id, isDisabled = false, describedBy: ariaDescribedBy } = control;
   const { url, file: stagedFile } = image;
   const t = useTranslations('assetUploadField');
   const inputRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
+  const { validationError, handleFileChange, handleRemove } =
+    useAssetFileChoice({ onStage, validateFile });
+  const shownError = validationError ?? error;
   const hintId = useId();
   const errorId = useId();
-  const describedBy = [hint && hintId, ariaDescribedBy, error && errorId]
+  const describedBy = [hint && hintId, ariaDescribedBy, shownError && errorId]
     .filter(Boolean)
     .join(' ');
-  const { onPick, onClear } = createStagingHandlers(onStage);
   const fileName = size === SIZE.SM ? getFileName(image) : undefined;
 
   const {
@@ -84,22 +84,7 @@ export const AssetUploadField = ({
     actions,
     input,
     error: errorSlot,
-  } = assetUploadFieldVariants({ size });
-
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-
-    const validationError = validateFile(file);
-    setError(validationError);
-    if (!validationError) onPick(file);
-  };
-
-  const handleRemove = () => {
-    setError(undefined);
-    onClear();
-  };
+  } = assetUploadFieldVariants({ size, isInvalid: Boolean(shownError) });
 
   return (
     <div className={field()}>
@@ -150,6 +135,7 @@ export const AssetUploadField = ({
             data-testid="asset-upload-field-input"
           />
           <Button
+            id={id}
             type="button"
             size={SIZE.SM}
             variant="secondary"
@@ -173,9 +159,13 @@ export const AssetUploadField = ({
           )}
         </div>
       </div>
-      {error && (
-        <p id={errorId} className={errorSlot()} role="alert">
-          {error}
+      {shownError && (
+        <p
+          id={errorId}
+          className={errorSlot()}
+          role={validationError ? 'alert' : undefined}
+        >
+          {shownError}
         </p>
       )}
     </div>

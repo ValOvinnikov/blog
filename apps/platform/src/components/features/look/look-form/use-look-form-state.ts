@@ -20,6 +20,7 @@ import { useId, useState } from 'react';
 
 import { useLookDraftFields } from './use-look-draft-fields';
 import { useLookSave } from './use-look-save';
+import { useLookSaveErrors } from './use-look-save-errors';
 
 type TUseLookFormStateArgs = {
   tenantId: string;
@@ -39,6 +40,7 @@ export const useLookFormState = ({
   revealInvalidField,
 }: TUseLookFormStateArgs) => {
   const accentHueFieldId = useId();
+  const brandAssetFieldIds = { logo: useId(), favicon: useId() };
   const toast = useToast();
   const t = useTranslations('lookForm');
   const draftFields = useLookDraftFields();
@@ -52,8 +54,10 @@ export const useLookFormState = ({
     isPending,
     form,
     brandImageError,
+    clearBrandImageError,
   } = useLookSave({
     tenantId,
+    brandAssetFieldIds,
     initialValues,
     archivedAt,
     onSuccess: () => {
@@ -84,11 +88,17 @@ export const useLookFormState = ({
       },
     },
   });
+  const { fieldError, saveError } = useLookSaveErrors({
+    status,
+    isPending,
+    brandImageError,
+  });
 
   const updateField: TLookFormFieldSetter = (key, value) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     if (isBrandAssetKind(key)) {
       setRepickKinds((prev) => prev.filter((kind) => kind !== key));
+      clearBrandImageError(key);
     }
   };
 
@@ -103,11 +113,13 @@ export const useLookFormState = ({
     isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
     accentHueFieldId,
     repickKinds,
+    brandAssetFieldIds,
+    brandImageError: fieldError,
     changePreset: (preset: TPresetId) =>
       setValues((prev) => applyPresetDefaults(preset, prev)),
     resetToPreset: () =>
       setValues((prev) => applyPresetDefaults(prev.preset, prev)),
   };
 
-  return { lookForm, status, isPending, form, brandImageError };
+  return { lookForm, isPending, form: { ...form, saveError } };
 };
