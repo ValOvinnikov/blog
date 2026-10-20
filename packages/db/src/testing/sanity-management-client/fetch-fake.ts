@@ -1,17 +1,3 @@
-export const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
-export const SANITY_WEBHOOKS_API_BASE = 'https://api.sanity.io/v2025-08-04';
-
-export const SANITY_TEST_TOKEN = 'tok';
-export const SANITY_TEST_PROJECT_ID = 'proj123';
-
-export function withSanityProject<T extends object>(extra: T) {
-  return {
-    token: SANITY_TEST_TOKEN,
-    projectId: SANITY_TEST_PROJECT_ID,
-    ...extra,
-  };
-}
-
 export function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status });
 }

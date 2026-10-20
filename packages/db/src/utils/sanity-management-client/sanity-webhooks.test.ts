@@ -1,22 +1,24 @@
 import {
   firstFetchCall,
   jsonResponse,
-  SANITY_TEST_PROJECT_ID,
-  SANITY_WEBHOOKS_API_BASE,
   textResponse,
   useFetchFake,
+} from '@blog/db/testing/sanity-management-client/fetch-fake';
+import {
+  SANITY_DATASET,
+  SANITY_EXPECTED_URL,
+  SANITY_PROJECT_ID,
+  SANITY_WEBHOOK_URL,
   withSanityProject,
-} from '@blog/db/testing/sanity-fetch';
+} from '@blog/db/testing/sanity-management-client/fixtures';
 
 import { createSanityWebhook, listSanityWebhooks } from './sanity-webhooks';
 
-const HOOKS_URL = `${SANITY_WEBHOOKS_API_BASE}/hooks/projects/${SANITY_TEST_PROJECT_ID}`;
-const HOOK_URL = 'https://web.example.com/api/revalidate';
-const hook = { id: 'hook1', url: HOOK_URL };
+const hook = { id: 'hook1', url: SANITY_WEBHOOK_URL };
 const createInput = withSanityProject({
-  dataset: 'production',
+  dataset: SANITY_DATASET,
   name: 'web-revalidate',
-  url: HOOK_URL,
+  url: SANITY_WEBHOOK_URL,
   secret: 'shh',
 });
 
@@ -30,7 +32,7 @@ describe(listSanityWebhooks, () => {
 
     const { url, init } = firstFetchCall(fetchMock);
     expect(result).toEqual([hook]);
-    expect(url).toBe(HOOKS_URL);
+    expect(url).toBe(SANITY_EXPECTED_URL.webhooks);
     expect(init.method ?? 'GET').toBe('GET');
     expect(init.redirect).toBe('error');
   });
@@ -39,7 +41,7 @@ describe(listSanityWebhooks, () => {
     fetchMock.mockResolvedValue(textResponse('Unauthorized', 401));
 
     await expect(listSanityWebhooks(withSanityProject({}))).rejects.toThrow(
-      new RegExp(`401 .*not a member of project "${SANITY_TEST_PROJECT_ID}"`),
+      new RegExp(`401 .*not a member of project "${SANITY_PROJECT_ID}"`),
     );
   });
 });
@@ -52,14 +54,14 @@ describe(createSanityWebhook, () => {
 
     const { url, init, body } = firstFetchCall(fetchMock);
     expect(result).toEqual(hook);
-    expect(url).toBe(HOOKS_URL);
+    expect(url).toBe(SANITY_EXPECTED_URL.webhooks);
     expect(init.method).toBe('POST');
     expect(init.redirect).toBe('error');
     expect(body).toEqual({
       type: 'document',
       name: createInput.name,
       dataset: createInput.dataset,
-      url: HOOK_URL,
+      url: SANITY_WEBHOOK_URL,
       apiVersion: 'v2021-06-07',
       httpMethod: 'POST',
       includeDrafts: false,
@@ -82,7 +84,7 @@ describe(createSanityWebhook, () => {
     fetchMock.mockResolvedValue(response);
 
     await expect(createSanityWebhook(createInput)).rejects.toThrow(
-      SANITY_TEST_PROJECT_ID,
+      SANITY_PROJECT_ID,
     );
   });
 
