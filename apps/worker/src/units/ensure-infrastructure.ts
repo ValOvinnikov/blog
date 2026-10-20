@@ -1,11 +1,9 @@
 import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import {
-  createTenantRevalidateWebhook,
-  mapTenantDomain,
-  persistTenantSanityToken,
-} from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
+import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
+import { mapTenantDomain } from '@worker/steps/map-domain';
+import { persistTenantSanityToken } from '@worker/steps/persist-sanity-token';
 import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
 import { ensureSanityProject } from './ensure-sanity-project';

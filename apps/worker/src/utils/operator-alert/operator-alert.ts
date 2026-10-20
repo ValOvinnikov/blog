@@ -7,7 +7,6 @@ import {
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 
-// TODO(#4961): collapses with the CLI's `postOperatorAlert` when the steps move into the worker.
 export async function postOperatorAlert(
   body: TOperatorAlertBody,
 ): Promise<boolean> {

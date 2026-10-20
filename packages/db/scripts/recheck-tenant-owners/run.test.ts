@@ -22,13 +22,13 @@ const { notifyOwnerElevationOutcomeMock } = vi.hoisted(() => ({
 vi.mock('@blog/db/queries/tenants', () => ({
   listTenantsPendingOwnerElevation: listTenantsPendingOwnerElevationMock,
 }));
-vi.mock('../provision-tenant/lib/report-owner-elevation-outcome', () => ({
+vi.mock('./lib/report-owner-elevation-outcome', () => ({
   reportOwnerElevationOutcome: reportOwnerElevationOutcomeMock,
 }));
-vi.mock('../provision-tenant/lib/notify-owner-elevation-outcome', () => ({
+vi.mock('./lib/notify-owner-elevation-outcome', () => ({
   notifyOwnerElevationOutcome: notifyOwnerElevationOutcomeMock,
 }));
-vi.mock('../provision-tenant/steps/elevate-tenant-owner', () => ({
+vi.mock('./lib/elevate-tenant-owner', () => ({
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
 

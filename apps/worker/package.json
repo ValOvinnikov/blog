@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "provision-tenant": "tsx --conditions=react-server src/cli/provision-tenant.ts"
   },
   "dependencies": {
     "@blog/config": "workspace:*",
@@ -35,6 +36,7 @@
     "@types/node": "^26",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "tsx": "^4.23.15",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

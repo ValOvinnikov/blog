@@ -65,16 +65,11 @@ importer rule in the last bullet is not lint-enforced.
   A feature needing both (a comment on a post) joins them in the app's Server
   Component — the post via `service`, the rows via `db` — never inside either
   package. A Sanity document id is a plain `text` column (`bookmarks.postId`),
-  never a Postgres foreign key. **One scoped exception:**
-  `scripts/provision-tenant/` imports `@sanity/client` to seed and verify
-  starter content (the data API), under its own ESLint override. The
-  Management API calls (project, dataset, CORS, webhook, tokens) use plain
-  `fetch`, all in `src/utils/sanity-management-client/`, and import no SDK.
-  **Temporary importer exception:** `apps/worker` imports
-  `scripts/provision-tenant/steps/*` and its pure `lib/` helpers in place
-  through its `@blog/db-provisioning/*` alias, never the CLI's `lib/env.ts`,
-  `run.ts` or `report-*` helpers. A change there must keep both drivers
-  green until #4961 moves the steps into the worker and removes the alias.
+  never a Postgres foreign key. The Management API calls (project, dataset,
+  CORS, webhook, tokens) use plain `fetch`, all in
+  `src/utils/sanity-management-client/`, and import no SDK. The provisioning
+  steps that call them live in `apps/worker`; nothing outside this package
+  imports from `scripts/`.
 - **Never log — return or throw to the caller.** No `console.*`, and `src/`
   never imports `@blog/insight`. An expected failure returns
   `TResult<T, TErrorCode>` (`@blog/utils`) with an `ERROR_CODE.DB_*` code; an
@@ -220,8 +215,8 @@ tool).
 Run once, after all work is complete:
 
 - `pnpm --filter @blog/db type-check`, `lint` and `test` pass.
-- No React, `@blog/service` or `@blog/auth` import; no Sanity SDK outside
-  `scripts/provision-tenant/`; no `@blog/insight` in `src/`; graph acyclic.
+- No React, `@blog/service`, `@blog/auth` or Sanity SDK import; no
+  `@blog/insight` in `src/`; graph acyclic.
 - Every schema change has a committed, generated (never hand-edited)
   migration under `packages/db/migrations/`.
 - Every exported function is fully typed; no faked defaults.

@@ -1,9 +1,18 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { mapTenantDomain } from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
 import { env } from '@worker/utils/env/env';
 import { FatalError } from 'workflow';
 
-export type TProvisionEnv = Parameters<typeof mapTenantDomain>[1];
+export type TProvisionEnv = {
+  sanityManagementToken: string;
+  sanityOrganizationId: string;
+  vercelToken: string;
+  vercelTeamId: TMaybeUndefined<string>;
+  vercelWebProjectId: string;
+  adminAppBaseUrl: string;
+  tenantSanityDataset: string;
+  webAppBaseUrl: string;
+  revalidateSecret: string;
+};
 
 function requireValue(name: string, value: TMaybeUndefined<string>): string {
   if (!value) {
@@ -38,10 +47,5 @@ export function getProvisionEnv(): TProvisionEnv {
       'SANITY_REVALIDATE_SECRET',
       env.SANITY_REVALIDATE_SECRET,
     ),
-    githubRunId: undefined,
-    githubRepository: undefined,
-    githubServerUrl: undefined,
-    githubActor: undefined,
-    tenantRegistryEnvironment: undefined,
   };
 }

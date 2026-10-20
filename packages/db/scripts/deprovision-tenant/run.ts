@@ -1,6 +1,5 @@
 /**
- * Deprovisioning workflow entrypoint — reverses `provision-tenant`'s steps
- * for one tenant: removes its domain from the shared web project, archives
+ * Deprovisioning workflow entrypoint — reverses provisioning for one tenant: removes its domain from the shared web project, archives
  * (never deletes) its Sanity project, revokes the provisioned Sanity robot
  * tokens still live in that project, clears the provisioning-artifact
  * columns, archives (never hard-deletes) the `tenants` row, purges its
@@ -16,8 +15,7 @@
  * name.
  *
  * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
- * resolve to a no-op outside Next.js's own build, same trick
- * `provision-tenant/run.ts` relies on.
+ * resolve to a no-op outside Next.js's own build.
  */
 import { pathToFileURL } from 'node:url';
 
