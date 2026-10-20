@@ -8,4 +8,10 @@ describe('privateRedirect', () => {
     expect(response.headers.get('location')).toBe('https://example.com/nl');
     expect(response.headers.get('cache-control')).toBe('private, no-store');
   });
+
+  it('redirects with the given status', () => {
+    const response = privateRedirect(new URL('https://example.com/nl'), 303);
+
+    expect(response.status).toBe(303);
+  });
 });
