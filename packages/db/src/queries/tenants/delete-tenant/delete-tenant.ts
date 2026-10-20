@@ -1,7 +1,9 @@
 import {
   SANITY_PROJECT_DELETE_OUTCOME,
+  TENANT_DELETE_OUTCOME,
   TENANT_DELETE_SANITY_PROJECT_OUTCOME,
   type TOutcome,
+  type TTenantDeleteOutcome,
   type TTenantDeleteSanityProjectOutcome,
 } from '@blog/config';
 import { getDb } from '@blog/db/client';
@@ -10,27 +12,13 @@ import { deleteSanityProject } from '@blog/db/utils/sanity-management-client/san
 import { toOutcome } from '@blog/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
-export type TDeleteTenantResult =
-  | { outcome: 'deleted'; sanityProject: TTenantDeleteSanityProjectOutcome }
-  | TOutcome<'not-archived'>
-  | TOutcome<'not-found'>;
+type TDeleted = typeof TENANT_DELETE_OUTCOME.DELETED;
 
-/**
- * Hard-deletes a tenant row — unlike `archiveTenant`, this is irreversible
- * and relies on cascading FKs on every tenant-scoped table to sweep
- * dependent rows, so a new tenant-scoped table needs its own cascade to
- * stay swept. Refusal and not-found are typed outcomes rather than throws,
- * since a stale id or an unarchived tenant are reachable, non-exceptional
- * callers.
- *
- * `sanityManagementToken` is optional: passing it also attempts to delete
- * the tenant's Sanity project (archived, not removed, by deprovisioning),
- * tolerating the same org-billing-permission 401 project cancellation has
- * always hit — the row is still hard-deleted when that happens, and
- * `sanityProject` on the result says plainly what became of the project
- * rather than assuming success. Any other Sanity failure still throws,
- * before the row is touched, same as `deleteSanityProject` itself.
- */
+export type TDeleteTenantResult =
+  | (TOutcome<TDeleted> & { sanityProject: TTenantDeleteSanityProjectOutcome })
+  | TOutcome<Exclude<TTenantDeleteOutcome, TDeleted>>;
+
+// Relies on cascading FKs: a new tenant-scoped table needs its own cascade to stay swept.
 export async function deleteTenant(
   tenantId: string,
   sanityManagementToken?: string,
@@ -43,11 +31,11 @@ export async function deleteTenant(
     .where(eq(tenants.id, tenantId));
 
   if (!existing) {
-    return toOutcome('not-found');
+    return toOutcome(TENANT_DELETE_OUTCOME.NOT_FOUND);
   }
 
   if (!existing.deprovisionedAt) {
-    return toOutcome('not-archived');
+    return toOutcome(TENANT_DELETE_OUTCOME.NOT_ARCHIVED);
   }
 
   let sanityProject: TTenantDeleteSanityProjectOutcome =
@@ -70,5 +58,5 @@ export async function deleteTenant(
 
   await db.delete(tenants).where(eq(tenants.id, tenantId));
 
-  return { outcome: 'deleted', sanityProject };
+  return { ...toOutcome(TENANT_DELETE_OUTCOME.DELETED), sanityProject };
 }

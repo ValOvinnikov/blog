@@ -1,4 +1,7 @@
-import { TENANT_DELETE_SANITY_PROJECT_OUTCOME } from '@blog/config';
+import {
+  TENANT_DELETE_OUTCOME,
+  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
+} from '@blog/config';
 import { PRESET_ID } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
@@ -66,7 +69,7 @@ describe(deleteTenant, () => {
       const result = await deleteTenant(tenantId);
 
       expect(result).toEqual({
-        outcome: 'deleted',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
       });
 
@@ -161,7 +164,7 @@ describe(deleteTenant, () => {
 
     const result = await deleteTenant(tenantId);
 
-    expect(result).toEqual({ outcome: 'not-archived' });
+    expect(result).toEqual({ outcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED });
 
     const remaining = await db()
       .select()
@@ -175,7 +178,7 @@ describe(deleteTenant, () => {
 
     const result = await deleteTenant(missingId);
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual({ outcome: TENANT_DELETE_OUTCOME.NOT_FOUND });
   });
 });
 
@@ -197,7 +200,7 @@ describe('deleteTenant — Sanity project deletion', () => {
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(result).toEqual({
-        outcome: 'deleted',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.SKIPPED_NO_TOKEN,
       });
     });
@@ -212,7 +215,7 @@ describe('deleteTenant — Sanity project deletion', () => {
       expect(url).toBe(SANITY_EXPECTED_URL.project);
       expect(init.method).toBe('DELETE');
       expect(result).toEqual({
-        outcome: 'deleted',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.DELETED,
       });
     });
@@ -223,7 +226,7 @@ describe('deleteTenant — Sanity project deletion', () => {
       const result = await deleteTenant(tenantId, 'mgmt-token');
 
       expect(result).toEqual({
-        outcome: 'deleted',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.ALREADY_GONE,
       });
 
@@ -249,7 +252,7 @@ describe('deleteTenant — Sanity project deletion', () => {
       const result = await deleteTenant(tenantId, 'mgmt-token');
 
       expect(result).toEqual({
-        outcome: 'deleted',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED,
       });
 
@@ -280,7 +283,7 @@ describe('deleteTenant — Sanity project deletion', () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(result).toEqual({
-      outcome: 'deleted',
+      outcome: TENANT_DELETE_OUTCOME.DELETED,
       sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
     });
   });
