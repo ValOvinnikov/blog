@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
@@ -107,11 +108,11 @@ function createClientStubResolving(
 
 function grantError(): ClientError {
   return new ClientError({
-    statusCode: 403,
+    statusCode: HTTP_STATUS.FORBIDDEN,
     headers: {},
     body: { message: 'Forbidden' },
     url: 'https://api.sanity.io/v2024-01-01/data/query/production',
-    method: 'GET',
+    method: HTTP_METHOD.GET,
   });
 }
 

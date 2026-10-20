@@ -7,4 +7,5 @@ export * from './pagination';
 export * from './primitives';
 export * from './reading-time';
 export * from './sanitize-href';
+export * from './to-outcome';
 export * from './version';

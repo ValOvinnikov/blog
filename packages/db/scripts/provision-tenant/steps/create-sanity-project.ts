@@ -1,47 +1,28 @@
+import { SANITY_PROJECT_ROLE } from '@blog/config';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { setTenantSanityProject } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
-
-import type { TProvisionEnv } from '../lib/env';
+import {
+  createSanityProjectInvite,
+  listSanityProjectInvites,
+} from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
-  createSanityProjectInvite,
   listSanityCorsOrigins,
   listSanityDatasets,
-  listSanityProjectInvites,
-} from '../lib/sanity-management-client';
+} from '@blog/db/utils/sanity-management-client/sanity-project-setup';
+import { sanitizeLogMessage } from '@blog/insight';
+
+import type { TProvisionEnv } from '../lib/env';
 
 export type TCreateSanityProjectResult = {
   sanityProjectId: string;
   sanityDataset: string;
 };
 
-// `viewer` is the only project-member role the invites endpoint accepts —
-// attempting `administrator` here 403s. It's still reachable after the
-// owner accepts, via the ACL endpoint — see `elevateTenantOwner`.
-const TENANT_PROJECT_MEMBER_ROLE = 'viewer';
-
-/**
- * Step 1 — creates the tenant's own Sanity project, its dataset (named per
- * `env.tenantSanityDataset`), a CORS entry for the admin app's origin, and
- * invites the tenant owner (resolved from their OWNER `memberships` row) as
- * a project member — Sanity Studio's login flow requires project
- * membership, so without this the owner could never sign in to their
- * Studio. The platform superadmin is not invited here: unlike the owner,
- * they're already in the Sanity organization and can add themselves to any
- * tenant project as administrator via the Sanity Manage UI, so a `viewer`
- * invite for them would only cost a Free-plan seat for no benefit.
- *
- * The project id is persisted the moment it's minted, before the dataset/CORS
- * calls: Sanity has no delete-project API to clean up an orphan, so a retry
- * must be able to find a project it already created rather than re-minting one.
- *
- * Does NOT mint a token — see `steps/persist-sanity-token.ts` for why that's
- * step 3's job, not this one.
- */
+/** Sanity has no delete-project API, so the project id is persisted the moment it is minted. */
 export async function createTenantSanityProject(
   tenant: TTenant,
   env: TProvisionEnv,
@@ -115,7 +96,8 @@ export async function createTenantSanityProject(
           token: env.sanityManagementToken,
           projectId,
           email: ownerEmail,
-          role: TENANT_PROJECT_MEMBER_ROLE,
+          // The invites endpoint rejects `administrator` with a 403.
+          role: SANITY_PROJECT_ROLE.VIEWER,
         });
       } catch (error) {
         console.error(

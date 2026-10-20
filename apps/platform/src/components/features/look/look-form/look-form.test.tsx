@@ -69,10 +69,8 @@ const pickLogo = async (user: UserEvent) => {
   if (!logoInput) throw new Error('logo input not found');
   await user.upload(logoInput, LOGO_FILE);
   await waitFor(() => {
-    expect(screen.getByAltText('Current logo')).toHaveAttribute(
-      'src',
-      'blob:staged-logo',
-    );
+    const logo = screen.getByAltText('Current logo');
+    expect(logo).toHaveAttribute('src', 'blob:staged-logo');
   });
 };
 
@@ -120,15 +118,15 @@ describe(`<${LookForm.name}/>`, () => {
       'renders the current preset and accent hue from the given initial values',
       { timeout: 15000 },
       () => {
-        expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-          'aria-checked',
-          'true',
-        );
-        expect(screen.getByText('hue 250°')).toBeVisible();
+        const consolePreset = screen.getByRole('radio', { name: 'Console' });
+        const hueReadout = screen.getByText('hue 250°');
+
+        expect(consolePreset).toHaveAttribute('aria-checked', 'true');
+        expect(hueReadout).toBeVisible();
       },
     );
 
-    it('groups the settings into Preset, Colour, Type, Shape, Brand and Language switcher cards', () => {
+    it('groups the settings into six titled cards', () => {
       for (const name of [
         'Preset',
         'Colour',
@@ -137,7 +135,8 @@ describe(`<${LookForm.name}/>`, () => {
         'Brand',
         'Language switcher',
       ]) {
-        expect(screen.getByRole('heading', { level: 2, name })).toBeVisible();
+        const cardHeading = screen.getByRole('heading', { level: 2, name });
+        expect(cardHeading).toBeVisible();
       }
     });
 
@@ -145,10 +144,12 @@ describe(`<${LookForm.name}/>`, () => {
       screen.getByRole('slider', { name: 'Accent hue' }).focus();
       await user.keyboard('{ArrowRight}');
 
-      expect(
-        screen.getByRole('heading', { name: 'Colour Unsaved' }),
-      ).toBeVisible();
-      expect(screen.getByRole('heading', { name: 'Type' })).toBeVisible();
+      const colourHeading = screen.getByRole('heading', {
+        name: 'Colour Unsaved',
+      });
+      const typeHeading = screen.getByRole('heading', { name: 'Type' });
+      expect(colourHeading).toBeVisible();
+      expect(typeHeading).toBeVisible();
     });
 
     it('switches between the Edit and Preview tabs', async () => {
@@ -162,43 +163,50 @@ describe(`<${LookForm.name}/>`, () => {
 
       expect(previewTab).toHaveAttribute('aria-selected', 'true');
       expect(editTab).toHaveAttribute('aria-selected', 'false');
-      expect(
-        screen.getByRole('tabpanel', { name: 'Preview' }),
-      ).toContainElement(screen.getByTestId('look-sample-tokens'));
+      const previewPanel = screen.getByRole('tabpanel', { name: 'Preview' });
+      const sampleTokens = screen.getByTestId('look-sample-tokens');
+      expect(previewPanel).toContainElement(sampleTokens);
     });
 
     it("describes each Look control with its field's hint", () => {
-      expect(
-        screen.getByRole('slider', { name: 'Accent hue' }),
-      ).toHaveAccessibleDescription(/Colours links/);
-      expect(
-        screen.getByRole('switch', { name: 'Follow accent hue' }),
-      ).toHaveAccessibleDescription(/Tints your wordmark/);
-      expect(
-        screen.getByRole('group', { name: 'Radius scale' }),
-      ).toHaveAccessibleDescription('Corner roundness across every surface.');
+      const hueSlider = screen.getByRole('slider', { name: 'Accent hue' });
+      const followSwitch = screen.getByRole('switch', {
+        name: 'Follow accent hue',
+      });
+      const radiusGroup = screen.getByRole('group', { name: 'Radius scale' });
+
+      expect(hueSlider).toHaveAccessibleDescription(/Colours links/);
+      expect(followSwitch).toHaveAccessibleDescription(/Tints your wordmark/);
+      expect(radiusGroup).toHaveAccessibleDescription(
+        'Corner roundness across every surface.',
+      );
     });
 
     it('names the logo hue group with its optional tag', () => {
-      expect(
-        screen.getByRole('group', { name: 'Logo hue optional' }),
-      ).toBeVisible();
+      const logoHueGroup = screen.getByRole('group', {
+        name: 'Logo hue optional',
+      });
+      expect(logoHueGroup).toBeVisible();
     });
 
     it('describes both brand uploads with one shared hint', () => {
       const hint = 'Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.';
-      expect(
-        screen.getByRole('button', { name: 'Upload logo' }),
-      ).toHaveAccessibleDescription(hint);
-      expect(
-        screen.getByRole('button', { name: 'Upload favicon' }),
-      ).toHaveAccessibleDescription(hint);
+      const uploadLogoButton = screen.getByRole('button', {
+        name: 'Upload logo',
+      });
+      const uploadFaviconButton = screen.getByRole('button', {
+        name: 'Upload favicon',
+      });
+
+      expect(uploadLogoButton).toHaveAccessibleDescription(hint);
+      expect(uploadFaviconButton).toHaveAccessibleDescription(hint);
     });
 
     it("choosing a preset resets every one of that preset's defaults", async () => {
       await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
-      expect(screen.getByText('hue 28°')).toBeVisible();
+      const hueReadout = screen.getByText('hue 28°');
+      expect(hueReadout).toBeVisible();
     });
 
     it('saves the current form state through updateLookAction', async () => {
@@ -225,9 +233,10 @@ describe(`<${LookForm.name}/>`, () => {
     it('saves the chosen header buttons style and marks Shape unsaved', async () => {
       await user.click(screen.getByRole('button', { name: 'Soft' }));
 
-      expect(
-        screen.getByRole('heading', { name: 'Shape Unsaved' }),
-      ).toBeVisible();
+      const shapeHeading = screen.getByRole('heading', {
+        name: 'Shape Unsaved',
+      });
+      expect(shapeHeading).toBeVisible();
 
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -242,9 +251,10 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('describes each header buttons option', () => {
-      expect(
-        screen.getByRole('button', { name: 'Plain' }),
-      ).toHaveAccessibleDescription('No outline until hovered');
+      const plainButton = screen.getByRole('button', { name: 'Plain' });
+      expect(plainButton).toHaveAccessibleDescription(
+        'No outline until hovered',
+      );
     });
 
     it('saves the chosen language switcher style', async () => {
@@ -266,27 +276,32 @@ describe(`<${LookForm.name}/>`, () => {
       await user.keyboard('{ArrowRight}');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(await screen.findByText('Look saved.')).toBeVisible();
+      const toast = await screen.findByText('Look saved.');
+      expect(toast).toBeVisible();
     });
 
     it('offers Save changes only once the form is dirty', async () => {
-      expect(
-        screen.queryByRole('button', { name: 'Save changes' }),
-      ).not.toBeInTheDocument();
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+      const idleSaveButton = screen.queryByRole('button', {
+        name: 'Save changes',
+      });
+      const savedNote = screen.queryByText('All changes saved');
+      expect(idleSaveButton).not.toBeInTheDocument();
+      expect(savedNote).not.toBeInTheDocument();
 
       screen.getByRole('slider', { name: 'Accent hue' }).focus();
       await user.keyboard('{ArrowRight}');
 
-      expect(
-        screen.getByRole('button', { name: 'Save changes' }),
-      ).toBeEnabled();
+      const dirtySaveButton = screen.getByRole('button', {
+        name: 'Save changes',
+      });
+      expect(dirtySaveButton).toBeEnabled();
     });
 
     it('hides Reset to preset while every preset-controlled value matches the preset', () => {
-      expect(
-        screen.queryByRole('button', { name: 'Reset to preset' }),
-      ).not.toBeInTheDocument();
+      const resetButton = screen.queryByRole('button', {
+        name: 'Reset to preset',
+      });
+      expect(resetButton).not.toBeInTheDocument();
     });
 
     it('discards unsaved changes back to the saved values', async () => {
@@ -294,10 +309,10 @@ describe(`<${LookForm.name}/>`, () => {
       await user.keyboard('{ArrowRight}');
       await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-      expect(screen.getByText('hue 250°')).toBeVisible();
-      expect(
-        screen.queryByRole('button', { name: 'Save changes' }),
-      ).not.toBeInTheDocument();
+      const hueReadout = screen.getByText('hue 250°');
+      const saveButton = screen.queryByRole('button', { name: 'Save changes' });
+      expect(hueReadout).toBeVisible();
+      expect(saveButton).not.toBeInTheDocument();
     });
 
     it('hides the save bar once the save resolves', async () => {
@@ -305,17 +320,18 @@ describe(`<${LookForm.name}/>`, () => {
       await user.keyboard('{ArrowRight}');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(await screen.findByText('All changes saved')).toBeVisible();
-      expect(
-        screen.queryByRole('button', { name: 'Save changes' }),
-      ).not.toBeInTheDocument();
+      const savedNote = await screen.findByText('All changes saved');
+      const saveButton = screen.queryByRole('button', { name: 'Save changes' });
+      expect(savedNote).toBeVisible();
+      expect(saveButton).not.toBeInTheDocument();
     });
 
     it('previews a changed radius scale and density before saving', async () => {
       await user.click(screen.getByRole('button', { name: 'Extra large' }));
       await user.click(screen.getByRole('button', { name: 'Compact' }));
 
-      expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+      const sampleTokens = screen.getByTestId('look-sample-tokens');
+      expect(sampleTokens).toHaveStyle({
         '--radius-md': '12px',
         '--spacing-card-x': '0.75rem',
       });
@@ -329,9 +345,8 @@ describe(`<${LookForm.name}/>`, () => {
         ),
       );
 
-      expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
-        '--item-border-width': '1px',
-      });
+      const sampleTokens = screen.getByTestId('look-sample-tokens');
+      expect(sampleTokens).toHaveStyle({ '--item-border-width': '1px' });
 
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -346,32 +361,39 @@ describe(`<${LookForm.name}/>`, () => {
     it("choosing a preset applies that preset's card style", async () => {
       await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
-      expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
-        '--item-border-width': '1px',
-      });
+      const sampleTokens = screen.getByTestId('look-sample-tokens');
+      expect(sampleTokens).toHaveStyle({ '--item-border-width': '1px' });
     });
 
     it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
       const slider = screen.getByRole('slider', { name: 'Accent hue' });
       slider.focus();
       await user.keyboard('{ArrowRight}');
-      expect(screen.getByText('hue 251°')).toBeVisible();
+      const changedReadout = screen.getByText('hue 251°');
+      expect(changedReadout).toBeVisible();
 
       await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
-      expect(screen.getByText('hue 250°')).toBeVisible();
+      const resetReadout = screen.getByText('hue 250°');
+      expect(resetReadout).toBeVisible();
     });
 
     it('leaves every Look control enabled for a non-archived tenant', () => {
-      expect(
-        screen.getByRole('radio', { name: 'Console' }),
-      ).not.toHaveAttribute('aria-disabled', 'true');
-      expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeEnabled();
-      expect(
-        screen.getByRole('switch', { name: 'Follow accent hue' }),
-      ).not.toHaveAttribute('aria-disabled', 'true');
-      expect(screen.getByRole('button', { name: 'Upload logo' })).toBeEnabled();
-      expect(screen.getByRole('button', { name: 'Small' })).toBeEnabled();
+      const consolePreset = screen.getByRole('radio', { name: 'Console' });
+      const hueSlider = screen.getByRole('slider', { name: 'Accent hue' });
+      const followSwitch = screen.getByRole('switch', {
+        name: 'Follow accent hue',
+      });
+      const uploadLogoButton = screen.getByRole('button', {
+        name: 'Upload logo',
+      });
+      const smallButton = screen.getByRole('button', { name: 'Small' });
+
+      expect(consolePreset).not.toHaveAttribute('aria-disabled', 'true');
+      expect(hueSlider).toBeEnabled();
+      expect(followSwitch).not.toHaveAttribute('aria-disabled', 'true');
+      expect(uploadLogoButton).toBeEnabled();
+      expect(smallButton).toBeEnabled();
     });
   });
 
@@ -383,7 +405,8 @@ describe(`<${LookForm.name}/>`, () => {
     }));
     setup();
 
-    expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
+    const tabPanel = screen.queryByRole('tabpanel');
+    expect(tabPanel).not.toBeInTheDocument();
   });
 
   it("choosing a preset doesn't clear an already-saved brand image", async () => {
@@ -396,7 +419,8 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
-    expect(screen.getByAltText('Current logo')).toBeVisible();
+    const logo = screen.getByAltText('Current logo');
+    expect(logo).toBeVisible();
   });
 
   it('resets the header buttons style with the rest of the preset', async () => {
@@ -409,25 +433,24 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
-    expect(
-      within(screen.getByRole('group', { name: 'Header buttons' })).getByRole(
-        'button',
-        { name: 'Outlined' },
-      ),
-    ).toHaveAttribute('aria-pressed', 'true');
+    const headerButtons = screen.getByRole('group', { name: 'Header buttons' });
+    const outlinedButton = within(headerButtons).getByRole('button', {
+      name: 'Outlined',
+    });
+    expect(outlinedButton).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('shows a note instead of the language switcher choice with one live language', () => {
     setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
-    expect(
-      screen.getByText(
-        'Add another language in Languages settings to choose a style.',
-      ),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Compact codes' }),
-    ).not.toBeInTheDocument();
+    const note = screen.getByText(
+      'Add another language in Languages settings to choose a style.',
+    );
+    const compactCodesButton = screen.queryByRole('button', {
+      name: 'Compact codes',
+    });
+    expect(note).toBeVisible();
+    expect(compactCodesButton).not.toBeInTheDocument();
   });
 
   it('marks Save busy while the save is in flight', async () => {
@@ -461,24 +484,26 @@ describe(`<${LookForm.name}/>`, () => {
     await user.keyboard('{ArrowRight}');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      "Couldn't save Look settings",
-    );
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent("Couldn't save Look settings");
   });
 
-  it('offers Reset to preset for saved values that differ from the preset, with no unsaved edits', async () => {
+  it('offers Reset to preset for differing saved values with no unsaved edits', async () => {
     setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
 
-    expect(
-      screen.queryByRole('region', { name: 'Unsaved changes' }),
-    ).not.toBeInTheDocument();
+    const unsavedRegion = screen.queryByRole('region', {
+      name: 'Unsaved changes',
+    });
+    expect(unsavedRegion).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
-    expect(screen.getByText('hue 250°')).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Reset to preset' }),
-    ).not.toBeInTheDocument();
+    const hueReadout = screen.getByText('hue 250°');
+    const resetButton = screen.queryByRole('button', {
+      name: 'Reset to preset',
+    });
+    expect(hueReadout).toBeVisible();
+    expect(resetButton).not.toBeInTheDocument();
   });
 
   it('rejects an accent hue the site would replace, with a message, and blocks Save', async () => {
@@ -492,7 +517,8 @@ describe(`<${LookForm.name}/>`, () => {
     expect(slider).toHaveAccessibleDescription(
       expect.stringContaining('the site would replace it'),
     );
-    expect(screen.getByText('1 field needs attention')).toBeVisible();
+    const attentionNote = screen.getByText('1 field needs attention');
+    expect(attentionNote).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -520,7 +546,8 @@ describe(`<${LookForm.name}/>`, () => {
 
       await goToFirstField();
 
-      expect(screen.getByRole('slider', { name: 'Accent hue' })).toHaveFocus();
+      const slider = screen.getByRole('slider', { name: 'Accent hue' });
+      expect(slider).toHaveFocus();
     });
 
     it('returns to the Edit tab and focuses the accent hue slider from the Preview', async () => {
@@ -529,11 +556,10 @@ describe(`<${LookForm.name}/>`, () => {
 
       await goToFirstField();
 
-      expect(screen.getByRole('tab', { name: 'Edit' })).toHaveAttribute(
-        'aria-selected',
-        'true',
-      );
-      expect(screen.getByRole('slider', { name: 'Accent hue' })).toHaveFocus();
+      const editTab = screen.getByRole('tab', { name: 'Edit' });
+      const slider = screen.getByRole('slider', { name: 'Accent hue' });
+      expect(editTab).toHaveAttribute('aria-selected', 'true');
+      expect(slider).toHaveFocus();
     });
   });
 
@@ -543,12 +569,14 @@ describe(`<${LookForm.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Compact' }));
     await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
-    expect(screen.getByText('hue 250°')).toBeVisible();
+    const resetReadout = screen.getByText('hue 250°');
+    expect(resetReadout).toBeVisible();
     expect(updateLookActionMock).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-    expect(screen.getByText('hue 260°')).toBeVisible();
+    const savedReadout = screen.getByText('hue 260°');
+    expect(savedReadout).toBeVisible();
   });
 
   describe('archived tenant', () => {
@@ -562,46 +590,54 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('disables every Look control', () => {
-        expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-          'aria-disabled',
-          'true',
-        );
-        expect(
-          screen.getByRole('radio', { name: 'Editorial' }),
-        ).toHaveAttribute('aria-disabled', 'true');
-        expect(
-          screen.getByRole('slider', { name: 'Accent hue' }),
-        ).toBeDisabled();
-        expect(
-          screen.getByRole('switch', { name: 'Follow accent hue' }),
-        ).toBeDisabled();
-        expect(
-          screen.getByRole('button', { name: 'Upload logo' }),
-        ).toBeDisabled();
-        expect(
-          screen.getByRole('button', { name: 'Upload favicon' }),
-        ).toBeDisabled();
+        const consolePreset = screen.getByRole('radio', { name: 'Console' });
+        const editorialPreset = screen.getByRole('radio', {
+          name: 'Editorial',
+        });
+        const hueSlider = screen.getByRole('slider', { name: 'Accent hue' });
+        const followSwitch = screen.getByRole('switch', {
+          name: 'Follow accent hue',
+        });
+        const uploadLogoButton = screen.getByRole('button', {
+          name: 'Upload logo',
+        });
+        const uploadFaviconButton = screen.getByRole('button', {
+          name: 'Upload favicon',
+        });
+
+        expect(consolePreset).toHaveAttribute('aria-disabled', 'true');
+        expect(editorialPreset).toHaveAttribute('aria-disabled', 'true');
+        expect(hueSlider).toBeDisabled();
+        expect(followSwitch).toBeDisabled();
+        expect(uploadLogoButton).toBeDisabled();
+        expect(uploadFaviconButton).toBeDisabled();
       });
 
       it('disables the Type and Shape controls', () => {
-        expect(
-          screen.getByRole('combobox', { name: 'Heading font' }),
-        ).toHaveAttribute('data-disabled');
-        expect(
-          screen.getByRole('combobox', { name: 'Body font' }),
-        ).toHaveAccessibleDescription(/This tenant is archived/);
-        expect(screen.getByRole('button', { name: 'Small' })).toBeDisabled();
-        expect(
-          screen.getByRole('button', { name: 'Extra large' }),
-        ).toBeDisabled();
-        expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
-        expect(
-          within(screen.getByRole('group', { name: 'Card style' })).getByRole(
-            'button',
-            { name: 'Outlined' },
-          ),
-        ).toBeDisabled();
-        expect(screen.getByRole('button', { name: 'Soft' })).toBeDisabled();
+        const headingFont = screen.getByRole('combobox', {
+          name: 'Heading font',
+        });
+        const bodyFont = screen.getByRole('combobox', { name: 'Body font' });
+        const smallButton = screen.getByRole('button', { name: 'Small' });
+        const extraLargeButton = screen.getByRole('button', {
+          name: 'Extra large',
+        });
+        const compactButton = screen.getByRole('button', { name: 'Compact' });
+        const cardStyleGroup = screen.getByRole('group', {
+          name: 'Card style',
+        });
+        const outlinedCardButton = within(cardStyleGroup).getByRole('button', {
+          name: 'Outlined',
+        });
+        const softButton = screen.getByRole('button', { name: 'Soft' });
+
+        expect(headingFont).toHaveAttribute('data-disabled');
+        expect(bodyFont).toHaveAccessibleDescription(/This tenant is archived/);
+        expect(smallButton).toBeDisabled();
+        expect(extraLargeButton).toBeDisabled();
+        expect(compactButton).toBeDisabled();
+        expect(outlinedCardButton).toBeDisabled();
+        expect(softButton).toBeDisabled();
       });
     });
 
@@ -614,7 +650,7 @@ describe(`<${LookForm.name}/>`, () => {
       expect(slider).toHaveAccessibleDescription(/the site would replace it/);
     });
 
-    it('disables Reset to preset and describes it with the archived notice text, for a screen-reader user', () => {
+    it('disables Reset to preset and describes it with the archived notice', () => {
       setup({
         archivedAt: ARCHIVED_AT,
         initialValues: { ...defaultLookFormValues(), accentHue: 260 },
@@ -626,7 +662,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('restores unsaved Look changes after leaving the page, keeping the current brand images', async () => {
+  it('restores unsaved changes after leaving, keeping the current brand images', async () => {
     const { unmount } = setup();
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
     unmount();
@@ -641,10 +677,14 @@ describe(`<${LookForm.name}/>`, () => {
       screen.getByRole('button', { name: /^Restore \d+ changes$/ }),
     );
 
-    expect(screen.getByRole('radio', { name: 'Editorial' })).toBeChecked();
-    expect(screen.getByText('hue 28°')).toBeVisible();
-    expect(screen.getByAltText('Current logo')).toBeVisible();
+    const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
+    const hueReadout = screen.getByText('hue 28°');
+    const logo = screen.getByAltText('Current logo');
+    expect(editorialPreset).toBeChecked();
+    expect(hueReadout).toBeVisible();
+    expect(logo).toBeVisible();
   });
+
   it('drops a draft saved before the header buttons style existed', () => {
     const olderValues = Object.fromEntries(
       Object.entries(defaultLookFormValues()).filter(
@@ -661,10 +701,10 @@ describe(`<${LookForm.name}/>`, () => {
     );
     setup();
 
-    expect(
-      screen.queryByRole('button', { name: /^Restore/ }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText('hue 250°')).toBeVisible();
+    const restoreButton = screen.queryByRole('button', { name: /^Restore/ });
+    const hueReadout = screen.getByText('hue 250°');
+    expect(restoreButton).not.toBeInTheDocument();
+    expect(hueReadout).toBeVisible();
   });
 
   describe('brand images', () => {
@@ -676,13 +716,12 @@ describe(`<${LookForm.name}/>`, () => {
       it('stages a picked logo as an unsaved change without uploading it', async () => {
         await pickLogo(user);
 
-        expect(
-          screen.getByRole('heading', { name: 'Brand Unsaved' }),
-        ).toBeVisible();
-        expect(screen.getByAltText('Current logo')).toHaveAttribute(
-          'src',
-          'blob:staged-logo',
-        );
+        const brandHeading = screen.getByRole('heading', {
+          name: 'Brand Unsaved',
+        });
+        const logo = screen.getByAltText('Current logo');
+        expect(brandHeading).toBeVisible();
+        expect(logo).toHaveAttribute('src', 'blob:staged-logo');
         expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
       });
 
@@ -690,14 +729,16 @@ describe(`<${LookForm.name}/>`, () => {
         await pickLogo(user);
         await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-        expect(await screen.findByText('All changes saved')).toBeVisible();
+        const savedNote = await screen.findByText('All changes saved');
+        expect(savedNote).toBeVisible();
         expect(uploadBrandAssetActionMock).toHaveBeenCalledWith(
           'tenant-1',
           'logo',
           expect.any(FormData),
         );
         expect(updateLookActionMock).toHaveBeenCalled();
-        expect(screen.getByAltText('Current logo')).toHaveAttribute(
+        const logo = screen.getByAltText('Current logo');
+        expect(logo).toHaveAttribute(
           'src',
           expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
         );
@@ -717,18 +758,16 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(await screen.findByTestId('look-form-edit-panel')).toHaveAttribute(
-        'inert',
-      );
+      const lockedPanel = await screen.findByTestId('look-form-edit-panel');
+      expect(lockedPanel).toHaveAttribute('inert');
 
       resolveUpload({
         outcome: ACTION_OUTCOME.SUCCESS,
         url: UPLOADED_LOGO_URL,
       });
       await waitFor(() => {
-        expect(screen.getByTestId('look-form-edit-panel')).not.toHaveAttribute(
-          'inert',
-        );
+        const editPanel = screen.getByTestId('look-form-edit-panel');
+        expect(editPanel).not.toHaveAttribute('inert');
       });
     });
 
@@ -753,12 +792,15 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('region', { name: 'Unsaved changes' }),
-        ).toHaveTextContent('1 unsaved change');
+        const unsavedRegion = screen.getByRole('region', {
+          name: 'Unsaved changes',
+        });
+        expect(unsavedRegion).toHaveTextContent('1 unsaved change');
       });
-      expect(screen.getByText('hue 251°')).toBeVisible();
-      expect(screen.getByAltText('Current logo')).toHaveAttribute(
+      const hueReadout = screen.getByText('hue 251°');
+      const logo = screen.getByAltText('Current logo');
+      expect(hueReadout).toBeVisible();
+      expect(logo).toHaveAttribute(
         'src',
         expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
       );
@@ -798,11 +840,13 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
       await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-      expect(screen.getByAltText('Current logo')).toHaveAttribute(
+      const logo = screen.getByAltText('Current logo');
+      const savedNote = screen.queryByText('All changes saved');
+      expect(logo).toHaveAttribute(
         'src',
         expect.stringContaining(encodeURIComponent(SAVED_LOGO_URL)),
       );
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+      expect(savedNote).not.toBeInTheDocument();
       expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
     });
 
@@ -817,14 +861,16 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        "Couldn't upload the logo — try again.",
-      );
+      const alert = await screen.findByRole('alert');
+      await waitFor(() => {
+        const saveButton = screen.getByRole('button', { name: 'Save changes' });
+        expect(saveButton).toBeEnabled();
+      });
+
+      const hueReadout = screen.getByText('hue 251°');
+      expect(alert).toHaveTextContent("Couldn't upload the logo — try again.");
       expect(updateLookActionMock).not.toHaveBeenCalled();
-      expect(
-        await screen.findByRole('button', { name: 'Save changes' }),
-      ).toBeEnabled();
-      expect(screen.getByText('hue 251°')).toBeVisible();
+      expect(hueReadout).toBeVisible();
     });
 
     it('fails the save with the refusal message when the upload is refused', async () => {
@@ -838,7 +884,8 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent(
         'That file is too large — the limit is 4 MB.',
       );
       expect(updateLookActionMock).not.toHaveBeenCalled();
@@ -860,7 +907,8 @@ describe(`<${LookForm.name}/>`, () => {
         await screen.findByRole('button', { name: 'Save changes' }),
       );
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent(
         "Couldn't remove the favicon — try again.",
       );
     });
@@ -876,13 +924,16 @@ describe(`<${LookForm.name}/>`, () => {
         screen.getByRole('button', { name: /^Restore \d+ changes$/ }),
       );
 
-      expect(screen.getByRole('radio', { name: 'Editorial' })).toBeChecked();
-      expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
-      expect(
-        screen.getByText(
-          "Your recovered draft had a new logo that couldn't be kept — pick it again.",
-        ),
-      ).toBeVisible();
+      const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
+      const uploadLogoButton = screen.getByRole('button', {
+        name: 'Upload logo',
+      });
+      const repickNote = screen.getByText(
+        "Your recovered draft had a new logo that couldn't be kept — pick it again.",
+      );
+      expect(editorialPreset).toBeChecked();
+      expect(uploadLogoButton).toBeVisible();
+      expect(repickNote).toBeVisible();
     });
   });
 });

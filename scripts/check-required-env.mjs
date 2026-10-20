@@ -72,6 +72,7 @@ export const BLOCKING_ENVIRONMENTS = new Set(['development']);
 export const ENV_FILES = [
   'apps/web/src/utils/env/env.ts',
   'apps/platform/src/utils/env/env.ts',
+  'apps/worker/src/utils/env/env.ts',
   'packages/service/src/utils/env/env.ts',
   'packages/db/src/utils/env/env.ts',
   'packages/auth/src/utils/env/env.ts',

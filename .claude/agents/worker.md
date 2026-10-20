@@ -43,10 +43,16 @@ default to zero".
 3. Read `packages/db/scripts/provision-tenant/` before writing a unit. Its
    `steps/` are the provisioning steps the worker takes over; reuse what is
    there and report what has to move, never fork a second copy (CLAUDE.md →
-   "Reuse before you create").
-4. **Vercel Workflow is pinned to the stable 4.x line.** Check every API you
-   call (`"use workflow"`, `"use step"`, retries, `sleep()`) with
-   `use-context7` against 4.x; never adopt the version 5 beta.
+   "Reuse before you create"). Until the GitHub Actions driver retires, the
+   worker imports those steps and the pure `lib/` helpers in place through
+   its `@blog/db-provisioning/*` alias, in one module carrying the
+   `TODO(#4961)`; it never imports `lib/env.ts`, `run.ts` or the
+   `report-*`/`record-*`/`notify-*` helpers, which belong to the CLI runner.
+4. **Vercel Workflow is pinned exactly to a 5.x release** (`workflow` in
+   `package.json`, no range). Check every API you call (`"use workflow"`,
+   `"use step"`, retries, `sleep()`) with `use-context7` against that
+   version, or against the installed package's own types when context7 is
+   unreachable.
 5. Verify that any `db` or `config` change your work depends on has actually
    landed before coding against it.
 

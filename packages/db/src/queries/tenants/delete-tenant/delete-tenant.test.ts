@@ -1,9 +1,26 @@
+import {
+  TENANT_DELETE_OUTCOME,
+  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
+  HTTP_METHOD,
+  HTTP_STATUS,
+} from '@blog/config';
 import { PRESET_ID } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  emptyResponse,
+  firstFetchCall,
+  jsonResponse,
+  textResponse,
+  useFetchFake,
+} from '@blog/db/testing/sanity-management-client/fetch-fake';
+import {
+  SANITY_EXPECTED_URL,
+  SANITY_PROJECT_ID,
+} from '@blog/db/testing/sanity-management-client/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { deleteTenant } from './delete-tenant';
@@ -54,8 +71,8 @@ describe(deleteTenant, () => {
       const result = await deleteTenant(tenantId);
 
       expect(result).toEqual({
-        outcome: 'deleted',
-        sanityProject: 'no-project',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
+        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
       });
 
       const remaining = await db()
@@ -149,7 +166,7 @@ describe(deleteTenant, () => {
 
     const result = await deleteTenant(tenantId);
 
-    expect(result).toEqual({ outcome: 'not-archived' });
+    expect(result).toEqual({ outcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED });
 
     const remaining = await db()
       .select()
@@ -163,21 +180,12 @@ describe(deleteTenant, () => {
 
     const result = await deleteTenant(missingId);
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual({ outcome: TENANT_DELETE_OUTCOME.NOT_FOUND });
   });
 });
 
 describe('deleteTenant — Sanity project deletion', () => {
-  const fetchMock = vi.fn();
-
-  beforeEach(() => {
-    vi.stubGlobal('fetch', fetchMock);
-    fetchMock.mockReset();
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+  const fetchMock = useFetchFake();
 
   describe('a tenant with a Sanity project', () => {
     let tenantId: string;
@@ -185,7 +193,7 @@ describe('deleteTenant — Sanity project deletion', () => {
     beforeEach(async () => {
       tenantId = await insertTenant({
         archived: true,
-        sanityProjectId: 'proj123',
+        sanityProjectId: SANITY_PROJECT_ID,
       });
     });
 
@@ -194,31 +202,36 @@ describe('deleteTenant — Sanity project deletion', () => {
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(result).toEqual({
-        outcome: 'deleted',
-        sanityProject: 'skipped-no-token',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
+        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.SKIPPED_NO_TOKEN,
       });
     });
 
     it('deletes the Sanity project when a token is supplied and the API succeeds', async () => {
-      fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+      fetchMock.mockResolvedValue(emptyResponse());
 
       const result = await deleteTenant(tenantId, 'mgmt-token');
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
-      const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123');
-      expect(init.method).toBe('DELETE');
-      expect(result).toEqual({ outcome: 'deleted', sanityProject: 'deleted' });
+      const { url, method } = firstFetchCall(fetchMock);
+      expect(url).toBe(SANITY_EXPECTED_URL.project);
+      expect(method).toBe(HTTP_METHOD.DELETE);
+      expect(result).toEqual({
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
+        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.DELETED,
+      });
     });
 
     it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
-      fetchMock.mockResolvedValue(new Response('not found', { status: 404 }));
+      fetchMock.mockResolvedValue(
+        textResponse('not found', HTTP_STATUS.NOT_FOUND),
+      );
 
       const result = await deleteTenant(tenantId, 'mgmt-token');
 
       expect(result).toEqual({
-        outcome: 'deleted',
-        sanityProject: 'already-gone',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
+        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.ALREADY_GONE,
       });
 
       const remaining = await db()
@@ -230,22 +243,21 @@ describe('deleteTenant — Sanity project deletion', () => {
 
     it('still hard-deletes the row and reports left-archived on the org-billing 401', async () => {
       fetchMock.mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            code: 401,
+        jsonResponse(
+          {
+            code: HTTP_STATUS.UNAUTHORIZED,
             status: 'Unauthorized',
-            message:
-              'Cancellation of project "proj123" requires billing permission on organization "org1"',
-          }),
-          { status: 401 },
+            message: `Cancellation of project "${SANITY_PROJECT_ID}" requires billing permission on organization "org1"`,
+          },
+          HTTP_STATUS.UNAUTHORIZED,
         ),
       );
 
       const result = await deleteTenant(tenantId, 'mgmt-token');
 
       expect(result).toEqual({
-        outcome: 'deleted',
-        sanityProject: 'left-archived',
+        outcome: TENANT_DELETE_OUTCOME.DELETED,
+        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED,
       });
 
       const remaining = await db()
@@ -256,9 +268,13 @@ describe('deleteTenant — Sanity project deletion', () => {
     });
 
     it('still throws on a Sanity failure unrelated to billing permission, and leaves the row untouched', async () => {
-      fetchMock.mockResolvedValue(new Response('forbidden', { status: 403 }));
+      fetchMock.mockResolvedValue(
+        textResponse('forbidden', HTTP_STATUS.FORBIDDEN),
+      );
 
-      await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(/403/);
+      await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(
+        new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
+      );
 
       const remaining = await db()
         .select()
@@ -274,6 +290,9 @@ describe('deleteTenant — Sanity project deletion', () => {
     const result = await deleteTenant(tenantId, 'mgmt-token');
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'deleted', sanityProject: 'no-project' });
+    expect(result).toEqual({
+      outcome: TENANT_DELETE_OUTCOME.DELETED,
+      sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
+    });
   });
 });

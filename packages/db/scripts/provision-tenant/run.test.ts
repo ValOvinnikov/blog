@@ -1,3 +1,4 @@
+import { SANITY_PROJECT_UNARCHIVE_OUTCOME } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
@@ -7,6 +8,7 @@ import {
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { toOutcome } from '@blog/utils/to-outcome';
 
 import { runSteps } from './run';
 
@@ -53,7 +55,7 @@ vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
 }));
 vi.mock(
-  '@blog/db/utils/sanity-management-client/sanity-management-client',
+  '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
   () => ({
     unarchiveSanityProject: unarchiveSanityProjectMock,
   }),
@@ -119,7 +121,7 @@ beforeEach(() => {
     .mockResolvedValue({ ok: true, data: baseTenant });
   unarchiveSanityProjectMock
     .mockReset()
-    .mockResolvedValue({ outcome: 'unarchived' });
+    .mockResolvedValue(toOutcome(SANITY_PROJECT_UNARCHIVE_OUTCOME.UNARCHIVED));
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
   reportProvisioningRunStartMock.mockReset().mockResolvedValue(undefined);
   reportProvisioningRunFinishMock.mockReset().mockResolvedValue(undefined);

@@ -95,16 +95,15 @@
   `eslint-suppressions.json` file remains anywhere in the repo, and all
   three rules are enforced from a clean baseline in every workspace.
 
-- `func-style` — enforces arrow-function expressions (`'error', 'expression',
-{ allowArrowFunctions: true }`) over function declarations. Registered only
-  in `web.js`, scoped to `apps/web/**/*.{ts,tsx}`, with an override turning it
-  back off in `**/page.tsx`, `**/layout.tsx`, `**/route.ts`, and
-  `**/not-found.tsx` — Next.js reserved exports (`generateMetadata`, route
-  verbs, …) stay as declarations.
+- `func-style` — set per layer kind. The React presets (`web.js`, `platform.js`,
+  `studio.js`) enforce arrow-function expressions (`'error', 'expression',
+{ allowArrowFunctions: true }`); `web.js` turns it back off in `**/page.tsx`, `**/layout.tsx`, `**/route.ts`, `**/not-found.tsx` and `**/global-not-found.tsx`, and `platform.js` in `page.tsx`, `layout.tsx`, `route.ts` and `src/proxy.ts` — Next.js reserved exports (`generateMetadata`, route
+  verbs, …) stay as declarations. The operation layers (`service.js`, `db.js`,
+  `email.js`, `worker.js`) enforce declarations.
 - Per-layer subpaths that compose `base.js` (and, where relevant,
   `no-upstream-imports.js`) with that layer's own constraints — `./config`,
   `./utils`, `./insight`, `./service`, `./db`, `./ui`, `./web`, `./studio`,
-  `./auth`, `./platform` — each imported by that workspace's own
+  `./auth`, `./platform`, `./email`, `./worker` — each imported by that workspace's own
   `eslint.config.js`. `./insight` composes `./utils` and exempts its own
   `src/**` from the repo-wide `no-console` ban — `files` patterns resolve
   relative to the consuming workspace, so workspace-specific `no-console`
@@ -118,7 +117,7 @@
 Every package and app workspace, plus `configs/tailwind` and
 `configs/vitest`: `packages/config`, `packages/utils`, `packages/insight`,
 `packages/service`, `packages/db`, `packages/auth`, `packages/ui`,
-`apps/web`, `packages/studio`, `apps/platform`, `configs/tailwind`, `configs/vitest`.
+`apps/web`, `packages/studio`, `apps/platform`, `apps/worker`, `configs/tailwind`, `configs/vitest`.
 
 ## Further reading
 

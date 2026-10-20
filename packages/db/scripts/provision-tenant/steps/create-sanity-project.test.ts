@@ -1,3 +1,4 @@
+import { HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -40,15 +41,21 @@ vi.mock('@blog/db/queries/memberships', () => ({
   getTenantOwnerEmail: getTenantOwnerEmailMock,
 }));
 
-vi.mock('../lib/sanity-management-client', () => ({
+vi.mock('@blog/db/utils/sanity-management-client/sanity-project-setup', () => ({
   createSanityProject: createSanityProjectMock,
   createSanityDataset: createSanityDatasetMock,
   addSanityCorsOrigin: addSanityCorsOriginMock,
-  createSanityProjectInvite: createSanityProjectInviteMock,
   listSanityDatasets: listSanityDatasetsMock,
   listSanityCorsOrigins: listSanityCorsOriginsMock,
-  listSanityProjectInvites: listSanityProjectInvitesMock,
 }));
+
+vi.mock(
+  '@blog/db/utils/sanity-management-client/sanity-project-access',
+  () => ({
+    createSanityProjectInvite: createSanityProjectInviteMock,
+    listSanityProjectInvites: listSanityProjectInvitesMock,
+  }),
+);
 
 const env: TProvisionEnv = {
   sanityManagementToken: 'mgmt-token',
@@ -212,7 +219,7 @@ describe(createTenantSanityProject, () => {
         token: 'mgmt-token',
         projectId: 'proj456',
         email: 'owner@example.com',
-        role: 'viewer',
+        role: SANITY_PROJECT_ROLE.VIEWER,
       });
     });
 
@@ -262,7 +269,7 @@ describe(createTenantSanityProject, () => {
         createSanityProjectInviteMock.mockImplementation(async () => {
           callOrder.push('createSanityProjectInvite');
           throw new Error(
-            '403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}',
+            `${HTTP_STATUS.FORBIDDEN} {"statusCode":${HTTP_STATUS.FORBIDDEN},"error":"Forbidden","message":"Missing permission to invite administrators."}`,
           );
         });
 
@@ -410,8 +417,8 @@ describe(createTenantSanityProject, () => {
 
       it('does not re-invite when a retry finds the owner still pending, exercising the real invite-list parsing against a mocked fetch', async () => {
         const actual = await vi.importActual<
-          typeof import('../lib/sanity-management-client')
-        >('../lib/sanity-management-client');
+          typeof import('@blog/db/utils/sanity-management-client/sanity-project-access')
+        >('@blog/db/utils/sanity-management-client/sanity-project-access');
         listSanityProjectInvitesMock.mockImplementation(
           actual.listSanityProjectInvites,
         );
@@ -421,7 +428,7 @@ describe(createTenantSanityProject, () => {
               data: [{ email: 'owner@example.com', status: 'pending' }],
               nextCursor: null,
             }),
-            { status: 200 },
+            { status: HTTP_STATUS.OK },
           ),
         );
         vi.stubGlobal('fetch', fetchMock);

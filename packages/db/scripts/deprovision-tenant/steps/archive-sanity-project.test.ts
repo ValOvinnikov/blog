@@ -1,5 +1,7 @@
+import { SANITY_PROJECT_ARCHIVE_OUTCOME } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { toOutcome } from '@blog/utils/to-outcome';
 
 import type { TDeprovisionEnv } from '../lib/env';
 
@@ -10,7 +12,7 @@ const { archiveSanityProjectMock } = vi.hoisted(() => ({
 }));
 
 vi.mock(
-  '@blog/db/utils/sanity-management-client/sanity-management-client',
+  '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
   () => ({
     archiveSanityProject: archiveSanityProjectMock,
   }),
@@ -54,7 +56,7 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 beforeEach(() => {
   archiveSanityProjectMock
     .mockReset()
-    .mockResolvedValue({ outcome: 'archived' });
+    .mockResolvedValue(toOutcome(SANITY_PROJECT_ARCHIVE_OUTCOME.ARCHIVED));
 });
 
 describe(archiveTenantSanityProject, () => {
@@ -83,7 +85,9 @@ describe(archiveTenantSanityProject, () => {
   });
 
   it('is a no-op when the project is already archived — the underlying idempotency check', async () => {
-    archiveSanityProjectMock.mockResolvedValue({ outcome: 'already-archived' });
+    archiveSanityProjectMock.mockResolvedValue(
+      toOutcome(SANITY_PROJECT_ARCHIVE_OUTCOME.ALREADY_ARCHIVED),
+    );
 
     await expect(
       archiveTenantSanityProject(baseTenant(), env),

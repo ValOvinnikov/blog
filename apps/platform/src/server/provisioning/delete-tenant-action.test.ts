@@ -1,4 +1,11 @@
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  TENANT_DELETE_OUTCOME,
+  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
+  type TMaybeNull,
+} from '@blog/config';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { logger } from '@platform/utils/logger/logger';
@@ -41,7 +48,7 @@ const loggerErrorMock = vi.mocked(logger.error);
 const tenant = {
   id: 'tenant-1',
   name: 'Acme Inc.',
-  deprovisionedAt: new Date('2026-01-01T00:00:00.000Z') as Date | null,
+  deprovisionedAt: new Date('2026-01-01T00:00:00.000Z') as TMaybeNull<Date>,
 };
 
 describe('deleteTenantAction', () => {
@@ -60,7 +67,10 @@ describe('deleteTenantAction', () => {
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(tenant);
     deleteTenantMock.mockReset();
-    deleteTenantMock.mockResolvedValue({ outcome: 'deleted' });
+    deleteTenantMock.mockResolvedValue({
+      outcome: TENANT_DELETE_OUTCOME.DELETED,
+      sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
+    });
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
@@ -116,7 +126,9 @@ describe('deleteTenantAction', () => {
   });
 
   it('returns an error and no audit event when the mutation refuses a live tenant', async () => {
-    deleteTenantMock.mockResolvedValue({ outcome: 'not-archived' });
+    deleteTenantMock.mockResolvedValue({
+      outcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED,
+    });
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });
@@ -129,7 +141,9 @@ describe('deleteTenantAction', () => {
   });
 
   it('returns an error and no audit event when the mutation reports the tenant gone', async () => {
-    deleteTenantMock.mockResolvedValue({ outcome: 'not-found' });
+    deleteTenantMock.mockResolvedValue({
+      outcome: TENANT_DELETE_OUTCOME.NOT_FOUND,
+    });
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });

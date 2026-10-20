@@ -1,9 +1,10 @@
+import { SANITY_ROBOT_ROLE } from '@blog/config';
 import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
-} from '@blog/db/utils/sanity-management-client/sanity-management-client';
+} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { createClient } from '@sanity/client';
 
@@ -55,7 +56,7 @@ export async function seedTenantContent(
     token: env.sanityManagementToken,
     projectId: tenant.sanityProjectId,
     label: SANITY_WRITE_TOKEN_LABEL,
-    role: 'editor',
+    role: SANITY_ROBOT_ROLE.EDITOR,
   });
 
   let persisted = false;

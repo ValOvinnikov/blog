@@ -1,6 +1,11 @@
 'use server';
 
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  TENANT_DELETE_OUTCOME,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -52,14 +57,14 @@ export const deleteTenantAction = async (
     return { outcome: ACTION_OUTCOME.SERVER_ERROR };
   }
 
-  if (result.outcome === 'not-found') {
+  if (result.outcome === TENANT_DELETE_OUTCOME.NOT_FOUND) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.NOT_FOUND,
     };
   }
 
-  if (result.outcome === 'not-archived') {
+  if (result.outcome === TENANT_DELETE_OUTCOME.NOT_ARCHIVED) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.NOT_ARCHIVED,

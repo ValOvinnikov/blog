@@ -1,5 +1,9 @@
 import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  listSanityWebhooks,
+  type TSanityWebhook,
+} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
 import { createClient } from '@sanity/client';
 
 import type { TProvisionEnv } from '../lib/env';
@@ -8,10 +12,6 @@ import {
   retryWithBackoff,
   type TRetryWithBackoffOptions,
 } from '../lib/retry-with-backoff';
-import {
-  listSanityWebhooks,
-  type TSanityWebhook,
-} from '../lib/sanity-management-client';
 import {
   listVercelProjectDomains,
   type TVercelDomain,
