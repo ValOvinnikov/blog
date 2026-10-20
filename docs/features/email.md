@@ -26,7 +26,7 @@ epics: [4083]
 
 ## What it does
 
-Every email the product sends is built and sent by `@blog/email`. Tenant-facing mail (sign-in link, team invite, newsletter confirmation) arrives in the tenant's own colours, name and logo, with subject and body copy the owner can rewrite per language. Operator alerts arrive in the platform's fixed look with fixed English copy. The contact-form notification to a site's owner uses the tenant's look with fixed English copy, and is not an editable template. Owners edit their sender details and templates on the platform's Email page, preview them at desktop and mobile width, and send a test to themselves.
+Every email the product sends is built and sent by `@blog/email`. Tenant-facing mail (sign-in link, team invite, newsletter confirmation) arrives in the tenant's own colours, name and logo, with subject and body copy the owner can rewrite per language. Operator alerts arrive in the platform's fixed look with fixed English copy. Owner onboarding mail — a heads-up that Sanity has emailed a Studio invite, a nudge when it is still unaccepted, and a "your site is ready" message — arrives in the platform's fixed look under the platform's name, with fixed transactional copy the sender passes in. The contact-form notification to a site's owner uses the tenant's look with fixed English copy, and is not an editable template. Owners edit their sender details and templates on the platform's Email page, preview them at desktop and mobile width, and send a test to themselves.
 
 ## Surfaces and routes
 
@@ -49,10 +49,12 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 - Plan gating: applies to the owner's `/dashboard/email` only, which exists only when the plan carries an email-sending capability (see [plans-and-entitlements](./plans-and-entitlements.md)); operators reach `/tenants/<id>/email` on every plan.
 - Look reach: brand colours and logo marks follow the tenant's Look ([look](./look.md)). Email copy is not Voice.
 - Operator alert copy is fixed and never tenant-editable.
+- Owner onboarding copy (subject, preview text, paragraphs, action label and URL) is fixed transactional copy passed by the sender; it is not Voice and not an editable template. Every value is escaped, the action URL sanitised.
 
 ## Constraints and invariants
 
-- **Separation is structural** — `buildOperatorShell` takes no brand and always uses `PLATFORM_EMAIL_BRAND`; `buildTenantShell` requires a resolved `TTenantEmailBrand`. Operator templates live in `templates/operator/`, tenant templates in `templates/tenant/`. Mail with no tenant (a platform sign-in) uses the neutral shell.
+- **Separation is structural** — `buildOperatorShell` takes no brand and always uses `PLATFORM_EMAIL_BRAND`; `buildTenantShell` requires a resolved `TTenantEmailBrand`. Operator templates live in `templates/operator/`, tenant templates in `templates/tenant/`, owner onboarding templates in `templates/owner/`. Mail with no tenant (a platform sign-in) uses the neutral shell.
+- **Platform shell** — `buildPlatformShell` renders mail the platform sends in its own name in `PLATFORM_EMAIL_BRAND`, taking the brand name but no palette. `buildOperatorShell` is it with the fixed name "Tenant Alerts"; the owner onboarding templates pass the platform's name.
 - **Locked action** — the sign-in, accept-invite and confirm links render as an action element outside the authored body, so authored copy cannot remove or replace them.
 - Authored bodies serialise only paragraphs, headings and bullet/number lists, with `strong`, `em` and links; every value goes through the canonical `escapeHtml` and `sanitizeHref`.
 - Field resolution per send: recipient's language, then the tenant's default language, then the product default in the recipient's language. Logo: template override, then the tenant logo.
@@ -71,8 +73,8 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 ## Entry points
 
 - `packages/email/src/transport/send-email.ts`
-- `packages/email/src/html/tenant-shell/tenant-shell.ts`, `operator-shell/operator-shell.ts`, `neutral-shell/neutral-shell.ts`, `email-layout/email-layout.ts`, `email-action/email-action.ts`
-- `packages/email/src/templates/tenant/**`, `packages/email/src/templates/operator/**`
+- `packages/email/src/html/tenant-shell/tenant-shell.ts`, `platform-shell/platform-shell.ts`, `operator-shell/operator-shell.ts`, `neutral-shell/neutral-shell.ts`, `email-layout/email-layout.ts`, `email-action/email-action.ts`
+- `packages/email/src/templates/tenant/**`, `packages/email/src/templates/operator/**`, `packages/email/src/templates/owner/**`
 - `packages/email/src/portable-text/serialize-portable-text.ts`
 - `packages/auth/src/providers/magic-link/magic-link-provider/magic-link-provider.ts`, `resolve-magic-link-email-settings/resolve-magic-link-email-settings.ts`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`, `apps/web/src/utils/resolve-tenant-email-identity/resolve-tenant-email-identity.ts`

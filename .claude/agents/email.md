@@ -72,6 +72,11 @@ don't apply here.
   broke or a tenant's documents are invalid. They stay English-only and
   hardcoded, on `buildOperatorShell`, which takes no brand. They must never
   become tenant-editable.
+- **Owner onboarding mail** (`templates/owner/` — invite heads-up, nudge,
+  site ready) is the platform writing to a tenant's owner in its own name, on
+  `buildPlatformShell`, which takes the platform's name but no palette. Its
+  copy is fixed transactional copy the sender passes in — never Voice, never
+  an editable template.
 - **Tenant mail** (`templates/tenant/` — sign-in, invite, newsletter
   confirmation) renders the tenant's authored copy on `buildTenantShell`,
   which requires a resolved brand. Sign-in and invite fall back to the
