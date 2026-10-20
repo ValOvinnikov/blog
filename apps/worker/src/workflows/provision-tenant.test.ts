@@ -115,4 +115,25 @@ describe(provisionTenant, () => {
     });
     expect(applySiteTemplate).not.toHaveBeenCalled();
   });
+
+  describe('when the run cannot be started', () => {
+    beforeEach(() => {
+      vi.mocked(beginRun).mockRejectedValue(new Error('registry unreachable'));
+    });
+
+    it('finishes the run as failed with the error', async () => {
+      await expect(provisionTenant(TENANT_ID)).rejects.toThrow(FatalError);
+
+      expect(finishRun).toHaveBeenCalledWith(TENANT_ID, CTX, {
+        ok: false,
+        error: 'registry unreachable',
+      });
+    });
+
+    it('runs none of the units', async () => {
+      await expect(provisionTenant(TENANT_ID)).rejects.toThrow(FatalError);
+
+      expect(ensureInfrastructure).not.toHaveBeenCalled();
+    });
+  });
 });

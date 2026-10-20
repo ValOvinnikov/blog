@@ -13,8 +13,6 @@ export async function provisionTenant(tenantId: string): Promise<TRunOutcome> {
   'use workflow';
 
   const ctx = { runId: getWorkflowMetadata().workflowRunId };
-  await beginRun(tenantId);
-
   const units = [
     () => ensureInfrastructure(tenantId, ctx),
     () => inviteOwner(tenantId),
@@ -24,6 +22,7 @@ export async function provisionTenant(tenantId: string): Promise<TRunOutcome> {
 
   let outcome: TRunOutcome = { ok: true };
   try {
+    await beginRun(tenantId);
     for (const unit of units) {
       const result = await unit();
       if (!result.ok) {
