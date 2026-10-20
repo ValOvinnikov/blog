@@ -7,6 +7,7 @@ import {
   emptyResponse,
   firstFetchCall,
   jsonResponse,
+  nthFetchCall,
   textResponse,
   useFetchFake,
 } from '@blog/db/testing/sanity-management-client/fetch-fake';
@@ -101,6 +102,39 @@ function projectResponse(isDisabledByUser: boolean): Response {
   );
 }
 
+describe.each([
+  {
+    name: 'archiveSanityProject',
+    run: archiveSanityProject,
+    isDisabledByUser: false,
+    outcome: SANITY_PROJECT_ARCHIVE_OUTCOME.ARCHIVED,
+  },
+  {
+    name: 'unarchiveSanityProject',
+    run: unarchiveSanityProject,
+    isDisabledByUser: true,
+    outcome: SANITY_PROJECT_UNARCHIVE_OUTCOME.UNARCHIVED,
+  },
+])('$name toggling', ({ run, isDisabledByUser, outcome }) => {
+  it('GETs, then PATCHes isDisabledByUser to the opposite value', async () => {
+    fetchMock
+      .mockResolvedValueOnce(projectResponse(isDisabledByUser))
+      .mockResolvedValueOnce(jsonResponse({}));
+
+    const result = await run(INPUT);
+
+    expect(result).toEqual(toOutcome(outcome));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const get = nthFetchCall(fetchMock, 0);
+    expect(get.url).toBe(SANITY_EXPECTED_URL.project);
+    expect(get.init.method).toBeUndefined();
+    const patch = nthFetchCall(fetchMock, 1);
+    expect(patch.url).toBe(SANITY_EXPECTED_URL.project);
+    expect(patch.init.method).toBe('PATCH');
+    expect(patch.body).toEqual({ isDisabledByUser: !isDisabledByUser });
+  });
+});
+
 describe(archiveSanityProject, () => {
   it('sends an abort signal on both the GET and the PATCH', async () => {
     fetchMock
@@ -109,32 +143,8 @@ describe(archiveSanityProject, () => {
 
     await archiveSanityProject(INPUT);
 
-    for (const [, init] of fetchMock.mock.calls as [string, RequestInit][]) {
-      expect(init.signal).toBeInstanceOf(AbortSignal);
-    }
-  });
-
-  it('GETs, then PATCHes isDisabledByUser to true when not already archived', async () => {
-    fetchMock
-      .mockResolvedValueOnce(projectResponse(false))
-      .mockResolvedValueOnce(jsonResponse({}));
-
-    const result = await archiveSanityProject(INPUT);
-
-    expect(result).toEqual(toOutcome(SANITY_PROJECT_ARCHIVE_OUTCOME.ARCHIVED));
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-
-    const { url: getUrl, init: getInit } = firstFetchCall(fetchMock);
-    expect(getUrl).toBe(SANITY_EXPECTED_URL.project);
-    expect(getInit.method).toBeUndefined();
-
-    const [patchUrl, patchInit] = fetchMock.mock.calls[1] as [
-      string,
-      RequestInit,
-    ];
-    expect(patchUrl).toBe(SANITY_EXPECTED_URL.project);
-    expect(patchInit.method).toBe('PATCH');
-    expect(patchInit.body).toBe(JSON.stringify({ isDisabledByUser: true }));
+    expect(nthFetchCall(fetchMock, 0).init.signal).toBeInstanceOf(AbortSignal);
+    expect(nthFetchCall(fetchMock, 1).init.signal).toBeInstanceOf(AbortSignal);
   });
 
   it('is idempotent — skips the PATCH when the project is already archived', async () => {
@@ -179,27 +189,6 @@ describe(archiveSanityProject, () => {
 });
 
 describe(unarchiveSanityProject, () => {
-  it('GETs, then PATCHes isDisabledByUser to false when currently archived', async () => {
-    fetchMock
-      .mockResolvedValueOnce(projectResponse(true))
-      .mockResolvedValueOnce(jsonResponse({}));
-
-    const result = await unarchiveSanityProject(INPUT);
-
-    expect(result).toEqual(
-      toOutcome(SANITY_PROJECT_UNARCHIVE_OUTCOME.UNARCHIVED),
-    );
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-
-    const [patchUrl, patchInit] = fetchMock.mock.calls[1] as [
-      string,
-      RequestInit,
-    ];
-    expect(patchUrl).toBe(SANITY_EXPECTED_URL.project);
-    expect(patchInit.method).toBe('PATCH');
-    expect(patchInit.body).toBe(JSON.stringify({ isDisabledByUser: false }));
-  });
-
   it('is idempotent — skips the PATCH when the project is already active', async () => {
     fetchMock.mockResolvedValueOnce(projectResponse(false));
 

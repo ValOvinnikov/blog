@@ -25,11 +25,18 @@ export function useFetchFake() {
   return fetchMock;
 }
 
-export function firstFetchCall(fetchMock: ReturnType<typeof vi.fn>) {
-  const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+export function nthFetchCall(
+  fetchMock: ReturnType<typeof vi.fn>,
+  index: number,
+) {
+  const [url, init] = fetchMock.mock.calls[index] as [string, RequestInit];
   const body =
     typeof init.body === 'string'
       ? (JSON.parse(init.body) as unknown)
       : undefined;
   return { url, init, body, headers: init.headers as Record<string, string> };
+}
+
+export function firstFetchCall(fetchMock: ReturnType<typeof vi.fn>) {
+  return nthFetchCall(fetchMock, 0);
 }
