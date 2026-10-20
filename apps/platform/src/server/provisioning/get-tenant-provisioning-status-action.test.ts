@@ -1,14 +1,13 @@
 export {};
 
-const { requireAdminMock, getTenantProvisioningStatusMock } = vi.hoisted(
-  () => ({
-    requireAdminMock: vi.fn(),
+const { requireTenantOwnerOrAdminMock, getTenantProvisioningStatusMock } =
+  vi.hoisted(() => ({
+    requireTenantOwnerOrAdminMock: vi.fn(),
     getTenantProvisioningStatusMock: vi.fn(),
-  }),
-);
+  }));
 
-vi.mock('@platform/server/auth/require-admin', () => ({
-  requireAdmin: requireAdminMock,
+vi.mock('@platform/server/auth/require-tenant-owner-or-admin', () => ({
+  requireTenantOwnerOrAdmin: requireTenantOwnerOrAdminMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -19,13 +18,13 @@ vi.mock('@blog/db', () => ({
 
 describe('getTenantProvisioningStatusAction', () => {
   beforeEach(() => {
-    requireAdminMock.mockReset();
-    requireAdminMock.mockResolvedValue({ id: 'admin-1' });
+    requireTenantOwnerOrAdminMock.mockReset();
+    requireTenantOwnerOrAdminMock.mockResolvedValue(undefined);
     getTenantProvisioningStatusMock.mockReset();
   });
 
-  it('requires an admin session before querying', async () => {
-    requireAdminMock.mockImplementation(() => {
+  it("requires the tenant's owner or an admin before querying", async () => {
+    requireTenantOwnerOrAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
     const { getTenantProvisioningStatusAction } =
@@ -34,6 +33,7 @@ describe('getTenantProvisioningStatusAction', () => {
     await expect(getTenantProvisioningStatusAction('tenant-1')).rejects.toThrow(
       'NEXT_REDIRECT',
     );
+    expect(requireTenantOwnerOrAdminMock).toHaveBeenCalledWith('tenant-1');
     expect(getTenantProvisioningStatusMock).not.toHaveBeenCalled();
   });
 

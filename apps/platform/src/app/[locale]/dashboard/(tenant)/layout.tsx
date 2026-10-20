@@ -7,6 +7,7 @@ import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
 import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
 import { dashboardNavSections } from '@platform/utils/nav-sections/nav-sections';
+import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 
 type TProps = {
@@ -39,7 +40,11 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   return (
     <AdminShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
-      sections={dashboardNavSections(tNavSections, access)}
+      sections={dashboardNavSections(
+        tNavSections,
+        access,
+        ownerStudioAccessFor(tenant, membership),
+      )}
       switcher={
         tenants.length > 1 ? (
           <TenantSwitcher

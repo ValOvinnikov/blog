@@ -70,11 +70,11 @@ The run then verifies all of it. The admin polls each step's progress and offers
   - `/tenants/{id}/provisioning` shows each step's status and the run. Until the workflow starts the run, it says the run is queued and counts the wait. A step that finishes between two polls is still shown Running before it settles.
   - `/tenants/{id}/domain` shows DNS records and live Vercel verification.
 - **SUPERADMIN only:** `/tenants/{id}/danger` holds deprovision (with dry run), reactivate and delete.
-- **Owner:** `/dashboard/domain` shows the same domain view.
+- **Owner:** `/dashboard` shows a setup progress card, with Retry on a failure, until provisioning is READY. `/dashboard/domain` shows the same domain view.
 - **Workflows:**
   - `deprovision-tenant.yml` and `invalidate-tenant-cache.yml` are dispatch only. No workflow provisions a tenant.
   - `recheck-tenant-owners.yml` and `validate-tenant-documents.yml` are dispatch only while their crons are parked.
-- **Worker:** `apps/worker` (`worker-dev`/`worker-prod`, no public hostname) serves `POST /api/provision`, body `{ "tenantId": "<uuid>" }`. It is signed with `x-worker-timestamp` (epoch milliseconds, within 5 minutes of the worker's clock) and `x-worker-signature` (`sha256=` plus the hex HMAC-SHA256 of `<timestamp>.<request path>.<raw body>`, keyed with `WORKER_ENQUEUE_SECRET`). It answers 202 with the run id, 401, 400, 404, or 409 when a run is already in progress. `POST /api/owner-access/check` ("Check now") and `POST /api/owner-access/resend` take the same signed body and answer 202, 401, 400, 404, or 409 `NOT_PROVISIONED` while the tenant has no Sanity project. The admin panel's "Add tenant", retry and reactivate call `POST /api/provision`; nothing calls the owner-access routes yet.
+- **Worker:** `apps/worker` (`worker-dev`/`worker-prod`, no public hostname) serves `POST /api/provision`, body `{ "tenantId": "<uuid>" }`. It is signed with `x-worker-timestamp` (epoch milliseconds, within 5 minutes of the worker's clock) and `x-worker-signature` (`sha256=` plus the hex HMAC-SHA256 of `<timestamp>.<request path>.<raw body>`, keyed with `WORKER_ENQUEUE_SECRET`). It answers 202 with the run id, 401, 400, 404, or 409 when a run is already in progress. `POST /api/owner-access/check` ("Check now") and `POST /api/owner-access/resend` take the same signed body and answer 202, 401, 400, 404, or 409 `NOT_PROVISIONED` while the tenant has no Sanity project. The admin panel's "Add tenant", retry and reactivate call `POST /api/provision`; the owner's Studio explainer calls the owner-access routes.
 - **Manual CLIs:** `db:seed-tenant` and `db:recover-wedged-provisioning`.
 
 ## Data
@@ -102,7 +102,7 @@ The run then verifies all of it. The admin polls each step's progress and offers
 
 - **Who can do what:**
   - Any admin can create a tenant and edit its name, domain, plan, language and pending owner email.
-  - Only a SUPERADMIN can retry provisioning, deprovision, reactivate or delete. Creating a tenant (any admin) starts the first run.
+  - A SUPERADMIN, or the tenant's own OWNER from `/dashboard`, can retry provisioning. Only a SUPERADMIN can deprovision, reactivate or delete. Creating a tenant (any admin) starts the first run.
 - **Unknown owner email:** if the email has no user yet, the wizard requires an HMAC confirmation token. The owner then gets an OWNER invite and a magic-link email ([tenant access](./tenant-access.md)).
 - **Platform env:** `WORKER_ENQUEUE_URL` and `WORKER_ENQUEUE_SECRET` sign and send each enqueue. Either missing, the enqueue is skipped and logged and the action reports a server error. `TENANT_PROVISIONING_GITHUB_TOKEN` (`actions: write`), `TENANT_PROVISIONING_GITHUB_REPO` and `TENANT_PROVISIONING_DATASET` drive the deprovisioning dispatch.
 - **Worker env:** the provisioning secrets live on the `worker-dev`/`worker-prod` projects ([environment variables](../context/environment-variables.md)).

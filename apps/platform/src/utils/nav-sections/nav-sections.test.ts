@@ -230,6 +230,12 @@ const configurationLabels = (access: TPlanPageAccess) => {
 };
 
 describe('dashboardNavSections', () => {
+  it("badges the Studio link with the owner's access state", () => {
+    const [, content] = dashboardNavSections(t, EVERY_PAGE, 'STALLED');
+
+    expect(content!.items[0]?.badge?.label).toBe('Action needed');
+  });
+
   it('opens with a "Your site" section whose only item is Overview, linking to /dashboard', () => {
     const [yourSite] = dashboardNavSections(t, EVERY_PAGE);
 

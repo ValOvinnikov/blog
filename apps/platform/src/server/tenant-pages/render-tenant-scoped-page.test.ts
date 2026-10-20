@@ -16,6 +16,18 @@ describe('renderTenantScopedPage', () => {
     expect(result).toBe('rendered content');
   });
 
+  it('hands the page content everything the resolver returned', async () => {
+    const context = { tenant: makeTenant(), membership: { role: 'OWNER' } };
+    const PageContent = vi.fn().mockResolvedValue('rendered content');
+
+    await renderTenantScopedPage(
+      vi.fn().mockResolvedValue(context),
+      PageContent,
+    );
+
+    expect(PageContent).toHaveBeenCalledWith(context);
+  });
+
   it('propagates a redirect thrown by the resolver without calling the content renderer', async () => {
     const resolveTenant = vi.fn().mockRejectedValue(new Error('NEXT_REDIRECT'));
     const PageContent = vi.fn();

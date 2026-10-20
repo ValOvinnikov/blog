@@ -2,7 +2,10 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import {
+  makeReadyTenant,
+  makeTenant,
+} from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -101,9 +104,12 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
       'tenant-1',
     );
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
-    ).toBeVisible();
+    const acmeIncHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Acme Inc.',
+    });
+
+    expect(acmeIncHeading).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
 
@@ -116,12 +122,51 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Owner' }),
-    ).toBeVisible();
-    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
+    const acmeIncHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Acme Inc.',
+    });
+
+    expect(acmeIncHeading).toBeVisible();
+    const ownerHeading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Owner',
+    });
+
+    expect(ownerHeading).toBeVisible();
+    const skeletonCount = screen.getAllByTestId('skeleton').length;
+
+    expect(skeletonCount).toBeGreaterThan(0);
+  });
+
+  it("shows the owner their site's setup progress while provisioning runs", async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership, tenant: makeTenant({ id: 'tenant-1' }) },
+    ]);
+
+    await setup();
+
+    const settingUpYourSiteHeading = screen.getByRole('heading', {
+      level: 2,
+      name: /Setting up your site/,
+    });
+
+    expect(settingUpYourSiteHeading).toBeVisible();
+  });
+
+  it('shows no setup progress once provisioning is ready', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership, tenant: makeReadyTenant({ id: 'tenant-1' }) },
+    ]);
+
+    await setup();
+
+    const settingUpYourSiteHeading = screen.queryByRole('heading', {
+      name: /Setting up your site/,
+    });
+
+    expect(settingUpYourSiteHeading).not.toBeInTheDocument();
   });
 });

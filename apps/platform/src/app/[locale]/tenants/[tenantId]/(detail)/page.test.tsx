@@ -53,16 +53,9 @@ vi.mock('@platform/server/provisioning/get-domain-verification-status', () => ({
   getDomainVerificationStatus: getDomainVerificationStatusMock,
 }));
 
-vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
-  retryProvisioningStepAction: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
-vi.mock(
-  '@platform/server/provisioning/get-tenant-provisioning-status-action',
-  () => ({
-    getTenantProvisioningStatusAction: vi.fn(),
-  }),
-);
+vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
 vi.mock(
   '@platform/server/provisioning/get-domain-verification-status-action',

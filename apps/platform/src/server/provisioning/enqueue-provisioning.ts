@@ -8,22 +8,24 @@ const PROVISION_PATH = '/api/provision';
 const ENQUEUE_TIMEOUT_MS = 10_000;
 
 /** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */
-export const enqueueProvisioning = async (
+export const enqueueWorkerRequest = async (
+  path: string,
   tenantId: string,
 ): Promise<TMaybeNull<number>> => {
   const workerUrl = env.WORKER_ENQUEUE_URL;
   const secret = env.WORKER_ENQUEUE_SECRET;
 
   if (!workerUrl || !secret) {
-    logger.error('provisioning.enqueue_skipped', {
+    logger.error('worker.enqueue_skipped', {
       tenantId,
+      path,
       hasWorkerUrl: Boolean(workerUrl),
       hasSecret: Boolean(secret),
     });
     return null;
   }
 
-  const url = new URL(PROVISION_PATH, workerUrl);
+  const url = new URL(path, workerUrl);
   const rawBody = JSON.stringify({ tenantId });
 
   try {
@@ -38,7 +40,12 @@ export const enqueueProvisioning = async (
     });
     return response.status;
   } catch (error) {
-    logger.error('provisioning.enqueue_error', { tenantId, error });
+    logger.error('worker.enqueue_error', { tenantId, path, error });
     return null;
   }
 };
+
+export const enqueueProvisioning = (
+  tenantId: string,
+): Promise<TMaybeNull<number>> =>
+  enqueueWorkerRequest(PROVISION_PATH, tenantId);

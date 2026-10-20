@@ -1,4 +1,4 @@
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, type TSanityLoginProvider } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { StudioMount } from '@blog/studio';
@@ -13,11 +13,13 @@ import { studioMountViewVariants } from './studio-mount-view-variants';
 export type TStudioMountViewProps = {
   tenant: TTenant;
   basePath: string;
+  loginProvider?: TSanityLoginProvider;
 };
 
 export const StudioMountView = async ({
   tenant,
   basePath,
+  loginProvider,
 }: TStudioMountViewProps) => {
   const t = await getTranslations('studioPage');
   const { root } = studioMountViewVariants();
@@ -58,6 +60,7 @@ export const StudioMountView = async ({
       enabledCapabilities={enabledCapabilities}
       defaultLocale={tenant.locale}
       liveLocales={liveLocales}
+      loginProvider={loginProvider}
     />
   );
 };

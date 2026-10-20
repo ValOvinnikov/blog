@@ -87,7 +87,9 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByTestId('studio-mount')).toBeVisible();
+    const studioMount = screen.getByTestId('studio-mount');
+
+    expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
         projectId: 'proj-acme',
@@ -95,6 +97,66 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
         basePath: '/dashboard/studio',
         title: 'Acme Inc.',
       }),
+    );
+  });
+
+  it("explains the owner's pending Studio access instead of mounting Studio", async () => {
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      {
+        membership,
+        tenant: makeTenant({
+          id: 'tenant-1',
+          sanityProjectId: 'proj-acme',
+          sanityDataset: 'production',
+          sanityReadTokenEncrypted: 'encrypted-token',
+          ownerInviteSentAt: new Date('2026-10-18T09:00:00.000Z'),
+        }),
+      },
+    ]);
+
+    await setup();
+
+    const acceptYourStudioText = screen.getByText('Accept your Studio invite');
+
+    expect(acceptYourStudioText).toBeVisible();
+    const checkNowButton = screen.getByRole('button', { name: 'Check now' });
+
+    expect(checkNowButton).toBeVisible();
+    const resendInviteButton = screen.getByRole('button', {
+      name: 'Resend invite',
+    });
+
+    expect(resendInviteButton).toBeVisible();
+    const studioMount = screen.queryByTestId('studio-mount');
+
+    expect(studioMount).not.toBeInTheDocument();
+  });
+
+  it("opens Studio straight into the owner's login provider once their access is ready", async () => {
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      {
+        membership,
+        tenant: makeTenant({
+          id: 'tenant-1',
+          sanityProjectId: 'proj-acme',
+          sanityDataset: 'production',
+          sanityReadTokenEncrypted: 'encrypted-token',
+          ownerInviteSentAt: new Date('2026-10-18T09:00:00.000Z'),
+          ownerInviteAcceptedAt: new Date('2026-10-18T10:00:00.000Z'),
+          ownerSanityUserId: 'sanity-user-1',
+          ownerSanityRole: 'ADMINISTRATOR',
+          ownerLoginProvider: 'GOOGLE',
+        }),
+      },
+    ]);
+
+    await setup();
+
+    const studioMount = screen.getByTestId('studio-mount');
+
+    expect(studioMount).toBeVisible();
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({ loginProvider: 'GOOGLE' }),
     );
   });
 });

@@ -107,7 +107,13 @@
     "badgePlatform": "platform",
     "features": "Features",
     "leads": "Leads",
-    "releases": "Releases"
+    "releases": "Releases",
+    "studioAccess": {
+      "INVITE_SENT": "Invite sent",
+      "ACTIVATING": "Activating",
+      "READY": "Ready",
+      "STALLED": "Action needed"
+    }
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -224,7 +230,15 @@
     "voiceTileTitle": "Voice",
     "voiceTileDescription": "The words your site uses",
     "featuresTileTitle": "Features",
-    "featuresTileDescription": "Comments, bookmarks, newsletter"
+    "featuresTileDescription": "Comments, bookmarks, newsletter",
+    "siteSetupCardTitle": "Setting up your site",
+    "siteSetupFailedTitle": "Your site's setup stopped",
+    "siteSetupFailedDescription": "One of the steps hit a problem. Try again — nothing already set up is lost.",
+    "siteSetupFailedContactDescription": "One of the steps hit a problem. Ask your platform contact to restart it.",
+    "siteSetupRetry": "Try again",
+    "siteSetupRetrying": "Restarting…",
+    "siteSetupRetryFailed": "Couldn't restart the setup — try again.",
+    "siteSetupRetryRefused": "Couldn't restart the setup — refresh the page and try again."
   },
   "provisioningBanner": {
     "readyTitle": "Provisioned",
@@ -830,6 +844,25 @@
     "title": "Studio",
     "notProvisionedTitle": "Studio isn't ready yet",
     "notProvisionedDescription": "This site's Sanity project hasn't finished setting up. Try again in a few minutes."
+  },
+  "ownerStudioAccess": {
+    "title": {
+      "INVITE_SENT": "Accept your Studio invite",
+      "ACTIVATING": "Setting up your Studio access",
+      "STALLED": "Your Studio invite hasn't been accepted"
+    },
+    "description": {
+      "INVITE_SENT": "We've emailed you an invite from Sanity, the editor behind Studio. Accept it, and Studio opens here once your access is confirmed.",
+      "ACTIVATING": "You've accepted the invite. We're giving your account editing rights, which usually takes a minute.",
+      "STALLED": "The invite was sent more than three days ago and hasn't been accepted, so we've stopped checking. Resend it for a fresh one, or check now if you've just accepted it."
+    },
+    "checkNow": "Check now",
+    "checking": "Checking…",
+    "resendInvite": "Resend invite",
+    "resending": "Sending…",
+    "checkStarted": "Checking your access now. Refresh in a minute to see the result.",
+    "inviteResent": "A new invite is on its way to your inbox.",
+    "requestFailed": "Couldn't reach the setup service — try again."
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",

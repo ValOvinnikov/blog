@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME, AUDIT_TARGET_TYPE } from '@blog/config';
+import { AUDIT_TARGET_TYPE } from '@blog/config';
 import { FINDING_STATUS } from '@blog/config/constants';
 import {
   ADMIN_ROLE,
@@ -9,6 +9,8 @@ import {
 } from '@blog/db/constants';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
+import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
+import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import { makeAuditEvent } from '@platform/testing/audit-events/fixtures';
 import {
   act,
@@ -28,16 +30,12 @@ import { TenantOverviewView } from './tenant-overview-view';
 const STEP_POLL_INTERVAL_MS = 4000;
 
 const {
-  retryProvisioningStepActionMock,
-  getTenantProvisioningStatusActionMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
   requireAdminMock,
 } = vi.hoisted(() => ({
-  retryProvisioningStepActionMock: vi.fn(),
-  getTenantProvisioningStatusActionMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
@@ -74,15 +72,13 @@ vi.mock(
   }),
 );
 
-vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
-  retryProvisioningStepAction: retryProvisioningStepActionMock,
-}));
+vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
-vi.mock(
-  '@platform/server/provisioning/get-tenant-provisioning-status-action',
-  () => ({
-    getTenantProvisioningStatusAction: getTenantProvisioningStatusActionMock,
-  }),
+vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
+
+const retryProvisioningStepActionMock = vi.mocked(retryProvisioningStepAction);
+const getTenantProvisioningStatusActionMock = vi.mocked(
+  getTenantProvisioningStatusAction,
 );
 
 vi.mock('@platform/server/findings/get-finding-details-action', () => ({
@@ -104,11 +100,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     retryProvisioningStepActionMock.mockReset();
-    retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
     getTenantProvisioningStatusActionMock.mockReset();
-    getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
     getTenantOwnerMembershipMock.mockReset();
     getTenantOwnerMembershipMock.mockResolvedValue({
       email: 'owner@example.com',

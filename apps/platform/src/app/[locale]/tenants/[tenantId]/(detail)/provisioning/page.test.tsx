@@ -20,16 +20,9 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
-  retryProvisioningStepAction: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
-vi.mock(
-  '@platform/server/provisioning/get-tenant-provisioning-status-action',
-  () => ({
-    getTenantProvisioningStatusAction: vi.fn(),
-  }),
-);
+vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
 const setup = customRenderAsync(TenantProvisioningPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
@@ -51,12 +44,17 @@ describe(TenantProvisioningPage, () => {
 
     expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Provisioning' }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Deprovision' }),
-    ).not.toBeInTheDocument();
+    const provisioningHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Provisioning',
+    });
+
+    expect(provisioningHeading).toBeVisible();
+    const deprovisionButton = screen.queryByRole('button', {
+      name: 'Deprovision',
+    });
+
+    expect(deprovisionButton).not.toBeInTheDocument();
   });
 
   it("shows the invited-pending owner badge when the tenant's owner has not resolved to a real user yet", async () => {
@@ -64,6 +62,8 @@ describe(TenantProvisioningPage, () => {
 
     await setup();
 
-    expect(screen.getByText('Invited, pending')).toBeVisible();
+    const invitedPendingText = screen.getByText('Invited, pending');
+
+    expect(invitedPendingText).toBeVisible();
   });
 });

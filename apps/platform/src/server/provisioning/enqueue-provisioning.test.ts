@@ -44,7 +44,7 @@ describe(enqueueProvisioning, () => {
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledWith(
-        'provisioning.enqueue_skipped',
+        'worker.enqueue_skipped',
         expect.objectContaining({ tenantId: TENANT_ID }),
       );
       expect(status).toBeNull();
@@ -88,8 +88,9 @@ describe(enqueueProvisioning, () => {
 
     const status = await enqueueProvisioning(TENANT_ID);
 
-    expect(loggerErrorMock).toHaveBeenCalledWith('provisioning.enqueue_error', {
+    expect(loggerErrorMock).toHaveBeenCalledWith('worker.enqueue_error', {
       tenantId: TENANT_ID,
+      path: '/api/provision',
       error,
     });
     expect(status).toBeNull();
