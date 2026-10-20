@@ -32,6 +32,7 @@ const {
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
+  requireAdminMock,
 } = vi.hoisted(() => ({
   retryProvisioningStepActionMock: vi.fn(),
   getTenantProvisioningStatusActionMock: vi.fn(),
@@ -39,6 +40,7 @@ const {
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
+  requireAdminMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
@@ -48,6 +50,15 @@ vi.mock('@blog/db', async () => ({
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     findings: { listFindingsForTenant: listFindingsForTenantMock },
   },
+}));
+
+vi.mock('@platform/server/auth/require-admin', () => ({
+  requireAdmin: requireAdminMock,
+}));
+
+vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
+  suspendTenantAction: vi.fn(),
+  liftTenantSuspensionAction: vi.fn(),
 }));
 
 vi.mock('@platform/server/provisioning/get-domain-verification-status', () => ({
@@ -105,6 +116,8 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     listAuditEventsForTargetMock.mockResolvedValue([]);
     listFindingsForTenantMock.mockReset();
     listFindingsForTenantMock.mockResolvedValue([]);
+    requireAdminMock.mockReset();
+    requireAdminMock.mockResolvedValue({ id: 'admin-1', role: 'SUPERADMIN' });
     getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
@@ -386,5 +399,55 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(
       screen.queryByText('This tenant is archived'),
     ).not.toBeInTheDocument();
+  });
+
+  describe('suspension', () => {
+    it('offers a super admin the Suspend action on an active tenant', async () => {
+      await setup({ tenant: makeTenant({ status: 'ACTIVE' }) });
+
+      expect(
+        screen.getByRole('button', { name: 'Suspend tenant' }),
+      ).toBeVisible();
+    });
+
+    it('offers a super admin the Reactivate action on a suspended tenant', async () => {
+      await setup({ tenant: makeTenant({ status: 'SUSPENDED' }) });
+
+      expect(
+        screen.getByRole('button', { name: 'Reactivate tenant' }),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole('button', { name: 'Suspend tenant' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it.each(['ADMIN', 'MODERATOR'])(
+      'offers neither action to a %s',
+      async (role) => {
+        requireAdminMock.mockResolvedValue({ id: 'admin-1', role });
+
+        await setup({ tenant: makeTenant({ status: 'SUSPENDED' }) });
+
+        expect(
+          screen.queryByRole('button', { name: 'Reactivate tenant' }),
+        ).not.toBeInTheDocument();
+      },
+    );
+
+    it('offers neither action on an archived tenant', async () => {
+      await setup({
+        tenant: makeTenant({
+          status: 'ARCHIVED',
+          deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        }),
+      });
+
+      expect(
+        screen.queryByRole('button', { name: 'Suspend tenant' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Reactivate tenant' }),
+      ).not.toBeInTheDocument();
+    });
   });
 });

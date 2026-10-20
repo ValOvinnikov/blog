@@ -286,6 +286,8 @@
       "DEPROVISION_REQUESTED": "Deprovisionierung angefordert",
       "DEPROVISIONED": "Mandant deprovisioniert",
       "REACTIVATED": "Mandant reaktiviert",
+      "SUSPENSION_APPLIED": "Mandant gesperrt",
+      "SUSPENSION_LIFTED": "Sperre aufgehoben",
       "PROVISIONED": "Mandant bereitgestellt",
       "PROVISIONING_FAILED": "Bereitstellung fehlgeschlagen",
       "SETTINGS_UPDATED": "Einstellungen aktualisiert",
@@ -912,9 +914,30 @@
     "confirmButton": "Reaktivieren",
     "confirmingButton": "Wird gestartet…"
   },
+  "tenantSuspensionControl": {
+    "active": {
+      "cardTitle": "Diesen Mandanten sperren",
+      "description": "Pausiert die schreibenden Funktionen der Live-Website — Kontaktformular, Newsletter-Anmeldungen und Lesezeichen —, während ihre Seiten online bleiben. Eine Reaktivierung ist jederzeit möglich.",
+      "triggerButton": "Mandanten sperren",
+      "dialogTitle": "{name} sperren",
+      "dialogDescription": "Die Website bleibt online, aber ab dem nächsten Seitenaufruf verschwindet ihr Kontaktformular und neue Newsletter-Anmeldungen und Lesezeichen werden abgelehnt, bis Sie sie reaktivieren.",
+      "confirmButton": "Sperren",
+      "confirmingButton": "Wird gesperrt…"
+    },
+    "suspended": {
+      "cardTitle": "Dieser Mandant ist gesperrt",
+      "description": "Kontaktformular, Newsletter-Anmeldungen und Lesezeichen der Live-Website sind abgeschaltet. Eine Reaktivierung stellt sie ab dem nächsten Seitenaufruf wieder her.",
+      "triggerButton": "Mandanten reaktivieren",
+      "dialogTitle": "{name} reaktivieren",
+      "dialogDescription": "Kontaktformular, Newsletter-Anmeldungen und Lesezeichen der Website sind ab dem nächsten Seitenaufruf wieder da.",
+      "confirmButton": "Reaktivieren",
+      "confirmingButton": "Wird reaktiviert…"
+    }
+  },
   "tenantLifecycleErrors": {
     "confirmRequired": "Geben Sie zur Bestätigung den Namen des Mandanten ein.",
     "notFound": "Mandant nicht gefunden.",
+    "archived": "Dieser Mandant ist archiviert.",
     "nameMismatch": "Stimmt nicht mit dem Namen des Mandanten überein.",
     "alreadyDeprovisioned": "Dieser Mandant ist bereits deprovisioniert.",
     "notDeprovisioned": "Dieser Mandant ist nicht deprovisioniert.",
@@ -922,7 +945,9 @@
     "notArchived": "Dieser Mandant muss archiviert werden, bevor er gelöscht werden kann.",
     "deprovisionFailed": "Die Deprovisionierung konnte nicht gestartet werden — bitte erneut versuchen.",
     "reactivateFailed": "Die Reaktivierung konnte nicht gestartet werden — bitte erneut versuchen.",
-    "deleteFailed": "Der Mandant konnte nicht gelöscht werden — bitte erneut versuchen."
+    "deleteFailed": "Der Mandant konnte nicht gelöscht werden — bitte erneut versuchen.",
+    "suspendFailed": "Der Mandant konnte nicht gesperrt werden — bitte erneut versuchen.",
+    "liftSuspensionFailed": "Der Mandant konnte nicht reaktiviert werden — bitte erneut versuchen."
   },
   "featuresSettings": {
     "heading": "Funktionen",

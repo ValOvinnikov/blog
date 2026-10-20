@@ -8,6 +8,7 @@ import type {
 
 export type TTenantLifecycleRefusal =
   | typeof TENANT_REFUSAL.NOT_FOUND
+  | typeof TENANT_REFUSAL.ARCHIVED
   | typeof TENANT_REFUSAL.ALREADY_DEPROVISIONED
   | typeof TENANT_REFUSAL.NOT_DEPROVISIONED
   | typeof TENANT_REFUSAL.ALREADY_IN_PROGRESS

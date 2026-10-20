@@ -73,8 +73,9 @@ neither.
   are stored as plain `text`, so adding a value needs no migration.
 - Writers today:
   - Platform Server Actions (actor = the session user): `CREATED`,
-    `DEPROVISION_REQUESTED`, `REACTIVATED`, `DELETED` and `SETTINGS_UPDATED`.
-    Tenant details and languages use target `TENANT`; Look, Voice, brand
+    `DEPROVISION_REQUESTED`, `REACTIVATED`, `SUSPENSION_APPLIED`,
+    `SUSPENSION_LIFTED`, `DELETED` and `SETTINGS_UPDATED`. Tenant details,
+    languages and suspension use target `TENANT`; Look, Voice, brand
     assets, email logo, email config and email templates use `SITE_CONFIG`;
     Features uses `SETTINGS_FEATURES`. `targetId` is always the tenant id.
   - CLI workflows (actor `github:<actor>`): `PROVISIONED`,

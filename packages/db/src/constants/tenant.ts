@@ -9,6 +9,9 @@ export const TENANT_STATUS = {
 
 export type TTenantStatus = TValueOf<typeof TENANT_STATUS>;
 
+export type TSuspensionStatus =
+  typeof TENANT_STATUS.ACTIVE | typeof TENANT_STATUS.SUSPENDED;
+
 export const TENANT_PLAN = {
   FREE: 'FREE',
   GROWTH: 'GROWTH',

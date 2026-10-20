@@ -25,6 +25,15 @@ vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
   requireTenantById: requireTenantByIdMock,
 }));
 
+vi.mock('@platform/server/auth/require-admin', () => ({
+  requireAdmin: vi.fn(async () => ({ id: 'admin-1', role: 'ADMIN' })),
+}));
+
+vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
+  suspendTenantAction: vi.fn(),
+  liftTenantSuspensionAction: vi.fn(),
+}));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {

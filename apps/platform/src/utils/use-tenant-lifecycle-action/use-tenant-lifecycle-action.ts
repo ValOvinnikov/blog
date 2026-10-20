@@ -16,6 +16,7 @@ const FIELD_ERROR_KEYS = {
 
 const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_FOUND]: 'notFound',
+  [TENANT_REFUSAL.ARCHIVED]: 'archived',
   [TENANT_REFUSAL.ALREADY_DEPROVISIONED]: 'alreadyDeprovisioned',
   [TENANT_REFUSAL.NOT_DEPROVISIONED]: 'notDeprovisioned',
   [TENANT_REFUSAL.ALREADY_IN_PROGRESS]: 'alreadyInProgress',
@@ -23,7 +24,11 @@ const REFUSAL_KEYS = {
 } satisfies Record<TTenantLifecycleRefusal, string>;
 
 type TServerErrorKey =
-  'deprovisionFailed' | 'reactivateFailed' | 'deleteFailed';
+  | 'deprovisionFailed'
+  | 'reactivateFailed'
+  | 'deleteFailed'
+  | 'suspendFailed'
+  | 'liftSuspensionFailed';
 
 export const useTenantLifecycleAction = <
   TArgs extends unknown[],

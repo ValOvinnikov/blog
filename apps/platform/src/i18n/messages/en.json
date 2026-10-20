@@ -286,6 +286,8 @@
       "DEPROVISION_REQUESTED": "Deprovisioning requested",
       "DEPROVISIONED": "Tenant deprovisioned",
       "REACTIVATED": "Tenant reactivated",
+      "SUSPENSION_APPLIED": "Tenant suspended",
+      "SUSPENSION_LIFTED": "Suspension lifted",
       "PROVISIONED": "Tenant provisioned",
       "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
@@ -912,9 +914,30 @@
     "confirmButton": "Reactivate",
     "confirmingButton": "Dispatching…"
   },
+  "tenantSuspensionControl": {
+    "active": {
+      "cardTitle": "Suspend this tenant",
+      "description": "Pauses the reader-facing write features on the live site — the contact form, newsletter sign-ups and bookmarks — while its pages stay online. Reactivate it at any time.",
+      "triggerButton": "Suspend tenant",
+      "dialogTitle": "Suspend {name}",
+      "dialogDescription": "The site stays online, but its contact form disappears and new newsletter sign-ups and bookmarks are refused from the next page load until you reactivate it.",
+      "confirmButton": "Suspend",
+      "confirmingButton": "Suspending…"
+    },
+    "suspended": {
+      "cardTitle": "This tenant is suspended",
+      "description": "The live site's contact form, newsletter sign-ups and bookmarks are switched off. Reactivating restores them from the next page load.",
+      "triggerButton": "Reactivate tenant",
+      "dialogTitle": "Reactivate {name}",
+      "dialogDescription": "The site's contact form, newsletter sign-ups and bookmarks come back from the next page load.",
+      "confirmButton": "Reactivate",
+      "confirmingButton": "Reactivating…"
+    }
+  },
   "tenantLifecycleErrors": {
     "confirmRequired": "Type the tenant name to confirm.",
     "notFound": "Tenant not found.",
+    "archived": "This tenant is archived.",
     "nameMismatch": "Doesn't match the tenant's name.",
     "alreadyDeprovisioned": "This tenant is already deprovisioned.",
     "notDeprovisioned": "This tenant is not deprovisioned.",
@@ -922,7 +945,9 @@
     "notArchived": "This tenant must be archived before it can be deleted.",
     "deprovisionFailed": "Couldn't start deprovisioning — try again.",
     "reactivateFailed": "Couldn't start reactivation — try again.",
-    "deleteFailed": "Couldn't delete the tenant — try again."
+    "deleteFailed": "Couldn't delete the tenant — try again.",
+    "suspendFailed": "Couldn't suspend the tenant — try again.",
+    "liftSuspensionFailed": "Couldn't reactivate the tenant — try again."
   },
   "featuresSettings": {
     "heading": "Features",
