@@ -58,6 +58,7 @@ export type TSanityRobotRole = TValueOf<typeof SANITY_ROBOT_ROLE>;
 export const SANITY_API_SURFACE = {
   MANAGEMENT: 'MANAGEMENT',
   ACCESS: 'ACCESS',
+  WEBHOOKS: 'WEBHOOKS',
 } as const;
 
 export type TSanityApiSurface = TValueOf<typeof SANITY_API_SURFACE>;
