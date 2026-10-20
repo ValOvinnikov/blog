@@ -6,6 +6,7 @@ import {
   AUDIT_TARGET_TYPE,
   type TActionResult,
 } from '@blog/config';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CONTRAST_WORKFLOW_FILE,
   RELEASE_REFUSAL,
@@ -32,13 +33,13 @@ export const startContrastCheckAction =
     await requireSuperAdmin();
 
     const headSha = await getBranchHeadSha();
-    if (!headSha.ok) return { outcome: ACTION_OUTCOME.UNAVAILABLE };
+    if (!headSha.ok) return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 
     const active = await isWorkflowRunActive(
       CONTRAST_WORKFLOW_FILE,
       headSha.data,
     );
-    if (!active.ok) return { outcome: ACTION_OUTCOME.UNAVAILABLE };
+    if (!active.ok) return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
     if (active.data) {
       return {
         outcome: ACTION_OUTCOME.REFUSED,
@@ -47,7 +48,7 @@ export const startContrastCheckAction =
     }
 
     const isDispatched = await dispatchContrastWorkflow();
-    if (!isDispatched) return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    if (!isDispatched) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
     await recordAuditEvent({
       logEvent: 'releases.contrast_check_audit_failed',
@@ -56,5 +57,5 @@ export const startContrastCheckAction =
       targetId: headSha.data,
     });
 
-    return { outcome: ACTION_OUTCOME.SUCCESS };
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
   };

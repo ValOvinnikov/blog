@@ -5,6 +5,7 @@ import {
   FORM_STATUS,
   type TActionOutcome,
   type TFormStatus,
+  type TOutcome,
 } from '@blog/config';
 import {
   useState,
@@ -15,7 +16,7 @@ import {
 
 export type TUseFormSubmissionArgs<
   TValues,
-  TResult extends { outcome: TActionOutcome },
+  TResult extends TOutcome<TActionOutcome>,
 > = {
   initialValues: TValues | (() => TValues);
   onSubmit: (values: TValues) => Promise<TResult>;
@@ -33,7 +34,7 @@ export type TUseFormSubmissionResult<TValues> = {
 // Any `setValues` call clears a previous save's status, so an edit made after an alert shows dismisses it.
 export const useFormSubmission = <
   TValues,
-  TResult extends { outcome: TActionOutcome },
+  TResult extends TOutcome<TActionOutcome>,
 >({
   initialValues,
   onSubmit,

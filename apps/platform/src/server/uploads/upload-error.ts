@@ -1,4 +1,4 @@
-import type { ACTION_OUTCOME, TActionResult } from '@blog/config';
+import type { ACTION_OUTCOME, TActionResult, TOutcome } from '@blog/config';
 import type { TUploadRefusal } from '@platform/constants/upload';
 
 export type TClearUploadResult = TActionResult<
@@ -10,7 +10,7 @@ export type TClearUploadResult = TActionResult<
 
 export type TUploadFailure = Exclude<
   TClearUploadResult,
-  { outcome: typeof ACTION_OUTCOME.SUCCESS }
+  TOutcome<typeof ACTION_OUTCOME.SUCCESS>
 >;
 
 export type TUploadResult =

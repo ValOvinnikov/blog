@@ -8,9 +8,11 @@ import {
   type TActionResult,
   type TEmailTemplateType,
   type TLocaleIsoCode,
+  type TOutcome,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   SETTINGS_REFUSAL,
   type TSettingsRefusal,
@@ -35,7 +37,7 @@ type TUpdateEmailTemplateFailure = Exclude<
     never,
     TSettingsRefusal
   >,
-  { outcome: typeof ACTION_OUTCOME.SUCCESS }
+  TOutcome<typeof ACTION_OUTCOME.SUCCESS>
 >;
 
 export type TUpdateEmailTemplateResult =
@@ -92,6 +94,6 @@ export const updateEmailTemplateAction = async (
       locale: parsedLocale.data,
       error,
     });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

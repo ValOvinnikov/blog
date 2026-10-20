@@ -7,9 +7,11 @@ import {
   DOMAIN_PATTERN,
   isLocaleIsoCode,
   type TActionResult,
+  type TOutcome,
 } from '@blog/config';
 import { queries, TENANT_PLAN } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
@@ -47,7 +49,7 @@ type TUpdateTenantDetailsFailure = Exclude<
     TTenantDetailsFieldError,
     TUpdateTenantDetailsRefusal
   >,
-  { outcome: typeof ACTION_OUTCOME.SUCCESS }
+  TOutcome<typeof ACTION_OUTCOME.SUCCESS>
 >;
 
 export type TUpdateTenantDetailsActionResult =
@@ -166,6 +168,6 @@ export const updateTenantDetailsAction = async (
     }
   } catch (error) {
     logger.error('tenants.update_details_failed', { tenantId, error });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

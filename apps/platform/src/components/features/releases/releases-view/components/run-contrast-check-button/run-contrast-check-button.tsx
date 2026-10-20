@@ -1,6 +1,6 @@
 'use client';
 
-import { ACTION_OUTCOME, SIZE } from '@blog/config';
+import { ACTION_OUTCOME, SIZE, type TOutcome } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { useToast } from '@platform/context/toast-provider';
@@ -16,7 +16,7 @@ const REFUSAL_KEYS = {
 const failureKey = (
   result: Exclude<
     Awaited<ReturnType<typeof startContrastCheckAction>>,
-    { outcome: typeof ACTION_OUTCOME.SUCCESS }
+    TOutcome<typeof ACTION_OUTCOME.SUCCESS>
   >,
 ) => {
   if (result.outcome === ACTION_OUTCOME.REFUSED) {
