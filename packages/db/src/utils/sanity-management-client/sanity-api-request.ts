@@ -4,16 +4,21 @@ const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
 const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
 
+// The global host, as `@sanity/cli` calls it; the project-scoped host answers a create with 2xx without creating a hook.
+const SANITY_WEBHOOKS_API_BASE = 'https://api.sanity.io/v2025-08-04';
+
 export const SANITY_API_TIMEOUT_MS = 30_000;
 
 const API_BASE: Record<TSanityApiSurface, string> = {
   [SANITY_API_SURFACE.MANAGEMENT]: SANITY_MANAGEMENT_API_BASE,
   [SANITY_API_SURFACE.ACCESS]: SANITY_ACCESS_API_BASE,
+  [SANITY_API_SURFACE.WEBHOOKS]: SANITY_WEBHOOKS_API_BASE,
 };
 
 const API_SURFACE_LABEL: Record<TSanityApiSurface, string> = {
   [SANITY_API_SURFACE.MANAGEMENT]: 'Management',
   [SANITY_API_SURFACE.ACCESS]: 'Access',
+  [SANITY_API_SURFACE.WEBHOOKS]: 'Webhooks',
 };
 
 export function sanityApiError(
@@ -72,6 +77,21 @@ export function sanityManagementResponse(
 ): Promise<Response> {
   return sanityApiResponse(
     SANITY_API_SURFACE.MANAGEMENT,
+    path,
+    token,
+    init,
+    allowStatus,
+  );
+}
+
+export function sanityWebhooksResponse(
+  path: string,
+  token: string,
+  init: RequestInit,
+  allowStatus: readonly number[],
+): Promise<Response> {
+  return sanityApiResponse(
+    SANITY_API_SURFACE.WEBHOOKS,
     path,
     token,
     init,

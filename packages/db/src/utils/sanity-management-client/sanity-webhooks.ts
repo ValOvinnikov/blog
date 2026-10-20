@@ -1,8 +1,11 @@
+import { SANITY_API_SURFACE } from '@blog/config';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
-import { SANITY_API_TIMEOUT_MS } from '@blog/db/utils/sanity-management-client/sanity-api-request';
+import {
+  sanityApiError,
+  sanityWebhooksResponse,
+} from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
-// The global host, as `@sanity/cli` calls it; the project-scoped host answers a create with 2xx without creating a hook.
-const SANITY_WEBHOOKS_API_BASE = 'https://api.sanity.io/v2025-08-04';
+const HTTP_UNAUTHORIZED = 401;
 
 function webhooksUnauthorizedHint(projectId: string): string {
   return `SANITY_MANAGEMENT_TOKEN is either invalid or not a member of project "${projectId}" — it is only an implicit administrator of projects it created itself. If this tenant points at a project created elsewhere (such as a shared dev project), add the token's robot to that project as administrator in Sanity Manage, or provision the tenant into its own project.`;
@@ -15,23 +18,21 @@ async function sanityWebhooksRequest<T>(
 ): Promise<T> {
   const path = SANITY_API_PATH.projectWebhooks(projectId);
   // A followed redirect replays a POST as a GET, whose 2xx list reads as success.
-  const response = await fetch(`${SANITY_WEBHOOKS_API_BASE}${path}`, {
-    ...init,
-    redirect: 'error',
-    signal: AbortSignal.timeout(SANITY_API_TIMEOUT_MS),
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...init.headers,
-    },
-  });
+  const response = await sanityWebhooksResponse(
+    path,
+    token,
+    { ...init, redirect: 'error' },
+    [HTTP_UNAUTHORIZED],
+  );
 
-  if (!response.ok) {
+  if (response.status === HTTP_UNAUTHORIZED) {
     const body = await response.text().catch(() => '');
-    const hint =
-      response.status === 401 ? ` ${webhooksUnauthorizedHint(projectId)}` : '';
-    throw new Error(
-      `Sanity Webhooks API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}${hint}`,
+    throw sanityApiError(
+      SANITY_API_SURFACE.WEBHOOKS,
+      init.method ?? 'GET',
+      path,
+      response,
+      `${body} ${webhooksUnauthorizedHint(projectId)}`,
     );
   }
 
