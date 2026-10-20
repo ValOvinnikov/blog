@@ -1,7 +1,7 @@
 ---
 title: Tenant provisioning
 status: built
-layers: [db, platform, web, worker, config]
+layers: [db, platform, web, worker, config, studio]
 code:
   - packages/db/scripts/provision-tenant/**
   - packages/config/src/starter-content/**
@@ -116,6 +116,7 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 - **Project membership:** `SANITY_MANAGEMENT_TOKEN` is an implicit administrator only of projects it created. A tenant row pointing at a project created elsewhere, such as the shared dev project, gets a 401 from the webhook API until the token's robot is added to that project as administrator; the step's error says so.
 - **Idempotency:** every step reads state it already created and resumes; the project id is persisted the moment it is minted, since Sanity cannot delete an orphan. On GitHub Actions a retry re-dispatches the whole workflow, not one step.
 - **Worker runs:** the enqueue route admits the run through `beginTenantProvisioning`, then starts a Vercel Workflow run (`workflow`, pinned exactly to 5.x). If the start fails after admission, the run is recorded as failed (`SANITY_PROJECT` FAILED, run finished), never left PROVISIONING. The run calls four units in order: `ensureInfrastructure` (`SANITY_PROJECT`, `PERSIST_TOKEN`, `CREATE_WEBHOOK`, `MAP_DOMAIN`), `inviteOwner`, `applySiteTemplate` (`SEED_CONTENT`) and `verifyTenant` (`VERIFY_CONTENT`). It reports under the same six step keys, so the status view is unchanged. A failing unit is retried up to three times and the run resumes from it, never from the start; after the last attempt the step is FAILED. The owner invite still runs inside the `SANITY_PROJECT` step. Document validation is not a worker unit, since the validator needs the Sanity CLI and the Studio source, which a Vercel function lacks; owner elevation is not part of a worker run yet. Audit events carry the actor `worker`.
+- **Starter content is schema-valid:** `packages/studio/src/starter-content.test.ts` builds the starter documents and runs Sanity's own document validation (`@sanity/validation`) against the schema the real Studio config compiles, once per default language in `LOCALE_ISO_CODES`, and fails on any marker. It runs in `pnpm verify` and CI, so an invalid starter document is caught before any tenant is seeded with it. Drift in a tenant's content after creation is `validate-tenant-documents.yml`'s job.
 - **No hard deletes:** deprovisioning only archives. It defaults to a dry run, and `confirm` must equal the tenant's name; the workflow checks that again. An already-deprovisioned tenant is skipped, so a failed cache purge is retried through `invalidate-tenant-cache.yml`.
 - **Delete:** delete refuses a tenant that is not archived. It hard-deletes the row and cascades. No Sanity token is passed, so the archived project is left in place.
 - **Locked fields:** details lock once provisioning is RUNNING or SUCCEEDED. After a failure, only `primaryDomain` locks, and only once `MAP_DOMAIN` is DONE. The owner email can change only while the invite is unaccepted.
@@ -146,6 +147,7 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 - `packages/db/src/queries/tenants/**` tests (PGlite).
 - `apps/worker/src/**/*.test.ts`: the enqueue signature and route, the units' retry and failure reporting, and the workflow's order.
 - `apps/platform/src/server/{provisioning,github,tenants}/*.test.ts`, `components/features/tenants/**/*.test.tsx` and the route `page.test.tsx` files.
+- `packages/studio/src/starter-content.test.ts`: every starter document validates against the Studio schema in every default language.
 - `apps/platform` has no Storybook.
 
 ## Related

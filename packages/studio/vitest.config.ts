@@ -16,8 +16,8 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 // `sanity/structure`, `sanity-plugin-media`, `@sanity/vision` and
 // `@sanity/code-input` pull in the Studio's UI dependency tree (including
 // `@sanity-labs/ui-poc`'s bundled CSS) in a way `inline` alone doesn't
-// resolve — `studio-config.test.ts`/`studio-mount.test.tsx` mock those
-// modules instead of loading them for real.
+// resolve — a test mocks those modules (`__mocks__/`, or inline for
+// `@sanity/code-input`) instead of loading them for real.
 export default mergeConfig(
   preset,
   defineConfig({
