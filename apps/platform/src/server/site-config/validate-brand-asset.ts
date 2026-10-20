@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { ACTION_OUTCOME } from '@blog/config';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
   readImageUpload,
@@ -40,7 +41,7 @@ const validateSvgAsset = async (
     sanitized = await sanitizeSvgMarkup(buffer.toString('utf-8'));
   } catch (error) {
     logger.error('site_config.svg_sanitize_failed', { kind, error });
-    return { ok: false, error: { outcome: ACTION_OUTCOME.SERVER_ERROR } };
+    return { ok: false, error: toOutcome(ACTION_OUTCOME.SERVER_ERROR) };
   }
   if (!sanitized) {
     return {

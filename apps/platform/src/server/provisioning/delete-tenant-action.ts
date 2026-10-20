@@ -7,6 +7,7 @@ import {
   TENANT_DELETE_OUTCOME,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -54,7 +55,7 @@ export const deleteTenantAction = async (
     result = await queries.tenants.deleteTenant(tenantId);
   } catch (error) {
     logger.error('tenants.delete_failed', { tenantId, error });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
   if (result.outcome === TENANT_DELETE_OUTCOME.NOT_FOUND) {
@@ -79,5 +80,5 @@ export const deleteTenantAction = async (
     details: { name: tenant.name },
   });
 
-  return { outcome: ACTION_OUTCOME.SUCCESS };
+  return toOutcome(ACTION_OUTCOME.SUCCESS);
 };

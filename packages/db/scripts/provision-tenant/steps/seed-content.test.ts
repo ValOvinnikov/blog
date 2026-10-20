@@ -1,4 +1,9 @@
-import { HTTP_METHOD, HTTP_STATUS, SANITY_ROBOT_ROLE } from '@blog/config';
+import {
+  buildStarterDocuments,
+  HTTP_METHOD,
+  HTTP_STATUS,
+  SANITY_ROBOT_ROLE,
+} from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
@@ -7,7 +12,6 @@ import type { Mock } from 'vitest';
 import type { TProvisionEnv } from '../lib/env';
 
 import { seedTenantContent, type TSeedContentDeps } from './seed-content';
-import { buildStarterDocuments } from './starter-content';
 
 const { setTenantSanityWriteTokenAndSeededAtMock } = vi.hoisted(() => ({
   setTenantSanityWriteTokenAndSeededAtMock: vi.fn(),
@@ -124,7 +128,7 @@ describe(seedTenantContent, () => {
       '*[_type == "settings_site"][0]._id',
     );
     expect(createIfNotExists).toHaveBeenCalledTimes(
-      buildStarterDocuments(seededTenant).length,
+      buildStarterDocuments(seededTenant.name).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
@@ -202,7 +206,7 @@ describe(seedTenantContent, () => {
     );
     expect(assetsUpload).not.toHaveBeenCalled();
     expect(createIfNotExists).toHaveBeenCalledTimes(
-      buildStarterDocuments(tenant).length,
+      buildStarterDocuments(tenant.name).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();

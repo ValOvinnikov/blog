@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, type TOutcome } from '@blog/config';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import type { TStartReleaseResult } from '@platform/server/releases/start-release-action';
 
@@ -13,7 +13,7 @@ const REFUSAL_KEYS = {
 
 type TReleaseFailure = Exclude<
   TStartReleaseResult,
-  { outcome: typeof ACTION_OUTCOME.SUCCESS }
+  TOutcome<typeof ACTION_OUTCOME.SUCCESS>
 >;
 
 export const releaseFailureKey = (result: TReleaseFailure) => {

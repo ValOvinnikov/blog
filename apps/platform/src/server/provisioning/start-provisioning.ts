@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, ERROR_CODE, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -54,8 +55,8 @@ export const startProvisioning = async (
       });
     }
 
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
-  return { outcome: ACTION_OUTCOME.SUCCESS };
+  return toOutcome(ACTION_OUTCOME.SUCCESS);
 };

@@ -6,7 +6,7 @@ import type {
   Settings_site,
   Template_home,
   Template_postIndex,
-} from '@blog/config';
+} from '@blog/config/sanity/generated/types';
 
 type TSanitySystemField = '_createdAt' | '_updatedAt' | '_rev';
 

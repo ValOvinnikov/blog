@@ -1,6 +1,6 @@
 'use client';
 
-import type { TActionOutcome, TMaybeUndefined } from '@blog/config';
+import type { TActionOutcome, TMaybeUndefined, TOutcome } from '@blog/config';
 import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useId, useState } from 'react';
@@ -17,7 +17,7 @@ type TSettingsFormDraftConfig<TValues> = Omit<
 
 export type TUseSettingsFormArgs<
   TValues,
-  TResult extends { outcome: TActionOutcome },
+  TResult extends TOutcome<TActionOutcome>,
 > = {
   initialValues: TValues;
   archivedAt: TMaybeUndefined<Date>;
@@ -49,7 +49,7 @@ export type TSettingsForm<TValues> = {
 
 export const useSettingsForm = <
   TValues,
-  TResult extends { outcome: TActionOutcome },
+  TResult extends TOutcome<TActionOutcome>,
 >({
   initialValues,
   archivedAt,

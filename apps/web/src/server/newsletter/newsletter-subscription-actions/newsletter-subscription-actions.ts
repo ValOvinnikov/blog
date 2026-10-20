@@ -8,6 +8,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { auth } from '@web/server/auth/auth';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
@@ -26,8 +27,8 @@ export type TResendConfirmationActionResult = TActionResult<
   typeof ACTION_OUTCOME.UNAVAILABLE | typeof ACTION_OUTCOME.SERVER_ERROR
 >;
 
-const SUCCESS = { outcome: ACTION_OUTCOME.SUCCESS } as const;
-const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
+const SUCCESS = toOutcome(ACTION_OUTCOME.SUCCESS);
+const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
   const session = await auth();
@@ -72,7 +73,7 @@ export const resendConfirmationAction =
     if (!tenant.ok) {
       if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
         logger.warn('newsletter.resend_confirmation_tenant_not_active');
-        return { outcome: ACTION_OUTCOME.UNAVAILABLE };
+        return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
       }
       return SERVER_ERROR;
     }

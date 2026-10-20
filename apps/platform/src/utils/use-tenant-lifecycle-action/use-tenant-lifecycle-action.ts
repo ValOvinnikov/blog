@@ -1,6 +1,6 @@
 'use client';
 
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, type TOutcome } from '@blog/config';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TConfirmTenantFieldError } from '@platform/server/provisioning/resolve-confirmed-tenant';
 import type {
@@ -37,7 +37,7 @@ export const useTenantLifecycleAction = <
   const errorKey = (
     result: Exclude<
       TTenantLifecycleResult<TRefusal>,
-      { outcome: typeof ACTION_OUTCOME.SUCCESS }
+      TOutcome<typeof ACTION_OUTCOME.SUCCESS>
     >,
   ) => {
     switch (result.outcome) {

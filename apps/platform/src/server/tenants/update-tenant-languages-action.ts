@@ -9,6 +9,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   SETTINGS_REFUSAL,
   type TSettingsRefusal,
@@ -78,12 +79,12 @@ export const updateTenantLanguagesAction = async (
       targetId: tenant.id,
       details: { additionalLocales: result.data },
     });
-    return { outcome: ACTION_OUTCOME.SUCCESS };
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error('tenants.update_languages_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

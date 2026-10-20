@@ -1,36 +1,16 @@
+import type { TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export type TConfirmSubscriberResult =
   | { outcome: 'confirmed'; subscriber: TSubscriber }
   | { outcome: 'already-confirmed'; subscriber: TSubscriber }
-  | { outcome: 'not-found' };
+  | TOutcome<'not-found'>;
 
-// Flips a subscriber from `pending` to `active` by their confirmation
-// token — the confirm-email link's route handler
-// (`/newsletter/confirm?token=...`).
-//
-// Idempotent-safe by design, not by accident: a second hit on the same
-// link (double-click, browser link-prefetch, a user revisiting an old
-// email) reports `already-confirmed` with the existing row instead of
-// either erroring or re-stamping `confirmedAt` to a later time — per the
-// issue's "confirming twice shouldn't error, though it also shouldn't need
-// to succeed twice." An unrecognized/expired token returns `not-found`
-// rather than throwing, since an invalid link is an expected, not
-// exceptional, path here.
-//
-// The transition is a single conditional `UPDATE ... WHERE
-// confirmation_token = $token AND status = 'pending'`, not a read-then-write
-// (read the row, branch on its `status`, then update it): two concurrent
-// hits on the same link could otherwise both read `status: 'pending'`
-// before either write lands, and both would then run the update — one
-// clobbering the other's `confirmedAt` (last-write-wins), with both callers
-// seeing `confirmed` instead of one `confirmed`/one `already-confirmed`.
-// Gating the `UPDATE` itself on `status = 'pending'` means only the call
-// that actually performs the transition gets a row back from `RETURNING` —
-// Postgres serializes concurrent updates to the same row, so exactly one of
-// two racing calls can win this `WHERE`, never both.
+// The `UPDATE` is gated on `status = 'pending'` rather than read-then-write,
+// so of two concurrent hits on one link exactly one gets `confirmed`.
 export async function confirmSubscriber(
   tenantId: string,
   token: string,
@@ -64,7 +44,7 @@ export async function confirmSubscriber(
     );
 
   if (!existing) {
-    return { outcome: 'not-found' };
+    return toOutcome('not-found');
   }
 
   return { outcome: 'already-confirmed', subscriber: existing };

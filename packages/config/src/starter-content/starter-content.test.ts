@@ -7,7 +7,7 @@ function findByType<TType extends TStarterType>(
   type: TType,
   name = 'Acme Corporation',
 ) {
-  const document = buildStarterDocuments({ name }).find(
+  const document = buildStarterDocuments(name).find(
     (doc): doc is Extract<TStarterDocumentUnion, { _type: TType }> =>
       doc._type === type,
   );
@@ -17,7 +17,7 @@ function findByType<TType extends TStarterType>(
 
 describe(buildStarterDocuments, () => {
   it('builds every starter document once, all published (no drafts. prefix)', () => {
-    const documents = buildStarterDocuments({ name: 'Acme Corporation' });
+    const documents = buildStarterDocuments('Acme Corporation');
 
     expect(documents.map((doc) => doc._type)).toEqual([
       'settings_navigation',
@@ -36,7 +36,7 @@ describe(buildStarterDocuments, () => {
 
   it('builds the same ids on every run, so a re-seed targets the documents it already created', () => {
     const [acmeIds, globexIds] = ['Acme', 'Globex'].map((name) =>
-      buildStarterDocuments({ name }).map(({ _id }) => _id),
+      buildStarterDocuments(name).map(({ _id }) => _id),
     );
 
     expect(acmeIds).toEqual(globexIds);
@@ -50,7 +50,7 @@ describe(buildStarterDocuments, () => {
     expect(findByType('settings_site')).toHaveProperty('currency', 'USD');
   });
 
-  it('the site settings brand carries the tenant name', () => {
+  it('the site settings brand carries the site name', () => {
     expect(findByType('settings_site', 'Globex').brand?.name).toBe('Globex');
   });
 
@@ -90,12 +90,12 @@ describe(buildStarterDocuments, () => {
   });
 
   it.each([
-    ['page_home', 'a 1-character tenant name', 'x'],
-    ['page_home', 'a 200-character tenant name', 'x'.repeat(200)],
-    ['page_postIndex', 'a 1-character tenant name', 'x'],
-    ['page_postIndex', 'a 200-character tenant name', 'x'.repeat(200)],
+    ['page_home', 'a 1-character site name', 'x'],
+    ['page_home', 'a 200-character site name', 'x'.repeat(200)],
+    ['page_postIndex', 'a 1-character site name', 'x'],
+    ['page_postIndex', 'a 200-character site name', 'x'.repeat(200)],
   ] as const)(
-    '%s.seo stays within every schema bound for %s (not derived from tenant.name)',
+    '%s.seo stays within every schema bound for %s (not derived from the site name)',
     (type, _label, name) => {
       const { seo } = findByType(type, name);
 

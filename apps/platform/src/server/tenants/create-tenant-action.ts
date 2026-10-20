@@ -6,9 +6,11 @@ import {
   AUDIT_TARGET_TYPE,
   DOMAIN_PATTERN,
   type TActionResult,
+  type TOutcome,
   type TReasonedFailure,
 } from '@blog/config';
 import { queries, TENANT_PLAN } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { routing } from '@platform/i18n/routing';
@@ -49,9 +51,8 @@ export type TCreateTenantResult =
       keyof TCreateTenantInput,
       TTenantDetailsFieldError
     >
-  | ({ outcome: typeof ACTION_OUTCOME.REFUSED } & TReasonedFailure<
-      typeof TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED
-    > &
+  | (TOutcome<typeof ACTION_OUTCOME.REFUSED> &
+      TReasonedFailure<typeof TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED> &
       TOwnerInviteConfirmation);
 
 export const createTenantAction = async (
@@ -134,13 +135,13 @@ export const createTenantAction = async (
         domain,
         error: result.error,
       });
-      return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+      return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
     tenantId = result.data.id;
   } catch (error) {
     logger.error('tenants.create_draft_failed', { domain, error });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
   await recordAuditEvent({

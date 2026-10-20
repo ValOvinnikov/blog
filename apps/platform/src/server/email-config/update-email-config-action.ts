@@ -8,6 +8,7 @@ import {
   type TFieldErrors,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   EMAIL_SENDER_FIELD_ERROR,
   type TEmailSenderFieldErrorReason,
@@ -73,12 +74,12 @@ export const updateEmailConfigAction = async (
       targetId: tenant.id,
       details: data,
     });
-    return { outcome: ACTION_OUTCOME.SUCCESS };
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error('email_config.update_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

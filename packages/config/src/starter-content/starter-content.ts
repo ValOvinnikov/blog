@@ -6,8 +6,7 @@ import type {
   Settings_site,
   Template_home,
   Template_postIndex,
-} from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@blog/config/sanity/generated/types';
 
 import {
   reference,
@@ -27,9 +26,7 @@ const STARTER_DOCUMENT_IDS = {
   POST_INDEX: 'provisioning.page.postIndex',
 } as const;
 
-// Static, not derived from `tenant.name` — the platform only validates that
-// name as `min(1)`, so a name-derived value can't be sized to satisfy
-// `seoSchema`'s bounds (`metaTitle` 30-60 chars) for every tenant.
+// Static, because a site name is only `min(1)` and can't be sized to `seoSchema`'s 30-60 char `metaTitle`.
 const HOME_SEO_META_TITLE =
   'Welcome to your new site — built and ready to customize';
 const HOME_SEO_META_DESCRIPTION =
@@ -88,7 +85,7 @@ function buildPostIndexDocuments(): TStarterDocumentUnion[] {
 }
 
 export function buildStarterDocuments(
-  tenant: Pick<TTenant, 'name'>,
+  siteName: string,
 ): TStarterDocumentUnion[] {
   return [
     {
@@ -107,7 +104,7 @@ export function buildStarterDocuments(
       _type: 'settings_site',
       title: 'Site Settings',
       currency: 'USD',
-      brand: { _type: 'brand', name: tenant.name },
+      brand: { _type: 'brand', name: siteName },
     } satisfies TStarterDocument<Settings_site, 'title'>,
     ...buildHomeDocuments(),
     ...buildPostIndexDocuments(),

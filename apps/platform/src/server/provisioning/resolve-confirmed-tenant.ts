@@ -2,6 +2,7 @@ import {
   ACTION_OUTCOME,
   type TFieldErrors,
   type TMaybeUndefined,
+  type TOutcome,
   type TReasonedFailure,
 } from '@blog/config';
 import { queries } from '@blog/db';
@@ -39,9 +40,8 @@ export type TResolveConfirmedTenantResult<
       outcome: typeof ACTION_OUTCOME.INVALID;
       fieldErrors: TFieldErrors<TConfirmTenantField, TConfirmTenantFieldError>;
     }
-  | ({ outcome: typeof ACTION_OUTCOME.REFUSED } & TReasonedFailure<
-      typeof TENANT_REFUSAL.NOT_FOUND | TPreconditionRefusal
-    >);
+  | (TOutcome<typeof ACTION_OUTCOME.REFUSED> &
+      TReasonedFailure<typeof TENANT_REFUSAL.NOT_FOUND | TPreconditionRefusal>);
 
 export const resolveConfirmedTenant = async <
   TPreconditionRefusal extends TTenantRefusal = never,
