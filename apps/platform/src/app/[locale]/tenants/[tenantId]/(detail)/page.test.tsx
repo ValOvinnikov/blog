@@ -121,29 +121,35 @@ describe(TenantOverviewPage, () => {
       { limit: 5 },
     );
     expect(listFindingsForTenantMock).toHaveBeenCalledWith(tenant.id, 'OPEN');
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
-    ).toBeVisible();
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Acme Inc.',
+    });
+    expect(heading).toBeVisible();
   });
 
   it('shows the owner membership join date in the Joined row', async () => {
     await setup();
 
-    expect(screen.getByText('Joined')).toBeVisible();
+    const joinedLabel = screen.getByText('Joined');
     const joinedTime = screen.getByText('Aug 12, 2026');
+    expect(joinedLabel).toBeVisible();
     expect(joinedTime).toBeVisible();
     expect(joinedTime).toHaveAttribute('dateTime', '2026-08-12T00:00:00.000Z');
   });
 
-  it('shows the invited email without a Joined row when the owner is still a pending invite', async () => {
+  it('shows the invited email without a Joined row for a pending invite', async () => {
     getTenantOwnerMembershipMock.mockResolvedValue({
       email: 'invited@example.com',
     });
 
     await setup();
 
-    expect(screen.queryByText('Joined')).not.toBeInTheDocument();
-    expect(screen.getByText('invited@example.com')).toBeVisible();
+    const joinedLabel = screen.queryByText('Joined');
+    const invitedEmail = screen.getByText('invited@example.com');
+    expect(joinedLabel).not.toBeInTheDocument();
+    expect(invitedEmail).toBeVisible();
   });
 
   it('shows the invited-pending badge when the tenant has no owner', async () => {
@@ -151,7 +157,8 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    expect(screen.getByText('Invited, pending')).toBeVisible();
+    const pendingBadge = screen.getByText('Invited, pending');
+    expect(pendingBadge).toBeVisible();
   });
 
   it('always shows "Open site", pointing at the tenant\'s live domain', async () => {
@@ -161,17 +168,19 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('link', { name: 'Open site (opens in new tab)' }),
-    ).toHaveAttribute('href', 'https://acme.example.com');
+    const openSiteLink = screen.getByRole('link', {
+      name: 'Open site (opens in new tab)',
+    });
+    expect(openSiteLink).toHaveAttribute('href', 'https://acme.example.com');
   });
 
-  it('never shows an "Open Studio" action — the sidebar is the only entry point to Studio', async () => {
+  it('never shows an "Open Studio" action — Studio opens from the sidebar', async () => {
     await setup();
 
-    expect(
-      screen.queryByRole('link', { name: 'Open Studio →' }),
-    ).not.toBeInTheDocument();
+    const openStudioLink = screen.queryByRole('link', {
+      name: 'Open Studio →',
+    });
+    expect(openStudioLink).not.toBeInTheDocument();
   });
 
   it("renders the tenant's open findings from listFindingsForTenant", async () => {
@@ -179,7 +188,8 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    expect(screen.getByText('Provisioning step failed')).toBeVisible();
+    const finding = screen.getByText('Provisioning step failed');
+    expect(finding).toBeVisible();
   });
 
   it('shows the healthy empty state when the tenant has no open findings', async () => {
@@ -187,11 +197,10 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    expect(
-      screen.getByText(
-        "No open findings for this tenant — everything's healthy.",
-      ),
-    ).toBeVisible();
+    const emptyState = screen.getByText(
+      "No open findings for this tenant — everything's healthy.",
+    );
+    expect(emptyState).toBeVisible();
   });
 
   it('renders the overview without waiting for the Vercel domain status', async () => {
@@ -199,18 +208,28 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Owner' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('heading', { level: 2, name: 'Domain' }),
-    ).toBeNull();
-    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
+    const pageHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Acme Inc.',
+    });
+    const ownerHeading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Owner',
+    });
+    const activityHeading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Recent activity',
+    });
+    const domainHeading = screen.queryByRole('heading', {
+      level: 2,
+      name: 'Domain',
+    });
+    const skeletons = screen.getAllByTestId('skeleton');
+
+    expect(pageHeading).toBeVisible();
+    expect(ownerHeading).toBeVisible();
+    expect(activityHeading).toBeVisible();
+    expect(domainHeading).not.toBeInTheDocument();
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 });

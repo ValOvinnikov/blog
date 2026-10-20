@@ -48,10 +48,13 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Suspend tenant' }));
 
-    expect(
-      await screen.findByRole('alertdialog', { name: /suspend acme inc\./i }),
-    ).toBeVisible();
-    expect(screen.getByText(/its contact form disappears/i)).toBeVisible();
+    const dialog = await screen.findByRole('alertdialog', {
+      name: /suspend acme inc\./i,
+    });
+    const consequence = screen.getByText(/its contact form disappears/i);
+
+    expect(dialog).toBeVisible();
+    expect(consequence).toBeVisible();
     expect(suspendTenantActionMock).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Suspend' }));
@@ -64,12 +67,11 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
   it('reactivates a suspended tenant', async () => {
     setup({ tenant: SUSPENDED_TENANT });
 
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: 'This tenant is suspended',
-      }),
-    ).toBeVisible();
+    const cardTitle = screen.getByRole('heading', {
+      level: 2,
+      name: 'This tenant is suspended',
+    });
+    expect(cardTitle).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
     await user.click(await screen.findByRole('button', { name: 'Reactivate' }));
@@ -81,7 +83,7 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
     expect(refreshMock).toHaveBeenCalled();
   });
 
-  it('keeps the dialog open with the refusal when the tenant was archived meanwhile', async () => {
+  it('keeps the dialog open with the refusal for a tenant archived meanwhile', async () => {
     suspendTenantActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.ARCHIVED,
@@ -91,7 +93,8 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Suspend tenant' }));
     await user.click(await screen.findByRole('button', { name: 'Suspend' }));
 
-    expect(await screen.findByText('This tenant is archived.')).toBeVisible();
+    const refusal = await screen.findByText('This tenant is archived.');
+    expect(refusal).toBeVisible();
     expect(refreshMock).not.toHaveBeenCalled();
   });
 });

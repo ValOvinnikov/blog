@@ -6,12 +6,16 @@ import { Icon } from './icon';
 describe(Icon, () => {
   it('is decorative by default', () => {
     render(<Icon name={ICONS.GRID} />);
-    expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
+
+    const icon = screen.getByTestId('icon');
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('exposes an accessible name when one is given', () => {
     render(<Icon name={ICONS.WARNING} ariaLabel="Warning" />);
-    expect(screen.getByLabelText('Warning')).toBeVisible();
+
+    const icon = screen.getByLabelText('Warning');
+    expect(icon).toBeVisible();
   });
 
   it('renders a glyph for every icon admin references', () => {
@@ -49,7 +53,8 @@ describe(Icon, () => {
     ];
     for (const name of used) {
       const { unmount } = render(<Icon name={name} />);
-      expect(screen.getByTestId('icon')).toBeVisible();
+      const icon = screen.getByTestId('icon');
+      expect(icon).toBeVisible();
       unmount();
     }
   });
