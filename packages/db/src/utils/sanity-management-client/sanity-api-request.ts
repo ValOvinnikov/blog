@@ -1,4 +1,8 @@
-import { SANITY_API_SURFACE, type TSanityApiSurface } from '@blog/config';
+import {
+  SANITY_API_SURFACE,
+  type TSanityApiSurface,
+  HTTP_METHOD,
+} from '@blog/config';
 
 const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
@@ -52,7 +56,13 @@ async function sanityApiResponse(
 
   if (!response.ok && !allowStatus.includes(response.status)) {
     const body = await response.text().catch(() => '');
-    throw sanityApiError(surface, init.method ?? 'GET', path, response, body);
+    throw sanityApiError(
+      surface,
+      init.method ?? HTTP_METHOD.GET,
+      path,
+      response,
+      body,
+    );
   }
 
   return response;

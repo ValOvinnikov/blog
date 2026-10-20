@@ -1,3 +1,4 @@
+import { SANITY_PROJECT_ROLE } from '@blog/config';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
@@ -9,8 +10,6 @@ import {
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 
 import type { TProvisionEnv } from '../lib/env';
-
-const OWNER_ELEVATION_ROLE = 'administrator';
 
 // How long an owner may sit un-accepted before a run reports STALLED rather
 // than PENDING_ACCEPTANCE — long enough that a same-day signup isn't flagged,
@@ -59,7 +58,7 @@ export async function elevateTenantOwner(
   }
 
   const isAlreadyAdministrator = ownerEntry.roles.some(
-    (role) => role.name === OWNER_ELEVATION_ROLE,
+    (role) => role.name === SANITY_PROJECT_ROLE.ADMINISTRATOR,
   );
   if (isAlreadyAdministrator) {
     return ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR;
@@ -69,7 +68,7 @@ export async function elevateTenantOwner(
     token: env.sanityManagementToken,
     projectId: sanityProjectId,
     projectUserId: ownerEntry.projectUserId,
-    role: OWNER_ELEVATION_ROLE,
+    role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
   });
 
   return ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED;

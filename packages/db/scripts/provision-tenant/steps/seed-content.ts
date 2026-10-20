@@ -1,3 +1,4 @@
+import { SANITY_ROBOT_ROLE } from '@blog/config';
 import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
@@ -55,7 +56,7 @@ export async function seedTenantContent(
     token: env.sanityManagementToken,
     projectId: tenant.sanityProjectId,
     label: SANITY_WRITE_TOKEN_LABEL,
-    role: 'editor',
+    role: SANITY_ROBOT_ROLE.EDITOR,
   });
 
   let persisted = false;

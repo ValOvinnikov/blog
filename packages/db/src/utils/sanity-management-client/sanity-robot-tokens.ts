@@ -1,4 +1,8 @@
-import type { TMaybeUndefined, TSanityRobotRole } from '@blog/config';
+import {
+  HTTP_METHOD,
+  type TMaybeUndefined,
+  type TSanityRobotRole,
+} from '@blog/config';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import { sanityAccessRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
@@ -16,7 +20,7 @@ export async function createSanityRobotToken(input: {
     token?: string;
     key?: string;
   }>(SANITY_API_PATH.projectRobots(input.projectId), input.token, {
-    method: 'POST',
+    method: HTTP_METHOD.POST,
     body: JSON.stringify({
       label: input.label,
       memberships: [
@@ -68,6 +72,6 @@ export async function deleteSanityRobotToken(input: {
   await sanityAccessRequest(
     SANITY_API_PATH.projectRobot(input.projectId, input.robotId),
     input.token,
-    { method: 'DELETE' },
+    { method: HTTP_METHOD.DELETE },
   );
 }

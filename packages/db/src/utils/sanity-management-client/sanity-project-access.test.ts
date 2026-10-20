@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
 import {
   firstFetchCall,
   jsonResponse,
@@ -20,11 +21,11 @@ import {
 
 const createInviteInput = withSanityProject({
   email: SANITY_INVITE_EMAIL,
-  role: 'editor' as const,
+  role: SANITY_PROJECT_ROLE.EDITOR,
 });
 const grantRoleInput = withSanityProject({
   projectUserId: SANITY_PROJECT_USER_ID,
-  role: 'administrator' as const,
+  role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
 });
 
 const fetchMock = useFetchFake();
@@ -38,10 +39,10 @@ describe(listSanityProjectInvites, () => {
 
     const result = await listSanityProjectInvites(withSanityProject({}));
 
-    const { url, init } = firstFetchCall(fetchMock);
+    const { url, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(invites);
     expect(url).toBe(SANITY_EXPECTED_URL.pendingAndAcceptedInvites);
-    expect(init.method ?? 'GET').toBe('GET');
+    expect(method).toBe(HTTP_METHOD.GET);
   });
 
   it('accepts a bare array response with no envelope', async () => {
@@ -62,9 +63,9 @@ describe(createSanityProjectInvite, () => {
 
     await createSanityProjectInvite(createInviteInput);
 
-    const { url, init, body } = firstFetchCall(fetchMock);
+    const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(SANITY_EXPECTED_URL.invites);
-    expect(init.method).toBe('POST');
+    expect(method).toBe(HTTP_METHOD.POST);
     expect(body).toEqual({
       email: createInviteInput.email,
       role: createInviteInput.role,
@@ -85,7 +86,7 @@ describe(listSanityProjectAcl, () => {
     const acl = [
       {
         projectUserId: SANITY_PROJECT_USER_ID,
-        roles: [{ name: 'viewer' }],
+        roles: [{ name: SANITY_PROJECT_ROLE.VIEWER }],
         isRobot: false,
       },
     ];
@@ -93,17 +94,17 @@ describe(listSanityProjectAcl, () => {
 
     const result = await listSanityProjectAcl(withSanityProject({}));
 
-    const { url, init } = firstFetchCall(fetchMock);
+    const { url, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(acl);
     expect(url).toBe(SANITY_EXPECTED_URL.acl);
-    expect(init.method ?? 'GET').toBe('GET');
+    expect(method).toBe(HTTP_METHOD.GET);
   });
 
   it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(textResponse('nope', 403));
+    fetchMock.mockResolvedValue(textResponse('nope', HTTP_STATUS.FORBIDDEN));
 
     await expect(listSanityProjectAcl(withSanityProject({}))).rejects.toThrow(
-      /403/,
+      new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
     );
   });
 });
@@ -111,20 +112,25 @@ describe(listSanityProjectAcl, () => {
 describe(grantSanityProjectRole, () => {
   it('PUTs the roleName to the legacy acl endpoint keyed on projectUserId', async () => {
     fetchMock.mockResolvedValue(
-      jsonResponse({ projectUserId: SANITY_PROJECT_USER_ID }, 201),
+      jsonResponse(
+        { projectUserId: SANITY_PROJECT_USER_ID },
+        HTTP_STATUS.CREATED,
+      ),
     );
 
     await grantSanityProjectRole(grantRoleInput);
 
-    const { url, init, body } = firstFetchCall(fetchMock);
+    const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(SANITY_EXPECTED_URL.aclEntry);
-    expect(init.method).toBe('PUT');
+    expect(method).toBe(HTTP_METHOD.PUT);
     expect(body).toEqual({ roleName: grantRoleInput.role });
   });
 
   it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(textResponse('nope', 403));
+    fetchMock.mockResolvedValue(textResponse('nope', HTTP_STATUS.FORBIDDEN));
 
-    await expect(grantSanityProjectRole(grantRoleInput)).rejects.toThrow(/403/);
+    await expect(grantSanityProjectRole(grantRoleInput)).rejects.toThrow(
+      new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
+    );
   });
 });

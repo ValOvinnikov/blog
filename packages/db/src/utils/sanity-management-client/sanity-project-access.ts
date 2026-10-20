@@ -1,4 +1,4 @@
-import type { TSanityProjectRole } from '@blog/config';
+import { HTTP_METHOD, type TSanityProjectRole } from '@blog/config';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import {
   sanityAccessRequest,
@@ -34,7 +34,7 @@ export async function createSanityProjectInvite(input: {
     SANITY_API_PATH.projectInvites(input.projectId),
     input.token,
     {
-      method: 'POST',
+      method: HTTP_METHOD.POST,
       body: JSON.stringify({ email: input.email, role: input.role }),
     },
   );
@@ -67,6 +67,6 @@ export async function grantSanityProjectRole(input: {
   await sanityManagementRequest(
     SANITY_API_PATH.projectAclEntry(input.projectId, input.projectUserId),
     input.token,
-    { method: 'PUT', body: JSON.stringify({ roleName: input.role }) },
+    { method: HTTP_METHOD.PUT, body: JSON.stringify({ roleName: input.role }) },
   );
 }

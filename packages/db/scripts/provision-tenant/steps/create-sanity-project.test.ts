@@ -1,3 +1,4 @@
+import { HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -218,7 +219,7 @@ describe(createTenantSanityProject, () => {
         token: 'mgmt-token',
         projectId: 'proj456',
         email: 'owner@example.com',
-        role: 'viewer',
+        role: SANITY_PROJECT_ROLE.VIEWER,
       });
     });
 
@@ -268,7 +269,7 @@ describe(createTenantSanityProject, () => {
         createSanityProjectInviteMock.mockImplementation(async () => {
           callOrder.push('createSanityProjectInvite');
           throw new Error(
-            '403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}',
+            `${HTTP_STATUS.FORBIDDEN} {"statusCode":${HTTP_STATUS.FORBIDDEN},"error":"Forbidden","message":"Missing permission to invite administrators."}`,
           );
         });
 
@@ -427,7 +428,7 @@ describe(createTenantSanityProject, () => {
               data: [{ email: 'owner@example.com', status: 'pending' }],
               nextCursor: null,
             }),
-            { status: 200 },
+            { status: HTTP_STATUS.OK },
           ),
         );
         vi.stubGlobal('fetch', fetchMock);

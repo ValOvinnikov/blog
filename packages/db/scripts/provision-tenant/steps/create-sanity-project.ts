@@ -1,3 +1,4 @@
+import { SANITY_PROJECT_ROLE } from '@blog/config';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { setTenantSanityProject } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -24,7 +25,6 @@ export type TCreateSanityProjectResult = {
 // `viewer` is the only project-member role the invites endpoint accepts —
 // attempting `administrator` here 403s. It's still reachable after the
 // owner accepts, via the ACL endpoint — see `elevateTenantOwner`.
-const TENANT_PROJECT_MEMBER_ROLE = 'viewer';
 
 /**
  * Step 1 — creates the tenant's own Sanity project, its dataset (named per
@@ -117,7 +117,7 @@ export async function createTenantSanityProject(
           token: env.sanityManagementToken,
           projectId,
           email: ownerEmail,
-          role: TENANT_PROJECT_MEMBER_ROLE,
+          role: SANITY_PROJECT_ROLE.VIEWER,
         });
       } catch (error) {
         console.error(

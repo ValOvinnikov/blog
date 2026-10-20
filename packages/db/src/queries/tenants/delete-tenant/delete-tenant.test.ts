@@ -1,6 +1,8 @@
 import {
   TENANT_DELETE_OUTCOME,
   TENANT_DELETE_SANITY_PROJECT_OUTCOME,
+  HTTP_METHOD,
+  HTTP_STATUS,
 } from '@blog/config';
 import { PRESET_ID } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
@@ -211,9 +213,9 @@ describe('deleteTenant — Sanity project deletion', () => {
       const result = await deleteTenant(tenantId, 'mgmt-token');
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
-      const { url, init } = firstFetchCall(fetchMock);
+      const { url, method } = firstFetchCall(fetchMock);
       expect(url).toBe(SANITY_EXPECTED_URL.project);
-      expect(init.method).toBe('DELETE');
+      expect(method).toBe(HTTP_METHOD.DELETE);
       expect(result).toEqual({
         outcome: TENANT_DELETE_OUTCOME.DELETED,
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.DELETED,
@@ -221,7 +223,9 @@ describe('deleteTenant — Sanity project deletion', () => {
     });
 
     it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
-      fetchMock.mockResolvedValue(textResponse('not found', 404));
+      fetchMock.mockResolvedValue(
+        textResponse('not found', HTTP_STATUS.NOT_FOUND),
+      );
 
       const result = await deleteTenant(tenantId, 'mgmt-token');
 
@@ -241,11 +245,11 @@ describe('deleteTenant — Sanity project deletion', () => {
       fetchMock.mockResolvedValue(
         jsonResponse(
           {
-            code: 401,
+            code: HTTP_STATUS.UNAUTHORIZED,
             status: 'Unauthorized',
             message: `Cancellation of project "${SANITY_PROJECT_ID}" requires billing permission on organization "org1"`,
           },
-          401,
+          HTTP_STATUS.UNAUTHORIZED,
         ),
       );
 
@@ -264,9 +268,13 @@ describe('deleteTenant — Sanity project deletion', () => {
     });
 
     it('still throws on a Sanity failure unrelated to billing permission, and leaves the row untouched', async () => {
-      fetchMock.mockResolvedValue(textResponse('forbidden', 403));
+      fetchMock.mockResolvedValue(
+        textResponse('forbidden', HTTP_STATUS.FORBIDDEN),
+      );
 
-      await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(/403/);
+      await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(
+        new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
+      );
 
       const remaining = await db()
         .select()
