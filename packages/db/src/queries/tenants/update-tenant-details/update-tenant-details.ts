@@ -1,3 +1,4 @@
+import type { TMaybeUndefined, TOutcome } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
@@ -16,6 +17,7 @@ import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-stat
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 
 export type TUpdateTenantDetailsInput = {
@@ -48,21 +50,21 @@ function tenantDetailsFields(
 
 export type TUpdateTenantDetailsResult =
   | { outcome: 'updated'; tenant: TTenant }
-  | { outcome: 'domain-taken' }
+  | TOutcome<'domain-taken'>
   | { outcome: 'domain-locked'; blockingStep: TTenantProvisioningStep }
-  | { outcome: 'domain-invalid' }
-  | { outcome: 'provisioning-started' }
-  | { outcome: 'owner-already-joined' }
-  | { outcome: 'owner-email-taken' };
+  | TOutcome<'domain-invalid'>
+  | TOutcome<'provisioning-started'>
+  | TOutcome<'owner-already-joined'>
+  | TOutcome<'owner-email-taken'>;
 
 // Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
 // a completed step; name/plan/locale never lock.
 function lockedFieldOutcome(
   input: TUpdateTenantDetailsInput,
   existing: TTenant,
-):
-  | Extract<TUpdateTenantDetailsResult, { outcome: 'domain-locked' }>
-  | undefined {
+): TMaybeUndefined<
+  Extract<TUpdateTenantDetailsResult, TOutcome<'domain-locked'>>
+> {
   const steps = existing.provisioningSteps;
 
   if (
@@ -79,20 +81,15 @@ function lockedFieldOutcome(
   return undefined;
 }
 
-// Pre-checked rather than caught off the `tenant_domains.domain` unique
-// constraint: a typed outcome the caller can map straight onto a field
-// error, instead of an unhandled Postgres throw. First match wins:
-// domain-invalid (a malformed `primaryDomain`, checked before any read),
-// then provisioning-started (RUNNING/SUCCEEDED), then domain-locked (FAILED,
-// only when a completed MAP_DOMAIN already consumed it), then domain-taken,
-// then (when `ownerEmail` is supplied) owner-already-joined /
-// owner-email-taken.
+// Domain conflicts are pre-checked rather than caught off the
+// `tenant_domains.domain` unique constraint, so the caller gets a typed
+// outcome instead of a Postgres throw.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,
 ): Promise<TUpdateTenantDetailsResult> {
   if (!isValidDomain(input.primaryDomain)) {
-    return { outcome: 'domain-invalid' };
+    return toOutcome('domain-invalid');
   }
 
   const db = getDb();
@@ -114,7 +111,7 @@ export async function updateTenantDetails(
   );
 
   if (provisioningState === 'RUNNING' || provisioningState === 'SUCCEEDED') {
-    return { outcome: 'provisioning-started' };
+    return toOutcome('provisioning-started');
   }
 
   if (provisioningState === 'FAILED') {
@@ -131,12 +128,12 @@ export async function updateTenantDetails(
       .where(eq(tenantDomains.domain, input.primaryDomain));
 
     if (domainConflict) {
-      return { outcome: 'domain-taken' };
+      return toOutcome('domain-taken');
     }
   }
 
-  let normalizedOwnerEmail: string | undefined;
-  let ownerInviteId: string | undefined;
+  let normalizedOwnerEmail: TMaybeUndefined<string>;
+  let ownerInviteId: TMaybeUndefined<string>;
 
   if (input.ownerEmail !== undefined) {
     normalizedOwnerEmail = normalizeEmail(input.ownerEmail);
@@ -161,7 +158,7 @@ export async function updateTenantDetails(
         );
 
       if (joinedOwner) {
-        return { outcome: 'owner-already-joined' };
+        return toOutcome('owner-already-joined');
       }
 
       const [pendingInvite] = await db
@@ -193,7 +190,7 @@ export async function updateTenantDetails(
         );
 
       if (emailConflict) {
-        return { outcome: 'owner-email-taken' };
+        return toOutcome('owner-email-taken');
       }
 
       ownerInviteId = pendingInvite.id;

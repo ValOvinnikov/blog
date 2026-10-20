@@ -1,14 +1,12 @@
+import type { TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export type TUnsubscribeByTokenResult =
-  | { outcome: 'unsubscribed'; subscriber: TSubscriber }
-  | { outcome: 'not-found' };
+  { outcome: 'unsubscribed'; subscriber: TSubscriber } | TOutcome<'not-found'>;
 
-// Deletes the subscriber row matching `unsubscribeToken` with no session at
-// all — the whole point of a per-recipient unsubscribe link that has to work
-// from an inbox.
 export async function unsubscribeByToken(
   tenantId: string,
   token: string,
@@ -26,7 +24,7 @@ export async function unsubscribeByToken(
     .returning();
 
   if (!deleted) {
-    return { outcome: 'not-found' };
+    return toOutcome('not-found');
   }
 
   return { outcome: 'unsubscribed', subscriber: deleted };
