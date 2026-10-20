@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE, HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -10,6 +10,11 @@ import {
   finishProvisioningRun,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
+import {
+  ENQUEUE_SIGNATURE_HEADER,
+  ENQUEUE_TIMESTAMP_HEADER,
+} from '@worker/constants/enqueue';
+import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { signEnqueuePayload } from '@worker/testing/enqueue/sign-enqueue-request';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { start } from 'workflow/api';
@@ -48,10 +53,10 @@ function signedRequest(
     rawBody,
   });
   return new Request('https://worker.example.com/api/provision', {
-    method: 'POST',
+    method: HTTP_METHOD.POST,
     headers: {
-      'x-worker-timestamp': String(timestamp),
-      'x-worker-signature': signature,
+      [ENQUEUE_TIMESTAMP_HEADER]: String(timestamp),
+      [ENQUEUE_SIGNATURE_HEADER]: signature,
     },
     body: rawBody,
   });
@@ -84,7 +89,7 @@ describe('POST /api/provision', () => {
       'a tampered body',
       () =>
         new Request('https://worker.example.com/api/provision', {
-          method: 'POST',
+          method: HTTP_METHOD.POST,
           headers: signedRequest('{}').headers,
           body: JSON.stringify({ tenantId: TENANT_ID }),
         }),
@@ -100,7 +105,7 @@ describe('POST /api/provision', () => {
       'no signature headers',
       () =>
         new Request('https://worker.example.com/api/provision', {
-          method: 'POST',
+          method: HTTP_METHOD.POST,
           body: JSON.stringify({ tenantId: TENANT_ID }),
         }),
     ],
@@ -114,7 +119,10 @@ describe('POST /api/provision', () => {
   ])('answers 401 and starts nothing for %s', async (_label, build) => {
     const response = await POST(build());
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
+    expect(await response.json()).toEqual({
+      error: ENQUEUE_ERROR.UNAUTHORIZED,
+    });
     expect(beginTenantProvisioning).not.toHaveBeenCalled();
     expect(start).not.toHaveBeenCalled();
   });
@@ -124,13 +132,19 @@ describe('POST /api/provision', () => {
 
     const response = await POST(enqueueRequest());
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
+    expect(await response.json()).toEqual({
+      error: ENQUEUE_ERROR.UNAUTHORIZED,
+    });
   });
 
   it('answers 400 for a body that is not JSON', async () => {
     const response = await POST(signedRequest('not json'));
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(await response.json()).toEqual({
+      error: ENQUEUE_ERROR.INVALID_BODY,
+    });
     expect(start).not.toHaveBeenCalled();
   });
 
@@ -140,7 +154,10 @@ describe('POST /api/provision', () => {
   ])('answers 400 for %s', async (_label, body) => {
     const response = await POST(signedRequest(JSON.stringify(body)));
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(await response.json()).toEqual({
+      error: ENQUEUE_ERROR.INVALID_BODY,
+    });
     expect(beginTenantProvisioning).not.toHaveBeenCalled();
   });
 
@@ -152,7 +169,10 @@ describe('POST /api/provision', () => {
 
     const response = await POST(enqueueRequest());
 
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(HTTP_STATUS.CONFLICT);
+    expect(await response.json()).toEqual({
+      error: ENQUEUE_ERROR.ALREADY_IN_PROGRESS,
+    });
     expect(start).not.toHaveBeenCalled();
   });
 
@@ -164,7 +184,8 @@ describe('POST /api/provision', () => {
 
     const response = await POST(enqueueRequest());
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
+    expect(await response.json()).toEqual({ error: ENQUEUE_ERROR.NOT_FOUND });
     expect(start).not.toHaveBeenCalled();
   });
 
@@ -176,7 +197,10 @@ describe('POST /api/provision', () => {
 
     const response = await POST(enqueueRequest());
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(await response.json()).toEqual({
+      error: ENQUEUE_ERROR.SERVER_ERROR,
+    });
     expect(start).not.toHaveBeenCalled();
   });
 
@@ -185,14 +209,17 @@ describe('POST /api/provision', () => {
 
     const response = await POST(enqueueRequest());
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(await response.json()).toEqual({
+      error: ENQUEUE_ERROR.SERVER_ERROR,
+    });
     expect(start).not.toHaveBeenCalled();
   });
 
   it('answers 202 with the run id once the run is started', async () => {
     const response = await POST(enqueueRequest());
 
-    expect(response.status).toBe(202);
+    expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
     expect(await response.json()).toEqual({ runId: 'run-1' });
   });
 
@@ -210,7 +237,10 @@ describe('POST /api/provision', () => {
     it('answers 500', async () => {
       const response = await POST(enqueueRequest());
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+      expect(await response.json()).toEqual({
+        error: ENQUEUE_ERROR.SERVER_ERROR,
+      });
     });
 
     it('marks the tenant failed instead of leaving it in progress', async () => {
