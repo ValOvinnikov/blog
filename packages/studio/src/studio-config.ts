@@ -2,7 +2,9 @@ import {
   LOCALE_ISO_CODES,
   type TCapability,
   type TLocaleIsoCode,
+  type TSanityLoginProvider,
 } from '@blog/config/constants';
+import { buildLoginProviderAuth } from '@blog/studio/auth/login-provider-auth';
 import { withLandingRedirects } from '@blog/studio/document-actions/with-landing-redirects/with-landing-redirects';
 import { schemaTypes } from '@blog/studio/schema-types';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
@@ -53,6 +55,7 @@ export type TBuildStudioConfigParams = {
   enabledCapabilities?: readonly TCapability[];
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
+  loginProvider?: TSanityLoginProvider;
 };
 
 const ONE_PER_LANGUAGE_DOCUMENT_TYPES: string[] = [
@@ -116,6 +119,7 @@ export const buildStudioConfig = ({
   enabledCapabilities,
   defaultLocale = LOCALE_ISO_CODES.EN,
   liveLocales,
+  loginProvider,
 }: TBuildStudioConfigParams) => {
   setDefaultLanguage(defaultLocale);
   setLiveLanguages(liveLocales ?? []);
@@ -132,6 +136,7 @@ export const buildStudioConfig = ({
     projectId,
     dataset,
     basePath,
+    ...(loginProvider && { auth: buildLoginProviderAuth(loginProvider) }),
 
     plugins: [
       structureTool({ structure: createStudioStructure(offeredLocales) }),

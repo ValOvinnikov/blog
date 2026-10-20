@@ -1,5 +1,5 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { SANITY_LOGIN_PROVIDER, SANITY_PROJECT_ROLE } from '@blog/db/constants';
+import { ERROR_CODE, SANITY_LOGIN_PROVIDER } from '@blog/config/constants';
+import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import { getTenantOwnerAccess } from '@blog/db/queries/tenants/get-tenant-owner-access';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';

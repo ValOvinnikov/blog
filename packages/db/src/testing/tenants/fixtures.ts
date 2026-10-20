@@ -1,4 +1,5 @@
-import { SANITY_LOGIN_PROVIDER, SANITY_PROJECT_ROLE } from '@blog/db/constants';
+import { SANITY_LOGIN_PROVIDER } from '@blog/config/constants';
+import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import type { TTenantOwnerAccess } from '@blog/db/queries/tenants/tenant-owner-access';
 import type * as schema from '@blog/db/schema';
 import { faker } from '@faker-js/faker';
