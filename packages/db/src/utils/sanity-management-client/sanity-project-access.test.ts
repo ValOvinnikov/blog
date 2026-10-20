@@ -1,5 +1,6 @@
 import { HTTP_METHOD, HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
 import {
+  emptyResponse,
   firstFetchCall,
   jsonResponse,
   textResponse,
@@ -8,12 +9,14 @@ import {
 import {
   SANITY_EXPECTED_URL,
   SANITY_INVITE_EMAIL,
+  SANITY_INVITE_ID,
   SANITY_PROJECT_USER_ID,
   withSanityProject,
 } from '@blog/db/testing/sanity-management-client/fixtures';
 
 import {
   createSanityProjectInvite,
+  deleteSanityProjectInvite,
   grantSanityProjectRole,
   listSanityProjectAcl,
   listSanityProjectInvites,
@@ -52,6 +55,36 @@ describe(listSanityProjectInvites, () => {
     const result = await listSanityProjectInvites(withSanityProject({}));
 
     expect(result).toEqual(invites);
+  });
+});
+
+describe(deleteSanityProjectInvite, () => {
+  const deleteInviteInput = withSanityProject({ inviteId: SANITY_INVITE_ID });
+
+  it('DELETEs the invite by id', async () => {
+    fetchMock.mockResolvedValue(emptyResponse(HTTP_STATUS.NO_CONTENT));
+
+    await deleteSanityProjectInvite(deleteInviteInput);
+
+    const { url, method } = firstFetchCall(fetchMock);
+    expect(url).toBe(SANITY_EXPECTED_URL.invite);
+    expect(method).toBe(HTTP_METHOD.DELETE);
+  });
+
+  it('treats an invite that is already gone as revoked', async () => {
+    fetchMock.mockResolvedValue(textResponse('gone', HTTP_STATUS.NOT_FOUND));
+
+    await expect(
+      deleteSanityProjectInvite(deleteInviteInput),
+    ).resolves.toBeUndefined();
+  });
+
+  it('throws on any other failure', async () => {
+    fetchMock.mockResolvedValue(textResponse('nope', HTTP_STATUS.FORBIDDEN));
+
+    await expect(deleteSanityProjectInvite(deleteInviteInput)).rejects.toThrow(
+      new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
+    );
   });
 });
 

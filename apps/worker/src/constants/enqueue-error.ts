@@ -6,6 +6,7 @@ export const ENQUEUE_ERROR = {
   SERVER_ERROR: 'SERVER_ERROR',
   ALREADY_IN_PROGRESS: 'ALREADY_IN_PROGRESS',
   NOT_FOUND: 'NOT_FOUND',
+  NOT_PROVISIONED: 'NOT_PROVISIONED',
 } as const;
 
 export type TEnqueueError = TValueOf<typeof ENQUEUE_ERROR>;

@@ -1,63 +1,21 @@
-import {
-  ERROR_CODE,
-  HTTP_STATUS,
-  type THttpStatus,
-} from '@blog/config/constants';
+import { ERROR_CODE, HTTP_STATUS } from '@blog/config/constants';
 import { beginTenantProvisioning } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
-import {
-  ENQUEUE_SIGNATURE_HEADER,
-  ENQUEUE_TIMESTAMP_HEADER,
-} from '@worker/constants/enqueue';
-import {
-  ENQUEUE_ERROR,
-  type TEnqueueError,
-} from '@worker/constants/enqueue-error';
-import { isValidEnqueueSignature } from '@worker/utils/enqueue-signature/enqueue-signature';
-import { env } from '@worker/utils/env/env';
+import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { logger } from '@worker/utils/logger/logger';
 import { markRunNotStarted } from '@worker/utils/provisioning-report/provisioning-report';
+import {
+  readSignedTenantRequest,
+  respond,
+  respondError,
+} from '@worker/utils/signed-tenant-request/signed-tenant-request';
 import { provisionTenant } from '@worker/workflows/provision-tenant';
 import { start } from 'workflow/api';
-import { z } from 'zod';
-
-const enqueueBodySchema = z.object({ tenantId: z.uuid() });
-
-function respond(status: THttpStatus, body: Record<string, string>): Response {
-  return Response.json(body, { status });
-}
-
-function respondError(status: THttpStatus, error: TEnqueueError): Response {
-  return respond(status, { error });
-}
 
 export async function POST(request: Request): Promise<Response> {
-  const secret = env.WORKER_ENQUEUE_SECRET;
-  const rawBody = await request.text();
-
-  const authenticated =
-    secret !== undefined &&
-    isValidEnqueueSignature({
-      secret,
-      timestamp: request.headers.get(ENQUEUE_TIMESTAMP_HEADER),
-      signature: request.headers.get(ENQUEUE_SIGNATURE_HEADER),
-      rawBody,
-    });
-  if (!authenticated) {
-    return respondError(HTTP_STATUS.UNAUTHORIZED, ENQUEUE_ERROR.UNAUTHORIZED);
-  }
-
-  let payload: unknown;
-  try {
-    payload = JSON.parse(rawBody);
-  } catch {
-    return respondError(HTTP_STATUS.BAD_REQUEST, ENQUEUE_ERROR.INVALID_BODY);
-  }
-  const parsed = enqueueBodySchema.safeParse(payload);
-  if (!parsed.success) {
-    return respondError(HTTP_STATUS.BAD_REQUEST, ENQUEUE_ERROR.INVALID_BODY);
-  }
-  const { tenantId } = parsed.data;
+  const signed = await readSignedTenantRequest(request);
+  if (!signed.ok) return signed.response;
+  const { tenantId } = signed;
 
   let began: Awaited<ReturnType<typeof beginTenantProvisioning>>;
   try {

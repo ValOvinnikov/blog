@@ -1,11 +1,21 @@
-import { HTTP_METHOD, type TSanityProjectRole } from '@blog/config';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  type TSanityProjectRole,
+} from '@blog/config';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import {
   sanityAccessRequest,
+  sanityAccessResponse,
   sanityManagementRequest,
 } from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
-export type TSanityInvite = { email?: string; status?: string };
+export type TSanityInvite = {
+  id?: string;
+  email?: string;
+  status?: string;
+  createdAt?: string;
+};
 
 // The envelope key is `data`, not `items`; unwrapping the wrong one yields an empty list and a retried invite 400s.
 export async function listSanityProjectInvites(input: {
@@ -13,15 +23,32 @@ export async function listSanityProjectInvites(input: {
   projectId: string;
 }): Promise<TSanityInvite[]> {
   const result = await sanityAccessRequest<
-    | { data?: Array<{ email?: string; status?: string }> }
-    | Array<{ email?: string; status?: string }>
+    { data?: TSanityInvite[] } | TSanityInvite[]
   >(
     SANITY_API_PATH.projectInvitesPendingOrAccepted(input.projectId),
     input.token,
   );
 
   const items = Array.isArray(result) ? result : (result.data ?? []);
-  return items.map((item) => ({ email: item.email, status: item.status }));
+  return items.map(({ id, email, status, createdAt }) => ({
+    id,
+    email,
+    status,
+    createdAt,
+  }));
+}
+
+export async function deleteSanityProjectInvite(input: {
+  token: string;
+  projectId: string;
+  inviteId: string;
+}): Promise<void> {
+  await sanityAccessResponse(
+    SANITY_API_PATH.projectInvite(input.projectId, input.inviteId),
+    input.token,
+    { method: HTTP_METHOD.DELETE },
+    [HTTP_STATUS.NOT_FOUND],
+  );
 }
 
 export async function createSanityProjectInvite(input: {

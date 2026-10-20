@@ -23,6 +23,13 @@ export async function loadTenant(tenantId: string): Promise<TTenant> {
   return tenant;
 }
 
+export function isFinalStepAttempt(error: unknown): boolean {
+  return (
+    FatalError.is(error) ||
+    getStepMetadata().attempt > PROVISIONING_UNIT_MAX_RETRIES
+  );
+}
+
 export async function runReportedStep(input: {
   tenantId: string;
   ctx: TUnitContext;
@@ -40,10 +47,7 @@ export async function runReportedStep(input: {
   try {
     await run();
   } catch (error) {
-    const isFinalAttempt =
-      FatalError.is(error) ||
-      getStepMetadata().attempt > PROVISIONING_UNIT_MAX_RETRIES;
-    if (!isFinalAttempt) throw error;
+    if (!isFinalStepAttempt(error)) throw error;
 
     const message = sanitizeLogMessage(error);
     logger.error('provisioning.step_failed', {

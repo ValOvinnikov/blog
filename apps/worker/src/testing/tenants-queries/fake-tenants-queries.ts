@@ -12,5 +12,6 @@ export function withFakeTenantsQueries(
     startProvisioningRun: vi.fn(),
     finishProvisioningRun: vi.fn(),
     setTenantProvisioningStatus: vi.fn(),
+    setTenantOwnerAccess: vi.fn(),
   };
 }

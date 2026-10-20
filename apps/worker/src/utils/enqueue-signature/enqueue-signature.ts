@@ -10,11 +10,12 @@ import {
 function signEnqueuePayload(input: {
   secret: string;
   timestamp: string;
+  path: string;
   rawBody: string;
 }): string {
-  const { secret, timestamp, rawBody } = input;
+  const { secret, timestamp, path, rawBody } = input;
   const digest = createHmac(ENQUEUE_SIGNATURE_ALGORITHM, secret)
-    .update(`${timestamp}.${rawBody}`)
+    .update(`${timestamp}.${path}.${rawBody}`)
     .digest('hex');
   return `${ENQUEUE_SIGNATURE_PREFIX}${digest}`;
 }
@@ -23,10 +24,18 @@ export function isValidEnqueueSignature(input: {
   secret: string;
   timestamp: TMaybeNull<string>;
   signature: TMaybeNull<string>;
+  path: string;
   rawBody: string;
   now?: number;
 }): boolean {
-  const { secret, timestamp, signature, rawBody, now = Date.now() } = input;
+  const {
+    secret,
+    timestamp,
+    signature,
+    path,
+    rawBody,
+    now = Date.now(),
+  } = input;
   if (!timestamp || !signature) return false;
 
   const sentAt = Number(timestamp);
@@ -34,7 +43,7 @@ export function isValidEnqueueSignature(input: {
   if (Math.abs(now - sentAt) > ENQUEUE_MAX_AGE_MS) return false;
 
   const expected = Buffer.from(
-    signEnqueuePayload({ secret, timestamp, rawBody }),
+    signEnqueuePayload({ secret, timestamp, path, rawBody }),
   );
   const received = Buffer.from(signature);
   return (
