@@ -37,21 +37,11 @@ export async function finishRun(
   const { runId } = ctx;
   await reportRunFinish(tenantId);
 
-  if (outcome.ok) {
-    await recordProvisioningAuditEvent({
-      tenantId,
-      runId,
-      action: AUDIT_ACTION.PROVISIONED,
-    });
-    return;
-  }
-
-  const { failedStep, error } = outcome;
-  if (failedStep === undefined) {
+  if (!outcome.ok && outcome.failedStep === undefined) {
     logger.error('provisioning.run_failed', {
       tenantId,
       runId,
-      error: sanitizeLogMessage(error ?? 'unknown'),
+      error: sanitizeLogMessage(outcome.error ?? 'unknown'),
     });
     const marked = await setTenantProvisioningStatus(
       tenantId,
@@ -65,11 +55,16 @@ export async function finishRun(
       });
     }
   }
+
   await recordProvisioningAuditEvent({
     tenantId,
     runId,
-    action: AUDIT_ACTION.PROVISIONING_FAILED,
-    ...(failedStep === undefined ? {} : { failedStep }),
+    action: outcome.ok
+      ? AUDIT_ACTION.PROVISIONED
+      : AUDIT_ACTION.PROVISIONING_FAILED,
+    ...(outcome.ok || outcome.failedStep === undefined
+      ? {}
+      : { failedStep: outcome.failedStep }),
   });
 }
 

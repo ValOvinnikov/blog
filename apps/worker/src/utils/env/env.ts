@@ -11,10 +11,8 @@ export const env = createEnv({
     VERCEL_TOKEN: z.string().min(1).optional(),
     // @env-optional
     VERCEL_TEAM_ID: z.string().min(1).optional(),
-    // The one shared `apps/web` project every tenant's custom domain is added to.
     // @env-required: development, production
     VERCEL_PROJECT_ID_WEB: z.string().min(1).optional(),
-    // The Sanity CORS origin every tenant project allows.
     // @env-optional
     ADMIN_APP_BASE_URL: z.string().url().optional(),
     // @env-optional
@@ -24,7 +22,6 @@ export const env = createEnv({
     // Must be byte-identical to `apps/web`'s own `SANITY_REVALIDATE_SECRET`.
     // @env-required: development, production
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
-    // Shared with `apps/platform`, which signs every enqueue request with it.
     // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
   },

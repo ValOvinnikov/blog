@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
+import type { TMaybeNull } from '@blog/config';
 import {
   ENQUEUE_MAX_AGE_MS,
   ENQUEUE_SIGNATURE_PREFIX,
@@ -19,8 +20,8 @@ function signEnqueuePayload(input: {
 
 export function isValidEnqueueSignature(input: {
   secret: string;
-  timestamp: string | null;
-  signature: string | null;
+  timestamp: TMaybeNull<string>;
+  signature: TMaybeNull<string>;
   rawBody: string;
   now?: number;
 }): boolean {

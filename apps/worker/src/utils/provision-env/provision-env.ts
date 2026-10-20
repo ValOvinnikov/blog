@@ -1,10 +1,11 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { mapTenantDomain } from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
 import { env } from '@worker/utils/env/env';
 import { FatalError } from 'workflow';
 
 export type TProvisionEnv = Parameters<typeof mapTenantDomain>[1];
 
-function requireValue(name: string, value: string | undefined): string {
+function requireValue(name: string, value: TMaybeUndefined<string>): string {
   if (!value) {
     throw new FatalError(`worker: missing required env var ${name}.`);
   }

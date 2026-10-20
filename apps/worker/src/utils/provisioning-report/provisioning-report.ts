@@ -20,6 +20,7 @@ import {
 import { overallStatusFor } from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
 import { logger } from '@worker/utils/logger/logger';
 
+// TODO(#4961): these wrappers collapse with the CLI's `report-*` helpers when the steps move into the worker.
 export async function reportStep(input: {
   tenantId: string;
   step: TTenantProvisioningStep;
