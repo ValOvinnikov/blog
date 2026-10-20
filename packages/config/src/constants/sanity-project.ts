@@ -74,3 +74,11 @@ export const TENANT_DELETE_SANITY_PROJECT_OUTCOME = {
 export type TTenantDeleteSanityProjectOutcome = TValueOf<
   typeof TENANT_DELETE_SANITY_PROJECT_OUTCOME
 >;
+
+export const TENANT_DELETE_OUTCOME = {
+  DELETED: 'DELETED',
+  NOT_ARCHIVED: 'NOT_ARCHIVED',
+  NOT_FOUND: 'NOT_FOUND',
+} as const;
+
+export type TTenantDeleteOutcome = TValueOf<typeof TENANT_DELETE_OUTCOME>;
