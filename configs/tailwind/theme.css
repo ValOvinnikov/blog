@@ -68,6 +68,8 @@
   /* prettier-ignore */
   --color-tint: var(--tint, var(--brand-primary-muted)); /* @role brand tint of the surface in scope */
   /* prettier-ignore */
+  --color-media-fill: var(--media-fill, var(--surface-2)); /* @role icon media fill of the surface in scope */
+  /* prettier-ignore */
   --color-brand-primary-contrast: var(--brand-primary-contrast); /* @role text on brand-primary-solid */
   /* Filled brand-primary surface (e.g. primary button). Kept distinct from
      --brand-primary so each mode can tune the fill independently: light mode
@@ -572,6 +574,7 @@
     var(--brand-primary-muted),
     var(--brand-primary) 10%
   );
+  --media-fill: var(--tint);
 }
 
 @utility surface-tint {

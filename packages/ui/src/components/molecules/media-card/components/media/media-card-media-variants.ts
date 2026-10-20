@@ -2,8 +2,8 @@ import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 const TINTED_FILL = [
-  'bg-tint text-brand-primary',
-  'group-hover:bg-surface group-focus-within:bg-surface',
+  'bg-media-fill text-brand-primary',
+  'group-hover:bg-transparent group-focus-within:bg-transparent',
 ];
 
 /** `isLead`'s 4:3 ratio must always match `mediaFrameVariants`'s `classic` ratio, not a value invented locally. */
