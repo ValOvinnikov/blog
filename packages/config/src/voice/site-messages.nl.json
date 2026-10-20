@@ -266,6 +266,9 @@
     "nextAriaLabel": "Volgende dia",
     "regionLabel": "Carrousel {title}"
   },
+  "codeBlock": {
+    "regionLabel": "Codevoorbeeld"
+  },
   "pricingModule": {
     "free": "Gratis",
     "from": "Vanaf",

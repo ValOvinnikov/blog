@@ -10,7 +10,10 @@ export const codeBlockVariants = tv({
       'border-b border-border px-4 py-2',
       'font-mono text-xs text-text-muted',
     ],
-    pre: ['text-code'],
+    pre: [
+      'text-code',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary',
+    ],
     highlightedLine: ['bg-brand-primary-muted'],
   },
 });

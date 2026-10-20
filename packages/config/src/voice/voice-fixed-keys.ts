@@ -39,6 +39,7 @@ export const VOICE_FIXED_KEYS = [
   'carousel.previousAriaLabel',
   'carousel.nextAriaLabel',
   'carousel.regionLabel',
+  'codeBlock.regionLabel',
   'pricingModule.free',
   'pricingModule.from',
   'pricingModule.compareAtLabel',
