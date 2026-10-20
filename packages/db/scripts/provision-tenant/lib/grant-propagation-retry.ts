@@ -1,8 +1,7 @@
+import { HTTP_STATUS } from '@blog/config';
 import { ClientError } from '@sanity/client';
 
 import type { TRetryWithBackoffOptions } from './retry-with-backoff';
-
-const INSUFFICIENT_PERMISSIONS_STATUS_CODE = 403;
 
 // Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.
 const GRANT_PROPAGATION_RETRY_MAX_ATTEMPTS = 5;
@@ -11,7 +10,7 @@ const GRANT_PROPAGATION_RETRY_BASE_DELAY_MS = 1000;
 function isGrantPropagationError(error: unknown): boolean {
   if (
     error instanceof ClientError &&
-    error.statusCode === INSUFFICIENT_PERMISSIONS_STATUS_CODE
+    error.statusCode === HTTP_STATUS.FORBIDDEN
   ) {
     return true;
   }

@@ -1,3 +1,4 @@
+import { SANITY_PROJECT_ROLE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -68,7 +69,11 @@ beforeEach(() => {
 describe(elevateTenantOwner, () => {
   it('reports PENDING_ACCEPTANCE and never grants when the owner has not yet accepted (fresh invite)', async () => {
     listSanityProjectAclMock.mockResolvedValue([
-      { projectUserId: 'p-robot', roles: [{ name: 'editor' }], isRobot: true },
+      {
+        projectUserId: 'p-robot',
+        roles: [{ name: SANITY_PROJECT_ROLE.EDITOR }],
+        isRobot: true,
+      },
     ]);
 
     const result = await elevateTenantOwner(tenantAt(new Date()), env);
@@ -89,10 +94,14 @@ describe(elevateTenantOwner, () => {
 
   it('grants administrator, keyed on projectUserId, once the owner appears in the ACL listing', async () => {
     listSanityProjectAclMock.mockResolvedValue([
-      { projectUserId: 'p-robot', roles: [{ name: 'editor' }], isRobot: true },
+      {
+        projectUserId: 'p-robot',
+        roles: [{ name: SANITY_PROJECT_ROLE.EDITOR }],
+        isRobot: true,
+      },
       {
         projectUserId: 'p-owner',
-        roles: [{ name: 'viewer' }],
+        roles: [{ name: SANITY_PROJECT_ROLE.VIEWER }],
         isRobot: false,
       },
     ]);
@@ -104,7 +113,7 @@ describe(elevateTenantOwner, () => {
       token: 'mgmt-token',
       projectId: 'proj-abc',
       projectUserId: 'p-owner',
-      role: 'administrator',
+      role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
     });
   });
 
@@ -112,7 +121,10 @@ describe(elevateTenantOwner, () => {
     listSanityProjectAclMock.mockResolvedValue([
       {
         projectUserId: 'p-owner',
-        roles: [{ name: 'viewer' }, { name: 'administrator' }],
+        roles: [
+          { name: SANITY_PROJECT_ROLE.VIEWER },
+          { name: SANITY_PROJECT_ROLE.ADMINISTRATOR },
+        ],
         isRobot: false,
       },
     ]);
@@ -137,12 +149,12 @@ describe(elevateTenantOwner, () => {
     listSanityProjectAclMock.mockResolvedValue([
       {
         projectUserId: 'p-superadmin',
-        roles: [{ name: 'administrator' }],
+        roles: [{ name: SANITY_PROJECT_ROLE.ADMINISTRATOR }],
         isRobot: false,
       },
       {
         projectUserId: 'p-owner',
-        roles: [{ name: 'viewer' }],
+        roles: [{ name: SANITY_PROJECT_ROLE.VIEWER }],
         isRobot: false,
       },
     ]);

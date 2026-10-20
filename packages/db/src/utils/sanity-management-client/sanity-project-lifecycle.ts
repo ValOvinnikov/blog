@@ -9,6 +9,8 @@ import {
   type TSanityProjectDeleteOutcome,
   type TSanityProjectToggleResult,
   type TSanityProjectUnarchiveOutcome,
+  HTTP_METHOD,
+  HTTP_STATUS,
 } from '@blog/config';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import {
@@ -19,8 +21,6 @@ import {
 import { toOutcome } from '@blog/utils/to-outcome';
 
 const BILLING_PERMISSION_TEXT = 'billing permission';
-const HTTP_NOT_FOUND = 404;
-const HTTP_UNAUTHORIZED = 401;
 
 export type TSanityDeleteResult = TOutcome<TSanityProjectDeleteOutcome>;
 
@@ -32,15 +32,15 @@ export async function deleteSanityProject(input: {
   const response = await sanityManagementResponse(
     path,
     input.token,
-    { method: 'DELETE' },
-    [HTTP_NOT_FOUND, HTTP_UNAUTHORIZED],
+    { method: HTTP_METHOD.DELETE },
+    [HTTP_STATUS.NOT_FOUND, HTTP_STATUS.UNAUTHORIZED],
   );
 
-  if (response.status === HTTP_NOT_FOUND) {
+  if (response.status === HTTP_STATUS.NOT_FOUND) {
     return toOutcome(SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE);
   }
 
-  if (response.status === HTTP_UNAUTHORIZED) {
+  if (response.status === HTTP_STATUS.UNAUTHORIZED) {
     const body = await response.text().catch(() => '');
     if (body.toLowerCase().includes(BILLING_PERMISSION_TEXT)) {
       return toOutcome(
@@ -49,7 +49,7 @@ export async function deleteSanityProject(input: {
     }
     throw sanityApiError(
       SANITY_API_SURFACE.MANAGEMENT,
-      'DELETE',
+      HTTP_METHOD.DELETE,
       path,
       response,
       body,
@@ -66,10 +66,10 @@ async function setSanityProjectDisabledByUser(input: {
 }): Promise<TSanityProjectToggleResult> {
   const path = SANITY_API_PATH.project(input.projectId);
   const getResponse = await sanityManagementResponse(path, input.token, {}, [
-    HTTP_NOT_FOUND,
+    HTTP_STATUS.NOT_FOUND,
   ]);
 
-  if (getResponse.status === HTTP_NOT_FOUND) {
+  if (getResponse.status === HTTP_STATUS.NOT_FOUND) {
     return SANITY_PROJECT_TOGGLE_RESULT.ALREADY_GONE;
   }
 
@@ -79,7 +79,7 @@ async function setSanityProjectDisabledByUser(input: {
   }
 
   await sanityManagementRequest(path, input.token, {
-    method: 'PATCH',
+    method: HTTP_METHOD.PATCH,
     body: JSON.stringify({ isDisabledByUser: input.disabled }),
   });
 

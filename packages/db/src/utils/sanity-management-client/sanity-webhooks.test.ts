@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import {
   firstFetchCall,
   jsonResponse,
@@ -30,18 +31,22 @@ describe(listSanityWebhooks, () => {
 
     const result = await listSanityWebhooks(withSanityProject({}));
 
-    const { url, init } = firstFetchCall(fetchMock);
+    const { url, init, method } = firstFetchCall(fetchMock);
     expect(result).toEqual([hook]);
     expect(url).toBe(SANITY_EXPECTED_URL.webhooks);
-    expect(init.method ?? 'GET').toBe('GET');
+    expect(method).toBe(HTTP_METHOD.GET);
     expect(init.redirect).toBe('error');
   });
 
   it('explains project membership when the management token is unauthorized', async () => {
-    fetchMock.mockResolvedValue(textResponse('Unauthorized', 401));
+    fetchMock.mockResolvedValue(
+      textResponse('Unauthorized', HTTP_STATUS.UNAUTHORIZED),
+    );
 
     await expect(listSanityWebhooks(withSanityProject({}))).rejects.toThrow(
-      new RegExp(`401 .*not a member of project "${SANITY_PROJECT_ID}"`),
+      new RegExp(
+        `${HTTP_STATUS.UNAUTHORIZED} .*not a member of project "${SANITY_PROJECT_ID}"`,
+      ),
     );
   });
 });
@@ -52,10 +57,10 @@ describe(createSanityWebhook, () => {
 
     const result = await createSanityWebhook(createInput);
 
-    const { url, init, body } = firstFetchCall(fetchMock);
+    const { url, init, body, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(hook);
     expect(url).toBe(SANITY_EXPECTED_URL.webhooks);
-    expect(init.method).toBe('POST');
+    expect(method).toBe(HTTP_METHOD.POST);
     expect(init.redirect).toBe('error');
     expect(body).toEqual({
       type: 'document',
@@ -63,7 +68,7 @@ describe(createSanityWebhook, () => {
       dataset: createInput.dataset,
       url: SANITY_WEBHOOK_URL,
       apiVersion: 'v2021-06-07',
-      httpMethod: 'POST',
+      httpMethod: HTTP_METHOD.POST,
       includeDrafts: false,
       rule: {
         on: ['create', 'update', 'delete'],
@@ -79,7 +84,10 @@ describe(createSanityWebhook, () => {
       case: 'the created hook targets a different URL',
       response: jsonResponse({ id: 'hook1', url: 'https://other.example.com' }),
     },
-    { case: 'the response body is empty', response: textResponse('', 201) },
+    {
+      case: 'the response body is empty',
+      response: textResponse('', HTTP_STATUS.CREATED),
+    },
   ])('throws naming the project when $case', async ({ response }) => {
     fetchMock.mockResolvedValue(response);
 

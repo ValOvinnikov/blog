@@ -1,3 +1,4 @@
+import { HTTP_METHOD } from '@blog/config';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import { sanityManagementRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
@@ -12,7 +13,7 @@ export async function createSanityProject(input: {
     SANITY_API_PATH.projects(),
     input.token,
     {
-      method: 'POST',
+      method: HTTP_METHOD.POST,
       body: JSON.stringify({
         displayName: input.displayName,
         organizationId: input.organizationId,
@@ -29,7 +30,7 @@ export async function createSanityDataset(input: {
   await sanityManagementRequest(
     SANITY_API_PATH.projectDataset(input.projectId, input.dataset),
     input.token,
-    { method: 'PUT', body: JSON.stringify({ aclMode: 'public' }) },
+    { method: HTTP_METHOD.PUT, body: JSON.stringify({ aclMode: 'public' }) },
   );
 }
 
@@ -55,7 +56,7 @@ export async function addSanityCorsOrigin(input: {
     SANITY_API_PATH.projectCors(input.projectId),
     input.token,
     {
-      method: 'POST',
+      method: HTTP_METHOD.POST,
       body: JSON.stringify({
         origin: input.origin,
         allowCredentials: input.allowCredentials ?? false,

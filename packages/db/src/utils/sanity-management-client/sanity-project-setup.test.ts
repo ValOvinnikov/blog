@@ -1,3 +1,4 @@
+import { HTTP_METHOD } from '@blog/config';
 import {
   emptyResponse,
   firstFetchCall,
@@ -36,10 +37,10 @@ describe(createSanityProject, () => {
 
     const result = await createSanityProject(createProjectInput);
 
-    const { url, init, body, headers } = firstFetchCall(fetchMock);
+    const { url, body, headers, method } = firstFetchCall(fetchMock);
     expect(result).toEqual({ id: SANITY_PROJECT_ID });
     expect(url).toBe(SANITY_EXPECTED_URL.projects);
-    expect(init.method).toBe('POST');
+    expect(method).toBe(HTTP_METHOD.POST);
     expect(body).toEqual({
       displayName: createProjectInput.displayName,
       organizationId: createProjectInput.organizationId,
@@ -70,9 +71,9 @@ describe(createSanityDataset, () => {
 
     await createSanityDataset(withSanityProject({ dataset: SANITY_DATASET }));
 
-    const { url, init, body } = firstFetchCall(fetchMock);
+    const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(SANITY_EXPECTED_URL.dataset);
-    expect(init.method).toBe('PUT');
+    expect(method).toBe(HTTP_METHOD.PUT);
     expect(body).toEqual({ aclMode: 'public' });
   });
 });
@@ -84,10 +85,10 @@ describe(listSanityDatasets, () => {
 
     const result = await listSanityDatasets(withSanityProject({}));
 
-    const { url, init } = firstFetchCall(fetchMock);
+    const { url, init, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(datasets);
     expect(url).toBe(SANITY_EXPECTED_URL.datasets);
-    expect(init.method ?? 'GET').toBe('GET');
+    expect(method).toBe(HTTP_METHOD.GET);
     expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 });
@@ -100,9 +101,9 @@ describe(addSanityCorsOrigin, () => {
       withSanityProject({ origin: SANITY_CORS_ORIGIN, allowCredentials: true }),
     );
 
-    const { url, init, body } = firstFetchCall(fetchMock);
+    const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(SANITY_EXPECTED_URL.cors);
-    expect(init.method).toBe('POST');
+    expect(method).toBe(HTTP_METHOD.POST);
     expect(body).toEqual({
       origin: SANITY_CORS_ORIGIN,
       allowCredentials: true,
@@ -117,9 +118,9 @@ describe(listSanityCorsOrigins, () => {
 
     const result = await listSanityCorsOrigins(withSanityProject({}));
 
-    const { url, init } = firstFetchCall(fetchMock);
+    const { url, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(origins);
     expect(url).toBe(SANITY_EXPECTED_URL.cors);
-    expect(init.method ?? 'GET').toBe('GET');
+    expect(method).toBe(HTTP_METHOD.GET);
   });
 });

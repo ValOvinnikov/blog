@@ -1,11 +1,9 @@
-import { SANITY_API_SURFACE } from '@blog/config';
+import { SANITY_API_SURFACE, HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import {
   sanityApiError,
   sanityWebhooksResponse,
 } from '@blog/db/utils/sanity-management-client/sanity-api-request';
-
-const HTTP_UNAUTHORIZED = 401;
 
 function webhooksUnauthorizedHint(projectId: string): string {
   return `SANITY_MANAGEMENT_TOKEN is either invalid or not a member of project "${projectId}" — it is only an implicit administrator of projects it created itself. If this tenant points at a project created elsewhere (such as a shared dev project), add the token's robot to that project as administrator in Sanity Manage, or provision the tenant into its own project.`;
@@ -22,14 +20,14 @@ async function sanityWebhooksRequest<T>(
     path,
     token,
     { ...init, redirect: 'error' },
-    [HTTP_UNAUTHORIZED],
+    [HTTP_STATUS.UNAUTHORIZED],
   );
 
-  if (response.status === HTTP_UNAUTHORIZED) {
+  if (response.status === HTTP_STATUS.UNAUTHORIZED) {
     const body = await response.text().catch(() => '');
     throw sanityApiError(
       SANITY_API_SURFACE.WEBHOOKS,
-      init.method ?? 'GET',
+      init.method ?? HTTP_METHOD.GET,
       path,
       response,
       `${body} ${webhooksUnauthorizedHint(projectId)}`,
@@ -61,14 +59,14 @@ export async function createSanityWebhook(input: {
     input.projectId,
     input.token,
     {
-      method: 'POST',
+      method: HTTP_METHOD.POST,
       body: JSON.stringify({
         type: 'document',
         name: input.name,
         dataset: input.dataset,
         url: input.url,
         apiVersion: 'v2021-06-07',
-        httpMethod: 'POST',
+        httpMethod: HTTP_METHOD.POST,
         includeDrafts: false,
         rule: {
           on: ['create', 'update', 'delete'],

@@ -11,7 +11,9 @@ export async function getTenantRow(tenantId: string): Promise<TTenant> {
     .where(eq(tenants.id, tenantId));
 
   if (!tenant) {
-    throw new Error(`deprovision-tenant: no "tenants" row for id "${tenantId}".`);
+    throw new Error(
+      `deprovision-tenant: no "tenants" row for id "${tenantId}".`,
+    );
   }
 
   return tenant;

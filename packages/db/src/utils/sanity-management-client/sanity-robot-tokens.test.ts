@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS, SANITY_ROBOT_ROLE } from '@blog/config';
 import {
   emptyResponse,
   firstFetchCall,
@@ -24,7 +25,7 @@ import {
 
 const createInput = withSanityProject({
   label: SANITY_READ_TOKEN_LABEL,
-  role: 'viewer' as const,
+  role: SANITY_ROBOT_ROLE.VIEWER,
 });
 
 const fetchMock = useFetchFake();
@@ -88,15 +89,15 @@ describe(createSanityRobotToken, () => {
 
 describe(deleteSanityRobotToken, () => {
   it('DELETEs the robot by id and tolerates an empty response body', async () => {
-    fetchMock.mockResolvedValue(emptyResponse(204));
+    fetchMock.mockResolvedValue(emptyResponse(HTTP_STATUS.NO_CONTENT));
 
     await expect(
       deleteSanityRobotToken(withSanityProject({ robotId: SANITY_ROBOT_ID })),
     ).resolves.toBeUndefined();
 
-    const { url, init } = firstFetchCall(fetchMock);
+    const { url, method } = firstFetchCall(fetchMock);
     expect(url).toBe(SANITY_EXPECTED_URL.robot);
-    expect(init.method).toBe('DELETE');
+    expect(method).toBe(HTTP_METHOD.DELETE);
   });
 });
 
@@ -110,10 +111,10 @@ describe(listSanityRobotTokens, () => {
 
     const result = await listSanityRobotTokens(withSanityProject({}));
 
-    const { url, init } = firstFetchCall(fetchMock);
+    const { url, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(robots);
     expect(url).toBe(SANITY_EXPECTED_URL.robots);
-    expect(init.method ?? 'GET').toBe('GET');
+    expect(method).toBe(HTTP_METHOD.GET);
   });
 
   it.each([

@@ -1,3 +1,4 @@
+import { SANITY_ROBOT_ROLE } from '@blog/config';
 import { setTenantSanityToken } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { createSanityRobotToken } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
@@ -44,7 +45,7 @@ export async function persistTenantSanityToken(
     token: env.sanityManagementToken,
     projectId: tenant.sanityProjectId,
     label: SANITY_READ_TOKEN_LABEL,
-    role: 'viewer',
+    role: SANITY_ROBOT_ROLE.VIEWER,
   });
 
   await setTenantSanityToken(tenant.id, readToken.token);
