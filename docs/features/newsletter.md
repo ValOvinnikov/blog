@@ -30,8 +30,9 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 - **Studio** — `module_newsletter` ("Newsletter Signup"): title, brand variant, variant (Full or Compact), heading block, copy, up to two trust cues, alignment, layout. Pickers relabel it "(off in Features)" and its documents warn while the capability is off.
 - **Public site** — the module on any page with a module list. Full shows copy and trust cues in a panel; Compact drops the supporting text, copy and trust cues.
-- `GET /api/newsletter/confirm?token=&lang=` — confirms and renders a small result page.
-- `GET /api/newsletter/unsubscribe?token=&lang=` renders a confirm button; `POST` to the same URL deletes the subscription (also the `List-Unsubscribe-Post` one-click target).
+- `GET /api/newsletter/confirm?token=&lang=` — confirms, then redirects (303) to the result page.
+- `GET /api/newsletter/unsubscribe?token=&lang=` renders a confirm button; `POST` to the same URL deletes the subscription (also the `List-Unsubscribe-Post` one-click target), then redirects (303) to the result page.
+- `/[locale]/newsletter/[result]` — the confirm or unsubscribe outcome (`NEWSLETTER_RESULT`: confirmed, unsubscribed, or an invalid, failed or unavailable link) in the site's layout, theme and the link's language, with a link home; `noindex`.
 - `/[locale]/account` — the Newsletter section (see [reader-account](./reader-account.md)).
 - **Platform** — the Features toggle, the Email page's `NEWSLETTER_CONFIRMATION` template, and a "Coming soon" Subscribers sidebar entry with no page.
 
@@ -62,7 +63,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 ## Dependencies
 
-- Layers: `studio`, `service`, `ui` (`NewsletterSignup`), `web`, `db`, `email`, `platform`, `config` (`NEWSLETTER_VARIANT`, `CAPABILITY`).
+- Layers: `studio`, `service`, `ui` (`NewsletterSignup`), `web`, `db`, `email`, `platform`, `config` (`NEWSLETTER_VARIANT`, `CAPABILITY`, `NEWSLETTER_RESULT`).
 - Features: [module-system](./module-system.md), [plans-and-entitlements](./plans-and-entitlements.md), [email](./email.md), [reader-account](./reader-account.md), [languages](./languages.md), [rendering-and-caching](./rendering-and-caching.md).
 - Env: `NEWSLETTER_FROM_ADDRESS`, `RESEND_API_KEY`, `DATABASE_URL`, `KV_REST_API_URL` and `KV_REST_API_TOKEN` (shared rate-limit store).
 
@@ -75,14 +76,15 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`
 - `apps/web/src/server/newsletter/subscribe-guard/subscribe-guard.ts` (built on `apps/web/src/server/rate-limit/public-write-guard/public-write-guard.ts`), `apps/web/src/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send.ts`
 - `apps/web/src/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions.ts`
-- `apps/web/src/app/api/newsletter/confirm/route.ts`, `apps/web/src/app/api/newsletter/unsubscribe/route.ts`
+- `apps/web/src/app/api/newsletter/confirm/route.ts`, `apps/web/src/app/api/newsletter/unsubscribe/route.ts`, `apps/web/src/server/newsletter/newsletter-result-redirect/newsletter-result-redirect.ts`
+- `apps/web/src/app/[tenant]/[locale]/newsletter/[result]/page.tsx`, `apps/web/src/components/pages/newsletter-result-page/newsletter-result-page.tsx`
 - `packages/db/src/queries/subscribers/`
 - `packages/email/src/templates/tenant/newsletter-confirmation/newsletter-confirmation.ts`
 
 ## Tests and stories
 
 - `packages/service/src/features/modules/newsletter/adaptor/*.test.ts`, `packages/db/src/queries/subscribers/**/*.test.ts`, `newsletter-confirmation.test.ts`.
-- `apps/web/src/modules/newsletter/*.test.tsx`, `apps/web/src/server/newsletter/**/*.test.ts`, `apps/web/src/app/api/newsletter/**/route.test.ts`, the form, gate and control tests.
+- `apps/web/src/modules/newsletter/*.test.tsx`, `apps/web/src/server/newsletter/**/*.test.ts`, `apps/web/src/app/api/newsletter/**/route.test.ts`, `newsletter-result-page.test.tsx` and its story, the form, gate and control tests.
 - Stories: `newsletter-module-view.stories.tsx`, `newsletter-form.stories.tsx` (web); `newsletter-signup*.stories.tsx` (ui).
 
 ## Related

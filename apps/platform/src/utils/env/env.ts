@@ -23,14 +23,16 @@ export const env = createEnv({
       .string()
       .regex(/^[^/\s]+\/[^/\s]+$/, 'Expected "owner/repo".')
       .optional(),
-    // Local dev only; must never be set in the production Vercel project.
-    // @env-optional
-    TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE: z.string().url().optional(),
     // Set by hand per Vercel project: `VERCEL_ENV` cannot tell a dev deployment from production.
     // @env-optional
     TENANT_PROVISIONING_DATASET: z
       .enum(['development', 'production'])
       .optional(),
+    // @env-optional
+    WORKER_ENQUEUE_URL: z.string().url().optional(),
+    // Must be byte-identical to `apps/worker`'s own `WORKER_ENQUEUE_SECRET`.
+    // @env-optional
+    WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
     // @env-optional
     TENANT_ROOT_DOMAIN: z
       .string()
@@ -69,9 +71,9 @@ export const env = createEnv({
       process.env.TENANT_PROVISIONING_GITHUB_TOKEN,
     TENANT_PROVISIONING_GITHUB_REPO:
       process.env.TENANT_PROVISIONING_GITHUB_REPO,
-    TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE:
-      process.env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE,
     TENANT_PROVISIONING_DATASET: process.env.TENANT_PROVISIONING_DATASET,
+    WORKER_ENQUEUE_URL: process.env.WORKER_ENQUEUE_URL,
+    WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
     TENANT_ROOT_DOMAIN: process.env.TENANT_ROOT_DOMAIN,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,

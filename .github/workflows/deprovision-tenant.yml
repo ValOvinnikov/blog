@@ -1,6 +1,6 @@
 name: Deprovision Tenant
 
-# Reverses `provision-tenant.yml` for one tenant — removes its custom domain
+# Reverses provisioning for one tenant — removes its custom domain
 # from the shared `apps/web` Vercel project, archives its Sanity project so
 # it stops billing, clears its persisted Sanity credentials, and archives
 # (never hard-deletes) the `tenants` row. The Sanity project is archived
@@ -17,7 +17,7 @@ name: Deprovision Tenant
 # delete anything. See `packages/db/scripts/deprovision-tenant/run.ts`.
 #
 # Deliberately manually-triggered only, same posture as
-# `refresh-dev-dataset.yml`/`provision-tenant.yml` — it should NOT no-op
+# `refresh-dev-dataset.yml` — it should NOT no-op
 # green when a secret is missing: the script fails loudly, before any
 # network call, if a required env var is absent.
 on:

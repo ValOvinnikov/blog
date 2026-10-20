@@ -147,7 +147,7 @@ jobs:
     # resolve every credential (including the tenant registry connection
     # string below) from the `development` GitHub Environment, and a
     # production dispatch/call from `production` — never a mix of the two,
-    # same as provision-tenant.yml/validate-tenant-documents.yml. See the
+    # same as validate-tenant-documents.yml. See the
     # concurrency group above for why this can't be spelled as a plain
     # `inputs.environment` fallback: `inputs` is null on the `push` trigger.
     environment: ${{ (github.event_name == 'push' && 'development') || (inputs.environment || 'production') }}

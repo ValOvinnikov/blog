@@ -910,7 +910,7 @@
     "description": "Vuelve a poner en línea un cliente archivado ejecutando de nuevo el aprovisionamiento: desarchiva la fila del cliente y su proyecto de Sanity, vuelve a asignar el dominio personalizado y recrea el webhook de revalidación. Úselo en lugar de eliminar un cliente que se desaprovisionó por error.",
     "triggerButton": "Reactivar cliente",
     "dialogTitle": "Reactivar {name}",
-    "dialogDescription": "Esto lanza provision-tenant.yml, que restaura todos los recursos aprovisionados para este cliente. Escriba el nombre del cliente para confirmar.",
+    "dialogDescription": "Esto vuelve a ejecutar el aprovisionamiento, que restaura todos los recursos aprovisionados para este cliente. Escriba el nombre del cliente para confirmar.",
     "confirmButton": "Reactivar",
     "confirmingButton": "Lanzando…"
   },
@@ -1067,7 +1067,8 @@
     "columnMessage": "Mensaje",
     "columnPage": "Página",
     "columnActions": "Acciones",
-    "empty": "Todavía no hay mensajes. Cuando alguien use su formulario de contacto, su mensaje aparecerá aquí."
+    "empty": "Todavía no hay mensajes. Cuando alguien use su formulario de contacto, su mensaje aparecerá aquí.",
+    "homePage": "Página de inicio"
   },
   "leadMessage": {
     "showMore": "Mostrar más",

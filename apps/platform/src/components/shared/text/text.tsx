@@ -1,13 +1,14 @@
-import type { ElementType, ReactNode } from 'react';
+import type { IWithClassName } from '@blog/config/types';
+import type { ElementType, ReactNode, Ref } from 'react';
 
 import { textVariants, type TTextVariants } from './text-variants';
 
-export type TTextProps = {
+export type TTextProps = IWithClassName & {
   variant?: TTextVariants['variant'];
   as?: 'p' | 'span';
   children: ReactNode;
-  className?: string;
   id?: string;
+  ref?: Ref<HTMLParagraphElement & HTMLSpanElement>;
 };
 
 export const Text = ({
@@ -16,11 +17,16 @@ export const Text = ({
   children,
   className,
   id,
+  ref,
 }: TTextProps) => {
   const Component: ElementType = as;
 
   return (
-    <Component id={id} className={textVariants({ variant, class: className })}>
+    <Component
+      ref={ref}
+      id={id}
+      className={textVariants({ variant, class: className })}
+    >
       {children}
     </Component>
   );

@@ -41,7 +41,7 @@ code:
   - apps/platform/src/app/**/provisioning/*.tsx
   - apps/platform/src/app/**/danger/*.tsx
   - apps/platform/src/app/**/tenants/new/*.tsx
-  - .github/workflows/*provision-tenant.yml
+  - .github/workflows/deprovision-tenant.yml
   - .github/workflows/invalidate-tenant-cache.yml
   - .github/workflows/recheck-tenant-owners.yml
 epics: [4840, 2798]
@@ -51,7 +51,7 @@ epics: [4840, 2798]
 
 ## What it does
 
-An operator creates a tenant in the admin. That inserts a draft row and dispatches a GitHub Actions workflow, which gives the tenant everything it needs:
+An operator creates a tenant in the admin. That inserts a draft row and enqueues a provisioning run on `apps/worker`, which gives the tenant everything it needs:
 
 - its own Sanity project and dataset;
 - starter content;
@@ -59,7 +59,7 @@ An operator creates a tenant in the admin. That inserts a draft row and dispatch
 - a domain on the shared web Vercel project;
 - a revalidation webhook.
 
-The workflow then verifies all of it. The admin polls each step's progress and offers Retry. Deprovisioning reverses the run: it archives the tenant, never hard-deletes it. Reactivation re-runs provisioning. Deletion is a separate, final hard delete of an archived tenant.
+The run then verifies all of it. The admin polls each step's progress and offers Retry. Deprovisioning reverses the run: it archives the tenant, never hard-deletes it. Reactivation re-runs provisioning. Deletion is a separate, final hard delete of an archived tenant.
 
 ## Surfaces and routes
 
@@ -72,9 +72,9 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 - **SUPERADMIN only:** `/tenants/{id}/danger` holds deprovision (with dry run), reactivate and delete.
 - **Owner:** `/dashboard/domain` shows the same domain view.
 - **Workflows:**
-  - `provision-tenant.yml`, `deprovision-tenant.yml` and `invalidate-tenant-cache.yml` are dispatch only; provisioning calls `validate-tenant-documents.yml` when it finishes.
+  - `deprovision-tenant.yml` and `invalidate-tenant-cache.yml` are dispatch only. No workflow provisions a tenant.
   - `recheck-tenant-owners.yml` and `validate-tenant-documents.yml` are dispatch only while their crons are parked.
-- **Worker:** `apps/worker` (`worker-dev`/`worker-prod`, no public hostname) serves `POST /api/provision`, body `{ "tenantId": "<uuid>" }`. It is signed with `x-worker-timestamp` (epoch milliseconds, within 5 minutes of the worker's clock) and `x-worker-signature` (`sha256=` plus the hex HMAC-SHA256 of `<timestamp>.<request path>.<raw body>`, keyed with `WORKER_ENQUEUE_SECRET`). It answers 202 with the run id, 401, 400, 404, or 409 when a run is already in progress. `POST /api/owner-access/check` ("Check now") and `POST /api/owner-access/resend` take the same signed body and answer 202, 401, 400, 404, or 409 `NOT_PROVISIONED` while the tenant has no Sanity project. Nothing calls them yet; the admin panel still dispatches `provision-tenant.yml` until #4961.
+- **Worker:** `apps/worker` (`worker-dev`/`worker-prod`, no public hostname) serves `POST /api/provision`, body `{ "tenantId": "<uuid>" }`. It is signed with `x-worker-timestamp` (epoch milliseconds, within 5 minutes of the worker's clock) and `x-worker-signature` (`sha256=` plus the hex HMAC-SHA256 of `<timestamp>.<request path>.<raw body>`, keyed with `WORKER_ENQUEUE_SECRET`). It answers 202 with the run id, 401, 400, 404, or 409 when a run is already in progress. `POST /api/owner-access/check` ("Check now") and `POST /api/owner-access/resend` take the same signed body and answer 202, 401, 400, 404, or 409 `NOT_PROVISIONED` while the tenant has no Sanity project. The admin panel's "Add tenant", retry and reactivate call `POST /api/provision`; nothing calls the owner-access routes yet.
 - **Manual CLIs:** `db:seed-tenant` and `db:recover-wedged-provisioning`.
 
 ## Data
@@ -104,18 +104,19 @@ The workflow then verifies all of it. The admin polls each step's progress and o
   - Any admin can create a tenant and edit its name, domain, plan, language and pending owner email.
   - Only a SUPERADMIN can retry provisioning, deprovision, reactivate or delete. Creating a tenant (any admin) starts the first run.
 - **Unknown owner email:** if the email has no user yet, the wizard requires an HMAC confirmation token. The owner then gets an OWNER invite and a magic-link email ([tenant access](./tenant-access.md)).
-- **Platform env:** `TENANT_PROVISIONING_GITHUB_TOKEN` (`actions: write`), `TENANT_PROVISIONING_GITHUB_REPO` and `TENANT_PROVISIONING_DATASET`. `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` forces the `development` dataset and environment.
-- **Workflow env:** each workflow resolves every secret from the dispatched GitHub Environment: `SANITY_MANAGEMENT_TOKEN`, `SANITY_ORGANIZATION_ID`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `ADMIN_APP_BASE_URL`, `TENANT_SANITY_DATASET`, `WEB_APP_URL`, `SANITY_REVALIDATE_SECRET`, `TENANT_TOKEN_ENCRYPTION_KEY`, `OPERATOR_ALERT_SECRET`, and `TENANT_REGISTRY_DATABASE_URL` (mapped to `DATABASE_URL`).
+- **Platform env:** `WORKER_ENQUEUE_URL` and `WORKER_ENQUEUE_SECRET` sign and send each enqueue. Either missing, the enqueue is skipped and logged and the action reports a server error. `TENANT_PROVISIONING_GITHUB_TOKEN` (`actions: write`), `TENANT_PROVISIONING_GITHUB_REPO` and `TENANT_PROVISIONING_DATASET` drive the deprovisioning dispatch.
+- **Worker env:** the provisioning secrets live on the `worker-dev`/`worker-prod` projects ([environment variables](../context/environment-variables.md)).
+- **Workflow env:** each remaining workflow resolves its secrets from the dispatched GitHub Environment: `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `ADMIN_APP_BASE_URL`, `WEB_APP_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, `OPERATOR_ALERT_SECRET`, and `TENANT_REGISTRY_DATABASE_URL` (mapped to `DATABASE_URL`).
 
 ## Constraints and invariants
 
-- **Admission:** `beginTenantProvisioning` admits a run in one atomic `UPDATE … RETURNING`. It accepts a row that is not PROVISIONING, or one whose run is provably dead: a failed step since `startedAt`, a recorded finish, or no start recorded, or a start older than 30 minutes. A run admitted within the last 2 minutes is never treated as dead. A failed dispatch reverts the status.
+- **Admission:** `beginTenantProvisioning` admits a run in one atomic `UPDATE … RETURNING`. It accepts a row that is not PROVISIONING, or one whose run is provably dead: a failed step since `startedAt`, a recorded finish, or no start recorded, or a start older than 30 minutes. A run admitted within the last 2 minutes is never treated as dead. Only the worker calls it; the admin panel maps the worker's 409 to "already in progress" and its 404 to "not found".
 - **Queued run:** a run is queued while `run.admittedAt` is set and the status is PROVISIONING; the workflow's start replaces the `run` entry and drops it.
 - **Overall status:** any FAILED step settles the status to FAILED. Only `VERIFY_CONTENT` finishing settles READY.
 - **Timeouts:** every Sanity management and Vercel call aborts after 30 seconds, so a hung call fails its step instead of stalling the run.
 - **Project membership:** `SANITY_MANAGEMENT_TOKEN` is an implicit administrator only of projects it created. A tenant row pointing at a project created elsewhere, such as the shared dev project, gets a 401 from the webhook API until the token's robot is added to that project as administrator; the step's error says so.
-- **Idempotency:** every step reads state it already created and resumes; the project id is persisted the moment it is minted, since Sanity cannot delete an orphan. On GitHub Actions a retry re-dispatches the whole workflow, not one step.
-- **Worker runs:** the enqueue route admits the run through `beginTenantProvisioning`, then starts a Vercel Workflow run (`workflow`, pinned exactly to 5.x). If the start fails after admission, the run is recorded as failed (`SANITY_PROJECT` FAILED, run finished), never left PROVISIONING. The run calls four units in order: `ensureInfrastructure` (`SANITY_PROJECT`, `PERSIST_TOKEN`, `CREATE_WEBHOOK`, `MAP_DOMAIN`), `inviteOwner`, `applySiteTemplate` (`SEED_CONTENT`) and `verifyTenant` (`VERIFY_CONTENT`). It reports under the same six step keys, so the status view is unchanged. A failing unit is retried up to three times and the run resumes from it, never from the start; after the last attempt the step is FAILED. The CLI's owner invite still runs inside the `SANITY_PROJECT` step; `inviteOwner` then records that invite's id and sent-at, sending one only if the owner has none, and never fails the run. Document validation is not a worker unit, since the validator needs the Sanity CLI and the Studio source, which a Vercel function lacks; Audit events carry the actor `worker`.
+- **Idempotency:** every step reads state it already created and resumes; the project id is persisted the moment it is minted, since Sanity cannot delete an orphan. A retry from the status view enqueues a whole new run, not one step.
+- **Worker runs:** the enqueue route admits the run through `beginTenantProvisioning`, then starts a Vercel Workflow run (`workflow`, pinned exactly to 5.x). If the start fails after admission, the run is recorded as failed (`SANITY_PROJECT` FAILED, run finished), never left PROVISIONING. The run calls four units in order: `ensureInfrastructure` (`SANITY_PROJECT`, `PERSIST_TOKEN`, `CREATE_WEBHOOK`, `MAP_DOMAIN`), `inviteOwner`, `applySiteTemplate` (`SEED_CONTENT`) and `verifyTenant` (`VERIFY_CONTENT`). It reports under the same six step keys, so the status view is unchanged. A failing unit is retried up to three times and the run resumes from it, never from the start; after the last attempt the step is FAILED. The CLI's owner invite still runs inside the `SANITY_PROJECT` step; `inviteOwner` then records that invite's id and sent-at, sending one only if the owner has none, and never fails the run. Document validation is not a worker unit, since the validator needs the Sanity CLI and the Studio source, which a Vercel function lacks; a fresh tenant holds only the starter documents, which `starter-content.test.ts` validates, and `validate-tenant-documents.yml` stays a manual drift check. Audit events carry the actor `worker`.
 - **Owner Studio access (worker):** a successful worker run starts `ensureOwnerAccess`, a separate Workflow run per tenant (hook token `owner-access:<tenantId>`). Each check finds the owner among the project's users by email (Access API `/access/project/{id}/users`); an owner who is already a user of the Sanity organization is added to the project as `viewer` directly, with no invite. A found owner is granted `administrator` through the project ACL (on every plan for now) and their acceptance time, Sanity user id, login provider and role are recorded. Checks run every minute for the first 30, then hourly, and stop at a grant or at STALLED: no acceptance three days after the invite was sent (else the tenant's creation). STALLED posts the `OWNER_ELEVATION` operator alert once, deduplicated on `lastNotifiedOwnerElevationOutcome`. Each check reports under the `OWNER_ELEVATION` step with the same outcomes, so the platform banner is unchanged. "Check now" wakes the running checks, or starts new ones once they have stopped; Resend revokes the owner's pending invites, sends a new `viewer` invite, records it and restarts the checks. The CLI's one-shot elevation and the parked recheck cron stay until #5596 retires them.
 - **Starter content is schema-valid:** `packages/studio/src/starter-content.test.ts` builds the starter documents and runs Sanity's own document validation (`@sanity/validation`) against the schema the real Studio config compiles, once per default language in `LOCALE_ISO_CODES`, and fails on any marker. It runs in `pnpm verify` and CI, so an invalid starter document is caught before any tenant is seeded with it. Drift in a tenant's content after creation is `validate-tenant-documents.yml`'s job.
 - **No hard deletes:** deprovisioning only archives. It defaults to a dry run, and `confirm` must equal the tenant's name; the workflow checks that again. An already-deprovisioned tenant is skipped, so a failed cache purge is retried through `invalidate-tenant-cache.yml`.
@@ -125,7 +126,7 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 
 ## Dependencies
 
-- **Layers:** `@blog/config` owns the starter documents (`src/starter-content/`), pure data typed by the generated Sanity types, so every layer that seeds or checks them can import them. `@blog/db` owns the scripts (the scoped Sanity and `@blog/insight` exceptions), the queries and the one Sanity management client (`src/utils/sanity-management-client/`). `apps/worker` runs the same steps as Vercel Workflow units, importing them in place through its `@blog/db-provisioning/*` alias until #4961. `apps/platform` dispatches and renders. `apps/web` provides the two revalidation endpoints.
+- **Layers:** `@blog/config` owns the starter documents (`src/starter-content/`), pure data typed by the generated Sanity types, so every layer that seeds or checks them can import them. `@blog/db` owns the scripts (the scoped Sanity and `@blog/insight` exceptions), the queries and the one Sanity management client (`src/utils/sanity-management-client/`). `apps/worker` runs the same steps as Vercel Workflow units, importing them in place through its `@blog/db-provisioning/*` alias until #4961. `apps/platform` enqueues to the worker and renders. `apps/web` provides the two revalidation endpoints.
 - **Features:** [multi-tenancy](./multi-tenancy.md), [tenant access](./tenant-access.md), [embedded studio](./embedded-studio.md), [audit and findings](./audit-and-findings.md), [operator alerts](./operator-alerts.md), [platform shell](./platform-shell.md), [cross-tenant migrations](./cross-tenant-migrations.md).
 
 ## Entry points
@@ -141,6 +142,7 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 - `packages/db/src/queries/tenants/create-tenant-draft/create-tenant-draft.ts`
 - `apps/platform/src/server/tenants/create-tenant-action.ts`
 - `apps/platform/src/server/provisioning/start-provisioning.ts`
+- `apps/platform/src/server/provisioning/enqueue-provisioning.ts`
 - `apps/platform/src/server/github/dispatch-github-workflow.ts`
 - `apps/platform/src/utils/use-provisioning-poll/use-provisioning-poll.ts`
 
@@ -148,7 +150,8 @@ The workflow then verifies all of it. The admin polls each step's progress and o
 
 - Co-located tests throughout `packages/db/scripts/**`, including `run.*.test.ts` sequencing suites.
 - `packages/db/src/queries/tenants/**` tests (PGlite).
-- `apps/worker/src/**/*.test.ts`: the enqueue signature and route, the units' retry and failure reporting, the workflow's order, the owner-access checks, polling and wake-ups, invite resend, and the operator alert.
+- `packages/utils/src/enqueue-signature/enqueue-signature.test.ts`: the enqueue signature.
+- `apps/worker/src/**/*.test.ts`: the enqueue route, the units' retry and failure reporting, the workflow's order, the owner-access checks, polling and wake-ups, invite resend, and the operator alert.
 - `apps/platform/src/server/{provisioning,github,tenants}/*.test.ts`, `components/features/tenants/**/*.test.tsx` and the route `page.test.tsx` files.
 - `packages/studio/src/starter-content.test.ts`: every starter document validates against the Studio schema in every default language.
 - `apps/platform` has no Storybook.

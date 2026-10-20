@@ -910,7 +910,7 @@
     "description": "Brings an archived tenant back online by re-running provisioning: it un-archives the tenant row and its Sanity project, re-maps the custom domain, and recreates the revalidation webhook. Use this instead of deleting a tenant that was deprovisioned by mistake.",
     "triggerButton": "Reactivate tenant",
     "dialogTitle": "Reactivate {name}",
-    "dialogDescription": "This dispatches provision-tenant.yml, which restores every provisioned resource for this tenant. Type the tenant's name to confirm.",
+    "dialogDescription": "This re-runs provisioning, which restores every provisioned resource for this tenant. Type the tenant's name to confirm.",
     "confirmButton": "Reactivate",
     "confirmingButton": "Dispatching…"
   },
@@ -1067,7 +1067,8 @@
     "columnMessage": "Message",
     "columnPage": "Page",
     "columnActions": "Actions",
-    "empty": "No messages yet. When someone uses your contact form, their message will appear here."
+    "empty": "No messages yet. When someone uses your contact form, their message will appear here.",
+    "homePage": "Home page"
   },
   "leadMessage": {
     "showMore": "Show more",

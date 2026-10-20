@@ -910,7 +910,7 @@
     "description": "Brengt een gearchiveerde tenant weer online door de inrichting opnieuw uit te voeren: de tenantrij en het Sanity-project worden uit het archief gehaald, het eigen domein wordt opnieuw gekoppeld en de hervalidatiewebhook wordt opnieuw aangemaakt. Gebruik dit in plaats van een tenant te verwijderen die per vergissing is ontmanteld.",
     "triggerButton": "Tenant opnieuw activeren",
     "dialogTitle": "{name} opnieuw activeren",
-    "dialogDescription": "Dit start provision-tenant.yml, dat elke ingerichte resource van deze tenant herstelt. Typ de naam van de tenant om te bevestigen.",
+    "dialogDescription": "Dit start de inrichting opnieuw, die elke ingerichte resource van deze tenant herstelt. Typ de naam van de tenant om te bevestigen.",
     "confirmButton": "Opnieuw activeren",
     "confirmingButton": "Starten…"
   },
@@ -1067,7 +1067,8 @@
     "columnMessage": "Bericht",
     "columnPage": "Pagina",
     "columnActions": "Acties",
-    "empty": "Nog geen berichten. Zodra iemand je contactformulier gebruikt, verschijnt het bericht hier."
+    "empty": "Nog geen berichten. Zodra iemand je contactformulier gebruikt, verschijnt het bericht hier.",
+    "homePage": "Startpagina"
   },
   "leadMessage": {
     "showMore": "Meer tonen",

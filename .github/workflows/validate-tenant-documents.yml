@@ -13,14 +13,10 @@ name: Validate Tenant Documents
 # findings store itself failing), never an expected invalid-document
 # outcome.
 #
-# Three triggers:
+# Two triggers:
 #   - Weekly cron, sweeping every in-scope tenant.
 #   - `workflow_dispatch`, optionally scoped to one tenant via `tenantId`
 #     (blank sweeps every in-scope tenant, same as the cron).
-#   - `workflow_call`, invoked by `provision-tenant.yml` right after a
-#     tenant finishes provisioning — catches a tenant seeded already-invalid
-#     by `starter-content.ts` immediately, rather than waiting for the next
-#     scheduled sweep.
 # TEMPORARY: the cron is parked. It resolves credentials from the `production`
 # Environment, which has no single-name `TENANT_REGISTRY_DATABASE_URL` secret
 # while production is paused (#2456/#2497 closed as superseded on 2026-09-02),
@@ -42,23 +38,6 @@ on:
         type: choice
         options: [development, production]
         default: production
-  workflow_call:
-    inputs:
-      tenantId:
-        description: "The freshly provisioned tenant's id"
-        required: true
-        type: string
-      environment:
-        description: 'Which GitHub Environment this run resolves its credentials from'
-        required: true
-        type: string
-    secrets:
-      TENANT_REGISTRY_DATABASE_URL:
-        required: true
-      TENANT_TOKEN_ENCRYPTION_KEY:
-        required: true
-      OPERATOR_ALERT_SECRET:
-        required: false
 
 permissions:
   contents: read
@@ -87,12 +66,12 @@ jobs:
     # `development` must resolve every credential (including the tenant
     # registry connection string below) from the `development` GitHub
     # Environment, and a `production` dispatch from `production` — never a
-    # mix of the two, same as provision-tenant.yml/recheck-tenant-owners.yml.
+    # mix of the two, same as deprovision-tenant.yml/recheck-tenant-owners.yml.
     #
     # The `|| 'production'` fallback is load-bearing for the cron trigger,
     # whose `inputs` context is null — see recheck-tenant-owners.yml's own
     # comment on this exact line for why it can't be spelled like
-    # provision-tenant.yml/deprovision-tenant.yml's unconditional
+    # deprovision-tenant.yml's unconditional
     # `${{ inputs.environment }}`.
     environment: ${{ inputs.environment || 'production' }}
     env:
@@ -108,8 +87,7 @@ jobs:
       # operator-alert event to on a tenant's first newly-failing
       # transition. Unset means the sweep still runs; only that
       # notification is skipped. Resolved from the job's own `environment:`
-      # binding above, not passed through `workflow_call.secrets` — it's a
-      # variable, not a secret.
+      # binding above — it's a variable, not a secret.
       ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
       # Shared secret apps/platform's `/api/internal/operator-alert` route
       # verifies as a Bearer token — same value in both places.
