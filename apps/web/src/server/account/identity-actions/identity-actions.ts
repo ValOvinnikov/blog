@@ -2,6 +2,7 @@
 
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,
@@ -28,8 +29,8 @@ export type TUpdateDisplayNameResult = TActionResult<
   TFieldErrorReason
 >;
 
-const SUCCESS = { outcome: ACTION_OUTCOME.SUCCESS } as const;
-const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
+const SUCCESS = toOutcome(ACTION_OUTCOME.SUCCESS);
+const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 export const unlinkProviderAction = async (
   provider: TLinkableProvider,
@@ -43,7 +44,7 @@ export const unlinkProviderAction = async (
   try {
     const result = await queries.account.unlinkProvider(userId, provider);
     if (result.outcome === 'last-method') {
-      return { outcome: ACTION_OUTCOME.BLOCKED };
+      return toOutcome(ACTION_OUTCOME.BLOCKED);
     }
     return SUCCESS;
   } catch (error) {
