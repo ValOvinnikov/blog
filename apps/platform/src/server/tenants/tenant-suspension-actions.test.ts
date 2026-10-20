@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { notFound } from 'next/navigation';
@@ -43,7 +44,7 @@ vi.mock('@blog/db', async () => ({
 const ACTIVE_TENANT = {
   id: 'tenant-1',
   name: 'Acme',
-  status: 'ACTIVE',
+  status: TENANT_STATUS.ACTIVE,
   deprovisionedAt: null,
 };
 
@@ -79,7 +80,7 @@ describe('tenant suspension actions', () => {
 
     expect(setTenantSuspensionMock).toHaveBeenCalledWith(
       'tenant-1',
-      'SUSPENDED',
+      TENANT_STATUS.SUSPENDED,
     );
     expect(revalidateSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(recordAuditEventMock).toHaveBeenCalledWith(
@@ -96,12 +97,15 @@ describe('tenant suspension actions', () => {
   it('reactivates a suspended tenant and records the lifted suspension', async () => {
     getTenantByIdMock.mockResolvedValue({
       ...ACTIVE_TENANT,
-      status: 'SUSPENDED',
+      status: TENANT_STATUS.SUSPENDED,
     });
 
     const result = await actions.liftTenantSuspensionAction('tenant-1');
 
-    expect(setTenantSuspensionMock).toHaveBeenCalledWith('tenant-1', 'ACTIVE');
+    expect(setTenantSuspensionMock).toHaveBeenCalledWith(
+      'tenant-1',
+      TENANT_STATUS.ACTIVE,
+    );
     expect(revalidateSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(recordAuditEventMock).toHaveBeenCalledWith(
       expect.objectContaining({ action: AUDIT_ACTION.SUSPENSION_LIFTED }),
@@ -122,8 +126,11 @@ describe('tenant suspension actions', () => {
   });
 
   it.each([
-    { status: 'ARCHIVED', deprovisionedAt: null },
-    { status: 'ACTIVE', deprovisionedAt: new Date('2026-08-26T00:00:00Z') },
+    { status: TENANT_STATUS.ARCHIVED, deprovisionedAt: null },
+    {
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: new Date('2026-08-26T00:00:00Z'),
+    },
   ])(
     'refuses an archived tenant ($status, deprovisionedAt $deprovisionedAt)',
     async (archived) => {

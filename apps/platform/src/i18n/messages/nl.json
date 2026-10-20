@@ -915,7 +915,7 @@
     "confirmingButton": "Starten…"
   },
   "tenantSuspensionControl": {
-    "active": {
+    "ACTIVE": {
       "cardTitle": "Deze tenant opschorten",
       "description": "Pauzeert de schrijffuncties van de live site — het contactformulier, nieuwsbriefinschrijvingen en bladwijzers — terwijl de pagina's online blijven. Je kunt hem op elk moment opnieuw activeren.",
       "triggerButton": "Tenant opschorten",
@@ -924,7 +924,7 @@
       "confirmButton": "Opschorten",
       "confirmingButton": "Bezig met opschorten…"
     },
-    "suspended": {
+    "SUSPENDED": {
       "cardTitle": "Deze tenant is opgeschort",
       "description": "Het contactformulier, nieuwsbriefinschrijvingen en bladwijzers van de live site staan uit. Opnieuw activeren herstelt ze vanaf de volgende paginaweergave.",
       "triggerButton": "Tenant opnieuw activeren",

@@ -915,7 +915,7 @@
     "confirmingButton": "Lancement…"
   },
   "tenantSuspensionControl": {
-    "active": {
+    "ACTIVE": {
       "cardTitle": "Suspendre ce locataire",
       "description": "Met en pause les fonctions d'écriture du site public — formulaire de contact, inscriptions à la newsletter et favoris — tandis que ses pages restent en ligne. Vous pouvez le réactiver à tout moment.",
       "triggerButton": "Suspendre le locataire",
@@ -924,7 +924,7 @@
       "confirmButton": "Suspendre",
       "confirmingButton": "Suspension…"
     },
-    "suspended": {
+    "SUSPENDED": {
       "cardTitle": "Ce locataire est suspendu",
       "description": "Le formulaire de contact, les inscriptions à la newsletter et les favoris du site public sont désactivés. La réactivation les rétablit dès le prochain chargement de page.",
       "triggerButton": "Réactiver le locataire",

@@ -1,4 +1,5 @@
 import { AUDIT_TARGET_TYPE } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
@@ -26,7 +27,10 @@ vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
 }));
 
 vi.mock('@platform/server/auth/require-admin', () => ({
-  requireAdmin: vi.fn(async () => ({ id: 'admin-1', role: 'ADMIN' })),
+  requireAdmin: vi.fn(async () => ({
+    id: 'admin-1',
+    role: ADMIN_ROLE.ADMIN,
+  })),
 }));
 
 vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({

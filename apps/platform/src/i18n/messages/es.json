@@ -915,7 +915,7 @@
     "confirmingButton": "Lanzando…"
   },
   "tenantSuspensionControl": {
-    "active": {
+    "ACTIVE": {
       "cardTitle": "Suspender este cliente",
       "description": "Pausa las funciones de escritura del sitio público —el formulario de contacto, las suscripciones al boletín y los marcadores— mientras sus páginas siguen en línea. Puedes reactivarlo en cualquier momento.",
       "triggerButton": "Suspender cliente",
@@ -924,7 +924,7 @@
       "confirmButton": "Suspender",
       "confirmingButton": "Suspendiendo…"
     },
-    "suspended": {
+    "SUSPENDED": {
       "cardTitle": "Este cliente está suspendido",
       "description": "El formulario de contacto, las suscripciones al boletín y los marcadores del sitio público están desactivados. Al reactivarlo vuelven desde la próxima carga de página.",
       "triggerButton": "Reactivar cliente",

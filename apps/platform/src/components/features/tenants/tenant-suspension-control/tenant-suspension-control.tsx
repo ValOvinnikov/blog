@@ -1,6 +1,6 @@
 'use client';
 
-import { TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_STATUS, type TSuspensionStatus } from '@blog/db/constants';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
@@ -34,16 +34,18 @@ export const TenantSuspensionControl = ({
   );
   const { id, name, status } = tenant;
   const isSuspended = status === TENANT_STATUS.SUSPENDED;
-  const copy = isSuspended ? 'suspended' : 'active';
+  const copyKey: TSuspensionStatus = isSuspended
+    ? TENANT_STATUS.SUSPENDED
+    : TENANT_STATUS.ACTIVE;
 
   const { content } = tenantSuspensionControlVariants();
 
   return (
     <Card>
-      <Card.Header title={t(`${copy}.cardTitle`)} />
+      <Card.Header title={t(`${copyKey}.cardTitle`)} />
       <Card.Body>
         <div className={content()}>
-          <Text variant="muted">{t(`${copy}.description`)}</Text>
+          <Text variant="muted">{t(`${copyKey}.description`)}</Text>
 
           <ConfirmDialog
             tone={isSuspended ? 'primary' : 'danger'}
@@ -53,13 +55,13 @@ export const TenantSuspensionControl = ({
             onConfirmed={() => router.refresh()}
           >
             <ConfirmDialog.Trigger>
-              {t(`${copy}.triggerButton`)}
+              {t(`${copyKey}.triggerButton`)}
             </ConfirmDialog.Trigger>
             <ConfirmDialog.Content
-              title={t(`${copy}.dialogTitle`, { name })}
-              description={t(`${copy}.dialogDescription`)}
-              confirmButtonLabel={t(`${copy}.confirmButton`)}
-              confirmingButtonLabel={t(`${copy}.confirmingButton`)}
+              title={t(`${copyKey}.dialogTitle`, { name })}
+              description={t(`${copyKey}.dialogDescription`)}
+              confirmButtonLabel={t(`${copyKey}.confirmButton`)}
+              confirmingButtonLabel={t(`${copyKey}.confirmingButton`)}
             />
           </ConfirmDialog>
         </div>

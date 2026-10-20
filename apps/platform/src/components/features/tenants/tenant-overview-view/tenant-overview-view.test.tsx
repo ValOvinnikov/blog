@@ -1,9 +1,11 @@
 import { ACTION_OUTCOME, AUDIT_TARGET_TYPE } from '@blog/config';
 import { FINDING_STATUS } from '@blog/config/constants';
 import {
+  ADMIN_ROLE,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
 } from '@blog/db/constants';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
@@ -117,7 +119,10 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     listFindingsForTenantMock.mockReset();
     listFindingsForTenantMock.mockResolvedValue([]);
     requireAdminMock.mockReset();
-    requireAdminMock.mockResolvedValue({ id: 'admin-1', role: 'SUPERADMIN' });
+    requireAdminMock.mockResolvedValue({
+      id: 'admin-1',
+      role: ADMIN_ROLE.SUPERADMIN,
+    });
     getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
@@ -130,7 +135,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('renders the tenant name and status/plan badges', async () => {
     await setup({
-      tenant: makeTenant({ name: 'Acme Inc.', status: 'ACTIVE' }),
+      tenant: makeTenant({ name: 'Acme Inc.', status: TENANT_STATUS.ACTIVE }),
     });
 
     const heading = screen.getByRole('heading', {
@@ -403,7 +408,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   describe('suspension', () => {
     it('offers a super admin the Suspend action on an active tenant', async () => {
-      await setup({ tenant: makeTenant({ status: 'ACTIVE' }) });
+      await setup({ tenant: makeTenant({ status: TENANT_STATUS.ACTIVE }) });
 
       expect(
         screen.getByRole('button', { name: 'Suspend tenant' }),
@@ -411,7 +416,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     it('offers a super admin the Reactivate action on a suspended tenant', async () => {
-      await setup({ tenant: makeTenant({ status: 'SUSPENDED' }) });
+      await setup({ tenant: makeTenant({ status: TENANT_STATUS.SUSPENDED }) });
 
       expect(
         screen.getByRole('button', { name: 'Reactivate tenant' }),
@@ -421,12 +426,14 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       ).not.toBeInTheDocument();
     });
 
-    it.each(['ADMIN', 'MODERATOR'])(
+    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
       'offers neither action to a %s',
       async (role) => {
         requireAdminMock.mockResolvedValue({ id: 'admin-1', role });
 
-        await setup({ tenant: makeTenant({ status: 'SUSPENDED' }) });
+        await setup({
+          tenant: makeTenant({ status: TENANT_STATUS.SUSPENDED }),
+        });
 
         expect(
           screen.queryByRole('button', { name: 'Reactivate tenant' }),
@@ -437,7 +444,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     it('offers neither action on an archived tenant', async () => {
       await setup({
         tenant: makeTenant({
-          status: 'ARCHIVED',
+          status: TENANT_STATUS.ARCHIVED,
           deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
         }),
       });

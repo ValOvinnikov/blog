@@ -17,11 +17,13 @@ describe(Icon, () => {
   it('renders a glyph for every icon admin references', () => {
     const used = [
       ICONS.ARROW,
+      ICONS.ARROW_UP,
       ICONS.BOOK,
       ICONS.CHECK,
       ICONS.CHECK_SHEET,
       ICONS.CHEVRON_DOWN,
       ICONS.CHEVRON_RIGHT,
+      ICONS.CLOCK,
       ICONS.CLOSE,
       ICONS.COMMENT,
       ICONS.EXTERNAL_LINK,
@@ -29,15 +31,21 @@ describe(Icon, () => {
       ICONS.GRID,
       ICONS.HOUSE,
       ICONS.INFO,
+      ICONS.LAYERS,
+      ICONS.LOCK,
       ICONS.MAIL,
       ICONS.MENU,
       ICONS.MENU_ROWS,
       ICONS.PALETTE,
       ICONS.PLUS,
+      ICONS.POWER,
       ICONS.QUOTE,
+      ICONS.ROCKET,
       ICONS.SETTINGS,
+      ICONS.SHIELD_CHECK,
       ICONS.USERS,
       ICONS.WARNING,
+      ICONS.ZAP,
     ];
     for (const name of used) {
       const { unmount } = render(<Icon name={name} />);

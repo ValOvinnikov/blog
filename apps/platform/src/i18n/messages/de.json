@@ -915,7 +915,7 @@
     "confirmingButton": "Wird gestartet…"
   },
   "tenantSuspensionControl": {
-    "active": {
+    "ACTIVE": {
       "cardTitle": "Diesen Mandanten sperren",
       "description": "Pausiert die schreibenden Funktionen der Live-Website — Kontaktformular, Newsletter-Anmeldungen und Lesezeichen —, während ihre Seiten online bleiben. Eine Reaktivierung ist jederzeit möglich.",
       "triggerButton": "Mandanten sperren",
@@ -924,7 +924,7 @@
       "confirmButton": "Sperren",
       "confirmingButton": "Wird gesperrt…"
     },
-    "suspended": {
+    "SUSPENDED": {
       "cardTitle": "Dieser Mandant ist gesperrt",
       "description": "Kontaktformular, Newsletter-Anmeldungen und Lesezeichen der Live-Website sind abgeschaltet. Eine Reaktivierung stellt sie ab dem nächsten Seitenaufruf wieder her.",
       "triggerButton": "Mandanten reaktivieren",

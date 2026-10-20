@@ -1,6 +1,11 @@
 'use server';
 
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TAuditAction,
+} from '@blog/config';
 import { queries, TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
@@ -17,7 +22,7 @@ export type TTenantSuspensionResult = TTenantLifecycleResult<
 const SUSPENSION_AUDIT_ACTION = {
   [TENANT_STATUS.SUSPENDED]: AUDIT_ACTION.SUSPENSION_APPLIED,
   [TENANT_STATUS.ACTIVE]: AUDIT_ACTION.SUSPENSION_LIFTED,
-} as const;
+} as const satisfies Record<TSuspensionStatus, TAuditAction>;
 
 const setSuspension = async (
   tenantId: string,

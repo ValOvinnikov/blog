@@ -915,7 +915,7 @@
     "confirmingButton": "Dispatching…"
   },
   "tenantSuspensionControl": {
-    "active": {
+    "ACTIVE": {
       "cardTitle": "Suspend this tenant",
       "description": "Pauses the reader-facing write features on the live site — the contact form, newsletter sign-ups and bookmarks — while its pages stay online. Reactivate it at any time.",
       "triggerButton": "Suspend tenant",
@@ -924,7 +924,7 @@
       "confirmButton": "Suspend",
       "confirmingButton": "Suspending…"
     },
-    "suspended": {
+    "SUSPENDED": {
       "cardTitle": "This tenant is suspended",
       "description": "The live site's contact form, newsletter sign-ups and bookmarks are switched off. Reactivating restores them from the next page load.",
       "triggerButton": "Reactivate tenant",
