@@ -58,7 +58,7 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 
 - `articleText` has no H1, so the body never competes with the page title. A stored `h1` block still renders, as a level-2 heading without an anchor.
 - H2 and H3 render with `id={block._key}` and scroll margins that clear the sticky header and the mobile contents bar; the contents rail links to those ids (./reading-experience.md).
-- Marks: `code` → `InlineCode`, `sub`/`sup` → native elements, `linkRef` → `TextLink` (`appearance="prose"`) rendered as `SmartLink`. A link whose document was deleted renders its text unlinked. Bold, italic, underline and strike use `@portabletext/react` defaults.
+- Marks: `code` → `InlineCode`, `sub`/`sup` → native elements, `linkRef` → `TextLink` (`appearance="prose"`) rendered as `SmartLink`. The link is always underlined in its own colour: 1px at rest, 2px on hover. A link whose document was deleted renders its text unlinked. Bold, italic, underline and strike use `@portabletext/react` defaults.
 - Blocks: `blockquote` → `QuoteBlock`; bullet and numbered lists → `ul`/`ol`.
 - `bodyImage` renders `ImageWithCaption` around `SanityImage` (1200px wide, lazy) and renders nothing without an asset. Floats apply from `lg` only, at 12rem; `FULL_BLEED` is wrapped in `data-full-bleed` so `proseMeasureCapSlot` leaves it uncapped.
 - `code` renders `CodeBlock`, which wraps `react-syntax-highlighter` (Prism) with line numbers, highlighted lines and `text` as the default language. It lives in `apps/web` because `@blog/ui` takes no third-party highlighter. The Studio code input does not offer a filename, so the filename caption only shows for data that carries one.

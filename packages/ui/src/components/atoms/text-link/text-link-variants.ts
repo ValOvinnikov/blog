@@ -17,7 +17,7 @@ export const textLinkVariants = tv({
       prose: {
         root: [
           ...LINK_UNDERLINE_AT_REST,
-          'text-brand-primary decoration-border-strong',
+          'text-brand-primary decoration-current',
         ],
       },
       nav: {
@@ -73,9 +73,7 @@ export const textLinkVariants = tv({
       appearance: 'prose',
       hasHref: true,
       class: {
-        root: [
-          'hover:decoration-2 hover:text-brand-primary-hover hover:decoration-current',
-        ],
+        root: ['hover:decoration-2 hover:text-brand-primary-hover'],
       },
     },
     {
