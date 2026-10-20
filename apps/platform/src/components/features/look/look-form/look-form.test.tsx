@@ -817,13 +817,15 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        "Couldn't upload the logo — try again.",
-      );
+      const alert = await screen.findByRole('alert');
+      await waitFor(() => {
+        expect(
+          screen.getByRole('button', { name: 'Save changes' }),
+        ).toBeEnabled();
+      });
+
+      expect(alert).toHaveTextContent("Couldn't upload the logo — try again.");
       expect(updateLookActionMock).not.toHaveBeenCalled();
-      expect(
-        await screen.findByRole('button', { name: 'Save changes' }),
-      ).toBeEnabled();
       expect(screen.getByText('hue 251°')).toBeVisible();
     });
 
