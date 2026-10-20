@@ -2,6 +2,7 @@
 
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { LEAD_REFUSAL, type TLeadRefusal } from '@platform/constants/lead';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { logger } from '@platform/utils/logger/logger';
@@ -36,10 +37,10 @@ export const deleteLeadAction = async (
       id: parsed.data.id,
     });
     return isDeleted
-      ? { outcome: ACTION_OUTCOME.SUCCESS }
+      ? toOutcome(ACTION_OUTCOME.SUCCESS)
       : { outcome: ACTION_OUTCOME.REFUSED, reason: LEAD_REFUSAL.NOT_FOUND };
   } catch (error) {
     logger.error('leads.delete_failed', { tenantId: tenant.id, error });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

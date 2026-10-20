@@ -1,6 +1,7 @@
 'use server';
 
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -60,7 +61,7 @@ export const deprovisionTenantAction = async (
   });
 
   if (!dispatched) {
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
   if (!dryRun) {
@@ -73,5 +74,5 @@ export const deprovisionTenantAction = async (
     });
   }
 
-  return { outcome: ACTION_OUTCOME.SUCCESS };
+  return toOutcome(ACTION_OUTCOME.SUCCESS);
 };

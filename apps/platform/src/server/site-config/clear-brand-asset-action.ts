@@ -1,6 +1,7 @@
 'use server';
 
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
@@ -28,7 +29,7 @@ export const clearBrandAssetAction = async (
 
   try {
     const previousUrl = await getBrandAssetUrl(tenant.id, targetKind);
-    if (!previousUrl) return { outcome: ACTION_OUTCOME.SUCCESS };
+    if (!previousUrl) return toOutcome(ACTION_OUTCOME.SUCCESS);
 
     await setBrandAssetUrl(tenant.id, targetKind, null);
 
@@ -46,13 +47,13 @@ export const clearBrandAssetAction = async (
       details: { asset: targetKind, operation: 'clear' },
     });
 
-    return { outcome: ACTION_OUTCOME.SUCCESS };
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error('site_config.brand_asset_clear_failed', {
       tenantId: tenant.id,
       kind: targetKind,
       error,
     });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

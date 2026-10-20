@@ -17,6 +17,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -65,12 +66,12 @@ export const updateLookAction = async (
       targetId: tenant.id,
       details: parsed.data,
     });
-    return { outcome: ACTION_OUTCOME.SUCCESS };
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error('site_config.look_save_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

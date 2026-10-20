@@ -7,6 +7,7 @@ import {
   RELEASE_CHANGE,
   type TActionResult,
 } from '@blog/config';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   IS_PRODUCTION_RELEASE_ENABLED,
   RELEASE_FIELD_ERROR,
@@ -72,7 +73,7 @@ export const startReleaseAction = async (
     getReleaseRun(),
   ]);
   if (!comparison.ok || !releaseRun.ok) {
-    return { outcome: ACTION_OUTCOME.UNAVAILABLE };
+    return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
   }
   if (releaseRun.data && isReleaseRunActive(releaseRun.data.status)) {
     return {
@@ -95,7 +96,7 @@ export const startReleaseAction = async (
     headSha,
     renderingChangedSinceTag: isRenderingChanged,
   });
-  if (!contrastStatus.ok) return { outcome: ACTION_OUTCOME.UNAVAILABLE };
+  if (!contrastStatus.ok) return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 
   const isOverride = isReleaseOverrideRequired({
     isRenderingChanged,
@@ -111,7 +112,7 @@ export const startReleaseAction = async (
   }
 
   const isDispatched = await dispatchReleaseWorkflow({ version, isOverride });
-  if (!isDispatched) return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+  if (!isDispatched) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
   await recordAuditEvent({
     logEvent: 'releases.release_audit_failed',
@@ -134,5 +135,5 @@ export const startReleaseAction = async (
     });
   }
 
-  return { outcome: ACTION_OUTCOME.SUCCESS };
+  return toOutcome(ACTION_OUTCOME.SUCCESS);
 };

@@ -7,6 +7,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { PLAN_REGISTRY, queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   SETTINGS_REFUSAL,
   type TSettingsRefusal,
@@ -89,12 +90,12 @@ export const updateFeaturesAction = async (
       targetId: tenant.id,
       details: toWrite,
     });
-    return { outcome: ACTION_OUTCOME.SUCCESS };
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error('settings_features.update_failed', {
       tenantId: tenant.id,
       error,
     });
-    return { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

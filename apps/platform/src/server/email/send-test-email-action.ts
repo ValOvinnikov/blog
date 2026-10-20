@@ -1,10 +1,15 @@
 'use server';
 
 import { applyTenantSenderName } from '@blog/auth/providers/magic-link/apply-tenant-sender-name/apply-tenant-sender-name';
-import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  type TActionResult,
+  type TOutcome,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { sendEmail } from '@blog/email';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
@@ -33,11 +38,11 @@ export type TSendTestEmailResult =
         typeof ACTION_OUTCOME.RATE_LIMITED | typeof ACTION_OUTCOME.SERVER_ERROR,
         keyof TSendTestEmailInput
       >,
-      { outcome: typeof ACTION_OUTCOME.SUCCESS }
+      TOutcome<typeof ACTION_OUTCOME.SUCCESS>
     >
   | { outcome: typeof ACTION_OUTCOME.SUCCESS; to: string };
 
-const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
+const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 export const sendTestEmailAction = async (
   tenantId: string,
@@ -59,7 +64,7 @@ export const sendTestEmailAction = async (
   if (!userId || !to) return SERVER_ERROR;
 
   if (!takeTestEmailSend(userId)) {
-    return { outcome: ACTION_OUTCOME.RATE_LIMITED };
+    return toOutcome(ACTION_OUTCOME.RATE_LIMITED);
   }
 
   const { templateType, sender } = parsed.data;

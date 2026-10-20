@@ -4,6 +4,7 @@ import {
   ACTION_OUTCOME,
   type TActionOutcome,
   type TLocaleIsoCode,
+  type TOutcome,
 } from '@blog/config';
 import {
   useSettingsForm,
@@ -35,7 +36,7 @@ import { persistStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useState } from 'react';
 
 type TUseEmailDraftArgs = Omit<
-  TUseSettingsFormArgs<TEmailDraft, { outcome: TActionOutcome }>,
+  TUseSettingsFormArgs<TEmailDraft, TOutcome<TActionOutcome>>,
   'initialValues' | 'onSubmit' | 'onSuccess' | 'invalidControls'
 > & {
   tenantId: string;
@@ -64,7 +65,7 @@ export const useEmailDraft = ({
   const [senderFieldErrors, setSenderFieldErrors] =
     useState<TSenderFieldErrors>({});
 
-  const settings = useSettingsForm<TEmailDraft, { outcome: TActionOutcome }>({
+  const settings = useSettingsForm<TEmailDraft, TOutcome<TActionOutcome>>({
     ...settingsArgs,
     initialValues: initialDraft,
     invalidControls: () => ({
