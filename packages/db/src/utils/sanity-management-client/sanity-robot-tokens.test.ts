@@ -1,219 +1,147 @@
 import {
+  emptyResponse,
+  firstFetchCall,
+  jsonResponse,
+  useFetchFake,
+} from '@blog/db/testing/sanity-management-client/fetch-fake';
+import {
+  SANITY_EXPECTED_URL,
+  SANITY_MINTED_TOKEN,
+  SANITY_PROJECT_ID,
+  SANITY_ROBOT_ID,
+  withSanityProject,
+} from '@blog/db/testing/sanity-management-client/fixtures';
+
+import {
   createSanityRobotToken,
   deleteSanityRobotToken,
   listSanityRobotTokens,
 } from './sanity-robot-tokens';
+import {
+  SANITY_READ_TOKEN_LABEL,
+  SANITY_WRITE_TOKEN_LABEL,
+} from './sanity-token-labels';
 
-const fetchMock = vi.fn();
-
-beforeEach(() => {
-  vi.stubGlobal('fetch', fetchMock);
-  fetchMock.mockReset();
+const createInput = withSanityProject({
+  label: SANITY_READ_TOKEN_LABEL,
+  role: 'viewer' as const,
 });
 
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
+const fetchMock = useFetchFake();
 
 describe(createSanityRobotToken, () => {
   it('POSTs the label and role membership and returns the minted token', async () => {
     fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ id: 'robot1', token: 'sk-minted' }), {
-        status: 200,
-      }),
+      jsonResponse({ id: SANITY_ROBOT_ID, token: SANITY_MINTED_TOKEN }),
     );
 
-    const result = await createSanityRobotToken({
-      token: 'tok',
-      projectId: 'proj123',
-      label: 'web-read',
-      role: 'viewer',
-    });
+    const result = await createSanityRobotToken(createInput);
 
-    expect(result).toEqual({ id: 'robot1', token: 'sk-minted' });
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(
-      'https://api.sanity.io/v2026-07-10/access/project/proj123/robots',
-    );
-    expect(JSON.parse(init.body as string)).toEqual({
-      label: 'web-read',
+    const { url, body } = firstFetchCall(fetchMock);
+    expect(result).toEqual({ id: SANITY_ROBOT_ID, token: SANITY_MINTED_TOKEN });
+    expect(url).toBe(SANITY_EXPECTED_URL.robots);
+    expect(body).toEqual({
+      label: createInput.label,
       memberships: [
         {
           resourceType: 'project',
-          resourceId: 'proj123',
-          roleNames: ['viewer'],
+          resourceId: SANITY_PROJECT_ID,
+          roleNames: [createInput.role],
         },
       ],
     });
   });
 
-  it('falls back to the key field when token is absent', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ id: 'robot1', key: 'sk-legacy' }), {
-        status: 200,
-      }),
-    );
+  it.each([
+    {
+      field: 'the key field when token is absent',
+      response: { id: SANITY_ROBOT_ID, key: 'sk-legacy' },
+      expected: { id: SANITY_ROBOT_ID, token: 'sk-legacy' },
+    },
+    {
+      field: 'the tokenId field when id is absent',
+      response: { tokenId: SANITY_ROBOT_ID, token: SANITY_MINTED_TOKEN },
+      expected: { id: SANITY_ROBOT_ID, token: SANITY_MINTED_TOKEN },
+    },
+  ])('falls back to $field', async ({ response, expected }) => {
+    fetchMock.mockResolvedValue(jsonResponse(response));
 
-    const result = await createSanityRobotToken({
-      token: 'tok',
-      projectId: 'proj123',
-      label: 'web-read',
-      role: 'viewer',
-    });
+    const result = await createSanityRobotToken(createInput);
 
-    expect(result).toEqual({ id: 'robot1', token: 'sk-legacy' });
+    expect(result).toEqual(expected);
   });
 
-  it('falls back to the tokenId field when id is absent', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ tokenId: 'robot1', token: 'sk-minted' }), {
-        status: 200,
-      }),
+  it.each([
+    { fields: 'a token nor key field', response: { id: SANITY_ROBOT_ID } },
+    {
+      fields: 'an id nor tokenId field',
+      response: { token: SANITY_MINTED_TOKEN },
+    },
+  ])('throws when the response has neither $fields', async ({ response }) => {
+    fetchMock.mockResolvedValue(jsonResponse(response));
+
+    await expect(createSanityRobotToken(createInput)).rejects.toThrow(
+      /returned no id\/token/,
     );
-
-    const result = await createSanityRobotToken({
-      token: 'tok',
-      projectId: 'proj123',
-      label: 'web-read',
-      role: 'viewer',
-    });
-
-    expect(result).toEqual({ id: 'robot1', token: 'sk-minted' });
-  });
-
-  it('throws when the response has neither a token nor key field', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ id: 'robot1' }), { status: 200 }),
-    );
-
-    await expect(
-      createSanityRobotToken({
-        token: 'tok',
-        projectId: 'proj123',
-        label: 'x',
-        role: 'viewer',
-      }),
-    ).rejects.toThrow(/returned no id\/token/);
-  });
-
-  it('throws when the response has neither an id nor tokenId field', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ token: 'sk-minted' }), { status: 200 }),
-    );
-
-    await expect(
-      createSanityRobotToken({
-        token: 'tok',
-        projectId: 'proj123',
-        label: 'x',
-        role: 'viewer',
-      }),
-    ).rejects.toThrow(/returned no id\/token/);
   });
 });
 
 describe(deleteSanityRobotToken, () => {
   it('DELETEs the robot by id and tolerates an empty response body', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    fetchMock.mockResolvedValue(emptyResponse(204));
 
     await expect(
-      deleteSanityRobotToken({
-        token: 'tok',
-        projectId: 'proj123',
-        robotId: 'robot1',
-      }),
+      deleteSanityRobotToken(withSanityProject({ robotId: SANITY_ROBOT_ID })),
     ).resolves.toBeUndefined();
 
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(
-      'https://api.sanity.io/v2026-07-10/access/project/proj123/robots/robot1',
-    );
+    const { url, init } = firstFetchCall(fetchMock);
+    expect(url).toBe(SANITY_EXPECTED_URL.robot);
     expect(init.method).toBe('DELETE');
   });
 });
 
 describe(listSanityRobotTokens, () => {
   it('GETs the robots endpoint and normalizes id/label from a bare array', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify([
-          { id: 'robot1', label: 'web-read (provisioned)' },
-          { id: 'robot2', label: 'web-write (provisioned)' },
-        ]),
-        { status: 200 },
-      ),
-    );
+    const robots = [
+      { id: SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
+      { id: 'robot2', label: SANITY_WRITE_TOKEN_LABEL },
+    ];
+    fetchMock.mockResolvedValue(jsonResponse(robots));
 
-    const result = await listSanityRobotTokens({
-      token: 'tok',
-      projectId: 'proj123',
-    });
+    const result = await listSanityRobotTokens(withSanityProject({}));
 
-    expect(result).toEqual([
-      { id: 'robot1', label: 'web-read (provisioned)' },
-      { id: 'robot2', label: 'web-write (provisioned)' },
-    ]);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(
-      'https://api.sanity.io/v2026-07-10/access/project/proj123/robots',
-    );
+    const { url, init } = firstFetchCall(fetchMock);
+    expect(result).toEqual(robots);
+    expect(url).toBe(SANITY_EXPECTED_URL.robots);
     expect(init.method ?? 'GET').toBe('GET');
   });
 
-  it('unwraps a `data` envelope response', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          data: [{ id: 'robot1', label: 'web-read (provisioned)' }],
-        }),
-        { status: 200 },
-      ),
-    );
+  it.each([
+    {
+      title: 'unwraps a `data` envelope response',
+      response: {
+        data: [{ id: SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL }],
+      },
+      expected: [{ id: SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL }],
+    },
+    {
+      title: 'falls back to the tokenId field when id is absent',
+      response: [{ tokenId: SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL }],
+      expected: [{ id: SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL }],
+    },
+    {
+      title: 'drops entries with no resolvable id',
+      response: [
+        { label: SANITY_READ_TOKEN_LABEL },
+        { id: 'robot2', label: SANITY_WRITE_TOKEN_LABEL },
+      ],
+      expected: [{ id: 'robot2', label: SANITY_WRITE_TOKEN_LABEL }],
+    },
+  ])('$title', async ({ response, expected }) => {
+    fetchMock.mockResolvedValue(jsonResponse(response));
 
-    const result = await listSanityRobotTokens({
-      token: 'tok',
-      projectId: 'proj123',
-    });
+    const result = await listSanityRobotTokens(withSanityProject({}));
 
-    expect(result).toEqual([{ id: 'robot1', label: 'web-read (provisioned)' }]);
-  });
-
-  it('falls back to the tokenId field when id is absent', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify([
-          { tokenId: 'robot1', label: 'web-read (provisioned)' },
-        ]),
-        { status: 200 },
-      ),
-    );
-
-    const result = await listSanityRobotTokens({
-      token: 'tok',
-      projectId: 'proj123',
-    });
-
-    expect(result).toEqual([{ id: 'robot1', label: 'web-read (provisioned)' }]);
-  });
-
-  it('drops entries with no resolvable id', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify([
-          { label: 'web-read (provisioned)' },
-          { id: 'robot2', label: 'web-write (provisioned)' },
-        ]),
-        { status: 200 },
-      ),
-    );
-
-    const result = await listSanityRobotTokens({
-      token: 'tok',
-      projectId: 'proj123',
-    });
-
-    expect(result).toEqual([
-      { id: 'robot2', label: 'web-write (provisioned)' },
-    ]);
+    expect(result).toEqual(expected);
   });
 });

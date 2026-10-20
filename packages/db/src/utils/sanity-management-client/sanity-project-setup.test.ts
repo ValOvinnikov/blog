@@ -1,4 +1,20 @@
 import {
+  emptyResponse,
+  firstFetchCall,
+  jsonResponse,
+  textResponse,
+  useFetchFake,
+} from '@blog/db/testing/sanity-management-client/fetch-fake';
+import {
+  SANITY_CORS_ORIGIN,
+  SANITY_DATASET,
+  SANITY_EXPECTED_URL,
+  SANITY_PROJECT_ID,
+  SANITY_TOKEN,
+  withSanityProject,
+} from '@blog/db/testing/sanity-management-client/fixtures';
+
+import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
@@ -6,107 +22,71 @@ import {
   listSanityDatasets,
 } from './sanity-project-setup';
 
-const fetchMock = vi.fn();
+const createProjectInput = {
+  token: SANITY_TOKEN,
+  displayName: 'Acme',
+  organizationId: 'org-abc',
+};
 
-beforeEach(() => {
-  vi.stubGlobal('fetch', fetchMock);
-  fetchMock.mockReset();
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
+const fetchMock = useFetchFake();
 
 describe(createSanityProject, () => {
   it('POSTs to /projects with the display name and organization id', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ id: 'proj123' }), { status: 200 }),
-    );
+    fetchMock.mockResolvedValue(jsonResponse({ id: SANITY_PROJECT_ID }));
 
-    const result = await createSanityProject({
-      token: 'tok',
-      displayName: 'Acme',
-      organizationId: 'org-abc',
-    });
+    const result = await createSanityProject(createProjectInput);
 
-    expect(result).toEqual({ id: 'proj123' });
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects');
+    const { url, init, body, headers } = firstFetchCall(fetchMock);
+    expect(result).toEqual({ id: SANITY_PROJECT_ID });
+    expect(url).toBe(SANITY_EXPECTED_URL.projects);
     expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body as string)).toEqual({
-      displayName: 'Acme',
-      organizationId: 'org-abc',
+    expect(body).toEqual({
+      displayName: createProjectInput.displayName,
+      organizationId: createProjectInput.organizationId,
     });
-    expect((init.headers as Record<string, string>)['Authorization']).toBe(
-      'Bearer tok',
-    );
+    expect(headers['Authorization']).toBe(`Bearer ${SANITY_TOKEN}`);
   });
 
   it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(new Response('nope', { status: 402 }));
+    fetchMock.mockResolvedValue(textResponse('nope', 402));
 
-    await expect(
-      createSanityProject({
-        token: 'tok',
-        displayName: 'Acme',
-        organizationId: 'org-abc',
-      }),
-    ).rejects.toThrow(/402/);
+    await expect(createSanityProject(createProjectInput)).rejects.toThrow(
+      /402/,
+    );
   });
 
   it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ id: 'proj123' }), { status: 200 }),
-    );
+    fetchMock.mockResolvedValue(jsonResponse({ id: SANITY_PROJECT_ID }));
 
-    await createSanityProject({
-      token: 'tok',
-      displayName: 'Acme',
-      organizationId: 'org-abc',
-    });
+    await createSanityProject(createProjectInput);
 
-    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(init.signal).toBeInstanceOf(AbortSignal);
+    expect(firstFetchCall(fetchMock).init.signal).toBeInstanceOf(AbortSignal);
   });
 });
 
 describe(createSanityDataset, () => {
   it('PUTs the dataset with a public aclMode', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+    fetchMock.mockResolvedValue(emptyResponse());
 
-    await createSanityDataset({
-      token: 'tok',
-      projectId: 'proj123',
-      dataset: 'production',
-    });
+    await createSanityDataset(withSanityProject({ dataset: SANITY_DATASET }));
 
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(
-      'https://api.sanity.io/v2021-06-07/projects/proj123/datasets/production',
-    );
+    const { url, init, body } = firstFetchCall(fetchMock);
+    expect(url).toBe(SANITY_EXPECTED_URL.dataset);
     expect(init.method).toBe('PUT');
-    expect(JSON.parse(init.body as string)).toEqual({ aclMode: 'public' });
+    expect(body).toEqual({ aclMode: 'public' });
   });
 });
 
 describe(listSanityDatasets, () => {
   it('GETs the project-scoped datasets endpoint and returns the list', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify([{ name: 'production' }]), {
-        status: 200,
-      }),
-    );
+    const datasets = [{ name: SANITY_DATASET }];
+    fetchMock.mockResolvedValue(jsonResponse(datasets));
 
-    const result = await listSanityDatasets({
-      token: 'tok',
-      projectId: 'proj123',
-    });
+    const result = await listSanityDatasets(withSanityProject({}));
 
-    expect(result).toEqual([{ name: 'production' }]);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(
-      'https://api.sanity.io/v2021-06-07/projects/proj123/datasets',
-    );
+    const { url, init } = firstFetchCall(fetchMock);
+    expect(result).toEqual(datasets);
+    expect(url).toBe(SANITY_EXPECTED_URL.datasets);
     expect(init.method ?? 'GET').toBe('GET');
     expect(init.signal).toBeInstanceOf(AbortSignal);
   });
@@ -114,20 +94,17 @@ describe(listSanityDatasets, () => {
 
 describe(addSanityCorsOrigin, () => {
   it('POSTs to /projects/:id/cors with credentials allowed', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+    fetchMock.mockResolvedValue(emptyResponse());
 
-    await addSanityCorsOrigin({
-      token: 'tok',
-      projectId: 'proj123',
-      origin: 'https://admin.example.com',
-      allowCredentials: true,
-    });
+    await addSanityCorsOrigin(
+      withSanityProject({ origin: SANITY_CORS_ORIGIN, allowCredentials: true }),
+    );
 
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123/cors');
+    const { url, init, body } = firstFetchCall(fetchMock);
+    expect(url).toBe(SANITY_EXPECTED_URL.cors);
     expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body as string)).toEqual({
-      origin: 'https://admin.example.com',
+    expect(body).toEqual({
+      origin: SANITY_CORS_ORIGIN,
       allowCredentials: true,
     });
   });
@@ -135,23 +112,14 @@ describe(addSanityCorsOrigin, () => {
 
 describe(listSanityCorsOrigins, () => {
   it('GETs the project-scoped cors endpoint and returns the list', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify([{ id: 'cors1', origin: 'https://admin.example.com' }]),
-        { status: 200 },
-      ),
-    );
+    const origins = [{ id: 'cors1', origin: SANITY_CORS_ORIGIN }];
+    fetchMock.mockResolvedValue(jsonResponse(origins));
 
-    const result = await listSanityCorsOrigins({
-      token: 'tok',
-      projectId: 'proj123',
-    });
+    const result = await listSanityCorsOrigins(withSanityProject({}));
 
-    expect(result).toEqual([
-      { id: 'cors1', origin: 'https://admin.example.com' },
-    ]);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123/cors');
+    const { url, init } = firstFetchCall(fetchMock);
+    expect(result).toEqual(origins);
+    expect(url).toBe(SANITY_EXPECTED_URL.cors);
     expect(init.method ?? 'GET').toBe('GET');
   });
 });
