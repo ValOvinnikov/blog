@@ -7,6 +7,8 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { leadsTableVariants } from './leads-table-variants';
 
+const HOME_PATH = '/';
+
 export type TLeadsTableProps = {
   leads: TLeadRow[];
 };
@@ -53,7 +55,9 @@ export const LeadsTable = ({ leads }: TLeadsTableProps) => {
             <LeadMessage message={lead.message} />
           </DataTableShell.Cell>
           <DataTableShell.Cell>
-            <span className={sourcePath()}>{lead.sourcePath}</span>
+            <span className={sourcePath()}>
+              {lead.sourcePath === HOME_PATH ? t('homePage') : lead.sourcePath}
+            </span>
           </DataTableShell.Cell>
           <DataTableShell.Cell>
             <DeleteLeadControl leadId={lead.id} leadName={lead.name} />
