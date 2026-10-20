@@ -90,8 +90,15 @@ export const textLinkVariants = tv({
     },
     {
       appearance: 'nav',
+      isCurrent: false,
       hasHref: true,
       class: { root: ['hover:text-text'] },
+    },
+    {
+      appearance: 'nav',
+      isCurrent: true,
+      hasHref: true,
+      class: { root: ['hover:text-brand-primary-hover'] },
     },
     {
       appearance: 'nav',
