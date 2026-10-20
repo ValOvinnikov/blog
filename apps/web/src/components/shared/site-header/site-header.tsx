@@ -1,5 +1,5 @@
 import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { service, urlForSanityImage } from '@blog/service';
+import { service } from '@blog/service';
 import { Header } from '@blog/ui/components/organisms/header';
 import { AccountRow, AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
@@ -10,6 +10,7 @@ import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -20,13 +21,20 @@ import { StickyHeaderFrame } from './components/sticky-header-frame/sticky-heade
 export const SiteHeader = async () => {
   const { tenantId, sanityContext, locale, defaultLocale, liveLocales } =
     await getRequestContext();
-  const [settingsResult, navResult, hasReaderAccounts, switcherStyle] =
-    await Promise.all([
-      getSiteSettings(),
-      service.global.navigation.v1.getNavigation(sanityContext),
-      isReaderAccountEnabled(),
-      getLanguageSwitcherStyle(tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER),
-    ]);
+  const siteConfigTenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
+  const [
+    settingsResult,
+    navResult,
+    hasReaderAccounts,
+    switcherStyle,
+    brandLogoUrl,
+  ] = await Promise.all([
+    getSiteSettings(),
+    service.global.navigation.v1.getNavigation(sanityContext),
+    isReaderAccountEnabled(),
+    getLanguageSwitcherStyle(siteConfigTenant),
+    getBrandLogoUrl(siteConfigTenant),
+  ]);
 
   if (!settingsResult.ok) {
     return null;
@@ -41,9 +49,6 @@ export const SiteHeader = async () => {
   const navItems = navResult.ok ? navResult.data.items : [];
   const hasLanguageSwitcher =
     navResult.ok && navResult.data.showLanguageSwitcher === true;
-  const brandLogoUrl = brand.logo
-    ? urlForSanityImage(brand.logo, sanityContext)
-    : undefined;
 
   return (
     <StickyHeaderFrame>

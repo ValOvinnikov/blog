@@ -1,17 +1,13 @@
-import { BrandLockup } from '@blog/ui/components/molecules/brand-lockup';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
+
+import { FallbackBrandLockup } from './components/fallback-brand-lockup/fallback-brand-lockup';
 
 export interface IBrandLockupLinkProps {
   logoUrl?: string;
   tagline?: string;
 }
 
-/**
- * Framework-coupled composition of `SmartLink` (routing) and `BrandLockup`
- * (`@blog/ui`, pure/prop-driven) — kept in `apps/web` because linking stays
- * out of `@blog/ui`.
- */
 export const BrandLockupLink = ({
   logoUrl,
   tagline,
@@ -20,7 +16,7 @@ export const BrandLockupLink = ({
 
   return (
     <SmartLink href="/" aria-label={t('ariaLabel')}>
-      <BrandLockup src={logoUrl} tagline={tagline} />
+      <FallbackBrandLockup src={logoUrl} tagline={tagline} />
     </SmartLink>
   );
 };

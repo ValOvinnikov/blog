@@ -52,6 +52,10 @@ const isInCarousel = (element: HTMLElement) =>
 const isCarouselSlide = (element: HTMLElement) =>
   element.tagName === 'LI' && isInCarousel(element);
 
+if (typeof HTMLImageElement !== 'undefined') {
+  HTMLImageElement.prototype.decode = () => Promise.resolve();
+}
+
 if (typeof HTMLElement !== 'undefined') {
   Object.defineProperties(HTMLElement.prototype, {
     offsetWidth: {

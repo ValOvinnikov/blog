@@ -1,22 +1,12 @@
-import type { ISanityImage } from '@blog/config';
-import {
-  service,
-  type TSanityProjectRef,
-  urlForSanityImage,
-} from '@blog/service';
-import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
+import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 
 export const contentType = 'image/svg+xml';
 
-const FAVICON_SIZE = 64;
 const FETCH_TIMEOUT_MS = 5000;
 
-/**
- * Inlined rather than read from a static file at request time — this is the
- * ultimate fallback for every failure mode below (fetch failure, timeout,
- * missing settings), so it must be zero-I/O and unable to throw itself.
- */
+// Inlined, not read from a file: it is the fallback for every failure below, so it must be zero-I/O.
 const FALLBACK_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
   <style>
     .l1{fill:#2E6BD6}.l2{fill:#4F87E8}.l3{fill:#7AA6F0}
@@ -27,75 +17,58 @@ const FALLBACK_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="80" he
   <polygon class="l3" points="40,12 66,21 40,30 14,21"/>
 </svg>`;
 
-const fetchLogoIcon = async (
-  logo: ISanityImage,
-  project: TSanityProjectRef,
-): Promise<Response | undefined> => {
-  const iconUrl = urlForSanityImage(logo, project, {
-    width: FAVICON_SIZE,
-    height: FAVICON_SIZE,
-    fit: 'crop',
-  });
-
-  const response = await fetch(iconUrl, {
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-  });
-
-  if (!response.ok) {
-    logger.error('icon.logo_response_not_ok', { status: response.status });
-    return undefined;
-  }
-
-  return response;
-};
-
 const buildFallbackResponse = (): Response => {
   return new Response(FALLBACK_MARK_SVG, {
     headers: { 'Content-Type': contentType },
   });
 };
 
-/**
- * Next.js's code-generated `icon` file convention. Falls back to a single
- * default mark (`FALLBACK_MARK_SVG`, which embeds its own
- * `prefers-color-scheme` media query) whenever no logo is uploaded, or the
- * fetch fails for any reason — a broken favicon must never break the page
- * it's attached to.
- */
+const fetchFavicon = async (
+  faviconUrl: string,
+): Promise<Response | undefined> => {
+  const response = await fetch(faviconUrl, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+
+  if (!response.ok) {
+    logger.error('icon.favicon_response_not_ok', { status: response.status });
+    return undefined;
+  }
+
+  return response;
+};
+
 export default async function Icon() {
-  const hostTenant = await getHostTenantSanityContext();
-  if (!hostTenant.isResolvable) {
+  const tenant = await resolveRequestTenant();
+  if (!tenant) {
     return buildFallbackResponse();
   }
 
-  const result = await service.global.siteSettings.v1.getSiteSettings(
-    hostTenant.tenant,
-  );
-
+  const result = await getSiteConfig(tenant.id);
   if (!result.ok) {
-    logger.error('icon.site_settings_fetch_failed', { error: result.error });
+    logger.error('icon.site_config_fetch_failed', { error: result.error });
     return buildFallbackResponse();
   }
 
-  const { logo } = result.data.brand;
-  if (!logo) {
+  const faviconUrl = result.data?.faviconAssetUrl;
+  if (!faviconUrl) {
     return buildFallbackResponse();
   }
 
   try {
-    const logoResponse = await fetchLogoIcon(logo, hostTenant.tenant);
-    if (logoResponse) {
-      const bytes = await logoResponse.arrayBuffer();
+    const faviconResponse = await fetchFavicon(faviconUrl);
+    if (faviconResponse) {
+      const bytes = await faviconResponse.arrayBuffer();
 
       return new Response(bytes, {
         headers: {
           'Content-Type':
-            logoResponse.headers.get('content-type') ?? contentType,
+            faviconResponse.headers.get('content-type') ?? contentType,
         },
       });
     }
   } catch (error) {
-    logger.error('icon.logo_fetch_failed', { error });
+    logger.error('icon.favicon_fetch_failed', { error });
   }
 
   return buildFallbackResponse();
