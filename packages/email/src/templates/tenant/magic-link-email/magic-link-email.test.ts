@@ -1,5 +1,8 @@
 import { NEUTRAL_EMAIL_PALETTE } from '@blog/email/html/neutral-shell/neutral-shell';
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import {
+  PLATFORM_EMAIL_BRAND,
+  PLATFORM_EMAIL_BRAND_NAME,
+} from '@blog/email/html/platform-email-brand/platform-email-brand';
 import type { TPortableTextContent } from '@blog/email/portable-text';
 import { TENANT_EMAIL_BRAND as brand } from '@blog/email/testing/tenant-email-brand';
 
@@ -73,6 +76,48 @@ describe(buildMagicLinkEmail, () => {
     it('renders no operator branding', () => {
       expect(email.html).not.toContain('Tenant Alerts');
       expect(email.html).not.toContain(PLATFORM_EMAIL_BRAND.brandPrimarySolid);
+    });
+  });
+
+  describe('sent by the platform without a tenant identity', () => {
+    let email: ReturnType<typeof buildMagicLinkEmail>;
+
+    beforeEach(() => {
+      email = buildMagicLinkEmail({
+        url: 'https://platform.example.com/api/auth/callback/email?token=abc',
+        subject: 'Sign in to your account',
+        body: bodyOf('We received a request to sign in.'),
+        isSentByPlatform: true,
+        logoImageUrl: 'https://cdn.example.com/logo.png',
+      });
+    });
+
+    it('links the magic-link url in the sign-in action', () => {
+      expect(email.html).toContain(
+        'href="https://platform.example.com/api/auth/callback/email?token=abc"',
+      );
+    });
+
+    it('renders the action as a button in the platform palette', () => {
+      expect(email.html).toContain(
+        `background-color:${PLATFORM_EMAIL_BRAND.brandPrimarySolid}`,
+      );
+    });
+
+    it('shows the platform logo mark next to the platform name', () => {
+      expect(email.html).toContain('<svg');
+      expect(email.html).toContain(PLATFORM_EMAIL_BRAND.logo1);
+      expect(email.html).toContain(
+        `&copy; ${new Date().getFullYear()} ${PLATFORM_EMAIL_BRAND_NAME}`,
+      );
+    });
+
+    it('never replaces the mark with an uploaded logo image', () => {
+      expect(email.html).not.toContain('https://cdn.example.com/logo.png');
+    });
+
+    it('renders no operator branding', () => {
+      expect(email.html).not.toContain('Tenant Alerts');
     });
   });
 
