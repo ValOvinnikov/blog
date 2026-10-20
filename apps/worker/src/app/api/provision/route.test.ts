@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -18,8 +19,8 @@ import { POST } from './route';
 const SECRET = 'enqueue-secret';
 const TENANT_ID = TEST_TENANT_ID;
 
-const mockEnv = vi.hoisted(() => ({
-  WORKER_ENQUEUE_SECRET: 'enqueue-secret' as string | undefined,
+const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
+  WORKER_ENQUEUE_SECRET: 'enqueue-secret',
 }));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));

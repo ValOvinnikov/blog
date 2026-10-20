@@ -1,17 +1,18 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { FatalError } from 'workflow';
 
 import { getProvisionEnv } from './provision-env';
 
-const mockEnv = vi.hoisted(() => ({
-  SANITY_MANAGEMENT_TOKEN: 'secret-management-token' as string | undefined,
-  SANITY_ORGANIZATION_ID: 'org-1' as string | undefined,
-  VERCEL_TOKEN: 'secret-vercel-token' as string | undefined,
-  VERCEL_TEAM_ID: undefined as string | undefined,
-  VERCEL_PROJECT_ID_WEB: 'prj_web' as string | undefined,
-  ADMIN_APP_BASE_URL: 'https://admin.example.com' as string | undefined,
-  TENANT_SANITY_DATASET: 'production' as string | undefined,
-  WEB_APP_URL: 'https://web.example.com' as string | undefined,
-  SANITY_REVALIDATE_SECRET: 'secret-revalidate' as string | undefined,
+const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
+  SANITY_MANAGEMENT_TOKEN: 'secret-management-token',
+  SANITY_ORGANIZATION_ID: 'org-1',
+  VERCEL_TOKEN: 'secret-vercel-token',
+  VERCEL_TEAM_ID: undefined,
+  VERCEL_PROJECT_ID_WEB: 'prj_web',
+  ADMIN_APP_BASE_URL: 'https://admin.example.com',
+  TENANT_SANITY_DATASET: 'production',
+  WEB_APP_URL: 'https://web.example.com',
+  SANITY_REVALIDATE_SECRET: 'secret-revalidate',
 }));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
