@@ -1,3 +1,5 @@
+import { LOCALE_ISO_CODES, NEWSLETTER_RESULT } from '@blog/config/constants';
+
 import { pageHref, routes } from './routes';
 
 describe('routes', () => {
@@ -23,7 +25,7 @@ describe('routes', () => {
   });
 
   it('builds the language-switch path with the current page encoded', () => {
-    expect(routes.switchLanguage('NL', '/nl/over ons')).toBe(
+    expect(routes.switchLanguage(LOCALE_ISO_CODES.NL, '/nl/over ons')).toBe(
       '/api/switch-language?to=NL&from=%2Fnl%2Fover+ons',
     );
   });
@@ -79,17 +81,19 @@ describe('routes', () => {
   });
 
   it('carries the language the link was sent in', () => {
-    expect(routes.newsletterConfirm('abc123', 'FR')).toBe(
+    expect(routes.newsletterConfirm('abc123', LOCALE_ISO_CODES.FR)).toBe(
       '/api/newsletter/confirm?token=abc123&lang=FR',
     );
-    expect(routes.newsletterUnsubscribe('abc123', 'FR')).toBe(
+    expect(routes.newsletterUnsubscribe('abc123', LOCALE_ISO_CODES.FR)).toBe(
       '/api/newsletter/unsubscribe?token=abc123&lang=FR',
     );
   });
 
   it('builds the newsletter result page path from the result', () => {
-    expect(routes.newsletterResult('CONFIRMED')).toBe('/newsletter/confirmed');
-    expect(routes.newsletterResult('UNSUBSCRIBE_INVALID')).toBe(
+    expect(routes.newsletterResult(NEWSLETTER_RESULT.CONFIRMED)).toBe(
+      '/newsletter/confirmed',
+    );
+    expect(routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID)).toBe(
       '/newsletter/unsubscribe-invalid',
     );
   });

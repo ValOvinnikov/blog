@@ -1,65 +1,54 @@
-import { TENANT_WRITE_REFUSAL } from '@blog/config';
+import { LOCALE_ISO_CODES, routes, TENANT_WRITE_REFUSAL } from '@blog/config';
+import { queries } from '@blog/db';
+import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
+import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
+import { makeNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
+import { makeSubscriber } from '@web/testing/shared/subscriber/fixtures';
+import {
+  DEFAULT_TENANT_BASE_URL,
+  DEFAULT_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 
-export {};
-
-const {
-  confirmSubscriberMock,
-  resolveWritableTenantMock,
-  resolveNewsletterLinkLocaleMock,
-} = vi.hoisted(() => ({
-  confirmSubscriberMock: vi.fn(),
-  resolveWritableTenantMock: vi.fn(),
-  resolveNewsletterLinkLocaleMock: vi.fn(),
-}));
+import { GET } from './route';
 
 vi.mock('@blog/db', () => ({
-  queries: { subscribers: { confirmSubscriber: confirmSubscriberMock } },
+  queries: { subscribers: { confirmSubscriber: vi.fn() } },
 }));
 
 vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
-  resolveWritableTenant: resolveWritableTenantMock,
+  resolveWritableTenant: vi.fn(),
 }));
 
 vi.mock(
   '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale',
-  () => ({ resolveNewsletterLinkLocale: resolveNewsletterLinkLocaleMock }),
+  () => ({ resolveNewsletterLinkLocale: vi.fn() }),
 );
 
-const TENANT_ID = 'tenant-1';
+const confirmSubscriberMock = vi.mocked(queries.subscribers.confirmSubscriber);
+const resolveWritableTenantMock = vi.mocked(resolveWritableTenant);
+const resolveNewsletterLinkLocaleMock = vi.mocked(resolveNewsletterLinkLocale);
 
-const subscriber = {
-  id: 'sub-1',
-  email: 'reader@example.com',
-  status: 'active' as const,
-  confirmationToken: 'token-abc',
-  subscribedAt: new Date('2026-01-01'),
-  confirmedAt: new Date('2026-01-02'),
-};
+const TOKEN = 'confirm-token';
+
+const toConfirmRequest = (path: string) =>
+  new Request(new URL(path, DEFAULT_TENANT_BASE_URL));
 
 describe('GET /api/newsletter/confirm', () => {
-  let GET: typeof import('./route').GET;
   let request: Request;
 
-  beforeEach(async () => {
-    request = new Request(
-      'https://example.com/api/newsletter/confirm?token=token-abc',
-    );
-    confirmSubscriberMock.mockReset();
+  beforeEach(() => {
+    request = toConfirmRequest(routes.newsletterConfirm(TOKEN));
     confirmSubscriberMock.mockResolvedValue({
       outcome: 'confirmed',
-      subscriber,
+      subscriber: makeSubscriber(),
     });
-    resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
-      tenantId: TENANT_ID,
+      tenantId: DEFAULT_TENANT_ID,
     });
-    resolveNewsletterLinkLocaleMock.mockReset();
-    resolveNewsletterLinkLocaleMock.mockResolvedValue({
-      locale: 'EN',
-      defaultLocale: 'EN',
-    });
-    ({ GET } = await import('./route'));
+    resolveNewsletterLinkLocaleMock.mockResolvedValue(
+      makeNewsletterLinkLocale(),
+    );
   });
 
   it('confirms the subscriber and sends them to the confirmed page', async () => {
@@ -70,23 +59,39 @@ describe('GET /api/newsletter/confirm', () => {
       'https://example.com/newsletter/confirmed',
     );
     expect(response.headers.get('cache-control')).toBe('private, no-store');
-    expect(confirmSubscriberMock).toHaveBeenCalledWith(TENANT_ID, 'token-abc');
+    expect(confirmSubscriberMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_ID,
+      TOKEN,
+    );
   });
 
   it('sends them to the page in the language the link carries', async () => {
-    resolveNewsletterLinkLocaleMock.mockResolvedValue({
-      locale: 'FR',
-      defaultLocale: 'EN',
-    });
+    resolveNewsletterLinkLocaleMock.mockResolvedValue(
+      makeNewsletterLinkLocale({ locale: LOCALE_ISO_CODES.FR }),
+    );
     const response = await GET(
-      new Request(
-        'https://example.com/api/newsletter/confirm?token=token-abc&lang=FR',
-      ),
+      toConfirmRequest(routes.newsletterConfirm(TOKEN, LOCALE_ISO_CODES.FR)),
     );
 
-    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith('FR');
+    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith(
+      LOCALE_ISO_CODES.FR,
+    );
     expect(response.headers.get('location')).toBe(
       'https://example.com/fr/newsletter/confirmed',
+    );
+  });
+
+  it("keeps the site's own default language unprefixed", async () => {
+    resolveNewsletterLinkLocaleMock.mockResolvedValue(
+      makeNewsletterLinkLocale({
+        locale: LOCALE_ISO_CODES.NL,
+        defaultLocale: LOCALE_ISO_CODES.NL,
+      }),
+    );
+    const response = await GET(request);
+
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/confirmed',
     );
   });
 
@@ -99,7 +104,7 @@ describe('GET /api/newsletter/confirm', () => {
   it('treats an already-confirmed token as success', async () => {
     confirmSubscriberMock.mockResolvedValue({
       outcome: 'already-confirmed',
-      subscriber,
+      subscriber: makeSubscriber(),
     });
     const response = await GET(request);
 
@@ -109,9 +114,7 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('sends a link without a token to the invalid page without querying the db', async () => {
-    const response = await GET(
-      new Request('https://example.com/api/newsletter/confirm'),
-    );
+    const response = await GET(toConfirmRequest('/api/newsletter/confirm'));
 
     expect(response.headers.get('location')).toBe(
       'https://example.com/newsletter/confirm-invalid',
@@ -141,7 +144,7 @@ describe('GET /api/newsletter/confirm', () => {
     expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
 
-  it('sends them to the failed page without querying the db when no tenant resolves', async () => {
+  it('sends an unresolved tenant to the failed page without querying the db', async () => {
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.UNRESOLVED,

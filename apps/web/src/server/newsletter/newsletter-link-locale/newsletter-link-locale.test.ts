@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 
 import { resolveNewsletterLinkLocale } from './newsletter-link-locale';
@@ -21,24 +22,26 @@ describe(resolveNewsletterLinkLocale, () => {
   beforeEach(() => {
     resolveRequestTenantMock.mockReset();
     resolveRequestTenantMock.mockResolvedValue({
-      locale: 'NL',
-      liveLocales: ['NL', 'FR'],
+      locale: LOCALE_ISO_CODES.NL,
+      liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.FR],
     } as never);
   });
 
   it('keeps a language the tenant offers', async () => {
-    await expect(resolveNewsletterLinkLocale('FR')).resolves.toEqual({
-      locale: 'FR',
-      defaultLocale: 'NL',
+    await expect(
+      resolveNewsletterLinkLocale(LOCALE_ISO_CODES.FR),
+    ).resolves.toEqual({
+      locale: LOCALE_ISO_CODES.FR,
+      defaultLocale: LOCALE_ISO_CODES.NL,
     });
   });
 
-  it.each([null, '', 'DE', 'fr', 'xx'])(
+  it.each([null, '', LOCALE_ISO_CODES.DE, 'fr', 'xx'])(
     "falls back to the tenant's default language for %j",
     async (lang) => {
       await expect(resolveNewsletterLinkLocale(lang)).resolves.toEqual({
-        locale: 'NL',
-        defaultLocale: 'NL',
+        locale: LOCALE_ISO_CODES.NL,
+        defaultLocale: LOCALE_ISO_CODES.NL,
       });
     },
   );
@@ -46,9 +49,11 @@ describe(resolveNewsletterLinkLocale, () => {
   it('falls back to English when no tenant matches the request', async () => {
     resolveRequestTenantMock.mockResolvedValue(undefined);
 
-    await expect(resolveNewsletterLinkLocale('FR')).resolves.toEqual({
-      locale: 'EN',
-      defaultLocale: 'EN',
+    await expect(
+      resolveNewsletterLinkLocale(LOCALE_ISO_CODES.FR),
+    ).resolves.toEqual({
+      locale: LOCALE_ISO_CODES.EN,
+      defaultLocale: LOCALE_ISO_CODES.EN,
     });
   });
 
@@ -56,9 +61,11 @@ describe(resolveNewsletterLinkLocale, () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     resolveRequestTenantMock.mockRejectedValue(new Error('db down'));
 
-    await expect(resolveNewsletterLinkLocale('FR')).resolves.toEqual({
-      locale: 'EN',
-      defaultLocale: 'EN',
+    await expect(
+      resolveNewsletterLinkLocale(LOCALE_ISO_CODES.FR),
+    ).resolves.toEqual({
+      locale: LOCALE_ISO_CODES.EN,
+      defaultLocale: LOCALE_ISO_CODES.EN,
     });
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining('newsletter.link_locale_tenant_lookup_failed'),

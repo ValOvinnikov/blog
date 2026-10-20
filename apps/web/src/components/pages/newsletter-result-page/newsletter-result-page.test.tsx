@@ -1,8 +1,11 @@
+import { NEWSLETTER_RESULT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { NewsletterResultPage } from './newsletter-result-page';
 
-const setup = customRender(NewsletterResultPage, { result: 'CONFIRMED' });
+const setup = customRender(NewsletterResultPage, {
+  result: NEWSLETTER_RESULT.CONFIRMED,
+});
 
 describe(`<${NewsletterResultPage.name}/>`, () => {
   it('renders the confirmed result with a link home', () => {
@@ -23,7 +26,7 @@ describe(`<${NewsletterResultPage.name}/>`, () => {
   });
 
   it('renders the unsubscribe copy for an unsubscribe result', () => {
-    setup({ result: 'UNSUBSCRIBE_INVALID' });
+    setup({ result: NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID });
 
     const heading = screen.getByRole('heading', {
       level: 1,

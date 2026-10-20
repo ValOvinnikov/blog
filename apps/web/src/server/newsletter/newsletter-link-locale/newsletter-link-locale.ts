@@ -8,7 +8,7 @@ import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 
-type TNewsletterLinkLocale = {
+export type TNewsletterLinkLocale = {
   locale: TLocaleIsoCode;
   defaultLocale: TLocaleIsoCode;
 };
