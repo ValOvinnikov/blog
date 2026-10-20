@@ -1,28 +1,19 @@
+import {
+  SANITY_PROJECT_DELETE_OUTCOME,
+  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
+  type TOutcome,
+  type TTenantDeleteSanityProjectOutcome,
+} from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { tenants } from '@blog/db/schema/tenants';
 import { deleteSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
-// What happened to the tenant's still-existing (archived by deprovisioning)
-// Sanity project during a permanent delete. `deleted` and `already-gone`
-// (a 404 — nothing left to delete) are kept distinct rather than folded
-// together, same as `left-archived` is kept distinct from both — none of
-// the three is "as good as deleted" from a caller's point of view.
-// `no-project` covers a tenant that never had one. `skipped-no-token` is
-// what happens on every call today: no caller currently supplies
-// `sanityManagementToken`, so the archived project is left exactly as
-// deprovisioning left it.
-export type TDeleteTenantSanityProjectOutcome =
-  | 'deleted'
-  | 'already-gone'
-  | 'left-archived'
-  | 'no-project'
-  | 'skipped-no-token';
-
 export type TDeleteTenantResult =
-  | { outcome: 'deleted'; sanityProject: TDeleteTenantSanityProjectOutcome }
-  | { outcome: 'not-archived' }
-  | { outcome: 'not-found' };
+  | { outcome: 'deleted'; sanityProject: TTenantDeleteSanityProjectOutcome }
+  | TOutcome<'not-archived'>
+  | TOutcome<'not-found'>;
 
 /**
  * Hard-deletes a tenant row — unlike `archiveTenant`, this is irreversible
@@ -52,14 +43,15 @@ export async function deleteTenant(
     .where(eq(tenants.id, tenantId));
 
   if (!existing) {
-    return { outcome: 'not-found' };
+    return toOutcome('not-found');
   }
 
   if (!existing.deprovisionedAt) {
-    return { outcome: 'not-archived' };
+    return toOutcome('not-archived');
   }
 
-  let sanityProject: TDeleteTenantSanityProjectOutcome = 'no-project';
+  let sanityProject: TTenantDeleteSanityProjectOutcome =
+    TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT;
   if (existing.sanityProjectId) {
     if (sanityManagementToken) {
       const result = await deleteSanityProject({
@@ -67,11 +59,12 @@ export async function deleteTenant(
         projectId: existing.sanityProjectId,
       });
       sanityProject =
-        result.outcome === 'blocked-by-billing-permission'
-          ? 'left-archived'
+        result.outcome ===
+        SANITY_PROJECT_DELETE_OUTCOME.BLOCKED_BY_BILLING_PERMISSION
+          ? TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED
           : result.outcome;
     } else {
-      sanityProject = 'skipped-no-token';
+      sanityProject = TENANT_DELETE_SANITY_PROJECT_OUTCOME.SKIPPED_NO_TOKEN;
     }
   }
 

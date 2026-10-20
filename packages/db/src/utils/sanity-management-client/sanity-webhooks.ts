@@ -1,3 +1,4 @@
+import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import { SANITY_API_TIMEOUT_MS } from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
 // The global host, as `@sanity/cli` calls it; the project-scoped host answers a create with 2xx without creating a hook.
@@ -12,7 +13,7 @@ async function sanityWebhooksRequest<T>(
   token: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const path = `/hooks/projects/${projectId}`;
+  const path = SANITY_API_PATH.projectWebhooks(projectId);
   // A followed redirect replays a POST as a GET, whose 2xx list reads as success.
   const response = await fetch(`${SANITY_WEBHOOKS_API_BASE}${path}`, {
     ...init,

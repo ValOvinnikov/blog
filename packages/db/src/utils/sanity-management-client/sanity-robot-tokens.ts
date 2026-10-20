@@ -1,7 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined, TSanityRobotRole } from '@blog/config';
+import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import { sanityAccessRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
-
-export type TSanityRobotRole = 'viewer' | 'editor';
 
 export type TSanityRobotToken = { id: string; token: string };
 
@@ -16,7 +15,7 @@ export async function createSanityRobotToken(input: {
     tokenId?: string;
     token?: string;
     key?: string;
-  }>(`/access/project/${input.projectId}/robots`, input.token, {
+  }>(SANITY_API_PATH.projectRobots(input.projectId), input.token, {
     method: 'POST',
     body: JSON.stringify({
       label: input.label,
@@ -53,7 +52,7 @@ export async function listSanityRobotTokens(input: {
   const result = await sanityAccessRequest<
     | { data?: Array<{ id?: string; tokenId?: string; label?: string }> }
     | Array<{ id?: string; tokenId?: string; label?: string }>
-  >(`/access/project/${input.projectId}/robots`, input.token);
+  >(SANITY_API_PATH.projectRobots(input.projectId), input.token);
 
   const items = Array.isArray(result) ? result : (result.data ?? []);
   return items
@@ -67,7 +66,7 @@ export async function deleteSanityRobotToken(input: {
   robotId: string;
 }): Promise<void> {
   await sanityAccessRequest(
-    `/access/project/${input.projectId}/robots/${input.robotId}`,
+    SANITY_API_PATH.projectRobot(input.projectId, input.robotId),
     input.token,
     { method: 'DELETE' },
   );

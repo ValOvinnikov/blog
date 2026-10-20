@@ -1,6 +1,8 @@
+import { SANITY_PROJECT_UNARCHIVE_OUTCOME } from '@blog/config';
 import { AUDIT_ACTION, ERROR_CODE } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STEP, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { toOutcome } from '@blog/utils/to-outcome';
 
 import { runSteps } from './run';
 
@@ -120,7 +122,7 @@ beforeEach(() => {
     .mockResolvedValue({ ok: true, data: baseTenant });
   unarchiveSanityProjectMock
     .mockReset()
-    .mockResolvedValue({ outcome: 'unarchived' });
+    .mockResolvedValue(toOutcome(SANITY_PROJECT_UNARCHIVE_OUTCOME.UNARCHIVED));
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
   reportProvisioningRunStartMock.mockReset().mockResolvedValue(undefined);
   reportProvisioningRunFinishMock.mockReset().mockResolvedValue(undefined);

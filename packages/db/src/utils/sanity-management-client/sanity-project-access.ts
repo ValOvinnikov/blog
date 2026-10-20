@@ -1,9 +1,9 @@
+import type { TSanityProjectRole } from '@blog/config';
+import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import {
   sanityAccessRequest,
   sanityManagementRequest,
 } from '@blog/db/utils/sanity-management-client/sanity-api-request';
-
-export type TSanityProjectMemberRole = 'administrator' | 'editor' | 'viewer';
 
 export type TSanityInvite = { email?: string; status?: string };
 
@@ -16,7 +16,7 @@ export async function listSanityProjectInvites(input: {
     | { data?: Array<{ email?: string; status?: string }> }
     | Array<{ email?: string; status?: string }>
   >(
-    `/access/project/${input.projectId}/invites?status=pending&status=accepted`,
+    SANITY_API_PATH.projectInvitesPendingOrAccepted(input.projectId),
     input.token,
   );
 
@@ -28,10 +28,10 @@ export async function createSanityProjectInvite(input: {
   token: string;
   projectId: string;
   email: string;
-  role: TSanityProjectMemberRole;
+  role: TSanityProjectRole;
 }): Promise<void> {
   await sanityAccessRequest(
-    `/access/project/${input.projectId}/invites`,
+    SANITY_API_PATH.projectInvites(input.projectId),
     input.token,
     {
       method: 'POST',
@@ -52,7 +52,7 @@ export async function listSanityProjectAcl(input: {
   projectId: string;
 }): Promise<TSanityAclEntry[]> {
   return sanityManagementRequest<TSanityAclEntry[]>(
-    `/projects/${input.projectId}/acl/`,
+    SANITY_API_PATH.projectAcl(input.projectId),
     input.token,
   );
 }
@@ -62,10 +62,10 @@ export async function grantSanityProjectRole(input: {
   token: string;
   projectId: string;
   projectUserId: string;
-  role: TSanityProjectMemberRole;
+  role: TSanityProjectRole;
 }): Promise<void> {
   await sanityManagementRequest(
-    `/projects/${input.projectId}/acl/${input.projectUserId}`,
+    SANITY_API_PATH.projectAclEntry(input.projectId, input.projectUserId),
     input.token,
     { method: 'PUT', body: JSON.stringify({ roleName: input.role }) },
   );

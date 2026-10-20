@@ -1,22 +1,40 @@
+import { SANITY_API_SURFACE, type TSanityApiSurface } from '@blog/config';
+
 export const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
-const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
+export const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
 
 export const SANITY_API_TIMEOUT_MS = 30_000;
 
-type TSanityApiSurface = 'Management' | 'Access';
-
 const API_BASE: Record<TSanityApiSurface, string> = {
-  Management: SANITY_MANAGEMENT_API_BASE,
-  Access: SANITY_ACCESS_API_BASE,
+  [SANITY_API_SURFACE.MANAGEMENT]: SANITY_MANAGEMENT_API_BASE,
+  [SANITY_API_SURFACE.ACCESS]: SANITY_ACCESS_API_BASE,
 };
 
-async function sanityApiRequest<T>(
+const API_SURFACE_LABEL: Record<TSanityApiSurface, string> = {
+  [SANITY_API_SURFACE.MANAGEMENT]: 'Management',
+  [SANITY_API_SURFACE.ACCESS]: 'Access',
+};
+
+export function sanityApiError(
+  surface: TSanityApiSurface,
+  method: string,
+  path: string,
+  response: Response,
+  body: string,
+): Error {
+  return new Error(
+    `Sanity ${API_SURFACE_LABEL[surface]} API ${method} ${path} failed: ${response.status} ${body}`,
+  );
+}
+
+async function sanityApiResponse(
   surface: TSanityApiSurface,
   path: string,
   token: string,
   init: RequestInit,
-): Promise<T> {
+  allowStatus: readonly number[],
+): Promise<Response> {
   const response = await fetch(`${API_BASE[surface]}${path}`, {
     ...init,
     signal: AbortSignal.timeout(SANITY_API_TIMEOUT_MS),
@@ -27,15 +45,38 @@ async function sanityApiRequest<T>(
     },
   });
 
-  if (!response.ok) {
+  if (!response.ok && !allowStatus.includes(response.status)) {
     const body = await response.text().catch(() => '');
-    throw new Error(
-      `Sanity ${surface} API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}`,
-    );
+    throw sanityApiError(surface, init.method ?? 'GET', path, response, body);
   }
 
+  return response;
+}
+
+async function sanityApiRequest<T>(
+  surface: TSanityApiSurface,
+  path: string,
+  token: string,
+  init: RequestInit,
+): Promise<T> {
+  const response = await sanityApiResponse(surface, path, token, init, []);
   const text = await response.text();
   return (text ? JSON.parse(text) : undefined) as T;
+}
+
+export function sanityManagementResponse(
+  path: string,
+  token: string,
+  init: RequestInit,
+  allowStatus: readonly number[],
+): Promise<Response> {
+  return sanityApiResponse(
+    SANITY_API_SURFACE.MANAGEMENT,
+    path,
+    token,
+    init,
+    allowStatus,
+  );
 }
 
 export function sanityManagementRequest<T>(
@@ -43,7 +84,7 @@ export function sanityManagementRequest<T>(
   token: string,
   init: RequestInit = {},
 ): Promise<T> {
-  return sanityApiRequest<T>('Management', path, token, init);
+  return sanityApiRequest<T>(SANITY_API_SURFACE.MANAGEMENT, path, token, init);
 }
 
 export function sanityAccessRequest<T>(
@@ -51,5 +92,5 @@ export function sanityAccessRequest<T>(
   token: string,
   init: RequestInit = {},
 ): Promise<T> {
-  return sanityApiRequest<T>('Access', path, token, init);
+  return sanityApiRequest<T>(SANITY_API_SURFACE.ACCESS, path, token, init);
 }

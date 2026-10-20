@@ -1,3 +1,4 @@
+import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
 import { sanityManagementRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
 export type TSanityProject = { id: string };
@@ -7,13 +8,17 @@ export async function createSanityProject(input: {
   displayName: string;
   organizationId: string;
 }): Promise<TSanityProject> {
-  return sanityManagementRequest<TSanityProject>('/projects', input.token, {
-    method: 'POST',
-    body: JSON.stringify({
-      displayName: input.displayName,
-      organizationId: input.organizationId,
-    }),
-  });
+  return sanityManagementRequest<TSanityProject>(
+    SANITY_API_PATH.projects(),
+    input.token,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        displayName: input.displayName,
+        organizationId: input.organizationId,
+      }),
+    },
+  );
 }
 
 export async function createSanityDataset(input: {
@@ -22,7 +27,7 @@ export async function createSanityDataset(input: {
   dataset: string;
 }): Promise<void> {
   await sanityManagementRequest(
-    `/projects/${input.projectId}/datasets/${input.dataset}`,
+    SANITY_API_PATH.projectDataset(input.projectId, input.dataset),
     input.token,
     { method: 'PUT', body: JSON.stringify({ aclMode: 'public' }) },
   );
@@ -35,7 +40,7 @@ export async function listSanityDatasets(input: {
   projectId: string;
 }): Promise<TSanityDataset[]> {
   return sanityManagementRequest<TSanityDataset[]>(
-    `/projects/${input.projectId}/datasets`,
+    SANITY_API_PATH.projectDatasets(input.projectId),
     input.token,
   );
 }
@@ -47,7 +52,7 @@ export async function addSanityCorsOrigin(input: {
   allowCredentials?: boolean;
 }): Promise<void> {
   await sanityManagementRequest(
-    `/projects/${input.projectId}/cors`,
+    SANITY_API_PATH.projectCors(input.projectId),
     input.token,
     {
       method: 'POST',
@@ -66,7 +71,7 @@ export async function listSanityCorsOrigins(input: {
   projectId: string;
 }): Promise<TSanityCorsOrigin[]> {
   return sanityManagementRequest<TSanityCorsOrigin[]>(
-    `/projects/${input.projectId}/cors`,
+    SANITY_API_PATH.projectCors(input.projectId),
     input.token,
   );
 }
