@@ -46,6 +46,7 @@ export async function readSignedTenantRequest(
       secret,
       timestamp: request.headers.get(ENQUEUE_TIMESTAMP_HEADER),
       signature: request.headers.get(ENQUEUE_SIGNATURE_HEADER),
+      path: new URL(request.url).pathname,
       rawBody,
     });
   if (!authenticated) {

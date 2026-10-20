@@ -11,11 +11,12 @@ import {
 export function signEnqueuePayload(input: {
   secret: string;
   timestamp: string;
+  path: string;
   rawBody: string;
 }): string {
-  const { secret, timestamp, rawBody } = input;
+  const { secret, timestamp, path, rawBody } = input;
   const digest = createHmac(ENQUEUE_SIGNATURE_ALGORITHM, secret)
-    .update(`${timestamp}.${rawBody}`)
+    .update(`${timestamp}.${path}.${rawBody}`)
     .digest('hex');
   return `${ENQUEUE_SIGNATURE_PREFIX}${digest}`;
 }
@@ -29,6 +30,7 @@ export function signedRequest(
   const signature = signEnqueuePayload({
     secret,
     timestamp: String(timestamp),
+    path: new URL(url).pathname,
     rawBody,
   });
   return new Request(url, {

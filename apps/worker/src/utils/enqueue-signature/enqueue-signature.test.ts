@@ -5,9 +5,15 @@ import { isValidEnqueueSignature } from './enqueue-signature';
 const SECRET = 'shared-secret';
 const NOW = 1_700_000_000_000;
 const BODY = '{"tenantId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b"}';
+const PATH = '/api/owner-access/check';
 
-function sign(secret: string, timestamp: string, rawBody: string): string {
-  return signEnqueuePayload({ secret, timestamp, rawBody });
+function sign(
+  secret: string,
+  timestamp: string,
+  rawBody: string,
+  path: string = PATH,
+): string {
+  return signEnqueuePayload({ secret, timestamp, path, rawBody });
 }
 
 function validate(
@@ -18,6 +24,7 @@ function validate(
     secret: SECRET,
     timestamp,
     signature: sign(SECRET, timestamp, BODY),
+    path: PATH,
     rawBody: BODY,
     now: NOW,
     ...overrides,
@@ -31,6 +38,10 @@ describe(isValidEnqueueSignature, () => {
 
   it('rejects a body changed after signing', () => {
     expect(validate({ rawBody: `${BODY} ` })).toBe(false);
+  });
+
+  it('rejects a signature replayed against another route', () => {
+    expect(validate({ path: '/api/owner-access/resend' })).toBe(false);
   });
 
   it('rejects a signature made with another secret', () => {
