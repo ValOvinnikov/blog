@@ -15,6 +15,7 @@ export const SANITY_WEBHOOK_URL = faker.internet.url({ appendSlash: false });
 
 export const SANITY_EXPECTED_URL = {
   projects: 'https://api.sanity.io/v2021-06-07/projects',
+  project: `https://api.sanity.io/v2021-06-07/projects/${SANITY_PROJECT_ID}`,
   datasets: `https://api.sanity.io/v2021-06-07/projects/${SANITY_PROJECT_ID}/datasets`,
   dataset: `https://api.sanity.io/v2021-06-07/projects/${SANITY_PROJECT_ID}/datasets/${SANITY_DATASET}`,
   cors: `https://api.sanity.io/v2021-06-07/projects/${SANITY_PROJECT_ID}/cors`,

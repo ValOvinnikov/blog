@@ -3,8 +3,19 @@ import {
   SANITY_PROJECT_DELETE_OUTCOME,
   SANITY_PROJECT_UNARCHIVE_OUTCOME,
 } from '@blog/config';
+import {
+  emptyResponse,
+  firstFetchCall,
+  jsonResponse,
+  textResponse,
+  useFetchFake,
+} from '@blog/db/testing/sanity-management-client/fetch-fake';
+import {
+  SANITY_EXPECTED_URL,
+  SANITY_PROJECT_ID,
+  withSanityProject,
+} from '@blog/db/testing/sanity-management-client/fixtures';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { faker } from '@faker-js/faker';
 
 import {
   archiveSanityProject,
@@ -12,59 +23,38 @@ import {
   unarchiveSanityProject,
 } from './sanity-project-lifecycle';
 
-const fetchMock = vi.fn();
+const fetchMock = useFetchFake();
 
-const TOKEN = faker.string.alphanumeric(24);
-const PROJECT_ID = faker.string.alphanumeric(8).toLowerCase();
-const INPUT = { token: TOKEN, projectId: PROJECT_ID };
-const SANITY_EXPECTED_URL = {
-  project: `https://api.sanity.io/v2021-06-07/projects/${PROJECT_ID}`,
-};
+const INPUT = withSanityProject({});
 const BILLING_401_BODY = JSON.stringify({
   code: 401,
   status: 'Unauthorized',
-  message: `Cancellation of project "${PROJECT_ID}" requires billing permission on organization "org1"`,
-});
-
-function okResponse(): Response {
-  return new Response('{}', { status: 200 });
-}
-function errorResponse(status: number, body = 'error'): Response {
-  return new Response(body, { status });
-}
-
-beforeEach(() => {
-  vi.stubGlobal('fetch', fetchMock);
-  fetchMock.mockReset();
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
+  message: `Cancellation of project "${SANITY_PROJECT_ID}" requires billing permission on organization "org1"`,
 });
 
 describe(deleteSanityProject, () => {
   it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+    fetchMock.mockResolvedValue(emptyResponse());
 
     await deleteSanityProject(INPUT);
 
-    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const { init } = firstFetchCall(fetchMock);
     expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 
   it('DELETEs the project', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+    fetchMock.mockResolvedValue(emptyResponse());
 
     const result = await deleteSanityProject(INPUT);
 
     expect(result).toEqual(toOutcome(SANITY_PROJECT_DELETE_OUTCOME.DELETED));
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const { url, init } = firstFetchCall(fetchMock);
     expect(url).toBe(SANITY_EXPECTED_URL.project);
     expect(init.method).toBe('DELETE');
   });
 
   it('treats a 404 as already gone rather than an error', async () => {
-    fetchMock.mockResolvedValue(errorResponse(404, 'not found'));
+    fetchMock.mockResolvedValue(textResponse('not found', 404));
 
     const result = await deleteSanityProject(INPUT);
 
@@ -74,15 +64,15 @@ describe(deleteSanityProject, () => {
   });
 
   it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(errorResponse(403, 'forbidden'));
+    fetchMock.mockResolvedValue(textResponse('forbidden', 403));
 
     await expect(deleteSanityProject(INPUT)).rejects.toThrow(
-      `Sanity Management API DELETE /projects/${PROJECT_ID} failed: 403 forbidden`,
+      `Sanity Management API DELETE /projects/${SANITY_PROJECT_ID} failed: 403 forbidden`,
     );
   });
 
   it('reports blocked by billing permission on the billing 401 without throwing', async () => {
-    fetchMock.mockResolvedValue(errorResponse(401, BILLING_401_BODY));
+    fetchMock.mockResolvedValue(textResponse(BILLING_401_BODY, 401));
 
     const result = await deleteSanityProject(INPUT);
 
@@ -92,17 +82,21 @@ describe(deleteSanityProject, () => {
   });
 
   it('still throws on a 401 unrelated to billing permission', async () => {
-    fetchMock.mockResolvedValue(errorResponse(401, 'invalid token'));
+    fetchMock.mockResolvedValue(textResponse('invalid token', 401));
 
     await expect(deleteSanityProject(INPUT)).rejects.toThrow(
-      `Sanity Management API DELETE /projects/${PROJECT_ID} failed: 401 invalid token`,
+      `Sanity Management API DELETE /projects/${SANITY_PROJECT_ID} failed: 401 invalid token`,
     );
   });
 });
 
 function projectResponse(isDisabledByUser: boolean): Response {
   return new Response(
-    JSON.stringify({ id: PROJECT_ID, isDisabled: false, isDisabledByUser }),
+    JSON.stringify({
+      id: SANITY_PROJECT_ID,
+      isDisabled: false,
+      isDisabledByUser,
+    }),
     { status: 200 },
   );
 }
@@ -111,7 +105,7 @@ describe(archiveSanityProject, () => {
   it('sends an abort signal on both the GET and the PATCH', async () => {
     fetchMock
       .mockResolvedValueOnce(projectResponse(false))
-      .mockResolvedValueOnce(okResponse());
+      .mockResolvedValueOnce(jsonResponse({}));
 
     await archiveSanityProject(INPUT);
 
@@ -123,14 +117,14 @@ describe(archiveSanityProject, () => {
   it('GETs, then PATCHes isDisabledByUser to true when not already archived', async () => {
     fetchMock
       .mockResolvedValueOnce(projectResponse(false))
-      .mockResolvedValueOnce(okResponse());
+      .mockResolvedValueOnce(jsonResponse({}));
 
     const result = await archiveSanityProject(INPUT);
 
     expect(result).toEqual(toOutcome(SANITY_PROJECT_ARCHIVE_OUTCOME.ARCHIVED));
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    const [getUrl, getInit] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const { url: getUrl, init: getInit } = firstFetchCall(fetchMock);
     expect(getUrl).toBe(SANITY_EXPECTED_URL.project);
     expect(getInit.method).toBeUndefined();
 
@@ -155,7 +149,7 @@ describe(archiveSanityProject, () => {
   });
 
   it('treats a 404 on the GET as already gone rather than an error', async () => {
-    fetchMock.mockResolvedValueOnce(errorResponse(404, 'not found'));
+    fetchMock.mockResolvedValueOnce(textResponse('not found', 404));
 
     const result = await archiveSanityProject(INPUT);
 
@@ -166,20 +160,20 @@ describe(archiveSanityProject, () => {
   });
 
   it('throws when the GET fails for a reason other than 404', async () => {
-    fetchMock.mockResolvedValueOnce(errorResponse(403, 'forbidden'));
+    fetchMock.mockResolvedValueOnce(textResponse('forbidden', 403));
 
     await expect(archiveSanityProject(INPUT)).rejects.toThrow(
-      `Sanity Management API GET /projects/${PROJECT_ID} failed: 403 forbidden`,
+      `Sanity Management API GET /projects/${SANITY_PROJECT_ID} failed: 403 forbidden`,
     );
   });
 
   it('throws when the PATCH fails', async () => {
     fetchMock
       .mockResolvedValueOnce(projectResponse(false))
-      .mockResolvedValueOnce(errorResponse(500, 'server error'));
+      .mockResolvedValueOnce(textResponse('server error', 500));
 
     await expect(archiveSanityProject(INPUT)).rejects.toThrow(
-      `Sanity Management API PATCH /projects/${PROJECT_ID} failed: 500 server error`,
+      `Sanity Management API PATCH /projects/${SANITY_PROJECT_ID} failed: 500 server error`,
     );
   });
 });
@@ -188,7 +182,7 @@ describe(unarchiveSanityProject, () => {
   it('GETs, then PATCHes isDisabledByUser to false when currently archived', async () => {
     fetchMock
       .mockResolvedValueOnce(projectResponse(true))
-      .mockResolvedValueOnce(okResponse());
+      .mockResolvedValueOnce(jsonResponse({}));
 
     const result = await unarchiveSanityProject(INPUT);
 
@@ -218,7 +212,7 @@ describe(unarchiveSanityProject, () => {
   });
 
   it('treats a 404 on the GET as already gone rather than an error', async () => {
-    fetchMock.mockResolvedValueOnce(errorResponse(404, 'not found'));
+    fetchMock.mockResolvedValueOnce(textResponse('not found', 404));
 
     const result = await unarchiveSanityProject(INPUT);
 
@@ -229,20 +223,20 @@ describe(unarchiveSanityProject, () => {
   });
 
   it('throws when the GET fails for a reason other than 404', async () => {
-    fetchMock.mockResolvedValueOnce(errorResponse(403, 'forbidden'));
+    fetchMock.mockResolvedValueOnce(textResponse('forbidden', 403));
 
     await expect(unarchiveSanityProject(INPUT)).rejects.toThrow(
-      `Sanity Management API GET /projects/${PROJECT_ID} failed: 403 forbidden`,
+      `Sanity Management API GET /projects/${SANITY_PROJECT_ID} failed: 403 forbidden`,
     );
   });
 
   it('throws when the PATCH fails', async () => {
     fetchMock
       .mockResolvedValueOnce(projectResponse(true))
-      .mockResolvedValueOnce(errorResponse(500, 'server error'));
+      .mockResolvedValueOnce(textResponse('server error', 500));
 
     await expect(unarchiveSanityProject(INPUT)).rejects.toThrow(
-      `Sanity Management API PATCH /projects/${PROJECT_ID} failed: 500 server error`,
+      `Sanity Management API PATCH /projects/${SANITY_PROJECT_ID} failed: 500 server error`,
     );
   });
 });
