@@ -1,5 +1,8 @@
-import { ERROR_CODE, HTTP_STATUS } from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
+import {
+  ERROR_CODE,
+  HTTP_STATUS,
+  type THttpStatus,
+} from '@blog/config/constants';
 import { beginTenantProvisioning } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 import {
@@ -17,10 +20,7 @@ import { z } from 'zod';
 
 const enqueueBodySchema = z.object({ tenantId: z.uuid() });
 
-function respond(
-  status: TValueOf<typeof HTTP_STATUS>,
-  body: Record<string, string>,
-): Response {
+function respond(status: THttpStatus, body: Record<string, string>): Response {
   return Response.json(body, { status });
 }
 

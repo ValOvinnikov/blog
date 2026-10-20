@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { TMaybeNull } from '@blog/config';
 import {
   ENQUEUE_MAX_AGE_MS,
+  ENQUEUE_SIGNATURE_ALGORITHM,
   ENQUEUE_SIGNATURE_PREFIX,
 } from '@worker/constants/enqueue';
 
@@ -12,7 +13,7 @@ function signEnqueuePayload(input: {
   rawBody: string;
 }): string {
   const { secret, timestamp, rawBody } = input;
-  const digest = createHmac('sha256', secret)
+  const digest = createHmac(ENQUEUE_SIGNATURE_ALGORITHM, secret)
     .update(`${timestamp}.${rawBody}`)
     .digest('hex');
   return `${ENQUEUE_SIGNATURE_PREFIX}${digest}`;
