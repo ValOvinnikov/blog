@@ -5,7 +5,7 @@ description: >-
   tenant provisioning as Vercel Workflow durable runs, enqueued by
   apps/platform with a shared secret. Owns the provisioning units
   (ensureInfrastructure, inviteOwner, applySiteTemplate, verifyTenant,
-  ensureOwnerAccess, validateDocuments), their calls to Sanity's Management
+  ensureOwnerAccess), their calls to Sanity's Management
   API and @sanity/client, and the provisioning secrets no other app holds.
   Reads and writes relational data through @blog/db only; imported by
   nothing, and never imports React, @blog/ui, @blog/service, @blog/auth or
@@ -80,8 +80,7 @@ default to zero".
   returning a result: `ensureInfrastructure` (project, dataset, CORS, tokens,
   webhook; the custom domain only when one exists), `inviteOwner`,
   `applySiteTemplate(siteType, plan, locale)`, `verifyTenant`,
-  `ensureOwnerAccess`, `validateDocuments`. A unit never reaches into
-  another's state.
+  `ensureOwnerAccess`. A unit never reaches into another's state.
 - **Idempotency is decided from what exists** in Sanity and Vercel, never
   from markers: a retried unit looks up the project, dataset, hook or domain
   before creating it.
