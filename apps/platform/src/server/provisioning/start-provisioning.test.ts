@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -23,7 +23,7 @@ describe(startProvisioning, () => {
   });
 
   it('succeeds when the worker accepts the run', async () => {
-    enqueueProvisioningMock.mockResolvedValue(202);
+    enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.ACCEPTED);
 
     const result = await startProvisioning('tenant-1');
 
@@ -33,7 +33,7 @@ describe(startProvisioning, () => {
   });
 
   it('refuses as already in progress, without logging, when a run is in progress', async () => {
-    enqueueProvisioningMock.mockResolvedValue(409);
+    enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.CONFLICT);
 
     const result = await startProvisioning('tenant-1');
 
@@ -45,7 +45,7 @@ describe(startProvisioning, () => {
   });
 
   it('refuses as not found and logs when the worker cannot find the tenant', async () => {
-    enqueueProvisioningMock.mockResolvedValue(404);
+    enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.NOT_FOUND);
 
     const result = await startProvisioning('tenant-1');
 
@@ -59,7 +59,11 @@ describe(startProvisioning, () => {
     });
   });
 
-  it.each([400, 401, 500])(
+  it.each([
+    HTTP_STATUS.BAD_REQUEST,
+    HTTP_STATUS.UNAUTHORIZED,
+    HTTP_STATUS.INTERNAL_SERVER_ERROR,
+  ])(
     'logs and returns a server error when the worker answers %i',
     async (responseStatus) => {
       enqueueProvisioningMock.mockResolvedValue(responseStatus);

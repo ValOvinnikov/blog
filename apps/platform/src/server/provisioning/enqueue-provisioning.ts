@@ -4,6 +4,7 @@ import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
 const PROVISION_PATH = '/api/provision';
+// Twice the platform's other outbound calls: the worker admits the row and starts the run before it answers.
 const ENQUEUE_TIMEOUT_MS = 10_000;
 
 /** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */

@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
@@ -23,7 +24,9 @@ describe(enqueueProvisioning, () => {
   beforeEach(() => {
     loggerErrorMock.mockReset();
     fetchMock.mockReset();
-    fetchMock.mockResolvedValue(new Response(null, { status: 202 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.ACCEPTED }),
+    );
     vi.stubGlobal('fetch', fetchMock);
     envMock.WORKER_ENQUEUE_URL = 'https://worker-dev.example.com';
     envMock.WORKER_ENQUEUE_SECRET = SECRET;
@@ -55,7 +58,7 @@ describe(enqueueProvisioning, () => {
     const headers = init.headers as Record<string, string>;
 
     expect(url.toString()).toBe('https://worker-dev.example.com/api/provision');
-    expect(init.method).toBe('POST');
+    expect(init.method).toBe(HTTP_METHOD.POST);
     expect(JSON.parse(init.body as string)).toEqual({ tenantId: TENANT_ID });
     expect(
       isValidEnqueueSignature({
@@ -68,18 +71,16 @@ describe(enqueueProvisioning, () => {
     ).toBe(true);
   });
 
-  it.each([202, 404, 409, 500])(
-    "returns the worker's %i response status",
-    async (responseStatus) => {
-      fetchMock.mockResolvedValue(
-        new Response(null, { status: responseStatus }),
-      );
+  it.each([
+    HTTP_STATUS.ACCEPTED,
+    HTTP_STATUS.NOT_FOUND,
+    HTTP_STATUS.CONFLICT,
+    HTTP_STATUS.INTERNAL_SERVER_ERROR,
+  ])("returns the worker's %i response status", async (responseStatus) => {
+    fetchMock.mockResolvedValue(new Response(null, { status: responseStatus }));
 
-      await expect(enqueueProvisioning(TENANT_ID)).resolves.toBe(
-        responseStatus,
-      );
-    },
-  );
+    await expect(enqueueProvisioning(TENANT_ID)).resolves.toBe(responseStatus);
+  });
 
   it('logs and returns null when the request fails', async () => {
     const error = new Error('network down');
