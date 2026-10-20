@@ -1,0 +1,11 @@
+import type { TValueOf } from '@blog/config/utils';
+
+export const ENQUEUE_ERROR = {
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  INVALID_BODY: 'INVALID_BODY',
+  SERVER_ERROR: 'SERVER_ERROR',
+  ALREADY_IN_PROGRESS: 'ALREADY_IN_PROGRESS',
+  NOT_FOUND: 'NOT_FOUND',
+} as const;
+
+export type TEnqueueError = TValueOf<typeof ENQUEUE_ERROR>;
