@@ -1042,7 +1042,8 @@
     "columnMessage": "Message",
     "columnPage": "Page",
     "columnActions": "Actions",
-    "empty": "Aucun message pour l'instant. Quand quelqu'un utilisera votre formulaire de contact, son message apparaîtra ici."
+    "empty": "Aucun message pour l'instant. Quand quelqu'un utilisera votre formulaire de contact, son message apparaîtra ici.",
+    "homePage": "Page d'accueil"
   },
   "leadMessage": {
     "showMore": "Afficher plus",

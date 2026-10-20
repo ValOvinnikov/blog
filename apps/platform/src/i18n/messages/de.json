@@ -1042,7 +1042,8 @@
     "columnMessage": "Nachricht",
     "columnPage": "Seite",
     "columnActions": "Aktionen",
-    "empty": "Noch keine Nachrichten. Sobald jemand Ihr Kontaktformular nutzt, erscheint die Nachricht hier."
+    "empty": "Noch keine Nachrichten. Sobald jemand Ihr Kontaktformular nutzt, erscheint die Nachricht hier.",
+    "homePage": "Startseite"
   },
   "leadMessage": {
     "showMore": "Mehr anzeigen",

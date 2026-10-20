@@ -1042,7 +1042,8 @@
     "columnMessage": "Mensaje",
     "columnPage": "Página",
     "columnActions": "Acciones",
-    "empty": "Todavía no hay mensajes. Cuando alguien use su formulario de contacto, su mensaje aparecerá aquí."
+    "empty": "Todavía no hay mensajes. Cuando alguien use su formulario de contacto, su mensaje aparecerá aquí.",
+    "homePage": "Página de inicio"
   },
   "leadMessage": {
     "showMore": "Mostrar más",

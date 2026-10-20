@@ -1042,7 +1042,8 @@
     "columnMessage": "Bericht",
     "columnPage": "Pagina",
     "columnActions": "Acties",
-    "empty": "Nog geen berichten. Zodra iemand je contactformulier gebruikt, verschijnt het bericht hier."
+    "empty": "Nog geen berichten. Zodra iemand je contactformulier gebruikt, verschijnt het bericht hier.",
+    "homePage": "Startpagina"
   },
   "leadMessage": {
     "showMore": "Meer tonen",
