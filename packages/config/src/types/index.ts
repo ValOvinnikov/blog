@@ -2,6 +2,7 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
 
 export * from './action-result';
 export * from './contrast-result';
+export * from './outcome';
 export * from './page-module';
 
 export type TMaybeUndefined<T> = T | undefined;
