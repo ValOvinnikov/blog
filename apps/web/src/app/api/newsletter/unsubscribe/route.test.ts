@@ -7,7 +7,6 @@ import {
   DEFAULT_TENANT_BASE_URL,
   DEFAULT_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
-import { getTranslations } from 'next-intl/server';
 
 import { GET, POST } from './route';
 
@@ -59,25 +58,21 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(resolveRequestTenantMock).not.toHaveBeenCalled();
   });
 
-  it('renders a confirmation form without touching the db for a present token', async () => {
+  it('sends a present token to the confirmation page without touching the db', async () => {
     const response = await GET(
       toUnsubscribeRequest(routes.newsletterUnsubscribe(TOKEN)),
     );
-    const html = await response.text();
 
-    expect(response.status).toBe(200);
-    expect(response.headers.get('Content-Type')).toBe(
-      'text/html; charset=utf-8',
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribe?token=unsubscribe-token',
     );
-    expect(html).toContain('<form method="post"');
-    expect(html).toContain('token=unsubscribe-token');
-    expect(html).toContain('Confirm unsubscribe');
-    expect(html).toContain('<a href="/">Return home</a>');
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
     expect(resolveRequestTenantMock).not.toHaveBeenCalled();
   });
 
-  it('renders in the language the link carries and keeps it on the form', async () => {
+  it('sends them to the confirmation page in the language the link carries', async () => {
     resolveNewsletterLinkLocaleMock.mockResolvedValue(
       makeNewsletterLinkLocale({ locale: LOCALE_ISO_CODES.FR }),
     );
@@ -86,17 +81,13 @@ describe('GET /api/newsletter/unsubscribe', () => {
         routes.newsletterUnsubscribe(TOKEN, LOCALE_ISO_CODES.FR),
       ),
     );
-    const html = await response.text();
 
     expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith(
       LOCALE_ISO_CODES.FR,
     );
-    expect(getTranslations).toHaveBeenCalledWith({
-      locale: LOCALE_ISO_CODES.FR,
-      namespace: 'newsletterUnsubscribe',
-    });
-    expect(html).toContain('<html lang="FR">');
-    expect(html).toContain('token=unsubscribe-token&amp;lang=FR');
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/fr/newsletter/unsubscribe?token=unsubscribe-token',
+    );
   });
 });
 

@@ -31,7 +31,7 @@ Public pages are rendered on their first request per tenant, language and path, 
 - `POST /api/revalidate` — Sanity publish/unpublish/delete webhook (signature-verified).
 - `POST /api/revalidate-site-config` — called by `apps/platform` after a Look, Voice, Features, tenant-details or languages save (Bearer secret, optional `{ tenantId }` body).
 - Every content route under `apps/web/src/app/[tenant]/[locale]/` declares `export const revalidate = 21600`, and every route with a dynamic segment (`[...slug]`, `blog/[slug]`, `blog/page/[page]`, and the topic and tag slug and pagination routes) declares an empty `generateStaticParams`, so none of them is prerendered at build and each path is cached on first request. The `[tenant]/[locale]` layout's `generateStaticParams` returns the default locale only.
-- `account` and `bookmarks` are `force-dynamic` and never cached across readers.
+- `account`, `bookmarks` and `newsletter/unsubscribe` are `force-dynamic` and never cached across readers.
 
 ## Data
 
