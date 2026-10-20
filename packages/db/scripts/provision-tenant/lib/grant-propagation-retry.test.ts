@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import { ClientError } from '@sanity/client';
 import type { Mock } from 'vitest';
 
@@ -6,11 +7,11 @@ import { retryWithBackoff } from './retry-with-backoff';
 
 function forbiddenClientError(): ClientError {
   return new ClientError({
-    statusCode: 403,
+    statusCode: HTTP_STATUS.FORBIDDEN,
     headers: {},
     body: { message: 'Forbidden' },
     url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
-    method: 'POST',
+    method: HTTP_METHOD.POST,
   });
 }
 
@@ -63,11 +64,11 @@ describe(grantPropagationRetryOptions, () => {
     [
       'a structured ClientError with an unrelated status code and message',
       new ClientError({
-        statusCode: 400,
+        statusCode: HTTP_STATUS.BAD_REQUEST,
         headers: {},
         body: { message: 'Malformed mutation' },
         url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
-        method: 'POST',
+        method: HTTP_METHOD.POST,
       }),
     ],
     [

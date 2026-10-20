@@ -73,7 +73,9 @@ describe(createSanityProjectInvite, () => {
   });
 
   it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(textResponse('nope', 402));
+    fetchMock.mockResolvedValue(
+      textResponse('nope', HTTP_STATUS.PAYMENT_REQUIRED),
+    );
 
     await expect(createSanityProjectInvite(createInviteInput)).rejects.toThrow(
       /402/,

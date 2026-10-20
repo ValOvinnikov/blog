@@ -1,3 +1,4 @@
+import { SANITY_ROBOT_ROLE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import type { Mock } from 'vitest';
@@ -96,7 +97,7 @@ describe(persistTenantSanityToken, () => {
       token: 'mgmt-token',
       projectId: 'proj123',
       label: expect.any(String),
-      role: 'viewer',
+      role: SANITY_ROBOT_ROLE.VIEWER,
     });
     expect(setTenantSanityTokenMock).toHaveBeenCalledWith(
       'tenant-1',

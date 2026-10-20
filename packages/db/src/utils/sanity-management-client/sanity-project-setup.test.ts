@@ -1,4 +1,4 @@
-import { HTTP_METHOD } from '@blog/config';
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import {
   emptyResponse,
   firstFetchCall,
@@ -49,7 +49,9 @@ describe(createSanityProject, () => {
   });
 
   it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(textResponse('nope', 402));
+    fetchMock.mockResolvedValue(
+      textResponse('nope', HTTP_STATUS.PAYMENT_REQUIRED),
+    );
 
     await expect(createSanityProject(createProjectInput)).rejects.toThrow(
       /402/,

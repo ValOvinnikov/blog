@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS, SANITY_ROBOT_ROLE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
@@ -189,7 +190,7 @@ describe(seedTenantContent, () => {
       token: 'mgmt-token',
       projectId: 'proj123',
       label: expect.any(String),
-      role: 'editor',
+      role: SANITY_ROBOT_ROLE.EDITOR,
     });
     expect(createClient).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -297,11 +298,11 @@ describe(seedTenantContent, () => {
 
   it('retries a structured ClientError carrying the permission-denied status code, even when its message text does not mention "insufficient permissions"', async () => {
     const grantError = new ClientError({
-      statusCode: 403,
+      statusCode: HTTP_STATUS.FORBIDDEN,
       headers: {},
       body: { message: 'Forbidden' },
       url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
-      method: 'POST',
+      method: HTTP_METHOD.POST,
     });
     commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
@@ -324,11 +325,11 @@ describe(seedTenantContent, () => {
 
   it('does not retry a structured ClientError with an unrelated status code and message', async () => {
     const otherError = new ClientError({
-      statusCode: 400,
+      statusCode: HTTP_STATUS.BAD_REQUEST,
       headers: {},
       body: { message: 'Malformed mutation' },
       url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
-      method: 'POST',
+      method: HTTP_METHOD.POST,
     });
     commit.mockRejectedValue(otherError);
 
