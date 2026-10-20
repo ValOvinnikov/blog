@@ -5,8 +5,7 @@ layers: [config, db, auth, email, studio, web, platform, worker]
 code:
   - apps/platform/src/server/tenants/create-tenant-action.ts
   - apps/platform/src/server/tenants/check-tenant-slug.ts
-  - apps/platform/src/server/provisioning/dispatch-provisioning-workflow.ts
-  - .github/workflows/provision-tenant.yml
+  - apps/platform/src/server/provisioning/enqueue-provisioning.ts
   - apps/web/src/server/tenant/resolve-tenant/**
 epics:
   [
@@ -95,8 +94,8 @@ Today: `tenants.status` is `ACTIVE`, `SUSPENDED` or `ARCHIVED`; `tenants.plan` i
 What it replaces or extends today:
 
 - `apps/platform/src/server/tenants/create-tenant-action.ts` (operator-only tenant creation)
-- `apps/platform/src/server/provisioning/start-provisioning.ts`, `dispatch-provisioning-workflow.ts`
-- `.github/workflows/provision-tenant.yml`, `packages/db/scripts/provision-tenant/`
+- `apps/platform/src/server/provisioning/start-provisioning.ts`, `enqueue-provisioning.ts`
+- `packages/db/scripts/provision-tenant/`
 - `apps/web/src/server/tenant/resolve-tenant/resolve-tenant.ts` (host → tenant)
 - `packages/db/src/constants/tenant.ts` (`TENANT_STATUS`, `PLAN_REGISTRY`)
 

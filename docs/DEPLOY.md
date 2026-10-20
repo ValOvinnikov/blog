@@ -406,25 +406,25 @@ Optional — each is feature-flag-by-absence (the surface it powers degrades
 with a logged, readable error rather than crashing the app), but the panel is
 not fully functional until they are set:
 
-| Key                                | Purpose                                                              |
-| ---------------------------------- | -------------------------------------------------------------------- |
-| `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                        |
-| `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                        |
-| `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender address (`@blog/auth`)                             |
-| `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)    |
-| `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                     |
-| `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache  |
-| `SITE_CONFIG_REVALIDATE_SECRET`    | bearer token for that call — byte-identical to `apps/web`'s own      |
-| `TENANT_PROVISIONING_GITHUB_TOKEN` | `actions: write`-only PAT that dispatches (de)provisioning workflows |
-| `TENANT_PROVISIONING_GITHUB_REPO`  | `owner/repo` those dispatches target                                 |
-| `TENANT_PROVISIONING_DATASET`      | which dataset new tenants' Sanity projects are created in            |
-| `VERCEL_API_TOKEN`                 | read-scoped token for the tenant status page's live domain check     |
-| `VERCEL_PROJECT_ID_WEB`            | the shared `apps/web` project id that check runs against             |
-| `VERCEL_TEAM_ID`                   | only when the Vercel account is team-owned                           |
+| Key                                | Purpose                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------- |
+| `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                          |
+| `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                          |
+| `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender address (`@blog/auth`)                               |
+| `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)      |
+| `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                       |
+| `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache    |
+| `SITE_CONFIG_REVALIDATE_SECRET`    | bearer token for that call — byte-identical to `apps/web`'s own        |
+| `TENANT_PROVISIONING_GITHUB_TOKEN` | `actions: write`-only PAT that dispatches the deprovisioning workflow  |
+| `TENANT_PROVISIONING_GITHUB_REPO`  | `owner/repo` those dispatches target                                   |
+| `TENANT_PROVISIONING_DATASET`      | which tenant registry deprovisioning dispatches target                 |
+| `WORKER_ENQUEUE_URL`               | the `apps/worker` origin "Add tenant", retry and reactivate enqueue to |
+| `WORKER_ENQUEUE_SECRET`            | signs each enqueue — byte-identical to the worker's own                |
+| `VERCEL_API_TOKEN`                 | read-scoped token for the tenant status page's live domain check       |
+| `VERCEL_PROJECT_ID_WEB`            | the shared `apps/web` project id that check runs against               |
+| `VERCEL_TEAM_ID`                   | only when the Vercel account is team-owned                             |
 
 > `NEWSLETTER_FROM_ADDRESS` is `apps/web`-only — do **not** set it here.
-> `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` is a local-dev escape hatch and
-> must **never** be set on `platform-prod`.
 
 > Every key above is **Production scope only**, same as the web projects — see
 > the Preview-scope note under the web keys above.
@@ -504,9 +504,13 @@ names, so their block below applies to **both** environments rather than only to
 
 **Tenant lifecycle — both environments**
 
-`.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`/
+Provisioning itself runs on the `worker-dev`/`worker-prod` Vercel projects,
+whose env is listed in `docs/context/environment-variables.md`; nothing below
+provisions a tenant.
+
+`.github/workflows/deprovision-tenant.yml`/
 `invalidate-tenant-cache.yml` (`workflow_dispatch` only, the first triggered
-from `apps/platform`'s "Add tenant" wizard) and
+from `apps/platform`'s "Deprovision tenant" control) and
 `.github/workflows/recheck-tenant-owners.yml`/`validate-tenant-documents.yml`
 all bind to whichever
 Environment their dispatch's `environment` input names (`development`/
@@ -518,12 +522,10 @@ So every entry below belongs on **both** the `development` and the
 `production` Environment, each holding that environment's own values. A
 fully-configured `production` does nothing for a `development` dispatch: it
 fails on whatever `development` is missing. These workflows read
-overlapping subsets, so configuring an environment for provisioning covers the
-rest:
+overlapping subsets:
 
 | Workflow                        | Reads                                                                                                                                                                |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provision-tenant.yml`          | all of them                                                                                                                                                          |
 | `deprovision-tenant.yml`        | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
 | `invalidate-tenant-cache.yml`   | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                         |
 | `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `ADMIN_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                             |
@@ -563,17 +565,9 @@ dispatch can point it at `development`.
 - [ ] Secret `SANITY_MANAGEMENT_TOKEN` — an **organization-level** Sanity
       token with "create project" permission (broader than `SANITY_MIGRATE_TOKEN`,
       which is scoped to one already-existing project). Mint it at
-      https://manage.sanity.io → your organization → API → Tokens. Used to
-      create each new tenant's Sanity project/dataset/CORS entry, to mint its
-      transient seed-content token and its persisted read-only token, and by
+      https://manage.sanity.io → your organization → API → Tokens. Used by
+      `deprovision-tenant.yml` to archive a tenant's Sanity project, and by
       the owner-elevation sweep to read and grant tenant project ACLs.
-- [ ] Variable `SANITY_ORGANIZATION_ID` — the Sanity organization id every
-      tenant project must be created under (find it at
-      https://manage.sanity.io → your organization → Settings). Sent as
-      `organizationId` in the Management API's `POST /projects` body;
-      without it the project is silently created in whichever org the
-      token's owner defaults to, not necessarily this one. Read by
-      `provision-tenant.yml` only.
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set as
       the Vercel env var of the same name on that environment's `apps/web`
       project (see the `@blog/db` env vars table above): `web-dev`'s on
@@ -581,31 +575,14 @@ dispatch can point it at `development`.
       throws without it.
 - [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/platform` origin for
       that environment (no trailing slash/path), e.g.
-      `https://admin.{your-hosting}`. Used as the CORS origin step 1 adds to
-      each new tenant's Sanity project, so it must match the domain on that
-      environment's Vercel platform project exactly — `platform-dev` on
-      `development`, `platform-prod` on `production` (§3 above). The two
-      sweeps below (`recheck-tenant-owners.yml`,
-      `validate-tenant-documents.yml`) reuse it as the base they POST
-      operator alerts to; there is no second URL variable to set.
-- [ ] Variable `TENANT_SANITY_DATASET` — the name of the single dataset created
-      inside each new tenant's Sanity project, set to match the Environment it
-      lives on. Externalized as a variable rather than hardcoded in TS;
-      `provision-tenant.yml` also accepts a per-dispatch `tenantSanityDataset`
-      input that overrides it for manual testing, which the wizard's real
-      dispatches never set.
+      `https://admin.{your-hosting}`. The two sweeps below
+      (`recheck-tenant-owners.yml`, `validate-tenant-documents.yml`) use it as
+      the base they POST operator alerts to.
 - [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin for that
-      environment (no trailing slash), e.g. `https://{your-web-domain}`. Used
-      to build the target URL for the revalidation webhook
-      `provision-tenant.yml` creates on each new tenant's Sanity project. Also
-      read by `deprovision-tenant.yml`/`invalidate-tenant-cache.yml`, as the
+      environment (no trailing slash), e.g. `https://{your-web-domain}`. Read
+      by `deprovision-tenant.yml`/`invalidate-tenant-cache.yml`, as the
       origin either of them POSTs to when purging an archived (or still-active)
       tenant's cached pages.
-- [ ] Secret `SANITY_REVALIDATE_SECRET` — the **same** value already set as
-      that environment's `apps/web` `SANITY_REVALIDATE_SECRET` Vercel env var.
-      Every tenant's webhook is created with this shared secret; a mismatch
-      makes that tenant's webhook calls fail `apps/web`'s signature check, so
-      content publishes in that tenant's Studio never trigger revalidation.
 - [ ] Secret `SITE_CONFIG_REVALIDATE_SECRET` — the **same** value already set as
       that environment's `apps/web` and `apps/platform` Vercel env vars (§3
       above, in both projects' tables). A GitHub Environment Secret is a **separate store** from those
@@ -639,26 +616,29 @@ dispatch can point it at `development`.
 
 **`apps/platform`'s own Vercel project (not a GitHub Environment)**
 
-The "Add tenant" wizard's and the tenant status page's "Deprovision tenant"
-control's Server Actions dispatch `provision-tenant.yml`/`deprovision-tenant.yml`
-directly against the GitHub API from `apps/platform` itself, not from a CI job
-— so these are Vercel env vars on that app's project, not entries on a GitHub
-Environment. See `docs/context/environment-variables.md`.
+The tenant status page's "Deprovision tenant" control's Server Action
+dispatches `deprovision-tenant.yml` directly against the GitHub API from
+`apps/platform` itself, and "Add tenant", retry and reactivate enqueue to
+`apps/worker` — so these are Vercel env vars on that app's project, not entries
+on a GitHub Environment. See `docs/context/environment-variables.md`.
+
+- [ ] Env vars `WORKER_ENQUEUE_URL` (that environment's worker origin,
+      `worker-dev` or `worker-prod`) and `WORKER_ENQUEUE_SECRET`, byte-identical
+      to the worker project's own. Either unset, "Add tenant" still creates the
+      tenant but its provisioning run never starts.
 
 - [ ] Env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>` (e.g.
       `ValOvinnikov/blog`), paired with its own
       `TENANT_PROVISIONING_GITHUB_TOKEN` — there's no `GITHUB_REPOSITORY`-style
       var to infer the repo from outside Actions.
 - [ ] Optional env var `TENANT_PROVISIONING_DATASET` (`development` or
-      `production`) picks which dataset that deployment's provisioning runs
-      create in — a manually-set, per-deployment opt-in, same posture as
+      `production`) is forwarded as `deprovision-tenant.yml`'s `environment`
+      input — a manually-set, per-deployment opt-in, same posture as
       `apps/web`'s `WEB_ANALYTICS_ENABLED`, since `VERCEL_ENV` can't reliably
-      tell a dev deployment apart from real production. Left unset,
-      provisioning falls back to the dispatched GitHub Environment's
-      `TENANT_SANITY_DATASET`. The same value is also forwarded as both
-      workflows' `environment` input — a `platform-dev` deployment setting
-      this to `development` points its provisioning/deprovisioning dispatches
-      at the `development` tenant registry too, not just the Sanity dataset.
+      tell a dev deployment apart from real production. A `platform-dev`
+      deployment setting it to `development` points its deprovisioning
+      dispatches at the `development` tenant registry. Left unset, the
+      workflow falls back to `production`.
 
 > Repo-level `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` remain the
 > fallback for `ci.yml` (which sets no environment) — point them at whichever

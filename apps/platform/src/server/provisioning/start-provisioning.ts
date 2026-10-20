@@ -1,10 +1,9 @@
-import { ACTION_OUTCOME, ERROR_CODE, type TActionResult } from '@blog/config';
-import { queries } from '@blog/db';
+import { ACTION_OUTCOME, HTTP_STATUS, type TActionResult } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { logger } from '@platform/utils/logger/logger';
 
-import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
+import { enqueueProvisioning } from './enqueue-provisioning';
 
 export type TStartProvisioningRefusal =
   typeof TENANT_REFUSAL.ALREADY_IN_PROGRESS | typeof TENANT_REFUSAL.NOT_FOUND;
@@ -16,47 +15,33 @@ export type TStartProvisioningResult = TActionResult<
   TStartProvisioningRefusal
 >;
 
-/** A failed dispatch reverts the tenant to its previous provisioning status. */
+/** The worker admits the run through `beginTenantProvisioning`, so its row guard is what refuses a concurrent start. */
 export const startProvisioning = async (
   tenantId: string,
 ): Promise<TStartProvisioningResult> => {
-  const began = await queries.tenants.beginTenantProvisioning(tenantId);
+  const status = await enqueueProvisioning(tenantId);
 
-  if (!began.ok) {
-    if (began.error === ERROR_CODE.DB_ALREADY_PROVISIONING) {
-      return {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
-      };
-    }
-
-    logger.error('provisioning.begin_failed', {
-      tenantId,
-      error: began.error,
-    });
+  if (status === HTTP_STATUS.ACCEPTED) {
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
+  }
+  if (status === HTTP_STATUS.CONFLICT) {
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+    };
+  }
+  if (status === HTTP_STATUS.NOT_FOUND) {
+    logger.error('provisioning.enqueue_not_found', { tenantId });
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.NOT_FOUND,
     };
   }
-
-  const dispatched = await dispatchProvisioningWorkflow(tenantId);
-
-  if (!dispatched) {
-    const reverted = await queries.tenants.setTenantProvisioningStatus(
+  if (status !== null) {
+    logger.error('provisioning.enqueue_failed', {
       tenantId,
-      began.data.previousProvisioningStatus,
-    );
-
-    if (!reverted.ok) {
-      logger.error('provisioning.revert_failed', {
-        tenantId,
-        error: reverted.error,
-      });
-    }
-
-    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+      responseStatus: status,
+    });
   }
-
-  return toOutcome(ACTION_OUTCOME.SUCCESS);
+  return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 };

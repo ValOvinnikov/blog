@@ -1,6 +1,10 @@
-import { signEnqueuePayload } from '@worker/testing/enqueue/sign-enqueue-request';
-
-import { isValidEnqueueSignature } from './enqueue-signature';
+import {
+  buildEnqueueHeaders,
+  ENQUEUE_SIGNATURE_HEADER,
+  ENQUEUE_TIMESTAMP_HEADER,
+  isValidEnqueueSignature,
+  signEnqueuePayload,
+} from './enqueue-signature';
 
 const SECRET = 'shared-secret';
 const NOW = 1_700_000_000_000;
@@ -96,6 +100,28 @@ describe(isValidEnqueueSignature, () => {
 
     expect(
       validate({ timestamp, signature: sign(SECRET, timestamp, BODY) }),
+    ).toBe(true);
+  });
+});
+
+describe(buildEnqueueHeaders, () => {
+  it('produces headers the verifier accepts for the same path and body', () => {
+    const headers = buildEnqueueHeaders({
+      secret: SECRET,
+      path: PATH,
+      rawBody: BODY,
+      now: NOW,
+    });
+
+    expect(
+      isValidEnqueueSignature({
+        secret: SECRET,
+        timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
+        signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
+        path: PATH,
+        rawBody: BODY,
+        now: NOW,
+      }),
     ).toBe(true);
   });
 });

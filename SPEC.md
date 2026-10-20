@@ -2512,7 +2512,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   existed and both environments read it. `deploy-production.yml`'s
   `migrate-db` job reads the `production` Environment's own
   `DATABASE_URL_UNPOOLED` (`main`); the tenant lifecycle workflows
-  (`provision-tenant.yml`/`deprovision-tenant.yml`/`recheck-tenant-owners.yml`/
+  (`deprovision-tenant.yml`/`recheck-tenant-owners.yml`/
   `invalidate-tenant-cache.yml`/`validate-tenant-documents.yml`) read their own
   Environment's
   `TENANT_REGISTRY_DATABASE_URL` secret instead
@@ -2696,9 +2696,9 @@ Answering audit questions with log retention turns the pipeline into an
 expensive, lossy database, and couples noise-reduction work to compliance.
 
 **`AUDIT_ACTION` names events, and never reuses a status value.** A tenant
-lifecycle run that spans the platform app and a CLI workflow records one event
+lifecycle run that spans the platform app and another system records one event
 per system, reading request-then-outcome: `CREATED` (platform) precedes
-`PROVISIONED`/`PROVISIONING_FAILED` (`provision-tenant`), and
+`PROVISIONED`/`PROVISIONING_FAILED` (the worker run), and
 `DEPROVISION_REQUESTED` (platform, written when the workflow is dispatched —
 it attests to the request, not the outcome) precedes `DEPROVISIONED`
 (`deprovision-tenant`, written once the `tenants` row is actually archived).
