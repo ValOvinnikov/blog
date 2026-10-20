@@ -71,6 +71,9 @@ describe(checkOwnerAccess, () => {
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
+    vi.mocked(listSanityProjectAcl).mockResolvedValue([
+      aclEntry(SANITY_PROJECT_ROLE.VIEWER),
+    ]);
     vi.mocked(setTenantOwnerAccess).mockResolvedValue({
       ok: true,
       data: {} as never,
@@ -86,9 +89,6 @@ describe(checkOwnerAccess, () => {
     beforeEach(() => {
       vi.mocked(listSanityProjectUsers).mockResolvedValue([
         makeSanityOwner({ email: 'Owner@Example.com' }),
-      ]);
-      vi.mocked(listSanityProjectAcl).mockResolvedValue([
-        aclEntry(SANITY_PROJECT_ROLE.VIEWER),
       ]);
     });
 
@@ -153,9 +153,6 @@ describe(checkOwnerAccess, () => {
   it('adds an owner who is already an organization user straight to the project', async () => {
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([
       makeSanityOwner(),
-    ]);
-    vi.mocked(listSanityProjectAcl).mockResolvedValue([
-      aclEntry(SANITY_PROJECT_ROLE.VIEWER),
     ]);
 
     const outcome = await checkOwnerAccess(TEST_TENANT_ID);

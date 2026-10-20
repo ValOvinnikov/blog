@@ -86,24 +86,27 @@ describe(inviteOwner, () => {
     expect(createSanityProjectInvite).toHaveBeenCalledOnce();
   });
 
-  it('retries a failed invite before its last attempt', async () => {
-    vi.mocked(listSanityProjectInvites).mockRejectedValue(new Error('503'));
+  describe('when the invite cannot be sent', () => {
+    beforeEach(() => {
+      vi.mocked(listSanityProjectInvites).mockRejectedValue(new Error('503'));
+    });
 
-    await expect(inviteOwner(TEST_TENANT_ID, CTX)).rejects.toThrow('503');
-  });
+    it('retries before its last attempt', async () => {
+      await expect(inviteOwner(TEST_TENANT_ID, CTX)).rejects.toThrow('503');
+    });
 
-  it('logs and lets provisioning carry on once the last attempt fails', async () => {
-    vi.mocked(getStepMetadata).mockReturnValue({
-      attempt: 99,
-    } as ReturnType<typeof getStepMetadata>);
-    vi.mocked(listSanityProjectInvites).mockRejectedValue(new Error('503'));
+    it('logs and lets provisioning carry on once the last attempt fails', async () => {
+      vi.mocked(getStepMetadata).mockReturnValue({
+        attempt: 99,
+      } as ReturnType<typeof getStepMetadata>);
 
-    const result = await inviteOwner(TEST_TENANT_ID, CTX);
+      const result = await inviteOwner(TEST_TENANT_ID, CTX);
 
-    expect(result).toEqual({ ok: true });
-    expect(logger.error).toHaveBeenCalledWith(
-      'owner_access.invite_failed',
-      expect.objectContaining({ tenantId: TEST_TENANT_ID }),
-    );
+      expect(result).toEqual({ ok: true });
+      expect(logger.error).toHaveBeenCalledWith(
+        'owner_access.invite_failed',
+        expect.objectContaining({ tenantId: TEST_TENANT_ID }),
+      );
+    });
   });
 });

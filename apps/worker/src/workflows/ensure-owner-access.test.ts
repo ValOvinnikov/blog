@@ -42,12 +42,14 @@ function checksReturn(...outcomes: TElevateTenantOwnerOutcome[]) {
 }
 
 describe(ensureOwnerAccess, () => {
+  let hook: ReturnType<typeof fakeHook>;
+
   beforeEach(() => {
+    hook = fakeHook();
     vi.mocked(sleep).mockResolvedValue(undefined);
   });
 
   it('keeps checking until the owner is granted access', async () => {
-    fakeHook();
     checksReturn(PENDING_ACCEPTANCE, PENDING_ACCEPTANCE, ELEVATED);
 
     const outcome = await ensureOwnerAccess(TEST_TENANT_ID);
@@ -57,14 +59,12 @@ describe(ensureOwnerAccess, () => {
   });
 
   it('stops once the owner is stalled', async () => {
-    fakeHook();
     checksReturn(PENDING_ACCEPTANCE, STALLED);
 
     await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBe(STALLED);
   });
 
   it('checks every minute for the first 30 checks, then hourly', async () => {
-    fakeHook();
     const pending = Array.from({ length: 31 }, () => PENDING_ACCEPTANCE);
     checksReturn(...pending, ELEVATED);
 
@@ -75,41 +75,50 @@ describe(ensureOwnerAccess, () => {
     expect(intervals[30]).toBe('1h');
   });
 
-  it('checks again straight away when woken, without waiting out the sleep', async () => {
-    fakeHook({ wakes: 1 });
-    vi.mocked(sleep).mockReturnValue(new Promise<never>(() => {}));
-    checksReturn(PENDING_ACCEPTANCE, ELEVATED);
-
-    await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBe(ELEVATED);
-    expect(checkOwnerAccess).toHaveBeenCalledTimes(2);
-  });
-
-  it('goes back to checking every minute after a wake', async () => {
-    fakeHook({ wakes: 1 });
-    vi.mocked(sleep)
-      .mockReturnValueOnce(new Promise<never>(() => {}))
-      .mockResolvedValue(undefined);
-    checksReturn(PENDING_ACCEPTANCE, PENDING_ACCEPTANCE, ELEVATED);
-
-    await ensureOwnerAccess(TEST_TENANT_ID);
-
-    expect(vi.mocked(sleep).mock.calls.at(-1)?.[0]).toBe('1m');
-  });
-
-  it('leaves the checks to the run that already owns the tenant', async () => {
-    const hook = fakeHook({ conflict: true });
-
-    await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBeNull();
-    expect(checkOwnerAccess).not.toHaveBeenCalled();
-    expect(hook.dispose).toHaveBeenCalled();
-  });
-
   it('releases the hook when it finishes', async () => {
-    const hook = fakeHook();
     checksReturn(ELEVATED);
 
     await ensureOwnerAccess(TEST_TENANT_ID);
 
     expect(hook.dispose).toHaveBeenCalled();
+  });
+
+  describe('when woken mid-sleep', () => {
+    beforeEach(() => {
+      fakeHook({ wakes: 1 });
+      vi.mocked(sleep).mockReturnValueOnce(new Promise<never>(() => {}));
+    });
+
+    it('checks again straight away, without waiting out the sleep', async () => {
+      checksReturn(PENDING_ACCEPTANCE, ELEVATED);
+
+      await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBe(ELEVATED);
+      expect(checkOwnerAccess).toHaveBeenCalledTimes(2);
+    });
+
+    it('goes back to checking every minute', async () => {
+      checksReturn(PENDING_ACCEPTANCE, PENDING_ACCEPTANCE, ELEVATED);
+
+      await ensureOwnerAccess(TEST_TENANT_ID);
+
+      expect(vi.mocked(sleep).mock.calls.at(-1)?.[0]).toBe('1m');
+    });
+  });
+
+  describe('when another run already owns the tenant', () => {
+    beforeEach(() => {
+      hook = fakeHook({ conflict: true });
+    });
+
+    it('leaves the checks to that run', async () => {
+      await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBeNull();
+      expect(checkOwnerAccess).not.toHaveBeenCalled();
+    });
+
+    it('releases its own hook', async () => {
+      await ensureOwnerAccess(TEST_TENANT_ID);
+
+      expect(hook.dispose).toHaveBeenCalled();
+    });
   });
 });
