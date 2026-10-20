@@ -485,7 +485,9 @@ describe(`<${LookForm.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     const alert = await screen.findByRole('alert');
+    const saveBar = screen.getByRole('region', { name: 'Unsaved changes' });
     expect(alert).toHaveTextContent("Couldn't save Look settings");
+    expect(saveBar).toContainElement(alert);
   });
 
   it('offers Reset to preset for differing saved values with no unsaved edits', async () => {
@@ -861,16 +863,68 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      const alert = await screen.findByRole('alert');
+      const replaceLogoButton = await screen.findByRole('button', {
+        name: 'Replace logo',
+      });
       await waitFor(() => {
-        const saveButton = screen.getByRole('button', { name: 'Save changes' });
-        expect(saveButton).toBeEnabled();
+        expect(replaceLogoButton).toHaveFocus();
       });
 
       const hueReadout = screen.getByText('hue 251°');
-      expect(alert).toHaveTextContent("Couldn't upload the logo — try again.");
+      const saveButton = screen.getByRole('button', { name: 'Save changes' });
+      expect(replaceLogoButton).toHaveAccessibleDescription(
+        expect.stringContaining("Couldn't upload the logo — try again."),
+      );
+      expect(saveButton).toBeEnabled();
       expect(updateLookActionMock).not.toHaveBeenCalled();
       expect(hueReadout).toBeVisible();
+    });
+
+    it('says beside Save that the save did not go through and links to the failed picker', async () => {
+      uploadBrandAssetActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      setup();
+
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      const saveBar = await screen.findByRole('region', {
+        name: 'Unsaved changes',
+      });
+      await waitFor(() => {
+        expect(saveBar).toHaveTextContent('Not saved');
+      });
+      expect(saveBar).toHaveTextContent('1 field needs attention');
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole('link', { name: 'Go to the first one' }),
+      );
+
+      const replaceLogoButton = screen.getByRole('button', {
+        name: 'Replace logo',
+      });
+      expect(replaceLogoButton).toHaveFocus();
+    });
+
+    it('clears the picker error once a new logo is picked', async () => {
+      uploadBrandAssetActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      setup();
+
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await screen.findByText("Couldn't upload the logo — try again.");
+      await pickLogo(user);
+
+      const error = screen.queryByText("Couldn't upload the logo — try again.");
+      const attentionLink = screen.queryByRole('link', {
+        name: 'Go to the first one',
+      });
+      expect(error).not.toBeInTheDocument();
+      expect(attentionLink).not.toBeInTheDocument();
     });
 
     it('fails the save with the refusal message when the upload is refused', async () => {
@@ -884,10 +938,10 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      const alert = await screen.findByRole('alert');
-      expect(alert).toHaveTextContent(
+      const error = await screen.findByText(
         'That file is too large — the limit is 4 MB.',
       );
+      expect(error).toBeVisible();
       expect(updateLookActionMock).not.toHaveBeenCalled();
     });
 
@@ -907,9 +961,14 @@ describe(`<${LookForm.name}/>`, () => {
         await screen.findByRole('button', { name: 'Save changes' }),
       );
 
-      const alert = await screen.findByRole('alert');
-      expect(alert).toHaveTextContent(
-        "Couldn't remove the favicon — try again.",
+      const uploadFaviconButton = await screen.findByRole('button', {
+        name: 'Upload favicon',
+      });
+      await waitFor(() => {
+        expect(uploadFaviconButton).toHaveFocus();
+      });
+      expect(uploadFaviconButton).toHaveAccessibleDescription(
+        expect.stringContaining("Couldn't remove the favicon — try again."),
       );
     });
 

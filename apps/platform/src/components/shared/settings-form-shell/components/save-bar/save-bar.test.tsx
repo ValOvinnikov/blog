@@ -111,4 +111,31 @@ describe(`<${SaveBar.name}/>`, () => {
 
     expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
   });
+
+  describe('after a save that failed', () => {
+    it('announces the error beside Save when no field caused it', () => {
+      renderBar({ saveError: "Couldn't save Look settings — try again." });
+
+      const alert = screen.getByRole('alert');
+      const changeCount = screen.queryByText('3 unsaved changes');
+      expect(alert).toHaveTextContent(
+        "Couldn't save Look settings — try again.",
+      );
+      expect(changeCount).not.toBeInTheDocument();
+    });
+
+    it('says the save did not go through and links to the field that caused it', () => {
+      renderBar({
+        saveError: "Couldn't upload the logo — try again.",
+        invalidControls: { ids: ['field-logo'] },
+      });
+
+      const region = screen.getByRole('region', { name: 'Unsaved changes' });
+      const link = screen.getByRole('link', { name: 'Go to the first one' });
+      expect(region).toHaveTextContent('Not saved');
+      expect(region).toHaveTextContent('1 field needs attention');
+      expect(link).toHaveAttribute('href', '#field-logo');
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+  });
 });

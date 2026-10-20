@@ -35,6 +35,8 @@ const renderPreview = (
     isAccentHueRejected: false,
     accentHueFieldId: 'accent-hue',
     repickKinds: [],
+    brandAssetFieldIds: { logo: 'logo', favicon: 'favicon' },
+    brandImageError: undefined,
     changePreset: vi.fn(),
     resetToPreset: vi.fn(),
   };

@@ -21,6 +21,7 @@ export type TSaveBarProps = {
   changeCount: number;
   breakdown: string;
   invalidControls: TInvalidControls;
+  saveError?: string;
   isPending: boolean;
   onSave: () => void;
   onDiscard: () => void;
@@ -30,6 +31,7 @@ export const SaveBar = ({
   changeCount,
   breakdown,
   invalidControls,
+  saveError,
   isPending,
   onSave,
   onDiscard,
@@ -37,7 +39,8 @@ export const SaveBar = ({
   const t = useTranslations('saveBar');
   const { ids: invalidControlIds, revealFirst } = invalidControls;
   const [firstInvalidControlId] = invalidControlIds;
-  const hasErrors = firstInvalidControlId !== undefined;
+  const hasInvalidFields = firstInvalidControlId !== undefined;
+  const hasErrors = hasInvalidFields || saveError !== undefined;
   const {
     root,
     summary,
@@ -67,10 +70,13 @@ export const SaveBar = ({
   return (
     <div role="region" aria-label={t('regionLabel')} className={root()}>
       <span className={summary()}>
-        {hasErrors ? (
+        {hasInvalidFields && (
           <>
             <Icon name={ICONS.WARNING} />
-            <span className={count()}>
+            {saveError !== undefined && (
+              <span className={count()}>{t('notSaved')}</span>
+            )}
+            <span className={saveError === undefined ? count() : undefined}>
               {t('fieldsNeedAttention', { count: invalidControlIds.length })}
             </span>
             <a
@@ -81,7 +87,16 @@ export const SaveBar = ({
               {t('goToFirstField')}
             </a>
           </>
-        ) : (
+        )}
+        {!hasInvalidFields && saveError !== undefined && (
+          <>
+            <Icon name={ICONS.WARNING} />
+            <span role="alert" className={count()}>
+              {saveError}
+            </span>
+          </>
+        )}
+        {!hasErrors && (
           <>
             <span aria-hidden="true" className={dot()} />
             <span className={count()}>

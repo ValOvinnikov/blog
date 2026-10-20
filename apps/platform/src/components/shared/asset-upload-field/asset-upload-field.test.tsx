@@ -105,13 +105,12 @@ describe(`<${AssetUploadField.name}/>`, () => {
     expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });
 
-  it('disables the upload and remove controls, and describes them, when isDisabled is true', () => {
+  it('disables the upload and remove controls, and describes them, when the control is disabled', () => {
     renderWithIntl(
       <AssetUploadField
         {...baseProps}
         image={{ url: 'https://example.com/logo.png' }}
-        isDisabled={true}
-        aria-describedby="archived-notice"
+        control={{ isDisabled: true, describedBy: 'archived-notice' }}
       />,
     );
 
@@ -153,5 +152,24 @@ describe(`<${AssetUploadField.name}/>`, () => {
     ).toHaveAccessibleDescription(
       'PNG, JPEG, or WebP. Choose a PNG, JPEG, or WebP image.',
     );
+  });
+
+  it('shows a given error under the field and describes the upload control with it, without announcing it', () => {
+    renderWithIntl(
+      <AssetUploadField
+        {...baseProps}
+        control={{ id: 'logo-control' }}
+        error="Couldn't upload the logo — try again."
+      />,
+    );
+
+    const uploadButton = screen.getByRole('button', { name: 'Upload logo' });
+    const error = screen.getByText("Couldn't upload the logo — try again.");
+    expect(error).toBeVisible();
+    expect(uploadButton).toHaveAttribute('id', 'logo-control');
+    expect(uploadButton).toHaveAccessibleDescription(
+      "PNG, JPEG, or WebP. Couldn't upload the logo — try again.",
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

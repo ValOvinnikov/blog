@@ -40,8 +40,12 @@ export const assetUploadFieldVariants = tv({
         actions: ['shrink-0 @max-lg:basis-full'],
       },
     },
+    isInvalid: {
+      true: { root: ['border-admin-bad-line'] },
+    },
   },
   defaultVariants: {
+    isInvalid: false,
     size: SIZE.MD,
   },
 });

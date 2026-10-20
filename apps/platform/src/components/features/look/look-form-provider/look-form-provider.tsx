@@ -18,6 +18,8 @@ export type TLookFormContext = {
   isAccentHueRejected: boolean;
   accentHueFieldId: string;
   repickKinds: readonly TBrandAssetKind[];
+  brandAssetFieldIds: Record<TBrandAssetKind, string>;
+  brandImageError: TMaybeUndefined<{ kind: TBrandAssetKind; message: string }>;
   changePreset: (preset: TPresetId) => void;
   resetToPreset: () => void;
 };

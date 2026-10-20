@@ -994,6 +994,7 @@
     "unsavedChanges": "{count, plural, one {# niet-opgeslagen wijziging} other {# niet-opgeslagen wijzigingen}}",
     "fieldsNeedAttention": "{count, plural, one {# veld vraagt aandacht} other {# velden vragen aandacht}}",
     "goToFirstField": "Naar het eerste veld",
+    "notSaved": "Niet opgeslagen",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Verwerpen",
     "save": "Wijzigingen opslaan",

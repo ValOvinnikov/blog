@@ -52,8 +52,10 @@ export const EmailLogoField = ({
       image={logo}
       onStage={onStage}
       asset={asset}
-      isDisabled={isArchived || isPending}
-      aria-describedby={archivedDescribedBy}
+      control={{
+        isDisabled: isArchived || isPending,
+        describedBy: archivedDescribedBy,
+      }}
     />
   );
 };

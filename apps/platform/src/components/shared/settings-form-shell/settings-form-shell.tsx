@@ -51,6 +51,7 @@ export const SettingsFormShell = <TValues,>({
     archivedAt,
     archivedNoticeId,
     draft,
+    saveError,
   } = form;
   const t = useTranslations('saveBar');
   const { root, alert, savedStatus, liveStatus } = settingsFormShellVariants({
@@ -178,6 +179,7 @@ export const SettingsFormShell = <TValues,>({
           changeCount={changeCount}
           breakdown={breakdown}
           invalidControls={invalidControls}
+          saveError={saveError}
           isPending={isPending}
           onSave={() => void handleSave()}
           onDiscard={handleDiscard}

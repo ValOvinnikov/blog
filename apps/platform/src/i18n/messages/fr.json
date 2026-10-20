@@ -994,6 +994,7 @@
     "unsavedChanges": "{count, plural, one {# modification non enregistrée} other {# modifications non enregistrées}}",
     "fieldsNeedAttention": "{count, plural, one {# champ à vérifier} other {# champs à vérifier}}",
     "goToFirstField": "Aller au premier",
+    "notSaved": "Non enregistré",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Annuler les modifications",
     "save": "Enregistrer les modifications",

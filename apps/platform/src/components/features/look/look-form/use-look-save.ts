@@ -25,21 +25,38 @@ import {
 import type { TUploadErrorState } from '@platform/utils/use-upload-error-text/use-upload-error-text';
 import { useState } from 'react';
 
+import { useFocusAfterSave } from './use-focus-after-save';
+
 type TUseLookSaveArgs = Omit<
   TUseSettingsFormArgs<TLookFormValues, TOutcome<TActionOutcome>>,
   'onSubmit'
 > & {
   tenantId: string;
+  brandAssetFieldIds: Record<TBrandAssetKind, string>;
 };
 
 export const useLookSave = ({
   tenantId,
+  brandAssetFieldIds,
+  invalidControls,
+  onDiscard,
   ...settingsArgs
 }: TUseLookSaveArgs) => {
   const [brandImageError, setBrandImageError] = useState<TUploadErrorState>();
 
   const settings = useSettingsForm<TLookFormValues, TOutcome<TActionOutcome>>({
     ...settingsArgs,
+    onDiscard: () => {
+      setBrandImageError(undefined);
+      onDiscard?.();
+    },
+    invalidControls: (vals) => {
+      const { ids, revealFirst } = invalidControls?.(vals) ?? { ids: [] };
+      const failedIds = brandImageError
+        ? [brandAssetFieldIds[brandImageError.kind]]
+        : [];
+      return { ids: [...ids, ...failedIds], revealFirst };
+    },
     onSubmit: async (vals) => {
       const { savedValues, setSavedValues, setValues } = settings;
       const savedImages: Partial<Record<TBrandAssetKind, TStagedImage>> = {};
@@ -68,6 +85,8 @@ export const useLookSave = ({
             operation: result.operation,
             kind,
           });
+          invalidControls?.(vals).revealFirst?.();
+          focusAfterSave(brandAssetFieldIds[kind]);
           return finish(result.failure.outcome);
         }
         savedImages[kind] = result.image;
@@ -89,5 +108,10 @@ export const useLookSave = ({
     },
   });
 
-  return { ...settings, brandImageError };
+  const focusAfterSave = useFocusAfterSave(settings.isPending);
+
+  const clearBrandImageError = (kind: TBrandAssetKind) =>
+    setBrandImageError((prev) => (prev?.kind === kind ? undefined : prev));
+
+  return { ...settings, brandImageError, clearBrandImageError };
 };
