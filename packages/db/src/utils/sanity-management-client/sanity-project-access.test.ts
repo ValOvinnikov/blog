@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 describe(listSanityProjectInvites, () => {
-  it('GETs the project-scoped invites endpoint filtered to pending and accepted, unwrapping the documented `data` envelope', async () => {
+  it('GETs pending and accepted invites, unwrapping the `data` envelope', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -138,7 +138,7 @@ describe(listSanityProjectAcl, () => {
 });
 
 describe(grantSanityProjectRole, () => {
-  it('PUTs the roleName to the project-scoped acl endpoint against v2021-06-07, keyed on projectUserId', async () => {
+  it('PUTs the roleName to the legacy acl endpoint keyed on projectUserId', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ projectUserId: 'p123' }), {
         status: 201,

@@ -16,7 +16,7 @@ afterEach(() => {
 });
 
 describe(createSanityRobotToken, () => {
-  it('POSTs the label + role membership to the Access API and returns the minted token', async () => {
+  it('POSTs the label and role membership and returns the minted token', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ id: 'robot1', token: 'sk-minted' }), {
         status: 200,
@@ -113,7 +113,7 @@ describe(createSanityRobotToken, () => {
 });
 
 describe(deleteSanityRobotToken, () => {
-  it('DELETEs the robot by id on the Access API and tolerates an empty response body', async () => {
+  it('DELETEs the robot by id and tolerates an empty response body', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     await expect(
@@ -133,7 +133,7 @@ describe(deleteSanityRobotToken, () => {
 });
 
 describe(listSanityRobotTokens, () => {
-  it('GETs the project robots endpoint and normalizes id/label from a bare array response', async () => {
+  it('GETs the robots endpoint and normalizes id/label from a bare array', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify([
