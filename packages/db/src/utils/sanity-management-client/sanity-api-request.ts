@@ -94,6 +94,21 @@ export function sanityManagementResponse(
   );
 }
 
+export function sanityAccessResponse(
+  path: string,
+  token: string,
+  init: RequestInit,
+  allowStatus: readonly number[],
+): Promise<Response> {
+  return sanityApiResponse(
+    SANITY_API_SURFACE.ACCESS,
+    path,
+    token,
+    init,
+    allowStatus,
+  );
+}
+
 export function sanityWebhooksResponse(
   path: string,
   token: string,

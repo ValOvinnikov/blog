@@ -1,0 +1,109 @@
+import { SANITY_PROJECT_ROLE } from '@blog/config/constants';
+import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
+import { getTenantById, setTenantOwnerAccess } from '@blog/db/queries/tenants';
+import {
+  createSanityProjectInvite,
+  deleteSanityProjectInvite,
+  listSanityProjectInvites,
+} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+import {
+  listSanityOrganizationUsers,
+  listSanityProjectUsers,
+} from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import {
+  makeSanityOwner,
+  OWNER_EMAIL,
+  SANITY_PROJECT_ID,
+} from '@worker/testing/owner-access/fixtures';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+
+import { resendOwnerInvite } from './resend-owner-invite';
+
+const SENT_AT = '2026-10-20T09:00:00.000Z';
+
+vi.mock('@blog/db/queries/memberships');
+vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
+vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
+vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+  (
+    await import('@worker/testing/tenants-queries/fake-tenants-queries')
+  ).withFakeTenantsQueries(
+    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
+  ),
+);
+vi.mock(
+  '@worker/utils/provision-env/provision-env',
+  () => import('@worker/testing/provision-env/fake-provision-env'),
+);
+
+describe(resendOwnerInvite, () => {
+  beforeEach(() => {
+    vi.mocked(getTenantById).mockResolvedValue(
+      makeTenant({ sanityProjectId: SANITY_PROJECT_ID }),
+    );
+    vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
+    vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
+    vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
+    vi.mocked(listSanityProjectInvites)
+      .mockResolvedValueOnce([
+        { id: 'invite-old', email: OWNER_EMAIL, status: 'pending' },
+        { id: 'invite-other', email: 'other@example.com', status: 'pending' },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'invite-new',
+          email: OWNER_EMAIL,
+          status: 'pending',
+          createdAt: SENT_AT,
+        },
+      ]);
+    vi.mocked(setTenantOwnerAccess).mockResolvedValue({
+      ok: true,
+      data: {} as never,
+    });
+  });
+
+  it("revokes the owner's previous invite and only theirs", async () => {
+    await resendOwnerInvite(TEST_TENANT_ID);
+
+    expect(deleteSanityProjectInvite).toHaveBeenCalledOnce();
+    expect(deleteSanityProjectInvite).toHaveBeenCalledWith(
+      expect.objectContaining({ inviteId: 'invite-old' }),
+    );
+  });
+
+  it('sends a new viewer invite after the revoke', async () => {
+    await resendOwnerInvite(TEST_TENANT_ID);
+
+    expect(createSanityProjectInvite).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: OWNER_EMAIL,
+        role: SANITY_PROJECT_ROLE.VIEWER,
+      }),
+    );
+    expect(
+      vi.mocked(deleteSanityProjectInvite).mock.invocationCallOrder[0],
+    ).toBeLessThan(
+      vi.mocked(createSanityProjectInvite).mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it('records the new invite and when it was sent', async () => {
+    await resendOwnerInvite(TEST_TENANT_ID);
+
+    expect(setTenantOwnerAccess).toHaveBeenCalledWith(TEST_TENANT_ID, {
+      sanityInviteId: 'invite-new',
+      inviteSentAt: new Date(SENT_AT),
+      inviteAcceptedAt: null,
+    });
+  });
+
+  it('sends no invite when the owner is already a project member', async () => {
+    vi.mocked(listSanityProjectUsers).mockResolvedValue([makeSanityOwner()]);
+
+    await resendOwnerInvite(TEST_TENANT_ID);
+
+    expect(deleteSanityProjectInvite).not.toHaveBeenCalled();
+    expect(createSanityProjectInvite).not.toHaveBeenCalled();
+  });
+});

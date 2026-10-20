@@ -65,8 +65,9 @@ default to zero".
 - **Never import** React, `@blog/ui`, `@blog/service`, `@blog/auth` or
   `@blog/studio`. Needing one is a signal to stop and report.
 - **Nothing imports `apps/worker`.** The admin panel reaches it only through
-  its enqueue endpoint, authenticated by the shared enqueue secret; that
-  endpoint is the only route the app exposes.
+  its signed endpoints — `POST /api/provision` and `POST /api/owner-access/*`
+  — every one authenticated by the shared enqueue secret; the app exposes no
+  other route.
 - **All relational reads and writes go through `@blog/db`'s exported
   functions** — no Drizzle, no Neon client, no SQL here. A missing query is a
   `db` request you report.

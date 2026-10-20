@@ -6,6 +6,7 @@ import {
   finishRun,
   type TRunOutcome,
 } from '@worker/units/run-lifecycle';
+import { startOwnerAccess } from '@worker/units/start-owner-access';
 import { verifyTenant } from '@worker/units/verify-tenant';
 import { FatalError, getWorkflowMetadata } from 'workflow';
 
@@ -15,7 +16,7 @@ export async function provisionTenant(tenantId: string): Promise<TRunOutcome> {
   const ctx = { runId: getWorkflowMetadata().workflowRunId };
   const units = [
     () => ensureInfrastructure(tenantId, ctx),
-    () => inviteOwner(tenantId),
+    () => inviteOwner(tenantId, ctx),
     () => applySiteTemplate(tenantId, ctx),
     () => verifyTenant(tenantId, ctx),
   ];
@@ -38,7 +39,9 @@ export async function provisionTenant(tenantId: string): Promise<TRunOutcome> {
   }
 
   await finishRun(tenantId, ctx, outcome);
-  if (!outcome.ok) {
+  if (outcome.ok) {
+    await startOwnerAccess(tenantId, ctx);
+  } else {
     throw new FatalError(`Provisioning failed for tenant "${tenantId}".`);
   }
   return outcome;

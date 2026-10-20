@@ -10,12 +10,8 @@ import {
   finishProvisioningRun,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
-import {
-  ENQUEUE_SIGNATURE_HEADER,
-  ENQUEUE_TIMESTAMP_HEADER,
-} from '@worker/constants/enqueue';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import { signEnqueuePayload } from '@worker/testing/enqueue/sign-enqueue-request';
+import { signedRequest as signedRequestTo } from '@worker/testing/enqueue/sign-enqueue-request';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { start } from 'workflow/api';
 
@@ -23,6 +19,17 @@ import { POST } from './route';
 
 const SECRET = 'enqueue-secret';
 const TENANT_ID = TEST_TENANT_ID;
+const PROVISION_URL = 'https://worker.example.com/api/provision';
+
+function signedRequest(
+  rawBody: string,
+  overrides: { secret?: string; timestamp?: number } = {},
+): Request {
+  return signedRequestTo(PROVISION_URL, rawBody, {
+    secret: SECRET,
+    ...overrides,
+  });
+}
 
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
   WORKER_ENQUEUE_SECRET: 'enqueue-secret',
@@ -41,26 +48,6 @@ vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
     await importOriginal<typeof import('@blog/db/queries/tenants')>(),
   ),
 );
-
-function signedRequest(
-  rawBody: string,
-  overrides: { secret?: string; timestamp?: number } = {},
-): Request {
-  const { secret = SECRET, timestamp = Date.now() } = overrides;
-  const signature = signEnqueuePayload({
-    secret,
-    timestamp: String(timestamp),
-    rawBody,
-  });
-  return new Request('https://worker.example.com/api/provision', {
-    method: HTTP_METHOD.POST,
-    headers: {
-      [ENQUEUE_TIMESTAMP_HEADER]: String(timestamp),
-      [ENQUEUE_SIGNATURE_HEADER]: signature,
-    },
-    body: rawBody,
-  });
-}
 
 function enqueueRequest(tenantId: string = TENANT_ID): Request {
   return signedRequest(JSON.stringify({ tenantId }));
@@ -88,7 +75,7 @@ describe('POST /api/provision', () => {
     [
       'a tampered body',
       () =>
-        new Request('https://worker.example.com/api/provision', {
+        new Request(PROVISION_URL, {
           method: HTTP_METHOD.POST,
           headers: signedRequest('{}').headers,
           body: JSON.stringify({ tenantId: TENANT_ID }),
@@ -104,7 +91,7 @@ describe('POST /api/provision', () => {
     [
       'no signature headers',
       () =>
-        new Request('https://worker.example.com/api/provision', {
+        new Request(PROVISION_URL, {
           method: HTTP_METHOD.POST,
           body: JSON.stringify({ tenantId: TENANT_ID }),
         }),

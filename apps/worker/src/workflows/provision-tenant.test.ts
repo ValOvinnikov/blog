@@ -3,6 +3,7 @@ import { applySiteTemplate } from '@worker/units/apply-site-template';
 import { ensureInfrastructure } from '@worker/units/ensure-infrastructure';
 import { inviteOwner } from '@worker/units/invite-owner';
 import { beginRun, finishRun } from '@worker/units/run-lifecycle';
+import { startOwnerAccess } from '@worker/units/start-owner-access';
 import { verifyTenant } from '@worker/units/verify-tenant';
 import { FatalError, getWorkflowMetadata } from 'workflow';
 
@@ -15,6 +16,7 @@ vi.mock('@worker/units/apply-site-template');
 vi.mock('@worker/units/ensure-infrastructure');
 vi.mock('@worker/units/invite-owner');
 vi.mock('@worker/units/run-lifecycle');
+vi.mock('@worker/units/start-owner-access');
 vi.mock('@worker/units/verify-tenant');
 vi.mock('workflow', async (importOriginal) => ({
   ...(await importOriginal<typeof import('workflow')>()),
@@ -76,6 +78,12 @@ describe(provisionTenant, () => {
     expect(finishRun).toHaveBeenCalledWith(TENANT_ID, CTX, { ok: true });
   });
 
+  it('starts the owner access check once a run succeeds', async () => {
+    await provisionTenant(TENANT_ID);
+
+    expect(startOwnerAccess).toHaveBeenCalledWith(TENANT_ID, CTX);
+  });
+
   describe('when a unit reports a failure', () => {
     const failure = {
       ok: false,
@@ -101,6 +109,12 @@ describe(provisionTenant, () => {
 
     it('ends the run in a fatal error so it is not retried', async () => {
       await expect(provisionTenant(TENANT_ID)).rejects.toThrow(FatalError);
+    });
+
+    it('does not start the owner access check', async () => {
+      await expect(provisionTenant(TENANT_ID)).rejects.toThrow();
+
+      expect(startOwnerAccess).not.toHaveBeenCalled();
     });
   });
 

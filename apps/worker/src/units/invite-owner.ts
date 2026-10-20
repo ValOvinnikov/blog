@@ -1,16 +1,35 @@
+import { sanitizeLogMessage } from '@blog/insight';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { FatalError } from 'workflow';
+import { logger } from '@worker/utils/logger/logger';
+import {
+  findOwner,
+  loadOwnerAccessTarget,
+} from '@worker/utils/owner-access/owner-access-target';
+import { sendOwnerInvite } from '@worker/utils/owner-access/owner-invite';
 
-import { loadTenant, type TUnitResult } from './run-reported-step';
+import {
+  isFinalStepAttempt,
+  type TUnitContext,
+  type TUnitResult,
+} from './run-reported-step';
 
-export async function inviteOwner(tenantId: string): Promise<TUnitResult> {
+export async function inviteOwner(
+  tenantId: string,
+  ctx: TUnitContext,
+): Promise<TUnitResult> {
   'use step';
 
-  const { sanityProjectId } = await loadTenant(tenantId);
-  if (!sanityProjectId) {
-    throw new FatalError(
-      `Tenant "${tenantId}" has no Sanity project to invite its owner to.`,
-    );
+  try {
+    const target = await loadOwnerAccessTarget(tenantId);
+    const owner = await findOwner(target);
+    if (!owner) await sendOwnerInvite(target, { replaceExisting: false });
+  } catch (error) {
+    if (!isFinalStepAttempt(error)) throw error;
+    logger.error('owner_access.invite_failed', {
+      tenantId,
+      runId: ctx.runId,
+      error: sanitizeLogMessage(error),
+    });
   }
   return { ok: true };
 }
