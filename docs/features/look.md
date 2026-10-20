@@ -44,7 +44,7 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Surfaces and routes
 
 - **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape (radius, density, card style, header buttons), Brand and Language switcher cards. Not plan-gated.
-- **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style.
+- **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style. The header brand shows the Look logo and `app/icon.tsx` serves the Look favicon.
 - **Email** — `resolveTenantEmailBrand` turns the preset, accent hue and logo hue into hex colours for the magic-link, newsletter and test emails.
 - No Studio surface: the theme is not Sanity content.
 
@@ -80,7 +80,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - Fonts are self-hosted woff2 files in both apps, with no Google Fonts fetch. Only the Console pair and the mono font preload on the site.
 - Brand images: PNG, JPEG, WebP or SVG. The logo may be up to 4 MB and 32–4000px; the favicon up to 1 MB, 16–512px and square. The server sniffs the real bytes and sanitises SVG; the client check is a convenience only.
 - Images upload before the Look save. The upload and clear actions do not revalidate the site; the `updateLookAction` call that follows does.
-- The public site's header logo and favicon come from the Studio's Site Settings brand logo. `logo_asset_url` and `favicon_asset_url` appear only in the Look preview, and no public render reads them.
+- The public site's header logo is `logo_asset_url` and its favicon is `favicon_asset_url`, each falling back to the platform's default three-layer mark when unset. The Studio's Site Settings brand logo is not a source for either. A logo that fails to load in the browser, or a favicon the icon route cannot fetch within 5s, also falls back to the default mark, so a broken upload never breaks the page. Both follow a save on the next render after `site-config:<id>` expires, subject to browser favicon caching.
 - Every save writes an audit event (`SETTINGS_UPDATED` on `SITE_CONFIG`).
 
 ## Dependencies
@@ -101,12 +101,14 @@ The Look page is where a tenant owner styles their public site without touching 
 - `apps/web/src/utils/to-theme-tokens/to-theme-tokens.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.ts`
 - `apps/web/src/components/shared/theme-scope/theme-scope.tsx`
+- `apps/web/src/app/icon.tsx` — the favicon
+- `apps/web/src/server/site-config/get-brand-logo-url/get-brand-logo-url.ts`, `apps/web/src/components/shared/brand-lockup-link/` — the header logo
 - `apps/web/src/config/fonts.ts`
 
 ## Tests and stories
 
 - Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`.
-- Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `apps/web/src/config/fonts.test.ts`.
+- Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `get-brand-logo-url.test.ts`, `icon.test.tsx`, `brand-lockup-link.test.tsx`, `site-header.test.tsx`, `apps/web/src/config/fonts.test.ts`.
 - db: `packages/db/src/queries/site-config/**/*.test.ts`.
 - Stories: `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`. The platform has no stories.
 
