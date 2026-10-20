@@ -5,8 +5,10 @@ import {
   CAPABILITY,
   TENANT_WRITE_REFUSAL,
   type TActionResult,
+  type TOutcome,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,
@@ -27,10 +29,10 @@ export type TSubscribeRefusal =
 
 export type TSubscribeResult =
   | TActionResult<TSubscribeRefusal, 'email', TFieldErrorReason>
-  | { outcome: typeof NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED };
+  | TOutcome<typeof NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED>;
 
-const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
-const UNAVAILABLE = { outcome: ACTION_OUTCOME.UNAVAILABLE } as const;
+const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+const UNAVAILABLE = toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 
 export const subscribeToNewsletterAction = async (
   email: string,
@@ -59,7 +61,7 @@ export const subscribeToNewsletterAction = async (
 
   try {
     if (await isSubscribeAttemptRefused(tenantId)) {
-      return { outcome: ACTION_OUTCOME.RATE_LIMITED };
+      return toOutcome(ACTION_OUTCOME.RATE_LIMITED);
     }
 
     const result = await queries.subscribers.createPendingSubscriber(
@@ -76,13 +78,13 @@ export const subscribeToNewsletterAction = async (
 
     if (outcome === 'already-active') {
       await markNewsletterSubscribedSafely();
-      return { outcome: NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED };
+      return toOutcome(NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED);
     }
 
     await sendNewsletterConfirmation(tenantId, subscriber);
 
     await markNewsletterSubscribedSafely();
-    return { outcome: ACTION_OUTCOME.SUCCESS };
+    return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error('newsletter.subscribe_failed', { error });
     return SERVER_ERROR;

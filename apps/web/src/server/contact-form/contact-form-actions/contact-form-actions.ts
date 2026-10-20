@@ -8,6 +8,7 @@ import {
 } from '@blog/config';
 import { queries, type schema } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { toOutcome } from '@blog/utils/to-outcome';
 import type { TFieldErrorReason } from '@web/constants/field-error';
 import { sendContactNotification } from '@web/server/contact-form/contact-notification-send/contact-notification-send';
 import { createPublicWriteGuard } from '@web/server/rate-limit/public-write-guard/public-write-guard';
@@ -37,8 +38,8 @@ export type TSubmitContactResult = TActionResult<
   TFieldErrorReason
 >;
 
-const BLOCKED = { outcome: ACTION_OUTCOME.BLOCKED } as const;
-const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR } as const;
+const BLOCKED = toOutcome(ACTION_OUTCOME.BLOCKED);
+const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 const { isBotOrUnverified, isRateLimited } = createPublicWriteGuard({
   name: 'contact-form-submit',
@@ -124,5 +125,5 @@ export const submitContactMessage = async (
     });
   }
 
-  return { outcome: ACTION_OUTCOME.SUCCESS };
+  return toOutcome(ACTION_OUTCOME.SUCCESS);
 };
