@@ -1,4 +1,9 @@
-import { SANITY_ROBOT_ROLE } from '@blog/config';
+import {
+  buildStarterDocuments,
+  SANITY_ROBOT_ROLE,
+  type TMaybeNull,
+  type TStarterDocumentUnion,
+} from '@blog/config';
 import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
@@ -11,9 +16,6 @@ import { createClient } from '@sanity/client';
 import type { TProvisionEnv } from '../lib/env';
 import { grantPropagationRetryOptions } from '../lib/grant-propagation-retry';
 import { retryWithBackoff } from '../lib/retry-with-backoff';
-
-import { buildStarterDocuments } from './starter-content';
-import type { TStarterDocumentUnion } from './starter-document';
 
 const SANITY_API_VERSION = '2024-01-01';
 
@@ -73,13 +75,13 @@ export async function seedTenantContent(
     const retryOptions = grantPropagationRetryOptions(deps.sleep);
 
     const alreadySeeded = await retryWithBackoff(
-      () => client.fetch<string | null>(SITE_SETTINGS_EXISTS_QUERY),
+      () => client.fetch<TMaybeNull<string>>(SITE_SETTINGS_EXISTS_QUERY),
       retryOptions,
     );
 
     if (alreadySeeded) return;
 
-    const documents = buildStarterDocuments(tenant);
+    const documents = buildStarterDocuments(tenant.name);
 
     const transaction = client.transaction();
     for (const document of documents) {
