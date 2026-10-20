@@ -72,11 +72,17 @@ module types whose capability is off for the tenant carry a warning.
 ## Constraints and invariants
 
 - `StudioMount` takes plain props only (`projectId`, `dataset`, `basePath`,
-  `title`, `enabledCapabilities`, `defaultLocale`, `liveLocales`) and calls
+  `title`, `enabledCapabilities`, `defaultLocale`, `liveLocales`,
+  `loginProvider`) and calls
   `buildStudioConfig` itself. It is the only `'use client'` file in
   `@blog/studio`. Nothing exports a built config: calling the builder in a
   Server Component pulls the Sanity SDK into the RSC graph, where `swr`,
   Sanity's bundled CSS and `sanity-plugin-media` break.
+- With `loginProvider` (a `SANITY_LOGIN_PROVIDER` value) set, the login
+  screen offers only that Sanity provider and redirects straight to it;
+  without it, Sanity's default provider list shows. A provider missing from
+  Sanity's list falls back to the full list, so the owner is never left
+  without a way in.
 - `apps/platform` reaches Sanity only through `StudioMount`. ESLint bans
   `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@blog/service` there.
 - `StudioMount` fills its parent (`height: 100%`) instead of `NextStudio`'s
@@ -133,13 +139,13 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 - `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.test.tsx`.
 - `apps/platform/src/utils/content-security-policy/content-security-policy.test.ts`.
 - Capability warnings: `packages/studio/src/schema-types/inputs/capability-warning-input/*.test.ts`.
+- Login provider: `packages/studio/src/auth/login-provider-auth.test.ts`.
 - No Storybook in either workspace.
 
 ## Related
 
 - #4840 epic: platform front door. Owner Studio access becomes a worker job,
   and the mount happens only once access is READY.
-- #4956 `StudioMount` takes the owner's login provider.
 - #4959 the sidebar Studio link carries access states; an explainer replaces
   the mount before READY.
 - #4035 localize the Studio interface for editors.
