@@ -40,6 +40,21 @@ export type TSanityProjectToggleResult = TValueOf<
   typeof SANITY_PROJECT_TOGGLE_RESULT
 >;
 
+export const SANITY_PROJECT_ROLE = {
+  ADMINISTRATOR: 'administrator',
+  EDITOR: 'editor',
+  VIEWER: 'viewer',
+} as const;
+
+export type TSanityProjectRole = TValueOf<typeof SANITY_PROJECT_ROLE>;
+
+export const SANITY_ROBOT_ROLE = {
+  EDITOR: SANITY_PROJECT_ROLE.EDITOR,
+  VIEWER: SANITY_PROJECT_ROLE.VIEWER,
+} as const;
+
+export type TSanityRobotRole = TValueOf<typeof SANITY_ROBOT_ROLE>;
+
 export const SANITY_API_SURFACE = {
   MANAGEMENT: 'MANAGEMENT',
   ACCESS: 'ACCESS',
