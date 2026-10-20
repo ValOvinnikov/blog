@@ -286,6 +286,8 @@
       "DEPROVISION_REQUESTED": "Desaprovisionamiento solicitado",
       "DEPROVISIONED": "Cliente desaprovisionado",
       "REACTIVATED": "Cliente reactivado",
+      "SUSPENSION_APPLIED": "Cliente suspendido",
+      "SUSPENSION_LIFTED": "Suspensión levantada",
       "PROVISIONED": "Cliente aprovisionado",
       "PROVISIONING_FAILED": "Aprovisionamiento fallido",
       "SETTINGS_UPDATED": "Configuración actualizada",
@@ -912,9 +914,30 @@
     "confirmButton": "Reactivar",
     "confirmingButton": "Lanzando…"
   },
+  "tenantSuspensionControl": {
+    "ACTIVE": {
+      "cardTitle": "Suspender este cliente",
+      "description": "Pausa las funciones de escritura del sitio público —el formulario de contacto, las suscripciones al boletín y los marcadores— mientras sus páginas siguen en línea. Puedes reactivarlo en cualquier momento.",
+      "triggerButton": "Suspender cliente",
+      "dialogTitle": "Suspender {name}",
+      "dialogDescription": "El sitio sigue en línea, pero desde la próxima carga de página desaparece su formulario de contacto y se rechazan nuevas suscripciones al boletín y marcadores hasta que lo reactives.",
+      "confirmButton": "Suspender",
+      "confirmingButton": "Suspendiendo…"
+    },
+    "SUSPENDED": {
+      "cardTitle": "Este cliente está suspendido",
+      "description": "El formulario de contacto, las suscripciones al boletín y los marcadores del sitio público están desactivados. Al reactivarlo vuelven desde la próxima carga de página.",
+      "triggerButton": "Reactivar cliente",
+      "dialogTitle": "Reactivar {name}",
+      "dialogDescription": "El formulario de contacto, las suscripciones al boletín y los marcadores del sitio vuelven desde la próxima carga de página.",
+      "confirmButton": "Reactivar",
+      "confirmingButton": "Reactivando…"
+    }
+  },
   "tenantLifecycleErrors": {
     "confirmRequired": "Escriba el nombre del cliente para confirmar.",
     "notFound": "No se encontró el cliente.",
+    "archived": "Este cliente está archivado.",
     "nameMismatch": "No coincide con el nombre del cliente.",
     "alreadyDeprovisioned": "Este cliente ya está desaprovisionado.",
     "notDeprovisioned": "Este cliente no está desaprovisionado.",
@@ -922,7 +945,9 @@
     "notArchived": "Este cliente debe archivarse antes de poder eliminarlo.",
     "deprovisionFailed": "No se pudo iniciar el desaprovisionamiento. Vuelva a intentarlo.",
     "reactivateFailed": "No se pudo iniciar la reactivación. Vuelva a intentarlo.",
-    "deleteFailed": "No se pudo eliminar el cliente. Vuelva a intentarlo."
+    "deleteFailed": "No se pudo eliminar el cliente. Vuelva a intentarlo.",
+    "suspendFailed": "No se pudo suspender el cliente — inténtalo de nuevo.",
+    "liftSuspensionFailed": "No se pudo reactivar el cliente — inténtalo de nuevo."
   },
   "featuresSettings": {
     "heading": "Funciones",

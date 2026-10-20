@@ -30,7 +30,7 @@ export const PageHeader = ({
   return (
     <div className={root({ class: className })}>
       <div className={titleGroup()}>
-        <div className={titleRow()}>
+        <div className={titleRow()} data-testid="page-header-title-row">
           <Heading level={1} size="pageTitle">
             {title}
           </Heading>

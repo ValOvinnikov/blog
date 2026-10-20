@@ -286,6 +286,8 @@
       "DEPROVISION_REQUESTED": "Déprovisionnement demandé",
       "DEPROVISIONED": "Locataire déprovisionné",
       "REACTIVATED": "Locataire réactivé",
+      "SUSPENSION_APPLIED": "Locataire suspendu",
+      "SUSPENSION_LIFTED": "Suspension levée",
       "PROVISIONED": "Locataire provisionné",
       "PROVISIONING_FAILED": "Échec du provisionnement",
       "SETTINGS_UPDATED": "Paramètres mis à jour",
@@ -912,9 +914,30 @@
     "confirmButton": "Réactiver",
     "confirmingButton": "Lancement…"
   },
+  "tenantSuspensionControl": {
+    "ACTIVE": {
+      "cardTitle": "Suspendre ce locataire",
+      "description": "Met en pause les fonctions d'écriture du site public — formulaire de contact, inscriptions à la newsletter et favoris — tandis que ses pages restent en ligne. Vous pouvez le réactiver à tout moment.",
+      "triggerButton": "Suspendre le locataire",
+      "dialogTitle": "Suspendre {name}",
+      "dialogDescription": "Le site reste en ligne, mais son formulaire de contact disparaît et les nouvelles inscriptions à la newsletter et les favoris sont refusés dès le prochain chargement de page, jusqu'à la réactivation.",
+      "confirmButton": "Suspendre",
+      "confirmingButton": "Suspension…"
+    },
+    "SUSPENDED": {
+      "cardTitle": "Ce locataire est suspendu",
+      "description": "Le formulaire de contact, les inscriptions à la newsletter et les favoris du site public sont désactivés. La réactivation les rétablit dès le prochain chargement de page.",
+      "triggerButton": "Réactiver le locataire",
+      "dialogTitle": "Réactiver {name}",
+      "dialogDescription": "Le formulaire de contact, les inscriptions à la newsletter et les favoris du site reviennent dès le prochain chargement de page.",
+      "confirmButton": "Réactiver",
+      "confirmingButton": "Réactivation…"
+    }
+  },
   "tenantLifecycleErrors": {
     "confirmRequired": "Saisissez le nom du locataire pour confirmer.",
     "notFound": "Locataire introuvable.",
+    "archived": "Ce locataire est archivé.",
     "nameMismatch": "Ne correspond pas au nom du locataire.",
     "alreadyDeprovisioned": "Ce locataire est déjà déprovisionné.",
     "notDeprovisioned": "Ce locataire n'est pas déprovisionné.",
@@ -922,7 +945,9 @@
     "notArchived": "Ce locataire doit être archivé avant de pouvoir être supprimé.",
     "deprovisionFailed": "Impossible de lancer le déprovisionnement — veuillez réessayer.",
     "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",
-    "deleteFailed": "Impossible de supprimer le locataire — veuillez réessayer."
+    "deleteFailed": "Impossible de supprimer le locataire — veuillez réessayer.",
+    "suspendFailed": "Impossible de suspendre le locataire — réessayez.",
+    "liftSuspensionFailed": "Impossible de réactiver le locataire — réessayez."
   },
   "featuresSettings": {
     "heading": "Fonctionnalités",
