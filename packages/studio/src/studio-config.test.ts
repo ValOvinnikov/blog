@@ -1,6 +1,7 @@
 import {
   CAPABILITY,
   LOCALE_ISO_CODES,
+  SANITY_LOGIN_PROVIDER,
   type TCapability,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
@@ -69,6 +70,21 @@ describe(buildStudioConfig, () => {
     });
 
     expect(configWithBasePath.basePath).toBe('/dashboard/studio');
+  });
+
+  it('leaves the default login providers when no loginProvider is given', () => {
+    expect(config.auth).toBeUndefined();
+  });
+
+  it('limits login to the given provider', () => {
+    const configWithLoginProvider = buildStudioConfig({
+      projectId: 'test-project',
+      dataset: 'test-dataset',
+      title: 'Test Studio',
+      loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
+    });
+
+    expect(configWithLoginProvider.auth?.redirectOnSingle).toBe(true);
   });
 
   describe('document actions', () => {

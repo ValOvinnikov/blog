@@ -1,8 +1,6 @@
+import type { TSanityLoginProvider } from '@blog/config/constants';
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
-import type {
-  TSanityLoginProvider,
-  TSanityProjectRole,
-} from '@blog/db/constants';
+import type { TSanityProjectRole } from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
 
 export type TTenantOwnerAccess = {

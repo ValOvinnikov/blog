@@ -1,6 +1,10 @@
 'use client';
 
-import type { TCapability, TLocaleIsoCode } from '@blog/config/constants';
+import type {
+  TCapability,
+  TLocaleIsoCode,
+  TSanityLoginProvider,
+} from '@blog/config/constants';
 import type { FC } from 'react';
 import { StudioLayout, StudioProvider } from 'sanity';
 
@@ -14,6 +18,7 @@ export type TStudioMountProps = {
   enabledCapabilities?: readonly TCapability[];
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
+  loginProvider?: TSanityLoginProvider;
 };
 
 // Fills the parent slot instead of assuming the viewport, unlike
@@ -36,6 +41,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
   enabledCapabilities,
   defaultLocale,
   liveLocales,
+  loginProvider,
 }) => {
   const config = buildStudioConfig({
     projectId,
@@ -45,6 +51,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
     enabledCapabilities,
     defaultLocale,
     liveLocales,
+    loginProvider,
   });
 
   return (
