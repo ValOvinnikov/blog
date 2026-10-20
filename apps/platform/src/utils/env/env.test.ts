@@ -7,7 +7,7 @@ const ENV_KEYS = [
   'SITE_CONFIG_REVALIDATE_SECRET',
   'TENANT_PROVISIONING_GITHUB_TOKEN',
   'TENANT_PROVISIONING_GITHUB_REPO',
-  'TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE',
+  'WORKER_ENQUEUE_URL',
   'VERCEL_API_TOKEN',
   'VERCEL_PROJECT_ID_WEB',
   'VERCEL_TEAM_ID',
@@ -172,23 +172,18 @@ describe('env', () => {
     await expect(importEnvOnServer()).rejects.toThrow();
   });
 
-  it('parses a valid TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE and exposes it typed', async () => {
-    process.env['TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE'] =
-      'https://tenant-dev.tailnet.ts.net';
+  it('parses a valid WORKER_ENQUEUE_URL and exposes it typed', async () => {
+    process.env['WORKER_ENQUEUE_URL'] = 'https://worker-dev.example.com';
 
     const { env } = await importEnvOnServer();
 
-    expect(env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE).toBe(
-      'https://tenant-dev.tailnet.ts.net',
-    );
+    expect(env.WORKER_ENQUEUE_URL).toBe('https://worker-dev.example.com');
   });
 
-  it('leaves TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE undefined when absent (the workflow dispatch omits the override input)', async () => {
-    delete process.env['TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE'];
+  it('rejects a WORKER_ENQUEUE_URL that is not a URL', async () => {
+    process.env['WORKER_ENQUEUE_URL'] = 'worker-dev';
 
-    const { env } = await importEnvOnServer();
-
-    expect(env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE).toBeUndefined();
+    await expect(importEnvOnServer()).rejects.toThrow();
   });
 
   it('parses valid Vercel domain-check vars and exposes them typed', async () => {

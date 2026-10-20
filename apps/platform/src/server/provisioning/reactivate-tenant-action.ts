@@ -23,7 +23,7 @@ export type TReactivateTenantResult = TTenantLifecycleResult<
 >;
 
 /**
- * Dispatching the provisioning workflow is what makes the tenant whole:
+ * Re-running provisioning is what makes the tenant whole:
  * clearing `deprovisionedAt` alone would leave the row reading ACTIVE while
  * its Sanity project stays archived and its domain unmapped.
  */

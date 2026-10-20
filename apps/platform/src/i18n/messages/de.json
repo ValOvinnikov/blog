@@ -908,7 +908,7 @@
     "description": "Bringt einen archivierten Mandanten wieder online, indem die Bereitstellung erneut ausgeführt wird: Der Mandanteneintrag und sein Sanity-Projekt werden aus dem Archiv geholt, die eigene Domain wird neu zugeordnet und der Revalidierungs-Webhook neu erstellt. Verwenden Sie dies, statt einen versehentlich deprovisionierten Mandanten zu löschen.",
     "triggerButton": "Mandant reaktivieren",
     "dialogTitle": "{name} reaktivieren",
-    "dialogDescription": "Dies startet provision-tenant.yml, das jede bereitgestellte Ressource dieses Mandanten wiederherstellt. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
+    "dialogDescription": "Dies startet die Bereitstellung erneut, die jede bereitgestellte Ressource dieses Mandanten wiederherstellt. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
     "confirmButton": "Reaktivieren",
     "confirmingButton": "Wird gestartet…"
   },

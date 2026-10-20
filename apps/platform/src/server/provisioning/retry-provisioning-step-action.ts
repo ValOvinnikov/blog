@@ -20,11 +20,7 @@ export type TRetryProvisioningStepResult = TActionResult<
   TRetryProvisioningRefusal
 >;
 
-/**
- * Re-dispatches the whole workflow rather than one step, since every step is
- * idempotent; `beginTenantProvisioning`'s atomic guard, not the archived check,
- * is what stops a concurrent double-dispatch.
- */
+/** Re-runs the whole provisioning rather than one step, since every unit is idempotent. */
 export const retryProvisioningStepAction = async (
   tenantId: string,
 ): Promise<TRetryProvisioningStepResult> => {

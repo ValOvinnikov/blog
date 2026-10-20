@@ -908,7 +908,7 @@
     "description": "Remet en ligne un locataire archivé en relançant le provisionnement : la ligne du locataire et son projet Sanity sont désarchivés, le domaine personnalisé est de nouveau associé et le webhook de revalidation est recréé. Utilisez cette option plutôt que de supprimer un locataire déprovisionné par erreur.",
     "triggerButton": "Réactiver le locataire",
     "dialogTitle": "Réactiver {name}",
-    "dialogDescription": "Cette action lance provision-tenant.yml, qui restaure toutes les ressources provisionnées pour ce locataire. Saisissez le nom du locataire pour confirmer.",
+    "dialogDescription": "Cette action relance le provisionnement, qui restaure toutes les ressources provisionnées pour ce locataire. Saisissez le nom du locataire pour confirmer.",
     "confirmButton": "Réactiver",
     "confirmingButton": "Lancement…"
   },

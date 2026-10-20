@@ -2,12 +2,12 @@ import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
-} from '@worker/constants/enqueue';
+  isValidEnqueueSignature,
+} from '@blog/utils/enqueue-signature';
 import {
   ENQUEUE_ERROR,
   type TEnqueueError,
 } from '@worker/constants/enqueue-error';
-import { isValidEnqueueSignature } from '@worker/utils/enqueue-signature/enqueue-signature';
 import { env } from '@worker/utils/env/env';
 import { z } from 'zod';
 
