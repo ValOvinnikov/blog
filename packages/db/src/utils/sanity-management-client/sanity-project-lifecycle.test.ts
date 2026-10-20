@@ -58,7 +58,7 @@ describe(deleteSanityProject, () => {
     ).rejects.toThrow(/403/);
   });
 
-  it('reports blocked-by-billing-permission on the org-billing 401, without throwing', async () => {
+  it('reports blocked-by-billing-permission on the billing 401 without throwing', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -108,7 +108,7 @@ describe(archiveSanityProject, () => {
     }
   });
 
-  it('GETs the project, then PATCHes isDisabledByUser to true when not already archived', async () => {
+  it('GETs, then PATCHes isDisabledByUser to true when not already archived', async () => {
     fetchMock
       .mockResolvedValueOnce(projectResponse(false))
       .mockResolvedValueOnce(
@@ -182,7 +182,7 @@ describe(archiveSanityProject, () => {
 });
 
 describe(unarchiveSanityProject, () => {
-  it('GETs the project, then PATCHes isDisabledByUser to false when currently archived', async () => {
+  it('GETs, then PATCHes isDisabledByUser to false when currently archived', async () => {
     fetchMock
       .mockResolvedValueOnce(projectResponse(true))
       .mockResolvedValueOnce(

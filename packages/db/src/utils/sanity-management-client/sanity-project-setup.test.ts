@@ -113,7 +113,7 @@ describe(listSanityDatasets, () => {
 });
 
 describe(addSanityCorsOrigin, () => {
-  it('POSTs to the corrected /projects/:id/cors path with credentials allowed', async () => {
+  it('POSTs to /projects/:id/cors with credentials allowed', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
     await addSanityCorsOrigin({

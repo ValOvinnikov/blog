@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { sanityAccessRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
 export type TSanityRobotRole = 'viewer' | 'editor';
@@ -42,7 +43,7 @@ export async function createSanityRobotToken(input: {
 
 export type TSanityRobotTokenSummary = {
   id: string;
-  label: string | undefined;
+  label: TMaybeUndefined<string>;
 };
 
 export async function listSanityRobotTokens(input: {

@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 describe(listSanityWebhooks, () => {
-  it('GETs the global hooks endpoint without following redirects and returns the list', async () => {
+  it('GETs the global hooks endpoint without following redirects', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify([
@@ -57,7 +57,7 @@ describe(createSanityWebhook, () => {
     secret: 'shh',
   };
 
-  it('POSTs a document webhook triggered on create, update and delete to the global hooks endpoint', async () => {
+  it('POSTs a document webhook for create, update and delete events', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -96,7 +96,7 @@ describe(createSanityWebhook, () => {
     });
   });
 
-  it('throws naming the project when the response is a hook list instead of the created hook', async () => {
+  it('throws naming the project when the response is a hook list', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify([]), { status: 200 }),
     );
