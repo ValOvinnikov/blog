@@ -2,23 +2,19 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { SiteHeader } from './site-header';
 
-const {
-  getNavigationMock,
-  getEnabledOAuthProviderIdsMock,
-  urlForSanityImageMock,
-  useSessionMock,
-} = vi.hoisted(() => ({
-  getNavigationMock: vi.fn(),
-  getEnabledOAuthProviderIdsMock: vi.fn(),
-  urlForSanityImageMock: vi.fn(),
-  useSessionMock: vi.fn(),
-}));
+const { getNavigationMock, getEnabledOAuthProviderIdsMock, useSessionMock } =
+  vi.hoisted(() => ({
+    getNavigationMock: vi.fn(),
+    getEnabledOAuthProviderIdsMock: vi.fn(),
+    useSessionMock: vi.fn(),
+  }));
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -26,6 +22,13 @@ vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
   () => ({
     getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
+  }),
+);
+
+vi.mock(
+  '@web/server/site-config/get-brand-logo-url/get-brand-logo-url',
+  () => ({
+    getBrandLogoUrl: vi.fn(),
   }),
 );
 
@@ -51,7 +54,6 @@ vi.mock('@blog/service', () => ({
   service: {
     global: { navigation: { v1: { getNavigation: getNavigationMock } } },
   },
-  urlForSanityImage: urlForSanityImageMock,
 }));
 
 vi.mock('next-auth/react', () => ({
@@ -63,6 +65,10 @@ vi.mock('next-auth/react', () => ({
 const getRequestContextMock = vi.mocked(getRequestContext);
 const getSiteSettingsMock = vi.mocked(getSiteSettings);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
+const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
+
+const LOOK_LOGO_URL = 'https://blob.example.com/tenants/tenant-a/logo.png';
+const STUDIO_LOGO = { assetId: 'image-abc123def-800x600-svg', alt: 'Logo' };
 
 const setup = customRenderAsync(SiteHeader, {});
 
@@ -73,10 +79,47 @@ describe(SiteHeader, () => {
       data: { brand: { name: 'Blog', logo: undefined } },
     } as never);
     getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
+    getBrandLogoUrlMock.mockResolvedValue(undefined);
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     isReaderAccountEnabledMock.mockResolvedValue(true);
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
+  });
+
+  describe('the brand logo', () => {
+    it("shows the tenant's Look logo, not the Studio brand logo", async () => {
+      getBrandLogoUrlMock.mockResolvedValue(LOOK_LOGO_URL);
+      getSiteSettingsMock.mockResolvedValue({
+        ok: true,
+        data: { brand: { name: 'Blog', logo: STUDIO_LOGO } },
+      } as never);
+
+      await setup();
+
+      expect(
+        within(screen.getByRole('link', { name: 'Home' })).getByRole(
+          'presentation',
+        ),
+      ).toHaveAttribute('src', LOOK_LOGO_URL);
+      expect(getBrandLogoUrlMock).toHaveBeenCalledWith(
+        DEFAULT_REQUEST_CONTEXT.tenantId,
+      );
+    });
+
+    it('shows the default mark when no Look logo is uploaded, even with a Studio brand logo', async () => {
+      getSiteSettingsMock.mockResolvedValue({
+        ok: true,
+        data: { brand: { name: 'Blog', logo: STUDIO_LOGO } },
+      } as never);
+
+      await setup();
+
+      const homeLink = screen.getByRole('link', { name: 'Home' });
+      expect(
+        within(homeLink).queryByRole('presentation'),
+      ).not.toBeInTheDocument();
+      expect(homeLink).not.toBeEmptyDOMElement();
+    });
   });
 
   describe('with several live languages and the switcher on', () => {

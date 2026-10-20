@@ -50,7 +50,7 @@ Every public page emits the title, description, canonical, Open Graph and Twitte
 
 - Editors author every SEO field per page in the Studio. There is no site-level SEO setting.
 - Which languages appear in alternates and the sitemap follows the tenant's live languages (see [languages](./languages.md)).
-- The favicon is the tenant's logo icon from site settings, with an inline fallback mark.
+- The favicon is the tenant's Look favicon upload, with an inline fallback mark ([look](./look.md)).
 - Not plan-gated; no Look or Voice reach.
 
 ## Constraints and invariants
