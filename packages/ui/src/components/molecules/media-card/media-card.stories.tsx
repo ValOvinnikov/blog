@@ -496,7 +496,10 @@ const restingAndFocusedOn = (tone: TBrandVariant): TStory => ({
         <MediaCard {...args} />
       </div>
       <div style={{ width: 280 }}>
-        <MediaCard {...args} />
+        <MediaCard {...args} {...IconPanelMedia.args} />
+      </div>
+      <div style={{ width: 280 }}>
+        <MediaCard {...args} {...IconPanelMedia.args} />
       </div>
     </BrandBand>
   ),
