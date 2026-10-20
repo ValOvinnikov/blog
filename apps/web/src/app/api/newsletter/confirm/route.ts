@@ -1,32 +1,17 @@
-import { TENANT_WRITE_REFUSAL } from '@blog/config';
+import { NEWSLETTER_RESULT, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
-import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
+import { redirectToNewsletterResult } from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
-import { getTranslations } from 'next-intl/server';
-
-import { renderResultResponse } from '../newsletter-result-page';
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
-  const lang = await resolveNewsletterLinkLocale(searchParams.get('lang'));
-  const t = await getTranslations({
-    locale: lang,
-    namespace: 'newsletterConfirm',
-  });
-  const returnHomeLabel = t('returnHome');
+  const token = new URL(request.url).searchParams.get('token');
 
   if (!token) {
-    return renderResultResponse(
-      {
-        lang,
-        title: t('invalidTitle'),
-        message: t('invalidMessage'),
-        returnHomeLabel,
-      },
-      400,
+    return redirectToNewsletterResult(
+      request,
+      NEWSLETTER_RESULT.CONFIRM_INVALID,
     );
   }
 
@@ -35,61 +20,33 @@ export async function GET(request: Request): Promise<NextResponse> {
     if (!tenant.ok) {
       if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
         logger.warn('newsletter.confirm_tenant_not_active');
-        return renderResultResponse(
-          {
-            lang,
-            title: t('unavailableTitle'),
-            message: t('unavailableMessage'),
-            returnHomeLabel,
-          },
-          403,
+        return redirectToNewsletterResult(
+          request,
+          NEWSLETTER_RESULT.CONFIRM_UNAVAILABLE,
         );
       }
-      return renderResultResponse(
-        {
-          lang,
-          title: t('errorTitle'),
-          message: t('errorMessage'),
-          returnHomeLabel,
-        },
-        404,
-      );
-    }
-    const { tenantId } = tenant;
-
-    const result = await queries.subscribers.confirmSubscriber(tenantId, token);
-
-    if (result.outcome === 'not-found') {
-      return renderResultResponse(
-        {
-          lang,
-          title: t('invalidTitle'),
-          message: t('invalidMessage'),
-          returnHomeLabel,
-        },
-        404,
+      return redirectToNewsletterResult(
+        request,
+        NEWSLETTER_RESULT.CONFIRM_FAILED,
       );
     }
 
-    return renderResultResponse(
-      {
-        lang,
-        title: t('confirmedTitle'),
-        message: t('confirmedMessage'),
-        returnHomeLabel,
-      },
-      200,
+    const result = await queries.subscribers.confirmSubscriber(
+      tenant.tenantId,
+      token,
+    );
+
+    return redirectToNewsletterResult(
+      request,
+      result.outcome === 'not-found'
+        ? NEWSLETTER_RESULT.CONFIRM_INVALID
+        : NEWSLETTER_RESULT.CONFIRMED,
     );
   } catch (error) {
     logger.error('newsletter.confirm_failed', { error });
-    return renderResultResponse(
-      {
-        lang,
-        title: t('errorTitle'),
-        message: t('errorMessage'),
-        returnHomeLabel,
-      },
-      500,
+    return redirectToNewsletterResult(
+      request,
+      NEWSLETTER_RESULT.CONFIRM_FAILED,
     );
   }
 }

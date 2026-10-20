@@ -3,9 +3,14 @@ import { getTranslations } from 'next-intl/server';
 
 export {};
 
-const { unsubscribeByTokenMock, resolveRequestTenantMock } = vi.hoisted(() => ({
+const {
+  unsubscribeByTokenMock,
+  resolveRequestTenantMock,
+  resolveNewsletterLinkLocaleMock,
+} = vi.hoisted(() => ({
   unsubscribeByTokenMock: vi.fn(),
   resolveRequestTenantMock: vi.fn(),
+  resolveNewsletterLinkLocaleMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
@@ -19,10 +24,6 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: resolveRequestTenantMock,
-}));
-
-const { resolveNewsletterLinkLocaleMock } = vi.hoisted(() => ({
-  resolveNewsletterLinkLocaleMock: vi.fn(),
 }));
 
 vi.mock(
@@ -42,6 +43,16 @@ const subscriber = {
   confirmedAt: new Date('2026-01-02'),
 };
 
+beforeEach(() => {
+  unsubscribeByTokenMock.mockReset();
+  resolveRequestTenantMock.mockReset();
+  resolveNewsletterLinkLocaleMock.mockReset();
+  resolveNewsletterLinkLocaleMock.mockResolvedValue({
+    locale: 'EN',
+    defaultLocale: 'EN',
+  });
+});
+
 describe('GET /api/newsletter/unsubscribe', () => {
   let GET: typeof import('./route').GET;
   let request: Request;
@@ -50,20 +61,18 @@ describe('GET /api/newsletter/unsubscribe', () => {
     request = new Request(
       'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
     );
-    unsubscribeByTokenMock.mockReset();
-    resolveRequestTenantMock.mockReset();
-    resolveNewsletterLinkLocaleMock.mockResolvedValue('EN');
     ({ GET } = await import('./route'));
   });
 
-  it('returns 400 without touching the db when no token is given', async () => {
+  it('sends a link without a token to the invalid page without touching the db', async () => {
     const response = await GET(
       new Request('https://example.com/api/newsletter/unsubscribe'),
     );
-    const html = await response.text();
 
-    expect(response.status).toBe(400);
-    expect(html).toContain('Link no longer valid');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribe-invalid',
+    );
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
     expect(resolveRequestTenantMock).not.toHaveBeenCalled();
   });
@@ -85,7 +94,10 @@ describe('GET /api/newsletter/unsubscribe', () => {
   });
 
   it('renders in the language the link carries and keeps it on the form', async () => {
-    resolveNewsletterLinkLocaleMock.mockResolvedValue('FR');
+    resolveNewsletterLinkLocaleMock.mockResolvedValue({
+      locale: 'FR',
+      defaultLocale: 'EN',
+    });
     const response = await GET(
       new Request(
         'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc&lang=FR',
@@ -112,82 +124,79 @@ describe('POST /api/newsletter/unsubscribe', () => {
       'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
       { method: 'POST' },
     );
-    unsubscribeByTokenMock.mockReset();
     unsubscribeByTokenMock.mockResolvedValue({
       outcome: 'unsubscribed',
       subscriber,
     });
-    resolveRequestTenantMock.mockReset();
     resolveRequestTenantMock.mockResolvedValue({
       id: TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
     });
-    resolveNewsletterLinkLocaleMock.mockResolvedValue('EN');
     ({ POST } = await import('./route'));
   });
 
-  it('returns 400 without querying the db when no token is given', async () => {
-    const response = await POST(
-      new Request('https://example.com/api/newsletter/unsubscribe', {
-        method: 'POST',
-      }),
-    );
-    const html = await response.text();
-
-    expect(response.status).toBe(400);
-    expect(html).toContain('Link no longer valid');
-    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
-  });
-
-  it('unsubscribes and returns 200 for a valid token', async () => {
+  it('unsubscribes and sends them to the unsubscribed page with a GET', async () => {
     const response = await POST(request);
-    const html = await response.text();
 
-    expect(response.status).toBe(200);
-    expect(html).toContain('You&apos;re unsubscribed');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribed',
+    );
     expect(unsubscribeByTokenMock).toHaveBeenCalledWith(
       TENANT_ID,
       'unsub-token-abc',
     );
   });
 
-  it('renders in the language the link carries', async () => {
-    resolveNewsletterLinkLocaleMock.mockResolvedValue('FR');
+  it('sends them to the page in the language the link carries', async () => {
+    resolveNewsletterLinkLocaleMock.mockResolvedValue({
+      locale: 'FR',
+      defaultLocale: 'EN',
+    });
     const response = await POST(
       new Request(
         'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc&lang=FR',
         { method: 'POST' },
       ),
     );
-    const html = await response.text();
 
     expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith('FR');
-    expect(html).toContain('<html lang="FR">');
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/fr/newsletter/unsubscribed',
+    );
   });
 
-  it('renders the calm "no longer valid" page for an unknown or already-used token', async () => {
-    unsubscribeByTokenMock.mockResolvedValue({ outcome: 'not-found' });
+  it('sends a link without a token to the invalid page without querying the db', async () => {
     const response = await POST(
-      new Request(
-        'https://example.com/api/newsletter/unsubscribe?token=bogus',
-        { method: 'POST' },
-      ),
+      new Request('https://example.com/api/newsletter/unsubscribe', {
+        method: 'POST',
+      }),
     );
-    const html = await response.text();
 
-    expect(response.status).toBe(200);
-    expect(html).toContain('Link no longer valid');
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribe-invalid',
+    );
+    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
+  });
+
+  it('sends an unknown or already-used token to the invalid page', async () => {
+    unsubscribeByTokenMock.mockResolvedValue({ outcome: 'not-found' });
+    const response = await POST(request);
+
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribe-invalid',
+    );
   });
 
   it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
-    'unsubscribes and returns 200 when the tenant is %s',
+    'unsubscribes when the tenant is %s',
     async (status) => {
       resolveRequestTenantMock.mockResolvedValue({ id: TENANT_ID, status });
       const response = await POST(request);
-      const html = await response.text();
 
-      expect(response.status).toBe(200);
-      expect(html).toContain('You&apos;re unsubscribed');
+      expect(response.headers.get('location')).toBe(
+        'https://example.com/newsletter/unsubscribed',
+      );
       expect(unsubscribeByTokenMock).toHaveBeenCalledWith(
         TENANT_ID,
         'unsub-token-abc',
@@ -195,26 +204,29 @@ describe('POST /api/newsletter/unsubscribe', () => {
     },
   );
 
-  it('returns 404 with the error copy without unsubscribing when no tenant resolves', async () => {
+  it('sends them to the failed page without unsubscribing when no tenant resolves', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     resolveRequestTenantMock.mockResolvedValue(undefined);
     const response = await POST(request);
-    const html = await response.text();
 
-    expect(response.status).toBe(404);
-    expect(html).toContain('Something went wrong');
-    expect(html).not.toContain('Link no longer valid');
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribe-failed',
+    );
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 
-  it('returns 500 with the error copy and logs when the db query throws', async () => {
+  it('sends them to the failed page and logs when the db query throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     unsubscribeByTokenMock.mockRejectedValue(new Error('db down'));
     const response = await POST(request);
-    const html = await response.text();
 
-    expect(response.status).toBe(500);
-    expect(html).toContain('Something went wrong');
-    expect(errorSpy).toHaveBeenCalled();
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribe-failed',
+    );
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('newsletter.unsubscribe_link_failed'),
+    );
     errorSpy.mockRestore();
   });
 });

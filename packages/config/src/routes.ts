@@ -1,4 +1,8 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import {
+  NEWSLETTER_RESULT_SLUGS,
+  type TLocaleIsoCode,
+  type TNewsletterResult,
+} from '@blog/config/constants';
 
 const toNewsletterLinkQuery = (token: string, locale?: TLocaleIsoCode) => {
   const tokenQuery = `token=${encodeURIComponent(token)}`;
@@ -30,6 +34,8 @@ export const routes = {
     `/api/newsletter/confirm?${toNewsletterLinkQuery(token, locale)}`,
   newsletterUnsubscribe: (token: string, locale?: TLocaleIsoCode) =>
     `/api/newsletter/unsubscribe?${toNewsletterLinkQuery(token, locale)}`,
+  newsletterResult: (result: TNewsletterResult) =>
+    `/newsletter/${NEWSLETTER_RESULT_SLUGS[result]}`,
   landingPage: (slug: string) => `/${slug}`,
   switchLanguage: (to: string, from: string) =>
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,

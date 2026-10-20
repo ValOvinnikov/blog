@@ -87,6 +87,13 @@ describe('routes', () => {
     );
   });
 
+  it('builds the newsletter result page path from the result', () => {
+    expect(routes.newsletterResult('CONFIRMED')).toBe('/newsletter/confirmed');
+    expect(routes.newsletterResult('UNSUBSCRIBE_INVALID')).toBe(
+      '/newsletter/unsubscribe-invalid',
+    );
+  });
+
   it('URL-encodes tokens containing reserved query characters', () => {
     expect(routes.newsletterConfirm('a b&c=d')).toBe(
       '/api/newsletter/confirm?token=a%20b%26c%3Dd',
