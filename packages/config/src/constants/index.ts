@@ -19,6 +19,7 @@ export * from './finding';
 export * from './form-status';
 export * from './header-control-style';
 export * from './html-tag';
+export * from './http-methods';
 export * from './http-statuses';
 export * from './icon';
 export * from './image-layout';
