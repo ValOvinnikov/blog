@@ -1,5 +1,4 @@
-import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import { buildPlatformShell } from '@blog/email/html/platform-shell/platform-shell';
 
 const OPERATOR_BRAND_NAME = 'Tenant Alerts';
 
@@ -8,22 +7,13 @@ export type TBuildOperatorShellInput = {
   bodyHtml: string;
 };
 
-/**
- * Wraps operator-alert HTML in the shared branded email layout, styled with
- * the fixed platform palette — never a tenant's, because there is no
- * parameter through which one could arrive.
- */
 export function buildOperatorShell({
   previewText,
   bodyHtml,
 }: TBuildOperatorShellInput): string {
-  return renderEmailShell({
-    palette: PLATFORM_EMAIL_BRAND,
+  return buildPlatformShell({
+    brandName: OPERATOR_BRAND_NAME,
     title: OPERATOR_BRAND_NAME,
-    identity: {
-      brandName: OPERATOR_BRAND_NAME,
-      markPalette: PLATFORM_EMAIL_BRAND,
-    },
     previewText,
     bodyHtml,
   });
