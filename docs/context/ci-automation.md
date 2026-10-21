@@ -213,6 +213,9 @@ The step names are the job names they replaced, in this order:
   `turbo.json`'s `build` `env` allowlist, which strict env mode strips.
 - **UI index** — `pnpm gen:ui-index:check`: drift, structure and description
   coverage of `packages/ui/COMPONENTS.md`.
+- **Const index** — `pnpm gen:const-index:check`: drift of
+  `packages/config/CONSTANTS.md` and `packages/config/const-index.json`, the
+  value→const map the touched-file `prefer-shared-constant` rule reads.
 - **Required env classification** — `pnpm check:required-env` with no
   environment, which runs only the classification half (see "Required env
   vars" below).
@@ -487,7 +490,8 @@ neither Storybook.
 Root `pnpm verify` is one `&&` chain over every required or gating CI check
 that has a local equivalent, in this order: `type-check`, `lint`, `test`,
 `knip`, `check:client-graph`, `check:revalidate-tags-sync`,
-`check:turbo-env-sync`, `check:migration-index`, `gen:ui-index:check`. The
+`check:turbo-env-sync`, `check:migration-index`, `gen:ui-index:check`,
+`gen:const-index:check`, `check:touched-lint`, `check:duplicate-literals`. The
 chain stops at the first failure, so a red step is reported once rather than
 buried under later output. It is the sequence `develop-feature` §5 hands to
 `verify-runner`, the `## Verify` line of every issue body, and — minus
@@ -508,6 +512,9 @@ threshold at which it would have stayed out).
 | **Turbo env sync** (gating)         | `pnpm check:turbo-env-sync` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                          |
 | **Migration index** (gating)        | `pnpm check:migration-index` — in `pnpm verify`. Compares against the local `origin/main` ref and never fetches, so it is only as current as the `git fetch origin` that opens `develop-feature` §5.                                                                                                                                                     |
 | **UI index** (gating)               | `pnpm gen:ui-index:check` — in `pnpm verify`. CI also runs the generator's own fixture tests in Verify's Script helper tests step; those only change when `scripts/gen-ui-index.mjs` does.                                                                                                                                                               |
+| **Const index** (gating)            | `pnpm gen:const-index:check` — in `pnpm verify`. Regenerate with `pnpm gen:const-index` after adding or changing a key/value const.                                                                                                                                                                                                                      |
+| Touched-file lint (local only)      | `pnpm check:touched-lint` — in `pnpm verify`; no CI step. Lints the `.ts`/`.tsx` files changed since the merge-base with `origin/main` with `BLOG_LINT_TOUCHED=1`, which adds `prefer-shared-constant` and `no-duplicate-string`.                                                                                                                        |
+| Duplicate literals (local only)     | `pnpm check:duplicate-literals` — in `pnpm verify`; no CI step. Fails when a string literal the diff adds already appears in the same file, workspace or a workspace it depends on; a match in another app is printed as a note.                                                                                                                         |
 | **Build** (via CI)                  | No routine mirror — `pnpm build` is CI-only by `CLAUDE.md`'s rule; run it locally only to reproduce an actual CI build failure (`open-pull-request` Gate 5a).                                                                                                                                                                                            |
 | **Workflow security** (required)    | Zizmor and actionlint have no local script. When the diff touches `.claude/hooks/**` or `scripts/*.sh`, run the shellcheck + guard-test block in `develop-feature` §5 by hand.                                                                                                                                                                           |
 | **Migrations** (via CI)             | None — needs the dataset. `pnpm migrate:dry` in `packages/studio` is the nearest rehearsal, and it also targets a live dataset.                                                                                                                                                                                                                          |

@@ -1,0 +1,256 @@
+import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
+
+import {
+  listTouchedSourceFiles,
+  readBaseVersion,
+  repoRoot,
+  resolveBase,
+} from './touched-files.mjs';
+
+const EXEMPT_PATHS = [
+  /\/sanity\/generated\//,
+  /^packages\/studio\/migrations\//,
+];
+const CLASS_HELPERS = new Set([
+  'cn',
+  'clsx',
+  'cx',
+  'tv',
+  'cva',
+  'twMerge',
+  'twJoin',
+]);
+const MODULE_PATH_CALLEES = new Set([
+  'require',
+  'mock',
+  'doMock',
+  'unmock',
+  'importActual',
+  'importMock',
+  'resolve',
+]);
+const TEST_TITLE_CALLEES = new Set(['describe', 'it', 'test', 'bench']);
+const MAX_LISTED_LOCATIONS = 3;
+
+const isExemptPath = (file) => EXEMPT_PATHS.some((re) => re.test(file));
+
+const calleeName = (expression) => {
+  if (ts.isIdentifier(expression)) {
+    return expression.text;
+  }
+  if (ts.isPropertyAccessExpression(expression)) {
+    return expression.name.text;
+  }
+  return undefined;
+};
+
+const isFirstArgumentOf = (node, names) => {
+  const { parent } = node;
+  return (
+    ts.isCallExpression(parent) &&
+    parent.arguments[0] === node &&
+    (parent.expression.kind === ts.SyntaxKind.ImportKeyword ||
+      names.has(calleeName(parent.expression)))
+  );
+};
+
+const isInsideClassOrJsxAttribute = (node) => {
+  for (let current = node.parent; current; current = current.parent) {
+    if (ts.isJsxAttribute(current)) {
+      return true;
+    }
+    if (
+      ts.isCallExpression(current) &&
+      CLASS_HELPERS.has(calleeName(current.expression))
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const isExemptLiteral = (node) => {
+  const { parent } = node;
+  return (
+    node.text.trim() === '' ||
+    /\s/.test(node.text) ||
+    ts.isExpressionStatement(parent) ||
+    ts.isImportDeclaration(parent) ||
+    ts.isExportDeclaration(parent) ||
+    ts.isExternalModuleReference(parent) ||
+    ts.isModuleDeclaration(parent) ||
+    (ts.isLiteralTypeNode(parent) && ts.isImportTypeNode(parent.parent)) ||
+    (parent.name === node && !ts.isElementAccessExpression(parent)) ||
+    isFirstArgumentOf(node, MODULE_PATH_CALLEES) ||
+    isFirstArgumentOf(node, TEST_TITLE_CALLEES) ||
+    isInsideClassOrJsxAttribute(node)
+  );
+};
+
+export const collectLiterals = (file, text) => {
+  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
+  const found = [];
+  const visit = (node) => {
+    if (
+      (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) &&
+      !isExemptLiteral(node)
+    ) {
+      const { line } = sf.getLineAndCharacterOfPosition(node.getStart(sf));
+      found.push({ value: node.text, line: line + 1 });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return found;
+};
+
+const countValues = (literals) => {
+  const counts = new Map();
+  for (const { value } of literals) {
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+  return counts;
+};
+
+export const addedValues = (baseText, currentLiterals, file) => {
+  const before = countValues(baseText ? collectLiterals(file, baseText) : []);
+  return [...countValues(currentLiterals)]
+    .filter(([value, count]) => count > (before.get(value) ?? 0))
+    .map(([value]) => value);
+};
+
+const readWorkspaces = () =>
+  ['apps', 'packages'].flatMap((group) =>
+    readdirSync(join(repoRoot, group))
+      .map((name) => `${group}/${name}`)
+      .filter((dir) => existsSync(join(repoRoot, dir, 'package.json')))
+      .map((dir) => {
+        const pkg = JSON.parse(
+          readFileSync(join(repoRoot, dir, 'package.json'), 'utf8'),
+        );
+        return {
+          dir,
+          name: pkg.name,
+          deps: Object.keys({ ...pkg.dependencies, ...pkg.devDependencies }),
+        };
+      }),
+  );
+
+export const scopeOf = (workspaces, dir) => {
+  const byName = new Map(workspaces.map((w) => [w.name, w]));
+  const scope = new Set();
+  const pending = [workspaces.find((w) => w.dir === dir)];
+  while (pending.length > 0) {
+    const workspace = pending.pop();
+    if (workspace && !scope.has(workspace.dir)) {
+      scope.add(workspace.dir);
+      pending.push(...workspace.deps.map((dep) => byName.get(dep)));
+    }
+  }
+  return scope;
+};
+
+const workspaceDirOf = (file) => /^(?:apps|packages)\/[^/]+/.exec(file)?.[0];
+
+const listWorkspaceSources = (dir) =>
+  execFileSync(
+    'git',
+    ['ls-files', '--cached', '--others', '--exclude-standard', '--', dir],
+    { cwd: repoRoot, encoding: 'utf8' },
+  )
+    .split('\n')
+    .filter((file) => /\.tsx?$/.test(file) && !file.endsWith('.d.ts'))
+    .filter((file) => !isExemptPath(file) && existsSync(join(repoRoot, file)));
+
+const buildCorpus = (dir) => {
+  const byValue = new Map();
+  for (const file of listWorkspaceSources(dir)) {
+    const text = readFileSync(join(repoRoot, file), 'utf8');
+    for (const { value, line } of collectLiterals(file, text)) {
+      byValue.set(value, [...(byValue.get(value) ?? []), `${file}:${line}`]);
+    }
+  }
+  return byValue;
+};
+
+const formatLocations = (locations) => {
+  const listed = locations.slice(0, MAX_LISTED_LOCATIONS).join(', ');
+  const more = locations.length - MAX_LISTED_LOCATIONS;
+  return more > 0 ? `${listed} and ${more} more` : listed;
+};
+
+const main = () => {
+  const base = resolveBase();
+  if (!base) {
+    console.log(
+      'No origin/main to diff against; skipping the duplicate-literal check.',
+    );
+    return;
+  }
+  const workspaces = readWorkspaces();
+  const apps = workspaces.filter((w) => w.dir.startsWith('apps/'));
+  const corpora = new Map();
+  const corpusOf = (dir) => {
+    if (!corpora.has(dir)) {
+      corpora.set(dir, buildCorpus(dir));
+    }
+    return corpora.get(dir);
+  };
+  const failures = [];
+  const notes = [];
+  for (const file of listTouchedSourceFiles(base)) {
+    const workspace = workspaceDirOf(file);
+    if (!workspace || isExemptPath(file)) {
+      continue;
+    }
+    const scope = scopeOf(workspaces, workspace);
+    const literals = collectLiterals(
+      file,
+      readFileSync(join(repoRoot, file), 'utf8'),
+    );
+    for (const value of addedValues(
+      readBaseVersion(base, file),
+      literals,
+      file,
+    )) {
+      const here = literals
+        .filter((l) => l.value === value)
+        .map((l) => `${file}:${l.line}`);
+      const elsewhere = [...scope]
+        .flatMap((dir) => corpusOf(dir).get(value) ?? [])
+        .filter((location) => !location.startsWith(`${file}:`));
+      const sameFile = here.length > 1 ? here.slice(1) : [];
+      if (elsewhere.length > 0 || sameFile.length > 0) {
+        failures.push(
+          `${here[0]} adds ${JSON.stringify(value)}, already at ${formatLocations([...sameFile, ...elsewhere])}`,
+        );
+        continue;
+      }
+      const crossApp = apps
+        .filter((app) => !scope.has(app.dir))
+        .flatMap((app) => corpusOf(app.dir).get(value) ?? []);
+      if (crossApp.length > 0) {
+        notes.push(
+          `${here[0]} adds ${JSON.stringify(value)}, also in another app at ${formatLocations(crossApp)}`,
+        );
+      }
+    }
+  }
+  for (const note of notes) {
+    console.log(`note: ${note}`);
+  }
+  if (failures.length > 0) {
+    console.error(
+      `A literal this diff adds already exists — extract it into one const (CLAUDE.md "Reuse before you create"):\n${failures.map((f) => `  ${f}`).join('\n')}`,
+    );
+    process.exit(1);
+  }
+};
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

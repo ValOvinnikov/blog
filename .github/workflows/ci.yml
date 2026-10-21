@@ -242,6 +242,12 @@ jobs:
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: pnpm gen:ui-index:check
 
+      # Drift over packages/config/CONSTANTS.md and const-index.json, which the
+      # prefer-shared-constant lint rule reads.
+      - name: Const index
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: pnpm gen:const-index:check
+
       # With no REQUIRED_ENV_ENVIRONMENT the script runs only its
       # classification half; presence is the Required env matrix's.
       - name: Required env classification
