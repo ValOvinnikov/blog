@@ -3,6 +3,7 @@ export * from './client-key';
 export * from './color';
 export * from './encryption';
 export * from './enqueue-signature';
+export * from './hash';
 export * from './is-secret-match';
 export * from './merge';
 export * from './pagination';

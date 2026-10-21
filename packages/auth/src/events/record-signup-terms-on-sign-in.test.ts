@@ -16,8 +16,8 @@ vi.mock('@blog/db', () => ({
   queries: { users: { recordTermsAcceptance: recordTermsAcceptanceMock } },
 }));
 
-const EMAIL = 'owner@example.com';
-const USER = { id: 'user-1', email: EMAIL };
+const EMAIL = 'signup@example.com';
+const USER = { id: 'signup-user', email: EMAIL };
 
 const withSignupCookie = (value?: string) => {
   cookiesMock.mockResolvedValue({

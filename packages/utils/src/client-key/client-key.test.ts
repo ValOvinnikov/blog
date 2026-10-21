@@ -1,4 +1,4 @@
-import { resolveClientKey } from './client-key';
+import { resolveClientKey, UNKNOWN_CLIENT_KEY } from './client-key';
 
 const REAL_IP = '203.0.113.9';
 
@@ -18,6 +18,6 @@ describe(resolveClientKey, () => {
   });
 
   it('answers "unknown" when neither header is present', () => {
-    expect(resolveClientKey(new Headers())).toBe('unknown');
+    expect(resolveClientKey(new Headers())).toBe(UNKNOWN_CLIENT_KEY);
   });
 });

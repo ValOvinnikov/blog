@@ -1,7 +1,6 @@
-import { createHash } from 'node:crypto';
-
 import { queries } from '@blog/db';
 import { resolveClientKey } from '@blog/utils/client-key';
+import { hashSha256Hex } from '@blog/utils/hash';
 
 const SEND_LIMIT_WINDOW_MS = 60 * 60_000;
 const MAX_SENDS_PER_EMAIL = 5;
@@ -9,7 +8,7 @@ const MAX_SENDS_PER_EMAIL = 5;
 const MAX_SENDS_PER_IP = 20;
 
 const toCounterKey = (scope: string, value: string): string =>
-  `${scope}:${createHash('sha256').update(value).digest('hex')}`;
+  `${scope}:${hashSha256Hex(value)}`;
 
 export async function isMagicLinkSendAllowed(
   identifier: string,
@@ -17,11 +16,11 @@ export async function isMagicLinkSendAllowed(
 ): Promise<boolean> {
   const [emailSends, ipSends] = await Promise.all([
     queries.magicLinkSendCounters.incrementMagicLinkSendCount(
-      toCounterKey('email', identifier.toLowerCase()),
+      toCounterKey('magic-link-email', identifier.toLowerCase()),
       SEND_LIMIT_WINDOW_MS,
     ),
     queries.magicLinkSendCounters.incrementMagicLinkSendCount(
-      toCounterKey('ip', resolveClientKey(request.headers)),
+      toCounterKey('magic-link-ip', resolveClientKey(request.headers)),
       SEND_LIMIT_WINDOW_MS,
     ),
   ]);

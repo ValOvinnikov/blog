@@ -12,8 +12,8 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const EMAIL = 'owner@example.com';
-const CLIENT_IP = '203.0.113.5';
+const EMAIL = 'limited@example.com';
+const CLIENT_IP = '198.51.100.7';
 
 const requestFrom = (ip: string) =>
   new Request('https://platform.example.com/api/auth/signin/email', {
@@ -21,9 +21,10 @@ const requestFrom = (ip: string) =>
   });
 
 const withSendCounts = ({ email, ip }: { email: number; ip: number }) => {
-  incrementMagicLinkSendCountMock.mockImplementation((key: string) =>
-    Promise.resolve(key.startsWith('email:') ? email : ip),
-  );
+  incrementMagicLinkSendCountMock
+    .mockResolvedValueOnce(email)
+    .mockResolvedValueOnce(ip)
+    .mockResolvedValue(1);
 };
 
 describe(isMagicLinkSendAllowed, () => {
@@ -55,7 +56,7 @@ describe(isMagicLinkSendAllowed, () => {
     withSendCounts({ email: 1, ip: 1 });
 
     await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
-    await isMagicLinkSendAllowed('Owner@Example.com', requestFrom(CLIENT_IP));
+    await isMagicLinkSendAllowed(EMAIL.toUpperCase(), requestFrom(CLIENT_IP));
 
     const keys = incrementMagicLinkSendCountMock.mock.calls.map(([key]) => key);
     expect(keys[2]).toBe(keys[0]);
@@ -67,6 +68,6 @@ describe(isMagicLinkSendAllowed, () => {
     await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
 
     const keys = incrementMagicLinkSendCountMock.mock.calls.map(([key]) => key);
-    expect(keys.join()).not.toMatch(/owner@example\.com|203\.0\.113\.5/);
+    expect(keys.join()).not.toMatch(/limited@example\.com|198\.51\.100\.7/);
   });
 });

@@ -1,3 +1,4 @@
+import { TERMS_VERSION } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
@@ -10,9 +11,8 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const USER_ID = 'user-1';
-const ACCEPTED_AT = new Date('2026-10-21T10:00:00Z');
-const ACCEPTED_TERMS_VERSION = '2026-10-21';
+const USER_ID = 'terms-user';
+const ACCEPTED_AT = new Date('2026-10-20T09:00:00Z');
 
 async function readUser() {
   const [user] = await db()
@@ -35,24 +35,24 @@ describe(recordTermsAcceptance, () => {
   it('stamps the acceptance time and version on the user', async () => {
     vi.useFakeTimers({ now: ACCEPTED_AT });
 
-    await recordTermsAcceptance(USER_ID, ACCEPTED_TERMS_VERSION);
+    await recordTermsAcceptance(USER_ID, TERMS_VERSION);
 
     expect(await readUser()).toMatchObject({
       termsAcceptedAt: ACCEPTED_AT,
-      termsVersion: ACCEPTED_TERMS_VERSION,
+      termsVersion: TERMS_VERSION,
     });
   });
 
   it('keeps the first acceptance when called again', async () => {
     vi.useFakeTimers({ now: ACCEPTED_AT });
-    await recordTermsAcceptance(USER_ID, ACCEPTED_TERMS_VERSION);
+    await recordTermsAcceptance(USER_ID, TERMS_VERSION);
     vi.setSystemTime(new Date('2026-11-01T10:00:00Z'));
 
     await recordTermsAcceptance(USER_ID, '2026-11-01');
 
     expect(await readUser()).toMatchObject({
       termsAcceptedAt: ACCEPTED_AT,
-      termsVersion: ACCEPTED_TERMS_VERSION,
+      termsVersion: TERMS_VERSION,
     });
   });
 });

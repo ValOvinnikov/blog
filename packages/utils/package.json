@@ -10,6 +10,7 @@
     "./color": "./src/color/index.ts",
     "./encryption": "./src/encryption/index.ts",
     "./enqueue-signature": "./src/enqueue-signature/index.ts",
+    "./hash": "./src/hash/index.ts",
     "./merge": "./src/merge/index.ts",
     "./pagination": "./src/pagination/index.ts",
     "./primitives": "./src/primitives/index.ts",
