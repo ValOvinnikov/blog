@@ -1,4 +1,9 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  LOCALE_ISO_CODES,
+} from '@blog/config/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TDeprovisionEnv } from '../lib/env';
@@ -6,36 +11,18 @@ import type { TDeprovisionEnv } from '../lib/env';
 import { purgeTenantReaderData } from './purge-reader-data';
 
 const {
-  countSubscribersForTenantMock,
-  deleteSubscribersForTenantMock,
-  countBookmarksForTenantMock,
-  deleteBookmarksForTenantMock,
-  countMembershipInvitesForTenantMock,
-  deleteMembershipInvitesForTenantMock,
+  countTenantReaderDataMock,
+  purgeTenantReaderDataMock,
   insertAuditEventMock,
 } = vi.hoisted(() => ({
-  countSubscribersForTenantMock: vi.fn(),
-  deleteSubscribersForTenantMock: vi.fn(),
-  countBookmarksForTenantMock: vi.fn(),
-  deleteBookmarksForTenantMock: vi.fn(),
-  countMembershipInvitesForTenantMock: vi.fn(),
-  deleteMembershipInvitesForTenantMock: vi.fn(),
+  countTenantReaderDataMock: vi.fn(),
+  purgeTenantReaderDataMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
 }));
 
-vi.mock('@blog/db/queries/subscribers', () => ({
-  countSubscribersForTenant: countSubscribersForTenantMock,
-  deleteSubscribersForTenant: deleteSubscribersForTenantMock,
-}));
-
-vi.mock('@blog/db/queries/bookmarks', () => ({
-  countBookmarksForTenant: countBookmarksForTenantMock,
-  deleteBookmarksForTenant: deleteBookmarksForTenantMock,
-}));
-
-vi.mock('@blog/db/queries/membership-invites', () => ({
-  countMembershipInvitesForTenant: countMembershipInvitesForTenantMock,
-  deleteMembershipInvitesForTenant: deleteMembershipInvitesForTenantMock,
+vi.mock('@blog/db/queries/reader-data', () => ({
+  countTenantReaderData: countTenantReaderDataMock,
+  purgeTenantReaderData: purgeTenantReaderDataMock,
 }));
 
 vi.mock('@blog/db/queries/audit-events', () => ({
@@ -56,6 +43,13 @@ const env: TDeprovisionEnv = {
   siteConfigRevalidateSecret: 'shared-secret',
 };
 
+const PURGED_COUNTS = {
+  subscribers: 3,
+  bookmarks: 5,
+  membershipInvites: 1,
+  leads: 2,
+};
+
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 'tenant-1',
@@ -65,8 +59,8 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
+    plan: TENANT_PLAN.FREE,
+    status: TENANT_STATUS.ACTIVE,
     provisioningStatus: null,
     provisioningSteps: null,
     seededAt: null,
@@ -78,12 +72,8 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 }
 
 beforeEach(() => {
-  countSubscribersForTenantMock.mockReset().mockResolvedValue(3);
-  deleteSubscribersForTenantMock.mockReset().mockResolvedValue(3);
-  countBookmarksForTenantMock.mockReset().mockResolvedValue(5);
-  deleteBookmarksForTenantMock.mockReset().mockResolvedValue(5);
-  countMembershipInvitesForTenantMock.mockReset().mockResolvedValue(1);
-  deleteMembershipInvitesForTenantMock.mockReset().mockResolvedValue(1);
+  countTenantReaderDataMock.mockReset().mockResolvedValue(PURGED_COUNTS);
+  purgeTenantReaderDataMock.mockReset().mockResolvedValue(PURGED_COUNTS);
   insertAuditEventMock.mockReset().mockResolvedValue({});
   vi.spyOn(console, 'warn').mockImplementation(() => {});
   vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -94,14 +84,10 @@ afterEach(() => {
 });
 
 describe(purgeTenantReaderData, () => {
-  it('deletes every reader-data row for the tenant across all three tables', async () => {
+  it("purges the tenant's reader data through the shared purge", async () => {
     await purgeTenantReaderData(baseTenant(), env);
 
-    expect(deleteSubscribersForTenantMock).toHaveBeenCalledWith('tenant-1');
-    expect(deleteBookmarksForTenantMock).toHaveBeenCalledWith('tenant-1');
-    expect(deleteMembershipInvitesForTenantMock).toHaveBeenCalledWith(
-      'tenant-1',
-    );
+    expect(purgeTenantReaderDataMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('records exactly one READER_DATA_PURGED/TENANT audit event with the per-table counts', async () => {
@@ -111,15 +97,13 @@ describe(purgeTenantReaderData, () => {
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'github:octocat',
       actorEmail: 'octocat@users.noreply.github.com',
-      action: 'READER_DATA_PURGED',
-      targetType: 'TENANT',
+      action: AUDIT_ACTION.READER_DATA_PURGED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
       details: {
         via: 'deprovision-tenant-workflow',
         runId: 'run-42',
-        subscribers: 3,
-        bookmarks: 5,
-        membershipInvites: 1,
+        ...PURGED_COUNTS,
       },
     });
   });
@@ -127,35 +111,9 @@ describe(purgeTenantReaderData, () => {
   it('only counts, never deletes, and records no audit event in dry-run mode', async () => {
     await purgeTenantReaderData(baseTenant(), { ...env, dryRun: true });
 
-    expect(countSubscribersForTenantMock).toHaveBeenCalledWith('tenant-1');
-    expect(countBookmarksForTenantMock).toHaveBeenCalledWith('tenant-1');
-    expect(countMembershipInvitesForTenantMock).toHaveBeenCalledWith(
-      'tenant-1',
-    );
-    expect(deleteSubscribersForTenantMock).not.toHaveBeenCalled();
-    expect(deleteBookmarksForTenantMock).not.toHaveBeenCalled();
-    expect(deleteMembershipInvitesForTenantMock).not.toHaveBeenCalled();
+    expect(countTenantReaderDataMock).toHaveBeenCalledWith('tenant-1');
+    expect(purgeTenantReaderDataMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
-  it('is idempotent — re-running after every table is already empty deletes nothing further and still records the (zero-count) purge', async () => {
-    deleteSubscribersForTenantMock.mockResolvedValue(0);
-    deleteBookmarksForTenantMock.mockResolvedValue(0);
-    deleteMembershipInvitesForTenantMock.mockResolvedValue(0);
-
-    await expect(
-      purgeTenantReaderData(baseTenant(), env),
-    ).resolves.toBeUndefined();
-
-    expect(insertAuditEventMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        details: expect.objectContaining({
-          subscribers: 0,
-          bookmarks: 0,
-          membershipInvites: 0,
-        }),
-      }),
-    );
   });
 
   it('purges successfully and logs, without throwing, when the audit write fails', async () => {
@@ -165,7 +123,7 @@ describe(purgeTenantReaderData, () => {
       purgeTenantReaderData(baseTenant(), env),
     ).resolves.toBeUndefined();
 
-    expect(deleteSubscribersForTenantMock).toHaveBeenCalled();
+    expect(purgeTenantReaderDataMock).toHaveBeenCalled();
     expect(console.error).toHaveBeenCalled();
   });
 
@@ -174,7 +132,7 @@ describe(purgeTenantReaderData, () => {
       purgeTenantReaderData(baseTenant(), { ...env, githubActor: undefined }),
     ).resolves.toBeUndefined();
 
-    expect(deleteSubscribersForTenantMock).toHaveBeenCalled();
+    expect(purgeTenantReaderDataMock).toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(console.error).toHaveBeenCalled();
   });

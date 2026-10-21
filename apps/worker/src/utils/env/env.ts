@@ -22,10 +22,15 @@ export const env = createEnv({
     // Must be byte-identical to `apps/web`'s own `SANITY_REVALIDATE_SECRET`.
     // @env-required: development, production
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
+    // Must be byte-identical to `apps/web`'s own `SITE_CONFIG_REVALIDATE_SECRET`.
+    // @env-required: development, production
+    SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
     // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
     // @env-optional
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
+    // @env-optional
+    OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-optional
     OWNER_EMAIL_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-optional
@@ -43,8 +48,10 @@ export const env = createEnv({
     TENANT_SANITY_DATASET: process.env.TENANT_SANITY_DATASET,
     WEB_APP_URL: process.env.WEB_APP_URL,
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
+    SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
+    OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
     OWNER_EMAIL_FROM_ADDRESS: process.env.OWNER_EMAIL_FROM_ADDRESS,
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,

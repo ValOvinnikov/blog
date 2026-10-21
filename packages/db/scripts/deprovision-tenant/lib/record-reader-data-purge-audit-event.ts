@@ -1,24 +1,14 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events';
+import type { TTenantReaderDataCounts } from '@blog/db/queries/reader-data';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import type { TDeprovisionEnv } from './env';
 
-export type TReaderDataPurgeCounts = {
-  subscribers: number;
-  bookmarks: number;
-  membershipInvites: number;
-};
-
-// Records exactly one `READER_DATA_PURGED`/`TENANT` audit event after a real
-// purge. Never throws: the purge itself already succeeded by the time this
-// runs, so a lost audit write is logged and swallowed rather than failing a
-// step whose destructive work is already done — mirrors
-// `recordDeprovisionAuditEvent`.
 export async function recordReaderDataPurgeAuditEvent(
   tenantId: string,
   env: TDeprovisionEnv,
-  counts: TReaderDataPurgeCounts,
+  counts: TTenantReaderDataCounts,
 ): Promise<void> {
   if (!env.githubActor) {
     console.error(

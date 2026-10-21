@@ -67,13 +67,12 @@ export async function reportRunFinish(tenantId: string): Promise<void> {
   }
 }
 
-export async function recordProvisioningAuditEvent(input: {
+export async function insertWorkerAuditEvent(input: {
   tenantId: string;
   action: TAuditAction;
-  runId: string;
-  failedStep?: TTenantProvisioningStep;
+  details: Record<string, unknown>;
 }): Promise<void> {
-  const { tenantId, action, runId, failedStep } = input;
+  const { tenantId, action, details } = input;
   try {
     await insertAuditEvent({
       actorId: PROVISIONING_AUDIT_ACTOR_ID,
@@ -81,11 +80,7 @@ export async function recordProvisioningAuditEvent(input: {
       action,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,
-      details: {
-        via: PROVISIONING_AUDIT_VIA,
-        runId,
-        ...(failedStep === undefined ? {} : { step: failedStep }),
-      },
+      details,
     });
   } catch (error) {
     logger.error('provisioning.audit_event_failed', {
@@ -94,6 +89,24 @@ export async function recordProvisioningAuditEvent(input: {
       error: sanitizeLogMessage(error),
     });
   }
+}
+
+export async function recordProvisioningAuditEvent(input: {
+  tenantId: string;
+  action: TAuditAction;
+  runId: string;
+  failedStep?: TTenantProvisioningStep;
+}): Promise<void> {
+  const { tenantId, action, runId, failedStep } = input;
+  await insertWorkerAuditEvent({
+    tenantId,
+    action,
+    details: {
+      via: PROVISIONING_AUDIT_VIA,
+      runId,
+      ...(failedStep === undefined ? {} : { step: failedStep }),
+    },
+  });
 }
 
 export async function markRunNotStarted(tenantId: string): Promise<void> {

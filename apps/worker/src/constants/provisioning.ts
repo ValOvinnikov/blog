@@ -13,3 +13,4 @@ export const PROVISION_CLI_RESULT = {
 } as const;
 
 export type TProvisionCliResult = TValueOf<typeof PROVISION_CLI_RESULT>;
+export const UNKNOWN_RUN_ERROR = 'unknown error';

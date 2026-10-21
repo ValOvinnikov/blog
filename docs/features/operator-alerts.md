@@ -12,6 +12,7 @@ code:
   - packages/db/scripts/*/lib/notify-operators*
   - packages/db/scripts/recheck-tenant-owners/lib/notify-owner-elevation-outcome.ts
   - apps/worker/src/utils/operator-alert/**
+  - apps/worker/src/utils/operator-email/**
   - packages/db/src/queries/admins/list-superadmin-emails/**
   - packages/email/src/templates/operator/**
   - packages/email/src/html/operator-shell/**
@@ -23,9 +24,12 @@ epics: [4955, 4840]
 ## What it does
 
 Emails the platform's SUPERADMINs when a background job finds a tenant that
-needs a human. Two conditions alert today: a tenant owner's Sanity access is
-stuck (the invite is unaccepted after three days, or the project has more than
-one candidate owner), and a tenant's Sanity documents newly fail validation.
+needs a human. Two conditions alert through the platform today: a tenant owner's Sanity
+access is stuck (the invite is unaccepted after three days, or the project has
+more than one candidate owner), and a tenant's Sanity documents newly fail
+validation. A third, a deprovisioned tenant whose archived Sanity project must
+be deleted by hand in Sanity Manage, is sent by `apps/worker` itself, because
+the platform route refuses an archived tenant.
 The CLI jobs report only facts. `apps/platform` picks the recipients, renders
 the email in the platform's own look, and sends it.
 
@@ -93,6 +97,12 @@ the email in the platform's own look, and sends it.
     fire for one outcome.
   - Document validation: only when the sweep opens a new finding, not when it
     refreshes an open one.
+- The archived Sanity project email goes out once per successful
+  deprovisioning run, from the worker, to every SUPERADMIN
+  (`listSuperadminEmails`), with `OPERATOR_ALERT_FROM_ADDRESS` set on the
+  worker projects, else the same Resend testing sender. A failed send is
+  logged (`deprovisioning.alert_send_failed`) and never fails the run; no
+  SUPERADMIN logs `deprovisioning.alert_no_recipients`.
 - Senders: `apps/worker` (a STALLED owner-access check),
   `recheck-tenant-owners` and `validate-tenant-documents`. Both sweeps' cron
   schedules are commented out, so they alert only on manual dispatch.
@@ -110,6 +120,8 @@ the email in the platform's own look, and sends it.
     `RESEND_API_KEY`.
   - CI (GitHub Environment): `OPERATOR_ALERT_SECRET` (byte-identical to the
     platform's), `ADMIN_APP_BASE_URL`.
+  - Worker: `OPERATOR_ALERT_FROM_ADDRESS`, `RESEND_API_KEY` for the archived
+    Sanity project email.
 
 ## Entry points
 
@@ -118,7 +130,9 @@ the email in the platform's own look, and sends it.
 - `packages/db/scripts/recheck-tenant-owners/lib/notify-owner-elevation-outcome.ts`
 - `packages/db/scripts/validate-tenant-documents/lib/notify-operators.ts`
 - `packages/email/src/templates/operator/owner-elevation-alert/owner-elevation-alert.ts`,
-  `document-validation-alert/document-validation-alert.ts`
+  `document-validation-alert/document-validation-alert.ts`,
+  `archived-sanity-project-alert/archived-sanity-project-alert.ts`
+- `apps/worker/src/utils/operator-email/sanity-project-deletion-alert.ts`
 
 ## Tests and stories
 

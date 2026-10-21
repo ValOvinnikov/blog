@@ -5,7 +5,10 @@ import {
 } from '@blog/db/constants';
 import { setTenantProvisioningStatus } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
-import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import {
+  PROVISIONING_UNIT_MAX_RETRIES,
+  UNKNOWN_RUN_ERROR,
+} from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import {
   recordProvisioningAuditEvent,
@@ -41,7 +44,7 @@ export async function finishRun(
     logger.error('provisioning.run_failed', {
       tenantId,
       runId,
-      error: sanitizeLogMessage(outcome.error ?? 'unknown'),
+      error: sanitizeLogMessage(outcome.error ?? UNKNOWN_RUN_ERROR),
     });
     const marked = await setTenantProvisioningStatus(
       tenantId,

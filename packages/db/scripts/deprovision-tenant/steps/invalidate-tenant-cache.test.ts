@@ -1,11 +1,16 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 
 import type { TDeprovisionEnv } from '../lib/env';
 
 import { invalidateTenantCache } from './invalidate-tenant-cache';
 
-const fetchMock = vi.fn();
+vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
+
+const MISSING_CONFIG_ERROR =
+  'invalidate-tenant-cache: missing WEB_APP_URL or SITE_CONFIG_REVALIDATE_SECRET';
 
 const env: TDeprovisionEnv = {
   sanityManagementToken: 'mgmt-token',
@@ -30,8 +35,8 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ARCHIVED',
+    plan: TENANT_PLAN.FREE,
+    status: TENANT_STATUS.ARCHIVED,
     provisioningStatus: null,
     provisioningSteps: null,
     seededAt: null,
@@ -42,79 +47,39 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   } as TTenant;
 }
 
-beforeEach(() => {
-  vi.stubGlobal('fetch', fetchMock);
-  fetchMock.mockReset().mockResolvedValue(
-    new Response(JSON.stringify({ revalidated: [], pathPurged: true }), {
-      status: 200,
-    }),
-  );
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
-
 describe(invalidateTenantCache, () => {
-  it('POSTs the tenant id to the revalidation endpoint with the bearer secret', async () => {
+  it("requests the purge of the tenant's cached pages", async () => {
     await invalidateTenantCache(baseTenant(), env);
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    expect(url.toString()).toBe(
-      'https://web.example.com/api/revalidate-site-config',
-    );
-    expect(init.method).toBe('POST');
-    expect(init.headers).toMatchObject({
-      Authorization: 'Bearer shared-secret',
+    expect(requestTenantCacheInvalidation).toHaveBeenCalledWith({
+      webAppUrl: env.webAppUrl,
+      secret: env.siteConfigRevalidateSecret,
+      tenantId: 'tenant-1',
     });
-    expect(init.body).toBe(JSON.stringify({ tenantId: 'tenant-1' }));
   });
 
-  it('does not call the endpoint in dry-run mode', async () => {
+  it('requests no purge in dry-run mode', async () => {
     await invalidateTenantCache(baseTenant(), { ...env, dryRun: true });
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(requestTenantCacheInvalidation).not.toHaveBeenCalled();
   });
 
-  it('throws loudly when WEB_APP_URL is missing, without calling fetch', async () => {
+  it('throws, requesting no purge, when WEB_APP_URL is missing', async () => {
     await expect(
       invalidateTenantCache(baseTenant(), { ...env, webAppUrl: undefined }),
-    ).rejects.toThrow(
-      'invalidate-tenant-cache: missing WEB_APP_URL or SITE_CONFIG_REVALIDATE_SECRET',
-    );
+    ).rejects.toThrow(MISSING_CONFIG_ERROR);
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(requestTenantCacheInvalidation).not.toHaveBeenCalled();
   });
 
-  it('throws loudly when SITE_CONFIG_REVALIDATE_SECRET is missing, without calling fetch', async () => {
+  it('throws when SITE_CONFIG_REVALIDATE_SECRET is missing', async () => {
     await expect(
       invalidateTenantCache(baseTenant(), {
         ...env,
         siteConfigRevalidateSecret: undefined,
       }),
-    ).rejects.toThrow(
-      'invalidate-tenant-cache: missing WEB_APP_URL or SITE_CONFIG_REVALIDATE_SECRET',
-    );
+    ).rejects.toThrow(MISSING_CONFIG_ERROR);
 
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it('throws and surfaces the status when the endpoint responds non-2xx', async () => {
-    fetchMock.mockResolvedValue(
-      new Response('secret mismatch', { status: 401 }),
-    );
-
-    await expect(invalidateTenantCache(baseTenant(), env)).rejects.toThrow(
-      'invalidate-tenant-cache: revalidation request failed for tenant "tenant-1": 401',
-    );
-  });
-
-  it('propagates a network failure rather than swallowing it', async () => {
-    fetchMock.mockRejectedValue(new Error('fetch failed'));
-
-    await expect(invalidateTenantCache(baseTenant(), env)).rejects.toThrow(
-      'fetch failed',
-    );
+    expect(requestTenantCacheInvalidation).not.toHaveBeenCalled();
   });
 });

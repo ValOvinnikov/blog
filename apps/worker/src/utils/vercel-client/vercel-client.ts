@@ -1,12 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
-const VERCEL_API_BASE = 'https://api.vercel.com';
-const VERCEL_API_TIMEOUT_MS = 30_000;
-
-function withTeamId(path: string, teamId: TMaybeUndefined<string>): string {
-  if (!teamId) return path;
-  const separator = path.includes('?') ? '&' : '?';
-  return `${path}${separator}teamId=${encodeURIComponent(teamId)}`;
-}
+import { HTTP_METHOD, type TMaybeUndefined } from '@blog/config';
+import {
+  VERCEL_API_BASE,
+  VERCEL_API_TIMEOUT_MS,
+  withTeamId,
+} from '@blog/db/utils/vercel-client/vercel-project-domains';
 
 async function vercelRequest<T>(
   path: string,
@@ -26,7 +23,7 @@ async function vercelRequest<T>(
   if (!response.ok) {
     const body = await response.text().catch(() => '');
     throw new Error(
-      `Vercel API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}`,
+      `Vercel API ${init.method ?? HTTP_METHOD.GET} ${path} failed: ${response.status} ${body}`,
     );
   }
 
@@ -57,6 +54,6 @@ export async function addVercelProjectDomain(input: {
   return vercelRequest<TVercelDomain>(
     withTeamId(`/v10/projects/${input.projectId}/domains`, input.teamId),
     input.token,
-    { method: 'POST', body: JSON.stringify({ name: input.domain }) },
+    { method: HTTP_METHOD.POST, body: JSON.stringify({ name: input.domain }) },
   );
 }
