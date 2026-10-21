@@ -1,17 +1,14 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
+import { KEY_ENCODING, PAYLOAD_ENCODING } from './crypto-encoding';
+
 const ALGORITHM = 'aes-256-gcm';
 // 96-bit IV is the AES-GCM-recommended length (NIST SP 800-38D).
 const IV_LENGTH = 12;
 
-/**
- * Encrypts `plaintext` with a 32-byte AES-256-GCM key (base64-encoded).
- * Returns `iv.authTag.ciphertext`, each segment base64url — safe to store
- * as a single text column value. A fresh random IV each call means the
- * same plaintext never produces the same ciphertext twice.
- */
+/** A fresh random IV each call, so one plaintext never encrypts to the same value twice and the output cannot be looked up. */
 export function encryptSecret(plaintext: string, keyBase64: string): string {
-  const key = Buffer.from(keyBase64, 'base64');
+  const key = Buffer.from(keyBase64, KEY_ENCODING);
   const iv = randomBytes(IV_LENGTH);
   const cipher = createCipheriv(ALGORITHM, key, iv);
   const ciphertext = Buffer.concat([
@@ -21,13 +18,13 @@ export function encryptSecret(plaintext: string, keyBase64: string): string {
   const authTag = cipher.getAuthTag();
 
   return [iv, authTag, ciphertext]
-    .map((buffer) => buffer.toString('base64url'))
+    .map((buffer) => buffer.toString(PAYLOAD_ENCODING))
     .join('.');
 }
 
-/** Inverse of {@link encryptSecret}. Throws on a wrong key or malformed input — GCM's auth tag makes tampering/corruption detectable, not silently wrong. */
+/** Throws on a wrong key or a tampered value rather than returning garbage. */
 export function decryptSecret(encrypted: string, keyBase64: string): string {
-  const key = Buffer.from(keyBase64, 'base64');
+  const key = Buffer.from(keyBase64, KEY_ENCODING);
   const segments = encrypted.split('.');
   if (segments.length !== 3) {
     throw new Error('Malformed encrypted secret.');
@@ -41,12 +38,12 @@ export function decryptSecret(encrypted: string, keyBase64: string): string {
   const decipher = createDecipheriv(
     ALGORITHM,
     key,
-    Buffer.from(ivB64, 'base64url'),
+    Buffer.from(ivB64, PAYLOAD_ENCODING),
   );
-  decipher.setAuthTag(Buffer.from(authTagB64, 'base64url'));
+  decipher.setAuthTag(Buffer.from(authTagB64, PAYLOAD_ENCODING));
 
   return Buffer.concat([
-    decipher.update(Buffer.from(ciphertextB64, 'base64url')),
+    decipher.update(Buffer.from(ciphertextB64, PAYLOAD_ENCODING)),
     decipher.final(),
   ]).toString('utf8');
 }

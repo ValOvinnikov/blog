@@ -1983,6 +1983,17 @@ canonical table in
 — includes the access conventions (validated entry points only, turbo strict
 env mode, cache-busting on shared config presets).
 
+**Personal data at rest.** Personal data that must be read back is stored
+encrypted with `@blog/utils`'s `encryptPersonalData`/`decryptPersonalData`
+(AES-256-GCM under `PERSONAL_DATA_ENCRYPTION_KEY`, its own key, never the
+tenant-token key). Each stored value starts with the version of the key that
+encrypted it (`v2:…`), so the key rotates without re-encrypting everything at
+once. A value that is only looked up or kept unique — an email address — is
+compared through `personalDataIndex`, an HMAC-SHA256 of the address
+normalised by `normalizeEmailIdentity` (lower-cased, trimmed, `+tag` dropped)
+under `PERSONAL_DATA_INDEX_KEY`. Both keys are backed up outside the database:
+losing the encryption key loses the data.
+
 **Rate limits are shared across instances.** `apps/web` keeps every rate
 limiter's counts in Upstash Redis (`KV_REST_API_URL`/`KV_REST_API_TOKEN`), so a
 client's allowance holds whichever serverless instance serves it. Callers build
