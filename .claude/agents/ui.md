@@ -38,6 +38,7 @@ Before writing code:
    component(s) to add or change.
 2. Skim `packages/ui/COMPONENTS.md` (the generated index — purpose, props,
    compound slots) for a component to reuse or extend before building one.
+   Skim `packages/config/CONSTANTS.md` the same way before writing a literal.
 3. Read the existing components at the same atomic level
    (`src/components/{atoms,molecules,organisms}/`) and follow their structure
    and naming — never their comments. Drift you find is fixed or reported per
@@ -136,3 +137,7 @@ a second copy of something you may import moves to its owning folder in this
 change. A match this layer may not import — in an app, or a package the layer
 contracts forbid — is named in your report, never copied. Discriminator values
 come from `@blog/config` constants, never repeated string literals.
+
+Check `packages/config/CONSTANTS.md` before writing a literal and import the
+const it names; a value written a second time becomes a const, tests included
+(CLAUDE.md → "Reuse a const; never retype its value").

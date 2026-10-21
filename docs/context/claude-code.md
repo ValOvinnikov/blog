@@ -95,6 +95,17 @@ contracts:
     silently. The rule is stated once there; each agent adds only its layer's
     specifics (what it may import, where a match it may not import is
     reported).
+  - The same eleven, plus `worker`, point at `packages/config/CONSTANTS.md`,
+    the generated const index, the way `ui` and `web` point at
+    `packages/ui/COMPONENTS.md`, and at `CLAUDE.md`'s **Reuse a const; never
+    retype its value**: check the index before writing a literal, and turn a
+    value written a second time into a const, tests included. `email` and
+    `insight` sit below `@blog/config`, so for them only the second half
+    applies. `explore` lists the index among its first stops;
+    `testing-practices` and `code-review-practices` carry the test and review
+    sides. Lint enforces it on touched files (the `BLOG_LINT_TOUCHED` rules
+    below and `pnpm check:duplicate-literals`), so the prose tells an agent
+    the rule before the post-edit hook does.
   - The same eleven list a required **Examined** item first in their "Report
     back" section: what they read beyond the files they changed, what they
     fixed in passing, and what they found and left. The rule it reports on,
@@ -508,7 +519,9 @@ file` are all denied alike) — an earlier version only handled the
       prefixes, e.g. `packages/ui` or
       `packages/config:packages/utils:configs`. A prefix matches that
       directory and its descendants only (`packages/ui` never matches
-      `packages/ui-foo`).
+      `packages/ui-foo`), so an entry naming a file allows exactly that file
+      — how `config` reaches `scripts/check-duplicate-literals.mjs` and its
+      test without owning the rest of `scripts/`.
     - `LAYER_FILES` (optional) — colon-separated path suffixes allowed
       anywhere in the checkout, e.g. `tsconfig.json:vitest.config.ts`. Set
       only on `config` and `email`, whose docs send them into every

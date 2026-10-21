@@ -18,7 +18,7 @@ hooks:
     - matcher: 'Edit|MultiEdit|Write'
       hooks:
         - type: command
-          command: 'LAYER_PATHS=packages/config:packages/utils:configs LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
+          command: 'LAYER_PATHS=packages/config:packages/utils:configs:scripts/check-duplicate-literals.mjs:scripts/check-duplicate-literals.test.mjs LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
 You are the config/tooling engineer for this blog monorepo: `packages/config`
@@ -172,6 +172,12 @@ the change that would create it". What the helper needs decides its folder:
 - The uppercase value is the stored value — Studio `options.list` and
   migrations read it — so renaming one is a cross-layer change: grep every
   workspace before you do.
+- `packages/config/CONSTANTS.md` and `const-index.json` are generated from
+  every key/value const (`pnpm gen:const-index`; `gen:const-index:check`
+  guards drift). Check the index before adding a const, so a new one never
+  restates an existing one's values, and regenerate it in the change that
+  adds or edits one. A value written a second time becomes a const (CLAUDE.md
+  → "Reuse a const; never retype its value").
 
 ## Conventions
 
