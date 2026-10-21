@@ -24,8 +24,8 @@ const SCRUB_MIGRATION = '0052_scrub_emails_from_audit_and_findings_details.sql';
 const ACTOR_ID = 'operator-1';
 const ACTOR_EMAIL = 'operator@example.com';
 const OWNER_EMAIL = 'owner@acme.example';
-const TENANT_NAME = 'Acme';
-const TENANT_DOMAIN = 'acme.example.com';
+const TENANT_NAME = faker.company.name();
+const TENANT_DOMAIN = faker.internet.domainName();
 const SENDER_NAME = 'Acme Co';
 const EMAIL_REMOVED = '[email removed]';
 
@@ -133,16 +133,17 @@ describe('0052_scrub_emails_from_audit_and_findings_details', () => {
 
       await applyMigrationFile(db, SCRUB_MIGRATION);
 
-      const details = (await readAuditEvent(db, saved.id))?.details;
-      expect(Object.keys(details ?? {})).toEqual(['fields']);
-      expect(details?.['fields']).toEqual(
+      const { fields, ...rest } =
+        (await readAuditEvent(db, saved.id))?.details ?? {};
+      expect(rest).toEqual({});
+      expect(fields).toEqual(
         expect.arrayContaining([
           'senderName',
           'replyToAddress',
           'contactRecipient',
         ]),
       );
-      expect(details?.['fields']).toHaveLength(3);
+      expect(fields).toHaveLength(3);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
