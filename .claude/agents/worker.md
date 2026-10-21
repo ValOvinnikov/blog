@@ -140,6 +140,9 @@ Read `.claude/skills/testing-practices/SKILL.md`.
 - CLAUDE.md → "Reuse before you create" applies in full. `apps/web` and
   `apps/platform` share no code with this app; a match there is reported,
   not extracted.
+- Check `packages/config/CONSTANTS.md` before writing a literal and import
+  the const it names; a value written a second time becomes a const, tests
+  included (CLAUDE.md → "Reuse a const; never retype its value").
 - File size: CLAUDE.md → Conventions → "File size budgets".
 - Comments: CLAUDE.md → Conventions → "Comments default to zero".
 

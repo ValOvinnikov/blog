@@ -134,6 +134,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **NEWSLETTER_RESULT**: `CONFIRMED`, `CONFIRM_INVALID`, `CONFIRM_UNAVAILABLE`, `CONFIRM_FAILED`, `UNSUBSCRIBED`, `UNSUBSCRIBE_INVALID`, `UNSUBSCRIBE_FAILED`
 
+### `@blog/config/constants` — `packages/config/src/constants/next-navigation-error.ts`
+
+- **NEXT_NAVIGATION_ERROR**: `NEXT_NOT_FOUND`, `NEXT_REDIRECT`
+
 ### `@blog/config/constants` — `packages/config/src/constants/operator-alert.ts`
 
 - **OPERATOR_ALERT_KIND**: `OWNER_ELEVATION`, `DOCUMENT_VALIDATION`
@@ -255,6 +259,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
 - **LEAD_REFUSAL**: `NOT_FOUND`
+
+### `@platform/constants/owner-studio-access` — `apps/platform/src/constants/owner-studio-access.ts`
+
+- **OWNER_STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
 
 ### `@platform/constants/preview` — `apps/platform/src/constants/preview.ts`
 

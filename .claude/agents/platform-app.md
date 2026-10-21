@@ -462,3 +462,7 @@ copy of something you may import moves to its owning folder in this change. A
 match in `apps/web`, or in a package this layer may not import, is named in
 your report, never copied. An extend-or-add-alongside call you cannot settle
 goes in the report as an explicit question.
+
+Check `packages/config/CONSTANTS.md` before writing a literal and import the
+const it names; a value written a second time becomes a const, tests included
+(CLAUDE.md → "Reuse a const; never retype its value").

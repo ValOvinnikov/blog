@@ -56,6 +56,9 @@ SPEC.md      architecture core — layer contracts, data flow, cross-cutting rul
 - `packages/ui/COMPONENTS.md` — generated index of every `@blog/ui` component
   (purpose, props, compound slots). Answer "is there already a component that
   does X" here before grepping `packages/ui/src/components/`.
+- `packages/config/CONSTANTS.md` — generated index of every key/value const
+  (`@blog/config`, `@blog/db`, each app's `src/constants/`). Answer "is there
+  already a const for X" here.
 - `apps/web/src/app/` — routes: public pages under `[tenant]/[locale]/`;
   `api/`, `sitemap.ts`, `robots.ts` at the root.
 - `apps/web/src/modules/module-renderer.tsx:38` — `renderModules`, the module

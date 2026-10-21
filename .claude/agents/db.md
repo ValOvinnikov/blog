@@ -173,6 +173,10 @@ included).
 - Search the whole repo before adding a function, type, constant, test fake,
   fixture or builder (CLAUDE.md → "Reuse before you create"). A match this
   layer may not import is named in your report, never copied.
+- Check `packages/config/CONSTANTS.md` before writing a literal and import
+  the const it names; a value written a second time becomes a const, tests
+  included (CLAUDE.md → "Reuse a const; never retype its value"). A const
+  you add here regenerates the index with `pnpm gen:const-index`.
 - Where a helper lives: shared by functions of one domain → at the domain
   level (`queries/findings/finding-summary-columns.ts`); by several domains →
   `src/utils/<name>/<name>.ts`; anything else → `.claude/agents/config.md` →
