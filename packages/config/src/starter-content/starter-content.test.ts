@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
 
+import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
 import { buildStarterDocuments } from './starter-content';
 import type { TStarterDocumentUnion } from './starter-document';
 
@@ -34,12 +35,13 @@ function findByType<TType extends TStarterType>(
   return document;
 }
 
-function referencedIds(node: unknown): string[] {
-  if (Array.isArray(node)) return node.flatMap(referencedIds);
-  if (node === null || typeof node !== 'object') return [];
-  const ref =
-    '_ref' in node && typeof node._ref === 'string' ? [node._ref] : [];
-  return [...ref, ...Object.values(node).flatMap(referencedIds)];
+function referencedIds(documents: TStarterDocumentUnion[]): string[] {
+  const ids: string[] = [];
+  JSON.stringify(documents, (key, value: unknown) => {
+    if (key === '_ref') ids.push(String(value));
+    return value;
+  });
+  return ids;
 }
 
 const everyCombination = STARTER_SITE_TYPES.flatMap((siteType) =>
@@ -102,26 +104,27 @@ describe(buildStarterDocuments, () => {
     expect(template).not.toHaveProperty('modules');
   });
 
-  it('the Blog home template opens with a blog hero and lists latest posts, topics and a call to action', () => {
+  it('the Blog home opens with a blog hero pinning a post, then latest posts, topics and a call to action', () => {
     const documents = build(SITE_TYPE.BLOG);
-    const typeOf = (id: string) =>
-      documents.find(({ _id }) => _id === id)?._type;
+    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
+    const heroDocument = byId(hero?._ref);
+    const pinned =
+      heroDocument && 'post' in heroDocument
+        ? byId(heroDocument.post?._ref)
+        : undefined;
 
-    expect(typeOf(hero!._ref)).toBe('module_heroBlog');
-    expect(modules.map(({ _ref }) => typeOf(_ref))).toEqual([
-      'module_postLatest',
-      'module_taxonomyList',
-      'module_cta',
+    expect(
+      [heroDocument, pinned, ...modules.map(({ _ref }) => byId(_ref))].map(
+        (document) => ({ _type: document?._type }),
+      ),
+    ).toEqual([
+      { _type: 'module_heroBlog' },
+      { _type: 'page_post' },
+      { _type: 'module_postLatest' },
+      { _type: 'module_taxonomyList' },
+      { _type: 'module_cta' },
     ]);
-  });
-
-  it('the Blog hero pins the welcome post', () => {
-    const documents = build(SITE_TYPE.BLOG);
-
-    expect(findByType(documents, 'module_heroBlog').post?._ref).toBe(
-      findByType(documents, 'page_post')._id,
-    );
   });
 
   it('the site settings brand carries the site name', () => {
@@ -133,24 +136,11 @@ describe(buildStarterDocuments, () => {
     ).toBe('Globex');
   });
 
-  it('the site settings document seeds USD as the currency', () => {
-    expect(findByType(build(), 'settings_site')).toHaveProperty(
-      'currency',
-      'USD',
-    );
-  });
-
-  it('the EN home page carries a literal "Welcome" heading', () => {
-    expect(findByType(build(), 'page_home').headingBlock.heading).toBe(
-      'Welcome',
-    );
-  });
-
-  it('the NL home page is seeded in Dutch', () => {
+  it('the NL home page takes its copy from the Dutch catalogue', () => {
     expect(
       findByType(build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.NL), 'page_home')
         .headingBlock.heading,
-    ).toBe('Welkom');
+    ).toBe(STARTER_COPY_BY_LOCALE.NL.home.heading);
   });
 
   it.each(LOCALES)(

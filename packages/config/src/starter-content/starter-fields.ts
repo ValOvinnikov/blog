@@ -64,7 +64,6 @@ export function paragraphs(texts: readonly string[]): ArticleText {
   return texts.map((text, index) => ({
     _type: 'block',
     _key: `paragraph${index}`,
-    style: 'normal',
     markDefs: [],
     children: [{ _type: 'span', _key: `span${index}`, text, marks: [] }],
   }));

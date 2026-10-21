@@ -46,6 +46,9 @@ test('collectLiterals skips values an outside standard spells', () => {
     "env['AUTH_SECRET'];",
     "vi.stubEnv('NODE_ENV', 'production');",
     "const cookie = { sameSite: 'strict' };",
+    "const doc = { _type: 'page_home' };",
+    "type TField = Pick<TDoc, 'title' | 'seo'>;",
+    "const ref = { '_type': 'reference' };",
   ].join('\n');
   assert.deepEqual(values(source), []);
 });
@@ -57,6 +60,8 @@ test('collectLiterals still collects the same values outside that vocabulary', (
     "const o = { mode: 'strict' };",
     "const eq = value === 'production';",
     "props['variant'];",
+    "const doc = { type: 'page_home' };",
+    "f('page_home');",
   ].join('\n');
   assert.deepEqual(values(source), [
     'production',
@@ -64,6 +69,8 @@ test('collectLiterals still collects the same values outside that vocabulary', (
     'strict',
     'production',
     'variant',
+    'page_home',
+    'page_home',
   ]);
 });
 

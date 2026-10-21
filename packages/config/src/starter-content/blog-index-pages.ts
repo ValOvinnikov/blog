@@ -48,6 +48,11 @@ function indexTaxonomyList(
   };
 }
 
+// The Studio opens these singletons by an id equal to their type, as the migrations that seed them do.
+function singleton<TDocument extends { _type: string }>(document: TDocument) {
+  return { _id: document._type, ...document };
+}
+
 function indexPage(
   locale: TLocaleIsoCode,
   copy: TIndexCopy,
@@ -80,8 +85,7 @@ export function buildBlogIndexPages(
       _type: 'template_topicIndex',
       title: 'Topic Index Template',
     } satisfies TStarterDocument<Template_topicIndex, 'title'>,
-    {
-      _id: ids.TOPIC_INDEX,
+    singleton({
       _type: 'page_topicIndex',
       ...indexPage(
         locale,
@@ -89,7 +93,7 @@ export function buildBlogIndexPages(
         ids.BLOG_TOPIC_INDEX_TEMPLATE,
         ids.TOPIC_INDEX_LIST,
       ),
-    } satisfies TStarterPage<Page_topicIndex>,
+    }) satisfies TStarterPage<Page_topicIndex>,
     indexTaxonomyList(
       ids.TAG_INDEX_LIST,
       'Tag Index List',
@@ -101,8 +105,7 @@ export function buildBlogIndexPages(
       _type: 'template_tagIndex',
       title: 'Tag Index Template',
     } satisfies TStarterDocument<Template_tagIndex, 'title'>,
-    {
-      _id: ids.TAG_INDEX,
+    singleton({
       _type: 'page_tagIndex',
       ...indexPage(
         locale,
@@ -110,6 +113,6 @@ export function buildBlogIndexPages(
         ids.BLOG_TAG_INDEX_TEMPLATE,
         ids.TAG_INDEX_LIST,
       ),
-    } satisfies TStarterPage<Page_tagIndex>,
+    }) satisfies TStarterPage<Page_tagIndex>,
   ];
 }

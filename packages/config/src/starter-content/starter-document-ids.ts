@@ -1,5 +1,4 @@
 // The base ids predate site templates and are a persisted contract on live tenants; never rename one.
-// The topic and tag index ids match the documents the Studio migrations seed, so the two converge.
 export const STARTER_DOCUMENT_IDS = {
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
@@ -8,9 +7,7 @@ export const STARTER_DOCUMENT_IDS = {
   HOME: 'provisioning.settings.home',
   POST_INDEX_TEMPLATE: 'provisioning.template.postIndex',
   POST_INDEX: 'provisioning.page.postIndex',
-  TOPIC_INDEX: 'page_topicIndex',
   TOPIC_INDEX_LIST: 'taxonomyList-topics',
-  TAG_INDEX: 'page_tagIndex',
   TAG_INDEX_LIST: 'taxonomyList-tags',
   BLOG_HERO: 'starter.blog.hero',
   BLOG_LATEST_POSTS: 'starter.blog.latestPosts',
