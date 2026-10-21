@@ -59,7 +59,7 @@ describe(unsubscribeByToken, () => {
     expect(result).toEqual({ outcome: 'not-found' });
   });
 
-  it('returns not-found when given the stored hash instead of the token', async () => {
+  it('treats the stored hash like an unknown token', async () => {
     const { subscriber } = await insertSubscriber(tenantId);
 
     const result = await unsubscribeByToken(
@@ -67,7 +67,9 @@ describe(unsubscribeByToken, () => {
       subscriber.unsubscribeTokenHash,
     );
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual(
+      await unsubscribeByToken(tenantId, crypto.randomUUID()),
+    );
   });
 
   it('returns not-found on a second use of the same token', async () => {

@@ -74,14 +74,17 @@ describe('0046_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
       const tenant = await insertTestTenant(db);
       const [first] = await db
         .insert(subscribers)
-        .values({ tenantId: tenant.id, email: 'reader@example.com' })
+        .values({
+          tenantId: tenant.id,
+          email: `${crypto.randomUUID()}@example.com`,
+        })
         .returning();
       if (!first) throw new Error('failed to seed a subscriber row');
 
       await expect(
         db.insert(subscribers).values({
           tenantId: tenant.id,
-          email: 'other@example.com',
+          email: `${crypto.randomUUID()}@example.com`,
           unsubscribeTokenHash: first.unsubscribeTokenHash,
         }),
       ).rejects.toThrow();

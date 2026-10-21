@@ -77,7 +77,7 @@ describe(confirmSubscriber, () => {
     expect(result).toEqual({ outcome: 'not-found' });
   });
 
-  it('returns not-found when given the stored hash instead of the token', async () => {
+  it('treats the stored hash like an unknown token', async () => {
     const pending = await insertPendingSubscriber(tenantId);
 
     const result = await confirmSubscriber(
@@ -85,7 +85,9 @@ describe(confirmSubscriber, () => {
       pending.confirmationTokenHash,
     );
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual(
+      await confirmSubscriber(tenantId, crypto.randomUUID()),
+    );
   });
 
   it("returns not-found for another tenant's token", async () => {
