@@ -365,6 +365,13 @@
       "when": 1792619192535,
       "tag": "0051_add_magic_link_send_counters_and_users_terms",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1792622555252,
+      "tag": "0052_scrub_emails_from_audit_and_findings_details",
+      "breakpoints": true
     }
   ]
 }
