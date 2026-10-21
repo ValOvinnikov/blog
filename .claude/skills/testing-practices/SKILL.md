@@ -136,6 +136,32 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   is fixed whenever the file is touched and never written new.
 
 - **Deterministic:** no real dates, network or randomness — inject or freeze.
+- **No nested `expect` — assert exact values.** Never an asymmetric matcher
+  inside an assertion: `expect.objectContaining`, `expect.any`,
+  `expect.anything`, `expect.stringContaining`, `expect.arrayContaining` or
+  `expect.not.*`. Pass the whole expected value, built from the same
+  consts and `testing/` builders the arrangement used; freeze the clock
+  instead of `expect.any(Date)`. When only part of a call matters, destructure
+  it into named consts first and assert each one exactly.
+
+  ```ts
+  expect(updateProvisioningStep).toHaveBeenCalledWith({
+    tenantId: TEST_TENANT_ID,
+    step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    detail: ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
+  }); // ✅
+  const [email] = vi.mocked(sendEmail).mock.calls.map(([input]) => input);
+  expect(email?.to).toBe(OWNER_EMAIL); // ✅
+
+  expect(updateProvisioningStep).toHaveBeenCalledWith(
+    expect.objectContaining({ detail: ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED }),
+  ); // ❌
+  ```
+
+  A test file you create or touch is converted whole; files the change does
+  not touch stay as they are.
+
 - **A bugfix gets a regression test that fails before the fix**, unless it is
   a pure styling fix with no behavioural surface, which gets
   `no-tests-needed` instead of a class assertion.
@@ -462,6 +488,8 @@ have a test? Report gaps rather than leaving them silent.
 - [ ] Fixtures from `testing/` builders; inputs and expectations use existing
       consts; no value written twice; no const's own value asserted.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
+- [ ] No asymmetric matcher (`expect.objectContaining`, `expect.any`, …) inside
+      an assertion; every expected value is exact.
 - [ ] Every asserted element is a named `const`; no `screen` query inside
       `expect(…)` anywhere in a file the change creates or touches.
 - [ ] Every `it` title is behaviour, 80 characters or fewer.
