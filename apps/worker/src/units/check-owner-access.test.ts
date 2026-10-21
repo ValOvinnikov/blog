@@ -16,8 +16,10 @@ import {
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
 import {
+  createSanityProjectInvite,
   grantSanityProjectRole,
   listSanityProjectAcl,
+  listSanityProjectInvites,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import {
   assignSanityProjectUserRole,
@@ -31,12 +33,19 @@ import {
   SANITY_PROJECT_ID,
 } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { logger } from '@worker/utils/logger/logger';
 import { postOperatorAlert } from '@worker/utils/operator-alert/operator-alert';
-import { FatalError } from 'workflow';
+import { FatalError, getStepMetadata } from 'workflow';
 
 import { checkOwnerAccess } from './check-owner-access';
 
 const FOUR_DAYS_AGO = new Date(Date.now() - 4 * 24 * 60 * 60_000);
+const PENDING_INVITE = {
+  id: 'invite-1',
+  email: OWNER_EMAIL,
+  status: 'pending',
+  createdAt: '2026-10-20T09:00:00.000Z',
+};
 
 vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/utils/operator-alert/operator-alert');
@@ -54,6 +63,16 @@ vi.mock(
   '@worker/utils/provision-env/provision-env',
   () => import('@worker/testing/provision-env/fake-provision-env'),
 );
+vi.mock('workflow', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('workflow')>()),
+  getStepMetadata: vi.fn(),
+}));
+
+function onAttempt(attempt: number) {
+  vi.mocked(getStepMetadata).mockReturnValue({
+    attempt,
+  } as ReturnType<typeof getStepMetadata>);
+}
 
 function aclEntry(roleName: string) {
   return {
@@ -65,8 +84,13 @@ function aclEntry(roleName: string) {
 
 describe(checkOwnerAccess, () => {
   beforeEach(() => {
+    onAttempt(1);
     vi.mocked(getTenantById).mockResolvedValue(
-      makeTenant({ sanityProjectId: SANITY_PROJECT_ID, createdAt: new Date() }),
+      makeTenant({
+        sanityProjectId: SANITY_PROJECT_ID,
+        createdAt: new Date(),
+        ownerInviteSentAt: new Date(),
+      }),
     );
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
@@ -171,6 +195,118 @@ describe(checkOwnerAccess, () => {
 
     expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
     expect(postOperatorAlert).not.toHaveBeenCalled();
+  });
+
+  it('sends no invite once one was recorded', async () => {
+    await checkOwnerAccess(TEST_TENANT_ID);
+
+    expect(listSanityProjectInvites).not.toHaveBeenCalled();
+  });
+
+  describe('when no invite was ever recorded', () => {
+    beforeEach(() => {
+      vi.mocked(getTenantById).mockResolvedValue(
+        makeTenant({
+          sanityProjectId: SANITY_PROJECT_ID,
+          createdAt: new Date(),
+        }),
+      );
+      vi.mocked(listSanityProjectInvites)
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([PENDING_INVITE]);
+    });
+
+    it('sends the invite and records when it was sent', async () => {
+      await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(createSanityProjectInvite).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: OWNER_EMAIL,
+          role: SANITY_PROJECT_ROLE.VIEWER,
+        }),
+      );
+      expect(setTenantOwnerAccess).toHaveBeenCalledWith(TEST_TENANT_ID, {
+        sanityInviteId: 'invite-1',
+        inviteSentAt: new Date(PENDING_INVITE.createdAt),
+        inviteAcceptedAt: null,
+      });
+    });
+
+    it('measures the wait from the new invite, not from the tenant creation', async () => {
+      vi.mocked(getTenantById).mockResolvedValue(
+        makeTenant({
+          sanityProjectId: SANITY_PROJECT_ID,
+          createdAt: FOUR_DAYS_AGO,
+        }),
+      );
+      vi.mocked(listSanityProjectInvites)
+        .mockReset()
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([
+          { ...PENDING_INVITE, createdAt: new Date().toISOString() },
+        ]);
+
+      const outcome = await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+    });
+  });
+
+  describe('when Sanity keeps failing', () => {
+    beforeEach(() => {
+      vi.mocked(listSanityProjectUsers).mockRejectedValue(new Error('503'));
+    });
+
+    it('retries before its last attempt', async () => {
+      await expect(checkOwnerAccess(TEST_TENANT_ID)).rejects.toThrow('503');
+    });
+
+    it('logs and reports the wait as pending once the last attempt fails', async () => {
+      onAttempt(99);
+
+      const outcome = await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+      expect(logger.error).toHaveBeenCalledWith(
+        'owner_access.check_failed',
+        expect.objectContaining({ tenantId: TEST_TENANT_ID }),
+      );
+      expect(updateProvisioningStep).toHaveBeenCalledWith(
+        expect.objectContaining({
+          step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+          detail: ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
+        }),
+      );
+    });
+
+    it('still marks the owner stalled and alerts the operator after three days', async () => {
+      onAttempt(99);
+      vi.mocked(getTenantById).mockResolvedValue(
+        makeTenant({
+          sanityProjectId: SANITY_PROJECT_ID,
+          ownerInviteSentAt: FOUR_DAYS_AGO,
+        }),
+      );
+
+      const outcome = await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
+      expect(postOperatorAlert).toHaveBeenCalledWith({
+        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
+        tenantId: TEST_TENANT_ID,
+        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      });
+    });
+
+    it('logs and reports the wait as pending when the owner has no ACL entry yet', async () => {
+      onAttempt(99);
+      vi.mocked(listSanityProjectUsers).mockResolvedValue([makeSanityOwner()]);
+      vi.mocked(listSanityProjectAcl).mockResolvedValue([]);
+
+      const outcome = await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+    });
   });
 
   describe('when the invite has gone unaccepted for three days', () => {

@@ -23,9 +23,12 @@ export async function loadTenant(tenantId: string): Promise<TTenant> {
   return tenant;
 }
 
-export function isFinalStepAttempt(error: unknown, ctx: TUnitContext): boolean {
+export function isFinalStepAttempt(
+  error: unknown,
+  ctx?: TUnitContext,
+): boolean {
   return (
-    ctx.isOneShot === true ||
+    ctx?.isOneShot === true ||
     FatalError.is(error) ||
     getStepMetadata().attempt > PROVISIONING_UNIT_MAX_RETRIES
   );
