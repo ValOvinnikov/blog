@@ -1,8 +1,12 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
+import { INACTIVITY_STAGE_DAY, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  daysAfterLastActivity,
+  LAST_ACTIVITY_AT,
+} from '@blog/db/testing/tenants/inactivity';
 
 import { touchTenantActivity } from './touch-tenant-activity';
 
@@ -12,10 +16,8 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const LAST_ACTIVITY_AT = new Date('2026-01-01T00:00:00.000Z');
-const TOUCHED_AT = new Date('2026-02-01T00:00:00.000Z');
+const TOUCHED_AT = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION);
 const EXPECTED_OK = 'expected ok:true';
-const MISSING_TENANT_ID = '00000000-0000-0000-0000-000000000000';
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -64,7 +66,7 @@ describe(touchTenantActivity, () => {
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
-    const result = await touchTenantActivity(MISSING_TENANT_ID, TOUCHED_AT);
+    const result = await touchTenantActivity(crypto.randomUUID(), TOUCHED_AT);
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });

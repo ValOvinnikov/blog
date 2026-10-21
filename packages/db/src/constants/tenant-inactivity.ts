@@ -14,6 +14,8 @@ export type TStampedInactivityStage = Exclude<
   typeof INACTIVITY_STAGE.DEPROVISIONING
 >;
 
+export const DAY_MS = 24 * 60 * 60 * 1000;
+
 export const INACTIVITY_STAGE_DAY: Record<TInactivityStage, number> = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: 23,
   [INACTIVITY_STAGE.SUSPENSION]: 30,

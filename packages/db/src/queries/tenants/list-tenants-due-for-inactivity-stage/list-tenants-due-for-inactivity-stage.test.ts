@@ -1,5 +1,6 @@
 import {
   INACTIVITY_STAGE,
+  INACTIVITY_STAGE_DAY,
   TENANT_STATUS,
   type TInactivityStage,
   type TStampedInactivityStage,
@@ -9,6 +10,10 @@ import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisi
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  daysAfterLastActivity,
+  LAST_ACTIVITY_AT,
+} from '@blog/db/testing/tenants/inactivity';
 
 import { listTenantsDueForInactivityStage } from './list-tenants-due-for-inactivity-stage';
 
@@ -18,12 +23,13 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const LAST_ACTIVITY_AT = new Date('2026-01-01T00:00:00.000Z');
-const DAY_22 = new Date('2026-01-23T00:00:00.000Z');
-const DAY_23 = new Date('2026-01-24T00:00:00.000Z');
-const DAY_30 = new Date('2026-01-31T00:00:00.000Z');
-const DAY_50 = new Date('2026-02-20T00:00:00.000Z');
-const DAY_60 = new Date('2026-03-02T00:00:00.000Z');
+const DAY_23 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION_WARNING);
+const DAY_22 = daysAfterLastActivity(
+  INACTIVITY_STAGE_DAY.SUSPENSION_WARNING - 1,
+);
+const DAY_30 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION);
+const DAY_50 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DELETION_NOTICE);
+const DAY_60 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DEPROVISIONING);
 
 const STAMPED_STAGES: [TStampedInactivityStage, Date][] = [
   [INACTIVITY_STAGE.SUSPENSION_WARNING, DAY_23],

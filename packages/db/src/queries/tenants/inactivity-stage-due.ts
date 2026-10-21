@@ -1,4 +1,5 @@
 import {
+  DAY_MS,
   INACTIVITY_STAGE,
   INACTIVITY_STAGE_DAY,
   SUSPENSION_REASON,
@@ -7,8 +8,6 @@ import {
 } from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
 import { and, eq, isNotNull, isNull, lte, sql, type SQL } from 'drizzle-orm';
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 const isActive = eq(tenants.status, TENANT_STATUS.ACTIVE);
 

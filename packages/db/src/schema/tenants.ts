@@ -134,12 +134,10 @@ export const tenants = pgTable('tenants', {
   ownerInviteHeadsUpSentAt: timestamp('owner_invite_heads_up_sent_at'),
   ownerInviteNudgeSentAt: timestamp('owner_invite_nudge_sent_at'),
   ownerSiteReadySentAt: timestamp('owner_site_ready_sent_at'),
-  lastActivityAt: timestamp('last_activity_at', { mode: 'date' })
-    .notNull()
-    .defaultNow(),
-  inactivityWarnedAt: timestamp('inactivity_warned_at', { mode: 'date' }),
-  suspendedAt: timestamp('suspended_at', { mode: 'date' }),
-  deletionNotifiedAt: timestamp('deletion_notified_at', { mode: 'date' }),
+  lastActivityAt: timestamp('last_activity_at').notNull().defaultNow(),
+  inactivityWarnedAt: timestamp('inactivity_warned_at'),
+  suspendedAt: timestamp('suspended_at'),
+  deletionNotifiedAt: timestamp('deletion_notified_at'),
   suspensionReason: text('suspension_reason').$type<TSuspensionReason>(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })

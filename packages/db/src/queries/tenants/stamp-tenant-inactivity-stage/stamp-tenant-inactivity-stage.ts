@@ -10,20 +10,9 @@ import { inactivityStageDue } from '@blog/db/queries/tenants/inactivity-stage-du
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { and, eq } from 'drizzle-orm';
 
-type TInactivityStamp = Partial<
-  Pick<
-    TTenant,
-    | 'inactivityWarnedAt'
-    | 'suspendedAt'
-    | 'deletionNotifiedAt'
-    | 'status'
-    | 'suspensionReason'
-  >
->;
-
 const stageStamp: Record<
   TStampedInactivityStage,
-  (now: Date) => TInactivityStamp
+  (now: Date) => Partial<TTenant>
 > = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: (now) => ({ inactivityWarnedAt: now }),
   [INACTIVITY_STAGE.SUSPENSION]: (now) => ({
