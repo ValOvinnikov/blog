@@ -35,11 +35,12 @@ export function scopeAdapterToApp(adapter: Adapter, app: TAuthApp): Adapter {
       createSession &&
       (async (session) => {
         // The Drizzle adapter inserts every field it is given, so `app` reaches the row.
-        const created = await createSession({
+        const stamped = {
           ...session,
           sessionToken: sha256Hex(session.sessionToken),
           app,
-        });
+        };
+        const created = await createSession(stamped);
         // Auth.js sets the cookie from the returned token, so it must be the raw one.
         return { ...created, sessionToken: session.sessionToken };
       }),
