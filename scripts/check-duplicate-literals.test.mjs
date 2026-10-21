@@ -42,10 +42,11 @@ test('collectLiterals skips values an outside standard spells', () => {
     "process.env.NODE_ENV === 'production';",
     "env.X !== 'staging';",
     "'production' === process.env['NODE_ENV'];",
+    "env['AUTH_SECRET'];",
     "vi.stubEnv('NODE_ENV', 'production');",
     "const cookie = { sameSite: 'strict' };",
   ].join('\n');
-  assert.deepEqual(values(source), ['NODE_ENV']);
+  assert.deepEqual(values(source), []);
 });
 
 test('collectLiterals still collects the same values outside that vocabulary', () => {
@@ -54,12 +55,14 @@ test('collectLiterals still collects the same values outside that vocabulary', (
     "f('strict');",
     "const o = { mode: 'strict' };",
     "const eq = value === 'production';",
+    "props['variant'];",
   ].join('\n');
   assert.deepEqual(values(source), [
     'production',
     'strict',
     'strict',
     'production',
+    'variant',
   ]);
 });
 

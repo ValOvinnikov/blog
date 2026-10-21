@@ -26,6 +26,16 @@ const isEnvComparisonOperand = ({ parent }) =>
   EQUALITY_OPERATORS.has(parent.operator) &&
   (isEnvRead(parent.left) || isEnvRead(parent.right));
 
+const isEnvReadKey = (node) => {
+  const { parent } = node;
+  return (
+    parent.type === 'MemberExpression' &&
+    parent.computed &&
+    parent.property === node &&
+    isEnvObject(parent.object)
+  );
+};
+
 const isStubEnvArgument = ({ parent }) =>
   parent.type === 'CallExpression' &&
   parent.callee.type === 'MemberExpression' &&
@@ -43,6 +53,7 @@ const isProtocolAttributeValue = (node) => {
 
 const isEnvironmentVocabulary = (node) =>
   isEnvComparisonOperand(node) ||
+  isEnvReadKey(node) ||
   isStubEnvArgument(node) ||
   isProtocolAttributeValue(node);
 

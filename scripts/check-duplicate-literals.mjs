@@ -97,6 +97,15 @@ const isEnvComparisonOperand = ({ parent }) =>
   EQUALITY_OPERATORS.has(ts.tokenToString(parent.operatorToken.kind)) &&
   (isEnvRead(parent.left) || isEnvRead(parent.right));
 
+const isEnvReadKey = (node) => {
+  const { parent } = node;
+  return (
+    ts.isElementAccessExpression(parent) &&
+    parent.argumentExpression === node &&
+    isEnvObject(parent.expression)
+  );
+};
+
 const isStubEnvArgument = ({ parent }) =>
   ts.isCallExpression(parent) &&
   ts.isPropertyAccessExpression(parent.expression) &&
@@ -123,6 +132,7 @@ const isExemptLiteral = (node) => {
     isFirstArgumentOf(node, TEST_TITLE_CALLEES) ||
     isInsideClassOrJsxAttribute(node) ||
     isEnvComparisonOperand(node) ||
+    isEnvReadKey(node) ||
     isStubEnvArgument(node) ||
     isProtocolAttributeValue(node)
   );

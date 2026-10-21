@@ -42,6 +42,10 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
       code: "const a = { sameSite: 'strict-mode' }; const b = { sameSite: 'strict-mode' };",
       options,
     },
+    {
+      code: "const a = process.env['SITE_KEY']; const b = env['SITE_KEY'];",
+      options,
+    },
   ],
   invalid: [
     {
@@ -56,6 +60,11 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
     },
     {
       code: "f('strict-mode'); f('strict-mode');",
+      options,
+      errors: 1,
+    },
+    {
+      code: "props['variant']; props['variant'];",
       options,
       errors: 1,
     },
