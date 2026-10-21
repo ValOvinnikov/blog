@@ -7,15 +7,12 @@
  * platform the first time a tenant newly transitions into a failing state.
  *
  * Invoked only by `.github/workflows/validate-tenant-documents.yml` — the
- * weekly scheduled sweep (every in-scope tenant), a `workflow_dispatch`
- * (optionally scoped to one tenant via `--tenant-id=<uuid>`), or the
- * post-provisioning check `provision-tenant.yml` calls into for its own
- * freshly provisioned tenant — never run by hand against a shared/production
+ * weekly scheduled sweep (every in-scope tenant) or a `workflow_dispatch`
+ * (optionally scoped to one tenant via `--tenant-id=<uuid>`) — never run by hand against a shared/production
  * tenant registry outside that workflow.
  *
  * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
- * resolve to a no-op outside Next.js's own build, same trick
- * `provision-tenant/run.ts` relies on.
+ * resolve to a no-op outside Next.js's own build.
  */
 import { pathToFileURL } from 'node:url';
 

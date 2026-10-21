@@ -106,6 +106,25 @@ describe(runReportedStep, () => {
     ]);
   });
 
+  it('records FAILED on the first failure of a one-shot run outside a durable step', async () => {
+    vi.mocked(getStepMetadata).mockImplementation(() => {
+      throw new Error('not in a step context');
+    });
+
+    const result = await runReportedStep({
+      tenantId: TENANT_ID,
+      ctx: { runId: 'cli-run', isOneShot: true },
+      step: STEP,
+      run: () => Promise.reject(new Error('sanity timed out')),
+    });
+
+    expect(result).toEqual({ ok: false, failedStep: STEP });
+    expect(reportedStatuses()).toEqual([
+      TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    ]);
+  });
+
   it('still completes the step when recording its progress fails', async () => {
     const result = await run(async () => {});
 

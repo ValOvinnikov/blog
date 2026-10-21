@@ -40,14 +40,11 @@ default to zero".
    one to invent.
 2. Read `SPEC.md` §4 (your row is the contract) and §13 (the worker's Vercel
    projects and secrets).
-3. Read `packages/db/scripts/provision-tenant/` before writing a unit. Its
-   `steps/` are the provisioning steps the worker takes over; reuse what is
-   there and report what has to move, never fork a second copy (CLAUDE.md →
-   "Reuse before you create"). Until the GitHub Actions driver retires, the
-   worker imports those steps and the pure `lib/` helpers in place through
-   its `@blog/db-provisioning/*` alias, in one module carrying the
-   `TODO(#4961)`; it never imports `lib/env.ts`, `run.ts` or the
-   `report-*`/`record-*`/`notify-*` helpers, which belong to the CLI runner.
+3. Read `src/steps/` before writing a unit — the provisioning steps the
+   units compose — and reuse what is there (CLAUDE.md → "Reuse before you
+   create"). The worker is the only provisioning driver: the durable
+   workflow and the break-glass CLI (`src/cli/provision-tenant.ts`) both run
+   `runProvisioningSequence`, so a unit change reaches both.
 4. **Vercel Workflow is pinned exactly to a 5.x release** (`workflow` in
    `package.json`, no range). Check every API you call (`"use workflow"`,
    `"use step"`, retries, `sleep()`) with `use-context7` against that
@@ -82,6 +79,11 @@ default to zero".
   webhook; the custom domain only when one exists), `inviteOwner`,
   `applySiteTemplate(siteType, plan, locale)`, `verifyTenant`,
   `ensureOwnerAccess`. A unit never reaches into another's state.
+- **The break-glass CLI runs outside a durable step**, so it passes
+  `isOneShot: true` on the unit context: every failure is final and no
+  unit may call a `workflow` API that needs a run (`getStepMetadata`,
+  `start`, `sleep`) without checking it first. The CLI never starts owner
+  access; it says so, and a signed `POST /api/owner-access/check` starts it.
 - **Idempotency is decided from what exists** in Sanity and Vercel, never
   from markers: a retried unit looks up the project, dataset, hook or domain
   before creating it.

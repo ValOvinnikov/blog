@@ -34,9 +34,8 @@ export type TUpdateProvisioningStepInput = {
 // call; the overall `provisioningStatus` column is left untouched unless
 // this call explicitly supplies one.
 //
-// `tenantId` not matching any row is a real, reachable outcome — the CI
-// provisioning script (`packages/db/scripts/provision-tenant/`) passes a
-// `--tenant-id` it does not itself validate.
+// `tenantId` not matching any row is a real, reachable outcome — a CLI
+// caller passes a `--tenant-id` it does not itself validate.
 export async function updateProvisioningStep(
   input: TUpdateProvisioningStepInput,
 ): Promise<TResult<TTenant, TErrorCode>> {

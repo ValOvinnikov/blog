@@ -26,7 +26,7 @@ async function listOwnerInvites(
 export async function sendOwnerInvite(
   target: TOwnerAccessTarget,
   options: { replaceExisting: boolean },
-): Promise<void> {
+): Promise<Date> {
   const { tenant, projectId, ownerEmail, env } = target;
   const token = env.sanityManagementToken;
 
@@ -50,9 +50,12 @@ export async function sendOwnerInvite(
     [invite] = await listOwnerInvites(target);
   }
 
+  const inviteSentAt = invite?.createdAt
+    ? new Date(invite.createdAt)
+    : new Date();
   const recorded = await setTenantOwnerAccess(tenant.id, {
     sanityInviteId: invite?.id ?? null,
-    inviteSentAt: invite?.createdAt ? new Date(invite.createdAt) : new Date(),
+    inviteSentAt,
     inviteAcceptedAt: null,
   });
   if (!recorded.ok) {
@@ -60,4 +63,5 @@ export async function sendOwnerInvite(
       `Tenant "${tenant.id}"'s owner invite could not be recorded (${recorded.error}).`,
     );
   }
+  return inviteSentAt;
 }

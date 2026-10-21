@@ -266,6 +266,9 @@
     "nextAriaLabel": "Nächste Folie",
     "regionLabel": "Karussell {title}"
   },
+  "codeBlock": {
+    "regionLabel": "Codebeispiel"
+  },
   "pricingModule": {
     "free": "Kostenlos",
     "from": "Ab",

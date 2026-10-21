@@ -1,7 +1,7 @@
 import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
-import { createTenantSanityProject } from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
+import { createTenantSanityProject } from '@worker/steps/create-sanity-project';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { FatalError } from 'workflow';
 

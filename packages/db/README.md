@@ -22,13 +22,6 @@ out" contract, a different store, and the two never reference each other.
   package. It also never imports `@blog/auth` — `auth` sits above `db` and
   reaches for its tables, never the reverse.
 
-**One scoped exception:** `scripts/provision-tenant/` imports `@sanity/client`
-directly to create a new tenant's Sanity project/dataset/CORS entry and seed
-its starter content via Sanity's Management API — a different concern from
-`service`'s content-read facade. A dedicated `configs/eslint/db.js` override
-scopes the exception to that one directory; every other path in this package
-keeps the blanket Sanity-SDK prohibition.
-
 ## Layout
 
 - `src/client.ts` — `getDb()`, the pooled Neon HTTP driver every query/mutation
@@ -44,29 +37,28 @@ keeps the blanket Sanity-SDK prohibition.
 - `src/testing/` — `createTestDb()`, an in-memory Postgres (via `pglite`) with
   every committed migration applied, used by query/mutation tests.
 - `src/utils/env/` — the validated `env` object (`t3-oss/env-core`) `getDb()`
-  and the provisioning scripts read instead of raw `process.env`.
+  and the tenant scripts read instead of raw `process.env`.
 - `scripts/` — human- or CI-invoked entrypoints that call the query layer
-  directly (`seed-tenant.ts`, `seed-admin.ts`, `provision-tenant/`,
-  `deprovision-tenant/`); never imported by `apps/web`/`apps/platform`.
+  directly (`seed-tenant.ts`, `seed-admin.ts`, `deprovision-tenant/`,
+  `recheck-tenant-owners/`, …); never imported by any app.
 - `migrations/` — the generated, committed SQL migration history plus
   drizzle-kit's snapshot metadata (`migrations/meta/`).
 
 ## Scripts
 
-| Script                  | Command                                                                            | What it does                                                                                                                                                                                                                       |
-| ----------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type-check`            | `pnpm --filter @blog/db type-check`                                                | `tsc --noEmit`.                                                                                                                                                                                                                    |
-| `lint`                  | `pnpm --filter @blog/db lint`                                                      | `eslint .`.                                                                                                                                                                                                                        |
-| `format`                | `pnpm --filter @blog/db format`                                                    | `prettier --write .`.                                                                                                                                                                                                              |
-| `test`                  | `pnpm --filter @blog/db test`                                                      | `vitest run --passWithNoTests`.                                                                                                                                                                                                    |
-| `test:watch`            | `pnpm --filter @blog/db test:watch`                                                | `vitest` in watch mode.                                                                                                                                                                                                            |
-| `db:generate`           | `pnpm --filter @blog/db db:generate`                                               | `drizzle-kit generate` — diffs `src/schema/` against the last migration and writes a new timestamped SQL file plus snapshot under `migrations/`. Touches no database; this is the schema-change dry run.                           |
-| `db:migrate`            | `pnpm --filter @blog/db db:migrate`                                                | `drizzle-kit migrate` — applies any un-applied migration file to the Neon branch pointed at by `DATABASE_URL_UNPOOLED`.                                                                                                            |
-| `db:studio`             | `pnpm --filter @blog/db db:studio`                                                 | `drizzle-kit studio` — local, read/write table browser against the same connection; inspection only.                                                                                                                               |
-| `db:seed-tenant`        | `pnpm --filter @blog/db db:seed-tenant -- --name=... ...`                          | Runs `scripts/seed-tenant.ts` — creates/reuses a `tenants` row (idempotency keyed on `--primary-domain`), its domain(s), and grants an existing user `OWNER` membership. Manual, human-run only.                                   |
-| `db:seed-admin`         | `pnpm --filter @blog/db db:seed-admin -- --email=... --role=...`                   | Runs `scripts/seed-admin.ts` — grants an existing user a platform-admin `admins` row. Manual, human-run only.                                                                                                                      |
-| `db:provision-tenant`   | `pnpm --filter @blog/db db:provision-tenant -- --tenant-id=...`                    | Runs `scripts/provision-tenant/run.ts` — the five-step tenant provisioning workflow (Sanity project, seed content, token persistence, domain mapping, revalidate webhook). Invoked only by the `provision-tenant.yml` CI workflow. |
-| `db:deprovision-tenant` | `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=... --confirm=<name>` | Runs `scripts/deprovision-tenant/run.ts` — reverses provisioning and archives the tenant row. Defaults to a dry run; invoked only by the `deprovision-tenant.yml` CI workflow.                                                     |
+| Script                  | Command                                                                            | What it does                                                                                                                                                                                             |
+| ----------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type-check`            | `pnpm --filter @blog/db type-check`                                                | `tsc --noEmit`.                                                                                                                                                                                          |
+| `lint`                  | `pnpm --filter @blog/db lint`                                                      | `eslint .`.                                                                                                                                                                                              |
+| `format`                | `pnpm --filter @blog/db format`                                                    | `prettier --write .`.                                                                                                                                                                                    |
+| `test`                  | `pnpm --filter @blog/db test`                                                      | `vitest run --passWithNoTests`.                                                                                                                                                                          |
+| `test:watch`            | `pnpm --filter @blog/db test:watch`                                                | `vitest` in watch mode.                                                                                                                                                                                  |
+| `db:generate`           | `pnpm --filter @blog/db db:generate`                                               | `drizzle-kit generate` — diffs `src/schema/` against the last migration and writes a new timestamped SQL file plus snapshot under `migrations/`. Touches no database; this is the schema-change dry run. |
+| `db:migrate`            | `pnpm --filter @blog/db db:migrate`                                                | `drizzle-kit migrate` — applies any un-applied migration file to the Neon branch pointed at by `DATABASE_URL_UNPOOLED`.                                                                                  |
+| `db:studio`             | `pnpm --filter @blog/db db:studio`                                                 | `drizzle-kit studio` — local, read/write table browser against the same connection; inspection only.                                                                                                     |
+| `db:seed-tenant`        | `pnpm --filter @blog/db db:seed-tenant -- --name=... ...`                          | Runs `scripts/seed-tenant.ts` — creates/reuses a `tenants` row (idempotency keyed on `--primary-domain`), its domain(s), and grants an existing user `OWNER` membership. Manual, human-run only.         |
+| `db:seed-admin`         | `pnpm --filter @blog/db db:seed-admin -- --email=... --role=...`                   | Runs `scripts/seed-admin.ts` — grants an existing user a platform-admin `admins` row. Manual, human-run only.                                                                                            |
+| `db:deprovision-tenant` | `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=... --confirm=<name>` | Runs `scripts/deprovision-tenant/run.ts` — reverses provisioning and archives the tenant row. Defaults to a dry run; invoked only by the `deprovision-tenant.yml` CI workflow.                           |
 
 The root-level `pnpm type-check`, `pnpm lint`, and `pnpm test` run every
 workspace, including this one, through Turborepo.

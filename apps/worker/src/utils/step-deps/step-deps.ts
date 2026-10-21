@@ -8,11 +8,9 @@ import {
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import { listSanityWebhooks } from '@blog/db/utils/sanity-management-client/sanity-webhooks';
 import { createClient } from '@sanity/client';
-import {
-  listVercelProjectDomains,
-  type TSeedContentDeps,
-  type TVerifyTenantSeededContentDeps,
-} from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
+import { type TSeedContentDeps } from '@worker/steps/seed-content';
+import { type TVerifyTenantSeededContentDeps } from '@worker/steps/verify-seeded-content';
+import { listVercelProjectDomains } from '@worker/utils/vercel-client/vercel-client';
 
 function createClientWithTimeout(
   config: Parameters<typeof createClient>[0],

@@ -17,3 +17,5 @@ export const PLATFORM_EMAIL_BRAND = {
   logo2: oklchToHex(0.63, 0.16, 250),
   logo3: oklchToHex(0.73, 0.13, 250),
 } as const;
+
+export const PLATFORM_EMAIL_BRAND_NAME = 'Platform';

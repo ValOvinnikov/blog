@@ -24,7 +24,7 @@ export async function inviteOwner(
     const owner = await findOwner(target);
     if (!owner) await sendOwnerInvite(target, { replaceExisting: false });
   } catch (error) {
-    if (!isFinalStepAttempt(error)) throw error;
+    if (!isFinalStepAttempt(error, ctx)) throw error;
     logger.error('owner_access.invite_failed', {
       tenantId,
       runId: ctx.runId,

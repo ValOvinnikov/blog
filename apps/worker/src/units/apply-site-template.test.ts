@@ -7,8 +7,8 @@ import {
   getTenantById,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
+import { seedTenantContent } from '@worker/steps/seed-content';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
-import { seedTenantContent } from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { applySiteTemplate } from './apply-site-template';
@@ -27,18 +27,7 @@ vi.mock(
   '@worker/utils/provision-env/provision-env',
   () => import('@worker/testing/provision-env/fake-provision-env'),
 );
-vi.mock(
-  '@worker/utils/db-provisioning-steps/db-provisioning-steps',
-  async (importOriginal) =>
-    (
-      await import('@worker/testing/db-provisioning-steps/fake-db-provisioning-steps')
-    ).withFakeProvisioningSteps(
-      await importOriginal<
-        typeof import('@worker/utils/db-provisioning-steps/db-provisioning-steps')
-      >(),
-      ['seedTenantContent'],
-    ),
-);
+vi.mock('@worker/steps/seed-content');
 vi.mock('workflow', async (importOriginal) => ({
   ...(await importOriginal<typeof import('workflow')>()),
   getStepMetadata: vi.fn(),

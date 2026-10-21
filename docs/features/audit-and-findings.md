@@ -10,7 +10,7 @@ code:
   - packages/config/src/constants/audit.ts
   - packages/config/src/constants/finding.ts
   - packages/db/scripts/validate-tenant-documents/**
-  - packages/db/scripts/provision-tenant/lib/record-provisioning-audit-event.ts
+  - apps/worker/src/utils/provisioning-report/**
   - packages/db/scripts/deprovision-tenant/lib/record-*-audit-event.ts
   - apps/platform/src/server/audit/**
   - apps/platform/src/server/findings/**

@@ -10,9 +10,4 @@ export const getProvisionEnv = vi.fn((): TProvisionEnv => ({
   tenantSanityDataset: 'production',
   webAppBaseUrl: 'https://web.example.com',
   revalidateSecret: 'revalidate-secret',
-  githubRunId: undefined,
-  githubRepository: undefined,
-  githubServerUrl: undefined,
-  githubActor: undefined,
-  tenantRegistryEnvironment: undefined,
 }));

@@ -10,7 +10,7 @@ import { logger } from '@worker/utils/logger/logger';
 import { reportStep } from '@worker/utils/provisioning-report/provisioning-report';
 import { FatalError, getStepMetadata } from 'workflow';
 
-export type TUnitContext = { runId: string };
+export type TUnitContext = { runId: string; isOneShot?: boolean };
 
 export type TUnitResult =
   { ok: true } | { ok: false; failedStep: TTenantProvisioningStep };
@@ -23,8 +23,12 @@ export async function loadTenant(tenantId: string): Promise<TTenant> {
   return tenant;
 }
 
-export function isFinalStepAttempt(error: unknown): boolean {
+export function isFinalStepAttempt(
+  error: unknown,
+  ctx?: TUnitContext,
+): boolean {
   return (
+    ctx?.isOneShot === true ||
     FatalError.is(error) ||
     getStepMetadata().attempt > PROVISIONING_UNIT_MAX_RETRIES
   );
@@ -47,7 +51,7 @@ export async function runReportedStep(input: {
   try {
     await run();
   } catch (error) {
-    if (!isFinalStepAttempt(error)) throw error;
+    if (!isFinalStepAttempt(error, ctx)) throw error;
 
     const message = sanitizeLogMessage(error);
     logger.error('provisioning.step_failed', {

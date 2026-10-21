@@ -14,9 +14,6 @@ export default mergeConfig(
     test: {
       environment: 'node',
       mockReset: true,
-      // `scripts/provision-tenant/**` is ops-script territory (not the
-      // query-layer `src/`), but its request-shape and idempotency-skip
-      // logic still gets the same unit-test coverage.
       include: ['src/**/*.{test,spec}.ts', 'scripts/**/*.{test,spec}.ts'],
       // Builds one migrated PGlite snapshot per vitest process; every query
       // test's `createTestDb()` restores from it instead of replaying all

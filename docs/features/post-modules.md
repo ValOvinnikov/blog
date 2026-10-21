@@ -33,7 +33,7 @@ Four modules put posts on a page as cards. **Latest Posts** shows the newest pos
 - **Featured Posts** — `postSource` (`PINNED` default, or `NEWEST_FEATURED`), `posts` (pinned, published only, unique, 1–3, in display order), `limit` (Newest featured only, 1–3, default 3), `displayMode`.
 - **Post List** — `pageSize` (required, 1–24). Always a grid.
 - **Related Reading** — `limit` (required, 1–6, default 3). Always a grid.
-- **Post cards** — `postCardFragment` via `toPostCard`; web turns them into `MediaCardItem` data with `toPostListItems`, adding a card image (or the larger lead image for the first Featured post) only when `showImages` is on.
+- **Post cards** — `postCardFragment` via `toPostCard`; web turns them into `MediaCardItem` data with `toPostListItems`, adding a card image (or the larger lead image for the first Featured post) only when `showImages` is on. A post with no hero image gets no media slot, so its card lays out as imageless rather than showing an empty image box.
 - **Caching** — module query `modules:<kind>` + `module:<id>`; post queries `posts`, `author`, `topic` (+ `tag` for Post List and Related Reading). Fallback revalidate 3600s.
 
 ## Configuration

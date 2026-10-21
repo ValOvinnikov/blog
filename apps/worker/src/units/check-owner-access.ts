@@ -1,14 +1,34 @@
 import type { TElevateTenantOwnerOutcome } from '@blog/db/constants';
+import { sanitizeLogMessage } from '@blog/insight';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import { logger } from '@worker/utils/logger/logger';
 import { grantOwnerAdministrator } from '@worker/utils/owner-access/grant-owner-administrator';
 import {
   findOwner,
   loadOwnerAccessTarget,
+  type TOwnerAccessTarget,
 } from '@worker/utils/owner-access/owner-access-target';
+import { sendOwnerInvite } from '@worker/utils/owner-access/owner-invite';
 import {
   pendingOwnerAccessOutcome,
   reportOwnerAccessOutcome,
 } from '@worker/utils/owner-access/report-owner-access-outcome';
+
+import { isFinalStepAttempt } from './run-reported-step';
+
+async function resolveOwnerAccess(
+  target: TOwnerAccessTarget,
+): Promise<TElevateTenantOwnerOutcome> {
+  const { tenant } = target;
+  const owner = await findOwner(target);
+  if (owner) return grantOwnerAdministrator(target, owner);
+  if (tenant.ownerInviteSentAt) return pendingOwnerAccessOutcome(tenant);
+
+  const ownerInviteSentAt = await sendOwnerInvite(target, {
+    replaceExisting: false,
+  });
+  return pendingOwnerAccessOutcome({ ...tenant, ownerInviteSentAt });
+}
 
 export async function checkOwnerAccess(
   tenantId: string,
@@ -16,10 +36,17 @@ export async function checkOwnerAccess(
   'use step';
 
   const target = await loadOwnerAccessTarget(tenantId);
-  const owner = await findOwner(target);
-  const outcome = owner
-    ? await grantOwnerAdministrator(target, owner)
-    : pendingOwnerAccessOutcome(target.tenant);
+  let outcome: TElevateTenantOwnerOutcome;
+  try {
+    outcome = await resolveOwnerAccess(target);
+  } catch (error) {
+    if (!isFinalStepAttempt(error)) throw error;
+    logger.error('owner_access.check_failed', {
+      tenantId,
+      error: sanitizeLogMessage(error),
+    });
+    outcome = pendingOwnerAccessOutcome(target.tenant);
+  }
 
   await reportOwnerAccessOutcome(target.tenant, outcome);
   return outcome;

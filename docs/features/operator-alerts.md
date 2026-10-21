@@ -10,7 +10,8 @@ code:
   - packages/config/src/constants/operator-alert.ts
   - packages/db/scripts/lib/post-operator-alert*
   - packages/db/scripts/*/lib/notify-operators*
-  - packages/db/scripts/provision-tenant/lib/notify-owner-elevation-outcome.ts
+  - packages/db/scripts/recheck-tenant-owners/lib/notify-owner-elevation-outcome.ts
+  - apps/worker/src/utils/operator-alert/**
   - packages/db/src/queries/admins/list-superadmin-emails/**
   - packages/email/src/templates/operator/**
   - packages/email/src/html/operator-shell/**
@@ -87,16 +88,14 @@ the email in the platform's own look, and sends it.
   reports it.
 - An alert fires once per transition:
   - Owner elevation: only for `STALLED` or `AMBIGUOUS_MEMBERSHIP`, and only
-    when the outcome differs from the last one notified. Shared by
-    provisioning's own check and the recheck sweep, so the two never both
+    when the outcome differs from the last one notified. Shared by the
+    worker's owner-access checks and the recheck sweep, so the two never both
     fire for one outcome.
   - Document validation: only when the sweep opens a new finding, not when it
     refreshes an open one.
-- Senders: `provision-tenant` (owner elevation right after core
-  provisioning, then the post-provisioning document check),
+- Senders: `apps/worker` (a STALLED owner-access check),
   `recheck-tenant-owners` and `validate-tenant-documents`. Both sweeps' cron
-  schedules are commented out, so they alert only on manual dispatch or as
-  part of a provisioning run.
+  schedules are commented out, so they alert only on manual dispatch.
 
 ## Dependencies
 
@@ -116,7 +115,7 @@ the email in the platform's own look, and sends it.
 
 - `apps/platform/src/app/api/internal/operator-alert/route.ts`
 - `packages/db/scripts/lib/post-operator-alert.ts`
-- `packages/db/scripts/provision-tenant/lib/notify-owner-elevation-outcome.ts`
+- `packages/db/scripts/recheck-tenant-owners/lib/notify-owner-elevation-outcome.ts`
 - `packages/db/scripts/validate-tenant-documents/lib/notify-operators.ts`
 - `packages/email/src/templates/operator/owner-elevation-alert.ts`,
   `document-validation-alert.ts`

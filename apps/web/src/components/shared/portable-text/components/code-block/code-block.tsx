@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
 import { codeBlockSyntaxTheme } from './code-block-syntax-theme';
@@ -21,6 +22,7 @@ export const CodeBlock = ({
   filename,
   highlightedLines,
 }: ICodeBlockProps) => {
+  const t = useTranslations('codeBlock');
   const s = codeBlockVariants();
 
   return (
@@ -42,6 +44,9 @@ export const CodeBlock = ({
             : {}),
         })}
         className={s.pre()}
+        tabIndex={0}
+        role="region"
+        aria-label={t('regionLabel')}
         data-testid="code-content"
       >
         {code}

@@ -6,11 +6,6 @@ function requireEnv(name: string): string {
   return value;
 }
 
-// Deliberately narrower than `provision-tenant`'s `TProvisionEnv` — this
-// sweep only ever calls `elevateTenantOwner`, which needs just the Sanity
-// management token. Structurally compatible with `TProvisionEnv` (same
-// field name and type), so it satisfies that function's parameter type
-// without importing it.
 export type TRecheckEnv = {
   sanityManagementToken: string;
 };

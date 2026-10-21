@@ -2,18 +2,14 @@
  * Owner-elevation sweep entrypoint — periodically re-checks every fully
  * core-provisioned, active tenant's Sanity project ACL and promotes its
  * owner from `viewer` to `administrator` once they've accepted their
- * invite (see `elevateTenantOwner`). `provision-tenant/run.ts` also calls
- * `elevateTenantOwner` once, right after core provisioning, but a human
- * owner routinely accepts their invite well after that single check — this
- * sweep is the recurring re-check that single run can't provide.
+ * invite (see `elevateTenantOwner`).
  *
  * Invoked only by `.github/workflows/recheck-tenant-owners.yml` via
  * `pnpm --filter @blog/db db:recheck-tenant-owners` — never run by hand
  * against a shared/production tenant registry outside that workflow.
  *
  * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
- * resolve to a no-op outside Next.js's own build, same trick
- * `provision-tenant/run.ts` relies on.
+ * resolve to a no-op outside Next.js's own build.
  */
 import { pathToFileURL } from 'node:url';
 
@@ -22,11 +18,10 @@ import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 
-import { notifyOwnerElevationOutcome } from '../provision-tenant/lib/notify-owner-elevation-outcome';
-import { reportOwnerElevationOutcome } from '../provision-tenant/lib/report-owner-elevation-outcome';
-import { elevateTenantOwner } from '../provision-tenant/steps/elevate-tenant-owner';
-
+import { elevateTenantOwner } from './lib/elevate-tenant-owner';
 import { loadRecheckEnv, type TRecheckEnv } from './lib/env';
+import { notifyOwnerElevationOutcome } from './lib/notify-owner-elevation-outcome';
+import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcome';
 
 export type TRecheckSummary = {
   checked: number;
@@ -50,24 +45,13 @@ function emptySummary(): TRecheckSummary {
   };
 }
 
-// `elevateTenantOwner`'s second parameter is nominally typed to the much
-// larger `TProvisionEnv` (Vercel/domain/webhook fields this sweep has no
-// use for), even though it only ever reads `sanityManagementToken` off it.
-// Deriving the parameter type structurally — rather than importing
-// `TProvisionEnv` itself — keeps this cast honest about exactly what's
-// being widened, without pulling in provisioning's full env surface.
-type TElevateTenantOwnerEnv = Parameters<typeof elevateTenantOwner>[1];
-
 async function recheckOne(
   tenant: TTenant,
   env: TRecheckEnv,
   summary: TRecheckSummary,
 ): Promise<void> {
   try {
-    const outcome = await elevateTenantOwner(
-      tenant,
-      env as TElevateTenantOwnerEnv,
-    );
+    const outcome = await elevateTenantOwner(tenant, env);
     const notifiedOutcome = await notifyOwnerElevationOutcome({
       tenant,
       outcome,

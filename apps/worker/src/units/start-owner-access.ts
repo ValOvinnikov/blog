@@ -14,7 +14,7 @@ export async function startOwnerAccess(
   try {
     await wakeOwnerAccess(tenantId);
   } catch (error) {
-    if (!isFinalStepAttempt(error)) throw error;
+    if (!isFinalStepAttempt(error, ctx)) throw error;
     logger.error('owner_access.start_failed', {
       tenantId,
       runId: ctx.runId,

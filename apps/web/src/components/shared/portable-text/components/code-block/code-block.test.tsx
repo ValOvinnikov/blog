@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { CodeBlock } from './code-block';
@@ -29,6 +30,18 @@ describe(`<${CodeBlock.name}/>`, () => {
       expect(screen.getByTestId('code-content').textContent).toBe(
         '1const x = 1;',
       );
+    });
+
+    it('exposes the code as a named region', () => {
+      expect(screen.getByRole('region', { name: 'Code sample' })).toBe(
+        screen.getByTestId('code-content'),
+      );
+    });
+
+    it('takes keyboard focus so an overflowing block can be scrolled', async () => {
+      await userEvent.setup().tab();
+
+      expect(screen.getByRole('region', { name: 'Code sample' })).toHaveFocus();
     });
 
     it('omits the filename caption when not provided', () => {

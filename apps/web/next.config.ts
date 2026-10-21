@@ -14,7 +14,7 @@ const scriptSrc = isDev
 // Google has served profile photos from several lhN.googleusercontent.com subdomains, hence the wildcard.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "img-src 'self' https://cdn.sanity.io https://avatars.githubusercontent.com https://*.googleusercontent.com data:",
+  "img-src 'self' https://cdn.sanity.io https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.blob.vercel-storage.com data:",
   scriptSrc,
   // Next.js and Tailwind inject per-render inline <style> tags, so there is no static set to hash.
   "style-src 'self' 'unsafe-inline'",

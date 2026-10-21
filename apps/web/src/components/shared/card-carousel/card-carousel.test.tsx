@@ -51,9 +51,9 @@ describe(`<${CardCarousel.name}/>`, () => {
     expect(screen.getByTestId('image-1')).toBeVisible();
   });
 
-  it('renders an empty media frame when an item has no image', () => {
+  it('renders no media frame when an item has no image', () => {
     setup({ items: [makePostListItem()], hasImages: true });
 
-    expect(screen.getByTestId('media-card-media')).toBeEmptyDOMElement();
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 });
