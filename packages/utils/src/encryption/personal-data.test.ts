@@ -1,12 +1,13 @@
 import {
+  OTHER_TEST_ENCRYPTION_KEY as KEY_V2,
+  TEST_ENCRYPTION_KEY as KEY_V1,
+} from './encryption-fixtures';
+import {
   decryptPersonalData,
   encryptPersonalData,
   parsePersonalDataKeyring,
   personalDataIndex,
 } from './personal-data';
-
-const KEY_V1 = 'wF3n9s6q0Zc7yq2z8Xh9mS4h9r0kQnW5R2t8jL1oQxo=';
-const KEY_V2 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=';
 const ADDRESS = 'reader@example.com';
 const KEYRING_V1 = parsePersonalDataKeyring(`v1:${KEY_V1}`);
 const KEYRING_V2 = parsePersonalDataKeyring(`v2:${KEY_V2},v1:${KEY_V1}`);
@@ -65,7 +66,7 @@ describe(decryptPersonalData, () => {
   });
 
   it.each([
-    ['a version the keyring lacks', `v9:${'x'.repeat(8)}`],
+    ['a version the keyring lacks', 'v9:iv.tag.ciphertext'],
     ['no version prefix', 'iv.tag.ciphertext'],
     ['an empty version', ':iv.tag.ciphertext'],
     ['an inherited property name', 'constructor:iv.tag.ciphertext'],

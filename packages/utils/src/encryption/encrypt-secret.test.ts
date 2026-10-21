@@ -1,34 +1,39 @@
 import { decryptSecret, encryptSecret } from './encrypt-secret';
+import {
+  OTHER_TEST_ENCRYPTION_KEY,
+  TEST_ENCRYPTION_KEY as TEST_KEY,
+} from './encryption-fixtures';
 
-const TEST_KEY = 'wF3n9s6q0Zc7yq2z8Xh9mS4h9r0kQnW5R2t8jL1oQxo=';
+const SECRET = 'sk-test-token-value';
+const SAME_VALUE = 'same-value';
 
 describe('encryptSecret / decryptSecret', () => {
   describe('with an encrypted secret', () => {
     let encrypted: string;
 
     beforeEach(() => {
-      encrypted = encryptSecret('sk-test-token-value', TEST_KEY);
+      encrypted = encryptSecret(SECRET, TEST_KEY);
     });
 
     it('round-trips a plaintext secret', () => {
-      expect(encrypted).not.toContain('sk-test-token-value');
-      expect(decryptSecret(encrypted, TEST_KEY)).toBe('sk-test-token-value');
+      expect(encrypted).not.toContain(SECRET);
+      expect(decryptSecret(encrypted, TEST_KEY)).toBe(SECRET);
     });
 
     it('rejects decryption with the wrong key', () => {
-      const wrongKey = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=';
-
-      expect(() => decryptSecret(encrypted, wrongKey)).toThrow();
+      expect(() =>
+        decryptSecret(encrypted, OTHER_TEST_ENCRYPTION_KEY),
+      ).toThrow();
     });
   });
 
   it('produces a different ciphertext for the same plaintext on each call', () => {
-    const first = encryptSecret('same-value', TEST_KEY);
-    const second = encryptSecret('same-value', TEST_KEY);
+    const first = encryptSecret(SAME_VALUE, TEST_KEY);
+    const second = encryptSecret(SAME_VALUE, TEST_KEY);
 
     expect(first).not.toBe(second);
-    expect(decryptSecret(first, TEST_KEY)).toBe('same-value');
-    expect(decryptSecret(second, TEST_KEY)).toBe('same-value');
+    expect(decryptSecret(first, TEST_KEY)).toBe(SAME_VALUE);
+    expect(decryptSecret(second, TEST_KEY)).toBe(SAME_VALUE);
   });
 
   it('rejects a malformed encrypted value', () => {

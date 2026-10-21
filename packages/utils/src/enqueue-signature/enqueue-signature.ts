@@ -1,11 +1,12 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
+import { HMAC_ALGORITHM } from '@blog/utils/encryption';
+
 export const ENQUEUE_SIGNATURE_HEADER = 'x-worker-signature';
 export const ENQUEUE_TIMESTAMP_HEADER = 'x-worker-timestamp';
 export const ENQUEUE_MAX_AGE_MS = 5 * 60_000;
 
-const ENQUEUE_SIGNATURE_ALGORITHM = 'sha256';
-const ENQUEUE_SIGNATURE_PREFIX = `${ENQUEUE_SIGNATURE_ALGORITHM}=`;
+const ENQUEUE_SIGNATURE_PREFIX = `${HMAC_ALGORITHM}=`;
 
 interface IEnqueuePayload {
   secret: string;
@@ -20,7 +21,7 @@ export function signEnqueuePayload({
   path,
   rawBody,
 }: IEnqueuePayload): string {
-  const digest = createHmac(ENQUEUE_SIGNATURE_ALGORITHM, secret)
+  const digest = createHmac(HMAC_ALGORITHM, secret)
     .update(`${timestamp}.${path}.${rawBody}`)
     .digest('hex');
   return `${ENQUEUE_SIGNATURE_PREFIX}${digest}`;

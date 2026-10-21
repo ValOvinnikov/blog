@@ -1,15 +1,15 @@
 import { normalizeEmailIdentity } from './normalize-email-identity';
 
-const ADDRESS = 'reader@example.com';
-const PLUS_IN_DOMAIN = 'reader@ex+ample.com';
+const ADDRESS = 'editor@example.org';
+const PLUS_IN_DOMAIN = 'editor@ex+ample.org';
 
 describe(normalizeEmailIdentity, () => {
   it('lower-cases and trims an address', () => {
-    expect(normalizeEmailIdentity('  Reader@Example.COM ')).toBe(ADDRESS);
+    expect(normalizeEmailIdentity('  Editor@Example.ORG ')).toBe(ADDRESS);
   });
 
   it('drops a +tag from the local part', () => {
-    expect(normalizeEmailIdentity('reader+news+weekly@example.com')).toBe(
+    expect(normalizeEmailIdentity('editor+news+weekly@example.org')).toBe(
       ADDRESS,
     );
   });
