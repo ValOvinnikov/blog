@@ -2,7 +2,9 @@
 # timeout — an unattended CI-style runner, an agent's Bash timeout, or an
 # interactive shell's own patience — should size it generously, since this
 # hook can't influence a wrapping timeout from inside.
-pnpm exec lint-staged || exit 1
+# BLOG_LINT_TOUCHED switches on the touched-file rules (prefer-shared-constant,
+# no-duplicate-string) for the staged files only.
+BLOG_LINT_TOUCHED=1 pnpm exec lint-staged || exit 1
 
 # When a ui component source is staged: regenerate packages/ui/COMPONENTS.md,
 # stage it, and verify it (structure + descriptions). Blocks the commit if a
