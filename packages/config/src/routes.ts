@@ -34,6 +34,8 @@ export const routes = {
     `/api/newsletter/confirm?${toNewsletterLinkQuery(token, locale)}`,
   newsletterUnsubscribe: (token: string, locale?: TLocaleIsoCode) =>
     `/api/newsletter/unsubscribe?${toNewsletterLinkQuery(token, locale)}`,
+  newsletterUnsubscribeConfirmation: (token: string) =>
+    `/newsletter/unsubscribe?${toNewsletterLinkQuery(token)}`,
   newsletterResult: (result: TNewsletterResult) =>
     `/newsletter/${NEWSLETTER_RESULT_SLUGS[result]}`,
   landingPage: (slug: string) => `/${slug}`,
