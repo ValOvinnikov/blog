@@ -8,9 +8,6 @@
     "types": ["node", "vitest/globals"],
     "paths": {
       "@worker/*": ["./src/*"],
-      "@blog/db-provisioning/*": [
-        "../../packages/db/scripts/provision-tenant/*"
-      ],
       "@blog/db/*": ["../../packages/db/src/*"],
       "@blog/insight/*": ["../../packages/insight/src/*"],
       "@blog/config/*": ["../../packages/config/src/*"],

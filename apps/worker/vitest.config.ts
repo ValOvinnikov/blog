@@ -17,10 +17,6 @@ export default mergeConfig(
           find: /^@worker\//,
           replacement: `${fileURLToPath(new URL('./src', import.meta.url))}/`,
         },
-        {
-          find: /^@blog\/db-provisioning\//,
-          replacement: `${fileURLToPath(new URL('../../packages/db/scripts/provision-tenant', import.meta.url))}/`,
-        },
         blogPackageAlias('db', import.meta.url),
         blogPackageAlias('insight', import.meta.url),
         blogPackageAlias('config', import.meta.url),

@@ -1,6 +1,6 @@
 import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { seedTenantContent } from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
+import { seedTenantContent } from '@worker/steps/seed-content';
 import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { seedContentDeps } from '@worker/utils/step-deps/step-deps';
 

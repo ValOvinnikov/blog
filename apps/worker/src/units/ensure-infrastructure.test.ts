@@ -10,13 +10,11 @@ import {
 } from '@blog/db/queries/tenants';
 import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
+import { createTenantSanityProject } from '@worker/steps/create-sanity-project';
+import { mapTenantDomain } from '@worker/steps/map-domain';
+import { persistTenantSanityToken } from '@worker/steps/persist-sanity-token';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
-import {
-  createTenantRevalidateWebhook,
-  createTenantSanityProject,
-  mapTenantDomain,
-  persistTenantSanityToken,
-} from '@worker/utils/db-provisioning-steps/db-provisioning-steps';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { ensureInfrastructure } from './ensure-infrastructure';
@@ -40,23 +38,10 @@ vi.mock(
   '@worker/utils/provision-env/provision-env',
   () => import('@worker/testing/provision-env/fake-provision-env'),
 );
-vi.mock(
-  '@worker/utils/db-provisioning-steps/db-provisioning-steps',
-  async (importOriginal) =>
-    (
-      await import('@worker/testing/db-provisioning-steps/fake-db-provisioning-steps')
-    ).withFakeProvisioningSteps(
-      await importOriginal<
-        typeof import('@worker/utils/db-provisioning-steps/db-provisioning-steps')
-      >(),
-      [
-        'createTenantSanityProject',
-        'persistTenantSanityToken',
-        'createTenantRevalidateWebhook',
-        'mapTenantDomain',
-      ],
-    ),
-);
+vi.mock('@worker/steps/create-revalidate-webhook');
+vi.mock('@worker/steps/create-sanity-project');
+vi.mock('@worker/steps/map-domain');
+vi.mock('@worker/steps/persist-sanity-token');
 vi.mock('workflow', async (importOriginal) => ({
   ...(await importOriginal<typeof import('workflow')>()),
   getStepMetadata: vi.fn(),

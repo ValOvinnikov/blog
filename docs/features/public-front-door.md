@@ -95,7 +95,7 @@ What it replaces or extends today:
 
 - `apps/platform/src/server/tenants/create-tenant-action.ts` (operator-only tenant creation)
 - `apps/platform/src/server/provisioning/start-provisioning.ts`, `enqueue-provisioning.ts`
-- `packages/db/scripts/provision-tenant/`
+- `apps/worker/src/steps/`, `apps/worker/src/cli/provision-tenant.ts`
 - `apps/web/src/server/tenant/resolve-tenant/resolve-tenant.ts` (host → tenant)
 - `packages/db/src/constants/tenant.ts` (`TENANT_STATUS`, `PLAN_REGISTRY`)
 

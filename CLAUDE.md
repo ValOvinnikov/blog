@@ -38,10 +38,8 @@ graph is acyclic
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
   by the three apps (`web`, `platform`, `worker`) and `@blog/auth`**, which
   binds the Auth.js adapter to its tables. It imports no Sanity SDK, and its `src/` never imports
-  `@blog/insight` — logging is the apps' job. Two scoped exceptions, both in
-  standalone CLI tools outside the request path (`SPEC.md` §4):
-  `packages/db/scripts/provision-tenant/` uses `@sanity/client` to seed a new
-  tenant's content, and five tools — `provision-tenant/`,
+  `@blog/insight` — logging is the apps' job. One scoped exception, in
+  standalone CLI tools outside the request path (`SPEC.md` §4): four tools —
   `deprovision-tenant/`, `recheck-tenant-owners/`,
   `validate-tenant-documents/` and `migrate-tenant-content/` — import
   `sanitizeLogMessage` directly rather than keep a drifted copy.
