@@ -2,6 +2,7 @@ import 'server-only';
 
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { consumePendingInvitesOnSignIn } from '@blog/auth/events/consume-pending-invites-on-sign-in';
+import { recordSignupTermsOnSignIn } from '@blog/auth/events/record-signup-terms-on-sign-in';
 import { buildMagicLinkProvider } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { scopeAdapterToApp } from '@blog/auth/sessions/app-scoped-adapter';
 import { buildPlatformCookies } from '@blog/auth/sessions/platform-cookies';
@@ -42,7 +43,12 @@ export function buildAuthConfig(app: TAuthApp): NextAuthConfig {
     },
     ...(app === AUTH_APP.PLATFORM && {
       events: {
-        signIn: ({ user }) => consumePendingInvitesOnSignIn({ user }),
+        signIn: async ({ user, isNewUser }) => {
+          await Promise.all([
+            consumePendingInvitesOnSignIn({ user }),
+            recordSignupTermsOnSignIn({ user, isNewUser }),
+          ]);
+        },
       },
     }),
     providers: [

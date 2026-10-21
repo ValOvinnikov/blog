@@ -1,4 +1,5 @@
 export * from './async';
+export * from './client-key';
 export * from './color';
 export * from './encryption';
 export * from './enqueue-signature';

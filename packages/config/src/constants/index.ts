@@ -43,5 +43,6 @@ export * from './sanity-project';
 export * from './size';
 export * from './taxonomy';
 export * from './tenant-write-refusal';
+export * from './terms';
 export * from './timeline';
 export * from './toast';

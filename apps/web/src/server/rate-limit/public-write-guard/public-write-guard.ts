@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { resolveClientKey } from '@web/server/rate-limit/client-key/client-key';
+import { resolveClientKey } from '@blog/utils/client-key';
 import { createRateLimiter } from '@web/server/rate-limit/rate-limiter/rate-limiter';
 import { logger } from '@web/utils/logger/logger';
 import { checkBotId } from 'botid/server';

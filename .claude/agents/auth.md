@@ -51,10 +51,10 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   report it.
 - **Never log** — no `console.*`, no `@blog/insight`. Auth.js surfaces its own
   failures; the app calling `NextAuth()` logs with request context.
-- **Workspace upstream is `@blog/db`, `@blog/config` and `@blog/email`
-  only** (`@blog/utils` is aliased solely because `@blog/email` resolves to
-  source). Third-party: `next-auth`/`@auth/*`, `@t3-oss/env-core` with `zod`,
-  and `server-only`. Only `apps/web` and `apps/platform` import this package.
+- **Workspace upstream is `@blog/db`, `@blog/config`, `@blog/utils` and
+  `@blog/email` only.** Third-party: `next-auth`/`@auth/*`, `next` (for
+  `next/headers` in sign-in events), `@t3-oss/env-core` with `zod`, and
+  `server-only`. Only `apps/web` and `apps/platform` import this package.
 - **Export the `buildAuthConfig()` builder — never a `NextAuth()` instance or
   a config built at import.** Each app calls `NextAuth(() => …)` itself, so
   its `auth`/`handlers` bind to its own runtime and `getDb()` waits for the
@@ -83,7 +83,11 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   `string` and `undefined` at runtime, which `tsc` cannot catch. Any session
   field an app needs belongs here. The augmentation is ambient: each
   consumer's `tsconfig.json` `include`s `packages/auth/src/**/*.d.ts`.
-- **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`),
+- **Magic-link send limits** — `isMagicLinkSendAllowed` counts every send
+  per email and per client IP in `@blog/db`'s counter table; a refused send
+  returns without sending, so the user sees the same page as a real send.
+- **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`,
+  `recordSignupTermsOnSignIn`),
   registered for `PLATFORM` only; a site sign-in never acts on platform
   invites, and the magic-link provider picks the invite template only for
   `PLATFORM` too. Auth.js wraps each event in its own try/catch and only logs an

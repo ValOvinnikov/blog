@@ -3,6 +3,7 @@ import {
   findPendingInviteTenants,
   type TPendingInviteTenant,
 } from '@blog/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
+import { isMagicLinkSendAllowed } from '@blog/auth/providers/magic-link/is-magic-link-send-allowed/is-magic-link-send-allowed';
 import { readRecipientLocale } from '@blog/auth/providers/magic-link/read-recipient-locale/read-recipient-locale';
 import { resolveMagicLinkEmailSettings } from '@blog/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
 import { resolveMagicLinkFromAddress } from '@blog/auth/providers/magic-link/resolve-magic-link-from-address/resolve-magic-link-from-address';
@@ -34,7 +35,10 @@ export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
     type: 'email',
     name: 'Email',
     from,
-    async sendVerificationRequest({ identifier, url }) {
+    async sendVerificationRequest({ identifier, url, request }) {
+      // Returning without sending lands on the same check-your-inbox page as a real send.
+      if (!(await isMagicLinkSendAllowed(identifier, request))) return;
+
       const { host } = new URL(url);
       const isSentByPlatform = app === AUTH_APP.PLATFORM;
       const inviteTenants = isSentByPlatform

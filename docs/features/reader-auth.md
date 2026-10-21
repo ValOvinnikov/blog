@@ -30,7 +30,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 ## Data
 
-- Neon (Auth.js Drizzle adapter tables, column names fixed by the adapter): `users` (`id`, `name`, `email` unique, `emailVerified`, `image`), `accounts` (PK `provider` + `providerAccountId`, cascade on user delete), `sessions` (`sessionToken`, `userId`, `expires`), `verification_tokens` (the magic-link token).
+- Neon (Auth.js Drizzle adapter tables, column names fixed by the adapter): `users` (`id`, `name`, `email` unique, `emailVerified`, `image`, `termsAcceptedAt`, `termsVersion`), `accounts` (PK `provider` + `providerAccountId`, cascade on user delete), `sessions` (`sessionToken`, `userId`, `expires`), `verification_tokens` (the magic-link token).
 - No tenant column on any of them: a reader is global, and tenant scoping happens in the rows that reference `users` (bookmarks, memberships).
 - Magic-link copy comes from `email_templates` (`MAGIC_LINK` on a site, always — a pending membership invite never changes a site's email; the platform uses `TENANT_INVITE` for an invited address) and sender settings from `email_config`. Only subject and body fall back to `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE`; sender name, reply-to, logo and postal footer stay unset when not configured, and the from address is `MAGIC_LINK_FROM_ADDRESS`, else Resend's testing sender.
 - Nothing is cached; every session read is a database lookup.
@@ -50,7 +50,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - The tenant is resolved from the magic-link URL's host. The email's language is the first segment of the `callbackUrl` path, matched only against the tenant's live locales, else the default locale; with no tenant behind the host it is the invited tenant's locale, else English.
 - A site registers no `events.signIn`: a reader's sign-in leaves pending membership invites pending, for the next admin sign-in to consume.
 - `@blog/auth` never logs; `db` must never import it.
-- Magic-link sends are unlimited.
+- Magic-link sends are limited per email (5) and per client IP (20) in a one-hour fixed window, counted in Neon's `magic_link_send_counters` under SHA-256 keys, so no raw email or IP is stored. A refused send delivers nothing and shows the same check-your-inbox page as a real one. The limits are constants in `is-magic-link-send-allowed.ts`, and they apply to both apps.
 
 ## Dependencies
 

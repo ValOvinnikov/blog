@@ -13,13 +13,22 @@ vi.mock('@auth/drizzle-adapter', () => ({
   DrizzleAdapter: vi.fn(() => drizzleAdapterStub),
 }));
 
-const { consumePendingInvitesOnSignInMock } = vi.hoisted(() => ({
-  consumePendingInvitesOnSignInMock: vi.fn(),
-}));
+const { consumePendingInvitesOnSignInMock, recordSignupTermsOnSignInMock } =
+  vi.hoisted(() => ({
+    consumePendingInvitesOnSignInMock: vi.fn(),
+    recordSignupTermsOnSignInMock: vi.fn(),
+  }));
 
 vi.mock('@blog/auth/events/consume-pending-invites-on-sign-in', () => ({
   consumePendingInvitesOnSignIn: consumePendingInvitesOnSignInMock,
 }));
+
+vi.mock('@blog/auth/events/record-signup-terms-on-sign-in', () => ({
+  recordSignupTermsOnSignIn: recordSignupTermsOnSignInMock,
+}));
+
+const SIGNED_IN_USER = { id: 'user-1', email: 'owner@example.com' };
+const AUTH_SECRET_VALUE = 'test-secret';
 
 async function importBuildAuthConfig(): Promise<typeof buildAuthConfig> {
   vi.resetModules();
@@ -84,16 +93,25 @@ describe(buildAuthConfig, () => {
 
     it('leaves pending membership invites alone on sign-in', async () => {
       await config.events?.signIn?.({
-        user: { id: 'user-1', email: 'owner@example.com' },
+        user: SIGNED_IN_USER,
       });
 
       expect(consumePendingInvitesOnSignInMock).not.toHaveBeenCalled();
+    });
+
+    it('records no signup terms on sign-in', async () => {
+      await config.events?.signIn?.({
+        user: SIGNED_IN_USER,
+        isNewUser: true,
+      });
+
+      expect(recordSignupTermsOnSignInMock).not.toHaveBeenCalled();
     });
   });
 
   describe('with AUTH_SECRET set', () => {
     beforeEach(() => {
-      process.env['AUTH_SECRET'] = 'test-secret';
+      process.env['AUTH_SECRET'] = AUTH_SECRET_VALUE;
     });
 
     it('ignores AUTH_COOKIE_DOMAIN', async () => {
@@ -110,7 +128,7 @@ describe(buildAuthConfig, () => {
 
       const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
-      expect(config.secret).toBe('test-secret');
+      expect(config.secret).toBe(AUTH_SECRET_VALUE);
     });
 
     describe('with a GitHub client id set', () => {
@@ -149,12 +167,24 @@ describe(buildAuthConfig, () => {
     });
 
     it('consumes pending membership invites on sign-in', async () => {
-      const user = { id: 'user-1', email: 'owner@example.com' };
+      const user = SIGNED_IN_USER;
       const config = buildAuthConfig(AUTH_APP.PLATFORM);
 
       await config.events?.signIn?.({ user });
 
       expect(consumePendingInvitesOnSignInMock).toHaveBeenCalledWith({ user });
+    });
+
+    it('records signup terms for a new user on sign-in', async () => {
+      const user = SIGNED_IN_USER;
+      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+
+      await config.events?.signIn?.({ user, isNewUser: true });
+
+      expect(recordSignupTermsOnSignInMock).toHaveBeenCalledWith({
+        user,
+        isNewUser: true,
+      });
     });
 
     it('names every cookie apart from the default Auth.js cookies', () => {
