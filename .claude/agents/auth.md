@@ -114,6 +114,9 @@ test); a folder of two or fewer stays flat, and the third module splits all.
 ## Reuse and size
 
 - Reuse and second copies: CLAUDE.md → "Reuse before you create".
+- Check `packages/config/CONSTANTS.md` before writing a literal and import
+  the const it names; a value written a second time becomes a const, tests
+  included (CLAUDE.md → "Reuse a const; never retype its value").
 - Shared types, helpers and constants: `.claude/agents/config.md`. File size
   budgets: CLAUDE.md → Conventions.
 

@@ -41,6 +41,15 @@ not to test", and treats "nothing to add" as a complete outcome.
   and reuse the builder with overrides, even from a directory the test would
   not otherwise touch. A generic entity with no builder yet gets one in
   `testing/` in the same PR, not inline "for now".
+- **Test inputs and expectations use existing consts — required.** Check
+  `packages/config/CONSTANTS.md` before typing a value into a test, and
+  write `expect(response.status).toBe(HTTP_STATUS.NOT_FOUND)`, never `404`.
+  A value a test file writes a second time becomes a const — or a `testing/`
+  builder when it is entity-shaped (CLAUDE.md → "Reuse a const; never retype
+  its value"). `prefer-shared-constant`, `no-duplicate-string` and
+  `pnpm check:duplicate-literals` enforce this on touched test files too.
+  Using a const is not asserting it: `expect(HTTP_STATUS.NOT_FOUND).toBe(404)`
+  still falls under "What not to test".
 - **Run:** `pnpm test`, `pnpm --filter <pkg> test`, `pnpm test:watch`. Run
   `pnpm --filter <pkg> type-check` after each group of files and the full
   suite once, when implementation is complete.
@@ -388,7 +397,8 @@ tenant)`) is fine: that call is the contract with the outside.
 - **Never assert the source back at itself.** A schema's field list, option
   list, default, fieldset, group, field order, title, icon or registry
   membership; a barrel "exposes X as a function"; an exported constant's
-  value; a component's static prop defaults; editor-facing copy — a
+  value (passing the const as an input, or expecting the code under test to
+  return it, is the required form — "Where tests live"); a component's static prop defaults; editor-facing copy — a
   `description`, label or placeholder pinned to its literal
   (`expect(displayModeField().description).toBe('Grid lays the posts out in rows. …')`);
   a field helper's default-vs-override precedence, which is `??`, not a
@@ -449,7 +459,8 @@ have a test? Report gaps rather than leaving them silent.
 - [ ] Rendered through the workspace's `testing/custom-render`.
 - [ ] Only edges faked; shared fakes from `__mocks__/`, defaults not restated;
       no network, no real time.
-- [ ] Fixtures from `testing/` builders, no duplicated literals.
+- [ ] Fixtures from `testing/` builders; inputs and expectations use existing
+      consts; no value written twice; no const's own value asserted.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
 - [ ] Every asserted element is a named `const`; no `screen` query inside
       `expect(…)` anywhere in a file the change creates or touches.

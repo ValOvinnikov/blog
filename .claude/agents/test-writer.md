@@ -133,6 +133,13 @@ fake or helper before writing one:
 - An extend-or-add-alongside call that the existing one's callers and
   `SPEC.md` do not settle: put it in your report as an explicit question.
 
+Inputs and expectations use the const `packages/config/CONSTANTS.md` names
+(`toBe(HTTP_STATUS.NOT_FOUND)`, never `404`), and a value a test file writes a
+second time becomes a const at the top of that file (testing-practices →
+"Where tests live"). A value several files share is a `testing/` builder or
+an `@blog/config` const, both outside your scope: handle it like the second
+copy above.
+
 ## Definition of done
 
 Once all test files are written, per package touched (a file listed for

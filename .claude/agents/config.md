@@ -172,6 +172,12 @@ the change that would create it". What the helper needs decides its folder:
 - The uppercase value is the stored value — Studio `options.list` and
   migrations read it — so renaming one is a cross-layer change: grep every
   workspace before you do.
+- `packages/config/CONSTANTS.md` and `const-index.json` are generated from
+  every key/value const (`pnpm gen:const-index`; `gen:const-index:check`
+  guards drift). Check the index before adding a const, so a new one never
+  restates an existing one's values, and regenerate it in the change that
+  adds or edits one. A value written a second time becomes a const (CLAUDE.md
+  → "Reuse a const; never retype its value").
 
 ## Conventions
 
