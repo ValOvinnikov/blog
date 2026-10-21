@@ -83,6 +83,9 @@ const doneProvisioningSteps = (): TTenantProvisioningState => {
   };
 };
 
+const TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
+const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
+
 export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
     id: 'tenant-1',
@@ -107,12 +110,15 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     ownerSanityUserId: null,
     ownerLoginProvider: null,
     ownerSanityRole: null,
+    ownerInviteHeadsUpSentAt: null,
+    ownerInviteNudgeSentAt: null,
+    ownerSiteReadySentAt: null,
     lastNotifiedOwnerElevationOutcome: null,
     seededAt: null,
     webhookCreatedAt: null,
     deprovisionedAt: null,
-    createdAt: new Date('2026-04-02T00:00:00.000Z'),
-    updatedAt: new Date('2026-04-02T00:00:00.000Z'),
+    createdAt: TENANT_CREATED_AT,
+    updatedAt: TENANT_CREATED_AT,
     ...overrides,
   };
 };
@@ -124,8 +130,8 @@ export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     locale: LOCALE_ISO_CODES.EN,
     provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
     provisioningSteps: doneProvisioningSteps(),
-    seededAt: new Date('2026-01-01T00:00:00.000Z'),
-    webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
+    seededAt: TENANT_SEEDED_AT,
+    webhookCreatedAt: TENANT_SEEDED_AT,
     ...overrides,
   });
 };

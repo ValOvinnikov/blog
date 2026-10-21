@@ -10,6 +10,9 @@ export type TTenantOwnerAccess = {
   sanityUserId: TMaybeUndefined<string>;
   loginProvider: TMaybeUndefined<TSanityLoginProvider>;
   sanityRole: TMaybeUndefined<TSanityProjectRole>;
+  inviteHeadsUpSentAt: TMaybeUndefined<Date>;
+  inviteNudgeSentAt: TMaybeUndefined<Date>;
+  siteReadySentAt: TMaybeUndefined<Date>;
 };
 
 export const tenantOwnerAccessColumns = {
@@ -19,6 +22,9 @@ export const tenantOwnerAccessColumns = {
   sanityUserId: tenants.ownerSanityUserId,
   loginProvider: tenants.ownerLoginProvider,
   sanityRole: tenants.ownerSanityRole,
+  inviteHeadsUpSentAt: tenants.ownerInviteHeadsUpSentAt,
+  inviteNudgeSentAt: tenants.ownerInviteNudgeSentAt,
+  siteReadySentAt: tenants.ownerSiteReadySentAt,
 };
 
 type TTenantOwnerAccessRow = {
@@ -37,5 +43,8 @@ export function toTenantOwnerAccess(
     sanityUserId: row.sanityUserId ?? undefined,
     loginProvider: row.loginProvider ?? undefined,
     sanityRole: row.sanityRole ?? undefined,
+    inviteHeadsUpSentAt: row.inviteHeadsUpSentAt ?? undefined,
+    inviteNudgeSentAt: row.inviteNudgeSentAt ?? undefined,
+    siteReadySentAt: row.siteReadySentAt ?? undefined,
   };
 }

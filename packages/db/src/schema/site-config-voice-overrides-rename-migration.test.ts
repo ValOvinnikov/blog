@@ -22,6 +22,10 @@ import { tenants } from './tenants';
 const RENAME_MIGRATION =
   '0018_rename_category_empty_to_topic_empty_voice_override.sql';
 
+const TOPIC_EMPTY_COPY = 'No posts in this topic yet.';
+const TAG_EMPTY_COPY = 'No posts with this tag yet.';
+const OLD_CATEGORY_EMPTY_COPY = 'Old copy from categoryEmpty.';
+
 async function setUpDbWithSiteConfigRow(
   voiceOverrides: Record<string, string>,
 ) {
@@ -81,13 +85,13 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
     'leaves a row with no categoryEmpty key untouched',
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
-        tagEmpty: 'No posts with this tag yet.',
+        tagEmpty: TAG_EMPTY_COPY,
       });
 
       await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
-        tagEmpty: 'No posts with this tag yet.',
+        tagEmpty: TAG_EMPTY_COPY,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -109,13 +113,13 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
     'leaves an already-migrated row (topicEmpty present, no categoryEmpty) untouched',
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
-        topicEmpty: 'No posts in this topic yet.',
+        topicEmpty: TOPIC_EMPTY_COPY,
       });
 
       await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
-        topicEmpty: 'No posts in this topic yet.',
+        topicEmpty: TOPIC_EMPTY_COPY,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -125,14 +129,14 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
     'when both categoryEmpty and topicEmpty are present, topicEmpty ends up holding the old categoryEmpty value (jsonb || favours its right operand — accepted, not a bug)',
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
-        categoryEmpty: 'Old copy from categoryEmpty.',
+        categoryEmpty: OLD_CATEGORY_EMPTY_COPY,
         topicEmpty: 'Newer copy already under topicEmpty.',
       });
 
       await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
-        topicEmpty: 'Old copy from categoryEmpty.',
+        topicEmpty: OLD_CATEGORY_EMPTY_COPY,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -160,10 +164,10 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
 
     beforeEach(async () => {
       ({ db } = await setUpDbWithSiteConfigRow({
-        categoryEmpty: 'No posts in this topic yet.',
-        tagEmpty: 'No posts with this tag yet.',
+        categoryEmpty: TOPIC_EMPTY_COPY,
+        tagEmpty: TAG_EMPTY_COPY,
       }));
-    });
+    }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
     it(
       'renames categoryEmpty to topicEmpty and preserves its value alongside other keys',
@@ -171,8 +175,8 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
         await applyRenameMigration(db);
 
         expect(await readVoiceOverrides(db)).toEqual({
-          topicEmpty: 'No posts in this topic yet.',
-          tagEmpty: 'No posts with this tag yet.',
+          topicEmpty: TOPIC_EMPTY_COPY,
+          tagEmpty: TAG_EMPTY_COPY,
         });
       },
       MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -189,8 +193,8 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
 
         expect(afterSecondRun).toEqual(afterFirstRun);
         expect(afterSecondRun).toEqual({
-          topicEmpty: 'No posts in this topic yet.',
-          tagEmpty: 'No posts with this tag yet.',
+          topicEmpty: TOPIC_EMPTY_COPY,
+          tagEmpty: TAG_EMPTY_COPY,
         });
       },
       MIGRATION_REPLAY_TEST_TIMEOUT_MS,

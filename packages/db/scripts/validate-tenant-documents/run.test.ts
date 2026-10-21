@@ -1,6 +1,12 @@
-import { FINDING_SEVERITY, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
+import {
+  FINDING_KIND,
+  FINDING_SEVERITY,
+  FINDING_SOURCE,
+  FINDING_STATUS,
+} from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { makeTenant } from '@blog/db/testing/tenants/fixtures';
 
 import {
   hasSystemicFailures,
@@ -47,36 +53,12 @@ vi.mock('./lib/notify-operators', () => ({
 }));
 
 function tenant(id: string, name: string): TTenant {
-  return {
+  return makeTenant({
     id,
     name,
     primaryDomain: `${name}.example.com`,
     sanityProjectId: `proj-${name}`,
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'encrypted',
-    sanityWriteTokenEncrypted: 'encrypted',
-    locale: LOCALE_ISO_CODES.EN,
-    additionalLocales: [],
-    plan: 'FREE',
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: 'READY',
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    deprovisioningSteps: null,
-    siteType: null,
-    siteTemplateVersion: null,
-    ownerSanityInviteId: null,
-    ownerInviteSentAt: null,
-    ownerInviteAcceptedAt: null,
-    ownerSanityUserId: null,
-    ownerLoginProvider: null,
-    ownerSanityRole: null,
-    createdAt: new Date('2026-01-01T00:00:00.000Z'),
-    updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-  };
+  });
 }
 
 function credentials(tenantId: string) {
@@ -86,7 +68,7 @@ function credentials(tenantId: string) {
     token: `token-${tenantId}`,
     status: TENANT_STATUS.ACTIVE,
     deprovisionedAt: null,
-    provisioningStatus: 'READY',
+    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
   };
 }
 
@@ -309,9 +291,9 @@ describe(runValidation, () => {
           {
             id: 'finding-1',
             tenantId: 't1',
-            source: 'DOCUMENT_VALIDATION',
-            kind: 'SCHEMA_VALIDATION_ERROR',
-            status: 'OPEN',
+            source: FINDING_SOURCE.DOCUMENT_VALIDATION,
+            kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
+            status: FINDING_STATUS.OPEN,
           },
         ]);
 
@@ -325,9 +307,9 @@ describe(runValidation, () => {
           {
             id: 'finding-1',
             tenantId: 't1',
-            source: 'RECHECK_TENANT_OWNERS',
-            kind: 'OWNER_CHECK_STALLED',
-            status: 'OPEN',
+            source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+            kind: FINDING_KIND.OWNER_CHECK_STALLED,
+            status: FINDING_STATUS.OPEN,
           },
         ]);
 

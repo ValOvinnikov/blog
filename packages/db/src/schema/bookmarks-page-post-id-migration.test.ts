@@ -14,6 +14,7 @@ import { bookmarks } from './bookmarks';
 import { tenants } from './tenants';
 
 const REWRITE_MIGRATION = '0030_rewrite_bookmark_post_ids_to_page_post.sql';
+const PREFIXED_POST_ID = 'page_post-welcome';
 
 async function setUpDbWithBookmark(postId: string) {
   const client = new PGlite();
@@ -71,11 +72,11 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
   it(
     'leaves an already-prefixed post id untouched',
     async () => {
-      const { db } = await setUpDbWithBookmark('page_post-welcome');
+      const { db } = await setUpDbWithBookmark(PREFIXED_POST_ID);
 
       await applyRewriteMigration(db);
 
-      expect(await readBookmarkPostIds(db)).toEqual(['page_post-welcome']);
+      expect(await readBookmarkPostIds(db)).toEqual([PREFIXED_POST_ID]);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
@@ -102,14 +103,14 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
 
     beforeEach(async () => {
       ({ db } = await setUpDbWithBookmark('welcome'));
-    });
+    }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
     it(
       'prefixes a bare post id with page_post-',
       async () => {
         await applyRewriteMigration(db);
 
-        expect(await readBookmarkPostIds(db)).toEqual(['page_post-welcome']);
+        expect(await readBookmarkPostIds(db)).toEqual([PREFIXED_POST_ID]);
       },
       MIGRATION_REPLAY_TEST_TIMEOUT_MS,
     );
@@ -124,7 +125,7 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
         const afterSecondRun = await readBookmarkPostIds(db);
 
         expect(afterSecondRun).toEqual(afterFirstRun);
-        expect(afterSecondRun).toEqual(['page_post-welcome']);
+        expect(afterSecondRun).toEqual([PREFIXED_POST_ID]);
       },
       MIGRATION_REPLAY_TEST_TIMEOUT_MS,
     );

@@ -1,42 +1,11 @@
-import { FINDING_SEVERITY, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  FINDING_SEVERITY,
+  HTTP_STATUS,
+  OPERATOR_ALERT_KIND,
+} from '@blog/config/constants';
+import { makeTenant } from '@blog/db/testing/tenants/fixtures';
 
 import { notifyOperatorsOfDocumentValidationFailure } from './notify-operators';
-
-function tenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 't1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj-acme',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    sanityWriteTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    additionalLocales: [],
-    plan: 'FREE',
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: 'READY',
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    deprovisioningSteps: null,
-    siteType: null,
-    siteTemplateVersion: null,
-    ownerSanityInviteId: null,
-    ownerInviteSentAt: null,
-    ownerInviteAcceptedAt: null,
-    ownerSanityUserId: null,
-    ownerLoginProvider: null,
-    ownerSanityRole: null,
-    createdAt: new Date('2026-01-01T00:00:00.000Z'),
-    updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-    ...overrides,
-  };
-}
 
 const originalEnv: Record<string, string | undefined> = {};
 
@@ -58,16 +27,22 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const tenant = makeTenant();
+
 describe(notifyOperatorsOfDocumentValidationFailure, () => {
   it('resolves without throwing when the platform responds with a failure status', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(new Response(null, { status: 500 })),
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
+        ),
     );
 
     await expect(
       notifyOperatorsOfDocumentValidationFailure({
-        tenant: tenant(),
+        tenant,
         invalidDocumentCount: 1,
         severity: FINDING_SEVERITY.WARNING,
       }),
@@ -79,7 +54,7 @@ describe(notifyOperatorsOfDocumentValidationFailure, () => {
 
     await expect(
       notifyOperatorsOfDocumentValidationFailure({
-        tenant: tenant(),
+        tenant,
         invalidDocumentCount: 1,
         severity: FINDING_SEVERITY.CRITICAL,
       }),
@@ -92,21 +67,21 @@ describe(notifyOperatorsOfDocumentValidationFailure, () => {
     beforeEach(() => {
       fetchMock = vi
         .fn()
-        .mockResolvedValue(new Response(null, { status: 200 }));
+        .mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
       vi.stubGlobal('fetch', fetchMock);
     });
 
     it('posts a DOCUMENT_VALIDATION alert with isCritical true for CRITICAL severity', async () => {
       await notifyOperatorsOfDocumentValidationFailure({
-        tenant: tenant(),
+        tenant,
         invalidDocumentCount: 3,
         severity: FINDING_SEVERITY.CRITICAL,
       });
 
       const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
       expect(JSON.parse(init.body)).toEqual({
-        kind: 'DOCUMENT_VALIDATION',
-        tenantId: 't1',
+        kind: OPERATOR_ALERT_KIND.DOCUMENT_VALIDATION,
+        tenantId: tenant.id,
         invalidDocumentCount: 3,
         isCritical: true,
       });
@@ -114,7 +89,7 @@ describe(notifyOperatorsOfDocumentValidationFailure, () => {
 
     it('posts isCritical false for WARNING severity', async () => {
       await notifyOperatorsOfDocumentValidationFailure({
-        tenant: tenant(),
+        tenant,
         invalidDocumentCount: 1,
         severity: FINDING_SEVERITY.WARNING,
       });

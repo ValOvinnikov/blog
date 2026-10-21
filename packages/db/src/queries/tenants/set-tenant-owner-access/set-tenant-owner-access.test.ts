@@ -72,11 +72,16 @@ describe(setTenantOwnerAccess, () => {
     );
     const { sanityInviteId } = makeTenantOwnerAccess();
 
-    await setTenantOwnerAccess(id, { sanityInviteId, inviteAcceptedAt: null });
+    await setTenantOwnerAccess(id, {
+      sanityInviteId,
+      inviteAcceptedAt: null,
+      siteReadySentAt: null,
+    });
 
     expect(await getTenantOwnerAccess(id)).toMatchObject({
       sanityInviteId,
       inviteAcceptedAt: undefined,
+      siteReadySentAt: undefined,
     });
   });
 

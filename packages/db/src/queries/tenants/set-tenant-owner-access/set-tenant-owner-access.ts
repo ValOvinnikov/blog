@@ -41,6 +41,9 @@ export async function setTenantOwnerAccess(
       ownerSanityUserId: input.sanityUserId,
       ownerLoginProvider: input.loginProvider,
       ownerSanityRole: input.sanityRole,
+      ownerInviteHeadsUpSentAt: input.inviteHeadsUpSentAt,
+      ownerInviteNudgeSentAt: input.inviteNudgeSentAt,
+      ownerSiteReadySentAt: input.siteReadySentAt,
     })
     .where(eq(tenants.id, tenantId))
     .returning(tenantOwnerAccessColumns);
