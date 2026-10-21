@@ -1,31 +1,13 @@
-import { applyTenantSenderName } from '@blog/auth/providers/magic-link/apply-tenant-sender-name/apply-tenant-sender-name';
-import {
-  findPendingInviteTenants,
-  type TPendingInviteTenant,
-} from '@blog/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
 import { isMagicLinkSendAllowed } from '@blog/auth/providers/magic-link/is-magic-link-send-allowed/is-magic-link-send-allowed';
-import { readRecipientLocale } from '@blog/auth/providers/magic-link/read-recipient-locale/read-recipient-locale';
-import { resolveMagicLinkEmailSettings } from '@blog/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
 import { resolveMagicLinkFromAddress } from '@blog/auth/providers/magic-link/resolve-magic-link-from-address/resolve-magic-link-from-address';
-import {
-  resolveTenantEmailIdentity,
-  type TResolvedTenantEmailIdentity,
-} from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
+import { sendMagicLinkEmail } from '@blog/auth/providers/magic-link/send-magic-link-email/send-magic-link-email';
 import { env } from '@blog/auth/utils/env/env';
-import {
-  AUTH_APP,
-  EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
-  type TAuthApp,
-  type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
-import {
-  buildInviteMagicLinkEmail,
-  buildMagicLinkEmail,
-  sendEmail,
-} from '@blog/email';
+import { withMinimumDuration } from '@blog/auth/utils/with-minimum-duration/with-minimum-duration';
+import type { TAuthApp } from '@blog/config/constants';
 import type { EmailConfig } from 'next-auth/providers/email';
+
+// Above a typical lookup-and-Resend round trip, so a refused send is not measurably faster than a real one.
+const MAGIC_LINK_RESPONSE_FLOOR_MS = 1500;
 
 export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);
@@ -35,93 +17,12 @@ export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
     type: 'email',
     name: 'Email',
     from,
-    async sendVerificationRequest({ identifier, url, request }) {
-      // Returning without sending lands on the same check-your-inbox page as a real send.
-      if (!(await isMagicLinkSendAllowed(identifier, request))) return;
+    sendVerificationRequest: ({ identifier, url, request }) =>
+      withMinimumDuration(MAGIC_LINK_RESPONSE_FLOOR_MS, async () => {
+        // A refusal sends nothing and lands on the same check-your-inbox page as a real send.
+        if (!(await isMagicLinkSendAllowed(identifier, request))) return;
 
-      const { host } = new URL(url);
-      const isSentByPlatform = app === AUTH_APP.PLATFORM;
-      const inviteTenants = isSentByPlatform
-        ? await findPendingInviteTenantsOrNone(identifier)
-        : [];
-      const tenantNames = inviteTenants.map(({ name }) => name);
-      const tenantIdentity = await resolveTenantEmailIdentity(host);
-      const isInvite = tenantNames.length > 0;
-      const templateType = isInvite
-        ? EMAIL_TEMPLATE_TYPE.TENANT_INVITE
-        : EMAIL_TEMPLATE_TYPE.MAGIC_LINK;
-      const locale = resolveRecipientLocale(url, tenantIdentity, inviteTenants);
-
-      const emailSettings = tenantIdentity
-        ? await resolveMagicLinkEmailSettings(
-            tenantIdentity.tenantId,
-            templateType,
-            locale,
-          )
-        : undefined;
-
-      const { subject: resolvedSubject, body: resolvedBody } =
-        emailSettings ??
-        EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[locale][templateType];
-
-      const { subject, html } = isInvite
-        ? buildInviteMagicLinkEmail({
-            url,
-            tenantIdentity,
-            isSentByPlatform,
-            tenantNames,
-            subject: resolvedSubject,
-            body: resolvedBody,
-            logoImageUrl: emailSettings?.logoImageUrl,
-            footerPostalAddress: emailSettings?.footerPostalAddress,
-          })
-        : buildMagicLinkEmail({
-            url,
-            tenantIdentity,
-            isSentByPlatform,
-            subject: resolvedSubject,
-            body: resolvedBody,
-            logoImageUrl: emailSettings?.logoImageUrl,
-            footerPostalAddress: emailSettings?.footerPostalAddress,
-          });
-
-      await sendEmail({
-        to: identifier,
-        from: applyTenantSenderName(from, emailSettings?.senderName),
-        subject,
-        html,
-        replyTo: emailSettings?.replyTo,
-      });
-    },
+        await sendMagicLinkEmail({ app, from, identifier, url });
+      }),
   };
-}
-
-async function findPendingInviteTenantsOrNone(
-  identifier: string,
-): Promise<TPendingInviteTenant[]> {
-  try {
-    return await findPendingInviteTenants(identifier);
-  } catch {
-    // A failed lookup must not block delivery: it degrades to the generic copy.
-    return [];
-  }
-}
-
-// With no tenant behind the host, an invite is written in the invited
-// tenant's default language, and a platform admin's own sign-in stays in
-// English.
-function resolveRecipientLocale(
-  url: string,
-  tenantIdentity: TResolvedTenantEmailIdentity | undefined,
-  inviteTenants: TPendingInviteTenant[],
-): TLocaleIsoCode {
-  if (tenantIdentity) {
-    return readRecipientLocale(
-      url,
-      tenantIdentity.liveLocales,
-      tenantIdentity.defaultLocale,
-    );
-  }
-
-  return inviteTenants[0]?.locale ?? LOCALE_ISO_CODES.EN;
 }
