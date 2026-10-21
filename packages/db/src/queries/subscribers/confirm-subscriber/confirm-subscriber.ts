@@ -1,6 +1,7 @@
 import type { TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import { hashToken } from '@blog/utils/hash-token';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
@@ -16,6 +17,7 @@ export async function confirmSubscriber(
   token: string,
 ): Promise<TConfirmSubscriberResult> {
   const db = getDb();
+  const tokenHash = hashToken(token);
 
   const [updated] = await db
     .update(subscribers)
@@ -23,7 +25,7 @@ export async function confirmSubscriber(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.confirmationToken, token),
+        eq(subscribers.confirmationTokenHash, tokenHash),
         eq(subscribers.status, 'pending'),
       ),
     )
@@ -39,7 +41,7 @@ export async function confirmSubscriber(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.confirmationToken, token),
+        eq(subscribers.confirmationTokenHash, tokenHash),
       ),
     );
 

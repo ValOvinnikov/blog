@@ -3,6 +3,7 @@ import {
   CAPABILITY,
   EMAIL_TEMPLATE_TYPE,
   ERROR_CODE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   resolveTenantEmailBrand,
   TENANT_WRITE_REFUSAL,
@@ -29,7 +30,11 @@ const {
   isSubscribeAttemptRefusedMock,
   getTenantPlanMock,
   getEffectiveSettingsFeaturesMock,
+  DEFAULT_SUBJECT,
+  DEFAULT_BODY,
 } = vi.hoisted(() => ({
+  DEFAULT_SUBJECT: 'Confirm your newsletter subscription',
+  DEFAULT_BODY: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
   resolveTenantEmailIdentityMock: vi.fn(),
@@ -45,9 +50,7 @@ const {
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await vi.importActual<typeof import('@blog/db/constants')>(
-    '@blog/db/constants',
-  )),
+  ...(await import('@blog/db/constants')),
   queries: {
     subscribers: {
       createPendingSubscriber: createPendingSubscriberMock,
@@ -60,21 +63,21 @@ vi.mock('@blog/db', async () => ({
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE: {
     EN: {
       NEWSLETTER_CONFIRMATION: {
-        subject: 'Confirm your newsletter subscription',
-        body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
+        subject: DEFAULT_SUBJECT,
+        body: DEFAULT_BODY,
       },
     },
     FR: {
       NEWSLETTER_CONFIRMATION: {
         subject: 'Confirmez votre abonnement',
-        body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
+        body: DEFAULT_BODY,
       },
     },
   },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/email')>()),
+vi.mock(import('@blog/email'), async (importOriginal) => ({
+  ...(await importOriginal()),
   sendEmail: sendEmailMock,
 }));
 
@@ -123,18 +126,30 @@ vi.mock('@web/utils/env/env', () => ({
 
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
+const ONE_CLICK_UNSUBSCRIBE = 'List-Unsubscribe=One-Click';
+const ALREADY_PENDING = 'already-pending';
+const ALREADY_ACTIVE = 'already-active';
+const COOKIE_SET_FAILED_EVENT = 'newsletter.subscribed_cookie_set_failed';
+
 const subscriber = {
   id: faker.string.uuid(),
   email: EMAIL,
   status: 'pending' as const,
-  confirmationToken: CONFIRMATION_TOKEN,
-  unsubscribeToken: UNSUBSCRIBE_TOKEN,
+  confirmationTokenHash: faker.string.hexadecimal({ length: 64 }),
+  unsubscribeTokenHash: faker.string.hexadecimal({ length: 64 }),
   subscribedAt: new Date('2026-01-01'),
   confirmedAt: null,
   confirmationSentAt: null,
 };
 
 const CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
+const CLAIM = {
+  claimedAt: CLAIMED_AT,
+  tokens: {
+    confirmationToken: CONFIRMATION_TOKEN,
+    unsubscribeToken: UNSUBSCRIBE_TOKEN,
+  },
+};
 
 const DEFAULT_BRAND = resolveTenantEmailBrand({
   preset: PRESET_ID.CONSOLE,
@@ -182,7 +197,7 @@ describe('subscribeToNewsletterAction', () => {
       body: [],
       logoAssetUrl: undefined,
     });
-    claimConfirmationSendMock.mockResolvedValue(CLAIMED_AT);
+    claimConfirmationSendMock.mockResolvedValue(CLAIM);
     releaseConfirmationSendMock.mockResolvedValue(undefined);
     isSubscribeAttemptRefusedMock.mockResolvedValue(false);
     ({ subscribeToNewsletterAction } = await import('./newsletter-actions'));
@@ -214,7 +229,7 @@ describe('subscribeToNewsletterAction', () => {
         ),
         headers: {
           'List-Unsubscribe': `<${SITE_URL}/api/newsletter/unsubscribe?token=${UNSUBSCRIBE_TOKEN}>`,
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'List-Unsubscribe-Post': ONE_CLICK_UNSUBSCRIBE,
         },
       }),
     );
@@ -230,7 +245,7 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('sends confirm and unsubscribe links carrying the language the reader subscribed in', async () => {
-    vi.mocked(getLocale).mockResolvedValueOnce('FR');
+    vi.mocked(getLocale).mockResolvedValueOnce(LOCALE_ISO_CODES.FR);
 
     await subscribeToNewsletterAction(EMAIL);
 
@@ -249,7 +264,7 @@ describe('subscribeToNewsletterAction', () => {
   it('re-sends the confirmation email and returns SUCCESS for a pending subscriber', async () => {
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
-      data: { outcome: 'already-pending', subscriber },
+      data: { outcome: ALREADY_PENDING, subscriber },
     });
     const result = await subscribeToNewsletterAction(EMAIL);
 
@@ -261,10 +276,10 @@ describe('subscribeToNewsletterAction', () => {
   it('answers SUCCESS to a second sign-up inside the cooldown without emailing again', async () => {
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
-      data: { outcome: 'already-pending', subscriber },
+      data: { outcome: ALREADY_PENDING, subscriber },
     });
     claimConfirmationSendMock
-      .mockResolvedValueOnce(CLAIMED_AT)
+      .mockResolvedValueOnce(CLAIM)
       .mockResolvedValueOnce(null);
 
     await subscribeToNewsletterAction(EMAIL);
@@ -291,7 +306,7 @@ describe('subscribeToNewsletterAction', () => {
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
       data: {
-        outcome: 'already-active',
+        outcome: ALREADY_ACTIVE,
         subscriber: { ...subscriber, status: 'active' as const },
       },
     });
@@ -368,7 +383,7 @@ describe('subscribeToNewsletterAction', () => {
         replyTo: REPLY_TO,
         headers: {
           'List-Unsubscribe': `<${SITE_URL}/api/newsletter/unsubscribe?token=${UNSUBSCRIBE_TOKEN}>`,
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'List-Unsubscribe-Post': ONE_CLICK_UNSUBSCRIBE,
         },
       }),
     );
@@ -442,10 +457,10 @@ describe('subscribeToNewsletterAction', () => {
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
           to: EMAIL,
-          subject: 'Confirm your newsletter subscription',
+          subject: DEFAULT_SUBJECT,
           headers: {
             'List-Unsubscribe': `<${SITE_URL}/api/newsletter/unsubscribe?token=${UNSUBSCRIBE_TOKEN}>`,
-            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            'List-Unsubscribe-Post': ONE_CLICK_UNSUBSCRIBE,
           },
         }),
       );
@@ -515,7 +530,7 @@ describe('subscribeToNewsletterAction', () => {
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
       expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('newsletter.subscribed_cookie_set_failed'),
+        expect.stringContaining(COOKIE_SET_FAILED_EVENT),
       );
     });
 
@@ -523,7 +538,7 @@ describe('subscribeToNewsletterAction', () => {
       createPendingSubscriberMock.mockResolvedValue({
         ok: true,
         data: {
-          outcome: 'already-active',
+          outcome: ALREADY_ACTIVE,
           subscriber: { ...subscriber, status: 'active' as const },
         },
       });
@@ -536,7 +551,7 @@ describe('subscribeToNewsletterAction', () => {
         outcome: NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED,
       });
       expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('newsletter.subscribed_cookie_set_failed'),
+        expect.stringContaining(COOKIE_SET_FAILED_EVENT),
       );
     });
   });

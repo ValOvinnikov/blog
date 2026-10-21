@@ -3,14 +3,17 @@ import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import {
+  type ISubscriberTokens,
+  mintSubscriberTokens,
+} from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
-// The tokens are returned unrotated: rotating either would break a link
-// already in flight.
+// The tokens are rotated: a stored hash can't be emailed again, so links in
+// any earlier confirmation email stop working.
 export type TResendConfirmationResult =
-  | { outcome: 'pending'; confirmationToken: string; unsubscribeToken: string }
-  | TOutcome<'not-pending'>;
+  ({ outcome: 'pending' } & ISubscriberTokens) | TOutcome<'not-pending'>;
 
 export async function resendConfirmation(
   tenantId: string,
@@ -23,27 +26,25 @@ export async function resendConfirmation(
     .from(users)
     .where(eq(users.id, userId));
 
-  if (!user?.email) {
+  const { tokens, hashes } = mintSubscriberTokens();
+
+  const [rotated] = user?.email
+    ? await db
+        .update(subscribers)
+        .set(hashes)
+        .where(
+          and(
+            eq(subscribers.tenantId, tenantId),
+            eq(subscribers.email, normalizeEmail(user.email)),
+            eq(subscribers.status, 'pending'),
+          ),
+        )
+        .returning({ id: subscribers.id })
+    : [];
+
+  if (!rotated) {
     return toOutcome('not-pending');
   }
 
-  const [subscriber] = await db
-    .select()
-    .from(subscribers)
-    .where(
-      and(
-        eq(subscribers.tenantId, tenantId),
-        eq(subscribers.email, normalizeEmail(user.email)),
-      ),
-    );
-
-  if (!subscriber || subscriber.status !== 'pending') {
-    return toOutcome('not-pending');
-  }
-
-  return {
-    outcome: 'pending',
-    confirmationToken: subscriber.confirmationToken,
-    unsubscribeToken: subscriber.unsubscribeToken,
-  };
+  return { outcome: 'pending', ...tokens };
 }

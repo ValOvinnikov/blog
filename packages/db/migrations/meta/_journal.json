@@ -323,6 +323,13 @@
       "when": 1792573622337,
       "tag": "0045_add_tenants_owner_email_sent_at",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1792597333330,
+      "tag": "0046_hash_subscriber_tokens",
+      "breakpoints": true
     }
   ]
 }
