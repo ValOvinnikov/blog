@@ -1,3 +1,5 @@
+import type { TSendEmailInput } from './send-email';
+
 const { sendMock, resendCtorMock } = vi.hoisted(() => ({
   sendMock: vi.fn(),
   resendCtorMock: vi.fn(),
@@ -12,166 +14,117 @@ vi.mock('resend', () => ({
   },
 }));
 
-async function importSendEmail(): Promise<typeof import('./send-email')> {
+const RESEND_API_KEY = 'test-resend-key';
+
+const EMAIL = {
+  to: 'reader@example.com',
+  from: 'Sign in <onboarding@resend.dev>',
+  subject: 'Sign in to example.com',
+  html: '<p>Click to sign in</p>',
+};
+
+type TSendEmailModule = typeof import('./send-email');
+
+async function importSendEmail(): Promise<TSendEmailModule> {
   vi.resetModules();
   return import('./send-email');
 }
 
+function sentEmail(): Partial<TSendEmailInput> | undefined {
+  return sendMock.mock.calls[0]?.[0];
+}
+
 describe('sendEmail', () => {
-  let sendEmail: typeof import('./send-email').sendEmail;
+  let sendEmail: TSendEmailModule['sendEmail'];
 
   beforeEach(async () => {
     sendMock.mockReset();
     resendCtorMock.mockReset();
-    process.env['RESEND_API_KEY'] = 'test-resend-key';
+    process.env['RESEND_API_KEY'] = RESEND_API_KEY;
     sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
     ({ sendEmail } = await importSendEmail());
   });
 
   it('sends the given email via the Resend client', async () => {
-    await sendEmail({
-      to: 'reader@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
-      html: '<p>Click to sign in</p>',
-    });
+    await sendEmail(EMAIL);
 
-    expect(sendMock).toHaveBeenCalledWith({
-      to: 'reader@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
-      html: '<p>Click to sign in</p>',
-    });
+    expect(sendMock).toHaveBeenCalledWith(EMAIL);
   });
 
   it('forwards custom headers to the Resend client when supplied', async () => {
-    await sendEmail({
-      to: 'reader@example.com',
-      from: 'Newsletter <newsletter@resend.dev>',
-      subject: 'Latest issue',
-      html: '<p>Read the latest issue</p>',
-      headers: {
-        'List-Unsubscribe': '<https://example.com/unsubscribe>',
-        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-      },
-    });
+    const headers = {
+      'List-Unsubscribe': '<https://example.com/unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    };
 
-    expect(sendMock).toHaveBeenCalledWith({
-      to: 'reader@example.com',
-      from: 'Newsletter <newsletter@resend.dev>',
-      subject: 'Latest issue',
-      html: '<p>Read the latest issue</p>',
-      headers: {
-        'List-Unsubscribe': '<https://example.com/unsubscribe>',
-        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-      },
-    });
+    await sendEmail({ ...EMAIL, headers });
+
+    expect(sendMock).toHaveBeenCalledWith({ ...EMAIL, headers });
+  });
+
+  it('forwards the plain-text alternative when supplied', async () => {
+    const text = 'Click to sign in';
+
+    await sendEmail({ ...EMAIL, text });
+
+    expect(sendMock).toHaveBeenCalledWith({ ...EMAIL, text });
   });
 
   it('sends no headers when none are supplied', async () => {
-    await sendEmail({
-      to: 'reader@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
-      html: '<p>Click to sign in</p>',
-    });
+    await sendEmail(EMAIL);
 
-    expect(sendMock.mock.calls[0]?.[0].headers).toBeUndefined();
+    expect(sentEmail()?.headers).toBeUndefined();
   });
 
   it('constructs the Resend client with the configured API key', async () => {
-    await sendEmail({
-      to: 'a@example.com',
-      from: 'from@example.com',
-      subject: 'Subject',
-      html: '<p>Body</p>',
-    });
+    await sendEmail(EMAIL);
 
-    expect(resendCtorMock).toHaveBeenCalledWith('test-resend-key');
+    expect(resendCtorMock).toHaveBeenCalledWith(RESEND_API_KEY);
   });
 
   it('reuses a single Resend client across calls', async () => {
-    await sendEmail({
-      to: 'a@example.com',
-      from: 'from@example.com',
-      subject: 'Subject',
-      html: '<p>Body</p>',
-    });
-    await sendEmail({
-      to: 'b@example.com',
-      from: 'from@example.com',
-      subject: 'Subject',
-      html: '<p>Body</p>',
-    });
+    await sendEmail(EMAIL);
+    await sendEmail({ ...EMAIL, to: 'second@example.com' });
 
     expect(resendCtorMock).toHaveBeenCalledTimes(1);
   });
 
   it('forwards a given replyTo address to the Resend client', async () => {
-    await sendEmail({
-      to: 'reader@example.com',
-      from: 'Newsletter <newsletter@resend.dev>',
-      subject: 'Latest issue',
-      html: '<p>Read the latest issue</p>',
-      replyTo: 'editor@example.com',
-    });
+    const replyTo = 'editor@example.com';
 
-    expect(sendMock).toHaveBeenCalledWith({
-      to: 'reader@example.com',
-      from: 'Newsletter <newsletter@resend.dev>',
-      subject: 'Latest issue',
-      html: '<p>Read the latest issue</p>',
-      replyTo: 'editor@example.com',
-    });
+    await sendEmail({ ...EMAIL, replyTo });
+
+    expect(sendMock).toHaveBeenCalledWith({ ...EMAIL, replyTo });
   });
 
   it('sends no replyTo when none is supplied', async () => {
-    await sendEmail({
-      to: 'reader@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
-      html: '<p>Click to sign in</p>',
-    });
+    await sendEmail(EMAIL);
 
-    expect(sendMock.mock.calls[0]?.[0].replyTo).toBeUndefined();
+    expect(sentEmail()?.replyTo).toBeUndefined();
   });
 
   it('rejects a malformed replyTo address before calling the Resend client', async () => {
     await expect(
-      sendEmail({
-        to: 'reader@example.com',
-        from: 'from@example.com',
-        subject: 'Subject',
-        html: '<p>Body</p>',
-        replyTo: 'not-an-email',
-      }),
+      sendEmail({ ...EMAIL, replyTo: 'not-an-email' }),
     ).rejects.toThrow('sendEmail received a malformed replyTo address');
     expect(sendMock).not.toHaveBeenCalled();
   });
 
   it('strips a newline from the subject so it cannot inject a header', async () => {
     await sendEmail({
-      to: 'reader@example.com',
-      from: 'from@example.com',
+      ...EMAIL,
       subject: 'Confirm subscription\r\nBcc: attacker@evil.example',
-      html: '<p>Body</p>',
     });
 
-    const sentSubject = sendMock.mock.calls[0]?.[0].subject as string;
-    expect(sentSubject).not.toMatch(/[\r\n]/);
-    expect(sentSubject).toBe('Confirm subscription Bcc: attacker@evil.example');
+    expect(sentEmail()?.subject).toBe(
+      'Confirm subscription Bcc: attacker@evil.example',
+    );
   });
 
   it('strips a bare carriage return or line feed from the subject', async () => {
-    await sendEmail({
-      to: 'reader@example.com',
-      from: 'from@example.com',
-      subject: 'Line one\nLine two\rLine three',
-      html: '<p>Body</p>',
-    });
+    await sendEmail({ ...EMAIL, subject: 'Line one\nLine two\rLine three' });
 
-    const sentSubject = sendMock.mock.calls[0]?.[0].subject as string;
-    expect(sentSubject).not.toMatch(/[\r\n]/);
+    expect(sentEmail()?.subject).toBe('Line one Line two Line three');
   });
 
   it('throws a clear error when Resend reports a send failure', async () => {
@@ -180,13 +133,8 @@ describe('sendEmail', () => {
       error: { name: 'validation_error', message: 'Invalid `to` field' },
     });
 
-    await expect(
-      sendEmail({
-        to: 'not-an-email',
-        from: 'from@example.com',
-        subject: 'Subject',
-        html: '<p>Body</p>',
-      }),
-    ).rejects.toThrow('Failed to send email via Resend: Invalid `to` field');
+    await expect(sendEmail(EMAIL)).rejects.toThrow(
+      'Failed to send email via Resend: Invalid `to` field',
+    );
   });
 });

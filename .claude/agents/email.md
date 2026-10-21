@@ -60,8 +60,8 @@ don't apply here.
 - **No JSX, no React** — templates are string-building.
 - **Escape everything interpolated** through the canonical `escapeHtml`
   (`html/escape-html/`).
-- Prefer a plain-text alternative where the transport supports one —
-  `TSendEmailInput` has no `text` field today.
+- Return a plain-text alternative beside the HTML (`plain-text/`
+  builds it) — `TSendEmailInput` forwards it as `text`.
 - A one-line comment naming a real client constraint (why a table, why an
   inlined style) is a "real gotcha" under CLAUDE.md → "Comments default to
   zero". Never narrate.
@@ -69,7 +69,7 @@ don't apply here.
 ## Tenant-editable vs never-editable — a trust boundary
 
 - **Operator alerts** (`templates/operator/`) tell a human that provisioning
-  broke or a tenant's documents are invalid. They stay English-only and
+  broke, a tenant's documents are invalid, or a tenant is about to be paused. They stay English-only and
   hardcoded, on `buildOperatorShell`, which takes no brand. They must never
   become tenant-editable.
 - **Owner onboarding mail** (`templates/owner/` — invite heads-up, nudge,
