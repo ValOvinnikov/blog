@@ -98,9 +98,18 @@ describe('routes', () => {
     );
   });
 
-  it('builds the unsubscribe confirmation page path from the token', () => {
-    expect(routes.newsletterUnsubscribeConfirmation('abc123')).toBe(
-      '/newsletter/unsubscribe?token=abc123',
+  it('builds the unsubscribe confirmation page path without the token', () => {
+    expect(routes.newsletterUnsubscribeConfirmation()).toBe(
+      '/newsletter/unsubscribe',
+    );
+  });
+
+  it('builds the unsubscribe submit path without the token, carrying the language', () => {
+    expect(routes.newsletterUnsubscribeSubmit()).toBe(
+      '/api/newsletter/unsubscribe',
+    );
+    expect(routes.newsletterUnsubscribeSubmit(LOCALE_ISO_CODES.FR)).toBe(
+      '/api/newsletter/unsubscribe?lang=FR',
     );
   });
 

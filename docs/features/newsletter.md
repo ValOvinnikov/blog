@@ -31,8 +31,8 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - **Studio** — `module_newsletter` ("Newsletter Signup"): title, brand variant, variant (Full or Compact), heading block, copy, up to two trust cues, alignment, layout. Pickers relabel it "(off in Features)" and its documents warn while the capability is off.
 - **Public site** — the module on any page with a module list. Full shows copy and trust cues in a panel; Compact drops the supporting text, copy and trust cues.
 - `GET /api/newsletter/confirm?token=&lang=` — confirms, then redirects (303) to the result page.
-- `GET /api/newsletter/unsubscribe?token=&lang=` redirects (303) to the confirmation page, or to the invalid-link result page when the token is missing; `POST` to the same URL deletes the subscription (also the `List-Unsubscribe-Post` one-click target), then redirects (303) to the result page.
-- `/[locale]/newsletter/unsubscribe?token=` — the confirm button, in the site's layout, theme and the link's language; it `POST`s to the unsubscribe URL. `force-dynamic` (the token is per subscriber), `noindex`, and a 404 without a token.
+- `GET /api/newsletter/unsubscribe?token=&lang=` keeps the token in a cookie and redirects (303) to the confirmation page, or to the invalid-link result page when the token is missing; `POST` to the same path deletes the subscription, taking the token from the query string (the `List-Unsubscribe-Post` one-click target) or else from that cookie, then clears the cookie and redirects (303) to the result page.
+- `/[locale]/newsletter/unsubscribe` — the confirm button, in the site's layout, theme and the link's language; it `POST`s to the unsubscribe path with no token in either URL, so the token never reaches analytics, history or a `Referer`. ISR like the result pages, `noindex`.
 - `/[locale]/newsletter/[result]` — the confirm or unsubscribe outcome (`NEWSLETTER_RESULT`: confirmed, unsubscribed, or an invalid, failed or unavailable link) in the site's layout, theme and the link's language, with a link home; `noindex`.
 - `/[locale]/account` — the Newsletter section (see [reader-account](./reader-account.md)).
 - **Platform** — the Features toggle, the Email page's `NEWSLETTER_CONFIRMATION` template, and a "Coming soon" Subscribers sidebar entry with no page.
@@ -42,6 +42,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - Sanity: `module_newsletter` documents; trust cues are `newsletterTrustCue` objects (localized `text`, max 40 characters). Loaded through `service.modules.newsletter.v1.getNewsletter`, ISR-tagged `modules:newsletter` and `module:<id>`.
 - Neon `subscribers`: `id`, `tenant_id` (cascade), `email` (normalized), `status` `pending` | `active`, `confirmation_token` and `unsubscribe_token` (unique random UUIDs), `subscribed_at`, `confirmed_at`, `confirmation_sent_at` (the last confirmation send, claimed atomically). Unique (`tenant_id`, `email`). No user FK: a signed-out reader can subscribe, and the account section matches on the session's email.
 - Unsubscribing deletes the row. Deprovisioning a tenant purges its subscribers.
+- Cookie `newsletter_unsubscribe_token` (one hour, `SameSite=Strict`, httpOnly, `Path=/api/newsletter/unsubscribe`) carries the token from the unsubscribe link to the confirm `POST`; without it the confirm lands on the invalid-link page.
 - Cookie `newsletter_subscribed` (one year, `SameSite=Lax`, not httpOnly) set on subscribe and cleared on account unsubscribe; `NewsletterSubscribedGate` hides every newsletter module while it is present, before hydration via an inline script.
 
 ## Configuration

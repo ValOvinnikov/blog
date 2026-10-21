@@ -1,6 +1,11 @@
 import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
+import {
+  clearNewsletterUnsubscribeToken,
+  readNewsletterUnsubscribeToken,
+  storeNewsletterUnsubscribeToken,
+} from '@web/server/newsletter/newsletter-unsubscribe-token-cookie/newsletter-unsubscribe-token-cookie';
 import { makeNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
 import { makeSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import {
@@ -28,6 +33,15 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
 vi.mock(
   '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale',
   () => ({ resolveNewsletterLinkLocale: vi.fn() }),
+);
+
+vi.mock(
+  '@web/server/newsletter/newsletter-unsubscribe-token-cookie/newsletter-unsubscribe-token-cookie',
+  () => ({
+    storeNewsletterUnsubscribeToken: vi.fn(),
+    readNewsletterUnsubscribeToken: vi.fn(),
+    clearNewsletterUnsubscribeToken: vi.fn(),
+  }),
 );
 
 const unsubscribeByTokenMock = vi.mocked(
@@ -58,14 +72,15 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(resolveRequestTenantMock).not.toHaveBeenCalled();
   });
 
-  it('sends a present token to the confirmation page without touching the db', async () => {
+  it('keeps a present token server-side and sends them to the confirmation page without it, without touching the db', async () => {
     const response = await GET(
       toUnsubscribeRequest(routes.newsletterUnsubscribe(TOKEN)),
     );
 
+    expect(storeNewsletterUnsubscribeToken).toHaveBeenCalledWith(TOKEN);
     expect(response.status).toBe(303);
     expect(response.headers.get('location')).toBe(
-      'https://example.com/newsletter/unsubscribe?token=unsubscribe-token',
+      'https://example.com/newsletter/unsubscribe',
     );
     expect(response.headers.get('cache-control')).toBe('private, no-store');
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
@@ -86,7 +101,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
       LOCALE_ISO_CODES.FR,
     );
     expect(response.headers.get('location')).toBe(
-      'https://example.com/fr/newsletter/unsubscribe?token=unsubscribe-token',
+      'https://example.com/fr/newsletter/unsubscribe',
     );
   });
 });
@@ -136,6 +151,22 @@ describe('POST /api/newsletter/unsubscribe', () => {
     expect(response.headers.get('location')).toBe(
       'https://example.com/fr/newsletter/unsubscribed',
     );
+  });
+
+  it('unsubscribes with the token kept from the link when the URL carries none', async () => {
+    vi.mocked(readNewsletterUnsubscribeToken).mockResolvedValueOnce(TOKEN);
+    const response = await POST(
+      toUnsubscribeRequest(routes.newsletterUnsubscribeSubmit(), 'POST'),
+    );
+
+    expect(response.headers.get('location')).toBe(
+      'https://example.com/newsletter/unsubscribed',
+    );
+    expect(unsubscribeByTokenMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_ID,
+      TOKEN,
+    );
+    expect(clearNewsletterUnsubscribeToken).toHaveBeenCalled();
   });
 
   it('sends a link without a token to the invalid page without querying the db', async () => {

@@ -1,34 +1,23 @@
 import type { ITenantLocalizedParams } from '@blog/config';
-import { isString } from '@blog/utils';
 import { NewsletterUnsubscribePage } from '@web/components/pages/newsletter-unsubscribe-page';
 import { buildNewsletterUnsubscribeMetadata } from '@web/metadata/newsletter-unsubscribe-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams>;
-  searchParams: Promise<{ token?: string | string[] }>;
 };
+
+/** Full Route Cache backstop for a missed purge — kept equal to `CONTENT_ROUTE_REVALIDATE_SECONDS` (Next requires a literal here, not an import). */
+export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   await enterRequestContext(params);
   return buildNewsletterUnsubscribeMetadata();
 }
 
-// The query-string token is a per-subscriber credential — never cacheable across readers.
-export const dynamic = 'force-dynamic';
-
-export default async function NewsletterUnsubscribeRoute({
-  params,
-  searchParams,
-}: TProps) {
+export default async function NewsletterUnsubscribeRoute({ params }: TProps) {
   await enterRequestContext(params);
-  const { token } = await searchParams;
 
-  if (!isString(token) || !token) {
-    notFound();
-  }
-
-  return <NewsletterUnsubscribePage token={token} />;
+  return <NewsletterUnsubscribePage />;
 }
