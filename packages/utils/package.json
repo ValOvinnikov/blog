@@ -9,6 +9,7 @@
     "./color": "./src/color/index.ts",
     "./encryption": "./src/encryption/index.ts",
     "./enqueue-signature": "./src/enqueue-signature/index.ts",
+    "./hash": "./src/hash/index.ts",
     "./merge": "./src/merge/index.ts",
     "./normalize-email-identity": "./src/normalize-email-identity/index.ts",
     "./pagination": "./src/pagination/index.ts",

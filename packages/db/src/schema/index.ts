@@ -1,6 +1,7 @@
 export * from './admins';
 export * from './audit-events';
 export * from './auth';
+export * from './blocked-signup-identities';
 export * from './bookmarks';
 export * from './email-config';
 export * from './email-templates';
