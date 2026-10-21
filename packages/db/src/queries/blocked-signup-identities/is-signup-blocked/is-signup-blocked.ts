@@ -2,11 +2,8 @@ import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
-import {
-  hashSignupAddress,
-  normalizeSignupEmail,
-} from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import type { TResult } from '@blog/utils';
+import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
+import { sha256Hex, type TResult } from '@blog/utils';
 import { and, eq, or } from 'drizzle-orm';
 
 export async function isSignupBlocked(
@@ -17,7 +14,7 @@ export async function isSignupBlocked(
   if (!normalized) return { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
 
   const db = getDb();
-  const addressHash = await hashSignupAddress(normalized.address);
+  const addressHash = sha256Hex(normalized.address);
 
   const [match] = await db
     .select({ id: blockedSignupIdentities.id })

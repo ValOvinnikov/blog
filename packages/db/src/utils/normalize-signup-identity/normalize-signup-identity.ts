@@ -27,12 +27,3 @@ export function normalizeSignupDomain(domain: string): TMaybeUndefined<string> {
 
   return isValidDomain(normalized) ? normalized : undefined;
 }
-
-export async function hashSignupAddress(address: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(address),
-  );
-
-  return Buffer.from(digest).toString('hex');
-}

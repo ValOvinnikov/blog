@@ -12,6 +12,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { admins } from './admins';
+import { CREATED_AT_COLUMN } from './columns';
 
 export const blockedIdentityKindEnum = pgEnum(
   'blocked_identity_kind',
@@ -26,14 +27,14 @@ export const blockedIdentityKindEnum = pgEnum(
 export const blockedSignupIdentities = pgTable(
   'blocked_signup_identities',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
-    kind: blockedIdentityKindEnum('kind').notNull(),
-    value: text('value').notNull(),
+    id: uuid().primaryKey().defaultRandom(),
+    kind: blockedIdentityKindEnum().notNull(),
+    value: text().notNull(),
     reason: text('reason').notNull(),
     createdByAdminId: uuid('created_by_admin_id').references(() => admins.id, {
       onDelete: 'set null',
     }),
-    createdAt: timestamp('created_at', { mode: 'date', withTimezone: true })
+    createdAt: timestamp(CREATED_AT_COLUMN, { withTimezone: true })
       .notNull()
       .defaultNow(),
   },

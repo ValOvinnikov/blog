@@ -1,12 +1,10 @@
 import {
   BLOCKED_ADDRESS,
   BLOCKED_ADDRESS_DOMAIN,
-  BLOCKED_ADDRESS_HASH,
   NOT_A_DOMAIN,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 
 import {
-  hashSignupAddress,
   normalizeSignupDomain,
   normalizeSignupEmail,
 } from './normalize-signup-identity';
@@ -43,13 +41,5 @@ describe(normalizeSignupDomain, () => {
 
   it('rejects a value that is not a domain', () => {
     expect(normalizeSignupDomain(NOT_A_DOMAIN)).toBeUndefined();
-  });
-});
-
-describe(hashSignupAddress, () => {
-  it('returns the SHA-256 hex digest of the address', async () => {
-    const hash = await hashSignupAddress(BLOCKED_ADDRESS);
-
-    expect(hash).toBe(BLOCKED_ADDRESS_HASH);
   });
 });

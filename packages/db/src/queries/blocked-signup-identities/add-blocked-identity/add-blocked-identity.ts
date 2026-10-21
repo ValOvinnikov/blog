@@ -9,11 +9,10 @@ import {
   type TBlockedSignupIdentity,
 } from '@blog/db/schema/blocked-signup-identities';
 import {
-  hashSignupAddress,
   normalizeSignupDomain,
   normalizeSignupEmail,
 } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import type { TResult } from '@blog/utils';
+import { sha256Hex, type TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
 export type TAddBlockedIdentityInput = {
@@ -23,10 +22,10 @@ export type TAddBlockedIdentityInput = {
   createdByAdminId: string;
 };
 
-async function toStoredValue(
+function toStoredValue(
   kind: TBlockedIdentityKind,
   identity: string,
-): Promise<TResult<string, TErrorCode>> {
+): TResult<string, TErrorCode> {
   if (kind === BLOCKED_IDENTITY_KIND.DOMAIN) {
     const domain = normalizeSignupDomain(identity);
 
@@ -38,7 +37,7 @@ async function toStoredValue(
   const email = normalizeSignupEmail(identity);
 
   return email
-    ? { ok: true, data: await hashSignupAddress(email.address) }
+    ? { ok: true, data: sha256Hex(email.address) }
     : { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
 }
 
@@ -52,7 +51,7 @@ export async function addBlockedIdentity({
 }: TAddBlockedIdentityInput): Promise<
   TResult<TBlockedSignupIdentity, TErrorCode>
 > {
-  const value = await toStoredValue(kind, identity);
+  const value = toStoredValue(kind, identity);
 
   if (!value.ok) return value;
 
