@@ -1,15 +1,18 @@
 import type { TMaybeNull } from '@blog/config';
+import { HTTP_STATUS } from '@blog/config/constants';
+import { resolveClientKey } from '@blog/utils/client-key';
 import {
   clientLogSchema,
   sanitizeClientLogPayload,
 } from '@web/server/client-log/client-log-schema/client-log-schema';
-import { resolveClientKey } from '@web/server/rate-limit/client-key/client-key';
 import { createRateLimiter } from '@web/server/rate-limit/rate-limiter/rate-limiter';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 
 // Well above the capped field set, small enough that no report carries a large payload.
 const MAX_PAYLOAD_BYTES = 8 * 1024;
+const PAYLOAD_TOO_LARGE_MESSAGE = 'Payload too large.';
+const MALFORMED_BODY_MESSAGE = 'Malformed request body.';
 
 const clientLogRateLimiter = createRateLimiter({
   name: 'client-log',
@@ -63,7 +66,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const contentLength = Number(request.headers.get('content-length') ?? 0);
   if (contentLength > MAX_PAYLOAD_BYTES) {
     return NextResponse.json(
-      { message: 'Payload too large.' },
+      { message: PAYLOAD_TOO_LARGE_MESSAGE },
       { status: 413 },
     );
   }
@@ -71,7 +74,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const rawBody = await readBodyWithinByteCap(request.body, MAX_PAYLOAD_BYTES);
   if (rawBody === null) {
     return NextResponse.json(
-      { message: 'Payload too large.' },
+      { message: PAYLOAD_TOO_LARGE_MESSAGE },
       { status: 413 },
     );
   }
@@ -81,16 +84,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     parsedJson = JSON.parse(rawBody);
   } catch {
     return NextResponse.json(
-      { message: 'Malformed request body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
   const parsed = clientLogSchema.safeParse(parsedJson);
   if (!parsed.success) {
     return NextResponse.json(
-      { message: 'Malformed request body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
@@ -103,5 +106,5 @@ export async function POST(request: Request): Promise<NextResponse> {
     source: 'client',
   });
 
-  return new NextResponse(null, { status: 204 });
+  return new NextResponse(null, { status: HTTP_STATUS.NO_CONTENT });
 }

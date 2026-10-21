@@ -45,5 +45,6 @@ export * from './subscriber-outcome';
 export * from './size';
 export * from './taxonomy';
 export * from './tenant-write-refusal';
+export * from './terms';
 export * from './timeline';
 export * from './toast';

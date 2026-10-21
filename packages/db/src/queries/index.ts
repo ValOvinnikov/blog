@@ -7,6 +7,7 @@ export * as emailConfig from './email-config';
 export * as emailTemplates from './email-templates';
 export * as findings from './findings';
 export * as leads from './leads';
+export * as magicLinkSendCounters from './magic-link-send-counters';
 export * as membershipInvites from './membership-invites';
 export * as memberships from './memberships';
 export * as migrations from './migrations';

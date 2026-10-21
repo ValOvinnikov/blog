@@ -7,6 +7,7 @@ export * from './email-config';
 export * from './email-templates';
 export * from './findings';
 export * from './leads';
+export * from './magic-link-send-counters';
 export * from './membership-invites';
 export * from './memberships';
 export * from './settings-features';

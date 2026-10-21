@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./async": "./src/async/index.ts",
+    "./client-key": "./src/client-key/index.ts",
     "./color": "./src/color/index.ts",
     "./encryption": "./src/encryption/index.ts",
     "./enqueue-signature": "./src/enqueue-signature/index.ts",

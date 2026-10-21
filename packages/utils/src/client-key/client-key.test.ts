@@ -1,4 +1,6 @@
-import { resolveClientKey } from './client-key';
+import { resolveClientKey, UNKNOWN_CLIENT_KEY } from './client-key';
+
+const REAL_IP = '203.0.113.9';
 
 describe(resolveClientKey, () => {
   it('uses the first address in x-forwarded-for', () => {
@@ -10,12 +12,12 @@ describe(resolveClientKey, () => {
   });
 
   it('falls back to x-real-ip', () => {
-    expect(resolveClientKey(new Headers({ 'x-real-ip': '203.0.113.9' }))).toBe(
-      '203.0.113.9',
+    expect(resolveClientKey(new Headers({ 'x-real-ip': REAL_IP }))).toBe(
+      REAL_IP,
     );
   });
 
   it('answers "unknown" when neither header is present', () => {
-    expect(resolveClientKey(new Headers())).toBe('unknown');
+    expect(resolveClientKey(new Headers())).toBe(UNKNOWN_CLIENT_KEY);
   });
 });

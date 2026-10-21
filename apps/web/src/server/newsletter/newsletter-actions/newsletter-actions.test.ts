@@ -341,7 +341,7 @@ describe('subscribeToNewsletterAction', () => {
       preset: PRESET_ID.CONSOLE,
       accentHue: faker.number.int({ max: 359 }),
     });
-    const tenantName = faker.company.name();
+    const tenantName = faker.string.alpha(12);
     resolveTenantEmailIdentityMock.mockResolvedValue({
       brand: tenantBrand,
       brandName: tenantName,

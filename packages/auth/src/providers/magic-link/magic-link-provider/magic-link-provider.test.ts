@@ -18,6 +18,43 @@ const MAGIC_LINK_DEFAULTS =
 const TENANT_INVITE_DEFAULTS =
   EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.TENANT_INVITE];
 
+const SITE_ORIGIN = 'https://example.com';
+const PLATFORM_ORIGIN = 'https://platform.example.com';
+const TOKEN = 'abc';
+const READER_EMAIL = 'jane@example.com';
+const INVITED_EMAIL = 'invited@example.com';
+const ADMIN_EMAIL = 'admin@example.com';
+const FROM_ADDRESS = 'Sign in <onboarding@resend.dev>';
+const SITE_CALLBACK_URL = `${SITE_ORIGIN}/api/auth/callback/email?token=${TOKEN}`;
+const PLATFORM_CALLBACK_URL = `${PLATFORM_ORIGIN}/api/auth/callback/email?token=${TOKEN}`;
+const PLATFORM_LAYOUT_MARK = '>Platform</td>';
+const CUSTOM_SENDER_FROM = 'Acme Support <onboarding@resend.dev>';
+const CUSTOM_SENDER_NAME = 'Acme Support';
+const CUSTOM_REPLY_TO = 'support@acme.example.com';
+const CUSTOM_POSTAL_ADDRESS = '123 Main St, Springfield';
+const CUSTOM_SUBJECT = 'Welcome back to Acme';
+const CUSTOM_BODY_TEXT = 'Use the button below to get back in.';
+const ADVERSARIAL_LINK_KEY = 'adversarial-link';
+const SITE_LINK_HREF = `href="${SITE_CALLBACK_URL}"`;
+
+function sendVerificationRequestFor(
+  provider: ReturnType<typeof buildMagicLinkProvider>,
+  {
+    identifier = READER_EMAIL,
+    url = SITE_CALLBACK_URL,
+  }: { identifier?: string; url?: string } = {},
+) {
+  return provider.sendVerificationRequest({
+    identifier,
+    url,
+    expires: new Date('2026-01-01T00:00:00.000Z'),
+    provider,
+    token: TOKEN,
+    theme: {},
+    request: new Request(new URL(url).origin),
+  });
+}
+
 const {
   findPendingInviteByEmailMock,
   listTenantsByIdsMock,
@@ -26,6 +63,7 @@ const {
   getEmailConfigMock,
   getEmailTemplateMock,
   sendEmailMock,
+  isMagicLinkSendAllowedMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
@@ -34,7 +72,13 @@ const {
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
   sendEmailMock: vi.fn(),
+  isMagicLinkSendAllowedMock: vi.fn(),
 }));
+
+vi.mock(
+  '@blog/auth/providers/magic-link/is-magic-link-send-allowed/is-magic-link-send-allowed',
+  () => ({ isMagicLinkSendAllowed: isMagicLinkSendAllowedMock }),
+);
 
 vi.mock('@blog/db', async () => ({
   queries: {
@@ -54,8 +98,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/email')>()),
+vi.mock(import('@blog/email'), async (importOriginal) => ({
+  ...(await importOriginal()),
   sendEmail: sendEmailMock,
 }));
 
@@ -74,7 +118,16 @@ describe(buildMagicLinkProvider, () => {
       logoAssetUrl: undefined,
     });
     sendEmailMock.mockReset().mockResolvedValue(undefined);
+    isMagicLinkSendAllowedMock.mockResolvedValue(true);
     provider = buildMagicLinkProvider(AUTH_APP.SITE);
+  });
+
+  it('sends nothing once the send limit refuses the request', async () => {
+    isMagicLinkSendAllowedMock.mockResolvedValue(false);
+
+    await sendVerificationRequestFor(provider);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
   it('identifies itself as the email provider', () => {
@@ -83,27 +136,17 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it('resolves the from address via resolveMagicLinkFromAddress', () => {
-    expect(provider.from).toBe('Sign in <onboarding@resend.dev>');
+    expect(provider.from).toBe(FROM_ADDRESS);
   });
 
   it("delivers the sign-in link through @blog/email's sendEmail", async () => {
-    await provider.sendVerificationRequest({
-      identifier: 'jane@example.com',
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://example.com'),
-    });
+    await sendVerificationRequestFor(provider);
 
     expect(sendEmailMock).toHaveBeenCalledWith({
-      to: 'jane@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
+      to: READER_EMAIL,
+      from: FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.stringContaining(
-        'href="https://example.com/api/auth/callback/email?token=abc"',
-      ),
+      html: expect.stringContaining(SITE_LINK_HREF),
     });
   });
 
@@ -116,23 +159,13 @@ describe(buildMagicLinkProvider, () => {
       { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.EN },
     ]);
 
-    await provider.sendVerificationRequest({
-      identifier: 'invited@example.com',
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://example.com'),
-    });
+    await sendVerificationRequestFor(provider, { identifier: INVITED_EMAIL });
 
-    expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(
-      'invited@example.com',
-    );
+    expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(INVITED_EMAIL);
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: 'invited@example.com',
-        from: 'Sign in <onboarding@resend.dev>',
+        to: INVITED_EMAIL,
+        from: FROM_ADDRESS,
         subject: TENANT_INVITE_DEFAULTS.subject,
         html: expect.stringContaining('Accept invite'),
       }),
@@ -152,15 +185,7 @@ describe(buildMagicLinkProvider, () => {
       { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.EN },
     ]);
 
-    await provider.sendVerificationRequest({
-      identifier: 'invited@example.com',
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://example.com'),
-    });
+    await sendVerificationRequestFor(provider, { identifier: INVITED_EMAIL });
 
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -174,43 +199,28 @@ describe(buildMagicLinkProvider, () => {
     const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
     findPendingInviteByEmailMock.mockRejectedValue(new Error('db error'));
 
-    await provider.sendVerificationRequest({
-      identifier: 'jane@example.com',
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://example.com'),
-    });
+    await sendVerificationRequestFor(provider);
 
     expect(sendEmailMock).toHaveBeenCalledWith({
-      to: 'jane@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
+      to: READER_EMAIL,
+      from: FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.stringContaining(
-        'href="https://example.com/api/auth/callback/email?token=abc"',
-      ),
+      html: expect.stringContaining(SITE_LINK_HREF),
     });
   });
 
   it("sends the admin's sign-in email in the platform layout", async () => {
     const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
 
-    await provider.sendVerificationRequest({
-      identifier: 'admin@example.com',
-      url: 'https://platform.example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://platform.example.com'),
+    await sendVerificationRequestFor(provider, {
+      identifier: ADMIN_EMAIL,
+      url: PLATFORM_CALLBACK_URL,
     });
 
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: MAGIC_LINK_DEFAULTS.subject,
-        html: expect.stringContaining('>Platform</td>'),
+        html: expect.stringContaining(PLATFORM_LAYOUT_MARK),
       }),
     );
   });
@@ -224,34 +234,21 @@ describe(buildMagicLinkProvider, () => {
       { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.EN },
     ]);
 
-    await provider.sendVerificationRequest({
-      identifier: 'invited@example.com',
-      url: 'https://platform.example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://platform.example.com'),
+    await sendVerificationRequestFor(provider, {
+      identifier: INVITED_EMAIL,
+      url: PLATFORM_CALLBACK_URL,
     });
 
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: TENANT_INVITE_DEFAULTS.subject,
-        html: expect.stringContaining('>Platform</td>'),
+        html: expect.stringContaining(PLATFORM_LAYOUT_MARK),
       }),
     );
   });
 
   it("never sends a site's sign-in email in the platform layout", async () => {
-    await provider.sendVerificationRequest({
-      identifier: 'jane@example.com',
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://example.com'),
-    });
+    await sendVerificationRequestFor(provider);
 
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -263,19 +260,11 @@ describe(buildMagicLinkProvider, () => {
   it('still delivers, in the unnamed neutral shell, when the host resolves to no tenant', async () => {
     getTenantByDomainMock.mockResolvedValue(undefined);
 
-    await provider.sendVerificationRequest({
-      identifier: 'jane@example.com',
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://example.com'),
-    });
+    await sendVerificationRequestFor(provider);
 
     expect(sendEmailMock).toHaveBeenCalledWith({
-      to: 'jane@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
+      to: READER_EMAIL,
+      from: FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
       html: expect.not.stringContaining('&copy;'),
     });
@@ -284,19 +273,11 @@ describe(buildMagicLinkProvider, () => {
   it('still delivers, in the unnamed neutral shell, when the tenant domain lookup throws', async () => {
     getTenantByDomainMock.mockRejectedValue(new Error('db error'));
 
-    await provider.sendVerificationRequest({
-      identifier: 'jane@example.com',
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://example.com'),
-    });
+    await sendVerificationRequestFor(provider);
 
     expect(sendEmailMock).toHaveBeenCalledWith({
-      to: 'jane@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
+      to: READER_EMAIL,
+      from: FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
       html: expect.not.stringContaining('&copy;'),
     });
@@ -311,14 +292,9 @@ describe(buildMagicLinkProvider, () => {
       { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.ES },
     ]);
 
-    await provider.sendVerificationRequest({
+    await sendVerificationRequestFor(provider, {
       identifier: 'owner@example.com',
-      url: 'https://platform.example.com/api/auth/callback/email?token=abc',
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://platform.example.com'),
+      url: PLATFORM_CALLBACK_URL,
     });
 
     expect(sendEmailMock).toHaveBeenCalledWith(
@@ -332,16 +308,12 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it('writes a sign-in from a tenant-less host in English whatever the return-to path', async () => {
-    await provider.sendVerificationRequest({
-      identifier: 'admin@example.com',
-      url: `https://platform.example.com/api/auth/callback/email?${new URLSearchParams(
-        { callbackUrl: 'https://platform.example.com/fr', token: 'abc' },
-      )}`,
-      expires: new Date('2026-01-01T00:00:00.000Z'),
-      provider,
-      token: 'abc',
-      theme: {},
-      request: new Request('https://platform.example.com'),
+    await sendVerificationRequestFor(provider, {
+      identifier: ADMIN_EMAIL,
+      url: `${PLATFORM_ORIGIN}/api/auth/callback/email?${new URLSearchParams({
+        callbackUrl: `${PLATFORM_ORIGIN}/fr`,
+        token: TOKEN,
+      })}`,
     });
 
     expect(sendEmailMock).toHaveBeenCalledWith(
@@ -371,15 +343,7 @@ describe(buildMagicLinkProvider, () => {
     });
 
     it("brands the sign-in email with the resolved tenant's hue", async () => {
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       const expectedBrand = resolveTenantEmailBrand({
         preset: PRESET_ID.CONSOLE,
@@ -395,25 +359,17 @@ describe(buildMagicLinkProvider, () => {
     it("applies the tenant's sender name and reply-to address", async () => {
       getEmailConfigMock.mockResolvedValue({
         logoAssetUrl: undefined,
-        senderName: 'Acme Support',
-        replyToAddress: 'support@acme.example.com',
+        senderName: CUSTOM_SENDER_NAME,
+        replyToAddress: CUSTOM_REPLY_TO,
         footerPostalAddress: undefined,
       });
 
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          from: 'Acme Support <onboarding@resend.dev>',
-          replyTo: 'support@acme.example.com',
+          from: CUSTOM_SENDER_FROM,
+          replyTo: CUSTOM_REPLY_TO,
         }),
       );
     });
@@ -426,15 +382,7 @@ describe(buildMagicLinkProvider, () => {
         footerPostalAddress: undefined,
       });
 
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       expect(sendEmailMock).toHaveBeenCalledTimes(1);
       expect(sendEmailMock).toHaveBeenCalledWith(
@@ -447,21 +395,13 @@ describe(buildMagicLinkProvider, () => {
         logoAssetUrl: 'https://cdn.example.com/tenant-logo.png',
         senderName: undefined,
         replyToAddress: undefined,
-        footerPostalAddress: '123 Main St, Springfield',
+        footerPostalAddress: CUSTOM_POSTAL_ADDRESS,
       });
       getEmailTemplateMock.mockResolvedValue({
         logoAssetUrl: 'https://cdn.example.com/template-logo.png',
       });
 
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -472,7 +412,7 @@ describe(buildMagicLinkProvider, () => {
       );
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining('123 Main St, Springfield'),
+          html: expect.stringContaining(CUSTOM_POSTAL_ADDRESS),
         }),
       );
     });
@@ -480,19 +420,11 @@ describe(buildMagicLinkProvider, () => {
     it('still delivers with product defaults when the email-config lookup fails', async () => {
       getEmailConfigMock.mockRejectedValue(new Error('db error'));
 
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          from: 'Sign in <onboarding@resend.dev>',
+          from: FROM_ADDRESS,
           replyTo: undefined,
         }),
       );
@@ -501,25 +433,17 @@ describe(buildMagicLinkProvider, () => {
     it('still delivers with product defaults when the email-template lookup fails', async () => {
       getEmailConfigMock.mockResolvedValue({
         logoAssetUrl: undefined,
-        senderName: 'Acme Support',
+        senderName: CUSTOM_SENDER_NAME,
         replyToAddress: undefined,
         footerPostalAddress: undefined,
       });
       getEmailTemplateMock.mockRejectedValue(new Error('db error'));
 
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          from: 'Acme Support <onboarding@resend.dev>',
+          from: CUSTOM_SENDER_FROM,
           subject: MAGIC_LINK_DEFAULTS.subject,
         }),
       );
@@ -527,7 +451,7 @@ describe(buildMagicLinkProvider, () => {
 
     it('sends the authored subject and body once a tenant has edited its magic-link copy', async () => {
       getEmailTemplateMock.mockResolvedValue({
-        subject: 'Welcome back to Acme',
+        subject: CUSTOM_SUBJECT,
         body: [
           {
             _type: 'block',
@@ -537,7 +461,7 @@ describe(buildMagicLinkProvider, () => {
               {
                 _type: 'span',
                 _key: 'authored-1-span',
-                text: 'Use the button below to get back in.',
+                text: CUSTOM_BODY_TEXT,
                 marks: [],
               },
             ],
@@ -546,20 +470,12 @@ describe(buildMagicLinkProvider, () => {
         logoAssetUrl: undefined,
       });
 
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          subject: 'Welcome back to Acme',
-          html: expect.stringContaining('Use the button below to get back in.'),
+          subject: CUSTOM_SUBJECT,
+          html: expect.stringContaining(CUSTOM_BODY_TEXT),
         }),
       );
     });
@@ -575,7 +491,7 @@ describe(buildMagicLinkProvider, () => {
             markDefs: [
               {
                 _type: 'link',
-                _key: 'adversarial-link',
+                _key: ADVERSARIAL_LINK_KEY,
                 href: 'https://attacker.example.com/phish',
               },
             ],
@@ -584,7 +500,7 @@ describe(buildMagicLinkProvider, () => {
                 _type: 'span',
                 _key: 'adversarial-span',
                 text: 'Sign in',
-                marks: ['adversarial-link'],
+                marks: [ADVERSARIAL_LINK_KEY],
               },
             ],
           },
@@ -592,21 +508,11 @@ describe(buildMagicLinkProvider, () => {
         logoAssetUrl: undefined,
       });
 
-      await provider.sendVerificationRequest({
-        identifier: 'jane@example.com',
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        expires: new Date('2026-01-01T00:00:00.000Z'),
-        provider,
-        token: 'abc',
-        theme: {},
-        request: new Request('https://example.com'),
-      });
+      await sendVerificationRequestFor(provider);
 
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining(
-            'href="https://example.com/api/auth/callback/email?token=abc"',
-          ),
+          html: expect.stringContaining(SITE_LINK_HREF),
         }),
       );
     });
@@ -618,16 +524,11 @@ describe(buildMagicLinkProvider, () => {
     ])(
       'looks the template up in the right language for a return-to path with %s',
       async (_, callbackPath, expectedLocale) => {
-        await provider.sendVerificationRequest({
-          identifier: 'jane@example.com',
-          url: `https://example.com/api/auth/callback/email?${new URLSearchParams(
-            { callbackUrl: `https://example.com${callbackPath}`, token: 'abc' },
-          )}`,
-          expires: new Date('2026-01-01T00:00:00.000Z'),
-          provider,
-          token: 'abc',
-          theme: {},
-          request: new Request('https://example.com'),
+        await sendVerificationRequestFor(provider, {
+          url: `${SITE_ORIGIN}/api/auth/callback/email?${new URLSearchParams({
+            callbackUrl: `${SITE_ORIGIN}${callbackPath}`,
+            token: TOKEN,
+          })}`,
         });
 
         expect(getEmailTemplateMock).toHaveBeenCalledWith(

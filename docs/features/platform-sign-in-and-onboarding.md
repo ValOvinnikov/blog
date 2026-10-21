@@ -72,7 +72,12 @@ Decided:
 - Decided: Create site runs one transaction (tenant `PENDING` with
   `site_type`, OWNER membership, `tenant_domains` row for `<slug>.<domain>`,
   `site_config`, `settings_features`, audit event) and enqueues the worker.
-  `termsAcceptedAt` and `termsVersion` are stored on acceptance.
+- Today: a new user's first platform sign-in records `users.termsAcceptedAt`
+  and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
+  cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing
+  users are never stamped, and a recorded acceptance is never overwritten.
+  Decided: `/signup` sets that cookie; a magic link opened in another browser
+  has no cookie, so `/onboarding` asks for acceptance again.
 
 ## Configuration
 
@@ -103,8 +108,8 @@ Decided:
 - Today the admin builds Auth.js with `AUTH_APP.PLATFORM`: its cookies carry
   their own names, each session it creates is stamped `PLATFORM` in
   `sessions.app`, and a session stamped otherwise reads as signed out. Invite
-  side effects run only here: the invite-consuming sign-in event and the
-  invite email template.
+  side effects run only here: the invite-consuming and terms-recording
+  sign-in events and the invite email template.
 - Today the admin's sign-in and invite emails render in the platform layout
   (the stacked logo mark and "Platform" in the top band). A site's sign-in
   email keeps its tenant's layout, or the neutral one on an unknown host.
@@ -131,6 +136,7 @@ Decided:
 - `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
+- `packages/auth/src/events/record-signup-terms-on-sign-in.ts`
 - `apps/platform/src/server/create-site-gate/create-site-gate.ts`
 
 ## Tests and stories
