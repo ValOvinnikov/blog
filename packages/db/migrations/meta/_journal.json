@@ -341,8 +341,22 @@
     {
       "idx": 48,
       "version": "7",
-      "when": 1792603730298,
-      "tag": "0048_hash_subscriber_tokens",
+      "when": 1792603649332,
+      "tag": "0048_clear_accounts_provider_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1792605073094,
+      "tag": "0049_make_audit_events_actor_email_nullable",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792607723605,
+      "tag": "0050_hash_subscriber_tokens",
       "breakpoints": true
     }
   ]

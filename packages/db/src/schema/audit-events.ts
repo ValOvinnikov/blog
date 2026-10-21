@@ -20,9 +20,7 @@ export const auditEvents = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     actorId: text('actor_id').notNull(),
-    // Snapshot of the actor's email at insert time — the row's only way back
-    // to "who did this" once the actor account itself may be long deleted.
-    actorEmail: text('actor_email').notNull(),
+    actorEmail: text('actor_email'),
     action: text('action').notNull().$type<TAuditAction>(),
     targetType: text('target_type').notNull().$type<TAuditTargetType>(),
     targetId: text('target_id').notNull(),

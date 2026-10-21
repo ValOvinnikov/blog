@@ -1,4 +1,9 @@
-import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  LOCALE_ISO_CODES,
+} from '@blog/config/constants';
 import {
   ADMIN_ROLE,
   GRANTED_VIA,
@@ -17,6 +22,8 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+const USER_ID = 'user-1';
+const OTHER_USER_ID = 'user-2';
 let tenantId: string;
 
 beforeEach(async () => {
@@ -37,6 +44,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  await db().delete(schema.auditEvents);
   await db().delete(schema.bookmarks);
   await db().delete(schema.sessions);
   await db().delete(schema.accounts);
@@ -66,17 +74,39 @@ async function seedUserWithRelatedRows(userId: string): Promise<void> {
     .values({ tenantId, userId, postId: 'post-1' });
 }
 
+async function seedAuditEvent(actorId: string): Promise<void> {
+  await db()
+    .insert(schema.auditEvents)
+    .values({
+      actorId,
+      actorEmail: `${actorId}@example.com`,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: tenantId,
+    });
+}
+
+async function findAuditEvents(actorId: string) {
+  return db()
+    .select({
+      actorId: schema.auditEvents.actorId,
+      actorEmail: schema.auditEvents.actorEmail,
+    })
+    .from(schema.auditEvents)
+    .where(eq(schema.auditEvents.actorId, actorId));
+}
+
 async function findUser(userId: string) {
   return db().select().from(schema.users).where(eq(schema.users.id, userId));
 }
 
 describe(deleteAccount, () => {
   beforeEach(async () => {
-    await seedUserWithRelatedRows('user-1');
+    await seedUserWithRelatedRows(USER_ID);
   });
 
   it('deletes the users row', async () => {
-    await expect(deleteAccount('user-1')).resolves.toEqual({
+    await expect(deleteAccount(USER_ID)).resolves.toEqual({
       ok: true,
       data: undefined,
     });
@@ -84,25 +114,25 @@ describe(deleteAccount, () => {
     const remainingUsers = await db()
       .select()
       .from(schema.users)
-      .where(eq(schema.users.id, 'user-1'));
+      .where(eq(schema.users.id, USER_ID));
     expect(remainingUsers).toEqual([]);
   });
 
   it('cascades to accounts, sessions, and bookmarks rows for that user', async () => {
-    await deleteAccount('user-1');
+    await deleteAccount(USER_ID);
 
     const remainingAccounts = await db()
       .select()
       .from(schema.accounts)
-      .where(eq(schema.accounts.userId, 'user-1'));
+      .where(eq(schema.accounts.userId, USER_ID));
     const remainingSessions = await db()
       .select()
       .from(schema.sessions)
-      .where(eq(schema.sessions.userId, 'user-1'));
+      .where(eq(schema.sessions.userId, USER_ID));
     const remainingBookmarks = await db()
       .select()
       .from(schema.bookmarks)
-      .where(eq(schema.bookmarks.userId, 'user-1'));
+      .where(eq(schema.bookmarks.userId, USER_ID));
 
     expect(remainingAccounts).toEqual([]);
     expect(remainingSessions).toEqual([]);
@@ -110,21 +140,54 @@ describe(deleteAccount, () => {
   });
 
   it("does not delete another user's rows", async () => {
-    await seedUserWithRelatedRows('user-2');
+    await seedUserWithRelatedRows(OTHER_USER_ID);
 
-    await deleteAccount('user-1');
+    await deleteAccount(USER_ID);
 
     const remainingUsers = await db()
       .select()
       .from(schema.users)
-      .where(eq(schema.users.id, 'user-2'));
+      .where(eq(schema.users.id, OTHER_USER_ID));
     const remainingBookmarks = await db()
       .select()
       .from(schema.bookmarks)
-      .where(eq(schema.bookmarks.userId, 'user-2'));
+      .where(eq(schema.bookmarks.userId, OTHER_USER_ID));
 
     expect(remainingUsers).toHaveLength(1);
     expect(remainingBookmarks).toHaveLength(1);
+  });
+
+  it("keeps the user's audit events but clears their email", async () => {
+    await seedAuditEvent(USER_ID);
+
+    await deleteAccount(USER_ID);
+
+    expect(await findAuditEvents(USER_ID)).toEqual([
+      { actorId: USER_ID, actorEmail: null },
+    ]);
+  });
+
+  it("leaves another actor's audit email in place", async () => {
+    await seedAuditEvent(OTHER_USER_ID);
+
+    await deleteAccount(USER_ID);
+
+    expect(await findAuditEvents(OTHER_USER_ID)).toEqual([
+      { actorId: OTHER_USER_ID, actorEmail: `${OTHER_USER_ID}@example.com` },
+    ]);
+  });
+
+  it('keeps the audit email of a refused owner', async () => {
+    await seedAuditEvent(USER_ID);
+    await db()
+      .insert(schema.memberships)
+      .values({ userId: USER_ID, tenantId, role: MEMBERSHIP_ROLE.OWNER });
+
+    await deleteAccount(USER_ID);
+
+    expect(await findAuditEvents(USER_ID)).toEqual([
+      { actorId: USER_ID, actorEmail: `${USER_ID}@example.com` },
+    ]);
   });
 
   it('is a no-op when the user does not exist', async () => {
@@ -137,50 +200,50 @@ describe(deleteAccount, () => {
   it('deletes a user whose only memberships are below owner', async () => {
     await db()
       .insert(schema.memberships)
-      .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.EDITOR });
+      .values({ userId: USER_ID, tenantId, role: MEMBERSHIP_ROLE.EDITOR });
 
-    await expect(deleteAccount('user-1')).resolves.toEqual({
+    await expect(deleteAccount(USER_ID)).resolves.toEqual({
       ok: true,
       data: undefined,
     });
-    expect(await findUser('user-1')).toEqual([]);
+    expect(await findUser(USER_ID)).toEqual([]);
   });
 
   it('refuses a tenant owner and keeps the account and its membership', async () => {
     await db()
       .insert(schema.memberships)
-      .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.OWNER });
+      .values({ userId: USER_ID, tenantId, role: MEMBERSHIP_ROLE.OWNER });
 
-    await expect(deleteAccount('user-1')).resolves.toEqual({
+    await expect(deleteAccount(USER_ID)).resolves.toEqual({
       ok: false,
       error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE,
     });
-    expect(await findUser('user-1')).toHaveLength(1);
+    expect(await findUser(USER_ID)).toHaveLength(1);
     expect(
       await db()
         .select()
         .from(schema.memberships)
-        .where(eq(schema.memberships.userId, 'user-1')),
+        .where(eq(schema.memberships.userId, USER_ID)),
     ).toHaveLength(1);
   });
 
   it('refuses a platform admin and keeps the account and its admins row', async () => {
     await db().insert(schema.admins).values({
-      userId: 'user-1',
+      userId: USER_ID,
       role: ADMIN_ROLE.SUPERADMIN,
       grantedVia: GRANTED_VIA.BREAK_GLASS,
     });
 
-    await expect(deleteAccount('user-1')).resolves.toEqual({
+    await expect(deleteAccount(USER_ID)).resolves.toEqual({
       ok: false,
       error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE,
     });
-    expect(await findUser('user-1')).toHaveLength(1);
+    expect(await findUser(USER_ID)).toHaveLength(1);
     expect(
       await db()
         .select()
         .from(schema.admins)
-        .where(eq(schema.admins.userId, 'user-1')),
+        .where(eq(schema.admins.userId, USER_ID)),
     ).toHaveLength(1);
   });
 });

@@ -11,9 +11,9 @@ import { PGlite } from '@electric-sql/pglite';
 import { asc, sql } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
-const HASH_MIGRATION = '0048_hash_subscriber_tokens.sql';
+const HASH_MIGRATION = '0050_hash_subscriber_tokens.sql';
 
-describe('0048_hash_subscriber_tokens (subscriber tokens hashed in place)', () => {
+describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () => {
   let db: PgliteDatabase<typeof schema>;
 
   beforeEach(() => {

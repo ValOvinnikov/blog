@@ -291,6 +291,7 @@
     "recentActivityCardTitle": "Recent activity",
     "recentActivitySourceLabel": "System log",
     "activityEmpty": "No activity recorded yet.",
+    "activityActorDeleted": "Deleted account",
     "relativeJustNow": "Just now",
     "relativeMinutesAgo": "{minutes}m ago",
     "relativeHoursAgo": "{hours}h ago",

@@ -1,5 +1,5 @@
 import { AUTH_APP } from '@blog/config/constants';
-import type { Adapter } from 'next-auth/adapters';
+import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 
 import { scopeAdapterToApp } from './app-scoped-adapter';
 
@@ -13,10 +13,14 @@ const expires = new Date('2030-01-01T00:00:00Z');
 function buildAdapter(
   storedApp: string,
 ): Required<
-  Pick<Adapter, 'createSession' | 'getSessionAndUser' | 'deleteSession'>
+  Pick<
+    Adapter,
+    'createSession' | 'getSessionAndUser' | 'deleteSession' | 'linkAccount'
+  >
 > {
   return {
     createSession: vi.fn(async (session) => session),
+    linkAccount: vi.fn(async () => undefined),
     getSessionAndUser: vi.fn(async (sessionToken) => ({
       session: { sessionToken, userId: user.id, expires, app: storedApp },
       user,
@@ -82,5 +86,27 @@ describe(scopeAdapterToApp, () => {
     await scoped.deleteSession?.('token');
 
     expect(adapter.deleteSession).not.toHaveBeenCalled();
+  });
+
+  it('links a provider account without its tokens', async () => {
+    const adapter = buildAdapter(AUTH_APP.SITE);
+    const scoped = scopeAdapterToApp(adapter, AUTH_APP.SITE);
+    const account: AdapterAccount = {
+      userId: user.id,
+      type: 'oidc',
+      provider: 'test-provider',
+      providerAccountId: 'provider-account-1',
+      token_type: 'bearer',
+      scope: 'read:user',
+    };
+
+    await scoped.linkAccount?.({
+      ...account,
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      id_token: 'id-token',
+    });
+
+    expect(adapter.linkAccount).toHaveBeenCalledWith(account);
   });
 });

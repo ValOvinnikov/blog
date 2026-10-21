@@ -33,6 +33,9 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+const CREATE_DRAFT_FAILED_EVENT = 'tenants.create_draft_failed';
+const OWNER_INVITE_EMAIL_FAILED_EVENT = 'tenants.owner_invite_email_failed';
+
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1),
   domain: z.string().trim().toLowerCase().regex(DOMAIN_PATTERN),
@@ -131,7 +134,7 @@ export const createTenantAction = async (
     });
 
     if (!result.ok) {
-      logger.error('tenants.create_draft_failed', {
+      logger.error(CREATE_DRAFT_FAILED_EVENT, {
         domain,
         error: result.error,
       });
@@ -140,7 +143,7 @@ export const createTenantAction = async (
 
     tenantId = result.data.id;
   } catch (error) {
-    logger.error('tenants.create_draft_failed', { domain, error });
+    logger.error(CREATE_DRAFT_FAILED_EVENT, { domain, error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
@@ -149,7 +152,7 @@ export const createTenantAction = async (
     action: AUDIT_ACTION.CREATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
-    details: { name, domain, plan, ownerEmail },
+    details: { name, domain, plan, ownerUserId: owner?.id ?? null },
   });
 
   if (!owner) {
@@ -159,14 +162,14 @@ export const createTenantAction = async (
         redirect: false,
       });
       if (!inviteEmailResult?.ok) {
-        logger.error('tenants.owner_invite_email_failed', {
+        logger.error(OWNER_INVITE_EMAIL_FAILED_EVENT, {
           tenantId,
           ownerEmail,
           error: inviteEmailResult?.error,
         });
       }
     } catch (error) {
-      logger.error('tenants.owner_invite_email_failed', {
+      logger.error(OWNER_INVITE_EMAIL_FAILED_EVENT, {
         tenantId,
         ownerEmail,
         error,
