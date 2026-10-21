@@ -266,6 +266,9 @@
     "nextAriaLabel": "Next slide",
     "regionLabel": "{title} carousel"
   },
+  "codeBlock": {
+    "regionLabel": "Code sample"
+  },
   "pricingModule": {
     "free": "Free",
     "from": "From",
