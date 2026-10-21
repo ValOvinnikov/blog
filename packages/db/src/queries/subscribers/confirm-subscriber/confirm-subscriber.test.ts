@@ -1,13 +1,17 @@
+import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  TEST_SUBSCRIBER_EMAIL,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mintSubscriberTokens } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
 import { confirmSubscriber } from './confirm-subscriber';
 
 const EXPECTED_CONFIRMED = 'expected confirmed';
-const ALREADY_CONFIRMED = 'already-confirmed';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
@@ -26,7 +30,7 @@ async function insertPendingSubscriber(
   const { tokens, hashes } = mintSubscriberTokens();
   const [inserted] = await db()
     .insert(schema.subscribers)
-    .values({ tenantId, email: 'reader@example.com', ...hashes })
+    .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, ...hashes })
     .returning();
 
   if (!inserted) throw new Error('failed to seed a subscriber row');
@@ -46,8 +50,9 @@ describe(confirmSubscriber, () => {
 
     const result = await confirmSubscriber(tenantId, pending.confirmationToken);
 
-    expect(result.outcome).toBe('confirmed');
-    if (result.outcome !== 'confirmed') throw new Error(EXPECTED_CONFIRMED);
+    expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.CONFIRMED);
+    if (result.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
+      throw new Error(EXPECTED_CONFIRMED);
     expect(result.subscriber.status).toBe('active');
     expect(result.subscriber.confirmedAt).not.toBeNull();
 
@@ -61,12 +66,13 @@ describe(confirmSubscriber, () => {
   it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
     const pending = await insertPendingSubscriber(tenantId);
     const first = await confirmSubscriber(tenantId, pending.confirmationToken);
-    if (first.outcome !== 'confirmed') throw new Error(EXPECTED_CONFIRMED);
+    if (first.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
+      throw new Error(EXPECTED_CONFIRMED);
 
     const second = await confirmSubscriber(tenantId, pending.confirmationToken);
 
     expect(second).toEqual({
-      outcome: ALREADY_CONFIRMED,
+      outcome: SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
       subscriber: first.subscriber,
     });
   });
@@ -74,7 +80,7 @@ describe(confirmSubscriber, () => {
   it('returns not-found for an unrecognized token', async () => {
     const result = await confirmSubscriber(tenantId, 'does-not-exist');
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 
   it('treats the stored hash like an unknown token', async () => {
@@ -100,7 +106,7 @@ describe(confirmSubscriber, () => {
       pending.confirmationToken,
     );
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 
   it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
@@ -112,10 +118,14 @@ describe(confirmSubscriber, () => {
     ]);
 
     const outcomes = [first.outcome, second.outcome].sort();
-    expect(outcomes).toEqual([ALREADY_CONFIRMED, 'confirmed']);
+    expect(outcomes).toEqual([
+      SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
+      SUBSCRIBER_OUTCOME.CONFIRMED,
+    ]);
 
-    const confirmed = first.outcome === 'confirmed' ? first : second;
-    if (confirmed.outcome !== 'confirmed') {
+    const confirmed =
+      first.outcome === SUBSCRIBER_OUTCOME.CONFIRMED ? first : second;
+    if (confirmed.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED) {
       throw new Error('expected one confirmed outcome');
     }
     const [row] = await db()

@@ -1,4 +1,4 @@
-import type { TOutcome } from '@blog/config';
+import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
 import { hashToken } from '@blog/utils/hash-token';
@@ -6,9 +6,13 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export type TConfirmSubscriberResult =
-  | { outcome: 'confirmed'; subscriber: TSubscriber }
-  | { outcome: 'already-confirmed'; subscriber: TSubscriber }
-  | TOutcome<'not-found'>;
+  | (TOutcome<typeof SUBSCRIBER_OUTCOME.CONFIRMED> & {
+      subscriber: TSubscriber;
+    })
+  | (TOutcome<typeof SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED> & {
+      subscriber: TSubscriber;
+    })
+  | TOutcome<typeof SUBSCRIBER_OUTCOME.NOT_FOUND>;
 
 // The `UPDATE` is gated on `status = 'pending'` rather than read-then-write,
 // so of two concurrent hits on one link exactly one gets `confirmed`.
@@ -32,7 +36,10 @@ export async function confirmSubscriber(
     .returning();
 
   if (updated) {
-    return { outcome: 'confirmed', subscriber: updated };
+    return {
+      ...toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED),
+      subscriber: updated,
+    };
   }
 
   const [existing] = await db
@@ -46,8 +53,11 @@ export async function confirmSubscriber(
     );
 
   if (!existing) {
-    return toOutcome('not-found');
+    return toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND);
   }
 
-  return { outcome: 'already-confirmed', subscriber: existing };
+  return {
+    ...toOutcome(SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED),
+    subscriber: existing,
+  };
 }

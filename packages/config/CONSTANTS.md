@@ -183,6 +183,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SIZE**: `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`
 
+### `@blog/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
+
+- **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`
+
 ### `@blog/config/constants` — `packages/config/src/constants/taxonomy.ts`
 
 - **TAXONOMY_KIND**: `TOPICS`, `TAGS`

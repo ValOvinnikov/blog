@@ -1,4 +1,4 @@
-import type { TOutcome } from '@blog/config';
+import { type TOutcome, SUBSCRIBER_OUTCOME } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
 import { hashToken } from '@blog/utils/hash-token';
@@ -6,7 +6,10 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export type TUnsubscribeByTokenResult =
-  { outcome: 'unsubscribed'; subscriber: TSubscriber } | TOutcome<'not-found'>;
+  | (TOutcome<typeof SUBSCRIBER_OUTCOME.UNSUBSCRIBED> & {
+      subscriber: TSubscriber;
+    })
+  | TOutcome<typeof SUBSCRIBER_OUTCOME.NOT_FOUND>;
 
 export async function unsubscribeByToken(
   tenantId: string,
@@ -26,8 +29,11 @@ export async function unsubscribeByToken(
     .returning();
 
   if (!deleted) {
-    return toOutcome('not-found');
+    return toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND);
   }
 
-  return { outcome: 'unsubscribed', subscriber: deleted };
+  return {
+    ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+    subscriber: deleted,
+  };
 }

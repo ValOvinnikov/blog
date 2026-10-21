@@ -1,10 +1,17 @@
 import {
   ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   resolveTenantEmailBrand,
+  SUBSCRIBER_OUTCOME,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db';
+import {
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
+  TENANT_STATUS,
+} from '@blog/db/constants';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import type { MockInstance } from 'vitest';
 
@@ -35,7 +42,8 @@ const {
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: {
     subscribers: {
       unsubscribe: unsubscribeMock,
@@ -44,23 +52,10 @@ vi.mock('@blog/db', () => ({
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
-  TENANT_STATUS: {
-    ACTIVE: 'ACTIVE',
-    SUSPENDED: 'SUSPENDED',
-    ARCHIVED: 'ARCHIVED',
-  },
-  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE: {
-    EN: {
-      NEWSLETTER_CONFIRMATION: {
-        subject: 'Confirm your newsletter subscription',
-        body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
-      },
-    },
-  },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/email')>()),
+vi.mock(import('@blog/email'), async (importOriginal) => ({
+  ...(await importOriginal()),
   sendEmail: sendEmailMock,
 }));
 
@@ -93,12 +88,23 @@ vi.mock('@web/utils/env/env', () => ({
 
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
+type TActions = typeof import('./newsletter-subscription-actions');
+
+const SESSION_EMAIL = 'val@icloud.com';
+const REPLY_TO_ADDRESS = 'support@example.com';
+const UNSUBSCRIBE_HEADER =
+  '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>';
+const DEFAULT_CONFIRMATION_SUBJECT =
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
+    EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION
+  ].subject;
+
 const session = {
-  user: { id: 'user-1', email: 'val@icloud.com' },
+  user: { id: 'user-1', email: SESSION_EMAIL },
 };
 
 describe('unsubscribeAction', () => {
-  let unsubscribeAction: typeof import('./newsletter-subscription-actions').unsubscribeAction;
+  let unsubscribeAction: TActions['unsubscribeAction'];
   let errorSpy: MockInstance<typeof console.error>;
 
   beforeEach(async () => {
@@ -186,14 +192,14 @@ describe('unsubscribeAction', () => {
 });
 
 describe('resendConfirmationAction', () => {
-  let resendConfirmationAction: typeof import('./newsletter-subscription-actions').resendConfirmationAction;
+  let resendConfirmationAction: TActions['resendConfirmationAction'];
 
   beforeEach(async () => {
     authMock.mockReset();
     authMock.mockResolvedValue(session);
     resendConfirmationMock.mockReset();
     resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
+      outcome: SUBSCRIBER_OUTCOME.PENDING,
       confirmationToken: 'token-abc',
       unsubscribeToken: 'unsub-token-abc',
     });
@@ -219,7 +225,7 @@ describe('resendConfirmationAction', () => {
     getEmailTemplateMock.mockReset();
     getEmailTemplateMock.mockResolvedValue({
       tenantId: TENANT_ID,
-      templateType: 'NEWSLETTER_CONFIRMATION',
+      templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
       subject: 'Confirm your subscription',
       body: [],
       logoAssetUrl: undefined,
@@ -280,14 +286,13 @@ describe('resendConfirmationAction', () => {
     expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: 'val@icloud.com',
+        to: SESSION_EMAIL,
         html: expect.stringContaining(
           'https://example.com/api/newsletter/confirm?token=token-abc',
         ),
         headers: {
-          'List-Unsubscribe':
-            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
+          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
         },
       }),
     );
@@ -314,7 +319,9 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR without sending when the db reports not-pending', async () => {
-    resendConfirmationMock.mockResolvedValue({ outcome: 'not-pending' });
+    resendConfirmationMock.mockResolvedValue({
+      outcome: SUBSCRIBER_OUTCOME.NOT_PENDING,
+    });
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
@@ -338,7 +345,7 @@ describe('resendConfirmationAction', () => {
       tenantId: TENANT_ID,
       logoAssetUrl: undefined,
       senderName: undefined,
-      replyToAddress: 'support@example.com',
+      replyToAddress: REPLY_TO_ADDRESS,
       footerPostalAddress: undefined,
     });
 
@@ -346,11 +353,10 @@ describe('resendConfirmationAction', () => {
 
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        replyTo: 'support@example.com',
+        replyTo: REPLY_TO_ADDRESS,
         headers: {
-          'List-Unsubscribe':
-            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
+          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
         },
       }),
     );
@@ -391,7 +397,7 @@ describe('resendConfirmationAction', () => {
         outcome: ACTION_OUTCOME.SUCCESS,
       });
       expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({ to: 'val@icloud.com' }),
+        expect.objectContaining({ to: SESSION_EMAIL }),
       );
     });
 
@@ -403,12 +409,11 @@ describe('resendConfirmationAction', () => {
       });
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: 'val@icloud.com',
-          subject: 'Confirm your newsletter subscription',
+          to: SESSION_EMAIL,
+          subject: DEFAULT_CONFIRMATION_SUBJECT,
           headers: {
-            'List-Unsubscribe':
-              '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
-            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            'List-Unsubscribe': UNSUBSCRIBE_HEADER,
+            'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
           },
         }),
       );

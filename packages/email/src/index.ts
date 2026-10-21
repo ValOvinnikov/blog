@@ -39,6 +39,7 @@ export {
   buildInviteMagicLinkEmail,
   type TMagicLinkInviteEmailInput,
   buildNewsletterConfirmationEmail,
+  LIST_UNSUBSCRIBE_ONE_CLICK,
   type TNewsletterConfirmationEmailInput,
   type TNewsletterConfirmationEmailContent,
   buildContactNotificationEmail,

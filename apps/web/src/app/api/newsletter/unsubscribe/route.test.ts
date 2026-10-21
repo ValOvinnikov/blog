@@ -4,6 +4,7 @@ import {
   LOCALE_ISO_CODES,
   routes,
   type THttpMethod,
+  SUBSCRIBER_OUTCOME,
 } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import type * as DbConstants from '@blog/db/constants';
@@ -125,7 +126,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
       HTTP_METHOD.POST,
     );
     unsubscribeByTokenMock.mockResolvedValue({
-      outcome: 'unsubscribed',
+      outcome: SUBSCRIBER_OUTCOME.UNSUBSCRIBED,
       subscriber: makeSubscriber(),
     });
     resolveRequestTenantMock.mockResolvedValue({
@@ -194,7 +195,9 @@ describe('POST /api/newsletter/unsubscribe', () => {
   });
 
   it('sends an unknown or already-used token to the invalid page', async () => {
-    unsubscribeByTokenMock.mockResolvedValue({ outcome: 'not-found' });
+    unsubscribeByTokenMock.mockResolvedValue({
+      outcome: SUBSCRIBER_OUTCOME.NOT_FOUND,
+    });
     const response = await POST(request);
 
     expect(locationOf(response)).toBe(INVALID_LOCATION);

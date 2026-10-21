@@ -1,4 +1,4 @@
-import type { TOutcome } from '@blog/config';
+import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
@@ -13,7 +13,8 @@ import { and, eq } from 'drizzle-orm';
 // The tokens are rotated: a stored hash can't be emailed again, so links in
 // any earlier confirmation email stop working.
 export type TResendConfirmationResult =
-  ({ outcome: 'pending' } & ISubscriberTokens) | TOutcome<'not-pending'>;
+  | (TOutcome<typeof SUBSCRIBER_OUTCOME.PENDING> & ISubscriberTokens)
+  | TOutcome<typeof SUBSCRIBER_OUTCOME.NOT_PENDING>;
 
 export async function resendConfirmation(
   tenantId: string,
@@ -43,8 +44,8 @@ export async function resendConfirmation(
     : [];
 
   if (!rotated) {
-    return toOutcome('not-pending');
+    return toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING);
   }
 
-  return { outcome: 'pending', ...tokens };
+  return { ...toOutcome(SUBSCRIBER_OUTCOME.PENDING), ...tokens };
 }

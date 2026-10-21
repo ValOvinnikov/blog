@@ -1,7 +1,12 @@
+import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  TEST_SUBSCRIBER_EMAIL,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mintSubscriberTokens } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
 import { unsubscribeByToken } from './unsubscribe-by-token';
@@ -24,7 +29,7 @@ async function insertSubscriber(
   const { tokens, hashes } = mintSubscriberTokens();
   const [inserted] = await db()
     .insert(schema.subscribers)
-    .values({ tenantId, email: 'reader@example.com', ...hashes, ...overrides })
+    .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, ...hashes, ...overrides })
     .returning();
 
   if (!inserted) throw new Error('failed to seed a subscriber row');
@@ -44,7 +49,10 @@ describe(unsubscribeByToken, () => {
 
     const result = await unsubscribeByToken(tenantId, unsubscribeToken);
 
-    expect(result).toEqual({ outcome: 'unsubscribed', subscriber });
+    expect(result).toEqual({
+      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+      subscriber,
+    });
 
     const rows = await db()
       .select()
@@ -56,7 +64,7 @@ describe(unsubscribeByToken, () => {
   it('returns not-found for an unrecognized token', async () => {
     const result = await unsubscribeByToken(tenantId, 'does-not-exist');
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 
   it('treats the stored hash like an unknown token', async () => {
@@ -78,8 +86,11 @@ describe(unsubscribeByToken, () => {
     const first = await unsubscribeByToken(tenantId, unsubscribeToken);
     const second = await unsubscribeByToken(tenantId, unsubscribeToken);
 
-    expect(first).toEqual({ outcome: 'unsubscribed', subscriber });
-    expect(second).toEqual({ outcome: 'not-found' });
+    expect(first).toEqual({
+      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+      subscriber,
+    });
+    expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 
   it("returns not-found for another tenant's token", async () => {
@@ -90,7 +101,7 @@ describe(unsubscribeByToken, () => {
 
     const result = await unsubscribeByToken(tenantTwoId, unsubscribeToken);
 
-    expect(result).toEqual({ outcome: 'not-found' });
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
 
     const rows = await db()
       .select()

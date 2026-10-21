@@ -1,21 +1,28 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
+import {
+  SUBSCRIBER_OUTCOME,
+  ERROR_CODE,
+  type TErrorCode,
+} from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import type { TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
-export type TCreatePendingSubscriberResult =
-  | { outcome: 'created'; subscriber: TSubscriber }
-  | { outcome: 'already-pending'; subscriber: TSubscriber }
-  | { outcome: 'already-active'; subscriber: TSubscriber };
+export interface ICreatePendingSubscriberResult {
+  outcome:
+    | typeof SUBSCRIBER_OUTCOME.CREATED
+    | typeof SUBSCRIBER_OUTCOME.ALREADY_PENDING
+    | typeof SUBSCRIBER_OUTCOME.ALREADY_ACTIVE;
+  subscriber: TSubscriber;
+}
 
 // Inserts first and reads only on conflict, so two concurrent signups for one
 // new email resolve through the unique constraint instead of one throwing.
 export async function createPendingSubscriber(
   tenantId: string,
   email: string,
-): Promise<TResult<TCreatePendingSubscriberResult, TErrorCode>> {
+): Promise<TResult<ICreatePendingSubscriberResult, TErrorCode>> {
   const db = getDb();
   const normalizedEmail = normalizeEmail(email);
 
@@ -26,7 +33,13 @@ export async function createPendingSubscriber(
     .returning();
 
   if (inserted) {
-    return { ok: true, data: { outcome: 'created', subscriber: inserted } };
+    return {
+      ok: true,
+      data: {
+        outcome: SUBSCRIBER_OUTCOME.CREATED,
+        subscriber: inserted,
+      },
+    };
   }
 
   const [existing] = await db
@@ -46,12 +59,18 @@ export async function createPendingSubscriber(
   if (existing.status === 'active') {
     return {
       ok: true,
-      data: { outcome: 'already-active', subscriber: existing },
+      data: {
+        outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
+        subscriber: existing,
+      },
     };
   }
 
   return {
     ok: true,
-    data: { outcome: 'already-pending', subscriber: existing },
+    data: {
+      outcome: SUBSCRIBER_OUTCOME.ALREADY_PENDING,
+      subscriber: existing,
+    },
   };
 }
