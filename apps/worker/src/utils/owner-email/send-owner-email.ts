@@ -9,6 +9,8 @@ import { sendEmail } from '@blog/email';
 import { sanitizeLogMessage } from '@blog/insight';
 import {
   DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
+  OWNER_EMAIL_RELEASE_FAILED_EVENT,
+  OWNER_EMAIL_SEND_FAILED_EVENT,
   OWNER_INVITE_NUDGE_AFTER_MS,
 } from '@worker/constants/owner-email';
 import { env } from '@worker/utils/env/env';
@@ -32,7 +34,7 @@ export async function sendOwnerEmailOnce(
       ...buildOwnerEmailMessage(target, email),
     });
   } catch (error) {
-    logger.error('owner_email.send_failed', {
+    logger.error(OWNER_EMAIL_SEND_FAILED_EVENT, {
       tenantId: tenant.id,
       email,
       error: sanitizeLogMessage(error),
@@ -49,7 +51,7 @@ async function releaseClaim(
   try {
     await releaseTenantOwnerEmail(tenantId, email, claimedAt);
   } catch (error) {
-    logger.error('owner_email.release_failed', {
+    logger.error(OWNER_EMAIL_RELEASE_FAILED_EVENT, {
       tenantId,
       email,
       error: sanitizeLogMessage(error),

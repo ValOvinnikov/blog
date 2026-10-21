@@ -5,7 +5,11 @@ import {
   releaseTenantOwnerEmail,
 } from '@blog/db/queries/tenants';
 import { sendEmail } from '@blog/email';
-import { DEFAULT_OWNER_EMAIL_FROM_ADDRESS } from '@worker/constants/owner-email';
+import {
+  DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
+  OWNER_EMAIL_RELEASE_FAILED_EVENT,
+  OWNER_EMAIL_SEND_FAILED_EVENT,
+} from '@worker/constants/owner-email';
 import {
   OWNER_EMAIL,
   SANITY_PROJECT_ID,
@@ -20,7 +24,6 @@ import { sendOwnerEmailOnce, sendPendingOwnerEmails } from './send-owner-email';
 
 const CLAIMED_AT = new Date('2026-10-21T09:00:00.000Z');
 const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60_000);
-const SEND_FAILED_EVENT = 'owner_email.send_failed';
 const AN_HOUR_AGO = new Date(Date.now() - 60 * 60_000);
 
 vi.mock('@worker/utils/logger/logger');
@@ -117,7 +120,7 @@ describe(sendOwnerEmailOnce, () => {
         sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.INVITE_HEADS_UP),
       ).resolves.toBeUndefined();
       expect(logger.error).toHaveBeenCalledWith(
-        SEND_FAILED_EVENT,
+        OWNER_EMAIL_SEND_FAILED_EVENT,
         expect.objectContaining({
           tenantId: TEST_TENANT_ID,
           email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
@@ -139,20 +142,24 @@ describe(sendOwnerEmailOnce, () => {
     });
 
     it('logs a release that fails without throwing', async () => {
-      vi.mocked(releaseTenantOwnerEmail).mockRejectedValue(new Error('503'));
+      vi.mocked(releaseTenantOwnerEmail).mockRejectedValue(
+        new Error('release refused'),
+      );
 
       await expect(
         sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.INVITE_HEADS_UP),
       ).resolves.toBeUndefined();
       expect(logger.error).toHaveBeenCalledWith(
-        'owner_email.release_failed',
+        OWNER_EMAIL_RELEASE_FAILED_EVENT,
         expect.objectContaining({ tenantId: TEST_TENANT_ID }),
       );
     });
   });
 
   it('logs a claim that fails without sending or releasing', async () => {
-    vi.mocked(claimTenantOwnerEmail).mockRejectedValue(new Error('503'));
+    vi.mocked(claimTenantOwnerEmail).mockRejectedValue(
+      new Error('claim refused'),
+    );
 
     await expect(
       sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.SITE_READY),
@@ -160,7 +167,7 @@ describe(sendOwnerEmailOnce, () => {
     expect(sendEmail).not.toHaveBeenCalled();
     expect(releaseTenantOwnerEmail).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
-      SEND_FAILED_EVENT,
+      OWNER_EMAIL_SEND_FAILED_EVENT,
       expect.objectContaining({ tenantId: TEST_TENANT_ID }),
     );
   });

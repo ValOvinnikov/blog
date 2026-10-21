@@ -12,8 +12,6 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const MISSING_TENANT_ID = '00000000-0000-0000-0000-000000000000';
-
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
@@ -76,7 +74,7 @@ describe(claimTenantOwnerEmail, () => {
 
   it('claims nothing for a tenant id that does not exist', async () => {
     await expect(
-      claimTenantOwnerEmail(MISSING_TENANT_ID, TENANT_OWNER_EMAIL.SITE_READY),
+      claimTenantOwnerEmail(crypto.randomUUID(), TENANT_OWNER_EMAIL.SITE_READY),
     ).resolves.toBeNull();
   });
 });

@@ -1,6 +1,6 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 
-export type TOwnerEmailCopyInput = {
+type TOwnerEmailCopyInput = {
   siteName: string;
   siteUrl: string;
   ownerEmail: string;
