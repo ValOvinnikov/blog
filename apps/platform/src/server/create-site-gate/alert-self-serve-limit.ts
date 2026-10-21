@@ -21,18 +21,13 @@ export const alertSelfServeLimit = async (
       dailyLimit,
     });
     const from = resolveOperatorAlertFromAddress();
-    const results = await Promise.allSettled(
-      recipients.map((to) => sendEmail({ to, from, subject, html })),
+    await Promise.all(
+      recipients.map((to) =>
+        sendEmail({ to, from, subject, html }).catch((error: unknown) => {
+          logger.error('create_site_gate.alert_send_failed', { day, error });
+        }),
+      ),
     );
-
-    results.forEach((result) => {
-      if (result.status === 'rejected') {
-        logger.error('create_site_gate.alert_send_failed', {
-          day,
-          error: result.reason,
-        });
-      }
-    });
   } catch (error) {
     logger.error('create_site_gate.alert_failed', { day, error });
   }

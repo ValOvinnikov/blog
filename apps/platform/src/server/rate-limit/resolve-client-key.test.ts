@@ -1,6 +1,6 @@
-import { resolveClientKey } from './resolve-client-key';
+import { resolveClientKey, UNKNOWN_CLIENT_KEY } from './resolve-client-key';
 
-const CLIENT_IP = '203.0.113.5';
+const CLIENT_IP = '203.0.113.9';
 
 describe('resolveClientKey', () => {
   it('uses the first x-forwarded-for address', () => {
@@ -18,6 +18,6 @@ describe('resolveClientKey', () => {
   });
 
   it('returns unknown when neither header is present', () => {
-    expect(resolveClientKey(new Headers())).toBe('unknown');
+    expect(resolveClientKey(new Headers())).toBe(UNKNOWN_CLIENT_KEY);
   });
 });

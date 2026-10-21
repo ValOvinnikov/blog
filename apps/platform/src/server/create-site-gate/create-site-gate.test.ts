@@ -26,7 +26,7 @@ const takeSlots = async (
   return results;
 };
 
-const sameClient = () => '203.0.113.5';
+const sameClient = () => '233.252.0.1';
 const distinctClient = (index: number) => `198.51.100.${index}`;
 
 describe('takeCreateSiteSlot', () => {

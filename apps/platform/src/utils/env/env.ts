@@ -59,7 +59,7 @@ export const env = createEnv({
     // @env-optional
     KV_REST_API_TOKEN: z.string().min(1).optional(),
     // @env-optional
-    VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
+    VERCEL_ENV: z.string().min(1).optional(),
     // @env-optional
     LOKI_PUSH_URL: z.string().min(1).optional(),
     // @env-optional

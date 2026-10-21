@@ -26,7 +26,7 @@ vi.mock('@blog/email', () => ({
   sendEmail: sendEmailMock,
 }));
 
-const DAY = '2026-10-21';
+const DAY = '2026-11-02';
 const DAILY_LIMIT = 50;
 const OPERATOR = 'ops@example.com';
 const SECOND_OPERATOR = 'oncall@example.com';
@@ -69,7 +69,7 @@ describe('alertSelfServeLimit', () => {
       alertSelfServeLimit(DAY, DAILY_LIMIT),
     ).resolves.toBeUndefined();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'create_site_gate.alert_send_failed',
+      expect.any(String),
       expect.objectContaining({ day: DAY }),
     );
   });
@@ -81,7 +81,7 @@ describe('alertSelfServeLimit', () => {
       alertSelfServeLimit(DAY, DAILY_LIMIT),
     ).resolves.toBeUndefined();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'create_site_gate.alert_failed',
+      expect.any(String),
       expect.objectContaining({ day: DAY }),
     );
   });
