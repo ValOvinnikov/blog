@@ -816,6 +816,14 @@
         "file": "packages/config/src/constants/error.ts"
       }
     ],
+    "DB_INVALID_EMAIL": [
+      {
+        "ref": "ERROR_CODE.DB_INVALID_EMAIL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
     "DB_LOCALE_LIMIT_EXCEEDED": [
       {
         "ref": "ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED",
@@ -2658,6 +2666,22 @@
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
+    "ADDRESS": [
+      {
+        "ref": "BLOCKED_IDENTITY_KIND.ADDRESS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/blocked-signup-identity.ts"
+      }
+    ],
+    "DOMAIN": [
+      {
+        "ref": "BLOCKED_IDENTITY_KIND.DOMAIN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/blocked-signup-identity.ts"
+      }
+    ],
     "OWNER": [
       {
         "ref": "MEMBERSHIP_ROLE.OWNER",
@@ -2798,6 +2822,54 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "SUSPENSION_WARNING": [
+      {
+        "ref": "INACTIVITY_STAGE.SUSPENSION_WARNING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "SUSPENSION": [
+      {
+        "ref": "INACTIVITY_STAGE.SUSPENSION",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "DELETION_NOTICE": [
+      {
+        "ref": "INACTIVITY_STAGE.DELETION_NOTICE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "DEPROVISIONING": [
+      {
+        "ref": "INACTIVITY_STAGE.DEPROVISIONING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "INACTIVITY": [
+      {
+        "ref": "SUSPENSION_REASON.INACTIVITY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "OPERATOR": [
+      {
+        "ref": "SUSPENSION_REASON.OPERATOR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
       }
     ],
     "VIEWER": [

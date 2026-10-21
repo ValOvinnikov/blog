@@ -323,6 +323,20 @@
       "when": 1792573622337,
       "tag": "0045_add_tenants_owner_email_sent_at",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1792596985693,
+      "tag": "0046_add_blocked_signup_identities",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792601607104,
+      "tag": "0047_add_tenants_inactivity_lifecycle",
+      "breakpoints": true
     }
   ]
 }
