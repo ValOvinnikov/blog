@@ -17,7 +17,6 @@ code:
   - apps/platform/src/utils/requested-path/**
   - apps/platform/src/server/create-site-gate/**
   - apps/platform/src/server/rate-limit/**
-  - apps/platform/src/utils/owner-identity-email/**
 epics: [4840, 4960, 4979, 4982, 4958, 4949]
 ---
 
@@ -88,9 +87,9 @@ Decided:
   Redis. The first refusal past the total cap emails every super admin once
   that day. Create site (#4960) calls it before enqueuing anything and refuses
   with a neutral "try again later" message.
-- Today: `toOwnerIdentityEmail` lower-cases an address and drops any `+tag`,
-  so `name+1@…` and `name+2@…` count as one person for the one-site-per-user
-  rule, which #4960's lookup applies.
+- Today: `@blog/db`'s `normalizeSignupEmail` lower-cases an address and drops
+  any `+tag`, so `name+1@…` and `name+2@…` resolve to one person. #4960's
+  one-site-per-user lookup compares addresses in that form.
 
 ## Constraints and invariants
 
@@ -140,8 +139,8 @@ Decided:
   `sign-out-action.test.ts`, `sign-in-error/page.test.tsx`, and the view
   tests beside
   `workspace-pending-view` and `sign-out-button`.
-- `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts`,
-  `owner-identity-email.test.ts` and the `server/rate-limit/` store tests.
+- `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
+  `server/rate-limit/` store tests.
 - No Storybook in `apps/platform`.
 
 ## Related
