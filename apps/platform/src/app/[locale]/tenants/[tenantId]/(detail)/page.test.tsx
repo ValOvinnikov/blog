@@ -1,4 +1,5 @@
 import { AUDIT_TARGET_TYPE } from '@blog/config';
+import { FINDING_STATUS } from '@blog/config/constants';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -98,38 +99,67 @@ describe(TenantOverviewPage, () => {
     );
   });
 
-  it('renders the overview for the resolved tenant', async () => {
-    await setup();
-
-    expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
-    expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
-      tenant.id,
-    );
-    expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-      'acme.example.com',
-    );
-    expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
-      AUDIT_TARGET_TYPE.TENANT,
-      tenant.id,
-      { limit: 5 },
-    );
-    expect(listFindingsForTenantMock).toHaveBeenCalledWith(tenant.id, 'OPEN');
-
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Acme Inc.',
+  describe('with the default tenant', () => {
+    beforeEach(async () => {
+      await setup();
     });
-    expect(heading).toBeVisible();
-  });
 
-  it('shows the owner membership join date in the Joined row', async () => {
-    await setup();
+    it('renders the overview for the resolved tenant', () => {
+      expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
+      expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
+        tenant.id,
+      );
+      expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
+        'acme.example.com',
+      );
+      expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
+        AUDIT_TARGET_TYPE.TENANT,
+        tenant.id,
+        { limit: 5 },
+      );
+      expect(listFindingsForTenantMock).toHaveBeenCalledWith(
+        tenant.id,
+        FINDING_STATUS.OPEN,
+      );
 
-    const joinedLabel = screen.getByText('Joined');
-    const joinedTime = screen.getByText('Aug 12, 2026');
-    expect(joinedLabel).toBeVisible();
-    expect(joinedTime).toBeVisible();
-    expect(joinedTime).toHaveAttribute('dateTime', '2026-08-12T00:00:00.000Z');
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Acme Inc.',
+      });
+      expect(heading).toBeVisible();
+    });
+
+    it('shows the owner membership join date in the Joined row', () => {
+      const joinedLabel = screen.getByText('Joined');
+      const joinedTime = screen.getByText('Aug 12, 2026');
+      expect(joinedLabel).toBeVisible();
+      expect(joinedTime).toBeVisible();
+      expect(joinedTime).toHaveAttribute(
+        'dateTime',
+        '2026-08-12T00:00:00.000Z',
+      );
+    });
+
+    it('always shows "Open site", pointing at the tenant\'s live domain', () => {
+      const openSiteLink = screen.getByRole('link', {
+        name: 'Open site (opens in new tab)',
+      });
+      expect(openSiteLink).toHaveAttribute('href', 'https://acme.example.com');
+    });
+
+    it('never shows an "Open Studio" action — Studio opens from the sidebar', () => {
+      const openStudioLink = screen.queryByRole('link', {
+        name: 'Open Studio →',
+      });
+      expect(openStudioLink).not.toBeInTheDocument();
+    });
+
+    it('shows the healthy empty state when the tenant has no open findings', () => {
+      const emptyState = screen.getByText(
+        "No open findings for this tenant — everything's healthy.",
+      );
+      expect(emptyState).toBeVisible();
+    });
   });
 
   it('shows the invited email without a Joined row for a pending invite', async () => {
@@ -154,28 +184,6 @@ describe(TenantOverviewPage, () => {
     expect(pendingBadge).toBeVisible();
   });
 
-  it('always shows "Open site", pointing at the tenant\'s live domain', async () => {
-    requireTenantByIdMock.mockResolvedValue({
-      tenant: makeTenant({ primaryDomain: 'acme.example.com' }),
-    });
-
-    await setup();
-
-    const openSiteLink = screen.getByRole('link', {
-      name: 'Open site (opens in new tab)',
-    });
-    expect(openSiteLink).toHaveAttribute('href', 'https://acme.example.com');
-  });
-
-  it('never shows an "Open Studio" action — Studio opens from the sidebar', async () => {
-    await setup();
-
-    const openStudioLink = screen.queryByRole('link', {
-      name: 'Open Studio →',
-    });
-    expect(openStudioLink).not.toBeInTheDocument();
-  });
-
   it("renders the tenant's open findings from listFindingsForTenant", async () => {
     listFindingsForTenantMock.mockResolvedValue([makeFinding()]);
 
@@ -183,17 +191,6 @@ describe(TenantOverviewPage, () => {
 
     const finding = screen.getByText('Provisioning step failed');
     expect(finding).toBeVisible();
-  });
-
-  it('shows the healthy empty state when the tenant has no open findings', async () => {
-    listFindingsForTenantMock.mockResolvedValue([]);
-
-    await setup();
-
-    const emptyState = screen.getByText(
-      "No open findings for this tenant — everything's healthy.",
-    );
-    expect(emptyState).toBeVisible();
   });
 
   it('renders the overview without waiting for the Vercel domain status', async () => {

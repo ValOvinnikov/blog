@@ -1,4 +1,5 @@
 import { TENANT_PLAN } from '@blog/db/constants';
+import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 
 import { renderTenantScopedPage } from './render-tenant-scoped-page';
@@ -17,7 +18,7 @@ describe('renderTenantScopedPage', () => {
   });
 
   it('hands the page content everything the resolver returned', async () => {
-    const context = { tenant: makeTenant(), membership: { role: 'OWNER' } };
+    const context = { tenant: makeTenant(), membership: makeMembership() };
     const PageContent = vi.fn().mockResolvedValue('rendered content');
 
     await renderTenantScopedPage(

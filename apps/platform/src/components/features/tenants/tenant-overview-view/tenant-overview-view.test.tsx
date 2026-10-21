@@ -143,25 +143,6 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(planBadge).toBeVisible();
   });
 
-  it("nests every card's title one level under the page's h1, with no h3", async () => {
-    await setup();
-
-    const cardTitles = [
-      'Tenant details',
-      'Domain',
-      'Owner',
-      'Content workspace',
-      'Recent activity',
-      'Open findings',
-    ].map((name) => screen.getByRole('heading', { level: 2, name }));
-    const thirdLevelHeading = screen.queryByRole('heading', { level: 3 });
-
-    for (const cardTitle of cardTitles) {
-      expect(cardTitle).toBeVisible();
-    }
-    expect(thirdLevelHeading).not.toBeInTheDocument();
-  });
-
   it('renders the provisioning banner', async () => {
     await setup({
       tenant: makeTenant({
@@ -383,13 +364,34 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(link).toHaveAttribute('target', '_blank');
   });
 
-  it('never renders an "Open Studio" action — Studio opens from the sidebar', async () => {
-    await setup();
-
-    const openStudioLink = screen.queryByRole('link', {
-      name: 'Open Studio →',
+  describe('with the default tenant', () => {
+    beforeEach(async () => {
+      await setup();
     });
-    expect(openStudioLink).not.toBeInTheDocument();
+
+    it("nests every card's title one level under the page's h1, with no h3", () => {
+      const cardTitles = [
+        'Tenant details',
+        'Domain',
+        'Owner',
+        'Content workspace',
+        'Recent activity',
+        'Open findings',
+      ].map((name) => screen.getByRole('heading', { level: 2, name }));
+      const thirdLevelHeading = screen.queryByRole('heading', { level: 3 });
+
+      for (const cardTitle of cardTitles) {
+        expect(cardTitle).toBeVisible();
+      }
+      expect(thirdLevelHeading).not.toBeInTheDocument();
+    });
+
+    it('never renders an "Open Studio" action — Studio opens from the sidebar', () => {
+      const openStudioLink = screen.queryByRole('link', {
+        name: 'Open Studio →',
+      });
+      expect(openStudioLink).not.toBeInTheDocument();
+    });
   });
 
   describe('archived tenant', () => {

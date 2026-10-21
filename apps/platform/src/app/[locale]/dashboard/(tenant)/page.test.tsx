@@ -2,6 +2,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   makeReadyTenant,
@@ -50,12 +51,7 @@ vi.mock('next/headers', () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
-const membership = {
-  id: 'm-1',
-  userId: 'user-1',
-  tenantId: 'tenant-1',
-  role: 'OWNER',
-};
+const membership = makeMembership();
 
 const setup = customRenderAsync(DashboardOverviewPage, {});
 

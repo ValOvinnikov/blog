@@ -1,3 +1,6 @@
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -21,6 +24,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
+const { tenantId, userId } = makeMembership();
+
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe(requireTenantOwnerOrAdmin, () => {
@@ -28,15 +33,15 @@ describe(requireTenantOwnerOrAdmin, () => {
     authMock.mockReset();
     getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    authMock.mockResolvedValue({ user: { id: userId } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    getMembershipMock.mockResolvedValue({ role: 'OWNER' });
+    getMembershipMock.mockResolvedValue(makeMembership());
   });
 
   it('redirects to sign-in without a session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(requireTenantOwnerOrAdmin('tenant-1')).rejects.toThrow(
+    await expect(requireTenantOwnerOrAdmin(tenantId)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
 
@@ -46,50 +51,50 @@ describe(requireTenantOwnerOrAdmin, () => {
   it('404s for a signed-in user with no membership in the tenant', async () => {
     getMembershipMock.mockResolvedValue(undefined);
 
-    await expect(requireTenantOwnerOrAdmin('tenant-1')).rejects.toThrow(
+    await expect(requireTenantOwnerOrAdmin(tenantId)).rejects.toThrow(
       'NEXT_NOT_FOUND',
     );
   });
 
   it('404s for an EDITOR of the tenant', async () => {
-    getMembershipMock.mockResolvedValue({ role: 'EDITOR' });
+    getMembershipMock.mockResolvedValue(
+      makeMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+    );
 
-    await expect(requireTenantOwnerOrAdmin('tenant-1')).rejects.toThrow(
+    await expect(requireTenantOwnerOrAdmin(tenantId)).rejects.toThrow(
       'NEXT_NOT_FOUND',
     );
   });
 
   it("admits the tenant's OWNER", async () => {
-    await expect(requireTenantOwnerOrAdmin('tenant-1')).resolves.toBe(
-      undefined,
-    );
+    await expect(requireTenantOwnerOrAdmin(tenantId)).resolves.toBe(undefined);
 
-    expect(getMembershipMock).toHaveBeenCalledWith('user-1', 'tenant-1');
+    expect(getMembershipMock).toHaveBeenCalledWith(userId, tenantId);
   });
 
   it('admits any admin by default, without a membership', async () => {
-    getAdminByUserIdMock.mockResolvedValue({ role: 'MODERATOR' });
+    getAdminByUserIdMock.mockResolvedValue(
+      makeAdmin({ role: ADMIN_ROLE.MODERATOR }),
+    );
     getMembershipMock.mockResolvedValue(undefined);
 
-    await expect(requireTenantOwnerOrAdmin('tenant-1')).resolves.toBe(
-      undefined,
-    );
+    await expect(requireTenantOwnerOrAdmin(tenantId)).resolves.toBe(undefined);
   });
 
   it('404s for an admin the predicate refuses who does not own the tenant', async () => {
-    getAdminByUserIdMock.mockResolvedValue({ role: 'ADMIN' });
+    getAdminByUserIdMock.mockResolvedValue(makeAdmin());
     getMembershipMock.mockResolvedValue(undefined);
 
     await expect(
-      requireTenantOwnerOrAdmin('tenant-1', isSuperAdmin),
+      requireTenantOwnerOrAdmin(tenantId, isSuperAdmin),
     ).rejects.toThrow('NEXT_NOT_FOUND');
   });
 
   it('admits an admin the predicate refuses who owns the tenant', async () => {
-    getAdminByUserIdMock.mockResolvedValue({ role: 'ADMIN' });
+    getAdminByUserIdMock.mockResolvedValue(makeAdmin());
 
     await expect(
-      requireTenantOwnerOrAdmin('tenant-1', isSuperAdmin),
+      requireTenantOwnerOrAdmin(tenantId, isSuperAdmin),
     ).resolves.toBe(undefined);
   });
 });

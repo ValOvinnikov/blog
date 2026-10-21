@@ -1,8 +1,10 @@
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
+import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import messages from '@platform/i18n/messages/en.json';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { createTranslator } from 'next-intl';
 
 import {
@@ -25,8 +27,8 @@ describe('operatorNavSections', () => {
       (item) => item.label === 'Add tenant',
     );
 
-    expect(tenants).toMatchObject({ href: '/tenants' });
-    expect(addTenant).toMatchObject({ href: '/tenants/new' });
+    expect(tenants).toMatchObject({ href: adminRoutes.tenants() });
+    expect(addTenant).toMatchObject({ href: adminRoutes.newTenant() });
     expect(addTenant?.badge).toBeUndefined();
   });
 
@@ -90,7 +92,7 @@ describe('tenantNavSections', () => {
     expect(tenant!.items.map((item) => item.label)).toEqual(['Overview']);
     expect(tenant!.items[0]).toMatchObject({
       label: 'Overview',
-      href: '/tenants/tenant-1',
+      href: adminRoutes.tenantOverview('tenant-1'),
     });
   });
 
@@ -99,7 +101,7 @@ describe('tenantNavSections', () => {
 
     expect(content!.items.map((item) => item.label)).toEqual(['Studio']);
     expect(content!.items[0]).toMatchObject({
-      href: '/tenants/tenant-1/studio',
+      href: adminRoutes.tenantStudio('tenant-1'),
     });
     expect(content!.items[0]?.badge).toBeUndefined();
   });
@@ -114,14 +116,14 @@ describe('tenantNavSections', () => {
     const domain = configuration!.items.find((item) => item.label === 'Domain');
     const email = configuration!.items.find((item) => item.label === 'Email');
 
-    expect(look?.href).toBe('/tenants/tenant-1/look');
-    expect(voice?.href).toBe('/tenants/tenant-1/voice');
-    expect(features?.href).toBe('/tenants/tenant-1/features');
+    expect(look?.href).toBe(adminRoutes.look('tenant-1'));
+    expect(voice?.href).toBe(adminRoutes.voice('tenant-1'));
+    expect(features?.href).toBe(adminRoutes.features('tenant-1'));
     expect(
       configuration!.items.find((item) => item.label === 'Leads')?.href,
-    ).toBe('/tenants/tenant-1/leads');
-    expect(domain?.href).toBe('/tenants/tenant-1/domain');
-    expect(email?.href).toBe('/tenants/tenant-1/email');
+    ).toBe(adminRoutes.leads('tenant-1'));
+    expect(domain?.href).toBe(adminRoutes.tenantDomain('tenant-1'));
+    expect(email?.href).toBe(adminRoutes.email('tenant-1'));
     expect(look?.href).not.toBe(voice?.href);
   });
 
@@ -196,11 +198,11 @@ describe('tenantNavSections', () => {
       'Danger zone',
     ]);
     expect(platform!.items[0]).toMatchObject({
-      href: '/tenants/tenant-1/provisioning',
+      href: adminRoutes.tenantProvisioning('tenant-1'),
       badge: { label: 'platform', tone: 'neutral', hasDot: false },
     });
     expect(platform!.items[1]).toMatchObject({
-      href: '/tenants/tenant-1/danger',
+      href: adminRoutes.tenantDanger('tenant-1'),
       badge: { label: 'platform', tone: 'neutral', hasDot: false },
     });
   });
@@ -231,7 +233,11 @@ const configurationLabels = (access: TPlanPageAccess) => {
 
 describe('dashboardNavSections', () => {
   it("badges the Studio link with the owner's access state", () => {
-    const [, content] = dashboardNavSections(t, EVERY_PAGE, 'STALLED');
+    const [, content] = dashboardNavSections(
+      t,
+      EVERY_PAGE,
+      OWNER_STUDIO_ACCESS.STALLED,
+    );
 
     expect(content!.items[0]?.badge?.label).toBe('Action needed');
   });
@@ -241,7 +247,10 @@ describe('dashboardNavSections', () => {
 
     expect(yourSite!.label).toBe('Your site');
     expect(yourSite!.items).toEqual([
-      expect.objectContaining({ label: 'Overview', href: '/dashboard' }),
+      expect.objectContaining({
+        label: 'Overview',
+        href: adminRoutes.dashboard(),
+      }),
     ]);
   });
 
@@ -309,14 +318,16 @@ describe('dashboardNavSections', () => {
     const hrefOf = (label: string) =>
       configuration!.items.find((item) => item.label === label)?.href;
 
-    expect(hrefOf('Look')).toBe('/dashboard/look');
-    expect(hrefOf('Voice')).toBe('/dashboard/voice');
-    expect(hrefOf('Features')).toBe('/dashboard/features');
-    expect(hrefOf('Leads')).toBe('/dashboard/leads');
-    expect(hrefOf('Languages')).toBe('/dashboard/languages');
-    expect(hrefOf('Domain')).toBe('/dashboard/domain');
-    expect(hrefOf('Email')).toBe('/dashboard/email');
-    expect(content!.items[0]).toMatchObject({ href: '/dashboard/studio' });
+    expect(hrefOf('Look')).toBe(adminRoutes.dashboardLook());
+    expect(hrefOf('Voice')).toBe(adminRoutes.dashboardVoice());
+    expect(hrefOf('Features')).toBe(adminRoutes.dashboardFeatures());
+    expect(hrefOf('Leads')).toBe(adminRoutes.dashboardLeads());
+    expect(hrefOf('Languages')).toBe(adminRoutes.dashboardLanguages());
+    expect(hrefOf('Domain')).toBe(adminRoutes.dashboardDomain());
+    expect(hrefOf('Email')).toBe(adminRoutes.dashboardEmail());
+    expect(content!.items[0]).toMatchObject({
+      href: adminRoutes.dashboardStudio(),
+    });
     expect(content!.items[0]?.badge).toBeUndefined();
   });
 

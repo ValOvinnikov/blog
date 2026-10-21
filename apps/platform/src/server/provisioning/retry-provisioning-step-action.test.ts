@@ -1,5 +1,8 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
+import type { TAdmin } from '@blog/db/schema/admins';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { notFound, redirect } from 'next/navigation';
 
 const {
@@ -75,11 +78,13 @@ describe('retryProvisioningStepAction', () => {
     await retryProvisioningStepAction('tenant-1');
 
     const [tenantId, isAdminPermitted] = requireTenantOwnerOrAdminMock.mock
-      .calls[0] as [string, (admin: { role: string }) => boolean];
+      .calls[0] as [string, (admin: TAdmin) => boolean];
 
     expect(tenantId).toBe('tenant-1');
-    expect(isAdminPermitted({ role: 'SUPERADMIN' })).toBe(true);
-    expect(isAdminPermitted({ role: 'ADMIN' })).toBe(false);
+    expect(isAdminPermitted(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }))).toBe(
+      true,
+    );
+    expect(isAdminPermitted(makeAdmin())).toBe(false);
   });
 
   it.each([

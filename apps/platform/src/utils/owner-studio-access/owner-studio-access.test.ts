@@ -1,6 +1,15 @@
-import type { TMembership } from '@blog/db/schema/memberships';
+import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  MEMBERSHIP_ROLE,
+  SANITY_PROJECT_ROLE,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { makeMembership } from '@platform/testing/memberships/fixtures';
 import {
   idleProvisioningSteps,
   makeReadyTenant,
@@ -8,55 +17,64 @@ import {
 
 import { ownerStudioAccessFor } from './owner-studio-access';
 
-const owner: TMembership = {
-  id: '6a1b2c3d-0000-4000-8000-000000000001',
-  userId: 'user-1',
-  tenantId: 'tenant-1',
-  role: 'OWNER',
-  createdAt: new Date('2026-10-01T00:00:00.000Z'),
-};
+const owner = makeMembership();
+const invitedAt = new Date('2026-10-18T09:00:00.000Z');
+const acceptedAt = new Date('2026-10-18T10:00:00.000Z');
+const sanityUserId = 'sanity-user-1';
 
 const invitedTenant = (overrides: Partial<TTenant> = {}) =>
   makeReadyTenant({
-    ownerInviteSentAt: new Date('2026-10-18T09:00:00.000Z'),
+    ownerInviteSentAt: invitedAt,
     ...overrides,
   });
 
 const stalledSteps = {
   ...idleProvisioningSteps(),
-  OWNER_ELEVATION: { status: 'DONE', detail: 'STALLED' },
-} as const;
+  [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    detail: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+  },
+};
 
 const joined = {
-  ownerInviteAcceptedAt: new Date('2026-10-18T10:00:00.000Z'),
-  ownerSanityUserId: 'sanity-user-1',
+  ownerInviteAcceptedAt: acceptedAt,
+  ownerSanityUserId: sanityUserId,
 };
 
 describe(ownerStudioAccessFor, () => {
   it('is INVITE_SENT while the invite waits for the owner', () => {
-    expect(ownerStudioAccessFor(invitedTenant(), owner)).toBe('INVITE_SENT');
+    expect(ownerStudioAccessFor(invitedTenant(), owner)).toBe(
+      OWNER_STUDIO_ACCESS.INVITE_SENT,
+    );
   });
 
   it('is STALLED once the owner check reports a stall', () => {
     const tenant = invitedTenant({ provisioningSteps: stalledSteps });
 
-    expect(ownerStudioAccessFor(tenant, owner)).toBe('STALLED');
+    expect(ownerStudioAccessFor(tenant, owner)).toBe(
+      OWNER_STUDIO_ACCESS.STALLED,
+    );
   });
 
   it('is ACTIVATING once the owner has joined but is not yet an administrator', () => {
-    const tenant = invitedTenant({ ...joined, ownerSanityRole: 'VIEWER' });
+    const tenant = invitedTenant({
+      ...joined,
+      ownerSanityRole: SANITY_PROJECT_ROLE.VIEWER,
+    });
 
-    expect(ownerStudioAccessFor(tenant, owner)).toBe('ACTIVATING');
+    expect(ownerStudioAccessFor(tenant, owner)).toBe(
+      OWNER_STUDIO_ACCESS.ACTIVATING,
+    );
   });
 
   it('is READY once the owner is recorded as an administrator', () => {
     const tenant = invitedTenant({
       ...joined,
-      ownerSanityRole: 'ADMINISTRATOR',
+      ownerSanityRole: SANITY_PROJECT_ROLE.ADMINISTRATOR,
       provisioningSteps: stalledSteps,
     });
 
-    expect(ownerStudioAccessFor(tenant, owner)).toBe('READY');
+    expect(ownerStudioAccessFor(tenant, owner)).toBe(OWNER_STUDIO_ACCESS.READY);
   });
 
   it('does not apply to a tenant the worker never invited an owner for', () => {
@@ -67,7 +85,10 @@ describe(ownerStudioAccessFor, () => {
 
   it('does not apply to an editor', () => {
     expect(
-      ownerStudioAccessFor(invitedTenant(), { ...owner, role: 'EDITOR' }),
+      ownerStudioAccessFor(
+        invitedTenant(),
+        makeMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      ),
     ).toBeUndefined();
   });
 
@@ -75,7 +96,7 @@ describe(ownerStudioAccessFor, () => {
     expect(
       ownerStudioAccessFor(
         invitedTenant(),
-        buildVirtualAdminMembership('admin-user', 'tenant-1'),
+        buildVirtualAdminMembership(makeAdmin().userId, owner.tenantId),
       ),
     ).toBeUndefined();
   });

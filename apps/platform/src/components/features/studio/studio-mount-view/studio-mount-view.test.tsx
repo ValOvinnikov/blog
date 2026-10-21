@@ -5,6 +5,7 @@ import {
 } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { StudioMountView } from './studio-mount-view';
 
@@ -55,7 +56,10 @@ describe(`<${StudioMountView.name}/>`, () => {
     });
 
     renderWithIntl(
-      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+      await StudioMountView({
+        tenant,
+        basePath: adminRoutes.dashboardStudio(),
+      }),
     );
 
     const studioHeading = screen.getByRole('heading', {
@@ -81,7 +85,10 @@ describe(`<${StudioMountView.name}/>`, () => {
       const tenant = makeProvisionedTenant({ [field]: null });
 
       renderWithIntl(
-        await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+        await StudioMountView({
+          tenant,
+          basePath: adminRoutes.dashboardStudio(),
+        }),
       );
 
       const studioHeading = screen.getByRole('heading', {
@@ -109,7 +116,7 @@ describe(`<${StudioMountView.name}/>`, () => {
     renderWithIntl(
       await StudioMountView({
         tenant,
-        basePath: '/tenants/tenant-2/studio',
+        basePath: adminRoutes.tenantStudio('tenant-2'),
       }),
     );
 
@@ -120,7 +127,7 @@ describe(`<${StudioMountView.name}/>`, () => {
       expect.objectContaining({
         projectId: 'proj-globex',
         dataset: 'staging',
-        basePath: '/tenants/tenant-2/studio',
+        basePath: adminRoutes.tenantStudio('tenant-2'),
         title: 'Globex Corp.',
       }),
     );
@@ -131,7 +138,10 @@ describe(`<${StudioMountView.name}/>`, () => {
     getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.COMMENTS]);
 
     renderWithIntl(
-      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+      await StudioMountView({
+        tenant,
+        basePath: adminRoutes.dashboardStudio(),
+      }),
     );
 
     expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(tenant);
@@ -148,7 +158,10 @@ describe(`<${StudioMountView.name}/>`, () => {
     ]);
 
     renderWithIntl(
-      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+      await StudioMountView({
+        tenant,
+        basePath: adminRoutes.dashboardStudio(),
+      }),
     );
 
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
@@ -164,7 +177,7 @@ describe(`<${StudioMountView.name}/>`, () => {
     renderWithIntl(
       await StudioMountView({
         tenant: makeProvisionedTenant(),
-        basePath: '/dashboard/studio',
+        basePath: adminRoutes.dashboardStudio(),
         loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
       }),
     );

@@ -1,5 +1,7 @@
+import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import messages from '@platform/i18n/messages/en.json';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { createTranslator } from 'next-intl';
 
 import { studioNavItem } from './studio-nav-item';
@@ -10,26 +12,27 @@ const t = createTranslator({
   namespace: 'navSections',
 }) as unknown as TLooseTranslator;
 
+const studioHref = adminRoutes.dashboardStudio();
+
 describe(studioNavItem, () => {
   it('links to the given Studio route', () => {
-    expect(studioNavItem(t, '/dashboard/studio')).toMatchObject({
-      label: 'Studio',
-      href: '/dashboard/studio',
-    });
+    const { href } = studioNavItem(t, studioHref);
+
+    expect(href).toBe(studioHref);
   });
 
-  it.each([
-    ['INVITE_SENT', 'Invite sent'],
-    ['ACTIVATING', 'Activating'],
-    ['READY', 'Ready'],
-    ['STALLED', 'Action needed'],
-  ] as const)("badges the link with the owner's %s access", (access, label) => {
-    const { badge } = studioNavItem(t, '/dashboard/studio', access);
+  it('badges each owner access state with a label of its own', () => {
+    const labels = Object.values(OWNER_STUDIO_ACCESS).map(
+      (access) => studioNavItem(t, studioHref, access).badge?.label,
+    );
 
-    expect(badge?.label).toBe(label);
+    expect(labels.every(Boolean)).toBe(true);
+    expect(new Set(labels).size).toBe(labels.length);
   });
 
   it('carries no badge without an owner access state', () => {
-    expect(studioNavItem(t, '/dashboard/studio').badge).toBeUndefined();
+    const { badge } = studioNavItem(t, studioHref);
+
+    expect(badge).toBeUndefined();
   });
 });

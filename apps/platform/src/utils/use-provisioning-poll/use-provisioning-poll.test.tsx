@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -62,13 +63,15 @@ describe(useProvisioningPoll, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            detail: 'STALLED',
+            detail: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
           },
         },
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
-      expect(result.current.ownerElevationOutcome).toBe('STALLED');
+      expect(result.current.ownerElevationOutcome).toBe(
+        ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      );
     });
 
     it('never influences isProvisioningRunning/isOverallFailed/displayOverallStatus, regardless of its value', () => {
@@ -110,7 +113,7 @@ describe(useProvisioningPoll, () => {
           ...allStepsDone,
           [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            detail: 'STALLED',
+            detail: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
           },
         },
       });
@@ -118,7 +121,9 @@ describe(useProvisioningPoll, () => {
         useProvisioningPoll(withStalledOwnerElevation),
       );
 
-      expect(withResult.current.ownerElevationOutcome).toBe('STALLED');
+      expect(withResult.current.ownerElevationOutcome).toBe(
+        ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      );
       expect(withResult.current.isOverallFailed).toBe(
         withoutResult.current.isOverallFailed,
       );

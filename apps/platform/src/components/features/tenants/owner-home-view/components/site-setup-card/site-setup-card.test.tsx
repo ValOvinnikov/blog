@@ -68,18 +68,6 @@ describe(`<${SiteSetupCard.name}/>`, () => {
     expect(setupStoppedText).not.toBeInTheDocument();
   });
 
-  it('lets the owner retry a failed setup', async () => {
-    setup();
-
-    const setupStoppedText = screen.getByText("Your site's setup stopped");
-
-    expect(setupStoppedText).toBeVisible();
-
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
-
-    expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
-  });
-
   it('points a viewer who cannot retry at their platform contact', () => {
     setup({ canRetry: false });
 
@@ -92,34 +80,53 @@ describe(`<${SiteSetupCard.name}/>`, () => {
     expect(tryAgainButton).not.toBeInTheDocument();
   });
 
-  it('reports a retry that could not start', async () => {
-    retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
+  describe('when the viewer can retry a failed setup', () => {
+    const clickTryAgain = () =>
+      user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    beforeEach(() => {
+      setup();
     });
-    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    it('explains that the setup stopped', () => {
+      const setupStoppedText = screen.getByText("Your site's setup stopped");
 
-    const couldNotRestartText = await screen.findByText(
-      "Couldn't restart the setup — try again.",
-    );
-
-    expect(couldNotRestartText).toBeVisible();
-  });
-
-  it('treats a run already under way as no failure', async () => {
-    retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+      expect(setupStoppedText).toBeVisible();
     });
-    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    it('restarts the setup on Try again', async () => {
+      await clickTryAgain();
 
-    const couldNotRestartText = screen.queryByText(
-      "Couldn't restart the setup — try again.",
-    );
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+    });
 
-    expect(couldNotRestartText).not.toBeInTheDocument();
+    it('reports a retry that could not start', async () => {
+      retryProvisioningStepActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+
+      await clickTryAgain();
+
+      const couldNotRestartText = await screen.findByText(
+        "Couldn't restart the setup — try again.",
+      );
+
+      expect(couldNotRestartText).toBeVisible();
+    });
+
+    it('treats a run already under way as no failure', async () => {
+      retryProvisioningStepActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+      });
+
+      await clickTryAgain();
+
+      const couldNotRestartText = screen.queryByText(
+        "Couldn't restart the setup — try again.",
+      );
+
+      expect(couldNotRestartText).not.toBeInTheDocument();
+    });
   });
 });

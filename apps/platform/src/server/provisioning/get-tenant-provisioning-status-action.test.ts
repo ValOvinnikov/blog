@@ -1,4 +1,8 @@
-export {};
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 
 const { requireTenantOwnerOrAdminMock, getTenantProvisioningStatusMock } =
   vi.hoisted(() => ({
@@ -39,8 +43,12 @@ describe('getTenantProvisioningStatusAction', () => {
 
   it('returns the fresh status and step map for the given tenant id', async () => {
     const result = {
-      provisioningStatus: 'PROVISIONING',
-      provisioningSteps: { SANITY_PROJECT: { status: 'RUNNING' } },
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      provisioningSteps: {
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      },
     };
     getTenantProvisioningStatusMock.mockResolvedValue(result);
     const { getTenantProvisioningStatusAction } =
