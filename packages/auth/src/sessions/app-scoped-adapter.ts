@@ -1,4 +1,5 @@
 import type { TAuthApp } from '@blog/config/constants';
+import { sha256Hex } from '@blog/utils/hash';
 import type {
   Adapter,
   AdapterAccount,
@@ -20,33 +21,51 @@ function withoutProviderTokens(account: AdapterAccount): AdapterAccount {
 }
 
 export function scopeAdapterToApp(adapter: Adapter, app: TAuthApp): Adapter {
-  const { createSession, getSessionAndUser, deleteSession, linkAccount } =
-    adapter;
+  const {
+    createSession,
+    getSessionAndUser,
+    updateSession,
+    deleteSession,
+    linkAccount,
+  } = adapter;
 
   return {
     ...adapter,
     createSession:
       createSession &&
-      ((session) => {
+      (async (session) => {
         // The Drizzle adapter inserts every field it is given, so `app` reaches the row.
-        const stamped = { ...session, app };
-        return createSession(stamped);
+        const created = await createSession({
+          ...session,
+          sessionToken: sha256Hex(session.sessionToken),
+          app,
+        });
+        // Auth.js sets the cookie from the returned token, so it must be the raw one.
+        return { ...created, sessionToken: session.sessionToken };
       }),
     linkAccount:
       linkAccount && ((account) => linkAccount(withoutProviderTokens(account))),
     getSessionAndUser:
       getSessionAndUser &&
       (async (sessionToken) => {
-        const found = await getSessionAndUser(sessionToken);
+        const found = await getSessionAndUser(sha256Hex(sessionToken));
         return found && isIssuedBy(found.session, app) ? found : null;
       }),
+    updateSession:
+      updateSession &&
+      ((session) =>
+        updateSession({
+          ...session,
+          sessionToken: sha256Hex(session.sessionToken),
+        })),
     deleteSession:
       deleteSession &&
       getSessionAndUser &&
       (async (sessionToken) => {
-        const found = await getSessionAndUser(sessionToken);
+        const tokenHash = sha256Hex(sessionToken);
+        const found = await getSessionAndUser(tokenHash);
         if (found && isIssuedBy(found.session, app)) {
-          await deleteSession(sessionToken);
+          await deleteSession(tokenHash);
         }
       }),
   };
