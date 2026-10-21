@@ -94,6 +94,9 @@ Decided:
   `sessions.app`, and a session stamped otherwise reads as signed out. Invite
   side effects run only here: the invite-consuming sign-in event and the
   invite email template.
+- Today the admin's sign-in and invite emails render in the platform layout
+  (the stacked logo mark and "Platform" in the top band). A site's sign-in
+  email keeps its tenant's layout, or the neutral one on an unknown host.
 
 ## Dependencies
 

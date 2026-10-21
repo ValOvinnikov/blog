@@ -194,6 +194,72 @@ describe(buildMagicLinkProvider, () => {
     });
   });
 
+  it("sends the admin's sign-in email in the platform layout", async () => {
+    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
+
+    await provider.sendVerificationRequest({
+      identifier: 'admin@example.com',
+      url: 'https://platform.example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://platform.example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: MAGIC_LINK_DEFAULTS.subject,
+        html: expect.stringContaining('>Platform</td>'),
+      }),
+    );
+  });
+
+  it("sends the admin's invite email in the platform layout", async () => {
+    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
+    findPendingInviteByEmailMock.mockResolvedValue([
+      { id: 'invite-1', tenantId: 'tenant-1' },
+    ]);
+    listTenantsByIdsMock.mockResolvedValue([
+      { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.EN },
+    ]);
+
+    await provider.sendVerificationRequest({
+      identifier: 'invited@example.com',
+      url: 'https://platform.example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://platform.example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: TENANT_INVITE_DEFAULTS.subject,
+        html: expect.stringContaining('>Platform</td>'),
+      }),
+    );
+  });
+
+  it("never sends a site's sign-in email in the platform layout", async () => {
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.not.stringContaining('Platform'),
+      }),
+    );
+  });
+
   it('still delivers, in the unnamed neutral shell, when the host resolves to no tenant', async () => {
     getTenantByDomainMock.mockResolvedValue(undefined);
 

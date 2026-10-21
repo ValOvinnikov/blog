@@ -36,10 +36,10 @@ export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
     from,
     async sendVerificationRequest({ identifier, url }) {
       const { host } = new URL(url);
-      const inviteTenants =
-        app === AUTH_APP.PLATFORM
-          ? await findPendingInviteTenantsOrNone(identifier)
-          : [];
+      const isSentByPlatform = app === AUTH_APP.PLATFORM;
+      const inviteTenants = isSentByPlatform
+        ? await findPendingInviteTenantsOrNone(identifier)
+        : [];
       const tenantNames = inviteTenants.map(({ name }) => name);
       const tenantIdentity = await resolveTenantEmailIdentity(host);
       const isInvite = tenantNames.length > 0;
@@ -64,6 +64,7 @@ export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
         ? buildInviteMagicLinkEmail({
             url,
             tenantIdentity,
+            isSentByPlatform,
             tenantNames,
             subject: resolvedSubject,
             body: resolvedBody,
@@ -73,6 +74,7 @@ export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
         : buildMagicLinkEmail({
             url,
             tenantIdentity,
+            isSentByPlatform,
             subject: resolvedSubject,
             body: resolvedBody,
             logoImageUrl: emailSettings?.logoImageUrl,

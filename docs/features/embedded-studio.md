@@ -37,7 +37,9 @@ module types whose capability is off for the tenant carry a warning.
   platform proxy skips only root-level dotted paths, so those still resolve.
 - The `studio` segment switches the shell to full-bleed: the content column is
   pinned to the viewport and the Studio fills it (`ShellFrame`).
-- The sidebar shows a Studio item under "Content" in both trees.
+- The sidebar shows a Studio item under "Content" in both trees. Under
+  `/dashboard`, the owner's item carries their access state as a badge:
+  Invite sent, Activating, Ready or Action needed (STALLED).
 - Outside the platform, `pnpm --filter @blog/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
@@ -48,6 +50,12 @@ module types whose capability is off for the tenant carry a warning.
   `deprovisionedAt` decides whether it is replaced by the archived notice.
   `locale`, `additionalLocales` and `plan` give the live locales
   (`selectLiveLocales`).
+- Neon `tenants` owner-access columns (`ownerInviteSentAt`,
+  `ownerInviteAcceptedAt`, `ownerSanityUserId`, `ownerSanityRole`,
+  `ownerLoginProvider`) and the `OWNER_ELEVATION` step's outcome give the
+  owner's access state, derived in `ownerStudioAccessFor`: READY once the
+  owner is recorded as `ADMINISTRATOR`, ACTIVATING once they have joined
+  without it, STALLED once the worker reports a stall, INVITE_SENT otherwise.
 - Neon `settings_features`: the saved capability toggles, clamped to the plan's
   entitlement (`getEnabledCapabilities`), become `enabledCapabilities`.
 - Content lives in the tenant's own Sanity project and dataset; the Studio
@@ -91,6 +99,14 @@ module types whose capability is off for the tenant carry a warning.
 - `StudioMountView` renders, in order: the archived notice for a deprovisioned
   tenant; a "Studio isn't ready yet" warning while project, dataset or read
   token is missing; otherwise the mount, titled with the tenant name.
+- **The owner's access gate** applies only when the viewer is the tenant's
+  own OWNER (a real membership, not an admin's virtual one) and the worker
+  has recorded an invite (`ownerInviteSentAt`). Before READY,
+  `/dashboard/studio` shows an explainer with Check now (and Resend, except
+  while ACTIVATING), which call the worker's owner-access routes; at READY the
+  Studio mounts with the owner's `loginProvider`. READY is read from stored
+  columns, so the gate never closes again. Every other viewer gets the Studio
+  as before: operators, editors, and tenants provisioned before the worker.
 - The route is gated by the shell: `resolveDashboardTenant` on `/dashboard`
   and `requireTenantById` (any admin role) on `/tenants/{id}`. Neither page is
   plan-gated.
@@ -127,6 +143,10 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 - `packages/studio/src/studio-mount.tsx`
 - `packages/studio/src/studio-config.ts`
 - `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.tsx`
+- `apps/platform/src/components/features/studio/dashboard-studio-view/dashboard-studio-view.tsx`
+- `apps/platform/src/components/features/studio/owner-studio-access-view/owner-studio-access-view.tsx`
+- `apps/platform/src/utils/owner-studio-access/owner-studio-access.ts`
+- `apps/platform/src/server/owner-access/{check-owner-access,resend-owner-invite}-action.ts`
 - `apps/platform/src/app/[locale]/dashboard/(tenant)/studio/[[...tool]]/page.tsx`
 - `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/studio/[[...tool]]/page.tsx`
 - `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
@@ -136,7 +156,10 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 
 - `packages/studio/src/studio-mount.test.tsx` and
   `packages/studio/src/studio-config.test.ts`.
-- `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.test.tsx`.
+- `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.test.tsx`,
+  `owner-studio-access-view/owner-studio-access-view.test.tsx`, the dashboard
+  Studio page test, `utils/owner-studio-access/owner-studio-access.test.ts`
+  and `server/owner-access/request-owner-access.test.ts`.
 - `apps/platform/src/utils/content-security-policy/content-security-policy.test.ts`.
 - Capability warnings: `packages/studio/src/schema-types/inputs/capability-warning-input/*.test.ts`.
 - Login provider: `packages/studio/src/auth/login-provider-auth.test.ts`.
@@ -146,7 +169,7 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 
 - #4840 epic: platform front door. Owner Studio access becomes a worker job,
   and the mount happens only once access is READY.
-- #4959 the sidebar Studio link carries access states; an explainer replaces
-  the mount before READY.
+- #4959 owner Studio access states in the sidebar and the explainer before
+  READY.
 - #4035 localize the Studio interface for editors.
 - #1036 draft preview with Sanity Presentation.

@@ -1,6 +1,11 @@
-import { CAPABILITY, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  CAPABILITY,
+  LOCALE_ISO_CODES,
+  SANITY_LOGIN_PROVIDER,
+} from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { StudioMountView } from './studio-mount-view';
 
@@ -51,15 +56,23 @@ describe(`<${StudioMountView.name}/>`, () => {
     });
 
     renderWithIntl(
-      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+      await StudioMountView({
+        tenant,
+        basePath: adminRoutes.dashboardStudio(),
+      }),
     );
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Studio' }),
-    ).toBeVisible();
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    const studioHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Studio',
+    });
+    const thisTenantIsText = screen.getByText('This tenant is archived');
+    const studioMount = screen.queryByTestId('studio-mount');
+
+    expect(studioHeading).toBeVisible();
+    expect(thisTenantIsText).toBeVisible();
     expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
-    expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
+    expect(studioMount).not.toBeInTheDocument();
   });
 
   it.each([
@@ -72,15 +85,23 @@ describe(`<${StudioMountView.name}/>`, () => {
       const tenant = makeProvisionedTenant({ [field]: null });
 
       renderWithIntl(
-        await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+        await StudioMountView({
+          tenant,
+          basePath: adminRoutes.dashboardStudio(),
+        }),
       );
 
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Studio' }),
-      ).toBeVisible();
-      expect(screen.getByText("Studio isn't ready yet")).toBeVisible();
+      const studioHeading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Studio',
+      });
+      const studioIsNotText = screen.getByText("Studio isn't ready yet");
+      const studioMount = screen.queryByTestId('studio-mount');
+
+      expect(studioHeading).toBeVisible();
+      expect(studioIsNotText).toBeVisible();
       expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
-      expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
+      expect(studioMount).not.toBeInTheDocument();
     },
   );
 
@@ -95,16 +116,18 @@ describe(`<${StudioMountView.name}/>`, () => {
     renderWithIntl(
       await StudioMountView({
         tenant,
-        basePath: '/tenants/tenant-2/studio',
+        basePath: adminRoutes.tenantStudio('tenant-2'),
       }),
     );
 
-    expect(screen.getByTestId('studio-mount')).toBeVisible();
+    const studioMount = screen.getByTestId('studio-mount');
+
+    expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
         projectId: 'proj-globex',
         dataset: 'staging',
-        basePath: '/tenants/tenant-2/studio',
+        basePath: adminRoutes.tenantStudio('tenant-2'),
         title: 'Globex Corp.',
       }),
     );
@@ -115,7 +138,10 @@ describe(`<${StudioMountView.name}/>`, () => {
     getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.COMMENTS]);
 
     renderWithIntl(
-      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+      await StudioMountView({
+        tenant,
+        basePath: adminRoutes.dashboardStudio(),
+      }),
     );
 
     expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(tenant);
@@ -132,7 +158,10 @@ describe(`<${StudioMountView.name}/>`, () => {
     ]);
 
     renderWithIntl(
-      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+      await StudioMountView({
+        tenant,
+        basePath: adminRoutes.dashboardStudio(),
+      }),
     );
 
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
@@ -141,6 +170,20 @@ describe(`<${StudioMountView.name}/>`, () => {
         defaultLocale: LOCALE_ISO_CODES.NL,
         liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN],
       }),
+    );
+  });
+
+  it('restricts Studio to the given login provider', async () => {
+    renderWithIntl(
+      await StudioMountView({
+        tenant: makeProvisionedTenant(),
+        basePath: adminRoutes.dashboardStudio(),
+        loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
+      }),
+    );
+
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({ loginProvider: SANITY_LOGIN_PROVIDER.GITHUB }),
     );
   });
 });

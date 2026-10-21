@@ -1,10 +1,13 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
+import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import {
   act,
   renderHookWithIntl,
@@ -20,35 +23,21 @@ import { useProvisioningPoll } from './use-provisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 1500;
 const TOAST_EXIT_BUFFER_MS = 1000;
-const MAX_POLL_TICKS = 1000;
+const MAX_POLL_TICKS = 400;
 
-const {
-  retryProvisioningStepActionMock,
-  getTenantProvisioningStatusActionMock,
-} = vi.hoisted(() => ({
-  retryProvisioningStepActionMock: vi.fn(),
-  getTenantProvisioningStatusActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
-vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
-  retryProvisioningStepAction: retryProvisioningStepActionMock,
-}));
+vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
-vi.mock(
-  '@platform/server/provisioning/get-tenant-provisioning-status-action',
-  () => ({
-    getTenantProvisioningStatusAction: getTenantProvisioningStatusActionMock,
-  }),
+const retryProvisioningStepActionMock = vi.mocked(retryProvisioningStepAction);
+const getTenantProvisioningStatusActionMock = vi.mocked(
+  getTenantProvisioningStatusAction,
 );
 
 describe(useProvisioningPoll, () => {
   beforeEach(() => {
     retryProvisioningStepActionMock.mockReset();
-    retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
     getTenantProvisioningStatusActionMock.mockReset();
-    getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
   });
 
   describe('ownerElevationOutcome', () => {
@@ -74,13 +63,15 @@ describe(useProvisioningPoll, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            detail: 'STALLED',
+            detail: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
           },
         },
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
-      expect(result.current.ownerElevationOutcome).toBe('STALLED');
+      expect(result.current.ownerElevationOutcome).toBe(
+        ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      );
     });
 
     it('never influences isProvisioningRunning/isOverallFailed/displayOverallStatus, regardless of its value', () => {
@@ -122,7 +113,7 @@ describe(useProvisioningPoll, () => {
           ...allStepsDone,
           [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            detail: 'STALLED',
+            detail: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
           },
         },
       });
@@ -130,7 +121,9 @@ describe(useProvisioningPoll, () => {
         useProvisioningPoll(withStalledOwnerElevation),
       );
 
-      expect(withResult.current.ownerElevationOutcome).toBe('STALLED');
+      expect(withResult.current.ownerElevationOutcome).toBe(
+        ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      );
       expect(withResult.current.isOverallFailed).toBe(
         withoutResult.current.isOverallFailed,
       );
@@ -614,21 +607,21 @@ describe(useProvisioningPoll, () => {
         },
       });
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
-        new Error('NEXT_REDIRECT'),
+        new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
       );
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
+      const couldNotRefreshText = screen.getByText(
+        "Couldn't refresh the latest status — retrying automatically.",
+      );
+
       expect(result.current.stepStatuses[0]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       );
-      expect(
-        screen.getByText(
-          "Couldn't refresh the latest status — retrying automatically.",
-        ),
-      ).toBeVisible();
+      expect(couldNotRefreshText).toBeVisible();
 
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -640,11 +633,11 @@ describe(useProvisioningPoll, () => {
           STEP_POLL_INTERVAL_MS + TOAST_EXIT_BUFFER_MS,
         );
       });
-      expect(
-        screen.queryByText(
-          "Couldn't refresh the latest status — retrying automatically.",
-        ),
-      ).not.toBeInTheDocument();
+      const couldNotRefreshText2 = screen.queryByText(
+        "Couldn't refresh the latest status — retrying automatically.",
+      );
+
+      expect(couldNotRefreshText2).not.toBeInTheDocument();
     });
   });
 

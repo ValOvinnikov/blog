@@ -4,6 +4,7 @@ import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
+import type { TOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type {
@@ -11,6 +12,7 @@ import type {
   TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
+import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
 
 export const operatorNavSections = (
   t: TLooseTranslator,
@@ -116,12 +118,6 @@ export const EVERY_PLAN_PAGE: TPlanPageAccess = {
   team: true,
 };
 
-const studioNavItem = (t: TLooseTranslator, href: string) => ({
-  label: t('studio'),
-  icon: ICONS.STUDIO,
-  href,
-});
-
 export const tenantNavSections = (
   t: TLooseTranslator,
   tenantId: string,
@@ -185,6 +181,7 @@ export const tenantNavSections = (
 export const dashboardNavSections = (
   t: TLooseTranslator,
   access: TPlanPageAccess,
+  studioAccess?: TOwnerStudioAccess,
 ): TSidebarNavSection[] => {
   const hrefs: TTenantNavHrefs = {
     look: adminRoutes.dashboardLook(),
@@ -210,7 +207,7 @@ export const dashboardNavSections = (
     },
     {
       label: t('contentSectionLabel'),
-      items: [studioNavItem(t, hrefs.studio)],
+      items: [studioNavItem(t, hrefs.studio, studioAccess)],
     },
     {
       label: t('configurationSectionLabel'),
