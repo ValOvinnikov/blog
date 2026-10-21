@@ -13,10 +13,14 @@ const expires = new Date('2030-01-01T00:00:00Z');
 function buildAdapter(
   storedApp: string,
 ): Required<
-  Pick<Adapter, 'createSession' | 'getSessionAndUser' | 'deleteSession'>
+  Pick<
+    Adapter,
+    'createSession' | 'getSessionAndUser' | 'deleteSession' | 'linkAccount'
+  >
 > {
   return {
     createSession: vi.fn(async (session) => session),
+    linkAccount: vi.fn(async () => undefined),
     getSessionAndUser: vi.fn(async (sessionToken) => ({
       session: { sessionToken, userId: user.id, expires, app: storedApp },
       user,
@@ -82,5 +86,31 @@ describe(scopeAdapterToApp, () => {
     await scoped.deleteSession?.('token');
 
     expect(adapter.deleteSession).not.toHaveBeenCalled();
+  });
+
+  it('links a provider account without its tokens', async () => {
+    const adapter = buildAdapter(AUTH_APP.SITE);
+    const scoped = scopeAdapterToApp(adapter, AUTH_APP.SITE);
+
+    await scoped.linkAccount?.({
+      userId: user.id,
+      type: 'oauth',
+      provider: 'github',
+      providerAccountId: 'gh-1',
+      access_token: 'access',
+      refresh_token: 'refresh',
+      id_token: 'id',
+      token_type: 'bearer',
+      scope: 'read:user',
+    });
+
+    expect(adapter.linkAccount).toHaveBeenCalledWith({
+      userId: user.id,
+      type: 'oauth',
+      provider: 'github',
+      providerAccountId: 'gh-1',
+      token_type: 'bearer',
+      scope: 'read:user',
+    });
   });
 });
