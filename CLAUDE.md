@@ -667,7 +667,11 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   is entity-shaped — while asserting a const's own value stays banned
   ("Never assert the source back at itself"). Exempt: generated Sanity types,
   Sanity migrations, Tailwind class strings, import paths, directives,
-  public-site copy (it belongs in the Voice catalog) and `0`, `1`, `-1`; a
+  public-site copy (it belongs in the Voice catalog), `0`, `1`, `-1`, and
+  vocabulary an outside standard spells — a value compared with an env read
+  (`process.env.NODE_ENV === 'production'`), an env read's bracket key
+  (`process.env['X']`), a `stubEnv` argument, and a protocol attribute's
+  value (`sameSite: 'strict'`); a
   match in the other app is reported, never shared. Lint enforces both on
   touched files only — `prefer-shared-constant` and `no-duplicate-string` in
   the post-edit hook, lint-staged and `pnpm check:touched-lint`, plus the
@@ -790,10 +794,11 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
     goes to the user before commit.
   - `apps/platform`'s own UI copy is never Voice.
 - Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
-  `lint`, `test`, `knip` and the five gating scripts (`check:client-graph`,
+  `lint`, `test`, `knip`, the six gating scripts (`check:client-graph`,
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
-  `check:migration-index`, `gen:ui-index:check`), so it stops at the first
-  failure and mirrors every required or gating CI check that has a local
+  `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`)
+  and the two local-only diff checks (`check:touched-lint`,
+  `check:duplicate-literals`), so it stops at the first failure and mirrors every required or gating CI check that has a local
   equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
   part of the local loop — CI's `ci.yml` `build` job gates every PR; reproduce
   it locally only when diagnosing an actual CI build failure

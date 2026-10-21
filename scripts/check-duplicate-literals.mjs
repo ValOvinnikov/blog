@@ -5,6 +5,13 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
 import {
+  ENV_OBJECT_NAME,
+  EQUALITY_OPERATORS,
+  PROCESS_NAME,
+  PROTOCOL_ATTRIBUTE_KEYS,
+  STUB_ENV_CALLEE,
+} from '../configs/eslint/literal-vocabulary.js';
+import {
   listTouchedSourceFiles,
   readBaseVersion,
   repoRoot,
@@ -73,6 +80,42 @@ const isInsideClassOrJsxAttribute = (node) => {
   return false;
 };
 
+const isEnvObject = (expression) =>
+  (ts.isIdentifier(expression) && expression.text === ENV_OBJECT_NAME) ||
+  (ts.isPropertyAccessExpression(expression) &&
+    expression.name.text === ENV_OBJECT_NAME &&
+    ts.isIdentifier(expression.expression) &&
+    expression.expression.text === PROCESS_NAME);
+
+const isEnvRead = (expression) =>
+  (ts.isPropertyAccessExpression(expression) ||
+    ts.isElementAccessExpression(expression)) &&
+  isEnvObject(expression.expression);
+
+const isEnvComparisonOperand = ({ parent }) =>
+  ts.isBinaryExpression(parent) &&
+  EQUALITY_OPERATORS.has(ts.tokenToString(parent.operatorToken.kind)) &&
+  (isEnvRead(parent.left) || isEnvRead(parent.right));
+
+const isEnvReadKey = (node) => {
+  const { parent } = node;
+  return (
+    ts.isElementAccessExpression(parent) &&
+    parent.argumentExpression === node &&
+    isEnvObject(parent.expression)
+  );
+};
+
+const isStubEnvArgument = ({ parent }) =>
+  ts.isCallExpression(parent) &&
+  ts.isPropertyAccessExpression(parent.expression) &&
+  parent.expression.name.text === STUB_ENV_CALLEE;
+
+const isProtocolAttributeValue = ({ parent }) =>
+  ts.isPropertyAssignment(parent) &&
+  (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
+  PROTOCOL_ATTRIBUTE_KEYS.has(parent.name.text);
+
 const isExemptLiteral = (node) => {
   const { parent } = node;
   return (
@@ -87,7 +130,11 @@ const isExemptLiteral = (node) => {
     (parent.name === node && !ts.isElementAccessExpression(parent)) ||
     isFirstArgumentOf(node, MODULE_PATH_CALLEES) ||
     isFirstArgumentOf(node, TEST_TITLE_CALLEES) ||
-    isInsideClassOrJsxAttribute(node)
+    isInsideClassOrJsxAttribute(node) ||
+    isEnvComparisonOperand(node) ||
+    isEnvReadKey(node) ||
+    isStubEnvArgument(node) ||
+    isProtocolAttributeValue(node)
   );
 };
 
