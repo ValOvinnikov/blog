@@ -25,9 +25,5 @@ export const redirectToNewsletterResult = (
 
 export const redirectToNewsletterUnsubscribeConfirmation = (
   request: Request,
-  token: string,
 ): Promise<NextResponse> =>
-  redirectToNewsletterPage(
-    request,
-    routes.newsletterUnsubscribeConfirmation(token),
-  );
+  redirectToNewsletterPage(request, routes.newsletterUnsubscribeConfirmation());

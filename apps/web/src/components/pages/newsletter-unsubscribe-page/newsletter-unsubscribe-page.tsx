@@ -6,13 +6,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTranslations } from 'next-intl/server';
 
-export interface INewsletterUnsubscribePageProps {
-  token: string;
-}
-
-export const NewsletterUnsubscribePage = async ({
-  token,
-}: INewsletterUnsubscribePageProps) => {
+export const NewsletterUnsubscribePage = async () => {
   const [{ locale }, t] = await Promise.all([
     getRequestContext(),
     getTranslations('newsletterUnsubscribe'),
@@ -22,7 +16,7 @@ export const NewsletterUnsubscribePage = async ({
     <MessagePage title={t('confirmTitle')} message={t('confirmMessage')}>
       <form
         method="post"
-        action={routes.newsletterUnsubscribe(token, locale)}
+        action={routes.newsletterUnsubscribeSubmit(locale)}
         data-testid="newsletter-unsubscribe-form"
       >
         <Button type="submit">{t('confirmButtonLabel')}</Button>

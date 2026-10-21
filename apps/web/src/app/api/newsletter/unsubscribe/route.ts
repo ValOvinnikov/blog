@@ -4,6 +4,11 @@ import {
   redirectToNewsletterResult,
   redirectToNewsletterUnsubscribeConfirmation,
 } from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
+import {
+  clearNewsletterUnsubscribeToken,
+  readNewsletterUnsubscribeToken,
+  storeNewsletterUnsubscribeToken,
+} from '@web/server/newsletter/newsletter-unsubscribe-token-cookie/newsletter-unsubscribe-token-cookie';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
@@ -18,11 +23,15 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 
-  return redirectToNewsletterUnsubscribeConfirmation(request, token);
+  await storeNewsletterUnsubscribeToken(token);
+  return redirectToNewsletterUnsubscribeConfirmation(request);
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const token = new URL(request.url).searchParams.get('token');
+  const token =
+    new URL(request.url).searchParams.get('token') ??
+    (await readNewsletterUnsubscribeToken());
+  await clearNewsletterUnsubscribeToken();
 
   if (!token) {
     return redirectToNewsletterResult(
