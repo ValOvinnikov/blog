@@ -26,7 +26,7 @@ epics: [4083]
 
 ## What it does
 
-Every email the product sends is built and sent by `@blog/email`. Tenant-facing mail (sign-in link, team invite, newsletter confirmation) arrives in the tenant's own colours, name and logo, with subject and body copy the owner can rewrite per language. Operator alerts arrive in the platform's fixed look with fixed English copy. Owner onboarding mail — a heads-up that Sanity has emailed a Studio invite, a nudge when it is still unaccepted, and a "your site is ready" message — arrives in the platform's fixed look under the platform's name, with fixed transactional copy the sender passes in. Inactivity mail warns an owner that their site will be paused, and later that it will be deleted, each with a sign-in link to keep it; the super admin gets a separate copy of the pause warning naming the tenant and its owner. The contact-form notification to a site's owner uses the tenant's look with fixed English copy, and is not an editable template. Owners edit their sender details and templates on the platform's Email page, preview them at desktop and mobile width, and send a test to themselves.
+Every email the product sends is built and sent by `@blog/email`. Tenant-facing mail (sign-in link, team invite, newsletter confirmation) arrives in the tenant's own colours, name and logo, with subject and body copy the owner can rewrite per language. Operator alerts arrive in the platform's fixed look with fixed English copy. Owner onboarding mail — a heads-up that Sanity has emailed a Studio invite, a nudge when it is still unaccepted, and a "your site is ready" message — arrives in the platform's fixed look under the platform's name, with fixed transactional copy the sender passes in. Inactivity mail warns an owner that their site will be paused, and later that it will be deleted, each with a sign-in link to keep it, in the same look and with copy the sender passes in; the super admin gets a separate operator copy of the pause warning, in fixed English, naming the tenant and its owner. The contact-form notification to a site's owner uses the tenant's look with fixed English copy, and is not an editable template. Owners edit their sender details and templates on the platform's Email page, preview them at desktop and mobile width, and send a test to themselves.
 
 ## Surfaces and routes
 
@@ -50,7 +50,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 - Look reach: brand colours and logo marks follow the tenant's Look ([look](./look.md)). Email copy is not Voice.
 - Operator alert copy is fixed and never tenant-editable.
 - Owner onboarding copy (subject, preview text, paragraphs, action label and URL) is fixed transactional copy passed by the sender; it is not Voice and not an editable template. Every value is escaped, the action URL sanitised.
-- Inactivity copy is fixed English held in `@blog/email`: the sender passes only the site name, the pre-formatted date of the coming step and the sign-in URL (plus the tenant id and owner email for the super-admin copy). It is not Voice and not an editable template.
+- The owner pause warning and deletion notice take their copy from the sender, like owner onboarding mail. The super admin's copy of the pause warning is fixed English held in `@blog/email`; the sender passes the tenant name and id, owner email, a pre-formatted pause date and the sign-in URL. Neither is Voice or an editable template.
 
 ## Constraints and invariants
 
