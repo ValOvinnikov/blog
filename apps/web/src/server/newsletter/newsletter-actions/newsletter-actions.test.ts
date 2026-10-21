@@ -13,7 +13,7 @@ import {
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
   TENANT_PLAN,
 } from '@blog/db/constants';
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
+import { escapeHtml, LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
@@ -140,7 +140,7 @@ const CLAIM = {
 
 const DEFAULT_BRAND = resolveTenantEmailBrand({
   preset: PRESET_ID.CONSOLE,
-  accentHue: 250,
+  accentHue: faker.number.int({ max: 359 }),
 });
 
 describe('subscribeToNewsletterAction', () => {
@@ -339,7 +339,7 @@ describe('subscribeToNewsletterAction', () => {
   it("renders the subscribing tenant's own brand and name in the confirmation email", async () => {
     const tenantBrand = resolveTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
-      accentHue: 40,
+      accentHue: faker.number.int({ max: 359 }),
     });
     const tenantName = faker.company.name();
     resolveTenantEmailIdentityMock.mockResolvedValue({
@@ -356,7 +356,7 @@ describe('subscribeToNewsletterAction', () => {
     );
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        html: expect.stringContaining(tenantName),
+        html: expect.stringContaining(escapeHtml(tenantName)),
       }),
     );
   });

@@ -666,7 +666,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   a repeated test value becomes a const, or a builder in `testing/` when it
   is entity-shaped — while asserting a const's own value stays banned
   ("Never assert the source back at itself"). Exempt: generated Sanity types,
-  Sanity migrations, Tailwind class strings, import paths, directives,
+  Sanity migrations, a Sanity `_type` value and a literal type (the
+  generated types already check both), Tailwind class strings, import paths, directives,
   public-site copy (it belongs in the Voice catalog), `0`, `1`, `-1`, and
   vocabulary an outside standard spells — a value compared with an env read
   (`process.env.NODE_ENV === 'production'`), an env read's bracket key

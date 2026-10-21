@@ -1,0 +1,76 @@
+{
+  "home": {
+    "title": "Accueil",
+    "heading": "Bienvenue",
+    "supportingText": "Votre nouveau site est prêt — ajoutez des pages, des articles et du contenu quand vous le souhaitez.",
+    "metaTitle": "Bienvenue sur votre nouveau site, prêt à personnaliser",
+    "metaDescription": "Cette page d’accueil a été créée automatiquement avec votre site. Modifiez son titre et ses champs SEO dès que vous avez votre propre texte."
+  },
+  "postIndex": {
+    "title": "Blog",
+    "heading": "Blog",
+    "supportingText": "Les derniers articles de ce site.",
+    "metaTitle": "Blog — les derniers articles de ce site",
+    "metaDescription": "Tous les articles de ce site, du plus récent au plus ancien. Modifiez le titre et les champs SEO de cette page dès que vous avez votre texte."
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "Commencez ici",
+      "primaryActionLabel": "Lire l’article"
+    },
+    "latestPosts": {
+      "heading": "Derniers articles"
+    },
+    "topics": {
+      "heading": "Parcourir par thème"
+    },
+    "postList": {
+      "heading": "Tous les articles"
+    },
+    "cta": {
+      "heading": "Faites connaissance avec l’auteur",
+      "supportingText": "Découvrez qui écrit ici et de quoi parle ce blog."
+    },
+    "topicIndex": {
+      "title": "Thèmes",
+      "heading": "Thèmes",
+      "supportingText": "Parcourez tous les articles par thème.",
+      "metaTitle": "Thèmes — tous les articles de ce blog par thème",
+      "metaDescription": "Tous les thèmes abordés sur ce blog, avec les derniers articles de chacun.",
+      "listHeading": "Tous les thèmes"
+    },
+    "tagIndex": {
+      "title": "Étiquettes",
+      "heading": "Étiquettes",
+      "supportingText": "Parcourez tous les articles par étiquette.",
+      "metaTitle": "Étiquettes — tous les articles de ce blog par étiquette",
+      "metaDescription": "Toutes les étiquettes utilisées sur ce blog, avec les articles qui les portent.",
+      "listHeading": "Toutes les étiquettes"
+    },
+    "topic": {
+      "title": "Pour commencer",
+      "slug": "pour-commencer",
+      "description": "Des articles sur la création et la tenue de ce blog.",
+      "metaTitle": "Pour commencer — articles sur la création de ce blog"
+    },
+    "welcomePost": {
+      "title": "Bienvenue sur votre nouveau blog",
+      "slug": "bienvenue",
+      "supportingText": "Un article d’exemple pour montrer à quoi ressemblent les articles. Modifiez-le ou supprimez-le quand vous le souhaitez.",
+      "body": [
+        "Ceci est un article d’exemple, créé avec votre site pour que votre blog ait quelque chose à montrer dès le premier jour.",
+        "Ouvrez-le dans le Studio pour voir comment un article est construit : un titre, un court résumé, le texte et un thème. Transformez-le en votre premier véritable article, ou supprimez-le une fois le vôtre publié."
+      ],
+      "metaTitle": "Bienvenue sur votre nouveau blog — un article d’exemple",
+      "metaDescription": "Un article d’exemple créé avec votre site. Transformez-le en votre premier véritable article, ou supprimez-le une fois le vôtre publié."
+    },
+    "about": {
+      "title": "À propos",
+      "slug": "a-propos",
+      "heading": "À propos",
+      "supportingText": "Dites aux lecteurs qui vous êtes et de quoi parle ce blog.",
+      "metaTitle": "À propos — qui écrit ce blog et de quoi il parle",
+      "metaDescription": "Qui écrit ce blog et de quoi il parle. Modifiez le titre et les champs SEO de cette page dès que vous avez votre propre texte."
+    }
+  }
+}

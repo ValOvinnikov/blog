@@ -1,0 +1,76 @@
+{
+  "home": {
+    "title": "Inicio",
+    "heading": "Bienvenido",
+    "supportingText": "Tu nuevo sitio está listo — añade páginas, entradas y contenido cuando quieras.",
+    "metaTitle": "Bienvenido a tu nuevo sitio, listo para personalizar",
+    "metaDescription": "Esta página de inicio se creó automáticamente con tu sitio. Edita su encabezado y sus campos SEO cuando tengas tu propio texto."
+  },
+  "postIndex": {
+    "title": "Blog",
+    "heading": "Blog",
+    "supportingText": "Las últimas entradas de este sitio.",
+    "metaTitle": "Blog — las últimas entradas de este sitio",
+    "metaDescription": "Todas las entradas de este sitio, de la más reciente a la más antigua. Edita el encabezado y los campos SEO cuando tengas tu texto."
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "Empieza aquí",
+      "primaryActionLabel": "Leer la entrada"
+    },
+    "latestPosts": {
+      "heading": "Últimas entradas"
+    },
+    "topics": {
+      "heading": "Explorar por tema"
+    },
+    "postList": {
+      "heading": "Todas las entradas"
+    },
+    "cta": {
+      "heading": "Conoce a quien escribe",
+      "supportingText": "Descubre quién escribe aquí y de qué trata este blog."
+    },
+    "topicIndex": {
+      "title": "Temas",
+      "heading": "Temas",
+      "supportingText": "Explora todas las entradas por tema.",
+      "metaTitle": "Temas — todas las entradas de este blog por tema",
+      "metaDescription": "Todos los temas de este blog, con las últimas entradas de cada uno.",
+      "listHeading": "Todos los temas"
+    },
+    "tagIndex": {
+      "title": "Etiquetas",
+      "heading": "Etiquetas",
+      "supportingText": "Explora todas las entradas por etiqueta.",
+      "metaTitle": "Etiquetas — todas las entradas de este blog por etiqueta",
+      "metaDescription": "Todas las etiquetas de este blog, con las entradas que las llevan.",
+      "listHeading": "Todas las etiquetas"
+    },
+    "topic": {
+      "title": "Primeros pasos",
+      "slug": "primeros-pasos",
+      "description": "Entradas sobre cómo crear y mantener este blog.",
+      "metaTitle": "Primeros pasos — entradas sobre cómo crear este blog"
+    },
+    "welcomePost": {
+      "title": "Bienvenido a tu nuevo blog",
+      "slug": "bienvenido",
+      "supportingText": "Una entrada de ejemplo para mostrar cómo se ven las entradas. Edítala o bórrala cuando quieras.",
+      "body": [
+        "Esta es una entrada de ejemplo, creada con tu sitio para que tu blog tenga algo que mostrar desde el primer día.",
+        "Ábrela en el Studio para ver cómo se construye una entrada: un título, un breve resumen, el texto y un tema. Conviértela en tu primera entrada real, o bórrala cuando hayas publicado la tuya."
+      ],
+      "metaTitle": "Bienvenido a tu nuevo blog — una entrada de ejemplo",
+      "metaDescription": "Una entrada de ejemplo creada con tu sitio. Conviértela en tu primera entrada real, o bórrala cuando hayas publicado la tuya."
+    },
+    "about": {
+      "title": "Acerca de",
+      "slug": "acerca-de",
+      "heading": "Acerca de",
+      "supportingText": "Cuenta a tus lectores quién eres y de qué trata este blog.",
+      "metaTitle": "Acerca de — quién escribe este blog y de qué trata",
+      "metaDescription": "Quién escribe este blog y de qué trata. Edita el encabezado y los campos SEO de esta página cuando tengas tu propio texto."
+    }
+  }
+}

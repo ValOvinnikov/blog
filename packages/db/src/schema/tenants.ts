@@ -1,17 +1,17 @@
 import {
   LOCALE_ISO_CODES,
+  SITE_TYPE,
   type TLocaleIsoCode,
   type TSanityLoginProvider,
+  type TSiteType,
 } from '@blog/config/constants';
 import {
-  SITE_TYPE,
   TENANT_PLAN,
   TENANT_STATUS,
   type TDeprovisioningStep,
   type TSuspensionReason,
   type TElevateTenantOwnerOutcome,
   type TSanityProjectRole,
-  type TSiteType,
   type TTenantPlan,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
