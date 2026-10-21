@@ -15,6 +15,8 @@ export const makeSubscriber = (
   id: SUBSCRIBER_ID,
   tenantId: DEFAULT_TENANT_ID,
   email: SUBSCRIBER_EMAIL,
+  emailEncrypted: null,
+  emailIndex: null,
   status: 'active',
   confirmationTokenHash: CONFIRMATION_TOKEN_HASH,
   unsubscribeTokenHash: UNSUBSCRIBE_TOKEN_HASH,

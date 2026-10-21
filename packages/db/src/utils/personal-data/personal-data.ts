@@ -12,7 +12,7 @@ export function encryptPersonalValue(value: string): TMaybeNull<string> {
   return raw ? encryptPersonalData(value, parsePersonalDataKeyring(raw)) : null;
 }
 
-export function indexPersonalEmail(email: string): TMaybeNull<string> {
+function indexPersonalEmail(email: string): TMaybeNull<string> {
   const key = env.PERSONAL_DATA_INDEX_KEY;
   return key ? personalDataIndex(email, key) : null;
 }
