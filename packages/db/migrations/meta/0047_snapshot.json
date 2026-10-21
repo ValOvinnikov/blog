@@ -1,5 +1,5 @@
 {
-  "id": "a19c0d08-d786-433d-94c8-bde913911e2e",
+  "id": "f446474d-c655-48bd-8aff-fc8d51036da5",
   "prevId": "999741fe-a08d-4a76-a23e-23e5b838cda4",
   "version": "7",
   "dialect": "postgresql",
@@ -110,7 +110,7 @@
           "name": "actor_email",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "action": {
           "name": "action",
@@ -1700,6 +1700,37 @@
         "owner_site_ready_sent_at": {
           "name": "owner_site_ready_sent_at",
           "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_activity_at": {
+          "name": "last_activity_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "inactivity_warned_at": {
+          "name": "inactivity_warned_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "suspended_at": {
+          "name": "suspended_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deletion_notified_at": {
+          "name": "deletion_notified_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "suspension_reason": {
+          "name": "suspension_reason",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
