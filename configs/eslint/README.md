@@ -73,10 +73,14 @@
   const files themselves, and `0`/`1`/`-1`. Co-located
   `prefer-shared-constant.test.js`.
 - `no-duplicate-string.js` — `eslint-plugin-sonarjs`'s `no-duplicate-string`
-  with Tailwind class strings (the same positions as above) skipped. Sonar
-  still ignores strings under 10 characters and strings with no separator;
-  `pnpm check:duplicate-literals` covers those across the diff. Co-located
-  `no-duplicate-string.test.js`.
+  with Tailwind class strings (the same positions as above) skipped, plus a
+  value compared with an env read, a `stubEnv` argument and a protocol-attribute
+  value (`sameSite`). That vocabulary lives in `literal-vocabulary.js`, shared
+  with `scripts/check-duplicate-literals.mjs`. Sonar still ignores strings
+  under 10 characters and strings with no separator; `pnpm check:duplicate-literals`
+  covers those across the diff, and also skips an env read's bracket key
+  (`process.env['X']`), which Sonar never reports as a member-access literal.
+  Co-located `no-duplicate-string.test.js`.
 
   Both are registered in `base.js` under the `blog-touched` namespace, at
   threshold 2 for the second, and only when `BLOG_LINT_TOUCHED=1` — set by

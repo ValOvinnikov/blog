@@ -14,6 +14,7 @@ const sonarRule = sonarjs.rules['no-duplicate-string'];
 const isEnvObject = (expression) =>
   (expression.type === 'Identifier' && expression.name === ENV_OBJECT_NAME) ||
   (expression.type === 'MemberExpression' &&
+    !expression.computed &&
     expression.property.name === ENV_OBJECT_NAME &&
     expression.object.type === 'Identifier' &&
     expression.object.name === PROCESS_NAME);
