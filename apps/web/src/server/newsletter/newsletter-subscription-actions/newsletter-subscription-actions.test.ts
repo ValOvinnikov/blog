@@ -1,10 +1,18 @@
 import {
   ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   resolveTenantEmailBrand,
+  SUBSCRIBER_OUTCOME,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db';
+import {
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
+  TENANT_STATUS,
+} from '@blog/db/constants';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
+import { faker } from '@faker-js/faker';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import type { MockInstance } from 'vitest';
 
@@ -35,7 +43,8 @@ const {
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: {
     subscribers: {
       unsubscribe: unsubscribeMock,
@@ -44,23 +53,10 @@ vi.mock('@blog/db', () => ({
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
-  TENANT_STATUS: {
-    ACTIVE: 'ACTIVE',
-    SUSPENDED: 'SUSPENDED',
-    ARCHIVED: 'ARCHIVED',
-  },
-  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE: {
-    EN: {
-      NEWSLETTER_CONFIRMATION: {
-        subject: 'Confirm your newsletter subscription',
-        body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
-      },
-    },
-  },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/email')>()),
+vi.mock(import('@blog/email'), async (importOriginal) => ({
+  ...(await importOriginal()),
   sendEmail: sendEmailMock,
 }));
 
@@ -85,7 +81,11 @@ vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 
-const TENANT_ID = 'tenant-1';
+const TENANT_ID = faker.string.uuid();
+const USER_ID = faker.string.uuid();
+const SITE_URL = `https://${faker.internet.domainName()}`;
+const CONFIRMATION_TOKEN = faker.string.alphanumeric(16);
+const UNSUBSCRIBE_TOKEN = faker.string.alphanumeric(16);
 
 vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
@@ -93,12 +93,22 @@ vi.mock('@web/utils/env/env', () => ({
 
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
+type TActions = typeof import('./newsletter-subscription-actions');
+
+const SESSION_EMAIL = faker.internet.email();
+const REPLY_TO_ADDRESS = faker.internet.email();
+const UNSUBSCRIBE_HEADER = `<${SITE_URL}/api/newsletter/unsubscribe?token=${UNSUBSCRIBE_TOKEN}>`;
+const DEFAULT_CONFIRMATION_SUBJECT =
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
+    EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION
+  ].subject;
+
 const session = {
-  user: { id: 'user-1', email: 'val@icloud.com' },
+  user: { id: USER_ID, email: SESSION_EMAIL },
 };
 
 describe('unsubscribeAction', () => {
-  let unsubscribeAction: typeof import('./newsletter-subscription-actions').unsubscribeAction;
+  let unsubscribeAction: TActions['unsubscribeAction'];
   let errorSpy: MockInstance<typeof console.error>;
 
   beforeEach(async () => {
@@ -149,7 +159,7 @@ describe('unsubscribeAction', () => {
       await expect(unsubscribeAction()).resolves.toEqual({
         outcome: ACTION_OUTCOME.SUCCESS,
       });
-      expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+      expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
     },
   );
 
@@ -157,7 +167,7 @@ describe('unsubscribeAction', () => {
     await expect(unsubscribeAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+    expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
     expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledTimes(1);
   });
 
@@ -186,16 +196,16 @@ describe('unsubscribeAction', () => {
 });
 
 describe('resendConfirmationAction', () => {
-  let resendConfirmationAction: typeof import('./newsletter-subscription-actions').resendConfirmationAction;
+  let resendConfirmationAction: TActions['resendConfirmationAction'];
 
   beforeEach(async () => {
     authMock.mockReset();
     authMock.mockResolvedValue(session);
     resendConfirmationMock.mockReset();
     resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
+      outcome: SUBSCRIBER_OUTCOME.PENDING,
+      confirmationToken: CONFIRMATION_TOKEN,
+      unsubscribeToken: UNSUBSCRIBE_TOKEN,
     });
     sendEmailMock.mockReset();
     sendEmailMock.mockResolvedValue(undefined);
@@ -203,12 +213,12 @@ describe('resendConfirmationAction', () => {
     resolveTenantEmailIdentityMock.mockResolvedValue({
       brand: resolveTenantEmailBrand({
         preset: PRESET_ID.CONSOLE,
-        accentHue: 250,
+        accentHue: faker.number.int({ max: 359 }),
       }),
-      brandName: 'Acme Blog',
+      brandName: faker.company.name(),
     });
     getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    getTenantBaseUrlMock.mockResolvedValue(SITE_URL);
     resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
@@ -219,8 +229,8 @@ describe('resendConfirmationAction', () => {
     getEmailTemplateMock.mockReset();
     getEmailTemplateMock.mockResolvedValue({
       tenantId: TENANT_ID,
-      templateType: 'NEWSLETTER_CONFIRMATION',
-      subject: 'Confirm your subscription',
+      templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+      subject: faker.lorem.sentence(),
       body: [],
       logoAssetUrl: undefined,
     });
@@ -239,7 +249,7 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR without resending when the session has no email', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    authMock.mockResolvedValue({ user: { id: USER_ID } });
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
@@ -277,17 +287,16 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+    expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: 'val@icloud.com',
+        to: SESSION_EMAIL,
         html: expect.stringContaining(
-          'https://example.com/api/newsletter/confirm?token=token-abc',
+          `${SITE_URL}/api/newsletter/confirm?token=${CONFIRMATION_TOKEN}`,
         ),
         headers: {
-          'List-Unsubscribe':
-            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
+          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
         },
       }),
     );
@@ -296,11 +305,11 @@ describe('resendConfirmationAction', () => {
   it("renders the subscribing tenant's own brand in the resent confirmation email", async () => {
     const tenantBrand = resolveTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
-      accentHue: 40,
+      accentHue: faker.number.int({ max: 359 }),
     });
     resolveTenantEmailIdentityMock.mockResolvedValue({
       brand: tenantBrand,
-      brandName: 'Zeta Times',
+      brandName: faker.company.name(),
     });
 
     await resendConfirmationAction();
@@ -314,7 +323,9 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR without sending when the db reports not-pending', async () => {
-    resendConfirmationMock.mockResolvedValue({ outcome: 'not-pending' });
+    resendConfirmationMock.mockResolvedValue({
+      outcome: SUBSCRIBER_OUTCOME.NOT_PENDING,
+    });
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
@@ -338,7 +349,7 @@ describe('resendConfirmationAction', () => {
       tenantId: TENANT_ID,
       logoAssetUrl: undefined,
       senderName: undefined,
-      replyToAddress: 'support@example.com',
+      replyToAddress: REPLY_TO_ADDRESS,
       footerPostalAddress: undefined,
     });
 
@@ -346,11 +357,10 @@ describe('resendConfirmationAction', () => {
 
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        replyTo: 'support@example.com',
+        replyTo: REPLY_TO_ADDRESS,
         headers: {
-          'List-Unsubscribe':
-            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
+          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
         },
       }),
     );
@@ -361,7 +371,7 @@ describe('resendConfirmationAction', () => {
       tenantId: TENANT_ID,
       logoAssetUrl: undefined,
       senderName: undefined,
-      replyToAddress: 'not-an-address',
+      replyToAddress: faker.lorem.word(),
       footerPostalAddress: undefined,
     });
 
@@ -391,7 +401,7 @@ describe('resendConfirmationAction', () => {
         outcome: ACTION_OUTCOME.SUCCESS,
       });
       expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({ to: 'val@icloud.com' }),
+        expect.objectContaining({ to: SESSION_EMAIL }),
       );
     });
 
@@ -403,12 +413,11 @@ describe('resendConfirmationAction', () => {
       });
       expect(sendEmailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: 'val@icloud.com',
-          subject: 'Confirm your newsletter subscription',
+          to: SESSION_EMAIL,
+          subject: DEFAULT_CONFIRMATION_SUBJECT,
           headers: {
-            'List-Unsubscribe':
-              '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
-            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            'List-Unsubscribe': UNSUBSCRIBE_HEADER,
+            'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
           },
         }),
       );

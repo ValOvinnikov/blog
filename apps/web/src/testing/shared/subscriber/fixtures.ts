@@ -1,17 +1,25 @@
 import type { schema } from '@blog/db';
+import { faker } from '@faker-js/faker';
 import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+
+const SUBSCRIBER_ID = faker.string.uuid();
+const SUBSCRIBER_EMAIL = faker.internet.email();
+const CONFIRMATION_TOKEN_HASH = faker.string.hexadecimal({ length: 64 });
+const UNSUBSCRIBE_TOKEN_HASH = faker.string.hexadecimal({ length: 64 });
+const SUBSCRIBED_AT = faker.date.past();
+const CONFIRMED_AT = faker.date.soon({ refDate: SUBSCRIBED_AT });
 
 export const makeSubscriber = (
   overrides: Partial<schema.TSubscriber> = {},
 ): schema.TSubscriber => ({
-  id: 'sub-1',
+  id: SUBSCRIBER_ID,
   tenantId: DEFAULT_TENANT_ID,
-  email: 'reader@example.com',
+  email: SUBSCRIBER_EMAIL,
   status: 'active',
-  confirmationToken: 'confirm-token',
-  unsubscribeToken: 'unsubscribe-token',
-  subscribedAt: new Date('2026-01-01'),
-  confirmedAt: new Date('2026-01-02'),
-  confirmationSentAt: new Date('2026-01-01'),
+  confirmationTokenHash: CONFIRMATION_TOKEN_HASH,
+  unsubscribeTokenHash: UNSUBSCRIBE_TOKEN_HASH,
+  subscribedAt: SUBSCRIBED_AT,
+  confirmedAt: CONFIRMED_AT,
+  confirmationSentAt: SUBSCRIBED_AT,
   ...overrides,
 });

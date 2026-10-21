@@ -1,4 +1,4 @@
-import { NEWSLETTER_RESULT } from '@blog/config';
+import { NEWSLETTER_RESULT, SUBSCRIBER_OUTCOME } from '@blog/config';
 import { queries } from '@blog/db';
 import {
   redirectToNewsletterResult,
@@ -57,7 +57,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return redirectToNewsletterResult(
       request,
-      result.outcome === 'not-found'
+      result.outcome === SUBSCRIBER_OUTCOME.NOT_FOUND
         ? NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID
         : NEWSLETTER_RESULT.UNSUBSCRIBED,
     );

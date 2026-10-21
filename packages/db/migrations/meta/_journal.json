@@ -351,6 +351,13 @@
       "when": 1792605073094,
       "tag": "0049_make_audit_events_actor_email_nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792607723605,
+      "tag": "0050_hash_subscriber_tokens",
+      "breakpoints": true
     }
   ]
 }

@@ -1,14 +1,16 @@
 import * as schema from '@blog/db/schema';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
+import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+
+const NO_TENANT_ERROR = 'failed to seed a tenant row';
 
 const BACKFILL_MIGRATION = '0024_faithful_kree.sql';
 
@@ -33,20 +35,20 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
 
       const insertedTenant = await db.execute<{ id: string }>(
         sql.raw(
-          `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('Acme', 'acme.example.com', 'en', 'FREE', 'ACTIVE') returning "id"`,
+          `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('${faker.string.alphanumeric(12)}', '${faker.internet.domainName()}', 'en', 'FREE', 'ACTIVE') returning "id"`,
         ),
       );
       const tenant = insertedTenant.rows[0];
-      if (!tenant) throw new Error('failed to seed a tenant row');
+      if (!tenant) throw new Error(NO_TENANT_ERROR);
 
       await db.execute(
         sql.raw(`
         insert into "subscribers"
           ("id", "tenant_id", "email", "confirmation_token")
         values
-          ('sub-1', '${tenant.id}', 'reader-one@example.com', 'token-1'),
-          ('sub-2', '${tenant.id}', 'reader-two@example.com', 'token-2'),
-          ('sub-3', '${tenant.id}', 'reader-three@example.com', 'token-3')
+          ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}'),
+          ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}'),
+          ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}')
       `),
       );
 
@@ -67,23 +69,31 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
   );
 
   it(
-    'enforces NOT NULL and UNIQUE on unsubscribe_token once fully migrated',
+    'enforces NOT NULL and UNIQUE on unsubscribe_token once backfilled',
     async () => {
       for (const file of listMigrationFiles()) {
+        if (file > BACKFILL_MIGRATION) break;
         await applyMigrationFile(db, file);
       }
 
-      const tenant = await insertTestTenant(db);
-      const [subscriber] = await db
-        .insert(subscribers)
-        .values({ tenantId: tenant.id, email: 'reader@example.com' })
-        .returning();
-      if (!subscriber) throw new Error('failed to seed a subscriber row');
+      const insertedTenant = await db.execute<{ id: string }>(
+        sql.raw(
+          `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('${faker.string.alphanumeric(12)}', '${faker.internet.domainName()}', 'en', 'FREE', 'ACTIVE') returning "id"`,
+        ),
+      );
+      const tenant = insertedTenant.rows[0];
+      if (!tenant) throw new Error(NO_TENANT_ERROR);
+      const existingUnsubscribeToken = faker.string.uuid();
+      await db.execute(
+        sql.raw(
+          `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}', '${existingUnsubscribeToken}')`,
+        ),
+      );
 
       await expect(
         db.execute(
           sql.raw(
-            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('sub-null', '${tenant.id}', 'other@example.com', 'token-other', NULL)`,
+            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}', NULL)`,
           ),
         ),
       ).rejects.toThrow();
@@ -91,7 +101,7 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
       await expect(
         db.execute(
           sql.raw(
-            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('sub-dup', '${tenant.id}', 'dup@example.com', 'token-dup', '${subscriber.unsubscribeToken}')`,
+            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}', '${existingUnsubscribeToken}')`,
           ),
         ),
       ).rejects.toThrow();
