@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config/types';
 import {
   DAY_MS,
   INACTIVITY_STAGE,
@@ -23,7 +24,7 @@ const hasNoDeprovisioningRunSinceNotice = sql`coalesce(
   true
 )`;
 
-const stageCondition: Record<TInactivityStage, SQL | undefined> = {
+const stageCondition: Record<TInactivityStage, TMaybeUndefined<SQL>> = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: and(
     isActive,
     isNull(tenants.inactivityWarnedAt),
@@ -46,7 +47,7 @@ const stageCondition: Record<TInactivityStage, SQL | undefined> = {
 export function inactivityStageDue(
   stage: TInactivityStage,
   now: Date,
-): SQL | undefined {
+): TMaybeUndefined<SQL> {
   const cutoff = new Date(now.getTime() - INACTIVITY_STAGE_DAY[stage] * DAY_MS);
 
   return and(
