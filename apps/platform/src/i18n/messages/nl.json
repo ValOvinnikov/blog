@@ -291,6 +291,7 @@
     "recentActivityCardTitle": "Recente activiteit",
     "recentActivitySourceLabel": "Systeemlog",
     "activityEmpty": "Nog geen activiteit geregistreerd.",
+    "activityActorDeleted": "Verwijderd account",
     "relativeJustNow": "Zojuist",
     "relativeMinutesAgo": "{minutes} min geleden",
     "relativeHoursAgo": "{hours} uur geleden",

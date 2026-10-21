@@ -2,6 +2,7 @@ import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { admins } from '@blog/db/schema/admins';
+import { auditEvents } from '@blog/db/schema/audit-events';
 import { users } from '@blog/db/schema/auth';
 import { memberships } from '@blog/db/schema/memberships';
 import type { TResult } from '@blog/utils';
@@ -12,6 +13,7 @@ import { and, eq, exists, not } from 'drizzle-orm';
 
 // Refuses an owner or platform admin: the cascade would orphan their tenant or
 // the platform. Performs no authorization — pass the session's own user id.
+// Audit rows outlive the account; only their email snapshot is cleared.
 export async function deleteAccount(
   userId: string,
 ): Promise<TResult<void, TErrorCode>> {
@@ -47,14 +49,20 @@ export async function deleteAccount(
     )
     .returning({ id: users.id });
 
-  if (deletedRows.length > 0) return { ok: true, data: undefined };
+  if (deletedRows.length === 0) {
+    const [remaining] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, userId));
 
-  const [remaining] = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.id, userId));
+    if (remaining)
+      return { ok: false, error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE };
+  }
 
-  return remaining
-    ? { ok: false, error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE }
-    : { ok: true, data: undefined };
+  await db
+    .update(auditEvents)
+    .set({ actorEmail: null })
+    .where(eq(auditEvents.actorId, userId));
+
+  return { ok: true, data: undefined };
 }

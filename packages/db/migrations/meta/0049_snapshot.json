@@ -1,5 +1,5 @@
 {
-  "id": "068dab07-94ec-46e1-9606-5cd2508dc623",
+  "id": "df6b8d0d-fbe3-428f-a005-30b401557251",
   "prevId": "b07979c3-84b1-4032-ae5d-7016bd479437",
   "version": "7",
   "dialect": "postgresql",
@@ -110,7 +110,7 @@
           "name": "actor_email",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "action": {
           "name": "action",
@@ -346,18 +346,6 @@
         },
         "image": {
           "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "termsAcceptedAt": {
-          "name": "termsAcceptedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "termsVersion": {
-          "name": "termsVersion",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -984,37 +972,6 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.magic_link_send_counters": {
-      "name": "magic_link_send_counters",
-      "schema": "",
-      "columns": {
-        "key": {
-          "name": "key",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "window_started_at": {
-          "name": "window_started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
