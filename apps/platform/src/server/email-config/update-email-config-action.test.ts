@@ -1,4 +1,9 @@
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@blog/config';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
@@ -32,12 +37,19 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
+const REPLY_TO_ADDRESS = 'support@acme.example';
+const CONTACT_RECIPIENT = 'leads@acme.example';
+const INVALID_EMAIL = 'not-an-email';
+const MEMBERSHIP_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
+
 const VALID_INPUT: TUpdateEmailConfigInput = {
   senderName: 'Acme Co',
-  replyToAddress: 'support@acme.example',
+  replyToAddress: REPLY_TO_ADDRESS,
+  contactRecipient: CONTACT_RECIPIENT,
   footerPostalAddress: '123 Main St, Springfield',
-  contactRecipient: 'leads@acme.example',
 };
+
+const { contactRecipient, ...EDITOR_SAVED_INPUT } = VALID_INPUT;
 
 const mockTenantOnPlan = (plan: TTenantPlan) =>
   vi.mocked(requireTenantMembership).mockResolvedValue({
@@ -47,7 +59,7 @@ const mockTenantOnPlan = (plan: TTenantPlan) =>
       userId: 'user-1',
       tenantId: 'tenant-1',
       role: MEMBERSHIP_ROLE.OWNER,
-      createdAt: new Date('2026-04-02T00:00:00.000Z'),
+      createdAt: MEMBERSHIP_CREATED_AT,
     },
   });
 
@@ -71,7 +83,7 @@ describe(updateEmailConfigAction, () => {
   it('rejects an invalid reply-to address without ever calling the tenant gate', async () => {
     const result = await updateEmailConfigAction('tenant-1', {
       ...VALID_INPUT,
-      replyToAddress: 'not-an-email',
+      replyToAddress: INVALID_EMAIL,
     });
 
     expect(result).toEqual({
@@ -83,7 +95,7 @@ describe(updateEmailConfigAction, () => {
 
   it.each([
     'Acme <evil@attacker.example>',
-    'support@acme.example',
+    REPLY_TO_ADDRESS,
     'Acme\r\nBcc: victim@example.com',
     'Acme "Support"',
     'Acme, Inc',
@@ -139,7 +151,7 @@ describe(updateEmailConfigAction, () => {
   it('rejects an invalid contact recipient with a field error, and writes nothing', async () => {
     const result = await updateEmailConfigAction('tenant-1', {
       ...VALID_INPUT,
-      contactRecipient: 'not-an-email',
+      contactRecipient: INVALID_EMAIL,
     });
 
     expect(result).toEqual({
@@ -173,7 +185,7 @@ describe(updateEmailConfigAction, () => {
         userId: 'user-2',
         tenantId: 'tenant-1',
         role: MEMBERSHIP_ROLE.EDITOR,
-        createdAt: new Date('2026-04-02T00:00:00.000Z'),
+        createdAt: MEMBERSHIP_CREATED_AT,
       },
     });
 
@@ -185,9 +197,7 @@ describe(updateEmailConfigAction, () => {
     );
     expect(insertAuditEventMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        details: expect.not.objectContaining({
-          contactRecipient: 'leads@acme.example',
-        }),
+        details: { fields: Object.keys(EDITOR_SAVED_INPUT) },
       }),
     );
   });
@@ -202,7 +212,7 @@ describe(updateEmailConfigAction, () => {
     expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
       1,
       'tenant-1',
-      expect.objectContaining({ contactRecipient: 'leads@acme.example' }),
+      expect.objectContaining({ contactRecipient }),
     );
     expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
       2,
@@ -227,7 +237,7 @@ describe(updateEmailConfigAction, () => {
     );
   });
 
-  it('records a SETTINGS_UPDATED audit event, with the operator as actor', async () => {
+  it('records a SETTINGS_UPDATED audit event naming the saved fields, never their addresses', async () => {
     await updateEmailConfigAction('tenant-1', VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -236,7 +246,7 @@ describe(updateEmailConfigAction, () => {
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: 'tenant-1',
-      details: VALID_INPUT,
+      details: { fields: Object.keys(VALID_INPUT) },
     });
   });
 
@@ -250,24 +260,24 @@ describe(updateEmailConfigAction, () => {
 
   it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
     vi.mocked(requireTenantMembership).mockRejectedValueOnce(
-      new Error('NEXT_REDIRECT'),
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
     );
 
     await expect(
       updateEmailConfigAction('tenant-1', VALID_INPUT),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(upsertEmailConfigMock).not.toHaveBeenCalled();
   });
 
   it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
     vi.mocked(requireTenantMembership).mockRejectedValueOnce(
-      new Error('NEXT_NOT_FOUND'),
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
     );
 
     await expect(
       updateEmailConfigAction('tenant-1', VALID_INPUT),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(upsertEmailConfigMock).not.toHaveBeenCalled();
   });

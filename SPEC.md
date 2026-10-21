@@ -2710,7 +2710,7 @@ optionally tenant-referenced, each open or resolved.
 
 It borrows `audit_events`' shape (`source`/`kind` as plain `text`, a `details`
 jsonb) but not its table, because `audit_events` answers _who did what_ —
-`actorId`/`actorEmail` are `notNull` — and most findings have no actor: a
+`actorId` is `notNull` — and most findings have no actor: a
 weekly cron, a failed webhook, a domain that never verified. Open/resolved
 state, not an append-only log, is what lets a consumer ask "did this tenant
 just transition into a bad state" instead of re-deriving it from history on

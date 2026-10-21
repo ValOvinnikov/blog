@@ -323,6 +323,13 @@
       "when": 1792573622337,
       "tag": "0045_add_tenants_owner_email_sent_at",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1792597321087,
+      "tag": "0046_make_audit_events_actor_email_nullable",
+      "breakpoints": true
     }
   ]
 }

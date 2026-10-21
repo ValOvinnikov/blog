@@ -11,10 +11,9 @@ export type TInsertAuditEventInput = {
   details?: Record<string, unknown>;
 };
 
-// The only write path this package exports for `audit_events` — no update
-// or delete query exists. A plain insert has no unique constraint to
-// violate and no existing row to miss, so a thrown error here is a genuine
-// driver/connectivity failure rather than a business outcome to branch on.
+// A plain insert has no unique constraint to violate and no existing row to
+// miss, so a thrown error here is a genuine driver/connectivity failure
+// rather than a business outcome to branch on.
 export async function insertAuditEvent(
   input: TInsertAuditEventInput,
 ): Promise<TAuditEvent> {
