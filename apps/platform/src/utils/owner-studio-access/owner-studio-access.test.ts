@@ -6,7 +6,10 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type {
+  TTenant,
+  TTenantProvisioningState,
+} from '@blog/db/schema/tenants';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
@@ -40,7 +43,7 @@ const ownerCheckSteps = (detail: string) =>
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
       detail,
     },
-  }) as TTenant['provisioningSteps'];
+  }) as TTenantProvisioningState;
 
 const stalledSteps = ownerCheckSteps(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
 
@@ -94,13 +97,13 @@ describe(ownerStudioAccessFor, () => {
   );
 
   it.each([
-    { record: 'missing', provisioningSteps: idleProvisioningSteps() },
+    { record: 'no recorded', provisioningSteps: idleProvisioningSteps() },
     {
-      record: 'malformed',
+      record: 'an unrecognised',
       provisioningSteps: ownerCheckSteps('NOT_AN_OUTCOME'),
     },
   ])(
-    'is STALLED once the invite reaches the stall threshold with a $record owner check',
+    'is STALLED once the invite reaches the stall threshold with $record owner check outcome',
     ({ provisioningSteps }) => {
       const tenant = invitedTenant({ provisioningSteps });
 
