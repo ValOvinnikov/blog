@@ -8,6 +8,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
 import { localeCodeEnum, tenants } from './tenants';
 
 // A Portable Text block, typed loosely on purpose — this package never
@@ -33,7 +34,9 @@ export const emailTemplates = pgTable(
     locale: localeCodeEnum('locale').notNull(),
     subject: text('subject'),
     body: jsonb('body').$type<TEmailTemplateBlock[]>(),
-    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+      .notNull()
+      .defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'date' })
       .notNull()
       .defaultNow()
@@ -60,7 +63,9 @@ export const emailTemplateLogos = pgTable(
       .references(() => tenants.id, { onDelete: 'cascade' }),
     templateType: text('template_type').notNull().$type<TEmailTemplateType>(),
     logoAssetUrl: text('logo_asset_url').notNull(),
-    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+      .notNull()
+      .defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'date' })
       .notNull()
       .defaultNow()

@@ -1,5 +1,6 @@
 import { pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
 import { membershipRoleEnum } from './memberships';
 import { tenants } from './tenants';
 
@@ -18,7 +19,9 @@ export const membershipInvites = pgTable(
       .references(() => tenants.id, { onDelete: 'cascade' }),
     email: text('email').notNull(),
     role: membershipRoleEnum('role').notNull(),
-    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+      .notNull()
+      .defaultNow(),
     consumedAt: timestamp('consumed_at', { mode: 'date' }),
   },
   (invite) => [unique().on(invite.tenantId, invite.email)],

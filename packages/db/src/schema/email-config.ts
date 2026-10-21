@@ -1,5 +1,6 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 export const emailConfig = pgTable('email_config', {
@@ -13,7 +14,9 @@ export const emailConfig = pgTable('email_config', {
   replyToAddress: text('reply_to_address'),
   footerPostalAddress: text('footer_postal_address'),
   contactRecipient: text('contact_recipient'),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
     .defaultNow()
