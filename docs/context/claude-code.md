@@ -519,7 +519,9 @@ file` are all denied alike) — an earlier version only handled the
       prefixes, e.g. `packages/ui` or
       `packages/config:packages/utils:configs`. A prefix matches that
       directory and its descendants only (`packages/ui` never matches
-      `packages/ui-foo`).
+      `packages/ui-foo`), so an entry naming a file allows exactly that file
+      — how `config` reaches `scripts/check-duplicate-literals.mjs` and its
+      test without owning the rest of `scripts/`.
     - `LAYER_FILES` (optional) — colon-separated path suffixes allowed
       anywhere in the checkout, e.g. `tsconfig.json:vitest.config.ts`. Set
       only on `config` and `email`, whose docs send them into every
