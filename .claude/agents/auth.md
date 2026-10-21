@@ -83,8 +83,8 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   `string` and `undefined` at runtime, which `tsc` cannot catch. Any session
   field an app needs belongs here. The augmentation is ambient: each
   consumer's `tsconfig.json` `include`s `packages/auth/src/**/*.d.ts`.
-- **Magic-link send limits** — `isMagicLinkSendAllowed` counts every send
-  per email and per client IP in `@blog/db`'s counter table; a refused send
+- **Magic-link send limits** — `isMagicLinkSendAllowed` counts each send per
+  client IP, then per email, in `@blog/db`'s counter table; a refused send
   returns without sending, so the user sees the same page as a real send.
 - **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`,
   `recordSignupTermsOnSignIn`),
