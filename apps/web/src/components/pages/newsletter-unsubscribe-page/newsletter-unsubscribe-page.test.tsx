@@ -12,9 +12,15 @@ const setup = customRenderServerAsync(NewsletterUnsubscribePage, {
 });
 
 describe(`<${NewsletterUnsubscribePage.name}/>`, () => {
-  it('asks the reader to confirm, with a link home', async () => {
+  beforeEach(async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.FR,
+    });
     await setup();
+  });
 
+  it('asks the reader to confirm, with a link home', () => {
     const heading = screen.getByRole('heading', {
       level: 1,
       name: 'Unsubscribe from our newsletter',
@@ -29,13 +35,7 @@ describe(`<${NewsletterUnsubscribePage.name}/>`, () => {
     expect(homeLink).toHaveAttribute('href', '/');
   });
 
-  it('posts the token to the unsubscribe endpoint in the page language', async () => {
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.FR,
-    });
-    await setup();
-
+  it('posts the token to the unsubscribe endpoint in the page language', () => {
     const form = screen.getByTestId('newsletter-unsubscribe-form');
     const button = screen.getByRole('button', { name: 'Confirm unsubscribe' });
 
