@@ -8,17 +8,15 @@ import {
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-type TTenantPageContent = (props: { tenant: TTenant }) => Promise<ReactNode>;
-
 // Called as a function, never as JSX: an async component nested via JSX resolves only under a real RSC renderer.
 export const renderTenantScopedPage = async <T extends { tenant: TTenant }>(
   resolveTenant: () => Promise<T>,
-  PageContent: TTenantPageContent,
+  PageContent: (context: T) => Promise<ReactNode>,
   planGatedPage?: TPlanPage,
 ): Promise<ReactNode> => {
-  const { tenant } = await resolveTenant();
-  if (planGatedPage && !planPageAccess(tenant.plan)[planGatedPage]) {
+  const context = await resolveTenant();
+  if (planGatedPage && !planPageAccess(context.tenant.plan)[planGatedPage]) {
     notFound();
   }
-  return PageContent({ tenant });
+  return PageContent(context);
 };

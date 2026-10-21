@@ -107,7 +107,13 @@
     "badgePlatform": "plateforme",
     "features": "Fonctionnalités",
     "leads": "Messages reçus",
-    "releases": "Versions"
+    "releases": "Versions",
+    "studioAccess": {
+      "INVITE_SENT": "Invitation envoyée",
+      "ACTIVATING": "Activation",
+      "READY": "Prêt",
+      "STALLED": "Action requise"
+    }
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"
@@ -224,7 +230,15 @@
     "voiceTileTitle": "Voix",
     "voiceTileDescription": "Les textes qu'utilise votre site",
     "featuresTileTitle": "Fonctionnalités",
-    "featuresTileDescription": "Commentaires, favoris, newsletter"
+    "featuresTileDescription": "Commentaires, favoris, newsletter",
+    "siteSetupCardTitle": "Configuration de votre site",
+    "siteSetupFailedTitle": "La configuration de votre site s'est arrêtée",
+    "siteSetupFailedDescription": "Une des étapes a rencontré un problème. Réessayez : rien de ce qui est déjà configuré n'est perdu.",
+    "siteSetupFailedContactDescription": "Une des étapes a rencontré un problème. Demandez à votre contact plateforme de la relancer.",
+    "siteSetupRetry": "Réessayer",
+    "siteSetupRetrying": "Relance…",
+    "siteSetupRetryFailed": "Impossible de relancer la configuration. Réessayez.",
+    "siteSetupRetryRefused": "Impossible de relancer la configuration. Actualisez la page et réessayez."
   },
   "provisioningBanner": {
     "readyTitle": "Provisionné",
@@ -830,6 +844,25 @@
     "title": "Studio",
     "notProvisionedTitle": "Studio n'est pas encore prêt",
     "notProvisionedDescription": "Le projet Sanity de ce site n'est pas encore prêt. Réessayez dans quelques minutes."
+  },
+  "ownerStudioAccess": {
+    "title": {
+      "INVITE_SENT": "Acceptez votre invitation à Studio",
+      "ACTIVATING": "Configuration de votre accès à Studio",
+      "STALLED": "Votre invitation à Studio n'a pas été acceptée"
+    },
+    "description": {
+      "INVITE_SENT": "Nous vous avons envoyé une invitation de Sanity, l'éditeur derrière Studio. Acceptez-la : Studio s'ouvrira ici dès que votre accès sera confirmé.",
+      "ACTIVATING": "Vous avez accepté l'invitation. Nous donnons à votre compte les droits de modification, ce qui prend généralement une minute.",
+      "STALLED": "L'invitation a été envoyée il y a plus de trois jours et n'a pas été acceptée, nous avons donc arrêté de vérifier. Renvoyez-en une nouvelle ou vérifiez maintenant si vous venez de l'accepter."
+    },
+    "checkNow": "Vérifier maintenant",
+    "checking": "Vérification…",
+    "resendInvite": "Renvoyer l'invitation",
+    "resending": "Envoi…",
+    "checkStarted": "Nous vérifions votre accès. Actualisez la page dans une minute pour voir le résultat.",
+    "inviteResent": "Une nouvelle invitation arrive dans votre boîte de réception.",
+    "requestFailed": "Le service de configuration est injoignable. Réessayez."
   },
   "tenantDetailsPanel": {
     "heading": "Détails du locataire",

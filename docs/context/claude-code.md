@@ -335,7 +335,11 @@ file` are all denied alike) — an earlier version only handled the
     violations — back to the agent. It runs ESLint from the workspace that
     owns the file (the nearest ancestor with an `eslint.config.*`), the way
     `pnpm lint` does, which keeps `@next/eslint-plugin-next`'s "Pages
-    directory cannot be found" line out of the feedback. Report-only (never
+    directory cannot be found" line out of the feedback. It sets
+    `BLOG_LINT_TOUCHED=1`, which switches on the touched-file rules
+    (`prefer-shared-constant`, `no-duplicate-string`) that repo-wide
+    `pnpm lint` leaves off; `.husky/pre-commit` sets it for lint-staged the
+    same way. Report-only (never
     `--fix`); the commit-time gates (lint-staged) stay authoritative. Both
     scripts fall back to `git rev-parse --show-toplevel` (from the file's
     directory) when `CLAUDE_PROJECT_DIR` is unset.

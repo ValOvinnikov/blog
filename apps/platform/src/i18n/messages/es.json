@@ -107,7 +107,13 @@
     "badgePlatform": "plataforma",
     "features": "Funciones",
     "leads": "Contactos",
-    "releases": "Versiones"
+    "releases": "Versiones",
+    "studioAccess": {
+      "INVITE_SENT": "Invitación enviada",
+      "ACTIVATING": "Activando",
+      "READY": "Listo",
+      "STALLED": "Acción necesaria"
+    }
   },
   "tenantLayout": {
     "scopeLabel": "Cliente"
@@ -224,7 +230,15 @@
     "voiceTileTitle": "Voz",
     "voiceTileDescription": "Los textos que usa su sitio",
     "featuresTileTitle": "Funciones",
-    "featuresTileDescription": "Comentarios, guardados, boletín"
+    "featuresTileDescription": "Comentarios, guardados, boletín",
+    "siteSetupCardTitle": "Configurando tu sitio",
+    "siteSetupFailedTitle": "La configuración de tu sitio se ha detenido",
+    "siteSetupFailedDescription": "Uno de los pasos ha tenido un problema. Vuelve a intentarlo: no se pierde nada de lo ya configurado.",
+    "siteSetupFailedContactDescription": "Uno de los pasos ha tenido un problema. Pide a tu contacto de la plataforma que la reinicie.",
+    "siteSetupRetry": "Reintentar",
+    "siteSetupRetrying": "Reiniciando…",
+    "siteSetupRetryFailed": "No se pudo reiniciar la configuración. Inténtalo de nuevo.",
+    "siteSetupRetryRefused": "No se pudo reiniciar la configuración. Recarga la página e inténtalo de nuevo."
   },
   "provisioningBanner": {
     "readyTitle": "Aprovisionado",
@@ -830,6 +844,25 @@
     "title": "Studio",
     "notProvisionedTitle": "Studio aún no está listo",
     "notProvisionedDescription": "El proyecto de Sanity de este sitio aún no está listo. Vuelva a intentarlo en unos minutos."
+  },
+  "ownerStudioAccess": {
+    "title": {
+      "INVITE_SENT": "Acepta tu invitación a Studio",
+      "ACTIVATING": "Configurando tu acceso a Studio",
+      "STALLED": "Tu invitación a Studio no se ha aceptado"
+    },
+    "description": {
+      "INVITE_SENT": "Te hemos enviado una invitación de Sanity, el editor que hay detrás de Studio. Acéptala y Studio se abrirá aquí en cuanto se confirme tu acceso.",
+      "ACTIVATING": "Has aceptado la invitación. Estamos dando a tu cuenta permisos de edición; suele tardar un minuto.",
+      "STALLED": "La invitación se envió hace más de tres días y no se ha aceptado, así que hemos dejado de comprobarla. Reenvíala para recibir una nueva o compruébalo ahora si acabas de aceptarla."
+    },
+    "checkNow": "Comprobar ahora",
+    "checking": "Comprobando…",
+    "resendInvite": "Reenviar invitación",
+    "resending": "Enviando…",
+    "checkStarted": "Estamos comprobando tu acceso. Recarga la página en un minuto para ver el resultado.",
+    "inviteResent": "Una nueva invitación va de camino a tu bandeja de entrada.",
+    "requestFailed": "No se pudo contactar con el servicio de configuración. Inténtalo de nuevo."
   },
   "tenantDetailsPanel": {
     "heading": "Detalles del cliente",

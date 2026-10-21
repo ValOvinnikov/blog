@@ -1,8 +1,16 @@
-import type { TMaybeNull } from '@blog/config';
+import {
+  SANITY_LOGIN_PROVIDER,
+  type TMaybeNull,
+  NEXT_NAVIGATION_ERROR,
+} from '@blog/config';
+import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -44,14 +52,28 @@ vi.mock('@blog/studio', () => ({
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const membership = {
-  id: 'm-1',
-  userId: 'user-1',
-  tenantId: 'tenant-1',
-  role: 'OWNER',
-};
+const membership = makeMembership();
 
 const setup = customRenderAsync(DashboardStudioPage, {});
+
+const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
+  listMembershipsWithTenantsForUserMock.mockResolvedValue([
+    {
+      membership,
+      tenant: makeTenant({
+        id: 'tenant-1',
+        name: 'Acme Inc.',
+        sanityProjectId: 'proj-acme',
+        sanityDataset: 'production',
+        sanityReadTokenEncrypted: 'encrypted-token',
+        ...overrides,
+      }),
+    },
+  ]);
+  await setup();
+};
+
+const invitedAt = new Date('2026-10-18T09:00:00.000Z');
 
 describe(`<${DashboardStudioPage.name}/>`, () => {
   beforeEach(() => {
@@ -65,36 +87,58 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   it('redirects to sign-in without resolving the tenant when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
   it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      {
-        membership,
-        tenant: makeTenant({
-          id: 'tenant-1',
-          name: 'Acme Inc.',
-          sanityProjectId: 'proj-acme',
-          sanityDataset: 'production',
-          sanityReadTokenEncrypted: 'encrypted-token',
-        }),
-      },
-    ]);
+    await renderForTenant();
 
-    await setup();
+    const studioMount = screen.getByTestId('studio-mount');
 
-    expect(screen.getByTestId('studio-mount')).toBeVisible();
+    expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
         projectId: 'proj-acme',
         dataset: 'production',
-        basePath: '/dashboard/studio',
+        basePath: adminRoutes.dashboardStudio(),
         title: 'Acme Inc.',
       }),
+    );
+  });
+
+  it("explains the owner's pending Studio access instead of mounting Studio", async () => {
+    await renderForTenant({ ownerInviteSentAt: invitedAt });
+
+    const explainerTitle = screen.getByText('Accept your Studio invite');
+    const checkNowButton = screen.getByRole('button', { name: 'Check now' });
+    const resendInviteButton = screen.getByRole('button', {
+      name: 'Resend invite',
+    });
+    const studioMount = screen.queryByTestId('studio-mount');
+
+    expect(explainerTitle).toBeVisible();
+    expect(checkNowButton).toBeVisible();
+    expect(resendInviteButton).toBeVisible();
+    expect(studioMount).not.toBeInTheDocument();
+  });
+
+  it("opens Studio straight into the owner's login provider once their access is ready", async () => {
+    await renderForTenant({
+      ownerInviteSentAt: invitedAt,
+      ownerInviteAcceptedAt: new Date('2026-10-18T10:00:00.000Z'),
+      ownerSanityUserId: 'sanity-user-1',
+      ownerSanityRole: SANITY_PROJECT_ROLE.ADMINISTRATOR,
+      ownerLoginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+    });
+
+    const studioMount = screen.getByTestId('studio-mount');
+
+    expect(studioMount).toBeVisible();
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({ loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE }),
     );
   });
 });

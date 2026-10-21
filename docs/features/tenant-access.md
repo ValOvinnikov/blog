@@ -74,7 +74,8 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
 - **Server Actions call a gate themselves.**
   - Tenant-scoped actions (Look, Voice, Features, Languages, Email, brand assets) call `requireTenantMembership`. That gate excludes archived tenants.
   - Creating a tenant and editing its details need `requireAdmin`.
-  - Retry, deprovision, reactivate, delete and the deprovisioning status poll need `requireSuperAdmin`.
+  - Deprovision, reactivate, delete and the deprovisioning status poll need `requireSuperAdmin`.
+  - The provisioning status poll needs the tenant's own OWNER or any admin; retry, Check now and Resend invite need the tenant's own OWNER or a SUPERADMIN (`requireTenantOwnerOrAdmin`).
 - **Roles differ in three places only.**
   - Admin roles gate identically, except that SUPERADMIN alone passes `requireSuperAdmin` and alone sees every tenant under `/dashboard`.
   - Only SUPERADMINs receive operator alerts.

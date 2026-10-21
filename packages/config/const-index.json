@@ -1,0 +1,3784 @@
+{
+  "strings": {
+    "SUCCESS": [
+      {
+        "ref": "ACTION_OUTCOME.SUCCESS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/action-outcome.ts"
+      },
+      {
+        "ref": "ALERT_TYPE.SUCCESS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/alert.ts"
+      },
+      {
+        "ref": "FORM_STATUS.SUCCESS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/form-status.ts"
+      },
+      {
+        "ref": "TOAST_TYPE.SUCCESS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/toast.ts"
+      }
+    ],
+    "INVALID": [
+      {
+        "ref": "ACTION_OUTCOME.INVALID",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/action-outcome.ts"
+      },
+      {
+        "ref": "FIELD_ERROR.INVALID",
+        "scope": "app:web",
+        "from": "@web/constants/field-error",
+        "file": "apps/web/src/constants/field-error.ts"
+      }
+    ],
+    "BLOCKED": [
+      {
+        "ref": "ACTION_OUTCOME.BLOCKED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/action-outcome.ts"
+      }
+    ],
+    "RATE_LIMITED": [
+      {
+        "ref": "ACTION_OUTCOME.RATE_LIMITED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/action-outcome.ts"
+      }
+    ],
+    "UNAVAILABLE": [
+      {
+        "ref": "ACTION_OUTCOME.UNAVAILABLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/action-outcome.ts"
+      }
+    ],
+    "REFUSED": [
+      {
+        "ref": "ACTION_OUTCOME.REFUSED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/action-outcome.ts"
+      }
+    ],
+    "SERVER_ERROR": [
+      {
+        "ref": "ACTION_OUTCOME.SERVER_ERROR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/action-outcome.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.SERVER_ERROR",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "WARNING": [
+      {
+        "ref": "ALERT_TYPE.WARNING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/alert.ts"
+      },
+      {
+        "ref": "FINDING_SEVERITY.WARNING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      },
+      {
+        "ref": "ICONS.WARNING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "TOAST_TYPE.WARNING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/toast.ts"
+      }
+    ],
+    "ERROR": [
+      {
+        "ref": "ALERT_TYPE.ERROR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/alert.ts"
+      },
+      {
+        "ref": "FORM_STATUS.ERROR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/form-status.ts"
+      },
+      {
+        "ref": "TOAST_TYPE.ERROR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/toast.ts"
+      },
+      {
+        "ref": "DOMAIN_VERIFICATION_STATUS.ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      },
+      {
+        "ref": "DOMAIN_AVAILABILITY.ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "INFO": [
+      {
+        "ref": "ALERT_TYPE.INFO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/alert.ts"
+      },
+      {
+        "ref": "FINDING_SEVERITY.INFO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      },
+      {
+        "ref": "ICONS.INFO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "TOAST_TYPE.INFO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/toast.ts"
+      }
+    ],
+    "WHY_NOT": [
+      {
+        "ref": "ASIDE_KIND.WHY_NOT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/aside.ts"
+      }
+    ],
+    "DIGRESSION": [
+      {
+        "ref": "ASIDE_KIND.DIGRESSION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/aside.ts"
+      }
+    ],
+    "CONTEXT": [
+      {
+        "ref": "ASIDE_KIND.CONTEXT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/aside.ts"
+      }
+    ],
+    "TENANT": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.TENANT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SITE_CONFIG": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.SITE_CONFIG",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SETTINGS_FEATURES": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.SETTINGS_FEATURES",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "RELEASE": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.RELEASE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "CREATED": [
+      {
+        "ref": "AUDIT_ACTION.CREATED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "DEPROVISION_REQUESTED": [
+      {
+        "ref": "AUDIT_ACTION.DEPROVISION_REQUESTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "DEPROVISIONED": [
+      {
+        "ref": "AUDIT_ACTION.DEPROVISIONED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "REACTIVATED": [
+      {
+        "ref": "AUDIT_ACTION.REACTIVATED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SUSPENSION_APPLIED": [
+      {
+        "ref": "AUDIT_ACTION.SUSPENSION_APPLIED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SUSPENSION_LIFTED": [
+      {
+        "ref": "AUDIT_ACTION.SUSPENSION_LIFTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "PROVISIONED": [
+      {
+        "ref": "AUDIT_ACTION.PROVISIONED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "PROVISIONING_FAILED": [
+      {
+        "ref": "AUDIT_ACTION.PROVISIONING_FAILED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SETTINGS_UPDATED": [
+      {
+        "ref": "AUDIT_ACTION.SETTINGS_UPDATED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "DELETED": [
+      {
+        "ref": "AUDIT_ACTION.DELETED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      },
+      {
+        "ref": "SANITY_PROJECT_DELETE_OUTCOME.DELETED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.DELETED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "TENANT_DELETE_OUTCOME.DELETED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "READER_DATA_PURGED": [
+      {
+        "ref": "AUDIT_ACTION.READER_DATA_PURGED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "RELEASE_STARTED": [
+      {
+        "ref": "AUDIT_ACTION.RELEASE_STARTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "RELEASE_OVERRIDE": [
+      {
+        "ref": "AUDIT_ACTION.RELEASE_OVERRIDE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "CONTRAST_CHECK_STARTED": [
+      {
+        "ref": "AUDIT_ACTION.CONTRAST_CHECK_STARTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "TENANT_MIGRATIONS_STARTED": [
+      {
+        "ref": "AUDIT_ACTION.TENANT_MIGRATIONS_STARTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SITE": [
+      {
+        "ref": "AUTH_APP.SITE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/auth-app.ts"
+      }
+    ],
+    "PLATFORM": [
+      {
+        "ref": "AUTH_APP.PLATFORM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/auth-app.ts"
+      }
+    ],
+    "DOT": [
+      {
+        "ref": "BRAND_TAGLINE_SEPARATORS.DOT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/brand-tagline.ts"
+      }
+    ],
+    "PIPE": [
+      {
+        "ref": "BRAND_TAGLINE_SEPARATORS.PIPE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/brand-tagline.ts"
+      }
+    ],
+    "BULLET": [
+      {
+        "ref": "BRAND_TAGLINE_SEPARATORS.BULLET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/brand-tagline.ts"
+      }
+    ],
+    "SLASH": [
+      {
+        "ref": "BRAND_TAGLINE_SEPARATORS.SLASH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/brand-tagline.ts"
+      }
+    ],
+    "COMMENTS": [
+      {
+        "ref": "CAPABILITY.COMMENTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
+    "RATINGS": [
+      {
+        "ref": "CAPABILITY.RATINGS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
+    "BOOKMARKS": [
+      {
+        "ref": "CAPABILITY.BOOKMARKS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
+    "NEWSLETTER": [
+      {
+        "ref": "CAPABILITY.NEWSLETTER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
+    "ANALYTICS": [
+      {
+        "ref": "CAPABILITY.ANALYTICS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
+    "CONSENT_BANNER": [
+      {
+        "ref": "CAPABILITY.CONSENT_BANNER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
+    "CONTACT_FORM": [
+      {
+        "ref": "CAPABILITY.CONTACT_FORM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
+    "WIDE": [
+      {
+        "ref": "CARD_IMAGE_SHAPE.WIDE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-image-shape.ts"
+      },
+      {
+        "ref": "CONTAINER_WIDTH.WIDE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "SQUARE": [
+      {
+        "ref": "CARD_IMAGE_SHAPE.SQUARE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-image-shape.ts"
+      }
+    ],
+    "CIRCLE": [
+      {
+        "ref": "CARD_IMAGE_SHAPE.CIRCLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-image-shape.ts"
+      }
+    ],
+    "ICON": [
+      {
+        "ref": "CARD_IMAGE_SHAPE.ICON",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-image-shape.ts"
+      }
+    ],
+    "ACCENT_BAR": [
+      {
+        "ref": "CARD_STYLE.ACCENT_BAR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-style.ts"
+      }
+    ],
+    "OUTLINED": [
+      {
+        "ref": "CARD_STYLE.OUTLINED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-style.ts"
+      },
+      {
+        "ref": "HEADER_CONTROL_STYLE.OUTLINED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-style.ts"
+      }
+    ],
+    "NECESSARY": [
+      {
+        "ref": "CONSENT_CATEGORY.NECESSARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/consent-category.ts"
+      }
+    ],
+    "EXTERNAL_MEDIA": [
+      {
+        "ref": "CONSENT_CATEGORY.EXTERNAL_MEDIA",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/consent-category.ts"
+      }
+    ],
+    "LIGHT": [
+      {
+        "ref": "COLOR_SCHEME.LIGHT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/contrast.ts"
+      },
+      {
+        "ref": "PREVIEW_MODE.LIGHT",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "DARK": [
+      {
+        "ref": "COLOR_SCHEME.DARK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/contrast.ts"
+      },
+      {
+        "ref": "PREVIEW_MODE.DARK",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "TEXT": [
+      {
+        "ref": "CONTRAST_ROLE.TEXT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/contrast.ts"
+      }
+    ],
+    "LARGE_TEXT": [
+      {
+        "ref": "CONTRAST_ROLE.LARGE_TEXT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/contrast.ts"
+      }
+    ],
+    "UI_BOUNDARY": [
+      {
+        "ref": "CONTRAST_ROLE.UI_BOUNDARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/contrast.ts"
+      }
+    ],
+    "FOCUS": [
+      {
+        "ref": "CONTRAST_ROLE.FOCUS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/contrast.ts"
+      }
+    ],
+    "DECORATIVE": [
+      {
+        "ref": "CONTRAST_ROLE.DECORATIVE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/contrast.ts"
+      }
+    ],
+    "BANNER": [
+      {
+        "ref": "CTA_VARIANT.BANNER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/cta.ts"
+      },
+      {
+        "ref": "HERO_VARIANT.BANNER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "SPLIT": [
+      {
+        "ref": "CTA_VARIANT.SPLIT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/cta.ts"
+      },
+      {
+        "ref": "HERO_VARIANT.SPLIT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "CALLOUT": [
+      {
+        "ref": "CTA_VARIANT.CALLOUT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/cta.ts"
+      }
+    ],
+    "CONTAINED": [
+      {
+        "ref": "CTA_ACTION_APPEARANCE.CONTAINED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/cta.ts"
+      }
+    ],
+    "INLINE": [
+      {
+        "ref": "CTA_ACTION_APPEARANCE.INLINE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/cta.ts"
+      },
+      {
+        "ref": "IMAGE_LAYOUT.INLINE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/image-layout.ts"
+      }
+    ],
+    "PRIMARY": [
+      {
+        "ref": "CTA_ACTION_VARIANT.PRIMARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/cta.ts"
+      },
+      {
+        "ref": "BRAND_VARIANT.PRIMARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "SECONDARY": [
+      {
+        "ref": "CTA_ACTION_VARIANT.SECONDARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/cta.ts"
+      },
+      {
+        "ref": "BRAND_VARIANT.SECONDARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "SKIM": [
+      {
+        "ref": "DEPTH.SKIM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/depth.ts"
+      }
+    ],
+    "READ": [
+      {
+        "ref": "DEPTH.READ",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/depth.ts"
+      }
+    ],
+    "DEEP": [
+      {
+        "ref": "DEPTH.DEEP",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/depth.ts"
+      }
+    ],
+    "GRID": [
+      {
+        "ref": "DISPLAY_MODE.GRID",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/display-mode.ts"
+      },
+      {
+        "ref": "ICONS.GRID",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CAROUSEL": [
+      {
+        "ref": "DISPLAY_MODE.CAROUSEL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/display-mode.ts"
+      }
+    ],
+    "MAGIC_LINK": [
+      {
+        "ref": "EMAIL_TEMPLATE_TYPE.MAGIC_LINK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-template.ts"
+      }
+    ],
+    "TENANT_INVITE": [
+      {
+        "ref": "EMAIL_TEMPLATE_TYPE.TENANT_INVITE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-template.ts"
+      }
+    ],
+    "NEWSLETTER_CONFIRMATION": [
+      {
+        "ref": "EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-template.ts"
+      }
+    ],
+    "DB_NOT_FOUND": [
+      {
+        "ref": "ERROR_CODE.DB_NOT_FOUND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_DUPLICATE_DOMAIN": [
+      {
+        "ref": "ERROR_CODE.DB_DUPLICATE_DOMAIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_LAST_LINKED_METHOD": [
+      {
+        "ref": "ERROR_CODE.DB_LAST_LINKED_METHOD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_HOLDS_PLATFORM_ROLE": [
+      {
+        "ref": "ERROR_CODE.DB_HOLDS_PLATFORM_ROLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_ALREADY_PROVISIONING": [
+      {
+        "ref": "ERROR_CODE.DB_ALREADY_PROVISIONING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_INVALID_DOMAIN": [
+      {
+        "ref": "ERROR_CODE.DB_INVALID_DOMAIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_LOCALE_LIMIT_EXCEEDED": [
+      {
+        "ref": "ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_DEFAULT_LOCALE_REPEATED": [
+      {
+        "ref": "ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DOCUMENT_VALIDATION": [
+      {
+        "ref": "FINDING_SOURCE.DOCUMENT_VALIDATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      },
+      {
+        "ref": "OPERATOR_ALERT_KIND.DOCUMENT_VALIDATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/operator-alert.ts"
+      }
+    ],
+    "TENANT_PROVISIONING": [
+      {
+        "ref": "FINDING_SOURCE.TENANT_PROVISIONING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "RECHECK_TENANT_OWNERS": [
+      {
+        "ref": "FINDING_SOURCE.RECHECK_TENANT_OWNERS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "DOMAIN_VERIFICATION": [
+      {
+        "ref": "FINDING_SOURCE.DOMAIN_VERIFICATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "SITE_CONFIG_REVALIDATION": [
+      {
+        "ref": "FINDING_SOURCE.SITE_CONFIG_REVALIDATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "CONTRAST_CHECK": [
+      {
+        "ref": "FINDING_SOURCE.CONTRAST_CHECK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "SCHEMA_VALIDATION_ERROR": [
+      {
+        "ref": "FINDING_KIND.SCHEMA_VALIDATION_ERROR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "PROVISIONING_STEP_FAILED": [
+      {
+        "ref": "FINDING_KIND.PROVISIONING_STEP_FAILED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "OWNER_CHECK_STALLED": [
+      {
+        "ref": "FINDING_KIND.OWNER_CHECK_STALLED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "OWNER_CHECK_AMBIGUOUS": [
+      {
+        "ref": "FINDING_KIND.OWNER_CHECK_AMBIGUOUS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "DOMAIN_NOT_ADDED": [
+      {
+        "ref": "FINDING_KIND.DOMAIN_NOT_ADDED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "REVALIDATION_FAILED": [
+      {
+        "ref": "FINDING_KIND.REVALIDATION_FAILED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "CONTRAST_REGRESSION": [
+      {
+        "ref": "FINDING_KIND.CONTRAST_REGRESSION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "CRITICAL": [
+      {
+        "ref": "FINDING_SEVERITY.CRITICAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "OPEN": [
+      {
+        "ref": "FINDING_STATUS.OPEN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "RESOLVED": [
+      {
+        "ref": "FINDING_STATUS.RESOLVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "IDLE": [
+      {
+        "ref": "FORM_STATUS.IDLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/form-status.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STEP_STATUS.IDLE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "SUBMITTING": [
+      {
+        "ref": "FORM_STATUS.SUBMITTING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/form-status.ts"
+      }
+    ],
+    "SOFT": [
+      {
+        "ref": "HEADER_CONTROL_STYLE.SOFT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-style.ts"
+      }
+    ],
+    "PLAIN": [
+      {
+        "ref": "HEADER_CONTROL_STYLE.PLAIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-style.ts"
+      }
+    ],
+    "GET": [
+      {
+        "ref": "HTTP_METHOD.GET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-methods.ts"
+      }
+    ],
+    "POST": [
+      {
+        "ref": "HTTP_METHOD.POST",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-methods.ts"
+      }
+    ],
+    "PUT": [
+      {
+        "ref": "HTTP_METHOD.PUT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-methods.ts"
+      }
+    ],
+    "PATCH": [
+      {
+        "ref": "HTTP_METHOD.PATCH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-methods.ts"
+      }
+    ],
+    "DELETE": [
+      {
+        "ref": "HTTP_METHOD.DELETE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-methods.ts"
+      }
+    ],
+    "SUN": [
+      {
+        "ref": "ICONS.SUN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MOON": [
+      {
+        "ref": "ICONS.MOON",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "HOUSE": [
+      {
+        "ref": "ICONS.HOUSE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SHARE": [
+      {
+        "ref": "ICONS.SHARE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "COPY": [
+      {
+        "ref": "ICONS.COPY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CHECK": [
+      {
+        "ref": "ICONS.CHECK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CHECK_SHEET": [
+      {
+        "ref": "ICONS.CHECK_SHEET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "EXTERNAL_LINK": [
+      {
+        "ref": "ICONS.EXTERNAL_LINK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MENU": [
+      {
+        "ref": "ICONS.MENU",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MENU_ROWS": [
+      {
+        "ref": "ICONS.MENU_ROWS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CLOSE": [
+      {
+        "ref": "ICONS.CLOSE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "X": [
+      {
+        "ref": "ICONS.X",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.X",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "GITHUB": [
+      {
+        "ref": "ICONS.GITHUB",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.GITHUB",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      },
+      {
+        "ref": "SANITY_LOGIN_PROVIDER.GITHUB",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "LINKEDIN": [
+      {
+        "ref": "ICONS.LINKEDIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.LINKEDIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "FACEBOOK": [
+      {
+        "ref": "ICONS.FACEBOOK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.FACEBOOK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "YOUTUBE": [
+      {
+        "ref": "ICONS.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "INSTAGRAM": [
+      {
+        "ref": "ICONS.INSTAGRAM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.INSTAGRAM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "MASTODON": [
+      {
+        "ref": "ICONS.MASTODON",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.MASTODON",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "BLUESKY": [
+      {
+        "ref": "ICONS.BLUESKY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.BLUESKY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "THREADS": [
+      {
+        "ref": "ICONS.THREADS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.THREADS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "RSS": [
+      {
+        "ref": "ICONS.RSS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.RSS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "ARROW_UP": [
+      {
+        "ref": "ICONS.ARROW_UP",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "GOOGLE": [
+      {
+        "ref": "ICONS.GOOGLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SANITY_LOGIN_PROVIDER.GOOGLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "BOOKMARK": [
+      {
+        "ref": "ICONS.BOOKMARK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SPINNER": [
+      {
+        "ref": "ICONS.SPINNER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SETTINGS": [
+      {
+        "ref": "ICONS.SETTINGS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "POWER": [
+      {
+        "ref": "ICONS.POWER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MAIL": [
+      {
+        "ref": "ICONS.MAIL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CHEVRON_RIGHT": [
+      {
+        "ref": "ICONS.CHEVRON_RIGHT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CHEVRON_LEFT": [
+      {
+        "ref": "ICONS.CHEVRON_LEFT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CHEVRON_DOWN": [
+      {
+        "ref": "ICONS.CHEVRON_DOWN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CHEVRON_UP": [
+      {
+        "ref": "ICONS.CHEVRON_UP",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "ARROW": [
+      {
+        "ref": "ICONS.ARROW",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SHIELD_CHECK": [
+      {
+        "ref": "ICONS.SHIELD_CHECK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "PLUS": [
+      {
+        "ref": "ICONS.PLUS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "PALETTE": [
+      {
+        "ref": "ICONS.PALETTE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "QUOTE": [
+      {
+        "ref": "ICONS.QUOTE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "GLOBE": [
+      {
+        "ref": "ICONS.GLOBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "STUDIO": [
+      {
+        "ref": "ICONS.STUDIO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "COMMENT": [
+      {
+        "ref": "ICONS.COMMENT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "USER": [
+      {
+        "ref": "ICONS.USER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "USERS": [
+      {
+        "ref": "ICONS.USERS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CODE": [
+      {
+        "ref": "ICONS.CODE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "LAYERS": [
+      {
+        "ref": "ICONS.LAYERS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "ZAP": [
+      {
+        "ref": "ICONS.ZAP",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SEARCH": [
+      {
+        "ref": "ICONS.SEARCH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CHART": [
+      {
+        "ref": "ICONS.CHART",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CLOCK": [
+      {
+        "ref": "ICONS.CLOCK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "WRENCH": [
+      {
+        "ref": "ICONS.WRENCH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "ROCKET": [
+      {
+        "ref": "ICONS.ROCKET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "BOOK": [
+      {
+        "ref": "ICONS.BOOK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "PEN": [
+      {
+        "ref": "ICONS.PEN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "STAR": [
+      {
+        "ref": "ICONS.STAR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "LOCK": [
+      {
+        "ref": "ICONS.LOCK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CLOUD": [
+      {
+        "ref": "ICONS.CLOUD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CPU": [
+      {
+        "ref": "ICONS.CPU",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "TARGET": [
+      {
+        "ref": "ICONS.TARGET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "HEART": [
+      {
+        "ref": "ICONS.HEART",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CAMERA": [
+      {
+        "ref": "ICONS.CAMERA",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "LIGHTBULB": [
+      {
+        "ref": "ICONS.LIGHTBULB",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MAP_PIN": [
+      {
+        "ref": "ICONS.MAP_PIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "PHONE": [
+      {
+        "ref": "ICONS.PHONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "TRENDING_UP": [
+      {
+        "ref": "ICONS.TRENDING_UP",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SMILE": [
+      {
+        "ref": "ICONS.SMILE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "BOLD": [
+      {
+        "ref": "ICONS.BOLD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "ITALIC": [
+      {
+        "ref": "ICONS.ITALIC",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "LINK": [
+      {
+        "ref": "ICONS.LINK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SEND": [
+      {
+        "ref": "ICONS.SEND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "FULL_BLEED": [
+      {
+        "ref": "IMAGE_LAYOUT.FULL_BLEED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/image-layout.ts"
+      }
+    ],
+    "FLOAT_LEFT": [
+      {
+        "ref": "IMAGE_LAYOUT.FLOAT_LEFT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/image-layout.ts"
+      }
+    ],
+    "FLOAT_RIGHT": [
+      {
+        "ref": "IMAGE_LAYOUT.FLOAT_RIGHT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/image-layout.ts"
+      }
+    ],
+    "EN": [
+      {
+        "ref": "LOCALE_ISO_CODES.EN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/language.ts"
+      }
+    ],
+    "NL": [
+      {
+        "ref": "LOCALE_ISO_CODES.NL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/language.ts"
+      }
+    ],
+    "FR": [
+      {
+        "ref": "LOCALE_ISO_CODES.FR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/language.ts"
+      }
+    ],
+    "DE": [
+      {
+        "ref": "LOCALE_ISO_CODES.DE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/language.ts"
+      }
+    ],
+    "ES": [
+      {
+        "ref": "LOCALE_ISO_CODES.ES",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/language.ts"
+      }
+    ],
+    "BRAND_PRIMARY": [
+      {
+        "ref": "BRAND_VARIANT.BRAND_PRIMARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "NONE": [
+      {
+        "ref": "SPACING_SCALE.NONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "HERO_FIELD_MODE.NONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      },
+      {
+        "ref": "CONTRAST_STATUS.NONE",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "SM": [
+      {
+        "ref": "SPACING_SCALE.SM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "RADIUS_SCALE.SM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      },
+      {
+        "ref": "SIZE.SM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/size.ts"
+      }
+    ],
+    "MD": [
+      {
+        "ref": "SPACING_SCALE.MD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "RADIUS_SCALE.MD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      },
+      {
+        "ref": "SIZE.MD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/size.ts"
+      }
+    ],
+    "LG": [
+      {
+        "ref": "SPACING_SCALE.LG",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "RADIUS_SCALE.LG",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      },
+      {
+        "ref": "SIZE.LG",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/size.ts"
+      }
+    ],
+    "XL": [
+      {
+        "ref": "SPACING_SCALE.XL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "RADIUS_SCALE.XL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      },
+      {
+        "ref": "SIZE.XL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/size.ts"
+      }
+    ],
+    "NARROW": [
+      {
+        "ref": "CONTAINER_WIDTH.NARROW",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "FULL": [
+      {
+        "ref": "CONTAINER_WIDTH.FULL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "NEWSLETTER_VARIANT.FULL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "LEFT": [
+      {
+        "ref": "CONTENT_ALIGNMENT.LEFT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "CENTER": [
+      {
+        "ref": "CONTENT_ALIGNMENT.CENTER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "RIGHT": [
+      {
+        "ref": "CONTENT_ALIGNMENT.RIGHT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "LAST": [
+      {
+        "ref": "MEDIA_ORDER.LAST",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "FIRST": [
+      {
+        "ref": "MEDIA_ORDER.FIRST",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
+    "INTERNAL": [
+      {
+        "ref": "LINK_TYPE.INTERNAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "EXTERNAL": [
+      {
+        "ref": "LINK_TYPE.EXTERNAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "CUSTOM": [
+      {
+        "ref": "HERO_FIELD_MODE.CUSTOM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "POST_TOPIC": [
+      {
+        "ref": "HERO_FIELD_MODE.POST_TOPIC",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "POST_TITLE": [
+      {
+        "ref": "HERO_FIELD_MODE.POST_TITLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "POST_EXCERPT": [
+      {
+        "ref": "HERO_FIELD_MODE.POST_EXCERPT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "POST_IMAGE": [
+      {
+        "ref": "HERO_FIELD_MODE.POST_IMAGE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "STACKED": [
+      {
+        "ref": "HERO_VARIANT.STACKED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "COMPACT": [
+      {
+        "ref": "NEWSLETTER_VARIANT.COMPACT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      },
+      {
+        "ref": "DENSITY.COMPACT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "PINNED": [
+      {
+        "ref": "POST_SOURCE.PINNED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "NEWEST_FEATURED": [
+      {
+        "ref": "POST_SOURCE.NEWEST_FEATURED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "CONFIRMED": [
+      {
+        "ref": "NEWSLETTER_RESULT.CONFIRMED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "CONFIRM_INVALID": [
+      {
+        "ref": "NEWSLETTER_RESULT.CONFIRM_INVALID",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "CONFIRM_UNAVAILABLE": [
+      {
+        "ref": "NEWSLETTER_RESULT.CONFIRM_UNAVAILABLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "CONFIRM_FAILED": [
+      {
+        "ref": "NEWSLETTER_RESULT.CONFIRM_FAILED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "UNSUBSCRIBED": [
+      {
+        "ref": "NEWSLETTER_RESULT.UNSUBSCRIBED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "UNSUBSCRIBE_INVALID": [
+      {
+        "ref": "NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "UNSUBSCRIBE_FAILED": [
+      {
+        "ref": "NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "OWNER_ELEVATION": [
+      {
+        "ref": "OPERATOR_ALERT_KIND.OWNER_ELEVATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/operator-alert.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STEP.OWNER_ELEVATION",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "bodyImage": [
+      {
+        "ref": "PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/portable-text-block-type.ts"
+      }
+    ],
+    "aside": [
+      {
+        "ref": "PORTABLE_TEXT_BLOCK_TYPE.ASIDE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/portable-text-block-type.ts"
+      }
+    ],
+    "linkRef": [
+      {
+        "ref": "PORTABLE_TEXT_BLOCK_TYPE.LINK_REF",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/portable-text-block-type.ts"
+      }
+    ],
+    "CONSOLE": [
+      {
+        "ref": "PRESET_ID.CONSOLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "EDITORIAL": [
+      {
+        "ref": "PRESET_ID.EDITORIAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "SPACE_GROTESK": [
+      {
+        "ref": "FONT_CHOICE.SPACE_GROTESK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "NEWSREADER": [
+      {
+        "ref": "FONT_CHOICE.NEWSREADER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "JETBRAINS_MONO": [
+      {
+        "ref": "FONT_CHOICE.JETBRAINS_MONO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "FRAUNCES": [
+      {
+        "ref": "FONT_CHOICE.FRAUNCES",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "INTER": [
+      {
+        "ref": "FONT_CHOICE.INTER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "DEFAULT": [
+      {
+        "ref": "DENSITY.DEFAULT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "MENU_CODE": [
+      {
+        "ref": "LANGUAGE_SWITCHER_STYLE.MENU_CODE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "MENU_GLOBE": [
+      {
+        "ref": "LANGUAGE_SWITCHER_STYLE.MENU_GLOBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "CODES": [
+      {
+        "ref": "LANGUAGE_SWITCHER_STYLE.CODES",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "ONE_TIME": [
+      {
+        "ref": "PRICE_PERIOD.ONE_TIME",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/price-period.ts"
+      }
+    ],
+    "HOUR": [
+      {
+        "ref": "PRICE_PERIOD.HOUR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/price-period.ts"
+      }
+    ],
+    "SESSION": [
+      {
+        "ref": "PRICE_PERIOD.SESSION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/price-period.ts"
+      }
+    ],
+    "MONTH": [
+      {
+        "ref": "PRICE_PERIOD.MONTH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/price-period.ts"
+      }
+    ],
+    "YEAR": [
+      {
+        "ref": "PRICE_PERIOD.YEAR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/price-period.ts"
+      }
+    ],
+    "PERMANENT": [
+      {
+        "ref": "REDIRECT_STATUS.PERMANENT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/redirect.ts"
+      }
+    ],
+    "TEMPORARY": [
+      {
+        "ref": "REDIRECT_STATUS.TEMPORARY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/redirect.ts"
+      }
+    ],
+    "RENDERING": [
+      {
+        "ref": "RELEASE_CHANGE.RENDERING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/release.ts"
+      }
+    ],
+    "DB_MIGRATION": [
+      {
+        "ref": "RELEASE_CHANGE.DB_MIGRATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/release.ts"
+      }
+    ],
+    "SANITY_MIGRATION": [
+      {
+        "ref": "RELEASE_CHANGE.SANITY_MIGRATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/release.ts"
+      }
+    ],
+    "ENV": [
+      {
+        "ref": "RELEASE_CHANGE.ENV",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/release.ts"
+      }
+    ],
+    "PASS": [
+      {
+        "ref": "CONTRAST_CHECK_OUTCOME.PASS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/release.ts"
+      }
+    ],
+    "FAIL": [
+      {
+        "ref": "CONTRAST_CHECK_OUTCOME.FAIL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/release.ts"
+      }
+    ],
+    "ALREADY_GONE": [
+      {
+        "ref": "SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "SANITY_PROJECT_ARCHIVE_OUTCOME.ALREADY_GONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "SANITY_PROJECT_UNARCHIVE_OUTCOME.ALREADY_GONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "SANITY_PROJECT_TOGGLE_RESULT.ALREADY_GONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.ALREADY_GONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "BLOCKED_BY_BILLING_PERMISSION": [
+      {
+        "ref": "SANITY_PROJECT_DELETE_OUTCOME.BLOCKED_BY_BILLING_PERMISSION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "ARCHIVED": [
+      {
+        "ref": "SANITY_PROJECT_ARCHIVE_OUTCOME.ARCHIVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "TENANT_STATUS.ARCHIVED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_REFUSAL.ARCHIVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "ALREADY_ARCHIVED": [
+      {
+        "ref": "SANITY_PROJECT_ARCHIVE_OUTCOME.ALREADY_ARCHIVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "UNARCHIVED": [
+      {
+        "ref": "SANITY_PROJECT_UNARCHIVE_OUTCOME.UNARCHIVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "ALREADY_ACTIVE": [
+      {
+        "ref": "SANITY_PROJECT_UNARCHIVE_OUTCOME.ALREADY_ACTIVE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "CHANGED": [
+      {
+        "ref": "SANITY_PROJECT_TOGGLE_RESULT.CHANGED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "ALREADY_IN_STATE": [
+      {
+        "ref": "SANITY_PROJECT_TOGGLE_RESULT.ALREADY_IN_STATE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "administrator": [
+      {
+        "ref": "SANITY_PROJECT_ROLE.ADMINISTRATOR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "editor": [
+      {
+        "ref": "SANITY_PROJECT_ROLE.EDITOR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "viewer": [
+      {
+        "ref": "SANITY_PROJECT_ROLE.VIEWER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "SANITY": [
+      {
+        "ref": "SANITY_LOGIN_PROVIDER.SANITY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "MANAGEMENT": [
+      {
+        "ref": "SANITY_API_SURFACE.MANAGEMENT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "ACCESS": [
+      {
+        "ref": "SANITY_API_SURFACE.ACCESS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "WEBHOOKS": [
+      {
+        "ref": "SANITY_API_SURFACE.WEBHOOKS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "LEFT_ARCHIVED": [
+      {
+        "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "NO_PROJECT": [
+      {
+        "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "SKIPPED_NO_TOKEN": [
+      {
+        "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.SKIPPED_NO_TOKEN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "NOT_ARCHIVED": [
+      {
+        "ref": "TENANT_DELETE_OUTCOME.NOT_ARCHIVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "TENANT_REFUSAL.NOT_ARCHIVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "NOT_FOUND": [
+      {
+        "ref": "TENANT_DELETE_OUTCOME.NOT_FOUND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "LEAD_REFUSAL.NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/lead",
+        "file": "apps/platform/src/constants/lead.ts"
+      },
+      {
+        "ref": "SETTINGS_REFUSAL.NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings",
+        "file": "apps/platform/src/constants/settings.ts"
+      },
+      {
+        "ref": "TENANT_REFUSAL.NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.NOT_FOUND",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      },
+      {
+        "ref": "PROVISION_CLI_RESULT.NOT_FOUND",
+        "scope": "app:worker",
+        "from": "@worker/constants/provisioning",
+        "file": "apps/worker/src/constants/provisioning.ts"
+      }
+    ],
+    "XS": [
+      {
+        "ref": "SIZE.XS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/size.ts"
+      }
+    ],
+    "XXL": [
+      {
+        "ref": "SIZE.XXL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/size.ts"
+      }
+    ],
+    "TOPICS": [
+      {
+        "ref": "TAXONOMY_KIND.TOPICS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/taxonomy.ts"
+      }
+    ],
+    "TAGS": [
+      {
+        "ref": "TAXONOMY_KIND.TAGS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/taxonomy.ts"
+      }
+    ],
+    "ALPHABETICAL": [
+      {
+        "ref": "TAXONOMY_SORT.ALPHABETICAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/taxonomy.ts"
+      }
+    ],
+    "MOST_POSTS": [
+      {
+        "ref": "TAXONOMY_SORT.MOST_POSTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/taxonomy.ts"
+      }
+    ],
+    "UNRESOLVED": [
+      {
+        "ref": "TENANT_WRITE_REFUSAL.UNRESOLVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/tenant-write-refusal.ts"
+      }
+    ],
+    "INACTIVE": [
+      {
+        "ref": "TENANT_WRITE_REFUSAL.INACTIVE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/tenant-write-refusal.ts"
+      }
+    ],
+    "NUMBERED": [
+      {
+        "ref": "TIMELINE_MARKER_STYLE.NUMBERED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/timeline.ts"
+      }
+    ],
+    "LABELLED": [
+      {
+        "ref": "TIMELINE_MARKER_STYLE.LABELLED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/timeline.ts"
+      }
+    ],
+    "VERTICAL": [
+      {
+        "ref": "TIMELINE_ORIENTATION.VERTICAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/timeline.ts"
+      }
+    ],
+    "HORIZONTAL": [
+      {
+        "ref": "TIMELINE_ORIENTATION.HORIZONTAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/timeline.ts"
+      }
+    ],
+    "SUPERADMIN": [
+      {
+        "ref": "ADMIN_ROLE.SUPERADMIN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
+    "ADMIN": [
+      {
+        "ref": "ADMIN_ROLE.ADMIN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
+    "MODERATOR": [
+      {
+        "ref": "ADMIN_ROLE.MODERATOR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
+    "BREAK_GLASS": [
+      {
+        "ref": "GRANTED_VIA.BREAK_GLASS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
+    "PROMOTION": [
+      {
+        "ref": "GRANTED_VIA.PROMOTION",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
+    "OWNER": [
+      {
+        "ref": "MEMBERSHIP_ROLE.OWNER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "EDITOR": [
+      {
+        "ref": "MEMBERSHIP_ROLE.EDITOR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      },
+      {
+        "ref": "SANITY_PROJECT_ROLE.EDITOR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-owner-access.ts"
+      }
+    ],
+    "READER": [
+      {
+        "ref": "MEMBERSHIP_ROLE.READER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "BLOG": [
+      {
+        "ref": "SITE_TYPE.BLOG",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-type.ts"
+      }
+    ],
+    "PORTFOLIO": [
+      {
+        "ref": "SITE_TYPE.PORTFOLIO",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-type.ts"
+      }
+    ],
+    "PERSONAL": [
+      {
+        "ref": "SITE_TYPE.PERSONAL",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-type.ts"
+      }
+    ],
+    "DOCS": [
+      {
+        "ref": "SITE_TYPE.DOCS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-type.ts"
+      }
+    ],
+    "BLANK": [
+      {
+        "ref": "SITE_TYPE.BLANK",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-type.ts"
+      }
+    ],
+    "BUSINESS": [
+      {
+        "ref": "SITE_TYPE.BUSINESS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-type.ts"
+      }
+    ],
+    "PRODUCT": [
+      {
+        "ref": "SITE_TYPE.PRODUCT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-type.ts"
+      }
+    ],
+    "REMOVE_DOMAIN": [
+      {
+        "ref": "DEPROVISIONING_STEP.REMOVE_DOMAIN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "ARCHIVE_SANITY_PROJECT": [
+      {
+        "ref": "DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "REVOKE_SANITY_TOKENS": [
+      {
+        "ref": "DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "CLEAR_ARTIFACTS": [
+      {
+        "ref": "DEPROVISIONING_STEP.CLEAR_ARTIFACTS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "ARCHIVE_TENANT": [
+      {
+        "ref": "DEPROVISIONING_STEP.ARCHIVE_TENANT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "PURGE_READER_DATA": [
+      {
+        "ref": "DEPROVISIONING_STEP.PURGE_READER_DATA",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "INVALIDATE_TENANT_CACHE": [
+      {
+        "ref": "DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-deprovisioning.ts"
+      }
+    ],
+    "VIEWER": [
+      {
+        "ref": "SANITY_PROJECT_ROLE.VIEWER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-owner-access.ts"
+      }
+    ],
+    "ADMINISTRATOR": [
+      {
+        "ref": "SANITY_PROJECT_ROLE.ADMINISTRATOR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-owner-access.ts"
+      }
+    ],
+    "PENDING": [
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.PENDING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "DOMAIN_VERIFICATION_STATUS.PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "PROVISIONING": [
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.PROVISIONING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "READY": [
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.READY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "FAILED": [
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.FAILED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STEP_STATUS.FAILED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "CONTRAST_STATUS.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "RELEASE_RUN_STATUS.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "STEP_INDICATOR_STATE.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
+      },
+      {
+        "ref": "PROVISION_CLI_RESULT.FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/provisioning",
+        "file": "apps/worker/src/constants/provisioning.ts"
+      }
+    ],
+    "SANITY_PROJECT": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP.SANITY_PROJECT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "SEED_CONTENT": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP.SEED_CONTENT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "PERSIST_TOKEN": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP.PERSIST_TOKEN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "MAP_DOMAIN": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP.MAP_DOMAIN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "CREATE_WEBHOOK": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP.CREATE_WEBHOOK",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "VERIFY_CONTENT": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP.VERIFY_CONTENT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "ENSURE_INFRASTRUCTURE": [
+      {
+        "ref": "WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "INVITE_OWNER": [
+      {
+        "ref": "WORKER_PROVISIONING_STEP.INVITE_OWNER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "APPLY_SITE_TEMPLATE": [
+      {
+        "ref": "WORKER_PROVISIONING_STEP.APPLY_SITE_TEMPLATE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "VERIFY_TENANT": [
+      {
+        "ref": "WORKER_PROVISIONING_STEP.VERIFY_TENANT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "ENSURE_OWNER_ACCESS": [
+      {
+        "ref": "WORKER_PROVISIONING_STEP.ENSURE_OWNER_ACCESS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "VALIDATE_DOCUMENTS": [
+      {
+        "ref": "WORKER_PROVISIONING_STEP.VALIDATE_DOCUMENTS",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "RUNNING": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP_STATUS.RUNNING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "CONTRAST_STATUS.RUNNING",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "RELEASE_RUN_STATUS.RUNNING",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "STEP_INDICATOR_STATE.RUNNING",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
+      }
+    ],
+    "DONE": [
+      {
+        "ref": "TENANT_PROVISIONING_STEP_STATUS.DONE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "STEP_INDICATOR_STATE.DONE",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
+      }
+    ],
+    "ELEVATED": [
+      {
+        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "ALREADY_ADMINISTRATOR": [
+      {
+        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "PENDING_ACCEPTANCE": [
+      {
+        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "STALLED": [
+      {
+        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.STALLED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "AMBIGUOUS_MEMBERSHIP": [
+      {
+        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "ACTIVE": [
+      {
+        "ref": "TENANT_STATUS.ACTIVE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "STEP_INDICATOR_STATE.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
+      }
+    ],
+    "SUSPENDED": [
+      {
+        "ref": "TENANT_STATUS.SUSPENDED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
+    "FREE": [
+      {
+        "ref": "TENANT_PLAN.FREE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
+    "GROWTH": [
+      {
+        "ref": "TENANT_PLAN.GROWTH",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
+    "EDITABLE": [
+      {
+        "ref": "CONTROL_MODE.EDITABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/control-mode",
+        "file": "apps/platform/src/constants/control-mode.ts"
+      }
+    ],
+    "READ_ONLY": [
+      {
+        "ref": "CONTROL_MODE.READ_ONLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/control-mode",
+        "file": "apps/platform/src/constants/control-mode.ts"
+      }
+    ],
+    "DISABLED": [
+      {
+        "ref": "CONTROL_MODE.DISABLED",
+        "scope": "app:platform",
+        "from": "@platform/constants/control-mode",
+        "file": "apps/platform/src/constants/control-mode.ts"
+      }
+    ],
+    "NOT_CONFIGURED": [
+      {
+        "ref": "DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      },
+      {
+        "ref": "DOMAIN_AVAILABILITY.NOT_CONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "NOT_ADDED": [
+      {
+        "ref": "DOMAIN_VERIFICATION_STATUS.NOT_ADDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "VERIFIED": [
+      {
+        "ref": "DOMAIN_VERIFICATION_STATUS.VERIFIED",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "AVAILABLE": [
+      {
+        "ref": "DOMAIN_AVAILABILITY.AVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "IN_USE": [
+      {
+        "ref": "DOMAIN_AVAILABILITY.IN_USE",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "SENDER": [
+      {
+        "ref": "EMAIL_LOGO_KIND.SENDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-logo",
+        "file": "apps/platform/src/constants/email-logo.ts"
+      }
+    ],
+    "TEMPLATE": [
+      {
+        "ref": "EMAIL_LOGO_KIND.TEMPLATE",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-logo",
+        "file": "apps/platform/src/constants/email-logo.ts"
+      }
+    ],
+    "SENDER_NAME_INVALID": [
+      {
+        "ref": "EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-sender",
+        "file": "apps/platform/src/constants/email-sender.ts"
+      }
+    ],
+    "CONTACT_RECIPIENT_INVALID": [
+      {
+        "ref": "EMAIL_SENDER_FIELD_ERROR.CONTACT_RECIPIENT_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-sender",
+        "file": "apps/platform/src/constants/email-sender.ts"
+      }
+    ],
+    "DESKTOP": [
+      {
+        "ref": "PREVIEW_WIDTH.DESKTOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "MOBILE": [
+      {
+        "ref": "PREVIEW_WIDTH.MOBILE",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "GREEN": [
+      {
+        "ref": "CONTRAST_STATUS.GREEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "DUE": [
+      {
+        "ref": "CONTRAST_STATUS.DUE",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "CONTRAST_CHECK_RUNNING": [
+      {
+        "ref": "RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "RELEASE_RUNNING": [
+      {
+        "ref": "RELEASE_REFUSAL.RELEASE_RUNNING",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "RELEASES_PAUSED": [
+      {
+        "ref": "RELEASE_REFUSAL.RELEASES_PAUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "VERSION_MALFORMED": [
+      {
+        "ref": "RELEASE_FIELD_ERROR.VERSION_MALFORMED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "VERSION_NOT_GREATER": [
+      {
+        "ref": "RELEASE_FIELD_ERROR.VERSION_NOT_GREATER",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "REASON_REQUIRED": [
+      {
+        "ref": "RELEASE_FIELD_ERROR.REASON_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "DISPATCHED": [
+      {
+        "ref": "RELEASE_RUN_STATUS.DISPATCHED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "SUCCEEDED": [
+      {
+        "ref": "RELEASE_RUN_STATUS.SUCCEEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "PROVISION_CLI_RESULT.SUCCEEDED",
+        "scope": "app:worker",
+        "from": "@worker/constants/provisioning",
+        "file": "apps/worker/src/constants/provisioning.ts"
+      }
+    ],
+    "NOT_IN_PLAN": [
+      {
+        "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings",
+        "file": "apps/platform/src/constants/settings.ts"
+      }
+    ],
+    "LOCALE_NOT_LIVE": [
+      {
+        "ref": "SETTINGS_REFUSAL.LOCALE_NOT_LIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings",
+        "file": "apps/platform/src/constants/settings.ts"
+      }
+    ],
+    "UPCOMING": [
+      {
+        "ref": "STEP_INDICATOR_STATE.UPCOMING",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
+      }
+    ],
+    "CONFIRM_REQUIRED": [
+      {
+        "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "NAME_MISMATCH": [
+      {
+        "ref": "TENANT_FIELD_ERROR.NAME_MISMATCH",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "NAME_REQUIRED": [
+      {
+        "ref": "TENANT_FIELD_ERROR.NAME_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_INVALID": [
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_TAKEN": [
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_ATTACHED_ELSEWHERE": [
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_ATTACHED_ELSEWHERE",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_LOCKED": [
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_LOCKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SLUG_INVALID": [
+      {
+        "ref": "TENANT_FIELD_ERROR.SLUG_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SLUG_RESERVED": [
+      {
+        "ref": "TENANT_FIELD_ERROR.SLUG_RESERVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SLUG_TAKEN": [
+      {
+        "ref": "TENANT_FIELD_ERROR.SLUG_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "EMAIL_INVALID": [
+      {
+        "ref": "TENANT_FIELD_ERROR.EMAIL_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "LOCALE_UNSUPPORTED": [
+      {
+        "ref": "TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "PLAN_UNSUPPORTED": [
+      {
+        "ref": "TENANT_FIELD_ERROR.PLAN_UNSUPPORTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_EMAIL_TAKEN": [
+      {
+        "ref": "TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "ALREADY_DEPROVISIONED": [
+      {
+        "ref": "TENANT_REFUSAL.ALREADY_DEPROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "NOT_DEPROVISIONED": [
+      {
+        "ref": "TENANT_REFUSAL.NOT_DEPROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "ALREADY_IN_PROGRESS": [
+      {
+        "ref": "TENANT_REFUSAL.ALREADY_IN_PROGRESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.ALREADY_IN_PROGRESS",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      },
+      {
+        "ref": "PROVISION_CLI_RESULT.ALREADY_IN_PROGRESS",
+        "scope": "app:worker",
+        "from": "@worker/constants/provisioning",
+        "file": "apps/worker/src/constants/provisioning.ts"
+      }
+    ],
+    "LOCALE_IS_ADDITIONAL": [
+      {
+        "ref": "TENANT_REFUSAL.LOCALE_IS_ADDITIONAL",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "PROVISIONING_STARTED": [
+      {
+        "ref": "TENANT_REFUSAL.PROVISIONING_STARTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_ALREADY_JOINED": [
+      {
+        "ref": "TENANT_REFUSAL.OWNER_ALREADY_JOINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_INVITE_UNCONFIRMED": [
+      {
+        "ref": "TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "UPLOADS_NOT_CONFIGURED": [
+      {
+        "ref": "UPLOAD_REFUSAL.UPLOADS_NOT_CONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "FILE_MISSING": [
+      {
+        "ref": "UPLOAD_REFUSAL.FILE_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "FILE_TOO_LARGE": [
+      {
+        "ref": "UPLOAD_REFUSAL.FILE_TOO_LARGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "UNREADABLE_IMAGE": [
+      {
+        "ref": "UPLOAD_REFUSAL.UNREADABLE_IMAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "UNRECOGNIZED_TARGET": [
+      {
+        "ref": "UPLOAD_REFUSAL.UNRECOGNIZED_TARGET",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "BRAND_IMAGE_TYPE_UNSUPPORTED": [
+      {
+        "ref": "UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "IMAGE_TOO_SMALL": [
+      {
+        "ref": "UPLOAD_REFUSAL.IMAGE_TOO_SMALL",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "IMAGE_TOO_LARGE": [
+      {
+        "ref": "UPLOAD_REFUSAL.IMAGE_TOO_LARGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "FAVICON_NOT_SQUARE": [
+      {
+        "ref": "UPLOAD_REFUSAL.FAVICON_NOT_SQUARE",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "SVG_FAVICON_NOT_SQUARE": [
+      {
+        "ref": "UPLOAD_REFUSAL.SVG_FAVICON_NOT_SQUARE",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "EMAIL_LOGO_SVG": [
+      {
+        "ref": "UPLOAD_REFUSAL.EMAIL_LOGO_SVG",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "EMAIL_LOGO_WEBP": [
+      {
+        "ref": "UPLOAD_REFUSAL.EMAIL_LOGO_WEBP",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "EMAIL_LOGO_TYPE_UNSUPPORTED": [
+      {
+        "ref": "UPLOAD_REFUSAL.EMAIL_LOGO_TYPE_UNSUPPORTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "UPLOAD": [
+      {
+        "ref": "UPLOAD_OPERATION.UPLOAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "CLEAR": [
+      {
+        "ref": "UPLOAD_OPERATION.CLEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "UNKNOWN": [
+      {
+        "ref": "CONSENT_STATUS.UNKNOWN",
+        "scope": "app:web",
+        "from": "@web/constants/consent",
+        "file": "apps/web/src/constants/consent.ts"
+      }
+    ],
+    "UNANSWERED": [
+      {
+        "ref": "CONSENT_STATUS.UNANSWERED",
+        "scope": "app:web",
+        "from": "@web/constants/consent",
+        "file": "apps/web/src/constants/consent.ts"
+      }
+    ],
+    "ANSWERED": [
+      {
+        "ref": "CONSENT_STATUS.ANSWERED",
+        "scope": "app:web",
+        "from": "@web/constants/consent",
+        "file": "apps/web/src/constants/consent.ts"
+      }
+    ],
+    "GRANTED": [
+      {
+        "ref": "CONSENT_STATUS.GRANTED",
+        "scope": "app:web",
+        "from": "@web/constants/consent",
+        "file": "apps/web/src/constants/consent.ts"
+      }
+    ],
+    "DENIED": [
+      {
+        "ref": "CONSENT_STATUS.DENIED",
+        "scope": "app:web",
+        "from": "@web/constants/consent",
+        "file": "apps/web/src/constants/consent.ts"
+      }
+    ],
+    "ALREADY_SUBSCRIBED": [
+      {
+        "ref": "NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "UNAUTHORIZED": [
+      {
+        "ref": "ENQUEUE_ERROR.UNAUTHORIZED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "INVALID_BODY": [
+      {
+        "ref": "ENQUEUE_ERROR.INVALID_BODY",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "NOT_PROVISIONED": [
+      {
+        "ref": "ENQUEUE_ERROR.NOT_PROVISIONED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ]
+  },
+  "numbers": {
+    "200": [
+      {
+        "ref": "HTTP_STATUS.OK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "201": [
+      {
+        "ref": "HTTP_STATUS.CREATED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "202": [
+      {
+        "ref": "HTTP_STATUS.ACCEPTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "204": [
+      {
+        "ref": "HTTP_STATUS.NO_CONTENT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "303": [
+      {
+        "ref": "HTTP_STATUS.SEE_OTHER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "400": [
+      {
+        "ref": "HTTP_STATUS.BAD_REQUEST",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "401": [
+      {
+        "ref": "HTTP_STATUS.UNAUTHORIZED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "402": [
+      {
+        "ref": "HTTP_STATUS.PAYMENT_REQUIRED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "403": [
+      {
+        "ref": "HTTP_STATUS.FORBIDDEN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "404": [
+      {
+        "ref": "HTTP_STATUS.NOT_FOUND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "409": [
+      {
+        "ref": "HTTP_STATUS.CONFLICT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "500": [
+      {
+        "ref": "HTTP_STATUS.INTERNAL_SERVER_ERROR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ]
+  }
+}

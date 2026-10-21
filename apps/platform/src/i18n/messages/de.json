@@ -107,7 +107,13 @@
     "badgePlatform": "Plattform",
     "features": "Funktionen",
     "leads": "Anfragen",
-    "releases": "Releases"
+    "releases": "Releases",
+    "studioAccess": {
+      "INVITE_SENT": "Einladung gesendet",
+      "ACTIVATING": "Wird aktiviert",
+      "READY": "Bereit",
+      "STALLED": "Aktion nötig"
+    }
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"
@@ -224,7 +230,15 @@
     "voiceTileTitle": "Tonalität",
     "voiceTileDescription": "Die Formulierungen Ihrer Website",
     "featuresTileTitle": "Funktionen",
-    "featuresTileDescription": "Kommentare, Lesezeichen, Newsletter"
+    "featuresTileDescription": "Kommentare, Lesezeichen, Newsletter",
+    "siteSetupCardTitle": "Ihre Website wird eingerichtet",
+    "siteSetupFailedTitle": "Die Einrichtung Ihrer Website wurde angehalten",
+    "siteSetupFailedDescription": "Bei einem der Schritte ist ein Problem aufgetreten. Versuchen Sie es erneut – bereits Eingerichtetes bleibt erhalten.",
+    "siteSetupFailedContactDescription": "Bei einem der Schritte ist ein Problem aufgetreten. Bitten Sie Ihren Plattform-Kontakt, sie neu zu starten.",
+    "siteSetupRetry": "Erneut versuchen",
+    "siteSetupRetrying": "Wird neu gestartet…",
+    "siteSetupRetryFailed": "Die Einrichtung konnte nicht neu gestartet werden – versuchen Sie es erneut.",
+    "siteSetupRetryRefused": "Die Einrichtung konnte nicht neu gestartet werden – laden Sie die Seite neu und versuchen Sie es erneut."
   },
   "provisioningBanner": {
     "readyTitle": "Bereitgestellt",
@@ -830,6 +844,25 @@
     "title": "Studio",
     "notProvisionedTitle": "Studio ist noch nicht bereit",
     "notProvisionedDescription": "Das Sanity-Projekt dieser Website ist noch nicht fertig eingerichtet. Versuchen Sie es in ein paar Minuten erneut."
+  },
+  "ownerStudioAccess": {
+    "title": {
+      "INVITE_SENT": "Nehmen Sie Ihre Studio-Einladung an",
+      "ACTIVATING": "Ihr Studio-Zugang wird eingerichtet",
+      "STALLED": "Ihre Studio-Einladung wurde nicht angenommen"
+    },
+    "description": {
+      "INVITE_SENT": "Wir haben Ihnen eine Einladung von Sanity geschickt, dem Editor hinter Studio. Nehmen Sie sie an – Studio öffnet sich hier, sobald Ihr Zugang bestätigt ist.",
+      "ACTIVATING": "Sie haben die Einladung angenommen. Wir geben Ihrem Konto Bearbeitungsrechte; das dauert meist eine Minute.",
+      "STALLED": "Die Einladung wurde vor mehr als drei Tagen gesendet und nicht angenommen, daher prüfen wir nicht mehr. Senden Sie eine neue oder prüfen Sie jetzt, falls Sie sie gerade angenommen haben."
+    },
+    "checkNow": "Jetzt prüfen",
+    "checking": "Wird geprüft…",
+    "resendInvite": "Einladung erneut senden",
+    "resending": "Wird gesendet…",
+    "checkStarted": "Ihr Zugang wird jetzt geprüft. Laden Sie die Seite in einer Minute neu, um das Ergebnis zu sehen.",
+    "inviteResent": "Eine neue Einladung ist auf dem Weg in Ihr Postfach.",
+    "requestFailed": "Der Einrichtungsdienst war nicht erreichbar – versuchen Sie es erneut."
   },
   "tenantDetailsPanel": {
     "heading": "Mandantendetails",

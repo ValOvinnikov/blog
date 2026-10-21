@@ -7,7 +7,30 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 import { noClassAssertionsRule } from './no-class-assertions.js';
+import { noDuplicateStringRule } from './no-duplicate-string.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
+import { preferSharedConstantRule } from './prefer-shared-constant.js';
+
+// Set only by the touched-file gates (post-edit hook, pre-commit, `pnpm
+// check:touched-lint`), so files nobody edits keep their existing violations.
+const lintsTouchedFiles = process.env.BLOG_LINT_TOUCHED === '1';
+
+const touchedFileRules = {
+  files: ['**/*.{ts,tsx}'],
+  ignores: ['migrations/**'],
+  plugins: {
+    'blog-touched': {
+      rules: {
+        'prefer-shared-constant': preferSharedConstantRule,
+        'no-duplicate-string': noDuplicateStringRule,
+      },
+    },
+  },
+  rules: {
+    'blog-touched/prefer-shared-constant': 'error',
+    'blog-touched/no-duplicate-string': ['error', { threshold: 2 }],
+  },
+};
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
@@ -109,5 +132,6 @@ export default [
       ],
     },
   },
+  ...(lintsTouchedFiles ? [touchedFileRules] : []),
   prettier,
 ];

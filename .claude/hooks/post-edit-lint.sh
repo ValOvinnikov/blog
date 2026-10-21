@@ -57,7 +57,9 @@ done
 
 cd "$workspace_dir" || exit 0
 
-output=$("$eslint" --no-warn-ignored "$file_path" 2>&1)
+# BLOG_LINT_TOUCHED switches on the rules that apply only to files being
+# changed (prefer-shared-constant, no-duplicate-string).
+output=$(BLOG_LINT_TOUCHED=1 "$eslint" --no-warn-ignored "$file_path" 2>&1)
 status=$?
 
 # ESLint exit codes: 0 = clean, 1 = lint problems, >=2 = fatal (e.g. no

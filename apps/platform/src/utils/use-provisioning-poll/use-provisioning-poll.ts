@@ -29,8 +29,8 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 
 // Short enough that a step lasting a couple of seconds is seen running.
 const STEP_POLL_INTERVAL_MS = 1500;
-// 25 minutes: outlasts the workflow's 20-minute job timeout plus runner pickup.
-const MAX_POLL_TICKS = (25 * 60_000) / STEP_POLL_INTERVAL_MS;
+// 10 minutes: a worker run takes under a minute, leaving room for every unit's retries.
+const MAX_POLL_TICKS = (10 * 60_000) / STEP_POLL_INTERVAL_MS;
 
 export type TDispatchNoticeKind =
   TRetryProvisioningRefusal | typeof ACTION_OUTCOME.SERVER_ERROR;
