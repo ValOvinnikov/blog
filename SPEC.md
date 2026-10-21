@@ -2374,7 +2374,8 @@ percent-encoded id cannot slip past a raw-string test.
 `account` and `bookmarks` opt out with `force-dynamic`: both render the
 signed-in reader's own session, so they must never be cached across users, and
 stating that on the route is safer than relying on a session read several
-layers below it.
+layers below it. `newsletter/unsubscribe` is `force-dynamic` for the same
+reason: its query-string token belongs to one subscriber.
 
 Client-side error capture is a self-hosted route, not a third-party SDK
 (`web`'s Lighthouse performance budget rules out shipping an SDK on every

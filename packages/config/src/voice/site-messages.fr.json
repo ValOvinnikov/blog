@@ -266,6 +266,9 @@
     "nextAriaLabel": "Diapositive suivante",
     "regionLabel": "Carrousel {title}"
   },
+  "codeBlock": {
+    "regionLabel": "Exemple de code"
+  },
   "pricingModule": {
     "free": "Gratuit",
     "from": "À partir de",

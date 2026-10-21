@@ -53,7 +53,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 
 ## Constraints and invariants
 
-- **Separation is structural** — `buildOperatorShell` takes no brand and always uses `PLATFORM_EMAIL_BRAND`; `buildTenantShell` requires a resolved `TTenantEmailBrand`. Operator templates live in `templates/operator/`, tenant templates in `templates/tenant/`, owner onboarding templates in `templates/owner/`. Mail with no tenant (a platform sign-in) uses the neutral shell.
+- **Separation is structural** — `buildOperatorShell` takes no brand and always uses `PLATFORM_EMAIL_BRAND`; `buildTenantShell` requires a resolved `TTenantEmailBrand`. Operator templates live in `templates/operator/`, tenant templates in `templates/tenant/`, owner onboarding templates in `templates/owner/`. Sign-in and invite mail picks its shell by sender: the tenant shell when a tenant identity resolves, the platform shell (the stacked logo mark beside the fixed name "Platform", `PLATFORM_EMAIL_BRAND_NAME`) when the builder is told `isSentByPlatform`, and the neutral shell otherwise — a sign-in on an unknown host.
 - **Platform shell** — `buildPlatformShell` renders mail the platform sends in its own name in `PLATFORM_EMAIL_BRAND`, taking the brand name but no palette. `buildOperatorShell` is it with the fixed name "Tenant Alerts"; the owner onboarding templates pass the platform's name.
 - **Locked action** — the sign-in, accept-invite and confirm links render as an action element outside the authored body, so authored copy cannot remove or replace them.
 - Authored bodies serialise only paragraphs, headings and bullet/number lists, with `strong`, `em` and links; every value goes through the canonical `escapeHtml` and `sanitizeHref`.

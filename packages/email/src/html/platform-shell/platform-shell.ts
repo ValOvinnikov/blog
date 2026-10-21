@@ -6,6 +6,7 @@ export type TBuildPlatformShellInput = {
   title: string;
   previewText?: string;
   bodyHtml: string;
+  structuralHtml?: string;
   actionHtml?: string;
 };
 
@@ -19,6 +20,7 @@ export function buildPlatformShell({
   title,
   previewText,
   bodyHtml,
+  structuralHtml,
   actionHtml,
 }: TBuildPlatformShellInput): string {
   return renderEmailShell({
@@ -27,6 +29,7 @@ export function buildPlatformShell({
     identity: { brandName, markPalette: PLATFORM_EMAIL_BRAND },
     previewText,
     bodyHtml,
+    structuralHtml,
     actionHtml,
   });
 }

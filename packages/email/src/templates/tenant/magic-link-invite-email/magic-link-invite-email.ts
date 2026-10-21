@@ -1,20 +1,16 @@
-import { renderEmailAction } from '@blog/email/html/email-action/email-action';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import {
-  buildNeutralShell,
-  NEUTRAL_EMAIL_PALETTE,
-} from '@blog/email/html/neutral-shell/neutral-shell';
-import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
 import {
   serializePortableText,
   type TPortableTextContent,
 } from '@blog/email/portable-text';
 import type { TMagicLinkEmailContent } from '@blog/email/templates/tenant/magic-link-email/magic-link-email';
+import { buildSignInEmailShell } from '@blog/email/templates/tenant/sign-in-email-shell/sign-in-email-shell';
 import type { TTenantEmailIdentity } from '@blog/email/templates/tenant/tenant-email-identity/tenant-email-identity';
 
 export type TMagicLinkInviteEmailInput = {
   url: string;
   tenantIdentity?: TTenantEmailIdentity;
+  isSentByPlatform?: boolean;
   tenantNames?: string[];
   subject: string;
   body: TPortableTextContent;
@@ -39,51 +35,29 @@ function renderInvitedTenantNamesHtml(tenantNames: string[]): string {
 }
 
 /**
- * Builds sign-in email copy for an address with a pending tenant invite. The
- * invited organisation name(s) and the accept-invite link are both rendered
- * as locked structural elements outside the authored body, so no authored
- * copy can remove, replace or displace them.
+ * Sign-in email for an address with a pending tenant invite. The invited
+ * organisation name(s) and the accept-invite link render outside the authored
+ * body, so no authored copy can remove, replace or displace them.
  */
 export function buildInviteMagicLinkEmail({
   url,
   tenantIdentity,
+  isSentByPlatform,
   tenantNames = [],
   subject,
   body,
   logoImageUrl,
   footerPostalAddress,
 }: TMagicLinkInviteEmailInput): TMagicLinkEmailContent {
-  const bodyHtml = serializePortableText(body);
-  const tenantNamesHtml = renderInvitedTenantNamesHtml(tenantNames);
-
-  const action = {
-    label: ACCEPT_INVITE_ACTION_LABEL,
-    url,
-    variant: 'button',
-  } as const;
-
-  if (!tenantIdentity) {
-    return {
-      subject,
-      html: buildNeutralShell({
-        title: subject,
-        bodyHtml,
-        structuralHtml: tenantNamesHtml,
-        actionHtml: renderEmailAction(action, NEUTRAL_EMAIL_PALETTE),
-      }),
-    };
-  }
-
-  const actionHtml = renderEmailAction(action, tenantIdentity.brand);
-
   return {
     subject,
-    html: buildTenantShell({
-      brand: tenantIdentity.brand,
-      brandName: tenantIdentity.brandName,
-      bodyHtml,
-      structuralHtml: tenantNamesHtml,
-      actionHtml,
+    html: buildSignInEmailShell({
+      title: subject,
+      bodyHtml: serializePortableText(body),
+      structuralHtml: renderInvitedTenantNamesHtml(tenantNames),
+      action: { label: ACCEPT_INVITE_ACTION_LABEL, url, variant: 'button' },
+      tenantIdentity,
+      isSentByPlatform,
       logoImageUrl,
       footerPostalAddress,
     }),

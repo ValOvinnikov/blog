@@ -1,17 +1,15 @@
-import { NEWSLETTER_RESULT, routes } from '@blog/config';
+import { NEWSLETTER_RESULT } from '@blog/config';
 import { queries } from '@blog/db';
-import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
-import { redirectToNewsletterResult } from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
+import {
+  redirectToNewsletterResult,
+  redirectToNewsletterUnsubscribeConfirmation,
+} from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
-import { getTranslations } from 'next-intl/server';
-
-import { renderConfirmResponse } from './unsubscribe-page';
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
+  const token = new URL(request.url).searchParams.get('token');
 
   if (!token) {
     return redirectToNewsletterResult(
@@ -20,22 +18,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 
-  const { locale } = await resolveNewsletterLinkLocale(
-    searchParams.get('lang'),
-  );
-  const t = await getTranslations({
-    locale,
-    namespace: 'newsletterUnsubscribe',
-  });
-
-  return renderConfirmResponse({
-    lang: locale,
-    title: t('confirmTitle'),
-    message: t('confirmMessage'),
-    confirmButtonLabel: t('confirmButtonLabel'),
-    returnHomeLabel: t('returnHome'),
-    actionUrl: routes.newsletterUnsubscribe(token, locale),
-  });
+  return redirectToNewsletterUnsubscribeConfirmation(request, token);
 }
 
 export async function POST(request: Request): Promise<NextResponse> {

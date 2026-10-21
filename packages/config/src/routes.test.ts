@@ -98,6 +98,12 @@ describe('routes', () => {
     );
   });
 
+  it('builds the unsubscribe confirmation page path from the token', () => {
+    expect(routes.newsletterUnsubscribeConfirmation('abc123')).toBe(
+      '/newsletter/unsubscribe?token=abc123',
+    );
+  });
+
   it('URL-encodes tokens containing reserved query characters', () => {
     expect(routes.newsletterConfirm('a b&c=d')).toBe(
       '/api/newsletter/confirm?token=a%20b%26c%3Dd',
