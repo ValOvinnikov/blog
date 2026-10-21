@@ -27,6 +27,7 @@
     "@blog/utils": "workspace:*",
     "@portabletext/editor": "^8.2.4",
     "@t3-oss/env-nextjs": "^0.13.11",
+    "@upstash/redis": "^1.39.0",
     "@vercel/blob": "^2.8.2",
     "@vercel/functions": "^3.10.1",
     "dompurify": "^3.4.17",

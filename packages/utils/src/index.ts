@@ -6,6 +6,7 @@ export * from './enqueue-signature';
 export * from './hash';
 export * from './is-secret-match';
 export * from './merge';
+export * from './normalize-email-identity';
 export * from './pagination';
 export * from './primitives';
 export * from './reading-time';

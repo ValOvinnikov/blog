@@ -53,6 +53,13 @@ export const env = createEnv({
     OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-required: development
     CONTRAST_RESULT_SECRET: z.string().min(1).optional(),
+    // Injected by the Upstash Redis Marketplace integration; the Create site gate refuses to start without them when VERCEL_ENV is production.
+    // @env-optional
+    KV_REST_API_URL: z.string().url().optional(),
+    // @env-optional
+    KV_REST_API_TOKEN: z.string().min(1).optional(),
+    // @env-optional
+    VERCEL_ENV: z.string().min(1).optional(),
     // @env-optional
     LOKI_PUSH_URL: z.string().min(1).optional(),
     // @env-optional
@@ -61,6 +68,10 @@ export const env = createEnv({
     LOKI_TOKEN: z.string().min(1).optional(),
     // Also signs the owner-invite confirmation token, not only Auth.js sessions.
     AUTH_SECRET: z.string().min(1),
+    // @env-optional
+    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    // @env-optional
+    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
@@ -81,10 +92,15 @@ export const env = createEnv({
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
     OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
     CONTRAST_RESULT_SECRET: process.env.CONTRAST_RESULT_SECRET,
+    KV_REST_API_URL: process.env.KV_REST_API_URL,
+    KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
+    VERCEL_ENV: process.env.VERCEL_ENV,
     LOKI_PUSH_URL: process.env.LOKI_PUSH_URL,
     LOKI_USER: process.env.LOKI_USER,
     LOKI_TOKEN: process.env.LOKI_TOKEN,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
+    PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
   },
   emptyStringAsUndefined: true,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

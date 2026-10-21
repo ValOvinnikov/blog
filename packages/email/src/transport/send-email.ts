@@ -10,6 +10,7 @@ export type TSendEmailInput = {
   from: string;
   subject: string;
   html: string;
+  text?: string;
   headers?: Record<string, string>;
   replyTo?: string;
 };
@@ -21,25 +22,18 @@ function sanitizeEmailSubject(subject: string): string {
 
 let resendClient: Resend | undefined;
 
-/** Lazy singleton — mirrors `@blog/db`'s `getDb()`, avoids constructing a client until the first send. */
 function getResendClient(): Resend {
   resendClient ??= new Resend(env.RESEND_API_KEY);
 
   return resendClient;
 }
 
-/**
- * The single Resend-backed transport every email builder in this repo sends
- * through — deliberately generic (`to`/`from`/`subject`/`html`, plus optional
- * mail headers) so callers as different as the Auth.js magic-link provider
- * and the newsletter confirmation email can share it without reshaping it
- * around either one.
- */
 export async function sendEmail({
   to,
   from,
   subject,
   html,
+  text,
   headers,
   replyTo,
 }: TSendEmailInput): Promise<void> {
@@ -52,6 +46,7 @@ export async function sendEmail({
     from,
     subject: sanitizeEmailSubject(subject),
     html,
+    text,
     headers,
     replyTo,
   });

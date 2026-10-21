@@ -40,6 +40,7 @@ export * from './release';
 export * from './reserved-slug';
 export * from './reserved-subdomain';
 export * from './sanity-project';
+export * from './site-type';
 export * from './size';
 export * from './taxonomy';
 export * from './tenant-write-refusal';

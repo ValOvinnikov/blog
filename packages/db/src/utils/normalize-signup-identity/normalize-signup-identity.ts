@@ -1,6 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { normalizeEmailIdentity } from '@blog/utils/normalize-email-identity';
 
 export type TSignupEmail = {
   address: string;
@@ -12,14 +12,13 @@ export type TSignupEmail = {
 export function normalizeSignupEmail(
   email: string,
 ): TMaybeUndefined<TSignupEmail> {
-  const normalized = normalizeEmail(email);
-  const separator = normalized.lastIndexOf('@');
-  const [localPart] = normalized.slice(0, separator).split('+');
-  const domain = normalized.slice(separator + 1);
+  const address = normalizeEmailIdentity(email);
+  const separator = address.lastIndexOf('@');
+  const domain = address.slice(separator + 1);
 
-  if (separator < 1 || !localPart || !isValidDomain(domain)) return undefined;
+  if (separator < 1 || !isValidDomain(domain)) return undefined;
 
-  return { address: `${localPart}@${domain}`, domain };
+  return { address, domain };
 }
 
 export function normalizeSignupDomain(domain: string): TMaybeUndefined<string> {
