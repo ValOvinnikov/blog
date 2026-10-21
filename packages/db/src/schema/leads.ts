@@ -1,5 +1,6 @@
 import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 export const leads = pgTable(
@@ -13,7 +14,10 @@ export const leads = pgTable(
     email: text('email').notNull(),
     message: text('message').notNull(),
     sourcePath: text('source_path').notNull(),
-    createdAt: timestamp('created_at', { mode: 'date', withTimezone: true })
+    createdAt: timestamp(CREATED_AT_COLUMN, {
+      mode: 'date',
+      withTimezone: true,
+    })
       .notNull()
       .defaultNow(),
   },
