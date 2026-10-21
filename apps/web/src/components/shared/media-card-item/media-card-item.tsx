@@ -43,7 +43,7 @@ export const MediaCardItem = ({
     isInteractive={Boolean(item.href)}
     dataTestId={dataTestId}
   >
-    {hasImage && (
+    {hasImage && Boolean(item.image) && (
       <MediaCard.Media dataTestId="media-card-media">
         {item.image}
       </MediaCard.Media>

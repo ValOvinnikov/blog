@@ -70,6 +70,12 @@ describe(`<${MediaCardItem.name}/>`, () => {
     expect(screen.getByTestId('post-image')).toBeVisible();
   });
 
+  it('renders no media region when hasImage is true but the item has no image', () => {
+    renderElement(<MediaCardItem item={item} hasImage={true} />);
+
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+  });
+
   it('forwards dataTestId to the underlying MediaCard', () => {
     renderElement(<MediaCardItem item={item} dataTestId="lead-card" />);
 
