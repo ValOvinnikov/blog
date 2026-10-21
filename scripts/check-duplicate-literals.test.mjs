@@ -25,6 +25,7 @@ test('collectLiterals skips every exempt position', () => {
     "import { x } from '@blog/config';",
     "export * from './a';",
     "vi.mock('@web/utils/logger/logger');",
+    "const alias = blogPackageAlias('email', import.meta.url);",
     "const m = await import('./lazy');",
     "describe('renders', () => {});",
     "const map = { 'aria-label': 1 };",
