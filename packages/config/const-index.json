@@ -2800,6 +2800,54 @@
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
+    "SUSPENSION_WARNING": [
+      {
+        "ref": "INACTIVITY_STAGE.SUSPENSION_WARNING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "SUSPENSION": [
+      {
+        "ref": "INACTIVITY_STAGE.SUSPENSION",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "DELETION_NOTICE": [
+      {
+        "ref": "INACTIVITY_STAGE.DELETION_NOTICE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "DEPROVISIONING": [
+      {
+        "ref": "INACTIVITY_STAGE.DEPROVISIONING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "INACTIVITY": [
+      {
+        "ref": "SUSPENSION_REASON.INACTIVITY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
+    "OPERATOR": [
+      {
+        "ref": "SUSPENSION_REASON.OPERATOR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-inactivity.ts"
+      }
+    ],
     "VIEWER": [
       {
         "ref": "SANITY_PROJECT_ROLE.VIEWER",

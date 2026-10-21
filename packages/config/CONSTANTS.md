@@ -220,6 +220,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **DEPROVISIONING_STEP**: `REMOVE_DOMAIN`, `ARCHIVE_SANITY_PROJECT`, `REVOKE_SANITY_TOKENS`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT`, `PURGE_READER_DATA`, `INVALIDATE_TENANT_CACHE`
 
+### `@blog/db/constants` — `packages/db/src/constants/tenant-inactivity.ts`
+
+- **INACTIVITY_STAGE**: `SUSPENSION_WARNING`, `SUSPENSION`, `DELETION_NOTICE`, `DEPROVISIONING`
+- **SUSPENSION_REASON**: `INACTIVITY`, `OPERATOR`
+
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-owner-access.ts`
 
 - **SANITY_PROJECT_ROLE**: `VIEWER`, `EDITOR`, `ADMINISTRATOR`
