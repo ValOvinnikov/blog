@@ -1,6 +1,7 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
+  MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -8,6 +9,9 @@ import {
   type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
+import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
+import { membershipInvites } from '@blog/db/schema/membership-invites';
+import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import {
   tenants,
@@ -20,7 +24,8 @@ import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normal
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
-import { insertDraftOwner, type TDraftOwner } from './insert-draft-owner';
+export type TDraftOwner =
+  { type: 'user'; userId: string } | { type: 'invite'; email: string };
 
 export type TCreateTenantDraftInput = {
   name: string;
@@ -71,13 +76,32 @@ export async function createTenantDraft(
     throw new Error('createTenantDraft: tenant insert returned no row.');
   }
 
+  const ownerInsert =
+    input.owner.type === 'user'
+      ? db
+          .insert(memberships)
+          .values({
+            tenantId: tenant.id,
+            userId: input.owner.userId,
+            role: MEMBERSHIP_ROLE.OWNER,
+          })
+          .returning()
+      : db
+          .insert(membershipInvites)
+          .values({
+            tenantId: tenant.id,
+            ...inviteEmailColumns(input.owner.email),
+            role: MEMBERSHIP_ROLE.OWNER,
+          })
+          .returning();
+
   try {
     const [domainRow, ownerRow] = await Promise.all([
       db
         .insert(tenantDomains)
         .values({ tenantId: tenant.id, domain: input.domain })
         .returning(),
-      insertDraftOwner(tenant.id, input.owner),
+      ownerInsert,
     ]);
 
     if (!domainRow[0]) {

@@ -1,11 +1,10 @@
 import { getDb } from '@blog/db/client';
 import type { TMembershipRole } from '@blog/db/constants';
+import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import {
   membershipInvites,
   type TMembershipInvite,
 } from '@blog/db/schema/membership-invites';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
-import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
 export type TCreateMembershipInviteResult =
@@ -25,16 +24,12 @@ export async function createMembershipInvite(
   role: TMembershipRole,
 ): Promise<TCreateMembershipInviteResult> {
   const db = getDb();
-  const normalizedEmail = normalizeEmail(email);
+  const emailColumns = inviteEmailColumns(email);
+  const { email: normalizedEmail } = emailColumns;
 
   const [inserted] = await db
     .insert(membershipInvites)
-    .values({
-      tenantId,
-      email: normalizedEmail,
-      ...personalEmailColumns(normalizedEmail),
-      role,
-    })
+    .values({ tenantId, ...emailColumns, role })
     .onConflictDoNothing()
     .returning();
 

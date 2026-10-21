@@ -7,7 +7,11 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN } from './columns';
+import {
+  CREATED_AT_COLUMN,
+  EMAIL_ENCRYPTED_COLUMN,
+  EMAIL_INDEX_COLUMN,
+} from './columns';
 import { membershipRoleEnum } from './memberships';
 import { tenants } from './tenants';
 
@@ -19,8 +23,8 @@ export const membershipInvites = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     email: text('email').notNull(),
-    emailEncrypted: text('email_encrypted'),
-    emailIndex: text('email_index'),
+    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN),
+    emailIndex: text(EMAIL_INDEX_COLUMN),
     role: membershipRoleEnum('role').notNull(),
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
       .notNull()

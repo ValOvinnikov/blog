@@ -7,6 +7,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { findPendingInviteByEmailIndex } from './find-pending-invite-by-email-index';
 
@@ -55,7 +56,7 @@ describe(findPendingInviteByEmailIndex, () => {
     await insertInvite(null);
 
     await expect(
-      findPendingInviteByEmailIndex('someone-else@example.com'),
+      findPendingInviteByEmailIndex(faker.internet.email()),
     ).resolves.toEqual([]);
   });
 });

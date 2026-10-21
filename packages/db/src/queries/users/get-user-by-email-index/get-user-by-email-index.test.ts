@@ -5,6 +5,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { getUserByEmailIndex } from './get-user-by-email-index';
 
@@ -15,7 +16,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const EMAIL = 'jane@example.com';
+const EMAIL = faker.internet.email().toLowerCase();
 
 afterEach(async () => {
   await db().delete(schema.users);
@@ -27,9 +28,9 @@ describe(getUserByEmailIndex, () => {
       emailIndex: testPersonalEmailIndex(EMAIL),
     });
 
-    await expect(
-      getUserByEmailIndex(' Jane+news@Example.com'),
-    ).resolves.toEqual(user);
+    await expect(getUserByEmailIndex(EMAIL.toUpperCase())).resolves.toEqual(
+      user,
+    );
   });
 
   it('returns undefined when no user has that index', async () => {

@@ -3,6 +3,7 @@ import {
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
+import { faker } from '@faker-js/faker';
 
 import {
   encryptPersonalValue,
@@ -10,7 +11,7 @@ import {
   requirePersonalEmailIndex,
 } from './personal-data';
 
-const EMAIL = 'reader@example.com';
+const EMAIL = faker.internet.email().toLowerCase();
 
 describe('with both personal data keys configured', () => {
   usePersonalDataKeys();

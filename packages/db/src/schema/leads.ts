@@ -1,6 +1,10 @@
 import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN } from './columns';
+import {
+  CREATED_AT_COLUMN,
+  EMAIL_ENCRYPTED_COLUMN,
+  EMAIL_INDEX_COLUMN,
+} from './columns';
 import { tenants } from './tenants';
 
 export const leads = pgTable(
@@ -13,8 +17,8 @@ export const leads = pgTable(
     name: text('name').notNull(),
     nameEncrypted: text('name_encrypted'),
     email: text('email').notNull(),
-    emailEncrypted: text('email_encrypted'),
-    emailIndex: text('email_index'),
+    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN),
+    emailIndex: text(EMAIL_INDEX_COLUMN),
     message: text('message').notNull(),
     messageEncrypted: text('message_encrypted'),
     sourcePath: text('source_path').notNull(),
