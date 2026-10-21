@@ -16,6 +16,9 @@ export function makeTenantOwnerAccess(
     sanityUserId: faker.string.alphanumeric(10),
     loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
     sanityRole: SANITY_PROJECT_ROLE.ADMINISTRATOR,
+    inviteHeadsUpSentAt: inviteSentAt,
+    inviteNudgeSentAt: faker.date.soon({ refDate: inviteSentAt }),
+    siteReadySentAt: faker.date.soon({ refDate: inviteSentAt }),
     ...overrides,
   };
 }
@@ -30,5 +33,8 @@ export function toTenantOwnerAccessColumns(
     ownerSanityUserId: access.sanityUserId,
     ownerLoginProvider: access.loginProvider,
     ownerSanityRole: access.sanityRole,
+    ownerInviteHeadsUpSentAt: access.inviteHeadsUpSentAt,
+    ownerInviteNudgeSentAt: access.inviteNudgeSentAt,
+    ownerSiteReadySentAt: access.siteReadySentAt,
   };
 }

@@ -87,7 +87,7 @@ The run then verifies all of it. The admin polls each step's progress and offers
   - Artifacts: `sanityProjectId`, `sanityDataset`, both encrypted tokens, `seededAt` and `webhookCreatedAt`.
   - `lastNotifiedOwnerElevationOutcome` and `deprovisioningSteps` (same shape as `provisioningSteps`).
   - `siteType` (`SITE_TYPE`: BLOG, PORTFOLIO, PERSONAL, DOCS, BLANK, BUSINESS, PRODUCT; a `site_type` pgEnum, null for tenants created before signup) and `siteTemplateVersion`.
-  - Owner Studio access: `ownerSanityInviteId`, `ownerInviteSentAt`, `ownerInviteAcceptedAt`, `ownerSanityUserId`, `ownerLoginProvider` (`SANITY_LOGIN_PROVIDER`) and `ownerSanityRole` (`SANITY_PROJECT_ROLE`), read and written through `getTenantOwnerAccess` / `setTenantOwnerAccess`.
+  - Owner Studio access: `ownerSanityInviteId`, `ownerInviteSentAt`, `ownerInviteAcceptedAt`, `ownerSanityUserId`, `ownerLoginProvider` (`SANITY_LOGIN_PROVIDER`), `ownerSanityRole` (`SANITY_PROJECT_ROLE`) and when each owner email went out (`ownerInviteHeadsUpSentAt`, `ownerInviteNudgeSentAt`, `ownerSiteReadySentAt`), read and written through `getTenantOwnerAccess` / `setTenantOwnerAccess`.
   - `provisioningSteps` also accepts the `apps/worker` unit keys (`WORKER_PROVISIONING_STEP`: `ENSURE_INFRASTRUCTURE`, `INVITE_OWNER`, `APPLY_SITE_TEMPLATE`, `VERIFY_TENANT`, `ENSURE_OWNER_ACCESS`, `VALIDATE_DOCUMENTS`), present only once a worker run reports them.
 - **Core steps, in order:**
   1. `SANITY_PROJECT` creates the project and dataset, adds a CORS entry for the admin origin, and invites the owner as `viewer`.

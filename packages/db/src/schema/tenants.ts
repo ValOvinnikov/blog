@@ -178,6 +178,15 @@ export const tenants = pgTable('tenants', {
     'owner_login_provider',
   ).$type<TSanityLoginProvider>(),
   ownerSanityRole: text('owner_sanity_role').$type<TSanityProjectRole>(),
+  ownerInviteHeadsUpSentAt: timestamp('owner_invite_heads_up_sent_at', {
+    mode: 'date',
+  }),
+  ownerInviteNudgeSentAt: timestamp('owner_invite_nudge_sent_at', {
+    mode: 'date',
+  }),
+  ownerSiteReadySentAt: timestamp('owner_site_ready_sent_at', {
+    mode: 'date',
+  }),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()

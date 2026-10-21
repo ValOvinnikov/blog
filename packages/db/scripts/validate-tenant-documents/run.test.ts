@@ -74,6 +74,9 @@ function tenant(id: string, name: string): TTenant {
     ownerSanityUserId: null,
     ownerLoginProvider: null,
     ownerSanityRole: null,
+    ownerInviteHeadsUpSentAt: null,
+    ownerInviteNudgeSentAt: null,
+    ownerSiteReadySentAt: null,
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   };

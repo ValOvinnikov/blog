@@ -316,6 +316,13 @@
       "when": 1792404834149,
       "tag": "0044_add_tenants_site_type_and_owner_access",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1792573622337,
+      "tag": "0045_add_tenants_owner_email_sent_at",
+      "breakpoints": true
     }
   ]
 }
