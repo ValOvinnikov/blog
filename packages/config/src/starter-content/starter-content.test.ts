@@ -1,13 +1,32 @@
+import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
+
 import { buildStarterDocuments } from './starter-content';
 import type { TStarterDocumentUnion } from './starter-document';
 
 type TStarterType = TStarterDocumentUnion['_type'];
 
+const SITE_NAME = 'Acme Corporation';
+const PUBLISHED_AT = '2026-10-21T09:00:00.000Z';
+const STARTER_SITE_TYPES = [SITE_TYPE.BLOG, SITE_TYPE.BLANK] as const;
+const LOCALES = Object.values(LOCALE_ISO_CODES);
+
+const build = (
+  siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
+  locale: (typeof LOCALES)[number] = LOCALE_ISO_CODES.EN,
+  siteName = SITE_NAME,
+) =>
+  buildStarterDocuments({
+    siteType,
+    siteName,
+    locale,
+    publishedAt: PUBLISHED_AT,
+  });
+
 function findByType<TType extends TStarterType>(
+  documents: TStarterDocumentUnion[],
   type: TType,
-  name = 'Acme Corporation',
 ) {
-  const document = buildStarterDocuments(name).find(
+  const document = documents.find(
     (doc): doc is Extract<TStarterDocumentUnion, { _type: TType }> =>
       doc._type === type,
   );
@@ -15,11 +34,21 @@ function findByType<TType extends TStarterType>(
   return document;
 }
 
-describe(buildStarterDocuments, () => {
-  it('builds every starter document once, all published (no drafts. prefix)', () => {
-    const documents = buildStarterDocuments('Acme Corporation');
+function referencedIds(node: unknown): string[] {
+  if (Array.isArray(node)) return node.flatMap(referencedIds);
+  if (node === null || typeof node !== 'object') return [];
+  const ref =
+    '_ref' in node && typeof node._ref === 'string' ? [node._ref] : [];
+  return [...ref, ...Object.values(node).flatMap(referencedIds)];
+}
 
-    expect(documents.map((doc) => doc._type)).toEqual([
+const everyCombination = STARTER_SITE_TYPES.flatMap((siteType) =>
+  LOCALES.map((locale) => [siteType, locale] as const),
+);
+
+describe(buildStarterDocuments, () => {
+  it('builds the Blank site from the base documents only', () => {
+    expect(build().map((doc) => doc._type)).toEqual([
       'settings_navigation',
       'settings_footer',
       'settings_site',
@@ -28,93 +57,127 @@ describe(buildStarterDocuments, () => {
       'template_postIndex',
       'page_postIndex',
     ]);
-
-    const ids = documents.map((doc) => doc._id);
-    expect(new Set(ids).size).toBe(ids.length);
-    expect(ids.every((id) => !id.startsWith('drafts.'))).toBe(true);
   });
 
-  it('builds the same ids on every run, so a re-seed targets the documents it already created', () => {
-    const [acmeIds, globexIds] = ['Acme', 'Globex'].map((name) =>
-      buildStarterDocuments(name).map(({ _id }) => _id),
-    );
+  it.each(everyCombination)(
+    '%s in %s builds unique, published ids whose references all resolve',
+    (siteType, locale) => {
+      const documents = build(siteType, locale);
+      const ids = documents.map((doc) => doc._id);
 
-    expect(acmeIds).toEqual(globexIds);
-  });
-
-  it('the site settings document has no defaultOgImage field', () => {
-    expect(findByType('settings_site')).not.toHaveProperty('defaultOgImage');
-  });
-
-  it('the site settings document seeds USD as the currency', () => {
-    expect(findByType('settings_site')).toHaveProperty('currency', 'USD');
-  });
-
-  it('the site settings brand carries the site name', () => {
-    expect(findByType('settings_site', 'Globex').brand?.name).toBe('Globex');
-  });
-
-  it('settings_navigation seeds with an empty items array', () => {
-    expect(findByType('settings_navigation').items).toEqual([]);
-  });
-
-  it('page_home references the seeded home template', () => {
-    expect(findByType('page_home').template).toEqual({
-      _type: 'reference',
-      _ref: findByType('template_home')._id,
-    });
-  });
-
-  it('page_postIndex references the seeded post index template', () => {
-    expect(findByType('page_postIndex').template).toEqual({
-      _type: 'reference',
-      _ref: findByType('template_postIndex')._id,
-    });
-  });
-
-  it('neither seeded template sets a hero', () => {
-    expect(findByType('template_home')).not.toHaveProperty('hero');
-    expect(findByType('template_postIndex')).not.toHaveProperty('hero');
-  });
-
-  it('page_home carries a literal "Welcome" heading and a non-empty supporting line', () => {
-    const { headingBlock } = findByType('page_home');
-
-    expect(headingBlock._type).toBe('pageHeadingBlock');
-    expect(headingBlock.heading).toBe('Welcome');
-    expect(headingBlock.supportingText?.length).toBeGreaterThan(0);
-  });
-
-  it('page_postIndex carries a literal "Blog" heading', () => {
-    expect(findByType('page_postIndex').headingBlock.heading).toBe('Blog');
-  });
-
-  it.each([
-    ['page_home', 'a 1-character site name', 'x'],
-    ['page_home', 'a 200-character site name', 'x'.repeat(200)],
-    ['page_postIndex', 'a 1-character site name', 'x'],
-    ['page_postIndex', 'a 200-character site name', 'x'.repeat(200)],
-  ] as const)(
-    '%s.seo stays within every schema bound for %s (not derived from the site name)',
-    (type, _label, name) => {
-      const { seo } = findByType(type, name);
-
-      expect(seo._type).toBe('seo');
-      expect(seo.metaTitle?.length).toBeGreaterThanOrEqual(30);
-      expect(seo.metaTitle?.length).toBeLessThanOrEqual(60);
-      expect(seo.metaDescription?.length).toBeLessThanOrEqual(160);
-      expect(seo.openGraph?.ogTitle?.length).toBeLessThanOrEqual(70);
-      expect(seo.openGraph?.ogDescription?.length).toBeLessThanOrEqual(200);
+      expect(new Set(ids).size).toBe(ids.length);
+      expect(ids.filter((id) => id.startsWith('drafts.'))).toEqual([]);
+      expect(
+        referencedIds(documents).filter((id) => !ids.includes(id)),
+      ).toEqual([]);
     },
   );
 
-  it.each(['page_home', 'page_postIndex'] as const)(
-    '%s.seo copy points editors at this page, not Site Settings',
-    (type) => {
-      const { seo } = findByType(type);
+  it.each(STARTER_SITE_TYPES)(
+    '%s builds the same ids for every site name and locale, so a re-seed targets the documents it created',
+    (siteType) => {
+      const [acmeIds, globexIds] = [
+        build(siteType, LOCALE_ISO_CODES.EN, 'Acme'),
+        build(siteType, LOCALE_ISO_CODES.DE, 'Globex'),
+      ].map((documents) => documents.map(({ _id }) => _id));
 
-      expect(seo.metaDescription).not.toMatch(/site settings/i);
-      expect(seo.openGraph?.ogDescription).not.toMatch(/site settings/i);
+      expect(acmeIds).toEqual(globexIds);
+    },
+  );
+
+  it('the Blog site keeps every base document id the Blank site seeds', () => {
+    const blogIds = build(SITE_TYPE.BLOG).map(({ _id }) => _id);
+
+    expect(
+      build()
+        .map(({ _id }) => _id)
+        .filter((id) => !blogIds.includes(id)),
+    ).toEqual([]);
+  });
+
+  it('the Blank home template has no hero and no modules', () => {
+    const template = findByType(build(), 'template_home');
+
+    expect(template).not.toHaveProperty('hero');
+    expect(template).not.toHaveProperty('modules');
+  });
+
+  it('the Blog home template opens with a blog hero and lists latest posts, topics and a call to action', () => {
+    const documents = build(SITE_TYPE.BLOG);
+    const typeOf = (id: string) =>
+      documents.find(({ _id }) => _id === id)?._type;
+    const { hero, modules = [] } = findByType(documents, 'template_home');
+
+    expect(typeOf(hero!._ref)).toBe('module_heroBlog');
+    expect(modules.map(({ _ref }) => typeOf(_ref))).toEqual([
+      'module_postLatest',
+      'module_taxonomyList',
+      'module_cta',
+    ]);
+  });
+
+  it('the Blog hero pins the welcome post', () => {
+    const documents = build(SITE_TYPE.BLOG);
+
+    expect(findByType(documents, 'module_heroBlog').post?._ref).toBe(
+      findByType(documents, 'page_post')._id,
+    );
+  });
+
+  it('the site settings brand carries the site name', () => {
+    expect(
+      findByType(
+        build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.EN, 'Globex'),
+        'settings_site',
+      ).brand?.name,
+    ).toBe('Globex');
+  });
+
+  it('the site settings document seeds USD as the currency', () => {
+    expect(findByType(build(), 'settings_site')).toHaveProperty(
+      'currency',
+      'USD',
+    );
+  });
+
+  it('the EN home page carries a literal "Welcome" heading', () => {
+    expect(findByType(build(), 'page_home').headingBlock.heading).toBe(
+      'Welcome',
+    );
+  });
+
+  it('the NL home page is seeded in Dutch', () => {
+    expect(
+      findByType(build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.NL), 'page_home')
+        .headingBlock.heading,
+    ).toBe('Welkom');
+  });
+
+  it.each(LOCALES)(
+    'every localized value in the %s Blog site is tagged with that locale',
+    (locale) => {
+      const languages = JSON.stringify(build(SITE_TYPE.BLOG, locale)).match(
+        /"language":"[A-Z]+"/g,
+      );
+
+      expect(new Set(languages)).toEqual(new Set([`"language":"${locale}"`]));
+    },
+  );
+
+  it.each(everyCombination)(
+    'every page seo in %s / %s stays within the schema bounds',
+    (siteType, locale) => {
+      const seos = build(siteType, locale).flatMap((doc) =>
+        'seo' in doc && doc.seo ? [doc.seo] : [],
+      );
+
+      for (const { metaTitle = '', metaDescription = '', openGraph } of seos) {
+        expect(metaTitle.length).toBeGreaterThanOrEqual(30);
+        expect(metaTitle.length).toBeLessThanOrEqual(60);
+        expect(metaDescription.length).toBeLessThanOrEqual(160);
+        expect(openGraph?.ogTitle?.length).toBeLessThanOrEqual(70);
+        expect(openGraph?.ogDescription?.length).toBeLessThanOrEqual(200);
+      }
     },
   );
 });

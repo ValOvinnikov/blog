@@ -56,7 +56,7 @@ Decided, not built:
 Today: `tenants.status` is `ACTIVE`, `SUSPENDED` or `ARCHIVED`; `tenants.plan` is `FREE` or `GROWTH`; no price exists in code. Planned:
 
 - `TENANT_STATUS` gains `TRIAL` and `PAST_DUE` (a pgEnum migration).
-- `tenants.site_type` and `site_template_version`; `SITE_TYPE` lives in `@blog/db`.
+- `tenants.site_type` and `site_template_version`; `SITE_TYPE` lives in `@blog/config`, since the starter-content builders read it.
 - Terms acceptance stored as `termsAcceptedAt` and `termsVersion`.
 - Owner Studio-access columns and an access state: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`.
 - One price per plan, written once where Stripe and the pricing page both read it, beside `PLAN_REGISTRY`.

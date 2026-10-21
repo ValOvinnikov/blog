@@ -179,6 +179,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TENANT_DELETE_SANITY_PROJECT_OUTCOME**: `DELETED`, `ALREADY_GONE`, `LEFT_ARCHIVED`, `NO_PROJECT`, `SKIPPED_NO_TOKEN`
 - **TENANT_DELETE_OUTCOME**: `DELETED`, `NOT_ARCHIVED`, `NOT_FOUND`
 
+### `@blog/config/constants` — `packages/config/src/constants/site-type.ts`
+
+- **SITE_TYPE**: `BLOG`, `PORTFOLIO`, `PERSONAL`, `DOCS`, `BLANK`, `BUSINESS`, `PRODUCT`
+
 ### `@blog/config/constants` — `packages/config/src/constants/size.ts`
 
 - **SIZE**: `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`
@@ -211,10 +215,6 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
-
-### `@blog/db/constants` — `packages/db/src/constants/site-type.ts`
-
-- **SITE_TYPE**: `BLOG`, `PORTFOLIO`, `PERSONAL`, `DOCS`, `BLANK`, `BUSINESS`, `PRODUCT`
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
 

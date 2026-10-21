@@ -2522,6 +2522,62 @@
         "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
+    "BLOG": [
+      {
+        "ref": "SITE_TYPE.BLOG",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/site-type.ts"
+      }
+    ],
+    "PORTFOLIO": [
+      {
+        "ref": "SITE_TYPE.PORTFOLIO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/site-type.ts"
+      }
+    ],
+    "PERSONAL": [
+      {
+        "ref": "SITE_TYPE.PERSONAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/site-type.ts"
+      }
+    ],
+    "DOCS": [
+      {
+        "ref": "SITE_TYPE.DOCS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/site-type.ts"
+      }
+    ],
+    "BLANK": [
+      {
+        "ref": "SITE_TYPE.BLANK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/site-type.ts"
+      }
+    ],
+    "BUSINESS": [
+      {
+        "ref": "SITE_TYPE.BUSINESS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/site-type.ts"
+      }
+    ],
+    "PRODUCT": [
+      {
+        "ref": "SITE_TYPE.PRODUCT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/site-type.ts"
+      }
+    ],
     "XS": [
       {
         "ref": "SIZE.XS",
@@ -2686,62 +2742,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/membership.ts"
-      }
-    ],
-    "BLOG": [
-      {
-        "ref": "SITE_TYPE.BLOG",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/site-type.ts"
-      }
-    ],
-    "PORTFOLIO": [
-      {
-        "ref": "SITE_TYPE.PORTFOLIO",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/site-type.ts"
-      }
-    ],
-    "PERSONAL": [
-      {
-        "ref": "SITE_TYPE.PERSONAL",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/site-type.ts"
-      }
-    ],
-    "DOCS": [
-      {
-        "ref": "SITE_TYPE.DOCS",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/site-type.ts"
-      }
-    ],
-    "BLANK": [
-      {
-        "ref": "SITE_TYPE.BLANK",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/site-type.ts"
-      }
-    ],
-    "BUSINESS": [
-      {
-        "ref": "SITE_TYPE.BUSINESS",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/site-type.ts"
-      }
-    ],
-    "PRODUCT": [
-      {
-        "ref": "SITE_TYPE.PRODUCT",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/site-type.ts"
       }
     ],
     "REMOVE_DOMAIN": [
