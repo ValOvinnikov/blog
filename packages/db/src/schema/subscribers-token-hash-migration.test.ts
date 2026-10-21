@@ -8,8 +8,13 @@ import {
 } from '@blog/db/testing/migration-files';
 import { sha256Hex } from '@blog/utils/hash';
 import { PGlite } from '@electric-sql/pglite';
-import { asc, sql } from 'drizzle-orm';
+import { faker } from '@faker-js/faker';
+import { sql } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+
+function byId(a: { id: string }, b: { id: string }): number {
+  return a.id < b.id ? -1 : 1;
+}
 
 const HASH_MIGRATION = '0050_hash_subscriber_tokens.sql';
 
@@ -30,36 +35,43 @@ describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
 
       const tenant = await insertTestTenant(db);
 
+      const seeds = Array.from({ length: 2 }, () => ({
+        id: faker.string.uuid(),
+        email: faker.internet.email(),
+        confirmationToken: faker.string.uuid(),
+        unsubscribeToken: faker.string.uuid(),
+      }));
+      const values = seeds
+        .map(
+          ({ id, email, confirmationToken, unsubscribeToken }) =>
+            `('${id}', '${tenant.id}', '${email}', '${confirmationToken}', '${unsubscribeToken}')`,
+        )
+        .join(', ');
       await db.execute(
-        sql.raw(`
-        insert into "subscribers"
-          ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token")
-        values
-          ('sub-1', '${tenant.id}', 'reader-one@example.com', 'confirm-1', 'unsub-1'),
-          ('sub-2', '${tenant.id}', 'reader-two@example.com', 'confirm-2', 'unsub-2')
-      `),
+        sql.raw(
+          `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ${values}`,
+        ),
       );
 
       await applyMigrationFile(db, HASH_MIGRATION);
 
       const rows = await db
         .select({
+          id: subscribers.id,
           confirmationTokenHash: subscribers.confirmationTokenHash,
           unsubscribeTokenHash: subscribers.unsubscribeTokenHash,
         })
-        .from(subscribers)
-        .orderBy(asc(subscribers.id));
+        .from(subscribers);
 
-      expect(rows).toEqual([
-        {
-          confirmationTokenHash: sha256Hex('confirm-1'),
-          unsubscribeTokenHash: sha256Hex('unsub-1'),
-        },
-        {
-          confirmationTokenHash: sha256Hex('confirm-2'),
-          unsubscribeTokenHash: sha256Hex('unsub-2'),
-        },
-      ]);
+      expect(rows.sort(byId)).toEqual(
+        seeds
+          .map(({ id, confirmationToken, unsubscribeToken }) => ({
+            id,
+            confirmationTokenHash: sha256Hex(confirmationToken),
+            unsubscribeTokenHash: sha256Hex(unsubscribeToken),
+          }))
+          .sort(byId),
+      );
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
@@ -76,7 +88,7 @@ describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
         .insert(subscribers)
         .values({
           tenantId: tenant.id,
-          email: `${crypto.randomUUID()}@example.com`,
+          email: `${faker.string.uuid()}@example.com`,
         })
         .returning();
       if (!first) throw new Error('failed to seed a subscriber row');
@@ -84,7 +96,7 @@ describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
       await expect(
         db.insert(subscribers).values({
           tenantId: tenant.id,
-          email: `${crypto.randomUUID()}@example.com`,
+          email: `${faker.string.uuid()}@example.com`,
           unsubscribeTokenHash: first.unsubscribeTokenHash,
         }),
       ).rejects.toThrow();

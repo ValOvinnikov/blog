@@ -7,6 +7,7 @@ import {
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mintSubscriberTokens } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { unsubscribeByToken } from './unsubscribe-by-token';
@@ -62,7 +63,7 @@ describe(unsubscribeByToken, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const result = await unsubscribeByToken(tenantId, 'does-not-exist');
+    const result = await unsubscribeByToken(tenantId, faker.string.uuid());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
@@ -76,7 +77,7 @@ describe(unsubscribeByToken, () => {
     );
 
     expect(result).toEqual(
-      await unsubscribeByToken(tenantId, crypto.randomUUID()),
+      await unsubscribeByToken(tenantId, faker.string.uuid()),
     );
   });
 
@@ -113,7 +114,7 @@ describe(unsubscribeByToken, () => {
   it("does not remove another subscriber's row", async () => {
     const { unsubscribeToken } = await insertSubscriber(tenantId);
     const { subscriber: other } = await insertSubscriber(tenantId, {
-      email: 'other@example.com',
+      email: faker.internet.email(),
     });
 
     await unsubscribeByToken(tenantId, unsubscribeToken);

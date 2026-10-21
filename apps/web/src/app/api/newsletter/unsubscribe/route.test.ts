@@ -8,6 +8,7 @@ import {
 } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import type * as DbConstants from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import {
   clearNewsletterUnsubscribeToken,
@@ -55,10 +56,10 @@ const unsubscribeByTokenMock = vi.mocked(
 );
 const resolveNewsletterLinkLocaleMock = vi.mocked(resolveNewsletterLinkLocale);
 
-const TOKEN = 'unsubscribe-token';
-const UNSUBSCRIBED_LOCATION = 'https://example.com/newsletter/unsubscribed';
-const INVALID_LOCATION = 'https://example.com/newsletter/unsubscribe-invalid';
-const FAILED_LOCATION = 'https://example.com/newsletter/unsubscribe-failed';
+const TOKEN = faker.string.alphanumeric(16);
+const UNSUBSCRIBED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/unsubscribed`;
+const INVALID_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/unsubscribe-invalid`;
+const FAILED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/unsubscribe-failed`;
 
 const toUnsubscribeRequest = (
   path: string,
@@ -91,7 +92,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(storeNewsletterUnsubscribeToken).toHaveBeenCalledWith(TOKEN);
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(locationOf(response)).toBe(
-      'https://example.com/newsletter/unsubscribe',
+      `${DEFAULT_TENANT_BASE_URL}/newsletter/unsubscribe`,
     );
     expect(response.headers.get('cache-control')).toBe('private, no-store');
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
@@ -112,7 +113,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
       LOCALE_ISO_CODES.FR,
     );
     expect(locationOf(response)).toBe(
-      'https://example.com/fr/newsletter/unsubscribe',
+      `${DEFAULT_TENANT_BASE_URL}/fr/newsletter/unsubscribe`,
     );
   });
 });
@@ -161,7 +162,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
       LOCALE_ISO_CODES.FR,
     );
     expect(locationOf(response)).toBe(
-      'https://example.com/fr/newsletter/unsubscribed',
+      `${DEFAULT_TENANT_BASE_URL}/fr/newsletter/unsubscribed`,
     );
   });
 

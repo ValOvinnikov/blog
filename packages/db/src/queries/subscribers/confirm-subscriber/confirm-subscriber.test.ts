@@ -7,6 +7,7 @@ import {
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mintSubscriberTokens } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { confirmSubscriber } from './confirm-subscriber';
@@ -78,7 +79,7 @@ describe(confirmSubscriber, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const result = await confirmSubscriber(tenantId, 'does-not-exist');
+    const result = await confirmSubscriber(tenantId, faker.string.uuid());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
@@ -92,7 +93,7 @@ describe(confirmSubscriber, () => {
     );
 
     expect(result).toEqual(
-      await confirmSubscriber(tenantId, crypto.randomUUID()),
+      await confirmSubscriber(tenantId, faker.string.uuid()),
     );
   });
 

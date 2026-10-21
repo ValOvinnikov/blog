@@ -6,6 +6,7 @@ import {
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
+import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -34,7 +35,7 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
 
       const insertedTenant = await db.execute<{ id: string }>(
         sql.raw(
-          `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('Acme', 'acme.example.com', 'en', 'FREE', 'ACTIVE') returning "id"`,
+          `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('${faker.string.alphanumeric(12)}', '${faker.internet.domainName()}', 'en', 'FREE', 'ACTIVE') returning "id"`,
         ),
       );
       const tenant = insertedTenant.rows[0];
@@ -45,9 +46,9 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
         insert into "subscribers"
           ("id", "tenant_id", "email", "confirmation_token")
         values
-          ('sub-1', '${tenant.id}', 'reader-one@example.com', 'token-1'),
-          ('sub-2', '${tenant.id}', 'reader-two@example.com', 'token-2'),
-          ('sub-3', '${tenant.id}', 'reader-three@example.com', 'token-3')
+          ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}'),
+          ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}'),
+          ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}')
       `),
       );
 
@@ -77,21 +78,22 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
 
       const insertedTenant = await db.execute<{ id: string }>(
         sql.raw(
-          `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('Acme', 'acme.example.com', 'en', 'FREE', 'ACTIVE') returning "id"`,
+          `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('${faker.string.alphanumeric(12)}', '${faker.internet.domainName()}', 'en', 'FREE', 'ACTIVE') returning "id"`,
         ),
       );
       const tenant = insertedTenant.rows[0];
       if (!tenant) throw new Error(NO_TENANT_ERROR);
+      const existingUnsubscribeToken = faker.string.uuid();
       await db.execute(
         sql.raw(
-          `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('sub-1', '${tenant.id}', 'reader@example.com', 'token-1', 'unsub-1')`,
+          `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}', '${existingUnsubscribeToken}')`,
         ),
       );
 
       await expect(
         db.execute(
           sql.raw(
-            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('sub-null', '${tenant.id}', 'other@example.com', 'token-other', NULL)`,
+            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}', NULL)`,
           ),
         ),
       ).rejects.toThrow();
@@ -99,7 +101,7 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
       await expect(
         db.execute(
           sql.raw(
-            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('sub-dup', '${tenant.id}', 'dup@example.com', 'token-dup', 'unsub-1')`,
+            `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ('${faker.string.uuid()}', '${tenant.id}', '${faker.internet.email()}', '${faker.string.uuid()}', '${existingUnsubscribeToken}')`,
           ),
         ),
       ).rejects.toThrow();

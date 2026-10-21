@@ -8,6 +8,7 @@ import {
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { resendConfirmation } from './resend-confirmation';
@@ -88,7 +89,7 @@ describe(resendConfirmation, () => {
   });
 
   it('returns not-pending for an unrecognized userId', async () => {
-    const result = await resendConfirmation(tenantId, 'does-not-exist');
+    const result = await resendConfirmation(tenantId, faker.string.uuid());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });

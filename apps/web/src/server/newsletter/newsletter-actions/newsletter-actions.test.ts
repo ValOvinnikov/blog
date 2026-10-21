@@ -129,7 +129,7 @@ const subscriber = makeSubscriber({
   confirmationSentAt: null,
 });
 
-const CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
+const CLAIMED_AT = faker.date.recent();
 const CLAIM = {
   claimedAt: CLAIMED_AT,
   tokens: {

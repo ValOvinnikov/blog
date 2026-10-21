@@ -6,6 +6,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { makeNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
@@ -34,10 +35,10 @@ const confirmSubscriberMock = vi.mocked(queries.subscribers.confirmSubscriber);
 const resolveWritableTenantMock = vi.mocked(resolveWritableTenant);
 const resolveNewsletterLinkLocaleMock = vi.mocked(resolveNewsletterLinkLocale);
 
-const TOKEN = 'confirm-token';
-const CONFIRMED_LOCATION = 'https://example.com/newsletter/confirmed';
-const INVALID_LOCATION = 'https://example.com/newsletter/confirm-invalid';
-const FAILED_LOCATION = 'https://example.com/newsletter/confirm-failed';
+const TOKEN = faker.string.alphanumeric(16);
+const CONFIRMED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirmed`;
+const INVALID_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-invalid`;
+const FAILED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-failed`;
 
 const toConfirmRequest = (path: string) =>
   new Request(new URL(path, DEFAULT_TENANT_BASE_URL));
@@ -84,7 +85,7 @@ describe('GET /api/newsletter/confirm', () => {
       LOCALE_ISO_CODES.FR,
     );
     expect(response.headers.get('location')).toBe(
-      'https://example.com/fr/newsletter/confirmed',
+      `${DEFAULT_TENANT_BASE_URL}/fr/newsletter/confirmed`,
     );
   });
 
@@ -140,7 +141,7 @@ describe('GET /api/newsletter/confirm', () => {
     const response = await GET(request);
 
     expect(response.headers.get('location')).toBe(
-      'https://example.com/newsletter/confirm-unavailable',
+      `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-unavailable`,
     );
     expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
