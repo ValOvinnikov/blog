@@ -291,6 +291,7 @@
     "recentActivityCardTitle": "Letzte Aktivitäten",
     "recentActivitySourceLabel": "Systemprotokoll",
     "activityEmpty": "Noch keine Aktivitäten erfasst.",
+    "activityActorDeleted": "Gelöschtes Konto",
     "relativeJustNow": "Gerade eben",
     "relativeMinutesAgo": "vor {minutes} Min.",
     "relativeHoursAgo": "vor {hours} Std.",

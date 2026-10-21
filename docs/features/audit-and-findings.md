@@ -52,7 +52,8 @@ neither.
   read. ADMINs and MODERATORs never trigger the read.
 - `/tenants/{id}` overview: the Findings card (OPEN findings, with a
   disclosure that loads `details` on open) and the Recent activity card (the
-  last five `TENANT` audit events: action, actor email, relative time).
+  last five `TENANT` audit events: action, actor email, relative time). An
+  event whose actor deleted their account shows "Deleted account" instead.
 - `/tenants/{id}/danger`: reads the latest `DEPROVISION_REQUESTED` time to
   decide whether a deprovisioning run is current or a retry.
 - No page lists `SITE_CONFIG` or `SETTINGS_FEATURES` events, and no UI
@@ -60,7 +61,8 @@ neither.
 
 ## Data
 
-- `audit_events`: `actorId`, `actorEmail` (a snapshot taken at insert),
+- `audit_events`: `actorId`, `actorEmail` (a snapshot taken at insert,
+  nullable: `deleteAccount` clears it on the user's rows),
   `action`, `targetType`, `targetId` (no foreign key; rows outlive their
   target), `details` jsonb, `createdAt`. Indexed on (`targetType`,
   `targetId`).
@@ -101,7 +103,13 @@ Nothing is configurable. Only admins (any role) see either record.
 
 ## Constraints and invariants
 
-- `audit_events` is insert-only, through `insertAuditEvent`.
+- `audit_events` is insert-only, through `insertAuditEvent`. The one update
+  is `deleteAccount` clearing the deleted user's `actorEmail`; the events and
+  `actorId` stay.
+- Neither `details` column holds an email address or other personal field.
+  Writers record field names or ids instead: email config lists the saved
+  field names, tenant details records `ownerEmailUpdated`, and tenant
+  creation records `ownerUserId` (null for an invited owner).
 - `recordAuditEvent` never throws and never changes its caller's result. A
   lost audit write is logged at `error` under the caller's `logEvent` and
   swallowed, because `neon-http` cannot couple the two writes in a

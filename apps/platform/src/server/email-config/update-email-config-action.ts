@@ -65,6 +65,10 @@ export const updateEmailConfigAction = async (
     ? parsed.data
     : { ...parsed.data, contactRecipient: undefined };
 
+  const writtenFields = Object.entries(data)
+    .filter(([, value]) => value !== undefined)
+    .map(([field]) => field);
+
   try {
     await queries.emailConfig.upsertEmailConfig(tenant.id, data);
     await recordAuditEvent({
@@ -72,7 +76,7 @@ export const updateEmailConfigAction = async (
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
-      details: data,
+      details: { fields: writtenFields },
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {

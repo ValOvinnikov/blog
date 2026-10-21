@@ -63,7 +63,9 @@ export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
               <CardList.Primary>
                 {t(`activityAction.${event.action}`)}
               </CardList.Primary>
-              <CardList.Secondary>{event.actorEmail}</CardList.Secondary>
+              <CardList.Secondary>
+                {event.actorEmail ?? t('activityActorDeleted')}
+              </CardList.Secondary>
               <CardList.Time date={event.createdAt}>
                 {formatRelativeTime(event.createdAt, t, locale)}
               </CardList.Time>

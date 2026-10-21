@@ -291,6 +291,7 @@
     "recentActivityCardTitle": "Activité récente",
     "recentActivitySourceLabel": "Journal système",
     "activityEmpty": "Aucune activité enregistrée pour le moment.",
+    "activityActorDeleted": "Compte supprimé",
     "relativeJustNow": "À l'instant",
     "relativeMinutesAgo": "il y a {minutes} min",
     "relativeHoursAgo": "il y a {hours} h",

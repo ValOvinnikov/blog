@@ -108,16 +108,21 @@ export const updateTenantDetailsAction = async (
     );
 
     switch (result.outcome) {
-      case 'updated':
+      case 'updated': {
+        const { ownerEmail, ...auditedDetails } = parsed.data;
         await revalidateSiteConfig(tenantId);
         await recordAuditEvent({
           logEvent: 'tenants.update_details_audit_failed',
           action: AUDIT_ACTION.SETTINGS_UPDATED,
           targetType: AUDIT_TARGET_TYPE.TENANT,
           targetId: tenantId,
-          details: parsed.data,
+          details: {
+            ...auditedDetails,
+            ownerEmailUpdated: ownerEmail !== undefined,
+          },
         });
         return { outcome: ACTION_OUTCOME.SUCCESS, tenant: result.tenant };
+      }
       case 'domain-taken':
         return {
           outcome: ACTION_OUTCOME.INVALID,
