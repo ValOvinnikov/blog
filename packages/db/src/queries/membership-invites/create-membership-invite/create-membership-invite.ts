@@ -5,6 +5,7 @@ import {
   type TMembershipInvite,
 } from '@blog/db/schema/membership-invites';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
 export type TCreateMembershipInviteResult =
@@ -28,7 +29,12 @@ export async function createMembershipInvite(
 
   const [inserted] = await db
     .insert(membershipInvites)
-    .values({ tenantId, email: normalizedEmail, role })
+    .values({
+      tenantId,
+      email: normalizedEmail,
+      ...personalEmailColumns(normalizedEmail),
+      role,
+    })
     .onConflictDoNothing()
     .returning();
 

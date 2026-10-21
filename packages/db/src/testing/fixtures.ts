@@ -15,6 +15,7 @@ import type { PgliteDatabase } from 'drizzle-orm/pglite';
 export type TTestDb = PgliteDatabase<typeof schema>;
 
 export const TEST_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
+export const TEST_INVITE_EMAIL = faker.internet.email().toLowerCase();
 
 // Seeds one `tenants` row against the given `createTestDb()` instance for a
 // test's `beforeEach`/setup — `name`/`primaryDomain`/`sanityProjectId`

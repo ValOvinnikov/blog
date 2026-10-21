@@ -1,5 +1,6 @@
 import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
 import {
+  index,
   integer,
   pgTable,
   primaryKey,
@@ -8,17 +9,24 @@ import {
 } from 'drizzle-orm/pg-core';
 
 // Column names are load-bearing: `@auth/drizzle-adapter` reads them by these exact keys.
-export const users = pgTable('users', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text('name'),
-  email: text('email').unique(),
-  emailVerified: timestamp('emailVerified', { mode: 'date' }),
-  image: text('image'),
-  termsAcceptedAt: timestamp('termsAcceptedAt'),
-  termsVersion: text('termsVersion'),
-});
+export const users = pgTable(
+  'users',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: text('name'),
+    nameEncrypted: text('nameEncrypted'),
+    email: text('email').unique(),
+    emailEncrypted: text('emailEncrypted'),
+    emailIndex: text('emailIndex'),
+    emailVerified: timestamp('emailVerified', { mode: 'date' }),
+    image: text('image'),
+    termsAcceptedAt: timestamp('termsAcceptedAt'),
+    termsVersion: text('termsVersion'),
+  },
+  (user) => [index('users_email_index_idx').on(user.emailIndex)],
+);
 
 export const accounts = pgTable(
   'accounts',

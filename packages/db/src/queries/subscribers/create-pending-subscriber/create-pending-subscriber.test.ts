@@ -4,6 +4,11 @@ import {
   insertTestTenant,
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import {
+  decryptTestPersonalValue,
+  testPersonalEmailIndex,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { createPendingSubscriber } from './create-pending-subscriber';
@@ -13,6 +18,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -42,8 +48,12 @@ describe(createPendingSubscriber, () => {
     expect(result.subscriber).toMatchObject({
       tenantId,
       email: TEST_SUBSCRIBER_EMAIL,
+      emailIndex: testPersonalEmailIndex(TEST_SUBSCRIBER_EMAIL),
       status: 'pending',
     });
+    expect(decryptTestPersonalValue(result.subscriber.emailEncrypted)).toBe(
+      TEST_SUBSCRIBER_EMAIL,
+    );
     expect(result.subscriber.confirmationTokenHash).toEqual(expect.any(String));
     expect(result.subscriber.unsubscribeTokenHash).toEqual(expect.any(String));
     expect(result.subscriber.confirmedAt).toBeNull();

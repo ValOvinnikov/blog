@@ -13,6 +13,10 @@ export const env = createEnv({
     DATABASE_URL: z.string().min(1),
     // @env-required: development, production
     TENANT_TOKEN_ENCRYPTION_KEY: z.string().min(1).optional(),
+    // @env-optional
+    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    // @env-optional
+    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

@@ -1,5 +1,9 @@
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
+import {
+  decryptTestPersonalValue,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
@@ -10,6 +14,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.users);
@@ -26,6 +31,9 @@ describe(updateDisplayName, () => {
       .from(schema.users)
       .where(eq(schema.users.id, user.id));
     expect(updated?.name).toBe('New Name');
+    expect(decryptTestPersonalValue(updated?.nameEncrypted ?? null)).toBe(
+      'New Name',
+    );
   });
 
   it("does not change another user's name", async () => {
