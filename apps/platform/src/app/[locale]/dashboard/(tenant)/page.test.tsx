@@ -1,3 +1,4 @@
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { auth } from '@platform/server/auth/auth';
@@ -49,7 +50,7 @@ vi.mock('next/headers', () => ({
   headers: async () => new Headers(),
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const membership = makeMembership();
 
@@ -84,7 +85,7 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
   it('redirects to sign-in without querying memberships when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();

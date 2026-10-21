@@ -1,11 +1,9 @@
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
-import messages from '@platform/i18n/messages/en.json';
-import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { createTranslator } from 'next-intl';
 
 import {
   dashboardNavSections,
@@ -13,11 +11,7 @@ import {
   tenantNavSections,
 } from './nav-sections';
 
-const t = createTranslator({
-  locale: 'EN',
-  messages,
-  namespace: 'navSections',
-}) as unknown as TLooseTranslator;
+const t = makeEnTranslator('navSections');
 
 describe('operatorNavSections', () => {
   it('gives both Tenants and Add tenant real hrefs', () => {

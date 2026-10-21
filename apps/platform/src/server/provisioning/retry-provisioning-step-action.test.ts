@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
@@ -52,11 +52,11 @@ describe('retryProvisioningStepAction', () => {
 
   it('requires a session before dispatching', async () => {
     requireTenantOwnerOrAdminMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
     expect(startProvisioningMock).not.toHaveBeenCalled();
   });
@@ -67,7 +67,7 @@ describe('retryProvisioningStepAction', () => {
     });
 
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(redirect).not.toHaveBeenCalled();

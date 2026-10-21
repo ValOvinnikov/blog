@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STATUS,
@@ -607,7 +607,7 @@ describe(useProvisioningPoll, () => {
         },
       });
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
-        new Error('NEXT_REDIRECT'),
+        new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
       );
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 

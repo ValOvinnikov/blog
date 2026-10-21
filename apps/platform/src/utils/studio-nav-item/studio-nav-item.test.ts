@@ -1,16 +1,10 @@
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
-import messages from '@platform/i18n/messages/en.json';
-import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { createTranslator } from 'next-intl';
 
 import { studioNavItem } from './studio-nav-item';
 
-const t = createTranslator({
-  locale: 'EN',
-  messages,
-  namespace: 'navSections',
-}) as unknown as TLooseTranslator;
+const t = makeEnTranslator('navSections');
 
 const studioHref = adminRoutes.dashboardStudio();
 

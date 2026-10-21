@@ -1,4 +1,8 @@
-import { SANITY_LOGIN_PROVIDER, type TMaybeNull } from '@blog/config';
+import {
+  SANITY_LOGIN_PROVIDER,
+  type TMaybeNull,
+  NEXT_NAVIGATION_ERROR,
+} from '@blog/config';
 import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { auth } from '@platform/server/auth/auth';
@@ -83,7 +87,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   it('redirects to sign-in without resolving the tenant when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();

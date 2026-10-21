@@ -1,3 +1,4 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
@@ -30,12 +31,14 @@ describe('renderTenantScopedPage', () => {
   });
 
   it('propagates a redirect thrown by the resolver without calling the content renderer', async () => {
-    const resolveTenant = vi.fn().mockRejectedValue(new Error('NEXT_REDIRECT'));
+    const resolveTenant = vi
+      .fn()
+      .mockRejectedValue(new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT));
     const PageContent = vi.fn();
 
     await expect(
       renderTenantScopedPage(resolveTenant, PageContent),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(PageContent).not.toHaveBeenCalled();
   });
@@ -52,7 +55,7 @@ describe('renderTenantScopedPage with a plan-gated page', () => {
         PageContent,
         'languages',
       ),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(PageContent).not.toHaveBeenCalled();
   });

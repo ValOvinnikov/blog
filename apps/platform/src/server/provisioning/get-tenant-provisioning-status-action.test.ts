@@ -1,3 +1,4 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -29,13 +30,13 @@ describe('getTenantProvisioningStatusAction', () => {
 
   it("requires the tenant's owner or an admin before querying", async () => {
     requireTenantOwnerOrAdminMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
     const { getTenantProvisioningStatusAction } =
       await import('./get-tenant-provisioning-status-action');
 
     await expect(getTenantProvisioningStatusAction('tenant-1')).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
     expect(requireTenantOwnerOrAdminMock).toHaveBeenCalledWith('tenant-1');
     expect(getTenantProvisioningStatusMock).not.toHaveBeenCalled();

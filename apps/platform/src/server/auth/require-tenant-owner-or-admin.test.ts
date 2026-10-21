@@ -1,3 +1,4 @@
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { makeMembership } from '@platform/testing/memberships/fixtures';
@@ -26,7 +27,7 @@ vi.mock('@blog/db', async () => ({
 
 const { tenantId, userId } = makeMembership();
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 describe(requireTenantOwnerOrAdmin, () => {
   beforeEach(() => {
@@ -42,7 +43,7 @@ describe(requireTenantOwnerOrAdmin, () => {
     authMock.mockResolvedValue(null);
 
     await expect(requireTenantOwnerOrAdmin(tenantId)).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
@@ -52,7 +53,7 @@ describe(requireTenantOwnerOrAdmin, () => {
     getMembershipMock.mockResolvedValue(undefined);
 
     await expect(requireTenantOwnerOrAdmin(tenantId)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
   });
 
@@ -62,7 +63,7 @@ describe(requireTenantOwnerOrAdmin, () => {
     );
 
     await expect(requireTenantOwnerOrAdmin(tenantId)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
   });
 
@@ -87,7 +88,7 @@ describe(requireTenantOwnerOrAdmin, () => {
 
     await expect(
       requireTenantOwnerOrAdmin(tenantId, isSuperAdmin),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
   it('admits an admin the predicate refuses who owns the tenant', async () => {

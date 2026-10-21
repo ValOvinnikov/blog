@@ -1,4 +1,8 @@
-import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  HTTP_STATUS,
+  NEXT_NAVIGATION_ERROR,
+} from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
@@ -47,10 +51,12 @@ describe.each([
 
   it('calls nothing on the worker for a caller the gate refuses', async () => {
     requireTenantOwnerOrAdminMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
-    await expect(action(tenantId)).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(action(tenantId)).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
 
     expect(enqueueWorkerRequestMock).not.toHaveBeenCalled();
   });
