@@ -1,5 +1,9 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_STATUS, type TTenantStatus } from '@blog/db/constants';
+import {
+  SUSPENSION_REASON,
+  TENANT_STATUS,
+  type TTenantStatus,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -13,6 +17,8 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+
+const EXPECTED_OK = 'expected ok:true';
 
 async function insertTenant(
   status: TTenantStatus,
@@ -45,7 +51,7 @@ describe(setTenantSuspension, () => {
 
     const result = await setTenantSuspension(tenantId, TENANT_STATUS.SUSPENDED);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.status).toBe(TENANT_STATUS.SUSPENDED);
     expect(await readStatus(tenantId)).toBe(TENANT_STATUS.SUSPENDED);
   });
@@ -55,9 +61,38 @@ describe(setTenantSuspension, () => {
 
     const result = await setTenantSuspension(tenantId, TENANT_STATUS.ACTIVE);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.status).toBe(TENANT_STATUS.ACTIVE);
     expect(await readStatus(tenantId)).toBe(TENANT_STATUS.ACTIVE);
+  });
+
+  it('records an operator suspension over an inactivity one', async () => {
+    const tenant = await insertTestTenant(db(), {
+      status: TENANT_STATUS.SUSPENDED,
+      suspensionReason: SUSPENSION_REASON.INACTIVITY,
+    });
+
+    const result = await setTenantSuspension(
+      tenant.id,
+      TENANT_STATUS.SUSPENDED,
+    );
+
+    if (!result.ok) throw new Error(EXPECTED_OK);
+    expect(result.data.suspensionReason).toBe(SUSPENSION_REASON.OPERATOR);
+  });
+
+  it('clears the suspension reason and stamp when the suspension is lifted', async () => {
+    const tenant = await insertTestTenant(db(), {
+      status: TENANT_STATUS.SUSPENDED,
+      suspendedAt: new Date('2026-04-07T00:00:00.000Z'),
+      suspensionReason: SUSPENSION_REASON.INACTIVITY,
+    });
+
+    const result = await setTenantSuspension(tenant.id, TENANT_STATUS.ACTIVE);
+
+    if (!result.ok) throw new Error(EXPECTED_OK);
+    expect(result.data.suspensionReason).toBeNull();
+    expect(result.data.suspendedAt).toBeNull();
   });
 
   it('leaves an archived tenant archived', async () => {
