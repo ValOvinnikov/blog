@@ -1,7 +1,7 @@
 import type { TSanityLoginProvider } from '@blog/config/constants';
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
-import type { TSanityProjectRole } from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
+import type { TSanityProjectRole, TTenantOwnerEmail } from '@blog/db/constants';
+import { tenants, type TTenant } from '@blog/db/schema/tenants';
 
 export type TTenantOwnerAccess = {
   sanityInviteId: TMaybeUndefined<string>;
@@ -48,3 +48,9 @@ export function toTenantOwnerAccess(
     siteReadySentAt: row.siteReadySentAt ?? undefined,
   };
 }
+
+export const tenantOwnerEmailSentAtField = {
+  INVITE_HEADS_UP: 'ownerInviteHeadsUpSentAt',
+  INVITE_NUDGE: 'ownerInviteNudgeSentAt',
+  SITE_READY: 'ownerSiteReadySentAt',
+} as const satisfies Record<TTenantOwnerEmail, keyof TTenant>;

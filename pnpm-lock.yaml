@@ -400,6 +400,9 @@ importers:
       '@blog/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@blog/email':
+        specifier: workspace:*
+        version: link:../../packages/email
       '@blog/insight':
         specifier: workspace:*
         version: link:../../packages/insight

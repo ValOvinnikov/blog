@@ -1,4 +1,7 @@
-import type { TElevateTenantOwnerOutcome } from '@blog/db/constants';
+import {
+  TENANT_OWNER_EMAIL,
+  type TElevateTenantOwnerOutcome,
+} from '@blog/db/constants';
 import { sanitizeLogMessage } from '@blog/insight';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
@@ -13,6 +16,10 @@ import {
   pendingOwnerAccessOutcome,
   reportOwnerAccessOutcome,
 } from '@worker/utils/owner-access/report-owner-access-outcome';
+import {
+  sendOwnerEmailOnce,
+  sendPendingOwnerEmails,
+} from '@worker/utils/owner-email/send-owner-email';
 
 import { isFinalStepAttempt } from './run-reported-step';
 
@@ -21,8 +28,15 @@ async function resolveOwnerAccess(
 ): Promise<TElevateTenantOwnerOutcome> {
   const { tenant } = target;
   const owner = await findOwner(target);
-  if (owner) return grantOwnerAdministrator(target, owner);
-  if (tenant.ownerInviteSentAt) return pendingOwnerAccessOutcome(tenant);
+  if (owner) {
+    const outcome = await grantOwnerAdministrator(target, owner);
+    await sendOwnerEmailOnce(target, TENANT_OWNER_EMAIL.SITE_READY);
+    return outcome;
+  }
+  if (tenant.ownerInviteSentAt) {
+    await sendPendingOwnerEmails(target);
+    return pendingOwnerAccessOutcome(tenant);
+  }
 
   const ownerInviteSentAt = await sendOwnerInvite(target, {
     replaceExisting: false,

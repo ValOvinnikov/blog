@@ -1,4 +1,5 @@
 import { SANITY_PROJECT_ROLE } from '@blog/config';
+import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
 import { setTenantOwnerAccess } from '@blog/db/queries/tenants';
 import {
   createSanityProjectInvite,
@@ -7,6 +8,7 @@ import {
   type TSanityInvite,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
+import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 
 import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
 
@@ -63,5 +65,6 @@ export async function sendOwnerInvite(
       `Tenant "${tenant.id}"'s owner invite could not be recorded (${recorded.error}).`,
     );
   }
+  await sendOwnerEmailOnce(target, TENANT_OWNER_EMAIL.INVITE_HEADS_UP);
   return inviteSentAt;
 }

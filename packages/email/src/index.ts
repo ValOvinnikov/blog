@@ -8,6 +8,7 @@ export {
   buildTenantShell,
   type TBuildTenantShellInput,
   type TTenantEmailBrand,
+  PLATFORM_EMAIL_BRAND_NAME,
 } from './html';
 export {
   serializePortableText,

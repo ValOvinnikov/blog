@@ -1,5 +1,6 @@
 export * from './archive-tenant';
 export * from './begin-tenant-provisioning';
+export * from './claim-tenant-owner-email';
 export * from './clear-tenant-provisioning-artifacts';
 export * from './create-tenant';
 export * from './create-tenant-draft';
@@ -21,6 +22,7 @@ export * from './list-tenants-by-ids';
 export * from './list-tenants-pending-owner-elevation';
 export * from './list-tenants-wedged-in-provisioning';
 export * from './reactivate-tenant';
+export * from './release-tenant-owner-email';
 export * from './set-tenant-additional-locales';
 export * from './set-tenant-owner-access';
 export * from './set-tenant-provisioning-status';

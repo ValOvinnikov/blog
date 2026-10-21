@@ -7,6 +7,7 @@ import {
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   SANITY_PROJECT_ROLE as STORED_SANITY_PROJECT_ROLE,
+  TENANT_OWNER_EMAIL,
   TENANT_PROVISIONING_STEP,
 } from '@blog/db/constants';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
@@ -35,6 +36,10 @@ import {
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { postOperatorAlert } from '@worker/utils/operator-alert/operator-alert';
+import {
+  sendOwnerEmailOnce,
+  sendPendingOwnerEmails,
+} from '@worker/utils/owner-email/send-owner-email';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { checkOwnerAccess } from './check-owner-access';
@@ -49,22 +54,21 @@ const PENDING_INVITE = {
 
 vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/utils/operator-alert/operator-alert');
+vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 vi.mock(
   '@worker/utils/provision-env/provision-env',
   () => import('@worker/testing/provision-env/fake-provision-env'),
 );
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
+vi.mock(import('workflow'), async (importOriginal) => ({
+  ...(await importOriginal()),
   getStepMetadata: vi.fn(),
 }));
 
@@ -151,6 +155,21 @@ describe(checkOwnerAccess, () => {
       );
     });
 
+    it('sends the owner the site-ready email', async () => {
+      await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
+        expect.objectContaining({ ownerEmail: OWNER_EMAIL }),
+        TENANT_OWNER_EMAIL.SITE_READY,
+      );
+    });
+
+    it('sends no invite reminders', async () => {
+      await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(sendPendingOwnerEmails).not.toHaveBeenCalled();
+    });
+
     it('grants nothing when the owner is already administrator', async () => {
       vi.mocked(listSanityProjectAcl).mockResolvedValue([
         aclEntry(SANITY_PROJECT_ROLE.ADMINISTRATOR),
@@ -195,6 +214,18 @@ describe(checkOwnerAccess, () => {
 
     expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
     expect(postOperatorAlert).not.toHaveBeenCalled();
+  });
+
+  it('sends whichever invite emails are due while the invite waits', async () => {
+    await checkOwnerAccess(TEST_TENANT_ID);
+
+    expect(sendPendingOwnerEmails).toHaveBeenCalledWith(
+      expect.objectContaining({ ownerEmail: OWNER_EMAIL }),
+    );
+    expect(sendOwnerEmailOnce).not.toHaveBeenCalledWith(
+      expect.anything(),
+      TENANT_OWNER_EMAIL.SITE_READY,
+    );
   });
 
   it('sends no invite once one was recorded', async () => {

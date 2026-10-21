@@ -1,3 +1,4 @@
+import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { getTenantById, setTenantOwnerAccess } from '@blog/db/queries/tenants';
 import {
@@ -14,6 +15,7 @@ import {
 } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
+import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 import { getStepMetadata } from 'workflow';
 
 import { inviteOwner } from './invite-owner';
@@ -27,22 +29,21 @@ const PENDING_INVITE = {
 };
 
 vi.mock('@worker/utils/logger/logger');
+vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 vi.mock(
   '@worker/utils/provision-env/provision-env',
   () => import('@worker/testing/provision-env/fake-provision-env'),
 );
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
+vi.mock(import('workflow'), async (importOriginal) => ({
+  ...(await importOriginal()),
   getStepMetadata: vi.fn(),
 }));
 
@@ -84,6 +85,15 @@ describe(inviteOwner, () => {
     await inviteOwner(TEST_TENANT_ID, CTX);
 
     expect(createSanityProjectInvite).toHaveBeenCalledOnce();
+  });
+
+  it('sends the owner the invite heads-up once the invite is recorded', async () => {
+    await inviteOwner(TEST_TENANT_ID, CTX);
+
+    expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
+      expect.objectContaining({ ownerEmail: OWNER_EMAIL }),
+      TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
+    );
   });
 
   describe('when the invite cannot be sent', () => {

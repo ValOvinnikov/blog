@@ -2816,6 +2816,30 @@
         "file": "packages/db/src/constants/tenant-owner-access.ts"
       }
     ],
+    "INVITE_HEADS_UP": [
+      {
+        "ref": "TENANT_OWNER_EMAIL.INVITE_HEADS_UP",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-owner-access.ts"
+      }
+    ],
+    "INVITE_NUDGE": [
+      {
+        "ref": "TENANT_OWNER_EMAIL.INVITE_NUDGE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-owner-access.ts"
+      }
+    ],
+    "SITE_READY": [
+      {
+        "ref": "TENANT_OWNER_EMAIL.SITE_READY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-owner-access.ts"
+      }
+    ],
     "PENDING": [
       {
         "ref": "TENANT_PROVISIONING_STATUS.PENDING",

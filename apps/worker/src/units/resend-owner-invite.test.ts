@@ -10,6 +10,7 @@ import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 import {
   makeSanityOwner,
   OWNER_EMAIL,
@@ -19,17 +20,18 @@ import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 
 import { resendOwnerInvite } from './resend-owner-invite';
 
+const OLD_INVITE_ID = 'invite-old';
+const NEW_INVITE_ID = 'invite-new';
 const SENT_AT = '2026-10-20T09:00:00.000Z';
 
+vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 vi.mock(
   '@worker/utils/provision-env/provision-env',
@@ -46,14 +48,22 @@ describe(resendOwnerInvite, () => {
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
     vi.mocked(listSanityProjectInvites)
       .mockResolvedValueOnce([
-        { id: 'invite-old', email: OWNER_EMAIL, status: 'pending' },
-        { id: 'invite-other', email: 'other@example.com', status: 'pending' },
+        {
+          id: OLD_INVITE_ID,
+          email: OWNER_EMAIL,
+          status: SANITY_PENDING_INVITE_STATUS,
+        },
+        {
+          id: 'invite-other',
+          email: 'other@example.com',
+          status: SANITY_PENDING_INVITE_STATUS,
+        },
       ])
       .mockResolvedValueOnce([
         {
-          id: 'invite-new',
+          id: NEW_INVITE_ID,
           email: OWNER_EMAIL,
-          status: 'pending',
+          status: SANITY_PENDING_INVITE_STATUS,
           createdAt: SENT_AT,
         },
       ]);
@@ -68,7 +78,7 @@ describe(resendOwnerInvite, () => {
 
     expect(deleteSanityProjectInvite).toHaveBeenCalledOnce();
     expect(deleteSanityProjectInvite).toHaveBeenCalledWith(
-      expect.objectContaining({ inviteId: 'invite-old' }),
+      expect.objectContaining({ inviteId: OLD_INVITE_ID }),
     );
   });
 
@@ -92,7 +102,7 @@ describe(resendOwnerInvite, () => {
     await resendOwnerInvite(TEST_TENANT_ID);
 
     expect(setTenantOwnerAccess).toHaveBeenCalledWith(TEST_TENANT_ID, {
-      sanityInviteId: 'invite-new',
+      sanityInviteId: NEW_INVITE_ID,
       inviteSentAt: new Date(SENT_AT),
       inviteAcceptedAt: null,
     });
