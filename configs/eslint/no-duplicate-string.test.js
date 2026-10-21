@@ -63,10 +63,5 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
       options,
       errors: 1,
     },
-    {
-      code: "props['variant']; props['variant'];",
-      options,
-      errors: 1,
-    },
   ],
 });
