@@ -15,6 +15,8 @@ code:
   - apps/platform/src/app/*/page.tsx
   - apps/platform/src/proxy.ts
   - apps/platform/src/utils/requested-path/**
+  - apps/platform/src/server/create-site-gate/**
+  - apps/platform/src/server/rate-limit/**
 epics: [4840, 4960, 4979, 4982, 4958, 4949]
 ---
 
@@ -79,6 +81,15 @@ Decided:
   `pnpm --filter @blog/db db:seed-admin`.
 - Decided: v1 offers the FREE plan only, one Free tenant per user. Wizard,
   card and email copy is fixed platform copy, not [Voice](./voice.md).
+- Today, built ahead of Create site: `takeCreateSiteSlot(clientKey)` allows
+  at most `MAX_SITES_PER_IP_PER_DAY` (3) creates per IP and
+  `MAX_SELF_SERVE_SITES_PER_DAY` (50) in total per UTC day, counted in Upstash
+  Redis. The first refusal past the total cap emails every super admin once
+  that day. Create site (#4960) calls it before enqueuing anything and refuses
+  with a neutral "try again later" message.
+- Today: `@blog/db`'s `normalizeSignupEmail` lower-cases an address and drops
+  any `+tag`, so `name+1@…` and `name+2@…` resolve to one person. #4960's
+  one-site-per-user lookup compares addresses in that form.
 
 ## Constraints and invariants
 
@@ -109,7 +120,8 @@ Decided:
   [public-front-door](./public-front-door.md).
 - Env: `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`,
   `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `RESEND_API_KEY`,
-  `MAGIC_LINK_FROM_ADDRESS`.
+  `MAGIC_LINK_FROM_ADDRESS`, `KV_REST_API_URL`/`KV_REST_API_TOKEN` (the
+  Create site gate's counts), `OPERATOR_ALERT_FROM_ADDRESS`.
 
 ## Entry points
 
@@ -119,6 +131,7 @@ Decided:
 - `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
+- `apps/platform/src/server/create-site-gate/create-site-gate.ts`
 
 ## Tests and stories
 
@@ -126,6 +139,8 @@ Decided:
   `sign-out-action.test.ts`, `sign-in-error/page.test.tsx`, and the view
   tests beside
   `workspace-pending-view` and `sign-out-button`.
+- `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
+  `server/rate-limit/` store tests.
 - No Storybook in `apps/platform`.
 
 ## Related
@@ -137,3 +152,4 @@ Decided:
   sign-in and refuses sessions it did not issue.
 - #4958 magic-link send limits and terms acceptance on first sign-in.
 - #4949 reserved subdomains and a slug availability check.
+- #5648 the Create site gate: per-IP and total daily limits, `+tag` addresses.

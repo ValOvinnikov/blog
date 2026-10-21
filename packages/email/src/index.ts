@@ -25,6 +25,8 @@ export {
   type TDocumentValidationAlertInput,
   buildInactivityWarningAlertEmail,
   type TInactivityWarningAlertInput,
+  buildSelfServeLimitAlertEmail,
+  type TSelfServeLimitAlertInput,
 } from './templates/operator';
 export {
   buildOwnerInviteHeadsUpEmail,

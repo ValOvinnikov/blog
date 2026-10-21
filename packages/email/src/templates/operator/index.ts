@@ -10,3 +10,7 @@ export {
   buildInactivityWarningAlertEmail,
   type TInactivityWarningAlertInput,
 } from './inactivity-warning-alert/inactivity-warning-alert';
+export {
+  buildSelfServeLimitAlertEmail,
+  type TSelfServeLimitAlertInput,
+} from './self-serve-limit-alert/self-serve-limit-alert';
