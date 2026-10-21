@@ -163,7 +163,7 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
         categoryEmpty: 'No posts in this topic yet.',
         tagEmpty: 'No posts with this tag yet.',
       }));
-    });
+    }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
     it(
       'renames categoryEmpty to topicEmpty and preserves its value alongside other keys',

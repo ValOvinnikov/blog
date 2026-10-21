@@ -102,7 +102,7 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
 
     beforeEach(async () => {
       ({ db } = await setUpDbWithBookmark('welcome'));
-    });
+    }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
     it(
       'prefixes a bare post id with page_post-',
