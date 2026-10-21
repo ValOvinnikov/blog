@@ -117,6 +117,10 @@ Any `apps/web`/`apps/platform` call site, their shared loggers at
 
 - CLAUDE.md → "Reuse before you create" applies in full. This package may
   import nothing, so a match elsewhere is named in your report, never copied.
+- A value written a second time becomes a const in this package, tests
+  included (CLAUDE.md → "Reuse a const; never retype its value");
+  `packages/config/CONSTANTS.md` lists none it may import, since it sits
+  below `@blog/config`.
 - File size: CLAUDE.md → Conventions → "File size budgets". Code extracted
   from `logger/logger.ts` stays internal: put it in a module under `logger/`
   that `logger/index.ts` does not re-export, so it never reaches

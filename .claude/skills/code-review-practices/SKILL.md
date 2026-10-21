@@ -234,6 +234,15 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   (→ `CLAUDE.md` "Examine before you change"). Drift in untouched files is
   not. Check the implementing agent's **Examined** section exists and that
   what it left is reported, not dropped.
+- **Literals and consts (blocking on what the diff adds).** A literal that
+  retypes the value of a const in `packages/config/CONSTANTS.md`, a value the
+  diff writes a second time without making it a const, and a new key/value
+  const that duplicates the values of an existing one are findings — in tests
+  as in source (→ `CLAUDE.md` "Reuse a const; never retype its value").
+  `pnpm verify`'s touched-file lint and `check:duplicate-literals` catch most
+  literals, but not a new const restating an existing one: compare each new
+  const against the index. A const the diff adds or changes without a
+  regenerated `CONSTANTS.md` fails `gen:const-index:check`.
 - **Comments (blocking).** Read every comment the diff adds or touches, not
   only the grep hits, against `CLAUDE.md` "Comments default to zero". A
   sibling carrying the same block is no defence — it is the drift, and the

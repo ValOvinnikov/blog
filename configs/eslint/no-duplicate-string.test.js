@@ -30,10 +30,32 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
       code: 'const a = <p className="flex items-center gap-2"><b className="flex items-center gap-2" /></p>;',
       options,
     },
+    {
+      code: "const a = process.env.SITE_MODE === 'staging-preview'; const b = env.SITE_MODE !== 'staging-preview';",
+      options,
+    },
+    {
+      code: "vi.stubEnv('SITE_MODE', 'staging-preview'); vi.stubEnv('SITE_MODE', 'staging-preview');",
+      options,
+    },
+    {
+      code: "const a = { sameSite: 'strict-mode' }; const b = { sameSite: 'strict-mode' };",
+      options,
+    },
   ],
   invalid: [
     {
       code: "const a = 'tenant.created.failed'; const b = 'tenant.created.failed';",
+      options,
+      errors: 1,
+    },
+    {
+      code: "const a = 'staging-preview'; const b = 'staging-preview';",
+      options,
+      errors: 1,
+    },
+    {
+      code: "f('strict-mode'); f('strict-mode');",
       options,
       errors: 1,
     },
