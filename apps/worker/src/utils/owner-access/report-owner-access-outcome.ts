@@ -1,13 +1,13 @@
 import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
+  OWNER_ACCESS_STALL_AFTER_MS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import { updateProvisioningStep } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { OWNER_ACCESS_STALL_AFTER_MS } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 import { postOperatorAlert } from '@worker/utils/operator-alert/operator-alert';
 

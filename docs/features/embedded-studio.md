@@ -53,9 +53,13 @@ module types whose capability is off for the tenant carry a warning.
 - Neon `tenants` owner-access columns (`ownerInviteSentAt`,
   `ownerInviteAcceptedAt`, `ownerSanityUserId`, `ownerSanityRole`,
   `ownerLoginProvider`) and the `OWNER_ELEVATION` step's outcome give the
-  owner's access state, derived in `ownerStudioAccessFor`: READY once the
-  owner is recorded as `ADMINISTRATOR`, ACTIVATING once they have joined
-  without it, STALLED once the worker reports a stall, INVITE_SENT otherwise.
+  owner's access state, derived in `ownerStudioAccessFor`: READY once both
+  `ownerInviteAcceptedAt` and `ownerSanityUserId` are recorded (the worker
+  writes them together when it grants administrator; a later change to
+  `ownerSanityRole` does not undo it), ACTIVATING while only one is,
+  STALLED once the worker reports a stall, INVITE_SENT otherwise. With no
+  recognisable owner-elevation outcome, STALLED falls back to the invite's
+  age against `OWNER_ACCESS_STALL_AFTER_MS`, the worker's own threshold.
 - Neon `settings_features`: the saved capability toggles, clamped to the plan's
   entitlement (`getEnabledCapabilities`), become `enabledCapabilities`.
 - Content lives in the tenant's own Sanity project and dataset; the Studio

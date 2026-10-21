@@ -96,3 +96,5 @@ export const ELEVATE_TENANT_OWNER_OUTCOME = {
 export type TElevateTenantOwnerOutcome = TValueOf<
   typeof ELEVATE_TENANT_OWNER_OUTCOME
 >;
+
+export const OWNER_ACCESS_STALL_AFTER_MS = 3 * 24 * 60 * 60_000;
