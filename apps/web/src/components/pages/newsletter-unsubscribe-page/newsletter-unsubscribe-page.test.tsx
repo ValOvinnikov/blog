@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -42,7 +42,7 @@ describe(`<${NewsletterUnsubscribePage.name}/>`, () => {
     expect(form).toHaveAttribute('method', 'post');
     expect(form).toHaveAttribute(
       'action',
-      '/api/newsletter/unsubscribe?lang=FR',
+      routes.newsletterUnsubscribeSubmit(LOCALE_ISO_CODES.FR),
     );
   });
 });

@@ -1,8 +1,13 @@
+import { routes } from '@blog/config';
+
 import {
   clearNewsletterUnsubscribeToken,
+  NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
   readNewsletterUnsubscribeToken,
   storeNewsletterUnsubscribeToken,
 } from './newsletter-unsubscribe-token-cookie';
+
+const TOKEN = 'kept-unsubscribe-token';
 
 const { setMock, getMock, deleteMock, cookiesMock } = vi.hoisted(() => ({
   setMock: vi.fn(),
@@ -27,14 +32,14 @@ afterEach(() => {
 
 describe(storeNewsletterUnsubscribeToken, () => {
   it('keeps the token in a short-lived, strict, httpOnly cookie scoped to the unsubscribe endpoint', async () => {
-    await storeNewsletterUnsubscribeToken('unsubscribe-token');
+    await storeNewsletterUnsubscribeToken(TOKEN);
 
     expect(setMock).toHaveBeenCalledWith(
-      'newsletter_unsubscribe_token',
-      'unsubscribe-token',
+      NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
+      TOKEN,
       expect.objectContaining({
         maxAge: 60 * 60,
-        path: '/api/newsletter/unsubscribe',
+        path: routes.newsletterUnsubscribeSubmit(),
         sameSite: 'strict',
         httpOnly: true,
       }),
@@ -44,11 +49,11 @@ describe(storeNewsletterUnsubscribeToken, () => {
   it('marks the cookie secure in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
 
-    await storeNewsletterUnsubscribeToken('unsubscribe-token');
+    await storeNewsletterUnsubscribeToken(TOKEN);
 
     expect(setMock).toHaveBeenCalledWith(
-      'newsletter_unsubscribe_token',
-      'unsubscribe-token',
+      NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
+      TOKEN,
       expect.objectContaining({ secure: true }),
     );
   });
@@ -56,12 +61,12 @@ describe(storeNewsletterUnsubscribeToken, () => {
 
 describe(readNewsletterUnsubscribeToken, () => {
   it('reads the kept token', async () => {
-    getMock.mockReturnValue({ value: 'unsubscribe-token' });
+    getMock.mockReturnValue({ value: TOKEN });
 
-    await expect(readNewsletterUnsubscribeToken()).resolves.toBe(
-      'unsubscribe-token',
+    await expect(readNewsletterUnsubscribeToken()).resolves.toBe(TOKEN);
+    expect(getMock).toHaveBeenCalledWith(
+      NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
     );
-    expect(getMock).toHaveBeenCalledWith('newsletter_unsubscribe_token');
   });
 
   it('answers undefined when no token is kept', async () => {
@@ -76,8 +81,8 @@ describe(clearNewsletterUnsubscribeToken, () => {
     await clearNewsletterUnsubscribeToken();
 
     expect(deleteMock).toHaveBeenCalledWith({
-      name: 'newsletter_unsubscribe_token',
-      path: '/api/newsletter/unsubscribe',
+      name: NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
+      path: routes.newsletterUnsubscribeSubmit(),
     });
   });
 });

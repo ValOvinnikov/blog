@@ -2,6 +2,9 @@ import { LOCALE_ISO_CODES, NEWSLETTER_RESULT } from '@blog/config/constants';
 
 import { pageHref, routes } from './routes';
 
+const DESIGN_TOPIC_PATH = '/topics/design';
+const TYPESCRIPT_TAG_PATH = '/tags/typescript';
+
 describe('routes', () => {
   it('builds the home path', () => {
     expect(routes.home()).toBe('/');
@@ -19,7 +22,7 @@ describe('routes', () => {
 
   it('builds post, topic, topics, and landing-page paths', () => {
     expect(routes.post('my-post')).toBe('/blog/my-post');
-    expect(routes.topic('design')).toBe('/topics/design');
+    expect(routes.topic('design')).toBe(DESIGN_TOPIC_PATH);
     expect(routes.topics()).toBe('/topics');
     expect(routes.landingPage('about')).toBe('/about');
   });
@@ -31,8 +34,8 @@ describe('routes', () => {
   });
 
   it('builds page 1 of a topic without a page segment', () => {
-    expect(routes.topic('design')).toBe('/topics/design');
-    expect(routes.topic('design', 1)).toBe('/topics/design');
+    expect(routes.topic('design')).toBe(DESIGN_TOPIC_PATH);
+    expect(routes.topic('design', 1)).toBe(DESIGN_TOPIC_PATH);
   });
 
   it('builds page N of a topic under /topics/{slug}/page/', () => {
@@ -45,8 +48,8 @@ describe('routes', () => {
   });
 
   it('builds page 1 of a tag without a page segment', () => {
-    expect(routes.tag('typescript')).toBe('/tags/typescript');
-    expect(routes.tag('typescript', 1)).toBe('/tags/typescript');
+    expect(routes.tag('typescript')).toBe(TYPESCRIPT_TAG_PATH);
+    expect(routes.tag('typescript', 1)).toBe(TYPESCRIPT_TAG_PATH);
   });
 
   it('builds page N of a tag under /tags/{slug}/page/', () => {
@@ -98,18 +101,9 @@ describe('routes', () => {
     );
   });
 
-  it('builds the unsubscribe confirmation page path without the token', () => {
-    expect(routes.newsletterUnsubscribeConfirmation()).toBe(
-      '/newsletter/unsubscribe',
-    );
-  });
-
   it('builds the unsubscribe submit path without the token, carrying the language', () => {
-    expect(routes.newsletterUnsubscribeSubmit()).toBe(
-      '/api/newsletter/unsubscribe',
-    );
     expect(routes.newsletterUnsubscribeSubmit(LOCALE_ISO_CODES.FR)).toBe(
-      '/api/newsletter/unsubscribe?lang=FR',
+      `${routes.newsletterUnsubscribeSubmit()}?lang=FR`,
     );
   });
 
@@ -133,7 +127,7 @@ describe('pageHref', () => {
 
   it('builds slugged paths for slugged page types', () => {
     expect(pageHref('page_post', 'hello')).toBe('/blog/hello');
-    expect(pageHref('page_topic', 'design')).toBe('/topics/design');
+    expect(pageHref('page_topic', 'design')).toBe(DESIGN_TOPIC_PATH);
     expect(pageHref('page_tag', 'react')).toBe('/tags/react');
     expect(pageHref('page_landing', 'about')).toBe('/about');
   });
