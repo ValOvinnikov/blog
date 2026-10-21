@@ -10,6 +10,7 @@
     "./encryption": "./src/encryption/index.ts",
     "./enqueue-signature": "./src/enqueue-signature/index.ts",
     "./merge": "./src/merge/index.ts",
+    "./normalize-email-identity": "./src/normalize-email-identity/index.ts",
     "./pagination": "./src/pagination/index.ts",
     "./primitives": "./src/primitives/index.ts",
     "./reading-time": "./src/reading-time/index.ts",

@@ -68,6 +68,10 @@ export const env = createEnv({
     LOKI_TOKEN: z.string().min(1).optional(),
     // @env-optional
     VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
+    // @env-optional
+    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    // @env-optional
+    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
   },
   client: {
     // @env-optional
@@ -91,6 +95,8 @@ export const env = createEnv({
     LOKI_USER: process.env.LOKI_USER,
     LOKI_TOKEN: process.env.LOKI_TOKEN,
     VERCEL_ENV: process.env.VERCEL_ENV,
+    PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
+    PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
