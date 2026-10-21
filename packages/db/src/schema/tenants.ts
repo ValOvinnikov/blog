@@ -29,6 +29,8 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
+
 export const tenantPlanEnum = pgEnum(
   'tenant_plan',
   Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]],
@@ -139,7 +141,9 @@ export const tenants = pgTable('tenants', {
   suspendedAt: timestamp('suspended_at'),
   deletionNotifiedAt: timestamp('deletion_notified_at'),
   suspensionReason: text('suspension_reason').$type<TSuspensionReason>(),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
     .defaultNow()

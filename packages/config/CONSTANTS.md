@@ -73,7 +73,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/error.ts`
 
-- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`
+- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/finding.ts`
 
@@ -207,6 +207,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ADMIN_ROLE**: `SUPERADMIN`, `ADMIN`, `MODERATOR`
 - **GRANTED_VIA**: `BREAK_GLASS`, `PROMOTION`
+
+### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
+
+- **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`
 
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
