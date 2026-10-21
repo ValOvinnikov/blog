@@ -107,7 +107,13 @@
     "badgePlatform": "platform",
     "features": "Functies",
     "leads": "Berichten",
-    "releases": "Releases"
+    "releases": "Releases",
+    "studioAccess": {
+      "INVITE_SENT": "Uitnodiging verstuurd",
+      "ACTIVATING": "Wordt geactiveerd",
+      "READY": "Klaar",
+      "STALLED": "Actie nodig"
+    }
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -224,7 +230,15 @@
     "voiceTileTitle": "Toon",
     "voiceTileDescription": "De woorden die uw site gebruikt",
     "featuresTileTitle": "Functies",
-    "featuresTileDescription": "Reacties, bladwijzers, nieuwsbrief"
+    "featuresTileDescription": "Reacties, bladwijzers, nieuwsbrief",
+    "siteSetupCardTitle": "Je site wordt ingericht",
+    "siteSetupFailedTitle": "Het inrichten van je site is gestopt",
+    "siteSetupFailedDescription": "Bij een van de stappen ging iets mis. Probeer het opnieuw; wat al is ingericht, blijft behouden.",
+    "siteSetupFailedContactDescription": "Bij een van de stappen ging iets mis. Vraag je platformcontactpersoon het opnieuw te starten.",
+    "siteSetupRetry": "Opnieuw proberen",
+    "siteSetupRetrying": "Wordt opnieuw gestart…",
+    "siteSetupRetryFailed": "Het inrichten kon niet opnieuw worden gestart. Probeer het opnieuw.",
+    "siteSetupRetryRefused": "Het inrichten kon niet opnieuw worden gestart. Vernieuw de pagina en probeer het opnieuw."
   },
   "provisioningBanner": {
     "readyTitle": "Ingericht",
@@ -830,6 +844,25 @@
     "title": "Studio",
     "notProvisionedTitle": "Studio is nog niet klaar",
     "notProvisionedDescription": "Het Sanity-project van deze site is nog niet klaar. Probeer het over een paar minuten opnieuw."
+  },
+  "ownerStudioAccess": {
+    "title": {
+      "INVITE_SENT": "Accepteer je Studio-uitnodiging",
+      "ACTIVATING": "Je Studio-toegang wordt ingericht",
+      "STALLED": "Je Studio-uitnodiging is niet geaccepteerd"
+    },
+    "description": {
+      "INVITE_SENT": "We hebben je een uitnodiging van Sanity gestuurd, de editor achter Studio. Accepteer die, en Studio opent hier zodra je toegang is bevestigd.",
+      "ACTIVATING": "Je hebt de uitnodiging geaccepteerd. We geven je account bewerkrechten; dat duurt meestal een minuut.",
+      "STALLED": "De uitnodiging is meer dan drie dagen geleden verstuurd en niet geaccepteerd, dus we controleren niet meer. Verstuur een nieuwe of controleer nu als je hem net hebt geaccepteerd."
+    },
+    "checkNow": "Nu controleren",
+    "checking": "Wordt gecontroleerd…",
+    "resendInvite": "Uitnodiging opnieuw versturen",
+    "resending": "Wordt verstuurd…",
+    "checkStarted": "We controleren je toegang. Vernieuw de pagina over een minuut om het resultaat te zien.",
+    "inviteResent": "Er is een nieuwe uitnodiging onderweg naar je inbox.",
+    "requestFailed": "De inrichtingsservice was niet bereikbaar. Probeer het opnieuw."
   },
   "tenantDetailsPanel": {
     "heading": "Tenantgegevens",

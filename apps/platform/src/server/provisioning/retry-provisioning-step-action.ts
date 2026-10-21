@@ -3,7 +3,8 @@
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
-import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
+import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 
 import {
   startProvisioning,
@@ -24,7 +25,7 @@ export type TRetryProvisioningStepResult = TActionResult<
 export const retryProvisioningStepAction = async (
   tenantId: string,
 ): Promise<TRetryProvisioningStepResult> => {
-  await requireSuperAdmin();
+  await requireTenantOwnerOrAdmin(tenantId, isSuperAdmin);
 
   const tenant = await queries.tenants.getTenantById(tenantId, {
     includeArchived: true,

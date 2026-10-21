@@ -14,6 +14,10 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import {
+  OWNER_STUDIO_ACCESS,
+  type TOwnerStudioAccess,
+} from '@platform/constants/owner-studio-access';
+import {
   CONTRAST_STATUS,
   RELEASE_RUN_STATUS,
   type TContrastStatus,
@@ -61,6 +65,13 @@ const RELEASE_RUN_STATUS_TONE: Record<TReleaseRunStatus, TBadgeTone> = {
   [RELEASE_RUN_STATUS.RUNNING]: 'brand',
   [RELEASE_RUN_STATUS.SUCCEEDED]: 'ok',
   [RELEASE_RUN_STATUS.FAILED]: 'bad',
+};
+
+const OWNER_STUDIO_ACCESS_TONE: Record<TOwnerStudioAccess, TBadgeTone> = {
+  [OWNER_STUDIO_ACCESS.INVITE_SENT]: 'warn',
+  [OWNER_STUDIO_ACCESS.ACTIVATING]: 'brand',
+  [OWNER_STUDIO_ACCESS.READY]: 'ok',
+  [OWNER_STUDIO_ACCESS.STALLED]: 'bad',
 };
 
 const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {
@@ -112,3 +123,6 @@ export const contrastStatusTone = (status: TContrastStatus) =>
 
 export const releaseRunStatusTone = (status: TReleaseRunStatus) =>
   RELEASE_RUN_STATUS_TONE[status];
+
+export const ownerStudioAccessTone = (access: TOwnerStudioAccess) =>
+  OWNER_STUDIO_ACCESS_TONE[access];

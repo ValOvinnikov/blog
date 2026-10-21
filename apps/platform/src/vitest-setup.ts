@@ -1,4 +1,8 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+  type TMaybeUndefined,
+} from '@blog/config';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import { createTranslator } from 'next-intl';
 
@@ -6,10 +10,11 @@ import '@testing-library/jest-dom/vitest';
 
 import messages from './i18n/messages/en.json';
 
-type TGetTranslationsArg =
-  string | { locale?: TLocaleIsoCode; namespace?: string } | undefined;
+type TGetTranslationsArg = TMaybeUndefined<
+  string | { locale?: TLocaleIsoCode; namespace?: string }
+>;
 
-const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
+const toNamespace = (arg: TGetTranslationsArg): TMaybeUndefined<string> =>
   typeof arg === 'string' ? arg : arg?.namespace;
 
 // createTranslator's const-generic namespace rejects the runtime string one.
@@ -43,16 +48,17 @@ vi.mock('next-intl/server', () => ({
 // createNavigation reads permanentRedirect at import, so it must exist.
 vi.mock('next/navigation', async () => {
   const { createRouterStub } = await import('@platform/testing/router-stub');
+  const { NEXT_NAVIGATION_ERROR } = await import('@blog/config');
 
   return {
     redirect: vi.fn(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     }),
     notFound: vi.fn(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     }),
     permanentRedirect: vi.fn(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     }),
     unstable_rethrow: vi.fn(),
     useParams: vi.fn(() => ({})),

@@ -6,6 +6,8 @@ import {
 } from '@blog/db';
 import type { TProvisioningRun } from '@blog/db/schema/tenants';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
+import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import {
   act,
   fireEvent,
@@ -27,23 +29,13 @@ const render = renderWithIntl;
 const STEP_POLL_INTERVAL_MS = 1500;
 const STEP_REVEAL_DWELL_MS = 800;
 
-const {
-  retryProvisioningStepActionMock,
-  getTenantProvisioningStatusActionMock,
-} = vi.hoisted(() => ({
-  retryProvisioningStepActionMock: vi.fn(),
-  getTenantProvisioningStatusActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
-vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
-  retryProvisioningStepAction: retryProvisioningStepActionMock,
-}));
+vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
-vi.mock(
-  '@platform/server/provisioning/get-tenant-provisioning-status-action',
-  () => ({
-    getTenantProvisioningStatusAction: getTenantProvisioningStatusActionMock,
-  }),
+const retryProvisioningStepActionMock = vi.mocked(retryProvisioningStepAction);
+const getTenantProvisioningStatusActionMock = vi.mocked(
+  getTenantProvisioningStatusAction,
 );
 
 describe(ProvisioningStatusView, () => {
@@ -53,11 +45,7 @@ describe(ProvisioningStatusView, () => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     user = userEvent.setup();
     retryProvisioningStepActionMock.mockReset();
-    retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
     getTenantProvisioningStatusActionMock.mockReset();
-    getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -86,12 +74,16 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Provisioning' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('Acme Inc. · each step is independently resumable.'),
-    ).toBeVisible();
+    const provisioningHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Provisioning',
+    });
+    const acmeIncEachText = screen.getByText(
+      'Acme Inc. · each step is independently resumable.',
+    );
+
+    expect(provisioningHeading).toBeVisible();
+    expect(acmeIncEachText).toBeVisible();
   });
 
   it('shows the archived notice for a deprovisioned tenant', () => {
@@ -102,7 +94,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    const thisTenantIsText = screen.getByText('This tenant is archived');
+
+    expect(thisTenantIsText).toBeVisible();
   });
 
   it('does not show the archived notice for a live tenant', () => {
@@ -111,9 +105,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      screen.queryByText('This tenant is archived'),
-    ).not.toBeInTheDocument();
+    const thisTenantIsText = screen.queryByText('This tenant is archived');
+
+    expect(thisTenantIsText).not.toBeInTheDocument();
   });
 
   it('renders the overall status badge in the Run card header, not the page header', () => {
@@ -131,22 +125,26 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      within(screen.getByRole('heading', { name: 'Provisioning' })).queryByText(
-        'Running…',
-      ),
-    ).not.toBeInTheDocument();
-    expect(
-      within(screen.getByTestId('run-status-live')).getByText('Running…'),
-    ).toBeVisible();
+    const runningText = within(
+      screen.getByRole('heading', { name: 'Provisioning' }),
+    ).queryByText('Running…');
+    const runningText2 = within(
+      screen.getByTestId('run-status-live'),
+    ).getByText('Running…');
+
+    expect(runningText).not.toBeInTheDocument();
+    expect(runningText2).toBeVisible();
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
     const tenant = makeClientTenant();
     render(<ProvisioningStatusView tenant={tenant} ownerEmail={undefined} />);
 
-    expect(screen.getByText('Owner')).toBeVisible();
-    expect(screen.getByText('Invited, pending')).toBeVisible();
+    const ownerText = screen.getByText('Owner');
+    const invitedPendingText = screen.getByText('Invited, pending');
+
+    expect(ownerText).toBeVisible();
+    expect(invitedPendingText).toBeVisible();
   });
 
   it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
@@ -155,7 +153,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.queryByText('Invited, pending')).not.toBeInTheDocument();
+    const invitedPendingText = screen.queryByText('Invited, pending');
+
+    expect(invitedPendingText).not.toBeInTheDocument();
   });
 
   it('renders no complementary landmark around the main content', () => {
@@ -164,7 +164,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+    const complementary = screen.queryByRole('complementary');
+
+    expect(complementary).not.toBeInTheDocument();
   });
 
   it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
@@ -176,10 +178,14 @@ describe(ProvisioningStatusView, () => {
     );
 
     const sidebar = screen.getByTestId('provisioning-steps');
-    expect(
-      within(sidebar).getByRole('heading', { level: 2, name: /^Steps/ }),
-    ).toBeVisible();
-    expect(within(sidebar).getByText('0 of 6 done')).toBeVisible();
+    const stepsHeading = within(sidebar).getByRole('heading', {
+      level: 2,
+      name: /^Steps/,
+    });
+    const n0Of6Text = within(sidebar).getByText('0 of 6 done');
+
+    expect(stepsHeading).toBeVisible();
+    expect(n0Of6Text).toBeVisible();
   });
 
   it("reflects the steps card's completion badge count from the tenant's actual step statuses", () => {
@@ -198,9 +204,11 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      within(screen.getByTestId('provisioning-steps')).getByText('2 of 6 done'),
-    ).toBeVisible();
+    const n2Of6Text = within(
+      screen.getByTestId('provisioning-steps'),
+    ).getByText('2 of 6 done');
+
+    expect(n2Of6Text).toBeVisible();
   });
 
   it('lists all six provisioning steps in order, in operator language', () => {
@@ -218,7 +226,9 @@ describe(ProvisioningStatusView, () => {
       'Confirm content is ready',
     ];
     for (const heading of headings) {
-      expect(screen.getByText(heading)).toBeVisible();
+      const headingElement = screen.getByText(heading);
+
+      expect(headingElement).toBeVisible();
     }
   });
 
@@ -235,7 +245,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.getAllByText('Running…')[0]).toBeVisible();
+    const firstRunningText = screen.getAllByText('Running…')[0];
+
+    expect(firstRunningText).toBeVisible();
   });
 
   it("shows a running step's number in its circle instead of a spinner", () => {
@@ -251,10 +263,13 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.queryAllByRole('status')).toHaveLength(0);
-    expect(
-      screen.getByText('1', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
+    const statusList = screen.queryAllByRole('status');
+    const n1Text = screen.getByText('1', {
+      selector: 'span[aria-hidden="true"]',
+    });
+
+    expect(statusList).toHaveLength(0);
+    expect(n1Text).toBeVisible();
   });
 
   it('exposes exactly one accessible announcement per step across all four statuses', () => {
@@ -288,7 +303,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.queryAllByRole('status')).toHaveLength(0);
+    const statusList = screen.queryAllByRole('status');
+
+    expect(statusList).toHaveLength(0);
 
     for (const text of ['Not started', 'Running…', 'Complete', 'Failed']) {
       for (const element of screen.getAllByText(text)) {
@@ -296,18 +313,23 @@ describe(ProvisioningStatusView, () => {
       }
     }
 
-    expect(
-      screen.getByText('1', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('2', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('✓', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('!', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
+    const n1Text = screen.getByText('1', {
+      selector: 'span[aria-hidden="true"]',
+    });
+    const n2Text = screen.getByText('2', {
+      selector: 'span[aria-hidden="true"]',
+    });
+    const checkMark = screen.getByText('✓', {
+      selector: 'span[aria-hidden="true"]',
+    });
+    const failureMark = screen.getByText('!', {
+      selector: 'span[aria-hidden="true"]',
+    });
+
+    expect(n1Text).toBeVisible();
+    expect(n2Text).toBeVisible();
+    expect(checkMark).toBeVisible();
+    expect(failureMark).toBeVisible();
   });
 
   it('shows a single Retry button in the Run card header for a failed step, with no per-step Retry buttons in the sidebar', () => {
@@ -326,15 +348,19 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      screen.getAllByRole('button', { name: 'Retry provisioning' }),
-    ).toHaveLength(1);
-    expect(
-      within(screen.getByTestId('provisioning-steps')).queryByRole('button', {
-        name: 'Retry provisioning',
-      }),
-    ).not.toBeInTheDocument();
-    expect(screen.getAllByText('Failed')).toHaveLength(2);
+    const retryProvisioningButtons = screen.getAllByRole('button', {
+      name: 'Retry provisioning',
+    });
+    const retryProvisioningButton = within(
+      screen.getByTestId('provisioning-steps'),
+    ).queryByRole('button', {
+      name: 'Retry provisioning',
+    });
+    const failedTexts = screen.getAllByText('Failed');
+
+    expect(retryProvisioningButtons).toHaveLength(1);
+    expect(retryProvisioningButton).not.toBeInTheDocument();
+    expect(failedTexts).toHaveLength(2);
   });
 
   it("no longer renders a step's raw error text inline in the sidebar", () => {
@@ -352,11 +378,13 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      within(screen.getByTestId('provisioning-steps')).queryByText(
-        'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
-      ),
-    ).not.toBeInTheDocument();
+    const vercelApiPostText = within(
+      screen.getByTestId('provisioning-steps'),
+    ).queryByText(
+      'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
+    );
+
+    expect(vercelApiPostText).not.toBeInTheDocument();
   });
 
   it('does not render a parsed error card when no step has failed', () => {
@@ -367,7 +395,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const alert = screen.queryByRole('alert');
+
+    expect(alert).not.toBeInTheDocument();
   });
 
   describe('parsed provisioning error card', () => {
@@ -395,16 +425,19 @@ describe(ProvisioningStatusView, () => {
         'Sanity Access API POST /access/project/xxxxx000/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}';
       renderFailed(rawError);
 
-      expect(
-        screen.getByRole('heading', {
-          name: 'Missing permission to complete this step',
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('Grant the missing permission, then retry.'),
-      ).toBeVisible();
-      expect(screen.getByText('Technical details')).toBeVisible();
-      expect(screen.getByText(rawError)).not.toBeVisible();
+      const missingPermissionToCompleteHeading = screen.getByRole('heading', {
+        name: 'Missing permission to complete this step',
+      });
+      const grantTheMissingText = screen.getByText(
+        'Grant the missing permission, then retry.',
+      );
+      const technicalDetailsText = screen.getByText('Technical details');
+      const rawErrorElement = screen.getByText(rawError);
+
+      expect(missingPermissionToCompleteHeading).toBeVisible();
+      expect(grantTheMissingText).toBeVisible();
+      expect(technicalDetailsText).toBeVisible();
+      expect(rawErrorElement).not.toBeVisible();
     });
 
     it('maps a 400 duplicate/already-in-use failure to a friendly headline and next step', () => {
@@ -412,40 +445,44 @@ describe(ProvisioningStatusView, () => {
         'Sanity Access API POST /access/project/xxxxx000/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}';
       renderFailed(rawError);
 
-      expect(
-        screen.getByRole('heading', {
-          name: 'Already in use by another tenant',
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('Resolve the conflict, then retry.'),
-      ).toBeVisible();
+      const alreadyInUseByHeading = screen.getByRole('heading', {
+        name: 'Already in use by another tenant',
+      });
+      const resolveTheConflictText = screen.getByText(
+        'Resolve the conflict, then retry.',
+      );
+
+      expect(alreadyInUseByHeading).toBeVisible();
+      expect(resolveTheConflictText).toBeVisible();
     });
 
     it('maps a network/timeout failure to a friendly headline and next step', () => {
       renderFailed('fetch failed');
 
-      expect(
-        screen.getByRole('heading', {
-          name: "Couldn't reach the provisioning service",
-        }),
-      ).toBeVisible();
-      expect(screen.getByText('Wait a moment, then retry.')).toBeVisible();
+      const couldNotReachTheHeading = screen.getByRole('heading', {
+        name: "Couldn't reach the provisioning service",
+      });
+      const waitAMomentText = screen.getByText('Wait a moment, then retry.');
+
+      expect(couldNotReachTheHeading).toBeVisible();
+      expect(waitAMomentText).toBeVisible();
     });
 
     it('falls back to a generic friendly headline and preserved raw text for an unrecognised failure shape', () => {
       const rawError = 'CORS API is down';
       renderFailed(rawError);
 
-      expect(
-        screen.getByRole('heading', { name: 'This step failed' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText(
-          'Retry, or check the technical details before asking for help.',
-        ),
-      ).toBeVisible();
-      expect(screen.getByText(rawError)).not.toBeVisible();
+      const thisStepFailedHeading = screen.getByRole('heading', {
+        name: 'This step failed',
+      });
+      const retryOrCheckText = screen.getByText(
+        'Retry, or check the technical details before asking for help.',
+      );
+      const rawErrorElement = screen.getByText(rawError);
+
+      expect(thisStepFailedHeading).toBeVisible();
+      expect(retryOrCheckText).toBeVisible();
+      expect(rawErrorElement).not.toBeVisible();
     });
   });
 
@@ -470,9 +507,13 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
-      expect(screen.queryByText('Failed')).not.toBeInTheDocument();
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      const runningCount = screen.getAllByText('Running…').length;
+      const failedText = screen.queryByText('Failed');
+      const alert = screen.queryByRole('alert');
+
+      expect(runningCount).toBeGreaterThan(0);
+      expect(failedText).not.toBeInTheDocument();
+      expect(alert).not.toBeInTheDocument();
     });
 
     it('renders the stale step with its pending number instead of the failed glyph', () => {
@@ -483,12 +524,15 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(
-        screen.queryByText('!', { selector: 'span[aria-hidden="true"]' }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByText('4', { selector: 'span[aria-hidden="true"]' }),
-      ).toBeVisible();
+      const failureMark = screen.queryByText('!', {
+        selector: 'span[aria-hidden="true"]',
+      });
+      const n4Text = screen.getByText('4', {
+        selector: 'span[aria-hidden="true"]',
+      });
+
+      expect(failureMark).not.toBeInTheDocument();
+      expect(n4Text).toBeVisible();
     });
 
     it('shows no Retry button while the run is genuinely in progress', () => {
@@ -499,9 +543,11 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(
-        screen.queryByRole('button', { name: 'Retry provisioning' }),
-      ).not.toBeInTheDocument();
+      const retryProvisioningButton = screen.queryByRole('button', {
+        name: 'Retry provisioning',
+      });
+
+      expect(retryProvisioningButton).not.toBeInTheDocument();
     });
   });
 
@@ -537,9 +583,11 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      screen.getAllByRole('button', { name: 'Start provisioning' }),
-    ).toHaveLength(1);
+    const startProvisioningButtons = screen.getAllByRole('button', {
+      name: 'Start provisioning',
+    });
+
+    expect(startProvisioningButtons).toHaveLength(1);
   });
 
   it('says no run has started yet in the Run card before any run exists', () => {
@@ -550,7 +598,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.getByText('No run has started yet.')).toBeVisible();
+    const noRunHasText = screen.getByText('No run has started yet.');
+
+    expect(noRunHasText).toBeVisible();
   });
 
   it('hides the Start provisioning action once any step has progressed past idle', () => {
@@ -566,9 +616,11 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      screen.queryByRole('button', { name: 'Start provisioning' }),
-    ).not.toBeInTheDocument();
+    const startProvisioningButton = screen.queryByRole('button', {
+      name: 'Start provisioning',
+    });
+
+    expect(startProvisioningButton).not.toBeInTheDocument();
   });
 
   it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
@@ -608,10 +660,13 @@ describe(ProvisioningStatusView, () => {
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    expect(
-      screen.queryByRole('button', { name: 'Start provisioning' }),
-    ).not.toBeInTheDocument();
-    expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
+    const startProvisioningButton = screen.queryByRole('button', {
+      name: 'Start provisioning',
+    });
+    const runningCount = screen.getAllByText('Running…').length;
+
+    expect(startProvisioningButton).not.toBeInTheDocument();
+    expect(runningCount).toBeGreaterThan(0);
 
     await act(async () => {
       resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -636,13 +691,17 @@ describe(ProvisioningStatusView, () => {
     );
 
     const liveRegion = screen.getByTestId('run-status-live');
-    expect(within(liveRegion).getByText('Not started')).toBeVisible();
+    const notStartedText = within(liveRegion).getByText('Not started');
+
+    expect(notStartedText).toBeVisible();
 
     await user.click(
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    expect(within(liveRegion).getByText('Running…')).toBeVisible();
+    const runningText = within(liveRegion).getByText('Running…');
+
+    expect(runningText).toBeVisible();
 
     await act(async () => {
       resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -665,12 +724,15 @@ describe(ProvisioningStatusView, () => {
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    expect(
-      await screen.findByText("Couldn't start provisioning — try again."),
-    ).toBeVisible();
-    expect(
-      await screen.findByRole('button', { name: 'Start provisioning' }),
-    ).toBeVisible();
+    const couldNotStartText = await screen.findByText(
+      "Couldn't start provisioning — try again.",
+    );
+    const startProvisioningButton = await screen.findByRole('button', {
+      name: 'Start provisioning',
+    });
+
+    expect(couldNotStartText).toBeVisible();
+    expect(startProvisioningButton).toBeVisible();
   });
 
   it('shows a not-found-specific error when the tenant no longer exists server-side', async () => {
@@ -689,11 +751,11 @@ describe(ProvisioningStatusView, () => {
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    expect(
-      await screen.findByText(
-        "Couldn't find this tenant — refresh the page and try again.",
-      ),
-    ).toBeVisible();
+    const couldNotFindText = await screen.findByText(
+      "Couldn't find this tenant — refresh the page and try again.",
+    );
+
+    expect(couldNotFindText).toBeVisible();
   });
 
   it('shows a distinct, non-error notice when a run is already in progress', async () => {
@@ -712,12 +774,13 @@ describe(ProvisioningStatusView, () => {
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    expect(
-      await screen.findByText(
-        'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
-      ),
-    ).toBeVisible();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const aProvisioningRunText = await screen.findByText(
+      'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
+    );
+    const alert = screen.queryByRole('alert');
+
+    expect(aProvisioningRunText).toBeVisible();
+    expect(alert).not.toBeInTheDocument();
   });
 
   it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
@@ -772,9 +835,13 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    ).toHaveAccessibleDescription(/This tenant is archived/);
+    const startProvisioningButton = screen.getByRole('button', {
+      name: 'Start provisioning',
+    });
+
+    expect(startProvisioningButton).toHaveAccessibleDescription(
+      /This tenant is archived/,
+    );
   });
 
   it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
@@ -793,9 +860,13 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(
-      screen.getByRole('button', { name: 'Retry provisioning' }),
-    ).toHaveAccessibleDescription(/This tenant is archived/);
+    const retryProvisioningButton = screen.getByRole('button', {
+      name: 'Retry provisioning',
+    });
+
+    expect(retryProvisioningButton).toHaveAccessibleDescription(
+      /This tenant is archived/,
+    );
   });
 
   it('shows an archived-specific error if a dispatch is somehow still attempted against an archived tenant', async () => {
@@ -814,11 +885,11 @@ describe(ProvisioningStatusView, () => {
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    expect(
-      await screen.findByText(
-        "This tenant is archived; provisioning can't be started.",
-      ),
-    ).toBeVisible();
+    const thisTenantIsText = await screen.findByText(
+      "This tenant is archived; provisioning can't be started.",
+    );
+
+    expect(thisTenantIsText).toBeVisible();
   });
 
   describe('live polling', () => {
@@ -858,7 +929,9 @@ describe(ProvisioningStatusView, () => {
       );
 
       const sidebar = screen.getByTestId('provisioning-steps');
-      expect(within(sidebar).getByText('Running…')).toBeVisible();
+      const runningText = within(sidebar).getByText('Running…');
+
+      expect(runningText).toBeVisible();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -870,8 +943,11 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
         'tenant-1',
       );
-      expect(within(sidebar).getByText('Complete')).toBeVisible();
-      expect(within(sidebar).queryByText('Running…')).not.toBeInTheDocument();
+      const completeText = within(sidebar).getByText('Complete');
+      const runningText2 = within(sidebar).queryByText('Running…');
+
+      expect(completeText).toBeVisible();
+      expect(runningText2).not.toBeInTheDocument();
     });
 
     it('announces a polled step-status transition through a stable aria-live region', async () => {
@@ -903,7 +979,9 @@ describe(ProvisioningStatusView, () => {
       const liveRegion = screen.getByTestId(
         `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
       );
-      expect(within(liveRegion).getByText('Running…')).toBeVisible();
+      const runningText = within(liveRegion).getByText('Running…');
+
+      expect(runningText).toBeVisible();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -912,7 +990,9 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
       });
 
-      expect(within(liveRegion).getByText('Complete')).toBeVisible();
+      const completeText = within(liveRegion).getByText('Complete');
+
+      expect(completeText).toBeVisible();
     });
     it('shows a step that finished between two polls as running before it shows as complete', async () => {
       const tenant = makeClientTenant({
@@ -946,13 +1026,17 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
       });
 
-      expect(within(liveRegion).getByText('Running…')).toBeVisible();
+      const runningText = within(liveRegion).getByText('Running…');
+
+      expect(runningText).toBeVisible();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
       });
 
-      expect(within(liveRegion).getByText('Complete')).toBeVisible();
+      const completeText = within(liveRegion).getByText('Complete');
+
+      expect(completeText).toBeVisible();
     });
 
     it('says the run is queued, with a wait that keeps counting, until the workflow starts it', async () => {
@@ -971,30 +1055,31 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(
-        screen.getByText('Queued — the provisioning workflow is starting up'),
-      ).toBeVisible();
-      expect(screen.getByTestId('queued-run-elapsed')).toHaveTextContent(
-        '0:05 waiting',
+      const queuedTheProvisioningText = screen.getByText(
+        'Queued — the provisioning workflow is starting up',
       );
-      expect(
-        within(screen.getByTestId('run-status-live')).getByText('Starting…'),
-      ).toBeVisible();
-      expect(
-        within(
-          screen.getByTestId(
-            `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
-          ),
-        ).getByText('Queued'),
-      ).toBeInTheDocument();
+      const queuedRunElapsed = screen.getByTestId('queued-run-elapsed');
+      const startingText = within(
+        screen.getByTestId('run-status-live'),
+      ).getByText('Starting…');
+      const queuedText = within(
+        screen.getByTestId(
+          `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
+        ),
+      ).getByText('Queued');
+
+      expect(queuedTheProvisioningText).toBeVisible();
+      expect(queuedRunElapsed).toHaveTextContent('0:05 waiting');
+      expect(startingText).toBeVisible();
+      expect(queuedText).toBeInTheDocument();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(screen.getByTestId('queued-run-elapsed')).toHaveTextContent(
-        '1:05 waiting',
-      );
+      const queuedRunElapsed2 = screen.getByTestId('queued-run-elapsed');
+
+      expect(queuedRunElapsed2).toHaveTextContent('1:05 waiting');
     });
 
     it('drops the queued notice once the workflow has started the run', async () => {
@@ -1023,12 +1108,15 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(
-        screen.queryByText('Queued — the provisioning workflow is starting up'),
-      ).not.toBeInTheDocument();
-      expect(
-        within(screen.getByTestId('run-status-live')).getByText('Running…'),
-      ).toBeVisible();
+      const queuedTheProvisioningText = screen.queryByText(
+        'Queued — the provisioning workflow is starting up',
+      );
+      const runningText = within(
+        screen.getByTestId('run-status-live'),
+      ).getByText('Running…');
+
+      expect(queuedTheProvisioningText).not.toBeInTheDocument();
+      expect(runningText).toBeVisible();
     });
   });
 
@@ -1263,7 +1351,9 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(screen.queryByText(/\d{4}/)).not.toBeInTheDocument();
+      const d4Text = screen.queryByText(/\d{4}/);
+
+      expect(d4Text).not.toBeInTheDocument();
     });
 
     it('renders a Run card header with no run details for a tenant with no run', () => {
@@ -1277,11 +1367,13 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Run' }),
-      ).toBeVisible();
-      expect(screen.queryByText('Started')).not.toBeInTheDocument();
-      expect(screen.queryByText('Finished')).not.toBeInTheDocument();
+      const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
+      const startedText = screen.queryByText('Started');
+      const finishedText = screen.queryByText('Finished');
+
+      expect(runHeading).toBeVisible();
+      expect(startedText).not.toBeInTheDocument();
+      expect(finishedText).not.toBeInTheDocument();
     });
 
     it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
@@ -1303,16 +1395,19 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Run' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('6m ago · Aug 12, 2026, 2:18 PM UTC'),
-      ).toBeVisible();
-      expect(
-        screen.getByText('2m ago · Aug 12, 2026, 2:22 PM UTC'),
-      ).toBeVisible();
-      expect(screen.getByText('production')).toBeVisible();
+      const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
+      const n6mAgoAugText = screen.getByText(
+        '6m ago · Aug 12, 2026, 2:18 PM UTC',
+      );
+      const n2mAgoAugText = screen.getByText(
+        '2m ago · Aug 12, 2026, 2:22 PM UTC',
+      );
+      const productionText = screen.getByText('production');
+
+      expect(runHeading).toBeVisible();
+      expect(n6mAgoAugText).toBeVisible();
+      expect(n2mAgoAugText).toBeVisible();
+      expect(productionText).toBeVisible();
     });
   });
 });

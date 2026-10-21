@@ -1,16 +1,22 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
+import type { TAdmin } from '@blog/db/schema/admins';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { notFound, redirect } from 'next/navigation';
 
-const { requireSuperAdminMock, startProvisioningMock, getTenantByIdMock } =
-  vi.hoisted(() => ({
-    requireSuperAdminMock: vi.fn(),
-    startProvisioningMock: vi.fn(),
-    getTenantByIdMock: vi.fn(),
-  }));
+const {
+  requireTenantOwnerOrAdminMock,
+  startProvisioningMock,
+  getTenantByIdMock,
+} = vi.hoisted(() => ({
+  requireTenantOwnerOrAdminMock: vi.fn(),
+  startProvisioningMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
+}));
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
+vi.mock('@platform/server/auth/require-tenant-owner-or-admin', () => ({
+  requireTenantOwnerOrAdmin: requireTenantOwnerOrAdminMock,
 }));
 
 vi.mock('./start-provisioning', () => ({
@@ -29,11 +35,8 @@ describe('retryProvisioningStepAction', () => {
   let retryProvisioningStepAction: typeof import('./retry-provisioning-step-action').retryProvisioningStepAction;
 
   beforeEach(async () => {
-    requireSuperAdminMock.mockReset();
-    requireSuperAdminMock.mockResolvedValue({
-      id: 'admin-1',
-      role: 'SUPERADMIN',
-    });
+    requireTenantOwnerOrAdminMock.mockReset();
+    requireTenantOwnerOrAdminMock.mockResolvedValue(undefined);
     startProvisioningMock.mockReset();
     startProvisioningMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -47,28 +50,41 @@ describe('retryProvisioningStepAction', () => {
       await import('./retry-provisioning-step-action'));
   });
 
-  it('requires a super-admin session before dispatching', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+  it('requires a session before dispatching', async () => {
+    requireTenantOwnerOrAdminMock.mockImplementation(() => {
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
     expect(startProvisioningMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an ADMIN-role caller via requireSuperAdmin's 404, before touching provisioning", async () => {
-    requireSuperAdminMock.mockImplementation(() => {
+  it('rejects a caller who is neither the owner nor a super-admin, before touching provisioning', async () => {
+    requireTenantOwnerOrAdminMock.mockImplementation(() => {
       notFound();
     });
 
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(redirect).not.toHaveBeenCalled();
     expect(startProvisioningMock).not.toHaveBeenCalled();
+  });
+
+  it("admits only the tenant's owner or a super-admin", async () => {
+    await retryProvisioningStepAction('tenant-1');
+
+    const [tenantId, isAdminPermitted] = requireTenantOwnerOrAdminMock.mock
+      .calls[0] as [string, (admin: TAdmin) => boolean];
+
+    expect(tenantId).toBe('tenant-1');
+    expect(isAdminPermitted(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }))).toBe(
+      true,
+    );
+    expect(isAdminPermitted(makeAdmin())).toBe(false);
   });
 
   it.each([
