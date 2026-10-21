@@ -609,13 +609,13 @@ describe(useProvisioningPoll, () => {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
-      expect(result.current.stepStatuses[0]).toBe(
-        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-      );
       const couldNotRefreshText = screen.getByText(
         "Couldn't refresh the latest status — retrying automatically.",
       );
 
+      expect(result.current.stepStatuses[0]).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      );
       expect(couldNotRefreshText).toBeVisible();
 
       getTenantProvisioningStatusActionMock.mockResolvedValue({

@@ -44,18 +44,15 @@ describe(OwnerHomeView, () => {
       level: 1,
       name: 'Northwind Field Notes',
     });
-
-    expect(northwindFieldNotesHeading).toBeVisible();
     const activeText = screen.getByText('Active');
-
-    expect(activeText).toBeVisible();
     const growthCount = screen.getAllByText('Growth').length;
-
-    expect(growthCount).toBeGreaterThan(0);
     const openSiteOpensInLink = screen.getByRole('link', {
       name: 'Open site (opens in new tab)',
     });
 
+    expect(northwindFieldNotesHeading).toBeVisible();
+    expect(activeText).toBeVisible();
+    expect(growthCount).toBeGreaterThan(0);
     expect(openSiteOpensInLink).toHaveAttribute(
       'href',
       'https://northwind.dev',
@@ -94,10 +91,9 @@ describe(OwnerHomeView, () => {
       level: 2,
       name: 'Your site',
     });
-
-    expect(yourSiteHeading).toBeVisible();
     const textbox = screen.queryByRole('textbox');
 
+    expect(yourSiteHeading).toBeVisible();
     expect(textbox).not.toBeInTheDocument();
   });
 
@@ -114,16 +110,14 @@ describe(OwnerHomeView, () => {
       level: 2,
       name: 'Domain',
     });
-
-    expect(domainHeading).toBeVisible();
     const ownerHeading = screen.getByRole('heading', {
       level: 2,
       name: 'Owner',
     });
-
-    expect(ownerHeading).toBeVisible();
     const dnsLink = screen.getByRole('link', { name: 'DNS' });
 
+    expect(domainHeading).toBeVisible();
+    expect(ownerHeading).toBeVisible();
     expect(dnsLink).toHaveAttribute('href', '/dashboard/domain');
   });
 
@@ -134,16 +128,13 @@ describe(OwnerHomeView, () => {
       level: 2,
       name: 'Make it yours',
     });
-
-    expect(makeItYoursHeading).toBeVisible();
     const lookLink = screen.getByRole('link', { name: /Look/ });
-
-    expect(lookLink).toHaveAttribute('href', '/dashboard/look');
     const voiceLink = screen.getByRole('link', { name: /Voice/ });
-
-    expect(voiceLink).toHaveAttribute('href', '/dashboard/voice');
     const featuresLink = screen.getByRole('link', { name: /Features/ });
 
+    expect(makeItYoursHeading).toBeVisible();
+    expect(lookLink).toHaveAttribute('href', '/dashboard/look');
+    expect(voiceLink).toHaveAttribute('href', '/dashboard/voice');
     expect(featuresLink).toHaveAttribute('href', '/dashboard/features');
   });
 
@@ -153,17 +144,15 @@ describe(OwnerHomeView, () => {
     const contentWorkspaceHeading = screen.queryByRole('heading', {
       name: 'Content workspace',
     });
-
-    expect(contentWorkspaceHeading).not.toBeInTheDocument();
     const recentActivityHeading = screen.queryByRole('heading', {
       name: 'Recent activity',
     });
-
-    expect(recentActivityHeading).not.toBeInTheDocument();
     const openStudioLink = screen.queryByRole('link', {
       name: 'Open Studio →',
     });
 
+    expect(contentWorkspaceHeading).not.toBeInTheDocument();
+    expect(recentActivityHeading).not.toBeInTheDocument();
     expect(openStudioLink).not.toBeInTheDocument();
   });
 
@@ -179,22 +168,19 @@ describe(OwnerHomeView, () => {
       level: 1,
       name: 'Northwind Field Notes',
     });
-
-    expect(northwindFieldNotesHeading).toBeVisible();
     const ownerHeading = screen.getByRole('heading', {
       level: 2,
       name: 'Owner',
     });
-
-    expect(ownerHeading).toBeVisible();
     const domainHeading = screen.queryByRole('heading', {
       level: 2,
       name: 'Domain',
     });
-
-    expect(domainHeading).toBeNull();
     const skeletonCount = screen.getAllByTestId('skeleton').length;
 
+    expect(northwindFieldNotesHeading).toBeVisible();
+    expect(ownerHeading).toBeVisible();
+    expect(domainHeading).toBeNull();
     expect(skeletonCount).toBeGreaterThan(0);
   });
 
@@ -206,10 +192,9 @@ describe(OwnerHomeView, () => {
     });
 
     const pendingAwaitingDnsText = screen.getByText('Pending — awaiting DNS');
-
-    expect(pendingAwaitingDnsText).toBeVisible();
     const skeleton = screen.queryByTestId('skeleton');
 
+    expect(pendingAwaitingDnsText).toBeVisible();
     expect(skeleton).toBeNull();
   });
 });

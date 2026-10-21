@@ -78,12 +78,11 @@ describe(ProvisioningStatusView, () => {
       level: 1,
       name: 'Provisioning',
     });
-
-    expect(provisioningHeading).toBeVisible();
     const acmeIncEachText = screen.getByText(
       'Acme Inc. · each step is independently resumable.',
     );
 
+    expect(provisioningHeading).toBeVisible();
     expect(acmeIncEachText).toBeVisible();
   });
 
@@ -129,12 +128,11 @@ describe(ProvisioningStatusView, () => {
     const runningText = within(
       screen.getByRole('heading', { name: 'Provisioning' }),
     ).queryByText('Running…');
-
-    expect(runningText).not.toBeInTheDocument();
     const runningText2 = within(
       screen.getByTestId('run-status-live'),
     ).getByText('Running…');
 
+    expect(runningText).not.toBeInTheDocument();
     expect(runningText2).toBeVisible();
   });
 
@@ -143,10 +141,9 @@ describe(ProvisioningStatusView, () => {
     render(<ProvisioningStatusView tenant={tenant} ownerEmail={undefined} />);
 
     const ownerText = screen.getByText('Owner');
-
-    expect(ownerText).toBeVisible();
     const invitedPendingText = screen.getByText('Invited, pending');
 
+    expect(ownerText).toBeVisible();
     expect(invitedPendingText).toBeVisible();
   });
 
@@ -185,10 +182,9 @@ describe(ProvisioningStatusView, () => {
       level: 2,
       name: /^Steps/,
     });
-
-    expect(stepsHeading).toBeVisible();
     const n0Of6Text = within(sidebar).getByText('0 of 6 done');
 
+    expect(stepsHeading).toBeVisible();
     expect(n0Of6Text).toBeVisible();
   });
 
@@ -268,12 +264,11 @@ describe(ProvisioningStatusView, () => {
     );
 
     const statusList = screen.queryAllByRole('status');
-
-    expect(statusList).toHaveLength(0);
     const n1Text = screen.getByText('1', {
       selector: 'span[aria-hidden="true"]',
     });
 
+    expect(statusList).toHaveLength(0);
     expect(n1Text).toBeVisible();
   });
 
@@ -321,22 +316,19 @@ describe(ProvisioningStatusView, () => {
     const n1Text = screen.getByText('1', {
       selector: 'span[aria-hidden="true"]',
     });
-
-    expect(n1Text).toBeVisible();
     const n2Text = screen.getByText('2', {
       selector: 'span[aria-hidden="true"]',
     });
-
-    expect(n2Text).toBeVisible();
     const checkMark = screen.getByText('✓', {
       selector: 'span[aria-hidden="true"]',
     });
-
-    expect(checkMark).toBeVisible();
     const failureMark = screen.getByText('!', {
       selector: 'span[aria-hidden="true"]',
     });
 
+    expect(n1Text).toBeVisible();
+    expect(n2Text).toBeVisible();
+    expect(checkMark).toBeVisible();
     expect(failureMark).toBeVisible();
   });
 
@@ -359,17 +351,15 @@ describe(ProvisioningStatusView, () => {
     const retryProvisioningButtons = screen.getAllByRole('button', {
       name: 'Retry provisioning',
     });
-
-    expect(retryProvisioningButtons).toHaveLength(1);
     const retryProvisioningButton = within(
       screen.getByTestId('provisioning-steps'),
     ).queryByRole('button', {
       name: 'Retry provisioning',
     });
-
-    expect(retryProvisioningButton).not.toBeInTheDocument();
     const failedTexts = screen.getAllByText('Failed');
 
+    expect(retryProvisioningButtons).toHaveLength(1);
+    expect(retryProvisioningButton).not.toBeInTheDocument();
     expect(failedTexts).toHaveLength(2);
   });
 
@@ -438,18 +428,15 @@ describe(ProvisioningStatusView, () => {
       const missingPermissionToCompleteHeading = screen.getByRole('heading', {
         name: 'Missing permission to complete this step',
       });
-
-      expect(missingPermissionToCompleteHeading).toBeVisible();
       const grantTheMissingText = screen.getByText(
         'Grant the missing permission, then retry.',
       );
-
-      expect(grantTheMissingText).toBeVisible();
       const technicalDetailsText = screen.getByText('Technical details');
-
-      expect(technicalDetailsText).toBeVisible();
       const rawErrorElement = screen.getByText(rawError);
 
+      expect(missingPermissionToCompleteHeading).toBeVisible();
+      expect(grantTheMissingText).toBeVisible();
+      expect(technicalDetailsText).toBeVisible();
       expect(rawErrorElement).not.toBeVisible();
     });
 
@@ -461,12 +448,11 @@ describe(ProvisioningStatusView, () => {
       const alreadyInUseByHeading = screen.getByRole('heading', {
         name: 'Already in use by another tenant',
       });
-
-      expect(alreadyInUseByHeading).toBeVisible();
       const resolveTheConflictText = screen.getByText(
         'Resolve the conflict, then retry.',
       );
 
+      expect(alreadyInUseByHeading).toBeVisible();
       expect(resolveTheConflictText).toBeVisible();
     });
 
@@ -476,10 +462,9 @@ describe(ProvisioningStatusView, () => {
       const couldNotReachTheHeading = screen.getByRole('heading', {
         name: "Couldn't reach the provisioning service",
       });
-
-      expect(couldNotReachTheHeading).toBeVisible();
       const waitAMomentText = screen.getByText('Wait a moment, then retry.');
 
+      expect(couldNotReachTheHeading).toBeVisible();
       expect(waitAMomentText).toBeVisible();
     });
 
@@ -490,15 +475,13 @@ describe(ProvisioningStatusView, () => {
       const thisStepFailedHeading = screen.getByRole('heading', {
         name: 'This step failed',
       });
-
-      expect(thisStepFailedHeading).toBeVisible();
       const retryOrCheckText = screen.getByText(
         'Retry, or check the technical details before asking for help.',
       );
-
-      expect(retryOrCheckText).toBeVisible();
       const rawErrorElement = screen.getByText(rawError);
 
+      expect(thisStepFailedHeading).toBeVisible();
+      expect(retryOrCheckText).toBeVisible();
       expect(rawErrorElement).not.toBeVisible();
     });
   });
@@ -525,13 +508,11 @@ describe(ProvisioningStatusView, () => {
       );
 
       const runningCount = screen.getAllByText('Running…').length;
-
-      expect(runningCount).toBeGreaterThan(0);
       const failedText = screen.queryByText('Failed');
-
-      expect(failedText).not.toBeInTheDocument();
       const alert = screen.queryByRole('alert');
 
+      expect(runningCount).toBeGreaterThan(0);
+      expect(failedText).not.toBeInTheDocument();
       expect(alert).not.toBeInTheDocument();
     });
 
@@ -546,12 +527,11 @@ describe(ProvisioningStatusView, () => {
       const failureMark = screen.queryByText('!', {
         selector: 'span[aria-hidden="true"]',
       });
-
-      expect(failureMark).not.toBeInTheDocument();
       const n4Text = screen.getByText('4', {
         selector: 'span[aria-hidden="true"]',
       });
 
+      expect(failureMark).not.toBeInTheDocument();
       expect(n4Text).toBeVisible();
     });
 
@@ -683,10 +663,9 @@ describe(ProvisioningStatusView, () => {
     const startProvisioningButton = screen.queryByRole('button', {
       name: 'Start provisioning',
     });
-
-    expect(startProvisioningButton).not.toBeInTheDocument();
     const runningCount = screen.getAllByText('Running…').length;
 
+    expect(startProvisioningButton).not.toBeInTheDocument();
     expect(runningCount).toBeGreaterThan(0);
 
     await act(async () => {
@@ -748,12 +727,11 @@ describe(ProvisioningStatusView, () => {
     const couldNotStartText = await screen.findByText(
       "Couldn't start provisioning — try again.",
     );
-
-    expect(couldNotStartText).toBeVisible();
     const startProvisioningButton = await screen.findByRole('button', {
       name: 'Start provisioning',
     });
 
+    expect(couldNotStartText).toBeVisible();
     expect(startProvisioningButton).toBeVisible();
   });
 
@@ -799,10 +777,9 @@ describe(ProvisioningStatusView, () => {
     const aProvisioningRunText = await screen.findByText(
       'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
     );
-
-    expect(aProvisioningRunText).toBeVisible();
     const alert = screen.queryByRole('alert');
 
+    expect(aProvisioningRunText).toBeVisible();
     expect(alert).not.toBeInTheDocument();
   });
 
@@ -967,10 +944,9 @@ describe(ProvisioningStatusView, () => {
         'tenant-1',
       );
       const completeText = within(sidebar).getByText('Complete');
-
-      expect(completeText).toBeVisible();
       const runningText2 = within(sidebar).queryByText('Running…');
 
+      expect(completeText).toBeVisible();
       expect(runningText2).not.toBeInTheDocument();
     });
 
@@ -1082,22 +1058,19 @@ describe(ProvisioningStatusView, () => {
       const queuedTheProvisioningText = screen.getByText(
         'Queued — the provisioning workflow is starting up',
       );
-
-      expect(queuedTheProvisioningText).toBeVisible();
       const queuedRunElapsed = screen.getByTestId('queued-run-elapsed');
-
-      expect(queuedRunElapsed).toHaveTextContent('0:05 waiting');
       const startingText = within(
         screen.getByTestId('run-status-live'),
       ).getByText('Starting…');
-
-      expect(startingText).toBeVisible();
       const queuedText = within(
         screen.getByTestId(
           `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
         ),
       ).getByText('Queued');
 
+      expect(queuedTheProvisioningText).toBeVisible();
+      expect(queuedRunElapsed).toHaveTextContent('0:05 waiting');
+      expect(startingText).toBeVisible();
       expect(queuedText).toBeInTheDocument();
 
       await act(async () => {
@@ -1138,12 +1111,11 @@ describe(ProvisioningStatusView, () => {
       const queuedTheProvisioningText = screen.queryByText(
         'Queued — the provisioning workflow is starting up',
       );
-
-      expect(queuedTheProvisioningText).not.toBeInTheDocument();
       const runningText = within(
         screen.getByTestId('run-status-live'),
       ).getByText('Running…');
 
+      expect(queuedTheProvisioningText).not.toBeInTheDocument();
       expect(runningText).toBeVisible();
     });
   });
@@ -1396,13 +1368,11 @@ describe(ProvisioningStatusView, () => {
       );
 
       const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-
-      expect(runHeading).toBeVisible();
       const startedText = screen.queryByText('Started');
-
-      expect(startedText).not.toBeInTheDocument();
       const finishedText = screen.queryByText('Finished');
 
+      expect(runHeading).toBeVisible();
+      expect(startedText).not.toBeInTheDocument();
       expect(finishedText).not.toBeInTheDocument();
     });
 
@@ -1426,20 +1396,17 @@ describe(ProvisioningStatusView, () => {
       );
 
       const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-
-      expect(runHeading).toBeVisible();
       const n6mAgoAugText = screen.getByText(
         '6m ago · Aug 12, 2026, 2:18 PM UTC',
       );
-
-      expect(n6mAgoAugText).toBeVisible();
       const n2mAgoAugText = screen.getByText(
         '2m ago · Aug 12, 2026, 2:22 PM UTC',
       );
-
-      expect(n2mAgoAugText).toBeVisible();
       const productionText = screen.getByText('production');
 
+      expect(runHeading).toBeVisible();
+      expect(n6mAgoAugText).toBeVisible();
+      expect(n2mAgoAugText).toBeVisible();
       expect(productionText).toBeVisible();
     });
   });

@@ -1,3 +1,4 @@
+import type { TTenant } from '@blog/db/schema/tenants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -58,9 +59,17 @@ const membership = {
 
 const setup = customRenderAsync(DashboardOverviewPage, {});
 
+const renderForTenant = async (tenant: TTenant) => {
+  listMembershipsWithTenantsForUserMock.mockResolvedValue([
+    { membership, tenant },
+  ]);
+  await setup();
+};
+
 describe(`<${DashboardOverviewPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -86,17 +95,18 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
   });
 
   it('renders the owner home for a member with exactly one membership', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    const tenant = makeTenant({
-      id: 'tenant-1',
-      name: 'Acme Inc.',
-      primaryDomain: 'acme.example.com',
-    });
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant },
-    ]);
+    await renderForTenant(
+      makeTenant({
+        id: 'tenant-1',
+        name: 'Acme Inc.',
+        primaryDomain: 'acme.example.com',
+      }),
+    );
 
-    await setup();
+    const tenantHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Acme Inc.',
+    });
 
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
       'acme.example.com',
@@ -104,69 +114,48 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
       'tenant-1',
     );
-    const acmeIncHeading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Acme Inc.',
-    });
-
-    expect(acmeIncHeading).toBeVisible();
+    expect(tenantHeading).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('renders the owner home without waiting for the Vercel domain status', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }) },
-    ]);
     getDomainVerificationStatusMock.mockReturnValue(new Promise(() => {}));
 
-    await setup();
+    await renderForTenant(makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }));
 
-    const acmeIncHeading = screen.getByRole('heading', {
+    const tenantHeading = screen.getByRole('heading', {
       level: 1,
       name: 'Acme Inc.',
     });
-
-    expect(acmeIncHeading).toBeVisible();
     const ownerHeading = screen.getByRole('heading', {
       level: 2,
       name: 'Owner',
     });
+    const skeletons = screen.getAllByTestId('skeleton');
 
+    expect(tenantHeading).toBeVisible();
     expect(ownerHeading).toBeVisible();
-    const skeletonCount = screen.getAllByTestId('skeleton').length;
-
-    expect(skeletonCount).toBeGreaterThan(0);
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it("shows the owner their site's setup progress while provisioning runs", async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: makeTenant({ id: 'tenant-1' }) },
-    ]);
+    await renderForTenant(makeTenant({ id: 'tenant-1' }));
 
-    await setup();
-
-    const settingUpYourSiteHeading = screen.getByRole('heading', {
+    const setupHeading = screen.getByRole('heading', {
       level: 2,
       name: /Setting up your site/,
     });
 
-    expect(settingUpYourSiteHeading).toBeVisible();
+    expect(setupHeading).toBeVisible();
   });
 
   it('shows no setup progress once provisioning is ready', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: makeReadyTenant({ id: 'tenant-1' }) },
-    ]);
+    await renderForTenant(makeReadyTenant({ id: 'tenant-1' }));
 
-    await setup();
-
-    const settingUpYourSiteHeading = screen.queryByRole('heading', {
+    const setupHeading = screen.queryByRole('heading', {
       name: /Setting up your site/,
     });
 
-    expect(settingUpYourSiteHeading).not.toBeInTheDocument();
+    expect(setupHeading).not.toBeInTheDocument();
   });
 });

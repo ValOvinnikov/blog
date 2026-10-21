@@ -51,10 +51,9 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
       level: 1,
       name: 'Studio',
     });
-
-    expect(studioHeading).toBeVisible();
     const titleElement = screen.getByText(title);
 
+    expect(studioHeading).toBeVisible();
     expect(titleElement).toBeVisible();
   });
 
@@ -62,12 +61,11 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
     setup({ studioAccess: 'ACTIVATING' });
 
     const checkNowButton = screen.getByRole('button', { name: 'Check now' });
-
-    expect(checkNowButton).toBeVisible();
     const resendInviteButton = screen.queryByRole('button', {
       name: 'Resend invite',
     });
 
+    expect(checkNowButton).toBeVisible();
     expect(resendInviteButton).not.toBeInTheDocument();
   });
 
@@ -76,11 +74,11 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Check now' }));
 
-    expect(checkOwnerAccessActionMock).toHaveBeenCalledWith('tenant-1');
     const checkingYourAccessText = await screen.findByText(
       'Checking your access now. Refresh in a minute to see the result.',
     );
 
+    expect(checkOwnerAccessActionMock).toHaveBeenCalledWith('tenant-1');
     expect(checkingYourAccessText).toBeVisible();
     expect(refresh).toHaveBeenCalledOnce();
   });
@@ -90,11 +88,11 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Resend invite' }));
 
-    expect(resendOwnerInviteActionMock).toHaveBeenCalledWith('tenant-1');
     const aNewInviteText = await screen.findByText(
       'A new invite is on its way to your inbox.',
     );
 
+    expect(resendOwnerInviteActionMock).toHaveBeenCalledWith('tenant-1');
     expect(aNewInviteText).toBeVisible();
   });
 

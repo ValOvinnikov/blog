@@ -1,4 +1,5 @@
 import type { TMaybeNull } from '@blog/config';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -53,6 +54,25 @@ const membership = {
 
 const setup = customRenderAsync(DashboardStudioPage, {});
 
+const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
+  listMembershipsWithTenantsForUserMock.mockResolvedValue([
+    {
+      membership,
+      tenant: makeTenant({
+        id: 'tenant-1',
+        name: 'Acme Inc.',
+        sanityProjectId: 'proj-acme',
+        sanityDataset: 'production',
+        sanityReadTokenEncrypted: 'encrypted-token',
+        ...overrides,
+      }),
+    },
+  ]);
+  await setup();
+};
+
+const invitedAt = new Date('2026-10-18T09:00:00.000Z');
+
 describe(`<${DashboardStudioPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
@@ -72,20 +92,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   });
 
   it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      {
-        membership,
-        tenant: makeTenant({
-          id: 'tenant-1',
-          name: 'Acme Inc.',
-          sanityProjectId: 'proj-acme',
-          sanityDataset: 'production',
-          sanityReadTokenEncrypted: 'encrypted-token',
-        }),
-      },
-    ]);
-
-    await setup();
+    await renderForTenant();
 
     const studioMount = screen.getByTestId('studio-mount');
 
@@ -101,56 +108,29 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   });
 
   it("explains the owner's pending Studio access instead of mounting Studio", async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      {
-        membership,
-        tenant: makeTenant({
-          id: 'tenant-1',
-          sanityProjectId: 'proj-acme',
-          sanityDataset: 'production',
-          sanityReadTokenEncrypted: 'encrypted-token',
-          ownerInviteSentAt: new Date('2026-10-18T09:00:00.000Z'),
-        }),
-      },
-    ]);
+    await renderForTenant({ ownerInviteSentAt: invitedAt });
 
-    await setup();
-
-    const acceptYourStudioText = screen.getByText('Accept your Studio invite');
-
-    expect(acceptYourStudioText).toBeVisible();
+    const explainerTitle = screen.getByText('Accept your Studio invite');
     const checkNowButton = screen.getByRole('button', { name: 'Check now' });
-
-    expect(checkNowButton).toBeVisible();
     const resendInviteButton = screen.getByRole('button', {
       name: 'Resend invite',
     });
-
-    expect(resendInviteButton).toBeVisible();
     const studioMount = screen.queryByTestId('studio-mount');
 
+    expect(explainerTitle).toBeVisible();
+    expect(checkNowButton).toBeVisible();
+    expect(resendInviteButton).toBeVisible();
     expect(studioMount).not.toBeInTheDocument();
   });
 
   it("opens Studio straight into the owner's login provider once their access is ready", async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      {
-        membership,
-        tenant: makeTenant({
-          id: 'tenant-1',
-          sanityProjectId: 'proj-acme',
-          sanityDataset: 'production',
-          sanityReadTokenEncrypted: 'encrypted-token',
-          ownerInviteSentAt: new Date('2026-10-18T09:00:00.000Z'),
-          ownerInviteAcceptedAt: new Date('2026-10-18T10:00:00.000Z'),
-          ownerSanityUserId: 'sanity-user-1',
-          ownerSanityRole: 'ADMINISTRATOR',
-          ownerLoginProvider: 'GOOGLE',
-        }),
-      },
-    ]);
-
-    await setup();
+    await renderForTenant({
+      ownerInviteSentAt: invitedAt,
+      ownerInviteAcceptedAt: new Date('2026-10-18T10:00:00.000Z'),
+      ownerSanityUserId: 'sanity-user-1',
+      ownerSanityRole: 'ADMINISTRATOR',
+      ownerLoginProvider: 'GOOGLE',
+    });
 
     const studioMount = screen.getByTestId('studio-mount');
 

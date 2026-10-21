@@ -62,14 +62,12 @@ describe(`<${StudioMountView.name}/>`, () => {
       level: 1,
       name: 'Studio',
     });
-
-    expect(studioHeading).toBeVisible();
     const thisTenantIsText = screen.getByText('This tenant is archived');
-
-    expect(thisTenantIsText).toBeVisible();
-    expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
     const studioMount = screen.queryByTestId('studio-mount');
 
+    expect(studioHeading).toBeVisible();
+    expect(thisTenantIsText).toBeVisible();
+    expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
     expect(studioMount).not.toBeInTheDocument();
   });
 
@@ -90,14 +88,12 @@ describe(`<${StudioMountView.name}/>`, () => {
         level: 1,
         name: 'Studio',
       });
-
-      expect(studioHeading).toBeVisible();
       const studioIsNotText = screen.getByText("Studio isn't ready yet");
-
-      expect(studioIsNotText).toBeVisible();
-      expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
       const studioMount = screen.queryByTestId('studio-mount');
 
+      expect(studioHeading).toBeVisible();
+      expect(studioIsNotText).toBeVisible();
+      expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
       expect(studioMount).not.toBeInTheDocument();
     },
   );

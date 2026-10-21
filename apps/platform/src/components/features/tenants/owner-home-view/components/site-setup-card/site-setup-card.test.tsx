@@ -62,10 +62,9 @@ describe(`<${SiteSetupCard.name}/>`, () => {
       level: 2,
       name: /Setting up your site/,
     });
-
-    expect(settingUpYourSiteHeading).toBeVisible();
     const setupStoppedText = screen.queryByText("Your site's setup stopped");
 
+    expect(settingUpYourSiteHeading).toBeVisible();
     expect(setupStoppedText).not.toBeInTheDocument();
   });
 
@@ -87,10 +86,9 @@ describe(`<${SiteSetupCard.name}/>`, () => {
     const oneOfTheText = screen.getByText(
       'One of the steps hit a problem. Ask your platform contact to restart it.',
     );
-
-    expect(oneOfTheText).toBeVisible();
     const tryAgainButton = screen.queryByRole('button', { name: 'Try again' });
 
+    expect(oneOfTheText).toBeVisible();
     expect(tryAgainButton).not.toBeInTheDocument();
   });
 

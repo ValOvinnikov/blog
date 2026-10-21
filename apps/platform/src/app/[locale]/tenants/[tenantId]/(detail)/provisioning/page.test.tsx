@@ -48,12 +48,11 @@ describe(TenantProvisioningPage, () => {
       level: 1,
       name: 'Provisioning',
     });
-
-    expect(provisioningHeading).toBeVisible();
     const deprovisionButton = screen.queryByRole('button', {
       name: 'Deprovision',
     });
 
+    expect(provisioningHeading).toBeVisible();
     expect(deprovisionButton).not.toBeInTheDocument();
   });
 
