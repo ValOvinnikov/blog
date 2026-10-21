@@ -1,6 +1,12 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  ADMIN_ROLE,
+  GRANTED_VIA,
+  TENANT_PLAN,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import type { TAdmin } from '@blog/db/schema/admins';
 import type { TUser } from '@blog/db/schema/auth';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
@@ -52,6 +58,23 @@ export async function insertTestUser(
   if (!user) throw new Error('insertTestUser: insert returned no row.');
 
   return user;
+}
+
+export async function insertTestAdmin(db: TTestDb): Promise<TAdmin> {
+  const { id: userId } = await insertTestUser(db);
+
+  const [admin] = await db
+    .insert(schema.admins)
+    .values({
+      userId,
+      role: ADMIN_ROLE.ADMIN,
+      grantedVia: GRANTED_VIA.PROMOTION,
+    })
+    .returning();
+
+  if (!admin) throw new Error('insertTestAdmin: insert returned no row.');
+
+  return admin;
 }
 
 // Seeds one `accounts` row linking `userId` to an OAuth `provider` — the

@@ -327,8 +327,22 @@
     {
       "idx": 46,
       "version": "7",
-      "when": 1792597333330,
-      "tag": "0046_hash_subscriber_tokens",
+      "when": 1792596985693,
+      "tag": "0046_add_blocked_signup_identities",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792601607104,
+      "tag": "0047_add_tenants_inactivity_lifecycle",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792603730298,
+      "tag": "0048_hash_subscriber_tokens",
       "breakpoints": true
     }
   ]

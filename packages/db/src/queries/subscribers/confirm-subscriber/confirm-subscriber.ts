@@ -1,7 +1,7 @@
 import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { hashToken } from '@blog/utils/hash-token';
+import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
@@ -21,7 +21,7 @@ export async function confirmSubscriber(
   token: string,
 ): Promise<TConfirmSubscriberResult> {
   const db = getDb();
-  const tokenHash = hashToken(token);
+  const tokenHash = sha256Hex(token);
 
   const [updated] = await db
     .update(subscribers)

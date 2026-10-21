@@ -8,6 +8,7 @@ import {
   TENANT_PLAN,
   TENANT_STATUS,
   type TDeprovisioningStep,
+  type TSuspensionReason,
   type TElevateTenantOwnerOutcome,
   type TSanityProjectRole,
   type TSiteType,
@@ -27,6 +28,8 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
+
+import { CREATED_AT_COLUMN } from './columns';
 
 export const tenantPlanEnum = pgEnum(
   'tenant_plan',
@@ -51,30 +54,19 @@ export const siteTypeEnum = pgEnum(
 export type TProvisioningStepState = {
   status: TTenantProvisioningStepStatus;
   error?: string;
-  // Currently only ever set on the `OWNER_ELEVATION` step, carrying
-  // `elevateTenantOwner`'s outcome. Typed as the outcome union (not `string`)
-  // so an exhaustive downstream switch/map over it stays checked by `tsc`.
   detail?: TElevateTenantOwnerOutcome;
-  // ISO-8601 timestamp of this step's last status change.
   updatedAt?: string;
 };
 
 export type TProvisioningRun = {
   startedAt: string;
   finishedAt?: string;
-  // The dispatched GitHub Environment name, verbatim (e.g. `development`,
-  // `production`) — an external identifier, not this codebase's own
-  // vocabulary.
   registry?: string;
   workflowRunUrl?: string;
-  // Stamped by `beginTenantProvisioning` each time it admits a retry —
-  // distinct from `startedAt`, which only the actual workflow run sets.
   admittedAt?: string;
 };
 
-// Keyed by every `TENANT_PROVISIONING_STEP` UPPERCASE constant, plus the
-// reserved lowercase `run` key for the overall run this set of steps
-// belongs to — the casing convention keeps the two from ever colliding.
+// `run` is lowercase so it can never collide with an UPPERCASE step key.
 export type TTenantProvisioningState = Record<
   TTenantProvisioningStep,
   TProvisioningStepState
@@ -100,30 +92,13 @@ export type TTenantDeprovisioningState = Record<
   TDeprovisioningStepState
 > & { run?: TDeprovisioningRun };
 
-// `primaryDomain` is the canonical domain; `tenant_domains` holds every
-// domain (including this one) a tenant answers to.
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   primaryDomain: text('primary_domain').notNull(),
-  // Nullable: null until provisioning step 1 (Create Sanity project) creates
-  // the project and fills these in — a draft tenant genuinely has neither
-  // yet, not a value standing in for one. Unique so a Sanity project can
-  // only ever back one tenant row; nullable and unique coexist fine since
-  // Postgres allows multiple NULLs under a unique index.
   sanityProjectId: text('sanity_project_id').unique(),
   sanityDataset: text('sanity_dataset'),
-  // Sanity read token for this tenant's project, AES-256-GCM encrypted
-  // (`@blog/utils`'s encryptSecret) with TENANT_TOKEN_ENCRYPTION_KEY.
-  // Nullable: a tenant provisioned before this column existed, or one still
-  // being set up, has no token yet — @blog/service's client factory falls
-  // back to the legacy single-tenant client until it's set.
   sanityReadTokenEncrypted: text('sanity_read_token_encrypted'),
-  // Sanity write token for this tenant's project, same encryption envelope
-  // as `sanityReadTokenEncrypted` above. Higher-privilege than the read
-  // token — minted `editor`-scoped during provisioning's seed step and kept
-  // (rather than revoked) so later writes can target this tenant's own
-  // project instead of the platform's.
   sanityWriteTokenEncrypted: text('sanity_write_token_encrypted'),
   locale: localeCodeEnum('locale').notNull(),
   additionalLocales: localeCodeEnum('additional_locales')
@@ -132,37 +107,17 @@ export const tenants = pgTable('tenants', {
     .default([]),
   plan: tenantPlanEnum('plan').notNull(),
   status: tenantStatusEnum('status').notNull(),
-  // Plain `text`, not a pgEnum, mirroring `TENANT_PROVISIONING_STATUS`'s own
-  // shape one level up. Nullable: a tenant created before provisioning
-  // tracking existed (or not yet provisioning at all) has none.
   provisioningStatus: text(
     'provisioning_status',
   ).$type<TTenantProvisioningStatus>(),
   provisioningSteps:
     jsonb('provisioning_steps').$type<TTenantProvisioningState>(),
-  // Outcome last actually communicated to operators, written by
-  // `notifyOwnerElevationOutcome` — distinct from `provisioningSteps`'
-  // `OWNER_ELEVATION` `detail` above, which only
-  // records the most recently *observed* outcome. Dedup for both
-  // provisioning's own first check and the recurring recheck sweep keys off
-  // this column, so a notifiable outcome first observed during provisioning
-  // is communicated once and the same-state sweep that follows stays
-  // silent. Nullable: never notified yet.
   lastNotifiedOwnerElevationOutcome: text(
     'last_notified_owner_elevation_outcome',
   ).$type<TElevateTenantOwnerOutcome>(),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
   webhookCreatedAt: timestamp('webhook_created_at', { mode: 'date' }),
-  // Set once `scripts/deprovision-tenant` finishes tearing a tenant's infra
-  // down (alongside `status` moving to ARCHIVED). The row is archived, never
-  // hard-deleted.
   deprovisionedAt: timestamp('deprovisioned_at', { mode: 'date' }),
-  // Map of every `DEPROVISIONING_STEP` key to its own progress, plus the
-  // current deprovisioning run's own metadata under `run` — see
-  // `TTenantDeprovisioningState` above. A separate column from
-  // `provisioningSteps`: `reactivateTenantAction` means a tenant can be
-  // re-provisioned after archival, so both histories need to coexist.
-  // Nullable: a tenant never deprovisioned has none.
   deprovisioningSteps: jsonb(
     'deprovisioning_steps',
   ).$type<TTenantDeprovisioningState>(),
@@ -181,7 +136,14 @@ export const tenants = pgTable('tenants', {
   ownerInviteHeadsUpSentAt: timestamp('owner_invite_heads_up_sent_at'),
   ownerInviteNudgeSentAt: timestamp('owner_invite_nudge_sent_at'),
   ownerSiteReadySentAt: timestamp('owner_site_ready_sent_at'),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  lastActivityAt: timestamp('last_activity_at').notNull().defaultNow(),
+  inactivityWarnedAt: timestamp('inactivity_warned_at'),
+  suspendedAt: timestamp('suspended_at'),
+  deletionNotifiedAt: timestamp('deletion_notified_at'),
+  suspensionReason: text('suspension_reason').$type<TSuspensionReason>(),
+  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
     .defaultNow()

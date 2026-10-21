@@ -1,10 +1,10 @@
-import { hashToken } from '@blog/utils/hash-token';
+import { sha256Hex } from '@blog/utils/hash';
 import { pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 
 import { tenants } from './tenants';
 
 function mintUnusableTokenHash(): string {
-  return hashToken(crypto.randomUUID());
+  return sha256Hex(crypto.randomUUID());
 }
 
 export const SUBSCRIBER_STATUS = ['pending', 'active'] as const;

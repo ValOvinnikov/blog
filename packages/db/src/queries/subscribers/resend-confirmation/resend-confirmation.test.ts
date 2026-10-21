@@ -6,7 +6,7 @@ import {
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { hashToken } from '@blog/utils/hash-token';
+import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
@@ -55,9 +55,9 @@ describe(resendConfirmation, () => {
       .from(schema.subscribers)
       .where(eq(schema.subscribers.id, subscriber.id));
     expect(row?.confirmationTokenHash).toBe(
-      hashToken(result.confirmationToken),
+      sha256Hex(result.confirmationToken),
     );
-    expect(row?.unsubscribeTokenHash).toBe(hashToken(result.unsubscribeToken));
+    expect(row?.unsubscribeTokenHash).toBe(sha256Hex(result.unsubscribeToken));
   });
 
   it('rotates the tokens on every call', async () => {

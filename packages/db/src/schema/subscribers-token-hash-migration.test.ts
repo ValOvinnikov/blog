@@ -6,14 +6,14 @@ import {
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { hashToken } from '@blog/utils/hash-token';
+import { sha256Hex } from '@blog/utils/hash';
 import { PGlite } from '@electric-sql/pglite';
 import { asc, sql } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
-const HASH_MIGRATION = '0046_hash_subscriber_tokens.sql';
+const HASH_MIGRATION = '0048_hash_subscriber_tokens.sql';
 
-describe('0046_hash_subscriber_tokens (subscriber tokens hashed in place)', () => {
+describe('0048_hash_subscriber_tokens (subscriber tokens hashed in place)', () => {
   let db: PgliteDatabase<typeof schema>;
 
   beforeEach(() => {
@@ -52,12 +52,12 @@ describe('0046_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
 
       expect(rows).toEqual([
         {
-          confirmationTokenHash: hashToken('confirm-1'),
-          unsubscribeTokenHash: hashToken('unsub-1'),
+          confirmationTokenHash: sha256Hex('confirm-1'),
+          unsubscribeTokenHash: sha256Hex('unsub-1'),
         },
         {
-          confirmationTokenHash: hashToken('confirm-2'),
-          unsubscribeTokenHash: hashToken('unsub-2'),
+          confirmationTokenHash: sha256Hex('confirm-2'),
+          unsubscribeTokenHash: sha256Hex('unsub-2'),
         },
       ]);
     },

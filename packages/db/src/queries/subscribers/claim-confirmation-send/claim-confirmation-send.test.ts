@@ -4,7 +4,7 @@ import {
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { hashToken } from '@blog/utils/hash-token';
+import { sha256Hex } from '@blog/utils/hash';
 import { eq } from 'drizzle-orm';
 
 import { claimConfirmationSend } from './claim-confirmation-send';
@@ -68,8 +68,8 @@ describe(claimConfirmationSend, () => {
     const { confirmationToken, unsubscribeToken } = claim.tokens;
 
     const row = await readRow(id);
-    expect(row.confirmationTokenHash).toBe(hashToken(confirmationToken));
-    expect(row.unsubscribeTokenHash).toBe(hashToken(unsubscribeToken));
+    expect(row.confirmationTokenHash).toBe(sha256Hex(confirmationToken));
+    expect(row.unsubscribeTokenHash).toBe(sha256Hex(unsubscribeToken));
   });
 
   it('refuses a second claim inside the cooldown and keeps the first send and tokens', async () => {
@@ -81,7 +81,7 @@ describe(claimConfirmationSend, () => {
     const row = await readRow(id);
     expect(row.confirmationSentAt).toEqual(first.claimedAt);
     expect(row.confirmationTokenHash).toBe(
-      hashToken(first.tokens.confirmationToken),
+      sha256Hex(first.tokens.confirmationToken),
     );
   });
 

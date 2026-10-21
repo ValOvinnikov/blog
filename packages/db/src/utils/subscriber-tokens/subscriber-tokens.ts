@@ -1,4 +1,4 @@
-import { hashToken } from '@blog/utils/hash-token';
+import { sha256Hex } from '@blog/utils/hash';
 
 export interface ISubscriberTokens {
   confirmationToken: string;
@@ -20,8 +20,8 @@ export function mintSubscriberTokens(): {
   return {
     tokens: { confirmationToken, unsubscribeToken },
     hashes: {
-      confirmationTokenHash: hashToken(confirmationToken),
-      unsubscribeTokenHash: hashToken(unsubscribeToken),
+      confirmationTokenHash: sha256Hex(confirmationToken),
+      unsubscribeTokenHash: sha256Hex(unsubscribeToken),
     },
   };
 }

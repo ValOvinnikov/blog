@@ -2,7 +2,7 @@ export * from './async';
 export * from './color';
 export * from './encryption';
 export * from './enqueue-signature';
-export * from './hash-token';
+export * from './hash';
 export * from './is-secret-match';
 export * from './merge';
 export * from './pagination';

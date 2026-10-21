@@ -7,6 +7,7 @@ import {
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { users } from './auth';
+import { CREATED_AT_COLUMN } from './columns';
 
 export const adminRoleEnum = pgEnum(
   'admin_role',
@@ -36,7 +37,9 @@ export const admins = pgTable('admins', {
   }),
   grantedVia: grantedViaEnum('granted_via').notNull(),
   grantedAt: timestamp('granted_at', { mode: 'date' }).notNull().defaultNow(),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+    .notNull()
+    .defaultNow(),
 });
 
 export type TAdmin = typeof admins.$inferSelect;

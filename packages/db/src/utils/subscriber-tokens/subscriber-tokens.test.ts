@@ -1,4 +1,4 @@
-import { hashToken } from '@blog/utils/hash-token';
+import { sha256Hex } from '@blog/utils/hash';
 
 import { mintSubscriberTokens } from './subscriber-tokens';
 
@@ -7,8 +7,8 @@ describe(mintSubscriberTokens, () => {
     const { tokens, hashes } = mintSubscriberTokens();
 
     expect(hashes).toEqual({
-      confirmationTokenHash: hashToken(tokens.confirmationToken),
-      unsubscribeTokenHash: hashToken(tokens.unsubscribeToken),
+      confirmationTokenHash: sha256Hex(tokens.confirmationToken),
+      unsubscribeTokenHash: sha256Hex(tokens.unsubscribeToken),
     });
   });
 
