@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { makeTenant } from '@blog/db/testing/tenants/fixtures';
 
 import {
   hasSystemicFailures,
@@ -40,40 +40,17 @@ vi.mock('./lib/run-tenant-migrate-script', () => ({
   exportTenantDataset: exportTenantDatasetMock,
 }));
 
+const EXPORT_DIR = '/tmp/exports';
+const EXPORT_CALL = 'export';
+const DEPLOY_CALL = 'deploy';
+
 function tenant(id: string, name: string): TTenant {
-  return {
+  return makeTenant({
     id,
     name,
     primaryDomain: `${name}.example.com`,
     sanityProjectId: `proj-${name}`,
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'encrypted',
-    sanityWriteTokenEncrypted: 'encrypted',
-    locale: LOCALE_ISO_CODES.EN,
-    additionalLocales: [],
-    plan: 'FREE',
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: 'READY',
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    deprovisioningSteps: null,
-    siteType: null,
-    siteTemplateVersion: null,
-    ownerSanityInviteId: null,
-    ownerInviteSentAt: null,
-    ownerInviteAcceptedAt: null,
-    ownerSanityUserId: null,
-    ownerLoginProvider: null,
-    ownerSanityRole: null,
-    ownerInviteHeadsUpSentAt: null,
-    ownerInviteNudgeSentAt: null,
-    ownerSiteReadySentAt: null,
-    createdAt: new Date('2026-01-01T00:00:00.000Z'),
-    updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-  };
+  });
 }
 
 function credentials(tenantId: string) {
@@ -83,7 +60,7 @@ function credentials(tenantId: string) {
     token: `token-${tenantId}`,
     status: TENANT_STATUS.ACTIVE,
     deprovisionedAt: null,
-    provisioningStatus: 'READY',
+    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
   };
 }
 
@@ -210,11 +187,11 @@ describe(runMigration, () => {
     });
 
     it('exports the tenant dataset before migrating it when an export directory is set', async () => {
-      vi.stubEnv('TENANT_EXPORT_DIR', '/tmp/exports');
+      vi.stubEnv('TENANT_EXPORT_DIR', EXPORT_DIR);
       const calls: string[] = [];
-      exportTenantDatasetMock.mockImplementation(() => calls.push('export'));
+      exportTenantDatasetMock.mockImplementation(() => calls.push(EXPORT_CALL));
       runTenantMigrationDeployMock.mockImplementation(() =>
-        calls.push('deploy'),
+        calls.push(DEPLOY_CALL),
       );
 
       await runMigration();
@@ -224,13 +201,13 @@ describe(runMigration, () => {
           projectId: 'proj-t1',
           dataset: 'production',
         }),
-        '/tmp/exports/t1.tar.gz',
+        `${EXPORT_DIR}/t1.tar.gz`,
       );
-      expect(calls).toEqual(['export', 'deploy']);
+      expect(calls).toEqual([EXPORT_CALL, DEPLOY_CALL]);
     });
 
     it('does not migrate a tenant whose export failed, and counts it as an error', async () => {
-      vi.stubEnv('TENANT_EXPORT_DIR', '/tmp/exports');
+      vi.stubEnv('TENANT_EXPORT_DIR', EXPORT_DIR);
       exportTenantDatasetMock.mockImplementation(() => {
         throw new Error('export failed');
       });
