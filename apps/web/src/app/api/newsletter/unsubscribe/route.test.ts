@@ -61,7 +61,7 @@ beforeEach(() => {
 describe('GET /api/newsletter/unsubscribe', () => {
   it('sends a link without a token to the invalid page without touching the db', async () => {
     const response = await GET(
-      toUnsubscribeRequest('/api/newsletter/unsubscribe'),
+      toUnsubscribeRequest(routes.newsletterUnsubscribeSubmit()),
     );
 
     expect(response.status).toBe(303);
@@ -171,7 +171,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
 
   it('sends a link without a token to the invalid page without querying the db', async () => {
     const response = await POST(
-      toUnsubscribeRequest('/api/newsletter/unsubscribe', 'POST'),
+      toUnsubscribeRequest(routes.newsletterUnsubscribeSubmit(), 'POST'),
     );
 
     expect(response.headers.get('location')).toBe(
