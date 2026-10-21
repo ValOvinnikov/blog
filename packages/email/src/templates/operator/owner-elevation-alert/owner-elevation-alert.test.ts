@@ -1,51 +1,55 @@
+import {
+  ESCAPED_UNSAFE_MARKUP,
+  TEST_TENANT_ID,
+  TEST_TENANT_NAME,
+  UNSAFE_MARKUP,
+} from '@blog/email/testing/email-fixtures';
+
 import { buildOwnerElevationAlertEmail } from './owner-elevation-alert';
+
+const ALERT = {
+  tenantName: TEST_TENANT_NAME,
+  tenantId: TEST_TENANT_ID,
+  outcome: 'STALLED',
+} as const;
 
 describe('buildOwnerElevationAlertEmail', () => {
   it('escapes the tenant name', () => {
     const { html } = buildOwnerElevationAlertEmail({
-      tenantName: '<script>alert(1)</script>',
-      tenantId: 'tenant_1',
-      outcome: 'STALLED',
+      ...ALERT,
+      tenantName: UNSAFE_MARKUP,
     });
 
-    expect(html).not.toContain('<script>');
-    expect(html).toContain('&lt;script&gt;');
+    expect(html).not.toContain(UNSAFE_MARKUP);
+    expect(html).toContain(`<strong>${ESCAPED_UNSAFE_MARKUP}</strong>`);
   });
 
   it('escapes the tenant id', () => {
     const { html } = buildOwnerElevationAlertEmail({
-      tenantName: 'Acme',
-      tenantId: '<script>alert(1)</script>',
-      outcome: 'STALLED',
+      ...ALERT,
+      tenantId: UNSAFE_MARKUP,
     });
 
-    expect(html).not.toContain('<code><script>');
-    expect(html).toContain(
-      '<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>',
-    );
+    expect(html).not.toContain(UNSAFE_MARKUP);
+    expect(html).toContain(`<code>${ESCAPED_UNSAFE_MARKUP}</code>`);
   });
 
   describe('for a stalled elevation', () => {
     let stalled: ReturnType<typeof buildOwnerElevationAlertEmail>;
 
     beforeEach(() => {
-      stalled = buildOwnerElevationAlertEmail({
-        tenantName: 'Acme',
-        tenantId: 'tenant_1',
-        outcome: 'STALLED',
-      });
+      stalled = buildOwnerElevationAlertEmail(ALERT);
     });
 
     it('names the tenant in the subject', () => {
       expect(stalled.subject).toBe(
-        'Tenant "Acme" (tenant_1) needs owner-elevation attention',
+        'Tenant "Northwind" (tenant_1) needs owner-elevation attention',
       );
     });
 
     it('uses distinct copy per outcome', () => {
       const ambiguous = buildOwnerElevationAlertEmail({
-        tenantName: 'Acme',
-        tenantId: 'tenant_1',
+        ...ALERT,
         outcome: 'AMBIGUOUS_MEMBERSHIP',
       });
 
