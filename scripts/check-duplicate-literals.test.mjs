@@ -37,6 +37,32 @@ test('collectLiterals skips every exempt position', () => {
   assert.deepEqual(values(source), []);
 });
 
+test('collectLiterals skips values an outside standard spells', () => {
+  const source = [
+    "process.env.NODE_ENV === 'production';",
+    "env.X !== 'staging';",
+    "'production' === process.env['NODE_ENV'];",
+    "vi.stubEnv('NODE_ENV', 'production');",
+    "const cookie = { sameSite: 'strict' };",
+  ].join('\n');
+  assert.deepEqual(values(source), ['NODE_ENV']);
+});
+
+test('collectLiterals still collects the same values outside that vocabulary', () => {
+  const source = [
+    "const mode = 'production';",
+    "f('strict');",
+    "const o = { mode: 'strict' };",
+    "const eq = value === 'production';",
+  ].join('\n');
+  assert.deepEqual(values(source), [
+    'production',
+    'strict',
+    'strict',
+    'production',
+  ]);
+});
+
 test('addedValues reports only literals whose count grew against the base', () => {
   const current = collectLiterals(
     'a.ts',
