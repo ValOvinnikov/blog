@@ -1,6 +1,7 @@
 export * as account from './account';
 export * as admins from './admins';
 export * as auditEvents from './audit-events';
+export * as blockedSignupIdentities from './blocked-signup-identities';
 export * as bookmarks from './bookmarks';
 export * as emailConfig from './email-config';
 export * as emailTemplates from './email-templates';

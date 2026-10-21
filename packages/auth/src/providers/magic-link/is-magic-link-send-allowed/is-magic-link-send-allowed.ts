@@ -1,6 +1,6 @@
 import { queries } from '@blog/db';
 import { resolveClientKey } from '@blog/utils/client-key';
-import { hashSha256Hex } from '@blog/utils/hash';
+import { sha256Hex } from '@blog/utils/hash';
 
 const SEND_LIMIT_WINDOW_MS = 60 * 60_000;
 const MAX_SENDS_PER_EMAIL = 5;
@@ -8,7 +8,7 @@ const MAX_SENDS_PER_EMAIL = 5;
 const MAX_SENDS_PER_IP = 20;
 
 const toCounterKey = (scope: string, value: string): string =>
-  `${scope}:${hashSha256Hex(value)}`;
+  `${scope}:${sha256Hex(value)}`;
 
 export async function isMagicLinkSendAllowed(
   identifier: string,

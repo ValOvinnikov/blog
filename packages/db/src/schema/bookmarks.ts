@@ -7,6 +7,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { users } from './auth';
+import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 // Private "save for later" rows — bookmarks only, not likes, since ratings
@@ -27,7 +28,9 @@ export const bookmarks = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     postId: text('post_id').notNull(),
-    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+      .notNull()
+      .defaultNow(),
   },
   (bookmark) => [
     // Composite primary key includes tenantId, not just (userId, postId):

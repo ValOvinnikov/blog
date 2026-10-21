@@ -26,6 +26,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 export const presetIdEnum = pgEnum(
@@ -106,7 +107,9 @@ export const siteConfig = pgTable('site_config', {
     .$type<TVoiceOverridesByLocale>()
     .notNull()
     .default({}),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
     .defaultNow()

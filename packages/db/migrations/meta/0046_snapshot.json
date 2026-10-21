@@ -1,5 +1,5 @@
 {
-  "id": "abf76f4b-b86f-4bf0-b1c5-7f22f0082e97",
+  "id": "999741fe-a08d-4a76-a23e-23e5b838cda4",
   "prevId": "eea62382-9a40-4775-98aa-8fd4a0cc6d0d",
   "version": "7",
   "dialect": "postgresql",
@@ -349,18 +349,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "termsAcceptedAt": {
-          "name": "termsAcceptedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "termsVersion": {
-          "name": "termsVersion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
@@ -409,6 +397,74 @@
         }
       },
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.blocked_signup_identities": {
+      "name": "blocked_signup_identities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "blocked_identity_kind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_by_admin_id": {
+          "name": "created_by_admin_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "blocked_signup_identities_created_by_admin_id_admins_id_fk": {
+          "name": "blocked_signup_identities_created_by_admin_id_admins_id_fk",
+          "tableFrom": "blocked_signup_identities",
+          "tableTo": "admins",
+          "columnsFrom": ["created_by_admin_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "blocked_signup_identities_kind_value_unique": {
+          "name": "blocked_signup_identities_kind_value_unique",
+          "nullsNotDistinct": false,
+          "columns": ["kind", "value"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -916,37 +972,6 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.magic_link_send_counters": {
-      "name": "magic_link_send_counters",
-      "schema": "",
-      "columns": {
-        "key": {
-          "name": "key",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "window_started_at": {
-          "name": "window_started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1718,6 +1743,11 @@
       "name": "granted_via",
       "schema": "public",
       "values": ["BREAK_GLASS", "PROMOTION"]
+    },
+    "public.blocked_identity_kind": {
+      "name": "blocked_identity_kind",
+      "schema": "public",
+      "values": ["ADDRESS", "DOMAIN"]
     },
     "public.membership_role": {
       "name": "membership_role",
