@@ -3,7 +3,7 @@
 export const UNKNOWN_CLIENT_KEY = 'unknown';
 
 export const resolveClientKey = (headers: Headers): string => {
-  const first = headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  const first = headers.get('x-forwarded-for')?.split(/,/)[0]?.trim();
   if (first) return first;
 
   return headers.get('x-real-ip') ?? UNKNOWN_CLIENT_KEY;
