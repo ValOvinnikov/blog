@@ -1,5 +1,5 @@
 {
-  "id": "a447d6b8-0568-4c27-878e-97ff52c479fc",
+  "id": "999741fe-a08d-4a76-a23e-23e5b838cda4",
   "prevId": "eea62382-9a40-4775-98aa-8fd4a0cc6d0d",
   "version": "7",
   "dialect": "postgresql",
@@ -110,7 +110,7 @@
           "name": "actor_email",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "action": {
           "name": "action",
@@ -397,6 +397,74 @@
         }
       },
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.blocked_signup_identities": {
+      "name": "blocked_signup_identities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "blocked_identity_kind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_by_admin_id": {
+          "name": "created_by_admin_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "blocked_signup_identities_created_by_admin_id_admins_id_fk": {
+          "name": "blocked_signup_identities_created_by_admin_id_admins_id_fk",
+          "tableFrom": "blocked_signup_identities",
+          "tableTo": "admins",
+          "columnsFrom": ["created_by_admin_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "blocked_signup_identities_kind_value_unique": {
+          "name": "blocked_signup_identities_kind_value_unique",
+          "nullsNotDistinct": false,
+          "columns": ["kind", "value"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1675,6 +1743,11 @@
       "name": "granted_via",
       "schema": "public",
       "values": ["BREAK_GLASS", "PROMOTION"]
+    },
+    "public.blocked_identity_kind": {
+      "name": "blocked_identity_kind",
+      "schema": "public",
+      "values": ["ADDRESS", "DOMAIN"]
     },
     "public.membership_role": {
       "name": "membership_role",
