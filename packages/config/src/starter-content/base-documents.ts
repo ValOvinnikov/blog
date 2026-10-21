@@ -19,6 +19,9 @@ import type {
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { pageHeadingBlock, reference, seo } from './starter-fields';
 
+// TODO(#5684): seed the tenant's own currency once tenants record one.
+const DEFAULT_SITE_CURRENCY = 'USD';
+
 type TStarterTemplateLayout<TTemplate extends Template_home> = Pick<
   TTemplate,
   'hero' | 'modules'
@@ -57,7 +60,7 @@ export function buildBaseDocuments({
       _id: STARTER_DOCUMENT_IDS.SITE,
       _type: 'settings_site',
       title: 'Site Settings',
-      currency: 'USD',
+      currency: DEFAULT_SITE_CURRENCY,
       brand: { _type: 'brand', name: siteName },
     } satisfies TStarterDocument<Settings_site, 'title'>,
     {
