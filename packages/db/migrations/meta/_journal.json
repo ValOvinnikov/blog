@@ -330,6 +330,13 @@
       "when": 1792596985693,
       "tag": "0046_add_blocked_signup_identities",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792601607104,
+      "tag": "0047_add_tenants_inactivity_lifecycle",
+      "breakpoints": true
     }
   ]
 }

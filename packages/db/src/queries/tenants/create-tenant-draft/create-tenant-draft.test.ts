@@ -1,5 +1,11 @@
 import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  MEMBERSHIP_ROLE,
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -16,9 +22,15 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+const DOMAIN = 'acme.example.com';
+const OWNER_EMAIL = 'owner@example.com';
+const SECOND_OWNER_EMAIL = 'owner-2@example.com';
+const EXPECTED_OK = 'expected ok:true';
+const IDLE = { status: TENANT_PROVISIONING_STEP_STATUS.IDLE };
+
 const draftInput: TCreateTenantDraftInput = {
   name: 'Acme',
-  domain: 'acme.example.com',
+  domain: DOMAIN,
   locale: LOCALE_ISO_CODES.EN,
   plan: TENANT_PLAN.FREE,
   owner: { type: 'user', userId: 'user-1' },
@@ -41,32 +53,45 @@ describe(createTenantDraft, () => {
     it('inserts a tenant row left in PENDING with an idle per-step map and no Sanity project yet', async () => {
       const result = await createTenantDraft(draftInput);
 
-      if (!result.ok) throw new Error('expected ok:true');
+      if (!result.ok) throw new Error(EXPECTED_OK);
       expect(result.data).toMatchObject({
         name: 'Acme',
-        primaryDomain: 'acme.example.com',
+        primaryDomain: DOMAIN,
         locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
-        provisioningStatus: 'PENDING',
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         sanityProjectId: null,
         sanityDataset: null,
       });
       expect(result.data.provisioningSteps).toEqual({
-        SANITY_PROJECT: { status: 'IDLE' },
-        SEED_CONTENT: { status: 'IDLE' },
-        PERSIST_TOKEN: { status: 'IDLE' },
-        MAP_DOMAIN: { status: 'IDLE' },
-        CREATE_WEBHOOK: { status: 'IDLE' },
-        VERIFY_CONTENT: { status: 'IDLE' },
-        OWNER_ELEVATION: { status: 'IDLE' },
+        SANITY_PROJECT: IDLE,
+        SEED_CONTENT: IDLE,
+        PERSIST_TOKEN: IDLE,
+        MAP_DOMAIN: IDLE,
+        CREATE_WEBHOOK: IDLE,
+        VERIFY_CONTENT: IDLE,
+        OWNER_ELEVATION: IDLE,
+      });
+    });
+
+    it('starts the tenant with its last activity set and no inactivity stamps', async () => {
+      const result = await createTenantDraft(draftInput);
+
+      if (!result.ok) throw new Error(EXPECTED_OK);
+      expect(result.data.lastActivityAt).toBeInstanceOf(Date);
+      expect(result.data).toMatchObject({
+        inactivityWarnedAt: null,
+        suspendedAt: null,
+        deletionNotifiedAt: null,
+        suspensionReason: null,
       });
     });
 
     it('inserts the primary domain into tenant_domains', async () => {
       const result = await createTenantDraft(draftInput);
 
-      if (!result.ok) throw new Error('expected ok:true');
+      if (!result.ok) throw new Error(EXPECTED_OK);
       const [domainRow] = await db()
         .select()
         .from(schema.tenantDomains)
@@ -74,14 +99,14 @@ describe(createTenantDraft, () => {
 
       expect(domainRow).toMatchObject({
         tenantId: result.data.id,
-        domain: 'acme.example.com',
+        domain: DOMAIN,
       });
     });
 
     it('inserts an OWNER membership row for the given owner user id', async () => {
       const result = await createTenantDraft(draftInput);
 
-      if (!result.ok) throw new Error('expected ok:true');
+      if (!result.ok) throw new Error(EXPECTED_OK);
       const [membershipRow] = await db()
         .select()
         .from(schema.memberships)
@@ -90,7 +115,7 @@ describe(createTenantDraft, () => {
       expect(membershipRow).toMatchObject({
         tenantId: result.data.id,
         userId: 'user-1',
-        role: 'OWNER',
+        role: MEMBERSHIP_ROLE.OWNER,
       });
     });
 
@@ -128,7 +153,7 @@ describe(createTenantDraft, () => {
       owner: { type: 'invite', email: 'Owner@Example.com' },
     });
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
 
     const [inviteRow] = await db()
       .select()
@@ -137,8 +162,8 @@ describe(createTenantDraft, () => {
 
     expect(inviteRow).toMatchObject({
       tenantId: result.data.id,
-      email: 'owner@example.com',
-      role: 'OWNER',
+      email: OWNER_EMAIL,
+      role: MEMBERSHIP_ROLE.OWNER,
       consumedAt: null,
     });
 
@@ -165,13 +190,13 @@ describe(createTenantDraft, () => {
   it('rejects on a colliding domain for an invite-email owner, and leaves the second tenant and its invite cleaned up', async () => {
     await createTenantDraft({
       ...draftInput,
-      owner: { type: 'invite', email: 'owner@example.com' },
+      owner: { type: 'invite', email: OWNER_EMAIL },
     });
 
     await expect(
       createTenantDraft({
         ...draftInput,
-        owner: { type: 'invite', email: 'owner-2@example.com' },
+        owner: { type: 'invite', email: SECOND_OWNER_EMAIL },
       }),
     ).rejects.toThrow();
 
@@ -181,7 +206,7 @@ describe(createTenantDraft, () => {
     const secondInviteRows = await db()
       .select()
       .from(schema.membershipInvites)
-      .where(eq(schema.membershipInvites.email, 'owner-2@example.com'));
+      .where(eq(schema.membershipInvites.email, SECOND_OWNER_EMAIL));
     expect(secondInviteRows).toHaveLength(0);
   });
 
