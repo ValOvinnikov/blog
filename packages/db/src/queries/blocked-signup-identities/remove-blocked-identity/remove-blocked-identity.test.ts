@@ -2,6 +2,10 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { addBlockedIdentity } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
 import * as schema from '@blog/db/schema';
+import {
+  BLOCK_REASON,
+  BLOCKED_DOMAIN,
+} from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -24,8 +28,8 @@ describe(removeBlockedIdentity, () => {
     const { id: createdByAdminId } = await insertTestAdmin(db());
     const added = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: 'mailinator.com',
-      reason: 'Disposable',
+      identity: BLOCKED_DOMAIN,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
     if (!added.ok) throw new Error('seed failed');
@@ -38,9 +42,7 @@ describe(removeBlockedIdentity, () => {
   });
 
   it('reports DB_NOT_FOUND when no entry has that id', async () => {
-    const result = await removeBlockedIdentity(
-      '00000000-0000-0000-0000-000000000000',
-    );
+    const result = await removeBlockedIdentity(crypto.randomUUID());
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });

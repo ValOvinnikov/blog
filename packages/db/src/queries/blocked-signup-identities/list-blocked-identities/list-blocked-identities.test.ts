@@ -17,6 +17,9 @@ afterEach(async () => {
   await db().delete(schema.users);
 });
 
+const OLDER_REASON = 'Older';
+const NEWER_REASON = 'Newer';
+
 describe(listBlockedIdentities, () => {
   it('returns an empty list when nothing is blocked', async () => {
     expect(await listBlockedIdentities()).toEqual({ ok: true, data: [] });
@@ -24,30 +27,31 @@ describe(listBlockedIdentities, () => {
 
   it('lists entries newest first', async () => {
     const { id: createdByAdminId } = await insertTestAdmin(db());
+    const now = Date.now();
     await db()
       .insert(schema.blockedSignupIdentities)
       .values([
         {
           kind: BLOCKED_IDENTITY_KIND.DOMAIN,
           value: 'older.example',
-          reason: 'Older',
+          reason: OLDER_REASON,
           createdByAdminId,
-          createdAt: new Date('2026-01-01T00:00:00Z'),
+          createdAt: new Date(now - 1),
         },
         {
           kind: BLOCKED_IDENTITY_KIND.DOMAIN,
           value: 'newer.example',
-          reason: 'Newer',
+          reason: NEWER_REASON,
           createdByAdminId,
-          createdAt: new Date('2026-02-01T00:00:00Z'),
+          createdAt: new Date(now),
         },
       ]);
 
     const result = await listBlockedIdentities();
 
     expect(result.ok && result.data.map(({ reason }) => reason)).toEqual([
-      'Newer',
-      'Older',
+      NEWER_REASON,
+      OLDER_REASON,
     ]);
   });
 });

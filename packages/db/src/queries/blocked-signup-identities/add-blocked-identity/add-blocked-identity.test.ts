@@ -1,13 +1,19 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import {
+  BLOCK_REASON,
+  BLOCKED_ADDRESS,
+  BLOCKED_ADDRESS_DOMAIN,
+  BLOCKED_ADDRESS_HASH,
+  BLOCKED_DOMAIN,
+  NOT_A_DOMAIN,
+  NOT_AN_ADDRESS,
+} from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { addBlockedIdentity } from './add-blocked-identity';
-
-const ADDRESS = 'ada@example.com';
-const REASON = 'Spam tenant';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
@@ -31,8 +37,8 @@ describe(addBlockedIdentity, () => {
   it('stores an address entry with no readable address in any column', async () => {
     const result = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: 'Ada+promo@Example.com',
-      reason: REASON,
+      identity: 'Blocked+promo@Example.com',
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
 
@@ -40,35 +46,35 @@ describe(addBlockedIdentity, () => {
     const [row] = await db().select().from(schema.blockedSignupIdentities);
     expect(row).toMatchObject({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      value: 'b5fc85e55755f9e0d030a10ab4429b6b2944855f9a0d60077fe832becbc41d72',
-      reason: REASON,
+      value: BLOCKED_ADDRESS_HASH,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
-    expect(JSON.stringify(row).toLowerCase()).not.toContain('ada');
+    expect(JSON.stringify(row).toLowerCase()).not.toContain('blocked@');
   });
 
   it('stores a domain entry as the lower-cased domain', async () => {
     await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
       identity: ' Mailinator.COM ',
-      reason: REASON,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
 
     const [row] = await db().select().from(schema.blockedSignupIdentities);
-    expect(row?.value).toBe('mailinator.com');
+    expect(row?.value).toBe(BLOCKED_DOMAIN);
   });
 
   it('returns the existing entry instead of adding a duplicate', async () => {
     const first = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: ADDRESS,
-      reason: REASON,
+      identity: BLOCKED_ADDRESS,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
     const second = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: 'ADA+again@example.com',
+      identity: 'BLOCKED+again@example.com',
       reason: 'Another reason',
       createdByAdminId,
     });
@@ -81,14 +87,14 @@ describe(addBlockedIdentity, () => {
   it('keeps an address and a domain with the same text apart', async () => {
     await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: 'example.com',
-      reason: REASON,
+      identity: BLOCKED_ADDRESS_DOMAIN,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
     await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: ADDRESS,
-      reason: REASON,
+      identity: BLOCKED_ADDRESS,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
 
@@ -99,8 +105,8 @@ describe(addBlockedIdentity, () => {
   it('refuses a malformed address', async () => {
     const result = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: 'not-an-address',
-      reason: REASON,
+      identity: NOT_AN_ADDRESS,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
 
@@ -110,8 +116,8 @@ describe(addBlockedIdentity, () => {
   it('refuses a malformed domain', async () => {
     const result = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: 'https://example.com',
-      reason: REASON,
+      identity: NOT_A_DOMAIN,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
 
@@ -121,8 +127,8 @@ describe(addBlockedIdentity, () => {
   it('keeps the entry when the admin who added it is removed', async () => {
     await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: ADDRESS,
-      reason: REASON,
+      identity: BLOCKED_ADDRESS,
+      reason: BLOCK_REASON,
       createdByAdminId,
     });
 
