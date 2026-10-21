@@ -223,6 +223,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-owner-access.ts`
 
 - **SANITY_PROJECT_ROLE**: `VIEWER`, `EDITOR`, `ADMINISTRATOR`
+- **TENANT_OWNER_EMAIL**: `INVITE_HEADS_UP`, `INVITE_NUDGE`, `SITE_READY`
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-provisioning.ts`
 

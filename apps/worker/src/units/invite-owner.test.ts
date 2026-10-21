@@ -1,3 +1,4 @@
+import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { getTenantById, setTenantOwnerAccess } from '@blog/db/queries/tenants';
 import {
@@ -9,16 +10,20 @@ import {
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import {
+  makeOwnerAccessTarget,
   OWNER_EMAIL,
   SANITY_PROJECT_ID,
 } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
+import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 import { getStepMetadata } from 'workflow';
 
 import { inviteOwner } from './invite-owner';
 
 const CTX = { runId: 'run-1' };
+const SANITY_OUTAGE = '503';
+const INVITED_TENANT = makeTenant({ sanityProjectId: SANITY_PROJECT_ID });
 const PENDING_INVITE = {
   id: 'invite-1',
   email: OWNER_EMAIL,
@@ -27,22 +32,21 @@ const PENDING_INVITE = {
 };
 
 vi.mock('@worker/utils/logger/logger');
+vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 vi.mock(
   '@worker/utils/provision-env/provision-env',
   () => import('@worker/testing/provision-env/fake-provision-env'),
 );
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
+vi.mock(import('workflow'), async (importOriginal) => ({
+  ...(await importOriginal()),
   getStepMetadata: vi.fn(),
 }));
 
@@ -51,9 +55,7 @@ describe(inviteOwner, () => {
     vi.mocked(getStepMetadata).mockReturnValue({
       attempt: 1,
     } as ReturnType<typeof getStepMetadata>);
-    vi.mocked(getTenantById).mockResolvedValue(
-      makeTenant({ sanityProjectId: SANITY_PROJECT_ID }),
-    );
+    vi.mocked(getTenantById).mockResolvedValue(INVITED_TENANT);
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
@@ -86,13 +88,26 @@ describe(inviteOwner, () => {
     expect(createSanityProjectInvite).toHaveBeenCalledOnce();
   });
 
+  it('sends the owner the invite heads-up once the invite is recorded', async () => {
+    await inviteOwner(TEST_TENANT_ID, CTX);
+
+    expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
+      makeOwnerAccessTarget(INVITED_TENANT),
+      TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
+    );
+  });
+
   describe('when the invite cannot be sent', () => {
     beforeEach(() => {
-      vi.mocked(listSanityProjectInvites).mockRejectedValue(new Error('503'));
+      vi.mocked(listSanityProjectInvites).mockRejectedValue(
+        new Error(SANITY_OUTAGE),
+      );
     });
 
     it('retries before its last attempt', async () => {
-      await expect(inviteOwner(TEST_TENANT_ID, CTX)).rejects.toThrow('503');
+      await expect(inviteOwner(TEST_TENANT_ID, CTX)).rejects.toThrow(
+        SANITY_OUTAGE,
+      );
     });
 
     it('logs and lets provisioning carry on once the last attempt fails', async () => {
@@ -103,10 +118,11 @@ describe(inviteOwner, () => {
       const result = await inviteOwner(TEST_TENANT_ID, CTX);
 
       expect(result).toEqual({ ok: true });
-      expect(logger.error).toHaveBeenCalledWith(
-        'owner_access.invite_failed',
-        expect.objectContaining({ tenantId: TEST_TENANT_ID }),
-      );
+      expect(logger.error).toHaveBeenCalledWith('owner_access.invite_failed', {
+        tenantId: TEST_TENANT_ID,
+        runId: CTX.runId,
+        error: SANITY_OUTAGE,
+      });
     });
   });
 });

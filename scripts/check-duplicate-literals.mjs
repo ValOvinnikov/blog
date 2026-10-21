@@ -32,6 +32,7 @@ const CLASS_HELPERS = new Set([
   'twJoin',
 ]);
 const MODULE_PATH_CALLEES = new Set([
+  'blogPackageAlias',
   'require',
   'mock',
   'doMock',
