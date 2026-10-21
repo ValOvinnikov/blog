@@ -73,7 +73,8 @@ const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
   await setup();
 };
 
-const invitedAt = new Date('2026-10-18T09:00:00.000Z');
+const STUDIO_MOUNT_TEST_ID = 'studio-mount';
+const invitedAt = new Date();
 
 describe(`<${DashboardStudioPage.name}/>`, () => {
   beforeEach(() => {
@@ -96,7 +97,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
     await renderForTenant();
 
-    const studioMount = screen.getByTestId('studio-mount');
+    const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
@@ -117,7 +118,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     const resendInviteButton = screen.getByRole('button', {
       name: 'Resend invite',
     });
-    const studioMount = screen.queryByTestId('studio-mount');
+    const studioMount = screen.queryByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(explainerTitle).toBeVisible();
     expect(checkNowButton).toBeVisible();
@@ -134,7 +135,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
       ownerLoginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
     });
 
-    const studioMount = screen.getByTestId('studio-mount');
+    const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(

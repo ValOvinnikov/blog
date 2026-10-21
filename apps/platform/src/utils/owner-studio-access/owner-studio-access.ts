@@ -1,7 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
-  SANITY_PROJECT_ROLE,
+  OWNER_ACCESS_STALL_AFTER_MS,
   TENANT_PROVISIONING_STEP,
 } from '@blog/db/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
@@ -18,29 +18,44 @@ type TOwnerAccessTenant = Pick<
   | 'ownerInviteSentAt'
   | 'ownerInviteAcceptedAt'
   | 'ownerSanityUserId'
-  | 'ownerSanityRole'
   | 'provisioningSteps'
 >;
 
-const accessStateOf = ({
-  ownerInviteAcceptedAt,
-  ownerSanityUserId,
-  ownerSanityRole,
-  provisioningSteps,
-}: TOwnerAccessTenant): TOwnerStudioAccess => {
-  if (
-    ownerInviteAcceptedAt &&
-    ownerSanityRole === SANITY_PROJECT_ROLE.ADMINISTRATOR
-  ) {
+const isKnownOwnerCheck = (detail: unknown) =>
+  Object.values(ELEVATE_TENANT_OWNER_OUTCOME).some(
+    (outcome) => outcome === detail,
+  );
+
+const isStalled = (
+  { ownerInviteSentAt, provisioningSteps }: TOwnerAccessTenant,
+  now: Date,
+) => {
+  const ownerCheck =
+    provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
+
+  if (isKnownOwnerCheck(ownerCheck)) {
+    return ownerCheck === ELEVATE_TENANT_OWNER_OUTCOME.STALLED;
+  }
+  return (
+    !!ownerInviteSentAt &&
+    now.getTime() - ownerInviteSentAt.getTime() >= OWNER_ACCESS_STALL_AFTER_MS
+  );
+};
+
+// The worker records acceptance with the Sanity user only after granting administrator; READY must not reopen when that role later changes.
+const accessStateOf = (
+  tenant: TOwnerAccessTenant,
+  now: Date,
+): TOwnerStudioAccess => {
+  const { ownerInviteAcceptedAt, ownerSanityUserId } = tenant;
+
+  if (ownerInviteAcceptedAt && ownerSanityUserId) {
     return OWNER_STUDIO_ACCESS.READY;
   }
   if (ownerInviteAcceptedAt || ownerSanityUserId) {
     return OWNER_STUDIO_ACCESS.ACTIVATING;
   }
-  const ownerCheck =
-    provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
-
-  return ownerCheck === ELEVATE_TENANT_OWNER_OUTCOME.STALLED
+  return isStalled(tenant, now)
     ? OWNER_STUDIO_ACCESS.STALLED
     : OWNER_STUDIO_ACCESS.INVITE_SENT;
 };
@@ -49,11 +64,12 @@ const accessStateOf = ({
 export const ownerStudioAccessFor = (
   tenant: TOwnerAccessTenant,
   membership: TMembership,
+  now: Date = new Date(),
 ): TMaybeUndefined<TOwnerStudioAccess> => {
   const isRealOwner =
     isTenantOwner(membership) && !isVirtualAdminMembership(membership);
 
   return isRealOwner && tenant.ownerInviteSentAt
-    ? accessStateOf(tenant)
+    ? accessStateOf(tenant, now)
     : undefined;
 };
