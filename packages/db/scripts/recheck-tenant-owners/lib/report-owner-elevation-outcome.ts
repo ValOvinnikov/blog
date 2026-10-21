@@ -21,9 +21,7 @@ export async function reportOwnerElevationOutcome(
     step,
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     detail: outcome,
-    ...(notifiedOutcome === undefined
-      ? {}
-      : { notifiedOwnerElevationOutcome: notifiedOutcome }),
+    notifiedOwnerElevationOutcome: notifiedOutcome,
   });
 
   if (!result.ok) {
