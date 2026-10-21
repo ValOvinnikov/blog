@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 
 type TOwnerEmailCopyInput = {
   siteName: string;
@@ -20,8 +20,8 @@ type TOwnerEmailCopy = {
   siteReady: (input: TOwnerEmailCopyInput) => TOwnerEmailTextWithAction;
 };
 
-export const OWNER_EMAIL_COPY: Record<TLocaleIsoCode, TOwnerEmailCopy> = {
-  EN: {
+export const OWNER_EMAIL_COPY = {
+  [LOCALE_ISO_CODES.EN]: {
     inviteHeadsUp: ({ siteName, ownerEmail }) => ({
       subject: 'Check your inbox for your Sanity invite',
       previewText: `Accept it to start editing ${siteName}.`,
@@ -50,7 +50,7 @@ export const OWNER_EMAIL_COPY: Record<TLocaleIsoCode, TOwnerEmailCopy> = {
       actionLabel: 'Open the Studio',
     }),
   },
-  NL: {
+  [LOCALE_ISO_CODES.NL]: {
     inviteHeadsUp: ({ siteName, ownerEmail }) => ({
       subject: 'Kijk in je inbox voor je Sanity-uitnodiging',
       previewText: `Accepteer hem om ${siteName} te gaan bewerken.`,
@@ -79,7 +79,7 @@ export const OWNER_EMAIL_COPY: Record<TLocaleIsoCode, TOwnerEmailCopy> = {
       actionLabel: 'Open de Studio',
     }),
   },
-  FR: {
+  [LOCALE_ISO_CODES.FR]: {
     inviteHeadsUp: ({ siteName, ownerEmail }) => ({
       subject: 'Votre invitation Sanity vous attend dans votre boîte mail',
       previewText: `Acceptez-la pour commencer à modifier ${siteName}.`,
@@ -108,7 +108,7 @@ export const OWNER_EMAIL_COPY: Record<TLocaleIsoCode, TOwnerEmailCopy> = {
       actionLabel: 'Ouvrir le Studio',
     }),
   },
-  DE: {
+  [LOCALE_ISO_CODES.DE]: {
     inviteHeadsUp: ({ siteName, ownerEmail }) => ({
       subject: 'Ihre Sanity-Einladung ist unterwegs',
       previewText: `Nehmen Sie sie an, um ${siteName} zu bearbeiten.`,
@@ -137,7 +137,7 @@ export const OWNER_EMAIL_COPY: Record<TLocaleIsoCode, TOwnerEmailCopy> = {
       actionLabel: 'Studio öffnen',
     }),
   },
-  ES: {
+  [LOCALE_ISO_CODES.ES]: {
     inviteHeadsUp: ({ siteName, ownerEmail }) => ({
       subject: 'Revise su bandeja de entrada: tiene una invitación de Sanity',
       previewText: `Acéptela para empezar a editar ${siteName}.`,
@@ -166,4 +166,4 @@ export const OWNER_EMAIL_COPY: Record<TLocaleIsoCode, TOwnerEmailCopy> = {
       actionLabel: 'Abrir el Studio',
     }),
   },
-};
+} as const satisfies Record<TLocaleIsoCode, TOwnerEmailCopy>;

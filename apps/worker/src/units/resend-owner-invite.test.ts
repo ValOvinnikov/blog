@@ -17,6 +17,7 @@ import {
   SANITY_PROJECT_ID,
 } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
 import { resendOwnerInvite } from './resend-owner-invite';
 
@@ -77,20 +78,22 @@ describe(resendOwnerInvite, () => {
     await resendOwnerInvite(TEST_TENANT_ID);
 
     expect(deleteSanityProjectInvite).toHaveBeenCalledOnce();
-    expect(deleteSanityProjectInvite).toHaveBeenCalledWith(
-      expect.objectContaining({ inviteId: OLD_INVITE_ID }),
-    );
+    expect(deleteSanityProjectInvite).toHaveBeenCalledWith({
+      token: getProvisionEnv().sanityManagementToken,
+      projectId: SANITY_PROJECT_ID,
+      inviteId: OLD_INVITE_ID,
+    });
   });
 
   it('sends a new viewer invite after the revoke', async () => {
     await resendOwnerInvite(TEST_TENANT_ID);
 
-    expect(createSanityProjectInvite).toHaveBeenCalledWith(
-      expect.objectContaining({
-        email: OWNER_EMAIL,
-        role: SANITY_PROJECT_ROLE.VIEWER,
-      }),
-    );
+    expect(createSanityProjectInvite).toHaveBeenCalledWith({
+      token: getProvisionEnv().sanityManagementToken,
+      projectId: SANITY_PROJECT_ID,
+      email: OWNER_EMAIL,
+      role: SANITY_PROJECT_ROLE.VIEWER,
+    });
     expect(
       vi.mocked(deleteSanityProjectInvite).mock.invocationCallOrder[0],
     ).toBeLessThan(

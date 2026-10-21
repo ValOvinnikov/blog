@@ -10,6 +10,7 @@ import {
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import {
+  makeOwnerAccessTarget,
   OWNER_EMAIL,
   SANITY_PROJECT_ID,
 } from '@worker/testing/owner-access/fixtures';
@@ -21,6 +22,8 @@ import { getStepMetadata } from 'workflow';
 import { inviteOwner } from './invite-owner';
 
 const CTX = { runId: 'run-1' };
+const SANITY_OUTAGE = '503';
+const INVITED_TENANT = makeTenant({ sanityProjectId: SANITY_PROJECT_ID });
 const PENDING_INVITE = {
   id: 'invite-1',
   email: OWNER_EMAIL,
@@ -52,9 +55,7 @@ describe(inviteOwner, () => {
     vi.mocked(getStepMetadata).mockReturnValue({
       attempt: 1,
     } as ReturnType<typeof getStepMetadata>);
-    vi.mocked(getTenantById).mockResolvedValue(
-      makeTenant({ sanityProjectId: SANITY_PROJECT_ID }),
-    );
+    vi.mocked(getTenantById).mockResolvedValue(INVITED_TENANT);
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
@@ -91,18 +92,22 @@ describe(inviteOwner, () => {
     await inviteOwner(TEST_TENANT_ID, CTX);
 
     expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
-      expect.objectContaining({ ownerEmail: OWNER_EMAIL }),
+      makeOwnerAccessTarget(INVITED_TENANT),
       TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
     );
   });
 
   describe('when the invite cannot be sent', () => {
     beforeEach(() => {
-      vi.mocked(listSanityProjectInvites).mockRejectedValue(new Error('503'));
+      vi.mocked(listSanityProjectInvites).mockRejectedValue(
+        new Error(SANITY_OUTAGE),
+      );
     });
 
     it('retries before its last attempt', async () => {
-      await expect(inviteOwner(TEST_TENANT_ID, CTX)).rejects.toThrow('503');
+      await expect(inviteOwner(TEST_TENANT_ID, CTX)).rejects.toThrow(
+        SANITY_OUTAGE,
+      );
     });
 
     it('logs and lets provisioning carry on once the last attempt fails', async () => {
@@ -113,10 +118,11 @@ describe(inviteOwner, () => {
       const result = await inviteOwner(TEST_TENANT_ID, CTX);
 
       expect(result).toEqual({ ok: true });
-      expect(logger.error).toHaveBeenCalledWith(
-        'owner_access.invite_failed',
-        expect.objectContaining({ tenantId: TEST_TENANT_ID }),
-      );
+      expect(logger.error).toHaveBeenCalledWith('owner_access.invite_failed', {
+        tenantId: TEST_TENANT_ID,
+        runId: CTX.runId,
+        error: SANITY_OUTAGE,
+      });
     });
   });
 });

@@ -10,11 +10,12 @@ import {
   OWNER_EMAIL_RELEASE_FAILED_EVENT,
   OWNER_EMAIL_SEND_FAILED_EVENT,
 } from '@worker/constants/owner-email';
+import { freezeClock, TEST_NOW } from '@worker/testing/clock/frozen-clock';
 import {
+  makeOwnerAccessTarget,
   OWNER_EMAIL,
   SANITY_PROJECT_ID,
 } from '@worker/testing/owner-access/fixtures';
-import { getProvisionEnv } from '@worker/testing/provision-env/fake-provision-env';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access-target';
@@ -22,9 +23,12 @@ import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access
 import { OWNER_EMAIL_COPY } from './owner-email-copy';
 import { sendOwnerEmailOnce, sendPendingOwnerEmails } from './send-owner-email';
 
-const CLAIMED_AT = new Date('2026-10-21T09:00:00.000Z');
-const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60_000);
-const AN_HOUR_AGO = new Date(Date.now() - 60 * 60_000);
+const CLAIMED_AT = TEST_NOW;
+const TWO_DAYS_AGO = new Date(TEST_NOW.getTime() - 2 * 24 * 60 * 60_000);
+const AN_HOUR_AGO = new Date(TEST_NOW.getTime() - 60 * 60_000);
+const RESEND_DOWN = 'Resend is down';
+const CLAIM_REFUSED = 'claim refused';
+const RELEASE_REFUSED = 'release refused';
 
 vi.mock('@worker/utils/logger/logger');
 vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
@@ -40,13 +44,18 @@ vi.mock(import('@blog/email'), async (importOriginal) => ({
 function makeTarget(
   overrides: Parameters<typeof makeTenant>[0] = {},
 ): TOwnerAccessTarget {
-  return {
-    tenant: makeTenant({ sanityProjectId: SANITY_PROJECT_ID, ...overrides }),
-    projectId: SANITY_PROJECT_ID,
-    ownerEmail: OWNER_EMAIL,
-    env: getProvisionEnv(),
-  };
+  return makeOwnerAccessTarget(
+    makeTenant({ sanityProjectId: SANITY_PROJECT_ID, ...overrides }),
+  );
 }
+
+beforeEach(() => {
+  freezeClock();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 function sentEmails() {
   return vi.mocked(sendEmail).mock.calls.map(([input]) => input);
@@ -65,12 +74,11 @@ describe(sendOwnerEmailOnce, () => {
       TEST_TENANT_ID,
       TENANT_OWNER_EMAIL.SITE_READY,
     );
-    expect(sentEmails()).toEqual([
-      expect.objectContaining({
-        to: OWNER_EMAIL,
-        from: DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
-      }),
-    ]);
+    const emails = sentEmails();
+    const [email] = emails;
+    expect(emails).toHaveLength(1);
+    expect(email?.to).toBe(OWNER_EMAIL);
+    expect(email?.from).toBe(DEFAULT_OWNER_EMAIL_FROM_ADDRESS);
   });
 
   it('sends nothing when the email was already claimed', async () => {
@@ -91,7 +99,8 @@ describe(sendOwnerEmailOnce, () => {
       siteUrl: `https://${target.tenant.primaryDomain}`,
       ownerEmail: OWNER_EMAIL,
     });
-    expect(sentEmails()).toEqual([expect.objectContaining({ subject })]);
+    const [email] = sentEmails();
+    expect(email?.subject).toBe(subject);
   });
 
   it('links the nudge to the admin dashboard', async () => {
@@ -112,20 +121,18 @@ describe(sendOwnerEmailOnce, () => {
 
   describe('when the send fails', () => {
     beforeEach(() => {
-      vi.mocked(sendEmail).mockRejectedValue(new Error('Resend is down'));
+      vi.mocked(sendEmail).mockRejectedValue(new Error(RESEND_DOWN));
     });
 
     it('logs the failure without throwing', async () => {
       await expect(
         sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.INVITE_HEADS_UP),
       ).resolves.toBeUndefined();
-      expect(logger.error).toHaveBeenCalledWith(
-        OWNER_EMAIL_SEND_FAILED_EVENT,
-        expect.objectContaining({
-          tenantId: TEST_TENANT_ID,
-          email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
-        }),
-      );
+      expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
+        tenantId: TEST_TENANT_ID,
+        email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
+        error: RESEND_DOWN,
+      });
     });
 
     it('releases its claim so a later check retries the send', async () => {
@@ -143,7 +150,7 @@ describe(sendOwnerEmailOnce, () => {
 
     it('logs a release that fails without throwing', async () => {
       vi.mocked(releaseTenantOwnerEmail).mockRejectedValue(
-        new Error('release refused'),
+        new Error(RELEASE_REFUSED),
       );
 
       await expect(
@@ -151,14 +158,18 @@ describe(sendOwnerEmailOnce, () => {
       ).resolves.toBeUndefined();
       expect(logger.error).toHaveBeenCalledWith(
         OWNER_EMAIL_RELEASE_FAILED_EVENT,
-        expect.objectContaining({ tenantId: TEST_TENANT_ID }),
+        {
+          tenantId: TEST_TENANT_ID,
+          email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
+          error: RELEASE_REFUSED,
+        },
       );
     });
   });
 
   it('logs a claim that fails without sending or releasing', async () => {
     vi.mocked(claimTenantOwnerEmail).mockRejectedValue(
-      new Error('claim refused'),
+      new Error(CLAIM_REFUSED),
     );
 
     await expect(
@@ -166,10 +177,11 @@ describe(sendOwnerEmailOnce, () => {
     ).resolves.toBeUndefined();
     expect(sendEmail).not.toHaveBeenCalled();
     expect(releaseTenantOwnerEmail).not.toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalledWith(
-      OWNER_EMAIL_SEND_FAILED_EVENT,
-      expect.objectContaining({ tenantId: TEST_TENANT_ID }),
-    );
+    expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
+      tenantId: TEST_TENANT_ID,
+      email: TENANT_OWNER_EMAIL.SITE_READY,
+      error: CLAIM_REFUSED,
+    });
   });
 });
 
