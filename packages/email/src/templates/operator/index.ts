@@ -6,3 +6,7 @@ export {
   buildDocumentValidationAlertEmail,
   type TDocumentValidationAlertInput,
 } from './document-validation-alert';
+export {
+  buildSelfServeLimitAlertEmail,
+  type TSelfServeLimitAlertInput,
+} from './self-serve-limit-alert';

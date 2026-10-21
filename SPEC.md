@@ -1995,6 +1995,12 @@ a `production` target it throws. A limiter guarding a public action that sends e
 closed: when its store errors, times out or is unconfigured, the action refuses
 with its rate-limit outcome and stores and sends nothing.
 
+`apps/platform` keeps its own counts in the same kind of store
+(`apps/platform/src/server/rate-limit/`; the apps share no code). Its one
+caller is the self-serve Create site gate (`takeCreateSiteSlot`), which caps
+sites per IP and in total per UTC day and alerts the super admins once on the
+day the total cap is reached.
+
 **Public write paths are guarded before they touch data.** The newsletter
 sign-up and the contact form are the two server actions an anonymous visitor
 can call. Each builds its guard with `createPublicWriteGuard`

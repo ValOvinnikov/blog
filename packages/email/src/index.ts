@@ -23,6 +23,8 @@ export {
   type TOwnerElevationAlertInput,
   buildDocumentValidationAlertEmail,
   type TDocumentValidationAlertInput,
+  buildSelfServeLimitAlertEmail,
+  type TSelfServeLimitAlertInput,
 } from './templates/operator';
 export {
   buildOwnerInviteHeadsUpEmail,
