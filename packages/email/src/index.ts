@@ -23,6 +23,8 @@ export {
   type TOwnerElevationAlertInput,
   buildDocumentValidationAlertEmail,
   type TDocumentValidationAlertInput,
+  buildInactivityWarningAlertEmail,
+  type TInactivityWarningAlertInput,
   buildSelfServeLimitAlertEmail,
   type TSelfServeLimitAlertInput,
 } from './templates/operator';
@@ -33,6 +35,10 @@ export {
   type TOwnerInviteNudgeEmailInput,
   buildOwnerSiteReadyEmail,
   type TOwnerSiteReadyEmailInput,
+  buildOwnerInactivityWarningEmail,
+  type TOwnerInactivityWarningEmailInput,
+  buildOwnerDeletionNoticeEmail,
+  type TOwnerDeletionNoticeEmailInput,
 } from './templates/owner';
 export {
   buildMagicLinkEmail,

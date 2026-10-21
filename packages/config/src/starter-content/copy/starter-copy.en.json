@@ -1,0 +1,76 @@
+{
+  "home": {
+    "title": "Home",
+    "heading": "Welcome",
+    "supportingText": "Your new site is ready — start adding pages, posts, and content whenever you like.",
+    "metaTitle": "Welcome to your new site — built and ready to customize",
+    "metaDescription": "This home page was seeded automatically during provisioning. Edit its Heading Block and SEO fields on this page once you have real copy."
+  },
+  "postIndex": {
+    "title": "Blog",
+    "heading": "Blog",
+    "supportingText": "The latest posts from this site.",
+    "metaTitle": "Blog — the latest posts from this site",
+    "metaDescription": "Every post on this site, newest first. Edit this page’s Heading Block and SEO fields once you have real copy."
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "Start here",
+      "primaryActionLabel": "Read the post"
+    },
+    "latestPosts": {
+      "heading": "Latest posts"
+    },
+    "topics": {
+      "heading": "Browse by topic"
+    },
+    "postList": {
+      "heading": "All posts"
+    },
+    "cta": {
+      "heading": "Get to know the author",
+      "supportingText": "Find out who writes here and what this blog is about."
+    },
+    "topicIndex": {
+      "title": "Topics",
+      "heading": "Topics",
+      "supportingText": "Browse every post by topic.",
+      "metaTitle": "Topics — browse every post on this blog by topic",
+      "metaDescription": "Every topic this blog writes about, with the latest posts in each.",
+      "listHeading": "All topics"
+    },
+    "tagIndex": {
+      "title": "Tags",
+      "heading": "Tags",
+      "supportingText": "Browse every post by tag.",
+      "metaTitle": "Tags — browse every post on this blog by tag",
+      "metaDescription": "Every tag used on this blog, with the posts that carry it.",
+      "listHeading": "All tags"
+    },
+    "topic": {
+      "title": "Getting started",
+      "slug": "getting-started",
+      "description": "Posts about setting up and running this blog.",
+      "metaTitle": "Getting started — posts about setting up this blog"
+    },
+    "welcomePost": {
+      "title": "Welcome to your new blog",
+      "slug": "welcome",
+      "supportingText": "A sample post to show how posts look. Edit it or delete it whenever you like.",
+      "body": [
+        "This is a sample post, created with your site so your blog has something to show from day one.",
+        "Open it in the Studio to see how a post is put together: a title, a short summary, the body text and a topic. Edit it into your first real post, or delete it once you have published your own."
+      ],
+      "metaTitle": "Welcome to your new blog — a sample post to edit",
+      "metaDescription": "A sample post created with your site. Edit it into your first real post, or delete it once you have published your own."
+    },
+    "about": {
+      "title": "About",
+      "slug": "about",
+      "heading": "About",
+      "supportingText": "Tell readers who you are and what this blog is about.",
+      "metaTitle": "About — who writes this blog and what it covers",
+      "metaDescription": "Who writes this blog and what it covers. Edit this page’s Heading Block and SEO fields once you have real copy."
+    }
+  }
+}

@@ -28,6 +28,10 @@ export const env = createEnv({
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // @env-optional
     OWNER_EMAIL_FROM_ADDRESS: z.string().min(1).optional(),
+    // @env-optional
+    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    // @env-optional
+    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: {
     SANITY_MANAGEMENT_TOKEN: process.env.SANITY_MANAGEMENT_TOKEN,
@@ -42,6 +46,8 @@ export const env = createEnv({
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
     OWNER_EMAIL_FROM_ADDRESS: process.env.OWNER_EMAIL_FROM_ADDRESS,
+    PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
+    PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
   },
   emptyStringAsUndefined: true,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

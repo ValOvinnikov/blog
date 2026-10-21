@@ -68,6 +68,10 @@ export const env = createEnv({
     LOKI_TOKEN: z.string().min(1).optional(),
     // Also signs the owner-invite confirmation token, not only Auth.js sessions.
     AUTH_SECRET: z.string().min(1),
+    // @env-optional
+    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    // @env-optional
+    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
@@ -95,6 +99,8 @@ export const env = createEnv({
     LOKI_USER: process.env.LOKI_USER,
     LOKI_TOKEN: process.env.LOKI_TOKEN,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
+    PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
   },
   emptyStringAsUndefined: true,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

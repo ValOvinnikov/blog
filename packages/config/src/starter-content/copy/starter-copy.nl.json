@@ -1,0 +1,76 @@
+{
+  "home": {
+    "title": "Home",
+    "heading": "Welkom",
+    "supportingText": "Je nieuwe site staat klaar — voeg pagina’s, berichten en inhoud toe wanneer je wilt.",
+    "metaTitle": "Welkom op je nieuwe site — klaar om aan te passen",
+    "metaDescription": "Deze homepage is automatisch aangemaakt bij het opzetten van je site. Pas de kop en de SEO-velden aan zodra je echte tekst hebt."
+  },
+  "postIndex": {
+    "title": "Blog",
+    "heading": "Blog",
+    "supportingText": "De nieuwste berichten op deze site.",
+    "metaTitle": "Blog — de nieuwste berichten op deze site",
+    "metaDescription": "Alle berichten op deze site, de nieuwste eerst. Pas de kop en de SEO-velden van deze pagina aan zodra je echte tekst hebt."
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "Begin hier",
+      "primaryActionLabel": "Lees het bericht"
+    },
+    "latestPosts": {
+      "heading": "Nieuwste berichten"
+    },
+    "topics": {
+      "heading": "Bekijk per onderwerp"
+    },
+    "postList": {
+      "heading": "Alle berichten"
+    },
+    "cta": {
+      "heading": "Maak kennis met de schrijver",
+      "supportingText": "Ontdek wie hier schrijft en waar deze blog over gaat."
+    },
+    "topicIndex": {
+      "title": "Onderwerpen",
+      "heading": "Onderwerpen",
+      "supportingText": "Bekijk alle berichten per onderwerp.",
+      "metaTitle": "Onderwerpen — alle berichten op deze blog per onderwerp",
+      "metaDescription": "Alle onderwerpen waar deze blog over schrijft, met de nieuwste berichten per onderwerp.",
+      "listHeading": "Alle onderwerpen"
+    },
+    "tagIndex": {
+      "title": "Tags",
+      "heading": "Tags",
+      "supportingText": "Bekijk alle berichten per tag.",
+      "metaTitle": "Tags — alle berichten op deze blog per tag",
+      "metaDescription": "Alle tags op deze blog, met de berichten die ze dragen.",
+      "listHeading": "Alle tags"
+    },
+    "topic": {
+      "title": "Aan de slag",
+      "slug": "aan-de-slag",
+      "description": "Berichten over het opzetten en bijhouden van deze blog.",
+      "metaTitle": "Aan de slag — berichten over het opzetten van deze blog"
+    },
+    "welcomePost": {
+      "title": "Welkom op je nieuwe blog",
+      "slug": "welkom",
+      "supportingText": "Een voorbeeldbericht dat laat zien hoe berichten eruitzien. Pas het aan of verwijder het wanneer je wilt.",
+      "body": [
+        "Dit is een voorbeeldbericht, aangemaakt met je site zodat je blog vanaf de eerste dag iets te tonen heeft.",
+        "Open het in de Studio om te zien hoe een bericht is opgebouwd: een titel, een korte samenvatting, de tekst en een onderwerp. Maak er je eerste echte bericht van, of verwijder het zodra je je eigen bericht hebt gepubliceerd."
+      ],
+      "metaTitle": "Welkom op je nieuwe blog — een voorbeeldbericht",
+      "metaDescription": "Een voorbeeldbericht, aangemaakt met je site. Maak er je eerste echte bericht van, of verwijder het zodra je je eigen bericht hebt gepubliceerd."
+    },
+    "about": {
+      "title": "Over",
+      "slug": "over",
+      "heading": "Over",
+      "supportingText": "Vertel lezers wie je bent en waar deze blog over gaat.",
+      "metaTitle": "Over — wie deze blog schrijft en waar hij over gaat",
+      "metaDescription": "Wie deze blog schrijft en waar hij over gaat. Pas de kop en de SEO-velden van deze pagina aan zodra je echte tekst hebt."
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "home": {
+    "title": "Startseite",
+    "heading": "Willkommen",
+    "supportingText": "Deine neue Website ist bereit — füge Seiten, Beiträge und Inhalte hinzu, wann immer du möchtest.",
+    "metaTitle": "Willkommen auf deiner neuen Website — bereit zum Anpassen",
+    "metaDescription": "Diese Startseite wurde beim Einrichten deiner Website automatisch erstellt. Bearbeite Überschrift und SEO-Felder, sobald du echte Texte hast."
+  },
+  "postIndex": {
+    "title": "Blog",
+    "heading": "Blog",
+    "supportingText": "Die neuesten Beiträge dieser Website.",
+    "metaTitle": "Blog — die neuesten Beiträge dieser Website",
+    "metaDescription": "Alle Beiträge dieser Website, die neuesten zuerst. Bearbeite Überschrift und SEO-Felder dieser Seite, sobald du echte Texte hast."
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "Hier beginnen",
+      "primaryActionLabel": "Beitrag lesen"
+    },
+    "latestPosts": {
+      "heading": "Neueste Beiträge"
+    },
+    "topics": {
+      "heading": "Nach Thema stöbern"
+    },
+    "postList": {
+      "heading": "Alle Beiträge"
+    },
+    "cta": {
+      "heading": "Lerne die Person hinter dem Blog kennen",
+      "supportingText": "Finde heraus, wer hier schreibt und worum es in diesem Blog geht."
+    },
+    "topicIndex": {
+      "title": "Themen",
+      "heading": "Themen",
+      "supportingText": "Alle Beiträge nach Thema durchstöbern.",
+      "metaTitle": "Themen — alle Beiträge dieses Blogs nach Thema",
+      "metaDescription": "Alle Themen, über die dieser Blog schreibt, mit den neuesten Beiträgen zu jedem Thema.",
+      "listHeading": "Alle Themen"
+    },
+    "tagIndex": {
+      "title": "Schlagwörter",
+      "heading": "Schlagwörter",
+      "supportingText": "Alle Beiträge nach Schlagwort durchstöbern.",
+      "metaTitle": "Schlagwörter — alle Beiträge dieses Blogs nach Schlagwort",
+      "metaDescription": "Alle Schlagwörter dieses Blogs, mit den Beiträgen, die sie tragen.",
+      "listHeading": "Alle Schlagwörter"
+    },
+    "topic": {
+      "title": "Erste Schritte",
+      "slug": "erste-schritte",
+      "description": "Beiträge über das Einrichten und Führen dieses Blogs.",
+      "metaTitle": "Erste Schritte — Beiträge zum Einrichten dieses Blogs"
+    },
+    "welcomePost": {
+      "title": "Willkommen in deinem neuen Blog",
+      "slug": "willkommen",
+      "supportingText": "Ein Beispielbeitrag, der zeigt, wie Beiträge aussehen. Bearbeite oder lösche ihn, wann immer du möchtest.",
+      "body": [
+        "Dies ist ein Beispielbeitrag, der mit deiner Website erstellt wurde, damit dein Blog vom ersten Tag an etwas zu zeigen hat.",
+        "Öffne ihn im Studio, um zu sehen, wie ein Beitrag aufgebaut ist: ein Titel, eine kurze Zusammenfassung, der Text und ein Thema. Mach ihn zu deinem ersten echten Beitrag oder lösche ihn, sobald du deinen eigenen veröffentlicht hast."
+      ],
+      "metaTitle": "Willkommen in deinem neuen Blog — ein Beispielbeitrag",
+      "metaDescription": "Ein Beispielbeitrag, der mit deiner Website erstellt wurde. Mach ihn zu deinem ersten echten Beitrag oder lösche ihn später."
+    },
+    "about": {
+      "title": "Über",
+      "slug": "ueber",
+      "heading": "Über",
+      "supportingText": "Erzähl deinen Lesern, wer du bist und worum es in diesem Blog geht.",
+      "metaTitle": "Über — wer diesen Blog schreibt und worum es geht",
+      "metaDescription": "Wer diesen Blog schreibt und worum es geht. Bearbeite Überschrift und SEO-Felder dieser Seite, sobald du echte Texte hast."
+    }
+  }
+}

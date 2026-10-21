@@ -43,6 +43,14 @@ describe(RecentActivityCard, () => {
     }
   });
 
+  it("names a deleted account in place of an actor's cleared email", () => {
+    render(
+      <RecentActivityCard events={[makeAuditEvent({ actorEmail: null })]} />,
+    );
+
+    expect(screen.getByText('Deleted account')).toBeVisible();
+  });
+
   it('shows an empty state when there is no recorded activity', () => {
     render(<RecentActivityCard events={[]} />);
 

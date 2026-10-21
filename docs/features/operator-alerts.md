@@ -117,8 +117,8 @@ the email in the platform's own look, and sends it.
 - `packages/db/scripts/lib/post-operator-alert.ts`
 - `packages/db/scripts/recheck-tenant-owners/lib/notify-owner-elevation-outcome.ts`
 - `packages/db/scripts/validate-tenant-documents/lib/notify-operators.ts`
-- `packages/email/src/templates/operator/owner-elevation-alert.ts`,
-  `document-validation-alert.ts`
+- `packages/email/src/templates/operator/owner-elevation-alert/owner-elevation-alert.ts`,
+  `document-validation-alert/document-validation-alert.ts`
 
 ## Tests and stories
 
@@ -126,7 +126,7 @@ the email in the platform's own look, and sends it.
 - `packages/db/scripts/lib/post-operator-alert.test.ts` and
   `packages/db/scripts/*/lib/notify-operators.test.ts`;
   `packages/db/scripts/recheck-tenant-owners/run.owner-elevation-notification.test.ts`.
-- `packages/email/src/templates/operator/*.test.ts` and
+- `packages/email/src/templates/operator/**/*.test.ts` and
   `packages/email/src/html/operator-shell/operator-shell.test.ts`.
 - `apps/platform/src/components/features/tenants/email-alerts-banner/email-alerts-banner.test.tsx`.
 - No Storybook.

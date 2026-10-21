@@ -1,58 +1,54 @@
+import {
+  ESCAPED_UNSAFE_MARKUP,
+  TEST_TENANT_ID,
+  TEST_TENANT_NAME,
+  UNSAFE_MARKUP,
+} from '@blog/email/testing/email-fixtures';
+
 import { buildDocumentValidationAlertEmail } from './document-validation-alert';
+
+const ALERT = {
+  tenantName: TEST_TENANT_NAME,
+  tenantId: TEST_TENANT_ID,
+  invalidDocumentCount: 2,
+  isCritical: false,
+};
 
 describe('buildDocumentValidationAlertEmail', () => {
   it('escapes the tenant name', () => {
     const { html } = buildDocumentValidationAlertEmail({
-      tenantName: '<script>alert(1)</script>',
-      tenantId: 'tenant_1',
-      invalidDocumentCount: 2,
-      isCritical: false,
+      ...ALERT,
+      tenantName: UNSAFE_MARKUP,
     });
 
-    expect(html).not.toContain('<script>');
-    expect(html).toContain('&lt;script&gt;');
+    expect(html).not.toContain(UNSAFE_MARKUP);
+    expect(html).toContain(`<strong>${ESCAPED_UNSAFE_MARKUP}</strong>`);
   });
 
   it('escapes the tenant id', () => {
     const { html } = buildDocumentValidationAlertEmail({
-      tenantName: 'Acme',
-      tenantId: '<script>alert(1)</script>',
-      invalidDocumentCount: 2,
-      isCritical: false,
+      ...ALERT,
+      tenantId: UNSAFE_MARKUP,
     });
 
-    expect(html).not.toContain('<code><script>');
-    expect(html).toContain(
-      '<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>',
-    );
+    expect(html).not.toContain(UNSAFE_MARKUP);
+    expect(html).toContain(`<code>${ESCAPED_UNSAFE_MARKUP}</code>`);
   });
 
   it('names the tenant in the subject', () => {
-    const { subject } = buildDocumentValidationAlertEmail({
-      tenantName: 'Acme',
-      tenantId: 'tenant_1',
-      invalidDocumentCount: 2,
-      isCritical: false,
-    });
+    const { subject } = buildDocumentValidationAlertEmail(ALERT);
 
     expect(subject).toBe(
-      'Tenant "Acme" (tenant_1) has invalid Sanity documents',
+      'Tenant "Northwind" (tenant_1) has invalid Sanity documents',
     );
   });
 
   it('uses distinct copy per severity', () => {
     const critical = buildDocumentValidationAlertEmail({
-      tenantName: 'Acme',
-      tenantId: 'tenant_1',
-      invalidDocumentCount: 3,
+      ...ALERT,
       isCritical: true,
     });
-    const warning = buildDocumentValidationAlertEmail({
-      tenantName: 'Acme',
-      tenantId: 'tenant_1',
-      invalidDocumentCount: 3,
-      isCritical: false,
-    });
+    const warning = buildDocumentValidationAlertEmail(ALERT);
 
     expect(critical.html).not.toEqual(warning.html);
     expect(critical.html).toContain(
@@ -65,10 +61,8 @@ describe('buildDocumentValidationAlertEmail', () => {
 
   it('includes the invalid document count in the body', () => {
     const { html } = buildDocumentValidationAlertEmail({
-      tenantName: 'Acme',
-      tenantId: 'tenant_1',
+      ...ALERT,
       invalidDocumentCount: 5,
-      isCritical: true,
     });
 
     expect(html).toContain('5 document(s) failed validation');
