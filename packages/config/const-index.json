@@ -2044,6 +2044,22 @@
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
+    "NEXT_NOT_FOUND": [
+      {
+        "ref": "NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/next-navigation-error.ts"
+      }
+    ],
+    "NEXT_REDIRECT": [
+      {
+        "ref": "NEXT_NAVIGATION_ERROR.NEXT_REDIRECT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/next-navigation-error.ts"
+      }
+    ],
     "OWNER_ELEVATION": [
       {
         "ref": "OPERATOR_ALERT_KIND.OWNER_ELEVATION",
@@ -2828,6 +2844,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "OWNER_STUDIO_ACCESS.READY",
+        "scope": "app:platform",
+        "from": "@platform/constants/owner-studio-access",
+        "file": "apps/platform/src/constants/owner-studio-access.ts"
       }
     ],
     "FAILED": [
@@ -3034,6 +3056,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "OWNER_STUDIO_ACCESS.STALLED",
+        "scope": "app:platform",
+        "from": "@platform/constants/owner-studio-access",
+        "file": "apps/platform/src/constants/owner-studio-access.ts"
       }
     ],
     "AMBIGUOUS_MEMBERSHIP": [
@@ -3182,6 +3210,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/email-sender",
         "file": "apps/platform/src/constants/email-sender.ts"
+      }
+    ],
+    "INVITE_SENT": [
+      {
+        "ref": "OWNER_STUDIO_ACCESS.INVITE_SENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/owner-studio-access",
+        "file": "apps/platform/src/constants/owner-studio-access.ts"
+      }
+    ],
+    "ACTIVATING": [
+      {
+        "ref": "OWNER_STUDIO_ACCESS.ACTIVATING",
+        "scope": "app:platform",
+        "from": "@platform/constants/owner-studio-access",
+        "file": "apps/platform/src/constants/owner-studio-access.ts"
       }
     ],
     "DESKTOP": [
