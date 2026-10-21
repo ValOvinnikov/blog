@@ -9,6 +9,7 @@ import {
   EQUALITY_OPERATORS,
   PROCESS_NAME,
   PROTOCOL_ATTRIBUTE_KEYS,
+  SANITY_TYPE_KEY,
   STUB_ENV_CALLEE,
 } from '../configs/eslint/literal-vocabulary.js';
 import {
@@ -117,6 +118,12 @@ const isProtocolAttributeValue = ({ parent }) =>
   (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
   PROTOCOL_ATTRIBUTE_KEYS.has(parent.name.text);
 
+// Sanity `_type` names and literal types are checked against the generated types, so they cannot drift.
+const isSanityTypeValue = ({ parent }) =>
+  ts.isPropertyAssignment(parent) &&
+  (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
+  parent.name.text === SANITY_TYPE_KEY;
+
 const isExemptLiteral = (node) => {
   const { parent } = node;
   return (
@@ -127,7 +134,7 @@ const isExemptLiteral = (node) => {
     ts.isExportDeclaration(parent) ||
     ts.isExternalModuleReference(parent) ||
     ts.isModuleDeclaration(parent) ||
-    (ts.isLiteralTypeNode(parent) && ts.isImportTypeNode(parent.parent)) ||
+    ts.isLiteralTypeNode(parent) ||
     (parent.name === node && !ts.isElementAccessExpression(parent)) ||
     isFirstArgumentOf(node, MODULE_PATH_CALLEES) ||
     isFirstArgumentOf(node, TEST_TITLE_CALLEES) ||
@@ -135,7 +142,8 @@ const isExemptLiteral = (node) => {
     isEnvComparisonOperand(node) ||
     isEnvReadKey(node) ||
     isStubEnvArgument(node) ||
-    isProtocolAttributeValue(node)
+    isProtocolAttributeValue(node) ||
+    isSanityTypeValue(node)
   );
 };
 

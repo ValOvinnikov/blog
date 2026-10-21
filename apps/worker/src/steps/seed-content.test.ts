@@ -4,10 +4,12 @@ import {
   HTTP_STATUS,
   SANITY_ROBOT_ROLE,
 } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { SITE_TYPE } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
-import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import { getProvisionEnv } from '@worker/testing/provision-env/fake-provision-env';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import type { Mock } from 'vitest';
 
 import { seedTenantContent, type TSeedContentDeps } from './seed-content';
@@ -21,36 +23,25 @@ vi.mock('@blog/db/queries/tenants', () => ({
     setTenantSanityWriteTokenAndSeededAtMock,
 }));
 
-const env: TProvisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  sanityOrganizationId: 'org-abc',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  adminAppBaseUrl: 'https://admin.example.com',
-  tenantSanityDataset: 'test-dataset',
-  webAppBaseUrl: 'https://example.com',
-  revalidateSecret: 'revalidate-shh',
-};
+const env = getProvisionEnv();
+const PROJECT_ID = 'proj123';
+const DATASET = 'production';
+const WRITE_TOKEN = 'sk-write';
+const ROBOT_ID = 'robot-1';
+const SITE_SETTINGS_QUERY = '*[_type == "settings_site"][0]._id';
+const COMMIT_FAILED = 'commit failed';
+const PERSIST_FAILED = 'persist failed';
+const INSUFFICIENT_PERMISSIONS =
+  'transaction failed: Insufficient permissions; permission "create" required';
+const MUTATE_URL = `https://api.sanity.io/v2024-01-01/data/mutate/${DATASET}`;
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj123',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PROVISIONING',
-    provisioningSteps: null,
-    seededAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+  return makeTenant({
+    sanityProjectId: PROJECT_ID,
+    sanityDataset: DATASET,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     ...overrides,
-  } as TTenant;
+  });
 }
 
 function createClientStub(
@@ -103,7 +94,7 @@ describe(seedTenantContent, () => {
     } = createClientStub({ createIfNotExists, commit }));
     mintWriteToken = vi
       .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+      .mockResolvedValue({ id: ROBOT_ID, token: WRITE_TOKEN });
     revokeWriteToken = vi.fn().mockResolvedValue(undefined);
     sleep = vi.fn().mockResolvedValue(undefined);
   });
@@ -118,16 +109,19 @@ describe(seedTenantContent, () => {
       sleep,
     });
 
-    expect(clientFetch).toHaveBeenCalledWith(
-      '*[_type == "settings_site"][0]._id',
-    );
+    expect(clientFetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
     expect(createIfNotExists).toHaveBeenCalledTimes(
-      buildStarterDocuments(seededTenant.name).length,
+      buildStarterDocuments({
+        siteType: SITE_TYPE.BLANK,
+        siteName: seededTenant.name,
+        locale: seededTenant.locale,
+        publishedAt: new Date().toISOString(),
+      }).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-      'sk-write',
+      TEST_TENANT_ID,
+      WRITE_TOKEN,
       expect.any(Date),
     );
     expect(revokeWriteToken).not.toHaveBeenCalled();
@@ -146,16 +140,14 @@ describe(seedTenantContent, () => {
       sleep,
     });
 
-    expect(existingSiteClient.fetch).toHaveBeenCalledWith(
-      '*[_type == "settings_site"][0]._id',
-    );
+    expect(existingSiteClient.fetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
     expect(createIfNotExists).not.toHaveBeenCalled();
     expect(commit).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
+      token: env.sanityManagementToken,
+      projectId: PROJECT_ID,
+      robotId: ROBOT_ID,
     });
   });
 
@@ -185,28 +177,33 @@ describe(seedTenantContent, () => {
     });
 
     expect(mintWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
+      token: env.sanityManagementToken,
+      projectId: PROJECT_ID,
       label: expect.any(String),
       role: SANITY_ROBOT_ROLE.EDITOR,
     });
     expect(createClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectId: 'proj123',
-        dataset: 'production',
-        token: 'sk-write',
+        projectId: PROJECT_ID,
+        dataset: DATASET,
+        token: WRITE_TOKEN,
         useCdn: false,
       }),
     );
     expect(assetsUpload).not.toHaveBeenCalled();
     expect(createIfNotExists).toHaveBeenCalledTimes(
-      buildStarterDocuments(tenant.name).length,
+      buildStarterDocuments({
+        siteType: SITE_TYPE.BLANK,
+        siteName: tenant.name,
+        locale: tenant.locale,
+        publishedAt: new Date().toISOString(),
+      }).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-      'sk-write',
+      TEST_TENANT_ID,
+      WRITE_TOKEN,
       expect.any(Date),
     );
     expect(revokeWriteToken).not.toHaveBeenCalled();
@@ -231,7 +228,7 @@ describe(seedTenantContent, () => {
   });
 
   it('still revokes the transient token when seeding fails', async () => {
-    commit.mockRejectedValue(new Error('commit failed'));
+    commit.mockRejectedValue(new Error(COMMIT_FAILED));
 
     await expect(
       seedTenantContent(tenant, env, {
@@ -240,19 +237,19 @@ describe(seedTenantContent, () => {
         revokeWriteToken,
         sleep,
       }),
-    ).rejects.toThrow('commit failed');
+    ).rejects.toThrow(COMMIT_FAILED);
 
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
+      token: env.sanityManagementToken,
+      projectId: PROJECT_ID,
+      robotId: ROBOT_ID,
     });
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
 
   it('regression: revokes the token when persisting the token+seededAt fails, so a crash/retry window never orphans a live Editor-scoped token or mints a second one on retry', async () => {
     setTenantSanityWriteTokenAndSeededAtMock.mockRejectedValue(
-      new Error('persist failed'),
+      new Error(PERSIST_FAILED),
     );
 
     await expect(
@@ -262,19 +259,17 @@ describe(seedTenantContent, () => {
         revokeWriteToken,
         sleep,
       }),
-    ).rejects.toThrow('persist failed');
+    ).rejects.toThrow(PERSIST_FAILED);
 
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
+      token: env.sanityManagementToken,
+      projectId: PROJECT_ID,
+      robotId: ROBOT_ID,
     });
   });
 
   it('retries a grant-propagation failure once and succeeds', async () => {
-    const grantError = new Error(
-      'transaction failed: Insufficient permissions; permission "create" required',
-    );
+    const grantError = new Error(INSUFFICIENT_PERMISSIONS);
     commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
     await seedTenantContent(tenant, env, {
@@ -287,8 +282,8 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-      'sk-write',
+      TEST_TENANT_ID,
+      WRITE_TOKEN,
       expect.any(Date),
     );
     expect(revokeWriteToken).not.toHaveBeenCalled();
@@ -299,7 +294,7 @@ describe(seedTenantContent, () => {
       statusCode: HTTP_STATUS.FORBIDDEN,
       headers: {},
       body: { message: 'Forbidden' },
-      url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
+      url: MUTATE_URL,
       method: HTTP_METHOD.POST,
     });
     commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
@@ -314,8 +309,8 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-      'sk-write',
+      TEST_TENANT_ID,
+      WRITE_TOKEN,
       expect.any(Date),
     );
     expect(revokeWriteToken).not.toHaveBeenCalled();
@@ -326,7 +321,7 @@ describe(seedTenantContent, () => {
       statusCode: HTTP_STATUS.BAD_REQUEST,
       headers: {},
       body: { message: 'Malformed mutation' },
-      url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
+      url: MUTATE_URL,
       method: HTTP_METHOD.POST,
     });
     commit.mockRejectedValue(otherError);
@@ -343,17 +338,15 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
+      token: env.sanityManagementToken,
+      projectId: PROJECT_ID,
+      robotId: ROBOT_ID,
     });
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
 
   it('exhausts retries on a persistent grant-propagation failure, still revokes the token, and never persists it or seededAt', async () => {
-    const grantError = new Error(
-      'transaction failed: Insufficient permissions; permission "create" required',
-    );
+    const grantError = new Error(INSUFFICIENT_PERMISSIONS);
     commit.mockRejectedValue(grantError);
 
     await expect(
@@ -367,9 +360,9 @@ describe(seedTenantContent, () => {
 
     expect(commit.mock.calls.length).toBeGreaterThan(1);
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
+      token: env.sanityManagementToken,
+      projectId: PROJECT_ID,
+      robotId: ROBOT_ID,
     });
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
@@ -390,9 +383,9 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
+      token: env.sanityManagementToken,
+      projectId: PROJECT_ID,
+      robotId: ROBOT_ID,
     });
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });

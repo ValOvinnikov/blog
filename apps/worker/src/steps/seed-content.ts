@@ -1,6 +1,7 @@
 import {
   buildStarterDocuments,
   SANITY_ROBOT_ROLE,
+  SITE_TYPE,
   type TMaybeNull,
   type TStarterDocumentUnion,
 } from '@blog/config';
@@ -73,7 +74,12 @@ export async function seedTenantContent(
 
     if (alreadySeeded) return;
 
-    const documents = buildStarterDocuments(tenant.name);
+    const documents = buildStarterDocuments({
+      siteType: SITE_TYPE.BLANK,
+      siteName: tenant.name,
+      locale: tenant.locale,
+      publishedAt: new Date().toISOString(),
+    });
 
     const transaction = client.transaction();
     for (const document of documents) {

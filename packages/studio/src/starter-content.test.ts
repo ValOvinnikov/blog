@@ -1,5 +1,5 @@
 import { buildStarterDocuments } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
 import { validateDocument, type ValidationClient } from '@sanity/validation';
 import { evaluate, parse } from 'groq-js';
 import { prepareConfig, type SanityDocument, type Schema } from 'sanity';
@@ -10,13 +10,14 @@ vi.mock('sanity/structure');
 vi.mock('sanity-plugin-media');
 vi.mock('@sanity/vision');
 
-const documents = buildStarterDocuments('Acme Corporation');
-const seededIds = new Set(documents.map(({ _id }) => _id));
-const siteSettings = documents.find(
-  (document) => document._type === 'settings_site',
-)!;
+const SITE_NAME = 'Acme Corporation';
+const PUBLISHED_AT = '2026-01-01T00:00:00Z';
 
-const createDatasetClient = (): ValidationClient => {
+type TStarterDocument = ReturnType<typeof buildStarterDocuments>[number];
+
+const createDatasetClient = (
+  documents: TStarterDocument[],
+): ValidationClient => {
   const client = {
     fetch: async (query: string, params: Record<string, unknown>) =>
       (await evaluate(parse(query), { dataset: documents, params })).get(),
@@ -26,12 +27,10 @@ const createDatasetClient = (): ValidationClient => {
   return client as unknown as ValidationClient;
 };
 
-const toSanityDocument = (
-  document: (typeof documents)[number],
-): SanityDocument => ({
+const toSanityDocument = (document: TStarterDocument): SanityDocument => ({
   ...document,
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
+  _createdAt: PUBLISHED_AT,
+  _updatedAt: PUBLISHED_AT,
   _rev: 'starter',
 });
 
@@ -51,20 +50,46 @@ describe.each(Object.values(LOCALE_ISO_CODES))(
       schema = prepareConfig(config).workspaces[0]!.schema;
     });
 
+    const documents = buildStarterDocuments({
+      siteType: SITE_TYPE.BLOG,
+      siteName: SITE_NAME,
+      locale: defaultLocale,
+      publishedAt: PUBLISHED_AT,
+    });
+    const siteSettings = documents.find(
+      (document) => document._type === 'settings_site',
+    )!;
+
     const validateStarterDocument = async (
-      document: (typeof documents)[number],
+      document: TStarterDocument,
+      dataset = documents,
     ) => {
       const { markers } = await validateDocument({
         document: toSanityDocument(document),
         schema,
-        client: createDatasetClient(),
-        getDocumentExists: async ({ id }) => seededIds.has(id),
+        client: createDatasetClient(dataset),
+        getDocumentExists: async ({ id }) =>
+          dataset.some(({ _id }) => _id === id),
       });
 
       return markers;
     };
 
-    it.each(documents)('$_type passes Studio validation', async (document) => {
+    it.each(documents)(
+      'Blog $_type $_id passes Studio validation',
+      async (document) => {
+        expect(await validateStarterDocument(document)).toEqual([]);
+      },
+    );
+
+    it.each(
+      buildStarterDocuments({
+        siteType: SITE_TYPE.BLANK,
+        siteName: SITE_NAME,
+        locale: defaultLocale,
+        publishedAt: PUBLISHED_AT,
+      }),
+    )('Blank $_type $_id passes Studio validation', async (document) => {
       expect(await validateStarterDocument(document)).toEqual([]);
     });
 
