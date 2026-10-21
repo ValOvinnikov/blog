@@ -1,4 +1,8 @@
-import { NEWSLETTER_RESULT, TENANT_WRITE_REFUSAL } from '@blog/config';
+import {
+  SUBSCRIBER_OUTCOME,
+  NEWSLETTER_RESULT,
+  TENANT_WRITE_REFUSAL,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { redirectToNewsletterResult } from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
@@ -38,7 +42,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     return redirectToNewsletterResult(
       request,
-      result.outcome === 'not-found'
+      result.outcome === SUBSCRIBER_OUTCOME.NOT_FOUND
         ? NEWSLETTER_RESULT.CONFIRM_INVALID
         : NEWSLETTER_RESULT.CONFIRMED,
     );

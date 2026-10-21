@@ -1,5 +1,5 @@
 {
-  "id": "cb03e77a-1b2b-42f0-8054-44039e37a65f",
+  "id": "32d2da02-89ca-418b-9eea-14af951ff7a5",
   "prevId": "df6b8d0d-fbe3-428f-a005-30b401557251",
   "version": "7",
   "dialect": "postgresql",
@@ -346,18 +346,6 @@
         },
         "image": {
           "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "termsAcceptedAt": {
-          "name": "termsAcceptedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "termsVersion": {
-          "name": "termsVersion",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -990,37 +978,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.magic_link_send_counters": {
-      "name": "magic_link_send_counters",
-      "schema": "",
-      "columns": {
-        "key": {
-          "name": "key",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "window_started_at": {
-          "name": "window_started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.membership_invites": {
       "name": "membership_invites",
       "schema": "",
@@ -1440,14 +1397,14 @@
           "notNull": true,
           "default": "'pending'"
         },
-        "confirmation_token": {
-          "name": "confirmation_token",
+        "confirmation_token_hash": {
+          "name": "confirmation_token_hash",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "unsubscribe_token": {
-          "name": "unsubscribe_token",
+        "unsubscribe_token_hash": {
+          "name": "unsubscribe_token_hash",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1486,15 +1443,15 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "subscribers_confirmation_token_unique": {
-          "name": "subscribers_confirmation_token_unique",
+        "subscribers_confirmation_token_hash_unique": {
+          "name": "subscribers_confirmation_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": ["confirmation_token"]
+          "columns": ["confirmation_token_hash"]
         },
-        "subscribers_unsubscribe_token_unique": {
-          "name": "subscribers_unsubscribe_token_unique",
+        "subscribers_unsubscribe_token_hash_unique": {
+          "name": "subscribers_unsubscribe_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": ["unsubscribe_token"]
+          "columns": ["unsubscribe_token_hash"]
         },
         "subscribers_tenant_id_email_unique": {
           "name": "subscribers_tenant_id_email_unique",

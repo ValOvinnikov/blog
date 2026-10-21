@@ -2,9 +2,10 @@
 
 import {
   ACTION_OUTCOME,
+  SUBSCRIBER_OUTCOME,
   routes,
-  TENANT_WRITE_REFUSAL,
   type TActionResult,
+  TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
@@ -84,7 +85,8 @@ export const resendConfirmationAction =
         tenantId,
         userId,
       );
-      if (result.outcome === 'not-pending') return SERVER_ERROR;
+      if (result.outcome === SUBSCRIBER_OUTCOME.NOT_PENDING)
+        return SERVER_ERROR;
 
       const siteUrl = (await getTenantBaseUrl()) ?? '';
       const locale = await getSubscribedPageLocale();

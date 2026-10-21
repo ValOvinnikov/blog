@@ -11,7 +11,11 @@ const CONFIRMATION_RESEND_COOLDOWN_MS = 15 * 60_000;
 
 const sendConfirmationEmail = async (
   tenantId: string,
-  { email, confirmationToken, unsubscribeToken }: schema.TSubscriber,
+  email: string,
+  {
+    confirmationToken,
+    unsubscribeToken,
+  }: queries.subscribers.IConfirmationSendClaim['tokens'],
 ): Promise<void> => {
   const siteUrl = (await getTenantBaseUrl()) ?? '';
   const locale = await getSubscribedPageLocale();
@@ -57,16 +61,18 @@ export const sendNewsletterConfirmation = async (
   tenantId: string,
   subscriber: schema.TSubscriber,
 ): Promise<void> => {
-  const claimedAt = await queries.subscribers.claimConfirmationSend(
-    subscriber.id,
+  const { id, email } = subscriber;
+  const claim = await queries.subscribers.claimConfirmationSend(
+    id,
     CONFIRMATION_RESEND_COOLDOWN_MS,
   );
-  if (!claimedAt) return;
+  if (!claim) return;
 
+  const { claimedAt, tokens } = claim;
   try {
-    await sendConfirmationEmail(tenantId, subscriber);
+    await sendConfirmationEmail(tenantId, email, tokens);
   } catch (error) {
-    await queries.subscribers.releaseConfirmationSend(subscriber.id, claimedAt);
+    await queries.subscribers.releaseConfirmationSend(id, claimedAt);
     throw error;
   }
 };

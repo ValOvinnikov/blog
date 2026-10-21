@@ -2602,6 +2602,50 @@
         "file": "packages/config/src/constants/size.ts"
       }
     ],
+    "ALREADY_PENDING": [
+      {
+        "ref": "SUBSCRIBER_OUTCOME.ALREADY_PENDING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/subscriber-outcome.ts"
+      }
+    ],
+    "ALREADY_CONFIRMED": [
+      {
+        "ref": "SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/subscriber-outcome.ts"
+      }
+    ],
+    "PENDING": [
+      {
+        "ref": "SUBSCRIBER_OUTCOME.PENDING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/subscriber-outcome.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.PENDING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "DOMAIN_VERIFICATION_STATUS.PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "NOT_PENDING": [
+      {
+        "ref": "SUBSCRIBER_OUTCOME.NOT_PENDING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/subscriber-outcome.ts"
+      }
+    ],
     "TOPICS": [
       {
         "ref": "TAXONOMY_KIND.TOPICS",
@@ -2910,20 +2954,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
-      }
-    ],
-    "PENDING": [
-      {
-        "ref": "TENANT_PROVISIONING_STATUS.PENDING",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/tenant-provisioning.ts"
-      },
-      {
-        "ref": "DOMAIN_VERIFICATION_STATUS.PENDING",
-        "scope": "app:platform",
-        "from": "@platform/constants/domain",
-        "file": "apps/platform/src/constants/domain.ts"
       }
     ],
     "PROVISIONING": [

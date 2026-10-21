@@ -3,8 +3,9 @@
 import {
   ACTION_OUTCOME,
   CAPABILITY,
-  TENANT_WRITE_REFUSAL,
+  SUBSCRIBER_OUTCOME,
   type TActionResult,
+  TENANT_WRITE_REFUSAL,
   type TOutcome,
 } from '@blog/config';
 import { queries } from '@blog/db';
@@ -31,6 +32,7 @@ export type TSubscribeResult =
   | TActionResult<TSubscribeRefusal, 'email', TFieldErrorReason>
   | TOutcome<typeof NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED>;
 
+const SUBSCRIBE_FAILED_EVENT = 'newsletter.subscribe_failed';
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 const UNAVAILABLE = toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 
@@ -70,13 +72,13 @@ export const subscribeToNewsletterAction = async (
     );
 
     if (!result.ok) {
-      logger.error('newsletter.subscribe_failed', { error: result.error });
+      logger.error(SUBSCRIBE_FAILED_EVENT, { error: result.error });
       return SERVER_ERROR;
     }
 
     const { outcome, subscriber } = result.data;
 
-    if (outcome === 'already-active') {
+    if (outcome === SUBSCRIBER_OUTCOME.ALREADY_ACTIVE) {
       await markNewsletterSubscribedSafely();
       return toOutcome(NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED);
     }
@@ -86,7 +88,7 @@ export const subscribeToNewsletterAction = async (
     await markNewsletterSubscribedSafely();
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error('newsletter.subscribe_failed', { error });
+    logger.error(SUBSCRIBE_FAILED_EVENT, { error });
     return SERVER_ERROR;
   }
 };

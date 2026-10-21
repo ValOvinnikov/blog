@@ -8,6 +8,8 @@ import {
   type TPortableTextContent,
 } from '@blog/email/portable-text';
 
+export const LIST_UNSUBSCRIBE_ONE_CLICK = 'List-Unsubscribe=One-Click';
+
 export type TNewsletterConfirmationEmailInput = {
   subject: string;
   body: TPortableTextContent;
@@ -71,7 +73,7 @@ export function buildNewsletterConfirmationEmail({
     }),
     headers: {
       'List-Unsubscribe': `<${unsubscribeUrl}>`,
-      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
     },
   };
 }

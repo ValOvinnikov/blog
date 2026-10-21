@@ -1,13 +1,18 @@
-import type { TOutcome } from '@blog/config';
+import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export type TConfirmSubscriberResult =
-  | { outcome: 'confirmed'; subscriber: TSubscriber }
-  | { outcome: 'already-confirmed'; subscriber: TSubscriber }
-  | TOutcome<'not-found'>;
+  | (TOutcome<typeof SUBSCRIBER_OUTCOME.CONFIRMED> & {
+      subscriber: TSubscriber;
+    })
+  | (TOutcome<typeof SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED> & {
+      subscriber: TSubscriber;
+    })
+  | TOutcome<typeof SUBSCRIBER_OUTCOME.NOT_FOUND>;
 
 // The `UPDATE` is gated on `status = 'pending'` rather than read-then-write,
 // so of two concurrent hits on one link exactly one gets `confirmed`.
@@ -16,6 +21,7 @@ export async function confirmSubscriber(
   token: string,
 ): Promise<TConfirmSubscriberResult> {
   const db = getDb();
+  const tokenHash = sha256Hex(token);
 
   const [updated] = await db
     .update(subscribers)
@@ -23,14 +29,17 @@ export async function confirmSubscriber(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.confirmationToken, token),
+        eq(subscribers.confirmationTokenHash, tokenHash),
         eq(subscribers.status, 'pending'),
       ),
     )
     .returning();
 
   if (updated) {
-    return { outcome: 'confirmed', subscriber: updated };
+    return {
+      ...toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED),
+      subscriber: updated,
+    };
   }
 
   const [existing] = await db
@@ -39,13 +48,16 @@ export async function confirmSubscriber(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.confirmationToken, token),
+        eq(subscribers.confirmationTokenHash, tokenHash),
       ),
     );
 
   if (!existing) {
-    return toOutcome('not-found');
+    return toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND);
   }
 
-  return { outcome: 'already-confirmed', subscriber: existing };
+  return {
+    ...toOutcome(SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED),
+    subscriber: existing,
+  };
 }

@@ -41,6 +41,7 @@ export * from './reserved-slug';
 export * from './reserved-subdomain';
 export * from './sanity-project';
 export * from './site-type';
+export * from './subscriber-outcome';
 export * from './size';
 export * from './taxonomy';
 export * from './tenant-write-refusal';
