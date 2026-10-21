@@ -8,6 +8,7 @@ import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSuspension } from './set-tenant-suspension';
@@ -84,7 +85,7 @@ describe(setTenantSuspension, () => {
   it('clears the suspension reason and stamp when the suspension is lifted', async () => {
     const tenant = await insertTestTenant(db(), {
       status: TENANT_STATUS.SUSPENDED,
-      suspendedAt: new Date('2026-04-07T00:00:00.000Z'),
+      suspendedAt: LAST_ACTIVITY_AT,
       suspensionReason: SUSPENSION_REASON.INACTIVITY,
     });
 

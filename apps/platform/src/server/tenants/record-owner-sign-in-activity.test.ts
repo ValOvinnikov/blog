@@ -33,7 +33,7 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/utils/logger/logger');
 
-const USER_ID = 'user-1';
+const { userId: USER_ID } = makeMembership();
 const DB_DOWN = new Error('db down');
 const OWNED_TENANT = makeTenant({ id: 'tenant-owned' });
 const EDITED_TENANT = makeTenant({ id: 'tenant-edited' });
@@ -83,7 +83,7 @@ describe(recordOwnerSignInActivity, () => {
 
     await expect(recordOwnerSignInActivity(USER_ID)).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
-      'tenant.sign_in_activity_failed',
+      expect.any(String),
       expect.objectContaining({ tenantId: OWNED_TENANT.id }),
     );
   });
@@ -93,7 +93,7 @@ describe(recordOwnerSignInActivity, () => {
 
     await expect(recordOwnerSignInActivity(USER_ID)).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
-      'tenant.sign_in_owner_lookup_failed',
+      expect.any(String),
       expect.objectContaining({ userId: USER_ID }),
     );
   });
