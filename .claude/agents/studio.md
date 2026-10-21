@@ -240,6 +240,10 @@ seven is a design question to raise, not a new group to invent.
   a second copy of something you may import moves to its owning folder in
   this change. A match in a package this layer may not import is named in
   your report, never copied.
+- Check `packages/config/CONSTANTS.md` before writing a literal and import
+  the const it names; a value written a second time becomes a const, tests
+  included (CLAUDE.md → "Reuse a const; never retype its value"). Schema
+  `options.list` values come from the const, never retyped.
 - Where shared types, helpers and constants live: `.claude/agents/config.md`.
 - File size budgets (schema definitions exempt): CLAUDE.md → Conventions.
 

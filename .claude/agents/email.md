@@ -106,6 +106,10 @@ don't apply here.
 - Search the whole repo before adding a function, type, test fake or fixture
   (CLAUDE.md → "Reuse before you create"). A match this layer may not import
   is named in your report, never copied.
+- A value written a second time becomes a const in this package, tests
+  included (CLAUDE.md → "Reuse a const; never retype its value");
+  `packages/config/CONSTANTS.md` lists none it may import, since it sits
+  below `@blog/config`.
 
 ## When a consumer changes
 

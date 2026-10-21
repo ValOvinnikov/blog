@@ -303,6 +303,9 @@ the schema contract at the query boundary:
   "Helpers"). Whole-repo reuse rules: CLAUDE.md → "Reuse before you create".
 - **A match you cannot import, or cannot extract because it lives outside
   `packages/service`, is not permission to copy it** — name it in your report.
+- Check `packages/config/CONSTANTS.md` before writing a literal and import
+  the const it names; a value written a second time becomes a const, tests
+  included (CLAUDE.md → "Reuse a const; never retype its value").
 - File size budgets: CLAUDE.md → Conventions → "File size budgets".
 
 ## Comments

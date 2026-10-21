@@ -656,6 +656,25 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   silently reorders a Postgres enum — confirm with `db:generate` that no
   migration appears.
 
+- **Reuse a const; never retype its value.** Check
+  `packages/config/CONSTANTS.md` — the generated index of every key/value
+  const in `@blog/config`, `@blog/db` and each app's `src/constants/` —
+  before writing a string or number literal, and import the const it names
+  (`HTTP_STATUS.NOT_FOUND`, never `404`). **A value written a second time
+  becomes a const** in the change that writes it, homed by the placement
+  rules above. Tests are included: inputs and expectations use the const, and
+  a repeated test value becomes a const, or a builder in `testing/` when it
+  is entity-shaped — while asserting a const's own value stays banned
+  ("Never assert the source back at itself"). Exempt: generated Sanity types,
+  Sanity migrations, Tailwind class strings, import paths, directives,
+  public-site copy (it belongs in the Voice catalog) and `0`, `1`, `-1`; a
+  match in the other app is reported, never shared. Lint enforces both on
+  touched files only — `prefer-shared-constant` and `no-duplicate-string` in
+  the post-edit hook, lint-staged and `pnpm check:touched-lint`, plus the
+  cross-file `pnpm check:duplicate-literals`, all in `pnpm verify` — so an
+  untouched file keeps its backlog. After adding or changing a const, run
+  `pnpm gen:const-index`; `pnpm gen:const-index:check` guards drift.
+
 - `'use client'` never in `@blog/ui` (it stays pure and prop-driven). Two
   components there, `Carousel` and `Dialog`, are nonetheless client-only —
   they own client hooks (`useEmblaCarousel`, Base UI's dialog) — and carry no
