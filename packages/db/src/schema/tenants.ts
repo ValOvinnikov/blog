@@ -28,6 +28,8 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
+
 export const tenantPlanEnum = pgEnum(
   'tenant_plan',
   Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]],
@@ -181,7 +183,9 @@ export const tenants = pgTable('tenants', {
   ownerInviteHeadsUpSentAt: timestamp('owner_invite_heads_up_sent_at'),
   ownerInviteNudgeSentAt: timestamp('owner_invite_nudge_sent_at'),
   ownerSiteReadySentAt: timestamp('owner_site_ready_sent_at'),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
     .defaultNow()

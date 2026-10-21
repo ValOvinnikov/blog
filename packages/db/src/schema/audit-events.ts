@@ -8,6 +8,8 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+import { CREATED_AT_COLUMN } from './columns';
+
 // `action`/`targetType` are plain `text`, not `pgEnum` — a new audited
 // action or target type never forces a migration this way — but stay bound
 // to `@blog/config`'s closed unions via `.$type<>()`. `targetId` has no
@@ -25,7 +27,9 @@ export const auditEvents = pgTable(
     targetType: text('target_type').notNull().$type<TAuditTargetType>(),
     targetId: text('target_id').notNull(),
     details: jsonb('details').$type<Record<string, unknown>>(),
-    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+      .notNull()
+      .defaultNow(),
   },
   // Unlike this package's other tables, this one is append-only and
   // unbounded — "every event for target X" is the obvious query, so it

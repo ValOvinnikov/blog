@@ -9,6 +9,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { users } from './auth';
+import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 export const membershipRoleEnum = pgEnum(
@@ -30,7 +31,9 @@ export const memberships = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     role: membershipRoleEnum('role').notNull(),
-    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
+      .notNull()
+      .defaultNow(),
   },
   (membership) => [unique().on(membership.userId, membership.tenantId)],
 );
