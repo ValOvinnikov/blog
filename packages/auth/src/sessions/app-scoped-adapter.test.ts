@@ -1,5 +1,5 @@
 import { AUTH_APP } from '@blog/config/constants';
-import type { Adapter } from 'next-auth/adapters';
+import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 
 import { scopeAdapterToApp } from './app-scoped-adapter';
 
@@ -91,26 +91,22 @@ describe(scopeAdapterToApp, () => {
   it('links a provider account without its tokens', async () => {
     const adapter = buildAdapter(AUTH_APP.SITE);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.SITE);
+    const account: AdapterAccount = {
+      userId: user.id,
+      type: 'oidc',
+      provider: 'test-provider',
+      providerAccountId: 'provider-account-1',
+      token_type: 'bearer',
+      scope: 'read:user',
+    };
 
     await scoped.linkAccount?.({
-      userId: user.id,
-      type: 'oauth',
-      provider: 'github',
-      providerAccountId: 'gh-1',
-      access_token: 'access',
-      refresh_token: 'refresh',
-      id_token: 'id',
-      token_type: 'bearer',
-      scope: 'read:user',
+      ...account,
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      id_token: 'id-token',
     });
 
-    expect(adapter.linkAccount).toHaveBeenCalledWith({
-      userId: user.id,
-      type: 'oauth',
-      provider: 'github',
-      providerAccountId: 'gh-1',
-      token_type: 'bearer',
-      scope: 'read:user',
-    });
+    expect(adapter.linkAccount).toHaveBeenCalledWith(account);
   });
 });
