@@ -15,6 +15,7 @@ export const SANITY_USER_ID = `g${faker.string.alphanumeric(10)}`;
 export const SANITY_ORGANIZATION_ID = `o${faker.string.alphanumeric(8)}`;
 export const SANITY_CORS_ORIGIN = faker.internet.url({ appendSlash: false });
 export const SANITY_WEBHOOK_URL = faker.internet.url({ appendSlash: false });
+export const SANITY_WEBHOOK_ID = faker.string.alphanumeric(10);
 
 export const SANITY_EXPECTED_URL = {
   projects: 'https://api.sanity.io/v2021-06-07/projects',
@@ -32,6 +33,7 @@ export const SANITY_EXPECTED_URL = {
   robots: `https://api.sanity.io/v2026-07-10/access/project/${SANITY_PROJECT_ID}/robots`,
   robot: `https://api.sanity.io/v2026-07-10/access/project/${SANITY_PROJECT_ID}/robots/${SANITY_ROBOT_ID}`,
   webhooks: `https://api.sanity.io/v2025-08-04/hooks/projects/${SANITY_PROJECT_ID}`,
+  webhook: `https://api.sanity.io/v2025-08-04/hooks/projects/${SANITY_PROJECT_ID}/${SANITY_WEBHOOK_ID}`,
 } as const;
 
 export function withSanityProject<T extends object>(extra: T) {

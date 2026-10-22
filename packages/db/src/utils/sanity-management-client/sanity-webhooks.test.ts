@@ -9,12 +9,19 @@ import {
   SANITY_DATASET,
   SANITY_EXPECTED_URL,
   SANITY_PROJECT_ID,
+  SANITY_WEBHOOK_ID,
   SANITY_WEBHOOK_URL,
   withSanityProject,
 } from '@blog/db/testing/sanity-management-client/fixtures';
 
-import { createSanityWebhook, listSanityWebhooks } from './sanity-webhooks';
+import {
+  createSanityWebhook,
+  listSanityWebhooks,
+  updateSanityWebhookSecret,
+} from './sanity-webhooks';
 
+const REDIRECT_MODE_ERROR = 'error';
+const NOT_FOUND_BODY = 'webhook not found';
 const hook = { id: 'hook1', url: SANITY_WEBHOOK_URL };
 const createInput = withSanityProject({
   dataset: SANITY_DATASET,
@@ -35,7 +42,7 @@ describe(listSanityWebhooks, () => {
     expect(result).toEqual([hook]);
     expect(url).toBe(SANITY_EXPECTED_URL.webhooks);
     expect(method).toBe(HTTP_METHOD.GET);
-    expect(init.redirect).toBe('error');
+    expect(init.redirect).toBe(REDIRECT_MODE_ERROR);
   });
 
   it('explains project membership when the management token is unauthorized', async () => {
@@ -61,7 +68,7 @@ describe(createSanityWebhook, () => {
     expect(result).toEqual(hook);
     expect(url).toBe(SANITY_EXPECTED_URL.webhooks);
     expect(method).toBe(HTTP_METHOD.POST);
-    expect(init.redirect).toBe('error');
+    expect(init.redirect).toBe(REDIRECT_MODE_ERROR);
     expect(body).toEqual({
       type: 'document',
       name: createInput.name,
@@ -102,5 +109,42 @@ describe(createSanityWebhook, () => {
     );
 
     await expect(createSanityWebhook(createInput)).rejects.toThrow(/402/);
+  });
+});
+
+describe(updateSanityWebhookSecret, () => {
+  const updateInput = withSanityProject({
+    webhookId: SANITY_WEBHOOK_ID,
+    secret: 'rotated-shh',
+  });
+
+  it('PATCHes only the secret of the named hook without following redirects', async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse({ id: SANITY_WEBHOOK_ID, url: SANITY_WEBHOOK_URL }),
+    );
+
+    await updateSanityWebhookSecret(updateInput);
+
+    const { url, init, body, method } = firstFetchCall(fetchMock);
+    expect(url).toBe(SANITY_EXPECTED_URL.webhook);
+    expect(method).toBe(HTTP_METHOD.PATCH);
+    expect(init.redirect).toBe(REDIRECT_MODE_ERROR);
+    expect(body).toEqual({ secret: updateInput.secret });
+  });
+
+  it('throws naming the hook when the response is not that hook', async () => {
+    fetchMock.mockResolvedValue(jsonResponse([]));
+
+    await expect(updateSanityWebhookSecret(updateInput)).rejects.toThrow(
+      SANITY_WEBHOOK_ID,
+    );
+  });
+
+  it('throws with the response status on failure', async () => {
+    fetchMock.mockResolvedValue(
+      textResponse(NOT_FOUND_BODY, HTTP_STATUS.NOT_FOUND),
+    );
+
+    await expect(updateSanityWebhookSecret(updateInput)).rejects.toThrow(/404/);
   });
 });
