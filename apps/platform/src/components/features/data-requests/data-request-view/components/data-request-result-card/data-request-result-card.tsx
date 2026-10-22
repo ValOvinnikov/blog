@@ -3,7 +3,10 @@
 import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
+import {
+  ConfirmDialog,
+  type TConfirmDialogActionResult,
+} from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
@@ -15,14 +18,12 @@ const dataRequestResultCardVariants = tv({
   },
 });
 
-type TEraseOutcome = { ok: true } | { ok: false; error?: string };
-
 export type TDataRequestResultCardProps = {
   email: string;
   matchCount: number;
   isExporting: boolean;
   onExport: (link: HTMLAnchorElement) => void;
-  onErase: () => Promise<TEraseOutcome>;
+  onErase: () => Promise<TConfirmDialogActionResult>;
   onErased: () => void;
 };
 

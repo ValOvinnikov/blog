@@ -5,6 +5,7 @@ import {
   type TMaybeUndefined,
   type TReasonedFailure,
 } from '@blog/config';
+import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { DATA_REQUEST_EXPORT_FILE_NAME } from '@platform/constants/data-request';
 import type { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
@@ -81,14 +82,16 @@ export const useDataRequest = ({
     });
   };
 
-  const erase = async (lookedUpEmail: string) => {
+  const erase = async (
+    lookedUpEmail: string,
+  ): Promise<TConfirmDialogActionResult> => {
     const result = await erasePersonalDataAction({ email: lookedUpEmail });
     if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-      return { ok: false as const, error: eraseFailed };
+      return { ok: false, error: eraseFailed };
     }
 
     erasedCount.current = result.erasedCount;
-    return { ok: true as const };
+    return { ok: true };
   };
 
   const finishErase = () => {
