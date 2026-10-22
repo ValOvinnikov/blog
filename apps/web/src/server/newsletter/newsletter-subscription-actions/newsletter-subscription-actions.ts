@@ -75,7 +75,7 @@ export const resendConfirmationAction =
     const { tenantId } = tenant;
 
     try {
-      const result = await queries.subscribers.prepareConfirmationResend(
+      const result = await queries.subscribers.resendConfirmation(
         tenantId,
         userId,
       );

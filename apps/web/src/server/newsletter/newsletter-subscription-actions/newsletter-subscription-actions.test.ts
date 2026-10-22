@@ -19,7 +19,7 @@ import type { MockInstance } from 'vitest';
 const {
   authMock,
   unsubscribeMock,
-  prepareConfirmationResendMock,
+  resendConfirmationMock,
   commitConfirmationTokenMock,
   mintNewsletterUnsubscribeTokenMock,
   sendEmailMock,
@@ -33,7 +33,7 @@ const {
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
-  prepareConfirmationResendMock: vi.fn(),
+  resendConfirmationMock: vi.fn(),
   commitConfirmationTokenMock: vi.fn(),
   mintNewsletterUnsubscribeTokenMock: vi.fn(),
   sendEmailMock: vi.fn(),
@@ -52,7 +52,7 @@ vi.mock('@blog/db', async () => ({
   queries: {
     subscribers: {
       unsubscribe: unsubscribeMock,
-      prepareConfirmationResend: prepareConfirmationResendMock,
+      resendConfirmation: resendConfirmationMock,
       commitConfirmationToken: commitConfirmationTokenMock,
     },
     emailConfig: { getEmailConfig: getEmailConfigMock },
@@ -214,8 +214,8 @@ describe('resendConfirmationAction', () => {
   beforeEach(async () => {
     authMock.mockReset();
     authMock.mockResolvedValue(session);
-    prepareConfirmationResendMock.mockReset();
-    prepareConfirmationResendMock.mockResolvedValue({
+    resendConfirmationMock.mockReset();
+    resendConfirmationMock.mockResolvedValue({
       outcome: SUBSCRIBER_OUTCOME.PENDING,
       subscriberId: SUBSCRIBER_ID,
       confirmationToken: CONFIRMATION_TOKEN,
@@ -260,7 +260,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
+    expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -270,7 +270,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
+    expect(resendConfirmationMock).not.toHaveBeenCalled();
   });
 
   it('returns SERVER_ERROR without resending when no tenant resolves', async () => {
@@ -282,7 +282,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
+    expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -295,7 +295,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,
     });
-    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
+    expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -303,10 +303,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(prepareConfirmationResendMock).toHaveBeenCalledWith(
-      TENANT_ID,
-      USER_ID,
-    );
+    expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         to: SESSION_EMAIL,
@@ -362,7 +359,7 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR without sending when the db reports not-pending', async () => {
-    prepareConfirmationResendMock.mockResolvedValue({
+    resendConfirmationMock.mockResolvedValue({
       outcome: SUBSCRIBER_OUTCOME.NOT_PENDING,
     });
 

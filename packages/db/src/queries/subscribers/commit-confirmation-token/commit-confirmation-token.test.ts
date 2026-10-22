@@ -67,11 +67,8 @@ describe(commitConfirmationToken, () => {
     expect((await readRow(id)).unsubscribeTokenHash).toBe(unsubscribeTokenHash);
   });
 
-  it('never changes an active subscriber', async () => {
-    const subscriber = await insertSubscriber({
-      status: 'active',
-      confirmedAt: new Date(),
-    });
+  it('never changes a subscriber who has confirmed', async () => {
+    const subscriber = await insertSubscriber({ confirmedAt: new Date() });
 
     await commitConfirmationToken(subscriber.id, faker.string.uuid());
 

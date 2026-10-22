@@ -1,3 +1,4 @@
+import { KEY_ENCODING } from '@blog/utils/encryption';
 import { faker } from '@faker-js/faker';
 import { env } from '@web/utils/env/env';
 
@@ -9,7 +10,9 @@ import {
 vi.mock('@web/utils/env/env', () => ({ env: {} }));
 
 const SUBSCRIBER_ID = faker.string.uuid();
-const KEY = Buffer.from(faker.string.alphanumeric(32)).toString('base64');
+const mintKey = (): string =>
+  Buffer.from(faker.string.alphanumeric(32)).toString(KEY_ENCODING);
+const KEY = mintKey();
 
 const setKey = (key: string | undefined): void => {
   Object.assign(env, { NEWSLETTER_UNSUBSCRIBE_KEY: key });
@@ -47,19 +50,20 @@ describe(readNewsletterUnsubscribeSubscriberId, () => {
   });
 
   it('rejects a token whose signature was made for another subscriber', () => {
-    const [, signature] =
-      mintNewsletterUnsubscribeToken(SUBSCRIBER_ID).split('.');
+    const signedTail = mintNewsletterUnsubscribeToken(SUBSCRIBER_ID).slice(
+      SUBSCRIBER_ID.length,
+    );
 
     expect(
       readNewsletterUnsubscribeSubscriberId(
-        `${faker.string.uuid()}.${signature}`,
+        `${faker.string.uuid()}${signedTail}`,
       ),
     ).toBeNull();
   });
 
   it('rejects a token signed with another key', () => {
     const token = mintNewsletterUnsubscribeToken(SUBSCRIBER_ID);
-    setKey(Buffer.from(faker.string.alphanumeric(32)).toString('base64'));
+    setKey(mintKey());
 
     expect(readNewsletterUnsubscribeSubscriberId(token)).toBeNull();
   });
@@ -71,9 +75,9 @@ describe(readNewsletterUnsubscribeSubscriberId, () => {
   });
 
   it('rejects a token with an empty subscriber id', () => {
-    const [, signature] = mintNewsletterUnsubscribeToken('').split('.');
-
-    expect(readNewsletterUnsubscribeSubscriberId(`.${signature}`)).toBeNull();
+    expect(
+      readNewsletterUnsubscribeSubscriberId(mintNewsletterUnsubscribeToken('')),
+    ).toBeNull();
   });
 
   it('rejects every token without a key', () => {

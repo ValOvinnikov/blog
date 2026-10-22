@@ -6,7 +6,7 @@ import { KEY_ENCODING, PAYLOAD_ENCODING } from '@blog/utils/encryption';
 import { SHA256_ALGORITHM } from '@blog/utils/hash';
 import { env } from '@web/utils/env/env';
 
-const TOKEN_SEPARATOR = '.';
+const TOKEN_SEPARATOR = '~';
 
 const signSubscriberId = (subscriberId: string, keyBase64: string): string =>
   createHmac(SHA256_ALGORITHM, Buffer.from(keyBase64, KEY_ENCODING))

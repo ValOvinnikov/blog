@@ -7,17 +7,17 @@ import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscrib
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
-export type TPrepareConfirmationResendResult =
+export type TResendConfirmationResult =
   | (TOutcome<typeof SUBSCRIBER_OUTCOME.PENDING> & {
       subscriberId: string;
       confirmationToken: string;
     })
   | TOutcome<typeof SUBSCRIBER_OUTCOME.NOT_PENDING>;
 
-export async function prepareConfirmationResend(
+export async function resendConfirmation(
   tenantId: string,
   userId: string,
-): Promise<TPrepareConfirmationResendResult> {
+): Promise<TResendConfirmationResult> {
   const db = getDb();
 
   const [user] = await db
