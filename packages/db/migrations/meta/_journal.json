@@ -365,6 +365,13 @@
       "when": 1792619192535,
       "tag": "0051_add_magic_link_send_counters_and_users_terms",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1792622741645,
+      "tag": "0052_remove_plain_hash_blocked_addresses",
+      "breakpoints": true
     }
   ]
 }

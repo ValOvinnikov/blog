@@ -5,13 +5,14 @@ import {
   BLOCK_REASON,
   BLOCKED_ADDRESS,
   BLOCKED_ADDRESS_DOMAIN,
-  BLOCKED_ADDRESS_HASH,
+  BLOCKED_ADDRESS_INDEX,
   BLOCKED_DOMAIN,
   NOT_A_DOMAIN,
   NOT_AN_ADDRESS,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 import { addBlockedIdentity } from './add-blocked-identity';
 
@@ -21,7 +22,12 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+beforeEach(() => {
+  vi.stubEnv('PERSONAL_DATA_INDEX_KEY', TEST_ENCRYPTION_KEY);
+});
+
 afterEach(async () => {
+  vi.unstubAllEnvs();
   await db().delete(schema.blockedSignupIdentities);
   await db().delete(schema.admins);
   await db().delete(schema.users);
@@ -46,11 +52,24 @@ describe(addBlockedIdentity, () => {
     const [row] = await db().select().from(schema.blockedSignupIdentities);
     expect(row).toMatchObject({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      value: BLOCKED_ADDRESS_HASH,
+      value: BLOCKED_ADDRESS_INDEX,
       reason: BLOCK_REASON,
       createdByAdminId,
     });
     expect(JSON.stringify(row).toLowerCase()).not.toContain('blocked@');
+  });
+
+  it('throws when the index key is not configured', async () => {
+    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
+
+    await expect(
+      addBlockedIdentity({
+        kind: BLOCKED_IDENTITY_KIND.ADDRESS,
+        identity: BLOCKED_ADDRESS,
+        reason: BLOCK_REASON,
+        createdByAdminId,
+      }),
+    ).rejects.toThrow('PERSONAL_DATA_INDEX_KEY is not configured.');
   });
 
   it('stores a domain entry as the lower-cased domain', async () => {
