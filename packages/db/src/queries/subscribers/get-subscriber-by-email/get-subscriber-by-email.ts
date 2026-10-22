@@ -1,6 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq } from 'drizzle-orm';
 
 // Reads a subscriber's current row (and therefore `status`) by tenant and

@@ -1,7 +1,7 @@
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
 import {
-  testPersonalEmailIndex,
+  testAccountEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -17,20 +17,27 @@ const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
 const EMAIL = faker.internet.email().toLowerCase();
+const TAGGED_EMAIL = EMAIL.replace('@', '+x@');
 
 afterEach(async () => {
   await db().delete(schema.users);
 });
 
 describe(getUserByEmailIndex, () => {
-  it('finds the user whose index matches any spelling of the address', async () => {
+  it('finds the user whose index matches any casing of the address', async () => {
     const user = await insertTestUser(db(), {
-      emailIndex: testPersonalEmailIndex(EMAIL),
+      emailIndex: testAccountEmailIndex(EMAIL),
     });
 
     await expect(getUserByEmailIndex(EMAIL.toUpperCase())).resolves.toEqual(
       user,
     );
+  });
+
+  it('never finds the account of an address for a +tag variant of it', async () => {
+    await insertTestUser(db(), { emailIndex: testAccountEmailIndex(EMAIL) });
+
+    await expect(getUserByEmailIndex(TAGGED_EMAIL)).resolves.toBeUndefined();
   });
 
   it('returns undefined when no user has that index', async () => {

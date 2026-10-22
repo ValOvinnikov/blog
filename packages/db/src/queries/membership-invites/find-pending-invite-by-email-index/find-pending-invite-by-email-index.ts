@@ -3,19 +3,31 @@ import {
   membershipInvites,
   type TMembershipInvite,
 } from '@blog/db/schema/membership-invites';
-import { requirePersonalEmailIndex } from '@blog/db/utils/personal-data/personal-data';
+import {
+  readPersonalValue,
+  requirePersonalEmailIndex,
+} from '@blog/db/utils/personal-data/personal-data';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq, isNull } from 'drizzle-orm';
 
+// The index drops `+tag`s so data requests reach every variant; an invite still belongs only to the exact address.
 export async function findPendingInviteByEmailIndex(
   email: string,
 ): Promise<TMembershipInvite[]> {
-  return getDb()
+  const address = normalizeEmail(email);
+  const candidates = await getDb()
     .select()
     .from(membershipInvites)
     .where(
       and(
-        eq(membershipInvites.emailIndex, requirePersonalEmailIndex(email)),
+        eq(membershipInvites.emailIndex, requirePersonalEmailIndex(address)),
         isNull(membershipInvites.consumedAt),
       ),
     );
+
+  return candidates.filter(
+    (invite) =>
+      normalizeEmail(readPersonalValue(invite.emailEncrypted, invite.email)) ===
+      address,
+  );
 }

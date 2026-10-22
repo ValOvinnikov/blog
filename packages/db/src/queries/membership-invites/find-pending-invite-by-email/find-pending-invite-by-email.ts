@@ -3,7 +3,7 @@ import {
   membershipInvites,
   type TMembershipInvite,
 } from '@blog/db/schema/membership-invites';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq, isNull } from 'drizzle-orm';
 
 // Returns every still-pending invite for `email`, across every tenant it

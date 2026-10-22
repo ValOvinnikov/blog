@@ -1993,7 +1993,10 @@ encrypted it (`v2:…`), so the key rotates without re-encrypting everything at
 once. A value that is only looked up or kept unique — an email address — is
 compared through `personalDataIndex`, an HMAC-SHA256 of the address
 normalised by `normalizeEmailIdentity` (lower-cased, trimmed, `+tag` dropped)
-under `PERSONAL_DATA_INDEX_KEY`. Both keys are backed up outside the database:
+under `PERSONAL_DATA_INDEX_KEY`. An account is the exception: `users` are
+indexed by `accountEmailIndex`, the same HMAC over `normalizeEmail` (`+tag`
+kept), because `name+tag@domain` may be a different mailbox and must never
+sign in as `name@domain`. Both keys are backed up outside the database:
 losing the encryption key loses the data.
 
 **Rate limits are shared across instances.** `apps/web` keeps every rate

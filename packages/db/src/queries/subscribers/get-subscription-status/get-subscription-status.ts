@@ -2,14 +2,16 @@ import type { TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
+
+const NOT_SUBSCRIBED = 'not-subscribed';
 
 export type TSubscriptionStatusResult =
   | { outcome: 'active'; subscriber: TSubscriber }
   | { outcome: 'pending'; subscriber: TSubscriber }
-  | TOutcome<'not-subscribed'>;
+  | TOutcome<typeof NOT_SUBSCRIBED>;
 
 // `subscribers` has no `userId` column, so the row is found through the
 // user's normalized account email.
@@ -25,7 +27,7 @@ export async function getSubscriptionStatus(
     .where(eq(users.id, userId));
 
   if (!user?.email) {
-    return toOutcome('not-subscribed');
+    return toOutcome(NOT_SUBSCRIBED);
   }
 
   const [subscriber] = await db
@@ -39,7 +41,7 @@ export async function getSubscriptionStatus(
     );
 
   if (!subscriber) {
-    return toOutcome('not-subscribed');
+    return toOutcome(NOT_SUBSCRIBED);
   }
 
   if (subscriber.status === 'active') {

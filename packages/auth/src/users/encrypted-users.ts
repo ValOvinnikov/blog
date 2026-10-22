@@ -1,5 +1,6 @@
 import { queries } from '@blog/db';
 import type { TUser } from '@blog/db/schema/auth';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
 type TStoredUser = Omit<AdapterUser, 'email'> &
@@ -37,7 +38,10 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
       }),
     getUserByEmail: async (email) => {
       const user = await queries.users.getUserByEmailIndex(email);
-      return user ? decryptUser(user) : null;
+      const found = user && decryptUser(user);
+      return found && normalizeEmail(found.email) === normalizeEmail(email)
+        ? found
+        : null;
     },
     getUserByAccount:
       getUserByAccount &&

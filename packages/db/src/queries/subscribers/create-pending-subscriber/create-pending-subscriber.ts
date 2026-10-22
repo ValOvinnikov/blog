@@ -5,9 +5,9 @@ import {
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import type { TResult } from '@blog/utils';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq } from 'drizzle-orm';
 
 export interface ICreatePendingSubscriberResult {

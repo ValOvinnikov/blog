@@ -7,7 +7,7 @@ import {
 import { queries } from '@blog/db';
 import type { TUser } from '@blog/db/schema/auth';
 import {
-  testPersonalEmailIndex,
+  testAccountEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
@@ -39,6 +39,7 @@ const NAME = 'Ada Reader';
 const CHANGED_EMAIL = 'renamed-reader@example.com';
 const PLAIN_EMAIL = 'plain-reader@example.com';
 const PLAIN_NAME = 'Plain Name';
+const TAGGED_EMAIL = 'encrypted-reader+x@example.com';
 
 const signedUpUser = (): AdapterUser => ({
   id: TEST_USER_ID,
@@ -91,7 +92,7 @@ describe(withEncryptedUsers, () => {
       expect.objectContaining({
         email: EMAIL,
         name: NAME,
-        emailIndex: testPersonalEmailIndex(EMAIL),
+        emailIndex: testAccountEmailIndex(EMAIL),
         emailEncrypted: expect.not.stringContaining(EMAIL),
         nameEncrypted: expect.not.stringContaining(NAME),
       }),
@@ -116,7 +117,7 @@ describe(withEncryptedUsers, () => {
 
     expect(adapter.updateUser).toHaveBeenCalledWith(
       expect.objectContaining({
-        emailIndex: testPersonalEmailIndex(CHANGED_EMAIL),
+        emailIndex: testAccountEmailIndex(CHANGED_EMAIL),
         nameEncrypted: null,
       }),
     );
@@ -172,6 +173,25 @@ describe(withEncryptedUsers, () => {
     expect(getUserByEmailIndexMock).toHaveBeenCalledWith(EMAIL);
     expect(adapter.getUserByEmail).not.toHaveBeenCalled();
     expect(user).toMatchObject(decrypted);
+  });
+
+  it('finds the user for another casing of the address', async () => {
+    getUserByEmailIndexMock.mockResolvedValue(storedUser());
+
+    const user = await withEncryptedUsers(buildAdapter()).getUserByEmail?.(
+      EMAIL.toUpperCase(),
+    );
+
+    expect(user).toMatchObject(decrypted);
+  });
+
+  it('finds no user when the stored email is not the requested address', async () => {
+    getUserByEmailIndexMock.mockResolvedValue(storedUser());
+
+    const user =
+      await withEncryptedUsers(buildAdapter()).getUserByEmail?.(TAGGED_EMAIL);
+
+    expect(user).toBeNull();
   });
 
   it('finds no user when no index matches', async () => {

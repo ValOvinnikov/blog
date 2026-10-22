@@ -2,8 +2,8 @@ import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 

@@ -4,6 +4,7 @@ import {
   TEST_ENCRYPTION_KEY as KEY_V1,
 } from './encryption-fixtures';
 import {
+  accountEmailIndex,
   decryptPersonalData,
   encryptPersonalData,
   isPersonalDataKey,
@@ -11,7 +12,8 @@ import {
   parsePersonalDataKeyring,
   personalDataIndex,
 } from './personal-data';
-const ADDRESS = 'reader@example.com';
+const LOCAL_PART = 'reader';
+const ADDRESS = `${LOCAL_PART}@example.com`;
 const KEYRING_V1 = parsePersonalDataKeyring(`v1:${KEY_V1}`);
 const KEYRING_V2 = parsePersonalDataKeyring(`v2:${KEY_V2},v1:${KEY_V1}`);
 const MALFORMED_KEYRING = 'Malformed personal data keyring.';
@@ -133,6 +135,24 @@ describe(personalDataIndex, () => {
   });
 
   it('never contains the address', () => {
-    expect(personalDataIndex(ADDRESS, KEY_V1)).not.toContain('reader');
+    expect(personalDataIndex(ADDRESS, KEY_V1)).not.toContain(LOCAL_PART);
+  });
+});
+
+describe(accountEmailIndex, () => {
+  it('gives two casings of one address the same index', () => {
+    expect(accountEmailIndex(' Reader@Example.com ', KEY_V1)).toBe(
+      accountEmailIndex(ADDRESS, KEY_V1),
+    );
+  });
+
+  it('gives a +tag variant of an address its own index', () => {
+    expect(accountEmailIndex('reader+news@example.com', KEY_V1)).not.toBe(
+      accountEmailIndex(ADDRESS, KEY_V1),
+    );
+  });
+
+  it('keeps the address out of the account index', () => {
+    expect(accountEmailIndex(ADDRESS, KEY_V1)).not.toContain(LOCAL_PART);
   });
 });

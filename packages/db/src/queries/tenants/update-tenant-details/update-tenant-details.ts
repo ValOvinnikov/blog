@@ -17,8 +17,8 @@ import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 

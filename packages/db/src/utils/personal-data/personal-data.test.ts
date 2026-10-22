@@ -1,19 +1,23 @@
 import {
   decryptTestPersonalValue,
+  testAccountEmailIndex,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { faker } from '@faker-js/faker';
 
 import {
+  accountEmailColumns,
   decryptPersonalValue,
   encryptPersonalValue,
   personalEmailColumns,
   readPersonalValue,
+  requireAccountEmailIndex,
   requirePersonalEmailIndex,
 } from './personal-data';
 
 const EMAIL = faker.internet.email().toLowerCase();
+const TAGGED_EMAIL = EMAIL.replace('@', '+tag@');
 
 describe('with both personal data keys configured', () => {
   usePersonalDataKeys();
@@ -49,6 +53,25 @@ describe('with both personal data keys configured', () => {
   it('indexes an email for lookup', () => {
     expect(requirePersonalEmailIndex(EMAIL)).toBe(
       testPersonalEmailIndex(EMAIL),
+    );
+  });
+
+  it('gives an account email its encrypted form and its exact-address index', () => {
+    const { emailEncrypted, emailIndex } = accountEmailColumns(EMAIL);
+
+    expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
+    expect(emailIndex).toBe(testAccountEmailIndex(EMAIL));
+  });
+
+  it('indexes a +tag variant of an account email apart from the address', () => {
+    expect(requireAccountEmailIndex(TAGGED_EMAIL)).not.toBe(
+      requireAccountEmailIndex(EMAIL),
+    );
+  });
+
+  it('indexes a +tag variant of a personal email with the address', () => {
+    expect(requirePersonalEmailIndex(TAGGED_EMAIL)).toBe(
+      requirePersonalEmailIndex(EMAIL),
     );
   });
 });

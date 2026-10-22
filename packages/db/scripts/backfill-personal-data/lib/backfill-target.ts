@@ -1,5 +1,5 @@
 import { getDb } from '@blog/db/client';
-import { encryptPersonalData, personalDataIndex } from '@blog/utils/encryption';
+import { encryptPersonalData } from '@blog/utils/encryption';
 import { isString } from '@blog/utils/primitives';
 import { and, asc, gt, type SQL, sql } from 'drizzle-orm';
 
@@ -21,7 +21,8 @@ function fillMissing(
   const encryptedSet = sql`${sql.identifier(encrypted.name)} = coalesce(${encrypted}, ${encryptPersonalData(value, keyring)})`;
   if (!emailIndex) return encryptedSet;
 
-  return sql`${encryptedSet}, ${sql.identifier(emailIndex.name)} = coalesce(${emailIndex}, ${personalDataIndex(value, indexKey)})`;
+  const { column, indexer } = emailIndex;
+  return sql`${encryptedSet}, ${sql.identifier(column.name)} = coalesce(${column}, ${indexer(value, indexKey)})`;
 }
 
 async function backfillRow(

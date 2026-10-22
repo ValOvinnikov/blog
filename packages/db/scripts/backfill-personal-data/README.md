@@ -11,8 +11,9 @@ personal-data columns existed, or while the keys were unset:
 | `leads`              | `name_encrypted`, `email_encrypted`, `message_encrypted` | `email_index` |
 
 Each non-empty plain value gets an encrypted form under
-`PERSONAL_DATA_ENCRYPTION_KEY`'s current key, and each email gets its
-`personalDataIndex` under `PERSONAL_DATA_INDEX_KEY`. Rows are read in batches
+`PERSONAL_DATA_ENCRYPTION_KEY`'s current key, and each email gets its index
+under `PERSONAL_DATA_INDEX_KEY`: `accountEmailIndex` (the exact address) for
+`users`, `personalDataIndex` (`+tag` dropped) for the rest. Rows are read in batches
 of 500. A value already filled is kept, and a row whose plain value changes
 mid-run is skipped and left for the next run, so running it again is always
 safe — a second run finds nothing to do.

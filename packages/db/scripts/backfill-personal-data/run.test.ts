@@ -9,6 +9,7 @@ import {
 } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
+  testAccountEmailIndex,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
@@ -80,7 +81,7 @@ describe(backfillPersonalData, () => {
     expect(decryptTestPersonalValue(user?.emailEncrypted ?? null)).toBe(
       USER_EMAIL,
     );
-    expect(user?.emailIndex).toBe(testPersonalEmailIndex(USER_EMAIL));
+    expect(user?.emailIndex).toBe(testAccountEmailIndex(USER_EMAIL));
 
     const [subscriber] = await db().select().from(schema.subscribers);
     expect(decryptTestPersonalValue(subscriber?.emailEncrypted ?? null)).toBe(
@@ -145,7 +146,7 @@ describe(backfillPersonalData, () => {
 
     const [user] = await db().select().from(schema.users);
     expect(user?.emailEncrypted).toBe(existing);
-    expect(user?.emailIndex).toBe(testPersonalEmailIndex(USER_EMAIL));
+    expect(user?.emailIndex).toBe(testAccountEmailIndex(USER_EMAIL));
   });
 
   it('backfills every row when there are more than fit in one batch', async () => {
