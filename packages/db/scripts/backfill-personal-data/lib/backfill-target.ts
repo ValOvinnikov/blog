@@ -1,5 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { encryptPersonalData, personalDataIndex } from '@blog/utils/encryption';
+import { isString } from '@blog/utils/primitives';
 import { and, asc, gt, type SQL, sql } from 'drizzle-orm';
 
 import type { TPersonalDataKeys } from './personal-data-keys';
@@ -32,7 +33,7 @@ async function backfillRow(
 
   for (const field of fields) {
     const value = row[field.plain.name];
-    if (typeof value !== 'string' || value === '') continue;
+    if (!isString(value) || value === '') continue;
 
     await db.execute(
       sql`update ${table} set ${fillMissing(field, value, keys)} where ${id} = ${row[id.name]} and ${field.plain} = ${value} and ${fieldGap(field)}`,

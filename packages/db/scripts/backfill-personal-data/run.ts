@@ -2,6 +2,8 @@ import { pathToFileURL } from 'node:url';
 
 import { getTableName } from 'drizzle-orm';
 
+import { hasDryRunFlag } from '../lib/dry-run-flag';
+
 import { backfillTarget } from './lib/backfill-target';
 import {
   countPersonalDataGaps,
@@ -12,8 +14,6 @@ import {
   type TPersonalDataKeys,
 } from './lib/personal-data-keys';
 import { PERSONAL_DATA_TARGETS } from './lib/personal-data-targets';
-
-const DRY_RUN_FLAG = '--dry-run';
 
 export async function backfillPersonalData(
   keys: TPersonalDataKeys,
@@ -42,7 +42,7 @@ function hasGaps(counts: TPersonalDataCounts): boolean {
 async function main(): Promise<void> {
   const keys = loadPersonalDataKeys();
 
-  if (process.argv.includes(DRY_RUN_FLAG)) {
+  if (hasDryRunFlag(process.argv)) {
     report('to backfill', await countPersonalDataGaps());
     return;
   }
