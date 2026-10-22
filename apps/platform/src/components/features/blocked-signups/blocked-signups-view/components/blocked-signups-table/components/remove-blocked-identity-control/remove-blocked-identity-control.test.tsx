@@ -36,9 +36,10 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
     mockRouterRefresh(refreshMock);
     setup();
 
-    await user.click(
-      screen.getByRole('button', { name: `Remove block ${BLOCKED_DOMAIN}` }),
-    );
+    const openDialog = screen.getByRole('button', {
+      name: `Remove block ${BLOCKED_DOMAIN}`,
+    });
+    await user.click(openDialog);
   });
 
   it('removes the entry only after the operator confirms', async () => {
@@ -49,7 +50,8 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
     expect(dialog).toBeVisible();
     expect(removeBlockedIdentityActionMock).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', CONFIRM_BUTTON));
+    const confirm = screen.getByRole('button', CONFIRM_BUTTON);
+    await user.click(confirm);
 
     expect(removeBlockedIdentityActionMock).toHaveBeenCalledWith(ENTRY.id);
     expect(refreshMock).toHaveBeenCalled();
@@ -61,7 +63,8 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
       reason: SIGNUP_BLOCK_REFUSAL.ENTRY_NOT_FOUND,
     });
 
-    await user.click(await screen.findByRole('button', CONFIRM_BUTTON));
+    const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
+    await user.click(confirm);
 
     const refusal = await screen.findByText('This block was already removed.');
 
@@ -74,7 +77,8 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
 
-    await user.click(await screen.findByRole('button', CONFIRM_BUTTON));
+    const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
+    await user.click(confirm);
 
     const error = await screen.findByText(
       "Couldn't remove the block — try again.",

@@ -53,19 +53,21 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
 
   describe('an active tenant with the suspend dialog open', () => {
     const chooseToBlockOwner = async () => {
-      await user.click(
-        await screen.findByRole('switch', { name: BLOCK_SWITCH }),
-      );
-      await user.type(
-        screen.getByRole('textbox', { name: BLOCK_REASON_FIELD }),
-        BLOCK_REASON,
-      );
+      const blockSwitch = await screen.findByRole('switch', {
+        name: BLOCK_SWITCH,
+      });
+      await user.click(blockSwitch);
+      const reasonField = screen.getByRole('textbox', {
+        name: BLOCK_REASON_FIELD,
+      });
+      await user.type(reasonField, BLOCK_REASON);
     };
 
     beforeEach(async () => {
       setup();
 
-      await user.click(screen.getByRole('button', { name: OPEN_SUSPEND }));
+      const openDialog = screen.getByRole('button', { name: OPEN_SUSPEND });
+      await user.click(openDialog);
     });
 
     it('suspends only after the operator confirms', async () => {
@@ -78,7 +80,8 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       expect(consequence).toBeVisible();
       expect(suspendTenantActionMock).not.toHaveBeenCalled();
 
-      await user.click(screen.getByRole('button', { name: CONFIRM_SUSPEND }));
+      const confirm = screen.getByRole('button', { name: CONFIRM_SUSPEND });
+      await user.click(confirm);
 
       expect(suspendTenantActionMock).toHaveBeenCalledWith(ACTIVE_TENANT.id);
       expect(liftTenantSuspensionActionMock).not.toHaveBeenCalled();
@@ -91,9 +94,10 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
         reason: TENANT_REFUSAL.ARCHIVED,
       });
 
-      await user.click(
-        await screen.findByRole('button', { name: CONFIRM_SUSPEND }),
-      );
+      const confirm = await screen.findByRole('button', {
+        name: CONFIRM_SUSPEND,
+      });
+      await user.click(confirm);
       const refusal = await screen.findByText('This tenant is archived.');
 
       expect(refusal).toBeVisible();
@@ -102,7 +106,8 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
 
     it('also blocks the owner email with the entered reason when the operator chooses to', async () => {
       await chooseToBlockOwner();
-      await user.click(screen.getByRole('button', { name: CONFIRM_SUSPEND }));
+      const confirm = screen.getByRole('button', { name: CONFIRM_SUSPEND });
+      await user.click(confirm);
 
       expect(suspendTenantActionMock).toHaveBeenCalledWith(ACTIVE_TENANT.id, {
         reason: BLOCK_REASON,
@@ -110,18 +115,20 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
     });
 
     it('cannot confirm a block until a reason is entered', async () => {
-      await user.click(
-        await screen.findByRole('switch', { name: BLOCK_SWITCH }),
-      );
+      const blockSwitch = await screen.findByRole('switch', {
+        name: BLOCK_SWITCH,
+      });
+      await user.click(blockSwitch);
       const confirm = screen.getByRole('button', { name: CONFIRM_SUSPEND });
 
       expect(confirm).toBeDisabled();
     });
 
     it('suspends without a block when the choice is left off', async () => {
-      await user.click(
-        await screen.findByRole('button', { name: CONFIRM_SUSPEND }),
-      );
+      const confirm = await screen.findByRole('button', {
+        name: CONFIRM_SUSPEND,
+      });
+      await user.click(confirm);
 
       expect(suspendTenantActionMock).toHaveBeenCalledWith(ACTIVE_TENANT.id);
     });
@@ -133,7 +140,8 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       });
 
       await chooseToBlockOwner();
-      await user.click(screen.getByRole('button', { name: CONFIRM_SUSPEND }));
+      const confirm = screen.getByRole('button', { name: CONFIRM_SUSPEND });
+      await user.click(confirm);
       const refusal = await screen.findByText(
         /owner has no email address on record/i,
       );
@@ -159,13 +167,17 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
 
     describe('with the reactivate dialog open', () => {
       beforeEach(async () => {
-        await user.click(screen.getByRole('button', { name: OPEN_REACTIVATE }));
+        const openDialog = screen.getByRole('button', {
+          name: OPEN_REACTIVATE,
+        });
+        await user.click(openDialog);
       });
 
       it('reactivates the tenant', async () => {
-        await user.click(
-          await screen.findByRole('button', { name: CONFIRM_REACTIVATE }),
-        );
+        const confirm = await screen.findByRole('button', {
+          name: CONFIRM_REACTIVATE,
+        });
+        await user.click(confirm);
 
         expect(liftTenantSuspensionActionMock).toHaveBeenCalledWith(
           SUSPENDED_TENANT.id,

@@ -37,12 +37,15 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     mockRouterRefresh(refreshMock);
     setup();
 
-    await user.type(screen.getByRole('textbox', DOMAIN_FIELD), BLOCKED_DOMAIN);
-    await user.type(screen.getByRole('textbox', REASON_FIELD), BLOCK_REASON);
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
+    const reasonField = screen.getByRole('textbox', REASON_FIELD);
+    await user.type(domainField, BLOCKED_DOMAIN);
+    await user.type(reasonField, BLOCK_REASON);
   });
 
   it('submits the entered domain and reason, then clears the form', async () => {
-    await user.click(screen.getByRole('button', SUBMIT_BUTTON));
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
+    await user.click(submit);
 
     expect(addBlockedDomainActionMock).toHaveBeenCalledWith({
       domain: BLOCKED_DOMAIN,
@@ -62,7 +65,8 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
       },
     });
 
-    await user.click(screen.getByRole('button', SUBMIT_BUTTON));
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
+    await user.click(submit);
 
     const error = await screen.findByText(
       'Enter a valid domain, such as example.com.',
@@ -79,7 +83,8 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
 
-    await user.click(screen.getByRole('button', SUBMIT_BUTTON));
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
+    await user.click(submit);
 
     const error = await screen.findByText(/couldn't block the domain/i);
     const reasonField = screen.getByRole('textbox', REASON_FIELD);
