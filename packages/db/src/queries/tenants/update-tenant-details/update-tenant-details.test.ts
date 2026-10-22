@@ -3,8 +3,10 @@ import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
+  type TTenantProvisioningStatus,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { users } from '@blog/db/schema/auth';
@@ -16,6 +18,11 @@ import {
   type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  decryptTestPersonalValue,
+  testPersonalEmailIndex,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { and, eq } from 'drizzle-orm';
 
@@ -30,9 +37,24 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+const ACME_DOMAIN = 'acme.example.com';
+const ACME_NEW_DOMAIN = 'acme-new.example.com';
+const ACME_ALT_DOMAIN = 'acme-alt.example.com';
+const ACME_FIXED_DOMAIN = 'acme-fixed.example.com';
+const GLOBEX_DOMAIN = 'globex.example.com';
+const OWNER_EMAIL = 'owner@example.com';
+const NEW_OWNER_EMAIL = 'new-owner@example.com';
+const UNNORMALIZED_NEW_OWNER_EMAIL = '  New-Owner@Example.com  ';
+const MEMBER_EMAIL = 'member@example.com';
+const OWNER_ALREADY_JOINED = 'owner-already-joined';
+const PROVISIONING_STARTED = 'provisioning-started';
+const DOMAIN_TAKEN = 'domain-taken';
+const DOMAIN_LOCKED = 'domain-locked';
+usePersonalDataKeys();
+
 const validInput: TUpdateTenantDetailsInput = {
   name: 'Acme Updated',
-  primaryDomain: 'acme.example.com',
+  primaryDomain: ACME_DOMAIN,
   plan: TENANT_PLAN.FREE,
   locale: LOCALE_ISO_CODES.EN,
 };
@@ -40,10 +62,10 @@ const validInput: TUpdateTenantDetailsInput = {
 async function insertTenantWithDomain(overrides?: {
   domain?: string;
   sanityProjectId?: string;
-  provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
+  provisioningStatus?: TTenantProvisioningStatus;
   provisioningSteps?: TTenantProvisioningState;
 }): Promise<string> {
-  const domain = overrides?.domain ?? 'acme.example.com';
+  const domain = overrides?.domain ?? ACME_DOMAIN;
 
   const tenant = await insertTestTenant(db(), {
     name: 'Acme',
@@ -135,13 +157,13 @@ describe(updateTenantDetails, () => {
     it('updates primaryDomain and moves the matching tenant_domains row with it', async () => {
       const result = await updateTenantDetails(tenantId, {
         ...validInput,
-        primaryDomain: 'acme-new.example.com',
+        primaryDomain: ACME_NEW_DOMAIN,
       });
 
       if (result.outcome !== 'updated') {
         throw new Error(`expected 'updated', got '${result.outcome}'`);
       }
-      expect(result.tenant.primaryDomain).toBe('acme-new.example.com');
+      expect(result.tenant.primaryDomain).toBe(ACME_NEW_DOMAIN);
 
       const domainRows = await db()
         .select()
@@ -149,7 +171,7 @@ describe(updateTenantDetails, () => {
         .where(eq(tenantDomains.tenantId, tenantId));
 
       expect(domainRows).toHaveLength(1);
-      expect(domainRows[0]).toMatchObject({ domain: 'acme-new.example.com' });
+      expect(domainRows[0]).toMatchObject({ domain: ACME_NEW_DOMAIN });
     });
     it('still updates when provisioningSteps is null', async () => {
       const result = await updateTenantDetails(tenantId, {
@@ -164,13 +186,13 @@ describe(updateTenantDetails, () => {
     });
     describe('with a pending owner invite', () => {
       beforeEach(async () => {
-        await insertOwnerInvite(tenantId, 'owner@example.com');
+        await insertOwnerInvite(tenantId, OWNER_EMAIL);
       });
 
       it('updates the pending owner invite email, normalized, when ownerEmail is supplied', async () => {
         const result = await updateTenantDetails(tenantId, {
           ...validInput,
-          ownerEmail: '  New-Owner@Example.com  ',
+          ownerEmail: UNNORMALIZED_NEW_OWNER_EMAIL,
         });
 
         expect(result).toMatchObject({ outcome: 'updated' });
@@ -179,7 +201,24 @@ describe(updateTenantDetails, () => {
           .select()
           .from(membershipInvites)
           .where(eq(membershipInvites.tenantId, tenantId));
-        expect(invite?.email).toBe('new-owner@example.com');
+        expect(invite?.email).toBe(NEW_OWNER_EMAIL);
+      });
+      it("rewrites the pending owner invite's index and encrypted email to the new address", async () => {
+        await updateTenantDetails(tenantId, {
+          ...validInput,
+          ownerEmail: UNNORMALIZED_NEW_OWNER_EMAIL,
+        });
+
+        const [invite] = await db()
+          .select()
+          .from(membershipInvites)
+          .where(eq(membershipInvites.tenantId, tenantId));
+        expect(invite?.emailIndex).toBe(
+          testPersonalEmailIndex(NEW_OWNER_EMAIL),
+        );
+        expect(decryptTestPersonalValue(invite?.emailEncrypted ?? null)).toBe(
+          NEW_OWNER_EMAIL,
+        );
       });
       it('leaves the pending owner invite untouched when ownerEmail is omitted', async () => {
         const result = await updateTenantDetails(tenantId, {
@@ -193,18 +232,18 @@ describe(updateTenantDetails, () => {
           .select()
           .from(membershipInvites)
           .where(eq(membershipInvites.tenantId, tenantId));
-        expect(invite?.email).toBe('owner@example.com');
+        expect(invite?.email).toBe(OWNER_EMAIL);
       });
       it('returns owner-email-taken and leaves the invite untouched when the new email collides with another invite on the tenant', async () => {
         await db().insert(membershipInvites).values({
           tenantId,
-          email: 'member@example.com',
+          email: MEMBER_EMAIL,
           role: MEMBERSHIP_ROLE.EDITOR,
         });
 
         const result = await updateTenantDetails(tenantId, {
           ...validInput,
-          ownerEmail: 'member@example.com',
+          ownerEmail: MEMBER_EMAIL,
         });
 
         expect(result).toEqual({ outcome: 'owner-email-taken' });
@@ -218,13 +257,13 @@ describe(updateTenantDetails, () => {
               eq(membershipInvites.role, MEMBERSHIP_ROLE.OWNER),
             ),
           );
-        expect(ownerInvite?.email).toBe('owner@example.com');
+        expect(ownerInvite?.email).toBe(OWNER_EMAIL);
       });
       it('leaves the pending invite untouched when ownerEmail resubmits its unchanged email', async () => {
         const result = await updateTenantDetails(tenantId, {
           ...validInput,
           name: 'New Name',
-          ownerEmail: 'owner@example.com',
+          ownerEmail: OWNER_EMAIL,
         });
 
         expect(result).toMatchObject({
@@ -236,19 +275,19 @@ describe(updateTenantDetails, () => {
           .select()
           .from(membershipInvites)
           .where(eq(membershipInvites.tenantId, tenantId));
-        expect(invite?.email).toBe('owner@example.com');
+        expect(invite?.email).toBe(OWNER_EMAIL);
       });
     });
     describe('with a joined owner who has an email', () => {
       beforeEach(async () => {
-        await insertJoinedOwner(tenantId, 'owner@example.com');
+        await insertJoinedOwner(tenantId, OWNER_EMAIL);
       });
 
       it("applies the rest of the update instead of returning owner-already-joined when ownerEmail resubmits the joined owner's unchanged email", async () => {
         const result = await updateTenantDetails(tenantId, {
           ...validInput,
           name: 'New Name',
-          ownerEmail: 'owner@example.com',
+          ownerEmail: OWNER_EMAIL,
         });
 
         if (result.outcome !== 'updated') {
@@ -275,7 +314,7 @@ describe(updateTenantDetails, () => {
           ownerEmail: 'someone-else@example.com',
         });
 
-        expect(result).toEqual({ outcome: 'owner-already-joined' });
+        expect(result).toEqual({ outcome: OWNER_ALREADY_JOINED });
 
         const [row] = await db()
           .select()
@@ -290,10 +329,10 @@ describe(updateTenantDetails, () => {
       const result = await updateTenantDetails(tenantId, {
         ...validInput,
         name: 'New Name',
-        ownerEmail: 'new-owner@example.com',
+        ownerEmail: NEW_OWNER_EMAIL,
       });
 
-      expect(result).toEqual({ outcome: 'owner-already-joined' });
+      expect(result).toEqual({ outcome: OWNER_ALREADY_JOINED });
 
       const [row] = await db()
         .select()
@@ -332,7 +371,7 @@ describe(updateTenantDetails, () => {
         name: 'New Name',
       });
 
-      expect(result).toEqual({ outcome: 'provisioning-started' });
+      expect(result).toEqual({ outcome: PROVISIONING_STARTED });
 
       const [row] = await db()
         .select()
@@ -341,39 +380,39 @@ describe(updateTenantDetails, () => {
       expect(row?.name).toBe('Acme');
     });
     it('returns provisioning-started for an ownerEmail edit after provisioning has started, and leaves the invite untouched', async () => {
-      await insertOwnerInvite(tenantId, 'owner@example.com');
+      await insertOwnerInvite(tenantId, OWNER_EMAIL);
 
       const result = await updateTenantDetails(tenantId, {
         ...validInput,
-        ownerEmail: 'new-owner@example.com',
+        ownerEmail: NEW_OWNER_EMAIL,
       });
 
-      expect(result).toEqual({ outcome: 'provisioning-started' });
+      expect(result).toEqual({ outcome: PROVISIONING_STARTED });
 
       const [invite] = await db()
         .select()
         .from(membershipInvites)
         .where(eq(membershipInvites.tenantId, tenantId));
-      expect(invite?.email).toBe('owner@example.com');
+      expect(invite?.email).toBe(OWNER_EMAIL);
     });
   });
 
   describe('with another tenant owning acme.example.com', () => {
     beforeEach(async () => {
-      await insertTenantWithDomain({ domain: 'acme.example.com' });
+      await insertTenantWithDomain({ domain: ACME_DOMAIN });
     });
 
     it('returns a handled domain-taken outcome instead of throwing on a domain collision', async () => {
       const secondTenantId = await insertTenantWithDomain({
-        domain: 'globex.example.com',
+        domain: GLOBEX_DOMAIN,
       });
 
       const result = await updateTenantDetails(secondTenantId, {
         ...validInput,
-        primaryDomain: 'acme.example.com',
+        primaryDomain: ACME_DOMAIN,
       });
 
-      expect(result).toEqual({ outcome: 'domain-taken' });
+      expect(result).toEqual({ outcome: DOMAIN_TAKEN });
 
       const [row] = await db()
         .select()
@@ -381,7 +420,7 @@ describe(updateTenantDetails, () => {
         .where(eq(tenants.id, secondTenantId));
       expect(row).toMatchObject({
         name: 'Acme',
-        primaryDomain: 'globex.example.com',
+        primaryDomain: GLOBEX_DOMAIN,
         plan: TENANT_PLAN.FREE,
         locale: LOCALE_ISO_CODES.EN,
       });
@@ -391,11 +430,11 @@ describe(updateTenantDetails, () => {
         .from(tenantDomains)
         .where(eq(tenantDomains.tenantId, secondTenantId));
       expect(domainRows).toHaveLength(1);
-      expect(domainRows[0]).toMatchObject({ domain: 'globex.example.com' });
+      expect(domainRows[0]).toMatchObject({ domain: GLOBEX_DOMAIN });
     });
     it('returns provisioning-started over domain-taken when both apply', async () => {
       const secondTenantId = await insertTenantWithDomain({
-        domain: 'globex.example.com',
+        domain: GLOBEX_DOMAIN,
         provisioningSteps: {
           SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
           SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
@@ -409,10 +448,10 @@ describe(updateTenantDetails, () => {
 
       const result = await updateTenantDetails(secondTenantId, {
         ...validInput,
-        primaryDomain: 'acme.example.com',
+        primaryDomain: ACME_DOMAIN,
       });
 
-      expect(result).toEqual({ outcome: 'provisioning-started' });
+      expect(result).toEqual({ outcome: PROVISIONING_STARTED });
     });
   });
 
@@ -421,7 +460,7 @@ describe(updateTenantDetails, () => {
 
     beforeEach(async () => {
       tenantId = await insertTenantWithDomain({
-        domain: 'acme.example.com',
+        domain: ACME_DOMAIN,
         provisioningSteps: stepsWith({
           SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
           SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
@@ -435,36 +474,36 @@ describe(updateTenantDetails, () => {
     it('refuses a changed primaryDomain with domain-locked once MAP_DOMAIN has completed, and leaves the row unchanged', async () => {
       const result = await updateTenantDetails(tenantId, {
         ...validInput,
-        primaryDomain: 'acme-new.example.com',
+        primaryDomain: ACME_NEW_DOMAIN,
       });
 
       expect(result).toEqual({
-        outcome: 'domain-locked',
-        blockingStep: 'MAP_DOMAIN',
+        outcome: DOMAIN_LOCKED,
+        blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
       });
 
       const [row] = await db()
         .select()
         .from(tenants)
         .where(eq(tenants.id, tenantId));
-      expect(row?.primaryDomain).toBe('acme.example.com');
+      expect(row?.primaryDomain).toBe(ACME_DOMAIN);
     });
     it('applies the rest of the update instead of domain-locked when the resubmitted primaryDomain is unchanged, even though MAP_DOMAIN has completed', async () => {
       const result = await updateTenantDetails(tenantId, {
         ...validInput,
-        primaryDomain: 'acme.example.com',
+        primaryDomain: ACME_DOMAIN,
         name: 'New Name',
       });
 
       expect(result).toMatchObject({
         outcome: 'updated',
-        tenant: { name: 'New Name', primaryDomain: 'acme.example.com' },
+        tenant: { name: 'New Name', primaryDomain: ACME_DOMAIN },
       });
     });
     it('keeps name, plan and locale editable on a FAILED tenant even once every earlier step has completed', async () => {
       const result = await updateTenantDetails(tenantId, {
         ...validInput,
-        primaryDomain: 'acme.example.com',
+        primaryDomain: ACME_DOMAIN,
         name: 'New Name',
         plan: TENANT_PLAN.GROWTH,
         locale: LOCALE_ISO_CODES.FR,
@@ -483,18 +522,18 @@ describe(updateTenantDetails, () => {
 
   it('returns a handled domain-taken outcome (not a throw) when renaming onto a secondary domain the same tenant already owns', async () => {
     const tenantId = await insertTenantWithDomain({
-      domain: 'acme.example.com',
+      domain: ACME_DOMAIN,
     });
     await db()
       .insert(tenantDomains)
-      .values({ tenantId, domain: 'acme-alt.example.com' });
+      .values({ tenantId, domain: ACME_ALT_DOMAIN });
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      primaryDomain: 'acme-alt.example.com',
+      primaryDomain: ACME_ALT_DOMAIN,
     });
 
-    expect(result).toEqual({ outcome: 'domain-taken' });
+    expect(result).toEqual({ outcome: DOMAIN_TAKEN });
 
     const [row] = await db()
       .select()
@@ -502,7 +541,7 @@ describe(updateTenantDetails, () => {
       .where(eq(tenants.id, tenantId));
     expect(row).toMatchObject({
       name: 'Acme',
-      primaryDomain: 'acme.example.com',
+      primaryDomain: ACME_DOMAIN,
       plan: TENANT_PLAN.FREE,
       locale: LOCALE_ISO_CODES.EN,
     });
@@ -513,25 +552,25 @@ describe(updateTenantDetails, () => {
       .where(eq(tenantDomains.tenantId, tenantId));
     expect(domainRows).toHaveLength(2);
     expect(domainRows.map((r) => r.domain).sort()).toEqual([
-      'acme-alt.example.com',
-      'acme.example.com',
+      ACME_ALT_DOMAIN,
+      ACME_DOMAIN,
     ]);
   });
 
   it("still updates when the domain is unchanged and only the tenant's own tenant_domains row holds it", async () => {
     const tenantId = await insertTenantWithDomain({
-      domain: 'acme.example.com',
+      domain: ACME_DOMAIN,
     });
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      primaryDomain: 'acme.example.com',
+      primaryDomain: ACME_DOMAIN,
       name: 'New Name',
     });
 
     expect(result).toMatchObject({
       outcome: 'updated',
-      tenant: { name: 'New Name', primaryDomain: 'acme.example.com' },
+      tenant: { name: 'New Name', primaryDomain: ACME_DOMAIN },
     });
   });
 
@@ -571,7 +610,7 @@ describe(updateTenantDetails, () => {
 
     const result = await updateTenantDetails(tenantId, validInput);
 
-    expect(result).toEqual({ outcome: 'provisioning-started' });
+    expect(result).toEqual({ outcome: PROVISIONING_STARTED });
   });
 
   it('refuses with provisioning-started when provisioningStatus is PROVISIONING even though every step is still IDLE', async () => {
@@ -585,7 +624,7 @@ describe(updateTenantDetails, () => {
       name: 'New Name',
     });
 
-    expect(result).toEqual({ outcome: 'provisioning-started' });
+    expect(result).toEqual({ outcome: PROVISIONING_STARTED });
 
     const [row] = await db()
       .select()
@@ -634,7 +673,7 @@ describe(updateTenantDetails, () => {
       name: 'New Name',
     });
 
-    expect(result).toEqual({ outcome: 'provisioning-started' });
+    expect(result).toEqual({ outcome: PROVISIONING_STARTED });
 
     const [row] = await db()
       .select()
@@ -660,7 +699,7 @@ describe(updateTenantDetails, () => {
       name: 'New Name',
     });
 
-    expect(result).toEqual({ outcome: 'provisioning-started' });
+    expect(result).toEqual({ outcome: PROVISIONING_STARTED });
 
     const [row] = await db()
       .select()
@@ -671,7 +710,7 @@ describe(updateTenantDetails, () => {
 
   it('updates a changed primaryDomain when provisioning failed before MAP_DOMAIN completed', async () => {
     const tenantId = await insertTenantWithDomain({
-      domain: 'acme.example.com',
+      domain: ACME_DOMAIN,
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
@@ -682,12 +721,12 @@ describe(updateTenantDetails, () => {
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      primaryDomain: 'acme-fixed.example.com',
+      primaryDomain: ACME_FIXED_DOMAIN,
     });
 
     expect(result).toMatchObject({
       outcome: 'updated',
-      tenant: { primaryDomain: 'acme-fixed.example.com' },
+      tenant: { primaryDomain: ACME_FIXED_DOMAIN },
     });
   });
 
@@ -732,7 +771,7 @@ describe(updateTenantDetails, () => {
 
   it('keeps primaryDomain editable when MAP_DOMAIN is FAILED even though a later-indexed step (CREATE_WEBHOOK) is stale-DONE from a prior run', async () => {
     const tenantId = await insertTenantWithDomain({
-      domain: 'acme.example.com',
+      domain: ACME_DOMAIN,
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
@@ -744,18 +783,18 @@ describe(updateTenantDetails, () => {
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      primaryDomain: 'acme-fixed.example.com',
+      primaryDomain: ACME_FIXED_DOMAIN,
     });
 
     expect(result).toMatchObject({
       outcome: 'updated',
-      tenant: { primaryDomain: 'acme-fixed.example.com' },
+      tenant: { primaryDomain: ACME_FIXED_DOMAIN },
     });
   });
 
   it('still locks primaryDomain via a stale-DONE MAP_DOMAIN even though an earlier-indexed step (PERSIST_TOKEN) is FAILED', async () => {
     const tenantId = await insertTenantWithDomain({
-      domain: 'acme.example.com',
+      domain: ACME_DOMAIN,
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
@@ -767,12 +806,12 @@ describe(updateTenantDetails, () => {
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      primaryDomain: 'acme-new.example.com',
+      primaryDomain: ACME_NEW_DOMAIN,
     });
 
     expect(result).toEqual({
-      outcome: 'domain-locked',
-      blockingStep: 'MAP_DOMAIN',
+      outcome: DOMAIN_LOCKED,
+      blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
     });
   });
 
@@ -807,7 +846,7 @@ describe(updateTenantDetails, () => {
         .where(eq(tenants.id, tenantId));
       expect(row).toMatchObject({
         name: 'Acme',
-        primaryDomain: 'acme.example.com',
+        primaryDomain: ACME_DOMAIN,
       });
 
       const domainRows = await db()
@@ -815,7 +854,7 @@ describe(updateTenantDetails, () => {
         .from(tenantDomains)
         .where(eq(tenantDomains.tenantId, tenantId));
       expect(domainRows).toHaveLength(1);
-      expect(domainRows[0]).toMatchObject({ domain: 'acme.example.com' });
+      expect(domainRows[0]).toMatchObject({ domain: ACME_DOMAIN });
     },
   );
 });
