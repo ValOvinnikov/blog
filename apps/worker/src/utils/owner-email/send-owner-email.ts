@@ -8,16 +8,15 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { sendEmail } from '@blog/email';
 import { sanitizeLogMessage } from '@blog/insight';
 import {
-  DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
   OWNER_EMAIL_RELEASE_FAILED_EVENT,
   OWNER_EMAIL_SEND_FAILED_EVENT,
   OWNER_INVITE_NUDGE_AFTER_MS,
 } from '@worker/constants/owner-email';
-import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access-target';
 
 import { buildOwnerEmailMessage } from './build-owner-email';
+import { ownerEmailFromAddress } from './owner-email-context';
 
 export async function sendOwnerEmailOnce(
   target: TOwnerAccessTarget,
@@ -30,7 +29,7 @@ export async function sendOwnerEmailOnce(
     if (!claimedAt) return;
     await sendEmail({
       to: ownerEmail,
-      from: env.OWNER_EMAIL_FROM_ADDRESS ?? DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
+      from: ownerEmailFromAddress(),
       ...buildOwnerEmailMessage(target, email),
     });
   } catch (error) {

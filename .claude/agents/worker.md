@@ -64,8 +64,9 @@ default to zero".
 - **Nothing imports `apps/worker`.** The admin panel reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision` and
   `POST /api/owner-access/*`
-  — every one authenticated by the shared enqueue secret; the app exposes no
-  other route.
+  — every one authenticated by the shared enqueue secret. The one other route
+  is Vercel Cron's `GET /api/inactivity-sweep`, authenticated by
+  `CRON_SECRET`.
 - **All relational reads and writes go through `@blog/db`'s exported
   functions** — no Drizzle, no Neon client, no SQL here. A missing query is a
   `db` request you report.
