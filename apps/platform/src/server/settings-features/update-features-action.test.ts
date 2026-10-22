@@ -1,8 +1,15 @@
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@blog/config';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
@@ -28,8 +35,6 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock(
   '@platform/server/settings-features/settings-features-or-defaults',
   () => ({ getSettingsFeaturesOrDefaults: getSettingsFeaturesOrDefaultsMock }),
@@ -50,8 +55,11 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const loggerWarnMock = vi.mocked(logger.warn);
 
-const FREE_TENANT = { id: 'tenant-1', plan: 'FREE' };
-const GROWTH_TENANT = { id: 'tenant-2', plan: 'GROWTH' };
+const SAVED_AT = '2026-10-01T00:00:00Z';
+const DB_UNAVAILABLE = 'db unavailable';
+
+const FREE_TENANT = { id: 'tenant-1', plan: TENANT_PLAN.FREE };
+const GROWTH_TENANT = { id: 'tenant-2', plan: TENANT_PLAN.GROWTH };
 
 const VALID_INPUT: TUpdateFeaturesInput = {
   commentsEnabled: false,
@@ -75,11 +83,11 @@ describe(updateFeaturesAction, () => {
     requireTenantMembershipMock.mockReset();
     requireTenantMembershipMock.mockResolvedValue({
       tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     upsertSettingsFeaturesMock.mockReset();
     upsertSettingsFeaturesMock.mockResolvedValue({});
@@ -164,7 +172,7 @@ describe(updateFeaturesAction, () => {
         analyticsEnabled: true,
         contactFormEnabled: true,
       },
-      savedAt: new Date('2026-10-01T00:00:00Z'),
+      savedAt: new Date(SAVED_AT),
     });
 
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
@@ -181,7 +189,7 @@ describe(updateFeaturesAction, () => {
   it('writes a stored "Coming soon" toggle off for a downgraded FREE tenant', async () => {
     getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
       values: { ...ALL_OFF, commentsEnabled: true, newsletterEnabled: true },
-      savedAt: new Date('2026-10-01T00:00:00Z'),
+      savedAt: new Date(SAVED_AT),
     });
 
     await updateFeaturesAction('tenant-1', VALID_INPUT);
@@ -195,7 +203,7 @@ describe(updateFeaturesAction, () => {
   it('refuses a downgraded FREE tenant switching an out-of-plan toggle on, and writes nothing', async () => {
     getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
       values: { ...ALL_OFF, bookmarksEnabled: true },
-      savedAt: new Date('2026-10-01T00:00:00Z'),
+      savedAt: new Date(SAVED_AT),
     });
 
     const result = await updateFeaturesAction('tenant-1', {
@@ -213,11 +221,11 @@ describe(updateFeaturesAction, () => {
   it("writes a GROWTH tenant's submitted toggles over the stored ones", async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: GROWTH_TENANT,
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
       values: { ...ALL_OFF, bookmarksEnabled: true, analyticsEnabled: true },
-      savedAt: new Date('2026-10-01T00:00:00Z'),
+      savedAt: new Date(SAVED_AT),
     });
 
     await updateFeaturesAction('tenant-2', VALID_INPUT);
@@ -230,7 +238,7 @@ describe(updateFeaturesAction, () => {
 
   it('reports failure instead of throwing when reading the stored toggles fails', async () => {
     getSettingsFeaturesOrDefaultsMock.mockRejectedValue(
-      new Error('db unavailable'),
+      new Error(DB_UNAVAILABLE),
     );
 
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
@@ -255,7 +263,7 @@ describe(updateFeaturesAction, () => {
   it('lets a GROWTH tenant switch the contact form on and back off', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: GROWTH_TENANT,
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
 
     const on = await updateFeaturesAction('tenant-2', {
@@ -280,7 +288,7 @@ describe(updateFeaturesAction, () => {
   it('allows a GROWTH tenant to enable the same capability', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: GROWTH_TENANT,
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
 
     const result = await updateFeaturesAction('tenant-2', {
@@ -298,7 +306,7 @@ describe(updateFeaturesAction, () => {
   it('writes Comments, Ratings and Newsletter off even when the payload switches them on', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: GROWTH_TENANT,
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
 
     const result = await updateFeaturesAction('tenant-2', {
@@ -329,7 +337,7 @@ describe(updateFeaturesAction, () => {
   });
 
   it('reports failure instead of throwing when the write itself fails', async () => {
-    upsertSettingsFeaturesMock.mockRejectedValue(new Error('db unavailable'));
+    upsertSettingsFeaturesMock.mockRejectedValue(new Error(DB_UNAVAILABLE));
 
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
 
@@ -342,8 +350,8 @@ describe(updateFeaturesAction, () => {
     await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
       targetId: 'tenant-1',
@@ -368,11 +376,11 @@ describe(updateFeaturesAction, () => {
 
   it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
     await expect(updateFeaturesAction('tenant-1', VALID_INPUT)).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
@@ -380,11 +388,11 @@ describe(updateFeaturesAction, () => {
 
   it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
     await expect(updateFeaturesAction('tenant-1', VALID_INPUT)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();

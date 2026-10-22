@@ -10,13 +10,13 @@ import { logger } from '@platform/utils/logger/logger';
 import { enqueueProvisioning } from './enqueue-provisioning';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const loggerErrorMock = vi.mocked(logger.error);
 
 const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
 const SECRET = 'shared-enqueue-secret';
+const PROVISION_PATH = '/api/provision';
 
 describe(enqueueProvisioning, () => {
   const fetchMock = vi.fn();
@@ -65,7 +65,7 @@ describe(enqueueProvisioning, () => {
         secret: SECRET,
         timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
         signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
-        path: '/api/provision',
+        path: PROVISION_PATH,
         rawBody: init.body as string,
       }),
     ).toBe(true);
@@ -90,7 +90,7 @@ describe(enqueueProvisioning, () => {
 
     expect(loggerErrorMock).toHaveBeenCalledWith('worker.enqueue_error', {
       tenantId: TENANT_ID,
-      path: '/api/provision',
+      path: PROVISION_PATH,
       error,
     });
     expect(status).toBeNull();

@@ -11,6 +11,7 @@ import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
@@ -23,8 +24,6 @@ const TENANT_NAME = 'Acme';
 const TENANT_DOMAIN = 'acme.example.com';
 const TENANT_ROOT_DOMAIN = 'example.com';
 const PROVISIONING_PATH = '/tenants/tenant-1/provisioning';
-const OPERATOR_ID = 'operator-1';
-const OPERATOR_EMAIL = 'operator@example.com';
 const EXISTING_TENANT_ID = 'existing-tenant';
 const OWNER_INVITE_EMAIL_FAILED_EVENT = 'tenants.owner_invite_email_failed';
 const CREATE_DRAFT_FAILED_EVENT = 'tenants.create_draft_failed';
@@ -62,8 +61,6 @@ vi.mock('@platform/server/provisioning/start-provisioning', () => ({
 vi.mock('@platform/server/provisioning/check-domain-availability', () => ({
   checkDomainAvailability: checkDomainAvailabilityMock,
 }));
-
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@platform/utils/env/env');
 

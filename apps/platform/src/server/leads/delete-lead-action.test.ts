@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -10,8 +10,6 @@ import { deleteLeadAction } from './delete-lead-action';
 const { deleteLeadMock } = vi.hoisted(() => ({ deleteLeadMock: vi.fn() }));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
-
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', () => ({
   queries: { leads: { deleteLead: deleteLeadMock } },
@@ -52,7 +50,7 @@ describe(deleteLeadAction, () => {
     );
 
     await expect(deleteLeadAction(TENANT_ID, LEAD_ID)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(deleteLeadMock).not.toHaveBeenCalled();
@@ -81,11 +79,11 @@ describe(deleteLeadAction, () => {
 
   it('deletes nothing when the caller is not a member of the tenant', async () => {
     vi.mocked(requireTenantMembership).mockRejectedValueOnce(
-      new Error('NEXT_NOT_FOUND'),
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
     );
 
     await expect(deleteLeadAction(TENANT_ID, LEAD_ID)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(deleteLeadMock).not.toHaveBeenCalled();

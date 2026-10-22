@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '@blog/config';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
@@ -8,9 +9,13 @@ vi.mock('@platform/utils/env/env');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 
-vi.mock('@platform/utils/logger/logger');
-
 const loggerErrorMock = vi.mocked(logger.error);
+
+const DOMAIN = 'example.com';
+const SUBDOMAIN = 'blog-dev.valstack.dev';
+const SUBDOMAIN_LOOKUP_PATH = '/v1/domains/valstack.dev/project-domains';
+const APEX_UNDETERMINED_EVENT = 'tenants.domain_availability_apex_undetermined';
+const UNRELATED_SUBDOMAIN = 'someone-else.valstack.dev';
 
 describe(checkDomainAvailability, () => {
   const fetchMock = vi.fn();
@@ -23,7 +28,9 @@ describe(checkDomainAvailability, () => {
     envMock.VERCEL_PROJECT_ID_WEB = 'prj_web';
     envMock.VERCEL_TEAM_ID = undefined;
     fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
+      new Response(JSON.stringify({ projectDomains: [] }), {
+        status: HTTP_STATUS.OK,
+      }),
     );
   });
 
@@ -35,7 +42,7 @@ describe(checkDomainAvailability, () => {
     envMock.VERCEL_API_TOKEN = undefined;
     envMock.VERCEL_PROJECT_ID_WEB = undefined;
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.NOT_CONFIGURED);
     expect(fetchMock).not.toHaveBeenCalled();
@@ -49,9 +56,11 @@ describe(checkDomainAvailability, () => {
   });
 
   it('returns AVAILABLE for a 404 response (domain unknown to the team)', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.NOT_FOUND }),
+    );
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
   });
@@ -60,13 +69,13 @@ describe(checkDomainAvailability, () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
-          projectDomains: [{ name: 'example.com', projectId: 'prj_web' }],
+          projectDomains: [{ name: DOMAIN, projectId: 'prj_web' }],
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
   });
@@ -75,13 +84,13 @@ describe(checkDomainAvailability, () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
-          projectDomains: [{ name: 'example.com', projectId: 'prj_other' }],
+          projectDomains: [{ name: DOMAIN, projectId: 'prj_other' }],
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
   });
@@ -92,20 +101,20 @@ describe(checkDomainAvailability, () => {
         JSON.stringify({
           projectDomains: [{ name: 'Example.com.', projectId: 'prj_other' }],
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
   });
 
   it('requests the apex domain and matches the full domain in the response', async () => {
-    await checkDomainAvailability('blog-dev.valstack.dev');
+    await checkDomainAvailability(SUBDOMAIN);
 
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
+    expect(calledUrl.pathname).toBe(SUBDOMAIN_LOOKUP_PATH);
   });
 
   it('requests the registrable domain under a multi-part public suffix', async () => {
@@ -122,10 +131,9 @@ describe(checkDomainAvailability, () => {
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'tenants.domain_availability_apex_undetermined',
-      { domain: 'co.uk' },
-    );
+    expect(loggerErrorMock).toHaveBeenCalledWith(APEX_UNDETERMINED_EVENT, {
+      domain: 'co.uk',
+    });
   });
 
   it('returns ERROR with no request for an IP-literal host', async () => {
@@ -133,10 +141,9 @@ describe(checkDomainAvailability, () => {
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'tenants.domain_availability_apex_undetermined',
-      { domain: '1.2.3.4' },
-    );
+    expect(loggerErrorMock).toHaveBeenCalledWith(APEX_UNDETERMINED_EVENT, {
+      domain: '1.2.3.4',
+    });
   });
 
   it('returns IN_USE for a subdomain attached to another project under the same apex', async () => {
@@ -144,38 +151,36 @@ describe(checkDomainAvailability, () => {
       new Response(
         JSON.stringify({
           projectDomains: [
-            { name: 'blog-dev.valstack.dev', projectId: 'prj_other' },
+            { name: SUBDOMAIN, projectId: 'prj_other' },
             { name: 'other-tenant.valstack.dev', projectId: 'prj_unrelated' },
           ],
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await checkDomainAvailability('blog-dev.valstack.dev');
+    const result = await checkDomainAvailability(SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
+    expect(calledUrl.pathname).toBe(SUBDOMAIN_LOOKUP_PATH);
   });
 
   it('returns AVAILABLE for a subdomain already attached to the shared web project', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
-          projectDomains: [
-            { name: 'blog-dev.valstack.dev', projectId: 'prj_web' },
-          ],
+          projectDomains: [{ name: SUBDOMAIN, projectId: 'prj_web' }],
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await checkDomainAvailability('blog-dev.valstack.dev');
+    const result = await checkDomainAvailability(SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
+    expect(calledUrl.pathname).toBe(SUBDOMAIN_LOOKUP_PATH);
   });
 
   it('returns AVAILABLE when no returned project domain is the exact requested name', async () => {
@@ -186,11 +191,11 @@ describe(checkDomainAvailability, () => {
             { name: 'other.example.com', projectId: 'prj_other' },
           ],
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
   });
@@ -202,28 +207,26 @@ describe(checkDomainAvailability, () => {
           JSON.stringify({
             projectDomains: [
               {
-                name: 'someone-else.valstack.dev',
+                name: UNRELATED_SUBDOMAIN,
                 projectId: 'prj_unrelated',
               },
             ],
             pagination: { count: 1, next: 1700000000000, prev: null },
           }),
-          { status: 200 },
+          { status: HTTP_STATUS.OK },
         ),
       )
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
-            projectDomains: [
-              { name: 'blog-dev.valstack.dev', projectId: 'prj_other' },
-            ],
+            projectDomains: [{ name: SUBDOMAIN, projectId: 'prj_other' }],
             pagination: { count: 1, next: null, prev: null },
           }),
-          { status: 200 },
+          { status: HTTP_STATUS.OK },
         ),
       );
 
-    const result = await checkDomainAvailability('blog-dev.valstack.dev');
+    const result = await checkDomainAvailability(SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -236,16 +239,14 @@ describe(checkDomainAvailability, () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
-          projectDomains: [
-            { name: 'blog-dev.valstack.dev', projectId: 'prj_other' },
-          ],
+          projectDomains: [{ name: SUBDOMAIN, projectId: 'prj_other' }],
           pagination: { count: 1, next: 1700000000000, prev: null },
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await checkDomainAvailability('blog-dev.valstack.dev');
+    const result = await checkDomainAvailability(SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -258,27 +259,29 @@ describe(checkDomainAvailability, () => {
           JSON.stringify({
             projectDomains: [
               {
-                name: 'someone-else.valstack.dev',
+                name: UNRELATED_SUBDOMAIN,
                 projectId: 'prj_unrelated',
               },
             ],
             pagination: { count: 1, next: 1700000000000, prev: null },
           }),
-          { status: 200 },
+          { status: HTTP_STATUS.OK },
         ),
       ),
     );
 
-    const result = await checkDomainAvailability('blog-dev.valstack.dev');
+    const result = await checkDomainAvailability(SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
   it('returns ERROR for an unexpected non-2xx response', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
+    );
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
   });
@@ -286,7 +289,7 @@ describe(checkDomainAvailability, () => {
   it('returns ERROR when the request throws or times out', async () => {
     fetchMock.mockRejectedValue(new Error('network down'));
 
-    const result = await checkDomainAvailability('example.com');
+    const result = await checkDomainAvailability(DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
   });

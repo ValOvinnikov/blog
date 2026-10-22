@@ -7,7 +7,6 @@ import {
 import { isWorkflowRunActive } from './is-workflow-run-active';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 describe(isWorkflowRunActive, () => {
   const github = useGitHubFetch();

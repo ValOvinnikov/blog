@@ -4,10 +4,13 @@ import {
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -27,8 +30,6 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock('@blog/db', () => ({
   queries: {
     emailTemplates: { upsertEmailTemplate: upsertEmailTemplateMock },
@@ -36,6 +37,11 @@ vi.mock('@blog/db', () => ({
     tenants: { selectLiveLocales: selectLiveLocalesMock },
   },
 }));
+
+const LINK_KEY = 'link1';
+const LINK_TEXT = 'click here';
+const SAFE_HREF = 'https://acme.example';
+const JAVASCRIPT_HREF = 'javascript:alert(1)';
 
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
@@ -54,7 +60,7 @@ const mockMembershipAndUpsert = (
 ) => {
   requireTenantMembershipMock.mockResolvedValue({
     tenant: { id: 'tenant-1' },
-    membership: { role: 'OWNER' },
+    membership: { role: MEMBERSHIP_ROLE.OWNER },
   });
   upsertEmailTemplateMock.mockResolvedValue({
     tenantId: 'tenant-1',
@@ -84,7 +90,7 @@ describe(updateEmailTemplateAction, () => {
     requireTenantMembershipMock.mockReset();
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     upsertEmailTemplateMock.mockReset();
     insertAuditEventMock.mockReset();
@@ -201,11 +207,14 @@ describe(updateEmailTemplateAction, () => {
           _key: 'k1',
           style: 'normal',
           children: [
-            { _type: 'span', _key: 's1', text: 'click here', marks: ['link1'] },
+            {
+              _type: 'span',
+              _key: 's1',
+              text: LINK_TEXT,
+              marks: [LINK_KEY],
+            },
           ],
-          markDefs: [
-            { _type: 'link', _key: 'link1', href: 'https://acme.example' },
-          ],
+          markDefs: [{ _type: 'link', _key: LINK_KEY, href: SAFE_HREF }],
         },
       ],
     };
@@ -227,7 +236,7 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it.each([
-    ['a javascript: href', 'javascript:alert(1)'],
+    ['a javascript: href', JAVASCRIPT_HREF],
     ['a data: href', 'data:text/html,<script>alert(1)</script>'],
     [
       'a case- and whitespace-obfuscated javascript: href',
@@ -247,11 +256,11 @@ describe(updateEmailTemplateAction, () => {
               {
                 _type: 'span',
                 _key: 's1',
-                text: 'click here',
-                marks: ['link1'],
+                text: LINK_TEXT,
+                marks: [LINK_KEY],
               },
             ],
-            markDefs: [{ _type: 'link', _key: 'link1', href }],
+            markDefs: [{ _type: 'link', _key: LINK_KEY, href }],
           },
         ],
       };
@@ -281,11 +290,9 @@ describe(updateEmailTemplateAction, () => {
           _key: 'k1',
           style: 'normal',
           children: [
-            { _type: 'span', _key: 's1', text: 'safe link', marks: ['link1'] },
+            { _type: 'span', _key: 's1', text: 'safe link', marks: [LINK_KEY] },
           ],
-          markDefs: [
-            { _type: 'link', _key: 'link1', href: 'https://acme.example' },
-          ],
+          markDefs: [{ _type: 'link', _key: LINK_KEY, href: SAFE_HREF }],
         },
         {
           _type: 'block',
@@ -307,7 +314,7 @@ describe(updateEmailTemplateAction, () => {
           ],
           markDefs: [
             { _type: 'link', _key: 'link2', href: 'https://safe.example' },
-            { _type: 'link', _key: 'link3', href: 'javascript:alert(1)' },
+            { _type: 'link', _key: 'link3', href: JAVASCRIPT_HREF },
           ],
         },
       ],
@@ -350,7 +357,7 @@ describe(updateEmailTemplateAction, () => {
   it('reports failure without throwing, and no audit event, when the write fails', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     upsertEmailTemplateMock.mockRejectedValue(new Error('db unavailable'));
 
@@ -374,8 +381,8 @@ describe(updateEmailTemplateAction, () => {
     );
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: 'tenant-1',
@@ -387,8 +394,16 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it.each([
-    ['the sign-in redirect', 'unauthenticated', 'NEXT_REDIRECT'],
-    ['the 404', 'the session has no membership', 'NEXT_NOT_FOUND'],
+    [
+      'the sign-in redirect',
+      'unauthenticated',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    ],
+    [
+      'the 404',
+      'the session has no membership',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    ],
   ])(
     'propagates %s the tenant gate throws when %s',
     async (_description, _reason, digest) => {

@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { HTTP_METHOD, HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
@@ -8,7 +8,6 @@ import { dispatchGitHubWorkflow } from './dispatch-github-workflow';
 vi.mock('@platform/utils/env/env');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
-vi.mock('@platform/utils/logger/logger');
 
 const loggerErrorMock = vi.mocked(logger.error);
 
@@ -60,7 +59,9 @@ describe(dispatchGitHubWorkflow, () => {
   });
 
   it('POSTs a workflow_dispatch built from the file and inputs, and returns true', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.NO_CONTENT }),
+    );
 
     const result = await dispatch({ tenantId });
 
@@ -68,7 +69,7 @@ describe(dispatchGitHubWorkflow, () => {
     expect(fetchMock).toHaveBeenCalledWith(
       `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflowFile}/dispatches`,
       expect.objectContaining({
-        method: 'POST',
+        method: HTTP_METHOD.POST,
         headers: expect.objectContaining({
           Authorization: `Bearer ${token}`,
           Accept: 'application/vnd.github+json',
@@ -81,7 +82,9 @@ describe(dispatchGitHubWorkflow, () => {
   });
 
   it('omits an undefined input from the dispatch body', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.NO_CONTENT }),
+    );
 
     await dispatch({ tenantId, environment: undefined });
 
@@ -94,7 +97,9 @@ describe(dispatchGitHubWorkflow, () => {
   });
 
   it('dispatches against the given ref instead of main', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.NO_CONTENT }),
+    );
     const ref = `release/v${faker.system.semver()}`;
 
     await dispatch({ tenantId }, ref);

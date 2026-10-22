@@ -2,12 +2,15 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
   TENANT_DELETE_OUTCOME,
   TENANT_DELETE_SANITY_PROJECT_OUTCOME,
   type TMaybeNull,
 } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -30,8 +33,6 @@ vi.mock('@platform/server/auth/require-super-admin', () => ({
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
@@ -44,6 +45,8 @@ vi.mock('@blog/db', () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
+
+const CONNECTION_ERROR_MESSAGE = 'connection reset';
 
 const tenant = {
   id: 'tenant-1',
@@ -58,11 +61,11 @@ describe('deleteTenantAction', () => {
     requireSuperAdminMock.mockReset();
     requireSuperAdminMock.mockResolvedValue({
       id: 'admin-1',
-      role: 'SUPERADMIN',
+      role: ADMIN_ROLE.SUPERADMIN,
     });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(tenant);
@@ -79,11 +82,11 @@ describe('deleteTenantAction', () => {
 
   it('requires a super-admin session before deleting', async () => {
     requireSuperAdminMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
     await expect(
       deleteTenantAction('tenant-1', { confirm: 'Acme Inc.' }),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
@@ -93,7 +96,7 @@ describe('deleteTenantAction', () => {
     });
     await expect(
       deleteTenantAction('tenant-1', { confirm: 'Acme Inc.' }),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(redirect).not.toHaveBeenCalled();
     expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -163,8 +166,8 @@ describe('deleteTenantAction', () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(deleteTenantMock).toHaveBeenCalledWith('tenant-1');
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.DELETED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
@@ -173,7 +176,7 @@ describe('deleteTenantAction', () => {
   });
 
   it('returns an error and records no audit event when the delete mutation throws', async () => {
-    deleteTenantMock.mockRejectedValue(new Error('connection reset'));
+    deleteTenantMock.mockRejectedValue(new Error(CONNECTION_ERROR_MESSAGE));
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });
@@ -190,7 +193,7 @@ describe('deleteTenantAction', () => {
   });
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
-    insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
+    insertAuditEventMock.mockRejectedValue(new Error(CONNECTION_ERROR_MESSAGE));
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });

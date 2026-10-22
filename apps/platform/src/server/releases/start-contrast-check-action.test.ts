@@ -2,6 +2,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
   type TMaybeNull,
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
@@ -9,6 +10,7 @@ import { faker } from '@faker-js/faker';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import type { Session } from 'next-auth';
 
 const {
@@ -30,8 +32,6 @@ vi.mock('@platform/server/auth/require-super-admin', () => ({
 }));
 
 vi.mock('@platform/server/auth/auth');
-
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@platform/server/github/get-branch-head-sha', () => ({
   getBranchHeadSha: getBranchHeadShaMock,
@@ -61,7 +61,7 @@ describe('startContrastCheckAction', () => {
       .mockReset()
       .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     authMock.mockReset().mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     getBranchHeadShaMock.mockReset().mockResolvedValue({
       ok: true,
@@ -79,10 +79,12 @@ describe('startContrastCheckAction', () => {
 
   it('requires a super-admin before dispatching anything', async () => {
     requireSuperAdminMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
-    await expect(startContrastCheckAction()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(startContrastCheckAction()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
 
     expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -94,8 +96,8 @@ describe('startContrastCheckAction', () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchContrastWorkflowMock).toHaveBeenCalledOnce();
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.CONTRAST_CHECK_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: headSha,

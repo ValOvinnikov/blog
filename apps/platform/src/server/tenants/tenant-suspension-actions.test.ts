@@ -41,8 +41,6 @@ const {
   revalidateSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock('@platform/server/signup-block/add-signup-block', () => ({
   saveSignupBlock: saveSignupBlockMock,
   recordSignupBlockAdded: recordSignupBlockAddedMock,
