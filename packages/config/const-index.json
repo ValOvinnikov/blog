@@ -3336,20 +3336,6 @@
         "file": "apps/platform/src/constants/control-mode.ts"
       }
     ],
-    "EMAIL_INVALID": [
-      {
-        "ref": "DATA_REQUEST_FIELD_ERROR.EMAIL_INVALID",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      },
-      {
-        "ref": "TENANT_FIELD_ERROR.EMAIL_INVALID",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
     "SUBSCRIBER": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
@@ -3695,6 +3681,14 @@
     "SLUG_TAKEN": [
       {
         "ref": "TENANT_FIELD_ERROR.SLUG_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "EMAIL_INVALID": [
+      {
+        "ref": "TENANT_FIELD_ERROR.EMAIL_INVALID",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

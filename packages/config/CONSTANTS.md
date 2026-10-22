@@ -260,7 +260,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
-- **DATA_REQUEST_FIELD_ERROR**: `EMAIL_INVALID`
 - **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`
 
 ### `@platform/constants/domain` — `apps/platform/src/constants/domain.ts`
