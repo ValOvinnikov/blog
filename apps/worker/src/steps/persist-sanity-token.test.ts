@@ -1,6 +1,7 @@
 import { SANITY_ROBOT_ROLE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import type { Mock } from 'vitest';
 
@@ -17,8 +18,10 @@ vi.mock('@blog/db/queries/tenants', () => ({
   setTenantSanityToken: setTenantSanityTokenMock,
 }));
 
+const MANAGEMENT_TOKEN = 'mgmt-token';
+
 const env: TProvisionEnv = {
-  sanityManagementToken: 'mgmt-token',
+  sanityManagementToken: MANAGEMENT_TOKEN,
   sanityOrganizationId: 'org-abc',
   vercelToken: 'v-token',
   vercelTeamId: undefined,
@@ -30,23 +33,12 @@ const env: TProvisionEnv = {
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
+  return makeTenant({
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PROVISIONING',
-    provisioningSteps: null,
-    seededAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     ...overrides,
-  } as TTenant;
+  });
 }
 
 beforeEach(() => {
@@ -88,13 +80,13 @@ describe(persistTenantSanityToken, () => {
     await persistTenantSanityToken(tenant, env, { mintReadToken });
 
     expect(mintReadToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
+      token: MANAGEMENT_TOKEN,
       projectId: 'proj123',
       label: expect.any(String),
       role: SANITY_ROBOT_ROLE.VIEWER,
     });
     expect(setTenantSanityTokenMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TEST_TENANT_ID,
       'sk-read',
     );
   });

@@ -9,10 +9,10 @@ import {
   setTenantProvisioningStatus,
   startProvisioningRun,
 } from '@blog/db/queries/tenants';
+import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 
 import { beginRun, finishRun } from './run-lifecycle';
 
-const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
 const CTX = { runId: 'run-1' };
 
 vi.mock('@blog/db/queries/audit-events', () => ({ insertAuditEvent: vi.fn() }));
@@ -33,9 +33,11 @@ describe(beginRun, () => {
       error: ERROR_CODE.DB_NOT_FOUND,
     });
 
-    await beginRun(TENANT_ID);
+    await beginRun(TEST_TENANT_ID);
 
-    expect(startProvisioningRun).toHaveBeenCalledWith({ tenantId: TENANT_ID });
+    expect(startProvisioningRun).toHaveBeenCalledWith({
+      tenantId: TEST_TENANT_ID,
+    });
   });
 });
 
@@ -52,14 +54,16 @@ describe(finishRun, () => {
   });
 
   it('closes the run and audits a successful provisioning', async () => {
-    await finishRun(TENANT_ID, CTX, { ok: true });
+    await finishRun(TEST_TENANT_ID, CTX, { ok: true });
 
-    expect(finishProvisioningRun).toHaveBeenCalledWith({ tenantId: TENANT_ID });
+    expect(finishProvisioningRun).toHaveBeenCalledWith({
+      tenantId: TEST_TENANT_ID,
+    });
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONED]);
   });
 
   it('audits the failed step of a failed run without overriding its status', async () => {
-    await finishRun(TENANT_ID, CTX, {
+    await finishRun(TEST_TENANT_ID, CTX, {
       ok: false,
       failedStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
     });
@@ -77,10 +81,13 @@ describe(finishRun, () => {
   });
 
   it('marks the tenant failed when a run dies outside any step', async () => {
-    await finishRun(TENANT_ID, CTX, { ok: false, error: 'workflow crashed' });
+    await finishRun(TEST_TENANT_ID, CTX, {
+      ok: false,
+      error: 'workflow crashed',
+    });
 
     expect(setTenantProvisioningStatus).toHaveBeenCalledWith(
-      TENANT_ID,
+      TEST_TENANT_ID,
       TENANT_PROVISIONING_STATUS.FAILED,
     );
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONING_FAILED]);
@@ -90,7 +97,7 @@ describe(finishRun, () => {
     vi.mocked(insertAuditEvent).mockRejectedValue(new Error('db down'));
 
     await expect(
-      finishRun(TENANT_ID, CTX, { ok: true }),
+      finishRun(TEST_TENANT_ID, CTX, { ok: true }),
     ).resolves.toBeUndefined();
   });
 });

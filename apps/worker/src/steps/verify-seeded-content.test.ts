@@ -1,7 +1,8 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
+import { makeTenant } from '@worker/testing/tenant/fixtures';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import type { Mock } from 'vitest';
 
@@ -18,8 +19,11 @@ vi.mock('@blog/db/queries/tenants', () => ({
   getTenantSanityCredentials: getTenantSanityCredentialsMock,
 }));
 
+const MANAGEMENT_TOKEN = 'mgmt-token';
+const TENANT_DOMAIN = 'acme.example.com';
+
 const env: TProvisionEnv = {
-  sanityManagementToken: 'mgmt-token',
+  sanityManagementToken: MANAGEMENT_TOKEN,
   sanityOrganizationId: 'org-abc',
   vercelToken: 'v-token',
   vercelTeamId: undefined,
@@ -33,32 +37,24 @@ const env: TProvisionEnv = {
 const REVALIDATE_WEBHOOK_URL = 'https://example.com/api/revalidate';
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
+  return makeTenant({
+    primaryDomain: TENANT_DOMAIN,
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'encrypted-token',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PROVISIONING',
-    provisioningSteps: null,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     seededAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides,
-  } as TTenant;
+  });
 }
 
 const baseCredentials = {
   projectId: 'proj123',
   dataset: 'production',
   token: 'sk-read',
-  status: 'ACTIVE' as const,
+  status: TENANT_STATUS.ACTIVE,
   deprovisionedAt: null,
-  provisioningStatus: 'PROVISIONING' as const,
+  provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
 };
 
 const VALID_HOME_PAGE = {
@@ -125,7 +121,7 @@ function baseDeps(
     listWebhooks: vi
       .fn()
       .mockResolvedValue([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]),
-    listDomains: vi.fn().mockResolvedValue([{ name: 'acme.example.com' }]),
+    listDomains: vi.fn().mockResolvedValue([{ name: TENANT_DOMAIN }]),
     sleep: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -154,9 +150,7 @@ describe(verifyTenantSeededContent, () => {
     const listWebhooks = vi
       .fn()
       .mockResolvedValue([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]);
-    const listDomains = vi
-      .fn()
-      .mockResolvedValue([{ name: 'acme.example.com' }]);
+    const listDomains = vi.fn().mockResolvedValue([{ name: TENANT_DOMAIN }]);
 
     await verifyTenantSeededContent(
       tenant,
@@ -182,7 +176,7 @@ describe(verifyTenantSeededContent, () => {
       }),
     );
     expect(listWebhooks).toHaveBeenCalledWith({
-      token: 'mgmt-token',
+      token: MANAGEMENT_TOKEN,
       projectId: 'proj123',
     });
     expect(listDomains).toHaveBeenCalledWith({
@@ -418,7 +412,7 @@ describe(verifyTenantSeededContent, () => {
     const listDomains = vi
       .fn()
       .mockRejectedValueOnce(grantError())
-      .mockResolvedValueOnce([{ name: 'acme.example.com' }]);
+      .mockResolvedValueOnce([{ name: TENANT_DOMAIN }]);
 
     await verifyTenantSeededContent(
       tenant,

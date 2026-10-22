@@ -1,5 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { makeTenant } from '@worker/testing/tenant/fixtures';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
 import { mapTenantDomain } from './map-domain';
@@ -16,6 +17,8 @@ vi.mock('@worker/utils/vercel-client/vercel-client', () => ({
   addVercelProjectDomain: addVercelProjectDomainMock,
 }));
 
+const TENANT_DOMAIN = 'acme.example.com';
+
 const env: TProvisionEnv = {
   sanityManagementToken: 'mgmt-token',
   sanityOrganizationId: 'org-abc',
@@ -29,23 +32,15 @@ const env: TProvisionEnv = {
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
+  return makeTenant({
+    primaryDomain: TENANT_DOMAIN,
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'enc',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PROVISIONING',
-    provisioningSteps: null,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     seededAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides,
-  } as TTenant;
+  });
 }
 
 beforeEach(() => {
@@ -75,14 +70,12 @@ describe(mapTenantDomain, () => {
       token: 'v-token',
       teamId: undefined,
       projectId: 'prj_web',
-      domain: 'acme.example.com',
+      domain: TENANT_DOMAIN,
     });
   });
 
   it('skips adding the domain when already registered on the project', async () => {
-    listVercelProjectDomainsMock.mockResolvedValue([
-      { name: 'acme.example.com' },
-    ]);
+    listVercelProjectDomainsMock.mockResolvedValue([{ name: TENANT_DOMAIN }]);
     await mapTenantDomain(tenant, env);
 
     expect(addVercelProjectDomainMock).not.toHaveBeenCalled();

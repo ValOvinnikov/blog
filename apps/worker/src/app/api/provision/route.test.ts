@@ -11,14 +11,13 @@ import {
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
+import { TEST_ENQUEUE_SECRET } from '@worker/testing/enqueue/fixtures';
 import { signedRequest as signedRequestTo } from '@worker/testing/enqueue/sign-enqueue-request';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { start } from 'workflow/api';
 
 import { POST } from './route';
 
-const SECRET = 'enqueue-secret';
-const TENANT_ID = TEST_TENANT_ID;
 const PROVISION_URL = 'https://worker.example.com/api/provision';
 
 function signedRequest(
@@ -26,7 +25,7 @@ function signedRequest(
   overrides: { secret?: string; timestamp?: number } = {},
 ): Request {
   return signedRequestTo(PROVISION_URL, rawBody, {
-    secret: SECRET,
+    secret: TEST_ENQUEUE_SECRET,
     ...overrides,
   });
 }
@@ -44,13 +43,13 @@ vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   ).withFakeTenantsQueries(await importOriginal()),
 );
 
-function enqueueRequest(tenantId: string = TENANT_ID): Request {
+function enqueueRequest(tenantId: string = TEST_TENANT_ID): Request {
   return signedRequest(JSON.stringify({ tenantId }));
 }
 
 describe('POST /api/provision', () => {
   beforeEach(() => {
-    mockEnv.WORKER_ENQUEUE_SECRET = SECRET;
+    mockEnv.WORKER_ENQUEUE_SECRET = TEST_ENQUEUE_SECRET;
     vi.mocked(beginTenantProvisioning).mockResolvedValue({
       ok: true,
       data: { tenant: makeTenant(), previousProvisioningStatus: null },
@@ -73,13 +72,13 @@ describe('POST /api/provision', () => {
         new Request(PROVISION_URL, {
           method: HTTP_METHOD.POST,
           headers: signedRequest('{}').headers,
-          body: JSON.stringify({ tenantId: TENANT_ID }),
+          body: JSON.stringify({ tenantId: TEST_TENANT_ID }),
         }),
     ],
     [
       'the wrong secret',
       () =>
-        signedRequest(JSON.stringify({ tenantId: TENANT_ID }), {
+        signedRequest(JSON.stringify({ tenantId: TEST_TENANT_ID }), {
           secret: 'other',
         }),
     ],
@@ -88,13 +87,13 @@ describe('POST /api/provision', () => {
       () =>
         new Request(PROVISION_URL, {
           method: HTTP_METHOD.POST,
-          body: JSON.stringify({ tenantId: TENANT_ID }),
+          body: JSON.stringify({ tenantId: TEST_TENANT_ID }),
         }),
     ],
     [
       'a stale timestamp',
       () =>
-        signedRequest(JSON.stringify({ tenantId: TENANT_ID }), {
+        signedRequest(JSON.stringify({ tenantId: TEST_TENANT_ID }), {
           timestamp: Date.now() - 10 * 60_000,
         }),
     ],
@@ -208,7 +207,7 @@ describe('POST /api/provision', () => {
   it('starts the workflow for the tenant that was enqueued', async () => {
     await POST(enqueueRequest());
 
-    expect(start).toHaveBeenCalledWith(expect.any(Function), [TENANT_ID]);
+    expect(start).toHaveBeenCalledWith(expect.any(Function), [TEST_TENANT_ID]);
   });
 
   describe('when the run cannot be started', () => {
@@ -230,23 +229,25 @@ describe('POST /api/provision', () => {
 
       expect(updateProvisioningStep).toHaveBeenCalledWith(
         expect.objectContaining({
-          tenantId: TENANT_ID,
+          tenantId: TEST_TENANT_ID,
           step: TENANT_PROVISIONING_STEP.SANITY_PROJECT,
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
           provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         }),
       );
       expect(finishProvisioningRun).toHaveBeenCalledWith({
-        tenantId: TENANT_ID,
+        tenantId: TEST_TENANT_ID,
       });
     });
   });
 
   it('never exposes the enqueue secret or internal error text', async () => {
-    vi.mocked(start).mockRejectedValue(new Error(`leaked ${SECRET}`));
+    vi.mocked(start).mockRejectedValue(
+      new Error(`leaked ${TEST_ENQUEUE_SECRET}`),
+    );
 
     const response = await POST(enqueueRequest());
 
-    expect(await response.text()).not.toContain(SECRET);
+    expect(await response.text()).not.toContain(TEST_ENQUEUE_SECRET);
   });
 });
