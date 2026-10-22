@@ -12,6 +12,9 @@ export const makeLead = (overrides: Partial<TLead> = {}): TLead => ({
   message: 'Hello there',
   messageEncrypted: null,
   sourcePath: '/contact',
+  sourceDocumentId: null,
+  sourceLocale: null,
+  readAt: null,
   createdAt: new Date('2026-04-02T09:30:00.000Z'),
   ...overrides,
 });

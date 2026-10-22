@@ -1,3 +1,4 @@
+import { LOCALE_BCP47_TAGS } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import {
@@ -54,6 +55,27 @@ describe(createLead, () => {
       message: decryptTestPersonalValue(lead.messageEncrypted),
     }).toEqual({ name: LEAD.name, email: LEAD.email, message: LEAD.message });
     expect(lead.emailIndex).toBe(testPersonalEmailIndex(LEAD.email));
+  });
+
+  it('stores the source page document id and locale when given', async () => {
+    const source = {
+      sourceDocumentId: 'page-contact',
+      sourceLocale: LOCALE_BCP47_TAGS.EN,
+    };
+
+    const lead = await createLead({ tenantId, ...LEAD, ...source });
+
+    expect(lead).toMatchObject(source);
+  });
+
+  it('stores a new lead unread and with no source page document id or locale', async () => {
+    const lead = await createLead({ tenantId, ...LEAD });
+
+    expect(lead).toMatchObject({
+      readAt: null,
+      sourceDocumentId: null,
+      sourceLocale: null,
+    });
   });
 
   it('rejects a tenantId with no matching tenants row', async () => {

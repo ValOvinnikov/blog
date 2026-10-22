@@ -1,0 +1,39 @@
+import * as schema from '@blog/db/schema';
+import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+
+import { countUnreadLeadsForTenant } from './count-unread-leads-for-tenant';
+
+const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+
+vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+
+const db = useQueryTestDb(getDbMock);
+
+afterEach(async () => {
+  await db().delete(schema.leads);
+  await db().delete(schema.tenants);
+});
+
+describe(countUnreadLeadsForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('counts only the unread leads for the tenant', async () => {
+    await insertTestLead(db(), tenantId);
+    await insertTestLead(db(), tenantId);
+    await insertTestLead(db(), tenantId, { readAt: new Date() });
+
+    await expect(countUnreadLeadsForTenant(tenantId)).resolves.toBe(2);
+  });
+
+  it("does not count another tenant's unread leads", async () => {
+    const { id: otherTenantId } = await insertTestTenant(db());
+    await insertTestLead(db(), otherTenantId);
+
+    await expect(countUnreadLeadsForTenant(tenantId)).resolves.toBe(0);
+  });
+});
