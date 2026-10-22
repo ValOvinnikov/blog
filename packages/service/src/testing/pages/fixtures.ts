@@ -18,6 +18,8 @@ import {
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 
+export const RAW_HOME_PAGE_ID = 'home-1';
+
 const AUTHOR_AVATAR_ALT = 'Jane avatar';
 const POST_SLUG = 'hello-world';
 const TAXONOMY_LIST_MODULE_ID = 'taxonomy-list-1';
@@ -90,7 +92,7 @@ export function makeRawHomePage(
   overrides: Partial<TRawHomePage> = {},
 ): TRawHomePage {
   return {
-    _id: 'home-1',
+    _id: RAW_HOME_PAGE_ID,
     headingBlock: makeRawHeadingBlock('Welcome'),
     contentAlignment: null,
     hero: { _id: 'hero-1', _type: 'module_heroBlog' },

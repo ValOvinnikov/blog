@@ -5,6 +5,9 @@ import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { homePageQuery } from './query';
 
+const EN_HOME_ID = 'en-home';
+const NL_HOME_ID = 'nl-home';
+
 describe('homePageQuery', () => {
   it('parses a home page whose SEO openGraph has no image (null ogImage)', () => {
     const raw = makeRawHomePage({
@@ -74,8 +77,8 @@ describe('homePageQuery language scoping', () => {
   }
 
   const dataset = [
-    home('page_home', 'Welcome', EN),
-    home('home-nl', 'Welkom', NL),
+    home(EN_HOME_ID, 'Welcome', EN),
+    home(NL_HOME_ID, 'Welkom', NL),
   ];
 
   it("resolves each language's own Home", async () => {
@@ -92,7 +95,7 @@ describe('homePageQuery language scoping', () => {
   });
 
   it('resolves a Home with no language for the default language only', async () => {
-    const legacy = [home('page_home', 'Welcome')];
+    const legacy = [home(EN_HOME_ID, 'Welcome')];
 
     expect(await run(legacy, EN)).toMatchObject({
       headingBlock: { heading: 'Welcome' },
@@ -123,8 +126,8 @@ describe('homePageQuery template layout', () => {
   }
 
   const dataset = [
-    home('page_home', EN, TEMPLATE_ID),
-    home('home-nl', NL, TEMPLATE_ID),
+    home(EN_HOME_ID, EN, TEMPLATE_ID),
+    home(NL_HOME_ID, NL, TEMPLATE_ID),
     {
       _id: TEMPLATE_ID,
       _type: 'template_home',
@@ -153,14 +156,14 @@ describe('homePageQuery template layout', () => {
   );
 
   it.each([
-    [EN, 'page_home'],
-    [NL, 'home-nl'],
+    [EN, EN_HOME_ID],
+    [NL, NL_HOME_ID],
   ])('projects the id of the %s Home', async (locale, id) => {
     expect(await run(dataset, locale)).toMatchObject({ _id: id });
   });
 
   it('resolves no hero and no modules for a Home without a template', async () => {
-    expect(await run([home('page_home', EN)], EN)).toMatchObject({
+    expect(await run([home(EN_HOME_ID, EN)], EN)).toMatchObject({
       hero: null,
       modules: null,
     });

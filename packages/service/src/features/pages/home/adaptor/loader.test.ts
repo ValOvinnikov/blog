@@ -1,6 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
+import {
+  makeRawHomePage,
+  RAW_HOME_PAGE_ID,
+} from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
   makeRawSeo,
@@ -40,7 +43,7 @@ describe('getHomePageDocument', () => {
   it("returns the page_home document's id", async () => {
     const page = await getHomePageDocument(tenant);
 
-    expect(page?.id).toBe('home-1');
+    expect(page?.id).toBe(RAW_HOME_PAGE_ID);
   });
 
   it('maps a headingBlock heading with no hero to an undefined hero', async () => {
