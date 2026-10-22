@@ -997,6 +997,14 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    writes `site_config`), so it is at least as exposed to schema drift as the
    public site is, but not on `migrate`, since it never reads Sanity.
 
+   **The personal-data keys may be stored as Sensitive.** The
+   build runs on the GitHub runner, where `vercel pull` writes a Sensitive
+   var as the literal `[SENSITIVE]`, so `vercel build` runs with
+   `SKIP_ENV_VALIDATION=true`. Each app validates its env when the deployed
+   server starts, so a malformed `PERSONAL_DATA_ENCRYPTION_KEY` or
+   `PERSONAL_DATA_INDEX_KEY` fails there with the same format message.
+   Production deploys the same way.
+
 Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
 `deploy-*` each keep `cancel-in-progress: true`, so a newer merge still
 supersedes an in-flight build/deploy — "latest merge wins" still holds. (The
