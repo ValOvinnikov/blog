@@ -6,6 +6,7 @@ import {
 import { faker } from '@faker-js/faker';
 
 import {
+  decryptPersonalValue,
   encryptPersonalValue,
   personalEmailColumns,
   requirePersonalEmailIndex,
@@ -21,6 +22,12 @@ describe('with both personal data keys configured', () => {
 
     expect(encrypted).not.toContain(EMAIL);
     expect(decryptTestPersonalValue(encrypted)).toBe(EMAIL);
+  });
+
+  it('decrypts a value it encrypted', () => {
+    const encrypted = encryptPersonalValue(EMAIL) ?? '';
+
+    expect(decryptPersonalValue(encrypted)).toBe(EMAIL);
   });
 
   it('gives an email its encrypted form and its index', () => {
@@ -57,6 +64,12 @@ describe('with no personal data keys configured', () => {
   it('refuses an index lookup', () => {
     expect(() => requirePersonalEmailIndex(EMAIL)).toThrow(
       'PERSONAL_DATA_INDEX_KEY is not configured.',
+    );
+  });
+
+  it('refuses to decrypt', () => {
+    expect(() => decryptPersonalValue(EMAIL)).toThrow(
+      'PERSONAL_DATA_ENCRYPTION_KEY is not configured.',
     );
   });
 });
