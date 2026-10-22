@@ -100,6 +100,7 @@ export const tenants = pgTable('tenants', {
   sanityDataset: text('sanity_dataset'),
   sanityReadTokenEncrypted: text('sanity_read_token_encrypted'),
   sanityWriteTokenEncrypted: text('sanity_write_token_encrypted'),
+  revalidateWebhookSecretEncrypted: text('revalidate_webhook_secret_encrypted'),
   locale: localeCodeEnum('locale').notNull(),
   additionalLocales: localeCodeEnum('additional_locales')
     .array()

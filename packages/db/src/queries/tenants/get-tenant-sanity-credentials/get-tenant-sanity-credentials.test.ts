@@ -11,6 +11,10 @@ import { setTenantSanityToken } from '@blog/db/queries/tenants/set-tenant-sanity
 import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MISSING_TENANT_TOKEN_KEY_ERROR,
+  useTenantTokenEncryptionKey,
+} from '@blog/db/testing/tenant-token-encryption-key';
 
 import { getTenantSanityCredentials } from './get-tenant-sanity-credentials';
 
@@ -32,21 +36,13 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-const db = useQueryTestDb(getDbMock);
-const originalKey = process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+const READ_TOKEN = 'sk-real-token-value';
 
-beforeEach(() => {
-  process.env['TENANT_TOKEN_ENCRYPTION_KEY'] =
-    'wF3n9s6q0Zc7yq2z8Xh9mS4h9r0kQnW5R2t8jL1oQxo=';
-});
+const db = useQueryTestDb(getDbMock);
+useTenantTokenEncryptionKey();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
-  if (originalKey === undefined) {
-    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-  } else {
-    process.env['TENANT_TOKEN_ENCRYPTION_KEY'] = originalKey;
-  }
 });
 
 describe(getTenantSanityCredentials, () => {
@@ -58,7 +54,7 @@ describe(getTenantSanityCredentials, () => {
 
   describe('with a token set', () => {
     beforeEach(async () => {
-      await setTenantSanityToken(tenant.id, 'sk-real-token-value');
+      await setTenantSanityToken(tenant.id, READ_TOKEN);
     });
 
     it('resolves the decrypted token alongside project/dataset and servable state for an active tenant', async () => {
@@ -67,7 +63,7 @@ describe(getTenantSanityCredentials, () => {
       expect(credentials).toEqual({
         projectId: 'abc123',
         dataset: 'production',
-        token: 'sk-real-token-value',
+        token: READ_TOKEN,
         defaultLocale: LOCALE_ISO_CODES.EN,
         status: TENANT_STATUS.ACTIVE,
         deprovisionedAt: null,
@@ -84,7 +80,7 @@ describe(getTenantSanityCredentials, () => {
       expect(credentials).toMatchObject({
         projectId: 'abc123',
         dataset: 'production',
-        token: 'sk-real-token-value',
+        token: READ_TOKEN,
         status: TENANT_STATUS.ARCHIVED,
       });
     });
@@ -98,10 +94,10 @@ describe(getTenantSanityCredentials, () => {
     });
 
     it('throws when the encryption key is not configured', async () => {
-      delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+      vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
       await expect(getTenantSanityCredentials(tenant.id)).rejects.toThrow(
-        'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
+        MISSING_TENANT_TOKEN_KEY_ERROR,
       );
     });
   });
