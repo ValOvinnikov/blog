@@ -10,6 +10,8 @@ import {
 } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
+export const SUBSCRIBER_OWNER = 'Subscriber';
+
 export type TUserSubscriber = Pick<TSubscriber, 'id' | 'status'> & {
   email: string;
 };
@@ -48,7 +50,7 @@ export async function findUserSubscriber(
     .map(({ id, status, emailEncrypted }) => ({
       id,
       status,
-      email: requireDecryptedPersonalValue(emailEncrypted, 'Subscriber'),
+      email: requireDecryptedPersonalValue(emailEncrypted, SUBSCRIBER_OWNER),
     }))
     .find(({ email }) => normalizeEmail(email) === accountEmail);
 }

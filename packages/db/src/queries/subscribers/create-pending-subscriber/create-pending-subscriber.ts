@@ -5,6 +5,7 @@ import {
 } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
+import { SUBSCRIBER_OWNER } from '@blog/db/queries/subscribers/user-subscriber';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import {
@@ -60,7 +61,7 @@ async function findExisting(
         : SUBSCRIBER_OUTCOME.ALREADY_PENDING,
     subscriber: {
       id,
-      email: requireDecryptedPersonalValue(emailEncrypted, 'Subscriber'),
+      email: requireDecryptedPersonalValue(emailEncrypted, SUBSCRIBER_OWNER),
     },
   });
 }

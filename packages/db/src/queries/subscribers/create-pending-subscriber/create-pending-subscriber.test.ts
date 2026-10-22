@@ -4,6 +4,7 @@ import {
   insertTestSubscriber,
   insertTestTenant,
   TEST_SUBSCRIBER_EMAIL,
+  TEST_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
@@ -131,10 +132,9 @@ describe(createPendingSubscriber, () => {
       tenantId,
       TEST_SUBSCRIBER_EMAIL,
     );
-    const [localPart, domain] = TEST_SUBSCRIBER_EMAIL.split('@');
 
     const result = unwrapOk(
-      await createPendingSubscriber(tenantId, `${localPart}+news@${domain}`),
+      await createPendingSubscriber(tenantId, TEST_SUBSCRIBER_TAGGED_EMAIL),
     );
 
     expect(result).toEqual({

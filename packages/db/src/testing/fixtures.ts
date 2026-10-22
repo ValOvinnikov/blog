@@ -19,6 +19,10 @@ import type { PgliteDatabase } from 'drizzle-orm/pglite';
 export type TTestDb = PgliteDatabase<typeof schema>;
 
 export const TEST_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
+export const TEST_SUBSCRIBER_TAGGED_EMAIL = TEST_SUBSCRIBER_EMAIL.replace(
+  /@/,
+  '+news@',
+);
 export const TEST_INVITE_EMAIL = faker.internet.email().toLowerCase();
 export const TEST_LEAD_NAME = 'Ada Lovelace';
 export const TEST_LEAD_EMAIL = 'lead@example.com';

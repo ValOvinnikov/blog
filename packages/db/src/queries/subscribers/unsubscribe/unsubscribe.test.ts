@@ -5,6 +5,7 @@ import {
   insertTestTenant,
   insertTestUser,
   TEST_SUBSCRIBER_EMAIL,
+  TEST_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -97,8 +98,7 @@ describe(unsubscribe, () => {
   });
 
   it('keeps a subscriber row whose address differs only by a +tag', async () => {
-    const [localPart, domain] = TEST_SUBSCRIBER_EMAIL.split('@');
-    await insertTestSubscriber(db(), tenantId, `${localPart}+news@${domain}`);
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_TAGGED_EMAIL);
 
     await unsubscribe(tenantId, userId);
 
