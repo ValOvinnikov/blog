@@ -1,26 +1,18 @@
 import { sha256Hex } from '@blog/utils/hash';
 
-import { mintSubscriberTokens } from './subscriber-tokens';
+import { mintConfirmationToken } from './subscriber-tokens';
 
-describe(mintSubscriberTokens, () => {
-  it('pairs each raw token with its hash', () => {
-    const { tokens, hashes } = mintSubscriberTokens();
+describe(mintConfirmationToken, () => {
+  it('pairs the raw token with its hash', () => {
+    const { confirmationToken, confirmationTokenHash } =
+      mintConfirmationToken();
 
-    expect(hashes).toEqual({
-      confirmationTokenHash: sha256Hex(tokens.confirmationToken),
-      unsubscribeTokenHash: sha256Hex(tokens.unsubscribeToken),
-    });
+    expect(confirmationTokenHash).toBe(sha256Hex(confirmationToken));
   });
 
-  it('mints distinct tokens on every call', () => {
-    const first = mintSubscriberTokens();
-    const second = mintSubscriberTokens();
-
-    expect(second.tokens.confirmationToken).not.toBe(
-      first.tokens.confirmationToken,
-    );
-    expect(second.tokens.unsubscribeToken).not.toBe(
-      first.tokens.unsubscribeToken,
+  it('mints a distinct token on every call', () => {
+    expect(mintConfirmationToken().confirmationToken).not.toBe(
+      mintConfirmationToken().confirmationToken,
     );
   });
 });

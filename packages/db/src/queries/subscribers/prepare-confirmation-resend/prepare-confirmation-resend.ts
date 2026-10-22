@@ -3,23 +3,22 @@ import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
-import {
-  type ISubscriberTokens,
-  mintSubscriberTokens,
-} from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
-// The tokens are rotated: a stored hash can't be emailed again, so links in
-// any earlier confirmation email stop working.
-export type TResendConfirmationResult =
-  | (TOutcome<typeof SUBSCRIBER_OUTCOME.PENDING> & ISubscriberTokens)
+export type TPrepareConfirmationResendResult =
+  | (TOutcome<typeof SUBSCRIBER_OUTCOME.PENDING> & {
+      subscriberId: string;
+      confirmationToken: string;
+    })
   | TOutcome<typeof SUBSCRIBER_OUTCOME.NOT_PENDING>;
 
-export async function resendConfirmation(
+// The token is not stored here: commitConfirmationToken stores it once the email is sent.
+export async function prepareConfirmationResend(
   tenantId: string,
   userId: string,
-): Promise<TResendConfirmationResult> {
+): Promise<TPrepareConfirmationResendResult> {
   const db = getDb();
 
   const [user] = await db
@@ -27,12 +26,10 @@ export async function resendConfirmation(
     .from(users)
     .where(eq(users.id, userId));
 
-  const { tokens, hashes } = mintSubscriberTokens();
-
-  const [rotated] = user?.email
+  const [pending] = user?.email
     ? await db
-        .update(subscribers)
-        .set(hashes)
+        .select({ id: subscribers.id })
+        .from(subscribers)
         .where(
           and(
             eq(subscribers.tenantId, tenantId),
@@ -40,12 +37,16 @@ export async function resendConfirmation(
             eq(subscribers.status, 'pending'),
           ),
         )
-        .returning({ id: subscribers.id })
     : [];
 
-  if (!rotated) {
+  if (!pending) {
     return toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING);
   }
 
-  return { ...toOutcome(SUBSCRIBER_OUTCOME.PENDING), ...tokens };
+  const { confirmationToken } = mintConfirmationToken();
+  return {
+    ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
+    subscriberId: pending.id,
+    confirmationToken,
+  };
 }

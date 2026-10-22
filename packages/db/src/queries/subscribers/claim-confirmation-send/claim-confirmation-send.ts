@@ -1,29 +1,25 @@
 import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { subscribers } from '@blog/db/schema/subscribers';
-import {
-  type ISubscriberTokens,
-  mintSubscriberTokens,
-} from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 
 export interface IConfirmationSendClaim {
   claimedAt: Date;
-  tokens: ISubscriberTokens;
+  confirmationToken: string;
 }
 
-// A claim replaces both stored hashes, so links in any earlier confirmation email stop working.
+// The token is not stored here: commitConfirmationToken stores it once the email is sent.
 export async function claimConfirmationSend(
   subscriberId: string,
   cooldownMs: number,
 ): Promise<TMaybeNull<IConfirmationSendClaim>> {
   const claimedAt = new Date();
   const cooldownStart = new Date(claimedAt.getTime() - cooldownMs);
-  const { tokens, hashes } = mintSubscriberTokens();
 
   const [claimed] = await getDb()
     .update(subscribers)
-    .set({ confirmationSentAt: claimedAt, ...hashes })
+    .set({ confirmationSentAt: claimedAt })
     .where(
       and(
         eq(subscribers.id, subscriberId),
@@ -38,5 +34,6 @@ export async function claimConfirmationSend(
 
   if (!claimed?.confirmationSentAt) return null;
 
-  return { claimedAt: claimed.confirmationSentAt, tokens };
+  const { confirmationToken } = mintConfirmationToken();
+  return { claimedAt: claimed.confirmationSentAt, confirmationToken };
 }

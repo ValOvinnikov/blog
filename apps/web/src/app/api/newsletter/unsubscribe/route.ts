@@ -4,6 +4,7 @@ import {
   redirectToNewsletterResult,
   redirectToNewsletterUnsubscribeConfirmation,
 } from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
+import { readNewsletterUnsubscribeSubscriberId } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import {
   clearNewsletterUnsubscribeToken,
   readNewsletterUnsubscribeToken,
@@ -50,10 +51,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    const result = await queries.subscribers.unsubscribeByToken(
-      tenant.id,
-      token,
-    );
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(token);
+    const result = subscriberId
+      ? await queries.subscribers.unsubscribeById(tenant.id, subscriberId)
+      : await queries.subscribers.unsubscribeByToken(tenant.id, token);
 
     return redirectToNewsletterResult(
       request,

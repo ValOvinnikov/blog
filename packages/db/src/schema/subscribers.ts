@@ -29,6 +29,7 @@ export const subscribers = pgTable(
       .notNull()
       .unique()
       .$defaultFn(mintUnusableTokenHash),
+    // Nothing writes it: it only matches unsubscribe links emailed before they were signed.
     unsubscribeTokenHash: text('unsubscribe_token_hash')
       .notNull()
       .unique()

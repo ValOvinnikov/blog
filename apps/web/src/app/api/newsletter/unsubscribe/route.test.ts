@@ -10,6 +10,7 @@ import { queries, TENANT_STATUS } from '@blog/db';
 import type * as DbConstants from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
+import { readNewsletterUnsubscribeSubscriberId } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import {
   clearNewsletterUnsubscribeToken,
   readNewsletterUnsubscribeToken,
@@ -30,7 +31,9 @@ const { resolveRequestTenantMock } = vi.hoisted(() => ({
 
 vi.mock('@blog/db', async () => ({
   ...(await vi.importActual<typeof DbConstants>('@blog/db/constants')),
-  queries: { subscribers: { unsubscribeByToken: vi.fn() } },
+  queries: {
+    subscribers: { unsubscribeByToken: vi.fn(), unsubscribeById: vi.fn() },
+  },
 }));
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
@@ -51,8 +54,17 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token',
+  () => ({ readNewsletterUnsubscribeSubscriberId: vi.fn() }),
+);
+
 const unsubscribeByTokenMock = vi.mocked(
   queries.subscribers.unsubscribeByToken,
+);
+const unsubscribeByIdMock = vi.mocked(queries.subscribers.unsubscribeById);
+const readNewsletterUnsubscribeSubscriberIdMock = vi.mocked(
+  readNewsletterUnsubscribeSubscriberId,
 );
 const resolveNewsletterLinkLocaleMock = vi.mocked(resolveNewsletterLinkLocale);
 
@@ -130,13 +142,14 @@ describe('POST /api/newsletter/unsubscribe', () => {
       outcome: SUBSCRIBER_OUTCOME.UNSUBSCRIBED,
       subscriber: makeSubscriber(),
     });
+    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(null);
     resolveRequestTenantMock.mockResolvedValue({
       id: DEFAULT_TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
     });
   });
 
-  it('unsubscribes and sends them to the unsubscribed page with a GET', async () => {
+  it('unsubscribes by an unsigned token from an earlier email and sends them to the unsubscribed page with a GET', async () => {
     const response = await POST(request);
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
@@ -145,6 +158,40 @@ describe('POST /api/newsletter/unsubscribe', () => {
       DEFAULT_TENANT_ID,
       TOKEN,
     );
+  });
+
+  it('unsubscribes the subscriber a signed token names', async () => {
+    const subscriber = makeSubscriber();
+    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(subscriber.id);
+    unsubscribeByIdMock.mockResolvedValue({
+      outcome: SUBSCRIBER_OUTCOME.UNSUBSCRIBED,
+      subscriber,
+    });
+
+    const response = await POST(request);
+
+    expect(locationOf(response)).toBe(UNSUBSCRIBED_LOCATION);
+    expect(readNewsletterUnsubscribeSubscriberIdMock).toHaveBeenCalledWith(
+      TOKEN,
+    );
+    expect(unsubscribeByIdMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_ID,
+      subscriber.id,
+    );
+    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
+  });
+
+  it('sends a signed token whose subscriber is gone to the invalid page', async () => {
+    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(
+      faker.string.uuid(),
+    );
+    unsubscribeByIdMock.mockResolvedValue({
+      outcome: SUBSCRIBER_OUTCOME.NOT_FOUND,
+    });
+
+    const response = await POST(request);
+
+    expect(locationOf(response)).toBe(INVALID_LOCATION);
   });
 
   it('sends them to the page in the language the link carries', async () => {

@@ -19,7 +19,9 @@ import type { MockInstance } from 'vitest';
 const {
   authMock,
   unsubscribeMock,
-  resendConfirmationMock,
+  prepareConfirmationResendMock,
+  commitConfirmationTokenMock,
+  mintNewsletterUnsubscribeTokenMock,
   sendEmailMock,
   resolveTenantEmailIdentityMock,
   clearNewsletterSubscribedCookieMock,
@@ -31,7 +33,9 @@ const {
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
-  resendConfirmationMock: vi.fn(),
+  prepareConfirmationResendMock: vi.fn(),
+  commitConfirmationTokenMock: vi.fn(),
+  mintNewsletterUnsubscribeTokenMock: vi.fn(),
   sendEmailMock: vi.fn(),
   resolveTenantEmailIdentityMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
@@ -48,7 +52,8 @@ vi.mock('@blog/db', async () => ({
   queries: {
     subscribers: {
       unsubscribe: unsubscribeMock,
-      resendConfirmation: resendConfirmationMock,
+      prepareConfirmationResend: prepareConfirmationResendMock,
+      commitConfirmationToken: commitConfirmationTokenMock,
     },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
@@ -71,6 +76,13 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token',
+  () => ({
+    mintNewsletterUnsubscribeToken: mintNewsletterUnsubscribeTokenMock,
+  }),
+);
+
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
@@ -83,6 +95,7 @@ vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
 
 const TENANT_ID = faker.string.uuid();
 const USER_ID = faker.string.uuid();
+const SUBSCRIBER_ID = faker.string.uuid();
 const SITE_URL = `https://${faker.internet.domainName()}`;
 const CONFIRMATION_TOKEN = faker.string.alphanumeric(16);
 const UNSUBSCRIBE_TOKEN = faker.string.alphanumeric(16);
@@ -201,12 +214,15 @@ describe('resendConfirmationAction', () => {
   beforeEach(async () => {
     authMock.mockReset();
     authMock.mockResolvedValue(session);
-    resendConfirmationMock.mockReset();
-    resendConfirmationMock.mockResolvedValue({
+    prepareConfirmationResendMock.mockReset();
+    prepareConfirmationResendMock.mockResolvedValue({
       outcome: SUBSCRIBER_OUTCOME.PENDING,
+      subscriberId: SUBSCRIBER_ID,
       confirmationToken: CONFIRMATION_TOKEN,
-      unsubscribeToken: UNSUBSCRIBE_TOKEN,
     });
+    commitConfirmationTokenMock.mockReset();
+    commitConfirmationTokenMock.mockResolvedValue(undefined);
+    mintNewsletterUnsubscribeTokenMock.mockReturnValue(UNSUBSCRIBE_TOKEN);
     sendEmailMock.mockReset();
     sendEmailMock.mockResolvedValue(undefined);
     resolveTenantEmailIdentityMock.mockReset();
@@ -244,7 +260,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
+    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -254,7 +270,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
+    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
   });
 
   it('returns SERVER_ERROR without resending when no tenant resolves', async () => {
@@ -266,7 +282,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
+    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -279,7 +295,7 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,
     });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
+    expect(prepareConfirmationResendMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -287,7 +303,10 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
+    expect(prepareConfirmationResendMock).toHaveBeenCalledWith(
+      TENANT_ID,
+      USER_ID,
+    );
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         to: SESSION_EMAIL,
@@ -299,6 +318,26 @@ describe('resendConfirmationAction', () => {
           'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
         },
       }),
+    );
+  });
+
+  it('stores the new confirm token only once the email is sent', async () => {
+    await resendConfirmationAction();
+
+    expect(commitConfirmationTokenMock).toHaveBeenCalledWith(
+      SUBSCRIBER_ID,
+      CONFIRMATION_TOKEN,
+    );
+    expect(sendEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
+      commitConfirmationTokenMock.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it('signs the same unsubscribe link for the subscriber as every earlier email', async () => {
+    await resendConfirmationAction();
+
+    expect(mintNewsletterUnsubscribeTokenMock).toHaveBeenCalledWith(
+      SUBSCRIBER_ID,
     );
   });
 
@@ -323,7 +362,7 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR without sending when the db reports not-pending', async () => {
-    resendConfirmationMock.mockResolvedValue({
+    prepareConfirmationResendMock.mockResolvedValue({
       outcome: SUBSCRIBER_OUTCOME.NOT_PENDING,
     });
 
@@ -341,6 +380,7 @@ describe('resendConfirmationAction', () => {
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(errorSpy).toHaveBeenCalled();
+    expect(commitConfirmationTokenMock).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
 

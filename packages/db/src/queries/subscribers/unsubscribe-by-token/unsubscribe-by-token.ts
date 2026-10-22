@@ -5,7 +5,7 @@ import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
-export type TUnsubscribeByTokenResult =
+export type TUnsubscribeByLinkResult =
   | (TOutcome<typeof SUBSCRIBER_OUTCOME.UNSUBSCRIBED> & {
       subscriber: TSubscriber;
     })
@@ -14,7 +14,7 @@ export type TUnsubscribeByTokenResult =
 export async function unsubscribeByToken(
   tenantId: string,
   token: string,
-): Promise<TUnsubscribeByTokenResult> {
+): Promise<TUnsubscribeByLinkResult> {
   const db = getDb();
   const tokenHash = sha256Hex(token);
 

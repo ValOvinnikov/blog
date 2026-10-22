@@ -72,6 +72,9 @@ export const env = createEnv({
     PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
     // @env-optional
     PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
+    // Without it no confirmation email can be sent; changing it breaks every unsubscribe link already sent.
+    // @env-optional
+    NEWSLETTER_UNSUBSCRIBE_KEY: z.string().min(1).optional(),
   },
   client: {
     // @env-optional
@@ -97,6 +100,7 @@ export const env = createEnv({
     VERCEL_ENV: process.env.VERCEL_ENV,
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
+    NEWSLETTER_UNSUBSCRIBE_KEY: process.env.NEWSLETTER_UNSUBSCRIBE_KEY,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,

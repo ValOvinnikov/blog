@@ -4,7 +4,6 @@ import {
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { sha256Hex } from '@blog/utils/hash';
 import { eq } from 'drizzle-orm';
 
 import { claimConfirmationSend } from './claim-confirmation-send';
@@ -60,32 +59,28 @@ describe(claimConfirmationSend, () => {
     expect((await readRow(id)).confirmationSentAt).toEqual(claim?.claimedAt);
   });
 
-  it('stores only the hashes of the tokens it returns', async () => {
-    const { id } = await insertSubscriber();
+  it('leaves the stored token hashes untouched', async () => {
+    const { id, confirmationTokenHash, unsubscribeTokenHash } =
+      await insertSubscriber();
 
     const claim = await claimConfirmationSend(id, COOLDOWN_MS);
-    if (!claim) throw new Error(NO_CLAIM_ERROR);
-    const { confirmationToken, unsubscribeToken } = claim.tokens;
 
+    expect(claim?.confirmationToken).toEqual(expect.any(String));
     const row = await readRow(id);
-    expect(row.confirmationTokenHash).toBe(sha256Hex(confirmationToken));
-    expect(row.unsubscribeTokenHash).toBe(sha256Hex(unsubscribeToken));
+    expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
+    expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);
   });
 
-  it('refuses a second claim inside the cooldown and keeps the first send and tokens', async () => {
+  it('refuses a second claim inside the cooldown and keeps the first send time', async () => {
     const { id } = await insertSubscriber();
     const first = await claimConfirmationSend(id, COOLDOWN_MS);
     if (!first) throw new Error(NO_CLAIM_ERROR);
 
     await expect(claimConfirmationSend(id, COOLDOWN_MS)).resolves.toBeNull();
-    const row = await readRow(id);
-    expect(row.confirmationSentAt).toEqual(first.claimedAt);
-    expect(row.confirmationTokenHash).toBe(
-      sha256Hex(first.tokens.confirmationToken),
-    );
+    expect((await readRow(id)).confirmationSentAt).toEqual(first.claimedAt);
   });
 
-  it('claims again with fresh tokens once the last send is older than the cooldown', async () => {
+  it('claims again with a fresh token once the last send is older than the cooldown', async () => {
     const { id } = await insertSubscriber();
     const first = await claimConfirmationSend(id, COOLDOWN_MS);
     await db()
@@ -96,9 +91,7 @@ describe(claimConfirmationSend, () => {
     const second = await claimConfirmationSend(id, COOLDOWN_MS);
 
     expect(second?.claimedAt).toBeInstanceOf(Date);
-    expect(second?.tokens.confirmationToken).not.toBe(
-      first?.tokens.confirmationToken,
-    );
+    expect(second?.confirmationToken).not.toBe(first?.confirmationToken);
   });
 
   it('lets exactly one of two concurrent claims through', async () => {

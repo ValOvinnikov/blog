@@ -1,27 +1,15 @@
 import { sha256Hex } from '@blog/utils/hash';
 
-export interface ISubscriberTokens {
+export interface IConfirmationToken {
   confirmationToken: string;
-  unsubscribeToken: string;
-}
-
-export interface ISubscriberTokenHashes {
   confirmationTokenHash: string;
-  unsubscribeTokenHash: string;
 }
 
-export function mintSubscriberTokens(): {
-  tokens: ISubscriberTokens;
-  hashes: ISubscriberTokenHashes;
-} {
+export function mintConfirmationToken(): IConfirmationToken {
   const confirmationToken = crypto.randomUUID();
-  const unsubscribeToken = crypto.randomUUID();
 
   return {
-    tokens: { confirmationToken, unsubscribeToken },
-    hashes: {
-      confirmationTokenHash: sha256Hex(confirmationToken),
-      unsubscribeTokenHash: sha256Hex(unsubscribeToken),
-    },
+    confirmationToken,
+    confirmationTokenHash: sha256Hex(confirmationToken),
   };
 }

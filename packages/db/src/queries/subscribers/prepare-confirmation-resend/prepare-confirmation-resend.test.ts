@@ -6,12 +6,11 @@ import {
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
-import { resendConfirmation } from './resend-confirmation';
+import { prepareConfirmationResend } from './prepare-confirmation-resend';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
@@ -31,7 +30,7 @@ async function insertUser(
   return insertTestUser(db(), { email: TEST_SUBSCRIBER_EMAIL, ...overrides });
 }
 
-describe(resendConfirmation, () => {
+describe(prepareConfirmationResend, () => {
   let user: Awaited<ReturnType<typeof insertUser>>;
   let tenantId: string;
 
@@ -40,34 +39,34 @@ describe(resendConfirmation, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns fresh tokens for a pending subscriber and stores only their hashes', async () => {
+  it('returns the pending subscriber and a token without changing the row', async () => {
     const [subscriber] = await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL })
       .returning();
     if (!subscriber) throw new Error('failed to seed a subscriber row');
 
-    const result = await resendConfirmation(tenantId, user.id);
-    if (result.outcome !== SUBSCRIBER_OUTCOME.PENDING)
-      throw new Error('expected pending');
+    const result = await prepareConfirmationResend(tenantId, user.id);
 
+    expect(result).toEqual({
+      ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
+      subscriberId: subscriber.id,
+      confirmationToken: expect.any(String),
+    });
     const [row] = await db()
       .select()
       .from(schema.subscribers)
       .where(eq(schema.subscribers.id, subscriber.id));
-    expect(row?.confirmationTokenHash).toBe(
-      sha256Hex(result.confirmationToken),
-    );
-    expect(row?.unsubscribeTokenHash).toBe(sha256Hex(result.unsubscribeToken));
+    expect(row).toEqual(subscriber);
   });
 
-  it('rotates the tokens on every call', async () => {
+  it('mints a fresh token on every call', async () => {
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL });
 
-    const first = await resendConfirmation(tenantId, user.id);
-    const second = await resendConfirmation(tenantId, user.id);
+    const first = await prepareConfirmationResend(tenantId, user.id);
+    const second = await prepareConfirmationResend(tenantId, user.id);
 
     expect(second).not.toEqual(first);
   });
@@ -77,19 +76,22 @@ describe(resendConfirmation, () => {
       .insert(schema.subscribers)
       .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, status: 'active' });
 
-    const result = await resendConfirmation(tenantId, user.id);
+    const result = await prepareConfirmationResend(tenantId, user.id);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
 
   it('returns not-pending when no subscriber row matches the account email', async () => {
-    const result = await resendConfirmation(tenantId, user.id);
+    const result = await prepareConfirmationResend(tenantId, user.id);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
 
   it('returns not-pending for an unrecognized userId', async () => {
-    const result = await resendConfirmation(tenantId, faker.string.uuid());
+    const result = await prepareConfirmationResend(
+      tenantId,
+      faker.string.uuid(),
+    );
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
@@ -97,7 +99,7 @@ describe(resendConfirmation, () => {
   it('returns not-pending when the user has no email on file', async () => {
     const user = await insertUser({ email: null });
 
-    const result = await resendConfirmation(tenantId, user.id);
+    const result = await prepareConfirmationResend(tenantId, user.id);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
@@ -109,7 +111,7 @@ describe(resendConfirmation, () => {
       .insert(schema.subscribers)
       .values({ tenantId: tenantOneId, email: TEST_SUBSCRIBER_EMAIL });
 
-    const result = await resendConfirmation(tenantTwoId, user.id);
+    const result = await prepareConfirmationResend(tenantTwoId, user.id);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
