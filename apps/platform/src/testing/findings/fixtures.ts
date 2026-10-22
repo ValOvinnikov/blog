@@ -5,13 +5,14 @@ import {
   FINDING_STATUS,
 } from '@blog/config/constants';
 import type { TOpenFinding } from '@blog/db/queries/findings';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 export const makeFinding = (
   overrides: Partial<TOpenFinding> = {},
 ): TOpenFinding => {
   return {
     id: 'finding-1',
-    tenantId: 'tenant-1',
+    tenantId: TENANT_ID,
     source: FINDING_SOURCE.TENANT_PROVISIONING,
     kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
     severity: FINDING_SEVERITY.CRITICAL,

@@ -4,6 +4,8 @@ import {
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
+import { faker } from '@faker-js/faker';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -14,8 +16,7 @@ vi.mock('@platform/utils/env/env');
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const loggerErrorMock = vi.mocked(logger.error);
 
-const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
-const SECRET = 'shared-enqueue-secret';
+const SECRET = faker.string.alphanumeric(32);
 const PROVISION_PATH = '/api/provision';
 
 describe(enqueueProvisioning, () => {

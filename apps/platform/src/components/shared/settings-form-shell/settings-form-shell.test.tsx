@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   fireEvent,
   renderWithIntl,
@@ -5,6 +6,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
@@ -23,7 +25,7 @@ const draftFor = (
   savedValues: TValues = SAVED,
   onRestore: (values: TValues) => void = vi.fn(),
 ): TSettingsForm<TValues>['draft'] => ({
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   page: 'voice',
   values,
   savedValues,
@@ -53,9 +55,12 @@ const formFor = (
   ...overrides,
 });
 
+const TOGGLE_CAPABILITIES_FOR_THIS_TENANT =
+  'Toggle capabilities for this tenant.';
+
 const baseProps: TSettingsFormShellProps<TValues> = {
   title: 'Features',
-  description: 'Toggle capabilities for this tenant.',
+  description: TOGGLE_CAPABILITIES_FOR_THIS_TENANT,
   form: formFor(),
   children: <p>tab body</p>,
 };
@@ -74,6 +79,17 @@ const dispatchBeforeUnload = () => {
   return event;
 };
 
+const ALL_CHANGES_SAVED = 'All changes saved';
+const UNSAVED_CHANGES = 'Unsaved changes';
+const CONTROL_S_CONTROL = '{Control>}s{/Control}';
+const THREE_UNSAVED_CHANGES = '3 unsaved changes';
+const SAVE_CHANGES = 'Save changes';
+const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
+const SOMETHING_WENT_WRONG_TRY_AGAIN = 'Something went wrong — try again.';
+const MY_TAGLINE = 'My tagline';
+const RESTORE_1_CHANGE = 'Restore 1 change';
+const THEIR_TAGLINE = 'Their tagline';
+
 describe(`<${SettingsFormShell.name}/>`, () => {
   let user: UserEvent;
 
@@ -87,9 +103,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Features' }),
     ).toBeVisible();
-    expect(
-      screen.getByText('Toggle capabilities for this tenant.'),
-    ).toBeVisible();
+    expect(screen.getByText(TOGGLE_CAPABILITIES_FOR_THIS_TENANT)).toBeVisible();
     expect(screen.getByText('tab body')).toBeVisible();
   });
 
@@ -102,14 +116,14 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('shows no save status and offers no save bar', () => {
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('region', { name: 'Unsaved changes' }),
+        screen.queryByRole('region', { name: UNSAVED_CHANGES }),
       ).not.toBeInTheDocument();
     });
 
     it('ignores the save shortcut', async () => {
-      await user.keyboard('{Control>}s{/Control}');
+      await user.keyboard(CONTROL_S_CONTROL);
 
       expect(onSave).not.toHaveBeenCalled();
     });
@@ -131,20 +145,20 @@ describe(`<${SettingsFormShell.name}/>`, () => {
 
     it('shows the save bar with the change count in place of the saved status', () => {
       expect(
-        screen.getByRole('region', { name: 'Unsaved changes' }),
-      ).toHaveTextContent('3 unsaved changes');
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+        screen.getByRole('region', { name: UNSAVED_CHANGES }),
+      ).toHaveTextContent(THREE_UNSAVED_CHANGES);
+      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
     });
 
     it('announces the change count politely', () => {
       const announcement = screen.getByTestId('unsaved-changes-announcement');
 
       expect(announcement).toHaveAttribute('role', 'status');
-      expect(announcement).toHaveTextContent('3 unsaved changes');
+      expect(announcement).toHaveTextContent(THREE_UNSAVED_CHANGES);
     });
 
     it('calls onSave from the Save button', async () => {
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
@@ -156,7 +170,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it.each([
-      ['Ctrl+S', '{Control>}s{/Control}'],
+      ['Ctrl+S', CONTROL_S_CONTROL],
       ['⌘S', '{Meta>}s{/Meta}'],
     ])('saves on %s', async (_, keys) => {
       await user.keyboard(keys);
@@ -211,35 +225,35 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       renderWithIntl(<TaglineSettings />);
 
       await editTagline();
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
-      expect(await screen.findByText('All changes saved')).toBeVisible();
+      expect(await screen.findByText(ALL_CHANGES_SAVED)).toBeVisible();
     });
 
     it('disappears on the next edit after a save', async () => {
       renderWithIntl(<TaglineSettings />);
       await editTagline();
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
-      await screen.findByText('All changes saved');
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      await screen.findByText(ALL_CHANGES_SAVED);
 
       await editTagline();
 
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
     });
 
     it('stays hidden after discarding back to clean', async () => {
       renderWithIntl(<TaglineSettings />);
       await editTagline();
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
-      await screen.findByText('All changes saved');
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      await screen.findByText(ALL_CHANGES_SAVED);
       await editTagline();
 
       await user.click(screen.getByRole('button', { name: 'Discard' }));
 
       expect(
-        screen.queryByRole('region', { name: 'Unsaved changes' }),
+        screen.queryByRole('region', { name: UNSAVED_CHANGES }),
       ).not.toBeInTheDocument();
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
     });
   });
 
@@ -255,33 +269,31 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   it('shows the archived notice when archivedAt is set', () => {
     renderShell({ archivedAt: new Date('2026-08-26T00:00:00.000Z') });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
   });
 
   it('shows no archived notice when archivedAt is unset', () => {
     renderShell();
 
-    expect(
-      screen.queryByText('This tenant is archived'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(THIS_TENANT_IS_ARCHIVED)).not.toBeInTheDocument();
   });
 
   it('shows no error alert without an error title', () => {
     renderShell();
 
     expect(
-      screen.queryByText('Something went wrong — try again.'),
+      screen.queryByText(SOMETHING_WENT_WRONG_TRY_AGAIN),
     ).not.toBeInTheDocument();
   });
 
   it('shows the error alert when an error title is set', () => {
-    renderShell({}, { errorTitle: 'Something went wrong — try again.' });
+    renderShell({}, { errorTitle: SOMETHING_WENT_WRONG_TRY_AGAIN });
 
-    expect(screen.getByText('Something went wrong — try again.')).toBeVisible();
+    expect(screen.getByText(SOMETHING_WENT_WRONG_TRY_AGAIN)).toBeVisible();
   });
 
   describe('draft recovery', () => {
-    const EDITED: TValues = { ...SAVED, tagline: 'My tagline' };
+    const EDITED: TValues = { ...SAVED, tagline: MY_TAGLINE };
 
     afterEach(() => {
       vi.restoreAllMocks();
@@ -316,9 +328,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
           'They were kept on this device when you left the page.',
         ),
       ).toBeVisible();
-      await user.click(
-        screen.getByRole('button', { name: 'Restore 1 change' }),
-      );
+      await user.click(screen.getByRole('button', { name: RESTORE_1_CHANGE }));
 
       expect(onRestore).toHaveBeenCalledWith(EDITED);
       expect(queryBanner()).not.toBeInTheDocument();
@@ -342,7 +352,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         draft: draftFor(EDITED),
       });
 
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
       await waitFor(() => expect(baseSave).toHaveBeenCalled());
       unmount();
       renderShell();
@@ -382,7 +392,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     it('keeps drafts apart per language', () => {
       leaveWithUnsavedChanges();
 
-      renderShell({ draft: { ...draftFor(SAVED), language: 'DE' } });
+      renderShell({
+        draft: { ...draftFor(SAVED), language: LOCALE_ISO_CODES.DE },
+      });
 
       expect(queryBanner()).not.toBeInTheDocument();
     });
@@ -401,7 +413,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         draft: draftFor(EDITED),
       });
 
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
       expect(onSave).toHaveBeenCalledTimes(1);
       unmount();
       renderShell();
@@ -410,7 +422,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     describe('when someone else saved since', () => {
-      const THEIRS: TValues = { ...SAVED, tagline: 'Their tagline' };
+      const THEIRS: TValues = { ...SAVED, tagline: THEIR_TAGLINE };
       let onRestore: (values: TValues) => void;
 
       beforeEach(() => {
@@ -430,7 +442,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
           ),
         ).toBeVisible();
         expect(
-          screen.queryByRole('button', { name: 'Restore 1 change' }),
+          screen.queryByRole('button', { name: RESTORE_1_CHANGE }),
         ).not.toBeInTheDocument();
         expect(onRestore).not.toHaveBeenCalled();
       });
@@ -440,10 +452,10 @@ describe(`<${SettingsFormShell.name}/>`, () => {
 
         const row = screen.getByRole('row', { name: /Tagline/ });
         expect(
-          within(row).getByRole('cell', { name: 'Their tagline' }),
+          within(row).getByRole('cell', { name: THEIR_TAGLINE }),
         ).toBeVisible();
         expect(
-          within(row).getByRole('cell', { name: 'My tagline' }),
+          within(row).getByRole('cell', { name: MY_TAGLINE }),
         ).toBeVisible();
       });
 

@@ -6,6 +6,7 @@ import {
   doneDeprovisioningSteps,
   idleDeprovisioningSteps,
   makeClientTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { act, renderHook } from '@testing-library/react';
 
@@ -27,20 +28,28 @@ vi.mock(
   }),
 );
 
+const SANITY_ACCESS_API_RETURNED_403 = 'Sanity Access API returned 403';
+const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
+const AT_20260812_1419 = '2026-08-12T14:19:00.000Z';
+
 const makeFailedRevokeTenant = () =>
   makeClientTenant({
     deprovisioningSteps: {
       ...idleDeprovisioningSteps(),
       [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
         status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-        error: 'Sanity Access API returned 403',
+        error: SANITY_ACCESS_API_RETURNED_403,
       },
       run: {
-        startedAt: '2026-08-12T14:18:00.000Z',
-        finishedAt: '2026-08-12T14:19:00.000Z',
+        startedAt: AT_20260812_1418,
+        finishedAt: AT_20260812_1419,
       },
     },
   });
+
+const AT_20260812_1425 = '2026-08-12T14:25:00.000Z';
+const AT_20260812_1420 = '2026-08-12T14:20:00.000Z';
+const AT_20260812_1426 = '2026-08-12T14:26:00.000Z';
 
 describe(useDeprovisioningPoll, () => {
   beforeEach(() => {
@@ -53,7 +62,7 @@ describe(useDeprovisioningPoll, () => {
       const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       });
       const { result } = renderHook(() =>
@@ -80,7 +89,7 @@ describe(useDeprovisioningPoll, () => {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'stale failure from a previous run',
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       });
       const { result } = renderHook(() =>
@@ -108,7 +117,7 @@ describe(useDeprovisioningPoll, () => {
         DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
       );
       expect(result.current.failedStepError).toBe(
-        'Sanity Access API returned 403',
+        SANITY_ACCESS_API_RETURNED_403,
       );
       expect(result.current.errorKind).toBe('permission');
     });
@@ -117,7 +126,7 @@ describe(useDeprovisioningPoll, () => {
       const { result } = renderHook(() =>
         useDeprovisioningPoll(makeFailedRevokeTenant(), {
           isEnabled: true,
-          deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
+          deprovisionRequestedAt: AT_20260812_1425,
         }),
       );
 
@@ -153,8 +162,8 @@ describe(useDeprovisioningPoll, () => {
         deprovisioningSteps: {
           ...doneDeprovisioningSteps(),
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:20:00.000Z',
+            startedAt: AT_20260812_1418,
+            finishedAt: AT_20260812_1420,
           },
         },
       });
@@ -176,9 +185,9 @@ describe(useDeprovisioningPoll, () => {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: '2026-08-12T14:19:00.000Z',
+            updatedAt: AT_20260812_1419,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       });
       const { result } = renderHook(() =>
@@ -186,9 +195,9 @@ describe(useDeprovisioningPoll, () => {
       );
 
       expect(result.current.run).toEqual({
-        startedAt: '2026-08-12T14:18:00.000Z',
+        startedAt: AT_20260812_1418,
       });
-      expect(result.current.stepUpdatedAt[0]).toBe('2026-08-12T14:19:00.000Z');
+      expect(result.current.stepUpdatedAt[0]).toBe(AT_20260812_1419);
       expect(result.current.stepUpdatedAt[1]).toBeUndefined();
     });
   });
@@ -209,7 +218,7 @@ describe(useDeprovisioningPoll, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
@@ -218,7 +227,7 @@ describe(useDeprovisioningPoll, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
         deprovisionedAt: null,
       });
@@ -235,7 +244,7 @@ describe(useDeprovisioningPoll, () => {
       });
 
       expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TENANT_ID,
       );
       expect(result.current.stepStatuses[0]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.DONE,
@@ -248,19 +257,19 @@ describe(useDeprovisioningPoll, () => {
         [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
         },
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: AT_20260812_1418 },
       };
       const doneSteps = {
         ...doneDeprovisioningSteps(),
         run: {
-          startedAt: '2026-08-12T14:18:00.000Z',
-          finishedAt: '2026-08-12T14:20:00.000Z',
+          startedAt: AT_20260812_1418,
+          finishedAt: AT_20260812_1420,
         },
       };
       const tenant = makeClientTenant({ deprovisioningSteps: runningSteps });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: doneSteps,
-        deprovisionedAt: new Date('2026-08-12T14:20:00.000Z'),
+        deprovisionedAt: new Date(AT_20260812_1420),
       });
       const { result } = renderHook(() =>
         useDeprovisioningPoll(tenant, ENABLED),
@@ -290,8 +299,8 @@ describe(useDeprovisioningPoll, () => {
             error: 'boom',
           },
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
+            startedAt: AT_20260812_1418,
+            finishedAt: AT_20260812_1419,
           },
         },
       });
@@ -313,8 +322,8 @@ describe(useDeprovisioningPoll, () => {
             error: 'boom',
           },
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
+            startedAt: AT_20260812_1418,
+            finishedAt: AT_20260812_1419,
           },
         },
       });
@@ -324,14 +333,14 @@ describe(useDeprovisioningPoll, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: '2026-08-12T14:26:00.000Z' },
+          run: { startedAt: AT_20260812_1426 },
         },
         deprovisionedAt: null,
       });
       const { result } = renderHook(() =>
         useDeprovisioningPoll(tenant, {
           isEnabled: true,
-          deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
+          deprovisionRequestedAt: AT_20260812_1425,
         }),
       );
 
@@ -343,14 +352,14 @@ describe(useDeprovisioningPoll, () => {
       });
 
       expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TENANT_ID,
       );
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       );
       expect(result.current.isFailed).toBe(false);
       expect(result.current.run).toEqual({
-        startedAt: '2026-08-12T14:26:00.000Z',
+        startedAt: AT_20260812_1426,
       });
     });
 
@@ -361,7 +370,7 @@ describe(useDeprovisioningPoll, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
@@ -372,8 +381,8 @@ describe(useDeprovisioningPoll, () => {
             error: 'boom',
           },
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
+            startedAt: AT_20260812_1418,
+            finishedAt: AT_20260812_1419,
           },
         },
         deprovisionedAt: null,
@@ -398,7 +407,7 @@ describe(useDeprovisioningPoll, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
@@ -407,7 +416,7 @@ describe(useDeprovisioningPoll, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
         deprovisionedAt: null,
       });
@@ -434,8 +443,8 @@ describe(useDeprovisioningPoll, () => {
             error: 'boom',
           },
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
+            startedAt: AT_20260812_1418,
+            finishedAt: AT_20260812_1419,
           },
         },
       ],
@@ -448,7 +457,7 @@ describe(useDeprovisioningPoll, () => {
         renderHook(() =>
           useDeprovisioningPoll(tenant, {
             isEnabled: true,
-            deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
+            deprovisionRequestedAt: AT_20260812_1425,
           }),
         );
 
@@ -507,7 +516,7 @@ describe(useDeprovisioningPoll, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       });
       const { unmount } = renderHook(() =>

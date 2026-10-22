@@ -13,6 +13,7 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -81,7 +82,7 @@ describe(clearBrandAssetAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
+      tenant: { id: TENANT_ID },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
@@ -97,9 +98,9 @@ describe(clearBrandAssetAction, () => {
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
-    await clearBrandAssetAction('tenant-1', 'favicon');
+    await clearBrandAssetAction(TENANT_ID, 'favicon');
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith(TENANT_ID);
   });
 
   it('nulls the logo column and deletes the stored blob', async () => {
@@ -109,10 +110,10 @@ describe(clearBrandAssetAction, () => {
       faviconAssetUrl: undefined,
     });
 
-    const result = await clearBrandAssetAction('tenant-1', 'logo');
+    const result = await clearBrandAssetAction(TENANT_ID, 'logo');
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
+    expect(upsertSiteConfigMock).toHaveBeenCalledWith(TENANT_ID, {
       ...THEME_FIELDS,
       logoAssetUrl: null,
     });
@@ -126,7 +127,7 @@ describe(clearBrandAssetAction, () => {
       faviconAssetUrl: FAVICON_URL,
     });
 
-    await clearBrandAssetAction('tenant-1', 'favicon');
+    await clearBrandAssetAction(TENANT_ID, 'favicon');
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -134,13 +135,13 @@ describe(clearBrandAssetAction, () => {
       actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: { asset: 'favicon', operation: 'clear' },
     });
   });
 
   it('is a no-op success when the field is already empty, and records no audit event', async () => {
-    const result = await clearBrandAssetAction('tenant-1', 'favicon');
+    const result = await clearBrandAssetAction(TENANT_ID, 'favicon');
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -156,7 +157,7 @@ describe(clearBrandAssetAction, () => {
     });
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
-    const result = await clearBrandAssetAction('tenant-1', 'favicon');
+    const result = await clearBrandAssetAction(TENANT_ID, 'favicon');
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -167,7 +168,7 @@ describe(clearBrandAssetAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
-    await expect(clearBrandAssetAction('tenant-1', 'logo')).rejects.toThrow(
+    await expect(clearBrandAssetAction(TENANT_ID, 'logo')).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
@@ -179,7 +180,7 @@ describe(clearBrandAssetAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
-    await expect(clearBrandAssetAction('tenant-1', 'logo')).rejects.toThrow(
+    await expect(clearBrandAssetAction(TENANT_ID, 'logo')).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 

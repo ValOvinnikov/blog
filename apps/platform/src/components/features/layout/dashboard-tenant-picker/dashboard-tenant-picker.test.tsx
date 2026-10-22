@@ -3,7 +3,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { DashboardTenantPicker } from './dashboard-tenant-picker';
 
@@ -35,7 +35,7 @@ describe(DashboardTenantPicker, () => {
     expect(acmeLink).toBeVisible();
     expect(acmeLink).toHaveAttribute(
       'href',
-      '/api/dashboard/select-tenant?tenantId=tenant-1',
+      `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
     );
     expect(globexLink).toBeVisible();
     expect(globexLink).toHaveAttribute(

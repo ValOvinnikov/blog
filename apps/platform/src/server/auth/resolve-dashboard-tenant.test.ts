@@ -1,3 +1,6 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 
 import { resolveDashboardTenant } from './resolve-dashboard-tenant';
@@ -13,19 +16,19 @@ vi.mock('./list-session-tenants', () => ({
 
 vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
-const tenant1 = { id: 'tenant-1' };
+const tenant1 = { id: TENANT_ID };
 const tenant2 = { id: 'tenant-2' };
 const membership1 = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: 'tenant-1',
-  role: 'OWNER',
+  tenantId: TENANT_ID,
+  role: MEMBERSHIP_ROLE.OWNER,
 };
 const membership2 = {
   id: 'm-2',
   userId: 'user-1',
   tenantId: 'tenant-2',
-  role: 'OWNER',
+  role: MEMBERSHIP_ROLE.OWNER,
 };
 
 const mockCookie = (value: string | undefined) => {
@@ -33,6 +36,8 @@ const mockCookie = (value: string | undefined) => {
     get: vi.fn(() => (value === undefined ? undefined : { value })),
   });
 };
+
+const DASHBOARD_SELECT_TENANT = '/dashboard/select-tenant';
 
 describe(resolveDashboardTenant, () => {
   beforeEach(() => {
@@ -52,7 +57,9 @@ describe(resolveDashboardTenant, () => {
       tenants: [],
     });
 
-    await expect(resolveDashboardTenant()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(resolveDashboardTenant()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
 
     expect(cookiesMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
@@ -92,16 +99,20 @@ describe(resolveDashboardTenant, () => {
   it('redirects to the picker when there are multiple memberships and no active-tenant cookie', async () => {
     mockCookie(undefined);
 
-    await expect(resolveDashboardTenant()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(resolveDashboardTenant()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
-    expect(redirect).toHaveBeenCalledWith('/dashboard/select-tenant');
+    expect(redirect).toHaveBeenCalledWith(DASHBOARD_SELECT_TENANT);
   });
 
   it('redirects to the picker when the cookie names a tenant the session no longer has a membership for', async () => {
     mockCookie('tenant-revoked');
 
-    await expect(resolveDashboardTenant()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(resolveDashboardTenant()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
-    expect(redirect).toHaveBeenCalledWith('/dashboard/select-tenant');
+    expect(redirect).toHaveBeenCalledWith(DASHBOARD_SELECT_TENANT);
   });
 });

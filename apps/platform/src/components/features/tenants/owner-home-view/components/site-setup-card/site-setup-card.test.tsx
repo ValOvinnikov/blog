@@ -12,6 +12,7 @@ import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   idleProvisioningSteps,
   makeClientTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -42,6 +43,9 @@ const setup = customRender(SiteSetupCard, {
   canRetry: true,
 });
 
+const YOUR_SITES_SETUP_STOPPED = "Your site's setup stopped";
+const COULDNT_RESTART_SETUP_TRY = "Couldn't restart the setup — try again.";
+
 describe(`<${SiteSetupCard.name}/>`, () => {
   let user: UserEvent;
 
@@ -62,7 +66,7 @@ describe(`<${SiteSetupCard.name}/>`, () => {
       level: 2,
       name: /Setting up your site/,
     });
-    const setupStoppedText = screen.queryByText("Your site's setup stopped");
+    const setupStoppedText = screen.queryByText(YOUR_SITES_SETUP_STOPPED);
 
     expect(settingUpYourSiteHeading).toBeVisible();
     expect(setupStoppedText).not.toBeInTheDocument();
@@ -89,7 +93,7 @@ describe(`<${SiteSetupCard.name}/>`, () => {
     });
 
     it('explains that the setup stopped', () => {
-      const setupStoppedText = screen.getByText("Your site's setup stopped");
+      const setupStoppedText = screen.getByText(YOUR_SITES_SETUP_STOPPED);
 
       expect(setupStoppedText).toBeVisible();
     });
@@ -97,7 +101,7 @@ describe(`<${SiteSetupCard.name}/>`, () => {
     it('restarts the setup on Try again', async () => {
       await clickTryAgain();
 
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
     });
 
     it('reports a retry that could not start', async () => {
@@ -108,7 +112,7 @@ describe(`<${SiteSetupCard.name}/>`, () => {
       await clickTryAgain();
 
       const couldNotRestartText = await screen.findByText(
-        "Couldn't restart the setup — try again.",
+        COULDNT_RESTART_SETUP_TRY,
       );
 
       expect(couldNotRestartText).toBeVisible();
@@ -122,9 +126,7 @@ describe(`<${SiteSetupCard.name}/>`, () => {
 
       await clickTryAgain();
 
-      const couldNotRestartText = screen.queryByText(
-        "Couldn't restart the setup — try again.",
-      );
+      const couldNotRestartText = screen.queryByText(COULDNT_RESTART_SETUP_TRY);
 
       expect(couldNotRestartText).not.toBeInTheDocument();
     });

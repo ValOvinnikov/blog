@@ -1,4 +1,6 @@
+import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FindingDetails } from './finding-details';
@@ -22,14 +24,14 @@ describe(FindingDetails, () => {
   });
 
   it('requests nothing until the disclosure is opened', () => {
-    render(<FindingDetails tenantId="tenant-1" findingId="finding-1" />);
+    render(<FindingDetails tenantId={TENANT_ID} findingId="finding-1" />);
 
     expect(getFindingDetailsActionMock).not.toHaveBeenCalled();
   });
 
   it('shows a labelled spinner while the details load', async () => {
     getFindingDetailsActionMock.mockReturnValue(new Promise(() => {}));
-    render(<FindingDetails tenantId="tenant-1" findingId="finding-1" />);
+    render(<FindingDetails tenantId={TENANT_ID} findingId="finding-1" />);
 
     await user.click(screen.getByText('Details'));
 
@@ -37,7 +39,7 @@ describe(FindingDetails, () => {
       screen.getByRole('status', { name: 'Loading details…' }),
     ).toBeVisible();
     expect(getFindingDetailsActionMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
       'finding-1',
     );
   });
@@ -53,7 +55,7 @@ describe(FindingDetails, () => {
         },
       ],
     });
-    render(<FindingDetails tenantId="tenant-1" findingId="finding-1" />);
+    render(<FindingDetails tenantId={TENANT_ID} findingId="finding-1" />);
 
     await user.click(screen.getByText('Details'));
 
@@ -63,8 +65,10 @@ describe(FindingDetails, () => {
   });
 
   it('falls back to a raw JSON dump for an unrecognized details shape', async () => {
-    getFindingDetailsActionMock.mockResolvedValue({ step: 'MAP_DOMAIN' });
-    render(<FindingDetails tenantId="tenant-1" findingId="finding-1" />);
+    getFindingDetailsActionMock.mockResolvedValue({
+      step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+    });
+    render(<FindingDetails tenantId={TENANT_ID} findingId="finding-1" />);
 
     await user.click(screen.getByText('Details'));
 
@@ -73,8 +77,10 @@ describe(FindingDetails, () => {
   });
 
   it('reuses the loaded details when reopened', async () => {
-    getFindingDetailsActionMock.mockResolvedValue({ step: 'MAP_DOMAIN' });
-    render(<FindingDetails tenantId="tenant-1" findingId="finding-1" />);
+    getFindingDetailsActionMock.mockResolvedValue({
+      step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+    });
+    render(<FindingDetails tenantId={TENANT_ID} findingId="finding-1" />);
 
     await user.click(screen.getByText('Details'));
     await screen.findByText(/"step": "MAP_DOMAIN"/);
@@ -88,8 +94,8 @@ describe(FindingDetails, () => {
   it('retries on the next open after a failed request', async () => {
     getFindingDetailsActionMock
       .mockRejectedValueOnce(new Error('network'))
-      .mockResolvedValueOnce({ step: 'MAP_DOMAIN' });
-    render(<FindingDetails tenantId="tenant-1" findingId="finding-1" />);
+      .mockResolvedValueOnce({ step: TENANT_PROVISIONING_STEP.MAP_DOMAIN });
+    render(<FindingDetails tenantId={TENANT_ID} findingId="finding-1" />);
 
     await user.click(screen.getByText('Details'));
     await user.click(screen.getByText('Details'));

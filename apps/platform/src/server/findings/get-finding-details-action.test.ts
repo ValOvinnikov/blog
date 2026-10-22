@@ -1,4 +1,7 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { getFindingDetailsAction } from './get-finding-details-action';
 
@@ -24,21 +27,25 @@ describe(getFindingDetailsAction, () => {
   });
 
   it('reads nothing when the tenant gate rejects', async () => {
-    requireTenantByIdMock.mockRejectedValue(new Error('NEXT_REDIRECT'));
+    requireTenantByIdMock.mockRejectedValue(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
+    );
 
     await expect(
-      getFindingDetailsAction('tenant-1', 'finding-1'),
-    ).rejects.toThrow('NEXT_REDIRECT');
+      getFindingDetailsAction(TENANT_ID, 'finding-1'),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     expect(getFindingDetailsMock).not.toHaveBeenCalled();
   });
 
   it('returns the details read for that tenant and finding', async () => {
-    getFindingDetailsMock.mockResolvedValue({ step: 'MAP_DOMAIN' });
+    getFindingDetailsMock.mockResolvedValue({
+      step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+    });
 
-    const result = await getFindingDetailsAction('tenant-1', 'finding-1');
+    const result = await getFindingDetailsAction(TENANT_ID, 'finding-1');
 
-    expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
-    expect(getFindingDetailsMock).toHaveBeenCalledWith('tenant-1', 'finding-1');
-    expect(result).toEqual({ step: 'MAP_DOMAIN' });
+    expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getFindingDetailsMock).toHaveBeenCalledWith(TENANT_ID, 'finding-1');
+    expect(result).toEqual({ step: TENANT_PROVISIONING_STEP.MAP_DOMAIN });
   });
 });

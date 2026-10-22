@@ -2,6 +2,7 @@ import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LanguagesSettings } from './languages-settings';
@@ -17,10 +18,15 @@ mockRouterRefresh();
 const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
 
 const setup = customRender(LanguagesSettings, {
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   defaultLocale: EN,
   locales: { stored: [], live: [], limit: 2 },
 });
+
+const DATA_DISABLED = 'data-disabled';
+const SAVE_CHANGES = 'Save changes';
+const DATA_CHECKED = 'data-checked';
+const DATA_UNCHECKED = 'data-unchecked';
 
 describe(`<${LanguagesSettings.name}/>`, () => {
   let user: UserEvent;
@@ -54,11 +60,11 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     await user.click(screen.getByRole('switch', { name: 'French' }));
 
     expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
-      'data-disabled',
+      DATA_DISABLED,
       '',
     );
     expect(screen.getByRole('switch', { name: 'Dutch' })).not.toHaveAttribute(
-      'data-disabled',
+      DATA_DISABLED,
     );
   });
 
@@ -70,10 +76,10 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
     await user.click(screen.getByRole('switch', { name: 'French' }));
     await user.click(screen.getByRole('switch', { name: 'Dutch' }));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     await waitFor(() => {
-      expect(updateTenantLanguagesActionMock).toHaveBeenCalledWith('tenant-1', [
+      expect(updateTenantLanguagesActionMock).toHaveBeenCalledWith(TENANT_ID, [
         NL,
         FR,
       ]);
@@ -84,7 +90,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     setup({ locales: { stored: [NL, FR], live: [NL, FR], limit: 2 } });
 
     expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
-      'data-disabled',
+      DATA_DISABLED,
       '',
     );
     expect(screen.getAllByText('Turn one off to switch this on')).toHaveLength(
@@ -96,11 +102,11 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     setup({ locales: { stored: [NL, FR, DE], live: [NL, DE], limit: 2 } });
 
     expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
-      'data-checked',
+      DATA_CHECKED,
       '',
     );
     expect(screen.getByRole('switch', { name: 'French' })).toHaveAttribute(
-      'data-unchecked',
+      DATA_UNCHECKED,
       '',
     );
   });
@@ -114,7 +120,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
       ),
     ).toBeInTheDocument();
     for (const toggle of screen.getAllByRole('switch')) {
-      expect(toggle).toHaveAttribute('data-disabled', '');
+      expect(toggle).toHaveAttribute(DATA_DISABLED, '');
     }
   });
 
@@ -124,7 +130,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
       expect(screen.getByText(/The first 2 stay live/)).toBeInTheDocument();
       expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
-        'data-unchecked',
+        DATA_UNCHECKED,
         '',
       );
       expect(
@@ -137,7 +143,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
       for (const name of ['Dutch', 'French']) {
         expect(screen.getByRole('switch', { name })).toHaveAttribute(
-          'data-disabled',
+          DATA_DISABLED,
           '',
         );
       }
@@ -150,7 +156,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
       setup({ locales: { stored: [NL, FR, DE], live: [NL, FR], limit: 2 } });
 
       expect(screen.getByRole('switch', { name: 'Spanish' })).toHaveAttribute(
-        'data-disabled',
+        DATA_DISABLED,
         '',
       );
     });
@@ -160,7 +166,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     setup({ locales: { stored: [ES], live: [ES], limit: 2 } });
 
     expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
+      screen.queryByRole('button', { name: SAVE_CHANGES }),
     ).not.toBeInTheDocument();
     expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
   });
@@ -178,11 +184,11 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Discard' }));
 
     expect(screen.getByRole('switch', { name: 'Spanish' })).toHaveAttribute(
-      'data-checked',
+      DATA_CHECKED,
       '',
     );
     expect(screen.getByRole('switch', { name: 'Dutch' })).toHaveAttribute(
-      'data-unchecked',
+      DATA_UNCHECKED,
       '',
     );
   });

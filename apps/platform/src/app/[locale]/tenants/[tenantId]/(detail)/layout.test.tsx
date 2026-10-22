@@ -1,6 +1,9 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -33,9 +36,11 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantDetailLayout, {
-  params: Promise.resolve({ tenantId: 'tenant-1' }),
+  params: Promise.resolve({ tenantId: TENANT_ID }),
   children: <div>tenant content</div>,
 });
+
+const ACME_EXAMPLE_COM = 'acme.example.com';
 
 describe(`<${TenantDetailLayout.name}/>`, () => {
   beforeEach(() => {
@@ -48,20 +53,20 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
       userId: 'user-1',
-      role: 'ADMIN',
+      role: ADMIN_ROLE.ADMIN,
       createdAt: new Date(),
     });
     getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
+      id: TENANT_ID,
       name: 'Acme Inc.',
-      primaryDomain: 'acme.example.com',
+      primaryDomain: ACME_EXAMPLE_COM,
     });
   });
 
   it('redirects to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
   });
@@ -69,7 +74,7 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
   it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(redirect).not.toHaveBeenCalled();
   });
@@ -90,14 +95,14 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
   it('renders no tenant switcher in the sidebar', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
+      id: TENANT_ID,
       slug: 'acme',
       name: 'Acme Inc.',
-      primaryDomain: 'acme.example.com',
+      primaryDomain: ACME_EXAMPLE_COM,
     });
 
     await setup();
 
-    expect(screen.queryByText('acme.example.com')).not.toBeInTheDocument();
+    expect(screen.queryByText(ACME_EXAMPLE_COM)).not.toBeInTheDocument();
   });
 });

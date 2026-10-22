@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 const { requireTenantOwnerOrAdminMock, getTenantProvisioningStatusMock } =
   vi.hoisted(() => ({
@@ -35,10 +36,10 @@ describe('getTenantProvisioningStatusAction', () => {
     const { getTenantProvisioningStatusAction } =
       await import('./get-tenant-provisioning-status-action');
 
-    await expect(getTenantProvisioningStatusAction('tenant-1')).rejects.toThrow(
+    await expect(getTenantProvisioningStatusAction(TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
-    expect(requireTenantOwnerOrAdminMock).toHaveBeenCalledWith('tenant-1');
+    expect(requireTenantOwnerOrAdminMock).toHaveBeenCalledWith(TENANT_ID);
     expect(getTenantProvisioningStatusMock).not.toHaveBeenCalled();
   });
 
@@ -55,9 +56,9 @@ describe('getTenantProvisioningStatusAction', () => {
     const { getTenantProvisioningStatusAction } =
       await import('./get-tenant-provisioning-status-action');
 
-    await expect(
-      getTenantProvisioningStatusAction('tenant-1'),
-    ).resolves.toEqual(result);
-    expect(getTenantProvisioningStatusMock).toHaveBeenCalledWith('tenant-1');
+    await expect(getTenantProvisioningStatusAction(TENANT_ID)).resolves.toEqual(
+      result,
+    );
+    expect(getTenantProvisioningStatusMock).toHaveBeenCalledWith(TENANT_ID);
   });
 });

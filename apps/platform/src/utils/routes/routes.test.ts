@@ -1,4 +1,5 @@
 import { routing } from '@platform/i18n/routing';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { adminRoutes } from './routes';
 
@@ -7,8 +8,8 @@ describe('adminRoutes', () => {
     expect(routing.localePrefix).toBe('never');
 
     expect(adminRoutes.dashboardStudio()).toBe('/dashboard/studio');
-    expect(adminRoutes.tenantStudio('tenant-1')).toBe(
-      '/tenants/tenant-1/studio',
+    expect(adminRoutes.tenantStudio(TENANT_ID)).toBe(
+      `/tenants/${TENANT_ID}/studio`,
     );
   });
 });

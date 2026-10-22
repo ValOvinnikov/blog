@@ -1,6 +1,6 @@
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import TenantProvisioningPage from './page';
 
@@ -25,7 +25,7 @@ vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
 const setup = customRenderAsync(TenantProvisioningPage, {
-  params: Promise.resolve({ tenantId: 'tenant-1' }),
+  params: Promise.resolve({ tenantId: TENANT_ID }),
 });
 
 describe(TenantProvisioningPage, () => {
@@ -42,7 +42,7 @@ describe(TenantProvisioningPage, () => {
   it('renders the provisioning status view for the resolved tenant, with no deprovisioning control', async () => {
     await setup();
 
-    expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
+    expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
     const provisioningHeading = screen.getByRole('heading', {
       level: 1,

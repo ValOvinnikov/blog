@@ -1,6 +1,9 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -36,8 +39,8 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const membership = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: 'tenant-1',
-  role: 'OWNER',
+  tenantId: TENANT_ID,
+  role: MEMBERSHIP_ROLE.OWNER,
 };
 
 const setup = customRenderAsync(DashboardFeaturesPage, {});
@@ -52,14 +55,14 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: { id: 'tenant-1', plan: 'FREE' } },
+      { membership, tenant: { id: TENANT_ID, plan: TENANT_PLAN.FREE } },
     ]);
   });
 
   it('redirects to sign-in without a session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(getSettingsFeaturesAndPresetMock).not.toHaveBeenCalled();
@@ -73,7 +76,7 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
 
     await setup();
 
-    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
   });
 });

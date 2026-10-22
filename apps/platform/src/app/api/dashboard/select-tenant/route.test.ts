@@ -1,5 +1,8 @@
+import { HTTP_STATUS } from '@blog/config';
+import { MEMBERSHIP_ROLE, ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { Session } from 'next-auth';
 
 const { getMembershipMock, getAdminByUserIdMock, listTenantsByIdsMock } =
@@ -22,6 +25,9 @@ vi.mock('@blog/db', async () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
+const ADMIN_ACTIVE_TENANT = 'admin-active-tenant';
+const DASHBOARD_URL = 'https://admin.example.com/dashboard';
+
 describe('GET /api/dashboard/select-tenant', () => {
   let GET: typeof import('./route').GET;
 
@@ -41,13 +47,13 @@ describe('GET /api/dashboard/select-tenant', () => {
 
     const response = await GET(
       new Request(
-        'https://admin.example.com/api/dashboard/select-tenant?tenantId=tenant-1',
+        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
       ),
     );
 
     expect(response.status).toBe(307);
     expect(response.headers.get('location')).toBe(
-      'https://admin.example.com/api/auth/signin?callbackUrl=%2Fapi%2Fdashboard%2Fselect-tenant%3FtenantId%3Dtenant-1',
+      `https://admin.example.com/api/auth/signin?callbackUrl=%2Fapi%2Fdashboard%2Fselect-tenant%3FtenantId%3D${TENANT_ID}`,
     );
     expect(getMembershipMock).not.toHaveBeenCalled();
   });
@@ -74,29 +80,27 @@ describe('GET /api/dashboard/select-tenant', () => {
       'user-1',
       'someone-elses-tenant',
     );
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(response.headers.get('location')).toBeNull();
-    expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
+    expect(response.cookies.get(ADMIN_ACTIVE_TENANT)).toBeUndefined();
   });
 
   it('sets the active-tenant cookie and redirects to /dashboard for a membership', async () => {
     getMembershipMock.mockResolvedValue({
       id: 'm-1',
       userId: 'user-1',
-      tenantId: 'tenant-1',
-      role: 'OWNER',
+      tenantId: TENANT_ID,
+      role: MEMBERSHIP_ROLE.OWNER,
     });
 
     const response = await GET(
       new Request(
-        'https://admin.example.com/api/dashboard/select-tenant?tenantId=tenant-1',
+        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
       ),
     );
 
-    expect(response.headers.get('location')).toBe(
-      'https://admin.example.com/dashboard',
-    );
-    expect(response.cookies.get('admin-active-tenant')?.value).toBe('tenant-1');
+    expect(response.headers.get('location')).toBe(DASHBOARD_URL);
+    expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(TENANT_ID);
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
@@ -105,7 +109,7 @@ describe('GET /api/dashboard/select-tenant', () => {
       authMock.mockResolvedValue({ user: { id: 'super-1' } });
       getAdminByUserIdMock.mockResolvedValue({
         id: 'admin-1',
-        role: 'SUPERADMIN',
+        role: ADMIN_ROLE.SUPERADMIN,
       });
     });
 
@@ -118,27 +122,23 @@ describe('GET /api/dashboard/select-tenant', () => {
         ),
       );
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
       expect(response.headers.get('location')).toBeNull();
-      expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
+      expect(response.cookies.get(ADMIN_ACTIVE_TENANT)).toBeUndefined();
     });
 
     it('sets the cookie and redirects to /dashboard for a SUPERADMIN with no membership', async () => {
-      listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
+      listTenantsByIdsMock.mockResolvedValue([{ id: TENANT_ID }]);
 
       const response = await GET(
         new Request(
-          'https://admin.example.com/api/dashboard/select-tenant?tenantId=tenant-1',
+          `https://admin.example.com/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
         ),
       );
 
-      expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
-      expect(response.headers.get('location')).toBe(
-        'https://admin.example.com/dashboard',
-      );
-      expect(response.cookies.get('admin-active-tenant')?.value).toBe(
-        'tenant-1',
-      );
+      expect(listTenantsByIdsMock).toHaveBeenCalledWith([TENANT_ID]);
+      expect(response.headers.get('location')).toBe(DASHBOARD_URL);
+      expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(TENANT_ID);
     });
   });
 });

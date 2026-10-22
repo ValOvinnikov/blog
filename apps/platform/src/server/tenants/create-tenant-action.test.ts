@@ -13,6 +13,7 @@ import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { redirect } from 'next/navigation';
@@ -23,7 +24,7 @@ const OWNER_USER_ID = 'user-1';
 const TENANT_NAME = 'Acme';
 const TENANT_DOMAIN = 'acme.example.com';
 const TENANT_ROOT_DOMAIN = 'example.com';
-const PROVISIONING_PATH = '/tenants/tenant-1/provisioning';
+const PROVISIONING_PATH = `/tenants/${TENANT_ID}/provisioning`;
 const EXISTING_TENANT_ID = 'existing-tenant';
 const OWNER_INVITE_EMAIL_FAILED_EVENT = 'tenants.owner_invite_email_failed';
 const CREATE_DRAFT_FAILED_EVENT = 'tenants.create_draft_failed';
@@ -118,7 +119,7 @@ describe('createTenantAction', () => {
     createTenantDraftMock.mockReset();
     createTenantDraftMock.mockResolvedValue({
       ok: true,
-      data: { id: 'tenant-1' },
+      data: { id: TENANT_ID },
     });
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
@@ -215,7 +216,7 @@ describe('createTenantAction', () => {
       email: OWNER_EMAIL,
       redirect: false,
     });
-    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
@@ -233,11 +234,11 @@ describe('createTenantAction', () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       OWNER_INVITE_EMAIL_FAILED_EVENT,
       expect.objectContaining({
-        tenantId: 'tenant-1',
+        tenantId: TENANT_ID,
         ownerEmail: OWNER_EMAIL,
       }),
     );
-    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
@@ -255,12 +256,12 @@ describe('createTenantAction', () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       OWNER_INVITE_EMAIL_FAILED_EVENT,
       expect.objectContaining({
-        tenantId: 'tenant-1',
+        tenantId: TENANT_ID,
         ownerEmail: OWNER_EMAIL,
         error: expect.any(Error),
       }),
     );
-    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
@@ -427,7 +428,7 @@ describe('createTenantAction', () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
@@ -461,7 +462,7 @@ describe('createTenantAction', () => {
       actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: {
         name: TENANT_NAME,
         domain: TENANT_DOMAIN,
@@ -500,12 +501,12 @@ describe('createTenantAction', () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_audit_failed',
       expect.objectContaining({
-        targetId: 'tenant-1',
+        targetId: TENANT_ID,
         error: expect.any(Error),
       }),
     );

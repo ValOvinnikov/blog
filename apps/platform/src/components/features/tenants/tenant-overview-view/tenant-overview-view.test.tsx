@@ -23,6 +23,7 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   idleProvisioningSteps,
   makeTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantOverviewView } from './tenant-overview-view';
@@ -96,6 +97,18 @@ const setup = async ({ tenant = makeTenant() } = {}) => {
   });
 };
 
+const TENANT_DETAILS = 'Tenant details';
+const SAVE_CHANGES = 'Save changes';
+const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
+  'Locked while provisioning is running.';
+const PRIMARY_DOMAIN = 'Primary domain';
+const ACME_EXAMPLE_COM = 'acme.example.com';
+const INVITED_EXAMPLE_COM = 'invited@example.com';
+const AT_20260826_0000 = '2026-08-26T00:00:00.000Z';
+const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
+const SUSPEND_TENANT = 'Suspend tenant';
+const REACTIVATE_TENANT = 'Reactivate tenant';
+
 describe(`<${TenantOverviewView.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
@@ -163,7 +176,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   it('relocates the tenant details panel here as the Identity card', async () => {
     await setup({ tenant: makeTenant({ name: 'Acme Inc.' }) });
 
-    const detailsTitle = screen.getByText('Tenant details');
+    const detailsTitle = screen.getByText(TENANT_DETAILS);
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
 
     expect(detailsTitle).toBeVisible();
@@ -183,11 +196,11 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
-    const saveButton = screen.getByRole('button', { name: 'Save changes' });
+    const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
 
     expect(nameInput).toBeDisabled();
     expect(nameInput).toHaveAccessibleDescription(
-      'Locked while provisioning is running.',
+      LOCKED_WHILE_PROVISIONING_IS_RUNNING,
     );
     expect(saveButton).toBeDisabled();
   });
@@ -218,7 +231,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     const domainInput = screen.getByRole('textbox', {
-      name: 'Primary domain',
+      name: PRIMARY_DOMAIN,
     });
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
 
@@ -239,7 +252,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
     const domainInput = screen.getByRole('textbox', {
-      name: 'Primary domain',
+      name: PRIMARY_DOMAIN,
     });
 
     expect(nameInput).toBeDisabled();
@@ -276,7 +289,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     expect(runningBanner).toBeVisible();
     expect(nameInput).toHaveAccessibleDescription(
-      'Locked while provisioning is running.',
+      LOCKED_WHILE_PROVISIONING_IS_RUNNING,
     );
 
     await act(async () => {
@@ -301,26 +314,26 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     await setup({
       tenant: makeTenant({
-        id: 'tenant-1',
-        primaryDomain: 'acme.example.com',
+        id: TENANT_ID,
+        primaryDomain: ACME_EXAMPLE_COM,
         sanityProjectId: 'proj-1',
       }),
     });
 
     expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
-      'tenant-1',
+      TENANT_ID,
     );
     expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
       AUDIT_TARGET_TYPE.TENANT,
-      'tenant-1',
+      TENANT_ID,
       { limit: 5 },
     );
     expect(listFindingsForTenantMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
       FINDING_STATUS.OPEN,
     );
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-      'acme.example.com',
+      ACME_EXAMPLE_COM,
     );
 
     const domainStatus = screen.getByText('Verified');
@@ -338,24 +351,24 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('shows a pending invite email in both the owner card and details panel', async () => {
     getTenantOwnerMembershipMock.mockResolvedValue({
-      email: 'invited@example.com',
+      email: INVITED_EXAMPLE_COM,
     });
 
     await setup();
 
-    const ownerEmail = screen.getByText('invited@example.com');
+    const ownerEmail = screen.getByText(INVITED_EXAMPLE_COM);
     const ownerEmailInput = screen.getByRole('textbox', {
       name: 'Owner email',
     });
     const joinedLabel = screen.queryByText('Joined');
 
     expect(ownerEmail).toBeVisible();
-    expect(ownerEmailInput).toHaveValue('invited@example.com');
+    expect(ownerEmailInput).toHaveValue(INVITED_EXAMPLE_COM);
     expect(joinedLabel).not.toBeInTheDocument();
   });
 
   it('always renders "Open site", linking to the tenant\'s live domain', async () => {
-    await setup({ tenant: makeTenant({ primaryDomain: 'acme.example.com' }) });
+    await setup({ tenant: makeTenant({ primaryDomain: ACME_EXAMPLE_COM }) });
 
     const link = screen.getByRole('link', {
       name: 'Open site (opens in new tab)',
@@ -371,7 +384,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     it("nests every card's title one level under the page's h1, with no h3", () => {
       const cardTitles = [
-        'Tenant details',
+        TENANT_DETAILS,
         'Domain',
         'Owner',
         'Content workspace',
@@ -396,7 +409,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   describe('archived tenant', () => {
     const archivedTenant = makeTenant({
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: new Date(AT_20260826_0000),
     });
 
     beforeEach(async () => {
@@ -404,12 +417,12 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     it('shows the archived notice', async () => {
-      const archivedNotice = screen.getByText('This tenant is archived');
+      const archivedNotice = screen.getByText(THIS_TENANT_IS_ARCHIVED);
       expect(archivedNotice).toBeVisible();
     });
 
     it("describes the details panel's disabled Save with the archived notice", async () => {
-      const saveButton = screen.getByRole('button', { name: 'Save changes' });
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
       expect(saveButton).toHaveAccessibleDescription(/This tenant is archived/);
     });
   });
@@ -417,7 +430,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   it('does not show the archived notice for a live tenant', async () => {
     await setup({ tenant: makeTenant({ deprovisionedAt: null }) });
 
-    const archivedNotice = screen.queryByText('This tenant is archived');
+    const archivedNotice = screen.queryByText(THIS_TENANT_IS_ARCHIVED);
     expect(archivedNotice).not.toBeInTheDocument();
   });
 
@@ -426,7 +439,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       await setup({ tenant: makeTenant({ status: TENANT_STATUS.ACTIVE }) });
 
       const suspendButton = screen.getByRole('button', {
-        name: 'Suspend tenant',
+        name: SUSPEND_TENANT,
       });
       expect(suspendButton).toBeVisible();
     });
@@ -435,10 +448,10 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       await setup({ tenant: makeTenant({ status: TENANT_STATUS.SUSPENDED }) });
 
       const reactivateButton = screen.getByRole('button', {
-        name: 'Reactivate tenant',
+        name: REACTIVATE_TENANT,
       });
       const suspendButton = screen.queryByRole('button', {
-        name: 'Suspend tenant',
+        name: SUSPEND_TENANT,
       });
 
       expect(reactivateButton).toBeVisible();
@@ -455,7 +468,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         });
 
         const reactivateButton = screen.queryByRole('button', {
-          name: 'Reactivate tenant',
+          name: REACTIVATE_TENANT,
         });
         expect(reactivateButton).not.toBeInTheDocument();
       },
@@ -465,15 +478,15 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       await setup({
         tenant: makeTenant({
           status: TENANT_STATUS.ARCHIVED,
-          deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+          deprovisionedAt: new Date(AT_20260826_0000),
         }),
       });
 
       const suspendButton = screen.queryByRole('button', {
-        name: 'Suspend tenant',
+        name: SUSPEND_TENANT,
       });
       const reactivateButton = screen.queryByRole('button', {
-        name: 'Reactivate tenant',
+        name: REACTIVATE_TENANT,
       });
 
       expect(suspendButton).not.toBeInTheDocument();

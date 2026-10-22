@@ -10,6 +10,7 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -76,7 +77,7 @@ describe(clearEmailLogoAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
+      tenant: { id: TENANT_ID },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
@@ -92,7 +93,7 @@ describe(clearEmailLogoAction, () => {
   it('is a no-op success when the tenant email logo is already unset', async () => {
     getEmailConfigMock.mockResolvedValue(undefined);
 
-    const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });
+    const result = await clearEmailLogoAction(TENANT_ID, { type: 'tenant' });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailConfigMock).not.toHaveBeenCalled();
@@ -100,10 +101,10 @@ describe(clearEmailLogoAction, () => {
   });
 
   it('clears the tenant email logo and deletes the blob', async () => {
-    const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });
+    const result = await clearEmailLogoAction(TENANT_ID, { type: 'tenant' });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith('tenant-1', {
+    expect(upsertEmailConfigMock).toHaveBeenCalledWith(TENANT_ID, {
       logoAssetUrl: null,
     });
     expect(delMock).toHaveBeenCalledWith(TENANT_LOGO_URL, {
@@ -118,14 +119,14 @@ describe(clearEmailLogoAction, () => {
     });
     upsertEmailTemplateMock.mockResolvedValue({});
 
-    const result = await clearEmailLogoAction('tenant-1', {
+    const result = await clearEmailLogoAction(TENANT_ID, {
       type: 'template',
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       { logoAssetUrl: null },
     );
@@ -133,7 +134,7 @@ describe(clearEmailLogoAction, () => {
   });
 
   it('records exactly one SETTINGS_UPDATED audit event', async () => {
-    await clearEmailLogoAction('tenant-1', { type: 'tenant' });
+    await clearEmailLogoAction(TENANT_ID, { type: 'tenant' });
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -141,7 +142,7 @@ describe(clearEmailLogoAction, () => {
       actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: { target: { type: 'tenant' }, operation: 'clear' },
     });
   });
@@ -149,7 +150,7 @@ describe(clearEmailLogoAction, () => {
   it('records no audit event when the write itself fails', async () => {
     upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
 
-    const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });
+    const result = await clearEmailLogoAction(TENANT_ID, { type: 'tenant' });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -161,7 +162,7 @@ describe(clearEmailLogoAction, () => {
     });
 
     await expect(
-      clearEmailLogoAction('tenant-1', { type: 'tenant' }),
+      clearEmailLogoAction(TENANT_ID, { type: 'tenant' }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(upsertEmailConfigMock).not.toHaveBeenCalled();
@@ -173,7 +174,7 @@ describe(clearEmailLogoAction, () => {
     });
 
     await expect(
-      clearEmailLogoAction('tenant-1', { type: 'tenant' }),
+      clearEmailLogoAction(TENANT_ID, { type: 'tenant' }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(upsertEmailConfigMock).not.toHaveBeenCalled();

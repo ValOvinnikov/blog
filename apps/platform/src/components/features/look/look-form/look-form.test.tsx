@@ -21,6 +21,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   settingsDraftStorageKey,
@@ -101,7 +102,7 @@ const pickLogo = async (user: UserEvent) => {
 };
 
 const setup = customRender(LookForm, {
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   tenantName: 'Acme Inc.',
   initialValues: defaultLookFormValues(),
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
@@ -241,7 +242,7 @@ describe(`<${LookForm.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
       await waitFor(() => {
-        expect(updateLookActionMock).toHaveBeenCalledWith('tenant-1', {
+        expect(updateLookActionMock).toHaveBeenCalledWith(TENANT_ID, {
           preset: PRESET_ID.CONSOLE,
           accentHue: 251,
           logoHue: null,
@@ -268,7 +269,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateLookActionMock).toHaveBeenCalledWith(
-          'tenant-1',
+          TENANT_ID,
           expect.objectContaining({
             headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
           }),
@@ -289,7 +290,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateLookActionMock).toHaveBeenCalledWith(
-          'tenant-1',
+          TENANT_ID,
           expect.objectContaining({
             languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
           }),
@@ -378,7 +379,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateLookActionMock).toHaveBeenCalledWith(
-          'tenant-1',
+          TENANT_ID,
           expect.objectContaining({ cardStyle: CARD_STYLE.OUTLINED }),
         );
       });
@@ -724,7 +725,7 @@ describe(`<${LookForm.name}/>`, () => {
       ),
     );
     writeSettingsDraft(
-      settingsDraftStorageKey({ tenantId: 'tenant-1', page: 'look' }),
+      settingsDraftStorageKey({ tenantId: TENANT_ID, page: 'look' }),
       {
         values: { ...olderValues, accentHue: 260 },
         baseline: olderValues,
@@ -764,7 +765,7 @@ describe(`<${LookForm.name}/>`, () => {
         const savedNote = await screen.findByText(ALL_CHANGES_SAVED);
         expect(savedNote).toBeVisible();
         expect(uploadBrandAssetActionMock).toHaveBeenCalledWith(
-          'tenant-1',
+          TENANT_ID,
           'logo',
           expect.any(FormData),
         );
@@ -855,7 +856,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() => {
         expect(clearBrandAssetActionMock).toHaveBeenCalledWith(
-          'tenant-1',
+          TENANT_ID,
           'logo',
         );
       });

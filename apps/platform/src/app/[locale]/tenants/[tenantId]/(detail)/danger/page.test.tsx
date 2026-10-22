@@ -1,8 +1,11 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   idleDeprovisioningSteps,
   makeTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import TenantDangerPage from './page';
@@ -57,8 +60,16 @@ vi.mock(
 );
 
 const setup = customRenderAsync(TenantDangerPage, {
-  params: Promise.resolve({ tenantId: 'tenant-1' }),
+  params: Promise.resolve({ tenantId: TENANT_ID }),
 });
+
+const NEXT_HTTP_ERROR_FALLBACK_404 = 'NEXT_HTTP_ERROR_FALLBACK;404';
+const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
+const REACTIVATE_TENANT = 'Reactivate tenant';
+const AT_20260410_0000 = '2026-04-10T00:00:00.000Z';
+const DEPROVISION_THIS_TENANT = 'Deprovision this tenant';
+const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
+const TEARDOWN_HISTORY = 'Teardown history';
 
 describe(TenantDangerPage, () => {
   beforeEach(() => {
@@ -66,7 +77,7 @@ describe(TenantDangerPage, () => {
     requireSuperAdminMock.mockReset();
     requireSuperAdminMock.mockResolvedValue({
       id: 'admin-1',
-      role: 'SUPERADMIN',
+      role: ADMIN_ROLE.SUPERADMIN,
     });
     requireTenantByIdMock.mockReset();
     requireTenantByIdMock.mockResolvedValue({ tenant: makeTenant() });
@@ -81,9 +92,11 @@ describe(TenantDangerPage, () => {
   });
 
   it('never queries the tenant when the caller is not a superadmin', async () => {
-    requireSuperAdminMock.mockRejectedValue(new Error('NEXT_REDIRECT'));
+    requireSuperAdminMock.mockRejectedValue(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
+    );
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(requireTenantByIdMock).not.toHaveBeenCalled();
   });
@@ -92,7 +105,7 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(requireSuperAdminMock).toHaveBeenCalled();
-    expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
+    expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
     expect(
       screen.getByRole('heading', { level: 1, name: 'Danger zone' }),
     ).toBeVisible();
@@ -101,24 +114,22 @@ describe(TenantDangerPage, () => {
 
   it('never queries the deprovision request when the tenant does not exist', async () => {
     requireTenantByIdMock.mockRejectedValue(
-      new Error('NEXT_HTTP_ERROR_FALLBACK;404'),
+      new Error(NEXT_HTTP_ERROR_FALLBACK_404),
     );
 
-    await expect(setup()).rejects.toThrow('NEXT_HTTP_ERROR_FALLBACK;404');
+    await expect(setup()).rejects.toThrow(NEXT_HTTP_ERROR_FALLBACK_404);
 
     expect(getLatestDeprovisionRequestedAtMock).not.toHaveBeenCalled();
   });
 
   it("passes the tenant's latest deprovision request through, so a pending request shows the starting state", async () => {
     getLatestDeprovisionRequestedAtMock.mockResolvedValue(
-      new Date('2026-08-12T14:18:00.000Z'),
+      new Date(AT_20260812_1418),
     );
 
     await setup();
 
-    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-    );
+    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(TENANT_ID);
     expect(screen.getByText('Starting…')).toBeVisible();
   });
 
@@ -126,21 +137,21 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(
-      screen.queryByRole('button', { name: 'Reactivate tenant' }),
+      screen.queryByRole('button', { name: REACTIVATE_TENANT }),
     ).not.toBeInTheDocument();
   });
 
   it('offers reactivation for an already-deprovisioned tenant', async () => {
     requireTenantByIdMock.mockResolvedValue({
       tenant: makeTenant({
-        deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+        deprovisionedAt: new Date(AT_20260410_0000),
       }),
     });
 
     await setup();
 
     expect(
-      screen.getByRole('button', { name: 'Reactivate tenant' }),
+      screen.getByRole('button', { name: REACTIVATE_TENANT }),
     ).toBeVisible();
   });
 
@@ -149,7 +160,7 @@ describe(TenantDangerPage, () => {
       tenant: makeTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: AT_20260812_1418 },
         },
       }),
     });
@@ -180,14 +191,14 @@ describe(TenantDangerPage, () => {
       expect(
         screen.getByRole('heading', {
           level: 2,
-          name: 'Deprovision this tenant',
+          name: DEPROVISION_THIS_TENANT,
         }),
       ).toBeVisible();
       expect(
-        screen.queryByText('This tenant is archived'),
+        screen.queryByText(THIS_TENANT_IS_ARCHIVED),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('heading', { name: 'Teardown history' }),
+        screen.queryByRole('heading', { name: TEARDOWN_HISTORY }),
       ).not.toBeInTheDocument();
     });
   });
@@ -195,11 +206,11 @@ describe(TenantDangerPage, () => {
   describe('archived-tenant reorganisation', () => {
     const archivedTenant = () =>
       makeTenant({
-        deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+        deprovisionedAt: new Date(AT_20260410_0000),
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
+            startedAt: AT_20260812_1418,
             finishedAt: '2026-08-12T14:20:00.000Z',
           },
         },
@@ -210,7 +221,7 @@ describe(TenantDangerPage, () => {
 
       await setup();
 
-      expect(screen.getByText('This tenant is archived')).toBeVisible();
+      expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
       expect(
         screen.getByRole('heading', {
           level: 2,
@@ -224,10 +235,10 @@ describe(TenantDangerPage, () => {
         }),
       ).toBeVisible();
       expect(
-        screen.queryByRole('heading', { name: 'Deprovision this tenant' }),
+        screen.queryByRole('heading', { name: DEPROVISION_THIS_TENANT }),
       ).not.toBeInTheDocument();
       expect(
-        screen.getByRole('heading', { name: 'Teardown history' }),
+        screen.getByRole('heading', { name: TEARDOWN_HISTORY }),
       ).toBeVisible();
       expect(
         screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
@@ -237,7 +248,7 @@ describe(TenantDangerPage, () => {
     it('renders no Teardown history section when the tenant has never been through a deprovisioning run', async () => {
       requireTenantByIdMock.mockResolvedValue({
         tenant: makeTenant({
-          deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+          deprovisionedAt: new Date(AT_20260410_0000),
           deprovisioningSteps: null,
         }),
       });
@@ -245,7 +256,7 @@ describe(TenantDangerPage, () => {
       await setup();
 
       expect(
-        screen.queryByRole('heading', { name: 'Teardown history' }),
+        screen.queryByRole('heading', { name: TEARDOWN_HISTORY }),
       ).not.toBeInTheDocument();
     });
   });

@@ -1,4 +1,5 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -31,7 +32,7 @@ describe(revalidateSiteConfig, () => {
     envMock.SITE_CONFIG_REVALIDATE_SECRET = REVALIDATE_SECRET;
     fetchMock.mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
 
-    await revalidateSiteConfig('tenant-1');
+    await revalidateSiteConfig(TENANT_ID);
 
     expect(fetchMock).toHaveBeenCalledWith(
       new URL('https://example.com/api/revalidate-site-config'),
@@ -41,7 +42,7 @@ describe(revalidateSiteConfig, () => {
           Authorization: `Bearer ${REVALIDATE_SECRET}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tenantId: 'tenant-1' }),
+        body: JSON.stringify({ tenantId: TENANT_ID }),
         signal: expect.any(AbortSignal),
       },
     );
@@ -50,7 +51,7 @@ describe(revalidateSiteConfig, () => {
   it('logs and skips the call when WEB_APP_URL is not configured', async () => {
     envMock.SITE_CONFIG_REVALIDATE_SECRET = REVALIDATE_SECRET;
 
-    await revalidateSiteConfig('tenant-1');
+    await revalidateSiteConfig(TENANT_ID);
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(REVALIDATE_SKIPPED_EVENT);
@@ -59,7 +60,7 @@ describe(revalidateSiteConfig, () => {
   it('logs and skips the call when SITE_CONFIG_REVALIDATE_SECRET is not configured', async () => {
     envMock.WEB_APP_URL = WEB_APP_URL;
 
-    await revalidateSiteConfig('tenant-1');
+    await revalidateSiteConfig(TENANT_ID);
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(REVALIDATE_SKIPPED_EVENT);
@@ -72,7 +73,7 @@ describe(revalidateSiteConfig, () => {
       new Response(null, { status: HTTP_STATUS.UNAUTHORIZED }),
     );
 
-    await expect(revalidateSiteConfig('tenant-1')).resolves.toBeUndefined();
+    await expect(revalidateSiteConfig(TENANT_ID)).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'site_config.revalidate_failed',
@@ -85,7 +86,7 @@ describe(revalidateSiteConfig, () => {
     envMock.SITE_CONFIG_REVALIDATE_SECRET = REVALIDATE_SECRET;
     fetchMock.mockRejectedValue(new Error(NETWORK_ERROR_MESSAGE));
 
-    await expect(revalidateSiteConfig('tenant-1')).resolves.toBeUndefined();
+    await expect(revalidateSiteConfig(TENANT_ID)).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(REVALIDATE_ERROR_EVENT, {
       error: new Error(NETWORK_ERROR_MESSAGE),
@@ -99,7 +100,7 @@ describe(revalidateSiteConfig, () => {
       new DOMException('The signal timed out', 'TimeoutError'),
     );
 
-    await expect(revalidateSiteConfig('tenant-1')).resolves.toBeUndefined();
+    await expect(revalidateSiteConfig(TENANT_ID)).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
       REVALIDATE_ERROR_EVENT,

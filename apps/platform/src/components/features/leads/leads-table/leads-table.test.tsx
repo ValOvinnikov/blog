@@ -5,6 +5,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeLead } from '@platform/testing/leads/fixtures';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { toLeadRow } from '@platform/utils/lead-row/lead-row';
 import type { ComponentProps } from 'react';
 
@@ -16,7 +17,7 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
 
 const setup = (props: Partial<ComponentProps<typeof LeadsTable>> = {}) =>
   renderWithIntl(
-    <LeadsTenantProvider tenantId="tenant-1">
+    <LeadsTenantProvider tenantId={TENANT_ID}>
       <LeadsTable leads={[toLeadRow(makeLead())]} {...props} />
     </LeadsTenantProvider>,
   );

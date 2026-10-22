@@ -9,7 +9,7 @@ import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -61,7 +61,7 @@ const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
     {
       membership,
       tenant: makeTenant({
-        id: 'tenant-1',
+        id: TENANT_ID,
         name: 'Acme Inc.',
         sanityProjectId: 'proj-acme',
         sanityDataset: 'production',

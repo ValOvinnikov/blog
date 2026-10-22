@@ -14,6 +14,7 @@ import type {
   TTenantDeprovisioningState,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
 import {
   toClientTenant,
   type TClientTenant,
@@ -83,12 +84,14 @@ const doneProvisioningSteps = (): TTenantProvisioningState => {
   };
 };
 
+export const TENANT_ID = faker.string.uuid();
+
 const TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
 const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
 
 export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
-    id: 'tenant-1',
+    id: TENANT_ID,
     name: 'Acme Inc.',
     primaryDomain: 'acme.example.com',
     sanityProjectId: null,

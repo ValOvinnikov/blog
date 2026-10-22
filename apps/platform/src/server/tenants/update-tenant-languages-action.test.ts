@@ -12,6 +12,7 @@ import { requireTenantMembership } from '@platform/server/auth/require-tenant-me
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -51,7 +52,7 @@ describe(updateTenantLanguagesAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', plan: TENANT_PLAN.GROWTH },
+      tenant: { id: TENANT_ID, plan: TENANT_PLAN.GROWTH },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockReset();
@@ -70,10 +71,10 @@ describe(updateTenantLanguagesAction, () => {
       data: [NL, FR],
     });
 
-    const result = await updateTenantLanguagesAction('tenant-1', [NL, FR]);
+    const result = await updateTenantLanguagesAction(TENANT_ID, [NL, FR]);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(setTenantAdditionalLocalesMock).toHaveBeenCalledWith('tenant-1', [
+    expect(setTenantAdditionalLocalesMock).toHaveBeenCalledWith(TENANT_ID, [
       NL,
       FR,
     ]);
@@ -81,7 +82,7 @@ describe(updateTenantLanguagesAction, () => {
       expect.objectContaining({
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: 'tenant-1',
+        targetId: TENANT_ID,
         details: { additionalLocales: [NL, FR] },
       }),
     );
@@ -90,13 +91,13 @@ describe(updateTenantLanguagesAction, () => {
   it('refreshes the public site for the tenant after saving', async () => {
     setTenantAdditionalLocalesMock.mockResolvedValue({ ok: true, data: [NL] });
 
-    await updateTenantLanguagesAction('tenant-1', [NL]);
+    await updateTenantLanguagesAction(TENANT_ID, [NL]);
 
-    expect(revalidateSiteConfigMock).toHaveBeenCalledWith('tenant-1');
+    expect(revalidateSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
   });
 
   it('rejects a language outside the supported list without saving', async () => {
-    const result = await updateTenantLanguagesAction('tenant-1', ['xx']);
+    const result = await updateTenantLanguagesAction(TENANT_ID, ['xx']);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -111,7 +112,7 @@ describe(updateTenantLanguagesAction, () => {
       error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
     });
 
-    const result = await updateTenantLanguagesAction('tenant-1', [NL, FR]);
+    const result = await updateTenantLanguagesAction(TENANT_ID, [NL, FR]);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -131,7 +132,7 @@ describe(updateTenantLanguagesAction, () => {
       error: ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED,
     });
 
-    const result = await updateTenantLanguagesAction('tenant-1', [NL]);
+    const result = await updateTenantLanguagesAction(TENANT_ID, [NL]);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -146,7 +147,7 @@ describe(updateTenantLanguagesAction, () => {
       error: ERROR_CODE.DB_NOT_FOUND,
     });
 
-    const result = await updateTenantLanguagesAction('tenant-1', [NL]);
+    const result = await updateTenantLanguagesAction(TENANT_ID, [NL]);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,

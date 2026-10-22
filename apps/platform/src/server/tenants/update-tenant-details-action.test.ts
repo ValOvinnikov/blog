@@ -11,7 +11,7 @@ import { auth } from '@platform/server/auth/auth';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -50,7 +50,6 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
-const TENANT_ID = 'tenant-1';
 const TENANT_NAME = 'Acme';
 const UPDATED = 'updated';
 const OWNER_EMAIL = 'owner@example.com';

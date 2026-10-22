@@ -19,6 +19,7 @@ import {
 import {
   idleProvisioningSteps,
   makeClientTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -37,6 +38,28 @@ const retryProvisioningStepActionMock = vi.mocked(retryProvisioningStepAction);
 const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
 );
+
+const AT_20260826_0000 = '2026-08-26T00:00:00.000Z';
+const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
+const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
+const RUN_STATUS_LIVE = 'run-status-live';
+const INVITED_PENDING = 'Invited, pending';
+const PROVISIONING_STEPS = 'provisioning-steps';
+const HIDDEN_ICON_SELECTOR = 'span[aria-hidden="true"]';
+const NOT_STARTED = 'Not started';
+const VERCEL_DOMAINS_FAILURE =
+  'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error';
+const RETRY_PROVISIONING = 'Retry provisioning';
+const DOMAINS_API_ERROR = 'Vercel Domains API returned 500';
+const START_PROVISIONING = 'Start provisioning';
+const AT_20261015_1300 = '2026-10-15T13:00:00.000Z';
+const QUEUED_PROVISIONING_WORKFLOW_STARTING_UP =
+  'Queued — the provisioning workflow is starting up';
+const QUEUED_RUN_ELAPSED = 'queued-run-elapsed';
+const ARIA_EXPANDED = 'aria-expanded';
+const AT_20260812_1425 = '2026-08-12T14:25:00.000Z';
+const AT_20260812_1419 = '2026-08-12T14:19:00.000Z';
+const AT_20260812_1420 = '2026-08-12T14:20:00.000Z';
 
 describe(ProvisioningStatusView, () => {
   let user: UserEvent;
@@ -88,13 +111,13 @@ describe(ProvisioningStatusView, () => {
 
   it('shows the archived notice for a deprovisioned tenant', () => {
     const tenant = makeClientTenant({
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: new Date(AT_20260826_0000),
     });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const thisTenantIsText = screen.getByText('This tenant is archived');
+    const thisTenantIsText = screen.getByText(THIS_TENANT_IS_ARCHIVED);
 
     expect(thisTenantIsText).toBeVisible();
   });
@@ -105,7 +128,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const thisTenantIsText = screen.queryByText('This tenant is archived');
+    const thisTenantIsText = screen.queryByText(THIS_TENANT_IS_ARCHIVED);
 
     expect(thisTenantIsText).not.toBeInTheDocument();
   });
@@ -118,7 +141,7 @@ describe(ProvisioningStatusView, () => {
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
         },
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: AT_20260812_1418 },
       },
     });
     render(
@@ -128,9 +151,9 @@ describe(ProvisioningStatusView, () => {
     const runningText = within(
       screen.getByRole('heading', { name: 'Provisioning' }),
     ).queryByText('Running…');
-    const runningText2 = within(
-      screen.getByTestId('run-status-live'),
-    ).getByText('Running…');
+    const runningText2 = within(screen.getByTestId(RUN_STATUS_LIVE)).getByText(
+      'Running…',
+    );
 
     expect(runningText).not.toBeInTheDocument();
     expect(runningText2).toBeVisible();
@@ -141,7 +164,7 @@ describe(ProvisioningStatusView, () => {
     render(<ProvisioningStatusView tenant={tenant} ownerEmail={undefined} />);
 
     const ownerText = screen.getByText('Owner');
-    const invitedPendingText = screen.getByText('Invited, pending');
+    const invitedPendingText = screen.getByText(INVITED_PENDING);
 
     expect(ownerText).toBeVisible();
     expect(invitedPendingText).toBeVisible();
@@ -153,7 +176,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const invitedPendingText = screen.queryByText('Invited, pending');
+    const invitedPendingText = screen.queryByText(INVITED_PENDING);
 
     expect(invitedPendingText).not.toBeInTheDocument();
   });
@@ -177,7 +200,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const sidebar = screen.getByTestId('provisioning-steps');
+    const sidebar = screen.getByTestId(PROVISIONING_STEPS);
     const stepsHeading = within(sidebar).getByRole('heading', {
       level: 2,
       name: /^Steps/,
@@ -204,9 +227,9 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const n2Of6Text = within(
-      screen.getByTestId('provisioning-steps'),
-    ).getByText('2 of 6 done');
+    const n2Of6Text = within(screen.getByTestId(PROVISIONING_STEPS)).getByText(
+      '2 of 6 done',
+    );
 
     expect(n2Of6Text).toBeVisible();
   });
@@ -265,7 +288,7 @@ describe(ProvisioningStatusView, () => {
 
     const statusList = screen.queryAllByRole('status');
     const n1Text = screen.getByText('1', {
-      selector: 'span[aria-hidden="true"]',
+      selector: HIDDEN_ICON_SELECTOR,
     });
 
     expect(statusList).toHaveLength(0);
@@ -307,23 +330,23 @@ describe(ProvisioningStatusView, () => {
 
     expect(statusList).toHaveLength(0);
 
-    for (const text of ['Not started', 'Running…', 'Complete', 'Failed']) {
+    for (const text of [NOT_STARTED, 'Running…', 'Complete', 'Failed']) {
       for (const element of screen.getAllByText(text)) {
         expect(element).not.toHaveAttribute('aria-hidden');
       }
     }
 
     const n1Text = screen.getByText('1', {
-      selector: 'span[aria-hidden="true"]',
+      selector: HIDDEN_ICON_SELECTOR,
     });
     const n2Text = screen.getByText('2', {
-      selector: 'span[aria-hidden="true"]',
+      selector: HIDDEN_ICON_SELECTOR,
     });
     const checkMark = screen.getByText('✓', {
-      selector: 'span[aria-hidden="true"]',
+      selector: HIDDEN_ICON_SELECTOR,
     });
     const failureMark = screen.getByText('!', {
-      selector: 'span[aria-hidden="true"]',
+      selector: HIDDEN_ICON_SELECTOR,
     });
 
     expect(n1Text).toBeVisible();
@@ -339,8 +362,7 @@ describe(ProvisioningStatusView, () => {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error:
-            'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
+          error: VERCEL_DOMAINS_FAILURE,
         },
       },
     });
@@ -349,12 +371,12 @@ describe(ProvisioningStatusView, () => {
     );
 
     const retryProvisioningButtons = screen.getAllByRole('button', {
-      name: 'Retry provisioning',
+      name: RETRY_PROVISIONING,
     });
     const retryProvisioningButton = within(
-      screen.getByTestId('provisioning-steps'),
+      screen.getByTestId(PROVISIONING_STEPS),
     ).queryByRole('button', {
-      name: 'Retry provisioning',
+      name: RETRY_PROVISIONING,
     });
     const failedTexts = screen.getAllByText('Failed');
 
@@ -369,8 +391,7 @@ describe(ProvisioningStatusView, () => {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error:
-            'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
+          error: VERCEL_DOMAINS_FAILURE,
         },
       },
     });
@@ -379,10 +400,8 @@ describe(ProvisioningStatusView, () => {
     );
 
     const vercelApiPostText = within(
-      screen.getByTestId('provisioning-steps'),
-    ).queryByText(
-      'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
-    );
+      screen.getByTestId(PROVISIONING_STEPS),
+    ).queryByText(VERCEL_DOMAINS_FAILURE);
 
     expect(vercelApiPostText).not.toBeInTheDocument();
   });
@@ -494,7 +513,7 @@ describe(ProvisioningStatusView, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Vercel Domains API returned 500',
+            error: DOMAINS_API_ERROR,
           },
         },
       });
@@ -525,10 +544,10 @@ describe(ProvisioningStatusView, () => {
       );
 
       const failureMark = screen.queryByText('!', {
-        selector: 'span[aria-hidden="true"]',
+        selector: HIDDEN_ICON_SELECTOR,
       });
       const n4Text = screen.getByText('4', {
-        selector: 'span[aria-hidden="true"]',
+        selector: HIDDEN_ICON_SELECTOR,
       });
 
       expect(failureMark).not.toBeInTheDocument();
@@ -544,7 +563,7 @@ describe(ProvisioningStatusView, () => {
       );
 
       const retryProvisioningButton = screen.queryByRole('button', {
-        name: 'Retry provisioning',
+        name: RETRY_PROVISIONING,
       });
 
       expect(retryProvisioningButton).not.toBeInTheDocument();
@@ -558,7 +577,7 @@ describe(ProvisioningStatusView, () => {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel Domains API returned 500',
+          error: DOMAINS_API_ERROR,
         },
       },
     });
@@ -566,12 +585,10 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Retry provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: RETRY_PROVISIONING }));
 
     await waitFor(() => {
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
     });
   });
 
@@ -584,7 +601,7 @@ describe(ProvisioningStatusView, () => {
     );
 
     const startProvisioningButtons = screen.getAllByRole('button', {
-      name: 'Start provisioning',
+      name: START_PROVISIONING,
     });
 
     expect(startProvisioningButtons).toHaveLength(1);
@@ -617,7 +634,7 @@ describe(ProvisioningStatusView, () => {
     );
 
     const startProvisioningButton = screen.queryByRole('button', {
-      name: 'Start provisioning',
+      name: START_PROVISIONING,
     });
 
     expect(startProvisioningButton).not.toBeInTheDocument();
@@ -631,12 +648,10 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     await waitFor(() => {
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
     });
   });
 
@@ -656,12 +671,10 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const startProvisioningButton = screen.queryByRole('button', {
-      name: 'Start provisioning',
+      name: START_PROVISIONING,
     });
     const runningCount = screen.getAllByText('Running…').length;
 
@@ -690,14 +703,12 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const liveRegion = screen.getByTestId('run-status-live');
-    const notStartedText = within(liveRegion).getByText('Not started');
+    const liveRegion = screen.getByTestId(RUN_STATUS_LIVE);
+    const notStartedText = within(liveRegion).getByText(NOT_STARTED);
 
     expect(notStartedText).toBeVisible();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const runningText = within(liveRegion).getByText('Running…');
 
@@ -720,15 +731,13 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const couldNotStartText = await screen.findByText(
       "Couldn't start provisioning — try again.",
     );
     const startProvisioningButton = await screen.findByRole('button', {
-      name: 'Start provisioning',
+      name: START_PROVISIONING,
     });
 
     expect(couldNotStartText).toBeVisible();
@@ -747,9 +756,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const couldNotFindText = await screen.findByText(
       "Couldn't find this tenant — refresh the page and try again.",
@@ -770,9 +777,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const aProvisioningRunText = await screen.findByText(
       'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
@@ -786,14 +791,14 @@ describe(ProvisioningStatusView, () => {
   it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
     const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: new Date(AT_20260826_0000),
     });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     const startButton = screen.getByRole('button', {
-      name: 'Start provisioning',
+      name: START_PROVISIONING,
     });
     expect(startButton).toBeDisabled();
 
@@ -804,12 +809,12 @@ describe(ProvisioningStatusView, () => {
   it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
     const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: new Date(AT_20260826_0000),
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel Domains API returned 500',
+          error: DOMAINS_API_ERROR,
         },
       },
     });
@@ -818,7 +823,7 @@ describe(ProvisioningStatusView, () => {
     );
 
     const retryButton = screen.getByRole('button', {
-      name: 'Retry provisioning',
+      name: RETRY_PROVISIONING,
     });
     expect(retryButton).toBeDisabled();
 
@@ -829,14 +834,14 @@ describe(ProvisioningStatusView, () => {
   it('describes the disabled Start button with the archived notice, for a screen-reader user', () => {
     const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: new Date(AT_20260826_0000),
     });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     const startProvisioningButton = screen.getByRole('button', {
-      name: 'Start provisioning',
+      name: START_PROVISIONING,
     });
 
     expect(startProvisioningButton).toHaveAccessibleDescription(
@@ -847,12 +852,12 @@ describe(ProvisioningStatusView, () => {
   it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
     const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: new Date(AT_20260826_0000),
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel Domains API returned 500',
+          error: DOMAINS_API_ERROR,
         },
       },
     });
@@ -861,7 +866,7 @@ describe(ProvisioningStatusView, () => {
     );
 
     const retryProvisioningButton = screen.getByRole('button', {
-      name: 'Retry provisioning',
+      name: RETRY_PROVISIONING,
     });
 
     expect(retryProvisioningButton).toHaveAccessibleDescription(
@@ -881,9 +886,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Start provisioning' }),
-    );
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const thisTenantIsText = await screen.findByText(
       "This tenant is archived; provisioning can't be started.",
@@ -928,7 +931,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const sidebar = screen.getByTestId('provisioning-steps');
+      const sidebar = screen.getByTestId(PROVISIONING_STEPS);
       const runningText = within(sidebar).getByText('Running…');
 
       expect(runningText).toBeVisible();
@@ -941,7 +944,7 @@ describe(ProvisioningStatusView, () => {
       });
 
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TENANT_ID,
       );
       const completeText = within(sidebar).getByText('Complete');
       const runningText2 = within(sidebar).queryByText('Running…');
@@ -1045,7 +1048,7 @@ describe(ProvisioningStatusView, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
-          run: { admittedAt: '2026-10-15T13:00:00.000Z' } as TProvisioningRun,
+          run: { admittedAt: AT_20261015_1300 } as TProvisioningRun,
         },
       });
       render(
@@ -1056,11 +1059,11 @@ describe(ProvisioningStatusView, () => {
       );
 
       const queuedTheProvisioningText = screen.getByText(
-        'Queued — the provisioning workflow is starting up',
+        QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
       );
-      const queuedRunElapsed = screen.getByTestId('queued-run-elapsed');
+      const queuedRunElapsed = screen.getByTestId(QUEUED_RUN_ELAPSED);
       const startingText = within(
-        screen.getByTestId('run-status-live'),
+        screen.getByTestId(RUN_STATUS_LIVE),
       ).getByText('Starting…');
       const queuedText = within(
         screen.getByTestId(
@@ -1077,7 +1080,7 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      const queuedRunElapsed2 = screen.getByTestId('queued-run-elapsed');
+      const queuedRunElapsed2 = screen.getByTestId(QUEUED_RUN_ELAPSED);
 
       expect(queuedRunElapsed2).toHaveTextContent('1:05 waiting');
     });
@@ -1087,7 +1090,7 @@ describe(ProvisioningStatusView, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
-          run: { admittedAt: '2026-10-15T13:00:00.000Z' } as TProvisioningRun,
+          run: { admittedAt: AT_20261015_1300 } as TProvisioningRun,
         },
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
@@ -1109,11 +1112,11 @@ describe(ProvisioningStatusView, () => {
       });
 
       const queuedTheProvisioningText = screen.queryByText(
-        'Queued — the provisioning workflow is starting up',
+        QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
       );
-      const runningText = within(
-        screen.getByTestId('run-status-live'),
-      ).getByText('Running…');
+      const runningText = within(screen.getByTestId(RUN_STATUS_LIVE)).getByText(
+        'Running…',
+      );
 
       expect(queuedTheProvisioningText).not.toBeInTheDocument();
       expect(runningText).toBeVisible();
@@ -1127,7 +1130,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     const stepsToggle = () =>
-      within(screen.getByTestId('provisioning-steps')).getByRole('button', {
+      within(screen.getByTestId(PROVISIONING_STEPS)).getByRole('button', {
         name: /Steps/,
       });
 
@@ -1148,7 +1151,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -1172,7 +1175,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'false');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -1206,7 +1209,7 @@ describe(ProvisioningStatusView, () => {
       );
 
       const disclosure = stepsToggle();
-      expect(disclosure).toHaveAttribute('aria-expanded', 'true');
+      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -1217,16 +1220,16 @@ describe(ProvisioningStatusView, () => {
         });
       }
 
-      expect(disclosure).toHaveAttribute('aria-expanded', 'false');
+      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'false');
 
       fireEvent.click(disclosure);
-      expect(disclosure).toHaveAttribute('aria-expanded', 'true');
+      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(disclosure).toHaveAttribute('aria-expanded', 'true');
+      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
   });
 
@@ -1240,13 +1243,13 @@ describe(ProvisioningStatusView, () => {
     });
 
     it("shows a done step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-      vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
+      vi.setSystemTime(new Date(AT_20260812_1425));
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: '2026-08-12T14:19:00.000Z',
+            updatedAt: AT_20260812_1419,
           },
         },
       });
@@ -1259,17 +1262,17 @@ describe(ProvisioningStatusView, () => {
 
       const timestamp = screen.getByText('6m ago');
       expect(timestamp.tagName).toBe('TIME');
-      expect(timestamp).toHaveAttribute('dateTime', '2026-08-12T14:19:00.000Z');
+      expect(timestamp).toHaveAttribute('dateTime', AT_20260812_1419);
     });
 
     it("keeps a step's timestamp outside the aria-live status region", () => {
-      vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
+      vi.setSystemTime(new Date(AT_20260812_1425));
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: '2026-08-12T14:19:00.000Z',
+            updatedAt: AT_20260812_1419,
           },
         },
       });
@@ -1282,7 +1285,7 @@ describe(ProvisioningStatusView, () => {
 
       const liveRegions = [
         ...screen.getAllByTestId(/^step-status-live-/),
-        screen.getByTestId('run-status-live'),
+        screen.getByTestId(RUN_STATUS_LIVE),
       ];
       expect(liveRegions.length).toBeGreaterThan(0);
       for (const region of liveRegions) {
@@ -1291,14 +1294,14 @@ describe(ProvisioningStatusView, () => {
     });
 
     it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-      vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
+      vi.setSystemTime(new Date(AT_20260812_1425));
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'boom',
-            updatedAt: '2026-08-12T14:20:00.000Z',
+            updatedAt: AT_20260812_1420,
           },
         },
       });
@@ -1311,7 +1314,7 @@ describe(ProvisioningStatusView, () => {
 
       const timestamp = screen.getByText('5m ago');
       expect(timestamp.tagName).toBe('TIME');
-      expect(timestamp).toHaveAttribute('dateTime', '2026-08-12T14:20:00.000Z');
+      expect(timestamp).toHaveAttribute('dateTime', AT_20260812_1420);
     });
 
     it('shows "now" for a running step instead of a timestamp', () => {
@@ -1382,7 +1385,7 @@ describe(ProvisioningStatusView, () => {
         provisioningSteps: {
           ...idleProvisioningSteps(),
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
+            startedAt: AT_20260812_1418,
             finishedAt: '2026-08-12T14:22:00.000Z',
             registry: 'production',
           },

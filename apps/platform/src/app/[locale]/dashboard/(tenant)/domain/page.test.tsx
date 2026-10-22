@@ -1,3 +1,5 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { auth } from '@platform/server/auth/auth';
 import {
@@ -6,7 +8,7 @@ import {
   screen,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -43,11 +45,14 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const membership = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: 'tenant-1',
-  role: 'OWNER',
+  tenantId: TENANT_ID,
+  role: MEMBERSHIP_ROLE.OWNER,
 };
 
 const setup = customRenderAsync(DashboardDomainPage, {});
+
+const VERCEL_A_RECORD = '76.76.21.21';
+const NORTHWIND_DEV = 'northwind.dev';
 
 describe(`<${DashboardDomainPage.name}/>`, () => {
   beforeEach(() => {
@@ -59,14 +64,14 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
     getProjectDomainMock.mockReset();
     getProjectDomainMock.mockResolvedValue({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
+      dnsRecords: [{ type: 'A', name: '@', value: VERCEL_A_RECORD }],
     });
   });
 
   it('redirects to sign-in without resolving a tenant when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(getProjectDomainMock).not.toHaveBeenCalled();
@@ -74,8 +79,8 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
 
   it("renders the resolved tenant's domain, live status, and DNS records table", async () => {
     const tenant = makeTenant({
-      id: 'tenant-1',
-      primaryDomain: 'northwind.dev',
+      id: TENANT_ID,
+      primaryDomain: NORTHWIND_DEV,
     });
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership, tenant },
@@ -85,9 +90,7 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
       await setup();
     });
 
-    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
-      'northwind.dev',
-    );
+    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(NORTHWIND_DEV);
     expect(
       screen.getByRole('heading', { level: 1, name: 'Domain' }),
     ).toBeVisible();
@@ -99,6 +102,6 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
     ).toBeVisible();
     expect(screen.getByText('Awaiting DNS')).toBeVisible();
     expect(screen.getByRole('table')).toBeVisible();
-    expect(screen.getByText('76.76.21.21')).toBeVisible();
+    expect(screen.getByText(VERCEL_A_RECORD)).toBeVisible();
   });
 });

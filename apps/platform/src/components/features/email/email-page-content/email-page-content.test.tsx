@@ -3,7 +3,7 @@ import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import { EmailPageContent } from './email-page-content';
@@ -72,6 +72,11 @@ const TEMPLATE_LOGO_URLS = {
 
 const setup = customRenderAsync(EmailPageContent, { tenant });
 
+const YOURE_INVITED_ACME_CO = "You're invited to Acme Co";
+const SUPPORT_ACME_EXAMPLE = 'support@acme.example';
+const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
+const LEADS_ACME_EXAMPLE = 'leads@acme.example';
+
 describe(`<${EmailPageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
@@ -85,7 +90,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
       {
         templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
         locale: LOCALE_ISO_CODES.EN,
-        subject: "You're invited to Acme Co",
+        subject: YOURE_INVITED_ACME_CO,
         body: null,
       },
     ]);
@@ -109,9 +114,9 @@ describe(`<${EmailPageContent.name}/>`, () => {
   it("renders the tenant's saved email_config row when one exists", async () => {
     getEmailConfigMock.mockResolvedValue({
       id: 'config-1',
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       senderName: 'Acme Co',
-      replyToAddress: 'support@acme.example',
+      replyToAddress: SUPPORT_ACME_EXAMPLE,
       footerPostalAddress: '123 Main St',
       logoAssetUrl: undefined,
       createdAt: new Date(),
@@ -121,28 +126,28 @@ describe(`<${EmailPageContent.name}/>`, () => {
     await setup();
 
     expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
-    expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
+    expect(screen.getByDisplayValue(SUPPORT_ACME_EXAMPLE)).toBeVisible();
   });
 
   it('hides the contact recipient field on a plan without the contact form', async () => {
     await setup();
 
     expect(
-      screen.queryByLabelText('Send contact messages to'),
+      screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
     ).not.toBeInTheDocument();
   });
 
   it('shows the stored contact recipient on a plan with the contact form', async () => {
     getEmailConfigMock.mockResolvedValue({
       senderName: 'Acme Co',
-      contactRecipient: 'leads@acme.example',
+      contactRecipient: LEADS_ACME_EXAMPLE,
       updatedAt: new Date(),
     });
 
-    await setup({ tenant: { ...tenant, plan: 'GROWTH' } });
+    await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
 
-    expect(screen.getByLabelText('Send contact messages to')).toHaveValue(
-      'leads@acme.example',
+    expect(screen.getByLabelText(SEND_CONTACT_MESSAGES_TO)).toHaveValue(
+      LEADS_ACME_EXAMPLE,
     );
   });
 
@@ -161,7 +166,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
     await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
 
     expect(
-      screen.queryByLabelText('Send contact messages to'),
+      screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
     ).not.toBeInTheDocument();
   });
 
@@ -174,7 +179,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
       await screen.findByRole('option', { name: /^Team invite/ }),
     );
 
-    expect(screen.getByDisplayValue("You're invited to Acme Co")).toBeVisible();
+    expect(screen.getByDisplayValue(YOURE_INVITED_ACME_CO)).toBeVisible();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

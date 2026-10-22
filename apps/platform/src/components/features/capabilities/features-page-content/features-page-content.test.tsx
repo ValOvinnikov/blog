@@ -1,8 +1,9 @@
 import { PRESET_ID } from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { FeaturesPageContent } from './features-page-content';
 
@@ -21,12 +22,16 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('@platform/server/auth/auth');
 
-const buildTenant = (plan: 'FREE' | 'GROWTH'): TTenant =>
+const buildTenant = (plan: TTenant['plan']): TTenant =>
   makeReadyTenant({ plan });
 
 const setup = customRenderAsync(FeaturesPageContent, {
-  tenant: buildTenant('FREE'),
+  tenant: buildTenant(TENANT_PLAN.FREE),
 });
+
+const DATA_CHECKED = 'data-checked';
+const DATA_UNCHECKED = 'data-unchecked';
+const DATA_DISABLED = 'data-disabled';
 
 describe(`<${FeaturesPageContent.name}/>`, () => {
   beforeEach(() => {
@@ -38,15 +43,15 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it('renders CONSOLE featureDefaults with no settings_features or site_config row', async () => {
-    await setup({ tenant: buildTenant('GROWTH') });
+    await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
-    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      'data-checked',
+      DATA_CHECKED,
       '',
     );
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-unchecked',
+      DATA_UNCHECKED,
       '',
     );
   });
@@ -64,14 +69,14 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       preset: undefined,
     });
 
-    await setup({ tenant: buildTenant('GROWTH') });
+    await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      'data-unchecked',
+      DATA_UNCHECKED,
       '',
     );
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-checked',
+      DATA_CHECKED,
       '',
     );
   });
@@ -82,19 +87,19 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       preset: PRESET_ID.EDITORIAL,
     });
 
-    await setup({ tenant: buildTenant('GROWTH') });
+    await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      'data-checked',
+      DATA_CHECKED,
       '',
     );
   });
 
   it('disables the GROWTH-only toggles for a FREE-plan tenant', async () => {
-    await setup({ tenant: buildTenant('FREE') });
+    await setup({ tenant: buildTenant(TENANT_PLAN.FREE) });
 
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-disabled',
+      DATA_DISABLED,
       '',
     );
   });
@@ -112,26 +117,26 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       preset: undefined,
     });
 
-    await setup({ tenant: buildTenant('FREE') });
+    await setup({ tenant: buildTenant(TENANT_PLAN.FREE) });
 
     const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
-    expect(analyticsSwitch).toHaveAttribute('data-unchecked', '');
-    expect(analyticsSwitch).toHaveAttribute('data-disabled', '');
+    expect(analyticsSwitch).toHaveAttribute(DATA_UNCHECKED, '');
+    expect(analyticsSwitch).toHaveAttribute(DATA_DISABLED, '');
   });
 
   it('enables every toggle for a GROWTH-plan tenant', async () => {
-    await setup({ tenant: buildTenant('GROWTH') });
+    await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
     expect(
       screen.getByRole('switch', { name: 'Analytics' }),
-    ).not.toHaveAttribute('data-disabled');
+    ).not.toHaveAttribute(DATA_DISABLED);
     expect(
       screen.getByRole('switch', { name: 'Cookie consent banner' }),
-    ).not.toHaveAttribute('data-disabled');
+    ).not.toHaveAttribute(DATA_DISABLED);
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
-    const tenant = buildTenant('FREE');
+    const tenant = buildTenant(TENANT_PLAN.FREE);
     await setup({
       tenant: {
         ...tenant,

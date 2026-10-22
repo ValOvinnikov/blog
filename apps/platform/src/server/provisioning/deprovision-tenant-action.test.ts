@@ -8,6 +8,7 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -45,7 +46,7 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 
 const tenant = {
-  id: 'tenant-1',
+  id: TENANT_ID,
   name: 'Acme Inc.',
   deprovisionedAt: null as Date | null,
 };
@@ -78,7 +79,7 @@ describe('deprovisionTenantAction', () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
     await expect(
-      deprovisionTenantAction('tenant-1', {
+      deprovisionTenantAction(TENANT_ID, {
         confirm: 'Acme Inc.',
         dryRun: true,
       }),
@@ -91,7 +92,7 @@ describe('deprovisionTenantAction', () => {
       notFound();
     });
     await expect(
-      deprovisionTenantAction('tenant-1', {
+      deprovisionTenantAction(TENANT_ID, {
         confirm: 'Acme Inc.',
         dryRun: true,
       }),
@@ -103,7 +104,7 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('returns a field error when confirm does not match the tenant name', async () => {
-    const result = await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction(TENANT_ID, {
       confirm: 'wrong-name',
       dryRun: true,
     });
@@ -117,7 +118,7 @@ describe('deprovisionTenantAction', () => {
 
   it('returns an error when the tenant is not found', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
-    const result = await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction(TENANT_ID, {
       confirm: 'Acme Inc.',
       dryRun: true,
     });
@@ -134,7 +135,7 @@ describe('deprovisionTenantAction', () => {
       ...tenant,
       deprovisionedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
-    const result = await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction(TENANT_ID, {
       confirm: 'Acme Inc.',
       dryRun: true,
     });
@@ -147,21 +148,21 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('dispatches the deprovisioning workflow when confirm matches the live name', async () => {
-    const result = await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction(TENANT_ID, {
       confirm: 'Acme Inc.',
       dryRun: false,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchDeprovisioningWorkflowMock).toHaveBeenCalledWith({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       confirm: 'Acme Inc.',
       dryRun: false,
     });
   });
 
   it('records a DEPROVISION_REQUESTED audit event for a real (non-dry-run) dispatch', async () => {
-    await deprovisionTenantAction('tenant-1', {
+    await deprovisionTenantAction(TENANT_ID, {
       confirm: 'Acme Inc.',
       dryRun: false,
     });
@@ -171,14 +172,14 @@ describe('deprovisionTenantAction', () => {
       actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.DEPROVISION_REQUESTED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: { name: 'Acme Inc.' },
     });
   });
 
   it('returns an error and writes no audit event when the dispatch fails', async () => {
     dispatchDeprovisioningWorkflowMock.mockResolvedValue(false);
-    const result = await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction(TENANT_ID, {
       confirm: 'Acme Inc.',
       dryRun: false,
     });
@@ -188,7 +189,7 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('records no audit event for a dry run', async () => {
-    const result = await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction(TENANT_ID, {
       confirm: 'Acme Inc.',
       dryRun: true,
     });
@@ -199,7 +200,7 @@ describe('deprovisionTenantAction', () => {
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
-    const result = await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction(TENANT_ID, {
       confirm: 'Acme Inc.',
       dryRun: false,
     });
@@ -208,7 +209,7 @@ describe('deprovisionTenantAction', () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'provisioning.deprovision_audit_failed',
       expect.objectContaining({
-        targetId: 'tenant-1',
+        targetId: TENANT_ID,
         error: expect.any(Error),
       }),
     );

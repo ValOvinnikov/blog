@@ -2,6 +2,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OwnerStudioAccessView } from './owner-studio-access-view';
@@ -22,9 +23,11 @@ vi.mock('@platform/server/owner-access/resend-owner-invite-action', () => ({
 }));
 
 const setup = customRender(OwnerStudioAccessView, {
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   studioAccess: OWNER_STUDIO_ACCESS.INVITE_SENT,
 });
+
+const RESEND_INVITE = 'Resend invite';
 
 describe(`<${OwnerStudioAccessView.name}/>`, () => {
   let user: UserEvent;
@@ -63,7 +66,7 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
 
     const checkNowButton = screen.getByRole('button', { name: 'Check now' });
     const resendInviteButton = screen.queryByRole('button', {
-      name: 'Resend invite',
+      name: RESEND_INVITE,
     });
 
     expect(checkNowButton).toBeVisible();
@@ -82,19 +85,19 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
         'Checking your access now. Refresh in a minute to see the result.',
       );
 
-      expect(checkOwnerAccessActionMock).toHaveBeenCalledWith('tenant-1');
+      expect(checkOwnerAccessActionMock).toHaveBeenCalledWith(TENANT_ID);
       expect(checkStartedText).toBeVisible();
       expect(refresh).toHaveBeenCalledOnce();
     });
 
     it('resends the invite and confirms it', async () => {
-      await user.click(screen.getByRole('button', { name: 'Resend invite' }));
+      await user.click(screen.getByRole('button', { name: RESEND_INVITE }));
 
       const inviteResentText = await screen.findByText(
         'A new invite is on its way to your inbox.',
       );
 
-      expect(resendOwnerInviteActionMock).toHaveBeenCalledWith('tenant-1');
+      expect(resendOwnerInviteActionMock).toHaveBeenCalledWith(TENANT_ID);
       expect(inviteResentText).toBeVisible();
     });
 
@@ -103,7 +106,7 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
 
-      await user.click(screen.getByRole('button', { name: 'Resend invite' }));
+      await user.click(screen.getByRole('button', { name: RESEND_INVITE }));
 
       const requestFailedText = await screen.findByText(
         "Couldn't reach the setup service — try again.",

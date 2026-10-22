@@ -2,6 +2,7 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
@@ -13,7 +14,6 @@ import {
 
 const t = makeEnTranslator('navSections');
 
-const TENANT_ID = 'tenant-1';
 const TENANT_NAME = 'Acme Co';
 const BLOCKED_SIGNUPS_LABEL = 'Blocked sign-ups';
 const COMING_SOON_LABEL = 'Coming soon';

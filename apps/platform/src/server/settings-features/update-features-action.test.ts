@@ -11,6 +11,7 @@ import { requireTenantMembership } from '@platform/server/auth/require-tenant-me
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -58,7 +59,7 @@ const loggerWarnMock = vi.mocked(logger.warn);
 const SAVED_AT = '2026-10-01T00:00:00Z';
 const DB_UNAVAILABLE = 'db unavailable';
 
-const FREE_TENANT = { id: 'tenant-1', plan: TENANT_PLAN.FREE };
+const FREE_TENANT = { id: TENANT_ID, plan: TENANT_PLAN.FREE };
 const GROWTH_TENANT = { id: 'tenant-2', plan: TENANT_PLAN.GROWTH };
 
 const VALID_INPUT: TUpdateFeaturesInput = {
@@ -105,24 +106,24 @@ describe(updateFeaturesAction, () => {
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
-    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
+    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith(TENANT_ID);
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
       VALID_INPUT,
     );
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
-    await updateFeaturesAction('tenant-1', VALID_INPUT);
+    await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a payload with a non-boolean field without ever calling the tenant gate', async () => {
-    const result = await updateFeaturesAction('tenant-1', {
+    const result = await updateFeaturesAction(TENANT_ID, {
       ...VALID_INPUT,
       commentsEnabled: 'yes' as unknown as boolean,
     });
@@ -135,7 +136,7 @@ describe(updateFeaturesAction, () => {
   });
 
   it('rejects enabling a GROWTH-only capability on a FREE tenant, and writes nothing', async () => {
-    const result = await updateFeaturesAction('tenant-1', {
+    const result = await updateFeaturesAction(TENANT_ID, {
       ...VALID_INPUT,
       analyticsEnabled: true,
     });
@@ -150,14 +151,14 @@ describe(updateFeaturesAction, () => {
   });
 
   it('lets a FREE tenant save an entitled field despite a clamped out-of-plan one', async () => {
-    const result = await updateFeaturesAction('tenant-1', {
+    const result = await updateFeaturesAction(TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: false,
       analyticsEnabled: false,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1', {
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: false,
       analyticsEnabled: false,
@@ -175,10 +176,10 @@ describe(updateFeaturesAction, () => {
       savedAt: new Date(SAVED_AT),
     });
 
-    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
+    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1', {
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: true,
       analyticsEnabled: true,
@@ -192,10 +193,10 @@ describe(updateFeaturesAction, () => {
       savedAt: new Date(SAVED_AT),
     });
 
-    await updateFeaturesAction('tenant-1', VALID_INPUT);
+    await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
       VALID_INPUT,
     );
   });
@@ -206,7 +207,7 @@ describe(updateFeaturesAction, () => {
       savedAt: new Date(SAVED_AT),
     });
 
-    const result = await updateFeaturesAction('tenant-1', {
+    const result = await updateFeaturesAction(TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: true,
     });
@@ -241,14 +242,14 @@ describe(updateFeaturesAction, () => {
       new Error(DB_UNAVAILABLE),
     );
 
-    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
+    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
   it('rejects switching the contact form on for a FREE tenant', async () => {
-    const result = await updateFeaturesAction('tenant-1', {
+    const result = await updateFeaturesAction(TENANT_ID, {
       ...VALID_INPUT,
       contactFormEnabled: true,
     });
@@ -324,14 +325,14 @@ describe(updateFeaturesAction, () => {
   });
 
   it('does not reject a FREE tenant for switching on a "Coming soon" capability outside its plan', async () => {
-    const result = await updateFeaturesAction('tenant-1', {
+    const result = await updateFeaturesAction(TENANT_ID, {
       ...VALID_INPUT,
       newsletterEnabled: true,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
       VALID_INPUT,
     );
   });
@@ -339,7 +340,7 @@ describe(updateFeaturesAction, () => {
   it('reports failure instead of throwing when the write itself fails', async () => {
     upsertSettingsFeaturesMock.mockRejectedValue(new Error(DB_UNAVAILABLE));
 
-    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
+    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
@@ -347,14 +348,14 @@ describe(updateFeaturesAction, () => {
   });
 
   it('records a SETTINGS_UPDATED audit event with the operator as actor', async () => {
-    await updateFeaturesAction('tenant-1', VALID_INPUT);
+    await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: OPERATOR_ID,
       actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: VALID_INPUT,
     });
   });
@@ -362,13 +363,13 @@ describe(updateFeaturesAction, () => {
   it('still succeeds when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
-    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
+    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'settings_features.update_audit_failed',
       expect.objectContaining({
-        targetId: 'tenant-1',
+        targetId: TENANT_ID,
         error: expect.any(Error),
       }),
     );
@@ -379,7 +380,7 @@ describe(updateFeaturesAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
-    await expect(updateFeaturesAction('tenant-1', VALID_INPUT)).rejects.toThrow(
+    await expect(updateFeaturesAction(TENANT_ID, VALID_INPUT)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
@@ -391,7 +392,7 @@ describe(updateFeaturesAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
-    await expect(updateFeaturesAction('tenant-1', VALID_INPUT)).rejects.toThrow(
+    await expect(updateFeaturesAction(TENANT_ID, VALID_INPUT)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 

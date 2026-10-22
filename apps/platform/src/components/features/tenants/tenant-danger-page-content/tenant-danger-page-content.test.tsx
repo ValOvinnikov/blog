@@ -6,6 +6,7 @@ import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
   idleDeprovisioningSteps,
   makeClientTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantDangerPageContent } from './tenant-danger-page-content';
@@ -57,6 +58,8 @@ const advancePoll = async (ticks = 1) => {
   });
 };
 
+const ARIA_DISABLED = 'aria-disabled';
+
 describe(TenantDangerPageContent, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
@@ -78,7 +81,7 @@ describe(TenantDangerPageContent, () => {
     await advancePoll(3);
 
     expect(getTrigger()).toBeEnabled();
-    expect(getTrigger()).not.toHaveAttribute('aria-disabled');
+    expect(getTrigger()).not.toHaveAttribute(ARIA_DISABLED);
     expect(screen.queryByText('Remove domain')).not.toBeInTheDocument();
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
   });
@@ -95,15 +98,15 @@ describe(TenantDangerPageContent, () => {
     );
 
     expect(screen.getByText('Starting…')).toBeVisible();
-    expect(getTrigger()).toHaveAttribute('aria-disabled', 'true');
+    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(getTrigger()).not.toBeDisabled();
 
     await advancePoll();
 
     expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
     );
-    expect(getTrigger()).toHaveAttribute('aria-disabled', 'true');
+    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   it('keeps the trigger aria-disabled while a run is in progress and re-enables it once the run fails', async () => {
@@ -123,12 +126,12 @@ describe(TenantDangerPageContent, () => {
       />,
     );
 
-    expect(getTrigger()).toHaveAttribute('aria-disabled', 'true');
+    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
 
     await advancePoll();
 
     expect(getTrigger()).toBeEnabled();
-    expect(getTrigger()).not.toHaveAttribute('aria-disabled');
+    expect(getTrigger()).not.toHaveAttribute(ARIA_DISABLED);
   });
 
   it('keeps the trigger enabled and does not poll for a run that had already failed', async () => {

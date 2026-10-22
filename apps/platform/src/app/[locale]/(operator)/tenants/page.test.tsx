@@ -1,9 +1,11 @@
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import {
   customRenderAsync,
   screen,
   within,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
 import TenantsPage from './page';
@@ -25,6 +27,9 @@ const setup = customRenderAsync(TenantsPage, {
   searchParams: Promise.resolve({}),
 });
 
+const AT_20260402_0000 = '2026-04-02T00:00:00.000Z';
+const EMAIL_ALERTS_NOT_CONFIGURED = 'Email alerts not configured';
+
 describe(TenantsPage, () => {
   beforeEach(() => {
     listTenantsMock.mockReset();
@@ -35,16 +40,16 @@ describe(TenantsPage, () => {
   it('renders the real tenant rows from listTenants, excluding archived by default', async () => {
     listTenantsMock.mockResolvedValue([
       {
-        id: 'tenant-1',
+        id: TENANT_ID,
         name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'proj-1',
         sanityDataset: 'production',
         locale: 'en',
-        plan: 'FREE',
-        status: 'ACTIVE',
-        createdAt: new Date('2026-04-02T00:00:00.000Z'),
-        updatedAt: new Date('2026-04-02T00:00:00.000Z'),
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+        createdAt: new Date(AT_20260402_0000),
+        updatedAt: new Date(AT_20260402_0000),
       },
     ]);
 
@@ -65,7 +70,7 @@ describe(TenantsPage, () => {
     await setup();
 
     expect(
-      screen.queryByText('Email alerts not configured'),
+      screen.queryByText(EMAIL_ALERTS_NOT_CONFIGURED),
     ).not.toBeInTheDocument();
   });
 
@@ -74,6 +79,6 @@ describe(TenantsPage, () => {
 
     await setup();
 
-    expect(screen.getByText('Email alerts not configured')).toBeVisible();
+    expect(screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED)).toBeVisible();
   });
 });

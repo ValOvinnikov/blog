@@ -3,6 +3,7 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { notFound, redirect } from 'next/navigation';
 
 const {
@@ -43,7 +44,7 @@ describe('retryProvisioningStepAction', () => {
     });
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
+      id: TENANT_ID,
       deprovisionedAt: null,
     });
     ({ retryProvisioningStepAction } =
@@ -55,7 +56,7 @@ describe('retryProvisioningStepAction', () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
-    await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
+    await expect(retryProvisioningStepAction(TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
     expect(startProvisioningMock).not.toHaveBeenCalled();
@@ -66,7 +67,7 @@ describe('retryProvisioningStepAction', () => {
       notFound();
     });
 
-    await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
+    await expect(retryProvisioningStepAction(TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
@@ -75,12 +76,12 @@ describe('retryProvisioningStepAction', () => {
   });
 
   it("admits only the tenant's owner or a super-admin", async () => {
-    await retryProvisioningStepAction('tenant-1');
+    await retryProvisioningStepAction(TENANT_ID);
 
     const [tenantId, isAdminPermitted] = requireTenantOwnerOrAdminMock.mock
       .calls[0] as [string, (admin: TAdmin) => boolean];
 
-    expect(tenantId).toBe('tenant-1');
+    expect(tenantId).toBe(TENANT_ID);
     expect(isAdminPermitted(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }))).toBe(
       true,
     );
@@ -98,9 +99,9 @@ describe('retryProvisioningStepAction', () => {
   ])('starts provisioning and returns its result %o', async (started) => {
     startProvisioningMock.mockResolvedValue(started);
 
-    const result = await retryProvisioningStepAction('tenant-1');
+    const result = await retryProvisioningStepAction(TENANT_ID);
 
-    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
     expect(result).toEqual(started);
   });
 
@@ -121,11 +122,11 @@ describe('retryProvisioningStepAction', () => {
 
   it('rejects a start/retry against an archived tenant server-side, without starting provisioning', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
+      id: TENANT_ID,
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
 
-    const result = await retryProvisioningStepAction('tenant-1');
+    const result = await retryProvisioningStepAction(TENANT_ID);
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(result).toEqual({
