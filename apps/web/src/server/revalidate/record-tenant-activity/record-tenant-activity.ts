@@ -7,7 +7,13 @@ export const recordTenantActivity = async (
   at: Date,
 ): Promise<void> => {
   try {
-    await queries.tenants.touchTenantActivity(tenantId, at);
+    const result = await queries.tenants.touchTenantActivity(tenantId, at);
+    if (!result.ok) {
+      logger.error(TENANT_ACTIVITY_TOUCH_FAILED_EVENT, {
+        tenantId,
+        error: result.error,
+      });
+    }
   } catch (error) {
     logger.error(TENANT_ACTIVITY_TOUCH_FAILED_EVENT, { tenantId, error });
   }
