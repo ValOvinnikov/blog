@@ -1,4 +1,5 @@
 import type { TAuthApp } from '@blog/config/constants';
+import { sha256Hex } from '@blog/utils/hash';
 import type {
   Adapter,
   AdapterAccount,
@@ -63,10 +64,43 @@ function withAppScopedSessions(app: TAuthApp): TAdapterWrapper {
   };
 }
 
+function withHashedSessionTokens(adapter: Adapter): Adapter {
+  const { createSession, getSessionAndUser, updateSession, deleteSession } =
+    adapter;
+
+  return {
+    ...adapter,
+    createSession:
+      createSession &&
+      (async (session) => {
+        const created = await createSession({
+          ...session,
+          sessionToken: sha256Hex(session.sessionToken),
+        });
+        // Auth.js sets the cookie from the returned token, so it must be the raw one.
+        return { ...created, sessionToken: session.sessionToken };
+      }),
+    getSessionAndUser:
+      getSessionAndUser &&
+      ((sessionToken) => getSessionAndUser(sha256Hex(sessionToken))),
+    updateSession:
+      updateSession &&
+      ((session) =>
+        updateSession({
+          ...session,
+          sessionToken: sha256Hex(session.sessionToken),
+        })),
+    deleteSession:
+      deleteSession &&
+      ((sessionToken) => deleteSession(sha256Hex(sessionToken))),
+  };
+}
+
 export function scopeAdapterToApp(adapter: Adapter, app: TAuthApp): Adapter {
   const wrappers: TAdapterWrapper[] = [
     withoutProviderTokens,
     withAppScopedSessions(app),
+    withHashedSessionTokens,
   ];
 
   return wrappers.reduce((wrapped, wrap) => wrap(wrapped), adapter);

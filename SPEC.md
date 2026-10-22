@@ -174,8 +174,9 @@ imports it, and it never touches `ui` or `service`. Both user-facing apps
 also consume `@blog/auth`, which sits above `db` and holds the single Auth.js
 configuration they share, so the two never maintain it separately. Sharing the
 builder never shares a session: every `sessions` row records the app that
-issued it, and an app that passes its `AUTH_APP` value reads another app's
-session as no session. `apps/platform` passes `PLATFORM` and names its cookies
+issued it and holds the SHA-256 hash of its cookie token, never the token,
+and an app that passes its `AUTH_APP` value reads another app's session as no
+session. `apps/platform` passes `PLATFORM` and names its cookies
 apart; `apps/web` passes `SITE` and keeps Auth.js's default cookie names. So
 each app accepts only the sessions it issued and is signed into independently,
 while the identity behind both is still one `users` row per person — one
