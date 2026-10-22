@@ -34,9 +34,10 @@ const INPUT = { domain: ` ${BLOCKED_DOMAIN} `, reason: ` ${BLOCK_REASON} ` };
 describe(addBlockedDomainAction, () => {
   beforeEach(() => {
     requireSuperAdminMock.mockReset().mockResolvedValue(ADMIN);
-    addSignupBlockMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: makeBlockedIdentity() });
+    addSignupBlockMock.mockReset().mockResolvedValue({
+      ok: true,
+      data: { entry: makeBlockedIdentity(), created: true },
+    });
     vi.mocked(logger.error).mockReset();
   });
 

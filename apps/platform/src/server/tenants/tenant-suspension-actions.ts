@@ -8,6 +8,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { queries, TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
+import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -15,7 +16,11 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import type { TTenantLifecycleResult } from '@platform/server/provisioning/tenant-lifecycle-result';
 import { signupBlockReasonSchema } from '@platform/server/signup-block/signup-block-reason-schema';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { blockTenantOwnerEmail } from '@platform/server/tenants/block-tenant-owner-email';
+import {
+  blockTenantOwnerEmail,
+  confirmOwnerEmailBlock,
+  undoOwnerEmailBlock,
+} from '@platform/server/tenants/block-tenant-owner-email';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -61,26 +66,33 @@ const setSuspension = async (
     return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
   }
 
+  let ownerBlock: TMaybeUndefined<TAddBlockedIdentityOutcome>;
+  let isSuspensionSaved = false;
   try {
     if (parsedBlock) {
-      const blockFailure = await blockTenantOwnerEmail(
+      const blocked = await blockTenantOwnerEmail(
         admin,
         tenantId,
         parsedBlock.data.reason,
       );
-      if (blockFailure) return blockFailure;
+      if (!blocked.ok) return blocked.error;
+      ownerBlock = blocked.data;
     }
 
     const updated = await queries.tenants.setTenantSuspension(tenantId, status);
     if (!updated.ok) {
+      await undoOwnerEmailBlock(ownerBlock);
       return {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: TENANT_REFUSAL.ARCHIVED,
       };
     }
+    isSuspensionSaved = true;
+    await confirmOwnerEmailBlock(ownerBlock, parsedBlock?.data.reason ?? '');
     await revalidateSiteConfig(tenantId);
   } catch (error) {
     logger.error('tenant.suspension_save_failed', { tenantId, status, error });
+    if (!isSuspensionSaved) await undoOwnerEmailBlock(ownerBlock);
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

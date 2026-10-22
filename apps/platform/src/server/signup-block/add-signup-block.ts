@@ -6,6 +6,7 @@ import {
   queries,
   type TBlockedIdentityKind,
 } from '@blog/db';
+import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
 import type { TAdmin } from '@blog/db/schema/admins';
 import type { TBlockedSignupIdentity } from '@blog/db/schema/blocked-signup-identities';
 import type { TResult } from '@blog/utils';
@@ -18,32 +19,25 @@ export type TAddSignupBlockInput = {
   admin: Pick<TAdmin, 'id'>;
 };
 
-const wasCreatedByThisCall = (
-  entry: TBlockedSignupIdentity,
-  { reason, admin }: Pick<TAddSignupBlockInput, 'reason' | 'admin'>,
-): boolean => entry.reason === reason && entry.createdByAdminId === admin.id;
-
-export const addSignupBlock = async ({
+export const saveSignupBlock = async ({
   kind,
   identity,
   reason,
   admin,
 }: TAddSignupBlockInput): Promise<
-  TResult<TBlockedSignupIdentity, TErrorCode>
-> => {
-  const result = await queries.blockedSignupIdentities.addBlockedIdentity({
+  TResult<TAddBlockedIdentityOutcome, TErrorCode>
+> =>
+  queries.blockedSignupIdentities.addBlockedIdentity({
     kind,
     identity,
     reason,
     createdByAdminId: admin.id,
   });
-  if (!result.ok) return result;
 
-  if (!wasCreatedByThisCall(result.data, { reason, admin })) {
-    return result;
-  }
-
-  const { id, value } = result.data;
+export const recordSignupBlockAdded = async (
+  { kind, value, id }: Pick<TBlockedSignupIdentity, 'kind' | 'value' | 'id'>,
+  reason: string,
+): Promise<void> => {
   await recordAuditEvent({
     logEvent: 'signup_block.add_audit_failed',
     action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
@@ -55,6 +49,15 @@ export const addSignupBlock = async ({
       ...(kind === BLOCKED_IDENTITY_KIND.DOMAIN && { domain: value }),
     },
   });
+};
+
+export const addSignupBlock = async (
+  input: TAddSignupBlockInput,
+): Promise<TResult<TAddBlockedIdentityOutcome, TErrorCode>> => {
+  const result = await saveSignupBlock(input);
+  if (result.ok && result.data.created) {
+    await recordSignupBlockAdded(result.data.entry, input.reason);
+  }
 
   return result;
 };
