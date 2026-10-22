@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
+import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 
 import { buildNotFoundMetadata } from './build-not-found-metadata';
@@ -7,7 +8,10 @@ vi.mock('@web/utils/resolve-tenant-messages', () => ({
   resolveTenantMessages: vi.fn(),
 }));
 
-const TENANT_ID = 'tenant-1';
+const EN_HEADING = 'Lost at sea';
+const EN_SUPPORTING_TEXT = 'Nothing lives at this address.';
+const NL_HEADING = 'Verdwaald';
+const NL_SUPPORTING_TEXT = 'Hier woont niets.';
 
 const withNotFoundOverrides = (
   heading: string,
@@ -36,43 +40,43 @@ describe(buildNotFoundMetadata, () => {
 
   it('uses the tenant’s voice overrides for heading and supporting text', async () => {
     vi.mocked(resolveTenantMessages).mockResolvedValue(
-      withNotFoundOverrides('Lost at sea', 'Nothing lives at this address.'),
+      withNotFoundOverrides(EN_HEADING, EN_SUPPORTING_TEXT),
     );
 
     const metadata = await buildNotFoundMetadata({
-      tenant: TENANT_ID,
+      tenant: DEFAULT_TENANT_ID,
       locale: LOCALE_ISO_CODES.EN,
     });
 
     expect(metadata).toEqual({
-      title: 'Lost at sea',
-      description: 'Nothing lives at this address.',
+      title: EN_HEADING,
+      description: EN_SUPPORTING_TEXT,
     });
     expect(resolveTenantMessages).toHaveBeenCalledWith(
       SITE_MESSAGES_BY_LOCALE.EN,
       LOCALE_ISO_CODES.EN,
-      TENANT_ID,
+      DEFAULT_TENANT_ID,
     );
   });
 
   it('resolves the tenant’s overrides in the served language', async () => {
     vi.mocked(resolveTenantMessages).mockResolvedValue(
-      withNotFoundOverrides('Verdwaald', 'Hier woont niets.'),
+      withNotFoundOverrides(NL_HEADING, NL_SUPPORTING_TEXT),
     );
 
     const metadata = await buildNotFoundMetadata({
-      tenant: TENANT_ID,
+      tenant: DEFAULT_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
     });
 
     expect(metadata).toEqual({
-      title: 'Verdwaald',
-      description: 'Hier woont niets.',
+      title: NL_HEADING,
+      description: NL_SUPPORTING_TEXT,
     });
     expect(resolveTenantMessages).toHaveBeenCalledWith(
       SITE_MESSAGES_BY_LOCALE.NL,
       LOCALE_ISO_CODES.NL,
-      TENANT_ID,
+      DEFAULT_TENANT_ID,
     );
   });
 });
