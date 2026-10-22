@@ -1,6 +1,10 @@
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import {
+  ADMIN_ROLE,
+  BLOCKED_IDENTITY_KIND,
+  GRANTED_VIA,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestAdmin } from '@blog/db/testing/fixtures';
+import { insertTestAdmin, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listBlockedIdentities } from './list-blocked-identities';
@@ -19,6 +23,7 @@ afterEach(async () => {
 
 const OLDER_REASON = 'Older';
 const NEWER_REASON = 'Newer';
+const ADMIN_EMAIL = 'operator@example.com';
 
 describe(listBlockedIdentities, () => {
   it('returns an empty list when nothing is blocked', async () => {
@@ -53,5 +58,50 @@ describe(listBlockedIdentities, () => {
       NEWER_REASON,
       OLDER_REASON,
     ]);
+  });
+
+  it('lists the adding admin email and nothing else from the user', async () => {
+    const { id: userId } = await insertTestUser(db(), {
+      email: ADMIN_EMAIL,
+      name: 'Operator',
+    });
+    const [admin] = await db()
+      .insert(schema.admins)
+      .values({
+        userId,
+        role: ADMIN_ROLE.ADMIN,
+        grantedVia: GRANTED_VIA.PROMOTION,
+      })
+      .returning();
+    await db().insert(schema.blockedSignupIdentities).values({
+      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
+      value: 'older.example',
+      reason: OLDER_REASON,
+      createdByAdminId: admin?.id,
+    });
+
+    const result = await listBlockedIdentities();
+
+    expect(result.ok && result.data[0]).toMatchObject({
+      reason: OLDER_REASON,
+      addedByEmail: ADMIN_EMAIL,
+    });
+    expect(JSON.stringify(result)).not.toContain('Operator');
+  });
+
+  it('still lists an entry whose admin is gone, with no email', async () => {
+    const { id: createdByAdminId } = await insertTestAdmin(db());
+    await db().insert(schema.blockedSignupIdentities).values({
+      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
+      value: 'older.example',
+      reason: OLDER_REASON,
+      createdByAdminId,
+    });
+    await db().delete(schema.admins);
+
+    const result = await listBlockedIdentities();
+
+    expect(result.ok && result.data).toHaveLength(1);
+    expect(result.ok && result.data[0]?.addedByEmail).toBeNull();
   });
 });

@@ -41,15 +41,20 @@ function toStoredValue(
     : { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
 }
 
+export type TAddBlockedIdentityOutcome = {
+  entry: TBlockedSignupIdentity;
+  created: boolean;
+};
+
 // Idempotent: an entry already on the list is returned as it stands, keeping
-// its original reason and author.
+// its original reason and author, with `created` false.
 export async function addBlockedIdentity({
   kind,
   identity,
   reason,
   createdByAdminId,
 }: TAddBlockedIdentityInput): Promise<
-  TResult<TBlockedSignupIdentity, TErrorCode>
+  TResult<TAddBlockedIdentityOutcome, TErrorCode>
 > {
   const value = toStoredValue(kind, identity);
 
@@ -63,7 +68,7 @@ export async function addBlockedIdentity({
     .onConflictDoNothing()
     .returning();
 
-  if (inserted) return { ok: true, data: inserted };
+  if (inserted) return { ok: true, data: { entry: inserted, created: true } };
 
   const [existing] = await db
     .select()
@@ -77,5 +82,5 @@ export async function addBlockedIdentity({
 
   if (!existing) return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
 
-  return { ok: true, data: existing };
+  return { ok: true, data: { entry: existing, created: false } };
 }
