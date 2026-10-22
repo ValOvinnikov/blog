@@ -21,7 +21,6 @@ const FORGED_SECRET = 'forged-secret';
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/workflows/deprovision-tenant', () => ({
   deprovisionTenant: vi.fn(),
 }));

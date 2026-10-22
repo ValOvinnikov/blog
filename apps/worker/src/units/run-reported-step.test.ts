@@ -11,14 +11,13 @@ import { runReportedStep } from './run-reported-step';
 
 const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
 const STEP = TENANT_PROVISIONING_STEP.CREATE_WEBHOOK;
+const SANITY_TIMED_OUT = 'sanity timed out';
+const STILL_DOWN = 'still down';
 
-vi.mock('@worker/utils/logger/logger');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 vi.mock('workflow', async (importOriginal) => ({
   ...(await importOriginal<typeof import('workflow')>()),
@@ -70,7 +69,7 @@ describe(runReportedStep, () => {
 
   it('rethrows a failure within the retry budget without recording FAILED', async () => {
     atAttempt(PROVISIONING_UNIT_MAX_RETRIES);
-    const failure = new Error('sanity timed out');
+    const failure = new Error(SANITY_TIMED_OUT);
 
     await expect(run(() => Promise.reject(failure))).rejects.toBe(failure);
 
@@ -82,7 +81,7 @@ describe(runReportedStep, () => {
   it('records FAILED once on the final attempt and names the failed step', async () => {
     atAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
 
-    const result = await run(() => Promise.reject(new Error('still down')));
+    const result = await run(() => Promise.reject(new Error(STILL_DOWN)));
 
     expect(result).toEqual({ ok: false, failedStep: STEP });
     expect(reportedStatuses()).toEqual([
@@ -90,7 +89,7 @@ describe(runReportedStep, () => {
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
     ]);
     expect(updateProvisioningStep).toHaveBeenLastCalledWith(
-      expect.objectContaining({ error: expect.stringContaining('still down') }),
+      expect.objectContaining({ error: expect.stringContaining(STILL_DOWN) }),
     );
   });
 
@@ -115,7 +114,7 @@ describe(runReportedStep, () => {
       tenantId: TENANT_ID,
       ctx: { runId: 'cli-run', isOneShot: true },
       step: STEP,
-      run: () => Promise.reject(new Error('sanity timed out')),
+      run: () => Promise.reject(new Error(SANITY_TIMED_OUT)),
     });
 
     expect(result).toEqual({ ok: false, failedStep: STEP });

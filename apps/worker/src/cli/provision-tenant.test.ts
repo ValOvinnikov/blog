@@ -10,14 +10,11 @@ import { runProvisioningSequence } from '@worker/workflows/provisioning-sequence
 
 import { provisionTenantOnce } from './provision-tenant';
 
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/workflows/provisioning-sequence');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 
 describe(provisionTenantOnce, () => {

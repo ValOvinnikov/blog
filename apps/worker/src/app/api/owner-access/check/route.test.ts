@@ -12,19 +12,14 @@ import { POST } from './route';
 const SECRET = 'enqueue-secret';
 const CHECK_URL = 'https://worker.example.com/api/owner-access/check';
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
-  WORKER_ENQUEUE_SECRET: 'enqueue-secret',
-}));
+const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/utils/owner-access-run/owner-access-run');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 
 function checkRequest(secret: string = SECRET): Request {
@@ -39,6 +34,7 @@ function checkRequest(secret: string = SECRET): Request {
 
 describe('POST /api/owner-access/check', () => {
   beforeEach(() => {
+    mockEnv.WORKER_ENQUEUE_SECRET = SECRET;
     vi.mocked(getTenantById).mockResolvedValue(
       makeTenant({ sanityProjectId: SANITY_PROJECT_ID }),
     );

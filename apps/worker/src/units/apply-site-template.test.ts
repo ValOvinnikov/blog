@@ -19,7 +19,6 @@ import { applySiteTemplate } from './apply-site-template';
 
 const CTX = { runId: 'run-1' };
 
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')

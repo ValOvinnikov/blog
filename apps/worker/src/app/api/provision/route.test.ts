@@ -31,22 +31,17 @@ function signedRequest(
   });
 }
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
-  WORKER_ENQUEUE_SECRET: 'enqueue-secret',
-}));
+const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/workflows/provision-tenant', () => ({
   provisionTenant: vi.fn(),
 }));
 vi.mock('workflow/api', () => ({ start: vi.fn() }));
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 
 function enqueueRequest(tenantId: string = TENANT_ID): Request {

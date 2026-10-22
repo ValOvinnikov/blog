@@ -9,6 +9,7 @@ export default mergeConfig(
     test: {
       environment: 'node',
       mockReset: true,
+      setupFiles: ['./src/vitest-setup.ts'],
       env: { SKIP_ENV_VALIDATION: 'true' },
     },
     resolve: {

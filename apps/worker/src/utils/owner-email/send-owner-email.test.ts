@@ -30,7 +30,6 @@ const RESEND_DOWN = 'Resend is down';
 const CLAIM_REFUSED = 'claim refused';
 const RELEASE_REFUSED = 'release refused';
 
-vi.mock('@worker/utils/logger/logger');
 vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
