@@ -583,6 +583,22 @@ major is pinned in **both** `deploy-development.yml` and
 deploys are manual (see below) it can sit latent for as long as nobody
 dispatches one.
 
+## Deploy builds skip env validation
+
+Both deploy workflows build on the GitHub runner
+(`vercel pull → build → deploy --prebuilt`), and Vercel decrypts a
+**Sensitive** var only inside its own builds and runtime: `vercel pull` writes
+it as the literal `[SENSITIVE]`. A var that only has to be non-empty passes
+that, but a format check — `PERSONAL_DATA_ENCRYPTION_KEY`'s keyring,
+`PERSONAL_DATA_INDEX_KEY`'s 32 bytes — rejects it with
+`Invalid environment variables` however valid the stored value is. So
+`vercel build` runs with `SKIP_ENV_VALIDATION=true`, set on that one command
+and never on `pull` or `deploy`. Validation still happens where the real
+values exist: each app's `instrumentation.ts` imports its env module when the
+deployed server starts, so a malformed value fails there with the schema's own
+message. `SKIP_ENV_VALIDATION` must never be set on a Vercel project, or that
+startup check is gone too.
+
 ## Required env vars
 
 Every env var in this repo's `env.ts` modules is either required in the zod
