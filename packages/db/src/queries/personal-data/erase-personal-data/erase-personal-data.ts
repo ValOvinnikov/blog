@@ -10,7 +10,7 @@ import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identiti
 import { leads } from '@blog/db/schema/leads';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { subscribers } from '@blog/db/schema/subscribers';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 export type TPersonalDataCounts = {
@@ -31,7 +31,7 @@ export async function erasePersonalData(
   email: string,
 ): Promise<TResult<TPersonalDataErasure, TErrorCode>> {
   const match = toPersonalDataMatch(email);
-  if (!match) return { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
+  if (!match) return errorResult(ERROR_CODE.DB_INVALID_EMAIL);
 
   const { emailIndex, mailbox } = match;
   const db = getDb();
@@ -66,17 +66,14 @@ export async function erasePersonalData(
       .returning({ id: auditEvents.id }),
   ]);
 
-  return {
-    ok: true,
-    data: {
-      emailIndex,
-      erased: {
-        subscribers: erasedSubscribers.length,
-        leads: erasedLeads.length,
-        membershipInvites: erasedInvites.length,
-        blockedSignupIdentities: erasedBlocks.length,
-        auditEvents: anonymisedAuditEvents.length,
-      },
+  return okResult({
+    emailIndex,
+    erased: {
+      subscribers: erasedSubscribers.length,
+      leads: erasedLeads.length,
+      membershipInvites: erasedInvites.length,
+      blockedSignupIdentities: erasedBlocks.length,
+      auditEvents: anonymisedAuditEvents.length,
     },
-  };
+  });
 }

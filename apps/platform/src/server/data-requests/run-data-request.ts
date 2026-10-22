@@ -10,7 +10,7 @@ import {
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import type { TPersonalDataCounts } from '@blog/db/queries/personal-data/erase-personal-data';
-import type { TResult } from '@blog/utils';
+import { errorResult, type TResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -56,7 +56,7 @@ export const runDataRequest = async <TData extends { emailIndex: string }>(
   { run, action, auditDetails }: TDataRequestStep<TData>,
 ): Promise<TResult<TData, TDataRequestFailure>> => {
   const parsed = dataRequestInputSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: INVALID_EMAIL };
+  if (!parsed.success) return errorResult(INVALID_EMAIL);
 
   try {
     const result = await run(parsed.data.email);
@@ -73,7 +73,7 @@ export const runDataRequest = async <TData extends { emailIndex: string }>(
     }
 
     if (result.error === ERROR_CODE.DB_INVALID_EMAIL) {
-      return { ok: false, error: INVALID_EMAIL };
+      return errorResult(INVALID_EMAIL);
     }
 
     logger.error(DATA_REQUEST_FAILED_EVENT, { action, error: result.error });
@@ -84,5 +84,5 @@ export const runDataRequest = async <TData extends { emailIndex: string }>(
     });
   }
 
-  return { ok: false, error: toOutcome(ACTION_OUTCOME.SERVER_ERROR) };
+  return errorResult(toOutcome(ACTION_OUTCOME.SERVER_ERROR));
 };

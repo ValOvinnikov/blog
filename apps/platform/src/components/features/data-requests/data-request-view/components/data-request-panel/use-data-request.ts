@@ -5,6 +5,7 @@ import {
   type TMaybeUndefined,
   type TReasonedFailure,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { DATA_REQUEST_EXPORT_FILE_NAME } from '@platform/constants/data-request';
 import type { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
@@ -87,11 +88,11 @@ export const useDataRequest = ({
   ): Promise<TConfirmDialogActionResult> => {
     const result = await erasePersonalDataAction({ email: lookedUpEmail });
     if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-      return { ok: false, error: eraseFailed };
+      return errorResult(eraseFailed);
     }
 
     erasedCount.current = result.erasedCount;
-    return { ok: true };
+    return okResult(undefined);
   };
 
   const finishErase = () => {

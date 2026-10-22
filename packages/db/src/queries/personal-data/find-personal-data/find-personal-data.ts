@@ -15,7 +15,7 @@ import { findSitePersonalData } from '@blog/db/queries/personal-data/site-person
 import type { TSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data-types';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { desc } from 'drizzle-orm';
 
 export type TPersonalDataBlock = {
@@ -44,7 +44,7 @@ export async function findPersonalData(
   email: string,
 ): Promise<TResult<TPersonalDataMatches, TErrorCode>> {
   const match = toPersonalDataMatch(email);
-  if (!match) return { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
+  if (!match) return errorResult(ERROR_CODE.DB_INVALID_EMAIL);
 
   const { emailIndex, mailbox } = match;
   const db = getDb();
@@ -73,16 +73,13 @@ export async function findPersonalData(
       .orderBy(desc(auditEvents.createdAt)),
   ]);
 
-  return {
-    ok: true,
-    data: {
-      emailIndex,
-      ...siteData,
-      blockedSignupIdentities: blockRows,
-      auditEvents: auditRows.map(({ actorEmail, ...event }) => ({
-        ...event,
-        email: actorEmail ?? undefined,
-      })),
-    },
-  };
+  return okResult({
+    emailIndex,
+    ...siteData,
+    blockedSignupIdentities: blockRows,
+    auditEvents: auditRows.map(({ actorEmail, ...event }) => ({
+      ...event,
+      email: actorEmail ?? undefined,
+    })),
+  });
 }
