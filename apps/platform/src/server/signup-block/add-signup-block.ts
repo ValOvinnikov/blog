@@ -18,17 +18,10 @@ export type TAddSignupBlockInput = {
   admin: Pick<TAdmin, 'id'>;
 };
 
-const CREATED_BY_THIS_CALL_WINDOW_MS = 60_000;
-
 const wasCreatedByThisCall = (
   entry: TBlockedSignupIdentity,
   { reason, admin }: Pick<TAddSignupBlockInput, 'reason' | 'admin'>,
-  now: Date,
-): boolean =>
-  entry.reason === reason &&
-  entry.createdByAdminId === admin.id &&
-  Math.abs(now.getTime() - entry.createdAt.getTime()) <=
-    CREATED_BY_THIS_CALL_WINDOW_MS;
+): boolean => entry.reason === reason && entry.createdByAdminId === admin.id;
 
 export const addSignupBlock = async ({
   kind,
@@ -38,7 +31,6 @@ export const addSignupBlock = async ({
 }: TAddSignupBlockInput): Promise<
   TResult<TBlockedSignupIdentity, TErrorCode>
 > => {
-  const requestedAt = new Date();
   const result = await queries.blockedSignupIdentities.addBlockedIdentity({
     kind,
     identity,
@@ -47,7 +39,7 @@ export const addSignupBlock = async ({
   });
   if (!result.ok) return result;
 
-  if (!wasCreatedByThisCall(result.data, { reason, admin }, requestedAt)) {
+  if (!wasCreatedByThisCall(result.data, { reason, admin })) {
     return result;
   }
 

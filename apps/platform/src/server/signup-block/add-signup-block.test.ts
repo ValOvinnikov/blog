@@ -32,7 +32,6 @@ vi.mock('@blog/db', async () => ({
 
 const ADMIN = makeAdmin();
 const NOW = new Date(Date.UTC(2026, 9, 21, 9));
-const A_DAY_MS = 24 * 60 * 60_000;
 
 const newEntry = (overrides: Partial<TBlockedSignupIdentity> = {}) =>
   makeBlockedIdentity({
@@ -43,14 +42,8 @@ const newEntry = (overrides: Partial<TBlockedSignupIdentity> = {}) =>
 
 describe(addSignupBlock, () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(NOW);
     addBlockedIdentityMock.mockReset();
     recordAuditEventMock.mockReset();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it('adds a domain entry as the admin and audits it with the domain', async () => {
@@ -121,7 +114,6 @@ describe(addSignupBlock, () => {
   });
 
   it.each([
-    ['an older entry', { createdAt: new Date(NOW.getTime() - A_DAY_MS) }],
     ['an entry with another reason', { reason: `${BLOCK_REASON} earlier` }],
     ['an entry added by another admin', { createdByAdminId: null }],
   ])(
