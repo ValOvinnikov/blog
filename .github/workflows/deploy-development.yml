@@ -207,7 +207,8 @@ jobs:
   # Gate: re-run the full suite on the exact merged commit before any deploy.
   # Deploy jobs `needs: verify`, so a dev deploy only happens after checks pass.
   # Skipped entirely (along with every deploy) when no app is affected. Test
-  # alone is skipped when a dispatched Full gate already passed on this SHA.
+  # alone is skipped when this SHA, or its PR's identical-tree head, already
+  # passed its tests.
   verify:
     name: Verify
     needs: changes
@@ -220,8 +221,10 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
-      # Reading Full gate's run history is what decides whether Test can skip.
+      # Reading Full gate and CI run history, and the PR that merged this SHA,
+      # is what decides whether Test can skip.
       actions: read
+      pull-requests: read
     concurrency:
       group: deploy-dev-verify
       cancel-in-progress: true
@@ -237,30 +240,58 @@ jobs:
         run: pnpm type-check
       - name: Lint
         run: pnpm lint
-      # Only a workflow_dispatch run counts: full-gate.yml's dispatch declares
-      # no `ref` input, so it always gated its own head_sha, whereas a
-      # workflow_call run may have gated a different ref. A failed lookup runs
-      # the tests rather than trusting nothing.
-      - name: Already passed the Full gate?
-        id: full-gate
+      # Only a workflow_dispatch Full gate run counts: its dispatch declares no
+      # `ref` input, so it always gated its own head_sha. A PR head counts only
+      # when its tree equals this commit's and a CI run's Test job succeeded,
+      # not merely skipped as on a draft. A failed lookup runs the tests.
+      - name: Already tested?
+        id: tested
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ github.sha }}
         run: |
           set -uo pipefail
-          if ! run_url=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/full-gate.yml/runs?head_sha=${HEAD_SHA}&event=workflow_dispatch&status=success&per_page=1" --jq '.workflow_runs[0].html_url // empty'); then
-            echo "::warning::Could not look up Full gate runs for ${HEAD_SHA} — running the tests."
-            echo "Tests ran: the Full gate run lookup for \`${HEAD_SHA}\` failed." >> "$GITHUB_STEP_SUMMARY"
-            echo "passed=false" >> "$GITHUB_OUTPUT"
-          elif [ -n "$run_url" ]; then
-            echo "Tests skipped: \`${HEAD_SHA}\` already passed the Full gate in ${run_url}." >> "$GITHUB_STEP_SUMMARY"
+          api() { gh api "repos/${GITHUB_REPOSITORY}/$1" --jq "$2"; }
+          trust() {
+            echo "Tests skipped: $1" >> "$GITHUB_STEP_SUMMARY"
             echo "passed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Tests ran: \`${HEAD_SHA}\` has no successful dispatched Full gate run." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          }
+          run_tests() {
+            echo "Tests ran: $1" >> "$GITHUB_STEP_SUMMARY"
             echo "passed=false" >> "$GITHUB_OUTPUT"
-          fi
+            exit 0
+          }
+          lookup_failed() {
+            echo "::warning::$1 — running the tests."
+            run_tests "$1."
+          }
+
+          full_gate_url=$(api "actions/workflows/full-gate.yml/runs?head_sha=${HEAD_SHA}&event=workflow_dispatch&status=success&per_page=1" '.workflow_runs[0].html_url // empty') \
+            || lookup_failed "Could not look up Full gate runs for \`${HEAD_SHA}\`"
+          [ -n "$full_gate_url" ] && trust "\`${HEAD_SHA}\` already passed the Full gate in ${full_gate_url}."
+
+          pr=$(api "commits/${HEAD_SHA}/pulls" "[.[] | select(.merge_commit_sha == \"${HEAD_SHA}\")][0] | select(. != null) | \"\(.head.sha) \(.html_url)\"") \
+            || lookup_failed "Could not look up the pull request that merged \`${HEAD_SHA}\`"
+          [ -n "$pr" ] || run_tests "\`${HEAD_SHA}\` has no successful dispatched Full gate run and is no pull request's merge commit."
+          read -r pr_head pr_url <<< "$pr"
+
+          head_tree=$(api "git/commits/${pr_head}" '.tree.sha') \
+            || lookup_failed "Could not read the tree of ${pr_url}'s head \`${pr_head}\`"
+          [ "$head_tree" = "$(git rev-parse "${HEAD_SHA}^{tree}")" ] \
+            || run_tests "${pr_url} merged while behind \`main\`: its head \`${pr_head}\` has a different tree from \`${HEAD_SHA}\`."
+
+          ci_runs=$(api "actions/workflows/ci.yml/runs?head_sha=${pr_head}&event=pull_request&status=success&per_page=20" '.workflow_runs[] | "\(.id) \(.html_url)"') \
+            || lookup_failed "Could not look up CI runs for ${pr_url}'s head \`${pr_head}\`"
+          while read -r run_id run_url; do
+            [ -n "$run_id" ] || continue
+            tested=$(api "actions/runs/${run_id}/jobs?per_page=100" '[.jobs[] | select(.name == "Test" and .conclusion == "success")] | length') \
+              || lookup_failed "Could not read the jobs of CI run ${run_url}"
+            [ "$tested" -gt 0 ] && trust "\`${HEAD_SHA}\` has the same tree as ${pr_url}'s head \`${pr_head}\`, whose tests passed in ${run_url}."
+          done <<< "$ci_runs"
+          run_tests "${pr_url}'s head \`${pr_head}\` has no successful CI run whose Test job ran."
       - name: Test
-        if: steps.full-gate.outputs.passed != 'true'
+        if: steps.tested.outputs.passed != 'true'
         run: pnpm test
       - name: Build
         run: pnpm build
