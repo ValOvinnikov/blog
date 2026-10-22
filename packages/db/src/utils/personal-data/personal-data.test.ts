@@ -4,6 +4,7 @@ import {
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
+import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
 import { faker } from '@faker-js/faker';
 
 import {
@@ -17,7 +18,7 @@ import {
 } from './personal-data';
 
 const EMAIL = faker.internet.email().toLowerCase();
-const TAGGED_EMAIL = EMAIL.replace('@', '+tag@');
+const TAGGED_EMAIL = taggedMixedCaseAddress(EMAIL);
 
 describe('with both personal data keys configured', () => {
   usePersonalDataKeys();

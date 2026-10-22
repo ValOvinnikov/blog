@@ -4,6 +4,7 @@ import {
   testAccountEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
+import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -17,7 +18,7 @@ const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
 const EMAIL = faker.internet.email().toLowerCase();
-const TAGGED_EMAIL = EMAIL.replace('@', '+x@');
+const TAGGED_EMAIL = taggedMixedCaseAddress(EMAIL);
 
 afterEach(async () => {
   await db().delete(schema.users);

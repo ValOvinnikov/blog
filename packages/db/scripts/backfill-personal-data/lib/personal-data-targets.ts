@@ -6,7 +6,7 @@ import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
 import { type SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn, PgTable } from 'drizzle-orm/pg-core';
 
-export interface IEmailIndexField {
+interface IEmailIndexField {
   column: AnyPgColumn;
   indexer: (email: string, keyBase64: string) => string;
 }

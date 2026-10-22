@@ -7,6 +7,7 @@ import {
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
+import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -19,7 +20,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const TAGGED_INVITE_EMAIL = TEST_INVITE_EMAIL.replace('@', '+x@');
+const TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(TEST_INVITE_EMAIL);
 
 afterEach(async () => {
   await db().delete(schema.membershipInvites);
