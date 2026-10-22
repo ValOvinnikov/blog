@@ -75,17 +75,20 @@ export const testHeroProfileHero = ({
   });
 };
 
+const FEATURE_LIST_ID = 'feature-list-1';
+const TESTIMONIAL_ID = 'testimonial-1';
+
 export const testFeatureListModule = ({
   setup,
   loggerWarnMock,
 }: IWithSetup & { loggerWarnMock: Mock }) => {
   it('renders a module_featureList module via the map', async () => {
     await setup({
-      modules: [{ id: 'feature-list-1', type: 'module_featureList' }],
+      modules: [{ id: FEATURE_LIST_ID, type: 'module_featureList' }],
     });
 
     expect(screen.getByTestId('stub-feature-list')).toHaveTextContent(
-      'feature-list-1',
+      FEATURE_LIST_ID,
     );
     expect(loggerWarnMock).not.toHaveBeenCalled();
   });
@@ -97,11 +100,11 @@ export const testTestimonialModule = ({
 }: IWithSetup & { loggerWarnMock: Mock }) => {
   it('renders a module_testimonial module via the map', async () => {
     await setup({
-      modules: [{ id: 'testimonial-1', type: 'module_testimonial' }],
+      modules: [{ id: TESTIMONIAL_ID, type: 'module_testimonial' }],
     });
 
     expect(screen.getByTestId('stub-testimonial')).toHaveTextContent(
-      'testimonial-1',
+      TESTIMONIAL_ID,
     );
     expect(loggerWarnMock).not.toHaveBeenCalled();
   });
@@ -132,12 +135,13 @@ export const testWarnsForUnknownModule = ({
 export const testRendersAllowedModulesInOrder = ({
   setup,
   modules,
-  expectedOrder,
-}: IWithSetup & { modules: unknown[]; expectedOrder: string[] }) => {
+}: IWithSetup & { modules: { id: string; type: string }[] }) => {
   it('renders every allowed module keyed by its id, in the given order', async () => {
     await setup({ modules });
 
     const stubs = screen.getAllByTestId(/^stub-/);
-    expect(stubs.map((node) => node.textContent)).toEqual(expectedOrder);
+    expect(stubs.map((node) => node.textContent)).toEqual(
+      modules.map(({ id }) => id),
+    );
   });
 };

@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TBlogIndexPage } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
@@ -37,17 +38,19 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 vi.mock('@web/i18n/navigation');
 
 const getIndexPageMock = vi.mocked(service.pages.blog.v1.getIndexPage);
+
+const SUPPORTING_TEXT = 'Notes from the team.';
+const CTA_HEADING = 'Join the list';
+const HERO_HEADING = 'Everything we write';
 
 const indexPage: TBlogIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   headingBlock: makeHeadingBlock({
     heading: 'Blog',
-    supportingText: 'Notes from the team.',
+    supportingText: SUPPORTING_TEXT,
   }),
   hero: undefined,
   modules: [],
@@ -87,7 +90,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
       expect(
         within(main).getByRole('heading', { level: 1, name: 'Blog' }),
       ).toBeVisible();
-      expect(within(main).getByText('Notes from the team.')).toBeVisible();
+      expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     });
 
@@ -121,7 +124,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
       error: new Error('boom'),
     });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
@@ -133,7 +136,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
   it('calls notFound() without logging when the index page does not exist', async () => {
     getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
@@ -147,7 +150,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
     getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
@@ -161,7 +164,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
       ok: true,
       data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: 'Join the list' }),
+        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
       }),
     });
 
@@ -169,7 +172,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     expect(
       within(screen.getByRole('main')).getByRole('region', {
-        name: 'Join the list',
+        name: CTA_HEADING,
       }),
     ).toBeVisible();
   });
@@ -181,13 +184,13 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
       ok: true,
-      data: makeHeroBlogData({ heading: 'Everything we write' }),
+      data: makeHeroBlogData({ heading: HERO_HEADING }),
     });
 
     await setup();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Everything we write' }),
+      screen.getByRole('heading', { level: 1, name: HERO_HEADING }),
     ).toBeVisible();
     expect(
       screen.queryByRole('heading', { level: 1, name: 'Blog' }),
@@ -207,7 +210,9 @@ describe(`<${PostIndexPage.name}/>`, () => {
       error: new Error('boom'),
     });
 
-    await expect(setup({ page: 2 })).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup({ page: 2 })).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
 
     expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
       'list-1',

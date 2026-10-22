@@ -2,7 +2,7 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import { buildHomePageMetadata } from './build-home-page-metadata';
 
@@ -39,16 +39,6 @@ describe('buildHomePageMetadata', () => {
   });
 
   describe('when no metadata can be built', () => {
-    let errorSpy: MockInstance<typeof console.error>;
-
-    beforeEach(() => {
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      errorSpy.mockRestore();
-    });
-
     it('returns empty metadata and logs when the fetch fails', async () => {
       getHomePageMock.mockResolvedValue({
         ok: false,
@@ -56,8 +46,9 @@ describe('buildHomePageMetadata', () => {
       });
 
       expect(await buildHomePageMetadata()).toEqual({});
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('home_page.metadata_fetch_failed'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'home_page.metadata_fetch_failed',
+        expect.objectContaining({ error: expect.any(Error) }),
       );
     });
 
@@ -65,7 +56,7 @@ describe('buildHomePageMetadata', () => {
       getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
 
       expect(await buildHomePageMetadata()).toEqual({});
-      expect(errorSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
   });
 

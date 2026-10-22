@@ -8,6 +8,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { buildTagMetadata } from './build-tag-metadata';
 
@@ -27,11 +28,18 @@ const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   DEFAULT_TENANT_SANITY_CONTEXT,
 );
 
+const DESCRIPTION = 'Posts about TypeScript.';
+const TAG_PATH = '/tags/typescript';
+const TAG_FEED_PATH = '/tags/typescript/rss.xml';
+const PAGE_TWO_TITLE = 'TypeScript – Page 2';
+const NL_DESIGN_TAG_PATH = '/nl/tags/ontwerp';
+const EN_DESIGN_TAG_PATH = '/tags/design';
+
 const seo = makeSeo({
   title: 'TypeScript',
-  description: 'Posts about TypeScript.',
+  description: DESCRIPTION,
   ogTitle: 'TypeScript',
-  ogDescription: 'Posts about TypeScript.',
+  ogDescription: DESCRIPTION,
   ogImage,
 });
 
@@ -54,13 +62,13 @@ describe('buildTagMetadata', () => {
     const metadata = await buildTagMetadata('typescript');
 
     expect(metadata.title).toBe('TypeScript');
-    expect(metadata.description).toBe('Posts about TypeScript.');
-    expect(metadata.alternates?.canonical).toBe('/tags/typescript');
+    expect(metadata.description).toBe(DESCRIPTION);
+    expect(metadata.alternates?.canonical).toBe(TAG_PATH);
     expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/tags/typescript/rss.xml',
+      'application/rss+xml': TAG_FEED_PATH,
     });
     expect(metadata.openGraph?.title).toBe('TypeScript');
-    expect(metadata.openGraph?.description).toBe('Posts about TypeScript.');
+    expect(metadata.openGraph?.description).toBe(DESCRIPTION);
     expect(metadata.openGraph?.images).toEqual([
       { url: EXPECTED_OG_IMAGE_URL },
     ]);
@@ -69,12 +77,12 @@ describe('buildTagMetadata', () => {
   it('builds page-N metadata with a "– Page N" suffix, canonical to its own page URL', async () => {
     const metadata = await buildTagMetadata('typescript', 2);
 
-    expect(metadata.title).toBe('TypeScript – Page 2');
-    expect(metadata.openGraph?.title).toBe('TypeScript – Page 2');
+    expect(metadata.title).toBe(PAGE_TWO_TITLE);
+    expect(metadata.openGraph?.title).toBe(PAGE_TWO_TITLE);
     expect(metadata.alternates?.canonical).toBe('/tags/typescript/page/2');
-    expect(metadata.alternates?.canonical).not.toBe('/tags/typescript');
+    expect(metadata.alternates?.canonical).not.toBe(TAG_PATH);
     expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/tags/typescript/rss.xml',
+      'application/rss+xml': TAG_FEED_PATH,
     });
   });
 
@@ -112,14 +120,12 @@ describe('buildTagMetadata', () => {
   });
 
   it('returns empty metadata without logging when the tag simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     const metadata = await buildTagMetadata('missing');
 
     expect(metadata).toEqual({});
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
   });
 });
 
@@ -162,11 +168,11 @@ describe('buildTagMetadata per language', () => {
     const metadata = await buildTagMetadata('ontwerp');
 
     expect(metadata.alternates).toMatchObject({
-      canonical: '/nl/tags/ontwerp',
+      canonical: NL_DESIGN_TAG_PATH,
       languages: {
-        en: '/tags/design',
-        nl: '/nl/tags/ontwerp',
-        'x-default': '/tags/design',
+        en: EN_DESIGN_TAG_PATH,
+        nl: NL_DESIGN_TAG_PATH,
+        'x-default': EN_DESIGN_TAG_PATH,
       },
     });
   });

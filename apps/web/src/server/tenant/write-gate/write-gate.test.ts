@@ -1,5 +1,5 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db';
+import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
@@ -9,15 +9,8 @@ import { isTenantActive, resolveWritableTenant } from './write-gate';
 vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: vi.fn(),
 }));
-vi.mock('@blog/db', () => ({
-  TENANT_STATUS: {
-    ACTIVE: 'ACTIVE',
-    SUSPENDED: 'SUSPENDED',
-    ARCHIVED: 'ARCHIVED',
-  },
-}));
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: { error: vi.fn(), warn: vi.fn() },
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
 }));
 
 const SITE = 'newsletter.subscribe';
@@ -25,8 +18,6 @@ const SITE = 'newsletter.subscribe';
 describe(resolveWritableTenant, () => {
   beforeEach(() => {
     vi.mocked(resolveRequestTenant).mockReset();
-    vi.mocked(logger.error).mockReset();
-    vi.mocked(logger.warn).mockReset();
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
       status: TENANT_STATUS.ACTIVE,

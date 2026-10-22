@@ -1,3 +1,4 @@
+import { FAVICON_RESPONSE_NOT_OK_EVENT } from '@web/constants/icon';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
@@ -31,7 +32,7 @@ const fetchFavicon = async (
   });
 
   if (!response.ok) {
-    logger.error('icon.favicon_response_not_ok', { status: response.status });
+    logger.error(FAVICON_RESPONSE_NOT_OK_EVENT, { status: response.status });
     return undefined;
   }
 

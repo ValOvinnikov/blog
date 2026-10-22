@@ -49,13 +49,13 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
   TaxonomyListModule: taxonomyListModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRender(BlogPostModuleRenderer, {
   modules: [] as TModule<TPagePostType>[],
 });
+
+const POST_RELATED_TEST_ID = 'stub-post-related';
 
 describe(`<${BlogPostModuleRenderer.name}/>`, () => {
   it('renders every allowed module keyed by its id, in the given order', () => {
@@ -71,7 +71,7 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
 
     const stubs = screen.getAllByTestId(/^stub-/);
     expect(stubs.map((node) => node.getAttribute('data-testid'))).toEqual([
-      'stub-post-related',
+      POST_RELATED_TEST_ID,
       'stub-newsletter',
       'stub-cta',
       'stub-post-latest',
@@ -100,7 +100,7 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
       context: { post: { id: 'post-1' } },
     });
 
-    expect(screen.getByTestId('stub-post-related')).toHaveTextContent(
+    expect(screen.getByTestId(POST_RELATED_TEST_ID)).toHaveTextContent(
       'related-1:post-1',
     );
   });

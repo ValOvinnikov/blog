@@ -1,20 +1,29 @@
-const { checkBotIdMock, headersMock, createRateLimiterMock } = vi.hoisted(
-  () => ({
-    checkBotIdMock: vi.fn(),
-    headersMock: vi.fn(),
-    createRateLimiterMock: vi.fn(),
-  }),
-);
+const {
+  checkBotIdMock,
+  headersMock,
+  createRateLimiterMock,
+  realCreateRateLimiter,
+} = vi.hoisted(() => ({
+  checkBotIdMock: vi.fn(),
+  headersMock: vi.fn(),
+  createRateLimiterMock: vi.fn(),
+  realCreateRateLimiter: vi.fn(),
+}));
 
 vi.mock('botid/server', () => ({ checkBotId: checkBotIdMock }));
 vi.mock('next/headers', () => ({ headers: headersMock }));
-vi.mock('@web/server/rate-limit/rate-limiter/rate-limiter', () => ({
-  createRateLimiter: createRateLimiterMock,
-}));
-vi.mock('@web/utils/logger/logger');
+vi.mock(
+  import('@web/server/rate-limit/rate-limiter/rate-limiter'),
+  async (importOriginal) => {
+    const { createRateLimiter } = await importOriginal();
+    realCreateRateLimiter.mockImplementation(createRateLimiter);
+    return { createRateLimiter: createRateLimiterMock };
+  },
+);
 vi.mock('@web/utils/env/env', () => ({ env: {} }));
 
 const TENANT_ID = 'tenant-1';
+const SUBSCRIBE_BLOCKED_EVENT = 'newsletter.subscribe_blocked';
 
 const loadGuard = async () => {
   vi.resetModules();
@@ -23,20 +32,13 @@ const loadGuard = async () => {
   return { isSubscribeAttemptRefused, warnMock: vi.mocked(freshLogger.warn) };
 };
 
-const useRealLimiter = async () => {
-  const actual = await vi.importActual<
-    typeof import('@web/server/rate-limit/rate-limiter/rate-limiter')
-  >('@web/server/rate-limit/rate-limiter/rate-limiter');
-  createRateLimiterMock.mockImplementation(actual.createRateLimiter);
-};
-
 describe('isSubscribeAttemptRefused', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     checkBotIdMock.mockResolvedValue({ isBot: false });
     headersMock.mockResolvedValue(
       new Headers({ 'x-forwarded-for': '203.0.113.5' }),
     );
-    await useRealLimiter();
+    createRateLimiterMock.mockImplementation(realCreateRateLimiter);
   });
 
   it('allows five attempts from one address and refuses the sixth', async () => {
@@ -68,7 +70,7 @@ describe('isSubscribeAttemptRefused', () => {
     checkBotIdMock.mockResolvedValue({ isBot: true });
 
     await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
-    expect(warnMock).toHaveBeenCalledWith('newsletter.subscribe_blocked', {
+    expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
       reason: 'bot',
     });
     expect(createRateLimiterMock).not.toHaveBeenCalled();
@@ -80,7 +82,7 @@ describe('isSubscribeAttemptRefused', () => {
 
     await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
     expect(warnMock).toHaveBeenCalledWith(
-      'newsletter.subscribe_blocked',
+      SUBSCRIBE_BLOCKED_EVENT,
       expect.objectContaining({ reason: 'bot_check_unavailable' }),
     );
     expect(createRateLimiterMock).not.toHaveBeenCalled();
@@ -94,7 +96,7 @@ describe('isSubscribeAttemptRefused', () => {
 
     await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
     expect(warnMock).toHaveBeenCalledWith(
-      'newsletter.subscribe_blocked',
+      SUBSCRIBE_BLOCKED_EVENT,
       expect.objectContaining({ reason: 'rate_limit_store_unavailable' }),
     );
   });

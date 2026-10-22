@@ -13,8 +13,12 @@ import {
 } from '@blog/db/constants';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
 import { faker } from '@faker-js/faker';
+import {
+  CONFIRMATION_RESEND_FAILED_EVENT,
+  UNSUBSCRIBE_FAILED_EVENT,
+} from '@web/constants/newsletter';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 const {
   authMock,
@@ -122,10 +126,8 @@ const session = {
 
 describe('unsubscribeAction', () => {
   let unsubscribeAction: TActions['unsubscribeAction'];
-  let errorSpy: MockInstance<typeof console.error>;
 
   beforeEach(async () => {
-    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockReset();
     authMock.mockResolvedValue(session);
     unsubscribeMock.mockReset();
@@ -138,10 +140,6 @@ describe('unsubscribeAction', () => {
       status: TENANT_STATUS.ACTIVE,
     });
     ({ unsubscribeAction } = await import('./newsletter-subscription-actions'));
-  });
-
-  afterEach(() => {
-    errorSpy.mockRestore();
   });
 
   it('returns SERVER_ERROR without unsubscribing when there is no session', async () => {
@@ -185,12 +183,16 @@ describe('unsubscribeAction', () => {
   });
 
   it('returns SERVER_ERROR, logs and keeps the cookie when the db write throws', async () => {
-    unsubscribeMock.mockRejectedValue(new Error('boom'));
+    const error = new Error('boom');
+    unsubscribeMock.mockRejectedValue(error);
 
     await expect(unsubscribeAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(errorSpy).toHaveBeenCalled();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      UNSUBSCRIBE_FAILED_EVENT,
+      { error },
+    );
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
   });
 
@@ -202,8 +204,9 @@ describe('unsubscribeAction', () => {
     await expect(unsubscribeAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('newsletter.subscribed_cookie_clear_failed'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'newsletter.subscribed_cookie_clear_failed',
+      expect.objectContaining({ error: expect.any(Error) }),
     );
   });
 });
@@ -370,15 +373,16 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR and logs when sending the confirmation email throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     sendEmailMock.mockRejectedValue(new Error('resend down'));
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(errorSpy).toHaveBeenCalled();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      CONFIRMATION_RESEND_FAILED_EVENT,
+      { error: expect.any(Error) },
+    );
     expect(commitConfirmationTokenMock).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
   });
 
   it('sends with a validated reply-to while preserving the List-Unsubscribe headers', async () => {
@@ -420,44 +424,32 @@ describe('resendConfirmationAction', () => {
     );
   });
 
-  describe('when console warnings are expected', () => {
-    let warnSpy: MockInstance<typeof console.warn>;
+  it('still sends the confirmation email when the email settings lookup rejects', async () => {
+    getEmailConfigMock.mockRejectedValue(new Error('db down'));
 
-    beforeEach(() => {
-      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
     });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({ to: SESSION_EMAIL }),
+    );
+  });
 
-    afterEach(() => {
-      warnSpy.mockRestore();
+  it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
+    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
     });
-
-    it('still sends the confirmation email when the email settings lookup rejects', async () => {
-      getEmailConfigMock.mockRejectedValue(new Error('db down'));
-
-      await expect(resendConfirmationAction()).resolves.toEqual({
-        outcome: ACTION_OUTCOME.SUCCESS,
-      });
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({ to: SESSION_EMAIL }),
-      );
-    });
-
-    it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
-      getEmailTemplateMock.mockRejectedValue(new Error('db down'));
-
-      await expect(resendConfirmationAction()).resolves.toEqual({
-        outcome: ACTION_OUTCOME.SUCCESS,
-      });
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          to: SESSION_EMAIL,
-          subject: DEFAULT_CONFIRMATION_SUBJECT,
-          headers: {
-            'List-Unsubscribe': UNSUBSCRIBE_HEADER,
-            'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
-          },
-        }),
-      );
-    });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: SESSION_EMAIL,
+        subject: DEFAULT_CONFIRMATION_SUBJECT,
+        headers: {
+          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
+          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
+        },
+      }),
+    );
   });
 });

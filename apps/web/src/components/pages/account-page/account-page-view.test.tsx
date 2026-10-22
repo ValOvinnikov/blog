@@ -11,8 +11,6 @@ vi.mock('@web/i18n/navigation');
 
 vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 
-vi.mock('@web/utils/logger/logger');
-
 const setup = (overrides?: Partial<IAccountPageViewProps>) =>
   renderElement(
     <ToastProvider>

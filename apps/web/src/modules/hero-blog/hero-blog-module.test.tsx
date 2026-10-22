@@ -25,13 +25,15 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/utils/logger/logger');
-
 const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerErrorMock = vi.mocked(logger.error);
 
+const HERO_BLOG_ID = 'hero-blog-1';
+const POST_HEADING = 'Hello World';
+const POST_UNRESOLVED_EVENT = 'hero_blog_module.post_unresolved';
+
 const setup = customRenderAsync(HeroBlogModule, {
-  id: 'hero-blog-1',
+  id: HERO_BLOG_ID,
 });
 
 describe(`<${HeroBlogModule.name}/>`, () => {
@@ -58,7 +60,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
 
     await setup();
 
-    expect(getHeroBlogMock).toHaveBeenCalledWith('hero-blog-1', tenant);
+    expect(getHeroBlogMock).toHaveBeenCalledWith(HERO_BLOG_ID, tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -72,13 +74,13 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   it('renders the resolved heading', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
-      data: makeHeroBlogData({ heading: 'Hello World' }),
+      data: makeHeroBlogData({ heading: POST_HEADING }),
     });
 
     await setup();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Hello World' }),
+      screen.getByRole('heading', { level: 1, name: POST_HEADING }),
     ).toBeVisible();
   });
 
@@ -91,10 +93,9 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'hero_blog_module.post_unresolved',
-      { id: 'hero-blog-1' },
-    );
+    expect(loggerErrorMock).toHaveBeenCalledWith(POST_UNRESOLVED_EVENT, {
+      id: HERO_BLOG_ID,
+    });
   });
 
   it('renders nothing without an error log when the post has no version in the request language', async () => {
@@ -120,10 +121,9 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'hero_blog_module.post_unresolved',
-      { id: 'hero-blog-1' },
-    );
+    expect(loggerErrorMock).toHaveBeenCalledWith(POST_UNRESOLVED_EVENT, {
+      id: HERO_BLOG_ID,
+    });
   });
 
   it('renders the hero image resolving through the Sanity CDN', async () => {

@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
 import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -16,11 +17,12 @@ vi.mock('@blog/service', () => ({
   service: { pages: { landing: { v1: { getRedirect: vi.fn() } } } },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 vi.mock('@web/i18n/navigation');
 
 const getRedirectMock = vi.mocked(service.pages.landing.v1.getRedirect);
+
+const OLD_FAQ_PATH = 'old-faq';
+const FAQ_DESTINATION = '/modules/faq';
 
 const MISSING = { ok: true, data: undefined } as const;
 
@@ -36,15 +38,15 @@ describe(redirectMovedLandingPage, () => {
     });
     getRedirectMock.mockResolvedValueOnce({
       ok: true,
-      data: { destination: '/modules/faq', status: REDIRECT_STATUS.PERMANENT },
+      data: { destination: FAQ_DESTINATION, status: REDIRECT_STATUS.PERMANENT },
     });
 
-    await expect(redirectMovedLandingPage(MISSING, 'old-faq')).rejects.toThrow(
-      'NEXT_REDIRECT',
-    );
+    await expect(
+      redirectMovedLandingPage(MISSING, OLD_FAQ_PATH),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(permanentRedirect).toHaveBeenCalledWith({
-      href: '/modules/faq',
+      href: FAQ_DESTINATION,
       locale: LOCALE_ISO_CODES.NL,
     });
     expect(redirect).not.toHaveBeenCalled();
@@ -61,7 +63,7 @@ describe(redirectMovedLandingPage, () => {
     });
 
     await expect(redirectMovedLandingPage(MISSING, 'sale')).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
     expect(redirect).toHaveBeenCalledWith({
@@ -93,12 +95,12 @@ describe(redirectMovedLandingPage, () => {
       error: new Error('boom'),
     });
 
-    await redirectMovedLandingPage(MISSING, 'old-faq');
+    await redirectMovedLandingPage(MISSING, OLD_FAQ_PATH);
 
     expect(permanentRedirect).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
       'landing_redirect.fetch_failed',
-      expect.objectContaining({ path: 'old-faq' }),
+      expect.objectContaining({ path: OLD_FAQ_PATH }),
     );
   });
 

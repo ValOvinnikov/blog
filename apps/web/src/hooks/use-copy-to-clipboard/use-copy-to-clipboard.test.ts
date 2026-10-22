@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { act, renderHook, waitFor } from '@web/testing/custom-render';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import { useCopyToClipboard } from './use-copy-to-clipboard';
 
@@ -13,6 +13,9 @@ const { reportClientErrorMock } = vi.hoisted(() => ({
 vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: reportClientErrorMock,
 }));
+
+const COPIED_URL = 'https://example.com/blog/hello';
+const WRITE_FAILED_EVENT = 'copy_to_clipboard.write_failed';
 
 const originalClipboard = navigator.clipboard;
 let writeText: ReturnType<typeof vi.fn>;
@@ -48,10 +51,10 @@ describe(useCopyToClipboard, () => {
 
     it('writes the given text to the clipboard and flips isCopied to true', async () => {
       act(() => {
-        result.current.copy('https://example.com/blog/hello');
+        result.current.copy(COPIED_URL);
       });
 
-      expect(writeText).toHaveBeenCalledWith('https://example.com/blog/hello');
+      expect(writeText).toHaveBeenCalledWith(COPIED_URL);
       await waitFor(() => {
         expect(result.current.isCopied).toBe(true);
       });
@@ -59,38 +62,33 @@ describe(useCopyToClipboard, () => {
 
     describe('when the clipboard write rejects', () => {
       const rejection = new Error('denied');
-      let consoleError: MockInstance<typeof console.error>;
 
       beforeEach(() => {
         writeText.mockRejectedValue(rejection);
-        consoleError = vi
-          .spyOn(console, 'error')
-          .mockImplementation(() => undefined);
-      });
-
-      afterEach(() => {
-        consoleError.mockRestore();
       });
 
       it('logs and keeps isCopied false when the clipboard write rejects', async () => {
         act(() => {
-          result.current.copy('https://example.com/blog/hello');
+          result.current.copy(COPIED_URL);
         });
 
         await waitFor(() => {
-          expect(consoleError).toHaveBeenCalled();
+          expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+            WRITE_FAILED_EVENT,
+            { error: rejection },
+          );
         });
         expect(result.current.isCopied).toBe(false);
       });
 
       it('reports the error through the client transport when the clipboard write rejects', async () => {
         act(() => {
-          result.current.copy('https://example.com/blog/hello');
+          result.current.copy(COPIED_URL);
         });
 
         await waitFor(() => {
           expect(reportClientErrorMock).toHaveBeenCalledWith(
-            'copy_to_clipboard.write_failed',
+            WRITE_FAILED_EVENT,
             rejection,
           );
         });
@@ -102,7 +100,7 @@ describe(useCopyToClipboard, () => {
     const { result } = renderHook(() => useCopyToClipboard(50));
 
     act(() => {
-      result.current.copy('https://example.com/blog/hello');
+      result.current.copy(COPIED_URL);
     });
     await waitFor(() => {
       expect(result.current.isCopied).toBe(true);

@@ -14,8 +14,6 @@ vi.mock('@blog/db', () => ({
   queries: { tenants: { touchTenantActivity: touchTenantActivityMock } },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerErrorMock = vi.mocked(logger.error);
 
 const AT = faker.date.recent();

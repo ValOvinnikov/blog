@@ -5,7 +5,8 @@ import { getBrandLogoUrl } from './get-brand-logo-url';
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
-vi.mock('@web/utils/logger/logger');
+
+const LOGO_URL = 'https://blob.example.com/logo.png';
 
 const getSiteConfigMock = vi.mocked(getSiteConfig);
 
@@ -13,12 +14,10 @@ describe(getBrandLogoUrl, () => {
   it("returns the tenant's Look logo", async () => {
     getSiteConfigMock.mockResolvedValue({
       ok: true,
-      data: { logoAssetUrl: 'https://blob.example.com/logo.png' },
+      data: { logoAssetUrl: LOGO_URL },
     } as Awaited<ReturnType<typeof getSiteConfig>>);
 
-    await expect(getBrandLogoUrl('tenant-a')).resolves.toBe(
-      'https://blob.example.com/logo.png',
-    );
+    await expect(getBrandLogoUrl('tenant-a')).resolves.toBe(LOGO_URL);
   });
 
   it('returns no logo when the tenant has no site config', async () => {

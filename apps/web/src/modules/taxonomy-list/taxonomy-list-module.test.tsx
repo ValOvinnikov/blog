@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  NEXT_NAVIGATION_ERROR,
+  TAXONOMY_KIND,
+} from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -8,6 +12,7 @@ import {
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { TaxonomyListModule } from './taxonomy-list-module';
@@ -57,6 +62,9 @@ const tagsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
   },
 });
 
+const FIRST_POST_TITLE = 'Shipping the new build pipeline';
+const SECOND_POST_TITLE = 'Why we rewrote our test runner';
+
 const entry = {
   id: 'topic-1',
   title: 'Engineering',
@@ -66,16 +74,20 @@ const entry = {
   latestPosts: [
     {
       id: 'post-1',
-      title: 'Shipping the new build pipeline',
+      title: FIRST_POST_TITLE,
       slug: 'shipping-the-new-build-pipeline',
     },
     {
       id: 'post-2',
-      title: 'Why we rewrote our test runner',
+      title: SECOND_POST_TITLE,
       slug: 'why-we-rewrote-our-test-runner',
     },
   ],
 };
+
+const MODULE_ID = 'taxonomy-list-1';
+const READ_THE_BLOG = 'read the blog';
+const LIST_NAME = 'Latest in Engineering';
 
 describe(`<${TaxonomyListModule.name}/>`, () => {
   beforeEach(() => {
@@ -86,7 +98,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
   describe('modules[] placement', () => {
     const setup = customRenderAsync(TaxonomyListModule, {
-      id: 'taxonomy-list-1',
+      id: MODULE_ID,
     });
 
     describe('with no topic entries', () => {
@@ -98,7 +110,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       it('forwards the tenant Sanity context to getTaxonomyList', async () => {
         expect(getTaxonomyListMock).toHaveBeenCalledWith(
-          'taxonomy-list-1',
+          MODULE_ID,
           DEFAULT_TENANT_SANITY_CONTEXT,
         );
       });
@@ -184,32 +196,33 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
     it('renders an authored link in the tags empty message', async () => {
       getTaxonomyListMock.mockResolvedValue(tagsResult());
       vi.mocked(getVoiceRich).mockResolvedValueOnce(
-        makeFormattedVoiceRich({ linkText: 'read the blog', href: '/blog' }),
+        makeFormattedVoiceRich({ linkText: READ_THE_BLOG, href: '/blog' }),
       );
 
       await setup();
 
       expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('tagsEmpty');
-      expect(
-        screen.getByRole('link', { name: 'read the blog' }),
-      ).toHaveAttribute('href', '/blog');
+      expect(screen.getByRole('link', { name: READ_THE_BLOG })).toHaveAttribute(
+        'href',
+        '/blog',
+      );
     });
 
     it('logs and calls notFound() when the fetch fails', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getTaxonomyListMock.mockResolvedValue({
         ok: false,
         error: new Error('boom'),
       });
 
-      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('taxonomy_list_module.fetch_failed'),
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
       );
 
-      errorSpy.mockRestore();
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'taxonomy_list_module.fetch_failed',
+        expect.anything(),
+      );
     });
 
     it('maps latestPosts to post-detail links, newest first, when showLatestPosts is on', async () => {
@@ -217,11 +230,11 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       await setup();
 
-      const list = screen.getByRole('list', { name: 'Latest in Engineering' });
+      const list = screen.getByRole('list', { name: LIST_NAME });
       const postLinks = within(list).getAllByRole('link');
       expect(postLinks.map((link) => link.textContent)).toEqual([
-        'Shipping the new build pipeline',
-        'Why we rewrote our test runner',
+        FIRST_POST_TITLE,
+        SECOND_POST_TITLE,
       ]);
       expect(postLinks[0]).toHaveAttribute(
         'href',
@@ -235,7 +248,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       await setup();
 
       expect(
-        screen.queryByRole('list', { name: 'Latest in Engineering' }),
+        screen.queryByRole('list', { name: LIST_NAME }),
       ).not.toBeInTheDocument();
     });
 
@@ -247,7 +260,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       await setup();
 
       expect(
-        screen.queryByRole('list', { name: 'Latest in Engineering' }),
+        screen.queryByRole('list', { name: LIST_NAME }),
       ).not.toBeInTheDocument();
     });
   });

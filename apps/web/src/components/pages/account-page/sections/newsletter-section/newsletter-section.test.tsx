@@ -3,6 +3,7 @@ import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
+import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_ID,
@@ -18,8 +19,6 @@ vi.mock('@blog/db', () => ({
   queries: { subscribers: { getSubscriptionStatus: vi.fn() } },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const authMock = vi.mocked(auth as () => Promise<unknown>);
 const getSubscriptionStatusMock = vi.mocked(
   queries.subscribers.getSubscriptionStatus,
@@ -34,7 +33,7 @@ const setup = customRenderServerAsync(
 describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
+      user: ACCOUNT_USER,
     });
   });
 
@@ -76,24 +75,24 @@ describe(`<${NewsletterSection.name}/>`, () => {
   it('shows the active subscription with an unsubscribe button', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'active',
-      subscriber: { email: 'jane@icloud.com' },
+      subscriber: { email: ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();
 
     expect(getSubscriptionStatusMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_ID,
-      'user-1',
+      ACCOUNT_USER.id,
     );
     expect(screen.getByText('Subscribed')).toBeVisible();
-    expect(screen.getByText('jane@icloud.com')).toBeVisible();
+    expect(screen.getByText(ACCOUNT_USER.email)).toBeVisible();
     expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
   });
 
   it('offers to resend the confirmation for a pending subscription', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'pending',
-      subscriber: { email: 'jane@icloud.com' },
+      subscriber: { email: ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();

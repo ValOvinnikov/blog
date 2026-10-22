@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
@@ -107,6 +108,8 @@ vi.mock('next-intl/server', () => ({
   })),
 }));
 
+vi.mock('@web/utils/logger/logger');
+
 // `next/font/local` relies on a Next build-time transform and throws when
 // `@web/config/fonts` is evaluated under Vitest.
 vi.mock('next/font/local', () => ({
@@ -120,13 +123,13 @@ vi.mock('next/font/local', () => ({
 // even when a test never navigates.
 vi.mock('next/navigation', () => ({
   notFound: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
+    throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   }),
   redirect: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
+    throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
   }),
   permanentRedirect: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
+    throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
   }),
   usePathname: vi.fn(() => '/'),
   useRouter: vi.fn(() => ({

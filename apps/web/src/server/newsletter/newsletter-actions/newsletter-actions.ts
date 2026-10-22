@@ -14,7 +14,10 @@ import {
   FIELD_ERROR,
   type TFieldErrorReason,
 } from '@web/constants/field-error';
-import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
+import {
+  SUBSCRIBE_FAILED_EVENT,
+  NEWSLETTER_OUTCOME,
+} from '@web/constants/newsletter';
 import { sendNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { isSubscribeAttemptRefused } from '@web/server/newsletter/subscribe-guard/subscribe-guard';
@@ -32,7 +35,6 @@ export type TSubscribeResult =
   | TActionResult<TSubscribeRefusal, 'email', TFieldErrorReason>
   | TOutcome<typeof NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED>;
 
-const SUBSCRIBE_FAILED_EVENT = 'newsletter.subscribe_failed';
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 const UNAVAILABLE = toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 

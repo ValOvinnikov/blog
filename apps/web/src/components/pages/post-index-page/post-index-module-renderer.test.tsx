@@ -76,13 +76,14 @@ vi.mock('@web/modules/post-latest/post-latest-module', () => ({
   PostLatestModule: postLatestModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
+
+const PAGE_HEADING = 'Notes on building things';
+const POST_LIST_ID = 'post-list-1';
 
 const setup = customRenderAsync(PostIndexModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Notes on building things' }),
+  headingBlock: makeHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
@@ -90,13 +91,13 @@ const setup = customRenderAsync(PostIndexModuleRenderer, {
 describe(`<${PostIndexModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({
     setup,
-    headingText: 'Notes on building things',
+    headingText: PAGE_HEADING,
   });
   testResolvedHero({ setup });
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock,
-    headingText: 'Notes on building things',
+    headingText: PAGE_HEADING,
   });
 
   it('renders the given children between the hero and the modules', async () => {
@@ -124,7 +125,7 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: 'post-list-1', type: 'module_postList' },
+      { id: POST_LIST_ID, type: 'module_postList' },
       { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
@@ -132,26 +133,17 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
       { id: 'content-1', type: 'module_content' },
       { id: 'post-latest-1', type: 'module_postLatest' },
     ],
-    expectedOrder: [
-      'post-list-1',
-      'taxonomy-list-1',
-      'cta-1',
-      'newsletter-1',
-      'post-featured-1',
-      'content-1',
-      'post-latest-1',
-    ],
   });
 
   it('forwards the given context to the modules', async () => {
     await setup({
-      modules: [{ id: 'post-list-1', type: 'module_postList' }],
+      modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
       context: { page: 2 },
     });
 
     expect(postListModuleMock).toHaveBeenCalledWith(
       {
-        id: 'post-list-1',
+        id: POST_LIST_ID,
         context: { page: 2 },
       },
       undefined,

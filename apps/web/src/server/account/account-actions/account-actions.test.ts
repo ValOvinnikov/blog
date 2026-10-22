@@ -50,13 +50,10 @@ describe('deleteAccountAction', () => {
   });
 
   it('returns SERVER_ERROR when the delete throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     deleteAccountMock.mockRejectedValue(new Error('boom'));
 
     await expect(deleteAccountAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-
-    errorSpy.mockRestore();
   });
 });

@@ -1,4 +1,5 @@
 import type { TFaqPageQuestion } from '@blog/service';
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { FaqPageSchema } from './faq-page-schema';
@@ -13,7 +14,7 @@ describe(`<${FaqPageSchema.name}/>`, () => {
   it('renders the JSON-LD FAQPage schema script', () => {
     setup();
 
-    const script = screen.getByTestId('json-ld-script');
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(script).toHaveAttribute('type', 'application/ld+json');
     expect(script.textContent).toContain('"@type":"FAQPage"');
   });

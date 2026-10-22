@@ -1,8 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { screen, within } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import type { Mock } from 'vitest';
 
@@ -25,14 +27,12 @@ export const testNotFoundWithoutLog = ({
   setup,
 }: IWithLoaderMock) => {
   it('calls notFound() without logging when the page document is missing', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     pageLoaderMock.mockResolvedValue({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
   });
 };
 
@@ -42,18 +42,17 @@ export const testNotFoundOnFetchFailure = ({
   eventFragment,
 }: IWithLoaderMock & { eventFragment?: string }) => {
   it('calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     pageLoaderMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     if (eventFragment) {
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining(eventFragment),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        eventFragment,
+        expect.anything(),
       );
     }
-    errorSpy.mockRestore();
   });
 };
 
@@ -99,7 +98,7 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
 
     await setup();
 
-    const script = screen.getByTestId('json-ld-script');
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(script).toHaveAttribute('type', 'application/ld+json');
     expect(script.textContent).toContain('"@type":"BreadcrumbList"');
     expect(script.textContent).toContain(
@@ -116,7 +115,7 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
 
     await setup();
 
-    expect(screen.getByTestId('json-ld-script').textContent).toContain(
+    expect(screen.getByTestId(JSON_LD_SCRIPT_TEST_ID).textContent).toContain(
       `"item":"https://example.com/nl${itemPath}"`,
     );
   });
@@ -138,7 +137,9 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
 
     await setup();
 
-    expect(screen.queryByTestId('json-ld-script')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID),
+    ).not.toBeInTheDocument();
   });
 };
 
@@ -175,7 +176,7 @@ export const testBreadcrumbsJsonLdTrail = <TData,>({
     await setup();
 
     const schema = JSON.parse(
-      screen.getByTestId('json-ld-script').textContent ?? '',
+      screen.getByTestId(JSON_LD_SCRIPT_TEST_ID).textContent ?? '',
     );
     expect(schema.itemListElement).toEqual(
       expectedTrail.map(({ name, path }, index) => ({

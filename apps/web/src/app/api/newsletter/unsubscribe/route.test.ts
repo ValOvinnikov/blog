@@ -22,6 +22,7 @@ import {
   DEFAULT_TENANT_BASE_URL,
   DEFAULT_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { GET, POST } from './route';
 
@@ -269,27 +270,25 @@ describe('POST /api/newsletter/unsubscribe', () => {
   );
 
   it('sends them to the failed page and logs when no tenant resolves', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     resolveRequestTenantMock.mockResolvedValue(undefined);
     const response = await POST(request);
 
     expect(locationOf(response)).toBe(FAILED_LOCATION);
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('newsletter.unsubscribe_link_tenant_unresolved'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'newsletter.unsubscribe_link_tenant_unresolved',
     );
-    errorSpy.mockRestore();
   });
 
   it('sends them to the failed page and logs when the db query throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    unsubscribeByTokenMock.mockRejectedValue(new Error('db down'));
+    const error = new Error('db down');
+    unsubscribeByTokenMock.mockRejectedValue(error);
     const response = await POST(request);
 
     expect(locationOf(response)).toBe(FAILED_LOCATION);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('newsletter.unsubscribe_link_failed'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'newsletter.unsubscribe_link_failed',
+      { error },
     );
-    errorSpy.mockRestore();
   });
 });

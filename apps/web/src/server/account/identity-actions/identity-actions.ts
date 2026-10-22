@@ -4,6 +4,10 @@ import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
+  DISPLAY_NAME_UPDATE_FAILED_EVENT,
+  PROVIDER_UNLINK_FAILED_EVENT,
+} from '@web/constants/account';
+import {
   FIELD_ERROR,
   type TFieldErrorReason,
 } from '@web/constants/field-error';
@@ -48,7 +52,7 @@ export const unlinkProviderAction = async (
     }
     return SUCCESS;
   } catch (error) {
-    logger.error('account.provider_unlink_failed', { provider, error });
+    logger.error(PROVIDER_UNLINK_FAILED_EVENT, { provider, error });
     return SERVER_ERROR;
   }
 };
@@ -72,7 +76,7 @@ export const updateDisplayNameAction = async (
     await queries.account.updateDisplayName(userId, trimmedName);
     return SUCCESS;
   } catch (error) {
-    logger.error('account.display_name_update_failed', { error });
+    logger.error(DISPLAY_NAME_UPDATE_FAILED_EVENT, { error });
     return SERVER_ERROR;
   }
 };

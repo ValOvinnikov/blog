@@ -91,26 +91,27 @@ vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
+
+const PAGE_HEADING = 'Welcome to the blog';
+const HERO_STATEMENT_TEST_ID = 'stub-hero-statement';
 
 const setup = customRenderAsync(HomeModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+  headingBlock: makeHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 
 describe(`<${HomeModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: 'Welcome to the blog' });
+  testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
 
   it('renders the resolved hero, with exactly one h1, when the hero has content', async () => {
     await setup({ hero: { id: 'hero-1', type: 'module_heroStatement' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(screen.getByTestId('stub-hero-statement')).toHaveTextContent(
+    expect(screen.getByTestId(HERO_STATEMENT_TEST_ID)).toHaveTextContent(
       'hero-1',
     );
   });
@@ -126,7 +127,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
 
     const nodes = screen.getAllByTestId(/^stub-/);
     expect(nodes.map((node) => node.getAttribute('data-testid'))).toEqual([
-      'stub-hero-statement',
+      HERO_STATEMENT_TEST_ID,
       'stub-cta',
       'stub-content',
     ]);
@@ -137,7 +138,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('Welcome to the blog');
+    expect(headings[0]).toHaveTextContent(PAGE_HEADING);
     expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
   });
 
@@ -161,14 +162,6 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
-    ],
-    expectedOrder: [
-      'cta-1',
-      'content-1',
-      'newsletter-1',
-      'post-latest-1',
-      'taxonomy-list-1',
-      'post-featured-1',
     ],
   });
 });

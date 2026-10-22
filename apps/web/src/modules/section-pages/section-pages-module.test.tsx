@@ -27,14 +27,14 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/utils/logger/logger');
-
 const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerWarnMock = vi.mocked(logger.warn);
 const loggerErrorMock = vi.mocked(logger.error);
 
+const SECTION_PAGES_ID = 'section-pages-1';
+
 const setup = customRenderAsync(SectionPagesModule, {
-  id: 'section-pages-1',
+  id: SECTION_PAGES_ID,
   context: { landingPage: { id: 'modules', path: 'modules' } },
 });
 
@@ -58,7 +58,7 @@ describe(`<${SectionPagesModule.name}/>`, () => {
 
     it('fetches the module for the landing page it sits on', async () => {
       expect(getSectionPagesModuleMock).toHaveBeenCalledWith(
-        'section-pages-1',
+        SECTION_PAGES_ID,
         'modules',
         'modules',
         DEFAULT_TENANT_SANITY_CONTEXT,

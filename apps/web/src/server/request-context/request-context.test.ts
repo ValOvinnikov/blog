@@ -1,21 +1,21 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { TENANT_PLAN } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { DEFAULT_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 import { setRequestLocale } from 'next-intl/server';
 
 import type * as TModule from './request-context';
 
 const {
-  loggerErrorMock,
   getTenantByIdMock,
   toTenantSanityCredentialsMock,
   selectLiveLocalesMock,
   isProductionEnvironmentMock,
   isTenantServableMock,
 } = vi.hoisted(() => ({
-  loggerErrorMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   toTenantSanityCredentialsMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
@@ -33,14 +33,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 vi.mock('@blog/service', () => ({
-  getPlatformSanityContext: () => ({
-    projectId: 'platform-project',
-    dataset: 'platform-dataset',
-    token: 'platform-token',
-  }),
-}));
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
+  getPlatformSanityContext: () => PLATFORM_CONTEXT,
 }));
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -48,12 +41,12 @@ vi.mock('@web/utils/is-production-environment', () => ({
 vi.mock(
   '@web/server/tenant/resolve-tenant/resolve-tenant',
   async (importOriginal) => ({
-    ...(await importOriginal<
-      typeof import('@web/server/tenant/resolve-tenant/resolve-tenant')
-    >()),
+    ...(await importOriginal()),
     isTenantServable: isTenantServableMock,
   }),
 );
+
+const NO_TENANT_ENTERED = 'with no tenant entered';
 
 const TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
 
@@ -182,11 +175,11 @@ describe('request-context', () => {
 
   it('throws a 404 for a locale the site does not serve', async () => {
     await expect(enterAndRead(TENANT_ID, 'xx')).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
   });
 
-  describe('with no tenant entered', () => {
+  describe(NO_TENANT_ENTERED, () => {
     it('serves the platform project and the site URL without a lookup', async () => {
       await expect(
         enterAndRead(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.NL),
@@ -194,7 +187,7 @@ describe('request-context', () => {
         tenantId: undefined,
         locale: LOCALE_ISO_CODES.NL,
         sanityContext: { ...PLATFORM_CONTEXT, locale: LOCALE_ISO_CODES.NL },
-        metadataBase: new URL('https://example.com'),
+        metadataBase: new URL(DEFAULT_TENANT_BASE_URL),
         defaultLocale: undefined,
         liveLocales: undefined,
       });
@@ -210,7 +203,7 @@ describe('request-context', () => {
     it('throws a 404 in production', async () => {
       await expect(
         enterAndRead(TENANT_ID, LOCALE_ISO_CODES.EN),
-      ).rejects.toThrow('NEXT_NOT_FOUND');
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
     it('falls back to the platform project outside production', async () => {
@@ -232,7 +225,7 @@ describe('request-context', () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
     await expect(enterAndRead(TENANT_ID, LOCALE_ISO_CODES.EN)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
   });
 
@@ -253,7 +246,7 @@ describe('request-context', () => {
         LOCALE_ISO_CODES.EN,
       );
 
-      expect(metadataBase).toEqual(new URL('https://example.com'));
+      expect(metadataBase).toEqual(new URL(DEFAULT_TENANT_BASE_URL));
     });
 
     it('falls back to the site URL for a deprovisioned tenant', async () => {
@@ -266,7 +259,7 @@ describe('request-context', () => {
         LOCALE_ISO_CODES.EN,
       );
 
-      expect(metadataBase).toEqual(new URL('https://example.com'));
+      expect(metadataBase).toEqual(new URL(DEFAULT_TENANT_BASE_URL));
     });
   });
 
@@ -331,13 +324,14 @@ describe('request-context', () => {
       await expect(
         enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
       ).resolves.toMatchObject({ locale: LOCALE_ISO_CODES.NL });
-      expect(loggerErrorMock).toHaveBeenCalledWith(
+      const { logger } = await import('@web/utils/logger/logger');
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'request_context.not_found_tenant_load_failed',
         { error },
       );
     });
 
-    describe('with no tenant entered', () => {
+    describe(NO_TENANT_ENTERED, () => {
       it('serves the entered language', async () => {
         await expect(
           enterAndReadNotFound(

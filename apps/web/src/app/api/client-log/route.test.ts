@@ -1,8 +1,14 @@
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
 import { logger } from '@web/utils/logger/logger';
 
-vi.mock('@web/utils/logger/logger');
+import type * as TRoute from './route';
 
 let loggerErrorMock = vi.mocked(logger.error);
+
+const CLIENT_LOG_URL = 'https://example.com/api/client-log';
+const CONTENT_LENGTH_HEADER = 'content-length';
+const CLIENT_IP = '203.0.113.5';
 
 const validPayload = {
   event: 'copy_to_clipboard.write_failed',
@@ -15,8 +21,8 @@ const postRequest = (
 ) => {
   const rawBody = init?.raw ?? JSON.stringify(body);
 
-  return new Request('https://example.com/api/client-log', {
-    method: 'POST',
+  return new Request(CLIENT_LOG_URL, {
+    method: HTTP_METHOD.POST,
     headers: { 'Content-Type': 'application/json', ...init?.headers },
     body: rawBody,
   });
@@ -30,8 +36,8 @@ const postStreamRequest = (byteLength: number) => {
     },
   });
 
-  return new Request('https://example.com/api/client-log', {
-    method: 'POST',
+  return new Request(CLIENT_LOG_URL, {
+    method: HTTP_METHOD.POST,
     headers: { 'Content-Type': 'application/json' },
     body: stream,
     duplex: 'half',
@@ -46,7 +52,7 @@ const freshRoute = async () => {
 };
 
 describe('POST /api/client-log', () => {
-  let POST: Awaited<ReturnType<typeof freshRoute>>['POST'];
+  let POST: typeof TRoute.POST;
 
   beforeEach(async () => {
     loggerErrorMock.mockReset();
@@ -56,10 +62,10 @@ describe('POST /api/client-log', () => {
   it('accepts a valid payload and logs through the shared logger with source: client', async () => {
     const response = await POST(postRequest(validPayload));
 
-    expect(response.status).toBe(204);
+    expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
     expect(loggerErrorMock).toHaveBeenCalledWith('client_log.report_received', {
-      message: 'clipboard write denied',
-      clientEvent: 'copy_to_clipboard.write_failed',
+      message: validPayload.message,
+      clientEvent: validPayload.event,
       source: 'client',
     });
   });
@@ -69,14 +75,14 @@ describe('POST /api/client-log', () => {
       postRequest({ ...validPayload, extra: 'nope' }),
     );
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
   it('rejects malformed JSON', async () => {
     const response = await POST(postRequest(undefined, { raw: '{not json' }));
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
@@ -102,7 +108,7 @@ describe('POST /api/client-log', () => {
 
   it('rejects an oversized streamed body with no Content-Length, without buffering it', async () => {
     const request = postStreamRequest(9 * 1024);
-    expect(request.headers.get('content-length')).toBeNull();
+    expect(request.headers.get(CONTENT_LENGTH_HEADER)).toBeNull();
 
     const response = await POST(request);
 
@@ -118,17 +124,17 @@ describe('POST /api/client-log', () => {
         controller.close();
       },
     });
-    const request = new Request('https://example.com/api/client-log', {
-      method: 'POST',
+    const request = new Request(CLIENT_LOG_URL, {
+      method: HTTP_METHOD.POST,
       headers: { 'Content-Type': 'application/json' },
       body: stream,
       duplex: 'half',
     } as RequestInit);
-    expect(request.headers.get('content-length')).toBeNull();
+    expect(request.headers.get(CONTENT_LENGTH_HEADER)).toBeNull();
 
     const response = await POST(request);
 
-    expect(response.status).toBe(204);
+    expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
   });
 
   it('strips control characters from the message so a payload cannot forge a log line', async () => {
@@ -144,7 +150,7 @@ describe('POST /api/client-log', () => {
       }),
     );
 
-    expect(response.status).toBe(204);
+    expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
     const loggedContext = loggerErrorMock.mock.calls[0]?.[1] as {
       message: string;
     };
@@ -166,7 +172,7 @@ describe('POST /api/client-log', () => {
   });
 
   it('accepts 20 reports per client per minute and refuses the 21st', async () => {
-    const headers = { 'x-forwarded-for': '203.0.113.5' };
+    const headers = { [FORWARDED_FOR_HEADER]: CLIENT_IP };
 
     const statuses: number[] = [];
     for (let i = 0; i < 21; i += 1) {
@@ -182,17 +188,17 @@ describe('POST /api/client-log', () => {
     for (let i = 0; i < 21; i += 1) {
       await POST(
         postRequest(validPayload, {
-          headers: { 'x-forwarded-for': '203.0.113.5' },
+          headers: { [FORWARDED_FOR_HEADER]: CLIENT_IP },
         }),
       );
     }
 
     const otherClientResponse = await POST(
       postRequest(validPayload, {
-        headers: { 'x-forwarded-for': '203.0.113.9' },
+        headers: { [FORWARDED_FOR_HEADER]: '203.0.113.9' },
       }),
     );
 
-    expect(otherClientResponse.status).toBe(204);
+    expect(otherClientResponse.status).toBe(HTTP_STATUS.NO_CONTENT);
   });
 });

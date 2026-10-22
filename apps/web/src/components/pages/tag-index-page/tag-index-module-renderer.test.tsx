@@ -62,8 +62,6 @@ vi.mock('@web/modules/content/content-module', () => ({
   ContentModule: contentModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TagIndexModuleRenderer, {
@@ -73,13 +71,15 @@ const setup = customRenderAsync(TagIndexModuleRenderer, {
   modules: [],
 });
 
+const TAXONOMY_LIST_ID = 'taxonomy-list-1';
+
 describe(`<${TagIndexModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'Tags' });
   testResolvedHero({ setup });
   testHeroBeforeModules({
     setup,
     modules: [
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
     ],
     expectedTestIds: ['stub-hero', 'stub-taxonomy-list', 'stub-cta'],
@@ -99,18 +99,11 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'content-1', type: 'module_content' },
-    ],
-    expectedOrder: [
-      'taxonomy-list-1',
-      'post-latest-1',
-      'cta-1',
-      'newsletter-1',
-      'content-1',
     ],
   });
 });
