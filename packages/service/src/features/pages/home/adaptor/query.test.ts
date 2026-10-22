@@ -109,6 +109,8 @@ describe('homePageQuery language scoping', () => {
 
 describe('homePageQuery template layout', () => {
   const { EN, NL } = LOCALE_ISO_CODES;
+  const TEMPLATE_ID = 'template-home';
+  const MODULE_ID = 'post-latest-1';
 
   function home(id: string, language: string, template?: string) {
     return {
@@ -121,16 +123,16 @@ describe('homePageQuery template layout', () => {
   }
 
   const dataset = [
-    home('page_home', EN, 'template-home'),
-    home('home-nl', NL, 'template-home'),
+    home('page_home', EN, TEMPLATE_ID),
+    home('home-nl', NL, TEMPLATE_ID),
     {
-      _id: 'template-home',
+      _id: TEMPLATE_ID,
       _type: 'template_home',
       hero: { _type: 'reference', _ref: 'hero-1' },
-      modules: [{ _key: 'a', _type: 'reference', _ref: 'post-latest-1' }],
+      modules: [{ _key: 'a', _type: 'reference', _ref: MODULE_ID }],
     },
     { _id: 'hero-1', _type: 'module_heroBlog' },
-    { _id: 'post-latest-1', _type: 'module_postLatest' },
+    { _id: MODULE_ID, _type: 'module_postLatest' },
   ];
 
   function run(data: unknown[], locale: string): Promise<unknown> {
@@ -145,10 +147,17 @@ describe('homePageQuery template layout', () => {
     async (locale) => {
       expect(await run(dataset, locale)).toMatchObject({
         hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-        modules: [{ _id: 'post-latest-1', _type: 'module_postLatest' }],
+        modules: [{ _id: MODULE_ID, _type: 'module_postLatest' }],
       });
     },
   );
+
+  it.each([
+    [EN, 'page_home'],
+    [NL, 'home-nl'],
+  ])('projects the id of the %s Home', async (locale, id) => {
+    expect(await run(dataset, locale)).toMatchObject({ _id: id });
+  });
 
   it('resolves no hero and no modules for a Home without a template', async () => {
     expect(await run([home('page_home', EN)], EN)).toMatchObject({

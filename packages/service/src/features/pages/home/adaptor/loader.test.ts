@@ -9,14 +9,14 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHomePageDocument } from './loader';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
+vi.mock(import('@blog/service/sanity/query/query'), async (importOriginal) => ({
+  ...(await importOriginal()),
   runQuery: vi.fn(),
 }));
 
 const tenant = makeTenant();
+const NO_HOME_PAGE = 'expected a home page';
+const SUPPORTING_TEXT = 'A subtitle';
 
 describe('getHomePageDocument', () => {
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('getHomePageDocument', () => {
 
   it('maps the thin page_home document to module refs', async () => {
     const page = await getHomePageDocument(tenant);
-    if (!page) throw new Error('expected a home page');
+    if (!page) throw new Error(NO_HOME_PAGE);
 
     expect(page.hero).toEqual({
       id: 'hero-1',
@@ -37,6 +37,12 @@ describe('getHomePageDocument', () => {
     ]);
   });
 
+  it("returns the page_home document's id", async () => {
+    const page = await getHomePageDocument(tenant);
+
+    expect(page?.id).toBe('home-1');
+  });
+
   it('maps a headingBlock heading with no hero to an undefined hero', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawHomePage({
@@ -46,7 +52,7 @@ describe('getHomePageDocument', () => {
     );
 
     const page = await getHomePageDocument(tenant);
-    if (!page) throw new Error('expected a home page');
+    if (!page) throw new Error(NO_HOME_PAGE);
 
     expect(page.hero).toBeUndefined();
     expect(page.headingBlock.heading).toBe('Welcome');
@@ -57,17 +63,17 @@ describe('getHomePageDocument', () => {
     mockRun.mockResolvedValueOnce(
       makeRawHomePage({
         headingBlock: makeRawHeadingBlock('Welcome', {
-          supportingText: 'A subtitle',
+          supportingText: SUPPORTING_TEXT,
         }),
       }),
     );
 
     const page = await getHomePageDocument(tenant);
-    if (!page) throw new Error('expected a home page');
+    if (!page) throw new Error(NO_HOME_PAGE);
 
     expect(page.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
     expect(page.headingBlock.heading).toBe('Welcome');
-    expect(page.headingBlock.supportingText).toBe('A subtitle');
+    expect(page.headingBlock.supportingText).toBe(SUPPORTING_TEXT);
   });
 
   it('rejects when page_home.hero resolves to a non-hero module type', async () => {
@@ -88,7 +94,7 @@ describe('getHomePageDocument', () => {
     );
 
     const page = await getHomePageDocument(tenant);
-    if (!page) throw new Error('expected a home page');
+    if (!page) throw new Error(NO_HOME_PAGE);
 
     expect(page.seo.title).toBe('Home');
     expect(page.seo.description).toBeUndefined();
@@ -103,7 +109,7 @@ describe('getHomePageDocument', () => {
     );
 
     const page = await getHomePageDocument(tenant);
-    if (!page) throw new Error('expected a home page');
+    if (!page) throw new Error(NO_HOME_PAGE);
 
     expect(page.translations).toEqual([
       LOCALE_ISO_CODES.EN,
