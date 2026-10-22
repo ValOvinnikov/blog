@@ -1,5 +1,7 @@
+import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { leads, type TLead } from '@blog/db/schema/leads';
+import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { count, desc, eq } from 'drizzle-orm';
 
 export type TListLeadsInput = {
@@ -8,10 +10,20 @@ export type TListLeadsInput = {
   pageSize: number;
 };
 
+export type TListedLead = Pick<
+  TLead,
+  'id' | 'name' | 'email' | 'message' | 'sourcePath' | 'createdAt'
+>;
+
 export type TListLeadsResult = {
-  leads: TLead[];
+  leads: TListedLead[];
   total: number;
 };
+
+function decryptLeadValue(encrypted: TMaybeNull<string>): string {
+  if (encrypted === null) throw new Error('Lead has no encrypted form.');
+  return decryptPersonalValue(encrypted);
+}
 
 export async function listLeads({
   tenantId,
@@ -23,7 +35,14 @@ export async function listLeads({
 
   const [rows, [totalRow]] = await Promise.all([
     db
-      .select()
+      .select({
+        id: leads.id,
+        nameEncrypted: leads.nameEncrypted,
+        emailEncrypted: leads.emailEncrypted,
+        messageEncrypted: leads.messageEncrypted,
+        sourcePath: leads.sourcePath,
+        createdAt: leads.createdAt,
+      })
       .from(leads)
       .where(byTenant)
       .orderBy(desc(leads.createdAt), desc(leads.id))
@@ -32,5 +51,24 @@ export async function listLeads({
     db.select({ total: count() }).from(leads).where(byTenant),
   ]);
 
-  return { leads: rows, total: totalRow?.total ?? 0 };
+  return {
+    leads: rows.map(
+      ({
+        id,
+        nameEncrypted,
+        emailEncrypted,
+        messageEncrypted,
+        sourcePath,
+        createdAt,
+      }) => ({
+        id,
+        name: decryptLeadValue(nameEncrypted),
+        email: decryptLeadValue(emailEncrypted),
+        message: decryptLeadValue(messageEncrypted),
+        sourcePath,
+        createdAt,
+      }),
+    ),
+    total: totalRow?.total ?? 0,
+  };
 }

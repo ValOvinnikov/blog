@@ -17,6 +17,9 @@ export type TTestDb = PgliteDatabase<typeof schema>;
 
 export const TEST_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
 export const TEST_INVITE_EMAIL = faker.internet.email().toLowerCase();
+export const TEST_LEAD_NAME = 'Ada Lovelace';
+export const TEST_LEAD_EMAIL = 'lead@example.com';
+export const TEST_LEAD_MESSAGE = 'I would like to talk about a project.';
 
 // Seeds one `tenants` row against the given `createTestDb()` instance for a
 // test's `beforeEach`/setup — `name`/`primaryDomain`/`sanityProjectId`
@@ -103,9 +106,9 @@ export async function insertTestLead(
     .insert(schema.leads)
     .values({
       tenantId,
-      name: 'Ada Lovelace',
-      email: 'lead@example.com',
-      message: 'I would like to talk about a project.',
+      name: TEST_LEAD_NAME,
+      email: TEST_LEAD_EMAIL,
+      message: TEST_LEAD_MESSAGE,
       sourcePath: '/en/hire-me',
       ...overrides,
     })

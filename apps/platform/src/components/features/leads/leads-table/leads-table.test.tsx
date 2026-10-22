@@ -6,7 +6,6 @@ import {
 } from '@platform/testing/custom-render';
 import { makeLead } from '@platform/testing/leads/fixtures';
 import { TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { toLeadRow } from '@platform/utils/lead-row/lead-row';
 import type { ComponentProps } from 'react';
 
 import { LeadsTable } from './leads-table';
@@ -18,7 +17,7 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
 const setup = (props: Partial<ComponentProps<typeof LeadsTable>> = {}) =>
   renderWithIntl(
     <LeadsTenantProvider tenantId={TENANT_ID}>
-      <LeadsTable leads={[toLeadRow(makeLead())]} {...props} />
+      <LeadsTable leads={[makeLead()]} {...props} />
     </LeadsTenantProvider>,
   );
 
@@ -35,8 +34,8 @@ describe(`<${LeadsTable.name}/>`, () => {
   it('lists the leads in the order given, one row each, under the page title', () => {
     setup({
       leads: [
-        toLeadRow(makeLead({ id: 'lead-2', name: 'Newest' })),
-        toLeadRow(makeLead({ id: 'lead-1', name: 'Oldest' })),
+        makeLead({ id: 'lead-2', name: 'Newest' }),
+        makeLead({ id: 'lead-1', name: 'Oldest' }),
       ],
     });
 
@@ -63,7 +62,7 @@ describe(`<${LeadsTable.name}/>`, () => {
   });
 
   it('names the home page instead of its bare path', () => {
-    setup({ leads: [toLeadRow(makeLead({ sourcePath: '/' }))] });
+    setup({ leads: [makeLead({ sourcePath: '/' })] });
 
     const sourcePage = screen.getByText('Home page');
     expect(sourcePage).toBeVisible();
