@@ -102,7 +102,7 @@ describe(seedTenantContent, () => {
   it('seeds when the dataset lacks settings_site even though seededAt is already set', async () => {
     const seededTenant = baseTenant({ seededAt: new Date() });
 
-    await seedTenantContent(seededTenant, env, {
+    await seedTenantContent(seededTenant, SITE_TYPE.BLANK, env, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -127,13 +127,33 @@ describe(seedTenantContent, () => {
     expect(revokeWriteToken).not.toHaveBeenCalled();
   });
 
+  it('seeds the documents of the site type it is given', async () => {
+    await seedTenantContent(tenant, SITE_TYPE.BLOG, env, {
+      createClient,
+      mintWriteToken,
+      revokeWriteToken,
+      sleep,
+    });
+
+    expect(
+      createIfNotExists.mock.calls.map(([document]) => document._id),
+    ).toEqual(
+      buildStarterDocuments({
+        siteType: SITE_TYPE.BLOG,
+        siteName: tenant.name,
+        locale: tenant.locale,
+        publishedAt: new Date().toISOString(),
+      }).map(({ _id }) => _id),
+    );
+  });
+
   it('skips seeding when the dataset already has settings_site', async () => {
     const existingSiteClient = createClientStub(
       { createIfNotExists, commit },
       { fetchResult: 'existing-settings-site-id' },
     );
 
-    await seedTenantContent(tenant, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
       createClient: existingSiteClient.createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -164,12 +184,12 @@ describe(seedTenantContent, () => {
     };
 
     await expect(
-      seedTenantContent(unprovisionedTenant, env, deps),
+      seedTenantContent(unprovisionedTenant, SITE_TYPE.BLANK, env, deps),
     ).rejects.toThrow(/has no Sanity project yet/);
   });
 
   it('mints an editor token, uploads no assets, commits a transaction, and persists the token and seededAt together instead of revoking', async () => {
-    await seedTenantContent(tenant, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -210,7 +230,7 @@ describe(seedTenantContent, () => {
   });
 
   it('the committed starter documents contain no defaultOgImage on the site settings', async () => {
-    await seedTenantContent(tenant, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
       createClient,
       mintWriteToken,
       revokeWriteToken: vi.fn().mockResolvedValue(undefined),
@@ -231,7 +251,7 @@ describe(seedTenantContent, () => {
     commit.mockRejectedValue(new Error(COMMIT_FAILED));
 
     await expect(
-      seedTenantContent(tenant, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -253,7 +273,7 @@ describe(seedTenantContent, () => {
     );
 
     await expect(
-      seedTenantContent(tenant, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -272,7 +292,7 @@ describe(seedTenantContent, () => {
     const grantError = new Error(INSUFFICIENT_PERMISSIONS);
     commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
-    await seedTenantContent(tenant, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -299,7 +319,7 @@ describe(seedTenantContent, () => {
     });
     commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
-    await seedTenantContent(tenant, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -327,7 +347,7 @@ describe(seedTenantContent, () => {
     commit.mockRejectedValue(otherError);
 
     await expect(
-      seedTenantContent(tenant, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -350,7 +370,7 @@ describe(seedTenantContent, () => {
     commit.mockRejectedValue(grantError);
 
     await expect(
-      seedTenantContent(tenant, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -372,7 +392,7 @@ describe(seedTenantContent, () => {
     commit.mockRejectedValue(otherError);
 
     await expect(
-      seedTenantContent(tenant, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
