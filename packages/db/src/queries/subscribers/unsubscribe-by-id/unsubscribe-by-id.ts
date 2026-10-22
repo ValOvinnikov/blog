@@ -14,14 +14,9 @@ export async function unsubscribeById(
     .where(
       and(eq(subscribers.tenantId, tenantId), eq(subscribers.id, subscriberId)),
     )
-    .returning();
+    .returning({ id: subscribers.id });
 
-  if (!deleted) {
-    return toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND);
-  }
-
-  return {
-    ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-    subscriber: deleted,
-  };
+  return toOutcome(
+    deleted ? SUBSCRIBER_OUTCOME.UNSUBSCRIBED : SUBSCRIBER_OUTCOME.NOT_FOUND,
+  );
 }

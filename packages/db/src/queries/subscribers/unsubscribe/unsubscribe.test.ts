@@ -1,7 +1,15 @@
 import * as schema from '@blog/db/schema';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
+import {
+  insertTestReader,
+  insertTestSubscriber,
+  insertTestTenant,
+  insertTestUser,
+  TEST_SUBSCRIBER_EMAIL,
+} from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { and, eq } from 'drizzle-orm';
+import { faker } from '@faker-js/faker';
+import { eq } from 'drizzle-orm';
 
 import { unsubscribe } from './unsubscribe';
 
@@ -10,6 +18,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -17,106 +26,73 @@ afterEach(async () => {
   await db().delete(schema.users);
 });
 
-async function insertUser(
-  overrides: Partial<typeof schema.users.$inferInsert> = {},
-): Promise<schema.TUser> {
-  return insertTestUser(db(), { email: 'reader@example.com', ...overrides });
+async function countSubscribers(tenantId: string): Promise<number> {
+  const rows = await db()
+    .select()
+    .from(schema.subscribers)
+    .where(eq(schema.subscribers.tenantId, tenantId));
+  return rows.length;
 }
 
 describe(unsubscribe, () => {
-  let user: Awaited<ReturnType<typeof insertUser>>;
+  let userId: string;
   let tenantId: string;
 
   beforeEach(async () => {
-    user = await insertUser();
+    ({ id: userId } = await insertTestReader(db(), TEST_SUBSCRIBER_EMAIL));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it('deletes the subscriber row matching the account email', async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: 'reader@example.com' });
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
 
-    await unsubscribe(tenantId, user.id);
+    await unsubscribe(tenantId, userId);
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(
-        and(
-          eq(schema.subscribers.tenantId, tenantId),
-          eq(schema.subscribers.email, 'reader@example.com'),
-        ),
-      );
-    expect(rows).toHaveLength(0);
+    expect(await countSubscribers(tenantId)).toBe(0);
   });
 
   it('is a no-op when no subscriber row matches the account email', async () => {
-    await expect(unsubscribe(tenantId, user.id)).resolves.toBeUndefined();
+    await expect(unsubscribe(tenantId, userId)).resolves.toBeUndefined();
   });
 
   it('is a no-op for an unrecognized userId', async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: 'reader@example.com' });
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
 
-    await unsubscribe(tenantId, 'does-not-exist');
+    await unsubscribe(tenantId, faker.string.uuid());
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.email, 'reader@example.com'));
-    expect(rows).toHaveLength(1);
+    expect(await countSubscribers(tenantId)).toBe(1);
   });
 
   it('is a no-op when the user has no email on file', async () => {
-    const user = await insertUser({ email: null });
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: 'reader@example.com' });
+    const { id } = await insertTestUser(db());
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
 
-    await unsubscribe(tenantId, user.id);
+    await unsubscribe(tenantId, id);
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.email, 'reader@example.com'));
-    expect(rows).toHaveLength(1);
+    expect(await countSubscribers(tenantId)).toBe(1);
   });
 
   it("does not remove another user's subscriber row", async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: 'reader@example.com' });
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: 'other@example.com' });
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
+    const other = await insertTestSubscriber(
+      db(),
+      tenantId,
+      faker.internet.email().toLowerCase(),
+    );
 
-    await unsubscribe(tenantId, user.id);
+    await unsubscribe(tenantId, userId);
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.email, 'other@example.com'));
-    expect(rows).toHaveLength(1);
+    const rows = await db().select().from(schema.subscribers);
+    expect(rows.map(({ id }) => id)).toEqual([other.id]);
   });
 
   it("does not remove another tenant's subscriber row for the same email", async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId: tenantOneId, email: 'reader@example.com' });
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId: tenantTwoId, email: 'reader@example.com' });
+    const { id: otherTenantId } = await insertTestTenant(db());
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
+    await insertTestSubscriber(db(), otherTenantId, TEST_SUBSCRIBER_EMAIL);
 
-    await unsubscribe(tenantOneId, user.id);
+    await unsubscribe(tenantId, userId);
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.tenantId, tenantTwoId));
-    expect(rows).toHaveLength(1);
+    expect(await countSubscribers(otherTenantId)).toBe(1);
   });
 });

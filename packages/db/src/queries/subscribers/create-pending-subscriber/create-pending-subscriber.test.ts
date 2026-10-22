@@ -1,6 +1,7 @@
 import { SUBSCRIBER_OUTCOME, ERROR_CODE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
@@ -10,6 +11,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { eq } from 'drizzle-orm';
 
 import { createPendingSubscriber } from './create-pending-subscriber';
 
@@ -44,23 +46,24 @@ describe(createPendingSubscriber, () => {
       await createPendingSubscriber(tenantId, TEST_SUBSCRIBER_EMAIL),
     );
 
-    expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.CREATED);
-    expect(result.subscriber).toMatchObject({
-      tenantId,
-      email: TEST_SUBSCRIBER_EMAIL,
-      emailIndex: testPersonalEmailIndex(TEST_SUBSCRIBER_EMAIL),
-      status: 'pending',
+    expect(result).toEqual({
+      outcome: SUBSCRIBER_OUTCOME.CREATED,
+      subscriber: { id: expect.any(String), email: TEST_SUBSCRIBER_EMAIL },
     });
-    expect(decryptTestPersonalValue(result.subscriber.emailEncrypted)).toBe(
-      TEST_SUBSCRIBER_EMAIL,
-    );
-    expect(result.subscriber.confirmationTokenHash).toEqual(expect.any(String));
-    expect(result.subscriber.unsubscribeTokenHash).toEqual(expect.any(String));
-    expect(result.subscriber.confirmedAt).toBeNull();
-    expect(result.subscriber.confirmationSentAt).toBeNull();
-
     const rows = await db().select().from(schema.subscribers);
     expect(rows).toHaveLength(1);
+    const [row] = rows;
+    expect(row).toMatchObject({
+      id: result.subscriber.id,
+      tenantId,
+      emailIndex: testPersonalEmailIndex(TEST_SUBSCRIBER_EMAIL),
+      status: 'pending',
+      confirmedAt: null,
+      confirmationSentAt: null,
+    });
+    expect(decryptTestPersonalValue(row?.emailEncrypted ?? null)).toBe(
+      TEST_SUBSCRIBER_EMAIL,
+    );
   });
 
   it('normalizes email casing/whitespace so it collides with an existing row', async () => {
@@ -98,28 +101,50 @@ describe(createPendingSubscriber, () => {
         subscriber: first.subscriber,
       },
     });
-    expect(unwrapOk(second).subscriber.confirmationTokenHash).toBe(
-      first.subscriber.confirmationTokenHash,
-    );
     const rows = await db().select().from(schema.subscribers);
     expect(rows).toHaveLength(1);
   });
 
   it('reports already-active for an email that already confirmed, without inserting or erroring', async () => {
-    await db().insert(schema.subscribers).values({
+    const { id } = await insertTestSubscriber(
+      db(),
       tenantId,
-      email: TEST_SUBSCRIBER_EMAIL,
-      status: 'active',
-      confirmedAt: new Date(),
-    });
+      TEST_SUBSCRIBER_EMAIL,
+      { status: 'active', confirmedAt: new Date() },
+    );
 
     const result = unwrapOk(
       await createPendingSubscriber(tenantId, TEST_SUBSCRIBER_EMAIL),
     );
 
-    expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.ALREADY_ACTIVE);
-    expect(result.subscriber.status).toBe('active');
+    expect(result).toEqual({
+      outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
+      subscriber: { id, email: TEST_SUBSCRIBER_EMAIL },
+    });
     const rows = await db().select().from(schema.subscribers);
+    expect(rows).toHaveLength(1);
+  });
+
+  it('dedupes a tagged address of an existing subscriber onto the stored row', async () => {
+    const { id } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      TEST_SUBSCRIBER_EMAIL,
+    );
+    const [localPart, domain] = TEST_SUBSCRIBER_EMAIL.split('@');
+
+    const result = unwrapOk(
+      await createPendingSubscriber(tenantId, `${localPart}+news@${domain}`),
+    );
+
+    expect(result).toEqual({
+      outcome: SUBSCRIBER_OUTCOME.ALREADY_PENDING,
+      subscriber: { id, email: TEST_SUBSCRIBER_EMAIL },
+    });
+    const rows = await db()
+      .select()
+      .from(schema.subscribers)
+      .where(eq(schema.subscribers.tenantId, tenantId));
     expect(rows).toHaveLength(1);
   });
 
@@ -160,9 +185,13 @@ describe(createPendingSubscriber, () => {
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
     await createPendingSubscriber(tenantId, TEST_SUBSCRIBER_EMAIL);
 
-    const selectSpy = vi.spyOn(db(), 'select').mockReturnValueOnce({
+    const noRows = {
       from: () => ({ where: () => Promise.resolve([]) }),
-    } as unknown as ReturnType<ReturnType<typeof db>['select']>);
+    } as unknown as ReturnType<ReturnType<typeof db>['select']>;
+    const selectSpy = vi
+      .spyOn(db(), 'select')
+      .mockReturnValueOnce(noRows)
+      .mockReturnValueOnce(noRows);
 
     const result = await createPendingSubscriber(
       tenantId,

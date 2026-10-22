@@ -38,12 +38,13 @@ export type TSubmitContactResult = TActionResult<
   TFieldErrorReason
 >;
 
+const SUBMIT_BLOCKED_EVENT = 'contact_form.submit_blocked';
 const BLOCKED = toOutcome(ACTION_OUTCOME.BLOCKED);
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 const { isBotOrUnverified, isRateLimited } = createPublicWriteGuard({
   name: 'contact-form-submit',
-  blockedEvent: 'contact_form.submit_blocked',
+  blockedEvent: SUBMIT_BLOCKED_EVENT,
   windowMs: 10 * 60_000,
   maxRequests: 5,
 });
@@ -65,7 +66,7 @@ const isContactFormOpen = async (tenant: TTenant): Promise<boolean> =>
 
 const storeLead = async (
   input: queries.leads.TCreateLeadInput,
-): Promise<TMaybeUndefined<schema.TLead>> => {
+): Promise<TMaybeUndefined<Pick<schema.TLead, 'id'>>> => {
   try {
     return await queries.leads.createLead(input);
   } catch (error) {
@@ -80,7 +81,7 @@ export const submitContactMessage = async (
   if (await isBotOrUnverified()) return BLOCKED;
 
   if (asText(input.website)) {
-    logger.warn('contact_form.submit_blocked', { reason: 'honeypot' });
+    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'honeypot' });
     return BLOCKED;
   }
 
@@ -93,7 +94,7 @@ export const submitContactMessage = async (
   if (await isRateLimited(tenant.id)) return BLOCKED;
 
   if (!(await isContactFormOpen(tenant))) {
-    logger.warn('contact_form.submit_blocked', { reason: 'unavailable' });
+    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'unavailable' });
     return BLOCKED;
   }
 
@@ -109,15 +110,16 @@ export const submitContactMessage = async (
     };
   }
 
-  const lead = await storeLead({
+  const leadInput = {
     tenantId: tenant.id,
     ...validation.data,
     sourcePath: toSourcePath(asText(input.sourcePath)),
-  });
+  };
+  const lead = await storeLead(leadInput);
   if (!lead) return SERVER_ERROR;
 
   try {
-    await sendContactNotification(lead);
+    await sendContactNotification(leadInput);
   } catch (error) {
     logger.error('contact_form.notification_send_failed', {
       leadId: lead.id,

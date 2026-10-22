@@ -12,13 +12,20 @@ import { eq } from 'drizzle-orm';
 
 import { confirmSubscriber } from './confirm-subscriber';
 
-const EXPECTED_CONFIRMED = 'expected confirmed';
-
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+
+async function readSubscriber(id: string): Promise<schema.TSubscriber> {
+  const [row] = await db()
+    .select()
+    .from(schema.subscribers)
+    .where(eq(schema.subscribers.id, id));
+  if (!row) throw new Error(`No subscriber "${id}".`);
+  return row;
+}
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -51,31 +58,21 @@ describe(confirmSubscriber, () => {
 
     const result = await confirmSubscriber(tenantId, pending.confirmationToken);
 
-    expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.CONFIRMED);
-    if (result.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
-      throw new Error(EXPECTED_CONFIRMED);
-    expect(result.subscriber.status).toBe('active');
-    expect(result.subscriber.confirmedAt).not.toBeNull();
-
-    const [row] = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, pending.id));
-    expect(row?.status).toBe('active');
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED));
+    const row = await readSubscriber(pending.id);
+    expect(row.status).toBe('active');
+    expect(row.confirmedAt).not.toBeNull();
   });
 
   it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
     const pending = await insertPendingSubscriber(tenantId);
-    const first = await confirmSubscriber(tenantId, pending.confirmationToken);
-    if (first.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
-      throw new Error(EXPECTED_CONFIRMED);
+    await confirmSubscriber(tenantId, pending.confirmationToken);
+    const { confirmedAt } = await readSubscriber(pending.id);
 
     const second = await confirmSubscriber(tenantId, pending.confirmationToken);
 
-    expect(second).toEqual({
-      outcome: SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
-      subscriber: first.subscriber,
-    });
+    expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED));
+    expect((await readSubscriber(pending.id)).confirmedAt).toEqual(confirmedAt);
   });
 
   it('returns not-found for an unrecognized token', async () => {
@@ -123,16 +120,5 @@ describe(confirmSubscriber, () => {
       SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
       SUBSCRIBER_OUTCOME.CONFIRMED,
     ]);
-
-    const confirmed =
-      first.outcome === SUBSCRIBER_OUTCOME.CONFIRMED ? first : second;
-    if (confirmed.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED) {
-      throw new Error('expected one confirmed outcome');
-    }
-    const [row] = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, pending.id));
-    expect(row?.confirmedAt).toEqual(confirmed.subscriber.confirmedAt);
   });
 });

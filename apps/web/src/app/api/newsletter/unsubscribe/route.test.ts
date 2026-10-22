@@ -8,6 +8,7 @@ import {
 } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import type * as DbConstants from '@blog/db/constants';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { readNewsletterUnsubscribeSubscriberId } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
@@ -17,7 +18,6 @@ import {
   storeNewsletterUnsubscribeToken,
 } from '@web/server/newsletter/newsletter-unsubscribe-token-cookie/newsletter-unsubscribe-token-cookie';
 import { makeNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
-import { makeSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import {
   DEFAULT_TENANT_BASE_URL,
   DEFAULT_TENANT_ID,
@@ -139,10 +139,9 @@ describe('POST /api/newsletter/unsubscribe', () => {
       routes.newsletterUnsubscribe(TOKEN),
       HTTP_METHOD.POST,
     );
-    unsubscribeByTokenMock.mockResolvedValue({
-      outcome: SUBSCRIBER_OUTCOME.UNSUBSCRIBED,
-      subscriber: makeSubscriber(),
-    });
+    unsubscribeByTokenMock.mockResolvedValue(
+      toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+    );
     readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(null);
     resolveRequestTenantMock.mockResolvedValue({
       id: DEFAULT_TENANT_ID,
@@ -162,12 +161,11 @@ describe('POST /api/newsletter/unsubscribe', () => {
   });
 
   it('unsubscribes the subscriber a signed token names', async () => {
-    const subscriber = makeSubscriber();
-    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(subscriber.id);
-    unsubscribeByIdMock.mockResolvedValue({
-      outcome: SUBSCRIBER_OUTCOME.UNSUBSCRIBED,
-      subscriber,
-    });
+    const subscriberId = faker.string.uuid();
+    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(subscriberId);
+    unsubscribeByIdMock.mockResolvedValue(
+      toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+    );
 
     const response = await POST(request);
 
@@ -177,7 +175,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
     );
     expect(unsubscribeByIdMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_ID,
-      subscriber.id,
+      subscriberId,
     );
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
   });

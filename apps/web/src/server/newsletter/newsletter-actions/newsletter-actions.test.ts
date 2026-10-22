@@ -136,13 +136,7 @@ const DEFAULT_CONFIRMATION_SUBJECT =
 
 const COOKIE_SET_FAILED_EVENT = 'newsletter.subscribed_cookie_set_failed';
 
-const subscriber = makeSubscriber({
-  id: faker.string.uuid(),
-  email: EMAIL,
-  status: 'pending',
-  confirmedAt: null,
-  confirmationSentAt: null,
-});
+const subscriber = makeSubscriber({ id: faker.string.uuid(), email: EMAIL });
 
 const CLAIMED_AT = faker.date.recent();
 const CLAIM = {
@@ -334,7 +328,7 @@ describe('subscribeToNewsletterAction', () => {
       ok: true,
       data: {
         outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
-        subscriber: { ...subscriber, status: 'active' as const },
+        subscriber,
       },
     });
     const result = await subscribeToNewsletterAction(EMAIL);
@@ -575,7 +569,7 @@ describe('subscribeToNewsletterAction', () => {
       ok: true,
       data: {
         outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
-        subscriber: { ...subscriber, status: 'active' as const },
+        subscriber,
       },
     });
     markNewsletterSubscribedMock.mockRejectedValue(

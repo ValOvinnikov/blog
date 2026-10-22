@@ -55,10 +55,7 @@ describe(unsubscribeByToken, () => {
 
     const result = await unsubscribeByToken(tenantId, unsubscribeToken);
 
-    expect(result).toEqual({
-      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-      subscriber,
-    });
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
 
     const rows = await db()
       .select()
@@ -87,15 +84,12 @@ describe(unsubscribeByToken, () => {
   });
 
   it('returns not-found on a second use of the same token', async () => {
-    const { subscriber, unsubscribeToken } = await insertSubscriber(tenantId);
+    const { unsubscribeToken } = await insertSubscriber(tenantId);
 
     const first = await unsubscribeByToken(tenantId, unsubscribeToken);
     const second = await unsubscribeByToken(tenantId, unsubscribeToken);
 
-    expect(first).toEqual({
-      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-      subscriber,
-    });
+    expect(first).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
     expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 

@@ -1,10 +1,13 @@
 import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
+  insertTestReader,
+  insertTestSubscriber,
   insertTestTenant,
   insertTestUser,
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
@@ -17,6 +20,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -24,29 +28,23 @@ afterEach(async () => {
   await db().delete(schema.users);
 });
 
-async function insertUser(
-  overrides: Partial<typeof schema.users.$inferInsert> = {},
-): Promise<schema.TUser> {
-  return insertTestUser(db(), { email: TEST_SUBSCRIBER_EMAIL, ...overrides });
-}
-
 describe(resendConfirmation, () => {
-  let user: Awaited<ReturnType<typeof insertUser>>;
+  let userId: string;
   let tenantId: string;
 
   beforeEach(async () => {
-    user = await insertUser();
+    ({ id: userId } = await insertTestReader(db(), TEST_SUBSCRIBER_EMAIL));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it('returns the pending subscriber and a token without changing the row', async () => {
-    const [subscriber] = await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL })
-      .returning();
-    if (!subscriber) throw new Error('failed to seed a subscriber row');
+    const subscriber = await insertTestSubscriber(
+      db(),
+      tenantId,
+      TEST_SUBSCRIBER_EMAIL,
+    );
 
-    const result = await resendConfirmation(tenantId, user.id);
+    const result = await resendConfirmation(tenantId, userId);
 
     expect(result).toEqual({
       ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
@@ -61,28 +59,26 @@ describe(resendConfirmation, () => {
   });
 
   it('mints a fresh token on every call', async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL });
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
 
-    const first = await resendConfirmation(tenantId, user.id);
-    const second = await resendConfirmation(tenantId, user.id);
+    const first = await resendConfirmation(tenantId, userId);
+    const second = await resendConfirmation(tenantId, userId);
 
     expect(second).not.toEqual(first);
   });
 
   it('returns not-pending for an already-active subscriber', async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, status: 'active' });
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL, {
+      status: 'active',
+    });
 
-    const result = await resendConfirmation(tenantId, user.id);
+    const result = await resendConfirmation(tenantId, userId);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
 
   it('returns not-pending when no subscriber row matches the account email', async () => {
-    const result = await resendConfirmation(tenantId, user.id);
+    const result = await resendConfirmation(tenantId, userId);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
@@ -94,21 +90,18 @@ describe(resendConfirmation, () => {
   });
 
   it('returns not-pending when the user has no email on file', async () => {
-    const user = await insertUser({ email: null });
+    const { id } = await insertTestUser(db());
 
-    const result = await resendConfirmation(tenantId, user.id);
+    const result = await resendConfirmation(tenantId, id);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });
 
   it('returns not-pending when the subscriber row belongs to a different tenant', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId: tenantOneId, email: TEST_SUBSCRIBER_EMAIL });
+    const { id: otherTenantId } = await insertTestTenant(db());
+    await insertTestSubscriber(db(), otherTenantId, TEST_SUBSCRIBER_EMAIL);
 
-    const result = await resendConfirmation(tenantTwoId, user.id);
+    const result = await resendConfirmation(tenantId, userId);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });

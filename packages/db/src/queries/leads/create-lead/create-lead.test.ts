@@ -7,6 +7,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { eq } from 'drizzle-orm';
 
 import { createLead } from './create-lead';
 
@@ -24,6 +25,15 @@ const LEAD = {
   sourcePath: '/en/contact',
 };
 
+async function readLead(id: string): Promise<schema.TLead> {
+  const [row] = await db()
+    .select()
+    .from(schema.leads)
+    .where(eq(schema.leads.id, id));
+  if (!row) throw new Error(`No lead "${id}".`);
+  return row;
+}
+
 afterEach(async () => {
   await db().delete(schema.leads);
   await db().delete(schema.tenants);
@@ -36,18 +46,27 @@ describe(createLead, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('stores the lead and returns it with an id and a creation time', async () => {
-    const lead = await createLead({ tenantId, ...LEAD });
+  it('returns only the id of the lead it stored', async () => {
+    const created = await createLead({ tenantId, ...LEAD });
 
-    expect(lead).toMatchObject({ tenantId, ...LEAD });
-    expect(lead.id).toEqual(expect.any(String));
-    expect(lead.createdAt).toBeInstanceOf(Date);
+    expect(created).toEqual({ id: expect.any(String) });
     const rows = await db().select().from(schema.leads);
     expect(rows).toHaveLength(1);
   });
 
+  it('stores the lead with a creation time', async () => {
+    const { id } = await createLead({ tenantId, ...LEAD });
+
+    const lead = await readLead(id);
+
+    expect(lead).toMatchObject({ tenantId, ...LEAD });
+    expect(lead.createdAt).toBeInstanceOf(Date);
+  });
+
   it('stores the name, email and message encrypted beside the plain values, with an email index', async () => {
-    const lead = await createLead({ tenantId, ...LEAD });
+    const { id } = await createLead({ tenantId, ...LEAD });
+
+    const lead = await readLead(id);
 
     expect({
       name: decryptTestPersonalValue(lead.nameEncrypted),
@@ -63,15 +82,15 @@ describe(createLead, () => {
       sourceLocale: LOCALE_BCP47_TAGS.EN,
     };
 
-    const lead = await createLead({ tenantId, ...LEAD, ...source });
+    const { id } = await createLead({ tenantId, ...LEAD, ...source });
 
-    expect(lead).toMatchObject(source);
+    expect(await readLead(id)).toMatchObject(source);
   });
 
   it('stores a new lead unread and with no source page document id or locale', async () => {
-    const lead = await createLead({ tenantId, ...LEAD });
+    const { id } = await createLead({ tenantId, ...LEAD });
 
-    expect(lead).toMatchObject({
+    expect(await readLead(id)).toMatchObject({
       readAt: null,
       sourceDocumentId: null,
       sourceLocale: null,

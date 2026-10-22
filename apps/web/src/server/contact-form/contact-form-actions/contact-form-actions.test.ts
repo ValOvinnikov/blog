@@ -89,11 +89,7 @@ describe('submitContactMessage', () => {
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
     });
-    createLeadMock.mockImplementation(async (input) => ({
-      id: faker.string.uuid(),
-      createdAt: new Date(),
-      ...input,
-    }));
+    createLeadMock.mockResolvedValue({ id: faker.string.uuid() });
     sendContactNotificationMock.mockResolvedValue(undefined);
   });
 
@@ -104,16 +100,15 @@ describe('submitContactMessage', () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
 
-    expect(createLeadMock).toHaveBeenCalledWith({
+    const submitted = {
       tenantId: TENANT_ID,
       name: NAME,
       email: EMAIL,
       message: MESSAGE,
       sourcePath: SOURCE_PATH,
-    });
-    expect(sendContactNotificationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ tenantId: TENANT_ID, name: NAME }),
-    );
+    };
+    expect(createLeadMock).toHaveBeenCalledWith(submitted);
+    expect(sendContactNotificationMock).toHaveBeenCalledWith(submitted);
   });
 
   it("gates on the resolved tenant's capability without a request context", async () => {

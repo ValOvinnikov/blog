@@ -54,10 +54,7 @@ describe(unsubscribeById, () => {
 
     const result = await unsubscribeById(tenantId, subscriber.id);
 
-    expect(result).toEqual({
-      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-      subscriber,
-    });
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
     expect(await countRows(subscriber.id)).toBe(0);
   });
 

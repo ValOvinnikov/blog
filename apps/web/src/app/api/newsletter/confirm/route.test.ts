@@ -6,11 +6,11 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { makeNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
-import { makeSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import {
   DEFAULT_TENANT_BASE_URL,
   DEFAULT_TENANT_ID,
@@ -51,7 +51,6 @@ describe('GET /api/newsletter/confirm', () => {
     request = toConfirmRequest(routes.newsletterConfirm(TOKEN));
     confirmSubscriberMock.mockResolvedValue({
       outcome: SUBSCRIBER_OUTCOME.CONFIRMED,
-      subscriber: makeSubscriber(),
     });
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
@@ -109,10 +108,9 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('treats an already-confirmed token as success', async () => {
-    confirmSubscriberMock.mockResolvedValue({
-      outcome: SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
-      subscriber: makeSubscriber(),
-    });
+    confirmSubscriberMock.mockResolvedValue(
+      toOutcome(SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED),
+    );
     const response = await GET(request);
 
     expect(response.headers.get('location')).toBe(CONFIRMED_LOCATION);

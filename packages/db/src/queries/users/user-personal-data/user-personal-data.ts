@@ -4,6 +4,7 @@ import {
   decryptPersonalValue,
   encryptPersonalValue,
   personalEmailColumns,
+  requireDecryptedPersonalValue,
 } from '@blog/db/utils/personal-data/personal-data';
 
 type TUserPersonalColumns = Pick<
@@ -34,10 +35,8 @@ export function readUserPersonalData({
   email: string;
   name: TMaybeNull<string>;
 } {
-  if (emailEncrypted === null) throw new Error('User has no encrypted email.');
-
   return {
-    email: decryptPersonalValue(emailEncrypted),
+    email: requireDecryptedPersonalValue(emailEncrypted, 'User'),
     name: nameEncrypted === null ? null : decryptPersonalValue(nameEncrypted),
   };
 }
