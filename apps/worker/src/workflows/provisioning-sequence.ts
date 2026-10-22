@@ -1,3 +1,4 @@
+import { UNKNOWN_RUN_ERROR } from '@worker/constants/provisioning';
 import { applySiteTemplate } from '@worker/units/apply-site-template';
 import { ensureInfrastructure } from '@worker/units/ensure-infrastructure';
 import { inviteOwner } from '@worker/units/invite-owner';
@@ -33,7 +34,7 @@ export async function runProvisioningSequence(
   } catch (error) {
     outcome = {
       ok: false,
-      error: error instanceof Error ? error.message : 'unknown',
+      error: error instanceof Error ? error.message : UNKNOWN_RUN_ERROR,
     };
   }
 

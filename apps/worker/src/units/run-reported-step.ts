@@ -1,6 +1,7 @@
 import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
+  type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -12,8 +13,30 @@ import { FatalError, getStepMetadata } from 'workflow';
 
 export type TUnitContext = { runId: string; isOneShot?: boolean };
 
-export type TUnitResult =
-  { ok: true } | { ok: false; failedStep: TTenantProvisioningStep };
+export type TUnitResult<TStep extends string = TTenantProvisioningStep> =
+  { ok: true } | { ok: false; failedStep: TStep };
+
+export type TStepReporter<TStep extends string> = {
+  failedEvent: string;
+  report: (input: {
+    tenantId: string;
+    step: TStep;
+    status: TTenantProvisioningStepStatus;
+    error?: string;
+  }) => Promise<void>;
+};
+
+type TReportedStepInput<TStep extends string> = {
+  tenantId: string;
+  ctx: TUnitContext;
+  step: TStep;
+  run: () => Promise<void>;
+};
+
+const PROVISIONING_STEP_REPORTER: TStepReporter<TTenantProvisioningStep> = {
+  failedEvent: 'provisioning.step_failed',
+  report: reportStep,
+};
 
 export async function loadTenant(tenantId: string): Promise<TTenant> {
   const tenant = await getTenantById(tenantId, { includeArchived: true });
@@ -34,15 +57,20 @@ export function isFinalStepAttempt(
   );
 }
 
-export async function runReportedStep(input: {
-  tenantId: string;
-  ctx: TUnitContext;
-  step: TTenantProvisioningStep;
-  run: () => Promise<void>;
-}): Promise<TUnitResult> {
-  const { tenantId, ctx, step, run } = input;
+export async function runReportedStep(
+  input: TReportedStepInput<TTenantProvisioningStep>,
+): Promise<TUnitResult> {
+  return runStepWithReporter(PROVISIONING_STEP_REPORTER, input);
+}
 
-  await reportStep({
+export async function runStepWithReporter<TStep extends string>(
+  reporter: TStepReporter<TStep>,
+  input: TReportedStepInput<TStep>,
+): Promise<TUnitResult<TStep>> {
+  const { tenantId, ctx, step, run } = input;
+  const { failedEvent, report } = reporter;
+
+  await report({
     tenantId,
     step,
     status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -54,13 +82,13 @@ export async function runReportedStep(input: {
     if (!isFinalStepAttempt(error, ctx)) throw error;
 
     const message = sanitizeLogMessage(error);
-    logger.error('provisioning.step_failed', {
+    logger.error(failedEvent, {
       tenantId,
       runId: ctx.runId,
       step,
       error: message,
     });
-    await reportStep({
+    await report({
       tenantId,
       step,
       status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -69,7 +97,7 @@ export async function runReportedStep(input: {
     return { ok: false, failedStep: step };
   }
 
-  await reportStep({
+  await report({
     tenantId,
     step,
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,

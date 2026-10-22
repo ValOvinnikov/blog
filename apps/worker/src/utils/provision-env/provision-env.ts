@@ -21,6 +21,15 @@ function requireValue(name: string, value: TMaybeUndefined<string>): string {
   return value;
 }
 
+export function requireValues<TName extends string>(
+  values: Record<TName, TMaybeUndefined<string>>,
+): Record<TName, string> {
+  const names = Object.keys(values) as TName[];
+  return Object.fromEntries(
+    names.map((name) => [name, requireValue(name, values[name])]),
+  ) as Record<TName, string>;
+}
+
 export function getProvisionEnv(): TProvisionEnv {
   return {
     sanityManagementToken: requireValue(

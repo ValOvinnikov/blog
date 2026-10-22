@@ -1,14 +1,8 @@
 import type { TTenant } from '@blog/db/schema/tenants';
+import { deleteVercelProjectDomain } from '@blog/db/utils/vercel-client/vercel-project-domains';
 
 import type { TDeprovisionEnv } from '../lib/env';
-import { deleteVercelProjectDomain } from '../lib/vercel-client';
 
-/**
- * Step 1 — removes the tenant's custom domain from the *shared* `apps/web`
- * Vercel project (mirrors `provision-tenant`'s "Map domain" step in
- * reverse). 404-tolerant: a domain that's already gone, or was never
- * mapped, is treated as done rather than an error.
- */
 export async function removeTenantDomain(
   tenant: TTenant,
   env: TDeprovisionEnv,

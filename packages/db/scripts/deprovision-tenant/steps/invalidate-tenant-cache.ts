@@ -1,24 +1,14 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 
-const REVALIDATE_PATH = '/api/revalidate-site-config';
-
-// Deliberately narrower than `TDeprovisionEnv` — this is the only field
-// subset the request below reads, so any caller's env satisfies it
-// structurally, including `scripts/invalidate-tenant-cache/`'s own,
-// unrelated env shape.
 export type TInvalidateTenantCacheEnv = {
   dryRun: boolean;
-  webAppUrl: string | undefined;
-  siteConfigRevalidateSecret: string | undefined;
+  webAppUrl: TMaybeUndefined<string>;
+  siteConfigRevalidateSecret: TMaybeUndefined<string>;
 };
 
-/**
- * Step 6 — purges the now-archived tenant's cached pages by POSTing to
- * `apps/web`'s on-demand revalidation endpoint, so the site stops serving
- * from the prerender cache instead of waiting out its fallback window.
- * Must run after `archive-tenant`: invalidating while the tenant is still
- * ACTIVE would let a page re-cache before the archive takes effect.
- */
+// Runs after archive-tenant: purging while the tenant is still ACTIVE lets a page re-cache before the archive lands.
 export async function invalidateTenantCache(
   tenant: TTenant,
   env: TInvalidateTenantCacheEnv,
@@ -36,19 +26,9 @@ export async function invalidateTenantCache(
     );
   }
 
-  const response = await fetch(new URL(REVALIDATE_PATH, env.webAppUrl), {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.siteConfigRevalidateSecret}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ tenantId: tenant.id }),
+  await requestTenantCacheInvalidation({
+    webAppUrl: env.webAppUrl,
+    secret: env.siteConfigRevalidateSecret,
+    tenantId: tenant.id,
   });
-
-  if (!response.ok) {
-    const body = await response.text().catch(() => '');
-    throw new Error(
-      `invalidate-tenant-cache: revalidation request failed for tenant "${tenant.id}": ${response.status} ${body}`,
-    );
-  }
 }

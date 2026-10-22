@@ -1,3 +1,5 @@
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+
 import type { TDeprovisionEnv } from './env';
 import { recordReaderDataPurgeAuditEvent } from './record-reader-data-purge-audit-event';
 
@@ -23,7 +25,12 @@ const env: TDeprovisionEnv = {
   siteConfigRevalidateSecret: 'shared-secret',
 };
 
-const counts = { subscribers: 3, bookmarks: 5, membershipInvites: 1 };
+const counts = {
+  subscribers: 3,
+  bookmarks: 5,
+  membershipInvites: 1,
+  leads: 2,
+};
 
 beforeEach(() => {
   insertAuditEventMock.mockReset().mockResolvedValue({});
@@ -41,8 +48,8 @@ describe(recordReaderDataPurgeAuditEvent, () => {
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'github:octocat',
       actorEmail: 'octocat@users.noreply.github.com',
-      action: 'READER_DATA_PURGED',
-      targetType: 'TENANT',
+      action: AUDIT_ACTION.READER_DATA_PURGED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
       details: {
         via: 'deprovision-tenant-workflow',
@@ -50,6 +57,7 @@ describe(recordReaderDataPurgeAuditEvent, () => {
         subscribers: 3,
         bookmarks: 5,
         membershipInvites: 1,
+        leads: 2,
       },
     });
   });

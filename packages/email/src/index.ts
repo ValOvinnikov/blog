@@ -27,6 +27,8 @@ export {
   type TInactivityWarningAlertInput,
   buildSelfServeLimitAlertEmail,
   type TSelfServeLimitAlertInput,
+  buildArchivedSanityProjectAlertEmail,
+  type TArchivedSanityProjectAlertInput,
 } from './templates/operator';
 export {
   buildOwnerInviteHeadsUpEmail,

@@ -5,7 +5,10 @@ import {
 } from '@blog/db/constants';
 import { setTenantProvisioningStatus } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
-import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import {
+  PROVISIONING_UNIT_MAX_RETRIES,
+  UNKNOWN_RUN_ERROR,
+} from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import {
   recordProvisioningAuditEvent,
@@ -15,9 +18,8 @@ import {
 
 import type { TUnitContext } from './run-reported-step';
 
-export type TRunOutcome =
-  | { ok: true }
-  | { ok: false; failedStep?: TTenantProvisioningStep; error?: string };
+export type TRunOutcome<TStep extends string = TTenantProvisioningStep> =
+  { ok: true } | { ok: false; failedStep?: TStep; error?: string };
 
 export async function beginRun(tenantId: string): Promise<void> {
   'use step';
@@ -41,7 +43,7 @@ export async function finishRun(
     logger.error('provisioning.run_failed', {
       tenantId,
       runId,
-      error: sanitizeLogMessage(outcome.error ?? 'unknown'),
+      error: sanitizeLogMessage(outcome.error ?? UNKNOWN_RUN_ERROR),
     });
     const marked = await setTenantProvisioningStatus(
       tenantId,
