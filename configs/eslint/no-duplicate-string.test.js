@@ -39,6 +39,10 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
       options,
     },
     {
+      code: "screen.getByRole('alertdialog'); within(x).getByRole('alertdialog'); queryByRole('alertdialog');",
+      options,
+    },
+    {
       code: "const a = { sameSite: 'strict-mode' }; const b = { sameSite: 'strict-mode' };",
       options,
     },

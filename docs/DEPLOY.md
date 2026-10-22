@@ -198,6 +198,29 @@ linking + domains remain:
         shows you, same as above. This must match the `ADMIN_APP_BASE_URL`
         Variable in §4 exactly (no trailing slash).
 
+#### Tenant subdomains — the wildcard and the domains that beat it
+
+Self-serve tenants live at `<slug>.<root>` with no Vercel call per tenant: a
+wildcard domain on the web project sends every such host to `apps/web`, which
+finds the tenant by its `tenant_domains` row. Wildcard domains need the zone on
+Vercel's nameservers (`{your-hosting}` is); Vercel then issues the wildcard
+certificate itself. Each environment has its own root so development never
+claims a production host:
+
+- [ ] **`web-dev`** → Settings → Domains → add `*.dev.{your-hosting}`
+      (Production environment).
+- [ ] **`platform-dev`** → add `platform.dev.{your-hosting}`. An explicitly
+      assigned domain on another project beats the wildcard — this host serves
+      the admin, not the public site (checked on dev 2026-10-22).
+- [ ] **`platform-dev`** env → `TENANT_ROOT_DOMAIN=dev.{your-hosting}`, so the
+      admin's slug check uses the dev root.
+- [ ] Production repeats the three with `*.{your-hosting}`,
+      `platform.{your-hosting}` and `TENANT_ROOT_DOMAIN={your-hosting}` when
+      self-serve signup ships (epic #4840).
+
+A host under the wildcard renders its tenant once `tenant_domains` holds that
+exact host; production answers any other host with a 404.
+
 #### Vercel env vars
 
 **Web** (`web-dev` / `web-prod`, Production scope — `deploy-development.yml`

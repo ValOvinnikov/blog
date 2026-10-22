@@ -8,6 +8,7 @@ import {
 import * as schema from '@blog/db/schema';
 import type { TAdmin } from '@blog/db/schema/admins';
 import type { TUser } from '@blog/db/schema/auth';
+import type { TLead } from '@blog/db/schema/leads';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -91,4 +92,26 @@ export async function insertTestAccount(
     provider,
     providerAccountId: `${userId}-${provider}`,
   });
+}
+
+export async function insertTestLead(
+  db: TTestDb,
+  tenantId: string,
+  overrides: Partial<typeof schema.leads.$inferInsert> = {},
+): Promise<TLead> {
+  const [lead] = await db
+    .insert(schema.leads)
+    .values({
+      tenantId,
+      name: 'Ada Lovelace',
+      email: 'lead@example.com',
+      message: 'I would like to talk about a project.',
+      sourcePath: '/en/hire-me',
+      ...overrides,
+    })
+    .returning();
+
+  if (!lead) throw new Error('insertTestLead: insert returned no row.');
+
+  return lead;
 }

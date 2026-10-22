@@ -72,5 +72,54 @@
       "metaTitle": "À propos — qui écrit ce blog et de quoi il parle",
       "metaDescription": "Qui écrit ce blog et de quoi il parle. Modifiez le titre et les champs SEO de cette page dès que vous avez votre propre texte."
     }
+  },
+  "portfolio": {
+    "hero": {
+      "eyebrow": "Portfolio",
+      "heading": "Une sélection de projets et leur histoire"
+    },
+    "intro": {
+      "body": [
+        "Bienvenue dans mon portfolio. Vous trouverez ici quelques projets dont je suis fier, avec une courte note sur chacun.",
+        "Remplacez ce texte par quelques lignes sur vous, votre métier et le type de missions que vous recherchez."
+      ]
+    },
+    "cta": {
+      "heading": "Voir les projets",
+      "supportingText": "Parcourez les projets, de la demande au résultat final."
+    },
+    "work": {
+      "title": "Projets",
+      "slug": "projets",
+      "heading": "Projets",
+      "supportingText": "Une sélection de projets récents.",
+      "listHeading": "Projets",
+      "metaTitle": "Projets — une sélection de réalisations récentes",
+      "metaDescription": "Une sélection de projets récents, chacun avec une courte note sur la demande, la démarche et le résultat."
+    },
+    "projects": [
+      {
+        "title": "Projet d’exemple un",
+        "slug": "projet-exemple-un",
+        "summary": "Une étude de cas d’exemple. Remplacez-la par un vrai projet.",
+        "body": [
+          "Décrivez la demande : pour qui était le projet et quel était le besoin.",
+          "Expliquez ensuite votre démarche et le résultat. Ajoutez des images et des liens quand vous les avez."
+        ],
+        "metaTitle": "Projet d’exemple un — une étude de cas à remplacer",
+        "metaDescription": "Une étude de cas d’exemple créée avec votre site. Remplacez-la par l’un de vos propres projets."
+      },
+      {
+        "title": "Projet d’exemple deux",
+        "slug": "projet-exemple-deux",
+        "summary": "Une autre étude de cas d’exemple, prête pour votre travail.",
+        "body": [
+          "Utilisez cette page pour un deuxième projet : le problème, ce que vous avez fait et le résultat.",
+          "Supprimez-la si un seul projet suffit pour l’instant."
+        ],
+        "metaTitle": "Projet d’exemple deux — une autre étude de cas",
+        "metaDescription": "Une deuxième étude de cas d’exemple créée avec votre site. Remplacez-la par votre travail, ou supprimez-la."
+      }
+    ]
   }
 }

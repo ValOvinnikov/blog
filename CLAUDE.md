@@ -671,8 +671,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   public-site copy (it belongs in the Voice catalog), `0`, `1`, `-1`, and
   vocabulary an outside standard spells — a value compared with an env read
   (`process.env.NODE_ENV === 'production'`), an env read's bracket key
-  (`process.env['X']`), a `stubEnv` argument, and a protocol attribute's
-  value (`sameSite: 'strict'`); a
+  (`process.env['X']`), a `stubEnv` argument, a protocol attribute's
+  value (`sameSite: 'strict'`), and a Testing Library role query's role
+  (`getByRole('button')`); a
   match in the other app is reported, never shared. Lint enforces both on
   touched files only — `prefer-shared-constant` and `no-duplicate-string` in
   the post-edit hook, lint-staged and `pnpm check:touched-lint`, plus the

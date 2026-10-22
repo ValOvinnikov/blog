@@ -1,11 +1,6 @@
-import type {
-  Blog_topic,
-  Link,
-  Person,
-} from '@blog/config/sanity/generated/types';
+import type { Blog_topic, Person } from '@blog/config/sanity/generated/types';
 
 import {
-  LINK_TYPE,
   PORTABLE_TEXT_BLOCK_TYPE,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
@@ -22,6 +17,7 @@ import type {
 } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import {
+  internalLink,
   keyedReference,
   localizedString,
   localizedText,
@@ -33,22 +29,6 @@ import {
 } from './starter-fields';
 
 const ids = STARTER_DOCUMENT_IDS;
-
-function internalLink(
-  id: string,
-  title: string,
-  locale: TLocaleIsoCode,
-  targetId: string,
-): TStarterDocument<Link, 'title' | 'label' | 'linkType'> {
-  return {
-    _id: id,
-    _type: 'link',
-    title,
-    label: localizedString(locale, title),
-    linkType: LINK_TYPE.INTERNAL,
-    internalReference: reference(targetId),
-  };
-}
 
 export function buildBlogDocuments({
   siteName,

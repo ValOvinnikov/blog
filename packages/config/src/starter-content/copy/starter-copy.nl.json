@@ -72,5 +72,54 @@
       "metaTitle": "Over — wie deze blog schrijft en waar hij over gaat",
       "metaDescription": "Wie deze blog schrijft en waar hij over gaat. Pas de kop en de SEO-velden van deze pagina aan zodra je echte tekst hebt."
     }
+  },
+  "portfolio": {
+    "hero": {
+      "eyebrow": "Portfolio",
+      "heading": "Geselecteerd werk en het verhaal erachter"
+    },
+    "intro": {
+      "body": [
+        "Welkom in mijn portfolio. Hier vind je een paar projecten waar ik trots op ben, met een korte toelichting bij elk.",
+        "Vervang deze tekst door een paar regels over wie je bent, wat je doet en wat voor werk je zoekt."
+      ]
+    },
+    "cta": {
+      "heading": "Bekijk het werk",
+      "supportingText": "Blader door de projecten, van opdracht tot eindresultaat."
+    },
+    "work": {
+      "title": "Werk",
+      "slug": "werk",
+      "heading": "Werk",
+      "supportingText": "Een selectie van recente projecten.",
+      "listHeading": "Projecten",
+      "metaTitle": "Werk — een selectie van recente projecten en cases",
+      "metaDescription": "Een selectie van recente projecten, elk met een korte toelichting op de opdracht, de aanpak en het resultaat."
+    },
+    "projects": [
+      {
+        "title": "Voorbeeldproject één",
+        "slug": "voorbeeldproject-een",
+        "summary": "Een voorbeeldcase. Vervang hem door een echt project.",
+        "body": [
+          "Beschrijf de opdracht: voor wie het project was en wat ze nodig hadden.",
+          "Leg daarna je aanpak uit en wat het opleverde. Voeg afbeeldingen en links toe zodra je ze hebt."
+        ],
+        "metaTitle": "Voorbeeldproject één — een case om te vervangen",
+        "metaDescription": "Een voorbeeldcase, aangemaakt met je site. Vervang hem door een van je eigen projecten."
+      },
+      {
+        "title": "Voorbeeldproject twee",
+        "slug": "voorbeeldproject-twee",
+        "summary": "Nog een voorbeeldcase, klaar voor je eigen werk.",
+        "body": [
+          "Gebruik deze pagina voor een tweede project: het probleem, wat je deed en het resultaat.",
+          "Verwijder hem als één project voorlopig genoeg is."
+        ],
+        "metaTitle": "Voorbeeldproject twee — nog een case om te vervangen",
+        "metaDescription": "Een tweede voorbeeldcase, aangemaakt met je site. Vervang hem door je eigen werk, of verwijder hem."
+      }
+    ]
   }
 }

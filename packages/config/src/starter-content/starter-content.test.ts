@@ -8,7 +8,11 @@ type TStarterType = TStarterDocumentUnion['_type'];
 
 const SITE_NAME = 'Acme Corporation';
 const PUBLISHED_AT = '2026-10-21T09:00:00.000Z';
-const STARTER_SITE_TYPES = [SITE_TYPE.BLOG, SITE_TYPE.BLANK] as const;
+const STARTER_SITE_TYPES = [
+  SITE_TYPE.BLOG,
+  SITE_TYPE.PORTFOLIO,
+  SITE_TYPE.BLANK,
+] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
 
 const build = (
@@ -127,6 +131,15 @@ describe(buildStarterDocuments, () => {
     ]);
   });
 
+  it('the Portfolio sample projects are two pages under one parent', () => {
+    const parents = build(SITE_TYPE.PORTFOLIO).flatMap((document) =>
+      'parent' in document && document.parent ? [document.parent._ref] : [],
+    );
+
+    expect(parents).toHaveLength(2);
+    expect(new Set(parents).size).toBe(1);
+  });
+
   it('the site settings brand carries the site name', () => {
     expect(
       findByType(
@@ -177,7 +190,7 @@ describe(toStarterSiteType, () => {
     expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
   });
 
-  it.each([null, SITE_TYPE.PORTFOLIO])(
+  it.each([null, SITE_TYPE.PERSONAL])(
     'starts %s from the Blank site',
     (siteType) => {
       expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);

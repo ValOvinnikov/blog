@@ -301,6 +301,17 @@ never reads state, props, handlers or markup shape.
   expect(screen.getByRole('heading', { level: 1 })).toBeVisible(); // ❌
   ```
 
+  The same holds for a query an interaction acts on: bind it, then pass the
+  const. A query is never nested inside another call:
+
+  ```tsx
+  const blockSwitch = await screen.findByRole('switch', { name: 'Block' });
+  await user.click(blockSwitch); // ✅
+
+  await user.click(await screen.findByRole('switch', { name: 'Block' })); // ❌
+  await user.click(screen.getByRole('button', { name: 'Save' })); // ❌
+  ```
+
   **A test file you create or touch is converted whole** — every inline
   query assertion in it, not only the lines your change edits. Files the
   change does not touch stay as they are.

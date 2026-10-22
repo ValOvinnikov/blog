@@ -1,15 +1,22 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TDeprovisionEnv } from '../lib/env';
 
 import { removeTenantDomain } from './remove-domain';
 
+const TENANT_DOMAIN = 'acme.example.com';
+
 const { deleteVercelProjectDomainMock } = vi.hoisted(() => ({
   deleteVercelProjectDomainMock: vi.fn(),
 }));
 
-vi.mock('../lib/vercel-client', () => ({
+vi.mock('@blog/db/utils/vercel-client/vercel-project-domains', () => ({
   deleteVercelProjectDomain: deleteVercelProjectDomainMock,
 }));
 
@@ -31,14 +38,14 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 'tenant-1',
     name: 'Acme',
-    primaryDomain: 'acme.example.com',
+    primaryDomain: TENANT_DOMAIN,
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'enc',
     locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'READY',
+    plan: TENANT_PLAN.FREE,
+    status: TENANT_STATUS.ACTIVE,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
     provisioningSteps: null,
     seededAt: new Date(),
     deprovisionedAt: null,
@@ -59,10 +66,10 @@ describe(removeTenantDomain, () => {
     await removeTenantDomain(baseTenant(), env);
 
     expect(deleteVercelProjectDomainMock).toHaveBeenCalledWith({
-      token: 'v-token',
+      token: env.vercelToken,
       teamId: undefined,
-      projectId: 'prj_web',
-      domain: 'acme.example.com',
+      projectId: env.vercelWebProjectId,
+      domain: TENANT_DOMAIN,
     });
   });
 

@@ -9,12 +9,17 @@ import {
   SANITY_PROJECT_ROLE as STORED_SANITY_PROJECT_ROLE,
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
-import { setTenantOwnerAccess } from '@blog/db/queries/tenants';
+import {
+  setTenantOwnerAccess,
+  touchTenantActivity,
+} from '@blog/db/queries/tenants';
 import {
   grantSanityProjectRole,
   listSanityProjectAcl,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT } from '@worker/constants/owner-access';
+import { logger } from '@worker/utils/logger/logger';
 
 import type { TOwnerAccessTarget } from './owner-access-target';
 
@@ -27,6 +32,19 @@ function toLoginProvider(
       (value) => value === normalized,
     ) ?? null
   );
+}
+
+async function touchActivityOnInviteAcceptance(
+  tenantId: string,
+  acceptedAt: Date,
+): Promise<void> {
+  const touched = await touchTenantActivity(tenantId, acceptedAt);
+  if (!touched.ok) {
+    logger.error(OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT, {
+      tenantId,
+      error: touched.error,
+    });
+  }
 }
 
 export async function grantOwnerAdministrator(
@@ -58,8 +76,9 @@ export async function grantOwnerAdministrator(
     });
   }
 
+  const inviteAcceptedAt = tenant.ownerInviteAcceptedAt ?? new Date();
   const recorded = await setTenantOwnerAccess(tenant.id, {
-    inviteAcceptedAt: tenant.ownerInviteAcceptedAt ?? new Date(),
+    inviteAcceptedAt,
     sanityUserId: owner.sanityUserId,
     loginProvider: toLoginProvider(owner.profile.provider),
     sanityRole: STORED_SANITY_PROJECT_ROLE.ADMINISTRATOR,
@@ -68,6 +87,10 @@ export async function grantOwnerAdministrator(
     throw new Error(
       `Tenant "${tenant.id}"'s owner access could not be recorded (${recorded.error}).`,
     );
+  }
+
+  if (!tenant.ownerInviteAcceptedAt) {
+    await touchActivityOnInviteAcceptance(tenant.id, inviteAcceptedAt);
   }
 
   return isAdministrator

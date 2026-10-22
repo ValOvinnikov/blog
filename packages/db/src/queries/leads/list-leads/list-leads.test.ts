@@ -1,5 +1,5 @@
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listLeads } from './list-leads';
@@ -10,21 +10,13 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+const JANUARY_1 = new Date('2026-01-01T00:00:00Z');
+const JANUARY_2 = new Date('2026-01-02T00:00:00Z');
+
 afterEach(async () => {
   await db().delete(schema.leads);
   await db().delete(schema.tenants);
 });
-
-async function seedLead(tenantId: string, name: string, createdAt: Date) {
-  await db().insert(schema.leads).values({
-    tenantId,
-    name,
-    email: 'reader@example.com',
-    message: 'Hello there, this is a message.',
-    sourcePath: '/en/contact',
-    createdAt,
-  });
-}
 
 describe(listLeads, () => {
   let tenantId: string;
@@ -40,9 +32,18 @@ describe(listLeads, () => {
   });
 
   it('lists leads newest first with the total', async () => {
-    await seedLead(tenantId, 'Oldest', new Date('2026-01-01T00:00:00Z'));
-    await seedLead(tenantId, 'Newest', new Date('2026-03-01T00:00:00Z'));
-    await seedLead(tenantId, 'Middle', new Date('2026-02-01T00:00:00Z'));
+    await insertTestLead(db(), tenantId, {
+      name: 'Oldest',
+      createdAt: JANUARY_1,
+    });
+    await insertTestLead(db(), tenantId, {
+      name: 'Newest',
+      createdAt: new Date('2026-03-01T00:00:00Z'),
+    });
+    await insertTestLead(db(), tenantId, {
+      name: 'Middle',
+      createdAt: new Date('2026-02-01T00:00:00Z'),
+    });
 
     const result = await listLeads({ tenantId, page: 1, pageSize: 10 });
 
@@ -55,9 +56,18 @@ describe(listLeads, () => {
   });
 
   it('pages through leads in order, keeping the full total on every page', async () => {
-    await seedLead(tenantId, 'First', new Date('2026-01-01T00:00:00Z'));
-    await seedLead(tenantId, 'Second', new Date('2026-01-02T00:00:00Z'));
-    await seedLead(tenantId, 'Third', new Date('2026-01-03T00:00:00Z'));
+    await insertTestLead(db(), tenantId, {
+      name: 'First',
+      createdAt: JANUARY_1,
+    });
+    await insertTestLead(db(), tenantId, {
+      name: 'Second',
+      createdAt: JANUARY_2,
+    });
+    await insertTestLead(db(), tenantId, {
+      name: 'Third',
+      createdAt: new Date('2026-01-03T00:00:00Z'),
+    });
 
     const firstPage = await listLeads({ tenantId, page: 1, pageSize: 2 });
     const secondPage = await listLeads({ tenantId, page: 2, pageSize: 2 });
@@ -73,8 +83,14 @@ describe(listLeads, () => {
 
   it("never returns another tenant's leads", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    await seedLead(tenantId, 'Mine', new Date('2026-01-01T00:00:00Z'));
-    await seedLead(otherTenantId, 'Theirs', new Date('2026-01-02T00:00:00Z'));
+    await insertTestLead(db(), tenantId, {
+      name: 'Mine',
+      createdAt: JANUARY_1,
+    });
+    await insertTestLead(db(), otherTenantId, {
+      name: 'Theirs',
+      createdAt: JANUARY_2,
+    });
 
     const result = await listLeads({ tenantId, page: 1, pageSize: 10 });
 

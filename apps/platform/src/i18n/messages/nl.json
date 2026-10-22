@@ -19,7 +19,8 @@
     "findings": "Bevindingen · Admin",
     "email": "E-mail · Admin",
     "leads": "Berichten · Admin",
-    "releases": "Releases · Admin"
+    "releases": "Releases · Admin",
+    "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin"
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
@@ -113,7 +114,8 @@
       "ACTIVATING": "Wordt geactiveerd",
       "READY": "Klaar",
       "STALLED": "Actie nodig"
-    }
+    },
+    "blockedSignups": "Geblokkeerde aanmeldingen"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -311,7 +313,9 @@
       "RELEASE_STARTED": "Release gestart",
       "RELEASE_OVERRIDE": "Releasecontrole overschreven",
       "CONTRAST_CHECK_STARTED": "Contrastcontrole gestart",
-      "TENANT_MIGRATIONS_STARTED": "Tenantmigraties gestart"
+      "TENANT_MIGRATIONS_STARTED": "Tenantmigraties gestart",
+      "SIGNUP_BLOCK_ADDED": "Aanmeldblokkade toegevoegd",
+      "SIGNUP_BLOCK_REMOVED": "Aanmeldblokkade verwijderd"
     }
   },
   "tenantDomainPage": {
@@ -966,6 +970,14 @@
       "dialogDescription": "Het contactformulier, nieuwsbriefinschrijvingen en bladwijzers van de site komen terug vanaf de volgende paginaweergave.",
       "confirmButton": "Opnieuw activeren",
       "confirmingButton": "Bezig met activeren…"
+    },
+    "blockOwner": {
+      "switchLabel": "Blokkeer ook het e-mailadres van de eigenaar",
+      "description": "De eigenaar kan zich met dit adres niet meer aanmelden of een site maken. Je kunt de blokkade later opheffen via Geblokkeerde aanmeldingen.",
+      "reasonLabel": "Reden van de blokkade",
+      "reasonHint": "Operators zien dit op de pagina Geblokkeerde aanmeldingen.",
+      "switchOn": "Aan",
+      "switchOff": "Uit"
     }
   },
   "tenantLifecycleErrors": {
@@ -981,7 +993,9 @@
     "reactivateFailed": "Het opnieuw activeren kon niet worden gestart — probeer het opnieuw.",
     "deleteFailed": "De tenant kon niet worden verwijderd — probeer het opnieuw.",
     "suspendFailed": "Kon de tenant niet opschorten — probeer het opnieuw.",
-    "liftSuspensionFailed": "Kon de tenant niet opnieuw activeren — probeer het opnieuw."
+    "liftSuspensionFailed": "Kon de tenant niet opnieuw activeren — probeer het opnieuw.",
+    "ownerEmailUnknown": "De eigenaar van deze tenant heeft nog geen e-mailadres vastgelegd, dus het kan niet worden geblokkeerd.",
+    "invalidInput": "Controleer de gegevens en probeer het opnieuw."
   },
   "featuresSettings": {
     "heading": "Functies",
@@ -1258,5 +1272,48 @@
       "tagListIncomplete": "De lijst met releasetags is te lang om helemaal te lezen, dus de nieuwste release is niet te bepalen.",
       "dbError": "De database kon niet worden gelezen."
     }
+  },
+  "blockedSignupsView": {
+    "title": "Geblokkeerde aanmeldingen",
+    "description": "E-mailadressen en domeinen die zich niet kunnen aanmelden of een site kunnen maken. Een adres wordt alleen als hash opgeslagen en is niet terug te lezen."
+  },
+  "blockedSignupsTable": {
+    "columnKind": "Soort",
+    "columnValue": "Waarde",
+    "columnReason": "Reden",
+    "columnAddedBy": "Toegevoegd door",
+    "columnAdded": "Toegevoegd",
+    "columnActions": "Acties",
+    "addedByUnknown": "Onbekend",
+    "empty": "Er is niets geblokkeerd.",
+    "regionLabel": "Geblokkeerde aanmeldingen"
+  },
+  "blockedSignupKindLabel": {
+    "ADDRESS": "E-mailadres",
+    "DOMAIN": "Domein"
+  },
+  "removeBlockedIdentityControl": {
+    "triggerAriaLabel": "Blokkade {value} verwijderen",
+    "dialogTitle": "Deze blokkade verwijderen?",
+    "dialogDescription": "Dit adres of domein kan zich direct weer aanmelden en sites maken.",
+    "confirmButton": "Blokkade verwijderen",
+    "confirmingButton": "Verwijderen…",
+    "openDialogButton": "Verwijderen",
+    "alreadyRemoved": "Deze blokkade was al verwijderd.",
+    "removalFailed": "De blokkade kon niet worden verwijderd — probeer het opnieuw."
+  },
+  "addBlockedDomainCard": {
+    "title": "Een domein blokkeren",
+    "supportingText": "Iedereen met een e-mailadres op dit domein wordt geweigerd.",
+    "domainLabel": "Domein",
+    "domainHint": "Zonder voorafgaande „@”, bijvoorbeeld example.com.",
+    "domainPlaceholder": "example.com",
+    "reasonLabel": "Reden",
+    "submitting": "Blokkeren…",
+    "reasonRequired": "Voer een reden in.",
+    "domainFormatInvalid": "Voer een geldig domein in, zoals example.com.",
+    "domainBlocked": "Domein geblokkeerd.",
+    "domainBlockFailed": "Het domein kon niet worden geblokkeerd — probeer het opnieuw.",
+    "blockSubmit": "Domein blokkeren"
   }
 }

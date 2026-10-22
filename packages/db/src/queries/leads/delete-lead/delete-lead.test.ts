@@ -1,5 +1,5 @@
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { deleteLead } from './delete-lead';
@@ -15,23 +15,6 @@ afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
-async function seedLead(tenantId: string) {
-  const [lead] = await db()
-    .insert(schema.leads)
-    .values({
-      tenantId,
-      name: 'Ada Lovelace',
-      email: 'ada@example.com',
-      message: 'I would like to talk about a project.',
-      sourcePath: '/en/contact',
-    })
-    .returning();
-
-  if (!lead) throw new Error('seedLead: insert returned no row.');
-
-  return lead;
-}
-
 describe(deleteLead, () => {
   let tenantId: string;
 
@@ -40,7 +23,7 @@ describe(deleteLead, () => {
   });
 
   it('deletes the lead and reports that a row was removed', async () => {
-    const { id } = await seedLead(tenantId);
+    const { id } = await insertTestLead(db(), tenantId);
 
     const removed = await deleteLead({ tenantId, id });
 
@@ -60,7 +43,7 @@ describe(deleteLead, () => {
 
   it("never deletes another tenant's lead", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    const { id } = await seedLead(otherTenantId);
+    const { id } = await insertTestLead(db(), otherTenantId);
 
     const removed = await deleteLead({ tenantId, id });
 

@@ -19,7 +19,8 @@
     "findings": "Constats · Administration",
     "email": "E-mail · Administration",
     "leads": "Messages reçus · Administration",
-    "releases": "Versions · Admin"
+    "releases": "Versions · Admin",
+    "blockedSignupsPage": "Inscriptions bloquées · Admin"
   },
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
@@ -113,7 +114,8 @@
       "ACTIVATING": "Activation",
       "READY": "Prêt",
       "STALLED": "Action requise"
-    }
+    },
+    "blockedSignups": "Inscriptions bloquées"
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"
@@ -311,7 +313,9 @@
       "RELEASE_STARTED": "Publication lancée",
       "RELEASE_OVERRIDE": "Contrôle de publication contourné",
       "CONTRAST_CHECK_STARTED": "Vérification du contraste lancée",
-      "TENANT_MIGRATIONS_STARTED": "Migrations du locataire lancées"
+      "TENANT_MIGRATIONS_STARTED": "Migrations du locataire lancées",
+      "SIGNUP_BLOCK_ADDED": "Blocage d’inscription ajouté",
+      "SIGNUP_BLOCK_REMOVED": "Blocage d’inscription retiré"
     }
   },
   "tenantDomainPage": {
@@ -966,6 +970,14 @@
       "dialogDescription": "Le formulaire de contact, les inscriptions à la newsletter et les favoris du site reviennent dès le prochain chargement de page.",
       "confirmButton": "Réactiver",
       "confirmingButton": "Réactivation…"
+    },
+    "blockOwner": {
+      "switchLabel": "Bloquer aussi l’adresse e-mail du propriétaire",
+      "description": "Le propriétaire ne pourra plus s’inscrire ni créer de site avec cette adresse. Vous pourrez retirer le blocage plus tard depuis Inscriptions bloquées.",
+      "reasonLabel": "Motif du blocage",
+      "reasonHint": "Les opérateurs le voient sur la page Inscriptions bloquées.",
+      "switchOn": "Activé",
+      "switchOff": "Désactivé"
     }
   },
   "tenantLifecycleErrors": {
@@ -981,7 +993,9 @@
     "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",
     "deleteFailed": "Impossible de supprimer le locataire — veuillez réessayer.",
     "suspendFailed": "Impossible de suspendre le locataire — réessayez.",
-    "liftSuspensionFailed": "Impossible de réactiver le locataire — réessayez."
+    "liftSuspensionFailed": "Impossible de réactiver le locataire — réessayez.",
+    "ownerEmailUnknown": "Le propriétaire de ce locataire n’a pas encore d’adresse e-mail enregistrée : elle ne peut donc pas être bloquée.",
+    "invalidInput": "Vérifiez les informations et réessayez."
   },
   "featuresSettings": {
     "heading": "Fonctionnalités",
@@ -1258,5 +1272,48 @@
       "tagListIncomplete": "La liste des tags de version est trop longue pour être lue en entier : la dernière version ne peut pas être déterminée.",
       "dbError": "La base de données n'a pas pu être lue."
     }
+  },
+  "blockedSignupsView": {
+    "title": "Inscriptions bloquées",
+    "description": "Adresses e-mail et domaines qui ne peuvent ni s’inscrire ni créer de site. Une adresse n’est conservée que sous forme de hachage : elle ne peut pas être relue."
+  },
+  "blockedSignupsTable": {
+    "columnKind": "Type",
+    "columnValue": "Valeur",
+    "columnReason": "Motif",
+    "columnAddedBy": "Ajouté par",
+    "columnAdded": "Ajouté",
+    "columnActions": "Actions",
+    "addedByUnknown": "Inconnu",
+    "empty": "Rien n’est bloqué.",
+    "regionLabel": "Inscriptions bloquées"
+  },
+  "blockedSignupKindLabel": {
+    "ADDRESS": "Adresse e-mail",
+    "DOMAIN": "Domaine"
+  },
+  "removeBlockedIdentityControl": {
+    "triggerAriaLabel": "Retirer le blocage {value}",
+    "dialogTitle": "Retirer ce blocage ?",
+    "dialogDescription": "Cette adresse ou ce domaine pourra de nouveau s’inscrire et créer des sites immédiatement.",
+    "confirmButton": "Retirer le blocage",
+    "confirmingButton": "Retrait…",
+    "openDialogButton": "Retirer",
+    "alreadyRemoved": "Ce blocage a déjà été retiré.",
+    "removalFailed": "Impossible de retirer le blocage — réessayez."
+  },
+  "addBlockedDomainCard": {
+    "title": "Bloquer un domaine",
+    "supportingText": "Toute personne ayant une adresse e-mail de ce domaine est refusée.",
+    "domainLabel": "Domaine",
+    "domainHint": "Sans « @ » au début, par exemple example.com.",
+    "domainPlaceholder": "example.com",
+    "reasonLabel": "Motif",
+    "submitting": "Blocage…",
+    "reasonRequired": "Saisissez un motif.",
+    "domainFormatInvalid": "Saisissez un domaine valide, par exemple example.com.",
+    "domainBlocked": "Domaine bloqué.",
+    "domainBlockFailed": "Impossible de bloquer le domaine — réessayez.",
+    "blockSubmit": "Bloquer le domaine"
   }
 }

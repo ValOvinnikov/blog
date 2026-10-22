@@ -14,3 +14,7 @@ export {
   buildSelfServeLimitAlertEmail,
   type TSelfServeLimitAlertInput,
 } from './self-serve-limit-alert/self-serve-limit-alert';
+export {
+  buildArchivedSanityProjectAlertEmail,
+  type TArchivedSanityProjectAlertInput,
+} from './archived-sanity-project-alert/archived-sanity-project-alert';
