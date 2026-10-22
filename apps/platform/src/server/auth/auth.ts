@@ -2,13 +2,14 @@ import 'server-only';
 
 import { buildAuthConfig } from '@blog/auth';
 import { AUTH_APP } from '@blog/config/constants';
+import { withOwnerSignInActivity } from '@platform/server/auth/with-owner-sign-in-activity';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import NextAuth from 'next-auth';
 import { cache } from 'react';
 
 // Lazy so `getDb()` waits for the first request; at import it breaks the build, where `DATABASE_URL` is unset.
 const { handlers, auth, signIn, signOut } = NextAuth(() => ({
-  ...buildAuthConfig(AUTH_APP.PLATFORM),
+  ...withOwnerSignInActivity(buildAuthConfig(AUTH_APP.PLATFORM)),
   pages: { error: adminRoutes.signInError() },
 }));
 

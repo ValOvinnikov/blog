@@ -21,5 +21,6 @@ export function withFakeTenantsQueries(
     startDeprovisioningRun: vi.fn(),
     finishDeprovisioningRun: vi.fn(),
     updateDeprovisioningStep: vi.fn(),
+    setTenantSiteTemplateVersion: vi.fn(),
   };
 }

@@ -1,4 +1,9 @@
+import {
+  TEST_SESSION_EXPIRES,
+  TEST_SESSION_TOKEN,
+} from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
+import { sha256Hex } from '@blog/utils/hash';
 import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 
 import { scopeAdapterToApp } from './app-scoped-adapter';
@@ -8,14 +13,19 @@ const user = {
   email: 'owner@example.com',
   emailVerified: null,
 };
-const expires = new Date('2030-01-01T00:00:00Z');
+const expires = TEST_SESSION_EXPIRES;
+const SESSION_TOKEN_HASH = sha256Hex(TEST_SESSION_TOKEN);
 
 function buildAdapter(
   storedApp: string,
 ): Required<
   Pick<
     Adapter,
-    'createSession' | 'getSessionAndUser' | 'deleteSession' | 'linkAccount'
+    | 'createSession'
+    | 'getSessionAndUser'
+    | 'updateSession'
+    | 'deleteSession'
+    | 'linkAccount'
   >
 > {
   return {
@@ -25,26 +35,67 @@ function buildAdapter(
       session: { sessionToken, userId: user.id, expires, app: storedApp },
       user,
     })),
+    updateSession: vi.fn(async (session) => ({
+      userId: user.id,
+      expires,
+      ...session,
+    })),
     deleteSession: vi.fn(async () => {}),
   };
 }
 
 describe(scopeAdapterToApp, () => {
-  it('stamps each new session with the app', async () => {
+  it('stores each new session under its token hash, stamped with the app', async () => {
     const adapter = buildAdapter(AUTH_APP.PLATFORM);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
     await scoped.createSession?.({
-      sessionToken: 'token',
+      sessionToken: TEST_SESSION_TOKEN,
       userId: user.id,
       expires,
     });
 
     expect(adapter.createSession).toHaveBeenCalledWith({
-      sessionToken: 'token',
+      sessionToken: SESSION_TOKEN_HASH,
       userId: user.id,
       expires,
       app: AUTH_APP.PLATFORM,
+    });
+  });
+
+  it('hands the raw token back for the session cookie', async () => {
+    const scoped = scopeAdapterToApp(
+      buildAdapter(AUTH_APP.PLATFORM),
+      AUTH_APP.PLATFORM,
+    );
+
+    const created = await scoped.createSession?.({
+      sessionToken: TEST_SESSION_TOKEN,
+      userId: user.id,
+      expires,
+    });
+
+    expect(created?.sessionToken).toBe(TEST_SESSION_TOKEN);
+  });
+
+  it('looks a session up by the hash of the cookie token', async () => {
+    const adapter = buildAdapter(AUTH_APP.PLATFORM);
+    const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
+
+    await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
+
+    expect(adapter.getSessionAndUser).toHaveBeenCalledWith(SESSION_TOKEN_HASH);
+  });
+
+  it('extends a session by the hash of the cookie token', async () => {
+    const adapter = buildAdapter(AUTH_APP.PLATFORM);
+    const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
+
+    await scoped.updateSession?.({ sessionToken: TEST_SESSION_TOKEN, expires });
+
+    expect(adapter.updateSession).toHaveBeenCalledWith({
+      sessionToken: SESSION_TOKEN_HASH,
+      expires,
     });
   });
 
@@ -54,7 +105,7 @@ describe(scopeAdapterToApp, () => {
       AUTH_APP.PLATFORM,
     );
 
-    const found = await scoped.getSessionAndUser?.('token');
+    const found = await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
 
     expect(found?.user).toEqual(user);
   });
@@ -65,25 +116,25 @@ describe(scopeAdapterToApp, () => {
       AUTH_APP.PLATFORM,
     );
 
-    const found = await scoped.getSessionAndUser?.('token');
+    const found = await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
 
     expect(found).toBeNull();
   });
 
-  it('deletes a session the app issued', async () => {
+  it('deletes a session the app issued by its token hash', async () => {
     const adapter = buildAdapter(AUTH_APP.PLATFORM);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
-    await scoped.deleteSession?.('token');
+    await scoped.deleteSession?.(TEST_SESSION_TOKEN);
 
-    expect(adapter.deleteSession).toHaveBeenCalledWith('token');
+    expect(adapter.deleteSession).toHaveBeenCalledWith(SESSION_TOKEN_HASH);
   });
 
   it('leaves a session another app issued in place', async () => {
     const adapter = buildAdapter(AUTH_APP.SITE);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
-    await scoped.deleteSession?.('token');
+    await scoped.deleteSession?.(TEST_SESSION_TOKEN);
 
     expect(adapter.deleteSession).not.toHaveBeenCalled();
   });

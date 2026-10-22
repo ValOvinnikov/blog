@@ -24,6 +24,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 const USER_ID = 'user-1';
 const OTHER_USER_ID = 'user-2';
+const DELETE_FAILURE = 'connection lost';
 let tenantId: string;
 
 beforeEach(async () => {
@@ -162,6 +163,34 @@ describe(deleteAccount, () => {
 
     await deleteAccount(USER_ID);
 
+    expect(await findAuditEvents(USER_ID)).toEqual([
+      { actorId: USER_ID, actorEmail: null },
+    ]);
+  });
+
+  it('removes the user and their audit email on a retry after the user delete fails', async () => {
+    await seedAuditEvent(USER_ID);
+    const testDb = db();
+    const deleteFrom = testDb.delete.bind(testDb);
+    let shouldFail = true;
+    testDb.delete = (table) => {
+      if (!shouldFail) return deleteFrom(table);
+      shouldFail = false;
+      throw new Error(DELETE_FAILURE);
+    };
+
+    await expect(deleteAccount(USER_ID)).rejects.toThrow(DELETE_FAILURE);
+    expect(await findUser(USER_ID)).toHaveLength(1);
+    expect(await findAuditEvents(USER_ID)).toEqual([
+      { actorId: USER_ID, actorEmail: null },
+    ]);
+
+    await expect(deleteAccount(USER_ID)).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+
+    expect(await findUser(USER_ID)).toEqual([]);
     expect(await findAuditEvents(USER_ID)).toEqual([
       { actorId: USER_ID, actorEmail: null },
     ]);

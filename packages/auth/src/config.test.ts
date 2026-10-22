@@ -1,7 +1,12 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import {
+  TEST_SESSION_EXPIRES,
+  TEST_SESSION_TOKEN,
+} from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { schema } from '@blog/db';
-import type { NextAuthConfig } from 'next-auth';
+import type { DefaultSession, NextAuthConfig } from 'next-auth';
 
 import { buildAuthConfig } from './config';
 
@@ -29,6 +34,40 @@ vi.mock('@blog/auth/events/record-signup-terms-on-sign-in', () => ({
 
 const SIGNED_IN_USER = { id: 'user-1', email: 'owner@example.com' };
 const AUTH_SECRET_VALUE = 'test-secret';
+
+type TSessionCallbackParams = Parameters<
+  NonNullable<NonNullable<NextAuthConfig['callbacks']>['session']>
+>[0];
+
+const SESSION_ROW_ONLY_FIELDS = {
+  sessionToken: TEST_SESSION_TOKEN,
+  userId: SIGNED_IN_USER.id,
+  app: AUTH_APP.SITE,
+};
+
+async function resolveSessionResponse(
+  config: NextAuthConfig,
+): Promise<TMaybeUndefined<DefaultSession>> {
+  const user = {
+    ...SIGNED_IN_USER,
+    name: null,
+    image: null,
+    emailVerified: null,
+  };
+  const databaseStrategyParams = {
+    session: {
+      ...SESSION_ROW_ONLY_FIELDS,
+      expires: TEST_SESSION_EXPIRES,
+      user,
+    },
+    user,
+    newSession: undefined,
+  };
+
+  return config.callbacks?.session?.(
+    databaseStrategyParams as unknown as TSessionCallbackParams,
+  );
+}
 
 async function importBuildAuthConfig(): Promise<typeof buildAuthConfig> {
   vi.resetModules();
@@ -87,8 +126,26 @@ describe(buildAuthConfig, () => {
       );
     });
 
-    it("exposes a session callback that adds the adapter user's id", () => {
-      expect(config.callbacks?.session).toEqual(expect.any(Function));
+    it('returns the user with their id, and the expiry, as the session', async () => {
+      expect(await resolveSessionResponse(config)).toEqual({
+        user: {
+          id: SIGNED_IN_USER.id,
+          name: null,
+          email: SIGNED_IN_USER.email,
+          image: null,
+        },
+        expires: TEST_SESSION_EXPIRES.toISOString(),
+      });
+    });
+
+    it('never puts the session token, user id or app in the session', async () => {
+      const response = await resolveSessionResponse(config);
+
+      expect(
+        Object.keys(response ?? {}).filter(
+          (field) => field in SESSION_ROW_ONLY_FIELDS,
+        ),
+      ).toEqual([]);
     });
 
     it('leaves pending membership invites alone on sign-in', async () => {

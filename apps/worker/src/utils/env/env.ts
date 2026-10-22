@@ -1,3 +1,9 @@
+import {
+  isPersonalDataKey,
+  isPersonalDataKeyring,
+  PERSONAL_DATA_KEY_FORMAT,
+  PERSONAL_DATA_KEYRING_FORMAT,
+} from '@blog/utils/encryption';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
@@ -34,9 +40,15 @@ export const env = createEnv({
     // @env-optional
     OWNER_EMAIL_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-optional
-    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    PERSONAL_DATA_ENCRYPTION_KEY: z
+      .string()
+      .refine(isPersonalDataKeyring, PERSONAL_DATA_KEYRING_FORMAT)
+      .optional(),
     // @env-optional
-    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
+    PERSONAL_DATA_INDEX_KEY: z
+      .string()
+      .refine(isPersonalDataKey, PERSONAL_DATA_KEY_FORMAT)
+      .optional(),
   },
   runtimeEnv: {
     SANITY_MANAGEMENT_TOKEN: process.env.SANITY_MANAGEMENT_TOKEN,
