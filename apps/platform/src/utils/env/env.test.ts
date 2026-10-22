@@ -1,4 +1,15 @@
-export {};
+import { KEY_ENCODING } from '@blog/utils/encryption';
+import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+
+const RESEND_KEY = 'resend-key';
+const WEB_URL = 'https://example.com';
+const REVALIDATE_SECRET = 'shared-secret';
+const GITHUB_REPO = 'acme-org/acme-repo';
+const WORKER_URL = 'https://worker-dev.example.com';
+const VERCEL_TOKEN = 'vercel-token';
+const VERCEL_PROJECT = 'prj_123';
+const VERCEL_TEAM = 'team_123';
+const SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
 
 const ENV_KEYS = [
   'RESEND_API_KEY',
@@ -12,6 +23,8 @@ const ENV_KEYS = [
   'VERCEL_PROJECT_ID_WEB',
   'VERCEL_TEAM_ID',
   'SKIP_ENV_VALIDATION',
+  'PERSONAL_DATA_ENCRYPTION_KEY',
+  'PERSONAL_DATA_INDEX_KEY',
   'AUTH_SECRET',
 ] as const;
 
@@ -57,11 +70,11 @@ describe('env', () => {
   });
 
   it('parses a valid RESEND_API_KEY and exposes it typed', async () => {
-    process.env['RESEND_API_KEY'] = 'resend-key';
+    process.env['RESEND_API_KEY'] = RESEND_KEY;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.RESEND_API_KEY).toBe('resend-key');
+    expect(env.RESEND_API_KEY).toBe(RESEND_KEY);
   });
 
   it('leaves RESEND_API_KEY undefined when absent (magic-link sign-in stays unavailable)', async () => {
@@ -70,6 +83,28 @@ describe('env', () => {
     const { env } = await importEnvOnServer();
 
     expect(env.RESEND_API_KEY).toBeUndefined();
+  });
+
+  it('accepts personal-data keys that are 32 bytes of base64', async () => {
+    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] = `v1:${TEST_ENCRYPTION_KEY}`;
+    process.env['PERSONAL_DATA_INDEX_KEY'] = TEST_ENCRYPTION_KEY;
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.PERSONAL_DATA_INDEX_KEY).toBe(TEST_ENCRYPTION_KEY);
+  });
+
+  it('rejects a PERSONAL_DATA_INDEX_KEY shorter than 32 bytes', async () => {
+    process.env['PERSONAL_DATA_INDEX_KEY'] = SHORT_KEY;
+
+    await expect(importEnvOnServer()).rejects.toThrow();
+  });
+
+  it('rejects a PERSONAL_DATA_ENCRYPTION_KEY with a short key in an older version', async () => {
+    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] =
+      `v2:${TEST_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
+
+    await expect(importEnvOnServer()).rejects.toThrow();
   });
 
   it('skips validation entirely when SKIP_ENV_VALIDATION is set', async () => {
@@ -96,11 +131,11 @@ describe('env', () => {
   });
 
   it('parses a valid WEB_APP_URL and exposes it typed', async () => {
-    process.env['WEB_APP_URL'] = 'https://example.com';
+    process.env['WEB_APP_URL'] = WEB_URL;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.WEB_APP_URL).toBe('https://example.com');
+    expect(env.WEB_APP_URL).toBe(WEB_URL);
   });
 
   it('leaves WEB_APP_URL undefined when absent (revalidation calls are skipped)', async () => {
@@ -112,11 +147,11 @@ describe('env', () => {
   });
 
   it('parses a valid SITE_CONFIG_REVALIDATE_SECRET and exposes it typed', async () => {
-    process.env['SITE_CONFIG_REVALIDATE_SECRET'] = 'shared-secret';
+    process.env['SITE_CONFIG_REVALIDATE_SECRET'] = REVALIDATE_SECRET;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.SITE_CONFIG_REVALIDATE_SECRET).toBe('shared-secret');
+    expect(env.SITE_CONFIG_REVALIDATE_SECRET).toBe(REVALIDATE_SECRET);
   });
 
   it('leaves SITE_CONFIG_REVALIDATE_SECRET undefined when absent (revalidation calls are skipped)', async () => {
@@ -151,11 +186,11 @@ describe('env', () => {
   });
 
   it('parses a valid TENANT_PROVISIONING_GITHUB_REPO and exposes it typed', async () => {
-    process.env['TENANT_PROVISIONING_GITHUB_REPO'] = 'acme-org/acme-repo';
+    process.env['TENANT_PROVISIONING_GITHUB_REPO'] = GITHUB_REPO;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.TENANT_PROVISIONING_GITHUB_REPO).toBe('acme-org/acme-repo');
+    expect(env.TENANT_PROVISIONING_GITHUB_REPO).toBe(GITHUB_REPO);
   });
 
   it('leaves TENANT_PROVISIONING_GITHUB_REPO undefined when absent (dispatch is skipped)', async () => {
@@ -173,11 +208,11 @@ describe('env', () => {
   });
 
   it('parses a valid WORKER_ENQUEUE_URL and exposes it typed', async () => {
-    process.env['WORKER_ENQUEUE_URL'] = 'https://worker-dev.example.com';
+    process.env['WORKER_ENQUEUE_URL'] = WORKER_URL;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.WORKER_ENQUEUE_URL).toBe('https://worker-dev.example.com');
+    expect(env.WORKER_ENQUEUE_URL).toBe(WORKER_URL);
   });
 
   it('rejects a WORKER_ENQUEUE_URL that is not a URL', async () => {
@@ -187,15 +222,15 @@ describe('env', () => {
   });
 
   it('parses valid Vercel domain-check vars and exposes them typed', async () => {
-    process.env['VERCEL_API_TOKEN'] = 'vercel-token';
-    process.env['VERCEL_PROJECT_ID_WEB'] = 'prj_123';
-    process.env['VERCEL_TEAM_ID'] = 'team_123';
+    process.env['VERCEL_API_TOKEN'] = VERCEL_TOKEN;
+    process.env['VERCEL_PROJECT_ID_WEB'] = VERCEL_PROJECT;
+    process.env['VERCEL_TEAM_ID'] = VERCEL_TEAM;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.VERCEL_API_TOKEN).toBe('vercel-token');
-    expect(env.VERCEL_PROJECT_ID_WEB).toBe('prj_123');
-    expect(env.VERCEL_TEAM_ID).toBe('team_123');
+    expect(env.VERCEL_API_TOKEN).toBe(VERCEL_TOKEN);
+    expect(env.VERCEL_PROJECT_ID_WEB).toBe(VERCEL_PROJECT);
+    expect(env.VERCEL_TEAM_ID).toBe(VERCEL_TEAM);
   });
 
   it('leaves Vercel domain-check vars undefined when absent (the status page skips the live check)', async () => {

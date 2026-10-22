@@ -9,10 +9,25 @@ import { decryptSecret, encryptSecret } from './encrypt-secret';
 const VERSION_SEPARATOR = ':';
 const KEY_SEPARATOR = ',';
 const KEY_VERSION_PATTERN = /^v\d+$/;
+const BASE64_PATTERN = /^[A-Za-z0-9+/]+={0,2}$/;
+// AES-256 and the HMAC-SHA256 index both take a 256-bit key.
+const PERSONAL_DATA_KEY_BYTES = 32;
+
+export const PERSONAL_DATA_KEY_FORMAT =
+  'Must be a 32-byte key, base64-encoded (openssl rand -base64 32).';
+export const PERSONAL_DATA_KEYRING_FORMAT =
+  'Must be comma-separated v<n>:<key> entries, each key 32 bytes base64-encoded (openssl rand -base64 32).';
 
 export interface IPersonalDataKeyring {
   currentVersion: string;
   keys: Readonly<Record<string, string>>;
+}
+
+export function isPersonalDataKey(keyBase64: string): boolean {
+  return (
+    BASE64_PATTERN.test(keyBase64) &&
+    Buffer.from(keyBase64, KEY_ENCODING).length === PERSONAL_DATA_KEY_BYTES
+  );
 }
 
 /** Reads `PERSONAL_DATA_ENCRYPTION_KEY`'s `v2:<base64>,v1:<base64>` form; the first entry encrypts, every entry decrypts. */
@@ -27,6 +42,7 @@ export function parsePersonalDataKeyring(raw: string): IPersonalDataKeyring {
       !version ||
       !KEY_VERSION_PATTERN.test(version) ||
       !key ||
+      !isPersonalDataKey(key) ||
       rest.length > 0 ||
       version in keys
     ) {
@@ -37,6 +53,15 @@ export function parsePersonalDataKeyring(raw: string): IPersonalDataKeyring {
 
   const [[currentVersion = ''] = []] = entries;
   return { currentVersion, keys };
+}
+
+export function isPersonalDataKeyring(raw: string): boolean {
+  try {
+    parsePersonalDataKeyring(raw);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function encryptPersonalData(
