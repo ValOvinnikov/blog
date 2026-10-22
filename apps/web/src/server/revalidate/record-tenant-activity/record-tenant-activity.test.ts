@@ -1,3 +1,5 @@
+import { ERROR_CODE } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { TENANT_ACTIVITY_TOUCH_FAILED_EVENT } from '@web/constants/revalidate';
 import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -16,7 +18,8 @@ vi.mock('@web/utils/logger/logger');
 
 const loggerErrorMock = vi.mocked(logger.error);
 
-const AT = new Date('2026-10-21T12:00:00.000Z');
+const AT = faker.date.recent();
+const CONNECTION_ERROR_MESSAGE = faker.lorem.sentence();
 
 describe(recordTenantActivity, () => {
   beforeEach(() => {
@@ -37,7 +40,7 @@ describe(recordTenantActivity, () => {
   });
 
   it('logs and resolves when the update throws', async () => {
-    const error = new Error('connection terminated');
+    const error = new Error(CONNECTION_ERROR_MESSAGE);
     touchTenantActivityMock.mockRejectedValue(error);
 
     await expect(
@@ -47,6 +50,22 @@ describe(recordTenantActivity, () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       TENANT_ACTIVITY_TOUCH_FAILED_EVENT,
       { tenantId: DEFAULT_TENANT_ID, error },
+    );
+  });
+
+  it('logs and resolves when the update returns a failure', async () => {
+    touchTenantActivityMock.mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_NOT_FOUND,
+    });
+
+    await expect(
+      recordTenantActivity(DEFAULT_TENANT_ID, AT),
+    ).resolves.toBeUndefined();
+
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      TENANT_ACTIVITY_TOUCH_FAILED_EVENT,
+      { tenantId: DEFAULT_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
     );
   });
 });

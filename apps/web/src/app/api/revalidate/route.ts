@@ -1,7 +1,12 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TTenantSanityContext } from '@blog/service';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
+import {
+  PATH_PURGE_FALLBACK_EVENT,
+  TENANT_LOOKUP_FAILED_MESSAGE,
+} from '@web/constants/revalidate';
 import {
   deriveRevalidatePaths,
   isDerivableRevalidateType,
@@ -18,19 +23,14 @@ import { NextResponse } from 'next/server';
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
 export const runtime = 'nodejs';
 
-// Sent by Sanity on every webhook request automatically — not exported by
-// any Sanity SDK, so this is the single source of truth for the literal.
+// Sent by Sanity on every webhook request; no Sanity SDK exports it.
 export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
 
-// Sent by Sanity on every webhook request automatically, one of
-// 'create' | 'update' | 'delete' — not exported by any Sanity SDK. Unpublish
-// deletes the published document and spawns a draft, so 'delete' covers both
-// true deletion and unpublish; 'create'/'update' can never reach cleanup.
+// Unpublish arrives as 'delete' too: it deletes the published document and spawns a draft.
 export const SANITY_OPERATION_HEADER = 'sanity-operation';
 
 const DELETE_OPERATION = 'delete';
 const MALFORMED_BODY_MESSAGE = 'Malformed request body.';
-const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';
 
 interface IRevalidateWebhookBody {
   _type: string;
@@ -52,17 +52,11 @@ const isRevalidateWebhookBody = (
 type TResolvedRevalidatePaths =
   { ok: true; paths: string[] } | { ok: false; reason: string };
 
-/**
- * Resolves the precise, tenant-scoped paths a published document affects.
- * Anything that isn't derivable — no resolved tenant, a `_type` without a
- * precise derivation yet, or a failed lookup — reports why so the caller can
- * fall back to a whole-site purge instead of serving stale content.
- */
 const resolveDerivedRevalidatePaths = async (
   type: string,
   id: string,
-  tenantId: string | undefined,
-  tenant: TTenantSanityContext | undefined,
+  tenantId: TMaybeUndefined<string>,
+  tenant: TMaybeUndefined<TTenantSanityContext>,
 ): Promise<TResolvedRevalidatePaths> => {
   if (!tenantId) {
     return { ok: false, reason: 'tenant_unresolved' };
@@ -118,14 +112,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { _type: type, _id: id } = parsedBody;
 
-  // Identifies which tenant's project published. `isr()` always emits the
-  // tenant-prefixed tag now, but the legacy unprefixed form can still be
-  // live in the cache from before, so both are purged below. Resolved once,
-  // up front, so both the archived-tenant check and the delete-cleanup
-  // branch further down share the same lookup.
   const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
 
-  let tenantId: string | undefined;
+  let tenantId: TMaybeUndefined<string>;
   if (tenantProjectId) {
     try {
       tenantId =
@@ -232,7 +221,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         revalidatePath(path);
       }
     } else {
-      logger.warn('revalidate.path_purge_fallback', {
+      logger.warn(PATH_PURGE_FALLBACK_EVENT, {
         type,
         id,
         tenantId,
