@@ -40,4 +40,5 @@ export * from './touch-tenant-activity';
 export * from './update-deprovisioning-step';
 export * from './update-provisioning-step';
 export * from './update-tenant-details';
+export * from './wake-tenant-from-inactivity';
 export type { TTenantOwnerAccess } from './tenant-owner-access';
