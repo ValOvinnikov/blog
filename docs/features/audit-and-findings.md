@@ -110,7 +110,7 @@ Nothing is configurable. Only admins (any role) see either record.
   Writers record field names or ids instead: email config lists the saved
   field names, tenant details records `ownerEmailUpdated`, and tenant
   creation records `ownerUserId` (null for an invited owner). Migration
-  `0052` scrubbed the rows written before that: tenant details events gained
+  `0053` scrubbed the rows written before that: tenant details events gained
   `ownerEmailUpdated: true`, email config events became `fields`, any other
   key whose value is an email address was dropped, and an address inside
   longer text became `[email removed]`. It reports the rows it changed as a

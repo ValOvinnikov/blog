@@ -59,6 +59,10 @@ export async function sendOwnerInvite(
     sanityInviteId: invite?.id ?? null,
     inviteSentAt,
     inviteAcceptedAt: null,
+    ...(options.replaceExisting && {
+      inviteHeadsUpSentAt: null,
+      inviteNudgeSentAt: null,
+    }),
   });
   if (!recorded.ok) {
     throw new Error(

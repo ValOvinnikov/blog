@@ -20,7 +20,7 @@ import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
-const SCRUB_MIGRATION = '0052_scrub_emails_from_audit_and_findings_details.sql';
+const SCRUB_MIGRATION = '0053_scrub_emails_from_audit_and_findings_details.sql';
 const ACTOR_ID = 'operator-1';
 const ACTOR_EMAIL = 'operator@example.com';
 const OWNER_EMAIL = 'owner@acme.example';
@@ -59,7 +59,7 @@ async function readAuditEvent(db: PgliteDatabase<typeof schema>, id: string) {
   return row;
 }
 
-describe('0052_scrub_emails_from_audit_and_findings_details', () => {
+describe('0053_scrub_emails_from_audit_and_findings_details', () => {
   let db: PgliteDatabase<typeof schema>;
 
   beforeEach(() => {
