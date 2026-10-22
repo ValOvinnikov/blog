@@ -8,6 +8,7 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   makeReadyTenant,
   makeTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -63,6 +64,8 @@ const renderForTenant = async (tenant: TTenant) => {
   await setup();
 };
 
+const ACME_EXAMPLE_COM = 'acme.example.com';
+
 describe(`<${DashboardOverviewPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
@@ -94,9 +97,9 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
   it('renders the owner home for a member with exactly one membership', async () => {
     await renderForTenant(
       makeTenant({
-        id: 'tenant-1',
+        id: TENANT_ID,
         name: 'Acme Inc.',
-        primaryDomain: 'acme.example.com',
+        primaryDomain: ACME_EXAMPLE_COM,
       }),
     );
 
@@ -106,10 +109,10 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     });
 
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-      'acme.example.com',
+      ACME_EXAMPLE_COM,
     );
     expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
-      'tenant-1',
+      TENANT_ID,
     );
     expect(tenantHeading).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
@@ -118,7 +121,7 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
   it('renders the owner home without waiting for the Vercel domain status', async () => {
     getDomainVerificationStatusMock.mockReturnValue(new Promise(() => {}));
 
-    await renderForTenant(makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }));
+    await renderForTenant(makeTenant({ id: TENANT_ID, name: 'Acme Inc.' }));
 
     const tenantHeading = screen.getByRole('heading', {
       level: 1,
@@ -136,7 +139,7 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
   });
 
   it("shows the owner their site's setup progress while provisioning runs", async () => {
-    await renderForTenant(makeTenant({ id: 'tenant-1' }));
+    await renderForTenant(makeTenant({ id: TENANT_ID }));
 
     const setupHeading = screen.getByRole('heading', {
       level: 2,
@@ -147,7 +150,7 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
   });
 
   it('shows no setup progress once provisioning is ready', async () => {
-    await renderForTenant(makeReadyTenant({ id: 'tenant-1' }));
+    await renderForTenant(makeReadyTenant({ id: TENANT_ID }));
 
     const setupHeading = screen.queryByRole('heading', {
       name: /Setting up your site/,

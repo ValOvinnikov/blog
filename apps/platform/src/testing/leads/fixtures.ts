@@ -1,8 +1,9 @@
 import type { TLead } from '@blog/db/schema/leads';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 export const makeLead = (overrides: Partial<TLead> = {}): TLead => ({
   id: 'lead-1',
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   name: 'Ada Lovelace',
   nameEncrypted: null,
   email: 'ada@example.com',

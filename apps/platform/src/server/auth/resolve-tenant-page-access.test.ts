@@ -1,5 +1,5 @@
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { resolveTenantPageAccess } from './resolve-tenant-page-access';
 
@@ -13,7 +13,7 @@ const membershipOf = (role: string) =>
   ({
     id: 'm-1',
     userId: 'user-1',
-    tenantId: 'tenant-1',
+    tenantId: TENANT_ID,
     role,
     createdAt: new Date(0),
   }) as Parameters<typeof resolveTenantPageAccess>[1];
@@ -36,13 +36,13 @@ describe(resolveTenantPageAccess, () => {
 
   it('keeps Leads closed for a downgraded owner with no stored leads', async () => {
     const access = await resolveTenantPageAccess(
-      makeReadyTenant({ id: 'tenant-1', plan: TENANT_PLAN.FREE }),
+      makeReadyTenant({ id: TENANT_ID, plan: TENANT_PLAN.FREE }),
       membershipOf(MEMBERSHIP_ROLE.OWNER),
     );
 
     expect(access.leads).toBe(false);
     expect(listLeadsMock).toHaveBeenCalledWith({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       page: 1,
       pageSize: 1,
     });

@@ -5,6 +5,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TopbarNavMenu } from './topbar-nav-menu';
@@ -25,6 +26,12 @@ const PLATFORM_TENANTS_SECTION = [
     items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
   },
 ];
+
+const THIS_MILESTONE = 'this milestone';
+const TENANT_SECTION_LABEL = 'Tenant · acme';
+const LOOK_AND_VOICE_SHIP_SOON = 'Look and Voice ship soon.';
+const ARIA_CURRENT = 'aria-current';
+const TENANT_SWITCHER = 'Tenant switcher';
 
 describe(`<${TopbarNavMenu.name}/>`, () => {
   let user: UserEvent;
@@ -52,14 +59,14 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
                 label: 'Tenants',
                 icon: ICONS.GRID,
                 href: '/tenants',
-                badge: { label: 'this milestone', tone: 'neutral' },
+                badge: { label: THIS_MILESTONE, tone: 'neutral' },
               },
             ],
           },
           {
-            label: 'Tenant · acme',
+            label: TENANT_SECTION_LABEL,
             items: [],
-            note: 'Look and Voice ship soon.',
+            note: LOOK_AND_VOICE_SHIP_SOON,
           },
         ]}
       />,
@@ -72,27 +79,27 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       name: /Tenants/,
     });
     expect(tenantsLink).toHaveAttribute('href', '/tenants');
-    expect(within(tenantsLink).getByText('this milestone')).toBeVisible();
-    expect(within(menu).getByText('Look and Voice ship soon.')).toBeVisible();
+    expect(within(tenantsLink).getByText(THIS_MILESTONE)).toBeVisible();
+    expect(within(menu).getByText(LOOK_AND_VOICE_SHIP_SOON)).toBeVisible();
   });
 
   it('marks only the item matching the current pathname active', async () => {
-    setPathname('/tenants/tenant-1/look');
+    setPathname(`/tenants/${TENANT_ID}/look`);
     render(
       <TopbarNavMenu
         sections={[
           {
-            label: 'Tenant · acme',
+            label: TENANT_SECTION_LABEL,
             items: [
               {
                 label: 'Look',
                 icon: ICONS.PALETTE,
-                href: '/tenants/tenant-1/look',
+                href: `/tenants/${TENANT_ID}/look`,
               },
               {
                 label: 'Voice',
                 icon: ICONS.QUOTE,
-                href: '/tenants/tenant-1/voice',
+                href: `/tenants/${TENANT_ID}/voice`,
               },
             ],
           },
@@ -105,19 +112,19 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
     expect(
       within(menu).getByRole('menuitem', { name: 'Look' }),
-    ).toHaveAttribute('aria-current', 'page');
+    ).toHaveAttribute(ARIA_CURRENT, 'page');
     expect(
       within(menu).getByRole('menuitem', { name: 'Voice' }),
-    ).not.toHaveAttribute('aria-current');
+    ).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('renders an item with no href as an inert row that is never marked active', async () => {
-    setPathname('/tenants/tenant-1/domain');
+    setPathname(`/tenants/${TENANT_ID}/domain`);
     render(
       <TopbarNavMenu
         sections={[
           {
-            label: 'Tenant · acme',
+            label: TENANT_SECTION_LABEL,
             items: [
               {
                 label: 'Domain',
@@ -139,7 +146,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     expect(within(menu).getByText('Domain')).toBeVisible();
     expect(within(menu).getByText('later')).toBeVisible();
     expect(within(menu).queryByText('Domain')).not.toHaveAttribute(
-      'aria-current',
+      ARIA_CURRENT,
     );
   });
 
@@ -165,8 +172,8 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     const menu = await screen.findByRole('menu');
     const text = menu.textContent ?? '';
 
-    expect(within(menu).getByText('Tenant switcher')).toBeVisible();
-    expect(text.indexOf('Tenant switcher')).toBeLessThan(
+    expect(within(menu).getByText(TENANT_SWITCHER)).toBeVisible();
+    expect(text.indexOf(TENANT_SWITCHER)).toBeLessThan(
       text.indexOf('Platform'),
     );
   });
@@ -177,6 +184,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Menu' }));
     await screen.findByRole('menu');
 
-    expect(screen.queryByText('Tenant switcher')).not.toBeInTheDocument();
+    expect(screen.queryByText(TENANT_SWITCHER)).not.toBeInTheDocument();
   });
 });

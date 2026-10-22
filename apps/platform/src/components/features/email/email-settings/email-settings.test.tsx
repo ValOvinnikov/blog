@@ -14,6 +14,7 @@ import {
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { selectFile } from '@platform/testing/select-file';
 import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import {
   buildEmailDraft,
   withCopy,
@@ -64,6 +65,8 @@ vi.mock('@platform/server/email/send-test-email-action', () => ({
 const { EN, FR } = LOCALE_ISO_CODES;
 const LIVE_LOCALES = [EN, FR];
 
+const SIGN_IN_TO_ACME = 'Sign in to Acme';
+
 const INITIAL_DRAFT = buildEmailDraft({
   sender: {
     senderName: '',
@@ -76,7 +79,7 @@ const INITIAL_DRAFT = buildEmailDraft({
     {
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       locale: EN,
-      subject: 'Sign in to Acme',
+      subject: SIGN_IN_TO_ACME,
       body: null,
     },
   ],
@@ -89,7 +92,7 @@ const INITIAL_DRAFT = buildEmailDraft({
 });
 
 const setup = customRender(EmailSettings, {
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   initialDraft: INITIAL_DRAFT,
   defaultLocale: EN,
   liveLocales: LIVE_LOCALES,
@@ -111,6 +114,18 @@ const openSignInTemplate = async (user: UserEvent) => {
 
 const chooseLanguage = (user: UserEvent, name: string) =>
   user.click(screen.getByRole('button', { name }));
+
+const SENDER_NAME = 'Sender name';
+const SUBJECT_ENGLISH = 'Subject (English)';
+const ARIA_SELECTED = 'aria-selected';
+const SUBJECT_FRENCH = 'Subject (French)';
+const SAVE_CHANGES = 'Save changes';
+const SEND_TEST_TO_ME = 'Send test to me';
+const GO_TO_THE_FIRST_ONE = 'Go to the first one';
+const ONE_FIELD_NEEDS_ATTENTION = '1 field needs attention';
+const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
+const LEADS_ACME_EXAMPLE = 'leads@acme.example';
+const WELCOME_BACK = 'Welcome back';
 
 describe(`<${EmailSettings.name}/>`, () => {
   let user: UserEvent;
@@ -145,7 +160,7 @@ describe(`<${EmailSettings.name}/>`, () => {
   it('opens on Sender & footer, with each template marked for the default language', async () => {
     setup();
 
-    expect(screen.getByLabelText('Sender name')).toBeVisible();
+    expect(screen.getByLabelText(SENDER_NAME)).toBeVisible();
     expect(picker()).toHaveTextContent(/^Sender & footer/);
 
     const list = await openPicker(user);
@@ -163,10 +178,8 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     await openSignInTemplate(user);
 
-    expect(screen.getByLabelText('Subject (English)')).toHaveValue(
-      'Sign in to Acme',
-    );
-    expect(screen.queryByLabelText('Sender name')).not.toBeInTheDocument();
+    expect(screen.getByLabelText(SUBJECT_ENGLISH)).toHaveValue(SIGN_IN_TO_ACME);
+    expect(screen.queryByLabelText(SENDER_NAME)).not.toBeInTheDocument();
     expect(picker()).toHaveTextContent('Sign-in linkTemplate · Customised');
   });
 
@@ -177,14 +190,14 @@ describe(`<${EmailSettings.name}/>`, () => {
       screen.getByRole('tablist', { name: 'Edit or preview' }),
     ).getByRole('tab', { name: 'Edit' });
     const previewTab = screen.getByRole('tab', { name: 'Preview' });
-    expect(editTab).toHaveAttribute('aria-selected', 'true');
+    expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
     expect(screen.getByRole('tabpanel', { name: 'Edit' })).toContainElement(
-      screen.getByLabelText('Sender name'),
+      screen.getByLabelText(SENDER_NAME),
     );
 
     await user.click(previewTab);
 
-    expect(previewTab).toHaveAttribute('aria-selected', 'true');
+    expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
     expect(screen.getByRole('tabpanel', { name: 'Preview' })).toContainElement(
       screen.getByRole('region', { name: 'Preview' }),
     );
@@ -203,7 +216,7 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     await openSignInTemplate(user);
     await chooseLanguage(user, 'French');
-    await user.type(screen.getByLabelText('Subject (French)'), 'Connexion');
+    await user.type(screen.getByLabelText(SUBJECT_FRENCH), 'Connexion');
 
     expect(
       within(picker).getByRole('button', { name: 'French' }),
@@ -215,15 +228,15 @@ describe(`<${EmailSettings.name}/>`, () => {
       setup();
       await openSignInTemplate(user);
       await chooseLanguage(user, 'French');
-      await user.type(screen.getByLabelText('Subject (French)'), 'Connexion');
+      await user.type(screen.getByLabelText(SUBJECT_FRENCH), 'Connexion');
     });
 
     it('falls back to the default-language subject in another language', async () => {
-      await user.clear(screen.getByLabelText('Subject (French)'));
+      await user.clear(screen.getByLabelText(SUBJECT_FRENCH));
 
-      expect(screen.getByLabelText('Subject (French)')).toHaveAttribute(
+      expect(screen.getByLabelText(SUBJECT_FRENCH)).toHaveAttribute(
         'placeholder',
-        'Sign in to Acme',
+        SIGN_IN_TO_ACME,
       );
     });
 
@@ -231,19 +244,17 @@ describe(`<${EmailSettings.name}/>`, () => {
       await chooseLanguage(user, 'English');
       await chooseLanguage(user, 'French');
 
-      expect(screen.getByLabelText('Subject (French)')).toHaveValue(
-        'Connexion',
-      );
+      expect(screen.getByLabelText(SUBJECT_FRENCH)).toHaveValue('Connexion');
       expect(picker()).toHaveTextContent(/^Sign-in link.*Unsaved$/);
     });
 
     it('saves only the language that changed', async () => {
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
       await waitFor(() => expect(refresh).toHaveBeenCalled());
       expect(updateEmailTemplateActionMock).toHaveBeenCalledTimes(1);
       expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TENANT_ID,
         EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         FR,
         { subject: 'Connexion', body: null },
@@ -254,9 +265,9 @@ describe(`<${EmailSettings.name}/>`, () => {
     it('restores the saved copy on Discard', async () => {
       await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-      expect(screen.getByLabelText('Subject (French)')).toHaveValue('');
+      expect(screen.getByLabelText(SUBJECT_FRENCH)).toHaveValue('');
       expect(
-        screen.queryByRole('button', { name: 'Save changes' }),
+        screen.queryByRole('button', { name: SAVE_CHANGES }),
       ).not.toBeInTheDocument();
     });
 
@@ -265,14 +276,12 @@ describe(`<${EmailSettings.name}/>`, () => {
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
 
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
       expect(
         await screen.findByText(/Couldn't save every change/),
       ).toBeVisible();
-      expect(screen.getByLabelText('Subject (French)')).toHaveValue(
-        'Connexion',
-      );
+      expect(screen.getByLabelText(SUBJECT_FRENCH)).toHaveValue('Connexion');
       expect(refresh).not.toHaveBeenCalled();
     });
     it('previews the edited subject and sends it as a test', async () => {
@@ -280,12 +289,12 @@ describe(`<${EmailSettings.name}/>`, () => {
         'Connexion',
       );
 
-      await user.click(screen.getByRole('button', { name: 'Send test to me' }));
+      await user.click(screen.getByRole('button', { name: SEND_TEST_TO_ME }));
 
       expect(
         await screen.findByText('Test sent to admin@example.com.'),
       ).toBeVisible();
-      expect(sendTestEmailActionMock).toHaveBeenCalledWith('tenant-1', {
+      expect(sendTestEmailActionMock).toHaveBeenCalledWith(TENANT_ID, {
         templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         copy: {
           subject: 'Connexion',
@@ -304,7 +313,7 @@ describe(`<${EmailSettings.name}/>`, () => {
         outcome: ACTION_OUTCOME.RATE_LIMITED,
       });
 
-      await user.click(screen.getByRole('button', { name: 'Send test to me' }));
+      await user.click(screen.getByRole('button', { name: SEND_TEST_TO_ME }));
 
       expect(
         await screen.findByText(/You've sent several tests recently/),
@@ -331,12 +340,12 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     it('is uploaded on Save', async () => {
       await user.click(
-        await screen.findByRole('button', { name: 'Save changes' }),
+        await screen.findByRole('button', { name: SAVE_CHANGES }),
       );
 
       await waitFor(() =>
         expect(uploadEmailLogoActionMock).toHaveBeenCalledWith(
-          'tenant-1',
+          TENANT_ID,
           { type: 'tenant' },
           expect.any(FormData),
         ),
@@ -350,10 +359,10 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     it('breaks the changes down so the parts add up to the total', async () => {
       setup();
-      await user.type(screen.getByLabelText('Sender name'), 'Acme');
+      await user.type(screen.getByLabelText(SENDER_NAME), 'Acme');
       await openSignInTemplate(user);
       await chooseLanguage(user, 'French');
-      await user.type(screen.getByLabelText('Subject (French)'), 'Connexion');
+      await user.type(screen.getByLabelText(SUBJECT_FRENCH), 'Connexion');
 
       expect(saveBar()).toHaveTextContent(
         '2 unsaved changesAll languages 1 · French 1',
@@ -362,7 +371,7 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     it('shows no language breakdown with one live language', async () => {
       setup({ liveLocales: [EN] });
-      await user.type(screen.getByLabelText('Sender name'), 'Acme');
+      await user.type(screen.getByLabelText(SENDER_NAME), 'Acme');
 
       expect(saveBar()).toHaveTextContent('1 unsaved change');
       expect(saveBar()).not.toHaveTextContent(/All languages|English/);
@@ -371,15 +380,15 @@ describe(`<${EmailSettings.name}/>`, () => {
     describe('when the sender name is rejected', () => {
       const goToFirstField = () =>
         user.click(
-          within(saveBar()).getByRole('link', { name: 'Go to the first one' }),
+          within(saveBar()).getByRole('link', { name: GO_TO_THE_FIRST_ONE }),
         );
 
       const saveAndSettle = async () => {
-        await user.click(screen.getByRole('button', { name: 'Save changes' }));
+        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
         await within(saveBar()).findByRole('link', {
-          name: 'Go to the first one',
+          name: GO_TO_THE_FIRST_ONE,
         });
-        await within(saveBar()).findByRole('button', { name: 'Save changes' });
+        await within(saveBar()).findByRole('button', { name: SAVE_CHANGES });
       };
 
       beforeEach(async () => {
@@ -392,19 +401,19 @@ describe(`<${EmailSettings.name}/>`, () => {
           },
         });
         setup();
-        await user.type(screen.getByLabelText('Sender name'), 'a@b');
+        await user.type(screen.getByLabelText(SENDER_NAME), 'a@b');
       });
 
       it('opens Sender & footer and focuses the sender name from a template', async () => {
         await openSignInTemplate(user);
-        await user.type(screen.getByLabelText('Subject (English)'), '!');
+        await user.type(screen.getByLabelText(SUBJECT_ENGLISH), '!');
         await saveAndSettle();
 
-        expect(saveBar()).toHaveTextContent('1 field needs attention');
+        expect(saveBar()).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
 
         await goToFirstField();
 
-        expect(screen.getByLabelText('Sender name')).toHaveFocus();
+        expect(screen.getByLabelText(SENDER_NAME)).toHaveFocus();
         expect(picker()).toHaveTextContent(/^Sender & footer/);
       });
 
@@ -412,15 +421,15 @@ describe(`<${EmailSettings.name}/>`, () => {
         await user.click(screen.getByRole('tab', { name: 'Preview' }));
         await saveAndSettle();
 
-        expect(saveBar()).toHaveTextContent('1 field needs attention');
+        expect(saveBar()).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
 
         await goToFirstField();
 
         expect(screen.getByRole('tab', { name: 'Edit' })).toHaveAttribute(
-          'aria-selected',
+          ARIA_SELECTED,
           'true',
         );
-        expect(screen.getByLabelText('Sender name')).toHaveFocus();
+        expect(screen.getByLabelText(SENDER_NAME)).toHaveFocus();
       });
     });
   });
@@ -434,8 +443,8 @@ describe(`<${EmailSettings.name}/>`, () => {
     });
     setup();
 
-    await user.type(screen.getByLabelText('Sender name'), 'a@b');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.type(screen.getByLabelText(SENDER_NAME), 'a@b');
+    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     expect(await screen.findByText(/not an email address/)).toBeVisible();
   });
@@ -444,15 +453,15 @@ describe(`<${EmailSettings.name}/>`, () => {
     setup();
 
     await user.type(
-      screen.getByLabelText('Send contact messages to'),
-      'leads@acme.example',
+      screen.getByLabelText(SEND_CONTACT_MESSAGES_TO),
+      LEADS_ACME_EXAMPLE,
     );
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     await waitFor(() =>
       expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        expect.objectContaining({ contactRecipient: 'leads@acme.example' }),
+        TENANT_ID,
+        expect.objectContaining({ contactRecipient: LEADS_ACME_EXAMPLE }),
       ),
     );
   });
@@ -465,12 +474,12 @@ describe(`<${EmailSettings.name}/>`, () => {
       },
     });
 
-    await user.clear(screen.getByLabelText('Send contact messages to'));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.clear(screen.getByLabelText(SEND_CONTACT_MESSAGES_TO));
+    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     await waitFor(() =>
       expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TENANT_ID,
         expect.objectContaining({ contactRecipient: null }),
       ),
     );
@@ -487,8 +496,8 @@ describe(`<${EmailSettings.name}/>`, () => {
     });
     setup();
 
-    await user.type(screen.getByLabelText('Send contact messages to'), 'nope');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.type(screen.getByLabelText(SEND_CONTACT_MESSAGES_TO), 'nope');
+    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     expect(
       await screen.findByText(/Enter a valid email address/),
@@ -500,7 +509,7 @@ describe(`<${EmailSettings.name}/>`, () => {
     await selectFile(new File(['x'], 'logo.png', { type: 'image/png' }));
     await openSignInTemplate(user);
     await chooseLanguage(user, 'French');
-    await user.type(screen.getByLabelText('Subject (French)'), 'Connexion');
+    await user.type(screen.getByLabelText(SUBJECT_FRENCH), 'Connexion');
     unmount();
 
     setup();
@@ -510,7 +519,7 @@ describe(`<${EmailSettings.name}/>`, () => {
     await openSignInTemplate(user);
     await chooseLanguage(user, 'French');
 
-    expect(screen.getByLabelText('Subject (French)')).toHaveValue('Connexion');
+    expect(screen.getByLabelText(SUBJECT_FRENCH)).toHaveValue('Connexion');
     expect(
       within(await openPicker(user)).getByRole('option', {
         name: /^Sender & footer.*Default$/,
@@ -520,13 +529,13 @@ describe(`<${EmailSettings.name}/>`, () => {
 
   it('shows a restored message in the template already open', async () => {
     writeSettingsDraft(
-      settingsDraftStorageKey({ tenantId: 'tenant-1', page: 'email' }),
+      settingsDraftStorageKey({ tenantId: TENANT_ID, page: 'email' }),
       {
         values: withCopy(
           INITIAL_DRAFT,
           { templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK, locale: EN },
           {
-            subject: 'Sign in to Acme',
+            subject: SIGN_IN_TO_ACME,
             body: [
               {
                 _type: 'block',
@@ -536,7 +545,7 @@ describe(`<${EmailSettings.name}/>`, () => {
                   {
                     _type: 'span',
                     _key: 's1',
-                    text: 'Welcome back',
+                    text: WELCOME_BACK,
                     marks: [],
                   },
                 ],
@@ -558,13 +567,13 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     expect(
       await screen.findByRole('textbox', { name: 'Message (English)' }),
-    ).toHaveTextContent('Welcome back');
+    ).toHaveTextContent(WELCOME_BACK);
   });
 
   it('is read-only for an archived tenant', () => {
     setup({ archivedAt: new Date('2026-08-26T00:00:00.000Z') });
 
     expectArchivedOffersNoSave();
-    expect(screen.getByLabelText('Sender name')).toBeDisabled();
+    expect(screen.getByLabelText(SENDER_NAME)).toBeDisabled();
   });
 });

@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 const { getTenantByIdMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
@@ -10,7 +11,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 const tenant = {
-  id: 'tenant-1',
+  id: TENANT_ID,
   name: 'Acme',
   deprovisionedAt: null,
 };
@@ -25,9 +26,9 @@ describe('resolveConfirmedTenant', () => {
   });
 
   it('returns the tenant, archived ones included, when confirm matches its name', async () => {
-    const result = await resolveConfirmedTenant('tenant-1', 'Acme');
+    const result = await resolveConfirmedTenant(TENANT_ID, 'Acme');
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
+    expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_ID, {
       includeArchived: true,
     });
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
@@ -49,7 +50,7 @@ describe('resolveConfirmedTenant', () => {
   });
 
   it('reports a failed precondition ahead of a name mismatch', async () => {
-    const result = await resolveConfirmedTenant('tenant-1', 'wrong', {
+    const result = await resolveConfirmedTenant(TENANT_ID, 'wrong', {
       precondition: () => TENANT_REFUSAL.NOT_DEPROVISIONED,
     });
 
@@ -60,7 +61,7 @@ describe('resolveConfirmedTenant', () => {
   });
 
   it('checks the name once the precondition passes', async () => {
-    const result = await resolveConfirmedTenant('tenant-1', 'acme', {
+    const result = await resolveConfirmedTenant(TENANT_ID, 'acme', {
       precondition: () => undefined,
     });
 

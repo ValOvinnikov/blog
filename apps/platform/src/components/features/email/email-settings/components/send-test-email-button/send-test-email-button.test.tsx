@@ -2,6 +2,7 @@ import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { screen } from '@platform/testing/custom-render';
 import { EMAIL_BODY } from '@platform/testing/email-draft';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SendTestEmailButton } from './send-test-email-button';
@@ -15,7 +16,7 @@ vi.mock('@platform/server/email/send-test-email-action', () => ({
 }));
 
 const setup = customRenderInSettingsForm(SendTestEmailButton, {
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   email: {
     templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
     subject: 'Join Acme',
@@ -28,6 +29,8 @@ const setup = customRenderInSettingsForm(SendTestEmailButton, {
     },
   },
 });
+
+const SEND_TEST_TO_ME = 'Send test to me';
 
 describe(`<${SendTestEmailButton.name}/>`, () => {
   let user: UserEvent;
@@ -44,12 +47,12 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
   it('sends the email as a test and says where it went', async () => {
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Send test to me' }));
+    await user.click(screen.getByRole('button', { name: SEND_TEST_TO_ME }));
 
     expect(
       await screen.findByText('Test sent to admin@example.com.'),
     ).toBeVisible();
-    expect(sendTestEmailActionMock).toHaveBeenCalledWith('tenant-1', {
+    expect(sendTestEmailActionMock).toHaveBeenCalledWith(TENANT_ID, {
       templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
       copy: { subject: 'Join Acme', body: EMAIL_BODY },
       sender: {
@@ -66,7 +69,7 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     });
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Send test to me' }));
+    await user.click(screen.getByRole('button', { name: SEND_TEST_TO_ME }));
 
     expect(
       await screen.findByText("Couldn't send the test — try again."),
@@ -77,7 +80,7 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     setup({}, { isArchived: true });
 
     expect(
-      screen.getByRole('button', { name: 'Send test to me' }),
+      screen.getByRole('button', { name: SEND_TEST_TO_ME }),
     ).toBeDisabled();
   });
 });

@@ -17,6 +17,7 @@ import {
 import {
   idleProvisioningSteps,
   makeClientTenant,
+  TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { useProvisioningPoll } from './use-provisioning-poll';
@@ -33,6 +34,13 @@ const retryProvisioningStepActionMock = vi.mocked(retryProvisioningStepAction);
 const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
 );
+
+const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
+const AT_20260812_1419 = '2026-08-12T14:19:00.000Z';
+const FETCH_FAILED = 'fetch failed';
+const DOMAINS_API_ERROR = 'Vercel Domains API returned 500';
+const COULDNT_REFRESH_LATEST_STATUS =
+  "Couldn't refresh the latest status — retrying automatically.";
 
 describe(useProvisioningPoll, () => {
   beforeEach(() => {
@@ -151,7 +159,7 @@ describe(useProvisioningPoll, () => {
         provisioningSteps: {
           ...idleProvisioningSteps(),
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
+            startedAt: AT_20260812_1418,
             registry: 'production',
           },
         },
@@ -160,7 +168,7 @@ describe(useProvisioningPoll, () => {
         useProvisioningPoll(withRun),
       );
       expect(withResult.current.provisioningRun).toEqual({
-        startedAt: '2026-08-12T14:18:00.000Z',
+        startedAt: AT_20260812_1418,
         registry: 'production',
       });
     });
@@ -171,13 +179,13 @@ describe(useProvisioningPoll, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: '2026-08-12T14:19:00.000Z',
+            updatedAt: AT_20260812_1419,
           },
         },
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
-      expect(result.current.stepUpdatedAt[0]).toBe('2026-08-12T14:19:00.000Z');
+      expect(result.current.stepUpdatedAt[0]).toBe(AT_20260812_1419);
       expect(result.current.stepUpdatedAt[1]).toBeUndefined();
     });
 
@@ -201,14 +209,14 @@ describe(useProvisioningPoll, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'fetch failed',
+            error: FETCH_FAILED,
           },
         },
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.isOverallFailed).toBe(true);
-      expect(result.current.failedStepError).toBe('fetch failed');
+      expect(result.current.failedStepError).toBe(FETCH_FAILED);
       expect(result.current.errorKind).toBe('network');
     });
 
@@ -219,7 +227,7 @@ describe(useProvisioningPoll, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'fetch failed',
+            error: FETCH_FAILED,
           },
         },
       });
@@ -237,7 +245,7 @@ describe(useProvisioningPoll, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Vercel Domains API returned 500',
+            error: DOMAINS_API_ERROR,
           },
         },
       });
@@ -263,7 +271,7 @@ describe(useProvisioningPoll, () => {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Vercel Domains API returned 500',
+            error: DOMAINS_API_ERROR,
           },
         },
       });
@@ -355,7 +363,7 @@ describe(useProvisioningPoll, () => {
       });
 
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TENANT_ID,
       );
       expect(result.current.stepStatuses[0]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.DONE,
@@ -397,7 +405,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it.each([
-      ['PENDING', TENANT_PROVISIONING_STATUS.PENDING],
+      [TENANT_PROVISIONING_STATUS.PENDING, TENANT_PROVISIONING_STATUS.PENDING],
       ['null', null],
     ])(
       'does not poll a tenant whose provisioning status is %s',
@@ -448,7 +456,7 @@ describe(useProvisioningPoll, () => {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'fetch failed',
+          error: FETCH_FAILED,
         },
       };
       const tenant = makeClientTenant({
@@ -615,7 +623,7 @@ describe(useProvisioningPoll, () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
       const couldNotRefreshText = screen.getByText(
-        "Couldn't refresh the latest status — retrying automatically.",
+        COULDNT_REFRESH_LATEST_STATUS,
       );
 
       expect(result.current.stepStatuses[0]).toBe(
@@ -634,7 +642,7 @@ describe(useProvisioningPoll, () => {
         );
       });
       const couldNotRefreshText2 = screen.queryByText(
-        "Couldn't refresh the latest status — retrying automatically.",
+        COULDNT_REFRESH_LATEST_STATUS,
       );
 
       expect(couldNotRefreshText2).not.toBeInTheDocument();
@@ -643,7 +651,7 @@ describe(useProvisioningPoll, () => {
 
   describe('dispatch', () => {
     it('dispatches the workflow and reports no error on success', async () => {
-      const tenant = makeClientTenant({ id: 'tenant-1' });
+      const tenant = makeClientTenant({ id: TENANT_ID });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       act(() => {
@@ -651,9 +659,7 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
-          'tenant-1',
-        );
+        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
       });
       await waitFor(() => {
         expect(result.current.isDispatchPending).toBe(false);

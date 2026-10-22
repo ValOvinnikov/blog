@@ -1,8 +1,16 @@
-import { CAPABILITY, PRESET_ID } from '@blog/config';
+import {
+  CAPABILITY,
+  PRESET_ID,
+  LOCALE_ISO_CODES,
+  FONT_CHOICE,
+  RADIUS_SCALE,
+  DENSITY,
+  LANGUAGE_SWITCHER_STYLE,
+} from '@blog/config';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
@@ -31,11 +39,13 @@ const tenant = makeReadyTenant();
 
 const setup = customRenderAsync(LookPageContent, { tenant });
 
+const ARIA_CHECKED = 'aria-checked';
+
 describe(`<${LookPageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
     getSiteConfigMock.mockResolvedValue(undefined);
-    selectLiveLocalesMock.mockReturnValue(['EN']);
+    selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
     getEnabledCapabilitiesMock.mockReset();
     getEnabledCapabilitiesMock.mockResolvedValue([]);
   });
@@ -43,10 +53,10 @@ describe(`<${LookPageContent.name}/>`, () => {
   it('renders Console defaults when the tenant has no saved site_config row yet', async () => {
     await setup();
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
     expect(screen.getByRole('heading', { name: 'Look' })).toBeVisible();
     expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-      'aria-checked',
+      ARIA_CHECKED,
       'true',
     );
   });
@@ -83,15 +93,15 @@ describe(`<${LookPageContent.name}/>`, () => {
   it("renders the tenant's saved site_config row when one exists", async () => {
     getSiteConfigMock.mockResolvedValue({
       id: 'config-1',
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       preset: PRESET_ID.EDITORIAL,
       accentHue: 28,
       logoHue: undefined,
-      headingFont: 'FRAUNCES',
-      bodyFont: 'INTER',
-      radiusScale: 'SM',
-      density: 'COMPACT',
-      languageSwitcherStyle: 'MENU_CODE',
+      headingFont: FONT_CHOICE.FRAUNCES,
+      bodyFont: FONT_CHOICE.INTER,
+      radiusScale: RADIUS_SCALE.SM,
+      density: DENSITY.COMPACT,
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: {},
@@ -102,7 +112,7 @@ describe(`<${LookPageContent.name}/>`, () => {
     await setup();
 
     expect(screen.getByRole('radio', { name: 'Editorial' })).toHaveAttribute(
-      'aria-checked',
+      ARIA_CHECKED,
       'true',
     );
     expect(screen.getByText('hue 28°')).toBeVisible();

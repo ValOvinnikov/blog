@@ -6,6 +6,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
@@ -25,6 +26,13 @@ const render = (ui: ReactNode) =>
 const setPathname = (pathname: string) => {
   usePathnameMock.mockReturnValue(pathname);
 };
+
+const TENANT_SECTION_LABEL = 'Tenant · acme';
+const LOOK_AND_VOICE_SHIP_SOON = 'Look and Voice ship soon.';
+const THIS_MILESTONE = 'this milestone';
+const ARIA_CURRENT = 'aria-current';
+const PROVISIONING_ISN_T_AVAILABLE_YET = "Provisioning isn't available yet.";
+const ARIA_EXPANDED = 'aria-expanded';
 
 describe(`<${Sidebar.name}/>`, () => {
   beforeEach(() => {
@@ -55,15 +63,15 @@ describe(`<${Sidebar.name}/>`, () => {
       <Sidebar
         sections={[
           {
-            label: 'Tenant · acme',
+            label: TENANT_SECTION_LABEL,
             items: [],
-            note: 'Look and Voice ship soon.',
+            note: LOOK_AND_VOICE_SHIP_SOON,
           },
         ]}
       />,
     );
 
-    expect(screen.getByText('Look and Voice ship soon.')).toBeVisible();
+    expect(screen.getByText(LOOK_AND_VOICE_SHIP_SOON)).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
@@ -85,13 +93,13 @@ describe(`<${Sidebar.name}/>`, () => {
       <Sidebar
         sections={[
           {
-            label: 'Tenant · acme',
+            label: TENANT_SECTION_LABEL,
             items: [
               {
                 label: 'Look',
                 icon: ICONS.PALETTE,
-                href: '/tenants/tenant-1/look',
-                badge: { label: 'this milestone', tone: 'neutral' },
+                href: `/tenants/${TENANT_ID}/look`,
+                badge: { label: THIS_MILESTONE, tone: 'neutral' },
               },
             ],
           },
@@ -100,27 +108,27 @@ describe(`<${Sidebar.name}/>`, () => {
     );
 
     const link = screen.getByRole('link', { name: /Look/ });
-    expect(within(link).getByText('this milestone')).toBeVisible();
+    expect(within(link).getByText(THIS_MILESTONE)).toBeVisible();
   });
 
   it('marks the item matching the current pathname active, and no other', () => {
-    setPathname('/tenants/tenant-1/look');
+    setPathname(`/tenants/${TENANT_ID}/look`);
 
     render(
       <Sidebar
         sections={[
           {
-            label: 'Tenant · acme',
+            label: TENANT_SECTION_LABEL,
             items: [
               {
                 label: 'Look',
                 icon: ICONS.PALETTE,
-                href: '/tenants/tenant-1/look',
+                href: `/tenants/${TENANT_ID}/look`,
               },
               {
                 label: 'Voice',
                 icon: ICONS.QUOTE,
-                href: '/tenants/tenant-1/voice',
+                href: `/tenants/${TENANT_ID}/voice`,
               },
             ],
           },
@@ -129,11 +137,11 @@ describe(`<${Sidebar.name}/>`, () => {
     );
 
     expect(screen.getByRole('link', { name: 'Look' })).toHaveAttribute(
-      'aria-current',
+      ARIA_CURRENT,
       'page',
     );
     expect(screen.getByRole('link', { name: 'Voice' })).not.toHaveAttribute(
-      'aria-current',
+      ARIA_CURRENT,
     );
   });
 
@@ -141,14 +149,18 @@ describe(`<${Sidebar.name}/>`, () => {
     {
       description:
         'marks Studio active when its own route is open, same as any other nav item',
-      pathname: '/tenants/tenant-1/studio',
+      pathname: `/tenants/${TENANT_ID}/studio`,
       items: [
         {
           label: 'Studio',
           icon: ICONS.STUDIO,
-          href: '/tenants/tenant-1/studio',
+          href: `/tenants/${TENANT_ID}/studio`,
         },
-        { label: 'Look', icon: ICONS.PALETTE, href: '/tenants/tenant-1/look' },
+        {
+          label: 'Look',
+          icon: ICONS.PALETTE,
+          href: `/tenants/${TENANT_ID}/look`,
+        },
       ],
       activeLabel: 'Studio',
       inactiveLabel: 'Look',
@@ -156,10 +168,18 @@ describe(`<${Sidebar.name}/>`, () => {
     {
       description:
         'switches which item is active when the route changes — the case a shared href could not express',
-      pathname: '/tenants/tenant-1/voice',
+      pathname: `/tenants/${TENANT_ID}/voice`,
       items: [
-        { label: 'Look', icon: ICONS.PALETTE, href: '/tenants/tenant-1/look' },
-        { label: 'Voice', icon: ICONS.QUOTE, href: '/tenants/tenant-1/voice' },
+        {
+          label: 'Look',
+          icon: ICONS.PALETTE,
+          href: `/tenants/${TENANT_ID}/look`,
+        },
+        {
+          label: 'Voice',
+          icon: ICONS.QUOTE,
+          href: `/tenants/${TENANT_ID}/voice`,
+        },
       ],
       activeLabel: 'Voice',
       inactiveLabel: 'Look',
@@ -167,25 +187,25 @@ describe(`<${Sidebar.name}/>`, () => {
   ])('$description', ({ pathname, items, activeLabel, inactiveLabel }) => {
     setPathname(pathname);
 
-    render(<Sidebar sections={[{ label: 'Tenant · acme', items }]} />);
+    render(<Sidebar sections={[{ label: TENANT_SECTION_LABEL, items }]} />);
 
     expect(screen.getByRole('link', { name: activeLabel })).toHaveAttribute(
-      'aria-current',
+      ARIA_CURRENT,
       'page',
     );
     expect(
       screen.getByRole('link', { name: inactiveLabel }),
-    ).not.toHaveAttribute('aria-current');
+    ).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('renders an unbuilt destination as an inert, never-active row with its badge text', () => {
-    setPathname('/tenants/tenant-1/domain');
+    setPathname(`/tenants/${TENANT_ID}/domain`);
 
     render(
       <Sidebar
         sections={[
           {
-            label: 'Tenant · acme',
+            label: TENANT_SECTION_LABEL,
             items: [
               {
                 label: 'Domain',
@@ -203,7 +223,7 @@ describe(`<${Sidebar.name}/>`, () => {
     ).not.toBeInTheDocument();
     expect(screen.getByText('Domain')).toBeVisible();
     expect(screen.getByText('later')).toBeVisible();
-    expect(screen.queryByText('Domain')).not.toHaveAttribute('aria-current');
+    expect(screen.queryByText('Domain')).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it("renders an inert item's disabled reason as visible text", () => {
@@ -217,7 +237,7 @@ describe(`<${Sidebar.name}/>`, () => {
                 label: 'Add tenant',
                 icon: ICONS.PLUS,
                 badge: { label: 'deferred', tone: 'warn' },
-                disabledReason: "Provisioning isn't available yet.",
+                disabledReason: PROVISIONING_ISN_T_AVAILABLE_YET,
               },
             ],
           },
@@ -226,7 +246,7 @@ describe(`<${Sidebar.name}/>`, () => {
     );
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.getByText("Provisioning isn't available yet.")).toBeVisible();
+    expect(screen.getByText(PROVISIONING_ISN_T_AVAILABLE_YET)).toBeVisible();
   });
 
   it('names its collapse toggle for its action, flipping name and aria-expanded', async () => {
@@ -234,13 +254,13 @@ describe(`<${Sidebar.name}/>`, () => {
     render(<Sidebar sections={[]} />);
 
     const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
 
     await user.click(toggle);
 
     expect(
       screen.getByRole('button', { name: 'Expand sidebar' }),
-    ).toHaveAttribute('aria-expanded', 'false');
+    ).toHaveAttribute(ARIA_EXPANDED, 'false');
   });
 
   it('keeps a nav link reachable by its name when the sidebar starts collapsed', () => {
@@ -268,7 +288,7 @@ describe(`<${Sidebar.name}/>`, () => {
         <Sidebar
           sections={[
             {
-              label: 'Tenant · acme',
+              label: TENANT_SECTION_LABEL,
               items: [
                 {
                   label: 'Analytics',

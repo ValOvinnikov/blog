@@ -1,6 +1,7 @@
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import FindingsPage from './page';
 
@@ -24,7 +25,7 @@ describe(FindingsPage, () => {
 
   it('renders every open finding with its tenant name', async () => {
     listOpenFindingsMock.mockResolvedValue([
-      makeFinding({ id: 'finding-1', tenantId: 'tenant-1' }),
+      makeFinding({ id: 'finding-1', tenantId: TENANT_ID }),
       makeFinding({ id: 'finding-2', tenantId: null, tenantName: null }),
     ]);
 
@@ -32,7 +33,7 @@ describe(FindingsPage, () => {
 
     expect(screen.getByRole('link', { name: 'Acme Inc.' })).toHaveAttribute(
       'href',
-      '/tenants/tenant-1',
+      `/tenants/${TENANT_ID}`,
     );
     expect(screen.getByText('— platform-wide')).toBeVisible();
   });

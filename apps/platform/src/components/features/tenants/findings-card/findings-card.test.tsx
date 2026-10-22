@@ -1,5 +1,6 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { FindingsCard } from './findings-card';
 
@@ -12,7 +13,7 @@ const render = renderWithIntl;
 describe(FindingsCard, () => {
   describe('with no findings', () => {
     beforeEach(() => {
-      render(<FindingsCard tenantId="tenant-1" findings={[]} />);
+      render(<FindingsCard tenantId={TENANT_ID} findings={[]} />);
     });
 
     it("nests the card's title one level under the page's own h1", () => {
@@ -31,7 +32,7 @@ describe(FindingsCard, () => {
   });
 
   it('renders a finding with its source, kind and severity', () => {
-    render(<FindingsCard tenantId="tenant-1" findings={[makeFinding()]} />);
+    render(<FindingsCard tenantId={TENANT_ID} findings={[makeFinding()]} />);
 
     expect(screen.getByText('Tenant provisioning')).toBeVisible();
     expect(screen.getByText('Provisioning step failed')).toBeVisible();
@@ -41,7 +42,7 @@ describe(FindingsCard, () => {
   it('renders a Details disclosure only when the finding carries details', () => {
     render(
       <FindingsCard
-        tenantId="tenant-1"
+        tenantId={TENANT_ID}
         findings={[
           makeFinding({ id: 'finding-1', hasDetails: true }),
           makeFinding({ id: 'finding-2', hasDetails: false }),

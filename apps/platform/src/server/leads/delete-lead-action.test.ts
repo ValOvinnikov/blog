@@ -2,7 +2,7 @@ import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { deleteLeadAction } from './delete-lead-action';
@@ -15,7 +15,6 @@ vi.mock('@blog/db', () => ({
   queries: { leads: { deleteLead: deleteLeadMock } },
 }));
 
-const TENANT_ID = '6f1c7a52-3b0e-4f0a-9a43-1d6b2b7a9c10';
 const LEAD_ID = '0b7d5c1e-8a47-4c3e-b1f6-2f4d9e6a7b31';
 
 describe(deleteLeadAction, () => {

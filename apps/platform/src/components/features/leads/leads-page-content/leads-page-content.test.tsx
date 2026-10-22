@@ -1,7 +1,8 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeLead } from '@platform/testing/leads/fixtures';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 
@@ -18,10 +19,13 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
 }));
 
 const setup = customRenderAsync(LeadsPageContent, {
-  tenant: makeReadyTenant({ id: 'tenant-1', plan: TENANT_PLAN.GROWTH }),
+  tenant: makeReadyTenant({ id: TENANT_ID, plan: TENANT_PLAN.GROWTH }),
   page: 1,
   pageHref: adminRoutes.dashboardLeads,
 });
+
+const CONTACT_FORM_NOT_INCLUDED_IN = 'Contact form not included in your plan';
+const ADA_LOVELACE = 'Ada Lovelace';
 
 describe(LeadsPageContent, () => {
   beforeEach(() => {
@@ -35,7 +39,7 @@ describe(LeadsPageContent, () => {
     await setup({ page: 2 });
 
     expect(listLeadsMock).toHaveBeenCalledWith({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       page: 2,
       pageSize: 25,
     });
@@ -68,27 +72,25 @@ describe(LeadsPageContent, () => {
     await setup();
 
     expect(
-      screen.queryByText('Contact form not included in your plan'),
+      screen.queryByText(CONTACT_FORM_NOT_INCLUDED_IN),
     ).not.toBeInTheDocument();
   });
 
   it('keeps the leads and warns when the plan no longer includes the contact form', async () => {
     listLeadsMock.mockResolvedValue({
-      leads: [makeLead({ name: 'Ada Lovelace' })],
+      leads: [makeLead({ name: ADA_LOVELACE })],
       total: 1,
     });
 
     await setup({
-      tenant: makeReadyTenant({ id: 'tenant-1', plan: TENANT_PLAN.FREE }),
+      tenant: makeReadyTenant({ id: TENANT_ID, plan: TENANT_PLAN.FREE }),
     });
 
-    expect(
-      screen.getByText('Contact form not included in your plan'),
-    ).toBeVisible();
+    expect(screen.getByText(CONTACT_FORM_NOT_INCLUDED_IN)).toBeVisible();
     expect(
       screen.getByText(/messages you already received are kept/),
     ).toBeVisible();
-    expect(screen.getByText('Ada Lovelace')).toBeVisible();
+    expect(screen.getByText(ADA_LOVELACE)).toBeVisible();
     expect(
       screen.getByRole('button', {
         name: 'Delete the message from Ada Lovelace',
@@ -102,11 +104,11 @@ describe(LeadsPageContent, () => {
     await expect(
       setup({
         page: 9,
-        pageHref: (page) => `/tenants/tenant-1/leads?page=${page}`,
+        pageHref: (page) => `/tenants/${TENANT_ID}/leads?page=${page}`,
       }),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/leads?page=2');
+    expect(redirect).toHaveBeenCalledWith(`/tenants/${TENANT_ID}/leads?page=2`);
   });
 
   it('shows the empty state for a tenant with no leads', async () => {
@@ -118,13 +120,17 @@ describe(LeadsPageContent, () => {
   it('sends a page past the end to the last page', async () => {
     listLeadsMock.mockResolvedValue({ leads: [], total: 30 });
 
-    await expect(setup({ page: 9 })).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup({ page: 9 })).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
     expect(redirect).toHaveBeenCalledWith('/dashboard/leads?page=2');
   });
 
   it('sends a page past the end of an empty list to the first page', async () => {
-    await expect(setup({ page: 3 })).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup({ page: 3 })).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
     expect(redirect).toHaveBeenCalledWith('/dashboard/leads');
   });

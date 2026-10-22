@@ -5,7 +5,7 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import TenantOverviewPage from './page';
 
@@ -74,8 +74,11 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
 }));
 
 const setup = customRenderAsync(TenantOverviewPage, {
-  params: Promise.resolve({ tenantId: 'tenant-1' }),
+  params: Promise.resolve({ tenantId: TENANT_ID }),
 });
+
+const AT_20260812_0000 = '2026-08-12T00:00:00.000Z';
+const INVITED_EXAMPLE_COM = 'invited@example.com';
 
 describe(TenantOverviewPage, () => {
   let tenant: ReturnType<typeof makeTenant>;
@@ -87,7 +90,7 @@ describe(TenantOverviewPage, () => {
     getTenantOwnerMembershipMock.mockReset();
     getTenantOwnerMembershipMock.mockResolvedValue({
       email: 'owner@example.com',
-      joinedAt: new Date('2026-08-12T00:00:00.000Z'),
+      joinedAt: new Date(AT_20260812_0000),
     });
     listAuditEventsForTargetMock.mockReset();
     listAuditEventsForTargetMock.mockResolvedValue([]);
@@ -105,7 +108,7 @@ describe(TenantOverviewPage, () => {
     });
 
     it('renders the overview for the resolved tenant', () => {
-      expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
+      expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
       expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
         tenant.id,
       );
@@ -134,10 +137,7 @@ describe(TenantOverviewPage, () => {
       const joinedTime = screen.getByText('Aug 12, 2026');
       expect(joinedLabel).toBeVisible();
       expect(joinedTime).toBeVisible();
-      expect(joinedTime).toHaveAttribute(
-        'dateTime',
-        '2026-08-12T00:00:00.000Z',
-      );
+      expect(joinedTime).toHaveAttribute('dateTime', AT_20260812_0000);
     });
 
     it('always shows "Open site", pointing at the tenant\'s live domain', () => {
@@ -164,13 +164,13 @@ describe(TenantOverviewPage, () => {
 
   it('shows the invited email without a Joined row for a pending invite', async () => {
     getTenantOwnerMembershipMock.mockResolvedValue({
-      email: 'invited@example.com',
+      email: INVITED_EXAMPLE_COM,
     });
 
     await setup();
 
     const joinedLabel = screen.queryByText('Joined');
-    const invitedEmail = screen.getByText('invited@example.com');
+    const invitedEmail = screen.getByText(INVITED_EXAMPLE_COM);
     expect(joinedLabel).not.toBeInTheDocument();
     expect(invitedEmail).toBeVisible();
   });

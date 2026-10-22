@@ -1,4 +1,4 @@
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { toTenantSwitcherItems } from './tenant-switcher-items';
 
@@ -11,7 +11,7 @@ describe(toTenantSwitcherItems, () => {
 
     expect(toTenantSwitcherItems([tenant])).toStrictEqual([
       {
-        id: 'tenant-1',
+        id: TENANT_ID,
         name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
         isArchived: false,

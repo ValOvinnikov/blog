@@ -2,7 +2,9 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import {
   ProvisioningBanner,
@@ -25,10 +27,14 @@ const idlePoll: TPoll = {
 
 const setup = (poll: Partial<TPoll> = {}) =>
   renderWithIntl(
-    <ProvisioningBanner tenantId="tenant-1" poll={{ ...idlePoll, ...poll }} />,
+    <ProvisioningBanner tenantId={TENANT_ID} poll={{ ...idlePoll, ...poll }} />,
   );
 
 const READY_STEP_STATUSES = Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE);
+
+const VIEW_STEPS = 'View steps';
+const OWNER_INVITE_STALLED = 'Owner invite stalled';
+const OWNER_MEMBERSHIP_UNCLEAR = 'Owner membership unclear';
 
 describe(`<${ProvisioningBanner.name}/>`, () => {
   it('renders nothing for a tenant that has not started provisioning', () => {
@@ -54,9 +60,9 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
     });
 
     expect(screen.getByText('Provisioning — step 3 of 6')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'View steps' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: VIEW_STEPS })).toHaveAttribute(
       'href',
-      '/tenants/tenant-1/provisioning',
+      `/tenants/${TENANT_ID}/provisioning`,
     );
   });
 
@@ -90,19 +96,19 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
     });
 
     expect(screen.getByText('Provisioned')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'View steps' })).toBeVisible();
+    expect(screen.getByRole('link', { name: VIEW_STEPS })).toBeVisible();
   });
 
   it.each([
     {
-      outcome: 'STALLED' as const,
-      heading: 'Owner invite stalled',
+      outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      heading: OWNER_INVITE_STALLED,
       description:
         "The owner hasn't accepted their invite yet — nothing failed, but they can't edit their own content until they do.",
     },
     {
-      outcome: 'AMBIGUOUS_MEMBERSHIP' as const,
-      heading: 'Owner membership unclear',
+      outcome: ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
+      heading: OWNER_MEMBERSHIP_UNCLEAR,
       description:
         "More than one membership matches this tenant's owner — resolve it manually in Sanity Manage.",
     },
@@ -122,7 +128,11 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
     },
   );
 
-  it.each(['ELEVATED', 'ALREADY_ADMINISTRATOR', 'PENDING_ACCEPTANCE'] as const)(
+  it.each([
+    ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
+    ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR,
+    ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
+  ] as const)(
     'renders nothing extra for a %s outcome when ready',
     (outcome) => {
       setup({
@@ -147,10 +157,10 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
         TENANT_PROVISIONING_STEP_STATUS.IDLE,
       ],
       isProvisioningRunning: true,
-      ownerElevationOutcome: 'STALLED',
+      ownerElevationOutcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
     });
 
-    expect(screen.queryByText('Owner invite stalled')).not.toBeInTheDocument();
+    expect(screen.queryByText(OWNER_INVITE_STALLED)).not.toBeInTheDocument();
   });
 
   it('never renders the owner-elevation row while provisioning has failed, regardless of outcome', () => {
@@ -165,11 +175,11 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
       ],
       isOverallFailed: true,
       errorKind: 'duplicate',
-      ownerElevationOutcome: 'AMBIGUOUS_MEMBERSHIP',
+      ownerElevationOutcome: ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
     });
 
     expect(
-      screen.queryByText('Owner membership unclear'),
+      screen.queryByText(OWNER_MEMBERSHIP_UNCLEAR),
     ).not.toBeInTheDocument();
   });
 });

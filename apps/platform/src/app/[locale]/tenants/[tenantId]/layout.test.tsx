@@ -1,6 +1,9 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -24,7 +27,7 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantByIdLayout, {
-  params: Promise.resolve({ tenantId: 'tenant-1' }),
+  params: Promise.resolve({ tenantId: TENANT_ID }),
   children: <div>tenant content</div>,
 });
 
@@ -37,7 +40,7 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
       userId: 'user-1',
-      role: 'ADMIN',
+      role: ADMIN_ROLE.ADMIN,
       createdAt: new Date(),
     });
   });
@@ -45,7 +48,7 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
   it('redirects to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
   });
@@ -53,18 +56,18 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
   it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
   it('404s for an unknown tenant id', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
   it('renders the gated content bare, with no AdminShell chrome, for an operator', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
+      id: TENANT_ID,
       name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });

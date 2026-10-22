@@ -1,4 +1,5 @@
 import { customRender, screen, within } from '@platform/testing/custom-render';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -6,10 +7,12 @@ import { TenantSwitcher } from './tenant-switcher';
 
 vi.mock('@platform/i18n/navigation');
 
+const ACME_EXAMPLE_COM = 'acme.example.com';
+
 const tenant: TTenantSwitcherItem = {
-  id: 'tenant-1',
+  id: TENANT_ID,
   name: 'Acme Inc.',
-  primaryDomain: 'acme.example.com',
+  primaryDomain: ACME_EXAMPLE_COM,
   isArchived: false,
 };
 
@@ -22,7 +25,7 @@ const archivedTenant: TTenantSwitcherItem = {
 
 const setup = customRender(TenantSwitcher, {
   tenants: [tenant],
-  activeTenantId: 'tenant-1',
+  activeTenantId: TENANT_ID,
 });
 
 describe(`<${TenantSwitcher.name}/>`, () => {
@@ -37,7 +40,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
 
     expect(
       screen.getByRole('button', { name: /acme inc\./i }),
-    ).toHaveTextContent('acme.example.com');
+    ).toHaveTextContent(ACME_EXAMPLE_COM);
   });
 
   it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', async () => {
@@ -48,7 +51,10 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     const menu = await screen.findByRole('menu', { name: /acme inc\./i });
     expect(
       within(menu).getByRole('menuitem', { name: /acme inc\./i }),
-    ).toHaveAttribute('href', '/api/dashboard/select-tenant?tenantId=tenant-1');
+    ).toHaveAttribute(
+      'href',
+      `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
+    );
     expect(
       within(menu).getByRole('menuitem', { name: /globex corp/i }),
     ).toHaveAttribute('href', '/api/dashboard/select-tenant?tenantId=tenant-2');

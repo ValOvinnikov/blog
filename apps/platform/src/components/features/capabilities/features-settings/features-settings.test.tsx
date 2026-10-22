@@ -6,6 +6,7 @@ import {
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -48,10 +49,19 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const setup = customRender(FeaturesSettings, {
-  tenantId: 'tenant-1',
+  tenantId: TENANT_ID,
   entitledCapabilities: ALL_ENTITLED,
   initialValues: INITIAL_VALUES,
 });
+
+const DATA_CHECKED = 'data-checked';
+const DATA_UNCHECKED = 'data-unchecked';
+const CONTACT_FORM_LABEL = 'Contact form';
+const SAVE_CHANGES = 'Save changes';
+const ALL_CHANGES_SAVED = 'All changes saved';
+const UNSAVED_CHANGES = 'Unsaved changes';
+const ONE_UNSAVED_CHANGE = '1 unsaved change';
+const DATA_DISABLED = 'data-disabled';
 
 describe(`<${FeaturesSettings.name}/>`, () => {
   let user: UserEvent;
@@ -72,16 +82,16 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     it('renders one toggle per built capability, reflecting the initial values', () => {
       expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-        'data-checked',
+        DATA_CHECKED,
         '',
       );
       expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-        'data-unchecked',
+        DATA_UNCHECKED,
         '',
       );
       expect(
-        screen.getByRole('switch', { name: 'Contact form' }),
-      ).toHaveAttribute('data-checked', '');
+        screen.getByRole('switch', { name: CONTACT_FORM_LABEL }),
+      ).toHaveAttribute(DATA_CHECKED, '');
       expect(screen.getAllByRole('switch')).toHaveLength(4);
     });
 
@@ -103,16 +113,16 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
 
       expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-        'data-unchecked',
+        DATA_UNCHECKED,
         '',
       );
     });
 
     it('offers no Save on initial render, with values unchanged', () => {
       expect(
-        screen.queryByRole('button', { name: 'Save changes' }),
+        screen.queryByRole('button', { name: SAVE_CHANGES }),
       ).not.toBeInTheDocument();
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
     });
 
     it('offers Save with the change count after toggling an entitled capability, and withdraws it once toggled back', async () => {
@@ -121,16 +131,14 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       });
 
       await user.click(analyticsSwitch);
+      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeVisible();
       expect(
-        screen.getByRole('button', { name: 'Save changes' }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('region', { name: 'Unsaved changes' }),
-      ).toHaveTextContent('1 unsaved change');
+        screen.getByRole('region', { name: UNSAVED_CHANGES }),
+      ).toHaveTextContent(ONE_UNSAVED_CHANGE);
 
       await user.click(analyticsSwitch);
       expect(
-        screen.queryByRole('button', { name: 'Save changes' }),
+        screen.queryByRole('button', { name: SAVE_CHANGES }),
       ).not.toBeInTheDocument();
     });
 
@@ -139,16 +147,16 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Discard' }));
 
       expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-        'data-unchecked',
+        DATA_UNCHECKED,
         '',
       );
-      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
     });
 
     it('leaves entitled capability toggles enabled for a non-archived tenant', () => {
       expect(
         screen.getByRole('switch', { name: 'Bookmarks' }),
-      ).not.toHaveAttribute('data-disabled');
+      ).not.toHaveAttribute(DATA_DISABLED);
     });
   });
 
@@ -169,18 +177,18 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
       expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-        'data-disabled',
+        DATA_DISABLED,
         '',
       );
       expect(
         screen.getByRole('switch', { name: 'Cookie consent banner' }),
-      ).toHaveAttribute('data-disabled', '');
+      ).toHaveAttribute(DATA_DISABLED, '');
       expect(
-        screen.getByRole('switch', { name: 'Contact form' }),
-      ).toHaveAttribute('data-disabled', '');
+        screen.getByRole('switch', { name: CONTACT_FORM_LABEL }),
+      ).toHaveAttribute(DATA_DISABLED, '');
       expect(
         screen.getByRole('switch', { name: 'Bookmarks' }),
-      ).not.toHaveAttribute('data-disabled');
+      ).not.toHaveAttribute(DATA_DISABLED);
       expect(screen.getAllByText('Growth plan')).toHaveLength(3);
     });
 
@@ -203,20 +211,20 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     it('withdraws Save after a successful save, without a remount', async () => {
       await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
       await waitFor(() =>
         expect(
-          screen.queryByRole('button', { name: 'Save changes' }),
+          screen.queryByRole('button', { name: SAVE_CHANGES }),
         ).not.toBeInTheDocument(),
       );
     });
 
     it('saves the current toggle state', async () => {
       await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
-      expect(updateFeaturesActionMock).toHaveBeenCalledWith('tenant-1', {
+      expect(updateFeaturesActionMock).toHaveBeenCalledWith(TENANT_ID, {
         ...INITIAL_VALUES,
         bookmarksEnabled: false,
       });
@@ -224,7 +232,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     it('shows a save-confirmation toast and refreshes after a successful save', async () => {
       await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
       expect(await screen.findByText('Features saved.')).toBeVisible();
       expect(refresh).toHaveBeenCalled();
@@ -242,7 +250,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     setup();
 
     await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     expect(
       await screen.findByRole('button', { name: 'Saving…' }),
@@ -258,7 +266,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     setup();
 
     await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save");
     expect(refresh).not.toHaveBeenCalled();
@@ -275,13 +283,13 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     it('disables every capability toggle, including entitled ones', async () => {
       const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
-      expect(bookmarksSwitch).toHaveAttribute('data-disabled', '');
+      expect(bookmarksSwitch).toHaveAttribute(DATA_DISABLED, '');
       expect(bookmarksSwitch).toHaveAccessibleDescription(
         /This tenant is archived/,
       );
 
       await user.click(bookmarksSwitch);
-      expect(bookmarksSwitch).toHaveAttribute('data-checked', '');
+      expect(bookmarksSwitch).toHaveAttribute(DATA_CHECKED, '');
     });
   });
 
@@ -294,11 +302,11 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Restore 1 change' }));
 
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-checked',
+      DATA_CHECKED,
       '',
     );
     expect(
-      screen.getByRole('region', { name: 'Unsaved changes' }),
-    ).toHaveTextContent('1 unsaved change');
+      screen.getByRole('region', { name: UNSAVED_CHANGES }),
+    ).toHaveTextContent(ONE_UNSAVED_CHANGE);
   });
 });

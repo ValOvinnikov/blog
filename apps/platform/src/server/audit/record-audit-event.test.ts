@@ -2,6 +2,7 @@ import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { OPERATOR_EMAIL } from '@platform/testing/admins/operator';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -38,7 +39,7 @@ describe('recordAuditEvent', () => {
       logEvent: LOG_EVENT,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
     });
 
@@ -47,7 +48,7 @@ describe('recordAuditEvent', () => {
       actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
     });
     expect(loggerErrorMock).not.toHaveBeenCalled();
@@ -62,7 +63,7 @@ describe('recordAuditEvent', () => {
         logEvent: LOG_EVENT,
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: 'tenant-1',
+        targetId: TENANT_ID,
       }),
     ).resolves.toBeUndefined();
 
@@ -71,7 +72,7 @@ describe('recordAuditEvent', () => {
       expect.objectContaining({
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: 'tenant-1',
+        targetId: TENANT_ID,
         error: expect.any(Error),
       }),
     );
@@ -85,13 +86,13 @@ describe('recordAuditEvent', () => {
       logEvent: LOG_EVENT,
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
     });
 
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       LOG_EVENT,
-      expect.objectContaining({ targetId: 'tenant-1' }),
+      expect.objectContaining({ targetId: TENANT_ID }),
     );
   });
 });

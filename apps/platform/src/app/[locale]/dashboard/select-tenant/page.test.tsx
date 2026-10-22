@@ -1,6 +1,8 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -40,7 +42,7 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('redirects to sign-in without a session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
   });
@@ -48,7 +50,7 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('redirects to /workspace-pending with zero memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/workspace-pending');
   });
@@ -56,12 +58,12 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1' },
-        tenant: { id: 'tenant-1' },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
+        tenant: { id: TENANT_ID },
       },
     ]);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/dashboard');
   });
@@ -69,8 +71,8 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('renders the picker for multiple memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1' },
-        tenant: { id: 'tenant-1', name: 'Acme Inc.' },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
+        tenant: { id: TENANT_ID, name: 'Acme Inc.' },
       },
       {
         membership: { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2' },

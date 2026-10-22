@@ -1,6 +1,9 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { TENANT_PLAN, MEMBERSHIP_ROLE, ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -50,28 +53,28 @@ vi.mock('next/headers', () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const tenant1 = {
-  id: 'tenant-1',
+  id: TENANT_ID,
   name: 'Acme Inc.',
   primaryDomain: 'acme.com',
-  plan: 'FREE',
+  plan: TENANT_PLAN.FREE,
 };
 const tenant2 = {
   id: 'tenant-2',
   name: 'Globex Corp.',
   primaryDomain: 'globex.com',
-  plan: 'GROWTH',
+  plan: TENANT_PLAN.GROWTH,
 };
 const membership1 = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: 'tenant-1',
-  role: 'OWNER',
+  tenantId: TENANT_ID,
+  role: MEMBERSHIP_ROLE.OWNER,
 };
 const membership2 = {
   id: 'm-2',
   userId: 'user-1',
   tenantId: 'tenant-2',
-  role: 'OWNER',
+  role: MEMBERSHIP_ROLE.OWNER,
 };
 
 const mockCookie = (value: string | undefined) => {
@@ -83,6 +86,8 @@ const mockCookie = (value: string | undefined) => {
 const setup = customRenderAsync(DashboardTenantLayout, {
   children: <div>dashboard content</div>,
 });
+
+const DASHBOARD_CONTENT = 'dashboard content';
 
 describe(`<${DashboardTenantLayout.name}/>`, () => {
   beforeEach(() => {
@@ -114,7 +119,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('hides Leads from a plan without the contact form and no stored leads', async () => {
-    mockCookie('tenant-1');
+    mockCookie(TENANT_ID);
 
     await setup();
 
@@ -124,7 +129,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('keeps Leads for a downgraded owner who still has stored leads', async () => {
-    mockCookie('tenant-1');
+    mockCookie(TENANT_ID);
     listLeadsMock.mockResolvedValue({ leads: [], total: 3 });
 
     await setup();
@@ -134,7 +139,10 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
   it('hides Leads from an editor', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership: { ...membership2, role: 'EDITOR' }, tenant: tenant2 },
+      {
+        membership: { ...membership2, role: MEMBERSHIP_ROLE.EDITOR },
+        tenant: tenant2,
+      },
     ]);
 
     await setup();
@@ -147,7 +155,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   it('redirects to sign-in without querying memberships when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
@@ -156,7 +164,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   it('redirects to /workspace-pending when the signed-in user has zero memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/workspace-pending');
   });
@@ -164,7 +172,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   it('redirects to the picker for several memberships and no active-tenant cookie', async () => {
     mockCookie(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/dashboard/select-tenant');
   });
@@ -172,7 +180,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   it('renders the active tenant and a switcher for several memberships with the cookie', async () => {
     await setup();
 
-    expect(screen.getByText('dashboard content')).toBeVisible();
+    expect(screen.getByText(DASHBOARD_CONTENT)).toBeVisible();
     expect(screen.getByRole('button', { name: /globex\.com/i })).toBeVisible();
   });
 
@@ -186,7 +194,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     it('renders the gated content with no switcher for a user with one membership', async () => {
       await setup();
 
-      expect(screen.getByText('dashboard content')).toBeVisible();
+      expect(screen.getByText(DASHBOARD_CONTENT)).toBeVisible();
       expect(redirect).not.toHaveBeenCalled();
       expect(
         screen.queryByRole('button', { name: /acme\.com/i }),
@@ -205,7 +213,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('hides Languages and Team from a FREE tenant', async () => {
-    mockCookie('tenant-1');
+    mockCookie(TENANT_ID);
 
     await setup();
 
@@ -232,14 +240,14 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
       userId: 'user-1',
-      role: 'SUPERADMIN',
+      role: ADMIN_ROLE.SUPERADMIN,
       createdAt: new Date(),
     });
     listTenantsMock.mockResolvedValue([tenant1]);
 
     await setup();
 
-    expect(screen.getByText('dashboard content')).toBeVisible();
+    expect(screen.getByText(DASHBOARD_CONTENT)).toBeVisible();
     expect(screen.getByText('Super admin · Platform')).toBeVisible();
     expect(screen.queryByText(/Owner/)).not.toBeInTheDocument();
   });

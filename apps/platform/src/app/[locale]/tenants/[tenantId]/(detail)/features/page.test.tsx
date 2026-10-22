@@ -1,6 +1,9 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ADMIN_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -32,8 +35,10 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(FeaturesPage, {
-  params: Promise.resolve({ tenantId: 'tenant-1' }),
+  params: Promise.resolve({ tenantId: TENANT_ID }),
 });
+
+const DATA_DISABLED = 'data-disabled';
 
 describe(`<${FeaturesPage.name}/>`, () => {
   beforeEach(() => {
@@ -42,7 +47,10 @@ describe(`<${FeaturesPage.name}/>`, () => {
     getTenantByIdMock.mockReset();
     getSettingsFeaturesAndPresetMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      role: ADMIN_ROLE.ADMIN,
+    });
     getSettingsFeaturesAndPresetMock.mockResolvedValue({
       features: undefined,
       preset: undefined,
@@ -52,7 +60,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
   it('redirects to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
   });
@@ -60,7 +68,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
   it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(redirect).not.toHaveBeenCalled();
     expect(getSettingsFeaturesAndPresetMock).not.toHaveBeenCalled();
@@ -68,13 +76,13 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
   it('renders preset featureDefaults for an operator with no settings_features row', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
-      plan: 'GROWTH',
+      id: TENANT_ID,
+      plan: TENANT_PLAN.GROWTH,
     });
 
     await setup();
 
-    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
@@ -84,22 +92,22 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
   it('renders the GROWTH-only toggles as locked for a FREE-plan tenant', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
-      plan: 'FREE',
+      id: TENANT_ID,
+      plan: TENANT_PLAN.FREE,
     });
 
     await setup();
 
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-disabled',
+      DATA_DISABLED,
       '',
     );
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      'data-disabled',
+      DATA_DISABLED,
       '',
     );
     expect(
       screen.getByRole('switch', { name: 'Cookie consent banner' }),
-    ).not.toHaveAttribute('data-disabled');
+    ).not.toHaveAttribute(DATA_DISABLED);
   });
 });

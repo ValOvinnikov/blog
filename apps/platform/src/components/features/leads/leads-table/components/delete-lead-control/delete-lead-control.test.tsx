@@ -7,6 +7,7 @@ import {
   waitFor,
 } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeleteLeadControl } from './delete-lead-control';
@@ -21,7 +22,7 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
 
 const setup = () =>
   renderWithIntl(
-    <LeadsTenantProvider tenantId="tenant-1">
+    <LeadsTenantProvider tenantId={TENANT_ID}>
       <DeleteLeadControl leadId="lead-1" leadName="Ada" />
     </LeadsTenantProvider>,
   );
@@ -30,6 +31,8 @@ const openDialog = (user: UserEvent) =>
   user.click(
     screen.getByRole('button', { name: 'Delete the message from Ada' }),
   );
+
+const DELETE_MESSAGE = 'Delete message';
 
 describe(`<${DeleteLeadControl.name}/>`, () => {
   let user: UserEvent;
@@ -57,10 +60,10 @@ describe(`<${DeleteLeadControl.name}/>`, () => {
     setup();
     await openDialog(user);
 
-    await user.click(screen.getByRole('button', { name: 'Delete message' }));
+    await user.click(screen.getByRole('button', { name: DELETE_MESSAGE }));
 
     await waitFor(() => expect(refresh).toHaveBeenCalled());
-    expect(deleteLeadActionMock).toHaveBeenCalledWith('tenant-1', 'lead-1');
+    expect(deleteLeadActionMock).toHaveBeenCalledWith(TENANT_ID, 'lead-1');
   });
 
   it('keeps the dialog open with an error when the delete fails', async () => {
@@ -70,7 +73,7 @@ describe(`<${DeleteLeadControl.name}/>`, () => {
     setup();
     await openDialog(user);
 
-    await user.click(screen.getByRole('button', { name: 'Delete message' }));
+    await user.click(screen.getByRole('button', { name: DELETE_MESSAGE }));
 
     expect(
       await screen.findByText("Couldn't delete the message. Try again."),
@@ -86,7 +89,7 @@ describe(`<${DeleteLeadControl.name}/>`, () => {
     setup();
     await openDialog(user);
 
-    await user.click(screen.getByRole('button', { name: 'Delete message' }));
+    await user.click(screen.getByRole('button', { name: DELETE_MESSAGE }));
 
     expect(
       await screen.findByText('This message was already deleted.'),

@@ -16,6 +16,7 @@ import {
   makeBlockedIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -81,7 +82,7 @@ const OWNER_EMAIL = BLOCKED_OWNER_EMAIL;
 const UNDO_FAILURE = new Error('delete failed');
 
 const ACTIVE_TENANT = {
-  id: 'tenant-1',
+  id: TENANT_ID,
   name: 'Acme',
   status: TENANT_STATUS.ACTIVE,
   deprovisionedAt: null,

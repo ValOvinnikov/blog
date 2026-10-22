@@ -1,3 +1,5 @@
+import { HTTP_STATUS, HTTP_METHOD } from '@blog/config';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
@@ -15,7 +17,9 @@ describe(dispatchDeprovisioningWorkflow, () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = 'ghp_token';
     envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
     envMock.TENANT_PROVISIONING_DATASET = undefined;
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.NO_CONTENT }),
+    );
   });
 
   afterEach(() => {
@@ -26,7 +30,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = undefined;
 
     const result = await dispatchDeprovisioningWorkflow({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       confirm: 'acme',
       dryRun: true,
     });
@@ -39,7 +43,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     envMock.TENANT_PROVISIONING_GITHUB_REPO = undefined;
 
     const result = await dispatchDeprovisioningWorkflow({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       confirm: 'acme',
       dryRun: true,
     });
@@ -50,7 +54,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
 
   it('POSTs a workflow_dispatch with tenantId, confirm and dryRun, and returns true', async () => {
     const result = await dispatchDeprovisioningWorkflow({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       confirm: 'acme',
       dryRun: true,
     });
@@ -58,13 +62,13 @@ describe(dispatchDeprovisioningWorkflow, () => {
     expect(fetchMock).toHaveBeenCalledWith(
       'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/deprovision-tenant.yml/dispatches',
       expect.objectContaining({
-        method: 'POST',
+        method: HTTP_METHOD.POST,
         headers: expect.objectContaining({
           Authorization: 'Bearer ghp_token',
         }),
         body: JSON.stringify({
           ref: 'main',
-          inputs: { tenantId: 'tenant-1', confirm: 'acme', dryRun: 'true' },
+          inputs: { tenantId: TENANT_ID, confirm: 'acme', dryRun: 'true' },
         }),
       }),
     );
@@ -73,7 +77,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
 
   it('omits environment from the dispatch body when no dataset is configured', async () => {
     await dispatchDeprovisioningWorkflow({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       confirm: 'acme',
       dryRun: true,
     });
@@ -83,7 +87,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
       expect.objectContaining({
         body: JSON.stringify({
           ref: 'main',
-          inputs: { tenantId: 'tenant-1', confirm: 'acme', dryRun: 'true' },
+          inputs: { tenantId: TENANT_ID, confirm: 'acme', dryRun: 'true' },
         }),
       }),
     );
@@ -92,7 +96,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
   it('sends environment from TENANT_PROVISIONING_DATASET when configured', async () => {
     envMock.TENANT_PROVISIONING_DATASET = 'development';
     await dispatchDeprovisioningWorkflow({
-      tenantId: 'tenant-1',
+      tenantId: TENANT_ID,
       confirm: 'acme',
       dryRun: true,
     });
@@ -103,7 +107,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
         body: JSON.stringify({
           ref: 'main',
           inputs: {
-            tenantId: 'tenant-1',
+            tenantId: TENANT_ID,
             confirm: 'acme',
             dryRun: 'true',
             environment: 'development',
@@ -114,11 +118,13 @@ describe(dispatchDeprovisioningWorkflow, () => {
   });
 
   it('returns false without throwing when the dispatch responds non-2xx', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.NOT_FOUND }),
+    );
 
     await expect(
       dispatchDeprovisioningWorkflow({
-        tenantId: 'tenant-1',
+        tenantId: TENANT_ID,
         confirm: 'acme',
         dryRun: true,
       }),
@@ -130,7 +136,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
 
     await expect(
       dispatchDeprovisioningWorkflow({
-        tenantId: 'tenant-1',
+        tenantId: TENANT_ID,
         confirm: 'acme',
         dryRun: true,
       }),
@@ -144,7 +150,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
 
     await expect(
       dispatchDeprovisioningWorkflow({
-        tenantId: 'tenant-1',
+        tenantId: TENANT_ID,
         confirm: 'acme',
         dryRun: true,
       }),

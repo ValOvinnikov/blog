@@ -11,6 +11,7 @@ import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -101,7 +102,7 @@ describe(uploadEmailLogoAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
+      tenant: { id: TENANT_ID },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
@@ -122,7 +123,7 @@ describe(uploadEmailLogoAction, () => {
 
   it('uploads and persists the tenant email logo under a unique name at a path distinct from the site logo', async () => {
     const result = await uploadEmailLogoAction(
-      'tenant-1',
+      TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -132,11 +133,11 @@ describe(uploadEmailLogoAction, () => {
       url: TENANT_LOGO_URL,
     });
     expect(putMock).toHaveBeenCalledWith(
-      'tenants/tenant-1/email-logo.png',
+      `tenants/${TENANT_ID}/email-logo.png`,
       VALID_ASSET.buffer,
       expect.objectContaining({ access: 'public', addRandomSuffix: true }),
     );
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith('tenant-1', {
+    expect(upsertEmailConfigMock).toHaveBeenCalledWith(TENANT_ID, {
       logoAssetUrl: TENANT_LOGO_URL,
     });
   });
@@ -148,19 +149,19 @@ describe(uploadEmailLogoAction, () => {
     upsertEmailTemplateMock.mockResolvedValue({});
 
     const result = await uploadEmailLogoAction(
-      'tenant-1',
+      TENANT_ID,
       { type: 'template', templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
     expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(putMock).toHaveBeenCalledWith(
-      'tenants/tenant-1/email-logo-magic_link.png',
+      `tenants/${TENANT_ID}/email-logo-magic_link.png`,
       VALID_ASSET.buffer,
       expect.objectContaining({ access: 'public', addRandomSuffix: true }),
     );
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       {
         logoAssetUrl: TEMPLATE_LOGO_URL,
@@ -178,7 +179,7 @@ describe(uploadEmailLogoAction, () => {
     });
 
     const result = await uploadEmailLogoAction(
-      'tenant-1',
+      TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.svg', { type: 'image/svg+xml' })),
     );
@@ -193,7 +194,7 @@ describe(uploadEmailLogoAction, () => {
 
   it('records exactly one SETTINGS_UPDATED audit event identifying the target', async () => {
     await uploadEmailLogoAction(
-      'tenant-1',
+      TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -204,7 +205,7 @@ describe(uploadEmailLogoAction, () => {
       actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: 'tenant-1',
+      targetId: TENANT_ID,
       details: {
         target: { type: 'tenant' },
         operation: 'upload',
@@ -217,7 +218,7 @@ describe(uploadEmailLogoAction, () => {
     upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await uploadEmailLogoAction(
-      'tenant-1',
+      TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -231,7 +232,7 @@ describe(uploadEmailLogoAction, () => {
 
     try {
       const result = await uploadEmailLogoAction(
-        'tenant-1',
+        TENANT_ID,
         { type: 'tenant' },
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       );
@@ -253,7 +254,7 @@ describe(uploadEmailLogoAction, () => {
 
     await expect(
       uploadEmailLogoAction(
-        'tenant-1',
+        TENANT_ID,
         { type: 'tenant' },
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),
@@ -269,7 +270,7 @@ describe(uploadEmailLogoAction, () => {
 
     await expect(
       uploadEmailLogoAction(
-        'tenant-1',
+        TENANT_ID,
         { type: 'tenant' },
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),

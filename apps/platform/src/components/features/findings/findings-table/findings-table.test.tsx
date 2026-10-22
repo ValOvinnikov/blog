@@ -6,10 +6,14 @@ import {
 } from '@blog/config/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
+import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { FindingsTable } from './findings-table';
 
 const render = renderWithIntl;
+
+const PLATFORM_WIDE = '— platform-wide';
+const WORKFLOW_RUN_URL = 'https://github.com/acme/blog/actions/runs/7';
 
 describe(FindingsTable, () => {
   it('renders one row per finding with its source, kind, severity and last-seen date', () => {
@@ -43,13 +47,11 @@ describe(FindingsTable, () => {
   });
 
   it("links a finding's tenant name to that tenant's overview page", () => {
-    render(
-      <FindingsTable findings={[makeFinding({ tenantId: 'tenant-1' })]} />,
-    );
+    render(<FindingsTable findings={[makeFinding({ tenantId: TENANT_ID })]} />);
 
     expect(screen.getByRole('link', { name: 'Acme Inc.' })).toHaveAttribute(
       'href',
-      '/tenants/tenant-1',
+      `/tenants/${TENANT_ID}`,
     );
   });
 
@@ -60,7 +62,7 @@ describe(FindingsTable, () => {
       />,
     );
 
-    expect(screen.getByText('— platform-wide')).toBeVisible();
+    expect(screen.getByText(PLATFORM_WIDE)).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
@@ -77,21 +79,21 @@ describe(FindingsTable, () => {
               sha: 'abcdef0123456789abcdef0123456789abcdef01',
               outcome: CONTRAST_CHECK_OUTCOME.FAIL,
               failureCount: 1,
-              runUrl: 'https://github.com/acme/blog/actions/runs/7',
+              runUrl: WORKFLOW_RUN_URL,
             },
           }),
         ]}
       />,
     );
 
-    expect(screen.getByText('— platform-wide')).toBeVisible();
+    expect(screen.getByText(PLATFORM_WIDE)).toBeVisible();
     expect(screen.getByText('abcdef0')).toBeVisible();
     expect(screen.getByText('1 failure')).toBeVisible();
     expect(
       screen.getByRole('link', {
         name: 'View the contrast run for commit abcdef0 (opens in new tab)',
       }),
-    ).toHaveAttribute('href', 'https://github.com/acme/blog/actions/runs/7');
+    ).toHaveAttribute('href', WORKFLOW_RUN_URL);
   });
 
   it('renders a healthy empty state instead of an empty table when there are no open findings', () => {

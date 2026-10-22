@@ -1,10 +1,16 @@
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { TenantsTable } from './tenants-table';
 
 const render = renderWithIntl;
+
+const HARBOR_CO = 'Harbor Co.';
+const HARBOR_DOMAIN = 'harbor.example.com';
+const MANAGE_ACME = 'Manage Acme Inc.';
+const MANAGE_HARBOR_CO = 'Manage Harbor Co.';
 
 describe(TenantsTable, () => {
   it('renders one row per tenant with its name, domain, plan and status', () => {
@@ -14,10 +20,10 @@ describe(TenantsTable, () => {
           makeReadyTenant(),
           makeReadyTenant({
             id: 'tenant-2',
-            name: 'Harbor Co.',
-            primaryDomain: 'harbor.example.com',
-            plan: 'GROWTH',
-            status: 'SUSPENDED',
+            name: HARBOR_CO,
+            primaryDomain: HARBOR_DOMAIN,
+            plan: TENANT_PLAN.GROWTH,
+            status: TENANT_STATUS.SUSPENDED,
           }),
         ]}
       />,
@@ -28,7 +34,7 @@ describe(TenantsTable, () => {
     expect(screen.getByText('Free')).toBeVisible();
     expect(screen.getByText('Active')).toBeVisible();
 
-    expect(screen.getByText('Harbor Co.')).toBeVisible();
+    expect(screen.getByText(HARBOR_CO)).toBeVisible();
     expect(screen.getByText('Growth')).toBeVisible();
     expect(screen.getByText('Suspended')).toBeVisible();
   });
@@ -40,18 +46,19 @@ describe(TenantsTable, () => {
           makeReadyTenant(),
           makeReadyTenant({
             id: 'tenant-2',
-            name: 'Harbor Co.',
-            primaryDomain: 'harbor.example.com',
+            name: HARBOR_CO,
+            primaryDomain: HARBOR_DOMAIN,
           }),
         ]}
       />,
     );
 
+    expect(screen.getByRole('link', { name: MANAGE_ACME })).toHaveAttribute(
+      'href',
+      `/tenants/${TENANT_ID}`,
+    );
     expect(
-      screen.getByRole('link', { name: 'Manage Acme Inc.' }),
-    ).toHaveAttribute('href', '/tenants/tenant-1');
-    expect(
-      screen.getByRole('link', { name: 'Manage Harbor Co.' }),
+      screen.getByRole('link', { name: MANAGE_HARBOR_CO }),
     ).toHaveAttribute('href', '/tenants/tenant-2');
   });
 
@@ -64,19 +71,20 @@ describe(TenantsTable, () => {
           }),
           makeReadyTenant({
             id: 'tenant-2',
-            name: 'Harbor Co.',
-            primaryDomain: 'harbor.example.com',
+            name: HARBOR_CO,
+            primaryDomain: HARBOR_DOMAIN,
             provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
           }),
         ]}
       />,
     );
 
+    expect(screen.getByRole('link', { name: MANAGE_ACME })).toHaveAttribute(
+      'href',
+      `/tenants/${TENANT_ID}/provisioning`,
+    );
     expect(
-      screen.getByRole('link', { name: 'Manage Acme Inc.' }),
-    ).toHaveAttribute('href', '/tenants/tenant-1/provisioning');
-    expect(
-      screen.getByRole('link', { name: 'Manage Harbor Co.' }),
+      screen.getByRole('link', { name: MANAGE_HARBOR_CO }),
     ).toHaveAttribute('href', '/tenants/tenant-2/provisioning');
   });
 

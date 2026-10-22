@@ -1,6 +1,7 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 const { requireAdminMock, getTenantByIdMock, getDomainVerificationStatusMock } =
   vi.hoisted(() => ({
@@ -22,6 +23,8 @@ vi.mock('./get-domain-verification-status', () => ({
   getDomainVerificationStatus: getDomainVerificationStatusMock,
 }));
 
+const ACME_EXAMPLE_COM = 'acme.example.com';
+
 describe('getDomainVerificationStatusAction', () => {
   beforeEach(() => {
     requireAdminMock.mockReset();
@@ -32,13 +35,13 @@ describe('getDomainVerificationStatusAction', () => {
 
   it('requires an admin session before doing anything else', async () => {
     requireAdminMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
     const { getDomainVerificationStatusAction } =
       await import('./get-domain-verification-status-action');
 
-    await expect(getDomainVerificationStatusAction('tenant-1')).rejects.toThrow(
-      'NEXT_REDIRECT',
+    await expect(getDomainVerificationStatusAction(TENANT_ID)).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
     expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();
@@ -46,7 +49,7 @@ describe('getDomainVerificationStatusAction', () => {
 
   it("resolves the domain from the tenant's own database row, never from the caller's argument", async () => {
     getTenantByIdMock.mockResolvedValue(
-      makeTenant({ id: 'tenant-1', primaryDomain: 'acme.example.com' }),
+      makeTenant({ id: TENANT_ID, primaryDomain: ACME_EXAMPLE_COM }),
     );
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.VERIFIED,
@@ -54,17 +57,15 @@ describe('getDomainVerificationStatusAction', () => {
     const { getDomainVerificationStatusAction } =
       await import('./get-domain-verification-status-action');
 
-    const result = await getDomainVerificationStatusAction('tenant-1');
+    const result = await getDomainVerificationStatusAction(TENANT_ID);
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
+    expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_ID, {
       includeArchived: true,
     });
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-      'acme.example.com',
+      ACME_EXAMPLE_COM,
     );
-    expect(getDomainVerificationStatusMock).not.toHaveBeenCalledWith(
-      'tenant-1',
-    );
+    expect(getDomainVerificationStatusMock).not.toHaveBeenCalledWith(TENANT_ID);
     expect(result).toBe(DOMAIN_VERIFICATION_STATUS.VERIFIED);
   });
 
