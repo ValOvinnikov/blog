@@ -1,4 +1,5 @@
 import { SANITY_PROJECT_ROLE } from '@blog/config/constants';
+import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { getTenantById, setTenantOwnerAccess } from '@blog/db/queries/tenants';
 import {
@@ -17,6 +18,7 @@ import {
   SANITY_PROJECT_ID,
 } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
 import { resendOwnerInvite } from './resend-owner-invite';
@@ -101,14 +103,31 @@ describe(resendOwnerInvite, () => {
     );
   });
 
-  it('records the new invite and when it was sent', async () => {
+  it('records the new invite and restarts its heads-up and nudge', async () => {
     await resendOwnerInvite(TEST_TENANT_ID);
 
     expect(setTenantOwnerAccess).toHaveBeenCalledWith(TEST_TENANT_ID, {
       sanityInviteId: NEW_INVITE_ID,
       inviteSentAt: new Date(SENT_AT),
       inviteAcceptedAt: null,
+      inviteHeadsUpSentAt: null,
+      inviteNudgeSentAt: null,
     });
+  });
+
+  it('claims a new heads-up once the new invite is recorded', async () => {
+    await resendOwnerInvite(TEST_TENANT_ID);
+
+    expect(sendOwnerEmailOnce).toHaveBeenCalledOnce();
+    expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
+      expect.objectContaining({ ownerEmail: OWNER_EMAIL }),
+      TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
+    );
+    expect(
+      vi.mocked(setTenantOwnerAccess).mock.invocationCallOrder[0],
+    ).toBeLessThan(
+      vi.mocked(sendOwnerEmailOnce).mock.invocationCallOrder[0] ?? 0,
+    );
   });
 
   it('sends no invite when the owner is already a project member', async () => {

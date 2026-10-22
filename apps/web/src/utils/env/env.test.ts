@@ -1,7 +1,15 @@
 /**
  * @vitest-environment jsdom
  */
-export {};
+import { KEY_ENCODING } from '@blog/utils/encryption';
+import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+
+const REVALIDATE_SECRET = 'revalidate-secret';
+const ANTHROPIC_KEY = 'anthropic-key';
+const GENERATE_SECRET = 'generate-secret';
+const SITE_URL = 'https://example.com';
+const STAGING_DATASET = 'staging';
+const SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
 
 const ENV_KEYS = [
   'SANITY_REVALIDATE_SECRET',
@@ -12,6 +20,8 @@ const ENV_KEYS = [
   'NEXT_PUBLIC_SANITY_PROJECT_ID',
   'NEXT_PUBLIC_SANITY_DATASET',
   'SKIP_ENV_VALIDATION',
+  'PERSONAL_DATA_ENCRYPTION_KEY',
+  'PERSONAL_DATA_INDEX_KEY',
 ] as const;
 
 const originalEnv = Object.fromEntries(
@@ -98,26 +108,47 @@ describe('env', () => {
     expect(env.NEXT_PUBLIC_SITE_URL).toBeUndefined();
   });
 
+  it('accepts personal-data keys that are 32 bytes of base64', async () => {
+    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] = `v1:${TEST_ENCRYPTION_KEY}`;
+    process.env['PERSONAL_DATA_INDEX_KEY'] = TEST_ENCRYPTION_KEY;
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.PERSONAL_DATA_INDEX_KEY).toBe(TEST_ENCRYPTION_KEY);
+  });
+
+  it('rejects a PERSONAL_DATA_INDEX_KEY shorter than 32 bytes', async () => {
+    process.env['PERSONAL_DATA_INDEX_KEY'] = SHORT_KEY;
+
+    await expect(importEnvOnServer()).rejects.toThrow();
+  });
+
+  it('rejects a PERSONAL_DATA_ENCRYPTION_KEY with a short key in an older version', async () => {
+    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] =
+      `v2:${TEST_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
+
+    await expect(importEnvOnServer()).rejects.toThrow();
+  });
+
   describe('with SANITY_REVALIDATE_SECRET set', () => {
     beforeEach(() => {
-      process.env['SANITY_REVALIDATE_SECRET'] = 'revalidate-secret';
+      process.env['SANITY_REVALIDATE_SECRET'] = REVALIDATE_SECRET;
     });
 
     it('parses a valid environment and exposes typed values', async () => {
-      process.env['ANTHROPIC_API_KEY'] = 'anthropic-key';
-      process.env['SANITY_GENERATE_SECRET'] = 'generate-secret';
-      process.env['NEXT_PUBLIC_SITE_URL'] = 'https://example.com';
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
+      process.env['ANTHROPIC_API_KEY'] = ANTHROPIC_KEY;
+      process.env['SANITY_GENERATE_SECRET'] = GENERATE_SECRET;
+      process.env['NEXT_PUBLIC_SITE_URL'] = SITE_URL;
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = STAGING_DATASET;
 
       const { env } = await importEnvOnServer();
 
-      expect(env.SANITY_REVALIDATE_SECRET).toBe('revalidate-secret');
-      expect(env.ANTHROPIC_API_KEY).toBe('anthropic-key');
-      expect(env.SANITY_GENERATE_SECRET).toBe('generate-secret');
-      expect(env.NEXT_PUBLIC_SITE_URL).toBe('https://example.com');
+      expect(env.SANITY_REVALIDATE_SECRET).toBe(REVALIDATE_SECRET);
+      expect(env.ANTHROPIC_API_KEY).toBe(ANTHROPIC_KEY);
+      expect(env.SANITY_GENERATE_SECRET).toBe(GENERATE_SECRET);
+      expect(env.NEXT_PUBLIC_SITE_URL).toBe(SITE_URL);
       expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
-      expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
+      expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe(STAGING_DATASET);
     });
 
     it('throws when SANITY_REVALIDATE_SECRET is read on the client', async () => {
