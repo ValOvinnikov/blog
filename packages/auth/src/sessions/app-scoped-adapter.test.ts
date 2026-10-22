@@ -1,3 +1,7 @@
+import {
+  TEST_SESSION_EXPIRES,
+  TEST_SESSION_TOKEN,
+} from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
 import { sha256Hex } from '@blog/utils/hash';
 import type { Adapter, AdapterAccount } from 'next-auth/adapters';
@@ -9,9 +13,8 @@ const user = {
   email: 'owner@example.com',
   emailVerified: null,
 };
-const expires = new Date('2030-01-01T00:00:00Z');
-const SESSION_TOKEN = 'session-token';
-const SESSION_TOKEN_HASH = sha256Hex(SESSION_TOKEN);
+const expires = TEST_SESSION_EXPIRES;
+const SESSION_TOKEN_HASH = sha256Hex(TEST_SESSION_TOKEN);
 
 function buildAdapter(
   storedApp: string,
@@ -47,7 +50,7 @@ describe(scopeAdapterToApp, () => {
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
     await scoped.createSession?.({
-      sessionToken: SESSION_TOKEN,
+      sessionToken: TEST_SESSION_TOKEN,
       userId: user.id,
       expires,
     });
@@ -67,19 +70,19 @@ describe(scopeAdapterToApp, () => {
     );
 
     const created = await scoped.createSession?.({
-      sessionToken: SESSION_TOKEN,
+      sessionToken: TEST_SESSION_TOKEN,
       userId: user.id,
       expires,
     });
 
-    expect(created?.sessionToken).toBe(SESSION_TOKEN);
+    expect(created?.sessionToken).toBe(TEST_SESSION_TOKEN);
   });
 
   it('looks a session up by the hash of the cookie token', async () => {
     const adapter = buildAdapter(AUTH_APP.PLATFORM);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
-    await scoped.getSessionAndUser?.(SESSION_TOKEN);
+    await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
 
     expect(adapter.getSessionAndUser).toHaveBeenCalledWith(SESSION_TOKEN_HASH);
   });
@@ -88,7 +91,7 @@ describe(scopeAdapterToApp, () => {
     const adapter = buildAdapter(AUTH_APP.PLATFORM);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
-    await scoped.updateSession?.({ sessionToken: SESSION_TOKEN, expires });
+    await scoped.updateSession?.({ sessionToken: TEST_SESSION_TOKEN, expires });
 
     expect(adapter.updateSession).toHaveBeenCalledWith({
       sessionToken: SESSION_TOKEN_HASH,
@@ -102,7 +105,7 @@ describe(scopeAdapterToApp, () => {
       AUTH_APP.PLATFORM,
     );
 
-    const found = await scoped.getSessionAndUser?.(SESSION_TOKEN);
+    const found = await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
 
     expect(found?.user).toEqual(user);
   });
@@ -113,7 +116,7 @@ describe(scopeAdapterToApp, () => {
       AUTH_APP.PLATFORM,
     );
 
-    const found = await scoped.getSessionAndUser?.(SESSION_TOKEN);
+    const found = await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
 
     expect(found).toBeNull();
   });
@@ -122,7 +125,7 @@ describe(scopeAdapterToApp, () => {
     const adapter = buildAdapter(AUTH_APP.PLATFORM);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
-    await scoped.deleteSession?.(SESSION_TOKEN);
+    await scoped.deleteSession?.(TEST_SESSION_TOKEN);
 
     expect(adapter.deleteSession).toHaveBeenCalledWith(SESSION_TOKEN_HASH);
   });
@@ -131,7 +134,7 @@ describe(scopeAdapterToApp, () => {
     const adapter = buildAdapter(AUTH_APP.SITE);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.PLATFORM);
 
-    await scoped.deleteSession?.(SESSION_TOKEN);
+    await scoped.deleteSession?.(TEST_SESSION_TOKEN);
 
     expect(adapter.deleteSession).not.toHaveBeenCalled();
   });

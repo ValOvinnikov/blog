@@ -1,7 +1,12 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import {
+  TEST_SESSION_EXPIRES,
+  TEST_SESSION_TOKEN,
+} from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { schema } from '@blog/db';
-import type { NextAuthConfig } from 'next-auth';
+import type { DefaultSession, NextAuthConfig } from 'next-auth';
 
 import { buildAuthConfig } from './config';
 
@@ -30,15 +35,19 @@ vi.mock('@blog/auth/events/record-signup-terms-on-sign-in', () => ({
 const SIGNED_IN_USER = { id: 'user-1', email: 'owner@example.com' };
 const AUTH_SECRET_VALUE = 'test-secret';
 
-const SESSION_EXPIRES = new Date('2030-01-01T00:00:00Z');
-
 type TSessionCallbackParams = Parameters<
   NonNullable<NonNullable<NextAuthConfig['callbacks']>['session']>
 >[0];
 
+const SESSION_ROW_ONLY_FIELDS = {
+  sessionToken: TEST_SESSION_TOKEN,
+  userId: SIGNED_IN_USER.id,
+  app: AUTH_APP.SITE,
+};
+
 async function resolveSessionResponse(
   config: NextAuthConfig,
-): Promise<unknown> {
+): Promise<TMaybeUndefined<DefaultSession>> {
   const user = {
     ...SIGNED_IN_USER,
     name: null,
@@ -47,10 +56,8 @@ async function resolveSessionResponse(
   };
   const databaseStrategyParams = {
     session: {
-      sessionToken: 'session-token',
-      userId: user.id,
-      expires: SESSION_EXPIRES,
-      app: AUTH_APP.SITE,
+      ...SESSION_ROW_ONLY_FIELDS,
+      expires: TEST_SESSION_EXPIRES,
       user,
     },
     user,
@@ -127,16 +134,18 @@ describe(buildAuthConfig, () => {
           email: SIGNED_IN_USER.email,
           image: null,
         },
-        expires: SESSION_EXPIRES.toISOString(),
+        expires: TEST_SESSION_EXPIRES.toISOString(),
       });
     });
 
     it('never puts the session token, user id or app in the session', async () => {
       const response = await resolveSessionResponse(config);
 
-      expect(response).not.toHaveProperty('sessionToken');
-      expect(response).not.toHaveProperty('userId');
-      expect(response).not.toHaveProperty('app');
+      expect(
+        Object.keys(response ?? {}).filter(
+          (field) => field in SESSION_ROW_ONLY_FIELDS,
+        ),
+      ).toEqual([]);
     });
 
     it('leaves pending membership invites alone on sign-in', async () => {
