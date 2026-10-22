@@ -56,6 +56,12 @@ describe.each(Object.values(LOCALE_ISO_CODES))(
       locale: defaultLocale,
       publishedAt: PUBLISHED_AT,
     });
+    const portfolioDocuments = buildStarterDocuments({
+      siteType: SITE_TYPE.PORTFOLIO,
+      siteName: SITE_NAME,
+      locale: defaultLocale,
+      publishedAt: PUBLISHED_AT,
+    });
     const siteSettings = documents.find(
       (document) => document._type === 'settings_site',
     )!;
@@ -81,6 +87,19 @@ describe.each(Object.values(LOCALE_ISO_CODES))(
         expect(await validateStarterDocument(document)).toEqual([]);
       },
     );
+
+    it.each(
+      buildStarterDocuments({
+        siteType: SITE_TYPE.PORTFOLIO,
+        siteName: SITE_NAME,
+        locale: defaultLocale,
+        publishedAt: PUBLISHED_AT,
+      }),
+    )('Portfolio $_type $_id passes Studio validation', async (document) => {
+      expect(
+        await validateStarterDocument(document, portfolioDocuments),
+      ).toEqual([]);
+    });
 
     it.each(
       buildStarterDocuments({

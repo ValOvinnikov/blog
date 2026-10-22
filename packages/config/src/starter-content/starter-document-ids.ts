@@ -25,4 +25,12 @@ export const STARTER_DOCUMENT_IDS = {
   BLOG_ABOUT: 'starter.blog.about',
   BLOG_POST_INDEX_LINK: 'starter.blog.postIndexLink',
   BLOG_ABOUT_LINK: 'starter.blog.aboutLink',
+  PORTFOLIO_HERO: 'starter.portfolio.hero',
+  PORTFOLIO_INTRO: 'starter.portfolio.intro',
+  PORTFOLIO_CTA: 'starter.portfolio.cta',
+  PORTFOLIO_AUTHOR: 'starter.portfolio.author',
+  PORTFOLIO_WORK_TEMPLATE: 'starter.portfolio.workTemplate',
+  PORTFOLIO_WORK_LIST: 'starter.portfolio.workList',
+  PORTFOLIO_WORK: 'starter.portfolio.work',
+  PORTFOLIO_WORK_LINK: 'starter.portfolio.workLink',
 } as const;
