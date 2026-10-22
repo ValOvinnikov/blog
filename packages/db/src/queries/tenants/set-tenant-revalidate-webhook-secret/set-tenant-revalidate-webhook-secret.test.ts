@@ -6,6 +6,7 @@ import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
 } from '@blog/db/testing/tenant-token-encryption-key';
+import { REVALIDATE_WEBHOOK_SECRET } from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantRevalidateWebhookSecret } from './set-tenant-revalidate-webhook-secret';
@@ -13,8 +14,6 @@ import { setTenantRevalidateWebhookSecret } from './set-tenant-revalidate-webhoo
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const WEBHOOK_SECRET = 'whsec-tenant-secret-value';
 
 const db = useQueryTestDb(getDbMock);
 
@@ -32,7 +31,10 @@ describe(setTenantRevalidateWebhookSecret, () => {
   });
 
   it('stores the secret encrypted, not as plaintext', async () => {
-    await setTenantRevalidateWebhookSecret(tenant.id, WEBHOOK_SECRET);
+    await setTenantRevalidateWebhookSecret(
+      tenant.id,
+      REVALIDATE_WEBHOOK_SECRET,
+    );
 
     const [row] = await db()
       .select()
@@ -40,13 +42,18 @@ describe(setTenantRevalidateWebhookSecret, () => {
       .where(eq(tenants.id, tenant.id));
 
     expect(row?.revalidateWebhookSecretEncrypted).toEqual(expect.any(String));
-    expect(row?.revalidateWebhookSecretEncrypted).not.toContain(WEBHOOK_SECRET);
+    expect(row?.revalidateWebhookSecretEncrypted).not.toContain(
+      REVALIDATE_WEBHOOK_SECRET,
+    );
   });
 
   it('leaves other tenants untouched', async () => {
     const other = await insertTestTenant(db());
 
-    await setTenantRevalidateWebhookSecret(tenant.id, WEBHOOK_SECRET);
+    await setTenantRevalidateWebhookSecret(
+      tenant.id,
+      REVALIDATE_WEBHOOK_SECRET,
+    );
 
     const [row] = await db()
       .select()
@@ -60,7 +67,7 @@ describe(setTenantRevalidateWebhookSecret, () => {
     vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
     await expect(
-      setTenantRevalidateWebhookSecret(tenant.id, WEBHOOK_SECRET),
+      setTenantRevalidateWebhookSecret(tenant.id, REVALIDATE_WEBHOOK_SECRET),
     ).rejects.toThrow(MISSING_TENANT_TOKEN_KEY_ERROR);
   });
 });

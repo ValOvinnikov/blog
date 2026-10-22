@@ -13,6 +13,8 @@ import type * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 
+export const REVALIDATE_WEBHOOK_SECRET = 'whsec-tenant-secret-value';
+
 export function makeTenantOwnerAccess(
   overrides: Partial<TTenantOwnerAccess> = {},
 ): TTenantOwnerAccess {

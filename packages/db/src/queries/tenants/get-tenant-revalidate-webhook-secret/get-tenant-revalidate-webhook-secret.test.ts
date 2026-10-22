@@ -3,19 +3,18 @@ import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
 } from '@blog/db/testing/tenant-token-encryption-key';
+import { REVALIDATE_WEBHOOK_SECRET } from '@blog/db/testing/tenants/fixtures';
 
 import { getTenantRevalidateWebhookSecret } from './get-tenant-revalidate-webhook-secret';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const SANITY_PROJECT_ID = 'abc123';
-const WEBHOOK_SECRET = 'whsec-tenant-secret-value';
 
 const db = useQueryTestDb(getDbMock);
 
@@ -36,13 +35,19 @@ describe(getTenantRevalidateWebhookSecret, () => {
 
   describe('with a secret stored', () => {
     beforeEach(async () => {
-      await setTenantRevalidateWebhookSecret(tenant.id, WEBHOOK_SECRET);
+      await setTenantRevalidateWebhookSecret(
+        tenant.id,
+        REVALIDATE_WEBHOOK_SECRET,
+      );
     });
 
     it('resolves the tenant id and the decrypted secret for its project id', async () => {
       await expect(
         getTenantRevalidateWebhookSecret(SANITY_PROJECT_ID),
-      ).resolves.toEqual({ tenantId: tenant.id, secret: WEBHOOK_SECRET });
+      ).resolves.toEqual({
+        tenantId: tenant.id,
+        secret: REVALIDATE_WEBHOOK_SECRET,
+      });
     });
 
     it('throws when the encryption key is not configured', async () => {
