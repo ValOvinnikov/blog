@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, ERROR_CODE, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 
@@ -38,13 +39,11 @@ vi.mock('@blog/db', () => ({
 
 const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
-const TENANT_ID = 'tenant-1';
-
 describe('getBookmarkStatus', () => {
   beforeEach(() => {
     authMock.mockReset();
     getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
     isBookmarkedMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
@@ -68,7 +67,7 @@ describe('getBookmarkStatus', () => {
 
     await expect(getBookmarkStatus('post-1')).resolves.toBe(true);
     expect(isBookmarkedMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      DEFAULT_TENANT_ID,
       'user-1',
       'post-1',
     );
@@ -82,7 +81,7 @@ describe('setBookmarkStatus', () => {
     resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
-      tenantId: TENANT_ID,
+      tenantId: DEFAULT_TENANT_ID,
     });
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
@@ -130,7 +129,11 @@ describe('setBookmarkStatus', () => {
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(addBookmarkMock).toHaveBeenCalledWith(TENANT_ID, 'user-1', 'post-1');
+    expect(addBookmarkMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_ID,
+      'user-1',
+      'post-1',
+    );
     expect(removeBookmarkMock).not.toHaveBeenCalled();
   });
 
@@ -152,7 +155,7 @@ describe('setBookmarkStatus', () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(removeBookmarkMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      DEFAULT_TENANT_ID,
       'user-1',
       'post-1',
     );

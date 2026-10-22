@@ -4,6 +4,10 @@ import { createTenant } from '@blog/db/queries/tenants/create-tenant';
 import * as schema from '@blog/db/schema';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MISSING_TENANT_TOKEN_KEY_ERROR,
+  useTenantTokenEncryptionKey,
+} from '@blog/db/testing/tenant-token-encryption-key';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSanityToken } from './set-tenant-sanity-token';
@@ -26,21 +30,13 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-const db = useQueryTestDb(getDbMock);
-const originalKey = process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+const READ_TOKEN = 'sk-real-token-value';
 
-beforeEach(() => {
-  process.env['TENANT_TOKEN_ENCRYPTION_KEY'] =
-    'wF3n9s6q0Zc7yq2z8Xh9mS4h9r0kQnW5R2t8jL1oQxo=';
-});
+const db = useQueryTestDb(getDbMock);
+useTenantTokenEncryptionKey();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
-  if (originalKey === undefined) {
-    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-  } else {
-    process.env['TENANT_TOKEN_ENCRYPTION_KEY'] = originalKey;
-  }
 });
 
 describe(setTenantSanityToken, () => {
@@ -51,22 +47,22 @@ describe(setTenantSanityToken, () => {
   });
 
   it('stores the token encrypted, not as plaintext', async () => {
-    await setTenantSanityToken(tenant.id, 'sk-real-token-value');
+    await setTenantSanityToken(tenant.id, READ_TOKEN);
 
     const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenant.id));
 
-    expect(row?.sanityReadTokenEncrypted).not.toContain('sk-real-token-value');
+    expect(row?.sanityReadTokenEncrypted).not.toContain(READ_TOKEN);
     expect(row?.sanityReadTokenEncrypted).toEqual(expect.any(String));
   });
 
   it('throws when the encryption key is not configured', async () => {
-    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+    vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
-    await expect(
-      setTenantSanityToken(tenant.id, 'sk-real-token-value'),
-    ).rejects.toThrow('TENANT_TOKEN_ENCRYPTION_KEY is not configured.');
+    await expect(setTenantSanityToken(tenant.id, READ_TOKEN)).rejects.toThrow(
+      MISSING_TENANT_TOKEN_KEY_ERROR,
+    );
   });
 });

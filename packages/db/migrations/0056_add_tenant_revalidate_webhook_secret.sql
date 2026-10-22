@@ -1,0 +1,1 @@
+ALTER TABLE "tenants" ADD COLUMN "revalidate_webhook_secret_encrypted" text;

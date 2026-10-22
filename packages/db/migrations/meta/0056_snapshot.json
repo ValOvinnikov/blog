@@ -1,5 +1,5 @@
 {
-  "id": "6461e821-ff77-474f-898b-b277e99d2074",
+  "id": "d2f015e9-6691-41a4-9b74-c7645e9de69b",
   "prevId": "1d9fe5e1-0cf2-4c85-8402-54672be8238a",
   "version": "7",
   "dialect": "postgresql",
@@ -1000,24 +1000,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "source_document_id": {
-          "name": "source_document_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "source_locale": {
-          "name": "source_locale",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "read_at": {
-          "name": "read_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -1742,6 +1724,12 @@
         },
         "sanity_write_token_encrypted": {
           "name": "sanity_write_token_encrypted",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revalidate_webhook_secret_encrypted": {
+          "name": "revalidate_webhook_secret_encrypted",
           "type": "text",
           "primaryKey": false,
           "notNull": false

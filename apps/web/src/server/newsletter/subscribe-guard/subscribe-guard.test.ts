@@ -1,3 +1,5 @@
+import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+
 const {
   checkBotIdMock,
   headersMock,
@@ -22,7 +24,6 @@ vi.mock(
 );
 vi.mock('@web/utils/env/env', () => ({ env: {} }));
 
-const TENANT_ID = 'tenant-1';
 const SUBSCRIBE_BLOCKED_EVENT = 'newsletter.subscribe_blocked';
 
 const loadGuard = async () => {
@@ -46,7 +47,7 @@ describe('isSubscribeAttemptRefused', () => {
 
     const refusals: boolean[] = [];
     for (let i = 0; i < 6; i += 1) {
-      refusals.push(await isSubscribeAttemptRefused(TENANT_ID));
+      refusals.push(await isSubscribeAttemptRefused(DEFAULT_TENANT_ID));
     }
 
     expect(refusals).toEqual([false, false, false, false, false, true]);
@@ -55,21 +56,25 @@ describe('isSubscribeAttemptRefused', () => {
   it('counts each address separately', async () => {
     const { isSubscribeAttemptRefused } = await loadGuard();
     for (let i = 0; i < 6; i += 1) {
-      await isSubscribeAttemptRefused(TENANT_ID);
+      await isSubscribeAttemptRefused(DEFAULT_TENANT_ID);
     }
 
     headersMock.mockResolvedValue(
       new Headers({ 'x-forwarded-for': '203.0.113.9' }),
     );
 
-    await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(false);
+    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
+      false,
+    );
   });
 
   it('refuses a bot without counting it against the address, and logs it', async () => {
     const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
     checkBotIdMock.mockResolvedValue({ isBot: true });
 
-    await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
+    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
+      true,
+    );
     expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
       reason: 'bot',
     });
@@ -80,7 +85,9 @@ describe('isSubscribeAttemptRefused', () => {
     const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
     checkBotIdMock.mockRejectedValue(new Error('botid down'));
 
-    await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
+    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
+      true,
+    );
     expect(warnMock).toHaveBeenCalledWith(
       SUBSCRIBE_BLOCKED_EVENT,
       expect.objectContaining({ reason: 'bot_check_unavailable' }),
@@ -94,7 +101,9 @@ describe('isSubscribeAttemptRefused', () => {
     });
     const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
 
-    await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
+    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
+      true,
+    );
     expect(warnMock).toHaveBeenCalledWith(
       SUBSCRIBE_BLOCKED_EVENT,
       expect.objectContaining({ reason: 'rate_limit_store_unavailable' }),
@@ -107,7 +116,9 @@ describe('isSubscribeAttemptRefused', () => {
     });
     const { isSubscribeAttemptRefused } = await loadGuard();
 
-    await expect(isSubscribeAttemptRefused(TENANT_ID)).resolves.toBe(true);
+    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
+      true,
+    );
   });
 
   it('refuses when the store does not answer in time', async () => {
@@ -117,7 +128,7 @@ describe('isSubscribeAttemptRefused', () => {
     });
     const { isSubscribeAttemptRefused } = await loadGuard();
 
-    const refused = isSubscribeAttemptRefused(TENANT_ID);
+    const refused = isSubscribeAttemptRefused(DEFAULT_TENANT_ID);
     await vi.advanceTimersByTimeAsync(2_000);
 
     await expect(refused).resolves.toBe(true);
