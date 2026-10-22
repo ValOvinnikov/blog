@@ -6,7 +6,6 @@ import {
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -40,7 +39,7 @@ describe(resendConfirmation, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns fresh tokens for a pending subscriber and stores only their hashes', async () => {
+  it('returns the pending subscriber and a token without changing the row', async () => {
     const [subscriber] = await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL })
@@ -48,20 +47,20 @@ describe(resendConfirmation, () => {
     if (!subscriber) throw new Error('failed to seed a subscriber row');
 
     const result = await resendConfirmation(tenantId, user.id);
-    if (result.outcome !== SUBSCRIBER_OUTCOME.PENDING)
-      throw new Error('expected pending');
 
+    expect(result).toEqual({
+      ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
+      subscriberId: subscriber.id,
+      confirmationToken: expect.any(String),
+    });
     const [row] = await db()
       .select()
       .from(schema.subscribers)
       .where(eq(schema.subscribers.id, subscriber.id));
-    expect(row?.confirmationTokenHash).toBe(
-      sha256Hex(result.confirmationToken),
-    );
-    expect(row?.unsubscribeTokenHash).toBe(sha256Hex(result.unsubscribeToken));
+    expect(row).toEqual(subscriber);
   });
 
-  it('rotates the tokens on every call', async () => {
+  it('mints a fresh token on every call', async () => {
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL });

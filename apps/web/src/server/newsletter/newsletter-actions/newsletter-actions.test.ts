@@ -33,6 +33,8 @@ const {
   getEmailTemplateMock,
   claimConfirmationSendMock,
   releaseConfirmationSendMock,
+  commitConfirmationTokenMock,
+  mintNewsletterUnsubscribeTokenMock,
   isSubscribeAttemptRefusedMock,
   getTenantPlanMock,
   getEffectiveSettingsFeaturesMock,
@@ -46,6 +48,8 @@ const {
   getEmailTemplateMock: vi.fn(),
   claimConfirmationSendMock: vi.fn(),
   releaseConfirmationSendMock: vi.fn(),
+  commitConfirmationTokenMock: vi.fn(),
+  mintNewsletterUnsubscribeTokenMock: vi.fn(),
   isSubscribeAttemptRefusedMock: vi.fn(),
   getTenantPlanMock: vi.fn(),
   getEffectiveSettingsFeaturesMock: vi.fn(),
@@ -58,6 +62,7 @@ vi.mock('@blog/db', async () => ({
       createPendingSubscriber: createPendingSubscriberMock,
       claimConfirmationSend: claimConfirmationSendMock,
       releaseConfirmationSend: releaseConfirmationSendMock,
+      commitConfirmationToken: commitConfirmationTokenMock,
     },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
@@ -96,6 +101,13 @@ vi.mock('@web/server/newsletter/subscribe-guard/subscribe-guard', () => ({
   isSubscribeAttemptRefused: isSubscribeAttemptRefusedMock,
 }));
 
+vi.mock(
+  '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token',
+  () => ({
+    mintNewsletterUnsubscribeToken: mintNewsletterUnsubscribeTokenMock,
+  }),
+);
+
 vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
@@ -132,10 +144,7 @@ const subscriber = makeSubscriber({
 const CLAIMED_AT = faker.date.recent();
 const CLAIM = {
   claimedAt: CLAIMED_AT,
-  tokens: {
-    confirmationToken: CONFIRMATION_TOKEN,
-    unsubscribeToken: UNSUBSCRIBE_TOKEN,
-  },
+  confirmationToken: CONFIRMATION_TOKEN,
 };
 
 const DEFAULT_BRAND = resolveTenantEmailBrand({
@@ -186,6 +195,8 @@ describe('subscribeToNewsletterAction', () => {
     });
     claimConfirmationSendMock.mockResolvedValue(CLAIM);
     releaseConfirmationSendMock.mockResolvedValue(undefined);
+    commitConfirmationTokenMock.mockResolvedValue(undefined);
+    mintNewsletterUnsubscribeTokenMock.mockReturnValue(UNSUBSCRIBE_TOKEN);
     isSubscribeAttemptRefusedMock.mockResolvedValue(false);
     ({ subscribeToNewsletterAction } = await import('./newsletter-actions'));
   });
@@ -221,6 +232,26 @@ describe('subscribeToNewsletterAction', () => {
       }),
     );
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('stores the new confirm token only once the email is sent', async () => {
+    await subscribeToNewsletterAction(EMAIL);
+
+    expect(commitConfirmationTokenMock).toHaveBeenCalledWith(
+      subscriber.id,
+      CONFIRMATION_TOKEN,
+    );
+    expect(sendEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
+      commitConfirmationTokenMock.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it("signs the unsubscribe link for the subscriber's own row", async () => {
+    await subscribeToNewsletterAction(EMAIL);
+
+    expect(mintNewsletterUnsubscribeTokenMock).toHaveBeenCalledWith(
+      subscriber.id,
+    );
   });
 
   it("gates on the resolved tenant's capability without a request context", async () => {
@@ -509,6 +540,28 @@ describe('subscribeToNewsletterAction', () => {
 
       await subscribeToNewsletterAction(EMAIL);
 
+      expect(releaseConfirmationSendMock).toHaveBeenCalledWith(
+        subscriber.id,
+        CLAIMED_AT,
+      );
+    });
+
+    it('keeps the previous confirm token when the confirmation email fails to send', async () => {
+      sendEmailMock.mockRejectedValue(new Error(faker.lorem.sentence()));
+
+      await subscribeToNewsletterAction(EMAIL);
+
+      expect(commitConfirmationTokenMock).not.toHaveBeenCalled();
+    });
+
+    it('gives back the cooldown claim when storing the confirm token fails', async () => {
+      commitConfirmationTokenMock.mockRejectedValue(
+        new Error(faker.lorem.sentence()),
+      );
+
+      const result = await subscribeToNewsletterAction(EMAIL);
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
       expect(releaseConfirmationSendMock).toHaveBeenCalledWith(
         subscriber.id,
         CLAIMED_AT,

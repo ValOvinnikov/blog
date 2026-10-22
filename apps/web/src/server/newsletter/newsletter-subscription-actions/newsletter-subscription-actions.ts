@@ -3,23 +3,17 @@
 import {
   ACTION_OUTCOME,
   SUBSCRIBER_OUTCOME,
-  routes,
   type TActionResult,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { auth } from '@web/server/auth/auth';
+import { deliverNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
-import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
-import { getSubscribedPageLocale } from '@web/server/newsletter/subscribed-page-locale/subscribed-page-locale';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
-import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
-import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
-import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
 export type TUnsubscribeResult = TActionResult<
   typeof ACTION_OUTCOME.SERVER_ERROR
@@ -88,42 +82,12 @@ export const resendConfirmationAction =
       if (result.outcome === SUBSCRIBER_OUTCOME.NOT_PENDING)
         return SERVER_ERROR;
 
-      const siteUrl = (await getTenantBaseUrl()) ?? '';
-      const locale = await getSubscribedPageLocale();
-      const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(result.confirmationToken, locale)}`;
-      const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(result.unsubscribeToken, locale)}`;
-      const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
-      const {
-        subject,
-        body,
-        logoImageUrl,
-        footerPostalAddress,
-        fromAddress,
-        replyTo,
-      } = await resolveNewsletterEmailSettings(
+      const { subscriberId, confirmationToken } = result;
+      await deliverNewsletterConfirmation(
         tenantId,
-        env.NEWSLETTER_FROM_ADDRESS,
-        locale,
+        { subscriberId, email },
+        confirmationToken,
       );
-      const { html, headers } = buildNewsletterConfirmationEmail({
-        subject,
-        body,
-        confirmationUrl,
-        unsubscribeUrl,
-        brand,
-        brandName,
-        logoImageUrl,
-        footerPostalAddress,
-      });
-
-      await sendEmail({
-        to: email,
-        from: fromAddress,
-        subject,
-        html,
-        headers,
-        replyTo,
-      });
       return SUCCESS;
     } catch (error) {
       logger.error('newsletter.confirmation_resend_failed', { error });

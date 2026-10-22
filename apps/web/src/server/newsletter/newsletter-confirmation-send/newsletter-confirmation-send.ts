@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { queries, type schema } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
+import { mintNewsletterUnsubscribeToken } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
 import { getSubscribedPageLocale } from '@web/server/newsletter/subscribed-page-locale/subscribed-page-locale';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
@@ -9,16 +10,19 @@ import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-iden
 
 const CONFIRMATION_RESEND_COOLDOWN_MS = 15 * 60_000;
 
+interface IConfirmationRecipient {
+  subscriberId: string;
+  email: string;
+}
+
 const sendConfirmationEmail = async (
   tenantId: string,
-  email: string,
-  {
-    confirmationToken,
-    unsubscribeToken,
-  }: queries.subscribers.IConfirmationSendClaim['tokens'],
+  { subscriberId, email }: IConfirmationRecipient,
+  confirmationToken: string,
 ): Promise<void> => {
   const siteUrl = (await getTenantBaseUrl()) ?? '';
   const locale = await getSubscribedPageLocale();
+  const unsubscribeToken = mintNewsletterUnsubscribeToken(subscriberId);
   const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(confirmationToken, locale)}`;
   const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(unsubscribeToken, locale)}`;
   const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
@@ -57,6 +61,18 @@ const sendConfirmationEmail = async (
   });
 };
 
+export const deliverNewsletterConfirmation = async (
+  tenantId: string,
+  recipient: IConfirmationRecipient,
+  confirmationToken: string,
+): Promise<void> => {
+  await sendConfirmationEmail(tenantId, recipient, confirmationToken);
+  await queries.subscribers.commitConfirmationToken(
+    recipient.subscriberId,
+    confirmationToken,
+  );
+};
+
 export const sendNewsletterConfirmation = async (
   tenantId: string,
   subscriber: schema.TSubscriber,
@@ -68,9 +84,13 @@ export const sendNewsletterConfirmation = async (
   );
   if (!claim) return;
 
-  const { claimedAt, tokens } = claim;
+  const { claimedAt, confirmationToken } = claim;
   try {
-    await sendConfirmationEmail(tenantId, email, tokens);
+    await deliverNewsletterConfirmation(
+      tenantId,
+      { subscriberId: id, email },
+      confirmationToken,
+    );
   } catch (error) {
     await queries.subscribers.releaseConfirmationSend(id, claimedAt);
     throw error;

@@ -5,7 +5,7 @@ import {
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { mintSubscriberTokens } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -27,15 +27,20 @@ async function insertSubscriber(
   tenantId: string,
   overrides: Partial<typeof schema.subscribers.$inferInsert> = {},
 ): Promise<{ subscriber: schema.TSubscriber; unsubscribeToken: string }> {
-  const { tokens, hashes } = mintSubscriberTokens();
+  const unsubscribeToken = faker.string.uuid();
   const [inserted] = await db()
     .insert(schema.subscribers)
-    .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, ...hashes, ...overrides })
+    .values({
+      tenantId,
+      email: TEST_SUBSCRIBER_EMAIL,
+      unsubscribeTokenHash: sha256Hex(unsubscribeToken),
+      ...overrides,
+    })
     .returning();
 
   if (!inserted) throw new Error('failed to seed a subscriber row');
 
-  return { subscriber: inserted, unsubscribeToken: tokens.unsubscribeToken };
+  return { subscriber: inserted, unsubscribeToken };
 }
 
 describe(unsubscribeByToken, () => {

@@ -5,7 +5,7 @@ import {
   TEST_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { mintSubscriberTokens } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -28,15 +28,15 @@ afterEach(async () => {
 async function insertPendingSubscriber(
   tenantId: string,
 ): Promise<schema.TSubscriber & { confirmationToken: string }> {
-  const { tokens, hashes } = mintSubscriberTokens();
+  const { confirmationToken, confirmationTokenHash } = mintConfirmationToken();
   const [inserted] = await db()
     .insert(schema.subscribers)
-    .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, ...hashes })
+    .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, confirmationTokenHash })
     .returning();
 
   if (!inserted) throw new Error('failed to seed a subscriber row');
 
-  return { ...inserted, confirmationToken: tokens.confirmationToken };
+  return { ...inserted, confirmationToken };
 }
 
 describe(confirmSubscriber, () => {
