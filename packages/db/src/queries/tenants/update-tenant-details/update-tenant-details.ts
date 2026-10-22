@@ -3,6 +3,7 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
+  PROVISIONING_STATE,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
@@ -110,13 +111,13 @@ export async function updateTenantDetails(
   );
 
   if (
-    provisioningState === TENANT_PROVISIONING_STEP_STATUS.RUNNING ||
-    provisioningState === 'SUCCEEDED'
+    provisioningState === PROVISIONING_STATE.RUNNING ||
+    provisioningState === PROVISIONING_STATE.SUCCEEDED
   ) {
     return toOutcome('provisioning-started');
   }
 
-  if (provisioningState === TENANT_PROVISIONING_STEP_STATUS.FAILED) {
+  if (provisioningState === PROVISIONING_STATE.FAILED) {
     const lockedField = lockedFieldOutcome(input, existing);
     if (lockedField) {
       return lockedField;
