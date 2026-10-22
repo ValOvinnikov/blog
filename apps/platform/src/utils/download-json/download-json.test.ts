@@ -1,5 +1,6 @@
 import { type Blob, resolveObjectURL } from 'node:buffer';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { faker } from '@faker-js/faker';
 
 import { downloadJson } from './download-json';
@@ -9,7 +10,7 @@ const VALUE = { subscribers: [{ id: faker.string.uuid() }] };
 
 describe(downloadJson, () => {
   const link = { href: '', download: '', click: vi.fn() };
-  let saved: Blob | undefined;
+  let saved: TMaybeUndefined<Blob>;
 
   const download = () =>
     downloadJson(link as unknown as HTMLAnchorElement, FILE_NAME, VALUE);
