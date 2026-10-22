@@ -3,6 +3,8 @@ import {
   TEST_SESSION_TOKEN,
 } from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
+import { queries } from '@blog/db';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { sha256Hex } from '@blog/utils/hash';
 import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 
@@ -11,10 +13,18 @@ import { scopeAdapterToApp } from './app-scoped-adapter';
 const user = {
   id: 'user-1',
   email: 'owner@example.com',
+  name: null,
   emailVerified: null,
 };
 const expires = TEST_SESSION_EXPIRES;
 const SESSION_TOKEN_HASH = sha256Hex(TEST_SESSION_TOKEN);
+
+usePersonalDataKeys();
+
+const storedUser = () => ({
+  ...user,
+  ...queries.users.userPersonalColumns(user),
+});
 
 function buildAdapter(
   storedApp: string,
@@ -33,7 +43,7 @@ function buildAdapter(
     linkAccount: vi.fn(async () => undefined),
     getSessionAndUser: vi.fn(async (sessionToken) => ({
       session: { sessionToken, userId: user.id, expires, app: storedApp },
-      user,
+      user: storedUser(),
     })),
     updateSession: vi.fn(async (session) => ({
       userId: user.id,
@@ -107,7 +117,7 @@ describe(scopeAdapterToApp, () => {
 
     const found = await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
 
-    expect(found?.user).toEqual(user);
+    expect(found?.user).toMatchObject(user);
   });
 
   it('reads a session another app issued as no session', async () => {
