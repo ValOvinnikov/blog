@@ -1,3 +1,4 @@
+import { KEY_ENCODING } from './crypto-encoding';
 import {
   OTHER_TEST_ENCRYPTION_KEY as KEY_V2,
   TEST_ENCRYPTION_KEY as KEY_V1,
@@ -5,6 +6,8 @@ import {
 import {
   decryptPersonalData,
   encryptPersonalData,
+  isPersonalDataKey,
+  isPersonalDataKeyring,
   parsePersonalDataKeyring,
   personalDataIndex,
 } from './personal-data';
@@ -12,6 +15,14 @@ const ADDRESS = 'reader@example.com';
 const KEYRING_V1 = parsePersonalDataKeyring(`v1:${KEY_V1}`);
 const KEYRING_V2 = parsePersonalDataKeyring(`v2:${KEY_V2},v1:${KEY_V1}`);
 const MALFORMED_KEYRING = 'Malformed personal data keyring.';
+const SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
+const LONG_KEY = Buffer.alloc(33).toString(KEY_ENCODING);
+const NON_BASE64_KEY = `${KEY_V1.slice(0, -2)}!=`;
+const BAD_KEYS: [string, string][] = [
+  ['a short key', SHORT_KEY],
+  ['a long key', LONG_KEY],
+  ['a key that is not base64', NON_BASE64_KEY],
+];
 
 describe(parsePersonalDataKeyring, () => {
   it('encrypts with the first entry and keeps every entry for decryption', () => {
@@ -21,14 +32,39 @@ describe(parsePersonalDataKeyring, () => {
     });
   });
 
-  it.each([
+  it.each<[string, string]>([
     ['an empty value', ''],
     ['an entry with no key', 'v1:'],
     ['an entry with no version', KEY_V1],
     ['a version not shaped v<n>', `one:${KEY_V1}`],
     ['a repeated version', `v1:${KEY_V1},v1:${KEY_V2}`],
+    ...BAD_KEYS.map(([label, key]): [string, string] => [label, `v1:${key}`]),
+    ['a bad key in an older version', `v2:${KEY_V2},v1:${SHORT_KEY}`],
   ])('rejects %s', (_label, raw) => {
     expect(() => parsePersonalDataKeyring(raw)).toThrow(MALFORMED_KEYRING);
+  });
+});
+
+describe(isPersonalDataKeyring, () => {
+  it('accepts a keyring whose every version holds a 32-byte key', () => {
+    expect(isPersonalDataKeyring(`v2:${KEY_V2},v1:${KEY_V1}`)).toBe(true);
+  });
+
+  it('rejects a keyring whose older version holds a long key', () => {
+    expect(isPersonalDataKeyring(`v2:${KEY_V2},v1:${LONG_KEY}`)).toBe(false);
+  });
+});
+
+describe(isPersonalDataKey, () => {
+  it('accepts a 32-byte base64 key', () => {
+    expect(isPersonalDataKey(KEY_V1)).toBe(true);
+  });
+
+  it.each<[string, string]>([
+    ...BAD_KEYS,
+    ['a key with surrounding whitespace', ` ${KEY_V1}`],
+  ])('rejects %s as a key', (_label, key) => {
+    expect(isPersonalDataKey(key)).toBe(false);
   });
 });
 

@@ -1,3 +1,9 @@
+import {
+  isPersonalDataKey,
+  isPersonalDataKeyring,
+  PERSONAL_DATA_KEY_FORMAT,
+  PERSONAL_DATA_KEYRING_FORMAT,
+} from '@blog/utils/encryption';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
@@ -69,9 +75,15 @@ export const env = createEnv({
     // @env-optional
     VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
     // @env-optional
-    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    PERSONAL_DATA_ENCRYPTION_KEY: z
+      .string()
+      .refine(isPersonalDataKeyring, PERSONAL_DATA_KEYRING_FORMAT)
+      .optional(),
     // @env-optional
-    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
+    PERSONAL_DATA_INDEX_KEY: z
+      .string()
+      .refine(isPersonalDataKey, PERSONAL_DATA_KEY_FORMAT)
+      .optional(),
   },
   client: {
     // @env-optional
