@@ -15,5 +15,6 @@ export function withFakeTenantsQueries(
     setTenantOwnerAccess: vi.fn(),
     claimTenantOwnerEmail: vi.fn(),
     releaseTenantOwnerEmail: vi.fn(),
+    setTenantSiteTemplateVersion: vi.fn(),
   };
 }

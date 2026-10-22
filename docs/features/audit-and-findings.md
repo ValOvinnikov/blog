@@ -109,7 +109,12 @@ Nothing is configurable. Only admins (any role) see either record.
 - Neither `details` column holds an email address or other personal field.
   Writers record field names or ids instead: email config lists the saved
   field names, tenant details records `ownerEmailUpdated`, and tenant
-  creation records `ownerUserId` (null for an invited owner).
+  creation records `ownerUserId` (null for an invited owner). Migration
+  `0053` scrubbed the rows written before that: tenant details events gained
+  `ownerEmailUpdated: true`, email config events became `fields`, any other
+  key whose value is an email address was dropped, and an address inside
+  longer text became `[email removed]`. It reports the rows it changed as a
+  notice and changes nothing on a second run.
 - `recordAuditEvent` never throws and never changes its caller's result. A
   lost audit write is logged at `error` under the caller's `logEvent` and
   swallowed, because `neon-http` cannot couple the two writes in a
