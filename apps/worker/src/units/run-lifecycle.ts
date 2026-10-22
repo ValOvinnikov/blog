@@ -18,9 +18,8 @@ import {
 
 import type { TUnitContext } from './run-reported-step';
 
-export type TRunOutcome =
-  | { ok: true }
-  | { ok: false; failedStep?: TTenantProvisioningStep; error?: string };
+export type TRunOutcome<TStep extends string = TTenantProvisioningStep> =
+  { ok: true } | { ok: false; failedStep?: TStep; error?: string };
 
 export async function beginRun(tenantId: string): Promise<void> {
   'use step';

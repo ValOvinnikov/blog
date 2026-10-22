@@ -12,11 +12,11 @@ import {
 import { logger } from '@worker/utils/logger/logger';
 import { alertOperatorsToDeleteSanityProject } from '@worker/utils/operator-email/sanity-project-deletion-alert';
 
+import type { TRunOutcome } from './run-lifecycle';
 import { loadTenant, type TUnitContext } from './run-reported-step';
 
 export type TDeprovisioningOutcome =
-  | { ok: true; skipped?: true }
-  | { ok: false; failedStep?: TDeprovisioningStep; error?: string };
+  TRunOutcome<TDeprovisioningStep> | { ok: true; skipped: true };
 
 export async function beginDeprovisioning(tenantId: string): Promise<boolean> {
   'use step';
