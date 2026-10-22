@@ -17,7 +17,7 @@ code:
   - apps/platform/src/utils/requested-path/**
   - apps/platform/src/server/create-site-gate/**
   - apps/platform/src/server/rate-limit/**
-epics: [4840, 4960, 4979, 4982, 4958, 4949]
+epics: [4840, 4960, 4979, 4982, 4958, 4949, 5649]
 ---
 
 # Platform sign-in and onboarding
@@ -98,6 +98,13 @@ Decided:
 
 ## Constraints and invariants
 
+- Today `@blog/auth`'s `isMagicLinkSendAllowed` refuses a magic-link send to
+  an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
+  then past the per-IP and per-address hourly limits. The per-address count
+  keys on `normalizeEmailIdentity`, so `+tag` variants share one budget. A
+  refusal, or a failed check, sends nothing and never throws, and every
+  request, refused or sent, takes at least `MAGIC_LINK_RESPONSE_FLOOR_MS`, so
+  the check-your-inbox page cannot be told apart by content or timing.
 - Today `resolveHomeHref` picks a dead end's link and `/`'s redirect: `/tenants` for an
   admin, `/dashboard` for anyone else. `/dashboard` with no membership
   redirects to `/workspace-pending`.
@@ -159,3 +166,4 @@ Decided:
 - #4958 magic-link send limits and terms acceptance on first sign-in.
 - #4949 reserved subdomains and a slug availability check.
 - #5648 the Create site gate: per-IP and total daily limits, `+tag` addresses.
+- #5649 epic: the signup blocklist; #5651 the magic-link send refuses it.

@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
-import { buildStarterDocuments } from './starter-content';
+import { buildStarterDocuments, toStarterSiteType } from './starter-content';
 import type { TStarterDocumentUnion } from './starter-document';
 
 type TStarterType = TStarterDocumentUnion['_type'];
@@ -168,6 +168,19 @@ describe(buildStarterDocuments, () => {
         expect(openGraph?.ogTitle?.length).toBeLessThanOrEqual(70);
         expect(openGraph?.ogDescription?.length).toBeLessThanOrEqual(200);
       }
+    },
+  );
+});
+
+describe(toStarterSiteType, () => {
+  it('keeps a site type that has a template', () => {
+    expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
+  });
+
+  it.each([null, SITE_TYPE.PORTFOLIO])(
+    'starts %s from the Blank site',
+    (siteType) => {
+      expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);
     },
   );
 });

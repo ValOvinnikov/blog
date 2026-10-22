@@ -1,4 +1,10 @@
 import { DOMAIN_PATTERN } from '@blog/config';
+import {
+  isPersonalDataKey,
+  isPersonalDataKeyring,
+  PERSONAL_DATA_KEY_FORMAT,
+  PERSONAL_DATA_KEYRING_FORMAT,
+} from '@blog/utils/encryption';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
@@ -69,9 +75,15 @@ export const env = createEnv({
     // Also signs the owner-invite confirmation token, not only Auth.js sessions.
     AUTH_SECRET: z.string().min(1),
     // @env-optional
-    PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
+    PERSONAL_DATA_ENCRYPTION_KEY: z
+      .string()
+      .refine(isPersonalDataKeyring, PERSONAL_DATA_KEYRING_FORMAT)
+      .optional(),
     // @env-optional
-    PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
+    PERSONAL_DATA_INDEX_KEY: z
+      .string()
+      .refine(isPersonalDataKey, PERSONAL_DATA_KEY_FORMAT)
+      .optional(),
   },
   runtimeEnv: {
     RESEND_API_KEY: process.env.RESEND_API_KEY,

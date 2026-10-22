@@ -64,6 +64,7 @@ const {
   getEmailTemplateMock,
   sendEmailMock,
   isMagicLinkSendAllowedMock,
+  withMinimumDurationMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
@@ -73,12 +74,17 @@ const {
   getEmailTemplateMock: vi.fn(),
   sendEmailMock: vi.fn(),
   isMagicLinkSendAllowedMock: vi.fn(),
+  withMinimumDurationMock: vi.fn(),
 }));
 
 vi.mock(
   '@blog/auth/providers/magic-link/is-magic-link-send-allowed/is-magic-link-send-allowed',
   () => ({ isMagicLinkSendAllowed: isMagicLinkSendAllowedMock }),
 );
+
+vi.mock('@blog/auth/utils/with-minimum-duration/with-minimum-duration', () => ({
+  withMinimumDuration: withMinimumDurationMock,
+}));
 
 vi.mock('@blog/db', async () => ({
   queries: {
@@ -119,15 +125,44 @@ describe(buildMagicLinkProvider, () => {
     });
     sendEmailMock.mockReset().mockResolvedValue(undefined);
     isMagicLinkSendAllowedMock.mockResolvedValue(true);
+    withMinimumDurationMock.mockImplementation(
+      (_minimumMs: number, task: () => Promise<unknown>) => task(),
+    );
     provider = buildMagicLinkProvider(AUTH_APP.SITE);
   });
 
-  it('sends nothing once the send limit refuses the request', async () => {
+  it('sends nothing once the send check refuses the request', async () => {
     isMagicLinkSendAllowedMock.mockResolvedValue(false);
 
     await sendVerificationRequestFor(provider);
 
     expect(sendEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('resolves a refused request as it resolves a real send', async () => {
+    isMagicLinkSendAllowedMock.mockResolvedValue(false);
+
+    await expect(sendVerificationRequestFor(provider)).resolves.toBeUndefined();
+  });
+
+  it('holds a refused request to the same minimum duration as a real send', async () => {
+    await sendVerificationRequestFor(provider);
+    isMagicLinkSendAllowedMock.mockResolvedValue(false);
+    await sendVerificationRequestFor(provider);
+
+    const [sentFloorMs, refusedFloorMs] =
+      withMinimumDurationMock.mock.calls.map(([minimumMs]) => minimumMs);
+    expect(refusedFloorMs).toBe(sentFloorMs);
+    expect(refusedFloorMs).toBeGreaterThan(0);
+  });
+
+  it('checks the requested address before sending', async () => {
+    await sendVerificationRequestFor(provider);
+
+    expect(isMagicLinkSendAllowedMock).toHaveBeenCalledWith(
+      READER_EMAIL,
+      expect.any(Request),
+    );
   });
 
   it('identifies itself as the email provider', () => {

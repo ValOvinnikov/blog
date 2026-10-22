@@ -12,7 +12,8 @@ import {
   normalizeSignupDomain,
   normalizeSignupEmail,
 } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { sha256Hex, type TResult } from '@blog/utils';
+import { signupAddressIndex } from '@blog/db/utils/signup-address-index/signup-address-index';
+import type { TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
 export type TAddBlockedIdentityInput = {
@@ -37,7 +38,7 @@ function toStoredValue(
   const email = normalizeSignupEmail(identity);
 
   return email
-    ? { ok: true, data: sha256Hex(email.address) }
+    ? { ok: true, data: signupAddressIndex(email.address) }
     : { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
 }
 
