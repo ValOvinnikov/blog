@@ -64,7 +64,6 @@ const PENDING_INVITE = {
   createdAt: '2026-10-20T09:00:00.000Z',
 };
 
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/utils/operator-alert/operator-alert');
 vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');

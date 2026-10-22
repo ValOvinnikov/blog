@@ -18,7 +18,6 @@ const CTX = { runId: 'deprovision-lifecycle-run' };
 const CRASH = 'lost the database';
 const ARCHIVED_TENANT = makeTenant({ deprovisionedAt: new Date(0) });
 
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/utils/operator-email/sanity-project-deletion-alert');
 vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (

@@ -21,14 +21,12 @@ import { ensureInfrastructure } from './ensure-infrastructure';
 
 const TENANT_ID = TEST_TENANT_ID;
 const CTX = { runId: 'run-1' };
+const EXISTING_PROJECT_ID = 'proj-existing';
 
-vi.mock('@worker/utils/logger/logger');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 vi.mock(
   '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
@@ -118,7 +116,7 @@ describe(ensureInfrastructure, () => {
     vi.mocked(reactivateTenant).mockResolvedValue({
       ok: true,
       data: makeTenant({
-        sanityProjectId: 'proj-existing',
+        sanityProjectId: EXISTING_PROJECT_ID,
         sanityDataset: 'production',
       }),
     });
@@ -126,7 +124,7 @@ describe(ensureInfrastructure, () => {
     await ensureInfrastructure(TENANT_ID, CTX);
 
     expect(unarchiveSanityProject).toHaveBeenCalledWith(
-      expect.objectContaining({ projectId: 'proj-existing' }),
+      expect.objectContaining({ projectId: EXISTING_PROJECT_ID }),
     );
   });
 

@@ -12,20 +12,15 @@ import { POST } from './route';
 const SECRET = 'enqueue-secret';
 const RESEND_URL = 'https://worker.example.com/api/owner-access/resend';
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
-  WORKER_ENQUEUE_SECRET: 'enqueue-secret',
-}));
+const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@worker/units/resend-owner-invite');
 vi.mock('@worker/utils/owner-access-run/owner-access-run');
-vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
     await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(
-    await importOriginal<typeof import('@blog/db/queries/tenants')>(),
-  ),
+  ).withFakeTenantsQueries(await importOriginal()),
 );
 
 function resendRequest(): Request {
@@ -38,6 +33,7 @@ function resendRequest(): Request {
 
 describe('POST /api/owner-access/resend', () => {
   beforeEach(() => {
+    mockEnv.WORKER_ENQUEUE_SECRET = SECRET;
     vi.mocked(getTenantById).mockResolvedValue(
       makeTenant({ sanityProjectId: SANITY_PROJECT_ID }),
     );

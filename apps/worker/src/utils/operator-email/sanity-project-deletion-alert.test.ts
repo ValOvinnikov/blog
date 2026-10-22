@@ -23,7 +23,6 @@ const SUPERADMINS = [
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@blog/db/queries/admins');
 vi.mock(import('@blog/email'), async (importOriginal) => ({
   ...(await importOriginal()),

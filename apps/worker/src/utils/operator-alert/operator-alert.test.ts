@@ -19,7 +19,6 @@ const ALERT = {
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/utils/logger/logger');
 
 const fetchMock = vi.fn();
 

@@ -49,7 +49,6 @@ const READER_DATA_COUNTS = {
   leads: 2,
 };
 
-vi.mock('@worker/utils/logger/logger');
 vi.mock('@blog/db/queries/audit-events');
 vi.mock('@blog/db/queries/reader-data');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-lifecycle');

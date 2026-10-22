@@ -1,6 +1,12 @@
 import { HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import type * as SanityProjectAccess from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import { logger } from '@worker/utils/logger/logger';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
@@ -33,8 +39,6 @@ const {
   };
 });
 
-vi.mock('@worker/utils/logger/logger');
-
 vi.mock('@blog/db/queries/tenants', () => ({
   setTenantSanityProject: setTenantSanityProjectMock,
 }));
@@ -52,37 +56,44 @@ vi.mock('@blog/db/utils/sanity-management-client/sanity-project-setup', () => ({
 }));
 
 vi.mock(
-  '@blog/db/utils/sanity-management-client/sanity-project-access',
+  import('@blog/db/utils/sanity-management-client/sanity-project-access'),
   () => ({
     createSanityProjectInvite: createSanityProjectInviteMock,
     listSanityProjectInvites: listSanityProjectInvitesMock,
   }),
 );
 
+const MANAGEMENT_TOKEN = 'mgmt-token';
+const TENANT_DATASET = 'test-dataset';
+const ADMIN_APP_BASE_URL = 'https://admin.example.com';
+const PROJECT_ID = 'proj456';
+const TENANT_ID = 'tenant-1';
+const OWNER_EMAIL = 'owner@example.com';
+
 const env: TProvisionEnv = {
-  sanityManagementToken: 'mgmt-token',
+  sanityManagementToken: MANAGEMENT_TOKEN,
   sanityOrganizationId: 'org-abc',
   vercelToken: 'v-token',
   vercelTeamId: undefined,
   vercelWebProjectId: 'prj_web',
-  adminAppBaseUrl: 'https://admin.example.com',
-  tenantSanityDataset: 'test-dataset',
+  adminAppBaseUrl: ADMIN_APP_BASE_URL,
+  tenantSanityDataset: TENANT_DATASET,
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
-    id: 'tenant-1',
+    id: TENANT_ID,
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: null,
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PENDING',
+    plan: TENANT_PLAN.FREE,
+    status: TENANT_STATUS.ACTIVE,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
     provisioningSteps: null,
     seededAt: null,
     createdAt: new Date(),
@@ -108,11 +119,11 @@ beforeEach(() => {
   });
   getTenantOwnerEmailMock.mockImplementation(async () => {
     callOrder.push('getTenantOwnerEmail');
-    return 'owner@example.com';
+    return OWNER_EMAIL;
   });
   createSanityProjectMock.mockImplementation(async () => {
     callOrder.push('createSanityProject');
-    return { id: 'proj456' };
+    return { id: PROJECT_ID };
   });
   createSanityDatasetMock.mockImplementation(async () => {
     callOrder.push('createSanityDataset');
@@ -149,28 +160,28 @@ describe(createTenantSanityProject, () => {
       const result = await createTenantSanityProject(tenant, env);
 
       expect(createSanityProjectMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
+        token: MANAGEMENT_TOKEN,
         displayName: 'Acme',
         organizationId: 'org-abc',
       });
-      expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
-        sanityProjectId: 'proj456',
-        sanityDataset: 'test-dataset',
+      expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TENANT_ID, {
+        sanityProjectId: PROJECT_ID,
+        sanityDataset: TENANT_DATASET,
       });
       expect(createSanityDatasetMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
-        projectId: 'proj456',
-        dataset: 'test-dataset',
+        token: MANAGEMENT_TOKEN,
+        projectId: PROJECT_ID,
+        dataset: TENANT_DATASET,
       });
       expect(addSanityCorsOriginMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
-        projectId: 'proj456',
-        origin: 'https://admin.example.com',
+        token: MANAGEMENT_TOKEN,
+        projectId: PROJECT_ID,
+        origin: ADMIN_APP_BASE_URL,
         allowCredentials: true,
       });
       expect(result).toEqual({
-        sanityProjectId: 'proj456',
-        sanityDataset: 'test-dataset',
+        sanityProjectId: PROJECT_ID,
+        sanityDataset: TENANT_DATASET,
       });
 
       expect(callOrder.indexOf('createSanityProject')).toBe(0);
@@ -193,9 +204,9 @@ describe(createTenantSanityProject, () => {
         /CORS API is down/,
       );
 
-      expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
-        sanityProjectId: 'proj456',
-        sanityDataset: 'test-dataset',
+      expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TENANT_ID, {
+        sanityProjectId: PROJECT_ID,
+        sanityDataset: TENANT_DATASET,
       });
       expect(callOrder.indexOf('setTenantSanityProject')).toBeGreaterThan(-1);
       expect(callOrder.indexOf('setTenantSanityProject')).toBeLessThan(
@@ -206,16 +217,16 @@ describe(createTenantSanityProject, () => {
     it('resolves the tenant owner email and invites them as a viewer when not already invited', async () => {
       await createTenantSanityProject(tenant, env);
 
-      expect(getTenantOwnerEmailMock).toHaveBeenCalledWith('tenant-1');
+      expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(TENANT_ID);
       expect(listSanityProjectInvitesMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
-        projectId: 'proj456',
+        token: MANAGEMENT_TOKEN,
+        projectId: PROJECT_ID,
       });
       expect(createSanityProjectInviteMock).toHaveBeenCalledTimes(1);
       expect(createSanityProjectInviteMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
-        projectId: 'proj456',
-        email: 'owner@example.com',
+        token: MANAGEMENT_TOKEN,
+        projectId: PROJECT_ID,
+        email: OWNER_EMAIL,
         role: SANITY_PROJECT_ROLE.VIEWER,
       });
     });
@@ -241,12 +252,12 @@ describe(createTenantSanityProject, () => {
         expect(listSanityProjectInvitesMock).not.toHaveBeenCalled();
         expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
         expect(result).toEqual({
-          sanityProjectId: 'proj456',
-          sanityDataset: 'test-dataset',
+          sanityProjectId: PROJECT_ID,
+          sanityDataset: TENANT_DATASET,
         });
         expect(logger.error).toHaveBeenCalledWith(
           'provisioning.owner_email_missing',
-          { tenantId: 'tenant-1' },
+          { tenantId: TENANT_ID },
         );
         expect(logger.error).toHaveBeenCalledTimes(1);
       });
@@ -262,20 +273,20 @@ describe(createTenantSanityProject, () => {
         const result = await createTenantSanityProject(tenant, env);
 
         expect(result).toEqual({
-          sanityProjectId: 'proj456',
-          sanityDataset: 'test-dataset',
+          sanityProjectId: PROJECT_ID,
+          sanityDataset: TENANT_DATASET,
         });
-        expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
-          sanityProjectId: 'proj456',
-          sanityDataset: 'test-dataset',
+        expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TENANT_ID, {
+          sanityProjectId: PROJECT_ID,
+          sanityDataset: TENANT_DATASET,
         });
         expect(createSanityDatasetMock).toHaveBeenCalled();
         expect(addSanityCorsOriginMock).toHaveBeenCalled();
         expect(logger.error).toHaveBeenCalledWith(
           'provisioning.owner_invite_failed',
           expect.objectContaining({
-            tenantId: 'tenant-1',
-            sanityProjectId: 'proj456',
+            tenantId: TENANT_ID,
+            sanityProjectId: PROJECT_ID,
           }),
         );
       });
@@ -289,13 +300,13 @@ describe(createTenantSanityProject, () => {
         const result = await createTenantSanityProject(tenant, env);
 
         expect(result).toEqual({
-          sanityProjectId: 'proj456',
-          sanityDataset: 'test-dataset',
+          sanityProjectId: PROJECT_ID,
+          sanityDataset: TENANT_DATASET,
         });
         expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
         expect(logger.error).toHaveBeenCalledWith(
           'provisioning.owner_invites_list_failed',
-          expect.objectContaining({ tenantId: 'tenant-1' }),
+          expect.objectContaining({ tenantId: TENANT_ID }),
         );
       });
     });
@@ -307,14 +318,14 @@ describe(createTenantSanityProject, () => {
     beforeEach(() => {
       tenant = baseTenant({
         sanityProjectId: 'proj123',
-        sanityDataset: 'test-dataset',
+        sanityDataset: TENANT_DATASET,
       });
     });
 
     it('only creates the dataset when the project is already persisted but the dataset is missing', async () => {
       listSanityCorsOriginsMock.mockImplementation(async () => {
         callOrder.push('listSanityCorsOrigins');
-        return [{ id: 'cors1', origin: 'https://admin.example.com' }];
+        return [{ id: 'cors1', origin: ADMIN_APP_BASE_URL }];
       });
 
       const result = await createTenantSanityProject(tenant, env);
@@ -322,21 +333,21 @@ describe(createTenantSanityProject, () => {
       expect(createSanityProjectMock).not.toHaveBeenCalled();
       expect(setTenantSanityProjectMock).not.toHaveBeenCalled();
       expect(createSanityDatasetMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
+        token: MANAGEMENT_TOKEN,
         projectId: 'proj123',
-        dataset: 'test-dataset',
+        dataset: TENANT_DATASET,
       });
       expect(addSanityCorsOriginMock).not.toHaveBeenCalled();
       expect(result).toEqual({
         sanityProjectId: 'proj123',
-        sanityDataset: 'test-dataset',
+        sanityDataset: TENANT_DATASET,
       });
     });
 
     it('only adds the CORS origin when the project and dataset already exist but the CORS entry is missing', async () => {
       listSanityDatasetsMock.mockImplementation(async () => {
         callOrder.push('listSanityDatasets');
-        return [{ name: 'test-dataset' }];
+        return [{ name: TENANT_DATASET }];
       });
 
       const result = await createTenantSanityProject(tenant, env);
@@ -345,14 +356,14 @@ describe(createTenantSanityProject, () => {
       expect(setTenantSanityProjectMock).not.toHaveBeenCalled();
       expect(createSanityDatasetMock).not.toHaveBeenCalled();
       expect(addSanityCorsOriginMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
+        token: MANAGEMENT_TOKEN,
         projectId: 'proj123',
-        origin: 'https://admin.example.com',
+        origin: ADMIN_APP_BASE_URL,
         allowCredentials: true,
       });
       expect(result).toEqual({
         sanityProjectId: 'proj123',
-        sanityDataset: 'test-dataset',
+        sanityDataset: TENANT_DATASET,
       });
     });
 
@@ -360,25 +371,25 @@ describe(createTenantSanityProject, () => {
       beforeEach(() => {
         listSanityDatasetsMock.mockImplementation(async () => {
           callOrder.push('listSanityDatasets');
-          return [{ name: 'test-dataset' }];
+          return [{ name: TENANT_DATASET }];
         });
         listSanityCorsOriginsMock.mockImplementation(async () => {
           callOrder.push('listSanityCorsOrigins');
-          return [{ id: 'cors1', origin: 'https://admin.example.com' }];
+          return [{ id: 'cors1', origin: ADMIN_APP_BASE_URL }];
         });
       });
 
       it('creates nothing when the project, dataset, CORS entry, and owner invite all already exist', async () => {
         listSanityProjectInvitesMock.mockImplementation(async () => {
           callOrder.push('listSanityProjectInvites');
-          return [{ email: 'owner@example.com', status: 'pending' }];
+          return [{ email: OWNER_EMAIL, status: 'pending' }];
         });
 
         const result = await createTenantSanityProject(tenant, env);
 
         expect(result).toEqual({
           sanityProjectId: 'proj123',
-          sanityDataset: 'test-dataset',
+          sanityDataset: TENANT_DATASET,
         });
         expect(createSanityProjectMock).not.toHaveBeenCalled();
         expect(setTenantSanityProjectMock).not.toHaveBeenCalled();
@@ -386,11 +397,11 @@ describe(createTenantSanityProject, () => {
         expect(addSanityCorsOriginMock).not.toHaveBeenCalled();
         expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
         expect(listSanityDatasetsMock).toHaveBeenCalledWith({
-          token: 'mgmt-token',
+          token: MANAGEMENT_TOKEN,
           projectId: 'proj123',
         });
         expect(listSanityCorsOriginsMock).toHaveBeenCalledWith({
-          token: 'mgmt-token',
+          token: MANAGEMENT_TOKEN,
           projectId: 'proj123',
         });
       });
@@ -407,16 +418,16 @@ describe(createTenantSanityProject, () => {
       });
 
       it('does not re-invite when a retry finds the owner still pending, exercising the real invite-list parsing against a mocked fetch', async () => {
-        const actual = await vi.importActual<
-          typeof import('@blog/db/utils/sanity-management-client/sanity-project-access')
-        >('@blog/db/utils/sanity-management-client/sanity-project-access');
+        const actual = await vi.importActual<typeof SanityProjectAccess>(
+          '@blog/db/utils/sanity-management-client/sanity-project-access',
+        );
         listSanityProjectInvitesMock.mockImplementation(
           actual.listSanityProjectInvites,
         );
         const fetchMock = vi.fn().mockResolvedValue(
           new Response(
             JSON.stringify({
-              data: [{ email: 'owner@example.com', status: 'pending' }],
+              data: [{ email: OWNER_EMAIL, status: 'pending' }],
               nextCursor: null,
             }),
             { status: HTTP_STATUS.OK },
