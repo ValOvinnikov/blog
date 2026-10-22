@@ -18,6 +18,18 @@ export type TAddSignupBlockInput = {
   admin: Pick<TAdmin, 'id'>;
 };
 
+const CREATED_BY_THIS_CALL_WINDOW_MS = 60_000;
+
+const wasCreatedByThisCall = (
+  entry: TBlockedSignupIdentity,
+  { reason, admin }: Pick<TAddSignupBlockInput, 'reason' | 'admin'>,
+  now: Date,
+): boolean =>
+  entry.reason === reason &&
+  entry.createdByAdminId === admin.id &&
+  Math.abs(now.getTime() - entry.createdAt.getTime()) <=
+    CREATED_BY_THIS_CALL_WINDOW_MS;
+
 export const addSignupBlock = async ({
   kind,
   identity,
@@ -26,6 +38,7 @@ export const addSignupBlock = async ({
 }: TAddSignupBlockInput): Promise<
   TResult<TBlockedSignupIdentity, TErrorCode>
 > => {
+  const requestedAt = new Date();
   const result = await queries.blockedSignupIdentities.addBlockedIdentity({
     kind,
     identity,
@@ -33,6 +46,10 @@ export const addSignupBlock = async ({
     createdByAdminId: admin.id,
   });
   if (!result.ok) return result;
+
+  if (!wasCreatedByThisCall(result.data, { reason, admin }, requestedAt)) {
+    return result;
+  }
 
   const { id, value } = result.data;
   await recordAuditEvent({

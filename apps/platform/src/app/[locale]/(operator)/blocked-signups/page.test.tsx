@@ -78,7 +78,10 @@ describe(BlockedSignupsPage, () => {
   it('lists every entry, showing an address only as the start of its hash', async () => {
     await setup();
 
-    expect(screen.getByText(BLOCKED_DOMAIN)).toBeVisible();
-    expect(screen.getByText(BLOCKED_ADDRESS_HASH_PREVIEW)).toBeVisible();
+    const domain = screen.getByText(BLOCKED_DOMAIN);
+    const addressHash = screen.getByText(BLOCKED_ADDRESS_HASH_PREVIEW);
+
+    expect(domain).toBeVisible();
+    expect(addressHash).toBeVisible();
   });
 });

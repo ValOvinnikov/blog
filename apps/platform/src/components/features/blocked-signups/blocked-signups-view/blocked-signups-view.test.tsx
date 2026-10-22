@@ -42,36 +42,44 @@ describe(`<${BlockedSignupsView.name}/>`, () => {
       name: new RegExp(BLOCKED_ADDRESS_HASH_PREVIEW),
     });
 
-    expect(within(domainRow).getByText(BLOCK_REASON)).toBeVisible();
-    expect(within(domainRow).getByText(BLOCK_AUTHOR_EMAIL)).toBeVisible();
-    expect(within(addressRow).getByText('Email address')).toBeVisible();
-    expect(
-      within(addressRow).queryByText(BLOCK_AUTHOR_EMAIL),
-    ).not.toBeInTheDocument();
+    const domainReason = within(domainRow).getByText(BLOCK_REASON);
+    const domainAuthor = within(domainRow).getByText(BLOCK_AUTHOR_EMAIL);
+    const addressKind = within(addressRow).getByText('Email address');
+    const addressAuthor = within(addressRow).queryByText(BLOCK_AUTHOR_EMAIL);
+
+    expect(domainReason).toBeVisible();
+    expect(domainAuthor).toBeVisible();
+    expect(addressKind).toBeVisible();
+    expect(addressAuthor).not.toBeInTheDocument();
   });
 
   it('offers a removal control for every entry', () => {
     setup();
 
-    expect(
-      screen.getByRole('button', { name: `Remove block ${BLOCKED_DOMAIN}` }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', {
-        name: `Remove block ${BLOCKED_ADDRESS_HASH_PREVIEW}`,
-      }),
-    ).toBeVisible();
+    const removeDomain = screen.getByRole('button', {
+      name: `Remove block ${BLOCKED_DOMAIN}`,
+    });
+    const removeAddress = screen.getByRole('button', {
+      name: `Remove block ${BLOCKED_ADDRESS_HASH_PREVIEW}`,
+    });
+
+    expect(removeDomain).toBeVisible();
+    expect(removeAddress).toBeVisible();
   });
 
   it('says nothing is blocked when the list is empty', () => {
     setup({ entries: [] });
 
-    expect(screen.getByText('Nothing is blocked.')).toBeVisible();
+    const empty = screen.getByText('Nothing is blocked.');
+
+    expect(empty).toBeVisible();
   });
 
   it('offers a form to block a domain', () => {
     setup();
 
-    expect(screen.getByRole('button', { name: 'Block domain' })).toBeVisible();
+    const submit = screen.getByRole('button', { name: 'Block domain' });
+
+    expect(submit).toBeVisible();
   });
 });

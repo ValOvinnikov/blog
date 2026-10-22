@@ -15,12 +15,12 @@ const FIELD_ERROR_KEYS = {
 
 export type TFieldErrorKey = TValueOf<typeof FIELD_ERROR_KEYS>;
 
-type TFieldErrors = {
+type TDomainFormErrors = {
   domain: TMaybeUndefined<TFieldErrorKey>;
   reason: TMaybeUndefined<TFieldErrorKey>;
 };
 
-const NO_ERRORS: TFieldErrors = { domain: undefined, reason: undefined };
+const NO_ERRORS: TDomainFormErrors = { domain: undefined, reason: undefined };
 
 export type TUseAddBlockedDomainMessages = {
   added: string;

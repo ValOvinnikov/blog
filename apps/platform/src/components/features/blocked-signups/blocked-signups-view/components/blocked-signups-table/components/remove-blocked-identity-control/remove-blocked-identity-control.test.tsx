@@ -42,9 +42,11 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
   });
 
   it('removes the entry only after the operator confirms', async () => {
-    expect(
-      await screen.findByRole('alertdialog', { name: 'Remove this block?' }),
-    ).toBeVisible();
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Remove this block?',
+    });
+
+    expect(dialog).toBeVisible();
     expect(removeBlockedIdentityActionMock).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', CONFIRM_BUTTON));
@@ -61,9 +63,9 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
 
     await user.click(await screen.findByRole('button', CONFIRM_BUTTON));
 
-    expect(
-      await screen.findByText('This block was already removed.'),
-    ).toBeVisible();
+    const refusal = await screen.findByText('This block was already removed.');
+
+    expect(refusal).toBeVisible();
     expect(refreshMock).not.toHaveBeenCalled();
   });
 
@@ -74,9 +76,11 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
 
     await user.click(await screen.findByRole('button', CONFIRM_BUTTON));
 
-    expect(
-      await screen.findByText("Couldn't remove the block — try again."),
-    ).toBeVisible();
+    const error = await screen.findByText(
+      "Couldn't remove the block — try again.",
+    );
+
+    expect(error).toBeVisible();
     expect(refreshMock).not.toHaveBeenCalled();
   });
 });

@@ -48,7 +48,9 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
       domain: BLOCKED_DOMAIN,
       reason: BLOCK_REASON,
     });
-    expect(await screen.findByRole('textbox', DOMAIN_FIELD)).toHaveValue('');
+    const domainField = await screen.findByRole('textbox', DOMAIN_FIELD);
+
+    expect(domainField).toHaveValue('');
     expect(refreshMock).toHaveBeenCalled();
   });
 
@@ -62,12 +64,13 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
 
     await user.click(screen.getByRole('button', SUBMIT_BUTTON));
 
-    expect(
-      await screen.findByText('Enter a valid domain, such as example.com.'),
-    ).toBeVisible();
-    expect(screen.getByRole('textbox', DOMAIN_FIELD)).toHaveValue(
-      BLOCKED_DOMAIN,
+    const error = await screen.findByText(
+      'Enter a valid domain, such as example.com.',
     );
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
+
+    expect(error).toBeVisible();
+    expect(domainField).toHaveValue(BLOCKED_DOMAIN);
     expect(refreshMock).not.toHaveBeenCalled();
   });
 
@@ -78,8 +81,11 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
 
     await user.click(screen.getByRole('button', SUBMIT_BUTTON));
 
-    expect(await screen.findByText(/couldn't block the domain/i)).toBeVisible();
-    expect(screen.getByRole('textbox', REASON_FIELD)).toHaveValue(BLOCK_REASON);
+    const error = await screen.findByText(/couldn't block the domain/i);
+    const reasonField = screen.getByRole('textbox', REASON_FIELD);
+
+    expect(error).toBeVisible();
+    expect(reasonField).toHaveValue(BLOCK_REASON);
     expect(refreshMock).not.toHaveBeenCalled();
   });
 });

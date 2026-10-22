@@ -67,6 +67,8 @@ describe(BlockedSignupsLayout, () => {
 
     await setup();
 
-    expect(screen.getByText('blocked sign-ups content')).toBeVisible();
+    const content = screen.getByText('blocked sign-ups content');
+
+    expect(content).toBeVisible();
   });
 });

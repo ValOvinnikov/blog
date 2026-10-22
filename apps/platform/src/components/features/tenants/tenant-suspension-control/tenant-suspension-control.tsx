@@ -38,7 +38,6 @@ export const TenantSuspensionControl = ({
   const [blockReason, setBlockReason] = useState('');
   const { id, name, status } = tenant;
   const isSuspended = status === TENANT_STATUS.SUSPENDED;
-  const hasBlockChoice = !isSuspended;
   const copyKey: TSuspensionStatus = isSuspended
     ? TENANT_STATUS.SUSPENDED
     : TENANT_STATUS.ACTIVE;
@@ -80,7 +79,7 @@ export const TenantSuspensionControl = ({
               confirmingButtonLabel={t(`${copyKey}.confirmingButton`)}
               isConfirmDisabled={isBlocking && blockReason.trim() === ''}
             >
-              {hasBlockChoice && (
+              {!isSuspended && (
                 <BlockOwnerFields
                   isBlocking={isBlocking}
                   onBlockingChange={setIsBlocking}
