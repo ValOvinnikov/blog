@@ -3,7 +3,10 @@ import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { DEPROVISIONING_START_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import { TEST_ENQUEUE_SECRET } from '@worker/testing/enqueue/fixtures';
+import {
+  FORGED_SECRET,
+  TEST_ENQUEUE_SECRET,
+} from '@worker/testing/enqueue/fixtures';
 import { signedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
@@ -16,7 +19,6 @@ const DEPROVISION_URL = 'https://worker.example.com/api/deprovision';
 const RUN_ID = 'deprovision-run';
 
 const QUEUE_DOWN = 'queue down';
-const FORGED_SECRET = 'forged-secret';
 
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 

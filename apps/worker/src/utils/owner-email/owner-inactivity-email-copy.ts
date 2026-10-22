@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import { INACTIVITY_STAGE } from '@blog/db/constants';
 
 import type { TOwnerEmailText } from './owner-email-copy';
 
@@ -12,21 +13,19 @@ type TOwnerInactivityEmailText = (
   input: TOwnerInactivityEmailCopyInput,
 ) => TOwnerEmailText;
 
-type TOwnerInactivityEmailCopy = {
-  actionLabel: string;
-  suspensionWarning: TOwnerInactivityEmailText;
-  deletionNotice: TOwnerInactivityEmailText;
-};
+export type TOwnerInactivityEmail =
+  | typeof INACTIVITY_STAGE.SUSPENSION_WARNING
+  | typeof INACTIVITY_STAGE.DELETION_NOTICE;
 
-export type TOwnerInactivityEmail = Exclude<
-  keyof TOwnerInactivityEmailCopy,
-  'actionLabel'
->;
+type TOwnerInactivityEmailCopy = Record<
+  TOwnerInactivityEmail,
+  TOwnerInactivityEmailText
+> & { actionLabel: string };
 
 export const OWNER_INACTIVITY_EMAIL_COPY = {
   [LOCALE_ISO_CODES.EN]: {
     actionLabel: 'Sign in',
-    suspensionWarning: ({ siteName, siteUrl, date }) => ({
+    [INACTIVITY_STAGE.SUSPENSION_WARNING]: ({ siteName, siteUrl, date }) => ({
       subject: `${siteName} will be paused on ${date}`,
       previewText: 'Sign in to keep your site running.',
       paragraphs: [
@@ -35,7 +34,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
         'Sign in before then to keep it running.',
       ],
     }),
-    deletionNotice: ({ siteName, date }) => ({
+    [INACTIVITY_STAGE.DELETION_NOTICE]: ({ siteName, date }) => ({
       subject: `${siteName} will be deleted on ${date}`,
       previewText: 'Sign in to keep your site.',
       paragraphs: [
@@ -47,7 +46,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
   },
   [LOCALE_ISO_CODES.NL]: {
     actionLabel: 'Inloggen',
-    suspensionWarning: ({ siteName, siteUrl, date }) => ({
+    [INACTIVITY_STAGE.SUSPENSION_WARNING]: ({ siteName, siteUrl, date }) => ({
       subject: `${siteName} wordt op ${date} gepauzeerd`,
       previewText: 'Log in om je site actief te houden.',
       paragraphs: [
@@ -56,7 +55,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
         'Log voor die tijd in om je site actief te houden.',
       ],
     }),
-    deletionNotice: ({ siteName, date }) => ({
+    [INACTIVITY_STAGE.DELETION_NOTICE]: ({ siteName, date }) => ({
       subject: `${siteName} wordt op ${date} verwijderd`,
       previewText: 'Log in om je site te behouden.',
       paragraphs: [
@@ -68,7 +67,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
   },
   [LOCALE_ISO_CODES.FR]: {
     actionLabel: 'Se connecter',
-    suspensionWarning: ({ siteName, siteUrl, date }) => ({
+    [INACTIVITY_STAGE.SUSPENSION_WARNING]: ({ siteName, siteUrl, date }) => ({
       subject: `${siteName} sera mis en pause le ${date}`,
       previewText: 'Connectez-vous pour que votre site reste actif.',
       paragraphs: [
@@ -77,7 +76,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
         'Connectez-vous d’ici là pour qu’il reste actif.',
       ],
     }),
-    deletionNotice: ({ siteName, date }) => ({
+    [INACTIVITY_STAGE.DELETION_NOTICE]: ({ siteName, date }) => ({
       subject: `${siteName} sera supprimé le ${date}`,
       previewText: 'Connectez-vous pour conserver votre site.',
       paragraphs: [
@@ -89,7 +88,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
   },
   [LOCALE_ISO_CODES.DE]: {
     actionLabel: 'Anmelden',
-    suspensionWarning: ({ siteName, siteUrl, date }) => ({
+    [INACTIVITY_STAGE.SUSPENSION_WARNING]: ({ siteName, siteUrl, date }) => ({
       subject: `${siteName} wird am ${date} pausiert`,
       previewText: 'Melden Sie sich an, damit Ihre Website aktiv bleibt.',
       paragraphs: [
@@ -98,7 +97,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
         'Melden Sie sich bis dahin an, damit sie aktiv bleibt.',
       ],
     }),
-    deletionNotice: ({ siteName, date }) => ({
+    [INACTIVITY_STAGE.DELETION_NOTICE]: ({ siteName, date }) => ({
       subject: `${siteName} wird am ${date} gelöscht`,
       previewText: 'Melden Sie sich an, um Ihre Website zu behalten.',
       paragraphs: [
@@ -110,7 +109,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
   },
   [LOCALE_ISO_CODES.ES]: {
     actionLabel: 'Iniciar sesión',
-    suspensionWarning: ({ siteName, siteUrl, date }) => ({
+    [INACTIVITY_STAGE.SUSPENSION_WARNING]: ({ siteName, siteUrl, date }) => ({
       subject: `${siteName} se pausará el ${date}`,
       previewText: 'Inicie sesión para mantener su sitio activo.',
       paragraphs: [
@@ -119,7 +118,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
         'Inicie sesión antes de esa fecha para mantenerlo activo.',
       ],
     }),
-    deletionNotice: ({ siteName, date }) => ({
+    [INACTIVITY_STAGE.DELETION_NOTICE]: ({ siteName, date }) => ({
       subject: `${siteName} se eliminará el ${date}`,
       previewText: 'Inicie sesión para conservar su sitio.',
       paragraphs: [

@@ -7,6 +7,7 @@ import {
   INACTIVITY_SWEEP_NOT_CONFIGURED_EVENT,
 } from '@worker/constants/inactivity-sweep';
 import { TEST_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
+import { FORGED_SECRET } from '@worker/testing/enqueue/fixtures';
 import { makeInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
 import { getInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import { runInactivitySweep } from '@worker/utils/inactivity-sweep/run-inactivity-sweep';
@@ -16,7 +17,6 @@ import { GET } from './route';
 
 const SWEEP_URL = 'https://worker.example.com/api/inactivity-sweep';
 const CRON_SECRET = 'cron-secret';
-const FORGED_SECRET = 'forged-secret';
 const DB_DOWN = 'db down';
 const SWEEP_ENV = makeInactivitySweepEnv();
 const ADVANCED = {

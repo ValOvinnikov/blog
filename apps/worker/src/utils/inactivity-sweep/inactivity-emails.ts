@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { INACTIVITY_STAGE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   buildInactivityWarningAlertEmail,
@@ -35,8 +36,8 @@ export type TInactivityEmailInput = {
 };
 
 const OWNER_INACTIVITY_EMAIL_BUILDERS = {
-  suspensionWarning: buildOwnerInactivityWarningEmail,
-  deletionNotice: buildOwnerDeletionNoticeEmail,
+  [INACTIVITY_STAGE.SUSPENSION_WARNING]: buildOwnerInactivityWarningEmail,
+  [INACTIVITY_STAGE.DELETION_NOTICE]: buildOwnerDeletionNoticeEmail,
 } satisfies Record<TOwnerInactivityEmail, unknown>;
 
 export async function sendOwnerInactivityEmail(
@@ -68,7 +69,7 @@ export async function sendOwnerInactivityEmail(
   } catch (error) {
     logger.error(INACTIVITY_EMAIL_SEND_FAILED_EVENT, {
       tenantId,
-      email,
+      stage: email,
       error: sanitizeLogMessage(error),
     });
   }

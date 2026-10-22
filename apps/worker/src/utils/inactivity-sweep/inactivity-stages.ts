@@ -59,7 +59,7 @@ async function warnOfSuspension(
       env,
     };
     await Promise.all([
-      sendOwnerInactivityEmail('suspensionWarning', input),
+      sendOwnerInactivityEmail(stage, input),
       alertOperatorsOfSuspensionWarning(input),
     ]);
   }
@@ -95,7 +95,7 @@ async function noticeDeletion(
 
   const ownerEmail = await findOwnerEmail(id, stage);
   if (ownerEmail) {
-    await sendOwnerInactivityEmail('deletionNotice', {
+    await sendOwnerInactivityEmail(stage, {
       tenant,
       ownerEmail,
       date: inactivityStageDate(tenant, INACTIVITY_STAGE.DEPROVISIONING),

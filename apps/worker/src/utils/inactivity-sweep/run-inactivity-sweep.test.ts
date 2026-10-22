@@ -23,6 +23,7 @@ import {
 } from '@worker/constants/inactivity-sweep';
 import { TEST_NOW } from '@worker/testing/clock/frozen-clock';
 import { makeInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
+import { SUPERADMIN_EMAILS } from '@worker/testing/operator-email/fixtures';
 import { OWNER_EMAIL } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
@@ -33,10 +34,6 @@ import { start } from 'workflow/api';
 import { runInactivitySweep } from './run-inactivity-sweep';
 
 const SWEEP_ENV = makeInactivitySweepEnv();
-const SUPERADMINS = [
-  'first-superadmin@example.com',
-  'second-superadmin@example.com',
-];
 const SITE_URL = 'https://acme.example.com';
 const RESEND_DOWN = 'resend down';
 const CACHE_DOWN = 'cache down';
@@ -89,7 +86,7 @@ beforeEach(() => {
     makeTenant({ id }),
   );
   vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
-  vi.mocked(listSuperadminEmails).mockResolvedValue(SUPERADMINS);
+  vi.mocked(listSuperadminEmails).mockResolvedValue(SUPERADMIN_EMAILS);
   vi.mocked(sendEmail).mockResolvedValue();
   vi.mocked(requestTenantCacheInvalidation).mockResolvedValue();
   vi.mocked(start).mockResolvedValue({ runId: 'run' } as never);
@@ -117,7 +114,9 @@ describe(runInactivitySweep, () => {
     it("warns the owner once, in the site's language, with the pause date", async () => {
       await sweep();
 
-      const { subject } = OWNER_INACTIVITY_EMAIL_COPY.FR.suspensionWarning({
+      const { subject } = OWNER_INACTIVITY_EMAIL_COPY.FR[
+        INACTIVITY_STAGE.SUSPENSION_WARNING
+      ]({
         siteName: tenant.name,
         siteUrl: SITE_URL,
         date: '28 octobre 2026',
@@ -133,8 +132,10 @@ describe(runInactivitySweep, () => {
     it('warns every super admin once, in English', async () => {
       await sweep();
 
-      const alerts = sentEmails().filter(({ to }) => SUPERADMINS.includes(to));
-      expect(alerts.map(({ to }) => to)).toEqual(SUPERADMINS);
+      const alerts = sentEmails().filter(({ to }) =>
+        SUPERADMIN_EMAILS.includes(to),
+      );
+      expect(alerts.map(({ to }) => to)).toEqual(SUPERADMIN_EMAILS);
       expect(alerts[0]?.subject).toContain('October 28, 2026');
     });
 
@@ -187,7 +188,9 @@ describe(runInactivitySweep, () => {
     it("sends the owner one deletion notice, in the site's language, with the deletion date", async () => {
       await sweep();
 
-      const { subject } = OWNER_INACTIVITY_EMAIL_COPY.DE.deletionNotice({
+      const { subject } = OWNER_INACTIVITY_EMAIL_COPY.DE[
+        INACTIVITY_STAGE.DELETION_NOTICE
+      ]({
         siteName: tenant.name,
         siteUrl: SITE_URL,
         date: '31. Oktober 2026',
@@ -245,12 +248,12 @@ describe(runInactivitySweep, () => {
 
     await sweep();
 
-    expect(sentTo()).toEqual(expect.arrayContaining(SUPERADMINS));
+    expect(sentTo()).toEqual(expect.arrayContaining(SUPERADMIN_EMAILS));
     expect(logger.error).toHaveBeenCalledWith(
       INACTIVITY_EMAIL_SEND_FAILED_EVENT,
       {
         tenantId: TEST_TENANT_ID,
-        email: 'suspensionWarning',
+        stage: INACTIVITY_STAGE.SUSPENSION_WARNING,
         error: RESEND_DOWN,
       },
     );
