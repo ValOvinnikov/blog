@@ -62,7 +62,8 @@ default to zero".
 - **Never import** React, `@blog/ui`, `@blog/service`, `@blog/auth` or
   `@blog/studio`. Needing one is a signal to stop and report.
 - **Nothing imports `apps/worker`.** The admin panel reaches it only through
-  its signed endpoints — `POST /api/provision` and `POST /api/owner-access/*`
+  its signed endpoints — `POST /api/provision`, `POST /api/deprovision` and
+  `POST /api/owner-access/*`
   — every one authenticated by the shared enqueue secret; the app exposes no
   other route.
 - **All relational reads and writes go through `@blog/db`'s exported
@@ -79,6 +80,11 @@ default to zero".
   webhook; the custom domain only when one exists), `inviteOwner`,
   `applySiteTemplate(siteType, plan, locale)`, `verifyTenant`,
   `ensureOwnerAccess`. A unit never reaches into another's state.
+- **Deprovisioning** (`deprovisionTenant`) runs `runDeprovisioningStep` once
+  per `DEPROVISIONING_STEP`, in the CLI's order, reusing `@blog/db`'s shared
+  pieces (`purgeTenantReaderData`, `deleteVercelProjectDomain`,
+  `requestTenantCacheInvalidation`, `archiveSanityProject`) rather than
+  copying the CLI's steps; a change to what deprovisioning does lands in both.
 - **The break-glass CLI runs outside a durable step**, so it passes
   `isOneShot: true` on the unit context: every failure is final and no
   unit may call a `workflow` API that needs a run (`getStepMetadata`,

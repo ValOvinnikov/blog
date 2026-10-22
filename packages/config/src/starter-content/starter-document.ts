@@ -2,9 +2,12 @@ import type {
   Blog_topic,
   Link,
   Module_cta,
+  Module_content,
   Module_heroBlog,
+  Module_heroProfile,
   Module_postLatest,
   Module_postList,
+  Module_sectionPages,
   Module_taxonomyList,
   Page_home,
   Page_landing,
@@ -46,6 +49,9 @@ export type TStarterPage<
 export type TStarterModule<
   TModule extends
     | Module_heroBlog
+    | Module_heroProfile
+    | Module_content
+    | Module_sectionPages
     | Module_postLatest
     | Module_postList
     | Module_taxonomyList
@@ -81,4 +87,7 @@ export type TStarterDocumentUnion =
   | TStarterModule<Module_postLatest>
   | TStarterModule<Module_postList>
   | TStarterModule<Module_taxonomyList>
-  | TStarterModule<Module_cta>;
+  | TStarterModule<Module_cta>
+  | TStarterModule<Module_heroProfile>
+  | TStarterModule<Module_content>
+  | TStarterModule<Module_sectionPages>;

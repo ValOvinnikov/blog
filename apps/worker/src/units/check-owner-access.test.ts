@@ -15,6 +15,7 @@ import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import {
   getTenantById,
   setTenantOwnerAccess,
+  touchTenantActivity,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
 import {
@@ -28,6 +29,7 @@ import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT } from '@worker/constants/owner-access';
 import { freezeClock, TEST_NOW } from '@worker/testing/clock/frozen-clock';
 import {
   makeOwnerAccessTarget,
@@ -115,6 +117,10 @@ describe(checkOwnerAccess, () => {
       ok: true,
       data: makeTenant(),
     });
+    vi.mocked(touchTenantActivity).mockResolvedValue({
+      ok: true,
+      data: makeTenant(),
+    });
     vi.mocked(postOperatorAlert).mockResolvedValue(true);
   });
 
@@ -187,6 +193,41 @@ describe(checkOwnerAccess, () => {
 
       expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR);
       expect(grantSanityProjectRole).not.toHaveBeenCalled();
+    });
+
+    it("resets the tenant's inactivity clock to the acceptance", async () => {
+      await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(touchTenantActivity).toHaveBeenCalledWith(
+        TEST_TENANT_ID,
+        TEST_NOW,
+      );
+    });
+
+    it('leaves the inactivity clock alone once the acceptance was recorded', async () => {
+      vi.mocked(getTenantById).mockResolvedValue({
+        ...WAITING_TENANT,
+        ownerInviteAcceptedAt: FOUR_DAYS_AGO,
+      });
+
+      await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(touchTenantActivity).not.toHaveBeenCalled();
+    });
+
+    it('still grants access and logs when the inactivity clock cannot be reset', async () => {
+      vi.mocked(touchTenantActivity).mockResolvedValue({
+        ok: false,
+        error: ERROR_CODE.DB_NOT_FOUND,
+      });
+
+      const outcome = await checkOwnerAccess(TEST_TENANT_ID);
+
+      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
+      expect(logger.error).toHaveBeenCalledWith(
+        OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT,
+        { tenantId: TEST_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
+      );
     });
 
     it('fails the attempt when recording the access fails', async () => {

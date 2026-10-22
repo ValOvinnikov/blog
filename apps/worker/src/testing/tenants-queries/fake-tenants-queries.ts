@@ -15,6 +15,12 @@ export function withFakeTenantsQueries(
     setTenantOwnerAccess: vi.fn(),
     claimTenantOwnerEmail: vi.fn(),
     releaseTenantOwnerEmail: vi.fn(),
+    touchTenantActivity: vi.fn(),
+    archiveTenant: vi.fn(),
+    clearTenantProvisioningArtifacts: vi.fn(),
+    startDeprovisioningRun: vi.fn(),
+    finishDeprovisioningRun: vi.fn(),
+    updateDeprovisioningStep: vi.fn(),
     setTenantSiteTemplateVersion: vi.fn(),
   };
 }

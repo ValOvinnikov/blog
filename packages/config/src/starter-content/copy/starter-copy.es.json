@@ -72,5 +72,54 @@
       "metaTitle": "Acerca de — quién escribe este blog y de qué trata",
       "metaDescription": "Quién escribe este blog y de qué trata. Edita el encabezado y los campos SEO de esta página cuando tengas tu propio texto."
     }
+  },
+  "portfolio": {
+    "hero": {
+      "eyebrow": "Portafolio",
+      "heading": "Trabajos seleccionados y la historia detrás"
+    },
+    "intro": {
+      "body": [
+        "Bienvenido a mi portafolio. Aquí encontrarás algunos proyectos de los que me siento orgulloso, con una breve nota sobre cada uno.",
+        "Sustituye este texto por unas líneas sobre quién eres, a qué te dedicas y qué tipo de trabajo buscas."
+      ]
+    },
+    "cta": {
+      "heading": "Ver los proyectos",
+      "supportingText": "Recorre los proyectos, desde el encargo hasta el resultado final."
+    },
+    "work": {
+      "title": "Proyectos",
+      "slug": "proyectos",
+      "heading": "Proyectos",
+      "supportingText": "Una selección de proyectos recientes.",
+      "listHeading": "Proyectos",
+      "metaTitle": "Proyectos — una selección de trabajos y casos recientes",
+      "metaDescription": "Una selección de proyectos recientes, cada uno con una breve nota sobre el encargo, el enfoque y el resultado."
+    },
+    "projects": [
+      {
+        "title": "Proyecto de ejemplo uno",
+        "slug": "proyecto-ejemplo-uno",
+        "summary": "Un caso de ejemplo. Sustitúyelo por un proyecto real.",
+        "body": [
+          "Describe el encargo: para quién era el proyecto y qué necesitaba.",
+          "Después explica tu enfoque y el resultado. Añade imágenes y enlaces cuando los tengas."
+        ],
+        "metaTitle": "Proyecto de ejemplo uno — un caso para sustituir",
+        "metaDescription": "Un caso de ejemplo creado con tu sitio. Sustitúyelo por uno de tus propios proyectos."
+      },
+      {
+        "title": "Proyecto de ejemplo dos",
+        "slug": "proyecto-ejemplo-dos",
+        "summary": "Otro caso de ejemplo, listo para tu propio trabajo.",
+        "body": [
+          "Usa esta página para un segundo proyecto: el problema, lo que hiciste y el resultado.",
+          "Bórrala si un proyecto es suficiente por ahora."
+        ],
+        "metaTitle": "Proyecto de ejemplo dos — otro caso para sustituir",
+        "metaDescription": "Un segundo caso de ejemplo creado con tu sitio. Sustitúyelo por tu propio trabajo, o bórralo."
+      }
+    ]
   }
 }
