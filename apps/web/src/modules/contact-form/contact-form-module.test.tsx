@@ -24,9 +24,7 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await vi.importActual<typeof import('@blog/db/constants')>(
-    '@blog/db/constants',
-  )),
+  ...(await vi.importActual('@blog/db/constants')),
 }));
 
 vi.mock('@web/server/request-context/request-context');
@@ -45,14 +43,14 @@ vi.mock(
   () => ({ submitContactMessage: vi.fn() }),
 );
 
-vi.mock('@web/utils/logger/logger');
-
 const HEADING = faker.company.catchPhrase();
 const TENANT_ID = faker.string.uuid();
 
 const setup = customRenderAsync(ContactFormModule, {
   id: faker.string.uuid(),
 });
+
+const SUBMIT_LABEL = 'Send message';
 
 describe(`<${ContactFormModule.name}/>`, () => {
   beforeEach(() => {
@@ -75,7 +73,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
     await setup();
 
     expect(screen.getByRole('heading', { name: HEADING })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Send message' })).toBeVisible();
+    expect(screen.getByRole('button', { name: SUBMIT_LABEL })).toBeVisible();
   });
 
   it('renders nothing when the contact form capability is off', async () => {
@@ -84,7 +82,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
     await setup();
 
     expect(
-      screen.queryByRole('button', { name: 'Send message' }),
+      screen.queryByRole('button', { name: SUBMIT_LABEL }),
     ).not.toBeInTheDocument();
     expect(getContactFormMock).not.toHaveBeenCalled();
   });
@@ -99,12 +97,15 @@ describe(`<${ContactFormModule.name}/>`, () => {
     await setup();
 
     expect(
-      screen.queryByRole('button', { name: 'Send message' }),
+      screen.queryByRole('button', { name: SUBMIT_LABEL }),
     ).not.toBeInTheDocument();
   });
 
   it('renders nothing when the module cannot be loaded', async () => {
-    getContactFormMock.mockResolvedValue({ ok: false, error: 'NOT_FOUND' });
+    getContactFormMock.mockResolvedValue({
+      ok: false,
+      error: new Error('contact form unavailable'),
+    });
 
     await setup();
 

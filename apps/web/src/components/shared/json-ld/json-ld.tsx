@@ -1,3 +1,5 @@
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
+
 type TJsonLdProps = {
   schema: Record<string, unknown>;
 };
@@ -32,7 +34,7 @@ export const JsonLd = ({ schema }: TJsonLdProps) => {
   return (
     <script
       type="application/ld+json"
-      data-testid="json-ld-script"
+      data-testid={JSON_LD_SCRIPT_TEST_ID}
       dangerouslySetInnerHTML={{ __html: serialized }}
     />
   );

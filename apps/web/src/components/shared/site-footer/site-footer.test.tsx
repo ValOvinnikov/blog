@@ -1,8 +1,15 @@
-import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
+import {
+  LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
+  routes,
+  SOCIAL_PLATFORMS,
+} from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { SiteFooter } from './site-footer';
 
@@ -16,7 +23,7 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
   () => ({
-    getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
+    getLanguageSwitcherStyle: vi.fn(),
   }),
 );
 
@@ -52,6 +59,10 @@ const translate = (key: string, values?: Record<string, string>): string => {
 const getRequestContextMock = vi.mocked(getRequestContext);
 const getSiteSettingsMock = vi.mocked(getSiteSettings);
 
+vi.mocked(getLanguageSwitcherStyle).mockResolvedValue(
+  LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+);
+
 const setup = customRenderAsync(SiteFooter, {});
 
 const makeSocial = (platform: string, label: string, href: string) => ({
@@ -64,6 +75,10 @@ const makeSocial = (platform: string, label: string, href: string) => ({
     ariaLabel: undefined,
   },
 });
+
+const LINKEDIN_URL = 'https://www.linkedin.com/in/example';
+const LINKEDIN_LABEL = 'LinkedIn profile';
+const MASTODON_URL = 'https://mastodon.social/@example';
 
 describe(SiteFooter, () => {
   beforeEach(() => {
@@ -124,21 +139,17 @@ describe(SiteFooter, () => {
       ok: true,
       data: {
         social: [
-          makeSocial(
-            SOCIAL_PLATFORMS.LINKEDIN,
-            'LinkedIn',
-            'https://www.linkedin.com/in/example',
-          ),
+          makeSocial(SOCIAL_PLATFORMS.LINKEDIN, 'LinkedIn', LINKEDIN_URL),
         ],
       },
     });
 
     await setup();
 
-    const link = screen.getByRole('link', { name: 'LinkedIn profile' });
+    const link = screen.getByRole('link', { name: LINKEDIN_LABEL });
 
-    expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/example');
-    expect(link).toHaveAttribute('title', 'LinkedIn profile');
+    expect(link).toHaveAttribute('href', LINKEDIN_URL);
+    expect(link).toHaveAttribute('title', LINKEDIN_LABEL);
     expect(
       within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.LINKEDIN}`),
     ).toBeVisible();
@@ -149,11 +160,7 @@ describe(SiteFooter, () => {
       ok: true,
       data: {
         social: [
-          makeSocial(
-            SOCIAL_PLATFORMS.MASTODON,
-            'Mastodon',
-            'https://mastodon.social/@example',
-          ),
+          makeSocial(SOCIAL_PLATFORMS.MASTODON, 'Mastodon', MASTODON_URL),
         ],
       },
     });
@@ -162,7 +169,7 @@ describe(SiteFooter, () => {
 
     const link = screen.getByRole('link', { name: 'Mastodon profile' });
 
-    expect(link).toHaveAttribute('href', 'https://mastodon.social/@example');
+    expect(link).toHaveAttribute('href', MASTODON_URL);
     expect(
       within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
     ).toBeVisible();
@@ -202,22 +209,15 @@ describe(SiteFooter, () => {
 
   describe('when the footer fails to load', () => {
     it('logs footer.layout_fetch_failed and renders without social links', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getFooterMock.mockResolvedValue({ ok: false, error: 'boom' });
 
       await setup();
 
       expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
-      expect(
-        errorSpy.mock.calls.some((call) =>
-          call.some(
-            (arg) =>
-              typeof arg === 'string' &&
-              arg.includes('footer.layout_fetch_failed'),
-          ),
-        ),
-      ).toBe(true);
-      errorSpy.mockRestore();
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'footer.layout_fetch_failed',
+        expect.anything(),
+      );
     });
   });
 });

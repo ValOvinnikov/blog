@@ -1,5 +1,6 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { logger } from '@web/utils/logger/logger';
 
 import { getThemeTokens } from './get-theme-tokens';
 
@@ -50,7 +51,6 @@ describe('getThemeTokens', () => {
   });
 
   it('falls back to the Console preset tokens and logs when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(getSiteConfig).mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -63,10 +63,9 @@ describe('getThemeTokens', () => {
         logoHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
       }),
     );
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('theme_tokens.site_config_fetch_failed'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'theme_tokens.site_config_fetch_failed',
+      expect.objectContaining({ error: expect.any(Error) }),
     );
-
-    errorSpy.mockRestore();
   });
 });

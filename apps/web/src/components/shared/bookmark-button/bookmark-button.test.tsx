@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { act, customRender, screen, waitFor } from '@web/testing/custom-render';
+import { logger } from '@web/utils/logger/logger';
 
 import { BookmarkButton } from './bookmark-button';
 
@@ -45,6 +46,15 @@ vi.mock('@web/context/toast-provider', () => ({
 }));
 
 const setup = customRender(BookmarkButton, { postId: 'post-1' });
+
+const REMOVE_BOOKMARK = 'Remove bookmark';
+const SAVE_POST = 'Save post';
+const ARIA_PRESSED = 'aria-pressed';
+const STATUS_FETCH_FAILED_EVENT = 'bookmark_button.status_fetch_failed';
+const SAVED_MESSAGE = 'Saved to bookmarks';
+const SAVE_FAILED_MESSAGE = "Couldn't save that. Try again.";
+const UNAVAILABLE_MESSAGE =
+  "Bookmarking isn't available on this site right now.";
 
 describe(`<${BookmarkButton.name}/>`, () => {
   let user: UserEvent;
@@ -99,40 +109,38 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole('button', { name: 'Remove bookmark' }),
+          screen.getByRole('button', { name: REMOVE_BOOKMARK }),
         ).toBeEnabled();
       });
       expect(
-        screen.getByRole('button', { name: 'Remove bookmark' }),
-      ).toHaveAttribute('aria-pressed', 'true');
+        screen.getByRole('button', { name: REMOVE_BOOKMARK }),
+      ).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(
-        screen.getByRole('button', { name: 'Remove bookmark' }),
+        screen.getByRole('button', { name: REMOVE_BOOKMARK }),
       ).toHaveTextContent('Saved');
     });
 
     it('recovers to an enabled, not-bookmarked toggle (instead of staying stuck disabled) when the initial status fetch rejects', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const fetchError = new Error('db unavailable');
       getBookmarkStatusMock.mockRejectedValue(fetchError);
 
       setup();
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+        expect(screen.getByRole('button', { name: SAVE_POST })).toBeEnabled();
       });
-      expect(screen.getByRole('button', { name: 'Save post' })).toHaveAttribute(
-        'aria-pressed',
+      expect(screen.getByRole('button', { name: SAVE_POST })).toHaveAttribute(
+        ARIA_PRESSED,
         'false',
       );
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('bookmark_button.status_fetch_failed'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        STATUS_FETCH_FAILED_EVENT,
+        expect.anything(),
       );
       expect(reportClientErrorMock).toHaveBeenCalledWith(
-        'bookmark_button.status_fetch_failed',
+        STATUS_FETCH_FAILED_EVENT,
         fetchError,
       );
-
-      errorSpy.mockRestore();
     });
 
     describe('with a not-bookmarked post', () => {
@@ -140,9 +148,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
         getBookmarkStatusMock.mockResolvedValue(false);
         setup();
         await waitFor(() => {
-          expect(
-            screen.getByRole('button', { name: 'Save post' }),
-          ).toBeEnabled();
+          expect(screen.getByRole('button', { name: SAVE_POST })).toBeEnabled();
         });
       });
 
@@ -154,17 +160,17 @@ describe(`<${BookmarkButton.name}/>`, () => {
         });
 
         it('optimistically toggles on click, calls setBookmarkStatus with the new value, and shows a success toast', async () => {
-          await user.click(screen.getByRole('button', { name: 'Save post' }));
+          await user.click(screen.getByRole('button', { name: SAVE_POST }));
 
           const toggledButton = screen.getByRole('button', {
-            name: 'Remove bookmark',
+            name: REMOVE_BOOKMARK,
           });
-          expect(toggledButton).toHaveAttribute('aria-pressed', 'true');
+          expect(toggledButton).toHaveAttribute(ARIA_PRESSED, 'true');
           expect(toggledButton).toHaveTextContent('Saved');
           expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', true);
           await waitFor(() => {
             expect(toastSuccessMock).toHaveBeenCalledWith({
-              message: 'Saved to bookmarks',
+              message: SAVED_MESSAGE,
               action: expect.objectContaining({ label: 'Undo' }),
             });
           });
@@ -173,7 +179,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
         });
 
         it('undoes a successful save: reverts state, re-invokes setBookmarkStatus, and shows a reverted-state info toast', async () => {
-          await user.click(screen.getByRole('button', { name: 'Save post' }));
+          await user.click(screen.getByRole('button', { name: SAVE_POST }));
           await waitFor(() => {
             expect(toastSuccessMock).toHaveBeenCalled();
           });
@@ -184,8 +190,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
           await waitFor(() => {
             expect(
-              screen.getByRole('button', { name: 'Save post' }),
-            ).toHaveAttribute('aria-pressed', 'false');
+              screen.getByRole('button', { name: SAVE_POST }),
+            ).toHaveAttribute(ARIA_PRESSED, 'false');
           });
           expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
           expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(
@@ -207,15 +213,15 @@ describe(`<${BookmarkButton.name}/>`, () => {
         });
 
         it('rolls back the optimistic toggle and shows an error toast when the write fails', async () => {
-          await user.click(screen.getByRole('button', { name: 'Save post' }));
+          await user.click(screen.getByRole('button', { name: SAVE_POST }));
 
           await waitFor(() => {
             expect(
-              screen.getByRole('button', { name: 'Save post' }),
-            ).toHaveAttribute('aria-pressed', 'false');
+              screen.getByRole('button', { name: SAVE_POST }),
+            ).toHaveAttribute(ARIA_PRESSED, 'false');
           });
           expect(toastErrorMock).toHaveBeenCalledWith({
-            message: "Couldn't save that. Try again.",
+            message: SAVE_FAILED_MESSAGE,
             action: expect.objectContaining({ label: 'Retry', keyHint: 'R' }),
           });
           expect(toastSuccessMock).not.toHaveBeenCalled();
@@ -223,7 +229,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
         });
 
         it('shows a fresh retry action when the retried save fails again', async () => {
-          await user.click(screen.getByRole('button', { name: 'Save post' }));
+          await user.click(screen.getByRole('button', { name: SAVE_POST }));
           await waitFor(() => {
             expect(toastErrorMock).toHaveBeenCalledTimes(1);
           });
@@ -236,8 +242,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
           });
           expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
           expect(
-            screen.getByRole('button', { name: 'Save post' }),
-          ).toHaveAttribute('aria-pressed', 'false');
+            screen.getByRole('button', { name: SAVE_POST }),
+          ).toHaveAttribute(ARIA_PRESSED, 'false');
           const { action: secondAction } = toastErrorMock.mock.calls[1]![0];
           expect(secondAction).toEqual(
             expect.objectContaining({ label: 'Retry', keyHint: 'R' }),
@@ -250,11 +256,11 @@ describe(`<${BookmarkButton.name}/>`, () => {
           outcome: ACTION_OUTCOME.UNAVAILABLE,
         });
 
-        await user.click(screen.getByRole('button', { name: 'Save post' }));
+        await user.click(screen.getByRole('button', { name: SAVE_POST }));
 
         await waitFor(() => {
           expect(toastErrorMock).toHaveBeenCalledWith({
-            message: "Bookmarking isn't available on this site right now.",
+            message: UNAVAILABLE_MESSAGE,
           });
         });
       });
@@ -264,7 +270,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
           .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS })
           .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.UNAVAILABLE });
 
-        await user.click(screen.getByRole('button', { name: 'Save post' }));
+        await user.click(screen.getByRole('button', { name: SAVE_POST }));
         await waitFor(() => {
           expect(toastSuccessMock).toHaveBeenCalled();
         });
@@ -274,7 +280,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
         await waitFor(() => {
           expect(toastErrorMock).toHaveBeenCalledWith({
-            message: "Bookmarking isn't available on this site right now.",
+            message: UNAVAILABLE_MESSAGE,
           });
         });
       });
@@ -284,7 +290,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
           .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS })
           .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SERVER_ERROR });
 
-        await user.click(screen.getByRole('button', { name: 'Save post' }));
+        await user.click(screen.getByRole('button', { name: SAVE_POST }));
         await waitFor(() => {
           expect(toastSuccessMock).toHaveBeenCalled();
         });
@@ -294,12 +300,12 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
         await waitFor(() => {
           expect(
-            screen.getByRole('button', { name: 'Remove bookmark' }),
-          ).toHaveAttribute('aria-pressed', 'true');
+            screen.getByRole('button', { name: REMOVE_BOOKMARK }),
+          ).toHaveAttribute(ARIA_PRESSED, 'true');
         });
         expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
         expect(toastErrorMock).toHaveBeenCalledWith({
-          message: "Couldn't save that. Try again.",
+          message: SAVE_FAILED_MESSAGE,
         });
         expect(toastInfoMock).not.toHaveBeenCalled();
       });
@@ -309,7 +315,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
           .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SERVER_ERROR })
           .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS });
 
-        await user.click(screen.getByRole('button', { name: 'Save post' }));
+        await user.click(screen.getByRole('button', { name: SAVE_POST }));
         await waitFor(() => {
           expect(toastErrorMock).toHaveBeenCalled();
         });
@@ -319,8 +325,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
         await waitFor(() => {
           expect(
-            screen.getByRole('button', { name: 'Remove bookmark' }),
-          ).toHaveAttribute('aria-pressed', 'true');
+            screen.getByRole('button', { name: REMOVE_BOOKMARK }),
+          ).toHaveAttribute(ARIA_PRESSED, 'true');
         });
         expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
         expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(
@@ -329,7 +335,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
           true,
         );
         expect(toastSuccessMock).toHaveBeenCalledWith({
-          message: 'Saved to bookmarks',
+          message: SAVED_MESSAGE,
           action: expect.objectContaining({ label: 'Undo' }),
         });
       });
@@ -344,15 +350,13 @@ describe(`<${BookmarkButton.name}/>`, () => {
         setup();
         await waitFor(() => {
           expect(
-            screen.getByRole('button', { name: 'Remove bookmark' }),
+            screen.getByRole('button', { name: REMOVE_BOOKMARK }),
           ).toBeEnabled();
         });
       });
 
       it('shows an info toast when unsaving an already-bookmarked post', async () => {
-        await user.click(
-          screen.getByRole('button', { name: 'Remove bookmark' }),
-        );
+        await user.click(screen.getByRole('button', { name: REMOVE_BOOKMARK }));
 
         expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', false);
         await waitFor(() => {
@@ -366,9 +370,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
       });
 
       it('undoes a successful remove: re-bookmarks, re-invokes setBookmarkStatus, and shows a reverted-state info toast', async () => {
-        await user.click(
-          screen.getByRole('button', { name: 'Remove bookmark' }),
-        );
+        await user.click(screen.getByRole('button', { name: REMOVE_BOOKMARK }));
         await waitFor(() => {
           expect(toastInfoMock).toHaveBeenCalledTimes(1);
         });
@@ -379,8 +381,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
         await waitFor(() => {
           expect(
-            screen.getByRole('button', { name: 'Remove bookmark' }),
-          ).toHaveAttribute('aria-pressed', 'true');
+            screen.getByRole('button', { name: REMOVE_BOOKMARK }),
+          ).toHaveAttribute(ARIA_PRESSED, 'true');
         });
         expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
         expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(

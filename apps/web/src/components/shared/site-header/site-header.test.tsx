@@ -1,11 +1,13 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { SiteHeader } from './site-header';
 
@@ -21,7 +23,7 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
   () => ({
-    getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
+    getLanguageSwitcherStyle: vi.fn(),
   }),
 );
 
@@ -67,10 +69,20 @@ const getSiteSettingsMock = vi.mocked(getSiteSettings);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
 
+vi.mocked(getLanguageSwitcherStyle).mockResolvedValue(
+  LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+);
+
 const LOOK_LOGO_URL = 'https://blob.example.com/tenants/tenant-a/logo.png';
 const STUDIO_LOGO = { assetId: 'image-abc123def-800x600-svg', alt: 'Logo' };
 
 const setup = customRenderAsync(SiteHeader, {});
+
+const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
+const LANGUAGE_ENGLISH = 'Language: English';
+const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
+const SIGN_IN_OPTIONS = 'Sign in options';
+const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
 
 describe(SiteHeader, () => {
   beforeEach(() => {
@@ -145,12 +157,12 @@ describe(SiteHeader, () => {
 
     it('puts the language pill and theme toggle in the open phone menu panel, and the account entry in its own row after them', async () => {
       await userEvent.click(
-        screen.getByRole('button', { name: 'Toggle navigation menu' }),
+        screen.getByRole('button', { name: TOGGLE_NAVIGATION_MENU }),
       );
       const panelRow = screen.getByTestId('primary-navigation-panel-actions');
 
       expect(
-        within(panelRow).getByRole('button', { name: 'Language: English' }),
+        within(panelRow).getByRole('button', { name: LANGUAGE_ENGLISH }),
       ).toBeVisible();
       expect(
         within(panelRow).getByRole('button', { name: /Switch to/ }),
@@ -159,9 +171,9 @@ describe(SiteHeader, () => {
         within(panelRow).queryByRole('button', { name: 'Sign in' }),
       ).not.toBeInTheDocument();
       expect(
-        within(
-          screen.getByTestId('primary-navigation-drawer-actions'),
-        ).getByRole('button', { name: 'Sign in' }),
+        within(screen.getByTestId(DRAWER_ACTIONS_TEST_ID)).getByRole('button', {
+          name: 'Sign in',
+        }),
       ).toBeVisible();
     });
 
@@ -169,16 +181,14 @@ describe(SiteHeader, () => {
       const user = userEvent.setup();
 
       await user.click(
-        screen.getAllByRole('button', { name: 'Language: English' })[0]!,
+        screen.getAllByRole('button', { name: LANGUAGE_ENGLISH })[0]!,
       );
       expect(screen.getByRole('menu', { name: 'Language' })).toBeVisible();
 
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
       expect(screen.getAllByRole('menu')).toHaveLength(1);
-      expect(
-        screen.getByRole('menu', { name: 'Sign in options' }),
-      ).toBeVisible();
+      expect(screen.getByRole('menu', { name: SIGN_IN_OPTIONS })).toBeVisible();
     });
   });
 
@@ -186,35 +196,35 @@ describe(SiteHeader, () => {
     beforeEach(async () => {
       await setup();
       await userEvent.click(
-        screen.getByRole('button', { name: 'Toggle navigation menu' }),
+        screen.getByRole('button', { name: TOGGLE_NAVIGATION_MENU }),
       );
     });
 
     it('closes the menu and opens the sign-in panel with focus on its first item', async () => {
       await userEvent.click(
-        within(
-          screen.getByTestId('primary-navigation-drawer-actions'),
-        ).getByRole('button', { name: 'Sign in' }),
+        within(screen.getByTestId(DRAWER_ACTIONS_TEST_ID)).getByRole('button', {
+          name: 'Sign in',
+        }),
       );
 
       expect(
         screen.getByTestId('primary-navigation-mobile-panel'),
       ).not.toBeVisible();
       expect(
-        screen.getByRole('menuitem', { name: 'Continue with GitHub' }),
+        screen.getByRole('menuitem', { name: CONTINUE_WITH_GITHUB }),
       ).toHaveFocus();
     });
 
     it('returns focus to the bar control when Escape closes the panel', async () => {
       await userEvent.click(
-        within(
-          screen.getByTestId('primary-navigation-drawer-actions'),
-        ).getByRole('button', { name: 'Sign in' }),
+        within(screen.getByTestId(DRAWER_ACTIONS_TEST_ID)).getByRole('button', {
+          name: 'Sign in',
+        }),
       );
       await userEvent.keyboard('{Escape}');
 
       expect(
-        screen.queryByRole('menu', { name: 'Sign in options' }),
+        screen.queryByRole('menu', { name: SIGN_IN_OPTIONS }),
       ).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Sign in' })).toHaveFocus();
     });
@@ -228,14 +238,13 @@ describe(SiteHeader, () => {
     await setup();
 
     await userEvent.click(
-      screen.getByRole('button', { name: 'Toggle navigation menu' }),
+      screen.getByRole('button', { name: TOGGLE_NAVIGATION_MENU }),
     );
 
     expect(
-      within(screen.getByTestId('primary-navigation-drawer-actions')).getByRole(
-        'button',
-        { name: 'Account' },
-      ),
+      within(screen.getByTestId(DRAWER_ACTIONS_TEST_ID)).getByRole('button', {
+        name: 'Account',
+      }),
     ).toBeVisible();
   });
 
@@ -274,7 +283,7 @@ describe(SiteHeader, () => {
     const panel = screen.getByRole('menu');
 
     expect(
-      within(panel).getByRole('menuitem', { name: 'Continue with GitHub' }),
+      within(panel).getByRole('menuitem', { name: CONTINUE_WITH_GITHUB }),
     ).toBeVisible();
     expect(
       within(panel).queryByRole('menuitem', { name: 'Continue with Google' }),
@@ -309,22 +318,15 @@ describe(SiteHeader, () => {
 
   describe('when navigation fails to load', () => {
     it('logs navigation.layout_fetch_failed and still renders the header', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getNavigationMock.mockResolvedValue({ ok: false, error: 'boom' });
 
       await setup();
 
       expect(screen.getByRole('banner')).toBeVisible();
-      expect(
-        errorSpy.mock.calls.some((call) =>
-          call.some(
-            (arg) =>
-              typeof arg === 'string' &&
-              arg.includes('navigation.layout_fetch_failed'),
-          ),
-        ),
-      ).toBe(true);
-      errorSpy.mockRestore();
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'navigation.layout_fetch_failed',
+        expect.anything(),
+      );
     });
   });
 });

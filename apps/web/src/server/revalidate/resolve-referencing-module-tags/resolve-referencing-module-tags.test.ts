@@ -14,9 +14,10 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerErrorMock = vi.mocked(logger.error);
+
+const TENANT_ID = 'tenant-uuid-1';
+const LOOKUP_FAILURE = 'sanity unreachable';
 
 const tenant = {
   projectId: 'tenant-a-project',
@@ -27,7 +28,7 @@ const tenant = {
 const input = {
   type: 'page_topic',
   id: 'topic-1',
-  tenantId: 'tenant-uuid-1',
+  tenantId: TENANT_ID,
   tenant,
 };
 
@@ -64,7 +65,7 @@ describe(resolveReferencingModuleTags, () => {
   it('degrades to no tags when the lookup fails, so the caller can purge the rest', async () => {
     getReferencingModuleIdsMock.mockResolvedValue({
       ok: false,
-      error: new Error('sanity unreachable'),
+      error: new Error(LOOKUP_FAILURE),
     });
 
     const result = await resolveReferencingModuleTags(input);
@@ -73,7 +74,7 @@ describe(resolveReferencingModuleTags, () => {
   });
 
   it('logs a failed lookup once, with the document and tenant context attached', async () => {
-    const error = new Error('sanity unreachable');
+    const error = new Error(LOOKUP_FAILURE);
     getReferencingModuleIdsMock.mockResolvedValue({ ok: false, error });
 
     await resolveReferencingModuleTags(input);
@@ -84,7 +85,7 @@ describe(resolveReferencingModuleTags, () => {
       expect.objectContaining({
         type: 'page_topic',
         id: 'topic-1',
-        tenantId: 'tenant-uuid-1',
+        tenantId: TENANT_ID,
         error,
       }),
     );

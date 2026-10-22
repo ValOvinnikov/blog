@@ -9,7 +9,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import { buildLandingPageMetadata } from './build-landing-page-metadata';
 
@@ -22,6 +22,10 @@ vi.mock('@web/server/landing/get-landing-page/get-landing-page', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+
+const FAQ_SLUG = 'modules/faq';
+const NL_ABOUT_PATH = '/nl/over-ons';
+const NL_ABOUT_SLUG = 'over-ons';
 
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   LANDING_PAGE_OG_IMAGE,
@@ -58,15 +62,15 @@ describe('buildLandingPageMetadata', () => {
       ok: true,
       data: {
         ...mockLandingPage,
-        path: 'modules/faq',
+        path: FAQ_SLUG,
         translations: [
-          { language: EN, slug: 'modules/faq' },
+          { language: EN, slug: FAQ_SLUG },
           { language: NL, slug: 'modules/vragen' },
         ],
       },
     });
 
-    const metadata = await buildLandingPageMetadata('modules/faq');
+    const metadata = await buildLandingPageMetadata(FAQ_SLUG);
 
     expect(metadata.alternates?.canonical).toBe('/modules/faq');
     expect(metadata.alternates?.languages).toMatchObject({
@@ -81,7 +85,7 @@ describe('buildLandingPageMetadata', () => {
         ...mockLandingPage,
         translations: [
           { language: EN, slug: 'about-us' },
-          { language: NL, slug: 'over-ons' },
+          { language: NL, slug: NL_ABOUT_SLUG },
           { language: DE, slug: 'ueber-uns' },
         ],
       },
@@ -91,7 +95,7 @@ describe('buildLandingPageMetadata', () => {
 
     expect(metadata.alternates?.languages).toEqual({
       en: '/about-us',
-      nl: '/nl/over-ons',
+      nl: NL_ABOUT_PATH,
       'x-default': '/about-us',
     });
   });
@@ -123,16 +127,16 @@ describe('buildLandingPageMetadata', () => {
       data: {
         ...mockLandingPage,
         translations: [
-          { language: NL, slug: 'over-ons' },
+          { language: NL, slug: NL_ABOUT_SLUG },
           { language: DE, slug: 'ueber-uns' },
         ],
       },
     });
 
-    const metadata = await buildLandingPageMetadata('over-ons');
+    const metadata = await buildLandingPageMetadata(NL_ABOUT_SLUG);
 
     expect(metadata.alternates?.languages).toEqual({
-      nl: '/nl/over-ons',
+      nl: NL_ABOUT_PATH,
       de: '/de/ueber-uns',
     });
   });
@@ -145,7 +149,7 @@ describe('buildLandingPageMetadata', () => {
           ...mockLandingPage,
           translations: [
             { language: EN, slug: 'about-us' },
-            { language: NL, slug: 'over-ons' },
+            { language: NL, slug: NL_ABOUT_SLUG },
           ],
         },
       });
@@ -169,7 +173,7 @@ describe('buildLandingPageMetadata', () => {
         canonical: '/about-us',
         languages: {
           en: '/about-us',
-          nl: '/nl/over-ons',
+          nl: NL_ABOUT_PATH,
           'x-default': '/about-us',
         },
       });
@@ -243,27 +247,27 @@ describe('buildLandingPageMetadata', () => {
         ok: true,
         data: {
           ...mockLandingPage,
-          slug: 'over-ons',
+          slug: NL_ABOUT_SLUG,
           translations: [
             { language: EN, slug: 'about-us' },
-            { language: NL, slug: 'over-ons' },
+            { language: NL, slug: NL_ABOUT_SLUG },
           ],
         },
       });
     });
 
     it('points a non-default translation canonical at its own prefixed address', async () => {
-      const metadata = await buildLandingPageMetadata('over-ons');
+      const metadata = await buildLandingPageMetadata(NL_ABOUT_SLUG);
 
-      expect(metadata.alternates?.canonical).toBe('/nl/over-ons');
+      expect(metadata.alternates?.canonical).toBe(NL_ABOUT_PATH);
       expect(metadata.alternates?.languages).toMatchObject({
-        nl: '/nl/over-ons',
+        nl: NL_ABOUT_PATH,
         en: '/about-us',
       });
     });
 
     it('emits locale, alternate locale and url for the NL translation of the same page', async () => {
-      const metadata = await buildLandingPageMetadata('over-ons');
+      const metadata = await buildLandingPageMetadata(NL_ABOUT_SLUG);
 
       expect(metadata.openGraph?.locale).toBe('nl_NL');
       expect(metadata.openGraph?.alternateLocale).toEqual(['en_US']);
@@ -272,16 +276,6 @@ describe('buildLandingPageMetadata', () => {
   });
 
   describe('when no metadata can be built', () => {
-    let errorSpy: MockInstance<typeof console.error>;
-
-    beforeEach(() => {
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      errorSpy.mockRestore();
-    });
-
     it('returns empty metadata and logs when the page fetch fails', async () => {
       getLandingPageMock.mockResolvedValue({
         ok: false,
@@ -291,8 +285,9 @@ describe('buildLandingPageMetadata', () => {
       const metadata = await buildLandingPageMetadata('missing');
 
       expect(metadata).toEqual({});
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('landing_page_metadata.fetch_failed'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'landing_page_metadata.fetch_failed',
+        expect.objectContaining({ error: expect.any(Error) }),
       );
     });
 
@@ -302,7 +297,7 @@ describe('buildLandingPageMetadata', () => {
       const metadata = await buildLandingPageMetadata('missing');
 
       expect(metadata).toEqual({});
-      expect(errorSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
   });
 });

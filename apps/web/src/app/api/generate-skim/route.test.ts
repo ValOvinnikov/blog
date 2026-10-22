@@ -1,3 +1,4 @@
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { logger } from '@web/utils/logger/logger';
 
 const {
@@ -16,6 +17,18 @@ const {
   getPlatformSanityWriteContextMock: vi.fn(),
 }));
 
+const { SKIM_MODEL, GENERATE_SECRET, ANTHROPIC_KEY, envMock } = vi.hoisted(
+  () => ({
+    SKIM_MODEL: 'claude-haiku-4-5',
+    GENERATE_SECRET: 'test-secret',
+    ANTHROPIC_KEY: 'test-api-key',
+    envMock: {} as {
+      SANITY_GENERATE_SECRET?: string;
+      ANTHROPIC_API_KEY?: string;
+    },
+  }),
+);
+
 vi.mock('@blog/service', () => ({
   service: {
     editorial: {
@@ -32,7 +45,7 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/skim/generate-takeaways/generate-takeaways', () => ({
   generateTakeaways: generateTakeawaysMock,
-  SKIM_GENERATION_MODEL: 'claude-haiku-4-5',
+  SKIM_GENERATION_MODEL: SKIM_MODEL,
 }));
 
 vi.mock(
@@ -43,14 +56,7 @@ vi.mock(
   }),
 );
 
-vi.mock('@web/utils/logger/logger');
-
-vi.mock('@web/utils/env/env', () => ({
-  env: {
-    SANITY_GENERATE_SECRET: 'test-secret',
-    ANTHROPIC_API_KEY: 'test-api-key',
-  },
-}));
+vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 
 let loggerErrorMock = vi.mocked(logger.error);
 let loggerWarnMock = vi.mocked(logger.warn);
@@ -61,11 +67,19 @@ const platformTenant = {
   token: 'platform-token',
 };
 
-const makeRequest = (body: unknown, secret = 'test-secret'): Request => {
-  const url = new URL('https://example.com/api/generate-skim');
+const GENERATE_SKIM_URL = 'https://example.com/api/generate-skim';
+
+const tenantWriteCredentials = {
+  projectId: 'tenant-project',
+  dataset: 'production',
+  token: 'tenant-write-token',
+};
+
+const makeRequest = (body: unknown, secret = GENERATE_SECRET): Request => {
+  const url = new URL(GENERATE_SKIM_URL);
   if (secret !== undefined) url.searchParams.set('secret', secret);
   return new Request(url, {
-    method: 'POST',
+    method: HTTP_METHOD.POST,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 };
@@ -75,6 +89,8 @@ describe('POST /api/generate-skim', () => {
     const fresh = await import('@web/utils/logger/logger');
     loggerErrorMock = vi.mocked(fresh.logger.error);
     loggerWarnMock = vi.mocked(fresh.logger.warn);
+    envMock.SANITY_GENERATE_SECRET = GENERATE_SECRET;
+    envMock.ANTHROPIC_API_KEY = ANTHROPIC_KEY;
     getPublishedPostBodyMock.mockReset();
     saveSkimDraftMock.mockReset();
     generateTakeawaysMock.mockReset();
@@ -113,7 +129,7 @@ describe('POST /api/generate-skim', () => {
     it('returns 401 when the secret is missing', async () => {
       const response = await POST(makeRequest({ _id: 'post-1' }, ''));
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
       expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
 
@@ -122,25 +138,25 @@ describe('POST /api/generate-skim', () => {
         makeRequest({ _id: 'post-1' }, 'wrong-secret'),
       );
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
       expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
 
     it('returns 400 for a malformed request body', async () => {
       const request = new Request(
-        'https://example.com/api/generate-skim?secret=test-secret',
-        { method: 'POST', body: 'not json' },
+        `${GENERATE_SKIM_URL}?secret=${GENERATE_SECRET}`,
+        { method: HTTP_METHOD.POST, body: 'not json' },
       );
       const response = await POST(request);
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
       expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
 
     it('returns 400 when the body is valid JSON but missing _id', async () => {
       const response = await POST(makeRequest({ foo: 'bar' }));
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
       expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
 
@@ -151,7 +167,7 @@ describe('POST /api/generate-skim', () => {
       });
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
       expect(generateTakeawaysMock).not.toHaveBeenCalled();
     });
 
@@ -184,14 +200,14 @@ describe('POST /api/generate-skim', () => {
       });
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     });
 
     it('reads the post body, generates takeaways, and patches the draft on success', async () => {
       const response = await POST(makeRequest({ _id: 'post-1' }));
       const json = await response.json();
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(HTTP_STATUS.OK);
       expect(json).toEqual({ ok: true, count: 3 });
       expect(getPublishedPostBodyMock).toHaveBeenCalledWith(
         'post-1',
@@ -201,7 +217,7 @@ describe('POST /api/generate-skim', () => {
         {
           postId: 'post-1',
           takeaways: ['a', 'b', 'c'],
-          model: 'claude-haiku-4-5',
+          model: SKIM_MODEL,
         },
         platformTenant,
       );
@@ -217,7 +233,7 @@ describe('POST /api/generate-skim', () => {
         {
           postId: 'post-1',
           takeaways: ['a', 'b', 'c'],
-          model: 'claude-haiku-4-5',
+          model: SKIM_MODEL,
         },
         platformTenant,
       );
@@ -226,18 +242,14 @@ describe('POST /api/generate-skim', () => {
         {
           postId: 'post-1',
           takeaways: ['a', 'b', 'c'],
-          model: 'claude-haiku-4-5',
+          model: SKIM_MODEL,
         },
         platformTenant,
       );
     });
 
     it('forwards the resolved tenant Sanity context to getPublishedPostBody', async () => {
-      const tenant = {
-        projectId: 'tenant-project',
-        dataset: 'production',
-        token: 'tenant-token',
-      };
+      const tenant = { ...tenantWriteCredentials, token: 'tenant-token' };
       getHostTenantSanityContextMock.mockResolvedValue({
         isResolvable: true,
         tenant,
@@ -251,16 +263,12 @@ describe('POST /api/generate-skim', () => {
       getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
       expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
 
     it('saves the skim draft with the resolved tenant Sanity write credentials', async () => {
-      const tenant = {
-        projectId: 'tenant-project',
-        dataset: 'production',
-        token: 'tenant-write-token',
-      };
+      const tenant = tenantWriteCredentials;
       getHostTenantSanityWriteContextMock.mockResolvedValue({
         isResolvable: true,
         tenant,
@@ -269,14 +277,14 @@ describe('POST /api/generate-skim', () => {
       });
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(HTTP_STATUS.OK);
       expect(getHostTenantSanityContextMock).toHaveBeenCalledTimes(1);
       expect(getHostTenantSanityWriteContextMock).toHaveBeenCalledTimes(1);
       expect(saveSkimDraftMock).toHaveBeenCalledWith(
         {
           postId: 'post-1',
           takeaways: ['a', 'b', 'c'],
-          model: 'claude-haiku-4-5',
+          model: SKIM_MODEL,
         },
         tenant,
       );
@@ -310,18 +318,14 @@ describe('POST /api/generate-skim', () => {
     it('returns 403 without writing when the resolved tenant is not active', async () => {
       getHostTenantSanityWriteContextMock.mockResolvedValue({
         isResolvable: true,
-        tenant: {
-          projectId: 'tenant-project',
-          dataset: 'production',
-          token: 'tenant-write-token',
-        },
+        tenant: tenantWriteCredentials,
         tenantId: 'tenant-1',
         isActive: false,
       });
       const response = await POST(makeRequest({ _id: 'post-1' }));
       const json = await response.json();
 
-      expect(response.status).toBe(403);
+      expect(response.status).toBe(HTTP_STATUS.FORBIDDEN);
       expect(json).toEqual({
         message: 'The requesting tenant is not permitted to write.',
       });
@@ -335,11 +339,7 @@ describe('POST /api/generate-skim', () => {
     });
 
     it('saves the skim draft when the resolved tenant is active', async () => {
-      const tenant = {
-        projectId: 'tenant-project',
-        dataset: 'production',
-        token: 'tenant-write-token',
-      };
+      const tenant = tenantWriteCredentials;
       getHostTenantSanityWriteContextMock.mockResolvedValue({
         isResolvable: true,
         tenant,
@@ -348,12 +348,12 @@ describe('POST /api/generate-skim', () => {
       });
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(HTTP_STATUS.OK);
       expect(saveSkimDraftMock).toHaveBeenCalledWith(
         {
           postId: 'post-1',
           takeaways: ['a', 'b', 'c'],
-          model: 'claude-haiku-4-5',
+          model: SKIM_MODEL,
         },
         tenant,
       );
@@ -368,7 +368,7 @@ describe('POST /api/generate-skim', () => {
       });
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(HTTP_STATUS.OK);
     });
 
     it('returns 404 without reading the post when the write-side tenant is unresolvable', async () => {
@@ -377,15 +377,13 @@ describe('POST /api/generate-skim', () => {
       });
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
       expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
   });
 
   it('returns 503 when ANTHROPIC_API_KEY is not configured', async () => {
-    vi.doMock('@web/utils/env/env', () => ({
-      env: { SANITY_GENERATE_SECRET: 'test-secret' },
-    }));
+    delete envMock.ANTHROPIC_API_KEY;
     const { POST } = await import('./route');
 
     const response = await POST(makeRequest({ _id: 'post-1' }));
@@ -395,9 +393,7 @@ describe('POST /api/generate-skim', () => {
   });
 
   it('returns 503 when SANITY_GENERATE_SECRET is not configured', async () => {
-    vi.doMock('@web/utils/env/env', () => ({
-      env: { ANTHROPIC_API_KEY: 'test-api-key' },
-    }));
+    delete envMock.SANITY_GENERATE_SECRET;
     const { POST } = await import('./route');
 
     const response = await POST(makeRequest({ _id: 'post-1' }));

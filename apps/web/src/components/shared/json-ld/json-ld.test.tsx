@@ -1,3 +1,4 @@
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { JsonLd } from './json-ld';
@@ -14,7 +15,7 @@ describe(`<${JsonLd.name}/>`, () => {
 
     setup({ schema });
 
-    const script = screen.getByTestId('json-ld-script');
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(script).toHaveAttribute('type', 'application/ld+json');
     expect(script.innerHTML).toBe(JSON.stringify(schema));
   });
@@ -24,7 +25,7 @@ describe(`<${JsonLd.name}/>`, () => {
 
     setup({ schema });
 
-    const script = screen.getByTestId('json-ld-script');
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(script.innerHTML).not.toContain('</script>');
     expect(script.innerHTML).toContain('\\u003c/script\\u003e');
   });
@@ -34,7 +35,7 @@ describe(`<${JsonLd.name}/>`, () => {
 
     setup({ schema });
 
-    const script = screen.getByTestId('json-ld-script');
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(script.innerHTML).toBe('{"description":"Tom \\u0026 Jerry"}');
   });
 });

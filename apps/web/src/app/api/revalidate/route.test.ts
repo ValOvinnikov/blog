@@ -99,8 +99,6 @@ vi.mock(
   }),
 );
 
-vi.mock('@web/utils/logger/logger');
-
 let loggerErrorMock = vi.mocked(logger.error);
 let loggerWarnMock = vi.mocked(logger.warn);
 

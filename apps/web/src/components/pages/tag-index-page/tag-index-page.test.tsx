@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TTagIndexPage } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
@@ -33,17 +34,20 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 vi.mock('@web/i18n/navigation');
 
 const getIndexPageMock = vi.mocked(service.pages.tagIndex.v1.getIndexPage);
+
+const SUPPORTING_TEXT = 'Browse every post by tag.';
+const CTA_HEADING = 'Join the list';
+const SECOND_CTA_HEADING = 'Write for us';
+const HERO_HEADING = 'Every tag we write about';
 
 const tagIndexPage: TTagIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   headingBlock: makeHeadingBlock({
     heading: 'Tags',
-    supportingText: 'Browse every post by tag.',
+    supportingText: SUPPORTING_TEXT,
   }),
   hero: undefined,
   modules: [],
@@ -61,7 +65,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
       ok: true,
       data: makeCtaModuleData({
         headingBlock: makeHeadingBlock({
-          heading: id === 'cta-1' ? 'Join the list' : 'Write for us',
+          heading: id === 'cta-1' ? CTA_HEADING : SECOND_CTA_HEADING,
         }),
       }),
     }));
@@ -73,7 +77,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
       error: new Error('boom'),
     });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
@@ -85,7 +89,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
   it('calls notFound() without logging when the index page does not exist', async () => {
     getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
@@ -99,7 +103,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
     });
     getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
@@ -121,7 +125,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
       expect(
         within(main).getByRole('heading', { level: 1, name: 'Tags' }),
       ).toBeVisible();
-      expect(within(main).getByText('Browse every post by tag.')).toBeVisible();
+      expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     });
 
@@ -153,8 +157,8 @@ describe(`<${TagIndexPage.name}/>`, () => {
 
     const main = screen.getByRole('main');
     expect(within(main).getAllByRole('region')).toEqual([
-      within(main).getByRole('region', { name: 'Join the list' }),
-      within(main).getByRole('region', { name: 'Write for us' }),
+      within(main).getByRole('region', { name: CTA_HEADING }),
+      within(main).getByRole('region', { name: SECOND_CTA_HEADING }),
     ]);
   });
 
@@ -168,7 +172,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
     });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
       ok: true,
-      data: makeHeroBlogData({ heading: 'Every tag we write about' }),
+      data: makeHeroBlogData({ heading: HERO_HEADING }),
     });
 
     await setup();
@@ -176,7 +180,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'Every tag we write about',
+        name: HERO_HEADING,
       }),
     ).toBeVisible();
     expect(

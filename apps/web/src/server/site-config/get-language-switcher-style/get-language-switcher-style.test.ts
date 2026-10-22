@@ -6,7 +6,6 @@ import { getLanguageSwitcherStyle } from './get-language-switcher-style';
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
-vi.mock('@web/utils/logger/logger');
 
 const getSiteConfigMock = vi.mocked(getSiteConfig);
 

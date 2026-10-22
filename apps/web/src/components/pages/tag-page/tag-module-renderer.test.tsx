@@ -77,8 +77,6 @@ vi.mock('@web/modules/faq/faq-module', () => ({
   FaqModule: faqModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TagModuleRenderer, {
@@ -88,6 +86,8 @@ const setup = customRenderAsync(TagModuleRenderer, {
   modules: [],
 });
 
+const POST_LIST_ID = 'post-list-1';
+
 describe(`<${TagModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'TypeScript' });
   testResolvedHero({ setup });
@@ -95,7 +95,7 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
     setup,
     modules: [
       { id: 'cta-1', type: 'module_cta' },
-      { id: 'post-list-1', type: 'module_postList' },
+      { id: POST_LIST_ID, type: 'module_postList' },
     ],
     expectedTestIds: ['stub-hero', 'stub-cta', 'stub-post-list'],
   });
@@ -114,22 +114,13 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: 'post-list-1', type: 'module_postList' },
+      { id: POST_LIST_ID, type: 'module_postList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'content-1', type: 'module_content' },
       { id: 'faq-1', type: 'module_faq' },
-    ],
-    expectedOrder: [
-      'post-list-1',
-      'post-latest-1',
-      'taxonomy-list-1',
-      'cta-1',
-      'newsletter-1',
-      'content-1',
-      'faq-1',
     ],
   });
 });

@@ -1,4 +1,5 @@
 import type { ISanityImage } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import {
   service,
   type TPortableTextBody,
@@ -31,14 +32,12 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@blog/service')>();
+  const actual = await importOriginal<object>();
   return {
     ...actual,
     service: { pages: { post: { v1: { getPost: vi.fn() } } } },
   };
 });
-
-vi.mock('@web/utils/logger/logger');
 
 vi.mock(
   '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
@@ -56,9 +55,11 @@ vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
 
 const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
+const AUTHOR_PROFILE_URL = '/blog/tag/writers';
+
 const setup = customRenderServerAsync(
   PostArticle,
-  { slug: 'hello-world' },
+  { slug: mockPostDetail.slug },
   { wrapper: ToastProvider },
 );
 
@@ -77,7 +78,7 @@ describe(`<${PostArticle.name}/>`, () => {
   it('calls notFound() without logging when no page_post matches the slug', async () => {
     getPostMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
@@ -86,12 +87,12 @@ describe(`<${PostArticle.name}/>`, () => {
   it('logs and calls notFound() when the fetch fails', async () => {
     getPostMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
       'post_article.fetch_failed',
-      expect.objectContaining({ slug: 'hello-world' }),
+      expect.objectContaining({ slug: mockPostDetail.slug }),
     );
   });
 
@@ -153,7 +154,7 @@ describe(`<${PostArticle.name}/>`, () => {
         ...mockPostDetail,
         author: {
           ...mockPostDetail.author,
-          profileUrl: '/blog/tag/writers',
+          profileUrl: AUTHOR_PROFILE_URL,
         },
       },
     });
@@ -162,7 +163,7 @@ describe(`<${PostArticle.name}/>`, () => {
 
     expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
       'href',
-      '/blog/tag/writers',
+      AUTHOR_PROFILE_URL,
     );
   });
 
@@ -254,7 +255,7 @@ describe(`<${PostArticle.name}/>`, () => {
 
     it('fetches the post for the given slug with the tenant context', async () => {
       expect(getPostMock).toHaveBeenCalledWith(
-        'hello-world',
+        mockPostDetail.slug,
         DEFAULT_TENANT_SANITY_CONTEXT,
       );
     });

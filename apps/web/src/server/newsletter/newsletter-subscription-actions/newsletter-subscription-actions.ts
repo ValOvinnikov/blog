@@ -8,6 +8,10 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
+import {
+  CONFIRMATION_RESEND_FAILED_EVENT,
+  UNSUBSCRIBE_FAILED_EVENT,
+} from '@web/constants/newsletter';
 import { auth } from '@web/server/auth/auth';
 import { deliverNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
@@ -42,7 +46,7 @@ export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
     await clearNewsletterSubscribedCookieSafely();
     return SUCCESS;
   } catch (error) {
-    logger.error('newsletter.unsubscribe_failed', { error });
+    logger.error(UNSUBSCRIBE_FAILED_EVENT, { error });
     return SERVER_ERROR;
   }
 };
@@ -90,7 +94,7 @@ export const resendConfirmationAction =
       );
       return SUCCESS;
     } catch (error) {
-      logger.error('newsletter.confirmation_resend_failed', { error });
+      logger.error(CONFIRMATION_RESEND_FAILED_EVENT, { error });
       return SERVER_ERROR;
     }
   };

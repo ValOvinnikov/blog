@@ -1,8 +1,10 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
+import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 import { redirect } from 'next/navigation';
 
 import { AccountPage } from './account-page';
@@ -22,8 +24,6 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/utils/logger/logger');
-
 const authMock = vi.mocked(auth as () => Promise<unknown>);
 
 const setup = customRenderServerAsync(
@@ -35,7 +35,7 @@ const setup = customRenderServerAsync(
 describe(`<${AccountPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
+      user: ACCOUNT_USER,
     });
     vi.mocked(queries.account.getLinkedProviders).mockResolvedValue({
       github: true,
@@ -44,14 +44,14 @@ describe(`<${AccountPage.name}/>`, () => {
     });
     vi.mocked(queries.subscribers.getSubscriptionStatus).mockResolvedValue({
       outcome: 'active',
-      subscriber: { email: 'jane@example.com' },
+      subscriber: { email: ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof queries.subscribers.getSubscriptionStatus>>);
   });
 
   it('redirects home when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
   });

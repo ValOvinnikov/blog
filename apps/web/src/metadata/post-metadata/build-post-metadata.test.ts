@@ -7,7 +7,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import { buildPostMetadata } from './build-post-metadata';
 
@@ -27,12 +27,22 @@ const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   DEFAULT_TENANT_SANITY_CONTEXT,
 );
 
+const TITLE = 'Hello World';
+const SLUG = 'hello-world';
+const EXCERPT = 'A sufficiently long excerpt for the card.';
+const PUBLISHED_AT = '2026-01-15T00:00:00Z';
+const OG_TITLE = 'Hello World OG';
+const OG_DESCRIPTION = 'A sufficiently long excerpt for the card OG.';
+const NL_SLUG = 'mijn-artikel';
+const NL_POST_PATH = '/nl/blog/mijn-artikel';
+const EN_POST_PATH = '/blog/my-article';
+
 const basePost: TPostDetail = {
   id: 'post-1',
-  title: 'Hello World',
-  slug: 'hello-world',
-  excerpt: 'A sufficiently long excerpt for the card.',
-  publishedAt: '2026-01-15T00:00:00Z',
+  title: TITLE,
+  slug: SLUG,
+  excerpt: EXCERPT,
+  publishedAt: PUBLISHED_AT,
   heroImage: ogImage,
   featured: false,
   body: [],
@@ -40,10 +50,10 @@ const basePost: TPostDetail = {
   hasAsides: false,
   modules: [],
   seo: makeSeo({
-    title: 'Hello World',
-    description: 'A sufficiently long excerpt for the card.',
-    ogTitle: 'Hello World OG',
-    ogDescription: 'A sufficiently long excerpt for the card OG.',
+    title: TITLE,
+    description: EXCERPT,
+    ogTitle: OG_TITLE,
+    ogDescription: OG_DESCRIPTION,
     ogImage,
   }),
   author: {
@@ -77,38 +87,34 @@ describe('buildPostMetadata', () => {
     });
 
     it('forwards the slug to getPostPage, the loader BlogPostPage reads', async () => {
-      await buildPostMetadata('hello-world');
+      await buildPostMetadata(SLUG);
 
-      expect(getPostPageMock).toHaveBeenCalledWith('hello-world');
+      expect(getPostPageMock).toHaveBeenCalledWith(SLUG);
     });
 
     it('passes the already-resolved seo through to toMetadata', async () => {
-      const metadata = await buildPostMetadata('hello-world');
+      const metadata = await buildPostMetadata(SLUG);
 
-      expect(metadata.title).toBe('Hello World');
-      expect(metadata.description).toBe(
-        'A sufficiently long excerpt for the card.',
-      );
+      expect(metadata.title).toBe(TITLE);
+      expect(metadata.description).toBe(EXCERPT);
       expect(metadata.alternates?.canonical).toBe('/blog/hello-world');
-      expect(metadata.openGraph?.title).toBe('Hello World OG');
-      expect(metadata.openGraph?.description).toBe(
-        'A sufficiently long excerpt for the card OG.',
-      );
+      expect(metadata.openGraph?.title).toBe(OG_TITLE);
+      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
       expect(metadata.openGraph?.images).toEqual([
         { url: EXPECTED_OG_IMAGE_URL },
       ]);
     });
 
     it('sets openGraph.publishedTime from post.publishedAt', async () => {
-      const metadata = await buildPostMetadata('hello-world');
+      const metadata = await buildPostMetadata(SLUG);
 
       expect(
         (metadata.openGraph as { publishedTime?: string })?.publishedTime,
-      ).toBe('2026-01-15T00:00:00Z');
+      ).toBe(PUBLISHED_AT);
     });
 
     it('sets openGraph.authors from post.author.name', async () => {
-      const metadata = await buildPostMetadata('hello-world');
+      const metadata = await buildPostMetadata(SLUG);
 
       expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
         'Jane Doe',
@@ -117,23 +123,13 @@ describe('buildPostMetadata', () => {
   });
 
   describe('when no metadata can be built', () => {
-    let errorSpy: MockInstance<typeof console.error>;
-
-    beforeEach(() => {
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      errorSpy.mockRestore();
-    });
-
     it('returns empty metadata without logging when no page_post matches the slug', async () => {
       getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
 
       const metadata = await buildPostMetadata('missing');
 
       expect(metadata).toEqual({});
-      expect(errorSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
 
     it('returns empty metadata when the post fetch fails', async () => {
@@ -142,7 +138,7 @@ describe('buildPostMetadata', () => {
         error: new Error('boom'),
       });
 
-      const metadata = await buildPostMetadata('hello-world');
+      const metadata = await buildPostMetadata(SLUG);
 
       expect(metadata).toEqual({});
     });
@@ -163,10 +159,10 @@ describe('buildPostMetadata per language', () => {
       ok: true,
       data: {
         ...basePost,
-        slug: 'mijn-artikel',
+        slug: NL_SLUG,
         translations: [
           { language: EN, slug: 'my-article' },
-          { language: NL, slug: 'mijn-artikel' },
+          { language: NL, slug: NL_SLUG },
           { language: DE, slug: 'mein-artikel' },
         ],
       },
@@ -178,14 +174,14 @@ describe('buildPostMetadata per language', () => {
   });
 
   it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
-    const metadata = await buildPostMetadata('mijn-artikel');
+    const metadata = await buildPostMetadata(NL_SLUG);
 
     expect(metadata.alternates).toMatchObject({
-      canonical: '/nl/blog/mijn-artikel',
+      canonical: NL_POST_PATH,
       languages: {
-        en: '/blog/my-article',
-        nl: '/nl/blog/mijn-artikel',
-        'x-default': '/blog/my-article',
+        en: EN_POST_PATH,
+        nl: NL_POST_PATH,
+        'x-default': EN_POST_PATH,
       },
     });
   });

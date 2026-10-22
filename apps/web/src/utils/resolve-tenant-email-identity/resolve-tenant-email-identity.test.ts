@@ -1,11 +1,12 @@
 import {
+  ERROR_CODE,
   PRESET_ID,
   PRESET_REGISTRY,
   resolveTenantEmailBrand,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 
@@ -17,20 +18,15 @@ vi.mock('@blog/db', () => ({
   queries: { tenants: { getTenantById: vi.fn() } },
 }));
 
+const TENANT_NAME = 'Zeta Times';
+
 const TENANT_ID = 'tenant-1';
 
 describe(resolveTenantEmailIdentity, () => {
-  let errorSpy: MockInstance<typeof console.warn>;
-
   beforeEach(() => {
-    errorSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
-      name: 'Zeta Times',
+      name: TENANT_NAME,
     } as never);
-  });
-
-  afterEach(() => {
-    errorSpy.mockRestore();
   });
 
   it("resolves the tenant's own brand and name on success", async () => {
@@ -41,7 +37,7 @@ describe(resolveTenantEmailIdentity, () => {
 
     const identity = await resolveTenantEmailIdentity(TENANT_ID);
 
-    expect(identity.brandName).toBe('Zeta Times');
+    expect(identity.brandName).toBe(TENANT_NAME);
     expect(identity.brand).toEqual(
       resolveTenantEmailBrand({ preset: PRESET_ID.CONSOLE, accentHue: 40 }),
     );
@@ -50,7 +46,7 @@ describe(resolveTenantEmailIdentity, () => {
   it('falls back to the default brand and logs when the site config fetch fails', async () => {
     vi.mocked(getSiteConfig).mockResolvedValue({
       ok: false,
-      error: 'DB_NOT_FOUND',
+      error: ERROR_CODE.DB_NOT_FOUND,
     });
 
     const identity = await resolveTenantEmailIdentity(TENANT_ID);
@@ -61,8 +57,9 @@ describe(resolveTenantEmailIdentity, () => {
         accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
       }),
     );
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('tenant_email_identity.site_config_fetch_failed'),
+    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+      'tenant_email_identity.site_config_fetch_failed',
+      { tenantId: TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
     );
   });
 
@@ -73,8 +70,9 @@ describe(resolveTenantEmailIdentity, () => {
     const identity = await resolveTenantEmailIdentity(TENANT_ID);
 
     expect(identity.brandName).toBe('Newsletter');
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('tenant_email_identity.tenant_row_not_found'),
+    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+      'tenant_email_identity.tenant_row_not_found',
+      { tenantId: TENANT_ID },
     );
   });
 });

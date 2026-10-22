@@ -1,9 +1,10 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { guardPageLoaderResult } from './guard-page-loader-result';
 
-vi.mock('@web/utils/logger/logger');
+const FETCH_FAILED_EVENT = 'tag_page.fetch_failed';
 
 describe(guardPageLoaderResult.name, () => {
   it('returns the data when the result is ok and data is present', () => {
@@ -21,12 +22,12 @@ describe(guardPageLoaderResult.name, () => {
     const error = new Error('boom');
 
     expect(() =>
-      guardPageLoaderResult({ ok: false, error }, 'tag_page.fetch_failed', {
+      guardPageLoaderResult({ ok: false, error }, FETCH_FAILED_EVENT, {
         slug: 'engineering',
       }),
-    ).toThrow('NEXT_NOT_FOUND');
+    ).toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
-    expect(logger.error).toHaveBeenCalledWith('tag_page.fetch_failed', {
+    expect(logger.error).toHaveBeenCalledWith(FETCH_FAILED_EVENT, {
       slug: 'engineering',
       error,
     });
@@ -35,12 +36,10 @@ describe(guardPageLoaderResult.name, () => {
 
   it('calls notFound() without logging when ok but data is undefined', () => {
     expect(() =>
-      guardPageLoaderResult(
-        { ok: true, data: undefined },
-        'tag_page.fetch_failed',
-        { slug: 'missing' },
-      ),
-    ).toThrow('NEXT_NOT_FOUND');
+      guardPageLoaderResult({ ok: true, data: undefined }, FETCH_FAILED_EVENT, {
+        slug: 'missing',
+      }),
+    ).toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(logger.error).not.toHaveBeenCalled();
     expect(notFound).toHaveBeenCalledTimes(1);

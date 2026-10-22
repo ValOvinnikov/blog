@@ -1,5 +1,11 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  type THttpMethod,
+} from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { TENANT_ID_HEADER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -38,8 +44,6 @@ vi.mock('./utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerErrorMock = vi.mocked(logger.error);
 
 const { config, default: proxy } = await import('./proxy');
@@ -56,6 +60,18 @@ const tenantRouting = (
 });
 
 const FOREIGN_TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
+const ROBOTS_PATH = '/robots.txt';
+const SITEMAP_PATH = '/sitemap.xml';
+const TAG_RSS_PATH = '/tags/typescript/rss.xml';
+const TENANT_HOST = 'acme.example.com';
+const BLOG_POST_PATH = '/blog/hello-world';
+const REWRITE_HEADER = 'x-middleware-rewrite';
+const SPOOFED_TENANT = 'spoofed-tenant';
+const UNKNOWN_HOST = 'unknown.example.com';
+const BLOG_URL = 'https://example.com/blog';
+const CONNECTION_REFUSED = 'connection refused';
+const DUTCH_ACCEPT_LANGUAGE = 'nl-NL,nl;q=0.9,en;q=0.8';
+const DUTCH_ABOUT_PATH = '/nl/over-ons';
 
 const buildRequest = (
   host: string | null,
@@ -95,11 +111,11 @@ describe('proxy matcher', () => {
   });
 
   it('matches dotted-extension paths, so the proxy itself can guard them', () => {
-    expect(matcher.test('/robots.txt')).toBe(true);
+    expect(matcher.test(ROBOTS_PATH)).toBe(true);
     expect(matcher.test('/favicon.ico')).toBe(true);
-    expect(matcher.test('/sitemap.xml')).toBe(true);
+    expect(matcher.test(SITEMAP_PATH)).toBe(true);
     expect(matcher.test('/rss.xml')).toBe(true);
-    expect(matcher.test('/tags/typescript/rss.xml')).toBe(true);
+    expect(matcher.test(TAG_RSS_PATH)).toBe(true);
   });
 
   it('bypasses locale middleware for sibling paths sharing an excluded prefix', () => {
@@ -128,7 +144,7 @@ describe('proxy matcher', () => {
   });
 
   it('still matches other dotted multi-segment paths, so per-tag RSS keeps working', () => {
-    expect(matcher.test('/tags/typescript/rss.xml')).toBe(true);
+    expect(matcher.test(TAG_RSS_PATH)).toBe(true);
   });
 });
 
@@ -142,10 +158,10 @@ describe('proxy security guard', () => {
 
   it('refuses a request whose first path segment is already tenant-shaped', async () => {
     const response = await proxy(
-      buildRequest('acme.example.com', undefined, `/${FOREIGN_TENANT_ID}/blog`),
+      buildRequest(TENANT_HOST, undefined, `/${FOREIGN_TENANT_ID}/blog`),
     );
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
@@ -153,13 +169,13 @@ describe('proxy security guard', () => {
   it('refuses a tenant-shaped first segment even when the path has a dotted extension', async () => {
     const response = await proxy(
       buildRequest(
-        'acme.example.com',
+        TENANT_HOST,
         undefined,
         `/${FOREIGN_TENANT_ID}/EN/blog/x.html`,
       ),
     );
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
@@ -167,13 +183,13 @@ describe('proxy security guard', () => {
   it('refuses an uppercase tenant-shaped first segment too', async () => {
     const response = await proxy(
       buildRequest(
-        'acme.example.com',
+        TENANT_HOST,
         undefined,
         `/${FOREIGN_TENANT_ID.toUpperCase()}/blog`,
       ),
     );
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
   });
 
   it('refuses a percent-encoded tenant-shaped first segment', async () => {
@@ -182,37 +198,33 @@ describe('proxy security guard', () => {
 
     const response = await proxy(
       buildRequest(
-        'acme.example.com',
+        TENANT_HOST,
         undefined,
         `/${percentEncodedForeignTenantId}/EN/blog/x.html`,
       ),
     );
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
   it('refuses a tenant-shaped first segment with trailing characters appended', async () => {
     const response = await proxy(
-      buildRequest(
-        'acme.example.com',
-        undefined,
-        `/${FOREIGN_TENANT_ID}./EN/blog`,
-      ),
+      buildRequest(TENANT_HOST, undefined, `/${FOREIGN_TENANT_ID}./EN/blog`),
     );
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
   it('refuses a first segment that cannot be percent-decoded', async () => {
     const response = await proxy(
-      buildRequest('acme.example.com', undefined, '/%E0%A4%A'),
+      buildRequest(TENANT_HOST, undefined, '/%E0%A4%A'),
     );
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
@@ -221,10 +233,10 @@ describe('proxy security guard', () => {
     resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
 
     const response = await proxy(
-      buildRequest('acme.example.com', undefined, '/blog/hello-world'),
+      buildRequest(TENANT_HOST, undefined, BLOG_POST_PATH),
     );
 
-    expect(response.status).not.toBe(404);
+    expect(response.status).not.toBe(HTTP_STATUS.NOT_FOUND);
   });
 });
 
@@ -236,25 +248,25 @@ describe('proxy dotted-path pass-through', () => {
     loggerErrorMock.mockReset();
   });
 
-  it.each(['/robots.txt', '/sitemap.xml'])(
+  it.each([ROBOTS_PATH, SITEMAP_PATH])(
     'passes %s through unrewritten, without resolving a tenant or invoking next-intl',
     async (pathname) => {
       const response = await proxy(
-        buildRequest('acme.example.com', undefined, pathname),
+        buildRequest(TENANT_HOST, undefined, pathname),
       );
 
       expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
       expect(intlMiddlewareMock).not.toHaveBeenCalled();
-      expect(response.headers.get('x-middleware-rewrite')).toBeNull();
-      expect(response.status).not.toBe(404);
+      expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+      expect(response.status).not.toBe(HTTP_STATUS.NOT_FOUND);
     },
   );
 
   it('strips a client-supplied x-tenant-id header on the pass-through branch', async () => {
     const request = buildRequest(
-      'acme.example.com',
-      { 'x-tenant-id': 'spoofed-tenant' },
-      '/robots.txt',
+      TENANT_HOST,
+      { TENANT_ID_HEADER: SPOOFED_TENANT },
+      ROBOTS_PATH,
     );
 
     const response = await proxy(request);
@@ -263,13 +275,11 @@ describe('proxy dotted-path pass-through', () => {
       'x-middleware-override-headers',
     );
     expect(overriddenHeaderNames).not.toBeNull();
-    expect(overriddenHeaderNames?.split(',')).not.toContain('x-tenant-id');
+    expect(overriddenHeaderNames?.split(',')).not.toContain(TENANT_ID_HEADER);
     expect(response.headers.get('x-middleware-request-x-tenant-id')).toBeNull();
 
     expect(overriddenHeaderNames?.split(',')).toContain('host');
-    expect(response.headers.get('x-middleware-request-host')).toBe(
-      'acme.example.com',
-    );
+    expect(response.headers.get('x-middleware-request-host')).toBe(TENANT_HOST);
   });
 });
 
@@ -282,7 +292,7 @@ describe('proxy RSS feeds', () => {
     intlMiddlewareMock.mockClear();
   });
 
-  it.each(['/rss.xml', '/tags/typescript/rss.xml'])(
+  it.each(['/rss.xml', TAG_RSS_PATH])(
     'routes %s into the tenant and language like a page',
     async (pathname) => {
       intlMiddlewareMock.mockImplementationOnce((request) =>
@@ -292,11 +302,11 @@ describe('proxy RSS feeds', () => {
       );
 
       const response = await proxy(
-        buildRequest('acme.example.com', undefined, pathname),
+        buildRequest(TENANT_HOST, undefined, pathname),
       );
 
-      expect(resolveTenantRoutingMock).toHaveBeenCalledWith('acme.example.com');
-      expect(response.headers.get('x-middleware-rewrite')).toBe(
+      expect(resolveTenantRoutingMock).toHaveBeenCalledWith(TENANT_HOST);
+      expect(response.headers.get(REWRITE_HEADER)).toBe(
         `https://example.com/tenant-1/EN${pathname}`,
       );
     },
@@ -304,7 +314,7 @@ describe('proxy RSS feeds', () => {
 
   it('redirects the feed of a switched-off language to the default-language feed', async () => {
     const response = await proxy(
-      buildRequest('acme.example.com', undefined, '/nl/rss.xml'),
+      buildRequest(TENANT_HOST, undefined, '/nl/rss.xml'),
     );
 
     expect(new URL(response.headers.get('location') ?? '').pathname).toBe(
@@ -323,11 +333,11 @@ describe('proxy tenant resolution', () => {
   });
 
   it('sets x-tenant-id on the request handed to next-intl when a tenant resolves', async () => {
-    await proxy(buildRequest('acme.example.com'));
+    await proxy(buildRequest(TENANT_HOST));
 
-    expect(resolveTenantRoutingMock).toHaveBeenCalledWith('acme.example.com');
+    expect(resolveTenantRoutingMock).toHaveBeenCalledWith(TENANT_HOST);
     const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
-    expect(forwardedRequest.headers.get('x-tenant-id')).toBe('tenant-1');
+    expect(forwardedRequest.headers.get(TENANT_ID_HEADER)).toBe('tenant-1');
   });
 
   it('calls resolveTenantId with null when the request has no Host header', async () => {
@@ -338,11 +348,11 @@ describe('proxy tenant resolution', () => {
 
   it('strips a client-supplied x-tenant-id header before forwarding a resolved tenant', async () => {
     await proxy(
-      buildRequest('acme.example.com', { 'x-tenant-id': 'spoofed-tenant' }),
+      buildRequest(TENANT_HOST, { TENANT_ID_HEADER: SPOOFED_TENANT }),
     );
 
     const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
-    expect(forwardedRequest.headers.get('x-tenant-id')).toBe('tenant-1');
+    expect(forwardedRequest.headers.get(TENANT_ID_HEADER)).toBe('tenant-1');
   });
 
   describe('when no tenant resolves', () => {
@@ -351,23 +361,23 @@ describe('proxy tenant resolution', () => {
     });
 
     it('falls through to next-intl with no header outside production and no tenant', async () => {
-      const response = await proxy(buildRequest('unknown.example.com'));
+      const response = await proxy(buildRequest(UNKNOWN_HOST));
 
       expect(intlMiddlewareMock).toHaveBeenCalledTimes(1);
       const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
-      expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
-      expect(response.status).not.toBe(404);
+      expect(forwardedRequest.headers.has(TENANT_ID_HEADER)).toBe(false);
+      expect(response.status).not.toBe(HTTP_STATUS.NOT_FOUND);
     });
 
     it('strips a client-supplied x-tenant-id header when resolution fails outside prod', async () => {
       await proxy(
-        buildRequest('unknown.example.com', {
-          'x-tenant-id': 'spoofed-tenant',
+        buildRequest(UNKNOWN_HOST, {
+          TENANT_ID_HEADER: SPOOFED_TENANT,
         }),
       );
 
       const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
-      expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
+      expect(forwardedRequest.headers.has(TENANT_ID_HEADER)).toBe(false);
     });
 
     describe('in production', () => {
@@ -376,9 +386,9 @@ describe('proxy tenant resolution', () => {
       });
 
       it('404s without calling next-intl when no tenant resolves in production', async () => {
-        const response = await proxy(buildRequest('unknown.example.com'));
+        const response = await proxy(buildRequest(UNKNOWN_HOST));
 
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
         expect(intlMiddlewareMock).not.toHaveBeenCalled();
       });
 
@@ -387,7 +397,7 @@ describe('proxy tenant resolution', () => {
           buildRequest('archived-tenant.example.com'),
         );
 
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
         expect(intlMiddlewareMock).not.toHaveBeenCalled();
       });
     });
@@ -411,10 +421,10 @@ describe('proxy tenant segment rewrite', () => {
     );
 
     const response = await proxy(
-      buildRequest('acme.example.com', undefined, '/blog/hello-world'),
+      buildRequest(TENANT_HOST, undefined, BLOG_POST_PATH),
     );
 
-    expect(response.headers.get('x-middleware-rewrite')).toBe(
+    expect(response.headers.get(REWRITE_HEADER)).toBe(
       'https://example.com/tenant-1/EN/blog/hello-world',
     );
   });
@@ -422,11 +432,9 @@ describe('proxy tenant segment rewrite', () => {
   it('falls back to the original request URL when next-intl did not need to rewrite', async () => {
     intlMiddlewareMock.mockImplementationOnce(() => NextResponse.next());
 
-    const response = await proxy(
-      buildRequest('acme.example.com', undefined, '/blog'),
-    );
+    const response = await proxy(buildRequest(TENANT_HOST, undefined, '/blog'));
 
-    expect(response.headers.get('x-middleware-rewrite')).toBe(
+    expect(response.headers.get(REWRITE_HEADER)).toBe(
       'https://example.com/tenant-1/blog',
     );
   });
@@ -440,73 +448,71 @@ describe('proxy tenant segment rewrite', () => {
     );
 
     const response = await proxy(
-      buildRequest('unknown.example.com', undefined, '/blog'),
+      buildRequest(UNKNOWN_HOST, undefined, '/blog'),
     );
 
-    expect(response.headers.get('x-middleware-rewrite')).toBe(
+    expect(response.headers.get(REWRITE_HEADER)).toBe(
       'https://example.com/unresolved-tenant/EN/blog',
     );
   });
 
   it('never rewrites the tenant-shaped segment onto a redirect response', async () => {
     intlMiddlewareMock.mockImplementationOnce(() =>
-      NextResponse.redirect(new URL('https://example.com/blog')),
+      NextResponse.redirect(new URL(BLOG_URL)),
     );
 
-    const response = await proxy(
-      buildRequest('acme.example.com', undefined, '/blog'),
-    );
+    const response = await proxy(buildRequest(TENANT_HOST, undefined, '/blog'));
 
-    expect(response.headers.get('x-middleware-rewrite')).toBeNull();
-    expect(response.headers.get('location')).toBe('https://example.com/blog');
+    expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+    expect(response.headers.get('location')).toBe(BLOG_URL);
   });
 });
 
 describe('proxy tenant lookup failure', () => {
   beforeEach(() => {
     resolveTenantRoutingMock.mockReset();
-    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
+    resolveTenantRoutingMock.mockRejectedValue(new Error(CONNECTION_REFUSED));
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
   });
 
   it('returns a controlled 503 instead of throwing when resolveTenantId rejects', async () => {
-    const response = await proxy(buildRequest('acme.example.com'));
+    const response = await proxy(buildRequest(TENANT_HOST));
 
     expect(response.status).toBe(503);
   });
 
   it('never calls next-intl when the tenant lookup fails', async () => {
-    await proxy(buildRequest('acme.example.com'));
+    await proxy(buildRequest(TENANT_HOST));
 
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
   it('logs the lookup failure exactly once with host and error context', async () => {
-    const error = new Error('connection refused');
+    const error = new Error(CONNECTION_REFUSED);
     resolveTenantRoutingMock.mockRejectedValue(error);
 
-    await proxy(buildRequest('acme.example.com'));
+    await proxy(buildRequest(TENANT_HOST));
 
     expect(loggerErrorMock).toHaveBeenCalledTimes(1);
     expect(loggerErrorMock).toHaveBeenCalledWith('proxy.tenant_lookup_failed', {
-      host: 'acme.example.com',
+      host: TENANT_HOST,
       error,
     });
   });
 
   it('fails closed in production when the tenant lookup fails', async () => {
     isProductionEnvironmentMock.mockReturnValue(true);
-    const response = await proxy(buildRequest('acme.example.com'));
+    const response = await proxy(buildRequest(TENANT_HOST));
 
     expect(response.status).toBe(503);
-    expect(response.status).not.toBe(404);
+    expect(response.status).not.toBe(HTTP_STATUS.NOT_FOUND);
   });
 
   it('sets no x-tenant-id and uses no fallback tenant when the lookup fails', async () => {
     await proxy(
-      buildRequest('acme.example.com', { 'x-tenant-id': 'spoofed-tenant' }),
+      buildRequest(TENANT_HOST, { TENANT_ID_HEADER: SPOOFED_TENANT }),
     );
 
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
@@ -515,7 +521,7 @@ describe('proxy tenant lookup failure', () => {
   it('does not log when a host resolves to no tenant, unlike a lookup failure', async () => {
     resolveTenantRoutingMock.mockResolvedValue(undefined);
 
-    await proxy(buildRequest('unknown.example.com'));
+    await proxy(buildRequest(UNKNOWN_HOST));
 
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
@@ -532,7 +538,7 @@ describe('proxy language routing', () => {
     resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
 
     const response = await proxy(
-      buildRequest('acme.example.com', undefined, '/nl/blog/hello'),
+      buildRequest(TENANT_HOST, undefined, '/nl/blog/hello'),
     );
 
     expect(response.status).toBe(307);
@@ -550,7 +556,7 @@ describe('proxy language routing', () => {
       ]),
     );
 
-    await proxy(buildRequest('acme.example.com', undefined, '/nl/blog'));
+    await proxy(buildRequest(TENANT_HOST, undefined, '/nl/blog'));
 
     expect(intlMiddlewareMock).toHaveBeenCalled();
   });
@@ -560,7 +566,7 @@ describe('proxy language routing', () => {
       tenantRouting('tenant-1', LOCALE_ISO_CODES.FR),
     );
 
-    await proxy(buildRequest('acme.example.com'));
+    await proxy(buildRequest(TENANT_HOST));
 
     expect(createMiddlewareMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -592,13 +598,13 @@ describe('proxy language detection', () => {
   const visit = (
     pathname: string,
     headers: Record<string, string> = {},
-    method = 'GET',
+    method: THttpMethod = HTTP_METHOD.GET,
   ) =>
     proxy(
       new NextRequest(`https://acme.example.com${pathname}`, {
         method,
         headers: {
-          host: 'acme.example.com',
+          host: TENANT_HOST,
           'user-agent': BROWSER,
           ...headers,
         },
@@ -622,7 +628,7 @@ describe('proxy language detection', () => {
 
   it("redirects to the page's translation in the browser's language", async () => {
     const response = await visit('/about?ref=mail', {
-      'accept-language': 'nl-NL,nl;q=0.9,en;q=0.8',
+      'accept-language': DUTCH_ACCEPT_LANGUAGE,
     });
 
     expect(response.status).toBe(307);
@@ -634,7 +640,7 @@ describe('proxy language detection', () => {
 
   it('forbids any cache from storing the visitor-specific redirect', async () => {
     const response = await visit('/about', {
-      'accept-language': 'nl-NL,nl;q=0.9,en;q=0.8',
+      'accept-language': DUTCH_ACCEPT_LANGUAGE,
     });
 
     expect(response.status).toBe(307);
@@ -665,7 +671,7 @@ describe('proxy language detection', () => {
     });
 
     expect(redirectPath(remembersDefault)).toBeNull();
-    expect(redirectPath(remembersDutch)).toBe('/nl/over-ons');
+    expect(redirectPath(remembersDutch)).toBe(DUTCH_ABOUT_PATH);
   });
 
   it('never redirects a crawler', async () => {
@@ -680,13 +686,17 @@ describe('proxy language detection', () => {
   });
 
   it('never redirects a form submission', async () => {
-    const response = await visit('/about', { 'accept-language': 'nl' }, 'POST');
+    const response = await visit(
+      '/about',
+      { 'accept-language': 'nl' },
+      HTTP_METHOD.POST,
+    );
 
     expect(redirectPath(response)).toBeNull();
   });
 
   it('leaves a language-prefixed URL alone', async () => {
-    await visit('/nl/over-ons', { 'accept-language': 'en' });
+    await visit(DUTCH_ABOUT_PATH, { 'accept-language': 'en' });
 
     expect(getTenantTranslationMapMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).toHaveBeenCalled();

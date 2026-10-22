@@ -1,10 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
-import type { MockInstance } from 'vitest';
 
 import { HomePage } from './home-page';
 
@@ -20,7 +21,7 @@ const { getHomePageMock, homeModuleRendererMock } = vi.hoisted(() => ({
       headingBlock: { heading: string };
       modules: { id: string }[];
     }) => (
-      <div data-testid="home-module-renderer">
+      <div data-testid={HOME_MODULE_RENDERER_TEST_ID}>
         {hero ? hero.id : headingBlock.heading} — {modules.length} modules
       </div>
     ),
@@ -43,6 +44,9 @@ vi.mock('./home-module-renderer', () => ({
 
 const setup = customRenderAsync(HomePage, {});
 
+const HEADING = 'Welcome to the blog';
+const HOME_MODULE_RENDERER_TEST_ID = 'home-module-renderer';
+
 describe(`<${HomePage.name}/>`, () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
@@ -50,37 +54,32 @@ describe(`<${HomePage.name}/>`, () => {
   });
 
   describe('when the page cannot be rendered', () => {
-    let errorSpy: MockInstance<typeof console.error>;
-
-    beforeEach(() => {
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      errorSpy.mockRestore();
-    });
-
     it('calls notFound() and logs when the fetch fails', async () => {
       getHomePageMock.mockResolvedValue({
         ok: false,
         error: new Error('boom'),
       });
 
-      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
       expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('home_page.fetch_failed'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'home_page.fetch_failed',
+        expect.anything(),
       );
     });
 
     it('calls notFound() without logging when the home page simply does not exist', async () => {
       getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
 
-      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
       expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-      expect(errorSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
   });
 
@@ -92,7 +91,7 @@ describe(`<${HomePage.name}/>`, () => {
     });
     getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
@@ -103,7 +102,7 @@ describe(`<${HomePage.name}/>`, () => {
       getHomePageMock.mockResolvedValue({
         ok: true,
         data: {
-          headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+          headingBlock: makeHeadingBlock({ heading: HEADING }),
           hero: { id: 'hero-1', type: 'module_hero' },
           modules: [{ id: 'module-1', type: 'module_content' }],
           faqs: [],
@@ -115,21 +114,23 @@ describe(`<${HomePage.name}/>`, () => {
 
     it('renders through PageShell: the module renderer inside a single main landmark', () => {
       const main = screen.getByRole('main');
-      expect(main).toContainElement(screen.getByTestId('home-module-renderer'));
+      expect(main).toContainElement(
+        screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID),
+      );
     });
 
     it('dispatches HomeModuleRenderer with the fetched hero, heading, and modules', () => {
       expect(homeModuleRendererMock).toHaveBeenCalledWith(
         {
           hero: { id: 'hero-1', type: 'module_hero' },
-          headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+          headingBlock: makeHeadingBlock({ heading: HEADING }),
           modules: [{ id: 'module-1', type: 'module_content' }],
         },
         undefined,
       );
-      expect(screen.getByTestId('home-module-renderer')).toHaveTextContent(
-        'hero-1 — 1 modules',
-      );
+      expect(
+        screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID),
+      ).toHaveTextContent('hero-1 — 1 modules');
     });
   });
 
@@ -137,7 +138,7 @@ describe(`<${HomePage.name}/>`, () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+        headingBlock: makeHeadingBlock({ heading: HEADING }),
         hero: undefined,
         modules: [],
         faqs: [],
@@ -150,8 +151,8 @@ describe(`<${HomePage.name}/>`, () => {
       expect.objectContaining({ hero: undefined }),
       undefined,
     );
-    expect(screen.getByTestId('home-module-renderer')).toHaveTextContent(
-      'Welcome to the blog — 0 modules',
+    expect(screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID)).toHaveTextContent(
+      `${HEADING} — 0 modules`,
     );
   });
 
@@ -193,7 +194,9 @@ describe(`<${HomePage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.queryByTestId('json-ld-script')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID),
+    ).not.toBeInTheDocument();
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
@@ -215,7 +218,7 @@ describe(`<${HomePage.name}/>`, () => {
 
     await setup();
 
-    const script = screen.getByTestId('json-ld-script');
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(script.textContent).toContain('"@type":"FAQPage"');
   });
 });

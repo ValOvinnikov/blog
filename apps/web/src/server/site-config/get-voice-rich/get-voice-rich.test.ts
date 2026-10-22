@@ -1,7 +1,9 @@
 import { LOCALE_ISO_CODES, type TVoicePortableText } from '@blog/config';
+import { VOICE_RICH_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { getVoiceRich } from './get-voice-rich';
 
@@ -20,8 +22,13 @@ vi.mock('next-intl/server', () => ({
   getMessages: getMessagesMock,
 }));
 
+const FIELD_ID = 'blogListEmpty';
+const FETCH_ERROR = 'site config unavailable';
+const CATALOG_EMPTY = 'No posts yet.';
+const OVERRIDE_EMPTY = 'Nothing published yet.';
+
 const BASE_MESSAGES = {
-  blogListPage: { empty: 'No posts yet.' },
+  blogListPage: { empty: CATALOG_EMPTY },
 };
 
 const richTextOf = (text: string): TVoicePortableText => [
@@ -45,7 +52,7 @@ describe(getVoiceRich, () => {
   });
 
   it('returns the stored override for the given field id', async () => {
-    const override = richTextOf('Nothing published yet.');
+    const override = richTextOf(OVERRIDE_EMPTY);
     getSiteConfigMock.mockResolvedValue({
       ok: true,
       data: {
@@ -55,26 +62,27 @@ describe(getVoiceRich, () => {
       },
     });
 
-    const result = await getVoiceRich('blogListEmpty');
+    const result = await getVoiceRich(FIELD_ID);
 
     expect(result).toBe(override);
   });
 
   it('falls back to the catalog default wrapped as one paragraph when there is no override', async () => {
-    const result = await getVoiceRich('blogListEmpty');
+    const result = await getVoiceRich(FIELD_ID);
 
-    expect(result[0]?.children[0]?.text).toBe('No posts yet.');
+    expect(result[0]?.children[0]?.text).toBe(CATALOG_EMPTY);
   });
 
   it('falls back to the catalog default and logs when the site config fetch fails', async () => {
-    getSiteConfigMock.mockResolvedValue({ ok: false, error: 'boom' });
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getSiteConfigMock.mockResolvedValue({ ok: false, error: FETCH_ERROR });
 
-    const result = await getVoiceRich('blogListEmpty');
+    const result = await getVoiceRich(FIELD_ID);
 
-    expect(result[0]?.children[0]?.text).toBe('No posts yet.');
-    expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(result[0]?.children[0]?.text).toBe(CATALOG_EMPTY);
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      VOICE_RICH_FETCH_FAILED_EVENT,
+      { id: FIELD_ID, error: FETCH_ERROR },
+    );
   });
 
   it("returns the request language's override in a non-default language", async () => {
@@ -88,14 +96,14 @@ describe(getVoiceRich, () => {
       data: {
         voiceOverridesByLocale: {
           [LOCALE_ISO_CODES.EN]: {
-            blogListEmpty: richTextOf('Nothing published yet.'),
+            blogListEmpty: richTextOf(OVERRIDE_EMPTY),
           },
           [LOCALE_ISO_CODES.DE]: { blogListEmpty: override },
         },
       },
     });
 
-    const result = await getVoiceRich('blogListEmpty');
+    const result = await getVoiceRich(FIELD_ID);
 
     expect(result).toBe(override);
   });
@@ -110,19 +118,19 @@ describe(getVoiceRich, () => {
       data: {
         voiceOverridesByLocale: {
           [LOCALE_ISO_CODES.EN]: {
-            blogListEmpty: richTextOf('Nothing published yet.'),
+            blogListEmpty: richTextOf(OVERRIDE_EMPTY),
           },
         },
       },
     });
 
-    const result = await getVoiceRich('blogListEmpty');
+    const result = await getVoiceRich(FIELD_ID);
 
-    expect(result[0]?.children[0]?.text).toBe('No posts yet.');
+    expect(result[0]?.children[0]?.text).toBe(CATALOG_EMPTY);
   });
 
   it("reads the site config of the request context's tenant", async () => {
-    await getVoiceRich('blogListEmpty');
+    await getVoiceRich(FIELD_ID);
 
     expect(getSiteConfigMock).toHaveBeenCalledWith(
       DEFAULT_REQUEST_CONTEXT.tenantId,
@@ -135,7 +143,7 @@ describe(getVoiceRich, () => {
       tenantId: undefined,
     });
 
-    await getVoiceRich('blogListEmpty');
+    await getVoiceRich(FIELD_ID);
 
     expect(getSiteConfigMock).toHaveBeenCalledWith(
       UNRESOLVED_TENANT_PLACEHOLDER,
