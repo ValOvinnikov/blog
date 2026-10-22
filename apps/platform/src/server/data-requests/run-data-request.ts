@@ -50,7 +50,10 @@ type TDataRequestStep<TData extends { emailIndex: string }> = {
   auditDetails: (data: TData) => TPersonalDataCounts;
 };
 
-// Callers check the operator first; the audit row names the email's index, never the email.
+// A failed query's message lists its bound parameters, the email among them, so only its name is logged.
+const errorName = (error: unknown): string =>
+  error instanceof Error ? error.name : typeof error;
+
 export const runDataRequest = async <TData extends { emailIndex: string }>(
   input: TDataRequestInput,
   { run, action, auditDetails }: TDataRequestStep<TData>,
@@ -78,7 +81,10 @@ export const runDataRequest = async <TData extends { emailIndex: string }>(
 
     logger.error(DATA_REQUEST_FAILED_EVENT, { action, error: result.error });
   } catch (error) {
-    logger.error(DATA_REQUEST_FAILED_EVENT, { action, error });
+    logger.error(DATA_REQUEST_FAILED_EVENT, {
+      action,
+      errorName: errorName(error),
+    });
   }
 
   return { ok: false, error: toOutcome(ACTION_OUTCOME.SERVER_ERROR) };

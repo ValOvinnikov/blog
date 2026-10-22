@@ -1,11 +1,5 @@
-import type { TMaybeNull } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
-import { auth } from '@platform/server/auth/auth';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { itGatesToSuperAdmins } from '@platform/testing/admins/super-admin-layout-gate';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
 
 import ReleasesLayout from './layout';
 
@@ -20,48 +14,6 @@ vi.mock('@blog/db', async () => ({
   queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
 }));
 
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
-
-const setup = customRenderAsync(ReleasesLayout, {
-  children: <div>releases content</div>,
-});
-
 describe(ReleasesLayout, () => {
-  beforeEach(() => {
-    authMock.mockReset().mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockReset();
-  });
-
-  it('redirects to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
-
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
-
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
-  });
-
-  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    '404s for a %s',
-    async (role) => {
-      getAdminByUserIdMock.mockResolvedValue(makeAdmin({ role }));
-
-      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-    },
-  );
-
-  it('404s when the user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-  });
-
-  it('renders the page for a SUPERADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue(
-      makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
-    );
-
-    await setup();
-
-    expect(screen.getByText('releases content')).toBeVisible();
-  });
+  itGatesToSuperAdmins(ReleasesLayout, getAdminByUserIdMock);
 });

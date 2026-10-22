@@ -116,4 +116,18 @@ describe(runDataRequest, () => {
     expect(result).toEqual(SERVER_ERROR);
     expect(recordAuditEventMock).not.toHaveBeenCalled();
   });
+
+  it('logs a thrown error by name only, never the email in its message', async () => {
+    runMock.mockRejectedValue(
+      new TypeError(`Failed query, params: ${DATA_REQUEST_EMAIL}`),
+    );
+
+    await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
+    const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
+
+    expect(context).toEqual({
+      action: AUDIT_ACTION.PERSONAL_DATA_LOOKED_UP,
+      errorName: TypeError.name,
+    });
+  });
 });

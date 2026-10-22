@@ -4,7 +4,6 @@ import {
   ERROR_CODE,
 } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
 import {
   BLOCK_REASON,
   NOT_AN_ADDRESS,
@@ -19,9 +18,11 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import {
+  deleteTestPersonalDataRows,
   insertTestPersonalDataRows,
   PERSONAL_DATA_LEAD_MESSAGE,
   PERSONAL_DATA_LEAD_NAME,
+  taggedMixedCaseAddress,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -38,12 +39,7 @@ const [LOCAL_PART, DOMAIN] = TEST_SUBSCRIBER_EMAIL.split('@');
 const TAGGED_EMAIL = `${LOCAL_PART}+news@${DOMAIN}`.toUpperCase();
 
 afterEach(async () => {
-  await db().delete(schema.auditEvents);
-  await db().delete(schema.blockedSignupIdentities);
-  await db().delete(schema.membershipInvites);
-  await db().delete(schema.leads);
-  await db().delete(schema.subscribers);
-  await db().delete(schema.tenants);
+  await deleteTestPersonalDataRows(db());
 });
 
 describe(findPersonalData, () => {
@@ -91,7 +87,7 @@ describe(findPersonalData, () => {
         ],
         auditEvents: [
           expect.objectContaining({
-            email: TEST_SUBSCRIBER_EMAIL,
+            email: taggedMixedCaseAddress(TEST_SUBSCRIBER_EMAIL),
             action: AUDIT_ACTION.SETTINGS_UPDATED,
             targetType: AUDIT_TARGET_TYPE.TENANT,
             targetId: tenantId,

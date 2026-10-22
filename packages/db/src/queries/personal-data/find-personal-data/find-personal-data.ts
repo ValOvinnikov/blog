@@ -11,10 +11,8 @@ import {
   isBlockedAddress,
   toPersonalDataMatch,
 } from '@blog/db/queries/personal-data/personal-data-match';
-import {
-  findSitePersonalData,
-  type TSitePersonalData,
-} from '@blog/db/queries/personal-data/site-personal-data';
+import { findSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data';
+import type { TSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data-types';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
 import type { TResult } from '@blog/utils';

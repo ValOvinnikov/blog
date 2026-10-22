@@ -48,6 +48,7 @@ const FIND_BUTTON = { name: 'Find data' };
 const ERASE_BUTTON = { name: 'Erase' };
 const ERASE_CONFIRM_BUTTON = { name: 'Erase data' };
 const EXPORT_BUTTON = { name: 'Download export' };
+const CANCEL_BUTTON = { name: 'Cancel' };
 const RESULTS_TABLE = { name: 'Stored records' };
 const BLOCK_MATCH = makeDataRequestMatch({
   key: 'SIGNUP_BLOCK-block-1',
@@ -61,10 +62,23 @@ const setup = customRender(DataRequestPanel, {});
 describe(`<${DataRequestPanel.name}/>`, () => {
   let user: UserEvent;
 
-  const lookUp = async (email = DATA_REQUEST_EMAIL) => {
+  const lookUp = async () => {
     const emailField = screen.getByRole('textbox', EMAIL_FIELD);
-    await user.type(emailField, email);
-    await user.click(screen.getByRole('button', FIND_BUTTON));
+    const findButton = screen.getByRole('button', FIND_BUTTON);
+    await user.type(emailField, DATA_REQUEST_EMAIL);
+    await user.click(findButton);
+  };
+
+  const openEraseDialog = async () => {
+    const eraseButton = await screen.findByRole('button', ERASE_BUTTON);
+    await user.click(eraseButton);
+    const dialog = await screen.findByRole('alertdialog');
+    const confirmField = within(dialog).getByRole('textbox');
+    const confirmButton = within(dialog).getByRole(
+      'button',
+      ERASE_CONFIRM_BUTTON,
+    );
+    return { dialog, confirmField, confirmButton };
   };
 
   beforeEach(() => {
@@ -83,14 +97,18 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     await lookUp();
 
     const table = await screen.findByRole('region', RESULTS_TABLE);
+    const subscriberKind = within(table).getByText('Subscriber');
+    const siteName = within(table).getByText(DATA_REQUEST_SITE_NAME);
+    const blockKind = within(table).getByText('Sign-up block');
+    const hashedEmail = within(table).getByText('Stored as a hash');
 
     expect(lookUpPersonalDataActionMock).toHaveBeenCalledWith({
       email: DATA_REQUEST_EMAIL,
     });
-    expect(within(table).getByText('Subscriber')).toBeVisible();
-    expect(within(table).getByText(DATA_REQUEST_SITE_NAME)).toBeVisible();
-    expect(within(table).getByText('Sign-up block')).toBeVisible();
-    expect(within(table).getByText('Stored as a hash')).toBeVisible();
+    expect(subscriberKind).toBeVisible();
+    expect(siteName).toBeVisible();
+    expect(blockKind).toBeVisible();
+    expect(hashedEmail).toBeVisible();
   });
 
   it('shows the field error for an invalid email and no results', async () => {
@@ -104,9 +122,10 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     await lookUp();
 
     const error = await screen.findByText('Enter a valid email address.');
+    const table = screen.queryByRole('region', RESULTS_TABLE);
 
     expect(error).toBeVisible();
-    expect(screen.queryByRole('region', RESULTS_TABLE)).not.toBeInTheDocument();
+    expect(table).not.toBeInTheDocument();
   });
 
   it('says so when nothing is stored, and offers no erasure', async () => {
@@ -119,10 +138,11 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
     const summary = await screen.findByText('No records found.');
     const empty = screen.getByText('Nothing is stored for this address.');
+    const eraseButton = screen.queryByRole('button', ERASE_BUTTON);
 
     expect(summary).toBeVisible();
     expect(empty).toBeVisible();
-    expect(screen.queryByRole('button', ERASE_BUTTON)).not.toBeInTheDocument();
+    expect(eraseButton).not.toBeInTheDocument();
   });
 
   it('downloads the export for the searched email', async () => {
@@ -133,7 +153,8 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     });
     await lookUp();
 
-    await user.click(await screen.findByRole('button', EXPORT_BUTTON));
+    const exportButton = await screen.findByRole('button', EXPORT_BUTTON);
+    await user.click(exportButton);
 
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
       email: DATA_REQUEST_EMAIL,
@@ -151,22 +172,21 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     });
     await lookUp();
 
-    await user.click(await screen.findByRole('button', ERASE_BUTTON));
-    const dialog = await screen.findByRole('alertdialog');
-    const confirm = within(dialog).getByRole('button', ERASE_CONFIRM_BUTTON);
+    const { confirmField, confirmButton } = await openEraseDialog();
 
-    expect(confirm).toBeDisabled();
+    expect(confirmButton).toBeDisabled();
 
-    await user.type(within(dialog).getByRole('textbox'), DATA_REQUEST_EMAIL);
-    await user.click(confirm);
+    await user.type(confirmField, DATA_REQUEST_EMAIL);
+    await user.click(confirmButton);
 
     const toast = await screen.findByText('2 records erased.');
+    const table = screen.queryByRole('region', RESULTS_TABLE);
 
     expect(erasePersonalDataActionMock).toHaveBeenCalledWith({
       email: DATA_REQUEST_EMAIL,
     });
     expect(toast).toBeVisible();
-    expect(screen.queryByRole('region', RESULTS_TABLE)).not.toBeInTheDocument();
+    expect(table).not.toBeInTheDocument();
   });
 
   it('keeps the results and explains when the erasure fails', async () => {
@@ -175,10 +195,9 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     });
     await lookUp();
 
-    await user.click(await screen.findByRole('button', ERASE_BUTTON));
-    const dialog = await screen.findByRole('alertdialog');
-    await user.type(within(dialog).getByRole('textbox'), DATA_REQUEST_EMAIL);
-    await user.click(within(dialog).getByRole('button', ERASE_CONFIRM_BUTTON));
+    const { dialog, confirmField, confirmButton } = await openEraseDialog();
+    await user.type(confirmField, DATA_REQUEST_EMAIL);
+    await user.click(confirmButton);
 
     const error = await within(dialog).findByText(
       "Couldn't erase the data — try again.",
@@ -186,7 +205,8 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
     expect(error).toBeVisible();
 
-    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    const cancelButton = within(dialog).getByRole('button', CANCEL_BUTTON);
+    await user.click(cancelButton);
     const table = await screen.findByRole('region', RESULTS_TABLE);
 
     expect(table).toBeVisible();

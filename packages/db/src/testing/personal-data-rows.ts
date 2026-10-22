@@ -12,6 +12,11 @@ export const PERSONAL_DATA_LEAD_NAME = 'Grace Hopper';
 export const PERSONAL_DATA_LEAD_MESSAGE = 'Please call me back.';
 export const PERSONAL_DATA_ACTOR_ID = 'user-with-remaining-data';
 
+export function taggedMixedCaseAddress(email: string): string {
+  const [localPart, domain] = email.split('@');
+  return ` ${localPart}+Promo@${domain?.toUpperCase()} `;
+}
+
 export async function insertTestPersonalDataRows(
   db: TTestDb,
   tenantId: string,
@@ -45,9 +50,18 @@ export async function insertTestPersonalDataRows(
   });
   await db.insert(schema.auditEvents).values({
     actorId: PERSONAL_DATA_ACTOR_ID,
-    actorEmail: email,
+    actorEmail: taggedMixedCaseAddress(email),
     action: AUDIT_ACTION.SETTINGS_UPDATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
   });
+}
+
+export async function deleteTestPersonalDataRows(db: TTestDb): Promise<void> {
+  await db.delete(schema.auditEvents);
+  await db.delete(schema.blockedSignupIdentities);
+  await db.delete(schema.membershipInvites);
+  await db.delete(schema.leads);
+  await db.delete(schema.subscribers);
+  await db.delete(schema.tenants);
 }

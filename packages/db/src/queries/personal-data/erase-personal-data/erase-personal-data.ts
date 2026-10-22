@@ -26,8 +26,7 @@ export type TPersonalDataErasure = {
   erased: TPersonalDataCounts;
 };
 
-// Deletes every matched row except audit events, which keep their history and lose only the email.
-// Each statement stands alone, so a retry after a partial failure finishes the rest.
+// Runs without a transaction (`neon-http`); every statement is idempotent, so a retry finishes the rest.
 export async function erasePersonalData(
   email: string,
 ): Promise<TResult<TPersonalDataErasure, TErrorCode>> {

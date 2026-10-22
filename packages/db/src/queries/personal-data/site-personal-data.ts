@@ -1,51 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import type { TMembershipRole } from '@blog/db/constants';
+import type { TSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data-types';
 import { leads } from '@blog/db/schema/leads';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
-import {
-  subscribers,
-  type TSubscriberStatus,
-} from '@blog/db/schema/subscribers';
+import { subscribers } from '@blog/db/schema/subscribers';
 import { tenants } from '@blog/db/schema/tenants';
 import { readPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { asc, eq } from 'drizzle-orm';
-
-type TPersonalDataSite = {
-  tenantId: string;
-  tenantName: string;
-};
-
-export type TPersonalDataSubscriber = TPersonalDataSite & {
-  id: string;
-  email: string;
-  status: TSubscriberStatus;
-  subscribedAt: Date;
-  confirmedAt: TMaybeUndefined<Date>;
-};
-
-export type TPersonalDataLead = TPersonalDataSite & {
-  id: string;
-  name: string;
-  email: string;
-  message: string;
-  sourcePath: string;
-  createdAt: Date;
-};
-
-export type TPersonalDataInvite = TPersonalDataSite & {
-  id: string;
-  email: string;
-  role: TMembershipRole;
-  createdAt: Date;
-  consumedAt: TMaybeUndefined<Date>;
-};
-
-export type TSitePersonalData = {
-  subscribers: TPersonalDataSubscriber[];
-  leads: TPersonalDataLead[];
-  membershipInvites: TPersonalDataInvite[];
-};
 
 const siteColumns = { tenantId: tenants.id, tenantName: tenants.name };
 
@@ -56,19 +16,46 @@ export async function findSitePersonalData(
 
   const [subscriberRows, leadRows, inviteRows] = await Promise.all([
     db
-      .select({ ...siteColumns, row: subscribers })
+      .select({
+        ...siteColumns,
+        id: subscribers.id,
+        email: subscribers.email,
+        emailEncrypted: subscribers.emailEncrypted,
+        status: subscribers.status,
+        subscribedAt: subscribers.subscribedAt,
+        confirmedAt: subscribers.confirmedAt,
+      })
       .from(subscribers)
       .innerJoin(tenants, eq(tenants.id, subscribers.tenantId))
       .where(eq(subscribers.emailIndex, emailIndex))
       .orderBy(asc(tenants.name), asc(subscribers.subscribedAt)),
     db
-      .select({ ...siteColumns, row: leads })
+      .select({
+        ...siteColumns,
+        id: leads.id,
+        name: leads.name,
+        nameEncrypted: leads.nameEncrypted,
+        email: leads.email,
+        emailEncrypted: leads.emailEncrypted,
+        message: leads.message,
+        messageEncrypted: leads.messageEncrypted,
+        sourcePath: leads.sourcePath,
+        createdAt: leads.createdAt,
+      })
       .from(leads)
       .innerJoin(tenants, eq(tenants.id, leads.tenantId))
       .where(eq(leads.emailIndex, emailIndex))
       .orderBy(asc(tenants.name), asc(leads.createdAt)),
     db
-      .select({ ...siteColumns, row: membershipInvites })
+      .select({
+        ...siteColumns,
+        id: membershipInvites.id,
+        email: membershipInvites.email,
+        emailEncrypted: membershipInvites.emailEncrypted,
+        role: membershipInvites.role,
+        createdAt: membershipInvites.createdAt,
+        consumedAt: membershipInvites.consumedAt,
+      })
       .from(membershipInvites)
       .innerJoin(tenants, eq(tenants.id, membershipInvites.tenantId))
       .where(eq(membershipInvites.emailIndex, emailIndex))
@@ -76,33 +63,35 @@ export async function findSitePersonalData(
   ]);
 
   return {
-    subscribers: subscriberRows.map(({ tenantId, tenantName, row }) => ({
-      tenantId,
-      tenantName,
-      id: row.id,
-      email: readPersonalValue(row.emailEncrypted, row.email),
-      status: row.status,
-      subscribedAt: row.subscribedAt,
-      confirmedAt: row.confirmedAt ?? undefined,
-    })),
-    leads: leadRows.map(({ tenantId, tenantName, row }) => ({
-      tenantId,
-      tenantName,
-      id: row.id,
-      name: readPersonalValue(row.nameEncrypted, row.name),
-      email: readPersonalValue(row.emailEncrypted, row.email),
-      message: readPersonalValue(row.messageEncrypted, row.message),
-      sourcePath: row.sourcePath,
-      createdAt: row.createdAt,
-    })),
-    membershipInvites: inviteRows.map(({ tenantId, tenantName, row }) => ({
-      tenantId,
-      tenantName,
-      id: row.id,
-      email: readPersonalValue(row.emailEncrypted, row.email),
-      role: row.role,
-      createdAt: row.createdAt,
-      consumedAt: row.consumedAt ?? undefined,
-    })),
+    subscribers: subscriberRows.map(
+      ({ email, emailEncrypted, confirmedAt, ...subscriber }) => ({
+        ...subscriber,
+        email: readPersonalValue(emailEncrypted, email),
+        confirmedAt: confirmedAt ?? undefined,
+      }),
+    ),
+    leads: leadRows.map(
+      ({
+        name,
+        nameEncrypted,
+        email,
+        emailEncrypted,
+        message,
+        messageEncrypted,
+        ...lead
+      }) => ({
+        ...lead,
+        name: readPersonalValue(nameEncrypted, name),
+        email: readPersonalValue(emailEncrypted, email),
+        message: readPersonalValue(messageEncrypted, message),
+      }),
+    ),
+    membershipInvites: inviteRows.map(
+      ({ email, emailEncrypted, consumedAt, ...invite }) => ({
+        ...invite,
+        email: readPersonalValue(emailEncrypted, email),
+        consumedAt: consumedAt ?? undefined,
+      }),
+    ),
   };
 }

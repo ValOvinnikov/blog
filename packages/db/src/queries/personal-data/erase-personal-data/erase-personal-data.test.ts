@@ -11,6 +11,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import {
+  deleteTestPersonalDataRows,
   insertTestPersonalDataRows,
   PERSONAL_DATA_ACTOR_ID,
 } from '@blog/db/testing/personal-data-rows';
@@ -35,12 +36,7 @@ const ONE_OF_EACH = {
 };
 
 afterEach(async () => {
-  await db().delete(schema.auditEvents);
-  await db().delete(schema.blockedSignupIdentities);
-  await db().delete(schema.membershipInvites);
-  await db().delete(schema.leads);
-  await db().delete(schema.subscribers);
-  await db().delete(schema.tenants);
+  await deleteTestPersonalDataRows(db());
 });
 
 describe(erasePersonalData, () => {
