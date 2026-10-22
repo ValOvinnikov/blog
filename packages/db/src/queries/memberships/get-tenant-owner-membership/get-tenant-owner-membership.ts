@@ -41,7 +41,10 @@ export async function getTenantOwnerMembership(
       ),
     );
 
-  return invite
-    ? { email: decryptPersonalValue(invite.emailEncrypted) }
-    : undefined;
+  if (!invite) return undefined;
+  if (invite.emailEncrypted === null) {
+    throw new Error('Invite has no encrypted email.');
+  }
+
+  return { email: decryptPersonalValue(invite.emailEncrypted) };
 }

@@ -1,10 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_ID,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
@@ -36,7 +37,7 @@ vi.mock('@blog/service', () => ({
 }));
 
 const { EN, NL } = LOCALE_ISO_CODES;
-const TENANT_ID = 'tenant-1';
+const LINK_TEXT = 'browse the blog';
 
 const setup = customRenderAsync(BookmarksPage, {});
 
@@ -53,7 +54,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
   it('redirects home without querying bookmarks when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(listBookmarksMock).not.toHaveBeenCalled();
@@ -66,7 +67,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
       tenantId: undefined,
     });
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(listBookmarksMock).not.toHaveBeenCalled();
@@ -76,7 +77,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
   it('queries bookmarks for the signed-in user and tenant, then resolves ids via getPostsByIds', async () => {
     await setup();
 
-    expect(listBookmarksMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+    expect(listBookmarksMock).toHaveBeenCalledWith(DEFAULT_TENANT_ID, 'user-1');
     expect(getPostsByIdsMock).toHaveBeenCalledWith(
       [],
       DEFAULT_TENANT_SANITY_CONTEXT,
@@ -170,14 +171,15 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
   it('renders the tenant-authored empty message with its formatting and link', async () => {
     vi.mocked(getVoiceRich).mockResolvedValueOnce(
-      makeFormattedVoiceRich({ linkText: 'browse the blog', href: '/blog' }),
+      makeFormattedVoiceRich({ linkText: LINK_TEXT, href: '/blog' }),
     );
 
     await setup();
 
-    expect(
-      screen.getByRole('link', { name: 'browse the blog' }),
-    ).toHaveAttribute('href', '/blog');
+    expect(screen.getByRole('link', { name: LINK_TEXT })).toHaveAttribute(
+      'href',
+      '/blog',
+    );
     expect(screen.getByText('bold', { selector: 'strong' })).toBeVisible();
     expect(screen.getByText('italic', { selector: 'em' })).toBeVisible();
   });

@@ -25,13 +25,9 @@ describe('with both personal data keys configured', () => {
   });
 
   it('decrypts a value it encrypted', () => {
-    expect(decryptPersonalValue(encryptPersonalValue(EMAIL))).toBe(EMAIL);
-  });
+    const encrypted = encryptPersonalValue(EMAIL) ?? '';
 
-  it('refuses to decrypt a value with no encrypted form', () => {
-    expect(() => decryptPersonalValue(null)).toThrow(
-      'A personal value has no encrypted form.',
-    );
+    expect(decryptPersonalValue(encrypted)).toBe(EMAIL);
   });
 
   it('gives an email its encrypted form and its index', () => {
@@ -65,15 +61,15 @@ describe('with no personal data keys configured', () => {
     });
   });
 
-  it('refuses to decrypt', () => {
-    expect(() => decryptPersonalValue('v1:payload')).toThrow(
-      'PERSONAL_DATA_ENCRYPTION_KEY is not configured.',
-    );
-  });
-
   it('refuses an index lookup', () => {
     expect(() => requirePersonalEmailIndex(EMAIL)).toThrow(
       'PERSONAL_DATA_INDEX_KEY is not configured.',
+    );
+  });
+
+  it('refuses to decrypt', () => {
+    expect(() => decryptPersonalValue(EMAIL)).toThrow(
+      'PERSONAL_DATA_ENCRYPTION_KEY is not configured.',
     );
   });
 });

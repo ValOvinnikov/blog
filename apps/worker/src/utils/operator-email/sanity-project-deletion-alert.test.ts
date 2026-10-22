@@ -2,11 +2,12 @@ import type { TMaybeUndefined } from '@blog/config';
 import { listSuperadminEmails } from '@blog/db/queries/admins';
 import { sendEmail } from '@blog/email';
 import {
-  DEFAULT_OPERATOR_ALERT_FROM_ADDRESS,
   DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
   DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
   SANITY_MANAGE_PROJECT_URL,
 } from '@worker/constants/deprovisioning';
+import { DEFAULT_OPERATOR_ALERT_FROM_ADDRESS } from '@worker/constants/operator-alert';
+import { SUPERADMIN_EMAILS } from '@worker/testing/operator-email/fixtures';
 import { SANITY_PROJECT_ID } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
@@ -15,10 +16,6 @@ import { alertOperatorsToDeleteSanityProject } from './sanity-project-deletion-a
 
 const ARCHIVED_TENANT = makeTenant({ sanityProjectId: SANITY_PROJECT_ID });
 const RESEND_DOWN = 'resend down';
-const SUPERADMINS = [
-  'first-superadmin@example.com',
-  'second-superadmin@example.com',
-];
 
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
@@ -35,14 +32,14 @@ function sentTo(): string[] {
 
 describe(alertOperatorsToDeleteSanityProject, () => {
   beforeEach(() => {
-    vi.mocked(listSuperadminEmails).mockResolvedValue(SUPERADMINS);
+    vi.mocked(listSuperadminEmails).mockResolvedValue(SUPERADMIN_EMAILS);
     vi.mocked(sendEmail).mockResolvedValue();
   });
 
   it('sends every super admin one email naming the project to delete in Sanity Manage', async () => {
     await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
 
-    expect(sentTo()).toEqual(SUPERADMINS);
+    expect(sentTo()).toEqual(SUPERADMIN_EMAILS);
     expect(sendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         from: DEFAULT_OPERATOR_ALERT_FROM_ADDRESS,
@@ -77,7 +74,7 @@ describe(alertOperatorsToDeleteSanityProject, () => {
 
     await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
 
-    expect(sentTo()).toEqual(SUPERADMINS);
+    expect(sentTo()).toEqual(SUPERADMIN_EMAILS);
     expect(logger.error).toHaveBeenCalledWith(
       DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
       { tenantId: TEST_TENANT_ID, error: RESEND_DOWN },

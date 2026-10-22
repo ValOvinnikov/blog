@@ -13,10 +13,7 @@ export function encryptPersonalValue(value: string): TMaybeNull<string> {
   return raw ? encryptPersonalData(value, parsePersonalDataKeyring(raw)) : null;
 }
 
-export function decryptPersonalValue(encrypted: TMaybeNull<string>): string {
-  if (encrypted === null) {
-    throw new Error('A personal value has no encrypted form.');
-  }
+export function decryptPersonalValue(encrypted: string): string {
   const raw = env.PERSONAL_DATA_ENCRYPTION_KEY;
   if (!raw) throw new Error('PERSONAL_DATA_ENCRYPTION_KEY is not configured.');
   return decryptPersonalData(encrypted, parsePersonalDataKeyring(raw));

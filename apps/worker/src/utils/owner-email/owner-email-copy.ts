@@ -6,7 +6,7 @@ type TOwnerEmailCopyInput = {
   ownerEmail: string;
 };
 
-type TOwnerEmailText = {
+export type TOwnerEmailText = {
   subject: string;
   previewText: string;
   paragraphs: string[];

@@ -1,20 +1,33 @@
 import {
+  TEST_PROVIDER,
+  TEST_PROVIDER_ACCOUNT_ID,
   TEST_SESSION_EXPIRES,
   TEST_SESSION_TOKEN,
+  TEST_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
+import { queries } from '@blog/db';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { sha256Hex } from '@blog/utils/hash';
 import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 
 import { scopeAdapterToApp } from './app-scoped-adapter';
 
 const user = {
-  id: 'user-1',
+  id: TEST_USER_ID,
   email: 'owner@example.com',
+  name: null,
   emailVerified: null,
 };
 const expires = TEST_SESSION_EXPIRES;
 const SESSION_TOKEN_HASH = sha256Hex(TEST_SESSION_TOKEN);
+
+usePersonalDataKeys();
+
+const storedUser = () => ({
+  ...user,
+  ...queries.users.userPersonalColumns(user),
+});
 
 function buildAdapter(
   storedApp: string,
@@ -33,7 +46,7 @@ function buildAdapter(
     linkAccount: vi.fn(async () => undefined),
     getSessionAndUser: vi.fn(async (sessionToken) => ({
       session: { sessionToken, userId: user.id, expires, app: storedApp },
-      user,
+      user: storedUser(),
     })),
     updateSession: vi.fn(async (session) => ({
       userId: user.id,
@@ -107,7 +120,7 @@ describe(scopeAdapterToApp, () => {
 
     const found = await scoped.getSessionAndUser?.(TEST_SESSION_TOKEN);
 
-    expect(found?.user).toEqual(user);
+    expect(found?.user).toMatchObject(user);
   });
 
   it('reads a session another app issued as no session', async () => {
@@ -145,8 +158,8 @@ describe(scopeAdapterToApp, () => {
     const account: AdapterAccount = {
       userId: user.id,
       type: 'oidc',
-      provider: 'test-provider',
-      providerAccountId: 'provider-account-1',
+      provider: TEST_PROVIDER,
+      providerAccountId: TEST_PROVIDER_ACCOUNT_ID,
       token_type: 'bearer',
       scope: 'read:user',
     };

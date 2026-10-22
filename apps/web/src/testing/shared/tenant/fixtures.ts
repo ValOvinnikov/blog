@@ -1,8 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TTenantSanityContext } from '@blog/service';
+import { faker } from '@faker-js/faker';
 import type { TRequestContext } from '@web/server/request-context/request-context';
 
-export const DEFAULT_TENANT_ID = 'tenant-1';
+export const DEFAULT_TENANT_ID = faker.string.uuid();
 
 export const DEFAULT_TENANT_BASE_URL = 'https://example.com';
 

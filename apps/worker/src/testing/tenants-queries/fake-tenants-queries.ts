@@ -16,6 +16,8 @@ export function withFakeTenantsQueries(
     claimTenantOwnerEmail: vi.fn(),
     releaseTenantOwnerEmail: vi.fn(),
     touchTenantActivity: vi.fn(),
+    listTenantsDueForInactivityStage: vi.fn(),
+    stampTenantInactivityStage: vi.fn(),
     archiveTenant: vi.fn(),
     clearTenantProvisioningArtifacts: vi.fn(),
     startDeprovisioningRun: vi.fn(),

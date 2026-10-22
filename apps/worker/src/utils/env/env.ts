@@ -36,6 +36,8 @@ export const env = createEnv({
     // @env-optional
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // @env-optional
+    CRON_SECRET: z.string().min(1).optional(),
+    // @env-optional
     OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-optional
     OWNER_EMAIL_FROM_ADDRESS: z.string().min(1).optional(),
@@ -63,6 +65,7 @@ export const env = createEnv({
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
+    CRON_SECRET: process.env.CRON_SECRET,
     OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
     OWNER_EMAIL_FROM_ADDRESS: process.env.OWNER_EMAIL_FROM_ADDRESS,
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,

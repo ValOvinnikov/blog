@@ -1,3 +1,4 @@
+import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { leads, type TLead } from '@blog/db/schema/leads';
 import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
@@ -18,6 +19,11 @@ export type TListLeadsResult = {
   leads: TListedLead[];
   total: number;
 };
+
+function decryptLeadValue(encrypted: TMaybeNull<string>): string {
+  if (encrypted === null) throw new Error('Lead has no encrypted form.');
+  return decryptPersonalValue(encrypted);
+}
 
 export async function listLeads({
   tenantId,
@@ -56,9 +62,9 @@ export async function listLeads({
         createdAt,
       }) => ({
         id,
-        name: decryptPersonalValue(nameEncrypted),
-        email: decryptPersonalValue(emailEncrypted),
-        message: decryptPersonalValue(messageEncrypted),
+        name: decryptLeadValue(nameEncrypted),
+        email: decryptLeadValue(emailEncrypted),
+        message: decryptLeadValue(messageEncrypted),
         sourcePath,
         createdAt,
       }),

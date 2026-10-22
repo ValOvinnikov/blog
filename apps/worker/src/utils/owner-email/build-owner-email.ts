@@ -11,6 +11,7 @@ import {
 } from '@worker/constants/owner-email';
 import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access-target';
 
+import { tenantSiteUrl } from './owner-email-context';
 import { OWNER_EMAIL_COPY } from './owner-email-copy';
 
 function adminUrl(env: TOwnerAccessTarget['env'], path: string): string {
@@ -25,7 +26,7 @@ export function buildOwnerEmailMessage(
   const copy = OWNER_EMAIL_COPY[tenant.locale];
   const input = {
     siteName: tenant.name,
-    siteUrl: `https://${tenant.primaryDomain}`,
+    siteUrl: tenantSiteUrl(tenant),
     ownerEmail,
   };
   const brandName = PLATFORM_EMAIL_BRAND_NAME;

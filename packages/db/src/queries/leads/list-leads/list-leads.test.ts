@@ -139,6 +139,6 @@ describe(listLeads, () => {
 
     await expect(
       listLeads({ tenantId, page: 1, pageSize: 10 }),
-    ).rejects.toThrow('A personal value has no encrypted form.');
+    ).rejects.toThrow('Lead has no encrypted form.');
   });
 });

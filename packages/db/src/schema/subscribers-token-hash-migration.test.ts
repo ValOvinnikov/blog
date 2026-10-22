@@ -1,10 +1,10 @@
 import * as schema from '@blog/db/schema';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  insertReplayTenant,
 } from '@blog/db/testing/migration-files';
 import { sha256Hex } from '@blog/utils/hash';
 import { PGlite } from '@electric-sql/pglite';
@@ -33,7 +33,7 @@ describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
         await applyMigrationFile(db, file);
       }
 
-      const tenant = await insertTestTenant(db);
+      const tenant = await insertReplayTenant(db);
 
       const seeds = Array.from({ length: 2 }, () => ({
         id: faker.string.uuid(),
@@ -83,7 +83,7 @@ describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
         await applyMigrationFile(db, file);
       }
 
-      const tenant = await insertTestTenant(db);
+      const tenant = await insertReplayTenant(db);
       const [first] = await db
         .insert(subscribers)
         .values({

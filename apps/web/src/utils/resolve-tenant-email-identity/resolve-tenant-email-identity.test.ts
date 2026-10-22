@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
@@ -20,8 +21,6 @@ vi.mock('@blog/db', () => ({
 
 const TENANT_NAME = 'Zeta Times';
 
-const TENANT_ID = 'tenant-1';
-
 describe(resolveTenantEmailIdentity, () => {
   beforeEach(() => {
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
@@ -35,7 +34,7 @@ describe(resolveTenantEmailIdentity, () => {
       data: { preset: PRESET_ID.CONSOLE, accentHue: 40 } as never,
     });
 
-    const identity = await resolveTenantEmailIdentity(TENANT_ID);
+    const identity = await resolveTenantEmailIdentity(DEFAULT_TENANT_ID);
 
     expect(identity.brandName).toBe(TENANT_NAME);
     expect(identity.brand).toEqual(
@@ -49,7 +48,7 @@ describe(resolveTenantEmailIdentity, () => {
       error: ERROR_CODE.DB_NOT_FOUND,
     });
 
-    const identity = await resolveTenantEmailIdentity(TENANT_ID);
+    const identity = await resolveTenantEmailIdentity(DEFAULT_TENANT_ID);
 
     expect(identity.brand).toEqual(
       resolveTenantEmailBrand({
@@ -59,7 +58,7 @@ describe(resolveTenantEmailIdentity, () => {
     );
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
       'tenant_email_identity.site_config_fetch_failed',
-      { tenantId: TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
+      { tenantId: DEFAULT_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
     );
   });
 
@@ -67,12 +66,12 @@ describe(resolveTenantEmailIdentity, () => {
     vi.mocked(getSiteConfig).mockResolvedValue({ ok: true, data: undefined });
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
 
-    const identity = await resolveTenantEmailIdentity(TENANT_ID);
+    const identity = await resolveTenantEmailIdentity(DEFAULT_TENANT_ID);
 
     expect(identity.brandName).toBe('Newsletter');
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
       'tenant_email_identity.tenant_row_not_found',
-      { tenantId: TENANT_ID },
+      { tenantId: DEFAULT_TENANT_ID },
     );
   });
 });
