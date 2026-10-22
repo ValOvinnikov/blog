@@ -1,6 +1,14 @@
 import { sha256Hex } from '@blog/utils/hash';
-import { pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import {
+  index,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
+import { EMAIL_ENCRYPTED_COLUMN, EMAIL_INDEX_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 function mintUnusableTokenHash(): string {
@@ -20,6 +28,8 @@ export const subscribers = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     email: text('email').notNull(),
+    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN),
+    emailIndex: text(EMAIL_INDEX_COLUMN),
     status: text('status', { enum: SUBSCRIBER_STATUS })
       .notNull()
       .default('pending'),
@@ -40,7 +50,13 @@ export const subscribers = pgTable(
     confirmedAt: timestamp('confirmed_at', { mode: 'date' }),
     confirmationSentAt: timestamp('confirmation_sent_at', { mode: 'date' }),
   },
-  (subscriber) => [unique().on(subscriber.tenantId, subscriber.email)],
+  (subscriber) => [
+    unique().on(subscriber.tenantId, subscriber.email),
+    index('subscribers_tenant_email_index_idx').on(
+      subscriber.tenantId,
+      subscriber.emailIndex,
+    ),
+  ],
 );
 
 export type TSubscriber = typeof subscribers.$inferSelect;

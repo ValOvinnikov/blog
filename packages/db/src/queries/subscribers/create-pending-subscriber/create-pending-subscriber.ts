@@ -6,6 +6,7 @@ import {
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import type { TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
@@ -28,7 +29,11 @@ export async function createPendingSubscriber(
 
   const [inserted] = await db
     .insert(subscribers)
-    .values({ tenantId, email: normalizedEmail })
+    .values({
+      tenantId,
+      email: normalizedEmail,
+      ...personalEmailColumns(normalizedEmail),
+    })
     .onConflictDoNothing()
     .returning();
 

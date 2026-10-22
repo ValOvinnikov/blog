@@ -8,6 +8,11 @@ import {
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
+import {
+  decryptTestPersonalValue,
+  testPersonalEmailIndex,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
@@ -21,6 +26,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
 
 const DOMAIN = 'acme.example.com';
 const OWNER_EMAIL = 'owner@example.com';
@@ -163,9 +169,13 @@ describe(createTenantDraft, () => {
     expect(inviteRow).toMatchObject({
       tenantId: result.data.id,
       email: OWNER_EMAIL,
+      emailIndex: testPersonalEmailIndex(OWNER_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
       consumedAt: null,
     });
+    expect(decryptTestPersonalValue(inviteRow?.emailEncrypted ?? null)).toBe(
+      OWNER_EMAIL,
+    );
 
     const membershipRows = await db()
       .select()

@@ -12,7 +12,7 @@ import {
   normalizeSignupDomain,
   normalizeSignupEmail,
 } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { signupAddressIndex } from '@blog/db/utils/signup-address-index/signup-address-index';
+import { requirePersonalEmailIndex } from '@blog/db/utils/personal-data/personal-data';
 import type { TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
@@ -38,7 +38,7 @@ function toStoredValue(
   const email = normalizeSignupEmail(identity);
 
   return email
-    ? { ok: true, data: signupAddressIndex(email.address) }
+    ? { ok: true, data: requirePersonalEmailIndex(email.address) }
     : { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
 }
 

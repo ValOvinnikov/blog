@@ -1,6 +1,5 @@
 import * as schema from '@blog/db/schema';
 import { sessions, users } from '@blog/db/schema/auth';
-import { insertTestUser } from '@blog/db/testing/fixtures';
 import {
   applyMigrationFile,
   listMigrationFiles,
@@ -8,6 +7,7 @@ import {
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
+import { sql } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
 const DELETE_SESSIONS_MIGRATION = '0054_delete_unhashed_sessions.sql';
@@ -27,7 +27,8 @@ describe('0054_delete_unhashed_sessions (sessions stored before hashing end)', (
         await applyMigrationFile(db, file);
       }
 
-      const user = await insertTestUser(db);
+      const user = { id: faker.string.uuid() };
+      await db.execute(sql`insert into "users" ("id") values (${user.id})`);
       await db.insert(sessions).values(
         Array.from({ length: 2 }, () => ({
           sessionToken: faker.string.uuid(),

@@ -1,5 +1,6 @@
 import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
 import type { schema } from '@blog/db';
+import type * as emailModule from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { logger } from '@web/utils/logger/logger';
@@ -25,7 +26,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/email')>()),
+  ...(await importOriginal<typeof emailModule>()),
   sendEmail: sendEmailMock,
 }));
 
@@ -49,8 +50,12 @@ const lead: schema.TLead = {
   id: faker.string.uuid(),
   tenantId: faker.string.uuid(),
   name: faker.person.fullName(),
+  nameEncrypted: null,
   email: faker.internet.email(),
+  emailEncrypted: null,
+  emailIndex: null,
   message: faker.lorem.sentences(2),
+  messageEncrypted: null,
   sourcePath: `/${faker.lorem.slug()}`,
   createdAt: faker.date.recent(),
 };
