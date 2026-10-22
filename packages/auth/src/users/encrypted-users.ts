@@ -2,27 +2,11 @@ import { queries } from '@blog/db';
 import type { TUser } from '@blog/db/schema/auth';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
-type TEncryptedUser = Pick<TUser, 'emailEncrypted' | 'nameEncrypted'>;
+type TStoredUser = Omit<AdapterUser, 'email'> &
+  Partial<Pick<TUser, 'emailEncrypted' | 'nameEncrypted'>>;
 
-function isEncryptedUser(
-  user: AdapterUser,
-): user is AdapterUser & TEncryptedUser {
-  return 'emailEncrypted' in user && 'nameEncrypted' in user;
-}
-
-function decryptUser(
-  user: TEncryptedUser & Omit<AdapterUser, 'email'>,
-): AdapterUser {
+function decryptUser(user: TStoredUser): AdapterUser {
   return { ...user, ...queries.users.readUserPersonalData(user) };
-}
-
-function decryptAdapterUser(user: AdapterUser): AdapterUser {
-  if (!isEncryptedUser(user)) {
-    throw new Error(
-      'The adapter returned a user without its encrypted columns.',
-    );
-  }
-  return decryptUser(user);
 }
 
 export function withEncryptedUsers(adapter: Adapter): Adapter {
@@ -43,13 +27,13 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
           ...user,
           ...queries.users.userPersonalColumns(user),
         };
-        return decryptAdapterUser(await createUser(withEncrypted));
+        return decryptUser(await createUser(withEncrypted));
       }),
     getUser:
       getUser &&
       (async (id) => {
         const user = await getUser(id);
-        return user && decryptAdapterUser(user);
+        return user && decryptUser(user);
       }),
     getUserByEmail: async (email) => {
       const user = await queries.users.getUserByEmailIndex(email);
@@ -59,7 +43,7 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
       getUserByAccount &&
       (async (account) => {
         const user = await getUserByAccount(account);
-        return user && decryptAdapterUser(user);
+        return user && decryptUser(user);
       }),
     updateUser:
       updateUser &&
@@ -68,13 +52,13 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
           ...user,
           ...queries.users.userPersonalColumns(user),
         };
-        return decryptAdapterUser(await updateUser(withEncrypted));
+        return decryptUser(await updateUser(withEncrypted));
       }),
     getSessionAndUser:
       getSessionAndUser &&
       (async (sessionToken) => {
         const found = await getSessionAndUser(sessionToken);
-        return found && { ...found, user: decryptAdapterUser(found.user) };
+        return found && { ...found, user: decryptUser(found.user) };
       }),
   };
 }

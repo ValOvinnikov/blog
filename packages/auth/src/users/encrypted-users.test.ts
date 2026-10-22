@@ -1,4 +1,9 @@
-import { TEST_SESSION_TOKEN } from '@blog/auth/testing/session-fixtures';
+import {
+  TEST_PROVIDER,
+  TEST_PROVIDER_ACCOUNT_ID,
+  TEST_SESSION_TOKEN,
+  TEST_USER_ID,
+} from '@blog/auth/testing/session-fixtures';
 import { queries } from '@blog/db';
 import type { TUser } from '@blog/db/schema/auth';
 import {
@@ -29,24 +34,23 @@ vi.mock('@blog/db', async (importActual) => {
 
 usePersonalDataKeys();
 
-const USER_ID = 'user-1';
-const EMAIL = 'reader@example.com';
+const EMAIL = 'encrypted-reader@example.com';
 const NAME = 'Ada Reader';
-const CHANGED_EMAIL = 'renamed@example.com';
-const STALE_EMAIL = 'stale@example.com';
-const STALE_NAME = 'Stale Name';
+const CHANGED_EMAIL = 'renamed-reader@example.com';
+const PLAIN_EMAIL = 'plain-reader@example.com';
+const PLAIN_NAME = 'Plain Name';
 
 const signedUpUser = (): AdapterUser => ({
-  id: USER_ID,
+  id: TEST_USER_ID,
   email: EMAIL,
   name: NAME,
   emailVerified: null,
 });
 
 const storedUser = (): TUser & AdapterUser => ({
-  id: USER_ID,
-  email: STALE_EMAIL,
-  name: STALE_NAME,
+  id: TEST_USER_ID,
+  email: PLAIN_EMAIL,
+  name: PLAIN_NAME,
   emailVerified: null,
   image: null,
   termsAcceptedAt: null,
@@ -69,7 +73,7 @@ function buildAdapter() {
     getUserByEmail: vi.fn(async () => stored),
     getUserByAccount: vi.fn(async () => stored),
     getSessionAndUser: vi.fn(async (sessionToken: string) => ({
-      session: { sessionToken, userId: USER_ID, expires: new Date() },
+      session: { sessionToken, userId: TEST_USER_ID, expires: new Date() },
       user: stored,
     })),
   } satisfies Adapter;
@@ -105,7 +109,7 @@ describe(withEncryptedUsers, () => {
     const adapter = buildAdapter();
 
     const updated = await withEncryptedUsers(adapter).updateUser?.({
-      id: USER_ID,
+      id: TEST_USER_ID,
       email: CHANGED_EMAIL,
       name: null,
     });
@@ -124,26 +128,27 @@ describe(withEncryptedUsers, () => {
     const emailVerified = new Date();
 
     await withEncryptedUsers(adapter).updateUser?.({
-      id: USER_ID,
+      id: TEST_USER_ID,
       emailVerified,
     });
 
     expect(adapter.updateUser).toHaveBeenCalledWith({
-      id: USER_ID,
+      id: TEST_USER_ID,
       emailVerified,
     });
   });
 
   it('reads a user by id from the encrypted columns', async () => {
-    const user = await withEncryptedUsers(buildAdapter()).getUser?.(USER_ID);
+    const user =
+      await withEncryptedUsers(buildAdapter()).getUser?.(TEST_USER_ID);
 
     expect(user).toMatchObject(decrypted);
   });
 
   it('reads a user by provider account from the encrypted columns', async () => {
     const user = await withEncryptedUsers(buildAdapter()).getUserByAccount?.({
-      provider: 'github',
-      providerAccountId: 'provider-account-1',
+      provider: TEST_PROVIDER,
+      providerAccountId: TEST_PROVIDER_ACCOUNT_ID,
     });
 
     expect(user).toMatchObject(decrypted);
@@ -182,7 +187,7 @@ describe(withEncryptedUsers, () => {
     const adapter = { getUser: vi.fn(async () => signedUpUser()) };
 
     await expect(
-      withEncryptedUsers(adapter).getUser?.(USER_ID),
+      withEncryptedUsers(adapter).getUser?.(TEST_USER_ID),
     ).rejects.toThrow();
   });
 });

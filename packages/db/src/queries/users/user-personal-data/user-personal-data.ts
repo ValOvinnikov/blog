@@ -28,9 +28,9 @@ export function userPersonalColumns({
 }
 
 export function readUserPersonalData({
-  emailEncrypted,
-  nameEncrypted,
-}: Pick<TUser, 'emailEncrypted' | 'nameEncrypted'>): {
+  emailEncrypted = null,
+  nameEncrypted = null,
+}: Partial<Pick<TUser, 'emailEncrypted' | 'nameEncrypted'>>): {
   email: string;
   name: TMaybeNull<string>;
 } {

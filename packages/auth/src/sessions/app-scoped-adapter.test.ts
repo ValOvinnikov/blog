@@ -1,6 +1,9 @@
 import {
+  TEST_PROVIDER,
+  TEST_PROVIDER_ACCOUNT_ID,
   TEST_SESSION_EXPIRES,
   TEST_SESSION_TOKEN,
+  TEST_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
 import { queries } from '@blog/db';
@@ -11,7 +14,7 @@ import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 import { scopeAdapterToApp } from './app-scoped-adapter';
 
 const user = {
-  id: 'user-1',
+  id: TEST_USER_ID,
   email: 'owner@example.com',
   name: null,
   emailVerified: null,
@@ -155,8 +158,8 @@ describe(scopeAdapterToApp, () => {
     const account: AdapterAccount = {
       userId: user.id,
       type: 'oidc',
-      provider: 'test-provider',
-      providerAccountId: 'provider-account-1',
+      provider: TEST_PROVIDER,
+      providerAccountId: TEST_PROVIDER_ACCOUNT_ID,
       token_type: 'bearer',
       scope: 'read:user',
     };
