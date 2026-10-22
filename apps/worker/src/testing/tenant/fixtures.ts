@@ -14,6 +14,7 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
+    revalidateWebhookSecretEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
     additionalLocales: [],
     plan: TENANT_PLAN.FREE,

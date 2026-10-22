@@ -1,11 +1,12 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import type {
   TTenantProvisioningStatus,
   TTenantStatus,
 } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { env } from '@blog/db/utils/env/env';
+import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
 import { decryptSecret } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -15,13 +16,13 @@ export type TTenantSanityCredentials = {
   token: string;
   defaultLocale: TLocaleIsoCode;
   status: TTenantStatus;
-  deprovisionedAt: Date | null;
-  provisioningStatus: TTenantProvisioningStatus | null;
+  deprovisionedAt: TMaybeNull<Date>;
+  provisioningStatus: TMaybeNull<TTenantProvisioningStatus>;
 };
 
 export function toTenantSanityCredentials(
   tenant: TTenant,
-): TTenantSanityCredentials | undefined {
+): TMaybeUndefined<TTenantSanityCredentials> {
   if (
     !tenant.sanityReadTokenEncrypted ||
     !tenant.sanityProjectId ||
@@ -30,16 +31,12 @@ export function toTenantSanityCredentials(
     return undefined;
   }
 
-  if (!env.TENANT_TOKEN_ENCRYPTION_KEY) {
-    throw new Error('TENANT_TOKEN_ENCRYPTION_KEY is not configured.');
-  }
-
   return {
     projectId: tenant.sanityProjectId,
     dataset: tenant.sanityDataset,
     token: decryptSecret(
       tenant.sanityReadTokenEncrypted,
-      env.TENANT_TOKEN_ENCRYPTION_KEY,
+      requireTenantTokenEncryptionKey(),
     ),
     defaultLocale: tenant.locale,
     status: tenant.status,
@@ -55,7 +52,7 @@ export function toTenantSanityCredentials(
  */
 export async function getTenantSanityCredentials(
   tenantId: string,
-): Promise<TTenantSanityCredentials | undefined> {
+): Promise<TMaybeUndefined<TTenantSanityCredentials>> {
   const db = getDb();
 
   const [tenant] = await db

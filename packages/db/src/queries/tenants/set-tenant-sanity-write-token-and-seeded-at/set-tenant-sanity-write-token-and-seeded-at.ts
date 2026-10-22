@@ -1,6 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { tenants } from '@blog/db/schema/tenants';
-import { env } from '@blog/db/utils/env/env';
+import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
 import { encryptSecret } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -14,14 +14,10 @@ export async function setTenantSanityWriteTokenAndSeededAt(
   plaintextToken: string,
   seededAt: Date,
 ): Promise<void> {
-  if (!env.TENANT_TOKEN_ENCRYPTION_KEY) {
-    throw new Error('TENANT_TOKEN_ENCRYPTION_KEY is not configured.');
-  }
-
   const db = getDb();
   const encrypted = encryptSecret(
     plaintextToken,
-    env.TENANT_TOKEN_ENCRYPTION_KEY,
+    requireTenantTokenEncryptionKey(),
   );
 
   await db

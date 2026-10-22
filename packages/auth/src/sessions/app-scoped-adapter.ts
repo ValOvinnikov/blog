@@ -1,3 +1,4 @@
+import { withEncryptedUsers } from '@blog/auth/users/encrypted-users';
 import type { TAuthApp } from '@blog/config/constants';
 import { sha256Hex } from '@blog/utils/hash';
 import type {
@@ -101,6 +102,7 @@ export function scopeAdapterToApp(adapter: Adapter, app: TAuthApp): Adapter {
     withoutProviderTokens,
     withAppScopedSessions(app),
     withHashedSessionTokens,
+    withEncryptedUsers,
   ];
 
   return wrappers.reduce((wrapped, wrap) => wrap(wrapped), adapter);

@@ -13,6 +13,8 @@ import type * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 
+export const REVALIDATE_WEBHOOK_SECRET = 'whsec-tenant-secret-value';
+
 export function makeTenantOwnerAccess(
   overrides: Partial<TTenantOwnerAccess> = {},
 ): TTenantOwnerAccess {
@@ -59,6 +61,7 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: faker.word.noun(),
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
+    revalidateWebhookSecretEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
     additionalLocales: [],
     plan: TENANT_PLAN.FREE,

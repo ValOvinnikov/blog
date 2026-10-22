@@ -13,14 +13,17 @@ export function encryptPersonalValue(value: string): TMaybeNull<string> {
   return raw ? encryptPersonalData(value, parsePersonalDataKeyring(raw)) : null;
 }
 
+export function decryptPersonalValue(encrypted: string): string {
+  const raw = env.PERSONAL_DATA_ENCRYPTION_KEY;
+  if (!raw) throw new Error('PERSONAL_DATA_ENCRYPTION_KEY is not configured.');
+  return decryptPersonalData(encrypted, parsePersonalDataKeyring(raw));
+}
+
 export function readPersonalValue(
   encrypted: TMaybeNull<string>,
   plain: string,
 ): string {
-  const raw = env.PERSONAL_DATA_ENCRYPTION_KEY;
-  return raw && encrypted
-    ? decryptPersonalData(encrypted, parsePersonalDataKeyring(raw))
-    : plain;
+  return encrypted === null ? plain : decryptPersonalValue(encrypted);
 }
 
 function indexPersonalEmail(email: string): TMaybeNull<string> {
