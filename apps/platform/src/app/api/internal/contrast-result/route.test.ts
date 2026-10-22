@@ -1,3 +1,8 @@
+import {
+  CONTRAST_CHECK_OUTCOME,
+  HTTP_METHOD,
+  HTTP_STATUS,
+} from '@blog/config/constants';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
@@ -9,8 +14,6 @@ const { recordContrastResultMock } = vi.hoisted(() => ({
 vi.mock('@platform/utils/env/env');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
-
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -27,7 +30,7 @@ const SHA = 'a'.repeat(40);
 
 const VALID_BODY = {
   sha: SHA,
-  outcome: 'FAIL',
+  outcome: CONTRAST_CHECK_OUTCOME.FAIL,
   failureCount: 3,
   runUrl: 'https://github.com/owner/repo/actions/runs/1',
 };
@@ -39,7 +42,7 @@ const postRequest = (
   },
 ): Request =>
   new Request(ENDPOINT, {
-    method: 'POST',
+    method: HTTP_METHOD.POST,
     headers: authorization ? { authorization } : {},
     body: JSON.stringify(body),
   });
@@ -59,7 +62,7 @@ describe('POST /api/internal/contrast-result', () => {
       postRequest(VALID_BODY, { authorization: undefined }),
     );
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(recordContrastResultMock).not.toHaveBeenCalled();
   });
 
@@ -68,7 +71,7 @@ describe('POST /api/internal/contrast-result', () => {
       postRequest(VALID_BODY, { authorization: 'Bearer wrong-secret-value' }),
     );
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(recordContrastResultMock).not.toHaveBeenCalled();
   });
 
@@ -77,7 +80,7 @@ describe('POST /api/internal/contrast-result', () => {
 
     const response = await POST(postRequest(VALID_BODY));
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'contrast_result.secret_missing',
     );
@@ -86,14 +89,14 @@ describe('POST /api/internal/contrast-result', () => {
 
   it('returns 400 for a body that is not valid JSON', async () => {
     const request = new Request(ENDPOINT, {
-      method: 'POST',
+      method: HTTP_METHOD.POST,
       headers: { authorization: `Bearer ${VALID_SECRET}` },
       body: '{not valid json',
     });
 
     const response = await POST(request);
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(recordContrastResultMock).not.toHaveBeenCalled();
   });
 
@@ -105,28 +108,28 @@ describe('POST /api/internal/contrast-result', () => {
   ])('returns 400 for %s', async (_label, body) => {
     const response = await POST(postRequest(body));
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(recordContrastResultMock).not.toHaveBeenCalled();
   });
 
   it('records a valid failing result', async () => {
     const response = await POST(postRequest(VALID_BODY));
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HTTP_STATUS.OK);
     expect(recordContrastResultMock).toHaveBeenCalledWith(VALID_BODY);
   });
 
   it('records a valid passing result with its tag', async () => {
     const body = {
       ...VALID_BODY,
-      outcome: 'PASS',
+      outcome: CONTRAST_CHECK_OUTCOME.PASS,
       failureCount: 0,
       tag: 'v1.2.3',
     };
 
     const response = await POST(postRequest(body));
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HTTP_STATUS.OK);
     expect(recordContrastResultMock).toHaveBeenCalledWith(body);
   });
 
@@ -136,10 +139,10 @@ describe('POST /api/internal/contrast-result', () => {
 
     const response = await POST(postRequest(VALID_BODY));
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'contrast_result.record_failed',
-      { sha: SHA, outcome: 'FAIL', error },
+      { sha: SHA, outcome: CONTRAST_CHECK_OUTCOME.FAIL, error },
     );
   });
 });

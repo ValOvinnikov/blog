@@ -2,6 +2,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
   RELEASE_CHANGE,
   type TMaybeNull,
 } from '@blog/config';
@@ -15,6 +16,7 @@ import {
 } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { makeReleaseRun } from '@platform/testing/releases/fixtures';
 import type { Session } from 'next-auth';
 
@@ -37,7 +39,7 @@ const {
 }));
 
 vi.mock('@platform/constants/release', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@platform/constants/release')>()),
+  ...(await importOriginal()),
   get IS_PRODUCTION_RELEASE_ENABLED() {
     return releaseSwitch.isEnabled;
   },
@@ -48,8 +50,6 @@ vi.mock('@platform/server/auth/require-super-admin', () => ({
 }));
 
 vi.mock('@platform/server/auth/auth');
-
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('./get-candidate-comparison', () => ({
   getCandidateComparison: getCandidateComparisonMock,
@@ -68,6 +68,8 @@ vi.mock('./dispatch-release-workflow', () => ({
 vi.mock('@blog/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
+
+const OVERRIDE_REASON = 'Hotfix for a broken checkout';
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
@@ -96,7 +98,7 @@ describe('startReleaseAction', () => {
       .mockReset()
       .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     authMock.mockReset().mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     getCandidateComparisonMock
       .mockReset()
@@ -121,10 +123,12 @@ describe('startReleaseAction', () => {
   };
 
   it('requires a super-admin before reading or dispatching anything', async () => {
-    requireSuperAdminMock.mockRejectedValue(new Error('NEXT_NOT_FOUND'));
+    requireSuperAdminMock.mockRejectedValue(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
 
     await expect(startReleaseAction({ version: 'v1.5.0' })).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(getCandidateComparisonMock).not.toHaveBeenCalled();
@@ -155,8 +159,8 @@ describe('startReleaseAction', () => {
     });
     expect(insertAuditEventMock).toHaveBeenCalledOnce();
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.RELEASE_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: 'v1.5.0',
@@ -185,7 +189,7 @@ describe('startReleaseAction', () => {
 
     const result = await startReleaseAction({
       version: 'v1.5.0',
-      overrideReason: 'Hotfix for a broken checkout',
+      overrideReason: OVERRIDE_REASON,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -194,15 +198,15 @@ describe('startReleaseAction', () => {
       isOverride: true,
     });
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.RELEASE_OVERRIDE,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: 'v1.5.0',
       details: {
         headSha,
         contrastStatus: CONTRAST_STATUS.DUE,
-        reason: 'Hotfix for a broken checkout',
+        reason: OVERRIDE_REASON,
       },
     });
   });

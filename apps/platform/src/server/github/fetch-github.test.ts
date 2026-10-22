@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   githubJson,
@@ -8,7 +9,6 @@ import { logger } from '@platform/utils/logger/logger';
 import { fetchGitHub, fetchGitHubJson } from './fetch-github';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 const loggerErrorMock = vi.mocked(logger.error);
 const loggerWarnMock = vi.mocked(logger.warn);
@@ -50,7 +50,7 @@ describe(fetchGitHub, () => {
       path,
       () =>
         new Response(null, {
-          status: 403,
+          status: HTTP_STATUS.FORBIDDEN,
           headers: { 'x-ratelimit-remaining': '0' },
         }),
     );

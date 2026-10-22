@@ -10,7 +10,6 @@ const { isSignupBlockedMock } = vi.hoisted(() => ({
   isSignupBlockedMock: vi.fn(),
 }));
 
-vi.mock('@platform/utils/logger/logger');
 vi.mock('@platform/server/create-site-gate/create-site-gate', () => ({
   takeCreateSiteSlot: vi.fn(),
 }));

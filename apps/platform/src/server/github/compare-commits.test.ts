@@ -8,7 +8,6 @@ import {
 import { compareCommits } from './compare-commits';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 const makeCommit = () => ({
   sha: faker.git.commitSha(),

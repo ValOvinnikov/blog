@@ -12,7 +12,6 @@ const { listSuperadminEmailsMock, sendEmailMock, ALERT_EMAIL } = vi.hoisted(
 );
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),

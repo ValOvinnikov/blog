@@ -27,8 +27,6 @@ vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
   enqueueWorkerRequest: enqueueWorkerRequestMock,
 }));
 
-vi.mock('@platform/utils/logger/logger');
-
 const { id: tenantId } = makeTenant();
 
 const loggerErrorMock = vi.mocked(logger.error);

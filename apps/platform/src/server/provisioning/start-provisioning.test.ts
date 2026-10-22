@@ -12,8 +12,6 @@ vi.mock('./enqueue-provisioning', () => ({
   enqueueProvisioning: enqueueProvisioningMock,
 }));
 
-vi.mock('@platform/utils/logger/logger');
-
 const loggerErrorMock = vi.mocked(logger.error);
 
 describe(startProvisioning, () => {

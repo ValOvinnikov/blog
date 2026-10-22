@@ -68,6 +68,8 @@ vi.mock('next/navigation', async () => {
   };
 });
 
+vi.mock('@platform/utils/logger/logger');
+
 vi.mock('next/headers', () => ({
   headers: vi.fn(async () => new Headers()),
 }));

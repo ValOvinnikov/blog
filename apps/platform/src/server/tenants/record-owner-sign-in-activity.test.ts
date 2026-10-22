@@ -31,8 +31,6 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-vi.mock('@platform/utils/logger/logger');
-
 const { userId: USER_ID } = makeMembership();
 const DB_DOWN = new Error('db down');
 const OWNED_TENANT = makeTenant({ id: 'tenant-owned' });

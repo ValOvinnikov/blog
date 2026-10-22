@@ -8,13 +8,16 @@ import {
   FONT_CHOICE,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
+  NEXT_NAVIGATION_ERROR,
   PRESET_ID,
   RADIUS_SCALE,
   type TMaybeNull,
 } from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -26,7 +29,7 @@ const { upsertSiteConfigMock, insertAuditEventMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/config', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/config')>()),
+  ...(await importOriginal()),
   isAccentHueAccessible: vi.fn(),
 }));
 
@@ -35,8 +38,6 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
-
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -72,11 +73,11 @@ describe(updateLookAction, () => {
     requireTenantMembershipMock.mockReset();
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     upsertSiteConfigMock.mockReset();
     upsertSiteConfigMock.mockResolvedValue({});
@@ -155,8 +156,8 @@ describe(updateLookAction, () => {
     await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: 'tenant-1',
@@ -181,11 +182,11 @@ describe(updateLookAction, () => {
 
   it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
     await expect(updateLookAction('tenant-1', VALID_INPUT)).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -193,11 +194,11 @@ describe(updateLookAction, () => {
 
   it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
     await expect(updateLookAction('tenant-1', VALID_INPUT)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();

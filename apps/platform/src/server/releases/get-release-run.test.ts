@@ -8,10 +8,13 @@ import {
 import { getReleaseRun } from './get-release-run';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 const runsPath = '/actions/workflows/release.yml/runs';
 const jobsPath = '/actions/runs/42/jobs';
+const RUN_URL = 'https://github.com/acme/blog/actions/runs/42';
+const RUN_TITLE = 'Release v1.5.0';
+const RUN_CREATED_AT = '2026-10-18T09:00:00Z';
+const GATE_JOB_NAME = 'Gate / Full gate';
 
 const workflowRun = (
   status: string,
@@ -20,9 +23,9 @@ const workflowRun = (
   id: 42,
   status,
   conclusion,
-  html_url: 'https://github.com/acme/blog/actions/runs/42',
-  display_title: 'Release v1.5.0',
-  created_at: '2026-10-18T09:00:00Z',
+  html_url: RUN_URL,
+  display_title: RUN_TITLE,
+  created_at: RUN_CREATED_AT,
 });
 
 describe(getReleaseRun, () => {
@@ -59,9 +62,9 @@ describe(getReleaseRun, () => {
         ok: true,
         data: {
           status: expected,
-          title: 'Release v1.5.0',
-          url: 'https://github.com/acme/blog/actions/runs/42',
-          createdAt: '2026-10-18T09:00:00Z',
+          title: RUN_TITLE,
+          url: RUN_URL,
+          createdAt: RUN_CREATED_AT,
           isTenantMigrationFailed: false,
         },
       });
@@ -73,7 +76,7 @@ describe(getReleaseRun, () => {
     github.respond(jobsPath, () =>
       githubJson({
         jobs: [
-          { name: 'Gate / Full gate', conclusion: 'success' },
+          { name: GATE_JOB_NAME, conclusion: 'success' },
           {
             name: 'Migrate tenants / Migrate tenant content',
             conclusion: 'failure',
@@ -98,7 +101,7 @@ describe(getReleaseRun, () => {
     respondWithRun('completed', 'failure');
     github.respond(jobsPath, () =>
       githubJson({
-        jobs: [{ name: 'Gate / Full gate', conclusion: 'failure' }],
+        jobs: [{ name: GATE_JOB_NAME, conclusion: 'failure' }],
       }),
     );
 

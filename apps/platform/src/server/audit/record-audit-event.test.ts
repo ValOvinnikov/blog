@@ -1,5 +1,7 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
+import { OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -9,11 +11,11 @@ const { insertAuditEventMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock('@blog/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
+
+const LOG_EVENT = 'test.audit_failed';
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
@@ -22,7 +24,7 @@ describe('recordAuditEvent', () => {
   beforeEach(() => {
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'user-1', email: 'operator@example.com' },
+      user: { id: 'user-1', email: OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
@@ -33,20 +35,20 @@ describe('recordAuditEvent', () => {
     const { recordAuditEvent } = await import('./record-audit-event');
 
     await recordAuditEvent({
-      logEvent: 'test.audit_failed',
+      logEvent: LOG_EVENT,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
-      details: { previousPlan: 'FREE', plan: 'PRO' },
+      details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
     });
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'user-1',
-      actorEmail: 'operator@example.com',
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
-      details: { previousPlan: 'FREE', plan: 'PRO' },
+      details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
     });
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
@@ -57,7 +59,7 @@ describe('recordAuditEvent', () => {
 
     await expect(
       recordAuditEvent({
-        logEvent: 'test.audit_failed',
+        logEvent: LOG_EVENT,
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: 'tenant-1',
@@ -65,7 +67,7 @@ describe('recordAuditEvent', () => {
     ).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'test.audit_failed',
+      LOG_EVENT,
       expect.objectContaining({
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
@@ -80,7 +82,7 @@ describe('recordAuditEvent', () => {
     const { recordAuditEvent } = await import('./record-audit-event');
 
     await recordAuditEvent({
-      logEvent: 'test.audit_failed',
+      logEvent: LOG_EVENT,
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
@@ -88,7 +90,7 @@ describe('recordAuditEvent', () => {
 
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'test.audit_failed',
+      LOG_EVENT,
       expect.objectContaining({ targetId: 'tenant-1' }),
     );
   });
