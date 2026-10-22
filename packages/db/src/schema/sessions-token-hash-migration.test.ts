@@ -10,9 +10,9 @@ import { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
-const DELETE_SESSIONS_MIGRATION = '0053_delete_unhashed_sessions.sql';
+const DELETE_SESSIONS_MIGRATION = '0054_delete_unhashed_sessions.sql';
 
-describe('0053_delete_unhashed_sessions (sessions stored before hashing end)', () => {
+describe('0054_delete_unhashed_sessions (sessions stored before hashing end)', () => {
   let db: PgliteDatabase<typeof schema>;
 
   beforeEach(() => {

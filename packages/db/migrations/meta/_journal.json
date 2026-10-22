@@ -376,8 +376,15 @@
     {
       "idx": 53,
       "version": "7",
-      "when": 1792654485430,
-      "tag": "0053_delete_unhashed_sessions",
+      "when": 1792657572521,
+      "tag": "0053_scrub_emails_from_audit_and_findings_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1792662390538,
+      "tag": "0054_delete_unhashed_sessions",
       "breakpoints": true
     }
   ]
