@@ -369,8 +369,15 @@
     {
       "idx": 52,
       "version": "7",
-      "when": 1792622028890,
-      "tag": "0052_delete_unhashed_sessions",
+      "when": 1792622741645,
+      "tag": "0052_remove_plain_hash_blocked_addresses",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1792654485430,
+      "tag": "0053_delete_unhashed_sessions",
       "breakpoints": true
     }
   ]
