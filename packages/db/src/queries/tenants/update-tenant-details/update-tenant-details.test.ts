@@ -24,6 +24,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
 import {
@@ -86,7 +87,12 @@ async function insertOwnerInvite(
 ): Promise<string> {
   const [invite] = await db()
     .insert(membershipInvites)
-    .values({ tenantId, email, role: MEMBERSHIP_ROLE.OWNER })
+    .values({
+      tenantId,
+      email,
+      emailEncrypted: encryptPersonalValue(email),
+      role: MEMBERSHIP_ROLE.OWNER,
+    })
     .returning();
 
   if (!invite)

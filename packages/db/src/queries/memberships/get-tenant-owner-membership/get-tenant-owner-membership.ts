@@ -4,6 +4,7 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { users } from '@blog/db/schema/auth';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
+import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export type TTenantOwnerMembership = {
@@ -30,7 +31,7 @@ export async function getTenantOwnerMembership(
   if (owner?.email) return { email: owner.email, joinedAt: owner.joinedAt };
 
   const [invite] = await db
-    .select({ email: membershipInvites.email })
+    .select({ emailEncrypted: membershipInvites.emailEncrypted })
     .from(membershipInvites)
     .where(
       and(
@@ -40,5 +41,7 @@ export async function getTenantOwnerMembership(
       ),
     );
 
-  return invite ? { email: invite.email } : undefined;
+  return invite
+    ? { email: decryptPersonalValue(invite.emailEncrypted) }
+    : undefined;
 }

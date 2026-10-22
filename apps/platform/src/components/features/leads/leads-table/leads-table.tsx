@@ -1,8 +1,8 @@
+import type { TListedLead } from '@blog/db/queries/leads';
 import { DeleteLeadControl } from '@platform/components/features/leads/leads-table/components/delete-lead-control';
 import { LeadMessage } from '@platform/components/features/leads/leads-table/components/lead-message';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
-import type { TLeadRow } from '@platform/utils/lead-row/lead-row';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { leadsTableVariants } from './leads-table-variants';
@@ -10,7 +10,7 @@ import { leadsTableVariants } from './leads-table-variants';
 const HOME_PATH = '/';
 
 export type TLeadsTableProps = {
-  leads: TLeadRow[];
+  leads: TListedLead[];
 };
 
 export const LeadsTable = ({ leads }: TLeadsTableProps) => {

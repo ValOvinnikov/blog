@@ -3,7 +3,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { LeadsPagination } from '@platform/components/features/leads/leads-pagination';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import { LeadsView } from '@platform/components/features/leads/leads-view';
-import { toLeadRow } from '@platform/utils/lead-row/lead-row';
 import {
   countLeadsPages,
   LEADS_PAGE_SIZE,
@@ -34,7 +33,7 @@ export const LeadsPageContent = async ({
   return (
     <LeadsTenantProvider tenantId={tenant.id}>
       <LeadsView
-        leads={leads.map(toLeadRow)}
+        leads={leads}
         isContactFormIncluded={planPageAccess(tenant.plan).leads}
         pagination={
           <LeadsPagination

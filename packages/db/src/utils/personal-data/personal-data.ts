@@ -1,6 +1,7 @@
 import type { TMaybeNull } from '@blog/config/types';
 import { env } from '@blog/db/utils/env/env';
 import {
+  decryptPersonalData,
   encryptPersonalData,
   parsePersonalDataKeyring,
   personalDataIndex,
@@ -10,6 +11,15 @@ import {
 export function encryptPersonalValue(value: string): TMaybeNull<string> {
   const raw = env.PERSONAL_DATA_ENCRYPTION_KEY;
   return raw ? encryptPersonalData(value, parsePersonalDataKeyring(raw)) : null;
+}
+
+export function decryptPersonalValue(encrypted: TMaybeNull<string>): string {
+  if (encrypted === null) {
+    throw new Error('A personal value has no encrypted form.');
+  }
+  const raw = env.PERSONAL_DATA_ENCRYPTION_KEY;
+  if (!raw) throw new Error('PERSONAL_DATA_ENCRYPTION_KEY is not configured.');
+  return decryptPersonalData(encrypted, parsePersonalDataKeyring(raw));
 }
 
 function indexPersonalEmail(email: string): TMaybeNull<string> {

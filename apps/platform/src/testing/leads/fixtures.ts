@@ -1,16 +1,12 @@
-import type { TLead } from '@blog/db/schema/leads';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import type { TListedLead } from '@blog/db/queries/leads';
 
-export const makeLead = (overrides: Partial<TLead> = {}): TLead => ({
+export const makeLead = (
+  overrides: Partial<TListedLead> = {},
+): TListedLead => ({
   id: 'lead-1',
-  tenantId: TENANT_ID,
   name: 'Ada Lovelace',
-  nameEncrypted: null,
   email: 'ada@example.com',
-  emailEncrypted: null,
-  emailIndex: null,
   message: 'Hello there',
-  messageEncrypted: null,
   sourcePath: '/contact',
   createdAt: new Date('2026-04-02T09:30:00.000Z'),
   ...overrides,
