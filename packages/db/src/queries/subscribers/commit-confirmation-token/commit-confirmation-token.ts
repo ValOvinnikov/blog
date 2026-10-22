@@ -3,7 +3,7 @@ import { subscribers } from '@blog/db/schema/subscribers';
 import { sha256Hex } from '@blog/utils/hash';
 import { and, eq } from 'drizzle-orm';
 
-// Replaces the stored hash, so the confirm link in any earlier email stops working.
+// Call only once the email is sent: replacing the hash retires the confirm link in every earlier email.
 export async function commitConfirmationToken(
   subscriberId: string,
   confirmationToken: string,

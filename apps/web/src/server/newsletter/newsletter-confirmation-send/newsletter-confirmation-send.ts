@@ -61,7 +61,6 @@ const sendConfirmationEmail = async (
   });
 };
 
-// The token is stored only after the send, so a failed send leaves the previous confirm link working.
 export const deliverNewsletterConfirmation = async (
   tenantId: string,
   recipient: IConfirmationRecipient,

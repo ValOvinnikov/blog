@@ -14,7 +14,6 @@ export type TPrepareConfirmationResendResult =
     })
   | TOutcome<typeof SUBSCRIBER_OUTCOME.NOT_PENDING>;
 
-// The token is not stored here: commitConfirmationToken stores it once the email is sent.
 export async function prepareConfirmationResend(
   tenantId: string,
   userId: string,

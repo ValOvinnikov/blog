@@ -9,7 +9,6 @@ export interface IConfirmationSendClaim {
   confirmationToken: string;
 }
 
-// The token is not stored here: commitConfirmationToken stores it once the email is sent.
 export async function claimConfirmationSend(
   subscriberId: string,
   cooldownMs: number,
