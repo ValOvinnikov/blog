@@ -1,4 +1,5 @@
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import type { TBlockedIdentityListing } from '@blog/db/queries/blocked-signup-identities/list-blocked-identities';
 import type { TBlockedSignupIdentity } from '@blog/db/schema/blocked-signup-identities';
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
 
@@ -22,6 +23,14 @@ export const makeBlockedIdentity = (
   reason: BLOCK_REASON,
   createdByAdminId: null,
   createdAt: BLOCKED_AT,
+  ...overrides,
+});
+
+export const makeBlockedIdentityListing = (
+  overrides: Partial<TBlockedIdentityListing> = {},
+): TBlockedIdentityListing => ({
+  ...makeBlockedIdentity(),
+  addedByEmail: BLOCK_AUTHOR_EMAIL,
   ...overrides,
 });
 

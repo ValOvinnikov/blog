@@ -79,36 +79,9 @@ describe(addBlockedIdentity, () => {
       createdByAdminId,
     });
 
-    expect(second).toEqual({
-      ok: true,
-      data: { entry: first.ok && first.data.entry, created: false },
-    });
+    expect(second).toEqual(first);
     const rows = await db().select().from(schema.blockedSignupIdentities);
     expect(rows).toHaveLength(1);
-  });
-
-  it('reports created on the first add and not on a repeat', async () => {
-    const input = {
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: BLOCKED_ADDRESS,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    };
-    const { id: otherAdminId } = await insertTestAdmin(db());
-
-    const first = await addBlockedIdentity(input);
-    const repeat = await addBlockedIdentity({
-      ...input,
-      reason: 'Another reason',
-      createdByAdminId: otherAdminId,
-    });
-
-    expect(first.ok && first.data.created).toBe(true);
-    expect(repeat.ok && repeat.data.created).toBe(false);
-    expect(repeat.ok && repeat.data.entry).toMatchObject({
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
   });
 
   it('keeps an address and a domain with the same text apart', async () => {

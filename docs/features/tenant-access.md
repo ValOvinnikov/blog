@@ -61,7 +61,7 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
 - **`memberships`:** unique on `(userId, tenantId)`. `role` is OWNER, EDITOR or READER.
 - **`membership_invites`:** unique on `(tenantId, email)`, with `role` and `consumedAt`.
 - **Cascades:** `admins` and `memberships` cascade on user delete. Memberships and invites cascade on tenant delete. An invite has no user until it is consumed.
-- **`blocked_signup_identities`:** unique on `(kind, value)`. An ADDRESS entry stores only the SHA-256 of the normalised address (lower-cased, `+tag` dropped), never the address. A DOMAIN entry stores the lower-cased domain. Each entry records `reason`, `createdByAdminId` and `createdAt`. Adds and removes are audited as `SIGNUP_BLOCK_ADDED` / `SIGNUP_BLOCK_REMOVED` against `BLOCKED_SIGNUP_IDENTITY`. An address entry's audit row carries its kind and reason, never the address or hash. "Added by" on the list page comes from the entry's earliest add event.
+- **`blocked_signup_identities`:** unique on `(kind, value)`. An ADDRESS entry stores only the SHA-256 of the normalised address (lower-cased, `+tag` dropped), never the address. A DOMAIN entry stores the lower-cased domain. Each entry records `reason`, `createdByAdminId` and `createdAt`. Adds and removes are audited as `SIGNUP_BLOCK_ADDED` / `SIGNUP_BLOCK_REMOVED` against `BLOCKED_SIGNUP_IDENTITY`. An address entry's audit row carries its kind and reason, never the address or hash. "Added by" on the list page is the email of the admin in `createdByAdminId`, read in the same query as the entries, and "Unknown" once that admin is gone.
 - **Caching:** none. Every gate reads Neon per request, and `cache()` deduplicates the reads within one request.
 
 ## Configuration

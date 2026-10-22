@@ -24,6 +24,9 @@ afterEach(async () => {
 const OLDER_REASON = 'Older';
 const NEWER_REASON = 'Newer';
 const ADMIN_EMAIL = 'operator@example.com';
+const ADMIN_NAME = 'Operator';
+const OLDER_DOMAIN = 'older.example';
+const NEWER_DOMAIN = 'newer.example';
 
 describe(listBlockedIdentities, () => {
   it('returns an empty list when nothing is blocked', async () => {
@@ -38,14 +41,14 @@ describe(listBlockedIdentities, () => {
       .values([
         {
           kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-          value: 'older.example',
+          value: OLDER_DOMAIN,
           reason: OLDER_REASON,
           createdByAdminId,
           createdAt: new Date(now - 1),
         },
         {
           kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-          value: 'newer.example',
+          value: NEWER_DOMAIN,
           reason: NEWER_REASON,
           createdByAdminId,
           createdAt: new Date(now),
@@ -63,7 +66,7 @@ describe(listBlockedIdentities, () => {
   it('lists the adding admin email and nothing else from the user', async () => {
     const { id: userId } = await insertTestUser(db(), {
       email: ADMIN_EMAIL,
-      name: 'Operator',
+      name: ADMIN_NAME,
     });
     const [admin] = await db()
       .insert(schema.admins)
@@ -75,7 +78,7 @@ describe(listBlockedIdentities, () => {
       .returning();
     await db().insert(schema.blockedSignupIdentities).values({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      value: 'older.example',
+      value: OLDER_DOMAIN,
       reason: OLDER_REASON,
       createdByAdminId: admin?.id,
     });
@@ -86,14 +89,14 @@ describe(listBlockedIdentities, () => {
       reason: OLDER_REASON,
       addedByEmail: ADMIN_EMAIL,
     });
-    expect(JSON.stringify(result)).not.toContain('Operator');
+    expect(JSON.stringify(result)).not.toContain(ADMIN_NAME);
   });
 
   it('still lists an entry whose admin is gone, with no email', async () => {
     const { id: createdByAdminId } = await insertTestAdmin(db());
     await db().insert(schema.blockedSignupIdentities).values({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      value: 'older.example',
+      value: OLDER_DOMAIN,
       reason: OLDER_REASON,
       createdByAdminId,
     });

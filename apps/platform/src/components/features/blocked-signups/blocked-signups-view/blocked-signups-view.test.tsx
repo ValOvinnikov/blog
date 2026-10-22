@@ -32,54 +32,58 @@ const setup = customRender(BlockedSignupsView, {
 });
 
 describe(`<${BlockedSignupsView.name}/>`, () => {
-  it('shows each entry with its value, reason and author', () => {
-    setup();
-
-    const domainRow = screen.getByRole('row', {
-      name: new RegExp(BLOCKED_DOMAIN),
-    });
-    const addressRow = screen.getByRole('row', {
-      name: new RegExp(BLOCKED_ADDRESS_HASH_PREVIEW),
+  describe('with entries', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    const domainReason = within(domainRow).getByText(BLOCK_REASON);
-    const domainAuthor = within(domainRow).getByText(BLOCK_AUTHOR_EMAIL);
-    const addressKind = within(addressRow).getByText('Email address');
-    const addressAuthor = within(addressRow).queryByText(BLOCK_AUTHOR_EMAIL);
+    it('shows each entry with its value, reason and author', () => {
+      const domainRow = screen.getByRole('row', {
+        name: new RegExp(BLOCKED_DOMAIN),
+      });
+      const addressRow = screen.getByRole('row', {
+        name: new RegExp(BLOCKED_ADDRESS_HASH_PREVIEW),
+      });
 
-    expect(domainReason).toBeVisible();
-    expect(domainAuthor).toBeVisible();
-    expect(addressKind).toBeVisible();
-    expect(addressAuthor).not.toBeInTheDocument();
+      const domainReason = within(domainRow).getByText(BLOCK_REASON);
+      const domainAuthor = within(domainRow).getByText(BLOCK_AUTHOR_EMAIL);
+      const addressKind = within(addressRow).getByText('Email address');
+      const addressAuthor = within(addressRow).queryByText(BLOCK_AUTHOR_EMAIL);
+
+      expect(domainReason).toBeVisible();
+      expect(domainAuthor).toBeVisible();
+      expect(addressKind).toBeVisible();
+      expect(addressAuthor).not.toBeInTheDocument();
+    });
+
+    it('offers a removal control for every entry', () => {
+      const removeDomain = screen.getByRole('button', {
+        name: `Remove block ${BLOCKED_DOMAIN}`,
+      });
+      const removeAddress = screen.getByRole('button', {
+        name: `Remove block ${BLOCKED_ADDRESS_HASH_PREVIEW}`,
+      });
+
+      expect(removeDomain).toBeVisible();
+      expect(removeAddress).toBeVisible();
+    });
+
+    it('offers a form to block a domain', () => {
+      const submit = screen.getByRole('button', { name: 'Block domain' });
+
+      expect(submit).toBeVisible();
+    });
   });
 
-  it('offers a removal control for every entry', () => {
-    setup();
-
-    const removeDomain = screen.getByRole('button', {
-      name: `Remove block ${BLOCKED_DOMAIN}`,
-    });
-    const removeAddress = screen.getByRole('button', {
-      name: `Remove block ${BLOCKED_ADDRESS_HASH_PREVIEW}`,
+  describe('without entries', () => {
+    beforeEach(() => {
+      setup({ entries: [] });
     });
 
-    expect(removeDomain).toBeVisible();
-    expect(removeAddress).toBeVisible();
-  });
+    it('says nothing is blocked when the list is empty', () => {
+      const empty = screen.getByText('Nothing is blocked.');
 
-  it('says nothing is blocked when the list is empty', () => {
-    setup({ entries: [] });
-
-    const empty = screen.getByText('Nothing is blocked.');
-
-    expect(empty).toBeVisible();
-  });
-
-  it('offers a form to block a domain', () => {
-    setup();
-
-    const submit = screen.getByRole('button', { name: 'Block domain' });
-
-    expect(submit).toBeVisible();
+      expect(empty).toBeVisible();
+    });
   });
 });

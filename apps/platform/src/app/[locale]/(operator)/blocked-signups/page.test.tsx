@@ -6,7 +6,7 @@ import {
   BLOCKED_ADDRESS_HASH,
   BLOCKED_ADDRESS_HASH_PREVIEW,
   BLOCKED_DOMAIN,
-  makeBlockedIdentity,
+  makeBlockedIdentityListing,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -14,14 +14,9 @@ import { notFound } from 'next/navigation';
 
 import BlockedSignupsPage from './page';
 
-const {
-  requireSuperAdminMock,
-  listBlockedIdentitiesMock,
-  listAuditEventsForTargetMock,
-} = vi.hoisted(() => ({
+const { requireSuperAdminMock, listBlockedIdentitiesMock } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
   listBlockedIdentitiesMock: vi.fn(),
-  listAuditEventsForTargetMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-super-admin', () => ({
@@ -42,7 +37,6 @@ vi.mock('@blog/db', async () => ({
     blockedSignupIdentities: {
       listBlockedIdentities: listBlockedIdentitiesMock,
     },
-    auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
   },
 }));
 
@@ -51,12 +45,11 @@ const setup = customRenderAsync(BlockedSignupsPage, {});
 describe(BlockedSignupsPage, () => {
   beforeEach(() => {
     requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
-    listAuditEventsForTargetMock.mockReset().mockResolvedValue([]);
     listBlockedIdentitiesMock.mockReset().mockResolvedValue({
       ok: true,
       data: [
-        makeBlockedIdentity(),
-        makeBlockedIdentity({
+        makeBlockedIdentityListing(),
+        makeBlockedIdentityListing({
           id: BLOCKED_ADDRESS_ENTRY_ID,
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
           value: BLOCKED_ADDRESS_HASH,

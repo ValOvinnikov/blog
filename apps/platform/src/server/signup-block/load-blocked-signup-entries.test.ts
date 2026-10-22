@@ -1,23 +1,18 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { makeAuditEvent } from '@platform/testing/audit-events/fixtures';
 import {
   BLOCK_AUTHOR_EMAIL,
   BLOCKED_ADDRESS_HASH,
   BLOCKED_ADDRESS_HASH_PREVIEW,
-  makeBlockedIdentity,
+  makeBlockedIdentityListing,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
 import { loadBlockedSignupEntries } from './load-blocked-signup-entries';
 
-const { listBlockedIdentitiesMock, listAuditEventsForTargetMock } = vi.hoisted(
-  () => ({
-    listBlockedIdentitiesMock: vi.fn(),
-    listAuditEventsForTargetMock: vi.fn(),
-  }),
-);
+const { listBlockedIdentitiesMock } = vi.hoisted(() => ({
+  listBlockedIdentitiesMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -25,40 +20,27 @@ vi.mock('@blog/db', async () => ({
     blockedSignupIdentities: {
       listBlockedIdentities: listBlockedIdentitiesMock,
     },
-    auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
   },
 }));
-
-const LATER_ADDER_EMAIL = `later-${BLOCK_AUTHOR_EMAIL}`;
-
-const addedEvent = (actorEmail: string) =>
-  makeAuditEvent({
-    action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
-    targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-    actorEmail,
-  });
 
 describe(loadBlockedSignupEntries, () => {
   beforeEach(() => {
     listBlockedIdentitiesMock.mockReset();
-    listAuditEventsForTargetMock
-      .mockReset()
-      .mockResolvedValue([addedEvent(BLOCK_AUTHOR_EMAIL)]);
   });
 
   it('shows a domain as it is stored and who added it', async () => {
-    const entry = makeBlockedIdentity();
-    listBlockedIdentitiesMock.mockResolvedValue({ ok: true, data: [entry] });
+    const listing = makeBlockedIdentityListing();
+    listBlockedIdentitiesMock.mockResolvedValue({ ok: true, data: [listing] });
 
     const entries = await loadBlockedSignupEntries();
 
     expect(entries).toEqual([
       {
-        id: entry.id,
+        id: listing.id,
         kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-        displayValue: entry.value,
-        reason: entry.reason,
-        createdAt: entry.createdAt,
+        displayValue: listing.value,
+        reason: listing.reason,
+        createdAt: listing.createdAt,
         addedBy: BLOCK_AUTHOR_EMAIL,
       },
     ]);
@@ -68,7 +50,7 @@ describe(loadBlockedSignupEntries, () => {
     listBlockedIdentitiesMock.mockResolvedValue({
       ok: true,
       data: [
-        makeBlockedIdentity({
+        makeBlockedIdentityListing({
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
           value: BLOCKED_ADDRESS_HASH,
         }),
@@ -80,27 +62,11 @@ describe(loadBlockedSignupEntries, () => {
     expect(entry?.displayValue).toBe(BLOCKED_ADDRESS_HASH_PREVIEW);
   });
 
-  it('credits the first admin to add the entry when it was added twice', async () => {
+  it('leaves the author empty when the adding admin is gone', async () => {
     listBlockedIdentitiesMock.mockResolvedValue({
       ok: true,
-      data: [makeBlockedIdentity()],
+      data: [makeBlockedIdentityListing({ addedByEmail: null })],
     });
-    listAuditEventsForTargetMock.mockResolvedValue([
-      addedEvent(LATER_ADDER_EMAIL),
-      addedEvent(BLOCK_AUTHOR_EMAIL),
-    ]);
-
-    const [entry] = await loadBlockedSignupEntries();
-
-    expect(entry?.addedBy).toBe(BLOCK_AUTHOR_EMAIL);
-  });
-
-  it('leaves the author empty when no add was audited', async () => {
-    listBlockedIdentitiesMock.mockResolvedValue({
-      ok: true,
-      data: [makeBlockedIdentity()],
-    });
-    listAuditEventsForTargetMock.mockResolvedValue([]);
 
     const [entry] = await loadBlockedSignupEntries();
 
