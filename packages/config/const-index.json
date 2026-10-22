@@ -896,6 +896,14 @@
         "file": "packages/config/src/constants/error.ts"
       }
     ],
+    "DB_ALREADY_OWNS_FREE_TENANT": [
+      {
+        "ref": "ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
     "DOCUMENT_VALIDATION": [
       {
         "ref": "FINDING_SOURCE.DOCUMENT_VALIDATION",
@@ -3773,6 +3781,14 @@
     "OWNER_ALREADY_JOINED": [
       {
         "ref": "TENANT_REFUSAL.OWNER_ALREADY_JOINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_HAS_FREE_TENANT": [
+      {
+        "ref": "TENANT_REFUSAL.OWNER_HAS_FREE_TENANT",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

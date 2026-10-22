@@ -899,6 +899,7 @@
       "localeIsAdditional": "Este idioma ya es un idioma adicional. Quítelo de ahí primero.",
       "provisioningStarted": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
       "ownerAlreadyJoined": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
+      "ownerHasFreeTenant": "Este propietario ya tiene un sitio gratuito. Archívelo o mantenga este sitio en su plan actual.",
       "saveFailed": "No se pudieron guardar los datos del cliente. Vuelva a intentarlo."
     }
   },

@@ -3,7 +3,9 @@ import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { reactivateTenant } from './reactivate-tenant';
@@ -13,6 +15,8 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+
+const EXPECTED_OK = 'expected ok:true';
 
 type TInsertTenantOptions = {
   status: (typeof TENANT_STATUS)[keyof typeof TENANT_STATUS];
@@ -46,7 +50,7 @@ describe(reactivateTenant, () => {
 
     const result = await reactivateTenant(tenantId);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.deprovisionedAt).toBeNull();
     expect(result.data.status).toBe(TENANT_STATUS.ACTIVE);
 
@@ -63,7 +67,7 @@ describe(reactivateTenant, () => {
 
     const result = await reactivateTenant(tenantId);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.status).toBe(TENANT_STATUS.ACTIVE);
     expect(result.data.deprovisionedAt).toBeNull();
   });
@@ -73,7 +77,7 @@ describe(reactivateTenant, () => {
 
     const result = await reactivateTenant(tenantId);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.status).toBe(TENANT_STATUS.SUSPENDED);
     expect(result.data.deprovisionedAt).toBeNull();
 
@@ -94,7 +98,7 @@ describe(reactivateTenant, () => {
 
     const result = await reactivateTenant(tenantId);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.sanityProjectId).toBe('proj-abc');
     expect(result.data.provisioningStatus).toBe(
       TENANT_PROVISIONING_STATUS.READY,
@@ -107,5 +111,30 @@ describe(reactivateTenant, () => {
     const result = await reactivateTenant(missingId);
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+  });
+
+  it('refuses with DB_ALREADY_OWNS_FREE_TENANT when the owner took a new Free slot', async () => {
+    const selfServeOwnerEmailIndex = testPersonalEmailIndex(
+      SELF_SERVE_OWNER_EMAIL,
+    );
+    const archivedAt = new Date();
+    const { id } = await insertTestTenant(db(), {
+      status: TENANT_STATUS.ARCHIVED,
+      deprovisionedAt: archivedAt,
+      selfServeOwnerEmailIndex,
+    });
+    await insertTestTenant(db(), { selfServeOwnerEmailIndex });
+
+    const result = await reactivateTenant(id);
+
+    expect(result).toEqual({
+      ok: false,
+      error: ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT,
+    });
+    const [row] = await db().select().from(tenants).where(eq(tenants.id, id));
+    expect(row).toMatchObject({
+      status: TENANT_STATUS.ARCHIVED,
+      deprovisionedAt: archivedAt,
+    });
   });
 });

@@ -28,6 +28,7 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     deprovisioningSteps: null,
     siteType: null,
     siteTemplateVersion: null,
+    selfServeOwnerEmailIndex: null,
     ownerSanityInviteId: null,
     ownerInviteSentAt: null,
     ownerInviteAcceptedAt: null,

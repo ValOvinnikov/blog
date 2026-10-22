@@ -1,28 +1,15 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
-  type TTenantPlan,
-  type TTenantProvisioningStep,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, type TTenantPlan } from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
+import { insertTenantWithDependents } from '@blog/db/queries/tenants/insert-tenant-with-dependents';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import {
-  tenants,
-  type TProvisioningStepState,
-  type TTenant,
-  type TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
 import type { TResult } from '@blog/utils';
-import { eq } from 'drizzle-orm';
 
 export type TDraftOwner =
   { type: 'user'; userId: string } | { type: 'invite'; email: string };
@@ -35,21 +22,6 @@ export type TCreateTenantDraftInput = {
   owner: TDraftOwner;
 };
 
-function buildIdleProvisioningSteps(): TTenantProvisioningState {
-  const steps = Object.values(
-    TENANT_PROVISIONING_STEP,
-  ) as TTenantProvisioningStep[];
-  const idleState: TProvisioningStepState = {
-    status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  };
-
-  return Object.fromEntries(steps.map((step) => [step, idleState])) as Record<
-    TTenantProvisioningStep,
-    TProvisioningStepState
-  >;
-}
-
-// `neon-http` has no multi-statement transactions, so a failed dependent insert deletes the tenant row by hand.
 export async function createTenantDraft(
   input: TCreateTenantDraftInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
@@ -59,68 +31,56 @@ export async function createTenantDraft(
 
   const db = getDb();
 
-  const [tenant] = await db
-    .insert(tenants)
-    .values({
+  const tenant = await insertTenantWithDependents(
+    {
       name: input.name,
       primaryDomain: input.domain,
       locale: normalizeLocaleCode(input.locale),
       plan: input.plan,
-      status: TENANT_STATUS.ACTIVE,
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-      provisioningSteps: buildIdleProvisioningSteps(),
-    })
-    .returning();
+    },
+    async ({ id: tenantId }) => {
+      const ownerInsert =
+        input.owner.type === 'user'
+          ? db
+              .insert(memberships)
+              .values({
+                tenantId,
+                userId: input.owner.userId,
+                role: MEMBERSHIP_ROLE.OWNER,
+              })
+              .returning()
+          : db
+              .insert(membershipInvites)
+              .values({
+                tenantId,
+                ...inviteEmailColumns(input.owner.email),
+                role: MEMBERSHIP_ROLE.OWNER,
+              })
+              .returning();
 
-  if (!tenant) {
-    throw new Error('createTenantDraft: tenant insert returned no row.');
-  }
+      const [domainRow, ownerRow] = await Promise.all([
+        db
+          .insert(tenantDomains)
+          .values({ tenantId, domain: input.domain })
+          .returning(),
+        ownerInsert,
+      ]);
 
-  const ownerInsert =
-    input.owner.type === 'user'
-      ? db
-          .insert(memberships)
-          .values({
-            tenantId: tenant.id,
-            userId: input.owner.userId,
-            role: MEMBERSHIP_ROLE.OWNER,
-          })
-          .returning()
-      : db
-          .insert(membershipInvites)
-          .values({
-            tenantId: tenant.id,
-            ...inviteEmailColumns(input.owner.email),
-            role: MEMBERSHIP_ROLE.OWNER,
-          })
-          .returning();
+      if (!domainRow[0]) {
+        throw new Error(
+          `createTenantDraft: tenant_domains insert for tenant "${tenantId}" returned no row.`,
+        );
+      }
 
-  try {
-    const [domainRow, ownerRow] = await Promise.all([
-      db
-        .insert(tenantDomains)
-        .values({ tenantId: tenant.id, domain: input.domain })
-        .returning(),
-      ownerInsert,
-    ]);
-
-    if (!domainRow[0]) {
-      throw new Error(
-        `createTenantDraft: tenant_domains insert for tenant "${tenant.id}" returned no row.`,
-      );
-    }
-
-    if (!ownerRow[0]) {
-      const table =
-        input.owner.type === 'user' ? 'memberships' : 'membership_invites';
-      throw new Error(
-        `createTenantDraft: ${table} insert for tenant "${tenant.id}" returned no row.`,
-      );
-    }
-  } catch (error) {
-    await db.delete(tenants).where(eq(tenants.id, tenant.id));
-    throw error;
-  }
+      if (!ownerRow[0]) {
+        const table =
+          input.owner.type === 'user' ? 'memberships' : 'membership_invites';
+        throw new Error(
+          `createTenantDraft: ${table} insert for tenant "${tenantId}" returned no row.`,
+        );
+      }
+    },
+  );
 
   return { ok: true, data: tenant };
 }

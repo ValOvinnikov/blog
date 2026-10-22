@@ -11,6 +11,7 @@ import {
 } from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
+import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
@@ -21,6 +22,8 @@ import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq, isNull, ne } from 'drizzle-orm';
+
+export const OWNS_FREE_TENANT_OUTCOME = 'owns-free-tenant';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
@@ -55,7 +58,8 @@ export type TUpdateTenantDetailsResult =
   | TOutcome<'domain-invalid'>
   | TOutcome<'provisioning-started'>
   | TOutcome<'owner-already-joined'>
-  | TOutcome<'owner-email-taken'>;
+  | TOutcome<'owner-email-taken'>
+  | TOutcome<typeof OWNS_FREE_TENANT_OUTCOME>;
 
 // Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
 // a completed step; name/plan/locale never lock.
@@ -199,16 +203,22 @@ export async function updateTenantDetails(
     }
   }
 
-  const [tenant] = await db
-    .update(tenants)
-    .set(
-      tenantDetailsFields({
-        ...input,
-        locale: normalizeLocaleCode(input.locale),
-      }),
-    )
-    .where(eq(tenants.id, tenantId))
-    .returning();
+  let tenant: TMaybeUndefined<TTenant>;
+  try {
+    [tenant] = await db
+      .update(tenants)
+      .set(
+        tenantDetailsFields({
+          ...input,
+          locale: normalizeLocaleCode(input.locale),
+        }),
+      )
+      .where(eq(tenants.id, tenantId))
+      .returning();
+  } catch (error) {
+    if (isFreeOwnerViolation(error)) return toOutcome(OWNS_FREE_TENANT_OUTCOME);
+    throw error;
+  }
 
   if (!tenant) {
     throw new Error(

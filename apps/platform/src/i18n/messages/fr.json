@@ -899,6 +899,7 @@
       "localeIsAdditional": "Cette langue est déjà une langue supplémentaire. Retirez-la d'abord de cette liste.",
       "provisioningStarted": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
       "ownerAlreadyJoined": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
+      "ownerHasFreeTenant": "Ce propriétaire a déjà un site gratuit. Archivez-le ou laissez ce site sur son offre actuelle.",
       "saveFailed": "Impossible d'enregistrer les informations du locataire — veuillez réessayer."
     }
   },

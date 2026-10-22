@@ -24,10 +24,12 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
 import {
+  OWNS_FREE_TENANT_OUTCOME,
   updateTenantDetails,
   type TUpdateTenantDetailsInput,
 } from './update-tenant-details';
@@ -863,4 +865,33 @@ describe(updateTenantDetails, () => {
       expect(domainRows[0]).toMatchObject({ domain: ACME_DOMAIN });
     },
   );
+
+  it('refuses a move to FREE that would give a person a second Free site', async () => {
+    const selfServeOwnerEmailIndex = testPersonalEmailIndex(
+      SELF_SERVE_OWNER_EMAIL,
+    );
+    const tenantId = await insertTenantWithDomain();
+    await db()
+      .update(tenants)
+      .set({ plan: TENANT_PLAN.GROWTH, selfServeOwnerEmailIndex })
+      .where(eq(tenants.id, tenantId));
+    await insertTestTenant(db(), { selfServeOwnerEmailIndex });
+    const [before] = await db()
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+      plan: TENANT_PLAN.FREE,
+    });
+
+    expect(result).toEqual({ outcome: OWNS_FREE_TENANT_OUTCOME });
+    const [after] = await db()
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(after).toEqual(before);
+  });
 });

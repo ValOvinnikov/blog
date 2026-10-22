@@ -40,7 +40,8 @@ export type TUpdateTenantDetailsRefusal =
   | typeof TENANT_REFUSAL.ARCHIVED
   | typeof TENANT_REFUSAL.LOCALE_IS_ADDITIONAL
   | typeof TENANT_REFUSAL.PROVISIONING_STARTED
-  | typeof TENANT_REFUSAL.OWNER_ALREADY_JOINED;
+  | typeof TENANT_REFUSAL.OWNER_ALREADY_JOINED
+  | typeof TENANT_REFUSAL.OWNER_HAS_FREE_TENANT;
 
 type TUpdateTenantDetailsFailure = Exclude<
   TActionResult<
@@ -163,6 +164,11 @@ export const updateTenantDetailsAction = async (
         return {
           outcome: ACTION_OUTCOME.REFUSED,
           reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
+        };
+      case queries.tenants.OWNS_FREE_TENANT_OUTCOME:
+        return {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,
         };
       default: {
         const unhandledOutcome: never = result;

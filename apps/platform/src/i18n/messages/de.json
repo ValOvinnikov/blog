@@ -899,6 +899,7 @@
       "localeIsAdditional": "Diese Sprache ist bereits eine zusätzliche Sprache. Entfernen Sie sie zuerst dort.",
       "provisioningStarted": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
       "ownerAlreadyJoined": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
+      "ownerHasFreeTenant": "Dieser Inhaber hat bereits eine kostenlose Website. Archivieren Sie sie oder belassen Sie diese Website in ihrem aktuellen Tarif.",
       "saveFailed": "Die Mandantendaten konnten nicht gespeichert werden — bitte erneut versuchen."
     }
   },

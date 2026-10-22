@@ -69,9 +69,31 @@ Decided:
 - Today: the Auth.js tables in Neon (`users`, `accounts`, `sessions`,
   `verification_tokens`) with the `database` session strategy. On sign-in,
   pending `membership_invites` for the email become `memberships`.
-- Decided: Create site runs one transaction (tenant `PENDING` with
-  `site_type`, OWNER membership, `tenant_domains` row for `<slug>.<domain>`,
-  `site_config`, `settings_features`, audit event) and enqueues the worker.
+- Today, built ahead of Create site: `@blog/db`'s `createSelfServeTenant`
+  writes a FREE tenant (status ACTIVE, provisioning PENDING, `site_type`),
+  the OWNER membership, the `tenant_domains` row for `<slug>.<domain>`,
+  `site_config` with the chosen preset and accent hue, `settings_features`
+  and a `CREATED` / `TENANT` audit event with the owner as actor. `neon-http`
+  has no transactions, so a failed dependent write deletes the tenant row and
+  its FK cascades sweep the rest. It refuses an invalid domain or address, a
+  taken domain (`DB_DUPLICATE_DOMAIN`, including a concurrent submit of the
+  same slug) and a person who already owns a Free tenant
+  (`DB_ALREADY_OWNS_FREE_TENANT`). Decided: Create site calls it after
+  `admitCreateSite`, then enqueues the worker.
+- One Free tenant per person: `ownsFreeTenant(email)` is the pre-check. It
+  matches an OWNER membership on a FREE, non-archived tenant whose user's
+  `users.emailIndex` is the keyed hash of the normalised address, so `+tag`
+  variants count as one person. An archived tenant frees the slot; suspended
+  and failed ones keep it, and an unaccepted OWNER invite doesn't count. The
+  database enforces it too: `createSelfServeTenant` stores that hash in
+  `tenants.self_serve_owner_email_index`, under a partial unique index over
+  FREE, non-archived rows, so two simultaneous submits can't both succeed.
+  Operator-created tenants leave it null. The index guards every write, not
+  only Create site: reactivating an archived self-serve tenant
+  (`reactivateTenant`, `DB_ALREADY_OWNS_FREE_TENANT`) or an operator setting
+  one back to FREE (`updateTenantDetails`, shown in the tenant details form as
+  a refusal alert, with no audit event) is refused while its owner holds
+  another.
 - Today: a new user's first platform sign-in records `users.termsAcceptedAt`
   and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
   cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing
@@ -148,6 +170,8 @@ Decided:
 - `packages/auth/src/config.ts`
 - `packages/auth/src/events/record-signup-terms-on-sign-in.ts`
 - `apps/platform/src/server/create-site-gate/create-site-gate.ts`
+- `packages/db/src/queries/tenants/create-self-serve-tenant/create-self-serve-tenant.ts`
+- `packages/db/src/queries/tenants/owns-free-tenant/owns-free-tenant.ts`
 
 ## Tests and stories
 

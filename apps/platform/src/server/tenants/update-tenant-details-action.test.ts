@@ -6,6 +6,7 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db/constants';
+import { OWNS_FREE_TENANT_OUTCOME } from '@blog/db/queries/tenants/update-tenant-details/update-tenant-details';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -35,12 +36,15 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
+vi.mock('@blog/db/utils/env/env', () => ({ env: {} }));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: {
       getTenantById: getTenantByIdMock,
       updateTenantDetails: updateTenantDetailsMock,
+      OWNS_FREE_TENANT_OUTCOME,
     },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
@@ -288,6 +292,30 @@ describe('updateTenantDetailsAction', () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
     });
+  });
+
+  it('maps an owns-free-tenant outcome to a form-level refusal', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: OWNS_FREE_TENANT_OUTCOME,
+    });
+
+    const result = await updateTenantDetailsAction(TENANT_ID, validInput);
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,
+    });
+  });
+
+  it('records no audit event and skips the refresh on owns-free-tenant', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: OWNS_FREE_TENANT_OUTCOME,
+    });
+
+    await updateTenantDetailsAction(TENANT_ID, validInput);
+
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('does not record an audit event for an owner-email-taken outcome', async () => {
