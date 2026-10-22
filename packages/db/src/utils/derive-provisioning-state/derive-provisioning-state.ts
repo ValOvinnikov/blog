@@ -1,12 +1,12 @@
 import {
   CORE_PROVISIONING_STEPS,
+  PROVISIONING_STATE,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
+  type TProvisioningState,
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
-
-type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
 
 // A dispatched workflow reports every step IDLE until its runner starts, so
 // the PROVISIONING column, not the steps map, is the only RUNNING signal then.
@@ -15,7 +15,7 @@ export function deriveProvisioningState(
   steps: TTenantProvisioningState | null,
 ): TProvisioningState {
   if (provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING) {
-    return 'RUNNING';
+    return PROVISIONING_STATE.RUNNING;
   }
 
   const stepStates = CORE_PROVISIONING_STEPS.map(
@@ -28,7 +28,7 @@ export function deriveProvisioningState(
       (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
     )
   ) {
-    return 'IDLE';
+    return PROVISIONING_STATE.IDLE;
   }
 
   if (
@@ -36,7 +36,7 @@ export function deriveProvisioningState(
       (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
     )
   ) {
-    return 'FAILED';
+    return PROVISIONING_STATE.FAILED;
   }
 
   if (
@@ -44,8 +44,8 @@ export function deriveProvisioningState(
       (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.DONE,
     )
   ) {
-    return 'SUCCEEDED';
+    return PROVISIONING_STATE.SUCCEEDED;
   }
 
-  return 'RUNNING';
+  return PROVISIONING_STATE.RUNNING;
 }

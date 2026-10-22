@@ -3176,6 +3176,26 @@
         "file": "apps/platform/src/constants/step-indicator.ts"
       }
     ],
+    "SUCCEEDED": [
+      {
+        "ref": "PROVISIONING_STATE.SUCCEEDED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "RELEASE_RUN_STATUS.SUCCEEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "PROVISION_CLI_RESULT.SUCCEEDED",
+        "scope": "app:worker",
+        "from": "@worker/constants/provisioning",
+        "file": "apps/worker/src/constants/provisioning.ts"
+      }
+    ],
     "ELEVATED": [
       {
         "ref": "ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED",
@@ -3464,20 +3484,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"
-      }
-    ],
-    "SUCCEEDED": [
-      {
-        "ref": "RELEASE_RUN_STATUS.SUCCEEDED",
-        "scope": "app:platform",
-        "from": "@platform/constants/release",
-        "file": "apps/platform/src/constants/release.ts"
-      },
-      {
-        "ref": "PROVISION_CLI_RESULT.SUCCEEDED",
-        "scope": "app:worker",
-        "from": "@worker/constants/provisioning",
-        "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
     "NOT_IN_PLAN": [

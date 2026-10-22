@@ -3,11 +3,13 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
+  PROVISIONING_STATE,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
+import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
@@ -35,8 +37,6 @@ type TTenantDetailsFields = {
   locale: TLocaleIsoCode;
 };
 
-// The tenant columns this mutation writes, shared by the main update and
-// `restoreTenantRow`'s compensating write so the two can't drift apart.
 function tenantDetailsFields(
   source: TTenantDetailsFields,
 ): TTenantDetailsFields {
@@ -110,11 +110,14 @@ export async function updateTenantDetails(
     existing.provisioningSteps,
   );
 
-  if (provisioningState === 'RUNNING' || provisioningState === 'SUCCEEDED') {
+  if (
+    provisioningState === PROVISIONING_STATE.RUNNING ||
+    provisioningState === PROVISIONING_STATE.SUCCEEDED
+  ) {
     return toOutcome('provisioning-started');
   }
 
-  if (provisioningState === 'FAILED') {
+  if (provisioningState === PROVISIONING_STATE.FAILED) {
     const lockedField = lockedFieldOutcome(input, existing);
     if (lockedField) {
       return lockedField;
@@ -132,11 +135,10 @@ export async function updateTenantDetails(
     }
   }
 
-  let normalizedOwnerEmail: TMaybeUndefined<string>;
-  let ownerInviteId: TMaybeUndefined<string>;
+  let ownerInviteUpdate: TMaybeUndefined<{ id: string; email: string }>;
 
   if (input.ownerEmail !== undefined) {
-    normalizedOwnerEmail = normalizeEmail(input.ownerEmail);
+    const normalizedOwnerEmail = normalizeEmail(input.ownerEmail);
 
     const currentOwnerEmail = await getTenantOwnerEmail(tenantId);
     const normalizedCurrentOwnerEmail =
@@ -193,7 +195,7 @@ export async function updateTenantDetails(
         return toOutcome('owner-email-taken');
       }
 
-      ownerInviteId = pendingInvite.id;
+      ownerInviteUpdate = { id: pendingInvite.id, email: normalizedOwnerEmail };
     }
   }
 
@@ -247,12 +249,12 @@ export async function updateTenantDetails(
     }
   }
 
-  if (ownerInviteId) {
+  if (ownerInviteUpdate) {
     try {
       const [inviteRow] = await db
         .update(membershipInvites)
-        .set({ email: normalizedOwnerEmail })
-        .where(eq(membershipInvites.id, ownerInviteId))
+        .set(inviteEmailColumns(ownerInviteUpdate.email))
+        .where(eq(membershipInvites.id, ownerInviteUpdate.id))
         .returning();
 
       if (!inviteRow) {

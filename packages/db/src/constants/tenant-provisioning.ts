@@ -68,6 +68,15 @@ export type TTenantProvisioningStepStatus = TValueOf<
   typeof TENANT_PROVISIONING_STEP_STATUS
 >;
 
+export const PROVISIONING_STATE = {
+  IDLE: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  RUNNING: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  FAILED: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  SUCCEEDED: 'SUCCEEDED',
+} as const;
+
+export type TProvisioningState = TValueOf<typeof PROVISIONING_STATE>;
+
 // Comfortably longer than `.github/workflows/provision-tenant.yml`'s
 // `timeout-minutes: 20` — a run whose `startedAt` predates this window is
 // treated as dead even if it never reported a FAILED step or a finish.
