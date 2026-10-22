@@ -62,6 +62,7 @@ vi.mock('@vercel/blob', () => ({
 vi.mock('@platform/utils/env/env');
 
 const BLOB_TOKEN = 'test-token';
+const FAVICON_FILE_NAME = 'favicon.png';
 const UPLOADED_LOGO_URL =
   'https://example.blob.vercel-storage.com/logo-abc.png';
 const PREVIOUS_LOGO_URL =
@@ -172,7 +173,7 @@ describe(uploadBrandAssetAction, () => {
     const result = await uploadBrandAssetAction(
       'tenant-1',
       'favicon',
-      makeFormData(new File(['x'], 'favicon.png', { type: 'image/png' })),
+      makeFormData(new File(['x'], FAVICON_FILE_NAME, { type: 'image/png' })),
     );
 
     expect(result).toEqual({
@@ -199,6 +200,20 @@ describe(uploadBrandAssetAction, () => {
       ...THEME_FIELDS,
       logoAssetUrl: UPLOADED_LOGO_URL,
     });
+  });
+
+  it('uploads each file under a unique name so a same-type replacement never collides', async () => {
+    await uploadBrandAssetAction(
+      'tenant-1',
+      'favicon',
+      makeFormData(new File(['x'], FAVICON_FILE_NAME, { type: 'image/png' })),
+    );
+
+    expect(putMock).toHaveBeenCalledWith(
+      'tenants/tenant-1/favicon.png',
+      expect.any(Buffer),
+      expect.objectContaining({ addRandomSuffix: true }),
+    );
   });
 
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {

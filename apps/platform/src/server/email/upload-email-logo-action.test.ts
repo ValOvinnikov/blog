@@ -120,7 +120,7 @@ describe(uploadEmailLogoAction, () => {
     upsertEmailConfigMock.mockResolvedValue({});
   });
 
-  it('uploads and persists the tenant email logo at a path distinct from the site logo', async () => {
+  it('uploads and persists the tenant email logo under a unique name at a path distinct from the site logo', async () => {
     const result = await uploadEmailLogoAction(
       'tenant-1',
       { type: 'tenant' },
@@ -134,14 +134,14 @@ describe(uploadEmailLogoAction, () => {
     expect(putMock).toHaveBeenCalledWith(
       'tenants/tenant-1/email-logo.png',
       VALID_ASSET.buffer,
-      expect.objectContaining({ access: 'public' }),
+      expect.objectContaining({ access: 'public', addRandomSuffix: true }),
     );
     expect(upsertEmailConfigMock).toHaveBeenCalledWith('tenant-1', {
       logoAssetUrl: TENANT_LOGO_URL,
     });
   });
 
-  it('uploads and persists a per-template logo at a path naming the template', async () => {
+  it('uploads and persists a per-template logo under a unique name at a path naming the template', async () => {
     putMock.mockResolvedValue({
       url: TEMPLATE_LOGO_URL,
     });
@@ -157,7 +157,7 @@ describe(uploadEmailLogoAction, () => {
     expect(putMock).toHaveBeenCalledWith(
       'tenants/tenant-1/email-logo-magic_link.png',
       VALID_ASSET.buffer,
-      expect.objectContaining({ access: 'public' }),
+      expect.objectContaining({ access: 'public', addRandomSuffix: true }),
     );
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
       'tenant-1',
