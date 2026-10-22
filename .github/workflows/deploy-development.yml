@@ -206,7 +206,8 @@ jobs:
 
   # Gate: re-run the full suite on the exact merged commit before any deploy.
   # Deploy jobs `needs: verify`, so a dev deploy only happens after checks pass.
-  # Skipped entirely (along with every deploy) when no app is affected.
+  # Skipped entirely (along with every deploy) when no app is affected. Test
+  # alone is skipped when a dispatched Full gate already passed on this SHA.
   verify:
     name: Verify
     needs: changes
@@ -217,6 +218,10 @@ jobs:
       needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      # Reading Full gate's run history is what decides whether Test can skip.
+      actions: read
     concurrency:
       group: deploy-dev-verify
       cancel-in-progress: true
@@ -232,7 +237,30 @@ jobs:
         run: pnpm type-check
       - name: Lint
         run: pnpm lint
+      # Only a workflow_dispatch run counts: full-gate.yml's dispatch declares
+      # no `ref` input, so it always gated its own head_sha, whereas a
+      # workflow_call run may have gated a different ref. A failed lookup runs
+      # the tests rather than trusting nothing.
+      - name: Already passed the Full gate?
+        id: full-gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -uo pipefail
+          if ! run_url=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/full-gate.yml/runs?head_sha=${HEAD_SHA}&event=workflow_dispatch&status=success&per_page=1" --jq '.workflow_runs[0].html_url // empty'); then
+            echo "::warning::Could not look up Full gate runs for ${HEAD_SHA} — running the tests."
+            echo "Tests ran: the Full gate run lookup for \`${HEAD_SHA}\` failed." >> "$GITHUB_STEP_SUMMARY"
+            echo "passed=false" >> "$GITHUB_OUTPUT"
+          elif [ -n "$run_url" ]; then
+            echo "Tests skipped: \`${HEAD_SHA}\` already passed the Full gate in ${run_url}." >> "$GITHUB_STEP_SUMMARY"
+            echo "passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tests ran: \`${HEAD_SHA}\` has no successful dispatched Full gate run." >> "$GITHUB_STEP_SUMMARY"
+            echo "passed=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Test
+        if: steps.full-gate.outputs.passed != 'true'
         run: pnpm test
       - name: Build
         run: pnpm build
