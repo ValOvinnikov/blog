@@ -393,6 +393,13 @@
       "when": 1792664731596,
       "tag": "0055_add_personal_data_encrypted_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1792690398623,
+      "tag": "0056_add_leads_read_state_and_source_page",
+      "breakpoints": true
     }
   ]
 }

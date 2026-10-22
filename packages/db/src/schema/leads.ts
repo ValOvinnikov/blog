@@ -22,6 +22,9 @@ export const leads = pgTable(
     message: text('message').notNull(),
     messageEncrypted: text('message_encrypted'),
     sourcePath: text('source_path').notNull(),
+    sourceDocumentId: text('source_document_id'),
+    sourceLocale: text('source_locale'),
+    readAt: timestamp('read_at', { mode: 'date', withTimezone: true }),
     createdAt: timestamp(CREATED_AT_COLUMN, {
       mode: 'date',
       withTimezone: true,

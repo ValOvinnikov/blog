@@ -8,7 +8,8 @@ import {
 export type TCreateLeadInput = Pick<
   TLead,
   'tenantId' | 'name' | 'email' | 'message' | 'sourcePath'
->;
+> &
+  Partial<Pick<TLead, 'sourceDocumentId' | 'sourceLocale'>>;
 
 export async function createLead(input: TCreateLeadInput): Promise<TLead> {
   const db = getDb();

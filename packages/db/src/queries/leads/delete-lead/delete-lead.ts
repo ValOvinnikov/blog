@@ -1,21 +1,13 @@
 import { getDb } from '@blog/db/client';
+import { byLeadKey, type TLeadKey } from '@blog/db/queries/leads/lead-key';
 import { leads } from '@blog/db/schema/leads';
-import { and, eq } from 'drizzle-orm';
 
-export type TDeleteLeadInput = {
-  tenantId: string;
-  id: string;
-};
-
-export async function deleteLead({
-  tenantId,
-  id,
-}: TDeleteLeadInput): Promise<boolean> {
+export async function deleteLead(key: TLeadKey): Promise<boolean> {
   const db = getDb();
 
   const deleted = await db
     .delete(leads)
-    .where(and(eq(leads.tenantId, tenantId), eq(leads.id, id)))
+    .where(byLeadKey(key))
     .returning({ id: leads.id });
 
   return deleted.length > 0;
