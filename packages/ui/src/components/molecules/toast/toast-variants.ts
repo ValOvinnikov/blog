@@ -6,7 +6,7 @@ export const toastVariants = tv({
   slots: {
     root: [
       'relative w-full overflow-hidden',
-      'rounded-card border border-border border-l-2 bg-surface surface-card shadow-float',
+      'rounded-card border border-border bg-surface surface-card shadow-float',
       'pointer-events-auto',
       'transition-[transform_var(--duration-slow)_var(--ease-smooth),opacity_var(--duration-base)_var(--ease-smooth)]',
       'motion-reduce:transition-[opacity_var(--duration-base)_linear]',
@@ -49,25 +49,21 @@ export const toastVariants = tv({
   variants: {
     type: {
       [TOAST_TYPE.SUCCESS]: {
-        root: ['border-l-success'],
         icon: ['text-success'],
         action: ['hover:border-success hover:text-success'],
         timer: ['bg-success'],
       },
       [TOAST_TYPE.INFO]: {
-        root: ['border-l-brand-primary'],
         icon: ['text-brand-primary'],
         action: ['hover:border-brand-primary hover:text-brand-primary'],
         timer: ['bg-brand-primary'],
       },
       [TOAST_TYPE.WARNING]: {
-        root: ['border-l-warn'],
         icon: ['text-warn'],
         action: ['hover:border-warn hover:text-warn'],
         timer: ['bg-warn'],
       },
       [TOAST_TYPE.ERROR]: {
-        root: ['border-l-error'],
         icon: ['text-error'],
         action: ['hover:border-error hover:text-error'],
         timer: ['bg-error'],
