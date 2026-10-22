@@ -56,6 +56,9 @@ const lead: schema.TLead = {
   message: faker.lorem.sentences(2),
   messageEncrypted: null,
   sourcePath: `/${faker.lorem.slug()}`,
+  sourceDocumentId: null,
+  sourceLocale: null,
+  readAt: null,
   createdAt: faker.date.recent(),
 };
 
