@@ -446,6 +446,9 @@ importers:
       '@blog/vitest-config':
         specifier: workspace:*
         version: link:../../configs/vitest
+      '@faker-js/faker':
+        specifier: ^10.6.0
+        version: 10.6.0
       '@types/node':
         specifier: ^26
         version: 26.6.5

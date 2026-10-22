@@ -3,6 +3,7 @@ import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { DEPROVISIONING_START_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
+import { TEST_ENQUEUE_SECRET } from '@worker/testing/enqueue/fixtures';
 import { signedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
@@ -11,7 +12,6 @@ import { start } from 'workflow/api';
 
 import { POST } from './route';
 
-const SECRET = 'deprovision-enqueue-secret';
 const DEPROVISION_URL = 'https://worker.example.com/api/deprovision';
 const RUN_ID = 'deprovision-run';
 
@@ -31,7 +31,7 @@ vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   ).withFakeTenantsQueries(await importOriginal()),
 );
 
-function deprovisionRequest(secret: string = SECRET): Request {
+function deprovisionRequest(secret: string = TEST_ENQUEUE_SECRET): Request {
   return signedRequest(
     DEPROVISION_URL,
     JSON.stringify({ tenantId: TEST_TENANT_ID }),
@@ -41,7 +41,7 @@ function deprovisionRequest(secret: string = SECRET): Request {
 
 describe('POST /api/deprovision', () => {
   beforeEach(() => {
-    mockEnv.WORKER_ENQUEUE_SECRET = SECRET;
+    mockEnv.WORKER_ENQUEUE_SECRET = TEST_ENQUEUE_SECRET;
     vi.mocked(getTenantById).mockResolvedValue(makeTenant());
     vi.mocked(start).mockResolvedValue({ runId: RUN_ID } as never);
   });
