@@ -95,4 +95,13 @@ describe(unsubscribe, () => {
 
     expect(await countSubscribers(otherTenantId)).toBe(1);
   });
+
+  it('keeps a subscriber row whose address differs only by a +tag', async () => {
+    const [localPart, domain] = TEST_SUBSCRIBER_EMAIL.split('@');
+    await insertTestSubscriber(db(), tenantId, `${localPart}+news@${domain}`);
+
+    await unsubscribe(tenantId, userId);
+
+    expect(await countSubscribers(tenantId)).toBe(1);
+  });
 });

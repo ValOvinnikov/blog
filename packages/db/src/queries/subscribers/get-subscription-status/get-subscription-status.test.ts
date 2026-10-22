@@ -73,17 +73,25 @@ describe(getSubscriptionStatus, () => {
     expect(result).toEqual(NOT_SUBSCRIBED);
   });
 
-  it('matches a subscriber stored under a differently cased or tagged address of the same mailbox', async () => {
-    const [localPart, domain] = TEST_SUBSCRIBER_EMAIL.split('@');
+  it('matches a subscriber stored under a differently cased address', async () => {
     await insertTestSubscriber(
       db(),
       tenantId,
-      `${localPart}+news@${domain?.toUpperCase()}`,
+      `  ${TEST_SUBSCRIBER_EMAIL.toUpperCase()}  `,
     );
 
     const result = await getSubscriptionStatus(tenantId, userId);
 
     expect(result).toEqual({ outcome: 'pending' });
+  });
+
+  it('does not match a subscriber whose address differs only by a +tag', async () => {
+    const [localPart, domain] = TEST_SUBSCRIBER_EMAIL.split('@');
+    await insertTestSubscriber(db(), tenantId, `${localPart}+news@${domain}`);
+
+    const result = await getSubscriptionStatus(tenantId, userId);
+
+    expect(result).toEqual(NOT_SUBSCRIBED);
   });
 
   it('returns not-subscribed when the subscriber row belongs to a different tenant', async () => {

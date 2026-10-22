@@ -63,8 +63,7 @@ export const resendConfirmationAction =
   async (): Promise<TResendConfirmationActionResult> => {
     const session = await auth();
     const userId = session?.user?.id;
-    const email = session?.user?.email;
-    if (!userId || !email) return SERVER_ERROR;
+    if (!userId) return SERVER_ERROR;
 
     const tenant = await resolveWritableTenant(
       'newsletter.resend_confirmation',
@@ -86,7 +85,7 @@ export const resendConfirmationAction =
       if (result.outcome === SUBSCRIBER_OUTCOME.NOT_PENDING)
         return SERVER_ERROR;
 
-      const { subscriberId, confirmationToken } = result;
+      const { subscriberId, email, confirmationToken } = result;
       await deliverNewsletterConfirmation(
         tenantId,
         { subscriberId, email },

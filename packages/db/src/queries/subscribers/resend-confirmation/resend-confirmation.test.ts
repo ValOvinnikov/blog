@@ -49,6 +49,7 @@ describe(resendConfirmation, () => {
     expect(result).toEqual({
       ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
       subscriberId: subscriber.id,
+      email: TEST_SUBSCRIBER_EMAIL,
       confirmationToken: expect.any(String),
     });
     const [row] = await db()
@@ -102,6 +103,16 @@ describe(resendConfirmation, () => {
     await insertTestSubscriber(db(), otherTenantId, TEST_SUBSCRIBER_EMAIL);
 
     const result = await resendConfirmation(tenantId, userId);
+
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
+  });
+
+  it('returns not-pending for an account whose tagged address only shares the index of a pending row', async () => {
+    const [localPart, domain] = TEST_SUBSCRIBER_EMAIL.split('@');
+    const { id } = await insertTestReader(db(), `${localPart}+x@${domain}`);
+    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
+
+    const result = await resendConfirmation(tenantId, id);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING));
   });

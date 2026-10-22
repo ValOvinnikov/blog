@@ -113,6 +113,7 @@ const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 type TActions = typeof import('./newsletter-subscription-actions');
 
 const SESSION_EMAIL = faker.internet.email();
+const SUBSCRIBER_EMAIL = faker.internet.email();
 const REPLY_TO_ADDRESS = faker.internet.email();
 const UNSUBSCRIBE_HEADER = `<${SITE_URL}/api/newsletter/unsubscribe?token=${UNSUBSCRIBE_TOKEN}>`;
 const DEFAULT_CONFIRMATION_SUBJECT =
@@ -221,6 +222,7 @@ describe('resendConfirmationAction', () => {
     resendConfirmationMock.mockResolvedValue({
       outcome: SUBSCRIBER_OUTCOME.PENDING,
       subscriberId: SUBSCRIBER_ID,
+      email: SUBSCRIBER_EMAIL,
       confirmationToken: CONFIRMATION_TOKEN,
     });
     commitConfirmationTokenMock.mockReset();
@@ -267,15 +269,6 @@ describe('resendConfirmationAction', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('returns SERVER_ERROR without resending when the session has no email', async () => {
-    authMock.mockResolvedValue({ user: { id: USER_ID } });
-
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
-  });
-
   it('returns SERVER_ERROR without resending when no tenant resolves', async () => {
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
@@ -302,14 +295,14 @@ describe('resendConfirmationAction', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('resends the confirmation email to the session email and returns SUCCESS', async () => {
+  it("resends the confirmation email to the subscriber's stored address and returns SUCCESS", async () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: SESSION_EMAIL,
+        to: SUBSCRIBER_EMAIL,
         html: expect.stringContaining(
           `${SITE_URL}/api/newsletter/confirm?token=${CONFIRMATION_TOKEN}`,
         ),
@@ -431,7 +424,7 @@ describe('resendConfirmationAction', () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({ to: SESSION_EMAIL }),
+      expect.objectContaining({ to: SUBSCRIBER_EMAIL }),
     );
   });
 
@@ -443,7 +436,7 @@ describe('resendConfirmationAction', () => {
     });
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: SESSION_EMAIL,
+        to: SUBSCRIBER_EMAIL,
         subject: DEFAULT_CONFIRMATION_SUBJECT,
         headers: {
           'List-Unsubscribe': UNSUBSCRIBE_HEADER,
