@@ -8,9 +8,6 @@ export const makeLead = (
   email: 'ada@example.com',
   message: 'Hello there',
   sourcePath: '/contact',
-  sourceDocumentId: null,
-  sourceLocale: null,
-  readAt: null,
   createdAt: new Date('2026-04-02T09:30:00.000Z'),
   ...overrides,
 });
