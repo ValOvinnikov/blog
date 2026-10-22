@@ -24,8 +24,8 @@ import {
   setTenantProvisioningStatus,
 } from '@blog/db/queries/tenants';
 
-// Exported for direct testing of the recovery logic without also exercising
-// argv parsing.
+import { hasDryRunFlag } from './lib/dry-run-flag';
+
 export async function recoverWedgedTenants(dryRun: boolean): Promise<number> {
   const wedged = await listTenantsWedgedInProvisioning();
 
@@ -46,7 +46,7 @@ export async function recoverWedgedTenants(dryRun: boolean): Promise<number> {
 }
 
 async function main(): Promise<void> {
-  const dryRun = process.argv.includes('--dry-run');
+  const dryRun = hasDryRunFlag(process.argv);
   const count = await recoverWedgedTenants(dryRun);
 
   console.warn(
@@ -54,10 +54,6 @@ async function main(): Promise<void> {
   );
 }
 
-// Only auto-run when this file is the CLI entrypoint (`tsx
-// recover-wedged-provisioning.ts`) — guards against `main()` firing as an
-// import side effect when a test imports `recoverWedgedTenants` from this
-// same module.
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
