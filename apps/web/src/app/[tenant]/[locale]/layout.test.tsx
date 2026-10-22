@@ -17,7 +17,10 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
@@ -66,7 +69,7 @@ const THEME_TOKENS = {
 };
 
 const makeParams = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
-  Promise.resolve({ tenant: 'tenant-1', locale });
+  Promise.resolve({ tenant: DEFAULT_TENANT_ID, locale });
 
 const renderLayout = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
   LocaleLayout({
@@ -181,7 +184,7 @@ describe('LocaleLayout', () => {
   it('forwards the entered tenant to the theme token loader', async () => {
     await renderLayout();
 
-    expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
+    expect(getThemeTokensMock).toHaveBeenCalledWith(DEFAULT_TENANT_ID);
   });
 
   it('composes the providers around the header, page content and footer, with analytics beside them', async () => {
