@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TTenantSanityContext } from '@blog/service';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
@@ -6,6 +7,7 @@ import {
   isDerivableRevalidateType,
   POST_TYPE,
 } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
+import { recordTenantActivity } from '@web/server/revalidate/record-tenant-activity/record-tenant-activity';
 import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -27,6 +29,8 @@ export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
 export const SANITY_OPERATION_HEADER = 'sanity-operation';
 
 const DELETE_OPERATION = 'delete';
+const MALFORMED_BODY_MESSAGE = 'Malformed request body.';
+const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';
 
 interface IRevalidateWebhookBody {
   _type: string;
@@ -75,18 +79,13 @@ const resolveDerivedRevalidatePaths = async (
   return { ok: false, reason: derived.reason };
 };
 
-/**
- * On-demand ISR revalidation webhook. Sanity Studio POSTs here on
- * publish/unpublish; the request is verified with `SANITY_REVALIDATE_SECRET`
- * before any cache tags are revalidated.
- */
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SANITY_REVALIDATE_SECRET;
   if (!secret) {
     logger.error('revalidate.secret_missing');
     return NextResponse.json(
       { message: 'Revalidation secret is not configured.' },
-      { status: 500 },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
     );
   }
 
@@ -96,7 +95,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (!signature || !(await isValidSignature(rawBody, signature, secret))) {
     return NextResponse.json(
       { message: 'Invalid signature.' },
-      { status: 401 },
+      { status: HTTP_STATUS.UNAUTHORIZED },
     );
   }
 
@@ -105,15 +104,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     parsedBody = JSON.parse(rawBody);
   } catch {
     return NextResponse.json(
-      { message: 'Malformed request body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
   if (!isRevalidateWebhookBody(parsedBody)) {
     return NextResponse.json(
-      { message: 'Malformed request body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
@@ -137,7 +136,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         error,
       });
       return NextResponse.json(
-        { message: 'Tenant lookup failed.' },
+        { message: TENANT_LOOKUP_FAILED_MESSAGE },
         { status: 502 },
       );
     }
@@ -153,7 +152,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         error,
       });
       return NextResponse.json(
-        { message: 'Tenant lookup failed.' },
+        { message: TENANT_LOOKUP_FAILED_MESSAGE },
         { status: 502 },
       );
     }
@@ -161,9 +160,11 @@ export async function POST(request: Request): Promise<NextResponse> {
       logger.warn('revalidate.tenant_archived', { tenantProjectId, tenantId });
       return NextResponse.json(
         { message: 'Tenant is archived; event ignored.' },
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       );
     }
+
+    await recordTenantActivity(tenantId, new Date());
   }
 
   const baseTags = getRevalidateTagsForType(type, id);
@@ -260,6 +261,6 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   return NextResponse.json(
     { revalidated, pathPurged, type, id, bookmarksRemoved },
-    { status: 200 },
+    { status: HTTP_STATUS.OK },
   );
 }

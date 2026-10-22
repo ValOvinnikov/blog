@@ -369,8 +369,22 @@
     {
       "idx": 52,
       "version": "7",
-      "when": 1792622181280,
-      "tag": "0052_add_personal_data_encrypted_columns",
+      "when": 1792622741645,
+      "tag": "0052_remove_plain_hash_blocked_addresses",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1792657572521,
+      "tag": "0053_scrub_emails_from_audit_and_findings_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1792662616069,
+      "tag": "0054_add_personal_data_encrypted_columns",
       "breakpoints": true
     }
   ]

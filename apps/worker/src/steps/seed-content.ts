@@ -1,9 +1,9 @@
 import {
   buildStarterDocuments,
   SANITY_ROBOT_ROLE,
-  SITE_TYPE,
   type TMaybeNull,
   type TStarterDocumentUnion,
+  type TStarterSiteType,
 } from '@blog/config';
 import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -38,6 +38,7 @@ const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 // Idempotent on the dataset's own `settings_site`, never `tenants.seededAt`, so an emptied dataset is re-seeded.
 export async function seedTenantContent(
   tenant: TTenant,
+  siteType: TStarterSiteType,
   env: TProvisionEnv,
   deps: TSeedContentDeps = defaultDeps,
 ): Promise<void> {
@@ -75,7 +76,7 @@ export async function seedTenantContent(
     if (alreadySeeded) return;
 
     const documents = buildStarterDocuments({
-      siteType: SITE_TYPE.BLANK,
+      siteType,
       siteName: tenant.name,
       locale: tenant.locale,
       publishedAt: new Date().toISOString(),
