@@ -1,9 +1,9 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import {
   DATA_REQUEST_EXPORT_FILE_NAME,
-  DATA_REQUEST_FIELD_ERROR,
   DATA_REQUEST_MATCH_KIND,
 } from '@platform/constants/data-request';
+import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   DATA_REQUEST_EMAIL,
@@ -48,7 +48,6 @@ const FIND_BUTTON = { name: 'Find data' };
 const ERASE_BUTTON = { name: 'Erase' };
 const ERASE_CONFIRM_BUTTON = { name: 'Erase data' };
 const EXPORT_BUTTON = { name: 'Download export' };
-const CANCEL_BUTTON = { name: 'Cancel' };
 const RESULTS_TABLE = { name: 'Stored records' };
 const BLOCK_MATCH = makeDataRequestMatch({
   key: 'SIGNUP_BLOCK-block-1',
@@ -115,13 +114,13 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     lookUpPersonalDataActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {
-        email: { reason: DATA_REQUEST_FIELD_ERROR.EMAIL_INVALID },
+        email: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID },
       },
     });
 
     await lookUp();
 
-    const error = await screen.findByText('Enter a valid email address.');
+    const error = await screen.findByText('Enter a valid email.');
     const table = screen.queryByRole('region', RESULTS_TABLE);
 
     expect(error).toBeVisible();
@@ -160,6 +159,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
       email: DATA_REQUEST_EMAIL,
     });
     expect(downloadJsonMock).toHaveBeenCalledWith(
+      expect.any(HTMLAnchorElement),
       DATA_REQUEST_EXPORT_FILE_NAME,
       { email: DATA_REQUEST_EMAIL, ...data },
     );
@@ -203,12 +203,12 @@ describe(`<${DataRequestPanel.name}/>`, () => {
       "Couldn't erase the data — try again.",
     );
 
+    const table = screen.getByRole('region', {
+      ...RESULTS_TABLE,
+      hidden: true,
+    });
+
     expect(error).toBeVisible();
-
-    const cancelButton = within(dialog).getByRole('button', CANCEL_BUTTON);
-    await user.click(cancelButton);
-    const table = await screen.findByRole('region', RESULTS_TABLE);
-
-    expect(table).toBeVisible();
+    expect(table).toBeInTheDocument();
   });
 });

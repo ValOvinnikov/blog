@@ -7,6 +7,7 @@ import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
+import { useRef } from 'react';
 
 const dataRequestResultCardVariants = tv({
   slots: {
@@ -20,7 +21,7 @@ export type TDataRequestResultCardProps = {
   email: string;
   matchCount: number;
   isExporting: boolean;
-  onExport: () => void;
+  onExport: (link: HTMLAnchorElement) => void;
   onErase: () => Promise<TEraseOutcome>;
   onErased: () => void;
 };
@@ -35,6 +36,11 @@ export const DataRequestResultCard = ({
 }: TDataRequestResultCardProps) => {
   const t = useTranslations('dataRequestResultCard');
   const { actions } = dataRequestResultCardVariants();
+  const exportLinkRef = useRef<HTMLAnchorElement>(null);
+
+  const handleExport = () => {
+    if (exportLinkRef.current) onExport(exportLinkRef.current);
+  };
 
   return (
     <Card>
@@ -46,7 +52,7 @@ export const DataRequestResultCard = ({
               type="button"
               variant="secondary"
               size={SIZE.SM}
-              onClick={onExport}
+              onClick={handleExport}
               isPending={isExporting}
               pendingLabel={t('exporting')}
             >
@@ -75,6 +81,7 @@ export const DataRequestResultCard = ({
       />
       <Card.Body>
         <Text>{t('matchCount', { count: matchCount })}</Text>
+        <a ref={exportLinkRef} hidden={true} />
       </Card.Body>
     </Card>
   );

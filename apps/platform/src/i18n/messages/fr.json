@@ -1331,11 +1331,10 @@
     "emailLabel": "Adresse e-mail",
     "emailHint": "Retrouve la même boîte aux lettres quelle que soit la casse et avec n’importe quel +tag.",
     "emailPlaceholder": "nom@example.com",
-    "submit": "Rechercher",
+    "findData": "Rechercher",
     "submitting": "Recherche…"
   },
   "dataRequestPanel": {
-    "emailInvalid": "Saisissez une adresse e-mail valide.",
     "lookUpFailed": "Impossible de rechercher cette adresse. Réessayez.",
     "exportFailed": "Impossible de préparer l’export. Réessayez.",
     "eraseFailed": "Impossible d’effacer les données. Réessayez.",

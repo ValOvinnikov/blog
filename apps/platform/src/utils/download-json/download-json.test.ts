@@ -1,40 +1,36 @@
+import { type Blob, resolveObjectURL } from 'node:buffer';
+
+import { faker } from '@faker-js/faker';
+
 import { downloadJson } from './download-json';
 
-const FILE_NAME = 'export.json';
-const OBJECT_URL = 'blob:export';
-const VALUE = { subscribers: [{ email: 'reader@example.com' }] };
+const FILE_NAME = faker.system.fileName();
+const VALUE = { subscribers: [{ id: faker.string.uuid() }] };
 
 describe(downloadJson, () => {
   const link = { href: '', download: '', click: vi.fn() };
-  let blob: Blob | undefined;
+  let saved: Blob | undefined;
+
+  const download = () =>
+    downloadJson(link as unknown as HTMLAnchorElement, FILE_NAME, VALUE);
 
   beforeEach(() => {
-    blob = undefined;
-    link.click.mockReset();
-    vi.stubGlobal('document', { createElement: () => link });
-    vi.spyOn(URL, 'createObjectURL').mockImplementation((value) => {
-      blob = value as Blob;
-      return OBJECT_URL;
+    saved = undefined;
+    link.click.mockReset().mockImplementation(() => {
+      saved = resolveObjectURL(link.href);
     });
-    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    vi.restoreAllMocks();
   });
 
   it('saves the value as a JSON file under the given name', async () => {
-    downloadJson(FILE_NAME, VALUE);
+    download();
 
-    expect(link.click).toHaveBeenCalledOnce();
-    expect(link).toMatchObject({ href: OBJECT_URL, download: FILE_NAME });
-    await expect(blob?.text().then(JSON.parse)).resolves.toEqual(VALUE);
+    expect(link.download).toBe(FILE_NAME);
+    await expect(saved?.text().then(JSON.parse)).resolves.toEqual(VALUE);
   });
 
   it('releases the file once saved', () => {
-    downloadJson(FILE_NAME, VALUE);
+    download();
 
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith(OBJECT_URL);
+    expect(resolveObjectURL(link.href)).toBeUndefined();
   });
 });

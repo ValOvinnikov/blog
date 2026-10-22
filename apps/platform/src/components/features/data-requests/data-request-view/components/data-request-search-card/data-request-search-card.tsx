@@ -61,7 +61,7 @@ export const DataRequestSearchCard = ({
               isPending={isPending}
               pendingLabel={t('submitting')}
             >
-              {t('submit')}
+              {t('findData')}
             </Button>
           </div>
         </Card.Footer>

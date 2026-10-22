@@ -1331,11 +1331,10 @@
     "emailLabel": "Email address",
     "emailHint": "Matches the same mailbox in any letter case and with any +tag.",
     "emailPlaceholder": "name@example.com",
-    "submit": "Find data",
+    "findData": "Find data",
     "submitting": "Searching…"
   },
   "dataRequestPanel": {
-    "emailInvalid": "Enter a valid email address.",
     "lookUpFailed": "Couldn't search for this address — try again.",
     "exportFailed": "Couldn't prepare the export — try again.",
     "eraseFailed": "Couldn't erase the data — try again.",

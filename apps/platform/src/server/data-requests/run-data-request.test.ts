@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
-import { DATA_REQUEST_FIELD_ERROR } from '@platform/constants/data-request';
+import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
   DATA_REQUEST_EMAIL,
@@ -34,7 +34,7 @@ const INVALID_EMAIL = {
   error: {
     outcome: ACTION_OUTCOME.INVALID,
     fieldErrors: {
-      email: { reason: DATA_REQUEST_FIELD_ERROR.EMAIL_INVALID },
+      email: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID },
     },
   },
 };

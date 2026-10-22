@@ -1331,11 +1331,10 @@
     "emailLabel": "E-mailadres",
     "emailHint": "Vindt dezelfde mailbox in elke combinatie van hoofdletters en met elke +tag.",
     "emailPlaceholder": "naam@example.com",
-    "submit": "Gegevens zoeken",
+    "findData": "Gegevens zoeken",
     "submitting": "Zoeken…"
   },
   "dataRequestPanel": {
-    "emailInvalid": "Voer een geldig e-mailadres in.",
     "lookUpFailed": "Zoeken naar dit adres is mislukt. Probeer het opnieuw.",
     "exportFailed": "De export kon niet worden voorbereid. Probeer het opnieuw.",
     "eraseFailed": "De gegevens konden niet worden gewist. Probeer het opnieuw.",

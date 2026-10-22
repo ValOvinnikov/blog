@@ -13,8 +13,11 @@ export const PERSONAL_DATA_LEAD_MESSAGE = 'Please call me back.';
 export const PERSONAL_DATA_ACTOR_ID = 'user-with-remaining-data';
 
 export function taggedMixedCaseAddress(email: string): string {
-  const [localPart, domain] = email.split('@');
-  return ` ${localPart}+Promo@${domain?.toUpperCase()} `;
+  const tagged = email.replace(
+    /@(.+)$/,
+    (_match, domain: string) => `+Promo@${domain.toUpperCase()}`,
+  );
+  return ` ${tagged} `;
 }
 
 export async function insertTestPersonalDataRows(

@@ -1331,11 +1331,10 @@
     "emailLabel": "Correo electrónico",
     "emailHint": "Encuentra el mismo buzón con cualquier combinación de mayúsculas y con cualquier +etiqueta.",
     "emailPlaceholder": "nombre@example.com",
-    "submit": "Buscar datos",
+    "findData": "Buscar datos",
     "submitting": "Buscando…"
   },
   "dataRequestPanel": {
-    "emailInvalid": "Introduce un correo electrónico válido.",
     "lookUpFailed": "No se pudo buscar esta dirección. Inténtalo de nuevo.",
     "exportFailed": "No se pudo preparar la exportación. Inténtalo de nuevo.",
     "eraseFailed": "No se pudieron borrar los datos. Inténtalo de nuevo.",

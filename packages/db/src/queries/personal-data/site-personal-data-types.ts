@@ -7,7 +7,7 @@ type TPersonalDataSite = {
   tenantName: string;
 };
 
-export type TPersonalDataSubscriber = TPersonalDataSite & {
+type TPersonalDataSubscriber = TPersonalDataSite & {
   id: string;
   email: string;
   status: TSubscriberStatus;
@@ -15,7 +15,7 @@ export type TPersonalDataSubscriber = TPersonalDataSite & {
   confirmedAt: TMaybeUndefined<Date>;
 };
 
-export type TPersonalDataLead = TPersonalDataSite & {
+type TPersonalDataLead = TPersonalDataSite & {
   id: string;
   name: string;
   email: string;
@@ -24,7 +24,7 @@ export type TPersonalDataLead = TPersonalDataSite & {
   createdAt: Date;
 };
 
-export type TPersonalDataInvite = TPersonalDataSite & {
+type TPersonalDataInvite = TPersonalDataSite & {
   id: string;
   email: string;
   role: TMembershipRole;

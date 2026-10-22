@@ -1,11 +1,5 @@
 import type { TValueOf } from '@blog/config/utils';
 
-export const DATA_REQUEST_FIELD_ERROR = {
-  EMAIL_INVALID: 'EMAIL_INVALID',
-} as const;
-
-export type TDataRequestFieldError = TValueOf<typeof DATA_REQUEST_FIELD_ERROR>;
-
 export const DATA_REQUEST_MATCH_KIND = {
   SUBSCRIBER: 'SUBSCRIBER',
   LEAD: 'LEAD',

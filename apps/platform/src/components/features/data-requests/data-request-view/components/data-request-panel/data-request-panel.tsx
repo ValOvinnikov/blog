@@ -3,16 +3,18 @@
 import { DataRequestMatchesTable } from '@platform/components/features/data-requests/data-request-view/components/data-request-matches-table/data-request-matches-table';
 import { DataRequestResultCard } from '@platform/components/features/data-requests/data-request-view/components/data-request-result-card/data-request-result-card';
 import { DataRequestSearchCard } from '@platform/components/features/data-requests/data-request-view/components/data-request-search-card/data-request-search-card';
+import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
 
 import { useDataRequest } from './use-data-request';
 
 export const DataRequestPanel = () => {
   const t = useTranslations('dataRequestPanel');
+  const fieldErrorText = useTenantFieldErrorText();
   const {
     email,
     setEmail,
-    errorKey,
+    emailError,
     lookup,
     isLookingUp,
     isExporting,
@@ -32,7 +34,7 @@ export const DataRequestPanel = () => {
       <DataRequestSearchCard
         email={email}
         onEmailChange={setEmail}
-        error={errorKey && t(errorKey)}
+        error={fieldErrorText(emailError)}
         isPending={isLookingUp}
         onSubmit={lookUp}
       />
@@ -42,7 +44,7 @@ export const DataRequestPanel = () => {
             email={lookup.email}
             matchCount={lookup.matches.length}
             isExporting={isExporting}
-            onExport={() => exportData(lookup.email)}
+            onExport={(link) => exportData(lookup.email, link)}
             onErase={() => erase(lookup.email)}
             onErased={finishErase}
           />

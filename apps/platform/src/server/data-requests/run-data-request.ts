@@ -12,10 +12,7 @@ import { ERROR_CODE } from '@blog/config/constants';
 import type { TPersonalDataCounts } from '@blog/db/queries/personal-data/erase-personal-data';
 import type { TResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
-import {
-  DATA_REQUEST_FIELD_ERROR,
-  type TDataRequestFieldError,
-} from '@platform/constants/data-request';
+import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -32,7 +29,7 @@ export type TDataRequestFailure = Exclude<
   TActionResult<
     typeof ACTION_OUTCOME.SERVER_ERROR,
     keyof TDataRequestInput,
-    TDataRequestFieldError
+    typeof TENANT_FIELD_ERROR.EMAIL_INVALID
   >,
   TOutcome<typeof ACTION_OUTCOME.SUCCESS>
 >;
@@ -40,7 +37,7 @@ export type TDataRequestFailure = Exclude<
 const INVALID_EMAIL: TDataRequestFailure = {
   outcome: ACTION_OUTCOME.INVALID,
   fieldErrors: {
-    email: { reason: DATA_REQUEST_FIELD_ERROR.EMAIL_INVALID },
+    email: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID },
   },
 };
 

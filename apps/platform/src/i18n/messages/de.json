@@ -1331,11 +1331,10 @@
     "emailLabel": "E-Mail-Adresse",
     "emailHint": "Findet dasselbe Postfach in jeder Groß- und Kleinschreibung und mit jedem +Tag.",
     "emailPlaceholder": "name@example.com",
-    "submit": "Daten finden",
+    "findData": "Daten finden",
     "submitting": "Wird gesucht…"
   },
   "dataRequestPanel": {
-    "emailInvalid": "Gib eine gültige E-Mail-Adresse ein.",
     "lookUpFailed": "Die Suche nach dieser Adresse ist fehlgeschlagen – versuch es erneut.",
     "exportFailed": "Der Export konnte nicht erstellt werden – versuch es erneut.",
     "eraseFailed": "Die Daten konnten nicht gelöscht werden – versuch es erneut.",

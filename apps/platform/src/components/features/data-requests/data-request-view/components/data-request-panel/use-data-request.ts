@@ -1,12 +1,12 @@
 'use client';
 
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
 import {
-  DATA_REQUEST_EXPORT_FILE_NAME,
-  DATA_REQUEST_FIELD_ERROR,
-  type TDataRequestFieldError,
-} from '@platform/constants/data-request';
+  ACTION_OUTCOME,
+  type TMaybeUndefined,
+  type TReasonedFailure,
+} from '@blog/config';
+import { DATA_REQUEST_EXPORT_FILE_NAME } from '@platform/constants/data-request';
+import type { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
 import { erasePersonalDataAction } from '@platform/server/data-requests/erase-personal-data-action';
 import { exportPersonalDataAction } from '@platform/server/data-requests/export-personal-data-action';
@@ -15,11 +15,7 @@ import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-r
 import { downloadJson } from '@platform/utils/download-json/download-json';
 import { useRef, useState, useTransition } from 'react';
 
-const FIELD_ERROR_KEYS = {
-  [DATA_REQUEST_FIELD_ERROR.EMAIL_INVALID]: 'emailInvalid',
-} as const satisfies Record<TDataRequestFieldError, string>;
-
-export type TDataRequestFieldErrorKey = TValueOf<typeof FIELD_ERROR_KEYS>;
+type TEmailError = TReasonedFailure<typeof TENANT_FIELD_ERROR.EMAIL_INVALID>;
 
 type TDataRequestLookup = {
   email: string;
@@ -41,8 +37,8 @@ export const useDataRequest = ({
 }: TUseDataRequestMessages) => {
   const toast = useToast();
   const [email, setEmail] = useState('');
-  const [errorKey, setErrorKey] =
-    useState<TMaybeUndefined<TDataRequestFieldErrorKey>>(undefined);
+  const [emailError, setEmailError] =
+    useState<TMaybeUndefined<TEmailError>>(undefined);
   const [lookup, setLookup] =
     useState<TMaybeUndefined<TDataRequestLookup>>(undefined);
   const [isLookingUp, startLookUp] = useTransition();
@@ -54,15 +50,14 @@ export const useDataRequest = ({
       const result = await lookUpPersonalDataAction({ email });
 
       if (result.outcome === ACTION_OUTCOME.SUCCESS) {
-        setErrorKey(undefined);
+        setEmailError(undefined);
         setLookup({ email: email.trim(), matches: result.matches });
         return;
       }
 
       setLookup(undefined);
       if (result.outcome === ACTION_OUTCOME.INVALID) {
-        const { email: emailError } = result.fieldErrors;
-        setErrorKey(emailError && FIELD_ERROR_KEYS[emailError.reason]);
+        setEmailError(result.fieldErrors.email);
         return;
       }
 
@@ -70,12 +65,12 @@ export const useDataRequest = ({
     });
   };
 
-  const exportData = (lookedUpEmail: string) => {
+  const exportData = (lookedUpEmail: string, link: HTMLAnchorElement) => {
     startExport(async () => {
       const result = await exportPersonalDataAction({ email: lookedUpEmail });
 
       if (result.outcome === ACTION_OUTCOME.SUCCESS) {
-        downloadJson(DATA_REQUEST_EXPORT_FILE_NAME, {
+        downloadJson(link, DATA_REQUEST_EXPORT_FILE_NAME, {
           email: lookedUpEmail,
           ...result.data,
         });
@@ -104,7 +99,7 @@ export const useDataRequest = ({
   return {
     email,
     setEmail,
-    errorKey,
+    emailError,
     lookup,
     isLookingUp,
     isExporting,

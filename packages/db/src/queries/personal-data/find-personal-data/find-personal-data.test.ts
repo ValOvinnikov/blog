@@ -35,8 +35,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const [LOCAL_PART, DOMAIN] = TEST_SUBSCRIBER_EMAIL.split('@');
-const TAGGED_EMAIL = `${LOCAL_PART}+news@${DOMAIN}`.toUpperCase();
+const NOBODY_EMAIL = 'nobody@example.org';
 
 afterEach(async () => {
   await deleteTestPersonalDataRows(db());
@@ -53,7 +52,9 @@ describe(findPersonalData, () => {
   });
 
   it('finds every row held for the mailbox, decrypted and named by site', async () => {
-    const result = await findPersonalData(TAGGED_EMAIL);
+    const result = await findPersonalData(
+      taggedMixedCaseAddress(TEST_SUBSCRIBER_EMAIL),
+    );
 
     expect(result).toEqual({
       ok: true,
@@ -98,7 +99,7 @@ describe(findPersonalData, () => {
   });
 
   it('finds nothing for a mailbox with no rows', async () => {
-    const result = await findPersonalData(`nobody@${DOMAIN}`);
+    const result = await findPersonalData(NOBODY_EMAIL);
 
     expect(result).toMatchObject({
       ok: true,
