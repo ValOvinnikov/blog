@@ -1,6 +1,7 @@
 export * from './admin';
 export * from './blocked-signup-identity';
 export * from './email-template-defaults';
+export * from './lead';
 export * from './membership';
 export * from './tenant';
 export * from './tenant-deprovisioning';
