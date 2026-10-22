@@ -1,4 +1,6 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import {
   customRenderServerAsync,
   screen,
@@ -31,8 +33,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 vi.mock('@web/i18n/navigation');
 
 const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
@@ -42,6 +42,10 @@ const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 const setup = customRenderServerAsync(TagPage, {
   slug: 'typescript',
 });
+
+const SUPPORTING_TEXT = 'Posts about TypeScript.';
+const CTA_HEADING = 'Join the list';
+const HERO_HEADING = 'All about TypeScript';
 
 describe(`<${TagPage.name}/>`, () => {
   describe('with the default tag', () => {
@@ -61,7 +65,7 @@ describe(`<${TagPage.name}/>`, () => {
       expect(
         within(main).getByRole('heading', { level: 1, name: 'TypeScript' }),
       ).toBeVisible();
-      expect(within(main).getByText('Posts about TypeScript.')).toBeVisible();
+      expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
     });
 
     it('renders the breadcrumb trail outside main', () => {
@@ -78,7 +82,7 @@ describe(`<${TagPage.name}/>`, () => {
     it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
       expect(
         screen
-          .queryAllByTestId('json-ld-script')
+          .queryAllByTestId(JSON_LD_SCRIPT_TEST_ID)
           .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
       ).toBe(false);
     });
@@ -90,7 +94,7 @@ describe(`<${TagPage.name}/>`, () => {
       data: makeTagDetailPage({
         headingBlock: makeHeadingBlock({
           heading: 'TypeScript',
-          supportingText: 'Posts about TypeScript.',
+          supportingText: SUPPORTING_TEXT,
         }),
       }),
     });
@@ -102,7 +106,7 @@ describe(`<${TagPage.name}/>`, () => {
       error: new Error('boom'),
     });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
@@ -114,7 +118,7 @@ describe(`<${TagPage.name}/>`, () => {
   it('calls notFound() without logging when the tag does not exist', async () => {
     getTagPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
@@ -130,7 +134,7 @@ describe(`<${TagPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
       ok: true,
       data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: 'Join the list' }),
+        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
       }),
     });
 
@@ -138,7 +142,7 @@ describe(`<${TagPage.name}/>`, () => {
 
     expect(
       within(screen.getByRole('main')).getByRole('region', {
-        name: 'Join the list',
+        name: CTA_HEADING,
       }),
     ).toBeVisible();
   });
@@ -152,13 +156,13 @@ describe(`<${TagPage.name}/>`, () => {
     });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
       ok: true,
-      data: makeHeroBlogData({ heading: 'All about TypeScript' }),
+      data: makeHeroBlogData({ heading: HERO_HEADING }),
     });
 
     await setup();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'All about TypeScript' }),
+      screen.getByRole('heading', { level: 1, name: HERO_HEADING }),
     ).toBeVisible();
     expect(
       screen.queryByRole('heading', { level: 1, name: 'TypeScript' }),
@@ -182,7 +186,9 @@ describe(`<${TagPage.name}/>`, () => {
         error: new Error('boom'),
       });
 
-      await expect(setup({ page })).rejects.toThrow('NEXT_NOT_FOUND');
+      await expect(setup({ page })).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
       expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
         'list-1',
@@ -228,7 +234,7 @@ describe(`<${TagPage.name}/>`, () => {
 
     expect(
       screen
-        .getAllByTestId('json-ld-script')
+        .getAllByTestId(JSON_LD_SCRIPT_TEST_ID)
         .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
     ).toBe(true);
   });

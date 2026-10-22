@@ -2,6 +2,7 @@ import { queries } from '@blog/db';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
+import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 
 import { IdentitySection } from './identity-section';
 
@@ -10,8 +11,6 @@ vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 vi.mock('@blog/db', () => ({
   queries: { account: { getLinkedProviders: vi.fn() } },
 }));
-
-vi.mock('@web/utils/logger/logger');
 
 const authMock = vi.mocked(auth as () => Promise<unknown>);
 const getLinkedProvidersMock = vi.mocked(queries.account.getLinkedProviders);
@@ -22,10 +21,13 @@ const setup = customRenderServerAsync(
   { wrapper: ToastProvider },
 );
 
+const SECTION_HEADING = 'Connected accounts';
+const LAST_METHOD_NOTE = "Last remaining method — can't unlink";
+
 describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
+      user: ACCOUNT_USER,
     });
   });
 
@@ -35,7 +37,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     await setup();
 
     expect(
-      screen.queryByRole('heading', { name: 'Connected accounts' }),
+      screen.queryByRole('heading', { name: SECTION_HEADING }),
     ).not.toBeInTheDocument();
     expect(getLinkedProvidersMock).not.toHaveBeenCalled();
   });
@@ -49,9 +51,9 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(getLinkedProvidersMock).toHaveBeenCalledWith('user-1');
+    expect(getLinkedProvidersMock).toHaveBeenCalledWith(ACCOUNT_USER.id);
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Connected accounts' }),
+      screen.getByRole('heading', { level: 2, name: SECTION_HEADING }),
     ).toBeVisible();
   });
 
@@ -94,9 +96,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     it('shows the last-method notice instead of a control for the sole method', async () => {
       await setup();
 
-      expect(
-        screen.getByText("Last remaining method — can't unlink"),
-      ).toBeVisible();
+      expect(screen.getByText(LAST_METHOD_NOTE)).toBeVisible();
       expect(
         screen.queryByRole('button', { name: 'Unlink' }),
       ).not.toBeInTheDocument();
@@ -106,7 +106,7 @@ describe(`<${IdentitySection.name}/>`, () => {
       await setup();
 
       expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
-        'Jane Doe',
+        ACCOUNT_USER.name,
       );
       expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
     });
@@ -121,8 +121,6 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByText("Last remaining method — can't unlink"),
-    ).toBeVisible();
+    expect(screen.getByText(LAST_METHOD_NOTE)).toBeVisible();
   });
 });

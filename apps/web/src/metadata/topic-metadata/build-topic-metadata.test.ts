@@ -7,6 +7,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { buildTopicMetadata } from './build-topic-metadata';
 
@@ -26,11 +27,18 @@ const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   DEFAULT_TENANT_SANITY_CONTEXT,
 );
 
+const DESCRIPTION = 'Posts about building things.';
+const OG_TITLE = 'Engineering OG';
+const OG_DESCRIPTION = 'Posts about building things OG.';
+const TOPIC_PATH = '/topics/engineering';
+const NL_DESIGN_TOPIC_PATH = '/nl/topics/ontwerp';
+const EN_DESIGN_TOPIC_PATH = '/topics/design';
+
 const seo = makeSeo({
   title: 'Engineering',
-  description: 'Posts about building things.',
-  ogTitle: 'Engineering OG',
-  ogDescription: 'Posts about building things OG.',
+  description: DESCRIPTION,
+  ogTitle: OG_TITLE,
+  ogDescription: OG_DESCRIPTION,
   ogImage,
 });
 
@@ -57,12 +65,10 @@ describe('buildTopicMetadata', () => {
       const metadata = await buildTopicMetadata('engineering');
 
       expect(metadata.title).toBe('Engineering');
-      expect(metadata.description).toBe('Posts about building things.');
-      expect(metadata.alternates?.canonical).toBe('/topics/engineering');
-      expect(metadata.openGraph?.title).toBe('Engineering OG');
-      expect(metadata.openGraph?.description).toBe(
-        'Posts about building things OG.',
-      );
+      expect(metadata.description).toBe(DESCRIPTION);
+      expect(metadata.alternates?.canonical).toBe(TOPIC_PATH);
+      expect(metadata.openGraph?.title).toBe(OG_TITLE);
+      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
       expect(metadata.openGraph?.images).toEqual([
         { url: EXPECTED_OG_IMAGE_URL },
       ]);
@@ -74,7 +80,7 @@ describe('buildTopicMetadata', () => {
       expect(metadata.title).toBe('Engineering – Page 2');
       expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
       expect(metadata.alternates?.canonical).toBe('/topics/engineering/page/2');
-      expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
+      expect(metadata.alternates?.canonical).not.toBe(TOPIC_PATH);
     });
   });
 
@@ -117,14 +123,12 @@ describe('buildTopicMetadata', () => {
   });
 
   it('returns empty metadata without logging when the topic simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     const metadata = await buildTopicMetadata('missing');
 
     expect(metadata).toEqual({});
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
   });
 });
 
@@ -161,11 +165,11 @@ describe('buildTopicMetadata per language', () => {
     const metadata = await buildTopicMetadata('ontwerp');
 
     expect(metadata.alternates).toMatchObject({
-      canonical: '/nl/topics/ontwerp',
+      canonical: NL_DESIGN_TOPIC_PATH,
       languages: {
-        en: '/topics/design',
-        nl: '/nl/topics/ontwerp',
-        'x-default': '/topics/design',
+        en: EN_DESIGN_TOPIC_PATH,
+        nl: NL_DESIGN_TOPIC_PATH,
+        'x-default': EN_DESIGN_TOPIC_PATH,
       },
     });
   });

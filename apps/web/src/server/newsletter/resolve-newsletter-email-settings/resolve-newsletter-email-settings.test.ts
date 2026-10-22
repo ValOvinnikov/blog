@@ -1,4 +1,5 @@
-import type { MockInstance } from 'vitest';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
+import { logger } from '@web/utils/logger/logger';
 
 const { getEmailConfigMock, getEmailTemplateMock } = vi.hoisted(() => ({
   getEmailConfigMock: vi.fn(),
@@ -35,6 +36,11 @@ vi.mock('@blog/db', () => ({
 const TENANT_ID = 'tenant-1';
 const DEFAULT_FROM_ADDRESS = 'Newsletter <onboarding@resend.dev>';
 const AUTHORED_SUBJECT = 'Confirm your subscription';
+const TENANT_LOGO_URL = 'https://cdn.example.com/tenant-logo.png';
+const TEMPLATE_LOGO_URL = 'https://cdn.example.com/template-logo.png';
+const SENDER_NAME = 'Zeta Times';
+const REPLY_TO_ADDRESS = 'support@example.com';
+const FOOTER_POSTAL_ADDRESS = '123 Main St, Springfield';
 const AUTHORED_BODY: unknown[] = [];
 
 describe('resolveNewsletterEmailSettings', () => {
@@ -46,7 +52,7 @@ describe('resolveNewsletterEmailSettings', () => {
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockResolvedValue({
       tenantId: TENANT_ID,
-      templateType: 'NEWSLETTER_CONFIRMATION',
+      templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
       subject: AUTHORED_SUBJECT,
       body: AUTHORED_BODY,
       logoAssetUrl: undefined,
@@ -59,7 +65,7 @@ describe('resolveNewsletterEmailSettings', () => {
     const settings = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(settings).toEqual({
@@ -73,12 +79,16 @@ describe('resolveNewsletterEmailSettings', () => {
   });
 
   it('reads the template in the given language', async () => {
-    await resolveNewsletterEmailSettings(TENANT_ID, undefined, 'FR');
+    await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      LOCALE_ISO_CODES.FR,
+    );
 
     expect(getEmailTemplateMock).toHaveBeenCalledWith(
       TENANT_ID,
-      'NEWSLETTER_CONFIRMATION',
-      'FR',
+      EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+      LOCALE_ISO_CODES.FR,
     );
   });
 
@@ -87,7 +97,7 @@ describe('resolveNewsletterEmailSettings', () => {
 
     expect(getEmailTemplateMock).toHaveBeenCalledWith(
       TENANT_ID,
-      'NEWSLETTER_CONFIRMATION',
+      EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
       undefined,
     );
   });
@@ -96,7 +106,7 @@ describe('resolveNewsletterEmailSettings', () => {
     beforeEach(() => {
       getEmailConfigMock.mockResolvedValue({
         tenantId: TENANT_ID,
-        logoAssetUrl: 'https://cdn.example.com/tenant-logo.png',
+        logoAssetUrl: TENANT_LOGO_URL,
         senderName: undefined,
         replyToAddress: undefined,
         footerPostalAddress: undefined,
@@ -106,32 +116,28 @@ describe('resolveNewsletterEmailSettings', () => {
     it('prefers the per-template logo over the tenant-level logo', async () => {
       getEmailTemplateMock.mockResolvedValue({
         tenantId: TENANT_ID,
-        templateType: 'NEWSLETTER_CONFIRMATION',
-        subject: 'Confirm your subscription',
+        templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+        subject: AUTHORED_SUBJECT,
         body: [],
-        logoAssetUrl: 'https://cdn.example.com/template-logo.png',
+        logoAssetUrl: TEMPLATE_LOGO_URL,
       });
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
-        'EN',
+        LOCALE_ISO_CODES.EN,
       );
 
-      expect(settings.logoImageUrl).toBe(
-        'https://cdn.example.com/template-logo.png',
-      );
+      expect(settings.logoImageUrl).toBe(TEMPLATE_LOGO_URL);
     });
 
     it('falls back to the tenant-level logo when no per-template logo is set', async () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
-        'EN',
+        LOCALE_ISO_CODES.EN,
       );
 
-      expect(settings.logoImageUrl).toBe(
-        'https://cdn.example.com/tenant-logo.png',
-      );
+      expect(settings.logoImageUrl).toBe(TENANT_LOGO_URL);
     });
   });
 
@@ -139,26 +145,26 @@ describe('resolveNewsletterEmailSettings', () => {
     getEmailConfigMock.mockResolvedValue({
       tenantId: TENANT_ID,
       logoAssetUrl: undefined,
-      senderName: 'Zeta Times',
+      senderName: SENDER_NAME,
       replyToAddress: undefined,
       footerPostalAddress: undefined,
     });
     const defaultAddress = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
     expect(defaultAddress.fromAddress).toBe(
-      'Zeta Times <onboarding@resend.dev>',
+      `${SENDER_NAME} <onboarding@resend.dev>`,
     );
 
     const configuredAddress = await resolveNewsletterEmailSettings(
       TENANT_ID,
       'Newsletter <news@mail.example.com>',
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
     expect(configuredAddress.fromAddress).toBe(
-      'Zeta Times <news@mail.example.com>',
+      `${SENDER_NAME} <news@mail.example.com>`,
     );
   });
 
@@ -173,7 +179,7 @@ describe('resolveNewsletterEmailSettings', () => {
     const settings = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(settings.fromAddress).toBe(
@@ -192,7 +198,7 @@ describe('resolveNewsletterEmailSettings', () => {
     const settings = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(settings.fromAddress.match(/</g)).toHaveLength(1);
@@ -210,7 +216,7 @@ describe('resolveNewsletterEmailSettings', () => {
     const settings = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(settings.fromAddress).toBe(DEFAULT_FROM_ADDRESS);
@@ -221,16 +227,16 @@ describe('resolveNewsletterEmailSettings', () => {
       tenantId: TENANT_ID,
       logoAssetUrl: undefined,
       senderName: undefined,
-      replyToAddress: 'support@example.com',
+      replyToAddress: REPLY_TO_ADDRESS,
       footerPostalAddress: undefined,
     });
     const settings = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
 
-    expect(settings.replyTo).toBe('support@example.com');
+    expect(settings.replyTo).toBe(REPLY_TO_ADDRESS);
   });
 
   it('passes the footer postal address through', async () => {
@@ -239,148 +245,133 @@ describe('resolveNewsletterEmailSettings', () => {
       logoAssetUrl: undefined,
       senderName: undefined,
       replyToAddress: undefined,
-      footerPostalAddress: '123 Main St, Springfield',
+      footerPostalAddress: FOOTER_POSTAL_ADDRESS,
     });
     const settings = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
-      'EN',
+      LOCALE_ISO_CODES.EN,
     );
 
-    expect(settings.footerPostalAddress).toBe('123 Main St, Springfield');
+    expect(settings.footerPostalAddress).toBe(FOOTER_POSTAL_ADDRESS);
   });
 
-  describe('when console warnings are expected', () => {
-    let warnSpy: MockInstance<typeof console.warn>;
-
-    beforeEach(() => {
-      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  it('drops a malformed reply-to address and logs rather than passing it through', async () => {
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: undefined,
+      senderName: undefined,
+      replyToAddress: 'not-an-address',
+      footerPostalAddress: undefined,
     });
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      LOCALE_ISO_CODES.EN,
+    );
 
-    afterEach(() => {
-      warnSpy.mockRestore();
+    expect(settings.replyTo).toBeUndefined();
+    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+      'newsletter_email_settings.reply_to_invalid',
+      { tenantId: TENANT_ID },
+    );
+  });
+
+  it('falls back to product defaults and logs when getEmailConfig rejects', async () => {
+    getEmailConfigMock.mockRejectedValue(new Error('db down'));
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      LOCALE_ISO_CODES.EN,
+    );
+
+    expect(settings).toEqual({
+      subject: AUTHORED_SUBJECT,
+      body: AUTHORED_BODY,
+      logoImageUrl: undefined,
+      footerPostalAddress: undefined,
+      fromAddress: DEFAULT_FROM_ADDRESS,
+      replyTo: undefined,
     });
+    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+      'newsletter_email_settings.email_config_fetch_failed',
+      { tenantId: TENANT_ID, error: expect.any(Error) },
+    );
+  });
 
-    it('drops a malformed reply-to address and logs rather than passing it through', async () => {
-      getEmailConfigMock.mockResolvedValue({
-        tenantId: TENANT_ID,
-        logoAssetUrl: undefined,
-        senderName: undefined,
-        replyToAddress: 'not-an-address',
-        footerPostalAddress: undefined,
-      });
-      const settings = await resolveNewsletterEmailSettings(
-        TENANT_ID,
-        undefined,
-        'EN',
-      );
+  it('falls back to product-default subject and body and logs when getEmailTemplate rejects', async () => {
+    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      LOCALE_ISO_CODES.EN,
+    );
 
-      expect(settings.replyTo).toBeUndefined();
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('newsletter_email_settings.reply_to_invalid'),
-      );
+    expect(settings).toEqual({
+      subject: DEFAULT_COPY_SUBJECT,
+      body: DEFAULT_COPY_BODY,
+      logoImageUrl: undefined,
+      footerPostalAddress: undefined,
+      fromAddress: DEFAULT_FROM_ADDRESS,
+      replyTo: undefined,
     });
+    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+      'newsletter_email_settings.email_template_fetch_failed',
+      { tenantId: TENANT_ID, error: expect.any(Error) },
+    );
+  });
 
-    it('falls back to product defaults and logs when getEmailConfig rejects', async () => {
-      getEmailConfigMock.mockRejectedValue(new Error('db down'));
-      const settings = await resolveNewsletterEmailSettings(
-        TENANT_ID,
-        undefined,
-        'EN',
-      );
+  it("falls back to the product default in the reader's language when getEmailTemplate rejects", async () => {
+    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      LOCALE_ISO_CODES.FR,
+    );
 
-      expect(settings).toEqual({
-        subject: AUTHORED_SUBJECT,
-        body: AUTHORED_BODY,
-        logoImageUrl: undefined,
-        footerPostalAddress: undefined,
-        fromAddress: DEFAULT_FROM_ADDRESS,
-        replyTo: undefined,
-      });
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'newsletter_email_settings.email_config_fetch_failed',
-        ),
-      );
+    expect(settings.subject).toBe(FRENCH_DEFAULT_COPY_SUBJECT);
+  });
+
+  it('still uses the successfully-resolved per-template logo when getEmailConfig rejects', async () => {
+    getEmailConfigMock.mockRejectedValue(new Error('db down'));
+    getEmailTemplateMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+      subject: AUTHORED_SUBJECT,
+      body: AUTHORED_BODY,
+      logoAssetUrl: TEMPLATE_LOGO_URL,
     });
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      LOCALE_ISO_CODES.EN,
+    );
 
-    it('falls back to product-default subject and body and logs when getEmailTemplate rejects', async () => {
-      getEmailTemplateMock.mockRejectedValue(new Error('db down'));
-      const settings = await resolveNewsletterEmailSettings(
-        TENANT_ID,
-        undefined,
-        'EN',
-      );
+    expect(settings.logoImageUrl).toBe(TEMPLATE_LOGO_URL);
+  });
 
-      expect(settings).toEqual({
-        subject: DEFAULT_COPY_SUBJECT,
-        body: DEFAULT_COPY_BODY,
-        logoImageUrl: undefined,
-        footerPostalAddress: undefined,
-        fromAddress: DEFAULT_FROM_ADDRESS,
-        replyTo: undefined,
-      });
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'newsletter_email_settings.email_template_fetch_failed',
-        ),
-      );
+  it('still uses the successfully-resolved email_config values when getEmailTemplate rejects', async () => {
+    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: TENANT_LOGO_URL,
+      senderName: SENDER_NAME,
+      replyToAddress: REPLY_TO_ADDRESS,
+      footerPostalAddress: FOOTER_POSTAL_ADDRESS,
     });
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      LOCALE_ISO_CODES.EN,
+    );
 
-    it("falls back to the product default in the reader's language when getEmailTemplate rejects", async () => {
-      getEmailTemplateMock.mockRejectedValue(new Error('db down'));
-      const settings = await resolveNewsletterEmailSettings(
-        TENANT_ID,
-        undefined,
-        'FR',
-      );
-
-      expect(settings.subject).toBe(FRENCH_DEFAULT_COPY_SUBJECT);
-    });
-
-    it('still uses the successfully-resolved per-template logo when getEmailConfig rejects', async () => {
-      getEmailConfigMock.mockRejectedValue(new Error('db down'));
-      getEmailTemplateMock.mockResolvedValue({
-        tenantId: TENANT_ID,
-        templateType: 'NEWSLETTER_CONFIRMATION',
-        subject: AUTHORED_SUBJECT,
-        body: AUTHORED_BODY,
-        logoAssetUrl: 'https://cdn.example.com/template-logo.png',
-      });
-      const settings = await resolveNewsletterEmailSettings(
-        TENANT_ID,
-        undefined,
-        'EN',
-      );
-
-      expect(settings.logoImageUrl).toBe(
-        'https://cdn.example.com/template-logo.png',
-      );
-    });
-
-    it('still uses the successfully-resolved email_config values when getEmailTemplate rejects', async () => {
-      getEmailTemplateMock.mockRejectedValue(new Error('db down'));
-      getEmailConfigMock.mockResolvedValue({
-        tenantId: TENANT_ID,
-        logoAssetUrl: 'https://cdn.example.com/tenant-logo.png',
-        senderName: 'Zeta Times',
-        replyToAddress: 'support@example.com',
-        footerPostalAddress: '123 Main St, Springfield',
-      });
-      const settings = await resolveNewsletterEmailSettings(
-        TENANT_ID,
-        undefined,
-        'EN',
-      );
-
-      expect(settings).toEqual({
-        subject: DEFAULT_COPY_SUBJECT,
-        body: DEFAULT_COPY_BODY,
-        logoImageUrl: 'https://cdn.example.com/tenant-logo.png',
-        footerPostalAddress: '123 Main St, Springfield',
-        fromAddress: 'Zeta Times <onboarding@resend.dev>',
-        replyTo: 'support@example.com',
-      });
+    expect(settings).toEqual({
+      subject: DEFAULT_COPY_SUBJECT,
+      body: DEFAULT_COPY_BODY,
+      logoImageUrl: TENANT_LOGO_URL,
+      footerPostalAddress: FOOTER_POSTAL_ADDRESS,
+      fromAddress: `${SENDER_NAME} <onboarding@resend.dev>`,
+      replyTo: REPLY_TO_ADDRESS,
     });
   });
 });

@@ -104,7 +104,9 @@ jobs:
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
           # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          # A Sensitive var reaches this runner as the literal `[SENSITIVE]`, so the
+          # build skips env validation; the deployed app validates at startup.
+          SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
           npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
   deploy-admin:
@@ -151,5 +153,7 @@ jobs:
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
           # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          # A Sensitive var reaches this runner as the literal `[SENSITIVE]`, so the
+          # build skips env validation; the deployed app validates at startup.
+          SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
           npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"

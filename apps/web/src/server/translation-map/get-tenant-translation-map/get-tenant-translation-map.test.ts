@@ -13,7 +13,6 @@ vi.mock('@blog/service', () => ({
     global: { translationMap: { v1: { getTranslationMap: vi.fn() } } },
   },
 }));
-vi.mock('@web/utils/logger/logger');
 
 const tenant = { id: 'tenant-1' } as TTenant;
 const credentials = { projectId: 'proj', dataset: 'production', token: 'tok' };

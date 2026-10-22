@@ -40,7 +40,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 - `email_templates` (tenant × template type × language): `subject`, `body` (Portable Text in `jsonb`), both nullable.
 - `email_template_logos` (tenant × template type): per-template logo override, the same in every language.
 - `EMAIL_TEMPLATE_TYPE`: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`. Product default copy per language is `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE` in `@blog/db`.
-- Logos are uploaded to Vercel Blob (PNG, JPEG or GIF, at most 100 KB).
+- Logos are uploaded to Vercel Blob (PNG, JPEG or GIF, at most 100 KB), each upload under a unique name; a replaced or cleared logo's old blob is deleted best-effort.
 - The tenant palette is derived from the tenant's Look (`site_config`) at send time.
 
 ## Configuration

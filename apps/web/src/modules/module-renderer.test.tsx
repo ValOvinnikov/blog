@@ -21,8 +21,6 @@ const { ctaModuleMock, postListModuleMock, heroModuleMock } = vi.hoisted(
   }),
 );
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const moduleMap = {
@@ -34,9 +32,13 @@ const heroMap = {
   module_hero: heroModuleMock,
 };
 
+const CTA_ID = 'cta-doc-id';
+const POST_LIST_ID = 'post-list-id';
+const HERO_ID = 'hero-doc-id';
+
 describe(renderModules.name, () => {
   const setup = customRender(renderModules, {
-    modules: [{ type: 'module_cta', id: 'cta-doc-id' }],
+    modules: [{ type: 'module_cta', id: CTA_ID }],
     map: moduleMap,
   });
 
@@ -46,13 +48,13 @@ describe(renderModules.name, () => {
     });
 
     it('renders the mapped component for a known module type with its id', () => {
-      expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
+      expect(screen.getByTestId('stub-cta')).toHaveTextContent(CTA_ID);
     });
 
     it('forwards id to every module component', () => {
       expect(ctaModuleMock).toHaveBeenCalledWith(
         {
-          id: 'cta-doc-id',
+          id: CTA_ID,
         },
         undefined,
       );
@@ -64,7 +66,7 @@ describe(renderModules.name, () => {
 
     expect(ctaModuleMock).toHaveBeenCalledWith(
       {
-        id: 'cta-doc-id',
+        id: CTA_ID,
         context: { page: 2 },
       },
       undefined,
@@ -73,11 +75,11 @@ describe(renderModules.name, () => {
 
   it('renders a module_postList entry through the given map', () => {
     setup({
-      modules: [{ type: 'module_postList', id: 'post-list-id' }],
+      modules: [{ type: 'module_postList', id: POST_LIST_ID }],
     });
 
     expect(screen.getByTestId('stub-post-list')).toHaveTextContent(
-      'post-list-id',
+      POST_LIST_ID,
     );
   });
 
@@ -97,22 +99,22 @@ describe(renderModules.name, () => {
   it('renders every module keyed by its id, in the given order', () => {
     setup({
       modules: [
-        { type: 'module_cta', id: 'cta-doc-id' },
-        { type: 'module_postList', id: 'post-list-id' },
+        { type: 'module_cta', id: CTA_ID },
+        { type: 'module_postList', id: POST_LIST_ID },
       ],
     });
 
     const stubs = screen.getAllByTestId(/^stub-/);
     expect(stubs.map((node) => node.textContent)).toEqual([
-      'cta-doc-id',
-      'post-list-id',
+      CTA_ID,
+      POST_LIST_ID,
     ]);
   });
 });
 
 describe(renderHeroModule.name, () => {
   const setup = customRenderAsync(renderHeroModule, {
-    hero: { id: 'hero-doc-id', type: 'module_hero' },
+    hero: { id: HERO_ID, type: 'module_hero' },
     map: heroMap,
   });
 
@@ -122,19 +124,19 @@ describe(renderHeroModule.name, () => {
     });
 
     it('dispatches to the registered hero component for a known type', async () => {
-      expect(screen.getByTestId('stub-hero')).toHaveTextContent('hero-doc-id');
+      expect(screen.getByTestId('stub-hero')).toHaveTextContent(HERO_ID);
     });
 
     it('forwards id to the registered hero component', async () => {
       expect(heroModuleMock).toHaveBeenCalledWith({
-        id: 'hero-doc-id',
+        id: HERO_ID,
       });
     });
   });
 
   it('renders nothing for a hero type the map does not know and warns once', async () => {
     const { container } = await setup({
-      hero: { id: 'hero-doc-id', type: 'module_heroUnknown' as never },
+      hero: { id: HERO_ID, type: 'module_heroUnknown' as never },
     });
 
     expect(container).toBeEmptyDOMElement();

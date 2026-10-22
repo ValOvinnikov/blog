@@ -1,4 +1,6 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import {
   customRenderServerAsync,
   screen,
@@ -36,8 +38,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 vi.mock('@web/i18n/navigation');
 
 const getTopicPageMock = vi.mocked(service.pages.topic.v1.getTopicPage);
@@ -48,6 +48,11 @@ const setup = customRenderServerAsync(TopicPage, {
   slug: 'news',
 });
 
+const SUPPORTING_TEXT = 'The latest updates.';
+const ARIA_CURRENT = 'aria-current';
+const CTA_HEADING = 'Join the list';
+const HERO_HEADING = 'All about news';
+
 describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockResolvedValue({
@@ -56,7 +61,7 @@ describe(`<${TopicPage.name}/>`, () => {
         topic: makeTopic({ title: 'News', slug: 'news' }),
         headingBlock: makeHeadingBlock({
           heading: 'News',
-          supportingText: 'The latest updates.',
+          supportingText: SUPPORTING_TEXT,
         }),
       }),
     });
@@ -90,7 +95,7 @@ describe(`<${TopicPage.name}/>`, () => {
       expect(
         within(main).getByRole('heading', { level: 1, name: 'News' }),
       ).toBeVisible();
-      expect(within(main).getByText('The latest updates.')).toBeVisible();
+      expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
     });
 
     it('renders the breadcrumb trail outside main', () => {
@@ -109,18 +114,18 @@ describe(`<${TopicPage.name}/>`, () => {
         name: 'Topics',
       });
       expect(within(chips).getByRole('link', { name: 'News' })).toHaveAttribute(
-        'aria-current',
+        ARIA_CURRENT,
         'page',
       );
       expect(
         within(chips).getByRole('link', { name: 'Design' }),
-      ).not.toHaveAttribute('aria-current');
+      ).not.toHaveAttribute(ARIA_CURRENT);
     });
 
     it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
       expect(
         screen
-          .queryAllByTestId('json-ld-script')
+          .queryAllByTestId(JSON_LD_SCRIPT_TEST_ID)
           .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
       ).toBe(false);
     });
@@ -132,7 +137,7 @@ describe(`<${TopicPage.name}/>`, () => {
       error: new Error('boom'),
     });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
@@ -144,7 +149,7 @@ describe(`<${TopicPage.name}/>`, () => {
   it('calls notFound() without logging when the topic does not exist', async () => {
     getTopicPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
@@ -161,7 +166,7 @@ describe(`<${TopicPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
       ok: true,
       data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: 'Join the list' }),
+        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
       }),
     });
 
@@ -169,7 +174,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     expect(
       within(screen.getByRole('main')).getByRole('region', {
-        name: 'Join the list',
+        name: CTA_HEADING,
       }),
     ).toBeVisible();
   });
@@ -185,13 +190,13 @@ describe(`<${TopicPage.name}/>`, () => {
     });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
       ok: true,
-      data: makeHeroBlogData({ heading: 'All about news' }),
+      data: makeHeroBlogData({ heading: HERO_HEADING }),
     });
 
     await setup();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'All about news' }),
+      screen.getByRole('heading', { level: 1, name: HERO_HEADING }),
     ).toBeVisible();
     expect(
       screen.queryByRole('heading', { level: 1, name: 'News' }),
@@ -216,7 +221,9 @@ describe(`<${TopicPage.name}/>`, () => {
         error: new Error('boom'),
       });
 
-      await expect(setup({ page })).rejects.toThrow('NEXT_NOT_FOUND');
+      await expect(setup({ page })).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
       expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
         'list-1',
@@ -264,7 +271,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     expect(
       screen
-        .getAllByTestId('json-ld-script')
+        .getAllByTestId(JSON_LD_SCRIPT_TEST_ID)
         .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
     ).toBe(true);
   });

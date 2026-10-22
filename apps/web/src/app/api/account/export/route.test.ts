@@ -1,4 +1,4 @@
-export {};
+import { HTTP_STATUS } from '@blog/config/constants';
 
 const { authMock, exportAccountDataMock, resolveTenantIdMock, headersMock } =
   vi.hoisted(() => ({
@@ -21,18 +21,21 @@ vi.mock('@blog/db', () => ({
 vi.mock('next/headers', () => ({ headers: headersMock }));
 
 const TENANT_ID = 'tenant-1';
+const USER_ID = 'user-1';
+const HOST = 'acme.example.com';
+const PROFILE = { id: USER_ID, name: 'Jane Doe', email: 'jane@example.com' };
 
 describe('GET /api/account/export', () => {
   let GET: typeof import('./route').GET;
 
   beforeEach(async () => {
     authMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    authMock.mockResolvedValue({ user: { id: USER_ID } });
     exportAccountDataMock.mockReset();
     resolveTenantIdMock.mockReset();
     resolveTenantIdMock.mockResolvedValue(TENANT_ID);
     headersMock.mockReset();
-    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
+    headersMock.mockResolvedValue(new Headers({ host: HOST }));
     ({ GET } = await import('./route'));
   });
 
@@ -40,7 +43,7 @@ describe('GET /api/account/export', () => {
     authMock.mockResolvedValue(null);
     const response = await GET();
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(exportAccountDataMock).not.toHaveBeenCalled();
   });
 
@@ -48,52 +51,50 @@ describe('GET /api/account/export', () => {
     exportAccountDataMock.mockResolvedValue(undefined);
     const response = await GET();
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
   });
 
   it('streams the export as a downloadable JSON attachment', async () => {
     const exportData = {
-      profile: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
+      profile: PROFILE,
       bookmarks: [{ postId: 'post-1', createdAt: new Date('2026-01-01') }],
     };
     exportAccountDataMock.mockResolvedValue(exportData);
     const response = await GET();
     const json = await response.json();
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HTTP_STATUS.OK);
     expect(response.headers.get('Content-Type')).toBe('application/json');
     expect(response.headers.get('Content-Disposition')).toBe(
       'attachment; filename="account-data.json"',
     );
-    expect(json.profile).toEqual(exportData.profile);
+    expect(json.profile).toEqual(PROFILE);
     expect(json.bookmarks[0].postId).toBe('post-1');
-    expect(exportAccountDataMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+    expect(exportAccountDataMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
   });
 
   it('returns 404 without querying the db when no tenant resolves', async () => {
     resolveTenantIdMock.mockResolvedValue(undefined);
     const response = await GET();
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(exportAccountDataMock).not.toHaveBeenCalled();
   });
 
   it('resolves the tenant from the request Host header', async () => {
     exportAccountDataMock.mockResolvedValue({
-      profile: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
+      profile: PROFILE,
       bookmarks: [],
     });
     await GET();
 
-    expect(resolveTenantIdMock).toHaveBeenCalledWith('acme.example.com');
+    expect(resolveTenantIdMock).toHaveBeenCalledWith(HOST);
   });
 
   it('returns 500 when the export query throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     exportAccountDataMock.mockRejectedValue(new Error('boom'));
     const response = await GET();
 
-    expect(response.status).toBe(500);
-    errorSpy.mockRestore();
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
   });
 });

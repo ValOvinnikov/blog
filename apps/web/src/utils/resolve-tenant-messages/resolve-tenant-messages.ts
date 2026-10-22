@@ -4,6 +4,7 @@ import {
   VOICE_FIELDS,
   type TVoicePortableText,
 } from '@blog/config';
+import { SITE_CONFIG_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
 import {
@@ -70,7 +71,7 @@ export const resolveTenantMessages = async (
   const result = await getSiteConfig(tenant);
 
   if (!result.ok) {
-    logger.error('site_config.fetch_failed', { error: result.error });
+    logger.error(SITE_CONFIG_FETCH_FAILED_EVENT, { error: result.error });
     return { messages: base, rich: resolveVoiceRichFields({}, base) };
   }
 

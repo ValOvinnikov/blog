@@ -27,15 +27,18 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/utils/logger/logger');
-
 const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerWarnMock = vi.mocked(logger.warn);
+
+const FIRST_POST_TITLE = 'First post';
+const POST_RELATED_ID = 'post-related-1';
+const ANCHOR_POST_ID = 'anchor-post-1';
+const MODULE_HEADING = 'Related reading';
 
 const makePost = (overrides: Record<string, unknown> = {}) => ({
   id: 'post-1',
   slug: 'first-post',
-  title: 'First post',
+  title: FIRST_POST_TITLE,
   excerpt: 'An excerpt',
   publishedAt: '2026-01-01T00:00:00.000Z',
   topic: { id: 'topic-1', title: 'News', slug: 'news' },
@@ -44,8 +47,8 @@ const makePost = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const setup = customRenderAsync(PostRelatedModule, {
-  id: 'post-related-1',
-  context: { post: { id: 'anchor-post-1' } },
+  id: POST_RELATED_ID,
+  context: { post: { id: ANCHOR_POST_ID } },
 });
 
 describe(`<${PostRelatedModule.name}/>`, () => {
@@ -58,7 +61,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
+        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -71,8 +74,8 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     await setup();
 
     expect(getPostRelatedMock).toHaveBeenCalledWith(
-      'post-related-1',
-      'anchor-post-1',
+      POST_RELATED_ID,
+      ANCHOR_POST_ID,
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });
@@ -85,7 +88,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
     expect(loggerWarnMock).toHaveBeenCalledWith(
       'post_related_module.missing_post_context',
-      { id: 'post-related-1' },
+      { id: POST_RELATED_ID },
     );
   });
 
@@ -111,7 +114,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
+        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
@@ -121,7 +124,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('First post')).toBeVisible();
+    expect(screen.getByText(FIRST_POST_TITLE)).toBeVisible();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
@@ -131,7 +134,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
+        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost({ heroImage: sanityImage })],
         layout: undefined,
         contentAlignment: undefined,
@@ -149,7 +152,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
+        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost({ heroImage: makeSanityImage() })],
         layout: undefined,
         contentAlignment: undefined,
@@ -167,7 +170,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
+        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost({ excerpt: undefined })],
         layout: undefined,
         contentAlignment: undefined,
@@ -177,6 +180,6 @@ describe(`<${PostRelatedModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('First post')).toBeVisible();
+    expect(screen.getByText(FIRST_POST_TITLE)).toBeVisible();
   });
 });

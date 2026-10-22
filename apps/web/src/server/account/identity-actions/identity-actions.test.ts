@@ -1,6 +1,10 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import {
+  DISPLAY_NAME_UPDATE_FAILED_EVENT,
+  PROVIDER_UNLINK_FAILED_EVENT,
+} from '@web/constants/account';
 import { FIELD_ERROR } from '@web/constants/field-error';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import type * as TIdentityActions from './identity-actions';
 
@@ -23,30 +27,26 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
+const PROVIDER = 'github';
+
 const session = {
   user: { id: 'user-1', email: 'jane@icloud.com' },
 };
 
 describe('unlinkProviderAction', () => {
   let unlinkProviderAction: (typeof TIdentityActions)['unlinkProviderAction'];
-  let errorSpy: MockInstance<typeof console.error>;
 
   beforeEach(async () => {
     authMock.mockReset();
     unlinkProviderMock.mockReset();
     authMock.mockResolvedValue(session);
-    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     ({ unlinkProviderAction } = await import('./identity-actions'));
-  });
-
-  afterEach(() => {
-    errorSpy.mockRestore();
   });
 
   it('returns SERVER_ERROR without unlinking when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(unlinkProviderAction('github')).resolves.toEqual({
+    await expect(unlinkProviderAction(PROVIDER)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(unlinkProviderMock).not.toHaveBeenCalled();
@@ -54,21 +54,21 @@ describe('unlinkProviderAction', () => {
 
   it('rejects a provider that is not literally "github" or "google" at runtime, without logging or querying it', async () => {
     await expect(
-      unlinkProviderAction('DROP TABLE accounts;--' as 'github'),
+      unlinkProviderAction('DROP TABLE accounts;--' as typeof PROVIDER),
     ).resolves.toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
 
     expect(authMock).not.toHaveBeenCalled();
     expect(unlinkProviderMock).not.toHaveBeenCalled();
-    expect(errorSpy).not.toHaveBeenCalled();
+    expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
   });
 
   it("unlinks the session user's provider and returns SUCCESS", async () => {
     unlinkProviderMock.mockResolvedValue({ outcome: 'unlinked' });
 
-    await expect(unlinkProviderAction('github')).resolves.toEqual({
+    await expect(unlinkProviderAction(PROVIDER)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(unlinkProviderMock).toHaveBeenCalledWith('user-1', 'github');
+    expect(unlinkProviderMock).toHaveBeenCalledWith('user-1', PROVIDER);
   });
 
   it('returns BLOCKED when the db rejects the unlink', async () => {
@@ -79,13 +79,17 @@ describe('unlinkProviderAction', () => {
     });
   });
 
-  it('returns SERVER_ERROR and logs when the db write throws', async () => {
-    unlinkProviderMock.mockRejectedValue(new Error('boom'));
+  it('returns SERVER_ERROR and logs when the unlink write throws', async () => {
+    const error = new Error('boom');
+    unlinkProviderMock.mockRejectedValue(error);
 
-    await expect(unlinkProviderAction('github')).resolves.toEqual({
+    await expect(unlinkProviderAction(PROVIDER)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(errorSpy).toHaveBeenCalled();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      PROVIDER_UNLINK_FAILED_EVENT,
+      { provider: PROVIDER, error },
+    );
   });
 });
 
@@ -126,13 +130,15 @@ describe('updateDisplayNameAction', () => {
   });
 
   it('returns SERVER_ERROR and logs when the db write throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    updateDisplayNameMock.mockRejectedValue(new Error('boom'));
+    const error = new Error('boom');
+    updateDisplayNameMock.mockRejectedValue(error);
 
     await expect(updateDisplayNameAction('Jane')).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      DISPLAY_NAME_UPDATE_FAILED_EVENT,
+      { error },
+    );
   });
 });

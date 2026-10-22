@@ -39,7 +39,6 @@ vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url', () => ({
 }));
 
 vi.mock('@web/utils/env/env', () => ({ env: envMock }));
-vi.mock('@web/utils/logger/logger');
 
 const SITE_URL = `https://${faker.internet.domainName()}`;
 const PLATFORM_URL = `https://${faker.internet.domainName()}`;

@@ -1,7 +1,9 @@
 // @vitest-environment node
+import { HTTP_STATUS } from '@blog/config';
+import { FAVICON_RESPONSE_NOT_OK_EVENT } from '@web/constants/icon';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
@@ -24,12 +26,14 @@ const mockSiteConfig = (faviconAssetUrl: string | undefined) => {
   } as Awaited<ReturnType<typeof getSiteConfig>>);
 };
 
+const PNG_CONTENT_TYPE = 'image/png';
+const SVG_CONTENT_TYPE = 'image/svg+xml';
+const CONTENT_TYPE_HEADER = 'content-type';
+
 describe('icon', () => {
   let Icon: typeof import('./icon').default;
-  let consoleErrorSpy: MockInstance<typeof console.error>;
 
   beforeEach(async () => {
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getSiteConfigMock.mockReset();
     resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-a' } as Awaited<
       ReturnType<typeof resolveRequestTenant>
@@ -38,7 +42,6 @@ describe('icon', () => {
   });
 
   afterEach(() => {
-    consoleErrorSpy.mockRestore();
     vi.unstubAllGlobals();
   });
 
@@ -50,8 +53,8 @@ describe('icon', () => {
     it('serves the uploaded favicon with its own content type', async () => {
       const fetchMock = vi.fn().mockResolvedValue(
         new Response(new Uint8Array([1, 2, 3]), {
-          status: 200,
-          headers: { 'Content-Type': 'image/png' },
+          status: HTTP_STATUS.OK,
+          headers: { 'Content-Type': PNG_CONTENT_TYPE },
         }),
       );
       vi.stubGlobal('fetch', fetchMock);
@@ -62,7 +65,7 @@ describe('icon', () => {
         FAVICON_URL,
         expect.objectContaining({ signal: expect.anything() }),
       );
-      expect(response.headers.get('content-type')).toBe('image/png');
+      expect(response.headers.get(CONTENT_TYPE_HEADER)).toBe(PNG_CONTENT_TYPE);
       expect(new Uint8Array(await response.arrayBuffer())).toEqual(
         new Uint8Array([1, 2, 3]),
       );
@@ -71,29 +74,33 @@ describe('icon', () => {
     it('falls back to the default mark and logs when the favicon responds with a non-2xx status', async () => {
       vi.stubGlobal(
         'fetch',
-        vi.fn().mockResolvedValue(new Response(null, { status: 404 })),
+        vi
+          .fn()
+          .mockResolvedValue(
+            new Response(null, { status: HTTP_STATUS.NOT_FOUND }),
+          ),
       );
 
       const response = await Icon();
 
-      expect(response.headers.get('content-type')).toBe('image/svg+xml');
+      expect(response.headers.get(CONTENT_TYPE_HEADER)).toBe(SVG_CONTENT_TYPE);
       expect(await response.text()).toContain(FALLBACK_CONTENT);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('404'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        FAVICON_RESPONSE_NOT_OK_EVENT,
+        { status: HTTP_STATUS.NOT_FOUND },
       );
     });
 
     it('falls back to the default mark and logs when the favicon fetch throws', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockRejectedValue(new Error('network error')),
-      );
+      const networkError = new Error('network error');
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(networkError));
 
       const response = await Icon();
 
       expect(await response.text()).toContain(FALLBACK_CONTENT);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('icon.favicon_fetch_failed'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'icon.favicon_fetch_failed',
+        { error: networkError },
       );
     });
   });
@@ -111,7 +118,7 @@ describe('icon', () => {
 
     const response = await Icon();
 
-    expect(response.headers.get('content-type')).toBe('image/svg+xml');
+    expect(response.headers.get(CONTENT_TYPE_HEADER)).toBe(SVG_CONTENT_TYPE);
     expect(await response.text()).toContain(FALLBACK_CONTENT);
   });
 
@@ -124,16 +131,18 @@ describe('icon', () => {
   });
 
   it('falls back to the default mark and logs when the site config read fails', async () => {
+    const error = new Error('down');
     getSiteConfigMock.mockResolvedValue({
       ok: false,
-      error: new Error('down'),
+      error,
     } as Awaited<ReturnType<typeof getSiteConfig>>);
 
     const response = await Icon();
 
     expect(await response.text()).toContain(FALLBACK_CONTENT);
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('icon.site_config_fetch_failed'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'icon.site_config_fetch_failed',
+      { error },
     );
   });
 

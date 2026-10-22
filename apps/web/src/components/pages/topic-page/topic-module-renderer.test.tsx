@@ -1,4 +1,5 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
+import { TAXONOMY_KIND } from '@blog/config/constants';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
@@ -76,8 +77,6 @@ vi.mock('@web/modules/faq/faq-module', () => ({
   FaqModule: faqModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TopicModuleRenderer, {
@@ -86,6 +85,8 @@ const setup = customRenderAsync(TopicModuleRenderer, {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
+
+const POST_LIST_ID = 'post-list-1';
 
 describe(`<${TopicModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'News' });
@@ -121,7 +122,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: 'post-list-1', type: 'module_postList' },
+      { id: POST_LIST_ID, type: 'module_postList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
@@ -129,34 +130,30 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
       { id: 'content-1', type: 'module_content' },
       { id: 'faq-1', type: 'module_faq' },
     ],
-    expectedOrder: [
-      'post-list-1',
-      'post-latest-1',
-      'taxonomy-list-1',
-      'cta-1',
-      'newsletter-1',
-      'content-1',
-      'faq-1',
-    ],
   });
 
   it('forwards the given context to the modules', async () => {
     await setup({
-      modules: [{ id: 'post-list-1', type: 'module_postList' }],
+      modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
       context: {
         page: 2,
-        archive: { id: 'topic-1', kind: 'TOPICS', slug: 'news', name: 'News' },
+        archive: {
+          id: 'topic-1',
+          kind: TAXONOMY_KIND.TOPICS,
+          slug: 'news',
+          name: 'News',
+        },
       },
     });
 
     expect(postListModuleMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: 'post-list-1',
+        id: POST_LIST_ID,
         context: {
           page: 2,
           archive: {
             id: 'topic-1',
-            kind: 'TOPICS',
+            kind: TAXONOMY_KIND.TOPICS,
             slug: 'news',
             name: 'News',
           },

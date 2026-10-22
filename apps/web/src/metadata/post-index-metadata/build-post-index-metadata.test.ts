@@ -8,7 +8,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import { buildPostIndexMetadata } from './build-post-index-metadata';
 
@@ -31,11 +31,16 @@ const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   DEFAULT_TENANT_SANITY_CONTEXT,
 );
 
+const DESCRIPTION = 'All the posts.';
+const OG_DESCRIPTION = 'All the posts OG.';
+const PAGE_TWO_OG_TITLE = 'The Blog OG – Page 2';
+const OG_TITLE = 'The Blog OG';
+
 const seo = makeSeo({
   title: 'The Blog',
-  description: 'All the posts.',
-  ogTitle: 'The Blog OG',
-  ogDescription: 'All the posts OG.',
+  description: DESCRIPTION,
+  ogTitle: OG_TITLE,
+  ogDescription: OG_DESCRIPTION,
   ogImage,
 });
 
@@ -69,10 +74,10 @@ describe('buildPostIndexMetadata', () => {
       const metadata = await buildPostIndexMetadata(1);
 
       expect(metadata.title).toBe('The Blog');
-      expect(metadata.description).toBe('All the posts.');
+      expect(metadata.description).toBe(DESCRIPTION);
       expect(metadata.alternates?.canonical).toBe('/blog');
-      expect(metadata.openGraph?.title).toBe('The Blog OG');
-      expect(metadata.openGraph?.description).toBe('All the posts OG.');
+      expect(metadata.openGraph?.title).toBe(OG_TITLE);
+      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
       expect(metadata.openGraph?.images).toEqual([
         { url: EXPECTED_OG_IMAGE_URL },
       ]);
@@ -85,8 +90,8 @@ describe('buildPostIndexMetadata', () => {
       const metadata = await buildPostIndexMetadata(2);
 
       expect(metadata.title).toBe('The Blog – Page 2');
-      expect(metadata.openGraph?.title).toBe('The Blog OG – Page 2');
-      expect(metadata.twitter?.title).toBe('The Blog OG – Page 2');
+      expect(metadata.openGraph?.title).toBe(PAGE_TWO_OG_TITLE);
+      expect(metadata.twitter?.title).toBe(PAGE_TWO_OG_TITLE);
       expect(metadata.alternates?.canonical).toBe('/blog/page/2');
       expect(metadata.alternates?.canonical).not.toBe('/blog');
       expect(metadata.alternates?.types).toEqual({
@@ -96,16 +101,6 @@ describe('buildPostIndexMetadata', () => {
   });
 
   describe('when no metadata can be built', () => {
-    let errorSpy: MockInstance<typeof console.error>;
-
-    beforeEach(() => {
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      errorSpy.mockRestore();
-    });
-
     it('returns empty metadata and logs when the index page fetch fails', async () => {
       getPostIndexPageMock.mockResolvedValue({
         ok: false,
@@ -115,8 +110,9 @@ describe('buildPostIndexMetadata', () => {
       const metadata = await buildPostIndexMetadata(1);
 
       expect(metadata).toEqual({});
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('post_index_metadata.fetch_failed'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'post_index_metadata.fetch_failed',
+        expect.objectContaining({ error: expect.any(Error) }),
       );
     });
 
@@ -126,7 +122,7 @@ describe('buildPostIndexMetadata', () => {
       const metadata = await buildPostIndexMetadata(1);
 
       expect(metadata).toEqual({});
-      expect(errorSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
   });
 

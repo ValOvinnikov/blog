@@ -1,4 +1,5 @@
 import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
+import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { applySiteTemplate } from '@worker/units/apply-site-template';
 import { ensureInfrastructure } from '@worker/units/ensure-infrastructure';
 import { inviteOwner } from '@worker/units/invite-owner';
@@ -9,8 +10,9 @@ import { FatalError, getWorkflowMetadata } from 'workflow';
 
 import { provisionTenant } from './provision-tenant';
 
-const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
 const CTX = { runId: 'run-1' };
+const NO_PROJECT = 'no project';
+const REGISTRY_UNREACHABLE = 'registry unreachable';
 
 vi.mock('@worker/units/apply-site-template');
 vi.mock('@worker/units/ensure-infrastructure');
@@ -59,7 +61,7 @@ describe(provisionTenant, () => {
       order.push('finish');
     });
 
-    await provisionTenant(TENANT_ID);
+    await provisionTenant(TEST_TENANT_ID);
 
     expect(order).toEqual([
       'begin',
@@ -72,16 +74,16 @@ describe(provisionTenant, () => {
   });
 
   it('finishes the run as successful when every unit succeeds', async () => {
-    const outcome = await provisionTenant(TENANT_ID);
+    const outcome = await provisionTenant(TEST_TENANT_ID);
 
     expect(outcome).toEqual({ ok: true });
-    expect(finishRun).toHaveBeenCalledWith(TENANT_ID, CTX, { ok: true });
+    expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, { ok: true });
   });
 
   it('starts the owner access check once a run succeeds', async () => {
-    await provisionTenant(TENANT_ID);
+    await provisionTenant(TEST_TENANT_ID);
 
-    expect(startOwnerAccess).toHaveBeenCalledWith(TENANT_ID, CTX);
+    expect(startOwnerAccess).toHaveBeenCalledWith(TEST_TENANT_ID, CTX);
   });
 
   describe('when a unit reports a failure', () => {
@@ -95,57 +97,57 @@ describe(provisionTenant, () => {
     });
 
     it('stops without running the later units', async () => {
-      await expect(provisionTenant(TENANT_ID)).rejects.toThrow();
+      await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow();
 
       expect(ensureInfrastructure).toHaveBeenCalled();
       expect(verifyTenant).not.toHaveBeenCalled();
     });
 
     it('finishes the run with the failing step', async () => {
-      await expect(provisionTenant(TENANT_ID)).rejects.toThrow();
+      await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow();
 
-      expect(finishRun).toHaveBeenCalledWith(TENANT_ID, CTX, failure);
+      expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, failure);
     });
 
     it('ends the run in a fatal error so it is not retried', async () => {
-      await expect(provisionTenant(TENANT_ID)).rejects.toThrow(FatalError);
+      await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow(FatalError);
     });
 
     it('does not start the owner access check', async () => {
-      await expect(provisionTenant(TENANT_ID)).rejects.toThrow();
+      await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow();
 
       expect(startOwnerAccess).not.toHaveBeenCalled();
     });
   });
 
   it('finishes the run with the error when a unit throws', async () => {
-    vi.mocked(inviteOwner).mockRejectedValue(new Error('no project'));
+    vi.mocked(inviteOwner).mockRejectedValue(new Error(NO_PROJECT));
 
-    await expect(provisionTenant(TENANT_ID)).rejects.toThrow(FatalError);
+    await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow(FatalError);
 
-    expect(finishRun).toHaveBeenCalledWith(TENANT_ID, CTX, {
+    expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
       ok: false,
-      error: 'no project',
+      error: NO_PROJECT,
     });
     expect(applySiteTemplate).not.toHaveBeenCalled();
   });
 
   describe('when the run cannot be started', () => {
     beforeEach(() => {
-      vi.mocked(beginRun).mockRejectedValue(new Error('registry unreachable'));
+      vi.mocked(beginRun).mockRejectedValue(new Error(REGISTRY_UNREACHABLE));
     });
 
     it('finishes the run as failed with the error', async () => {
-      await expect(provisionTenant(TENANT_ID)).rejects.toThrow(FatalError);
+      await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow(FatalError);
 
-      expect(finishRun).toHaveBeenCalledWith(TENANT_ID, CTX, {
+      expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
         ok: false,
-        error: 'registry unreachable',
+        error: REGISTRY_UNREACHABLE,
       });
     });
 
     it('runs none of the units', async () => {
-      await expect(provisionTenant(TENANT_ID)).rejects.toThrow(FatalError);
+      await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow(FatalError);
 
       expect(ensureInfrastructure).not.toHaveBeenCalled();
     });

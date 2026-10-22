@@ -1,6 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
+import { TEST_ENQUEUE_SECRET } from '@worker/testing/enqueue/fixtures';
 import { signedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { SANITY_PROJECT_ID } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
@@ -9,7 +10,6 @@ import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run
 
 import { POST } from './route';
 
-const SECRET = 'enqueue-secret';
 const RESEND_URL = 'https://worker.example.com/api/owner-access/resend';
 
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
@@ -27,13 +27,13 @@ function resendRequest(): Request {
   return signedRequest(
     RESEND_URL,
     JSON.stringify({ tenantId: TEST_TENANT_ID }),
-    { secret: SECRET },
+    { secret: TEST_ENQUEUE_SECRET },
   );
 }
 
 describe('POST /api/owner-access/resend', () => {
   beforeEach(() => {
-    mockEnv.WORKER_ENQUEUE_SECRET = SECRET;
+    mockEnv.WORKER_ENQUEUE_SECRET = TEST_ENQUEUE_SECRET;
     vi.mocked(getTenantById).mockResolvedValue(
       makeTenant({ sanityProjectId: SANITY_PROJECT_ID }),
     );

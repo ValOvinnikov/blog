@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { logger } from '@web/utils/logger/logger';
 
 import { resolveNewsletterLinkLocale } from './newsletter-link-locale';
 
@@ -58,7 +59,6 @@ describe(resolveNewsletterLinkLocale, () => {
   });
 
   it('falls back to English when the tenant lookup fails', async () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     resolveRequestTenantMock.mockRejectedValue(new Error('db down'));
 
     await expect(
@@ -67,9 +67,9 @@ describe(resolveNewsletterLinkLocale, () => {
       locale: LOCALE_ISO_CODES.EN,
       defaultLocale: LOCALE_ISO_CODES.EN,
     });
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('newsletter.link_locale_tenant_lookup_failed'),
+    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+      'newsletter.link_locale_tenant_lookup_failed',
+      expect.objectContaining({ error: expect.any(Error) }),
     );
-    warnSpy.mockRestore();
   });
 });

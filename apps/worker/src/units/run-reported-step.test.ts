@@ -5,11 +5,11 @@ import {
 } from '@blog/db/constants';
 import { updateProvisioningStep } from '@blog/db/queries/tenants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { runReportedStep } from './run-reported-step';
 
-const TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
 const STEP = TENANT_PROVISIONING_STEP.CREATE_WEBHOOK;
 const SANITY_TIMED_OUT = 'sanity timed out';
 const STILL_DOWN = 'still down';
@@ -47,7 +47,7 @@ describe(runReportedStep, () => {
 
   function run(work: () => Promise<void>) {
     return runReportedStep({
-      tenantId: TENANT_ID,
+      tenantId: TEST_TENANT_ID,
       ctx: { runId: 'run-1' },
       step: STEP,
       run: work,
@@ -63,7 +63,7 @@ describe(runReportedStep, () => {
       TENANT_PROVISIONING_STEP_STATUS.DONE,
     ]);
     expect(updateProvisioningStep).toHaveBeenCalledWith(
-      expect.objectContaining({ tenantId: TENANT_ID, step: STEP }),
+      expect.objectContaining({ tenantId: TEST_TENANT_ID, step: STEP }),
     );
   });
 
@@ -111,7 +111,7 @@ describe(runReportedStep, () => {
     });
 
     const result = await runReportedStep({
-      tenantId: TENANT_ID,
+      tenantId: TEST_TENANT_ID,
       ctx: { runId: 'cli-run', isOneShot: true },
       step: STEP,
       run: () => Promise.reject(new Error(SANITY_TIMED_OUT)),

@@ -7,7 +7,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
-import type { MockInstance } from 'vitest';
+import { logger } from '@web/utils/logger/logger';
 
 import { buildTopicIndexMetadata } from './build-topic-index-metadata';
 
@@ -30,11 +30,15 @@ const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   DEFAULT_TENANT_SANITY_CONTEXT,
 );
 
+const DESCRIPTION = 'Browse every post by topic.';
+const OG_DESCRIPTION = 'Browse every post by topic OG.';
+const NL_TOPICS_PATH = '/nl/topics';
+
 const seo = makeSeo({
   title: 'Topics',
-  description: 'Browse every post by topic.',
+  description: DESCRIPTION,
   ogTitle: 'Topics OG',
-  ogDescription: 'Browse every post by topic OG.',
+  ogDescription: OG_DESCRIPTION,
   ogImage,
 });
 
@@ -67,12 +71,10 @@ describe('buildTopicIndexMetadata', () => {
       const metadata = await buildTopicIndexMetadata();
 
       expect(metadata.title).toBe('Topics');
-      expect(metadata.description).toBe('Browse every post by topic.');
+      expect(metadata.description).toBe(DESCRIPTION);
       expect(metadata.alternates?.canonical).toBe('/topics');
       expect(metadata.openGraph?.title).toBe('Topics OG');
-      expect(metadata.openGraph?.description).toBe(
-        'Browse every post by topic OG.',
-      );
+      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
       expect(metadata.openGraph?.images).toEqual([
         { url: EXPECTED_OG_IMAGE_URL },
       ]);
@@ -80,16 +82,6 @@ describe('buildTopicIndexMetadata', () => {
   });
 
   describe('when no metadata can be built', () => {
-    let errorSpy: MockInstance<typeof console.error>;
-
-    beforeEach(() => {
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      errorSpy.mockRestore();
-    });
-
     it('returns empty metadata and logs when the index page fetch fails', async () => {
       getTopicIndexPageMock.mockResolvedValue({
         ok: false,
@@ -99,8 +91,9 @@ describe('buildTopicIndexMetadata', () => {
       const metadata = await buildTopicIndexMetadata();
 
       expect(metadata).toEqual({});
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('topic_index_metadata.fetch_failed'),
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'topic_index_metadata.fetch_failed',
+        expect.objectContaining({ error: expect.any(Error) }),
       );
     });
 
@@ -110,7 +103,7 @@ describe('buildTopicIndexMetadata', () => {
       const metadata = await buildTopicIndexMetadata();
 
       expect(metadata).toEqual({});
-      expect(errorSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
   });
 
@@ -135,8 +128,8 @@ describe('buildTopicIndexMetadata', () => {
     const metadata = await buildTopicIndexMetadata();
 
     expect(metadata.alternates).toMatchObject({
-      canonical: '/nl/topics',
-      languages: { en: '/topics', nl: '/nl/topics', 'x-default': '/topics' },
+      canonical: NL_TOPICS_PATH,
+      languages: { en: '/topics', nl: NL_TOPICS_PATH, 'x-default': '/topics' },
     });
   });
 });

@@ -1,8 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
 
-export const TEST_TENANT_ID = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
+export const TEST_TENANT_ID = faker.string.uuid();
 
 export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
   return {

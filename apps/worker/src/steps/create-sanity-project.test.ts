@@ -1,12 +1,8 @@
 import { HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import {
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import type * as SanityProjectAccess from '@blog/db/utils/sanity-management-client/sanity-project-access';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
@@ -67,7 +63,6 @@ const MANAGEMENT_TOKEN = 'mgmt-token';
 const TENANT_DATASET = 'test-dataset';
 const ADMIN_APP_BASE_URL = 'https://admin.example.com';
 const PROJECT_ID = 'proj456';
-const TENANT_ID = 'tenant-1';
 const OWNER_EMAIL = 'owner@example.com';
 
 const env: TProvisionEnv = {
@@ -83,23 +78,10 @@ const env: TProvisionEnv = {
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: TENANT_ID,
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: null,
-    sanityDataset: null,
-    sanityReadTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
+  return makeTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-    provisioningSteps: null,
-    seededAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides,
-  } as TTenant;
+  });
 }
 
 beforeEach(() => {
@@ -164,7 +146,7 @@ describe(createTenantSanityProject, () => {
         displayName: 'Acme',
         organizationId: 'org-abc',
       });
-      expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TENANT_ID, {
+      expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TEST_TENANT_ID, {
         sanityProjectId: PROJECT_ID,
         sanityDataset: TENANT_DATASET,
       });
@@ -204,7 +186,7 @@ describe(createTenantSanityProject, () => {
         /CORS API is down/,
       );
 
-      expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TENANT_ID, {
+      expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TEST_TENANT_ID, {
         sanityProjectId: PROJECT_ID,
         sanityDataset: TENANT_DATASET,
       });
@@ -217,7 +199,7 @@ describe(createTenantSanityProject, () => {
     it('resolves the tenant owner email and invites them as a viewer when not already invited', async () => {
       await createTenantSanityProject(tenant, env);
 
-      expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(TENANT_ID);
+      expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(TEST_TENANT_ID);
       expect(listSanityProjectInvitesMock).toHaveBeenCalledWith({
         token: MANAGEMENT_TOKEN,
         projectId: PROJECT_ID,
@@ -257,7 +239,7 @@ describe(createTenantSanityProject, () => {
         });
         expect(logger.error).toHaveBeenCalledWith(
           'provisioning.owner_email_missing',
-          { tenantId: TENANT_ID },
+          { tenantId: TEST_TENANT_ID },
         );
         expect(logger.error).toHaveBeenCalledTimes(1);
       });
@@ -276,16 +258,19 @@ describe(createTenantSanityProject, () => {
           sanityProjectId: PROJECT_ID,
           sanityDataset: TENANT_DATASET,
         });
-        expect(setTenantSanityProjectMock).toHaveBeenCalledWith(TENANT_ID, {
-          sanityProjectId: PROJECT_ID,
-          sanityDataset: TENANT_DATASET,
-        });
+        expect(setTenantSanityProjectMock).toHaveBeenCalledWith(
+          TEST_TENANT_ID,
+          {
+            sanityProjectId: PROJECT_ID,
+            sanityDataset: TENANT_DATASET,
+          },
+        );
         expect(createSanityDatasetMock).toHaveBeenCalled();
         expect(addSanityCorsOriginMock).toHaveBeenCalled();
         expect(logger.error).toHaveBeenCalledWith(
           'provisioning.owner_invite_failed',
           expect.objectContaining({
-            tenantId: TENANT_ID,
+            tenantId: TEST_TENANT_ID,
             sanityProjectId: PROJECT_ID,
           }),
         );
@@ -306,7 +291,7 @@ describe(createTenantSanityProject, () => {
         expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
         expect(logger.error).toHaveBeenCalledWith(
           'provisioning.owner_invites_list_failed',
-          expect.objectContaining({ tenantId: TENANT_ID }),
+          expect.objectContaining({ tenantId: TEST_TENANT_ID }),
         );
       });
     });

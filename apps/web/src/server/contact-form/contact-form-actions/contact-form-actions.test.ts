@@ -35,9 +35,7 @@ vi.mock('@web/server/rate-limit/public-write-guard/public-write-guard', () => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await vi.importActual<typeof import('@blog/db/constants')>(
-    '@blog/db/constants',
-  )),
+  ...(await import('@blog/db/constants')),
   queries: { leads: { createLead: createLeadMock } },
 }));
 
@@ -59,8 +57,6 @@ vi.mock(
   '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features',
   () => ({ getEffectiveSettingsFeatures: getEffectiveSettingsFeaturesMock }),
 );
-
-vi.mock('@web/utils/logger/logger');
 
 const TENANT_ID = faker.string.uuid();
 const NAME = faker.person.fullName();

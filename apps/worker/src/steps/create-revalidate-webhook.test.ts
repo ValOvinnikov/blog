@@ -1,5 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
 import {
@@ -24,37 +25,34 @@ vi.mock('@blog/db/utils/sanity-management-client/sanity-webhooks', () => ({
   createSanityWebhook: createSanityWebhookMock,
 }));
 
+const REVALIDATE_WEBHOOK_URL = 'https://example.com/api/revalidate';
+const OLD_WEBHOOK_URL = 'https://old.example.com/api/revalidate';
+const OTHER_WEBHOOK_URL = 'https://other.example.com/api/revalidate';
+const MANAGEMENT_TOKEN = 'mgmt-token';
+const WEB_APP_BASE_URL = 'https://example.com';
+const REVALIDATE_SECRET = 'revalidate-shh';
+
 const env: TProvisionEnv = {
-  sanityManagementToken: 'mgmt-token',
+  sanityManagementToken: MANAGEMENT_TOKEN,
   sanityOrganizationId: 'org-abc',
   vercelToken: 'v-token',
   vercelTeamId: undefined,
   vercelWebProjectId: 'prj_web',
   adminAppBaseUrl: 'https://admin.example.com',
   tenantSanityDataset: 'test-dataset',
-  webAppBaseUrl: 'https://example.com',
-  revalidateSecret: 'revalidate-shh',
+  webAppBaseUrl: WEB_APP_BASE_URL,
+  revalidateSecret: REVALIDATE_SECRET,
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
+  return makeTenant({
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'enc',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PROVISIONING',
-    provisioningSteps: null,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     seededAt: new Date(),
-    webhookCreatedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides,
-  } as TTenant;
+  });
 }
 
 beforeEach(() => {
@@ -65,9 +63,7 @@ beforeEach(() => {
 
 describe(revalidateWebhookUrl, () => {
   it('appends the revalidation route to the base origin', () => {
-    expect(revalidateWebhookUrl('https://example.com')).toBe(
-      'https://example.com/api/revalidate',
-    );
+    expect(revalidateWebhookUrl(WEB_APP_BASE_URL)).toBe(REVALIDATE_WEBHOOK_URL);
   });
 });
 
@@ -75,21 +71,19 @@ describe(createTenantRevalidateWebhook, () => {
   it('creates the webhook when the marker is set but the existing hook targets an old URL', async () => {
     const tenant = baseTenant({ webhookCreatedAt: new Date() });
     listSanityWebhooksMock
+      .mockResolvedValueOnce([{ id: 'hook0', url: OLD_WEBHOOK_URL }])
       .mockResolvedValueOnce([
-        { id: 'hook0', url: 'https://old.example.com/api/revalidate' },
-      ])
-      .mockResolvedValueOnce([
-        { id: 'hook0', url: 'https://old.example.com/api/revalidate' },
-        { id: 'hook1', url: 'https://example.com/api/revalidate' },
+        { id: 'hook0', url: OLD_WEBHOOK_URL },
+        { id: 'hook1', url: REVALIDATE_WEBHOOK_URL },
       ]);
 
     await createTenantRevalidateWebhook(tenant, env);
 
     expect(createSanityWebhookMock).toHaveBeenCalledWith(
-      expect.objectContaining({ url: 'https://example.com/api/revalidate' }),
+      expect.objectContaining({ url: REVALIDATE_WEBHOOK_URL }),
     );
     expect(setTenantWebhookCreatedAtMock).toHaveBeenCalledWith(
-      'tenant-1',
+      TEST_TENANT_ID,
       expect.any(Date),
     );
   });
@@ -98,9 +92,7 @@ describe(createTenantRevalidateWebhook, () => {
     const tenant = baseTenant({ webhookCreatedAt: new Date() });
     listSanityWebhooksMock
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([
-        { id: 'hook1', url: 'https://example.com/api/revalidate' },
-      ]);
+      .mockResolvedValueOnce([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]);
 
     await createTenantRevalidateWebhook(tenant, env);
 
@@ -110,7 +102,7 @@ describe(createTenantRevalidateWebhook, () => {
   it('creates nothing and keeps the marker when the marker is set and the matching hook exists', async () => {
     const tenant = baseTenant({ webhookCreatedAt: new Date() });
     listSanityWebhooksMock.mockResolvedValue([
-      { id: 'hook1', url: 'https://example.com/api/revalidate' },
+      { id: 'hook1', url: REVALIDATE_WEBHOOK_URL },
     ]);
 
     await createTenantRevalidateWebhook(tenant, env);
@@ -137,60 +129,56 @@ describe(createTenantRevalidateWebhook, () => {
     it('creates the webhook and persists the marker when none exists yet', async () => {
       listSanityWebhooksMock
         .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([
-          { id: 'hook1', url: 'https://example.com/api/revalidate' },
-        ]);
+        .mockResolvedValueOnce([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]);
       createSanityWebhookMock.mockResolvedValue({
         id: 'hook1',
-        url: 'https://example.com/api/revalidate',
+        url: REVALIDATE_WEBHOOK_URL,
       });
 
       await createTenantRevalidateWebhook(tenant, env);
 
       expect(listSanityWebhooksMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
+        token: MANAGEMENT_TOKEN,
         projectId: 'proj123',
       });
       expect(createSanityWebhookMock).toHaveBeenCalledWith({
-        token: 'mgmt-token',
+        token: MANAGEMENT_TOKEN,
         projectId: 'proj123',
         dataset: 'production',
         name: expect.any(String),
-        url: 'https://example.com/api/revalidate',
-        secret: 'revalidate-shh',
+        url: REVALIDATE_WEBHOOK_URL,
+        secret: REVALIDATE_SECRET,
       });
       expect(setTenantWebhookCreatedAtMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TEST_TENANT_ID,
         expect.any(Date),
       );
     });
 
     it('skips creation but still persists the marker when a matching webhook already exists', async () => {
       listSanityWebhooksMock.mockResolvedValue([
-        { id: 'hook1', url: 'https://example.com/api/revalidate' },
+        { id: 'hook1', url: REVALIDATE_WEBHOOK_URL },
       ]);
 
       await createTenantRevalidateWebhook(tenant, env);
 
       expect(createSanityWebhookMock).not.toHaveBeenCalled();
       expect(setTenantWebhookCreatedAtMock).toHaveBeenCalledWith(
-        'tenant-1',
+        TEST_TENANT_ID,
         expect.any(Date),
       );
     });
 
     it('creates the webhook when existing webhooks point at different URLs', async () => {
       listSanityWebhooksMock
+        .mockResolvedValueOnce([{ id: 'hook0', url: OTHER_WEBHOOK_URL }])
         .mockResolvedValueOnce([
-          { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
-        ])
-        .mockResolvedValueOnce([
-          { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
-          { id: 'hook1', url: 'https://example.com/api/revalidate' },
+          { id: 'hook0', url: OTHER_WEBHOOK_URL },
+          { id: 'hook1', url: REVALIDATE_WEBHOOK_URL },
         ]);
       createSanityWebhookMock.mockResolvedValue({
         id: 'hook1',
-        url: 'https://example.com/api/revalidate',
+        url: REVALIDATE_WEBHOOK_URL,
       });
 
       await createTenantRevalidateWebhook(tenant, env);
@@ -202,7 +190,7 @@ describe(createTenantRevalidateWebhook, () => {
       listSanityWebhooksMock.mockResolvedValue([]);
       createSanityWebhookMock.mockResolvedValue({
         id: 'hook1',
-        url: 'https://example.com/api/revalidate',
+        url: REVALIDATE_WEBHOOK_URL,
       });
 
       await expect(createTenantRevalidateWebhook(tenant, env)).rejects.toThrow(

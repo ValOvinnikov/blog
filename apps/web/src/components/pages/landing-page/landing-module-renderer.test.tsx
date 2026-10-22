@@ -107,8 +107,6 @@ vi.mock('@web/modules/section-pages/section-pages-module', () => ({
   SectionPagesModule: sectionPagesModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(LandingModuleRenderer, {
@@ -118,6 +116,8 @@ const setup = customRenderAsync(LandingModuleRenderer, {
   modules: [],
   landingPage: { id: 'modules', path: 'modules' },
 });
+
+const SECTION_PAGES_ID = 'section-pages-1';
 
 describe(`<${LandingModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'About Us' });
@@ -147,15 +147,15 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
 
   it('renders the section pages module with the landing page as its context', async () => {
     await setup({
-      modules: [{ id: 'section-pages-1', type: 'module_sectionPages' }],
+      modules: [{ id: SECTION_PAGES_ID, type: 'module_sectionPages' }],
     });
 
     expect(screen.getByTestId('stub-section-pages')).toHaveTextContent(
-      'section-pages-1',
+      SECTION_PAGES_ID,
     );
     expect(sectionPagesModuleMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: 'section-pages-1',
+        id: SECTION_PAGES_ID,
         context: { landingPage: { id: 'modules', path: 'modules' } },
       }),
       undefined,
@@ -171,14 +171,6 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
-    ],
-    expectedOrder: [
-      'cta-1',
-      'content-1',
-      'newsletter-1',
-      'post-latest-1',
-      'taxonomy-list-1',
-      'post-featured-1',
     ],
   });
 });

@@ -1,6 +1,10 @@
 import {
+  DENSITY,
+  FONT_CHOICE,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+  RADIUS_SCALE,
   type TLocaleIsoCode,
 } from '@blog/config';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
@@ -14,9 +18,9 @@ import {
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
-import type { MockInstance } from 'vitest';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 
@@ -55,10 +59,10 @@ const getSiteSettingsMock = vi.mocked(getSiteSettings);
 
 const THEME_TOKENS = {
   accentHue: 250,
-  headingFont: 'SPACE_GROTESK',
-  bodyFont: 'NEWSREADER',
-  radiusScale: 'MD',
-  density: 'DEFAULT',
+  headingFont: FONT_CHOICE.SPACE_GROTESK,
+  bodyFont: FONT_CHOICE.NEWSREADER,
+  radiusScale: RADIUS_SCALE.MD,
+  density: DENSITY.DEFAULT,
 };
 
 const makeParams = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
@@ -135,16 +139,9 @@ describe('LocaleLayout', () => {
       expect(metadata.metadataBase).toBe(DEFAULT_REQUEST_CONTEXT.metadataBase);
     });
 
-    describe('when site settings fail to load', () => {
-      let errorSpy: MockInstance<typeof console.error>;
-
+    describe('when site settings fail to load the metadata', () => {
       beforeEach(() => {
-        errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         settingsFailure();
-      });
-
-      afterEach(() => {
-        errorSpy.mockRestore();
       });
 
       it('falls back to metadataBase only when site settings fail', async () => {
@@ -199,20 +196,15 @@ describe('LocaleLayout', () => {
     expect(footer?.type).toBe(SiteFooter);
   });
 
-  describe('when site settings fail to load', () => {
-    let errorSpy: MockInstance<typeof console.error>;
-
+  describe('when site settings fail to load the layout', () => {
     beforeEach(() => {
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       settingsFailure();
     });
 
-    afterEach(() => {
-      errorSpy.mockRestore();
-    });
-
     it('calls the real Next.js notFound() instead of rendering a broken shell', async () => {
-      await expect(renderLayout()).rejects.toThrow('NEXT_NOT_FOUND');
+      await expect(renderLayout()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
       expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     });
@@ -220,19 +212,16 @@ describe('LocaleLayout', () => {
     it('preserves the site_settings.layout_fetch_failed log call', async () => {
       await expect(renderLayout()).rejects.toThrow();
 
-      expect(
-        errorSpy.mock.calls.some((call) =>
-          call.some(
-            (arg) =>
-              typeof arg === 'string' &&
-              arg.includes('site_settings.layout_fetch_failed'),
-          ),
-        ),
-      ).toBe(true);
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'site_settings.layout_fetch_failed',
+        expect.anything(),
+      );
     });
 
     it('enters the request context ahead of the notFound() it throws', async () => {
-      await expect(renderLayout()).rejects.toThrow('NEXT_NOT_FOUND');
+      await expect(renderLayout()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
       expect(enterRequestContextMock.mock.invocationCallOrder[0]).toBeLessThan(
         vi.mocked(notFound).mock.invocationCallOrder[0]!,

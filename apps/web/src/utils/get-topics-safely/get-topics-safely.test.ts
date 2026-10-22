@@ -1,4 +1,5 @@
 import { service, type TTenantSanityContext } from '@blog/service';
+import { logger } from '@web/utils/logger/logger';
 
 import { getTopicsSafely } from './get-topics-safely';
 
@@ -36,17 +37,15 @@ describe('getTopicsSafely', () => {
   });
 
   it('falls back to an empty list and logs when the fetch resolves to a failure result', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
 
     await expect(getTopicsSafely(tenant)).resolves.toEqual([]);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('topics.fetch_failed'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'topics.fetch_failed',
+      expect.objectContaining({ error: expect.any(Error) }),
     );
-
-    errorSpy.mockRestore();
   });
 });

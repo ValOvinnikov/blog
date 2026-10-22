@@ -1,11 +1,17 @@
 import {
+  DENSITY,
+  FONT_CHOICE,
   LOCALE_ISO_CODES,
+  PRESET_ID,
+  RADIUS_SCALE,
   SITE_MESSAGES,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
   type TVoicePortableText,
 } from '@blog/config';
+import { SITE_CONFIG_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import { logger } from '@web/utils/logger/logger';
 
 import { resolveTenantMessages } from './resolve-tenant-messages';
 
@@ -29,17 +35,22 @@ const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
 const TENANT = { id: 'tenant-1' };
 
+const NOT_FOUND_HEADING_OVERRIDE = 'nope, try again';
+const BLOG_LIST_EMPTY_OVERRIDE = 'Nothing published yet.';
+const TOPIC_EMPTY_OVERRIDE = 'Nothing here yet.';
+const ORIGINAL_HEADING = 'Original heading';
+
 const siteConfigRow = (
   voiceOverrides: Record<string, string | TVoicePortableText> = {},
   locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN,
 ) => {
   return {
-    preset: 'CONSOLE',
+    preset: PRESET_ID.CONSOLE,
     accentHue: 250,
-    headingFont: 'SPACE_GROTESK',
-    bodyFont: 'NEWSREADER',
-    radiusScale: 'MD',
-    density: 'DEFAULT',
+    headingFont: FONT_CHOICE.SPACE_GROTESK,
+    bodyFont: FONT_CHOICE.NEWSREADER,
+    radiusScale: RADIUS_SCALE.MD,
+    density: DENSITY.DEFAULT,
     voiceOverridesByLocale: { [locale]: voiceOverrides },
   };
 };
@@ -92,7 +103,7 @@ describe('resolveTenantMessages', () => {
 
   it('applies a TEXT override at its registry path, leaving the rest unchanged', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ notFoundHeading: 'nope, try again' }),
+      siteConfigRow({ notFoundHeading: NOT_FOUND_HEADING_OVERRIDE }),
     );
 
     const { messages } = await resolveTenantMessages(
@@ -101,7 +112,7 @@ describe('resolveTenantMessages', () => {
     );
 
     expect(getAtPath(messages, ['notFound', 'heading'])).toBe(
-      'nope, try again',
+      NOT_FOUND_HEADING_OVERRIDE,
     );
     expect(getAtPath(messages, ['notFound', 'supportingText'])).toBe(
       SITE_MESSAGES.notFound.supportingText,
@@ -136,7 +147,7 @@ describe('resolveTenantMessages', () => {
 
   it('a tenant blogListEmpty voice override reaches blogListPage.empty', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ blogListEmpty: richTextOf('Nothing published yet.') }),
+      siteConfigRow({ blogListEmpty: richTextOf(BLOG_LIST_EMPTY_OVERRIDE) }),
     );
 
     const { messages } = await resolveTenantMessages(
@@ -145,13 +156,13 @@ describe('resolveTenantMessages', () => {
     );
 
     expect(getAtPath(messages, ['blogListPage', 'empty'])).toBe(
-      'Nothing published yet.',
+      BLOG_LIST_EMPTY_OVERRIDE,
     );
   });
 
   it('flattens a RICH override to plain text in the message tree', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ topicEmpty: richTextOf('Nothing here yet.') }),
+      siteConfigRow({ topicEmpty: richTextOf(TOPIC_EMPTY_OVERRIDE) }),
     );
 
     const { messages } = await resolveTenantMessages(
@@ -160,7 +171,7 @@ describe('resolveTenantMessages', () => {
     );
 
     expect(getAtPath(messages, ['topicPage', 'empty'])).toBe(
-      'Nothing here yet.',
+      TOPIC_EMPTY_OVERRIDE,
     );
   });
 
@@ -185,9 +196,6 @@ describe('resolveTenantMessages', () => {
 
   it('falls back to the base messages when the site config fetch fails', async () => {
     getSiteConfigMock.mockRejectedValue(new Error('boom'));
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
 
     const { messages } = await resolveTenantMessages(
       SITE_MESSAGES,
@@ -195,19 +203,21 @@ describe('resolveTenantMessages', () => {
     );
 
     expect(messages).toEqual(SITE_MESSAGES);
-    expect(consoleErrorSpy).toHaveBeenCalled();
-    consoleErrorSpy.mockRestore();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      SITE_CONFIG_FETCH_FAILED_EVENT,
+      { error: expect.any(Error) },
+    );
   });
 
   it('does not mutate the source object at the overridden path', async () => {
-    const base = { notFound: { heading: 'Original heading' } };
+    const base = { notFound: { heading: ORIGINAL_HEADING } };
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ notFoundHeading: 'Overridden heading' }),
     );
 
     await resolveTenantMessages(base, LOCALE_ISO_CODES.EN);
 
-    expect(base.notFound.heading).toBe('Original heading');
+    expect(base.notFound.heading).toBe(ORIGINAL_HEADING);
   });
 
   it('flattens a TEXT-kind override stored as Portable Text to plain text', async () => {
@@ -224,7 +234,7 @@ describe('resolveTenantMessages', () => {
   });
 
   it('returns a RICH override unflattened in the rich map, keyed by voice field id', async () => {
-    const override = richTextOf('Nothing published yet.');
+    const override = richTextOf(BLOG_LIST_EMPTY_OVERRIDE);
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ blogListEmpty: override }),
     );

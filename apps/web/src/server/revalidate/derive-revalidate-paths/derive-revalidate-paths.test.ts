@@ -59,8 +59,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 const loggerErrorMock = vi.mocked(logger.error);
 
 const tenant = {

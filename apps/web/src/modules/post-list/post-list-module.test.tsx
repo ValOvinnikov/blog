@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  NEXT_NAVIGATION_ERROR,
+  TAXONOMY_KIND,
+} from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -9,6 +13,7 @@ import {
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { PostListModule } from './post-list-module';
@@ -32,9 +37,28 @@ vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 
+const FIRST_POST = {
+  id: 'post-1',
+  slug: 'first-post',
+  title: 'First post',
+  excerpt: 'An excerpt',
+  publishedAt: '2026-01-01T00:00:00.000Z',
+  topic: { id: 'topic-1', title: 'News', slug: 'news' },
+  readingTimeMinutes: 2,
+};
+
+const MODULE_ID = 'post-list-1';
+
 const setup = customRenderAsync(PostListModule, {
-  id: 'post-list-1',
+  id: MODULE_ID,
 });
+
+const EMPTY_STATE = 'No posts yet.';
+const BROWSE_TOPICS = 'browse topics';
+const TOPIC_HEADING = 'Posts in News';
+const TOPIC_TITLE_ID = 'topic-posts-title';
+const TAG_HEADING = 'Posts tagged TypeScript';
+const TAG_TITLE_ID = 'tag-posts-title';
 
 describe(`<${PostListModule.name}/>`, () => {
   beforeEach(() => {
@@ -56,20 +80,18 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const error = new Error('boom');
     getPostListMock.mockResolvedValue({ ok: false, error });
 
     await expect(setup({ context: { page: 2 } })).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('post_list_module.fetch_failed'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'post_list_module.fetch_failed',
+      expect.anything(),
     );
-
-    errorSpy.mockRestore();
   });
 
   it('calls getPostList with the module id and context.page', async () => {
@@ -89,7 +111,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({ context: { page: 2 } });
 
     expect(getPostListMock).toHaveBeenCalledWith(
-      'post-list-1',
+      MODULE_ID,
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
       undefined,
@@ -100,7 +122,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({ context: undefined });
 
     expect(getPostListMock).toHaveBeenCalledWith(
-      'post-list-1',
+      MODULE_ID,
       DEFAULT_TENANT_SANITY_CONTEXT,
       1,
       undefined,
@@ -120,7 +142,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup();
 
     expect(getPostListMock).toHaveBeenCalledWith(
-      'post-list-1',
+      MODULE_ID,
       tenant,
       1,
       undefined,
@@ -130,18 +152,18 @@ describe(`<${PostListModule.name}/>`, () => {
   it('renders the i18n default empty message when zero posts resolve, unconditionally', async () => {
     await setup();
 
-    expect(screen.getByText('No posts yet.')).toBeVisible();
+    expect(screen.getByText(EMPTY_STATE)).toBeVisible();
   });
 
   it('renders an authored link in the empty message', async () => {
     vi.mocked(getVoiceRich).mockResolvedValueOnce(
-      makeFormattedVoiceRich({ linkText: 'browse topics', href: '/topics' }),
+      makeFormattedVoiceRich({ linkText: BROWSE_TOPICS, href: '/topics' }),
     );
 
     await setup();
 
     expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('blogListEmpty');
-    expect(screen.getByRole('link', { name: 'browse topics' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: BROWSE_TOPICS })).toHaveAttribute(
       'href',
       '/topics',
     );
@@ -153,17 +175,7 @@ describe(`<${PostListModule.name}/>`, () => {
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
+        posts: [FIRST_POST],
         layout: undefined,
         contentAlignment: undefined,
         currentPage: 2,
@@ -198,7 +210,7 @@ describe(`<${PostListModule.name}/>`, () => {
     });
 
     await expect(setup({ context: { page: 5 } })).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
@@ -208,7 +220,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({ context: { page: 1 } });
 
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    expect(screen.getByText('No posts yet.')).toBeVisible();
+    expect(screen.getByText(EMPTY_STATE)).toBeVisible();
   });
 
   it('renders each post image when showImages is true', async () => {
@@ -220,13 +232,7 @@ describe(`<${PostListModule.name}/>`, () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [
           {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
+            ...FIRST_POST,
             heroImage: sanityImage,
           },
         ],
@@ -251,13 +257,7 @@ describe(`<${PostListModule.name}/>`, () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [
           {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
+            ...FIRST_POST,
             heroImage: makeSanityImage(),
           },
         ],
@@ -279,18 +279,8 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Posts in News' }),
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
+        headingBlock: makeHeadingBlock({ heading: TOPIC_HEADING }),
+        posts: [FIRST_POST],
         layout: undefined,
         contentAlignment: undefined,
         currentPage: 2,
@@ -311,16 +301,17 @@ describe(`<${PostListModule.name}/>`, () => {
     });
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Posts in News' }),
-    ).toHaveAttribute('id', 'topic-posts-title');
-    expect(
-      screen.getByRole('region', { name: 'Posts in News' }),
-    ).toHaveAttribute('aria-labelledby', 'topic-posts-title');
+      screen.getByRole('heading', { level: 2, name: TOPIC_HEADING }),
+    ).toHaveAttribute('id', TOPIC_TITLE_ID);
+    expect(screen.getByRole('region', { name: TOPIC_HEADING })).toHaveAttribute(
+      'aria-labelledby',
+      TOPIC_TITLE_ID,
+    );
     expect(
       screen.getByRole('navigation', { name: 'News pages' }),
     ).toBeVisible();
     expect(getPostListMock).toHaveBeenCalledWith(
-      'post-list-1',
+      MODULE_ID,
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
       { termId: 'topic-1' },
@@ -338,18 +329,8 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Posts tagged TypeScript' }),
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
+        headingBlock: makeHeadingBlock({ heading: TAG_HEADING }),
+        posts: [FIRST_POST],
         layout: undefined,
         contentAlignment: undefined,
         currentPage: 2,
@@ -372,14 +353,14 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: 'Posts tagged TypeScript',
+        name: TAG_HEADING,
       }),
-    ).toHaveAttribute('id', 'tag-posts-title');
+    ).toHaveAttribute('id', TAG_TITLE_ID);
     expect(
       screen.getByRole('navigation', { name: 'TypeScript pages' }),
     ).toBeVisible();
     expect(getPostListMock).toHaveBeenCalledWith(
-      'post-list-1',
+      MODULE_ID,
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
       { termId: 'tag-1' },
@@ -397,7 +378,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Posts tagged TypeScript' }),
+        headingBlock: makeHeadingBlock({ heading: TAG_HEADING }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -421,9 +402,9 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: 'Posts tagged TypeScript',
+        name: TAG_HEADING,
       }),
-    ).toHaveAttribute('id', 'tag-posts-title');
+    ).toHaveAttribute('id', TAG_TITLE_ID);
   });
 
   it('keeps the blog-archive defaults intact when context.archive is absent', async () => {
@@ -445,6 +426,6 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'All posts' }),
     ).toHaveAttribute('id', 'blog-posts-title');
-    expect(screen.getByText('No posts yet.')).toBeVisible();
+    expect(screen.getByText(EMPTY_STATE)).toBeVisible();
   });
 });

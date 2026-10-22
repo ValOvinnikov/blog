@@ -1,5 +1,7 @@
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
+import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
@@ -37,8 +39,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/logger/logger');
-
 vi.mock('@web/i18n/navigation');
 
 const getPageMock = vi.mocked(service.pages.landing.v1.getPage);
@@ -49,6 +49,12 @@ const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 const setup = customRenderServerAsync(LandingPage, {
   path: 'about-us',
 });
+
+const SECTION_NAV_NAME = 'In this section';
+const MOVED_DESTINATION = '/company/about';
+const SUPPORTING_TEXT = 'Who we are.';
+const CTA_HEADING = 'Join the list';
+const HERO_HEADING = 'Meet the team';
 
 describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
@@ -85,12 +91,12 @@ describe(`<${LandingPage.name}/>`, () => {
 
     it('renders no section navigation when the page is outside a section', () => {
       expect(
-        screen.queryByRole('navigation', { name: 'In this section' }),
+        screen.queryByRole('navigation', { name: SECTION_NAV_NAME }),
       ).not.toBeInTheDocument();
     });
 
     it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
-      const scripts = screen.getAllByTestId('json-ld-script');
+      const scripts = screen.getAllByTestId(JSON_LD_SCRIPT_TEST_ID);
       expect(
         scripts.some((script) =>
           script.textContent?.includes(FAQ_PAGE_JSON_LD),
@@ -108,22 +114,26 @@ describe(`<${LandingPage.name}/>`, () => {
       getRedirectMock.mockResolvedValueOnce({
         ok: true,
         data: {
-          destination: '/company/about',
+          destination: MOVED_DESTINATION,
           status: REDIRECT_STATUS.PERMANENT,
         },
       });
 
-      await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+      );
 
       expect(permanentRedirect).toHaveBeenCalledWith({
-        href: '/company/about',
+        href: MOVED_DESTINATION,
         locale: DEFAULT_REQUEST_CONTEXT.locale,
       });
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     });
 
     it('calls notFound() without logging when the page does not exist', async () => {
-      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
       expect(vi.mocked(notFound)).toHaveBeenCalled();
       expect(logger.error).not.toHaveBeenCalled();
@@ -133,7 +143,7 @@ describe(`<${LandingPage.name}/>`, () => {
   it('logs and calls notFound() when the fetch fails', async () => {
     getPageMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
@@ -156,7 +166,7 @@ describe(`<${LandingPage.name}/>`, () => {
       data: tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
     }));
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalled();
   });
@@ -168,7 +178,7 @@ describe(`<${LandingPage.name}/>`, () => {
         ...mockLandingPage,
         headingBlock: makeHeadingBlock({
           heading: 'About Us',
-          supportingText: 'Who we are.',
+          supportingText: SUPPORTING_TEXT,
         }),
       },
     });
@@ -179,7 +189,7 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(
       within(main).getByRole('heading', { level: 1, name: 'About Us' }),
     ).toBeVisible();
-    expect(within(main).getByText('Who we are.')).toBeVisible();
+    expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
   });
 
   it('renders the section navigation inside main with the current page marked', async () => {
@@ -195,7 +205,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
     const sectionNav = within(screen.getByRole('main')).getByRole(
       'navigation',
-      { name: 'In this section' },
+      { name: SECTION_NAV_NAME },
     );
     expect(
       within(sectionNav).getByRole('link', { name: 'FAQ' }),
@@ -213,7 +223,7 @@ describe(`<${LandingPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
       ok: true,
       data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: 'Join the list' }),
+        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
       }),
     });
 
@@ -221,7 +231,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
     expect(
       within(screen.getByRole('main')).getByRole('region', {
-        name: 'Join the list',
+        name: CTA_HEADING,
       }),
     ).toBeVisible();
   });
@@ -236,13 +246,13 @@ describe(`<${LandingPage.name}/>`, () => {
     });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
       ok: true,
-      data: makeHeroBlogData({ heading: 'Meet the team' }),
+      data: makeHeroBlogData({ heading: HERO_HEADING }),
     });
 
     await setup();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Meet the team' }),
+      screen.getByRole('heading', { level: 1, name: HERO_HEADING }),
     ).toBeVisible();
     expect(
       screen.queryByRole('heading', { level: 1, name: 'About Us' }),
@@ -266,7 +276,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    const scripts = screen.getAllByTestId('json-ld-script');
+    const scripts = screen.getAllByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(
       scripts.some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
     ).toBe(true);

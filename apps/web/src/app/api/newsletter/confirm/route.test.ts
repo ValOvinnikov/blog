@@ -15,6 +15,7 @@ import {
   DEFAULT_TENANT_BASE_URL,
   DEFAULT_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { GET } from './route';
 
@@ -158,14 +159,14 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('sends them to the failed page and logs when the db query throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    confirmSubscriberMock.mockRejectedValue(new Error('db down'));
+    const error = new Error('db down');
+    confirmSubscriberMock.mockRejectedValue(error);
     const response = await GET(request);
 
     expect(response.headers.get('location')).toBe(FAILED_LOCATION);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('newsletter.confirm_failed'),
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      'newsletter.confirm_failed',
+      { error },
     );
-    errorSpy.mockRestore();
   });
 });

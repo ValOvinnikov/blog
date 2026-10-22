@@ -1,6 +1,5 @@
-import { ACTION_OUTCOME, TENANT_WRITE_REFUSAL } from '@blog/config';
+import { ACTION_OUTCOME, ERROR_CODE, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
-import type { MockInstance } from 'vitest';
 
 import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 
@@ -77,12 +76,9 @@ describe('getBookmarkStatus', () => {
 });
 
 describe('setBookmarkStatus', () => {
-  let errorSpy: MockInstance<typeof console.error>;
-
   beforeEach(() => {
     authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
@@ -90,10 +86,6 @@ describe('setBookmarkStatus', () => {
     });
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
-  });
-
-  afterEach(() => {
-    errorSpy.mockRestore();
   });
 
   it('returns SERVER_ERROR without writing when there is no session', async () => {
@@ -143,7 +135,10 @@ describe('setBookmarkStatus', () => {
   });
 
   it('returns SERVER_ERROR when addBookmark resolves a typed failure', async () => {
-    addBookmarkMock.mockResolvedValue({ ok: false, error: 'DB_NOT_FOUND' });
+    addBookmarkMock.mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_NOT_FOUND,
+    });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
