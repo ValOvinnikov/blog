@@ -25,13 +25,15 @@ type TBlockTenantOwnerEmailFailure =
   | (TOutcome<typeof ACTION_OUTCOME.REFUSED> &
       TReasonedFailure<typeof TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN>);
 
+export type TSavedOwnerEmailBlock = TAddBlockedIdentityOutcome & {
+  reason: string;
+};
+
 export const blockTenantOwnerEmail = async (
   admin: TAdmin,
   tenantId: string,
   reason: string,
-): Promise<
-  TResult<TAddBlockedIdentityOutcome, TBlockTenantOwnerEmailFailure>
-> => {
+): Promise<TResult<TSavedOwnerEmailBlock, TBlockTenantOwnerEmailFailure>> => {
   const ownerEmail = await queries.memberships.getTenantOwnerEmail(tenantId);
   if (!ownerEmail) {
     return {
@@ -49,7 +51,7 @@ export const blockTenantOwnerEmail = async (
     reason,
     admin,
   });
-  if (saved.ok) return saved;
+  if (saved.ok) return { ok: true, data: { ...saved.data, reason } };
 
   logger.error('tenant.suspension_block_failed', {
     tenantId,
@@ -59,14 +61,13 @@ export const blockTenantOwnerEmail = async (
 };
 
 export const confirmOwnerEmailBlock = async (
-  block: TMaybeUndefined<TAddBlockedIdentityOutcome>,
-  reason: string,
+  block: TMaybeUndefined<TSavedOwnerEmailBlock>,
 ): Promise<void> => {
-  if (block?.created) await recordSignupBlockAdded(block.entry, reason);
+  if (block?.created) await recordSignupBlockAdded(block.entry, block.reason);
 };
 
 export const undoOwnerEmailBlock = async (
-  block: TMaybeUndefined<TAddBlockedIdentityOutcome>,
+  block: TMaybeUndefined<TSavedOwnerEmailBlock>,
 ): Promise<void> => {
   if (!block?.created) return;
 

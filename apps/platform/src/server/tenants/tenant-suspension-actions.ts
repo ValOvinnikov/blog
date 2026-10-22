@@ -8,7 +8,6 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { queries, TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
-import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -19,6 +18,7 @@ import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-si
 import {
   blockTenantOwnerEmail,
   confirmOwnerEmailBlock,
+  type TSavedOwnerEmailBlock,
   undoOwnerEmailBlock,
 } from '@platform/server/tenants/block-tenant-owner-email';
 import { logger } from '@platform/utils/logger/logger';
@@ -66,7 +66,7 @@ const setSuspension = async (
     return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
   }
 
-  let ownerBlock: TMaybeUndefined<TAddBlockedIdentityOutcome>;
+  let ownerBlock: TMaybeUndefined<TSavedOwnerEmailBlock>;
   let isSuspensionSaved = false;
   try {
     if (parsedBlock) {
@@ -88,7 +88,7 @@ const setSuspension = async (
       };
     }
     isSuspensionSaved = true;
-    await confirmOwnerEmailBlock(ownerBlock, parsedBlock?.data.reason ?? '');
+    await confirmOwnerEmailBlock(ownerBlock);
     await revalidateSiteConfig(tenantId);
   } catch (error) {
     logger.error('tenant.suspension_save_failed', { tenantId, status, error });

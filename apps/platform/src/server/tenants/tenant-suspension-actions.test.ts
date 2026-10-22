@@ -361,6 +361,23 @@ describe('tenant suspension actions', () => {
         },
       );
 
+      it('keeps the block and audits it once when only the cache purge fails', async () => {
+        revalidateSiteConfigMock.mockRejectedValue(new Error('cache down'));
+
+        const result = await actions.suspendTenantAction(
+          ACTIVE_TENANT.id,
+          OWNER_BLOCK,
+        );
+
+        expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+        expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
+        expect(recordSignupBlockAddedMock).toHaveBeenCalledTimes(1);
+        expect(recordSignupBlockAddedMock).toHaveBeenCalledWith(
+          ENTRY,
+          BLOCK_REASON,
+        );
+      });
+
       it('keeps a block that was already on the list', async () => {
         saveSignupBlockMock.mockResolvedValue({
           ok: true,
