@@ -35,10 +35,15 @@ export function buildAuthConfig(app: TAuthApp): NextAuthConfig {
       cookies: buildPlatformCookies(useSecureCookies),
     }),
     callbacks: {
-      // The database strategy's default callback drops the adapter user's id.
+      // The returned object is the public /api/auth/session body, so it never spreads the session row.
       session: ({ session, user }) => ({
-        ...session,
-        user: { ...session.user, id: user.id },
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        },
+        expires: new Date(session.expires).toISOString(),
       }),
     },
     ...(app === AUTH_APP.PLATFORM && {

@@ -30,6 +30,38 @@ vi.mock('@blog/auth/events/record-signup-terms-on-sign-in', () => ({
 const SIGNED_IN_USER = { id: 'user-1', email: 'owner@example.com' };
 const AUTH_SECRET_VALUE = 'test-secret';
 
+const SESSION_EXPIRES = new Date('2030-01-01T00:00:00Z');
+
+type TSessionCallbackParams = Parameters<
+  NonNullable<NonNullable<NextAuthConfig['callbacks']>['session']>
+>[0];
+
+async function resolveSessionResponse(
+  config: NextAuthConfig,
+): Promise<unknown> {
+  const user = {
+    ...SIGNED_IN_USER,
+    name: null,
+    image: null,
+    emailVerified: null,
+  };
+  const databaseStrategyParams = {
+    session: {
+      sessionToken: 'session-token',
+      userId: user.id,
+      expires: SESSION_EXPIRES,
+      app: AUTH_APP.SITE,
+      user,
+    },
+    user,
+    newSession: undefined,
+  };
+
+  return config.callbacks?.session?.(
+    databaseStrategyParams as unknown as TSessionCallbackParams,
+  );
+}
+
 async function importBuildAuthConfig(): Promise<typeof buildAuthConfig> {
   vi.resetModules();
   return (await import('./config')).buildAuthConfig;
@@ -87,8 +119,24 @@ describe(buildAuthConfig, () => {
       );
     });
 
-    it("exposes a session callback that adds the adapter user's id", () => {
-      expect(config.callbacks?.session).toEqual(expect.any(Function));
+    it('returns the user with their id, and the expiry, as the session', async () => {
+      expect(await resolveSessionResponse(config)).toEqual({
+        user: {
+          id: SIGNED_IN_USER.id,
+          name: null,
+          email: SIGNED_IN_USER.email,
+          image: null,
+        },
+        expires: SESSION_EXPIRES.toISOString(),
+      });
+    });
+
+    it('never puts the session token, user id or app in the session', async () => {
+      const response = await resolveSessionResponse(config);
+
+      expect(response).not.toHaveProperty('sessionToken');
+      expect(response).not.toHaveProperty('userId');
+      expect(response).not.toHaveProperty('app');
     });
 
     it('leaves pending membership invites alone on sign-in', async () => {

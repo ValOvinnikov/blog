@@ -44,7 +44,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 ## Constraints and invariants
 
-- Session strategy is `database`; the `session` callback copies the adapter's `user.id` onto `session.user.id`, which every authorization lookup keys on.
+- Session strategy is `database`; the `session` callback returns only the user (`id`, `name`, `email`, `image`) and `expires` — `user.id` is what every authorization lookup keys on, and the session row's `sessionToken`, `userId` and `app` never reach `/api/auth/session`.
 - An `accounts` row never holds the provider's `access_token`, `refresh_token` or `id_token`: nothing calls Google or GitHub on a user's behalf, so the adapter drops them before the row is written. The columns stay because the adapter expects them.
 - A `sessions` row never holds the session cookie's value: the adapter stores and looks a session up by the SHA-256 hex of the cookie token, and only the cookie carries the raw token.
 - Each session row records the app that issued it (`sessions.app`). Each app reads the other's session as no session: the platform names its cookies apart, and a site stamps its sessions `SITE` and keeps Auth.js's default cookie names.
