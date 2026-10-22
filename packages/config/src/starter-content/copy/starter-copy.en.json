@@ -72,5 +72,54 @@
       "metaTitle": "About — who writes this blog and what it covers",
       "metaDescription": "Who writes this blog and what it covers. Edit this page’s Heading Block and SEO fields once you have real copy."
     }
+  },
+  "portfolio": {
+    "hero": {
+      "eyebrow": "Portfolio",
+      "heading": "Selected work and the story behind it"
+    },
+    "intro": {
+      "body": [
+        "Welcome to my portfolio. Here you'll find a few projects I'm proud of, with a short note on what each one involved.",
+        "Replace this text with a few lines about who you are, what you do and the kind of work you're looking for."
+      ]
+    },
+    "cta": {
+      "heading": "See the work",
+      "supportingText": "Browse the projects, from the brief to the finished result."
+    },
+    "work": {
+      "title": "Work",
+      "slug": "work",
+      "heading": "Work",
+      "supportingText": "A selection of recent projects.",
+      "listHeading": "Projects",
+      "metaTitle": "Work — a selection of recent projects and case studies",
+      "metaDescription": "A selection of recent projects, each with a short note on the brief, the approach and the result."
+    },
+    "projects": [
+      {
+        "title": "Sample project one",
+        "slug": "sample-project-one",
+        "summary": "A sample case study. Replace it with a real project.",
+        "body": [
+          "Describe the brief: who the project was for and what they needed.",
+          "Then explain your approach and what came of it. Add images and links once you have them."
+        ],
+        "metaTitle": "Sample project one — a case study to replace",
+        "metaDescription": "A sample case study created with your site. Replace it with one of your own projects."
+      },
+      {
+        "title": "Sample project two",
+        "slug": "sample-project-two",
+        "summary": "Another sample case study, ready for your own work.",
+        "body": [
+          "Use this page for a second project: the problem, what you did and the outcome.",
+          "Delete it if one project is enough for now."
+        ],
+        "metaTitle": "Sample project two — another case study to replace",
+        "metaDescription": "A second sample case study created with your site. Replace it with your own work, or delete it."
+      }
+    ]
   }
 }

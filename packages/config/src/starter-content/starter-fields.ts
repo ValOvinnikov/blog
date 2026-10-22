@@ -1,6 +1,8 @@
-import type { ArticleText } from '@blog/config/sanity/generated/types';
+import type { ArticleText, Link } from '@blog/config/sanity/generated/types';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import { LINK_TYPE, type TLocaleIsoCode } from '@blog/config/constants';
+
+import type { TStarterDocument } from './starter-document';
 
 export function seo(metaTitle: string, metaDescription: string) {
   return {
@@ -60,6 +62,20 @@ export function moduleHeadingBlock(
   } as const;
 }
 
+export function localizedArticleText(
+  locale: TLocaleIsoCode,
+  texts: readonly string[],
+) {
+  return [
+    {
+      _key: locale,
+      _type: 'internationalizedArrayArticleTextValue',
+      language: locale,
+      value: paragraphs(texts),
+    } as const,
+  ];
+}
+
 export function paragraphs(texts: readonly string[]): ArticleText {
   return texts.map((text, index) => ({
     _type: 'block',
@@ -67,4 +83,20 @@ export function paragraphs(texts: readonly string[]): ArticleText {
     markDefs: [],
     children: [{ _type: 'span', _key: `span${index}`, text, marks: [] }],
   }));
+}
+
+export function internalLink(
+  id: string,
+  title: string,
+  locale: TLocaleIsoCode,
+  targetId: string,
+): TStarterDocument<Link, 'title' | 'label' | 'linkType'> {
+  return {
+    _id: id,
+    _type: 'link',
+    title,
+    label: localizedString(locale, title),
+    linkType: LINK_TYPE.INTERNAL,
+    internalReference: reference(targetId),
+  };
 }

@@ -72,5 +72,54 @@
       "metaTitle": "Über — wer diesen Blog schreibt und worum es geht",
       "metaDescription": "Wer diesen Blog schreibt und worum es geht. Bearbeite Überschrift und SEO-Felder dieser Seite, sobald du echte Texte hast."
     }
+  },
+  "portfolio": {
+    "hero": {
+      "eyebrow": "Portfolio",
+      "heading": "Ausgewählte Arbeiten und die Geschichte dahinter"
+    },
+    "intro": {
+      "body": [
+        "Willkommen in meinem Portfolio. Hier findest du einige Projekte, auf die ich stolz bin, jeweils mit einer kurzen Notiz.",
+        "Ersetze diesen Text durch ein paar Zeilen darüber, wer du bist, was du machst und welche Aufträge du suchst."
+      ]
+    },
+    "cta": {
+      "heading": "Arbeiten ansehen",
+      "supportingText": "Stöbere durch die Projekte, vom Auftrag bis zum fertigen Ergebnis."
+    },
+    "work": {
+      "title": "Arbeiten",
+      "slug": "arbeiten",
+      "heading": "Arbeiten",
+      "supportingText": "Eine Auswahl aktueller Projekte.",
+      "listHeading": "Projekte",
+      "metaTitle": "Arbeiten — eine Auswahl aktueller Projekte und Fallstudien",
+      "metaDescription": "Eine Auswahl aktueller Projekte, jeweils mit einer kurzen Notiz zu Auftrag, Vorgehen und Ergebnis."
+    },
+    "projects": [
+      {
+        "title": "Beispielprojekt eins",
+        "slug": "beispielprojekt-eins",
+        "summary": "Eine Beispiel-Fallstudie. Ersetze sie durch ein echtes Projekt.",
+        "body": [
+          "Beschreibe den Auftrag: für wen das Projekt war und was gebraucht wurde.",
+          "Erkläre dann dein Vorgehen und das Ergebnis. Füge Bilder und Links hinzu, sobald du sie hast."
+        ],
+        "metaTitle": "Beispielprojekt eins — eine Fallstudie zum Ersetzen",
+        "metaDescription": "Eine Beispiel-Fallstudie, die mit deiner Website erstellt wurde. Ersetze sie durch eines deiner Projekte."
+      },
+      {
+        "title": "Beispielprojekt zwei",
+        "slug": "beispielprojekt-zwei",
+        "summary": "Eine weitere Beispiel-Fallstudie, bereit für deine Arbeit.",
+        "body": [
+          "Nutze diese Seite für ein zweites Projekt: das Problem, was du getan hast und das Ergebnis.",
+          "Lösche sie, wenn ein Projekt vorerst genügt."
+        ],
+        "metaTitle": "Beispielprojekt zwei — noch eine Fallstudie zum Ersetzen",
+        "metaDescription": "Eine zweite Beispiel-Fallstudie, die mit deiner Website erstellt wurde. Ersetze oder lösche sie."
+      }
+    ]
   }
 }
