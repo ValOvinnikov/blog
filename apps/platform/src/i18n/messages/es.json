@@ -20,7 +20,8 @@
     "email": "Correo electrónico · Administración",
     "leads": "Contactos · Administración",
     "releases": "Versiones · Admin",
-    "blockedSignupsPage": "Registros bloqueados · Admin"
+    "blockedSignupsPage": "Registros bloqueados · Admin",
+    "dataRequestsPage": "Solicitudes de datos · Admin"
   },
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
@@ -115,7 +116,8 @@
       "READY": "Listo",
       "STALLED": "Acción necesaria"
     },
-    "blockedSignups": "Registros bloqueados"
+    "blockedSignups": "Registros bloqueados",
+    "dataRequests": "Solicitudes de datos"
   },
   "tenantLayout": {
     "scopeLabel": "Cliente"
@@ -315,7 +317,10 @@
       "CONTRAST_CHECK_STARTED": "Comprobación de contraste iniciada",
       "TENANT_MIGRATIONS_STARTED": "Migraciones del cliente iniciadas",
       "SIGNUP_BLOCK_ADDED": "Bloqueo de registro añadido",
-      "SIGNUP_BLOCK_REMOVED": "Bloqueo de registro eliminado"
+      "SIGNUP_BLOCK_REMOVED": "Bloqueo de registro eliminado",
+      "PERSONAL_DATA_LOOKED_UP": "Datos personales consultados",
+      "PERSONAL_DATA_EXPORTED": "Datos personales exportados",
+      "PERSONAL_DATA_ERASED": "Datos personales borrados"
     }
   },
   "tenantDomainPage": {
@@ -1315,5 +1320,53 @@
     "domainBlocked": "Dominio bloqueado.",
     "domainBlockFailed": "No se pudo bloquear el dominio. Inténtelo de nuevo.",
     "blockSubmit": "Bloquear dominio"
+  },
+  "dataRequestView": {
+    "title": "Solicitudes de datos",
+    "description": "Busca, exporta o borra lo que se guarda sobre una persona a partir de su correo electrónico, incluso después de eliminar su cuenta. Cada búsqueda, exportación y borrado queda en el registro de auditoría sin la dirección."
+  },
+  "dataRequestSearchCard": {
+    "title": "Buscar los datos de una persona",
+    "supportingText": "Busca en suscriptores, mensajes de contacto, invitaciones, bloqueos de registro y eventos de auditoría de todos los sitios.",
+    "emailLabel": "Correo electrónico",
+    "emailHint": "Encuentra el mismo buzón con cualquier combinación de mayúsculas y con cualquier +etiqueta.",
+    "emailPlaceholder": "nombre@example.com",
+    "submit": "Buscar datos",
+    "submitting": "Buscando…"
+  },
+  "dataRequestPanel": {
+    "emailInvalid": "Introduce un correo electrónico válido.",
+    "lookUpFailed": "No se pudo buscar esta dirección. Inténtalo de nuevo.",
+    "exportFailed": "No se pudo preparar la exportación. Inténtalo de nuevo.",
+    "eraseFailed": "No se pudieron borrar los datos. Inténtalo de nuevo.",
+    "erased": "{count, plural, one {# registro borrado.} other {# registros borrados.}}"
+  },
+  "dataRequestResultCard": {
+    "title": "Datos guardados de {email}",
+    "matchCount": "{count, plural, =0 {No se encontró ningún registro.} one {# registro encontrado.} other {# registros encontrados.}}",
+    "export": "Descargar exportación",
+    "exporting": "Preparando…",
+    "erase": "Borrar",
+    "eraseDialogTitle": "¿Borrar los datos de esta persona?",
+    "eraseDialogDescription": "Elimina sus suscripciones, mensajes de contacto, invitaciones y bloqueo de registro en todos los sitios, y quita su dirección de los eventos de auditoría. No se puede deshacer.",
+    "eraseConfirm": "Borrar datos",
+    "erasing": "Borrando…"
+  },
+  "dataRequestMatchesTable": {
+    "columnKind": "Tipo",
+    "columnSite": "Sitio",
+    "columnEmail": "Correo",
+    "columnRecorded": "Registrado",
+    "platformWide": "Plataforma",
+    "emailHashed": "Guardado como hash",
+    "empty": "No hay nada guardado para esta dirección.",
+    "regionLabel": "Registros guardados"
+  },
+  "dataRequestMatchKind": {
+    "SUBSCRIBER": "Suscriptor",
+    "LEAD": "Mensaje de contacto",
+    "INVITE": "Invitación",
+    "SIGNUP_BLOCK": "Bloqueo de registro",
+    "AUDIT_EVENT": "Evento de auditoría"
   }
 }

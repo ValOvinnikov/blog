@@ -20,7 +20,8 @@
     "email": "E-mail · Administration",
     "leads": "Messages reçus · Administration",
     "releases": "Versions · Admin",
-    "blockedSignupsPage": "Inscriptions bloquées · Admin"
+    "blockedSignupsPage": "Inscriptions bloquées · Admin",
+    "dataRequestsPage": "Demandes de données · Admin"
   },
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
@@ -115,7 +116,8 @@
       "READY": "Prêt",
       "STALLED": "Action requise"
     },
-    "blockedSignups": "Inscriptions bloquées"
+    "blockedSignups": "Inscriptions bloquées",
+    "dataRequests": "Demandes de données"
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"
@@ -315,7 +317,10 @@
       "CONTRAST_CHECK_STARTED": "Vérification du contraste lancée",
       "TENANT_MIGRATIONS_STARTED": "Migrations du locataire lancées",
       "SIGNUP_BLOCK_ADDED": "Blocage d’inscription ajouté",
-      "SIGNUP_BLOCK_REMOVED": "Blocage d’inscription retiré"
+      "SIGNUP_BLOCK_REMOVED": "Blocage d’inscription retiré",
+      "PERSONAL_DATA_LOOKED_UP": "Données personnelles consultées",
+      "PERSONAL_DATA_EXPORTED": "Données personnelles exportées",
+      "PERSONAL_DATA_ERASED": "Données personnelles effacées"
     }
   },
   "tenantDomainPage": {
@@ -1315,5 +1320,53 @@
     "domainBlocked": "Domaine bloqué.",
     "domainBlockFailed": "Impossible de bloquer le domaine — réessayez.",
     "blockSubmit": "Bloquer le domaine"
+  },
+  "dataRequestView": {
+    "title": "Demandes de données",
+    "description": "Retrouvez, exportez ou effacez ce qui est conservé sur une personne à partir de son adresse e-mail, y compris après la suppression de son compte. Chaque recherche, export et effacement est consigné dans le journal d’audit sans l’adresse."
+  },
+  "dataRequestSearchCard": {
+    "title": "Retrouver les données d’une personne",
+    "supportingText": "Recherche parmi les abonnés, les messages de contact, les invitations, les blocages d’inscription et les événements d’audit de tous les sites.",
+    "emailLabel": "Adresse e-mail",
+    "emailHint": "Retrouve la même boîte aux lettres quelle que soit la casse et avec n’importe quel +tag.",
+    "emailPlaceholder": "nom@example.com",
+    "submit": "Rechercher",
+    "submitting": "Recherche…"
+  },
+  "dataRequestPanel": {
+    "emailInvalid": "Saisissez une adresse e-mail valide.",
+    "lookUpFailed": "Impossible de rechercher cette adresse. Réessayez.",
+    "exportFailed": "Impossible de préparer l’export. Réessayez.",
+    "eraseFailed": "Impossible d’effacer les données. Réessayez.",
+    "erased": "{count, plural, one {# enregistrement effacé.} other {# enregistrements effacés.}}"
+  },
+  "dataRequestResultCard": {
+    "title": "Données conservées pour {email}",
+    "matchCount": "{count, plural, =0 {Aucun enregistrement trouvé.} one {# enregistrement trouvé.} other {# enregistrements trouvés.}}",
+    "export": "Télécharger l’export",
+    "exporting": "Préparation…",
+    "erase": "Effacer",
+    "eraseDialogTitle": "Effacer les données de cette personne ?",
+    "eraseDialogDescription": "Supprime ses abonnements, messages de contact, invitations et blocage d’inscription sur tous les sites, et retire son adresse des événements d’audit. Cette action est irréversible.",
+    "eraseConfirm": "Effacer les données",
+    "erasing": "Effacement…"
+  },
+  "dataRequestMatchesTable": {
+    "columnKind": "Type",
+    "columnSite": "Site",
+    "columnEmail": "E-mail",
+    "columnRecorded": "Enregistré",
+    "platformWide": "Plateforme",
+    "emailHashed": "Conservé sous forme de hash",
+    "empty": "Rien n’est conservé pour cette adresse.",
+    "regionLabel": "Enregistrements conservés"
+  },
+  "dataRequestMatchKind": {
+    "SUBSCRIBER": "Abonné",
+    "LEAD": "Message de contact",
+    "INVITE": "Invitation",
+    "SIGNUP_BLOCK": "Blocage d’inscription",
+    "AUDIT_EVENT": "Événement d’audit"
   }
 }

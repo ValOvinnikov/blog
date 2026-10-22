@@ -20,7 +20,8 @@
     "email": "E-mail · Admin",
     "leads": "Berichten · Admin",
     "releases": "Releases · Admin",
-    "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin"
+    "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin",
+    "dataRequestsPage": "Gegevensverzoeken · Admin"
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
@@ -115,7 +116,8 @@
       "READY": "Klaar",
       "STALLED": "Actie nodig"
     },
-    "blockedSignups": "Geblokkeerde aanmeldingen"
+    "blockedSignups": "Geblokkeerde aanmeldingen",
+    "dataRequests": "Gegevensverzoeken"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -315,7 +317,10 @@
       "CONTRAST_CHECK_STARTED": "Contrastcontrole gestart",
       "TENANT_MIGRATIONS_STARTED": "Tenantmigraties gestart",
       "SIGNUP_BLOCK_ADDED": "Aanmeldblokkade toegevoegd",
-      "SIGNUP_BLOCK_REMOVED": "Aanmeldblokkade verwijderd"
+      "SIGNUP_BLOCK_REMOVED": "Aanmeldblokkade verwijderd",
+      "PERSONAL_DATA_LOOKED_UP": "Persoonsgegevens opgezocht",
+      "PERSONAL_DATA_EXPORTED": "Persoonsgegevens geëxporteerd",
+      "PERSONAL_DATA_ERASED": "Persoonsgegevens gewist"
     }
   },
   "tenantDomainPage": {
@@ -1315,5 +1320,53 @@
     "domainBlocked": "Domein geblokkeerd.",
     "domainBlockFailed": "Het domein kon niet worden geblokkeerd — probeer het opnieuw.",
     "blockSubmit": "Domein blokkeren"
+  },
+  "dataRequestView": {
+    "title": "Gegevensverzoeken",
+    "description": "Zoek, exporteer of wis wat er over iemand is opgeslagen op basis van het e-mailadres, ook nadat het account is verwijderd. Elke zoekopdracht, export en wissing wordt zonder het adres vastgelegd in het auditlog."
+  },
+  "dataRequestSearchCard": {
+    "title": "Gegevens van een persoon zoeken",
+    "supportingText": "Doorzoekt abonnees, contactberichten, uitnodigingen, aanmeldblokkades en auditgebeurtenissen van alle sites.",
+    "emailLabel": "E-mailadres",
+    "emailHint": "Vindt dezelfde mailbox in elke combinatie van hoofdletters en met elke +tag.",
+    "emailPlaceholder": "naam@example.com",
+    "submit": "Gegevens zoeken",
+    "submitting": "Zoeken…"
+  },
+  "dataRequestPanel": {
+    "emailInvalid": "Voer een geldig e-mailadres in.",
+    "lookUpFailed": "Zoeken naar dit adres is mislukt. Probeer het opnieuw.",
+    "exportFailed": "De export kon niet worden voorbereid. Probeer het opnieuw.",
+    "eraseFailed": "De gegevens konden niet worden gewist. Probeer het opnieuw.",
+    "erased": "{count, plural, one {# record gewist.} other {# records gewist.}}"
+  },
+  "dataRequestResultCard": {
+    "title": "Opgeslagen gegevens van {email}",
+    "matchCount": "{count, plural, =0 {Geen records gevonden.} one {# record gevonden.} other {# records gevonden.}}",
+    "export": "Export downloaden",
+    "exporting": "Voorbereiden…",
+    "erase": "Wissen",
+    "eraseDialogTitle": "Gegevens van deze persoon wissen?",
+    "eraseDialogDescription": "Verwijdert de abonnementen, contactberichten, uitnodigingen en aanmeldblokkade op alle sites, en haalt het adres uit de auditgebeurtenissen. Dit kan niet ongedaan worden gemaakt.",
+    "eraseConfirm": "Gegevens wissen",
+    "erasing": "Wissen…"
+  },
+  "dataRequestMatchesTable": {
+    "columnKind": "Soort",
+    "columnSite": "Site",
+    "columnEmail": "E-mail",
+    "columnRecorded": "Vastgelegd",
+    "platformWide": "Platform",
+    "emailHashed": "Opgeslagen als hash",
+    "empty": "Er is niets opgeslagen voor dit adres.",
+    "regionLabel": "Opgeslagen records"
+  },
+  "dataRequestMatchKind": {
+    "SUBSCRIBER": "Abonnee",
+    "LEAD": "Contactbericht",
+    "INVITE": "Uitnodiging",
+    "SIGNUP_BLOCK": "Aanmeldblokkade",
+    "AUDIT_EVENT": "Auditgebeurtenis"
   }
 }

@@ -21,8 +21,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/audit.ts`
 
-- **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`
-- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`
+- **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`
+- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/auth-app.ts`
 
@@ -257,6 +257,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/control-mode` — `apps/platform/src/constants/control-mode.ts`
 
 - **CONTROL_MODE**: `EDITABLE`, `READ_ONLY`, `DISABLED`
+
+### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
+
+- **DATA_REQUEST_FIELD_ERROR**: `EMAIL_INVALID`
+- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`
 
 ### `@platform/constants/domain` — `apps/platform/src/constants/domain.ts`
 

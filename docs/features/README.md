@@ -25,6 +25,7 @@ on the public site or the platform yet).
 | [Embedded Studio](embedded-studio.md)                                 | built   | studio, platform, db, config              | One Studio from `@blog/studio`, mounted in the platform per tenant and pointed at that tenant's Sanity project.         |
 | [Audit events and findings](audit-and-findings.md)                    | partial | db, platform, config                      | An append-only log of who did what to a tenant, and open/resolved conditions an operator should act on.                 |
 | [Operator alerts](operator-alerts.md)                                 | built   | platform, email, db, config               | Emails SUPERADMINs when a background job finds a tenant needing a human, such as stuck Sanity access.                   |
+| [Data requests](data-requests.md)                                     | built   | db, platform, config                      | A SUPERADMIN finds, exports and erases what is still stored about a person, by email address.                           |
 | [Cross-tenant migrations](cross-tenant-migrations.md)                 | built   | studio, db                                | Runs content migrations for the one shared schema against every tenant's Sanity project.                                |
 | [Platform releases](platform-releases.md)                             | partial | config, utils                             | A SUPERADMIN sees the release candidate, runs the contrast check and cuts a production release.                         |
 

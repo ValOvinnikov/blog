@@ -16,6 +16,7 @@ const t = makeEnTranslator('navSections');
 
 const TENANT_NAME = 'Acme Co';
 const BLOCKED_SIGNUPS_LABEL = 'Blocked sign-ups';
+const DATA_REQUESTS_LABEL = 'Data requests';
 const COMING_SOON_LABEL = 'Coming soon';
 const PLATFORM_BADGE_LABEL = 'platform';
 const PROVISIONING_LABEL = 'Provisioning';
@@ -50,22 +51,25 @@ describe('operatorNavSections', () => {
     ).toMatchObject({ href: '/releases' });
   });
 
-  it('gives a SUPERADMIN a Blocked sign-ups entry', () => {
+  it.each([
+    [BLOCKED_SIGNUPS_LABEL, adminRoutes.blockedSignups()],
+    [DATA_REQUESTS_LABEL, adminRoutes.dataRequests()],
+  ])('gives a SUPERADMIN a %s entry', (label, href) => {
     const [platform] = operatorNavSections(t, ADMIN_ROLE.SUPERADMIN);
 
-    expect(
-      platform!.items.find((item) => item.label === BLOCKED_SIGNUPS_LABEL),
-    ).toMatchObject({ href: adminRoutes.blockedSignups() });
+    expect(platform!.items.find((item) => item.label === label)).toMatchObject({
+      href,
+    });
   });
 
   it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    'omits the Blocked sign-ups entry for a %s',
+    'omits the Blocked sign-ups and Data requests entries for a %s',
     (role) => {
       const [platform] = operatorNavSections(t, role);
+      const labels = platform!.items.map((item) => item.label);
 
-      expect(platform!.items.map((item) => item.label)).not.toContain(
-        BLOCKED_SIGNUPS_LABEL,
-      );
+      expect(labels).not.toContain(BLOCKED_SIGNUPS_LABEL);
+      expect(labels).not.toContain(DATA_REQUESTS_LABEL);
     },
   );
 

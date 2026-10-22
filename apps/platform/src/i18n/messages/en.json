@@ -20,7 +20,8 @@
     "email": "Email · Admin",
     "leads": "Leads · Admin",
     "releases": "Releases · Admin",
-    "blockedSignupsPage": "Blocked sign-ups · Admin"
+    "blockedSignupsPage": "Blocked sign-ups · Admin",
+    "dataRequestsPage": "Data requests · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -115,7 +116,8 @@
       "READY": "Ready",
       "STALLED": "Action needed"
     },
-    "blockedSignups": "Blocked sign-ups"
+    "blockedSignups": "Blocked sign-ups",
+    "dataRequests": "Data requests"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -315,7 +317,10 @@
       "CONTRAST_CHECK_STARTED": "Contrast check started",
       "TENANT_MIGRATIONS_STARTED": "Tenant migrations started",
       "SIGNUP_BLOCK_ADDED": "Sign-up block added",
-      "SIGNUP_BLOCK_REMOVED": "Sign-up block removed"
+      "SIGNUP_BLOCK_REMOVED": "Sign-up block removed",
+      "PERSONAL_DATA_LOOKED_UP": "Personal data looked up",
+      "PERSONAL_DATA_EXPORTED": "Personal data exported",
+      "PERSONAL_DATA_ERASED": "Personal data erased"
     }
   },
   "tenantDomainPage": {
@@ -1315,5 +1320,53 @@
     "domainBlocked": "Domain blocked.",
     "domainBlockFailed": "Couldn't block the domain — try again.",
     "blockSubmit": "Block domain"
+  },
+  "dataRequestView": {
+    "title": "Data requests",
+    "description": "Find, export or erase what is stored about a person by their email address, including after their account is deleted. Every lookup, export and erasure is recorded in the audit log without the address."
+  },
+  "dataRequestSearchCard": {
+    "title": "Find a person's data",
+    "supportingText": "Searches subscribers, contact messages, invites, sign-up blocks and audit events on every site.",
+    "emailLabel": "Email address",
+    "emailHint": "Matches the same mailbox in any letter case and with any +tag.",
+    "emailPlaceholder": "name@example.com",
+    "submit": "Find data",
+    "submitting": "Searching…"
+  },
+  "dataRequestPanel": {
+    "emailInvalid": "Enter a valid email address.",
+    "lookUpFailed": "Couldn't search for this address — try again.",
+    "exportFailed": "Couldn't prepare the export — try again.",
+    "eraseFailed": "Couldn't erase the data — try again.",
+    "erased": "{count, plural, one {# record erased.} other {# records erased.}}"
+  },
+  "dataRequestResultCard": {
+    "title": "Data held for {email}",
+    "matchCount": "{count, plural, =0 {No records found.} one {# record found.} other {# records found.}}",
+    "export": "Download export",
+    "exporting": "Preparing…",
+    "erase": "Erase",
+    "eraseDialogTitle": "Erase this person's data?",
+    "eraseDialogDescription": "Deletes their subscriptions, contact messages, invites and sign-up block on every site, and removes their address from audit events. This can't be undone.",
+    "eraseConfirm": "Erase data",
+    "erasing": "Erasing…"
+  },
+  "dataRequestMatchesTable": {
+    "columnKind": "Kind",
+    "columnSite": "Site",
+    "columnEmail": "Email",
+    "columnRecorded": "Recorded",
+    "platformWide": "Platform",
+    "emailHashed": "Stored as a hash",
+    "empty": "Nothing is stored for this address.",
+    "regionLabel": "Stored records"
+  },
+  "dataRequestMatchKind": {
+    "SUBSCRIBER": "Subscriber",
+    "LEAD": "Contact message",
+    "INVITE": "Invite",
+    "SIGNUP_BLOCK": "Sign-up block",
+    "AUDIT_EVENT": "Audit event"
   }
 }

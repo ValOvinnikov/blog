@@ -234,6 +234,14 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "PERSONAL_DATA": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.PERSONAL_DATA",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "CREATED": [
       {
         "ref": "AUDIT_ACTION.CREATED",
@@ -383,6 +391,30 @@
     "SIGNUP_BLOCK_REMOVED": [
       {
         "ref": "AUDIT_ACTION.SIGNUP_BLOCK_REMOVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "PERSONAL_DATA_LOOKED_UP": [
+      {
+        "ref": "AUDIT_ACTION.PERSONAL_DATA_LOOKED_UP",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "PERSONAL_DATA_EXPORTED": [
+      {
+        "ref": "AUDIT_ACTION.PERSONAL_DATA_EXPORTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "PERSONAL_DATA_ERASED": [
+      {
+        "ref": "AUDIT_ACTION.PERSONAL_DATA_ERASED",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/audit.ts"
@@ -3304,6 +3336,60 @@
         "file": "apps/platform/src/constants/control-mode.ts"
       }
     ],
+    "EMAIL_INVALID": [
+      {
+        "ref": "DATA_REQUEST_FIELD_ERROR.EMAIL_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.EMAIL_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SUBSCRIBER": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "LEAD": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.LEAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "INVITE": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "SIGNUP_BLOCK": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "AUDIT_EVENT": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.AUDIT_EVENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "NOT_CONFIGURED": [
       {
         "ref": "DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED",
@@ -3609,14 +3695,6 @@
     "SLUG_TAKEN": [
       {
         "ref": "TENANT_FIELD_ERROR.SLUG_TAKEN",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "EMAIL_INVALID": [
-      {
-        "ref": "TENANT_FIELD_ERROR.EMAIL_INVALID",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

@@ -8,6 +8,7 @@ import { faker } from '@faker-js/faker';
 import {
   encryptPersonalValue,
   personalEmailColumns,
+  readPersonalValue,
   requirePersonalEmailIndex,
 } from './personal-data';
 
@@ -28,6 +29,14 @@ describe('with both personal data keys configured', () => {
 
     expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
     expect(emailIndex).toBe(testPersonalEmailIndex(EMAIL));
+  });
+
+  it('reads an encrypted value back', () => {
+    expect(readPersonalValue(encryptPersonalValue(EMAIL), '')).toBe(EMAIL);
+  });
+
+  it('reads the plain value of a row not yet encrypted', () => {
+    expect(readPersonalValue(null, EMAIL)).toBe(EMAIL);
   });
 
   it('indexes an email for lookup', () => {

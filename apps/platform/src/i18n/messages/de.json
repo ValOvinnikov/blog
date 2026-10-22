@@ -20,7 +20,8 @@
     "email": "E-Mail · Admin",
     "leads": "Anfragen · Admin",
     "releases": "Releases · Admin",
-    "blockedSignupsPage": "Gesperrte Registrierungen · Admin"
+    "blockedSignupsPage": "Gesperrte Registrierungen · Admin",
+    "dataRequestsPage": "Datenanfragen · Admin"
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
@@ -115,7 +116,8 @@
       "READY": "Bereit",
       "STALLED": "Aktion nötig"
     },
-    "blockedSignups": "Gesperrte Registrierungen"
+    "blockedSignups": "Gesperrte Registrierungen",
+    "dataRequests": "Datenanfragen"
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"
@@ -315,7 +317,10 @@
       "CONTRAST_CHECK_STARTED": "Kontrastprüfung gestartet",
       "TENANT_MIGRATIONS_STARTED": "Mandantenmigrationen gestartet",
       "SIGNUP_BLOCK_ADDED": "Registrierungssperre hinzugefügt",
-      "SIGNUP_BLOCK_REMOVED": "Registrierungssperre aufgehoben"
+      "SIGNUP_BLOCK_REMOVED": "Registrierungssperre aufgehoben",
+      "PERSONAL_DATA_LOOKED_UP": "Personenbezogene Daten abgefragt",
+      "PERSONAL_DATA_EXPORTED": "Personenbezogene Daten exportiert",
+      "PERSONAL_DATA_ERASED": "Personenbezogene Daten gelöscht"
     }
   },
   "tenantDomainPage": {
@@ -1315,5 +1320,53 @@
     "domainBlocked": "Domain gesperrt.",
     "domainBlockFailed": "Die Domain konnte nicht gesperrt werden – versuchen Sie es erneut.",
     "blockSubmit": "Domain sperren"
+  },
+  "dataRequestView": {
+    "title": "Datenanfragen",
+    "description": "Finde, exportiere oder lösche, was über eine Person unter ihrer E-Mail-Adresse gespeichert ist – auch nachdem ihr Konto gelöscht wurde. Jede Suche, jeder Export und jede Löschung wird ohne die Adresse im Audit-Log festgehalten."
+  },
+  "dataRequestSearchCard": {
+    "title": "Daten einer Person finden",
+    "supportingText": "Durchsucht Abonnenten, Kontaktnachrichten, Einladungen, Registrierungssperren und Audit-Ereignisse aller Websites.",
+    "emailLabel": "E-Mail-Adresse",
+    "emailHint": "Findet dasselbe Postfach in jeder Groß- und Kleinschreibung und mit jedem +Tag.",
+    "emailPlaceholder": "name@example.com",
+    "submit": "Daten finden",
+    "submitting": "Wird gesucht…"
+  },
+  "dataRequestPanel": {
+    "emailInvalid": "Gib eine gültige E-Mail-Adresse ein.",
+    "lookUpFailed": "Die Suche nach dieser Adresse ist fehlgeschlagen – versuch es erneut.",
+    "exportFailed": "Der Export konnte nicht erstellt werden – versuch es erneut.",
+    "eraseFailed": "Die Daten konnten nicht gelöscht werden – versuch es erneut.",
+    "erased": "{count, plural, one {# Eintrag gelöscht.} other {# Einträge gelöscht.}}"
+  },
+  "dataRequestResultCard": {
+    "title": "Gespeicherte Daten zu {email}",
+    "matchCount": "{count, plural, =0 {Keine Einträge gefunden.} one {# Eintrag gefunden.} other {# Einträge gefunden.}}",
+    "export": "Export herunterladen",
+    "exporting": "Wird vorbereitet…",
+    "erase": "Löschen",
+    "eraseDialogTitle": "Daten dieser Person löschen?",
+    "eraseDialogDescription": "Löscht ihre Abonnements, Kontaktnachrichten, Einladungen und Registrierungssperre auf allen Websites und entfernt ihre Adresse aus den Audit-Ereignissen. Das lässt sich nicht rückgängig machen.",
+    "eraseConfirm": "Daten löschen",
+    "erasing": "Wird gelöscht…"
+  },
+  "dataRequestMatchesTable": {
+    "columnKind": "Art",
+    "columnSite": "Website",
+    "columnEmail": "E-Mail",
+    "columnRecorded": "Erfasst",
+    "platformWide": "Plattform",
+    "emailHashed": "Als Hash gespeichert",
+    "empty": "Zu dieser Adresse ist nichts gespeichert.",
+    "regionLabel": "Gespeicherte Einträge"
+  },
+  "dataRequestMatchKind": {
+    "SUBSCRIBER": "Abonnent",
+    "LEAD": "Kontaktnachricht",
+    "INVITE": "Einladung",
+    "SIGNUP_BLOCK": "Registrierungssperre",
+    "AUDIT_EVENT": "Audit-Ereignis"
   }
 }
