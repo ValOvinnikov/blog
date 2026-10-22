@@ -1,3 +1,4 @@
+import { LOCALE_BCP47_TAGS } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import {
@@ -57,7 +58,10 @@ describe(createLead, () => {
   });
 
   it('stores the source page document id and locale when given', async () => {
-    const source = { sourceDocumentId: 'page-contact', sourceLocale: 'en' };
+    const source = {
+      sourceDocumentId: 'page-contact',
+      sourceLocale: LOCALE_BCP47_TAGS.EN,
+    };
 
     const lead = await createLead({ tenantId, ...LEAD, ...source });
 

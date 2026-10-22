@@ -143,11 +143,11 @@ describe(listLeadsByCursor, () => {
 
   it("never returns another tenant's leads", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    await insertTestLead(db(), tenantId, { name: 'Mine' });
-    await insertTestLead(db(), otherTenantId, { name: 'Theirs' });
+    const mine = await insertTestLead(db(), tenantId);
+    await insertTestLead(db(), otherTenantId);
 
     const { leads } = await listLeadsByCursor({ tenantId });
 
-    expect(leads.map(({ name }) => name)).toEqual(['Mine']);
+    expect(leads.map(({ id }) => id)).toEqual([mine.id]);
   });
 });

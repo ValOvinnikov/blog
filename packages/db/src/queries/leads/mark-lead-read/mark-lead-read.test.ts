@@ -1,6 +1,7 @@
 import * as schema from '@blog/db/schema';
 import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { markLeadRead } from './mark-lead-read';
 
@@ -10,7 +11,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const FIRST_READ_AT = new Date('2026-01-01T00:00:00Z');
+const FIRST_READ_AT = faker.date.past();
 
 afterEach(async () => {
   await db().delete(schema.leads);
@@ -46,7 +47,7 @@ describe(markLeadRead, () => {
 
   it('reports false when no lead has that id', async () => {
     await expect(
-      markLeadRead({ tenantId, id: '00000000-0000-0000-0000-000000000000' }),
+      markLeadRead({ tenantId, id: faker.string.uuid() }),
     ).resolves.toBe(false);
   });
 

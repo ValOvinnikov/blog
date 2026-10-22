@@ -4,6 +4,7 @@ import {
   CREATED_AT_COLUMN,
   EMAIL_ENCRYPTED_COLUMN,
   EMAIL_INDEX_COLUMN,
+  TIMESTAMP_WITH_TIME_ZONE,
 } from './columns';
 import { tenants } from './tenants';
 
@@ -24,11 +25,8 @@ export const leads = pgTable(
     sourcePath: text('source_path').notNull(),
     sourceDocumentId: text('source_document_id'),
     sourceLocale: text('source_locale'),
-    readAt: timestamp('read_at', { mode: 'date', withTimezone: true }),
-    createdAt: timestamp(CREATED_AT_COLUMN, {
-      mode: 'date',
-      withTimezone: true,
-    })
+    readAt: timestamp('read_at', TIMESTAMP_WITH_TIME_ZONE),
+    createdAt: timestamp(CREATED_AT_COLUMN, TIMESTAMP_WITH_TIME_ZONE)
       .notNull()
       .defaultNow(),
   },
