@@ -4,6 +4,10 @@ import { createTenant } from '@blog/db/queries/tenants/create-tenant';
 import * as schema from '@blog/db/schema';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MISSING_TENANT_TOKEN_KEY_ERROR,
+  useTenantTokenEncryptionKey,
+} from '@blog/db/testing/tenant-token-encryption-key';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSanityWriteTokenAndSeededAt } from './set-tenant-sanity-write-token-and-seeded-at';
@@ -26,21 +30,14 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-const db = useQueryTestDb(getDbMock);
-const originalKey = process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+const WRITE_TOKEN = 'sk-real-write-token-value';
+const SEEDED_AT = new Date('2026-08-15T12:00:00.000Z');
 
-beforeEach(() => {
-  process.env['TENANT_TOKEN_ENCRYPTION_KEY'] =
-    'wF3n9s6q0Zc7yq2z8Xh9mS4h9r0kQnW5R2t8jL1oQxo=';
-});
+const db = useQueryTestDb(getDbMock);
+useTenantTokenEncryptionKey();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
-  if (originalKey === undefined) {
-    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-  } else {
-    process.env['TENANT_TOKEN_ENCRYPTION_KEY'] = originalKey;
-  }
 });
 
 describe(setTenantSanityWriteTokenAndSeededAt, () => {
@@ -51,12 +48,10 @@ describe(setTenantSanityWriteTokenAndSeededAt, () => {
   });
 
   it('stores the token encrypted and the seeded-at timestamp in one call', async () => {
-    const seededAt = new Date('2026-08-15T12:00:00.000Z');
-
     await setTenantSanityWriteTokenAndSeededAt(
       tenant.id,
-      'sk-real-write-token-value',
-      seededAt,
+      WRITE_TOKEN,
+      SEEDED_AT,
     );
 
     const [row] = await db()
@@ -64,23 +59,17 @@ describe(setTenantSanityWriteTokenAndSeededAt, () => {
       .from(tenants)
       .where(eq(tenants.id, tenant.id));
 
-    expect(row?.sanityWriteTokenEncrypted).not.toContain(
-      'sk-real-write-token-value',
-    );
+    expect(row?.sanityWriteTokenEncrypted).not.toContain(WRITE_TOKEN);
     expect(row?.sanityWriteTokenEncrypted).toEqual(expect.any(String));
-    expect(row?.seededAt).toEqual(seededAt);
+    expect(row?.seededAt).toEqual(SEEDED_AT);
   });
 
   it('throws when the encryption key is not configured, leaving both columns untouched', async () => {
-    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+    vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
     await expect(
-      setTenantSanityWriteTokenAndSeededAt(
-        tenant.id,
-        'sk-real-write-token-value',
-        new Date('2026-08-15T12:00:00.000Z'),
-      ),
-    ).rejects.toThrow('TENANT_TOKEN_ENCRYPTION_KEY is not configured.');
+      setTenantSanityWriteTokenAndSeededAt(tenant.id, WRITE_TOKEN, SEEDED_AT),
+    ).rejects.toThrow(MISSING_TENANT_TOKEN_KEY_ERROR);
 
     const [row] = await db()
       .select()

@@ -3,7 +3,10 @@ import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import {
+  MISSING_TENANT_TOKEN_KEY_ERROR,
+  useTenantTokenEncryptionKey,
+} from '@blog/db/testing/tenant-token-encryption-key';
 
 import { getTenantRevalidateWebhookSecret } from './get-tenant-revalidate-webhook-secret';
 
@@ -16,12 +19,9 @@ const WEBHOOK_SECRET = 'whsec-tenant-secret-value';
 
 const db = useQueryTestDb(getDbMock);
 
-beforeEach(() => {
-  vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', TEST_ENCRYPTION_KEY);
-});
+useTenantTokenEncryptionKey();
 
 afterEach(async () => {
-  vi.unstubAllEnvs();
   await db().delete(schema.tenants);
 });
 
@@ -50,7 +50,7 @@ describe(getTenantRevalidateWebhookSecret, () => {
 
       await expect(
         getTenantRevalidateWebhookSecret(SANITY_PROJECT_ID),
-      ).rejects.toThrow('TENANT_TOKEN_ENCRYPTION_KEY is not configured.');
+      ).rejects.toThrow(MISSING_TENANT_TOKEN_KEY_ERROR);
     });
   });
 

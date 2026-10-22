@@ -12,6 +12,10 @@ import { setTenantSanityWriteToken } from '@blog/db/queries/tenants/set-tenant-s
 import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MISSING_TENANT_TOKEN_KEY_ERROR,
+  useTenantTokenEncryptionKey,
+} from '@blog/db/testing/tenant-token-encryption-key';
 import { eq } from 'drizzle-orm';
 
 import {
@@ -37,21 +41,14 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-const db = useQueryTestDb(getDbMock);
-const originalKey = process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+const READ_TOKEN = 'sk-real-read-token-value';
+const WRITE_TOKEN = 'sk-real-write-token-value';
 
-beforeEach(() => {
-  process.env['TENANT_TOKEN_ENCRYPTION_KEY'] =
-    'wF3n9s6q0Zc7yq2z8Xh9mS4h9r0kQnW5R2t8jL1oQxo=';
-});
+const db = useQueryTestDb(getDbMock);
+useTenantTokenEncryptionKey();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
-  if (originalKey === undefined) {
-    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-  } else {
-    process.env['TENANT_TOKEN_ENCRYPTION_KEY'] = originalKey;
-  }
 });
 
 describe(getTenantSanityWriteCredentials, () => {
@@ -63,7 +60,7 @@ describe(getTenantSanityWriteCredentials, () => {
 
   describe('with a write token set', () => {
     beforeEach(async () => {
-      await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
+      await setTenantSanityWriteToken(tenant.id, WRITE_TOKEN);
     });
 
     it('resolves the decrypted token alongside project/dataset and servable state for an active tenant', async () => {
@@ -72,7 +69,7 @@ describe(getTenantSanityWriteCredentials, () => {
       expect(credentials).toEqual({
         projectId: 'abc123',
         dataset: 'production',
-        token: 'sk-real-write-token-value',
+        token: WRITE_TOKEN,
         status: TENANT_STATUS.ACTIVE,
         deprovisionedAt: null,
         provisioningStatus: null,
@@ -88,7 +85,7 @@ describe(getTenantSanityWriteCredentials, () => {
       expect(credentials).toMatchObject({
         projectId: 'abc123',
         dataset: 'production',
-        token: 'sk-real-write-token-value',
+        token: WRITE_TOKEN,
         status: TENANT_STATUS.ARCHIVED,
       });
     });
@@ -102,10 +99,10 @@ describe(getTenantSanityWriteCredentials, () => {
     });
 
     it('throws when the encryption key is not configured', async () => {
-      delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+      vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
       await expect(getTenantSanityWriteCredentials(tenant.id)).rejects.toThrow(
-        'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
+        MISSING_TENANT_TOKEN_KEY_ERROR,
       );
     });
   });
@@ -139,7 +136,7 @@ describe(getTenantSanityWriteCredentials, () => {
   });
 
   it('resolves undefined when only the read token is set, not the write token', async () => {
-    await setTenantSanityToken(tenant.id, 'sk-real-read-token-value');
+    await setTenantSanityToken(tenant.id, READ_TOKEN);
 
     await expect(
       getTenantSanityWriteCredentials(tenant.id),
@@ -169,25 +166,25 @@ describe(toTenantSanityWriteCredentials, () => {
     let row: TTenant;
 
     beforeEach(async () => {
-      row = await insertTenantRow('sk-real-write-token-value');
+      row = await insertTenantRow(WRITE_TOKEN);
     });
 
     it('maps a tenant row with a write token to decrypted credentials and servable state', async () => {
       expect(toTenantSanityWriteCredentials(row)).toEqual({
         projectId: 'abc123',
         dataset: 'production',
-        token: 'sk-real-write-token-value',
+        token: WRITE_TOKEN,
         status: TENANT_STATUS.ACTIVE,
         deprovisionedAt: null,
         provisioningStatus: null,
       });
     });
 
-    it('throws when the encryption key is not configured', async () => {
-      delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+    it('throws mapping the row when the encryption key is not configured', async () => {
+      vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
       expect(() => toTenantSanityWriteCredentials(row)).toThrow(
-        'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
+        MISSING_TENANT_TOKEN_KEY_ERROR,
       );
     });
   });
