@@ -34,7 +34,7 @@ describe(removeBlockedIdentity, () => {
     });
     if (!added.ok) throw new Error('seed failed');
 
-    const result = await removeBlockedIdentity(added.data.id);
+    const result = await removeBlockedIdentity(added.data.entry.id);
 
     expect(result).toEqual({ ok: true, data: undefined });
     const rows = await db().select().from(schema.blockedSignupIdentities);

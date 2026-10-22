@@ -8,11 +8,14 @@ export type TTenantDetailsFieldError = Exclude<
   TConfirmTenantFieldError
 >;
 
-export const toTenantFieldErrors = <TField extends string>(
+export const toTenantFieldErrors = <
+  TField extends string,
+  TReason extends string = TTenantDetailsFieldError,
+>(
   issues: z.ZodError['issues'],
-  reasonByField: Partial<Record<TField, TTenantDetailsFieldError>>,
-): TFieldErrors<TField, TTenantDetailsFieldError> => {
-  const fieldErrors: TFieldErrors<TField, TTenantDetailsFieldError> = {};
+  reasonByField: Partial<Record<TField, TReason>>,
+): TFieldErrors<TField, TReason> => {
+  const fieldErrors: TFieldErrors<TField, TReason> = {};
   for (const { path } of issues) {
     const field = path[0] as TField;
     const reason = reasonByField[field];

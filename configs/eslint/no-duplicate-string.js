@@ -5,6 +5,7 @@ import {
   EQUALITY_OPERATORS,
   PROCESS_NAME,
   PROTOCOL_ATTRIBUTE_KEYS,
+  ROLE_QUERY_CALLEES,
   STUB_ENV_CALLEE,
 } from './literal-vocabulary.js';
 import { isClassString } from './prefer-shared-constant.js';
@@ -32,6 +33,13 @@ const isStubEnvArgument = ({ parent }) =>
   parent.callee.type === 'MemberExpression' &&
   parent.callee.property.name === STUB_ENV_CALLEE;
 
+const isRoleQueryArgument = ({ parent }) =>
+  parent.type === 'CallExpression' &&
+  ((parent.callee.type === 'Identifier' &&
+    ROLE_QUERY_CALLEES.has(parent.callee.name)) ||
+    (parent.callee.type === 'MemberExpression' &&
+      ROLE_QUERY_CALLEES.has(parent.callee.property.name)));
+
 const isProtocolAttributeValue = (node) => {
   const { parent } = node;
   return (
@@ -45,6 +53,7 @@ const isProtocolAttributeValue = (node) => {
 const isEnvironmentVocabulary = (node) =>
   isEnvComparisonOperand(node) ||
   isStubEnvArgument(node) ||
+  isRoleQueryArgument(node) ||
   isProtocolAttributeValue(node);
 
 export const noDuplicateStringRule = {

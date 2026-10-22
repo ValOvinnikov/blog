@@ -90,8 +90,11 @@ Decided:
   at most `MAX_SITES_PER_IP_PER_DAY` (3) creates per IP and
   `MAX_SELF_SERVE_SITES_PER_DAY` (50) in total per UTC day, counted in Upstash
   Redis. The first refusal past the total cap emails every super admin once
-  that day. Create site (#4960) calls it before enqueuing anything and refuses
-  with a neutral "try again later" message.
+  that day. `admitCreateSite({ clientKey, email })` wraps it: an email that
+  `isSignupBlocked` matches is refused first and takes no slot, and a failed
+  lookup refuses too. Create site (#4960) calls `admitCreateSite` before
+  enqueuing anything and answers every refusal with the same neutral "try
+  again later" message, so the blocklist can't be probed.
 - Today: `@blog/db`'s `normalizeSignupEmail` lower-cases an address and drops
   any `+tag`, so `name+1@…` and `name+2@…` resolve to one person. #4960's
   one-site-per-user lookup compares addresses in that form.

@@ -19,7 +19,8 @@
     "findings": "Findings · Admin",
     "email": "Email · Admin",
     "leads": "Leads · Admin",
-    "releases": "Releases · Admin"
+    "releases": "Releases · Admin",
+    "blockedSignupsPage": "Blocked sign-ups · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -113,7 +114,8 @@
       "ACTIVATING": "Activating",
       "READY": "Ready",
       "STALLED": "Action needed"
-    }
+    },
+    "blockedSignups": "Blocked sign-ups"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -311,7 +313,9 @@
       "RELEASE_STARTED": "Release started",
       "RELEASE_OVERRIDE": "Release gate overridden",
       "CONTRAST_CHECK_STARTED": "Contrast check started",
-      "TENANT_MIGRATIONS_STARTED": "Tenant migrations started"
+      "TENANT_MIGRATIONS_STARTED": "Tenant migrations started",
+      "SIGNUP_BLOCK_ADDED": "Sign-up block added",
+      "SIGNUP_BLOCK_REMOVED": "Sign-up block removed"
     }
   },
   "tenantDomainPage": {
@@ -966,6 +970,14 @@
       "dialogDescription": "The site's contact form, newsletter sign-ups and bookmarks come back from the next page load.",
       "confirmButton": "Reactivate",
       "confirmingButton": "Reactivating…"
+    },
+    "blockOwner": {
+      "switchLabel": "Also block this owner's email",
+      "description": "The owner can no longer sign up or create a site with this address. You can remove the block later from Blocked sign-ups.",
+      "reasonLabel": "Reason for blocking",
+      "reasonHint": "Operators see this on the Blocked sign-ups page.",
+      "switchOn": "On",
+      "switchOff": "Off"
     }
   },
   "tenantLifecycleErrors": {
@@ -981,7 +993,9 @@
     "reactivateFailed": "Couldn't start reactivation — try again.",
     "deleteFailed": "Couldn't delete the tenant — try again.",
     "suspendFailed": "Couldn't suspend the tenant — try again.",
-    "liftSuspensionFailed": "Couldn't reactivate the tenant — try again."
+    "liftSuspensionFailed": "Couldn't reactivate the tenant — try again.",
+    "ownerEmailUnknown": "This tenant's owner has no email address on record yet, so it can't be blocked.",
+    "invalidInput": "Check the details and try again."
   },
   "featuresSettings": {
     "heading": "Features",
@@ -1258,5 +1272,48 @@
       "tagListIncomplete": "The release tag list is too long to read in full, so the latest release can't be determined.",
       "dbError": "The database could not be read."
     }
+  },
+  "blockedSignupsView": {
+    "title": "Blocked sign-ups",
+    "description": "Email addresses and domains that can't sign up or create a site. An address is stored only as a hash, so it can't be read back."
+  },
+  "blockedSignupsTable": {
+    "columnKind": "Kind",
+    "columnValue": "Value",
+    "columnReason": "Reason",
+    "columnAddedBy": "Added by",
+    "columnAdded": "Added",
+    "columnActions": "Actions",
+    "addedByUnknown": "Unknown",
+    "empty": "Nothing is blocked.",
+    "regionLabel": "Blocked sign-ups"
+  },
+  "blockedSignupKindLabel": {
+    "ADDRESS": "Email address",
+    "DOMAIN": "Domain"
+  },
+  "removeBlockedIdentityControl": {
+    "triggerAriaLabel": "Remove block {value}",
+    "dialogTitle": "Remove this block?",
+    "dialogDescription": "This address or domain can sign up and create sites again straight away.",
+    "confirmButton": "Remove block",
+    "confirmingButton": "Removing…",
+    "openDialogButton": "Remove",
+    "alreadyRemoved": "This block was already removed.",
+    "removalFailed": "Couldn't remove the block — try again."
+  },
+  "addBlockedDomainCard": {
+    "title": "Block a domain",
+    "supportingText": "Everyone with an email address on this domain is refused.",
+    "domainLabel": "Domain",
+    "domainHint": "Without a leading \"@\", for example example.com.",
+    "domainPlaceholder": "example.com",
+    "reasonLabel": "Reason",
+    "submitting": "Blocking…",
+    "reasonRequired": "Enter a reason.",
+    "domainFormatInvalid": "Enter a valid domain, such as example.com.",
+    "domainBlocked": "Domain blocked.",
+    "domainBlockFailed": "Couldn't block the domain — try again.",
+    "blockSubmit": "Block domain"
   }
 }

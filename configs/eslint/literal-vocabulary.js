@@ -4,3 +4,11 @@ export const ENV_OBJECT_NAME = 'env';
 export const PROCESS_NAME = 'process';
 export const STUB_ENV_CALLEE = 'stubEnv';
 export const SANITY_TYPE_KEY = '_type';
+export const ROLE_QUERY_CALLEES = new Set([
+  'getByRole',
+  'getAllByRole',
+  'queryByRole',
+  'queryAllByRole',
+  'findByRole',
+  'findAllByRole',
+]);

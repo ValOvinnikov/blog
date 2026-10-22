@@ -9,6 +9,7 @@ import {
   EQUALITY_OPERATORS,
   PROCESS_NAME,
   PROTOCOL_ATTRIBUTE_KEYS,
+  ROLE_QUERY_CALLEES,
   SANITY_TYPE_KEY,
   STUB_ENV_CALLEE,
 } from '../configs/eslint/literal-vocabulary.js';
@@ -138,6 +139,7 @@ const isExemptLiteral = (node) => {
     (parent.name === node && !ts.isElementAccessExpression(parent)) ||
     isFirstArgumentOf(node, MODULE_PATH_CALLEES) ||
     isFirstArgumentOf(node, TEST_TITLE_CALLEES) ||
+    isFirstArgumentOf(node, ROLE_QUERY_CALLEES) ||
     isInsideClassOrJsxAttribute(node) ||
     isEnvComparisonOperand(node) ||
     isEnvReadKey(node) ||

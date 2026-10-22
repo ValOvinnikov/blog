@@ -19,7 +19,8 @@
     "findings": "Befunde · Admin",
     "email": "E-Mail · Admin",
     "leads": "Anfragen · Admin",
-    "releases": "Releases · Admin"
+    "releases": "Releases · Admin",
+    "blockedSignupsPage": "Gesperrte Registrierungen · Admin"
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
@@ -113,7 +114,8 @@
       "ACTIVATING": "Wird aktiviert",
       "READY": "Bereit",
       "STALLED": "Aktion nötig"
-    }
+    },
+    "blockedSignups": "Gesperrte Registrierungen"
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"
@@ -311,7 +313,9 @@
       "RELEASE_STARTED": "Release gestartet",
       "RELEASE_OVERRIDE": "Release-Prüfung übergangen",
       "CONTRAST_CHECK_STARTED": "Kontrastprüfung gestartet",
-      "TENANT_MIGRATIONS_STARTED": "Mandantenmigrationen gestartet"
+      "TENANT_MIGRATIONS_STARTED": "Mandantenmigrationen gestartet",
+      "SIGNUP_BLOCK_ADDED": "Registrierungssperre hinzugefügt",
+      "SIGNUP_BLOCK_REMOVED": "Registrierungssperre aufgehoben"
     }
   },
   "tenantDomainPage": {
@@ -966,6 +970,14 @@
       "dialogDescription": "Kontaktformular, Newsletter-Anmeldungen und Lesezeichen der Website sind ab dem nächsten Seitenaufruf wieder da.",
       "confirmButton": "Reaktivieren",
       "confirmingButton": "Wird reaktiviert…"
+    },
+    "blockOwner": {
+      "switchLabel": "E-Mail-Adresse des Inhabers ebenfalls sperren",
+      "description": "Der Inhaber kann sich mit dieser Adresse nicht mehr registrieren und keine Website erstellen. Die Sperre lässt sich später unter „Gesperrte Registrierungen“ aufheben.",
+      "reasonLabel": "Grund der Sperre",
+      "reasonHint": "Betreiber sehen ihn auf der Seite „Gesperrte Registrierungen“.",
+      "switchOn": "An",
+      "switchOff": "Aus"
     }
   },
   "tenantLifecycleErrors": {
@@ -981,7 +993,9 @@
     "reactivateFailed": "Die Reaktivierung konnte nicht gestartet werden — bitte erneut versuchen.",
     "deleteFailed": "Der Mandant konnte nicht gelöscht werden — bitte erneut versuchen.",
     "suspendFailed": "Der Mandant konnte nicht gesperrt werden — bitte erneut versuchen.",
-    "liftSuspensionFailed": "Der Mandant konnte nicht reaktiviert werden — bitte erneut versuchen."
+    "liftSuspensionFailed": "Der Mandant konnte nicht reaktiviert werden — bitte erneut versuchen.",
+    "ownerEmailUnknown": "Für den Inhaber dieses Mandanten ist noch keine E-Mail-Adresse hinterlegt, daher kann sie nicht gesperrt werden.",
+    "invalidInput": "Prüfen Sie die Angaben und versuchen Sie es erneut."
   },
   "featuresSettings": {
     "heading": "Funktionen",
@@ -1258,5 +1272,48 @@
       "tagListIncomplete": "Die Liste der Release-Tags ist zu lang, um sie vollständig zu lesen, daher lässt sich das neueste Release nicht bestimmen.",
       "dbError": "Die Datenbank konnte nicht gelesen werden."
     }
+  },
+  "blockedSignupsView": {
+    "title": "Gesperrte Registrierungen",
+    "description": "E-Mail-Adressen und Domains, die sich nicht registrieren und keine Website erstellen können. Eine Adresse wird nur als Hash gespeichert und ist nicht mehr lesbar."
+  },
+  "blockedSignupsTable": {
+    "columnKind": "Art",
+    "columnValue": "Wert",
+    "columnReason": "Grund",
+    "columnAddedBy": "Hinzugefügt von",
+    "columnAdded": "Hinzugefügt",
+    "columnActions": "Aktionen",
+    "addedByUnknown": "Unbekannt",
+    "empty": "Es ist nichts gesperrt.",
+    "regionLabel": "Gesperrte Registrierungen"
+  },
+  "blockedSignupKindLabel": {
+    "ADDRESS": "E-Mail-Adresse",
+    "DOMAIN": "Domain"
+  },
+  "removeBlockedIdentityControl": {
+    "triggerAriaLabel": "Sperre {value} entfernen",
+    "dialogTitle": "Diese Sperre entfernen?",
+    "dialogDescription": "Diese Adresse oder Domain kann sich sofort wieder registrieren und Websites erstellen.",
+    "confirmButton": "Sperre entfernen",
+    "confirmingButton": "Wird entfernt…",
+    "openDialogButton": "Entfernen",
+    "alreadyRemoved": "Diese Sperre wurde bereits entfernt.",
+    "removalFailed": "Die Sperre konnte nicht entfernt werden – versuchen Sie es erneut."
+  },
+  "addBlockedDomainCard": {
+    "title": "Domain sperren",
+    "supportingText": "Alle mit einer E-Mail-Adresse dieser Domain werden abgewiesen.",
+    "domainLabel": "Domain",
+    "domainHint": "Ohne vorangestelltes „@“, zum Beispiel example.com.",
+    "domainPlaceholder": "example.com",
+    "reasonLabel": "Grund",
+    "submitting": "Wird gesperrt…",
+    "reasonRequired": "Geben Sie einen Grund ein.",
+    "domainFormatInvalid": "Geben Sie eine gültige Domain ein, zum Beispiel example.com.",
+    "domainBlocked": "Domain gesperrt.",
+    "domainBlockFailed": "Die Domain konnte nicht gesperrt werden – versuchen Sie es erneut.",
+    "blockSubmit": "Domain sperren"
   }
 }

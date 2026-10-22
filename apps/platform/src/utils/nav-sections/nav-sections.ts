@@ -43,6 +43,11 @@ export const operatorNavSections = (
               icon: ICONS.CHECK_SHEET,
               href: adminRoutes.releases(),
             },
+            {
+              label: t('blockedSignups'),
+              icon: ICONS.SHIELD_CHECK,
+              href: adminRoutes.blockedSignups(),
+            },
           ]
         : []),
     ],

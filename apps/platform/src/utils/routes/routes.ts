@@ -23,6 +23,7 @@ export const adminRoutes = {
   newTenant: () => '/tenants/new',
   findings: () => '/findings',
   releases: () => '/releases',
+  blockedSignups: () => '/blocked-signups',
   tenantOverview: (tenantId: string) => `/tenants/${tenantId}`,
   tenantProvisioning: (tenantId: string) => `/tenants/${tenantId}/provisioning`,
   tenantDanger: (tenantId: string) => `/tenants/${tenantId}/danger`,

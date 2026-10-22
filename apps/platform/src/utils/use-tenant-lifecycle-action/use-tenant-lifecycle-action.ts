@@ -21,6 +21,7 @@ const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_DEPROVISIONED]: 'notDeprovisioned',
   [TENANT_REFUSAL.ALREADY_IN_PROGRESS]: 'alreadyInProgress',
   [TENANT_REFUSAL.NOT_ARCHIVED]: 'notArchived',
+  [TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN]: 'ownerEmailUnknown',
 } satisfies Record<TTenantLifecycleRefusal, string>;
 
 type TServerErrorKey =
@@ -47,10 +48,9 @@ export const useTenantLifecycleAction = <
   ) => {
     switch (result.outcome) {
       case ACTION_OUTCOME.INVALID:
-        return FIELD_ERROR_KEYS[
-          result.fieldErrors.confirm?.reason ??
-            TENANT_FIELD_ERROR.CONFIRM_REQUIRED
-        ];
+        return result.fieldErrors.confirm
+          ? FIELD_ERROR_KEYS[result.fieldErrors.confirm.reason]
+          : 'invalidInput';
       case ACTION_OUTCOME.REFUSED:
         return REFUSAL_KEYS[result.reason];
       case ACTION_OUTCOME.SERVER_ERROR:

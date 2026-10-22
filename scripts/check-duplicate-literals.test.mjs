@@ -45,6 +45,9 @@ test('collectLiterals skips values an outside standard spells', () => {
     "'production' === process.env['NODE_ENV'];",
     "env['AUTH_SECRET'];",
     "vi.stubEnv('NODE_ENV', 'production');",
+    "screen.getByRole('button');",
+    "within(row).findAllByRole('textbox');",
+    "queryByRole('switch');",
     "const cookie = { sameSite: 'strict' };",
     "const doc = { _type: 'page_home' };",
     "type TField = Pick<TDoc, 'title' | 'seo'>;",
@@ -62,6 +65,8 @@ test('collectLiterals still collects the same values outside that vocabulary', (
     "props['variant'];",
     "const doc = { type: 'page_home' };",
     "f('page_home');",
+    "f('button');",
+    "screen.getByText('button');",
   ].join('\n');
   assert.deepEqual(values(source), [
     'production',
@@ -71,6 +76,8 @@ test('collectLiterals still collects the same values outside that vocabulary', (
     'variant',
     'page_home',
     'page_home',
+    'button',
+    'button',
   ]);
 });
 

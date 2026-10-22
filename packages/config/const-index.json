@@ -226,6 +226,14 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "BLOCKED_SIGNUP_IDENTITY": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "CREATED": [
       {
         "ref": "AUDIT_ACTION.CREATED",
@@ -359,6 +367,22 @@
     "TENANT_MIGRATIONS_STARTED": [
       {
         "ref": "AUDIT_ACTION.TENANT_MIGRATIONS_STARTED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SIGNUP_BLOCK_ADDED": [
+      {
+        "ref": "AUDIT_ACTION.SIGNUP_BLOCK_ADDED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "SIGNUP_BLOCK_REMOVED": [
+      {
+        "ref": "AUDIT_ACTION.SIGNUP_BLOCK_REMOVED",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/audit.ts"
@@ -3472,6 +3496,30 @@
         "file": "apps/platform/src/constants/settings.ts"
       }
     ],
+    "BLOCK_DOMAIN_INVALID": [
+      {
+        "ref": "SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "BLOCK_REASON_REQUIRED": [
+      {
+        "ref": "SIGNUP_BLOCK_FIELD_ERROR.BLOCK_REASON_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "ENTRY_NOT_FOUND": [
+      {
+        "ref": "SIGNUP_BLOCK_REFUSAL.ENTRY_NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
     "UPCOMING": [
       {
         "ref": "STEP_INDICATOR_STATE.UPCOMING",
@@ -3655,6 +3703,14 @@
     "OWNER_INVITE_UNCONFIRMED": [
       {
         "ref": "TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_EMAIL_UNKNOWN": [
+      {
+        "ref": "TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
