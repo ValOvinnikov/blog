@@ -49,6 +49,7 @@ export const uploadBrandAssetAction = async (
 
     const blob = await put(pathname, buffer, {
       access: 'public',
+      addRandomSuffix: true,
       contentType,
       token,
     });

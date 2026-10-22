@@ -184,7 +184,7 @@ describe(uploadBrandAssetAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('uploads, saves the theme fields plus the new logo URL, and returns it', async () => {
+  it('uploads under a unique name, saves the theme fields plus the new logo URL, and returns it', async () => {
     const result = await uploadBrandAssetAction(
       'tenant-1',
       'logo',
@@ -195,6 +195,11 @@ describe(uploadBrandAssetAction, () => {
       outcome: ACTION_OUTCOME.SUCCESS,
       url: UPLOADED_LOGO_URL,
     });
+    expect(putMock).toHaveBeenCalledWith(
+      'tenants/tenant-1/logo.png',
+      expect.any(Buffer),
+      expect.objectContaining({ addRandomSuffix: true }),
+    );
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
       ...THEME_FIELDS,
       logoAssetUrl: UPLOADED_LOGO_URL,
