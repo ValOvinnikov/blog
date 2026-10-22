@@ -62,7 +62,6 @@ vi.mock('@vercel/blob', () => ({
 vi.mock('@platform/utils/env/env');
 
 const BLOB_TOKEN = 'test-token';
-const FAVICON_FILE_NAME = 'favicon.png';
 const UPLOADED_LOGO_URL =
   'https://example.blob.vercel-storage.com/logo-abc.png';
 const PREVIOUS_LOGO_URL =
@@ -173,7 +172,7 @@ describe(uploadBrandAssetAction, () => {
     const result = await uploadBrandAssetAction(
       'tenant-1',
       'favicon',
-      makeFormData(new File(['x'], FAVICON_FILE_NAME, { type: 'image/png' })),
+      makeFormData(new File(['x'], 'favicon.png', { type: 'image/png' })),
     );
 
     expect(result).toEqual({
@@ -185,7 +184,7 @@ describe(uploadBrandAssetAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('uploads, saves the theme fields plus the new logo URL, and returns it', async () => {
+  it('uploads under a unique name, saves the theme fields plus the new logo URL, and returns it', async () => {
     const result = await uploadBrandAssetAction(
       'tenant-1',
       'logo',
@@ -196,24 +195,15 @@ describe(uploadBrandAssetAction, () => {
       outcome: ACTION_OUTCOME.SUCCESS,
       url: UPLOADED_LOGO_URL,
     });
+    expect(putMock).toHaveBeenCalledWith(
+      'tenants/tenant-1/logo.png',
+      expect.any(Buffer),
+      expect.objectContaining({ addRandomSuffix: true }),
+    );
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
       ...THEME_FIELDS,
       logoAssetUrl: UPLOADED_LOGO_URL,
     });
-  });
-
-  it('uploads each file under a unique name so a same-type replacement never collides', async () => {
-    await uploadBrandAssetAction(
-      'tenant-1',
-      'favicon',
-      makeFormData(new File(['x'], FAVICON_FILE_NAME, { type: 'image/png' })),
-    );
-
-    expect(putMock).toHaveBeenCalledWith(
-      'tenants/tenant-1/favicon.png',
-      expect.any(Buffer),
-      expect.objectContaining({ addRandomSuffix: true }),
-    );
   });
 
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
