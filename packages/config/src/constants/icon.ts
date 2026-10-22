@@ -1,5 +1,7 @@
 import type { TValueOf } from '@blog/config/utils';
 
+import { ALERT_TYPE } from './alert';
+
 export const ICONS = {
   SUN: 'SUN',
   MOON: 'MOON',
@@ -28,6 +30,7 @@ export const ICONS = {
   SPINNER: 'SPINNER',
   WARNING: 'WARNING',
   INFO: 'INFO',
+  ERROR: ALERT_TYPE.ERROR,
   SETTINGS: 'SETTINGS',
   POWER: 'POWER',
   MAIL: 'MAIL',

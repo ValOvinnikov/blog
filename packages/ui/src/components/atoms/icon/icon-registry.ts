@@ -43,6 +43,8 @@ import CopyComponent from '@blog/ui/assets/icons/copy.svg';
 import CopyUrl from '@blog/ui/assets/icons/copy.svg?url';
 import CpuComponent from '@blog/ui/assets/icons/cpu.svg';
 import CpuUrl from '@blog/ui/assets/icons/cpu.svg?url';
+import ErrorComponent from '@blog/ui/assets/icons/error.svg';
+import ErrorUrl from '@blog/ui/assets/icons/error.svg?url';
 import ExternalLinkComponent from '@blog/ui/assets/icons/external-link.svg';
 import ExternalLinkUrl from '@blog/ui/assets/icons/external-link.svg?url';
 import FacebookComponent from '@blog/ui/assets/icons/facebook.svg';
@@ -195,6 +197,7 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.SPINNER]: { component: SpinnerComponent, url: SpinnerUrl },
   [ICONS.WARNING]: { component: WarningComponent, url: WarningUrl },
   [ICONS.INFO]: { component: InfoComponent, url: InfoUrl },
+  [ICONS.ERROR]: { component: ErrorComponent, url: ErrorUrl },
   [ICONS.SETTINGS]: { component: SettingsComponent, url: SettingsUrl },
   [ICONS.POWER]: { component: PowerComponent, url: PowerUrl },
   [ICONS.MAIL]: { component: MailComponent, url: MailUrl },
