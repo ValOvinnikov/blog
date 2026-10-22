@@ -1,8 +1,6 @@
 export const DEPROVISIONING_AUDIT_VIA = 'deprovision-tenant-worker';
 export const SANITY_MANAGE_PROJECT_URL =
   'https://www.sanity.io/manage/project/';
-export const DEFAULT_OPERATOR_ALERT_FROM_ADDRESS =
-  'Tenant Alerts <onboarding@resend.dev>';
 export const DEPROVISIONING_START_FAILED_EVENT = 'deprovisioning.start_failed';
 export const DEPROVISIONING_STEP_FAILED_EVENT = 'deprovisioning.step_failed';
 export const DEPROVISIONING_RUN_FAILED_EVENT = 'deprovisioning.run_failed';

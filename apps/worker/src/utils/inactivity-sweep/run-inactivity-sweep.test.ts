@@ -1,0 +1,281 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  DAY_MS,
+  INACTIVITY_STAGE,
+  SUSPENSION_REASON,
+  TENANT_STATUS,
+  type TInactivityStage,
+} from '@blog/db/constants';
+import { listSuperadminEmails } from '@blog/db/queries/admins';
+import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
+import {
+  listTenantsDueForInactivityStage,
+  stampTenantInactivityStage,
+  startDeprovisioningRun,
+} from '@blog/db/queries/tenants';
+import type { TTenant } from '@blog/db/schema/tenants';
+import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
+import { sendEmail } from '@blog/email';
+import {
+  INACTIVITY_EMAIL_SEND_FAILED_EVENT,
+  INACTIVITY_OWNER_MISSING_EVENT,
+  INACTIVITY_STAGE_FAILED_EVENT,
+} from '@worker/constants/inactivity-sweep';
+import { TEST_NOW } from '@worker/testing/clock/frozen-clock';
+import { makeInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
+import { OWNER_EMAIL } from '@worker/testing/owner-access/fixtures';
+import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { logger } from '@worker/utils/logger/logger';
+import { OWNER_INACTIVITY_EMAIL_COPY } from '@worker/utils/owner-email/owner-inactivity-email-copy';
+import { deprovisionTenant } from '@worker/workflows/deprovision-tenant';
+import { start } from 'workflow/api';
+
+import { runInactivitySweep } from './run-inactivity-sweep';
+
+const SWEEP_ENV = makeInactivitySweepEnv();
+const SUPERADMINS = [
+  'first-superadmin@example.com',
+  'second-superadmin@example.com',
+];
+const SITE_URL = 'https://acme.example.com';
+const RESEND_DOWN = 'resend down';
+const CACHE_DOWN = 'cache down';
+
+vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
+  (
+    await import('@worker/testing/tenants-queries/fake-tenants-queries')
+  ).withFakeTenantsQueries(await importOriginal()),
+);
+vi.mock('@blog/db/queries/admins');
+vi.mock('@blog/db/queries/memberships');
+vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
+vi.mock(import('@blog/email'), async (importOriginal) => ({
+  ...(await importOriginal()),
+  sendEmail: vi.fn(),
+}));
+vi.mock('@worker/workflows/deprovision-tenant', () => ({
+  deprovisionTenant: vi.fn(),
+}));
+vi.mock('workflow/api', () => ({ start: vi.fn() }));
+
+function inactiveFor(days: number, overrides: Partial<TTenant> = {}): TTenant {
+  return makeTenant({
+    lastActivityAt: new Date(TEST_NOW.getTime() - days * DAY_MS),
+    ...overrides,
+  });
+}
+
+function dueAt(stage: TInactivityStage, tenants: TTenant[]): void {
+  vi.mocked(listTenantsDueForInactivityStage).mockImplementation(
+    async (dueStage) => (dueStage === stage ? tenants : []),
+  );
+}
+
+function sweep() {
+  return runInactivitySweep({ now: TEST_NOW, env: SWEEP_ENV });
+}
+
+function sentEmails() {
+  return vi.mocked(sendEmail).mock.calls.map(([input]) => input);
+}
+
+function sentTo(): string[] {
+  return sentEmails().map(({ to }) => to);
+}
+
+beforeEach(() => {
+  vi.mocked(listTenantsDueForInactivityStage).mockResolvedValue([]);
+  vi.mocked(stampTenantInactivityStage).mockImplementation(async (id) =>
+    makeTenant({ id }),
+  );
+  vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
+  vi.mocked(listSuperadminEmails).mockResolvedValue(SUPERADMINS);
+  vi.mocked(sendEmail).mockResolvedValue();
+  vi.mocked(requestTenantCacheInvalidation).mockResolvedValue();
+  vi.mocked(start).mockResolvedValue({ runId: 'run' } as never);
+});
+
+describe(runInactivitySweep, () => {
+  describe('at day 23', () => {
+    const tenant = inactiveFor(23, { locale: LOCALE_ISO_CODES.FR });
+
+    beforeEach(() => {
+      dueAt(INACTIVITY_STAGE.SUSPENSION_WARNING, [tenant]);
+      vi.mocked(stampTenantInactivityStage).mockResolvedValue(tenant);
+    });
+
+    it('stamps the warning before sending it', async () => {
+      await sweep();
+
+      expect(stampTenantInactivityStage).toHaveBeenCalledWith(
+        TEST_TENANT_ID,
+        INACTIVITY_STAGE.SUSPENSION_WARNING,
+        TEST_NOW,
+      );
+    });
+
+    it("warns the owner once, in the site's language, with the pause date", async () => {
+      await sweep();
+
+      const { subject } = OWNER_INACTIVITY_EMAIL_COPY.FR.suspensionWarning({
+        siteName: tenant.name,
+        siteUrl: SITE_URL,
+        date: '28 octobre 2026',
+      });
+      const ownerEmails = sentEmails().filter(({ to }) => to === OWNER_EMAIL);
+      expect(ownerEmails).toHaveLength(1);
+      expect(ownerEmails[0]?.subject).toBe(subject);
+      expect(ownerEmails[0]?.html).toContain(
+        `href="${SWEEP_ENV.adminAppBaseUrl}/dashboard"`,
+      );
+    });
+
+    it('warns every super admin once, in English', async () => {
+      await sweep();
+
+      const alerts = sentEmails().filter(({ to }) => SUPERADMINS.includes(to));
+      expect(alerts.map(({ to }) => to)).toEqual(SUPERADMINS);
+      expect(alerts[0]?.subject).toContain('October 28, 2026');
+    });
+
+    it('reports the tenant as advanced', async () => {
+      await expect(sweep()).resolves.toMatchObject({
+        [INACTIVITY_STAGE.SUSPENSION_WARNING]: 1,
+      });
+    });
+  });
+
+  describe('at day 30', () => {
+    beforeEach(() => {
+      dueAt(INACTIVITY_STAGE.SUSPENSION, [inactiveFor(30)]);
+    });
+
+    it('suspends the tenant for inactivity', async () => {
+      await sweep();
+
+      expect(stampTenantInactivityStage).toHaveBeenCalledWith(
+        TEST_TENANT_ID,
+        INACTIVITY_STAGE.SUSPENSION,
+        TEST_NOW,
+      );
+    });
+
+    it('purges the site cache so the next load serves the suspended site', async () => {
+      await sweep();
+
+      expect(requestTenantCacheInvalidation).toHaveBeenCalledWith({
+        webAppUrl: SWEEP_ENV.webAppBaseUrl,
+        secret: SWEEP_ENV.siteConfigRevalidateSecret,
+        tenantId: TEST_TENANT_ID,
+      });
+      expect(sendEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('at day 50', () => {
+    const tenant = inactiveFor(50, {
+      locale: LOCALE_ISO_CODES.DE,
+      status: TENANT_STATUS.SUSPENDED,
+      suspensionReason: SUSPENSION_REASON.INACTIVITY,
+    });
+
+    beforeEach(() => {
+      dueAt(INACTIVITY_STAGE.DELETION_NOTICE, [tenant]);
+      vi.mocked(stampTenantInactivityStage).mockResolvedValue(tenant);
+    });
+
+    it("sends the owner one deletion notice, in the site's language, with the deletion date", async () => {
+      await sweep();
+
+      const { subject } = OWNER_INACTIVITY_EMAIL_COPY.DE.deletionNotice({
+        siteName: tenant.name,
+        siteUrl: SITE_URL,
+        date: '31. Oktober 2026',
+      });
+      expect(sentTo()).toEqual([OWNER_EMAIL]);
+      expect(sentEmails()[0]?.subject).toBe(subject);
+    });
+  });
+
+  describe('at day 60', () => {
+    beforeEach(() => {
+      dueAt(INACTIVITY_STAGE.DEPROVISIONING, [inactiveFor(60)]);
+    });
+
+    it('starts one deprovisioning run and records its start', async () => {
+      await sweep();
+
+      expect(start).toHaveBeenCalledExactlyOnceWith(deprovisionTenant, [
+        TEST_TENANT_ID,
+      ]);
+      expect(startDeprovisioningRun).toHaveBeenCalledWith({
+        tenantId: TEST_TENANT_ID,
+      });
+    });
+  });
+
+  it('sends nothing for a tenant another sweep already moved into the stage', async () => {
+    dueAt(INACTIVITY_STAGE.SUSPENSION_WARNING, [inactiveFor(23)]);
+    vi.mocked(stampTenantInactivityStage).mockResolvedValue(null);
+
+    await expect(sweep()).resolves.toMatchObject({
+      [INACTIVITY_STAGE.SUSPENSION_WARNING]: 0,
+    });
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('logs a tenant with no owner and sends it nothing', async () => {
+    dueAt(INACTIVITY_STAGE.DELETION_NOTICE, [inactiveFor(50)]);
+    vi.mocked(getTenantOwnerEmail).mockResolvedValue(undefined);
+
+    await sweep();
+
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(INACTIVITY_OWNER_MISSING_EVENT, {
+      tenantId: TEST_TENANT_ID,
+      stage: INACTIVITY_STAGE.DELETION_NOTICE,
+    });
+  });
+
+  it('logs a failed owner email and still alerts the super admins', async () => {
+    dueAt(INACTIVITY_STAGE.SUSPENSION_WARNING, [inactiveFor(23)]);
+    vi.mocked(sendEmail).mockImplementation(async ({ to }) => {
+      if (to === OWNER_EMAIL) throw new Error(RESEND_DOWN);
+    });
+
+    await sweep();
+
+    expect(sentTo()).toEqual(expect.arrayContaining(SUPERADMINS));
+    expect(logger.error).toHaveBeenCalledWith(
+      INACTIVITY_EMAIL_SEND_FAILED_EVENT,
+      {
+        tenantId: TEST_TENANT_ID,
+        email: 'suspensionWarning',
+        error: RESEND_DOWN,
+      },
+    );
+  });
+
+  it('logs a tenant whose stage fails and carries on with the next', async () => {
+    const secondTenantId = crypto.randomUUID();
+    dueAt(INACTIVITY_STAGE.SUSPENSION, [
+      inactiveFor(30),
+      inactiveFor(30, { id: secondTenantId }),
+    ]);
+    vi.mocked(requestTenantCacheInvalidation).mockRejectedValueOnce(
+      new Error(CACHE_DOWN),
+    );
+
+    await expect(sweep()).resolves.toMatchObject({
+      [INACTIVITY_STAGE.SUSPENSION]: 1,
+    });
+    expect(logger.error).toHaveBeenCalledWith(INACTIVITY_STAGE_FAILED_EVENT, {
+      tenantId: TEST_TENANT_ID,
+      stage: INACTIVITY_STAGE.SUSPENSION,
+      error: CACHE_DOWN,
+    });
+    expect(requestTenantCacheInvalidation).toHaveBeenLastCalledWith(
+      expect.objectContaining({ tenantId: secondTenantId }),
+    );
+  });
+});

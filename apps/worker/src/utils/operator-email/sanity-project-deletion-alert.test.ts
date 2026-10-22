@@ -2,11 +2,11 @@ import type { TMaybeUndefined } from '@blog/config';
 import { listSuperadminEmails } from '@blog/db/queries/admins';
 import { sendEmail } from '@blog/email';
 import {
-  DEFAULT_OPERATOR_ALERT_FROM_ADDRESS,
   DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
   DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
   SANITY_MANAGE_PROJECT_URL,
 } from '@worker/constants/deprovisioning';
+import { DEFAULT_OPERATOR_ALERT_FROM_ADDRESS } from '@worker/constants/operator-alert';
 import { SANITY_PROJECT_ID } from '@worker/testing/owner-access/fixtures';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
