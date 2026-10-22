@@ -1,4 +1,10 @@
-import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import type * as BlogEmail from '@blog/email';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
@@ -24,7 +30,6 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/auth/auth');
 vi.mock('@platform/server/email/load-tenant-email-brand');
 vi.mock('@platform/server/email/test-email-rate-limit');
-vi.mock('@platform/utils/logger/logger');
 vi.mock('@platform/utils/env/env');
 
 vi.mock('@blog/db', () => ({
@@ -35,7 +40,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/email')>()),
+  ...(await importOriginal<typeof BlogEmail>()),
   sendEmail: sendEmailMock,
 }));
 
@@ -44,6 +49,9 @@ const requireTenantMembershipMock = vi.mocked<
 >(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const takeTestEmailSendMock = vi.mocked(takeTestEmailSend);
+
+const REPLY_TO_ADDRESS = 'hello@acme.example';
+const ADMIN_EMAIL = 'admin@example.com';
 
 const INPUT: TSendTestEmailInput = {
   templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -61,7 +69,7 @@ const INPUT: TSendTestEmailInput = {
   },
   sender: {
     senderName: 'Acme Co',
-    replyToAddress: 'hello@acme.example',
+    replyToAddress: REPLY_TO_ADDRESS,
     footerPostalAddress: '1 Rue de Paris',
   },
 };
@@ -71,11 +79,11 @@ describe(sendTestEmailAction, () => {
     requireTenantMembershipMock.mockReset();
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1', name: 'Acme Co' },
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'admin-1', email: 'admin@example.com' },
+      user: { id: 'admin-1', email: ADMIN_EMAIL },
     });
     takeTestEmailSendMock.mockReset();
     takeTestEmailSendMock.mockReturnValue(true);
@@ -92,14 +100,14 @@ describe(sendTestEmailAction, () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
-      to: 'admin@example.com',
+      to: ADMIN_EMAIL,
     });
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: 'admin@example.com',
+        to: ADMIN_EMAIL,
         subject: '[Test] Connexion',
-        replyTo: 'hello@acme.example',
+        replyTo: REPLY_TO_ADDRESS,
         from: expect.stringMatching(/^Acme Co </),
         html: expect.stringContaining('Bonjour'),
       }),
@@ -166,11 +174,11 @@ describe(sendTestEmailAction, () => {
 
   it('propagates the tenant gate when the session has no membership', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
     await expect(sendTestEmailAction('tenant-1', INPUT)).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
     expect(sendEmailMock).not.toHaveBeenCalled();
   });

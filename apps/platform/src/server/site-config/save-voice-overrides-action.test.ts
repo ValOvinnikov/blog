@@ -4,22 +4,28 @@ import {
   AUDIT_TARGET_TYPE,
   VOICE_FIELD_ERROR,
 } from '@blog/config';
-import { LOCALE_ISO_CODES, PRESET_ID } from '@blog/config/constants';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  LOCALE_ISO_CODES,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { logger } from '@platform/utils/logger/logger';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
 const {
   getSiteConfigOrDefaultsMock,
   upsertSiteConfigMock,
-  loggerErrorMock,
   recordAuditEventMock,
 } = vi.hoisted(() => ({
   getSiteConfigOrDefaultsMock: vi.fn(),
   upsertSiteConfigMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
 }));
 
@@ -33,10 +39,6 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/server/site-config/site-config-or-defaults', () => ({
   getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
-}));
-
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
 }));
 
 vi.mock('@blog/db', () => ({
@@ -61,13 +63,14 @@ const overridesByLocale = {
 const savedTheme = {
   preset: PRESET_ID.EDITORIAL,
   accentHue: 28,
-  headingFont: 'FRAUNCES',
-  bodyFont: 'INTER',
-  radiusScale: 'SM',
-  density: 'COMPACT',
+  headingFont: FONT_CHOICE.FRAUNCES,
+  bodyFont: FONT_CHOICE.INTER,
+  radiusScale: RADIUS_SCALE.SM,
+  density: DENSITY.COMPACT,
 };
 
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
+const loggerErrorMock = vi.mocked(logger.error);
 
 describe(saveVoiceOverridesAction, () => {
   beforeEach(() => {
@@ -75,7 +78,6 @@ describe(saveVoiceOverridesAction, () => {
     getSiteConfigOrDefaultsMock.mockReset();
     upsertSiteConfigMock.mockReset();
     revalidateSiteConfigMock.mockReset();
-    loggerErrorMock.mockReset();
     recordAuditEventMock.mockReset();
     recordAuditEventMock.mockResolvedValue(undefined);
     revalidateSiteConfigMock.mockResolvedValue(undefined);
@@ -87,7 +89,7 @@ describe(saveVoiceOverridesAction, () => {
     upsertSiteConfigMock.mockResolvedValue({ ok: true });
     requireTenantMembershipMock.mockResolvedValue({
       tenant,
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
   });
 

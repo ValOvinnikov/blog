@@ -9,6 +9,7 @@ import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -34,8 +35,6 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
@@ -54,8 +53,6 @@ const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 const TENANT_ID = 'tenant-1';
 const TENANT_NAME = 'Acme';
 const UPDATED = 'updated';
-const OPERATOR_ID = 'operator-1';
-const OPERATOR_EMAIL = 'operator@example.com';
 const OWNER_EMAIL = 'owner@example.com';
 const NEW_OWNER_EMAIL = 'new-owner@example.com';
 const RENAMED_TENANT_NAME = 'Acme Renamed';

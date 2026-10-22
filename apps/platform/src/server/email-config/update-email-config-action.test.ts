@@ -28,8 +28,6 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock('@blog/db', () => ({
   queries: {
     emailConfig: { upsertEmailConfig: upsertEmailConfigMock },

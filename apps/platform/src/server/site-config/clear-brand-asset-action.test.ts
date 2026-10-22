@@ -4,11 +4,15 @@ import {
   AUDIT_TARGET_TYPE,
   DENSITY,
   FONT_CHOICE,
+  NEXT_NAVIGATION_ERROR,
   PRESET_ID,
   RADIUS_SCALE,
+  type TMaybeNull,
 } from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -47,12 +51,16 @@ vi.mock('@vercel/blob', () => ({
 
 vi.mock('@platform/utils/env/env');
 
-Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
+const BLOB_TOKEN = 'test-token';
+const LOGO_URL = 'https://example.blob.vercel-storage.com/logo.png';
+const FAVICON_URL = 'https://example.blob.vercel-storage.com/favicon.png';
+
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
 
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const THEME_FIELDS = {
   preset: PRESET_ID.CONSOLE,
@@ -74,10 +82,10 @@ describe(clearBrandAssetAction, () => {
 
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     getSiteConfigOrDefaultsMock.mockResolvedValue({
@@ -97,7 +105,7 @@ describe(clearBrandAssetAction, () => {
   it('nulls the logo column and deletes the stored blob', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
-      logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
+      logoAssetUrl: LOGO_URL,
       faviconAssetUrl: undefined,
     });
 
@@ -108,25 +116,22 @@ describe(clearBrandAssetAction, () => {
       ...THEME_FIELDS,
       logoAssetUrl: null,
     });
-    expect(delMock).toHaveBeenCalledWith(
-      'https://example.blob.vercel-storage.com/logo.png',
-      { token: 'test-token' },
-    );
+    expect(delMock).toHaveBeenCalledWith(LOGO_URL, { token: BLOB_TOKEN });
   });
 
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
-      faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
+      faviconAssetUrl: FAVICON_URL,
     });
 
     await clearBrandAssetAction('tenant-1', 'favicon');
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: 'tenant-1',
@@ -147,7 +152,7 @@ describe(clearBrandAssetAction, () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
-      faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
+      faviconAssetUrl: FAVICON_URL,
     });
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
@@ -159,11 +164,11 @@ describe(clearBrandAssetAction, () => {
 
   it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
     await expect(clearBrandAssetAction('tenant-1', 'logo')).rejects.toThrow(
-      'NEXT_REDIRECT',
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -171,11 +176,11 @@ describe(clearBrandAssetAction, () => {
 
   it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
     await expect(clearBrandAssetAction('tenant-1', 'logo')).rejects.toThrow(
-      'NEXT_NOT_FOUND',
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();

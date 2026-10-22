@@ -1,5 +1,6 @@
 import { FINDING_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { CONTRAST_WORKFLOW_FILE } from '@platform/constants/release';
 import {
   githubCompareJson,
   githubJson,
@@ -10,7 +11,6 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { isContrastDue } from './is-contrast-due';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 const { getContrastFindingMock, getLatestPassingContrastShaMock } = vi.hoisted(
   () => ({
@@ -28,6 +28,8 @@ vi.mock('@blog/db', async () => ({
     },
   },
 }));
+
+const MAIN_BRANCH_PATH = '/branches/main';
 
 const renderingFile = {
   filename: 'apps/web/src/app/page.tsx',
@@ -50,10 +52,10 @@ describe(isContrastDue, () => {
     github.respond('/git/matching-refs/tags/v', () =>
       githubJson([{ ref: `refs/tags/${lastTag}` }]),
     );
-    github.respond('/branches/main', () =>
+    github.respond(MAIN_BRANCH_PATH, () =>
       githubJson({ commit: { sha: headSha } }),
     );
-    github.respond('/actions/workflows/contrast.yml/runs', () =>
+    github.respond(`/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`, () =>
       githubJson({ workflow_runs: [] }),
     );
     getContrastFindingMock.mockReset().mockResolvedValue(undefined);
@@ -91,7 +93,7 @@ describe(isContrastDue, () => {
   });
 
   it('is not due when GitHub cannot be reached', async () => {
-    github.respond('/branches/main', () => githubJson({}, 500));
+    github.respond(MAIN_BRANCH_PATH, () => githubJson({}, 500));
 
     expect(await isContrastDue()).toBe(false);
   });

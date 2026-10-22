@@ -1,4 +1,9 @@
+import { FINDING_STATUS, HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  CONTRAST_STATUS,
+  CONTRAST_WORKFLOW_FILE,
+} from '@platform/constants/release';
 import {
   githubCompareJson,
   githubJson,
@@ -9,7 +14,6 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { getReleaseCandidate } from './get-release-candidate';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 
 const {
   getContrastFindingMock,
@@ -38,6 +42,11 @@ vi.mock('@blog/db', async () => ({
 }));
 
 type TFile = { filename: string; status: string };
+
+const TAGS_PATH = '/git/matching-refs/tags/v';
+const MAIN_BRANCH_PATH = '/branches/main';
+const CONTRAST_RUNS_PATH = `/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`;
+const RENDERING_FILENAME = 'apps/web/src/app/page.tsx';
 
 const makeCommit = () => ({
   sha: faker.git.commitSha(),
@@ -69,15 +78,13 @@ describe(getReleaseCandidate, () => {
 
   beforeEach(() => {
     headSha = faker.git.commitSha();
-    github.respond('/git/matching-refs/tags/v', () =>
+    github.respond(TAGS_PATH, () =>
       githubJson([{ ref: `refs/tags/${lastTag}` }]),
     );
-    github.respond('/branches/main', () =>
+    github.respond(MAIN_BRANCH_PATH, () =>
       githubJson({ commit: { sha: headSha } }),
     );
-    github.respond('/actions/workflows/contrast.yml/runs', () =>
-      githubJson({ workflow_runs: [] }),
-    );
+    github.respond(CONTRAST_RUNS_PATH, () => githubJson({ workflow_runs: [] }));
     getContrastFindingMock.mockReset().mockResolvedValue(undefined);
     getLatestPassingContrastShaMock.mockReset().mockResolvedValue(undefined);
     listActiveTenantsMock.mockReset().mockResolvedValue([]);
@@ -112,20 +119,20 @@ describe(getReleaseCandidate, () => {
     const { changes, contrastStatus } = await candidate();
 
     expect(changes.RENDERING).toBe(false);
-    expect(contrastStatus).toBe('NONE');
+    expect(contrastStatus).toBe(CONTRAST_STATUS.NONE);
   });
 
   it('reports contrast as due when a rendering path changed since the last green run', async () => {
     const lastGreenSha = faker.git.commitSha();
     const renderingFile = {
-      filename: 'apps/web/src/app/page.tsx',
+      filename: RENDERING_FILENAME,
       status: 'modified',
     };
     getLatestPassingContrastShaMock.mockResolvedValue(lastGreenSha);
     compare(lastTag, [renderingFile]);
     compare(lastGreenSha, [renderingFile]);
 
-    expect((await candidate()).contrastStatus).toBe('DUE');
+    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.DUE);
   });
 
   it('reports contrast as not due when nothing rendering changed since the last green run', async () => {
@@ -136,7 +143,7 @@ describe(getReleaseCandidate, () => {
     ]);
     compare(lastGreenSha, [{ filename: 'docs/README.md', status: 'modified' }]);
 
-    expect((await candidate()).contrastStatus).toBe('NONE');
+    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.NONE);
   });
 
   it('reports contrast as due when rendering changed and no run has ever passed', async () => {
@@ -144,36 +151,32 @@ describe(getReleaseCandidate, () => {
       { filename: 'configs/tailwind/theme.css', status: 'modified' },
     ]);
 
-    expect((await candidate()).contrastStatus).toBe('DUE');
+    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.DUE);
   });
 
   it('reports contrast as green when HEAD matches a stored passing run', async () => {
-    compare(lastTag, [
-      { filename: 'apps/web/src/app/page.tsx', status: 'modified' },
-    ]);
-    getContrastFindingMock.mockResolvedValue({ status: 'RESOLVED' });
+    compare(lastTag, [{ filename: RENDERING_FILENAME, status: 'modified' }]);
+    getContrastFindingMock.mockResolvedValue({
+      status: FINDING_STATUS.RESOLVED,
+    });
 
-    expect((await candidate()).contrastStatus).toBe('GREEN');
+    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.GREEN);
   });
 
   it('reports contrast as failed when HEAD has a failing run', async () => {
-    compare(lastTag, [
-      { filename: 'apps/web/src/app/page.tsx', status: 'modified' },
-    ]);
-    getContrastFindingMock.mockResolvedValue({ status: 'OPEN' });
+    compare(lastTag, [{ filename: RENDERING_FILENAME, status: 'modified' }]);
+    getContrastFindingMock.mockResolvedValue({ status: FINDING_STATUS.OPEN });
 
-    expect((await candidate()).contrastStatus).toBe('FAILED');
+    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.FAILED);
   });
 
   it('reports contrast as running while a contrast run for HEAD is in progress', async () => {
-    compare(lastTag, [
-      { filename: 'apps/web/src/app/page.tsx', status: 'modified' },
-    ]);
-    github.respond('/actions/workflows/contrast.yml/runs', () =>
+    compare(lastTag, [{ filename: RENDERING_FILENAME, status: 'modified' }]);
+    github.respond(CONTRAST_RUNS_PATH, () =>
       githubJson({ workflow_runs: [{ status: 'in_progress' }] }),
     );
 
-    expect((await candidate()).contrastStatus).toBe('RUNNING');
+    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.RUNNING);
   });
 
   it('counts the content migrations, the tenants they run across and the pending db migrations', async () => {
@@ -208,9 +211,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('reports zero migrations when the release adds none', async () => {
-    compare(lastTag, [
-      { filename: 'apps/web/src/app/page.tsx', status: 'modified' },
-    ]);
+    compare(lastTag, [{ filename: RENDERING_FILENAME, status: 'modified' }]);
 
     expect((await candidate()).migrations).toEqual({
       contentMigrations: 0,
@@ -237,7 +238,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with noReleaseTag when the repository has no release tag yet', async () => {
-    github.respond('/git/matching-refs/tags/v', () => githubJson([]));
+    github.respond(TAGS_PATH, () => githubJson([]));
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
@@ -246,7 +247,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with tagListIncomplete when the tag list never stops paging', async () => {
-    github.respond('/git/matching-refs/tags/v', () =>
+    github.respond(TAGS_PATH, () =>
       githubJson(
         Array.from({ length: 100 }, (_, index) => ({
           ref: `refs/tags/v1.${index}.0`,
@@ -270,7 +271,10 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with githubError when GitHub errors', async () => {
-    github.respond('/branches/main', () => new Response(null, { status: 500 }));
+    github.respond(
+      MAIN_BRANCH_PATH,
+      () => new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
+    );
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
@@ -279,7 +283,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with rateLimited when GitHub rate-limits the request', async () => {
-    github.respond('/branches/main', () => new Response(null, { status: 429 }));
+    github.respond(MAIN_BRANCH_PATH, () => new Response(null, { status: 429 }));
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
@@ -288,9 +292,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with dbError when a database read fails', async () => {
-    compare(lastTag, [
-      { filename: 'apps/web/src/app/page.tsx', status: 'modified' },
-    ]);
+    compare(lastTag, [{ filename: RENDERING_FILENAME, status: 'modified' }]);
     getContrastFindingMock.mockRejectedValue(new Error('connection lost'));
 
     expect(await getReleaseCandidate()).toEqual({

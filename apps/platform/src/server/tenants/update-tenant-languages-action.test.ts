@@ -5,10 +5,12 @@ import {
   ERROR_CODE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
@@ -27,8 +29,6 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
-
-vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -51,12 +51,12 @@ describe(updateTenantLanguagesAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', plan: 'GROWTH' },
-      membership: { role: 'OWNER' },
+      tenant: { id: 'tenant-1', plan: TENANT_PLAN.GROWTH },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     setTenantAdditionalLocalesMock.mockReset();
     insertAuditEventMock.mockReset();

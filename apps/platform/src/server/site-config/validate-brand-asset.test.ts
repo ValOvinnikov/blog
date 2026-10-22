@@ -6,8 +6,11 @@ import { logger } from '@platform/utils/logger/logger';
 import { sanitizeSvgMarkup } from './sanitize-svg-markup';
 import { validateBrandAssetUpload } from './validate-brand-asset';
 
-vi.mock('@platform/utils/logger/logger');
 vi.mock('./sanitize-svg-markup', { spy: true });
+
+const PNG_TYPE = 'image/png';
+const SVG_TYPE = 'image/svg+xml';
+const PNG_FILENAME = 'upload.png';
 
 const buildPngBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(33);
@@ -26,13 +29,13 @@ const pngFile = (width: number, height: number, sizeOverrideBytes?: number) => {
   const padded = sizeOverrideBytes
     ? Buffer.concat([bytes, Buffer.alloc(sizeOverrideBytes)])
     : bytes;
-  return new File([new Uint8Array(padded)], 'upload.png', {
-    type: 'image/png',
+  return new File([new Uint8Array(padded)], PNG_FILENAME, {
+    type: PNG_TYPE,
   });
 };
 
 const svgFile = (markup: string, filename = 'upload.svg') => {
-  return new File([markup], filename, { type: 'image/svg+xml' });
+  return new File([markup], filename, { type: SVG_TYPE });
 };
 
 describe(validateBrandAssetUpload, () => {
@@ -43,7 +46,7 @@ describe(validateBrandAssetUpload, () => {
       ok: true,
       asset: {
         buffer: expect.any(Buffer),
-        contentType: 'image/png',
+        contentType: PNG_TYPE,
         extension: 'png',
       },
     });
@@ -69,7 +72,7 @@ describe(validateBrandAssetUpload, () => {
   });
 
   it('rejects an empty file', async () => {
-    const file = new File([], 'empty.png', { type: 'image/png' });
+    const file = new File([], 'empty.png', { type: PNG_TYPE });
 
     const result = await validateBrandAssetUpload(file, 'logo');
 
@@ -127,7 +130,7 @@ describe(validateBrandAssetUpload, () => {
       ok: true,
       asset: {
         buffer: expect.any(Buffer),
-        contentType: 'image/svg+xml',
+        contentType: SVG_TYPE,
         extension: 'svg',
       },
     });
@@ -204,8 +207,8 @@ describe(validateBrandAssetUpload, () => {
   });
 
   it('rejects unreadable bytes even when the declared MIME type claims to be an image', async () => {
-    const file = new File(['not an image'], 'upload.png', {
-      type: 'image/png',
+    const file = new File(['not an image'], PNG_FILENAME, {
+      type: PNG_TYPE,
     });
 
     const result = await validateBrandAssetUpload(file, 'logo');

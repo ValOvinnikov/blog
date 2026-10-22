@@ -31,8 +31,6 @@ const {
   recordAuditEventMock: vi.fn(),
 }));
 
-vi.mock('@platform/utils/logger/logger');
-
 vi.mock('@platform/server/auth/require-super-admin', () => ({
   requireSuperAdmin: requireSuperAdminMock,
 }));

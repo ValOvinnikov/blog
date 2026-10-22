@@ -7,7 +7,6 @@ import {
 } from './create-site-gate';
 
 vi.mock('@platform/utils/env/env');
-vi.mock('@platform/utils/logger/logger');
 vi.mock('@platform/server/create-site-gate/alert-self-serve-limit', () => ({
   alertSelfServeLimit: vi.fn(),
 }));

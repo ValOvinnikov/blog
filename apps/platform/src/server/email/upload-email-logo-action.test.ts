@@ -3,10 +3,14 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
+  NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
 } from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -58,14 +62,20 @@ vi.mock('@vercel/blob', () => ({ put: putMock, del: delMock }));
 
 vi.mock('@platform/utils/env/env');
 
-Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
+const BLOB_TOKEN = 'test-token';
+const TENANT_LOGO_URL =
+  'https://example.blob.vercel-storage.com/email-logo-new.png';
+const TEMPLATE_LOGO_URL =
+  'https://example.blob.vercel-storage.com/email-logo-magic-link.png';
+
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
 
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const makeFormData = (file: File | null): FormData => {
+const makeFormData = (file: TMaybeNull<File>): FormData => {
   const formData = new FormData();
   if (file) formData.append('file', file);
   return formData;
@@ -92,10 +102,10 @@ describe(uploadEmailLogoAction, () => {
 
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
+      membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
-      user: { id: 'operator-1', email: 'operator@example.com' },
+      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     getEmailConfigMock.mockResolvedValue(undefined);
@@ -105,7 +115,7 @@ describe(uploadEmailLogoAction, () => {
       asset: VALID_ASSET,
     });
     putMock.mockResolvedValue({
-      url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
+      url: TENANT_LOGO_URL,
     });
     upsertEmailConfigMock.mockResolvedValue({});
   });
@@ -119,7 +129,7 @@ describe(uploadEmailLogoAction, () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
-      url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
+      url: TENANT_LOGO_URL,
     });
     expect(putMock).toHaveBeenCalledWith(
       'tenants/tenant-1/email-logo.png',
@@ -127,14 +137,13 @@ describe(uploadEmailLogoAction, () => {
       expect.objectContaining({ access: 'public' }),
     );
     expect(upsertEmailConfigMock).toHaveBeenCalledWith('tenant-1', {
-      logoAssetUrl:
-        'https://example.blob.vercel-storage.com/email-logo-new.png',
+      logoAssetUrl: TENANT_LOGO_URL,
     });
   });
 
   it('uploads and persists a per-template logo at a path naming the template', async () => {
     putMock.mockResolvedValue({
-      url: 'https://example.blob.vercel-storage.com/email-logo-magic-link.png',
+      url: TEMPLATE_LOGO_URL,
     });
     upsertEmailTemplateMock.mockResolvedValue({});
 
@@ -154,8 +163,7 @@ describe(uploadEmailLogoAction, () => {
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       {
-        logoAssetUrl:
-          'https://example.blob.vercel-storage.com/email-logo-magic-link.png',
+        logoAssetUrl: TEMPLATE_LOGO_URL,
       },
     );
   });
@@ -192,15 +200,15 @@ describe(uploadEmailLogoAction, () => {
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'operator-1',
-      actorEmail: 'operator@example.com',
+      actorId: OPERATOR_ID,
+      actorEmail: OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: 'tenant-1',
       details: {
         target: { type: 'tenant' },
         operation: 'upload',
-        url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
+        url: TENANT_LOGO_URL,
       },
     });
   });
@@ -234,13 +242,13 @@ describe(uploadEmailLogoAction, () => {
       });
       expect(putMock).not.toHaveBeenCalled();
     } finally {
-      Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
+      Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
     }
   });
 
   it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
     await expect(
@@ -249,14 +257,14 @@ describe(uploadEmailLogoAction, () => {
         { type: 'tenant' },
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(putMock).not.toHaveBeenCalled();
   });
 
   it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
     await expect(
@@ -265,7 +273,7 @@ describe(uploadEmailLogoAction, () => {
         { type: 'tenant' },
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(putMock).not.toHaveBeenCalled();
   });
