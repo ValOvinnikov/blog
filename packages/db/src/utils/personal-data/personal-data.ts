@@ -19,6 +19,13 @@ export function decryptPersonalValue(encrypted: string): string {
   return decryptPersonalData(encrypted, parsePersonalDataKeyring(raw));
 }
 
+export function readPersonalValue(
+  encrypted: TMaybeNull<string>,
+  plain: string,
+): string {
+  return encrypted === null ? plain : decryptPersonalValue(encrypted);
+}
+
 function indexPersonalEmail(email: string): TMaybeNull<string> {
   const key = env.PERSONAL_DATA_INDEX_KEY;
   return key ? personalDataIndex(email, key) : null;

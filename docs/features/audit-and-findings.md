@@ -80,6 +80,10 @@ neither.
     languages and suspension use target `TENANT`; Look, Voice, brand
     assets, email logo, email config and email templates use `SITE_CONFIG`;
     Features uses `SETTINGS_FEATURES`. `targetId` is always the tenant id.
+  - The data-request actions write `PERSONAL_DATA_LOOKED_UP`,
+    `PERSONAL_DATA_EXPORTED` and `PERSONAL_DATA_ERASED` against target
+    `PERSONAL_DATA`, whose `targetId` is the email's index, never the email
+    ([Data requests](data-requests.md)).
   - CLI workflows (actor `github:<actor>`): `PROVISIONED`,
     `PROVISIONING_FAILED` (with the failed step and run id), `DEPROVISIONED`,
     `READER_DATA_PURGED`.
@@ -103,9 +107,9 @@ Nothing is configurable. Only admins (any role) see either record.
 
 ## Constraints and invariants
 
-- `audit_events` is insert-only, through `insertAuditEvent`. The one update
-  is `deleteAccount` clearing the deleted user's `actorEmail`; the events and
-  `actorId` stay.
+- `audit_events` is insert-only, through `insertAuditEvent`. The two updates
+  clear `actorEmail`: `deleteAccount` for the deleted user, and
+  `erasePersonalData` for an erased address. The events and `actorId` stay.
 - Neither `details` column holds an email address or other personal field.
   Writers record field names or ids instead: email config lists the saved
   field names, tenant details records `ownerEmailUpdated`, and tenant
