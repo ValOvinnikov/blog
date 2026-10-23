@@ -110,3 +110,36 @@ test('scopeOf follows workspace dependencies transitively, never into a sibling 
     'packages/ui',
   ]);
 });
+
+test('collectLiterals skips groqd typed builder arguments and isr tags', () => {
+  const source = [
+    "q.star.filterByType('page_home', 'page_landing');",
+    "sub.field('slug.current');",
+    "q.star.filterBy('language == $locale').order('publishedAt desc');",
+    "post.field('tags[]').deref();",
+    "isr(['posts', 'author'], tenant.projectId);",
+    "isr('posts', tenant.projectId);",
+  ].join('\n');
+  assert.deepEqual(values(source), []);
+});
+
+test('collectLiterals still collects repeated strings beside groqd and isr', () => {
+  const source = [
+    "field('slug');",
+    "sub.raw('coalesce(showBio,true)');",
+    "q.star.filterRaw('defined(slug)');",
+    "isr(['posts'], 'tenant-1');",
+    "cache.isr(['posts']);",
+    "const tags = ['posts'];",
+    "const status = 'published';",
+  ].join('\n');
+  assert.deepEqual(values(source), [
+    'slug',
+    'coalesce(showBio,true)',
+    'defined(slug)',
+    'tenant-1',
+    'posts',
+    'posts',
+    'published',
+  ]);
+});
