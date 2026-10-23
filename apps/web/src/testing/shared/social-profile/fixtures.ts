@@ -1,4 +1,8 @@
-import { SOCIAL_PLATFORM_LABEL, SOCIAL_PLATFORMS } from '@blog/config';
+import {
+  SOCIAL_PLATFORM_LABEL,
+  SOCIAL_PLATFORMS,
+  type TSocialPlatform,
+} from '@blog/config';
 import type { TSocialProfile } from '@blog/service';
 import { faker } from '@faker-js/faker';
 
@@ -22,35 +26,18 @@ export const mockSocialProfile = ({
   ...overrides,
 });
 
-export const MOCK_GITHUB_PROFILE: TSocialProfile = {
-  platform: SOCIAL_PLATFORMS.GITHUB,
-  link: {
-    label: SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.GITHUB],
-    href: faker.internet.url(),
-    target: '_blank',
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-};
+const mockPlatformProfile = (platform: TSocialPlatform): TSocialProfile =>
+  mockSocialProfile({
+    platform,
+    link: { label: SOCIAL_PLATFORM_LABEL[platform], target: '_blank' },
+  });
 
-export const MOCK_LINKEDIN_PROFILE: TSocialProfile = {
-  platform: SOCIAL_PLATFORMS.LINKEDIN,
-  link: {
-    label: SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.LINKEDIN],
-    href: faker.internet.url(),
-    target: '_blank',
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-};
+export const MOCK_GITHUB_PROFILE = mockPlatformProfile(SOCIAL_PLATFORMS.GITHUB);
 
-export const MOCK_MASTODON_PROFILE: TSocialProfile = {
-  platform: SOCIAL_PLATFORMS.MASTODON,
-  link: {
-    label: SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.MASTODON],
-    href: faker.internet.url(),
-    target: '_blank',
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-};
+export const MOCK_LINKEDIN_PROFILE = mockPlatformProfile(
+  SOCIAL_PLATFORMS.LINKEDIN,
+);
+
+export const MOCK_MASTODON_PROFILE = mockPlatformProfile(
+  SOCIAL_PLATFORMS.MASTODON,
+);

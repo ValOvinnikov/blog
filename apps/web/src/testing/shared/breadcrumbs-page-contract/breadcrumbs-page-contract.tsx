@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -80,7 +81,7 @@ export const testBreadcrumbsTrail = <TData,>({
     });
 
     const currentEl = within(nav).getByText(currentLabel);
-    expect(currentEl).toHaveAttribute('aria-current', 'page');
+    expect(currentEl).toHaveAttribute(ARIA_CURRENT, 'page');
     expect(currentEl.tagName).not.toBe('A');
   });
 };

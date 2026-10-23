@@ -1,3 +1,4 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import { fireEvent, renderElement, screen } from '@web/testing/custom-render';
@@ -12,7 +13,6 @@ import { SiteNavigation } from './site-navigation';
 
 vi.mock('@web/i18n/navigation');
 
-const ARIA_CURRENT = 'aria-current';
 const ARIA_EXPANDED = 'aria-expanded';
 const TOGGLE_NAME = 'Toggle navigation menu';
 const BLOG_POST_PATH = `${MOCK_BLOG_LINK.href}/hello-world`;

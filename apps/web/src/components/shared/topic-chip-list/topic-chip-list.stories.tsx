@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
-  MOCK_DESIGN_TOPIC,
+  MOCK_SECOND_TOPIC,
   MOCK_ENGINEERING_TOPIC,
-  MOCK_PRODUCT_TOPIC,
+  MOCK_THIRD_TOPIC,
 } from '@web/testing/shared/topic/fixtures';
 
 import { TopicChipList } from './topic-chip-list';
 
-const topics = [MOCK_ENGINEERING_TOPIC, MOCK_DESIGN_TOPIC, MOCK_PRODUCT_TOPIC];
+const topics = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC, MOCK_THIRD_TOPIC];
 
 const meta = {
   title: 'Components/TopicChipList',
@@ -25,7 +25,7 @@ export const AllActive: TStory = {};
 
 /** `activeSlug` highlights the matching chip instead, as on `/topics/[slug]`. */
 export const TopicActive: TStory = {
-  args: { activeSlug: MOCK_DESIGN_TOPIC.slug },
+  args: { activeSlug: MOCK_SECOND_TOPIC.slug },
 };
 
 export const Empty: TStory = {

@@ -1,6 +1,6 @@
 import { customRender, screen } from '@web/testing/custom-render';
+import { MOCK_POST_LIST_HEADING } from '@web/testing/modules/post-list/fixtures';
 import {
-  MOCK_LATEST_POSTS_HEADING,
   MOCK_LATEST_POSTS_SUPPORTING_TEXT,
   mockHeadingBlock,
 } from '@web/testing/shared/heading-block/fixtures';
@@ -10,7 +10,7 @@ import { ModuleHeading } from './module-heading';
 const HEADING_ID = 'section-title';
 
 const setup = customRender(ModuleHeading, {
-  headingBlock: mockHeadingBlock({ heading: MOCK_LATEST_POSTS_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   id: HEADING_ID,
   level: 2,
   align: undefined,
@@ -25,7 +25,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
     it('renders the authored heading text at the given level and id', () => {
       const heading = screen.getByRole('heading', {
         level: 2,
-        name: MOCK_LATEST_POSTS_HEADING,
+        name: MOCK_POST_LIST_HEADING,
       });
 
       expect(heading).toHaveAttribute('id', HEADING_ID);
@@ -43,7 +43,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
 
     const heading = screen.getByRole('heading', {
       level: 3,
-      name: MOCK_LATEST_POSTS_HEADING,
+      name: MOCK_POST_LIST_HEADING,
     });
 
     expect(heading).toBeVisible();

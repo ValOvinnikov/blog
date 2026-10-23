@@ -1,3 +1,4 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { screen, within } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import {
@@ -28,7 +29,7 @@ export const testStaticBreadcrumbsContract = ({
     expect(homeLink).toHaveAttribute('href', '/');
 
     const current = within(nav).getByText(label);
-    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
     expect(current.tagName).not.toBe('A');
   });
 

@@ -1,16 +1,17 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 import {
   MOCK_SIDEBAR_NAV_ITEMS,
   MOCK_SIDEBAR_NAV_LABEL,
   MOCK_SIDEBAR_NAV_PRICING_ITEM,
+  MOCK_SIDEBAR_NAV_TRIGGER_NAME,
 } from '@web/testing/shared/sidebar-nav/fixtures';
 
 import { SidebarNav } from './sidebar-nav';
 
 vi.mock('@web/i18n/navigation');
 
-const ARIA_CURRENT = 'aria-current';
 const ARIA_EXPANDED = 'aria-expanded';
 const ITEM_COUNT = MOCK_SIDEBAR_NAV_ITEMS.length;
 const PRICING_LABEL = MOCK_SIDEBAR_NAV_PRICING_ITEM.label;
@@ -23,7 +24,7 @@ const setup = customRender(SidebarNav, {
 });
 
 const getMobileTrigger = () =>
-  screen.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) });
+  screen.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME });
 
 describe(`<${SidebarNav.name}/>`, () => {
   describe('with an active item', () => {
@@ -58,7 +59,7 @@ describe(`<${SidebarNav.name}/>`, () => {
 
     it('shows the active item in the mobile selector', () => {
       const selector = screen.getByRole('button', {
-        name: `${MOCK_SIDEBAR_NAV_LABEL} ${PRICING_LABEL}`,
+        name: MOCK_SIDEBAR_NAV_TRIGGER_NAME,
       });
 
       expect(selector).toBeVisible();

@@ -1,6 +1,8 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
+import { ARIA_LIVE_ASSERTIVE_SELECTOR } from '@web/testing/shared/aria/constants';
 import {
   MOCK_ERROR_DIGEST,
   MOCK_ERROR_WITH_DIGEST,
@@ -16,10 +18,12 @@ vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: reportClientErrorMock,
 }));
 
-const HEADING = 'Something went wrong';
-const ANNOUNCEMENT = 'Something went wrong. You can try again, or go home.';
-const TRY_AGAIN = 'Try again';
-const GO_HOME = 'Go home';
+const {
+  title: HEADING,
+  announcement: ANNOUNCEMENT,
+  retry: TRY_AGAIN,
+  goHome: GO_HOME,
+} = SITE_MESSAGES.localeErrorPage;
 
 const error = MOCK_ERROR_WITH_DIGEST;
 const reset = vi.fn();
@@ -65,7 +69,9 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
     });
 
     it('announces the error to assistive technology after mount', () => {
-      const liveRegion = screen.getByText(ANNOUNCEMENT);
+      const liveRegion = screen.getByText(ANNOUNCEMENT, {
+        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      });
 
       expect(liveRegion).toBeVisible();
     });
@@ -81,7 +87,9 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
     });
 
     it('sets aria-atomic on the live region', () => {
-      const liveRegion = screen.getByText(ANNOUNCEMENT);
+      const liveRegion = screen.getByText(ANNOUNCEMENT, {
+        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      });
 
       expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
     });

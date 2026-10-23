@@ -1,3 +1,5 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   mockLandingSectionNavigation,
@@ -13,8 +15,7 @@ import { SectionNavigation } from './section-navigation';
 
 vi.mock('@web/i18n/navigation');
 
-const ARIA_CURRENT = 'aria-current';
-const NAV_NAME = 'In this section';
+const NAV_NAME = SITE_MESSAGES.sectionNavigation.label;
 const AUTHORED_TITLE = 'Guides';
 const PARENT_TITLE = 'Library';
 const BACK_LINK_NAME = `Back to ${PARENT_TITLE}`;

@@ -1,15 +1,9 @@
-import {
-  LANGUAGE_SWITCHER_STYLE,
-  LOCALE_ISO_CODES,
-  routes,
-  SOCIAL_PLATFORMS,
-} from '@blog/config';
+import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_LINKEDIN_PROFILE,
   MOCK_MASTODON_PROFILE,
@@ -28,17 +22,9 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
-  () => ({
-    getLanguageSwitcherStyle: vi.fn(),
-  }),
 );
 
-vi.mock(
-  '@web/server/site-settings/get-site-settings/get-site-settings',
-  () => ({
-    getSiteSettings: vi.fn(),
-  }),
-);
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 vi.mock('@blog/service', () => ({
   service: { global: { footer: { v1: { getFooter: getFooterMock } } } },
@@ -63,23 +49,14 @@ const translate = (key: string, values?: Record<string, string>): string => {
 };
 
 const getRequestContextMock = vi.mocked(getRequestContext);
-const getSiteSettingsMock = vi.mocked(getSiteSettings);
-
-vi.mocked(getLanguageSwitcherStyle).mockResolvedValue(
-  LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-);
 
 const setup = customRenderAsync(SiteFooter, {});
 
 describe(SiteFooter, () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockResolvedValue(
-      okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
-    );
     getFooterMock.mockResolvedValue(
       okResult({ social: [], showRssFeed: true }),
     );
-    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     getTranslationsMock.mockResolvedValue(translate);
   });
 
@@ -97,7 +74,7 @@ describe(SiteFooter, () => {
     it('shows the brand name and the current year in the copyright', async () => {
       const footer = screen.getByRole('contentinfo');
 
-      expect(footer).toHaveTextContent('Blog');
+      expect(footer).toHaveTextContent(MOCK_SITE_SETTINGS.brand.name);
       expect(footer).toHaveTextContent(String(new Date().getFullYear()));
     });
 
@@ -164,7 +141,7 @@ describe(SiteFooter, () => {
   });
 
   it('shows the language switcher when its toggle is on and languages are live', async () => {
-    getRequestContextMock.mockResolvedValue({
+    getRequestContextMock.mockResolvedValueOnce({
       ...MOCK_REQUEST_CONTEXT,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });

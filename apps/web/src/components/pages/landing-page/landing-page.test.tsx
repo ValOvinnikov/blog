@@ -1,6 +1,7 @@
-import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS, SITE_MESSAGES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TLandingPage } from '@blog/service';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { permanentRedirect } from '@web/i18n/navigation';
@@ -61,7 +62,7 @@ const setup = customRenderServerAsync(LandingPage, {
   path: LANDING_PATH,
 });
 
-const SECTION_NAV_NAME = 'In this section';
+const SECTION_NAV_NAME = SITE_MESSAGES.sectionNavigation.label;
 const MOVED_DESTINATION = '/company/about';
 const SUPPORTING_TEXT = 'Who we are.';
 const HERO_HEADING = 'Meet the team';
@@ -217,7 +218,7 @@ describe(`<${LandingPage.name}/>`, () => {
       name: SECTION_NAV_NAME,
     });
     const faqLink = within(sectionNav).getByRole('link', { name: 'FAQ' });
-    expect(faqLink).toHaveAttribute('aria-current', 'page');
+    expect(faqLink).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('renders the authored modules inside main', async () => {

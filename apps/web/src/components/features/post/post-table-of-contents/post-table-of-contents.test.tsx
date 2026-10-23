@@ -1,3 +1,4 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CONFIGURATION_HEADING,
@@ -17,7 +18,6 @@ vi.mock('@web/hooks/use-active-heading-id', () => ({
   useActiveHeadingId: useActiveHeadingIdMock,
 }));
 
-const ARIA_CURRENT = 'aria-current';
 const NAV_NAME = 'Contents';
 
 const setup = customRender(PostTableOfContents, {

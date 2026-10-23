@@ -1,7 +1,9 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import {
-  MOCK_DESIGN_TOPIC,
+  MOCK_SECOND_TOPIC,
   mockTopicWithPostCount,
 } from '@web/testing/shared/topic/fixtures';
 
@@ -19,8 +21,7 @@ vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
 }));
 
-const ARIA_CURRENT = 'aria-current';
-const NAV_NAME = 'Topics';
+const NAV_NAME = SITE_MESSAGES.topicChipList.ariaLabel;
 const NEWS_SLUG = 'news';
 const newsTopic = mockTopicWithPostCount({ title: 'News', slug: NEWS_SLUG });
 
@@ -34,7 +35,7 @@ describe(`<${TopicChips.name}/>`, () => {
   });
 
   it('renders the topic chip row with the current topic highlighted', async () => {
-    getTopicsSafelyMock.mockResolvedValue([newsTopic, MOCK_DESIGN_TOPIC]);
+    getTopicsSafelyMock.mockResolvedValue([newsTopic, MOCK_SECOND_TOPIC]);
 
     await setup();
 
@@ -43,7 +44,7 @@ describe(`<${TopicChips.name}/>`, () => {
       name: newsTopic.title,
     });
     const designLink = within(nav).getByRole('link', {
-      name: MOCK_DESIGN_TOPIC.title,
+      name: MOCK_SECOND_TOPIC.title,
     });
     const allLink = within(nav).getByRole('link', { name: 'All' });
 

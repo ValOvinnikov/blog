@@ -1,13 +1,14 @@
-import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import userEvent from '@testing-library/user-event';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
-import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -24,9 +25,6 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
-  () => ({
-    getLanguageSwitcherStyle: vi.fn(),
-  }),
 );
 
 vi.mock(
@@ -36,12 +34,7 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  '@web/server/site-settings/get-site-settings/get-site-settings',
-  () => ({
-    getSiteSettings: vi.fn(),
-  }),
-);
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
@@ -71,12 +64,8 @@ const getSiteSettingsMock = vi.mocked(getSiteSettings);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
 
-vi.mocked(getLanguageSwitcherStyle).mockResolvedValue(
-  LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-);
-
 const LOOK_LOGO_URL = 'https://blob.example.com/tenants/tenant-a/logo.png';
-const STUDIO_LOGO = { assetId: 'image-abc123def-800x600-svg', alt: 'Logo' };
+const STUDIO_LOGO = mockSanityImage({ alt: 'Logo' });
 
 const setup = customRenderAsync(SiteHeader, {});
 
@@ -88,12 +77,8 @@ const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
 
 describe(SiteHeader, () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockResolvedValue(
-      okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
-    );
     getNavigationMock.mockResolvedValue(okResult({ items: [] }));
     getBrandLogoUrlMock.mockResolvedValue(undefined);
-    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     isReaderAccountEnabledMock.mockResolvedValue(true);
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
@@ -102,8 +87,11 @@ describe(SiteHeader, () => {
   describe('the brand logo', () => {
     it("shows the tenant's Look logo, not the Studio brand logo", async () => {
       getBrandLogoUrlMock.mockResolvedValue(LOOK_LOGO_URL);
-      getSiteSettingsMock.mockResolvedValue(
-        okResult({ brand: { name: 'Blog', logo: STUDIO_LOGO } }) as never,
+      getSiteSettingsMock.mockResolvedValueOnce(
+        okResult({
+          ...MOCK_SITE_SETTINGS,
+          brand: { ...MOCK_SITE_SETTINGS.brand, logo: STUDIO_LOGO },
+        }),
       );
 
       await setup();
@@ -118,8 +106,11 @@ describe(SiteHeader, () => {
     });
 
     it('shows the default mark without a Look logo, despite a Studio logo', async () => {
-      getSiteSettingsMock.mockResolvedValue(
-        okResult({ brand: { name: 'Blog', logo: STUDIO_LOGO } }) as never,
+      getSiteSettingsMock.mockResolvedValueOnce(
+        okResult({
+          ...MOCK_SITE_SETTINGS,
+          brand: { ...MOCK_SITE_SETTINGS.brand, logo: STUDIO_LOGO },
+        }),
       );
 
       await setup();
@@ -134,7 +125,7 @@ describe(SiteHeader, () => {
 
   describe('with several live languages and the switcher on', () => {
     beforeEach(async () => {
-      getRequestContextMock.mockResolvedValue({
+      getRequestContextMock.mockResolvedValueOnce({
         ...MOCK_REQUEST_CONTEXT,
         liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       });
@@ -269,7 +260,7 @@ describe(SiteHeader, () => {
   });
 
   it('hides the language switcher when its toggle is off', async () => {
-    getRequestContextMock.mockResolvedValue({
+    getRequestContextMock.mockResolvedValueOnce({
       ...MOCK_REQUEST_CONTEXT,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });

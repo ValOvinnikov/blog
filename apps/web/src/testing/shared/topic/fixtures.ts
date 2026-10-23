@@ -33,18 +33,28 @@ export const MOCK_ENGINEERING_TOPIC = mockTopicWithPostCount({
   postCount: 3,
 });
 
-export const MOCK_DESIGN_TOPIC = mockTopicWithPostCount({
+const [SECOND_TOPIC_TITLE, THIRD_TOPIC_TITLE] = faker.helpers.uniqueArray(
+  faker.lorem.word,
+  2,
+);
+
+const [SECOND_TOPIC_SLUG, THIRD_TOPIC_SLUG] = faker.helpers.uniqueArray(
+  faker.lorem.slug,
+  2,
+);
+
+export const MOCK_SECOND_TOPIC = mockTopicWithPostCount({
   id: faker.string.uuid(),
-  title: faker.lorem.word(),
-  slug: faker.lorem.slug(),
+  title: SECOND_TOPIC_TITLE!,
+  slug: SECOND_TOPIC_SLUG!,
   description: undefined,
   postCount: 1,
 });
 
-export const MOCK_PRODUCT_TOPIC = mockTopicWithPostCount({
+export const MOCK_THIRD_TOPIC = mockTopicWithPostCount({
   id: faker.string.uuid(),
-  title: faker.lorem.word(),
-  slug: faker.lorem.slug(),
+  title: THIRD_TOPIC_TITLE!,
+  slug: THIRD_TOPIC_SLUG!,
   description: undefined,
   postCount: 2,
 });

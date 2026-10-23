@@ -4,6 +4,7 @@ import {
   MOCK_SIDEBAR_NAV_CONTENTS_ITEMS,
   MOCK_SIDEBAR_NAV_ITEMS,
   MOCK_SIDEBAR_NAV_LABEL,
+  MOCK_SIDEBAR_NAV_TRIGGER_NAME,
   MOCK_SIDEBAR_NAV_NESTED_ITEMS,
   MOCK_SIDEBAR_NAV_PRICING_ITEM,
 } from '@web/testing/shared/sidebar-nav/fixtures';
@@ -86,7 +87,7 @@ export const MobileOpen: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) }),
+      canvas.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME }),
     );
   },
 };
@@ -111,13 +112,12 @@ export const MobileOpenPostContents: TStory = {
   },
 };
 
-// The desktop and mobile copies of each item share an accessible name; `.at(-1)` is the mobile one.
 export const MobileOpenItemHover: TStory = {
   globals: { viewport: 'mobile' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) }),
+      canvas.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME }),
     );
     const links = canvas.getAllByRole('link', {
       name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label,
@@ -131,7 +131,7 @@ export const MobileOpenItemFocus: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) }),
+      canvas.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME }),
     );
     const links = canvas.getAllByRole('link', {
       name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label,

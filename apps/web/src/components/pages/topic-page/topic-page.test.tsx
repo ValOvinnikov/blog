@@ -1,5 +1,7 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TTopicDetailPage } from '@blog/service';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import {
@@ -62,7 +64,6 @@ const resolveTopicPageWith = (overrides: Partial<TTopicDetailPage>) =>
   );
 
 const SUPPORTING_TEXT = 'The latest updates.';
-const ARIA_CURRENT = 'aria-current';
 const HERO_HEADING = 'All about news';
 
 describe(`<${TopicPage.name}/>`, () => {
@@ -129,7 +130,9 @@ describe(`<${TopicPage.name}/>`, () => {
 
     it('marks the current topic chip inside main', () => {
       const main = screen.getByRole('main');
-      const chips = within(main).getByRole('navigation', { name: 'Topics' });
+      const chips = within(main).getByRole('navigation', {
+        name: SITE_MESSAGES.topicChipList.ariaLabel,
+      });
       const newsChip = within(chips).getByRole('link', { name: 'News' });
       const designChip = within(chips).getByRole('link', { name: 'Design' });
       expect(newsChip).toHaveAttribute(ARIA_CURRENT, 'page');

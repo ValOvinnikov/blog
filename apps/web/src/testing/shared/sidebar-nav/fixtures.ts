@@ -1,12 +1,15 @@
+import { SITE_MESSAGES } from '@blog/config';
 import type { TSidebarNavItem } from '@web/components/shared/sidebar-nav';
 
-export const MOCK_SIDEBAR_NAV_LABEL = 'In this section';
+export const MOCK_SIDEBAR_NAV_LABEL = SITE_MESSAGES.sectionNavigation.label;
 
 export const MOCK_SIDEBAR_NAV_PRICING_ITEM: TSidebarNavItem = {
   label: 'Pricing',
   href: '/modules/pricing',
   level: 2,
 };
+
+export const MOCK_SIDEBAR_NAV_TRIGGER_NAME = `${MOCK_SIDEBAR_NAV_LABEL} ${MOCK_SIDEBAR_NAV_PRICING_ITEM.label}`;
 
 export const MOCK_SIDEBAR_NAV_ITEMS: TSidebarNavItem[] = [
   { label: 'Modules', href: '/modules', level: 1 },

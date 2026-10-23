@@ -70,7 +70,7 @@ const resolveHomePageWith = (overrides: Record<string, unknown> = {}) =>
 describe(`<${HomePage.name}/>`, () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
-    vi.mocked(getRequestContext).mockResolvedValue(MOCK_REQUEST_CONTEXT);
+    vi.mocked(getRequestContext).mockReset();
   });
 
   describe('when the page cannot be rendered', () => {

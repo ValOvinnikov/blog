@@ -65,7 +65,6 @@ const render = async (): Promise<{
 
 describe(SiteProviders, () => {
   beforeEach(() => {
-    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
     resolveTenantMessagesMock.mockImplementation((messages) =>
@@ -101,7 +100,7 @@ describe(SiteProviders, () => {
   });
 
   it("applies the tenant voice pack in another language to that language's messages", async () => {
-    getRequestContextMock.mockResolvedValue({
+    getRequestContextMock.mockResolvedValueOnce({
       ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });

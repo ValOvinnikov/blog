@@ -1,6 +1,8 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
-  MOCK_DESIGN_TOPIC,
+  MOCK_SECOND_TOPIC,
   MOCK_ENGINEERING_TOPIC,
   mockTopicWithPostCount,
 } from '@web/testing/shared/topic/fixtures';
@@ -9,11 +11,9 @@ import { TopicChipList } from './topic-chip-list';
 
 vi.mock('@web/i18n/navigation');
 
-const ARIA_CURRENT = 'aria-current';
-const NAV_NAME = 'Topics';
-const ALL_CHIP_NAME = 'All';
+const { ariaLabel: NAV_NAME, all: ALL_CHIP_NAME } = SITE_MESSAGES.topicChipList;
 
-const topics = [MOCK_ENGINEERING_TOPIC, MOCK_DESIGN_TOPIC];
+const topics = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC];
 
 const setup = customRender(TopicChipList, { topics });
 
@@ -35,9 +35,9 @@ describe(`<${TopicChipList.name}/>`, () => {
       expect(allLink).toHaveAttribute('href', '/blog');
     });
 
-    it.each(topics)(
-      'renders a chip for $title linking to its archive',
-      ({ title, slug }) => {
+    it.each(topics.map((topic, index) => ({ position: index + 1, topic })))(
+      'renders chip $position linking to its archive',
+      ({ topic: { title, slug } }) => {
         const link = screen.getByRole('link', { name: title });
 
         expect(link).toHaveAttribute('href', `/topics/${slug}`);
@@ -71,7 +71,7 @@ describe(`<${TopicChipList.name}/>`, () => {
     });
     const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
     const designLink = screen.getByRole('link', {
-      name: MOCK_DESIGN_TOPIC.title,
+      name: MOCK_SECOND_TOPIC.title,
     });
 
     expect(engineeringLink).toHaveAttribute(ARIA_CURRENT, 'page');
