@@ -69,7 +69,7 @@ export const StartReleaseDialog = ({
       Object.keys(result.fieldErrors).length > 0
     ) {
       setFieldErrors(result.fieldErrors);
-      return errorResult(undefined);
+      return errorResult();
     }
     return errorResult(t(releaseFailureKey(result)));
   };
