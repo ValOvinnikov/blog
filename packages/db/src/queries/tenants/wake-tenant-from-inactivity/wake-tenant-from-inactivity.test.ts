@@ -6,7 +6,7 @@ import {
 } from '@blog/db/constants';
 import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisioning-run';
 import * as schema from '@blog/db/schema';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_IDLE_DEPROVISIONING_STEPS } from '@blog/db/testing/tenants/fixtures';
@@ -22,12 +22,12 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 
 async function insertTenantSuspendedForInactivity(
-  deprovisioningSteps: TTenant['deprovisioningSteps'],
+  overrides: Parameters<typeof insertTestTenant>[1] = {},
 ) {
   return insertTestTenant(db(), {
     status: TENANT_STATUS.SUSPENDED,
     suspensionReason: SUSPENSION_REASON.INACTIVITY,
-    deprovisioningSteps,
+    ...overrides,
   });
 }
 
@@ -49,10 +49,8 @@ afterEach(async () => {
 
 describe(wakeTenantFromInactivity, () => {
   it('reactivates a tenant suspended for inactivity and clears its suspension', async () => {
-    const tenant = await insertTestTenant(db(), {
-      status: TENANT_STATUS.SUSPENDED,
+    const tenant = await insertTenantSuspendedForInactivity({
       suspendedAt: MOCK_LAST_ACTIVITY_AT,
-      suspensionReason: SUSPENSION_REASON.INACTIVITY,
     });
 
     const woken = await wakeTenantFromInactivity(tenant.id);
@@ -66,10 +64,7 @@ describe(wakeTenantFromInactivity, () => {
   });
 
   it('wakes a tenant only once', async () => {
-    const tenant = await insertTestTenant(db(), {
-      status: TENANT_STATUS.SUSPENDED,
-      suspensionReason: SUSPENSION_REASON.INACTIVITY,
-    });
+    const tenant = await insertTenantSuspendedForInactivity();
 
     await wakeTenantFromInactivity(tenant.id);
 
@@ -99,9 +94,7 @@ describe(wakeTenantFromInactivity, () => {
   });
 
   it('leaves a deprovisioned tenant untouched', async () => {
-    const tenant = await insertTestTenant(db(), {
-      status: TENANT_STATUS.SUSPENDED,
-      suspensionReason: SUSPENSION_REASON.INACTIVITY,
+    const tenant = await insertTenantSuspendedForInactivity({
       deprovisionedAt: MOCK_LAST_ACTIVITY_AT,
     });
 
@@ -113,10 +106,12 @@ describe(wakeTenantFromInactivity, () => {
 
   it('leaves a tenant suspended once a deprovisioning step is recorded', async () => {
     const tenant = await insertTenantSuspendedForInactivity({
-      run: { startedAt: MOCK_LAST_ACTIVITY_AT.toISOString() },
-      ...MOCK_IDLE_DEPROVISIONING_STEPS,
-      [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      deprovisioningSteps: {
+        run: { startedAt: MOCK_LAST_ACTIVITY_AT.toISOString() },
+        ...MOCK_IDLE_DEPROVISIONING_STEPS,
+        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
       },
     });
 
@@ -127,7 +122,9 @@ describe(wakeTenantFromInactivity, () => {
   });
 
   it('leaves a tenant suspended once its deprovisioning run has started', async () => {
-    const tenant = await insertTenantSuspendedForInactivity(null);
+    const tenant = await insertTenantSuspendedForInactivity({
+      deprovisioningSteps: null,
+    });
     await startDeprovisioningRun({ tenantId: tenant.id });
 
     expect(await wakeTenantFromInactivity(tenant.id)).toBeNull();

@@ -1,5 +1,8 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import {
+  BLOCKED_IDENTITY_KIND,
+  type TBlockedIdentityKind,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   MOCK_BLOCK_REASON,
@@ -42,13 +45,20 @@ describe(addBlockedIdentity, () => {
     ({ id: createdByAdminId } = await insertTestAdmin(db()));
   });
 
-  it('stores an address entry with no readable address in any column', async () => {
-    const result = await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: 'Blocked+promo@Example.com',
+  function addEntry(kind: TBlockedIdentityKind, identity: string) {
+    return addBlockedIdentity({
+      kind,
+      identity,
       reason: MOCK_BLOCK_REASON,
       createdByAdminId,
     });
+  }
+
+  it('stores an address entry with no readable address in any column', async () => {
+    const result = await addEntry(
+      BLOCKED_IDENTITY_KIND.ADDRESS,
+      'Blocked+promo@Example.com',
+    );
 
     expect(result.ok).toBe(true);
     const [row] = await db().select().from(schema.blockedSignupIdentities);
@@ -65,22 +75,12 @@ describe(addBlockedIdentity, () => {
     vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
 
     await expect(
-      addBlockedIdentity({
-        kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-        identity: MOCK_BLOCKED_ADDRESS,
-        reason: MOCK_BLOCK_REASON,
-        createdByAdminId,
-      }),
+      addEntry(BLOCKED_IDENTITY_KIND.ADDRESS, MOCK_BLOCKED_ADDRESS),
     ).rejects.toThrow('PERSONAL_DATA_INDEX_KEY is not configured.');
   });
 
   it('stores a domain entry as the lower-cased domain', async () => {
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: ' Mailinator.COM ',
-      reason: MOCK_BLOCK_REASON,
-      createdByAdminId,
-    });
+    await addEntry(BLOCKED_IDENTITY_KIND.DOMAIN, ' Mailinator.COM ');
 
     const [row] = await db().select().from(schema.blockedSignupIdentities);
     expect(row?.value).toBe(MOCK_BLOCKED_DOMAIN);
@@ -88,12 +88,10 @@ describe(addBlockedIdentity, () => {
 
   it('returns the existing entry, not created, instead of adding a duplicate', async () => {
     const { id: otherAdminId } = await insertTestAdmin(db());
-    const first = await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: MOCK_BLOCKED_ADDRESS,
-      reason: MOCK_BLOCK_REASON,
-      createdByAdminId,
-    });
+    const first = await addEntry(
+      BLOCKED_IDENTITY_KIND.ADDRESS,
+      MOCK_BLOCKED_ADDRESS,
+    );
     const second = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
       identity: 'BLOCKED+again@example.com',
@@ -111,18 +109,8 @@ describe(addBlockedIdentity, () => {
   });
 
   it('keeps an address and a domain with the same text apart', async () => {
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: MOCK_BLOCKED_ADDRESS_DOMAIN,
-      reason: MOCK_BLOCK_REASON,
-      createdByAdminId,
-    });
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: MOCK_BLOCKED_ADDRESS,
-      reason: MOCK_BLOCK_REASON,
-      createdByAdminId,
-    });
+    await addEntry(BLOCKED_IDENTITY_KIND.DOMAIN, MOCK_BLOCKED_ADDRESS_DOMAIN);
+    await addEntry(BLOCKED_IDENTITY_KIND.ADDRESS, MOCK_BLOCKED_ADDRESS);
 
     const rows = await db().select().from(schema.blockedSignupIdentities);
     expect(rows).toHaveLength(2);
@@ -140,23 +128,13 @@ describe(addBlockedIdentity, () => {
       error: ERROR_CODE.DB_INVALID_DOMAIN,
     },
   ])('refuses a malformed $kind', async ({ kind, identity, error }) => {
-    const result = await addBlockedIdentity({
-      kind,
-      identity,
-      reason: MOCK_BLOCK_REASON,
-      createdByAdminId,
-    });
+    const result = await addEntry(kind, identity);
 
     expect(result).toEqual({ ok: false, error });
   });
 
   it('keeps the entry when the admin who added it is removed', async () => {
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: MOCK_BLOCKED_ADDRESS,
-      reason: MOCK_BLOCK_REASON,
-      createdByAdminId,
-    });
+    await addEntry(BLOCKED_IDENTITY_KIND.ADDRESS, MOCK_BLOCKED_ADDRESS);
 
     await db().delete(schema.admins);
 

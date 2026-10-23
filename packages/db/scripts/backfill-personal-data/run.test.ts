@@ -38,7 +38,7 @@ const NO_GAPS = {
   leads: 0,
 };
 
-async function seedPlainRows(): Promise<string> {
+async function seedPlainRows(): Promise<void> {
   const { id: tenantId } = await insertTestTenant(db());
   await insertTestUser(db(), { name: MOCK_USER_NAME, email: MOCK_USER_EMAIL });
   await db()
@@ -50,7 +50,6 @@ async function seedPlainRows(): Promise<string> {
     role: MEMBERSHIP_ROLE.EDITOR,
   });
   await insertTestLead(db(), tenantId);
-  return tenantId;
 }
 
 async function readAllRows(): Promise<unknown[]> {
@@ -71,61 +70,6 @@ afterEach(async () => {
 });
 
 describe(backfillPersonalData, () => {
-  it('encrypts every non-empty plain value and indexes every email', async () => {
-    await seedPlainRows();
-
-    await backfillPersonalData(loadPersonalDataKeys());
-
-    const [user] = await db().select().from(schema.users);
-    expect(decryptTestPersonalValue(user?.nameEncrypted ?? null)).toBe(
-      MOCK_USER_NAME,
-    );
-    expect(decryptTestPersonalValue(user?.emailEncrypted ?? null)).toBe(
-      MOCK_USER_EMAIL,
-    );
-    expect(user?.emailIndex).toBe(testPersonalEmailIndex(MOCK_USER_EMAIL));
-
-    const [subscriber] = await db().select().from(schema.subscribers);
-    expect(decryptTestPersonalValue(subscriber?.emailEncrypted ?? null)).toBe(
-      MOCK_SUBSCRIBER_EMAIL,
-    );
-    expect(subscriber?.emailIndex).toBe(
-      testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-    );
-
-    const [invite] = await db().select().from(schema.membershipInvites);
-    expect(decryptTestPersonalValue(invite?.emailEncrypted ?? null)).toBe(
-      MOCK_INVITE_EMAIL,
-    );
-    expect(invite?.emailIndex).toBe(testPersonalEmailIndex(MOCK_INVITE_EMAIL));
-
-    const [lead] = await db().select().from(schema.leads);
-    expect(decryptTestPersonalValue(lead?.nameEncrypted ?? null)).toBe(
-      lead?.name,
-    );
-    expect(decryptTestPersonalValue(lead?.emailEncrypted ?? null)).toBe(
-      lead?.email,
-    );
-    expect(lead?.emailIndex).toBe(testPersonalEmailIndex(lead?.email ?? ''));
-    expect(decryptTestPersonalValue(lead?.messageEncrypted ?? null)).toBe(
-      lead?.message,
-    );
-  });
-
-  it('reports how many rows of each table it backfilled', async () => {
-    await seedPlainRows();
-    await insertTestUser(db(), { email: faker.internet.email() });
-
-    const backfilled = await backfillPersonalData(loadPersonalDataKeys());
-
-    expect(backfilled).toEqual({
-      users: 2,
-      subscribers: 1,
-      membership_invites: 1,
-      leads: 1,
-    });
-  });
-
   it('leaves a missing value without an encrypted form', async () => {
     const { id } = await insertTestUser(db(), { name: null, email: null });
 
@@ -168,22 +112,83 @@ describe(backfillPersonalData, () => {
     expect(await countPersonalDataGaps()).toEqual(NO_GAPS);
   });
 
-  it('changes nothing on a second run', async () => {
-    await seedPlainRows();
-    await backfillPersonalData(loadPersonalDataKeys());
-    const afterFirstRun = await readAllRows();
+  describe('with plain rows seeded', () => {
+    beforeEach(async () => {
+      await seedPlainRows();
+    });
 
-    const backfilled = await backfillPersonalData(loadPersonalDataKeys());
+    it('encrypts every non-empty plain value and indexes every email', async () => {
+      await backfillPersonalData(loadPersonalDataKeys());
 
-    expect(backfilled).toEqual(NO_GAPS);
-    expect(await readAllRows()).toEqual(afterFirstRun);
+      const [user] = await db().select().from(schema.users);
+      expect(decryptTestPersonalValue(user?.nameEncrypted ?? null)).toBe(
+        MOCK_USER_NAME,
+      );
+      expect(decryptTestPersonalValue(user?.emailEncrypted ?? null)).toBe(
+        MOCK_USER_EMAIL,
+      );
+      expect(user?.emailIndex).toBe(testPersonalEmailIndex(MOCK_USER_EMAIL));
+
+      const [subscriber] = await db().select().from(schema.subscribers);
+      expect(decryptTestPersonalValue(subscriber?.emailEncrypted ?? null)).toBe(
+        MOCK_SUBSCRIBER_EMAIL,
+      );
+      expect(subscriber?.emailIndex).toBe(
+        testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+      );
+
+      const [invite] = await db().select().from(schema.membershipInvites);
+      expect(decryptTestPersonalValue(invite?.emailEncrypted ?? null)).toBe(
+        MOCK_INVITE_EMAIL,
+      );
+      expect(invite?.emailIndex).toBe(
+        testPersonalEmailIndex(MOCK_INVITE_EMAIL),
+      );
+
+      const [lead] = await db().select().from(schema.leads);
+      expect(decryptTestPersonalValue(lead?.nameEncrypted ?? null)).toBe(
+        lead?.name,
+      );
+      expect(decryptTestPersonalValue(lead?.emailEncrypted ?? null)).toBe(
+        lead?.email,
+      );
+      expect(lead?.emailIndex).toBe(testPersonalEmailIndex(lead?.email ?? ''));
+      expect(decryptTestPersonalValue(lead?.messageEncrypted ?? null)).toBe(
+        lead?.message,
+      );
+    });
+
+    it('reports how many rows of each table it backfilled', async () => {
+      await insertTestUser(db(), { email: faker.internet.email() });
+
+      const backfilled = await backfillPersonalData(loadPersonalDataKeys());
+
+      expect(backfilled).toEqual({
+        users: 2,
+        subscribers: 1,
+        membership_invites: 1,
+        leads: 1,
+      });
+    });
+
+    it('changes nothing on a second run', async () => {
+      await backfillPersonalData(loadPersonalDataKeys());
+      const afterFirstRun = await readAllRows();
+
+      const backfilled = await backfillPersonalData(loadPersonalDataKeys());
+
+      expect(backfilled).toEqual(NO_GAPS);
+      expect(await readAllRows()).toEqual(afterFirstRun);
+    });
   });
 });
 
 describe(countPersonalDataGaps, () => {
-  it('counts the rows with a plain value but no encrypted form or index', async () => {
+  beforeEach(async () => {
     await seedPlainRows();
+  });
 
+  it('counts the rows with a plain value but no encrypted form or index', async () => {
     expect(await countPersonalDataGaps()).toEqual({
       users: 1,
       subscribers: 1,
@@ -193,8 +198,6 @@ describe(countPersonalDataGaps, () => {
   });
 
   it('finds no gaps once the backfill has run', async () => {
-    await seedPlainRows();
-
     await backfillPersonalData(loadPersonalDataKeys());
 
     expect(await countPersonalDataGaps()).toEqual(NO_GAPS);

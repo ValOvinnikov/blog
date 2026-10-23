@@ -48,23 +48,32 @@ describe(commitConfirmationToken, () => {
     return row;
   }
 
-  it('stores only the hash of the token', async () => {
-    const { id } = await insertSubscriber();
-    const confirmationToken = faker.string.uuid();
+  describe('with an unconfirmed subscriber', () => {
+    let subscriber: schema.TSubscriber;
 
-    await commitConfirmationToken(id, confirmationToken);
+    beforeEach(async () => {
+      subscriber = await insertSubscriber();
+    });
 
-    expect((await readRow(id)).confirmationTokenHash).toBe(
-      sha256Hex(confirmationToken),
-    );
-  });
+    it('stores only the hash of the token', async () => {
+      const confirmationToken = faker.string.uuid();
 
-  it('leaves the unsubscribe token hash untouched', async () => {
-    const { id, unsubscribeTokenHash } = await insertSubscriber();
+      await commitConfirmationToken(subscriber.id, confirmationToken);
 
-    await commitConfirmationToken(id, faker.string.uuid());
+      expect((await readRow(subscriber.id)).confirmationTokenHash).toBe(
+        sha256Hex(confirmationToken),
+      );
+    });
 
-    expect((await readRow(id)).unsubscribeTokenHash).toBe(unsubscribeTokenHash);
+    it('leaves the unsubscribe token hash untouched', async () => {
+      const { id, unsubscribeTokenHash } = subscriber;
+
+      await commitConfirmationToken(id, faker.string.uuid());
+
+      expect((await readRow(id)).unsubscribeTokenHash).toBe(
+        unsubscribeTokenHash,
+      );
+    });
   });
 
   it('never changes a subscriber who has confirmed', async () => {

@@ -67,6 +67,12 @@ const RUNNING_STEP = { status: RUNNING };
 const DONE_STEP = { status: DONE };
 const FAILED_STEP = { status: FAILED };
 
+const EARLY_STEPS_DONE = {
+  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
+  [TENANT_PROVISIONING_STEP.SEED_CONTENT]: DONE_STEP,
+  [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: DONE_STEP,
+};
+
 const ORIGINAL_DETAILS = {
   name: TENANT_NAME,
   primaryDomain: MOCK_TENANT_DOMAIN,
@@ -319,6 +325,43 @@ describe(updateTenantDetails, () => {
       expect((await readDetails(tenantId))?.name).toBe(TENANT_NAME);
       expect(await readOwnerInvite(tenantId)).toBeUndefined();
     });
+
+    it('returns domain-taken when renaming onto its own secondary domain', async () => {
+      await db()
+        .insert(tenantDomains)
+        .values({ tenantId, domain: ACME_ALT_DOMAIN });
+
+      const result = await updateTenantDetails(tenantId, {
+        ...validInput,
+        primaryDomain: ACME_ALT_DOMAIN,
+      });
+
+      expect(result).toEqual({ outcome: DOMAIN_TAKEN });
+      expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
+      expect(await readDomains(tenantId)).toEqual([
+        ACME_ALT_DOMAIN,
+        MOCK_TENANT_DOMAIN,
+      ]);
+    });
+
+    it.each([
+      ['a scheme-prefixed value', 'https://acme-new.com'],
+      ['a trailing-slash value', 'acme-new.com/'],
+      ['a whitespace-padded value', ' acme-new.com '],
+    ])(
+      'returns domain-invalid for %s primaryDomain and applies no changes',
+      async (_description, primaryDomain) => {
+        const result = await updateTenantDetails(tenantId, {
+          ...validInput,
+          name: NEW_NAME,
+          primaryDomain,
+        });
+
+        expect(result).toEqual({ outcome: 'domain-invalid' });
+        expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
+        expect(await readDomains(tenantId)).toEqual([MOCK_TENANT_DOMAIN]);
+      },
+    );
   });
 
   describe('a tenant with a RUNNING step', () => {
@@ -402,9 +445,7 @@ describe(updateTenantDetails, () => {
       tenantId = await insertTenantWithDomain({
         domain: MOCK_TENANT_DOMAIN,
         provisioningSteps: stepsWith({
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: DONE_STEP,
+          ...EARLY_STEPS_DONE,
           [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: DONE_STEP,
           [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: FAILED_STEP,
         }),
@@ -444,27 +485,6 @@ describe(updateTenantDetails, () => {
     });
   });
 
-  it('returns domain-taken when renaming onto its own secondary domain', async () => {
-    const tenantId = await insertTenantWithDomain({
-      domain: MOCK_TENANT_DOMAIN,
-    });
-    await db()
-      .insert(tenantDomains)
-      .values({ tenantId, domain: ACME_ALT_DOMAIN });
-
-    const result = await updateTenantDetails(tenantId, {
-      ...validInput,
-      primaryDomain: ACME_ALT_DOMAIN,
-    });
-
-    expect(result).toEqual({ outcome: DOMAIN_TAKEN });
-    expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
-    expect(await readDomains(tenantId)).toEqual([
-      ACME_ALT_DOMAIN,
-      MOCK_TENANT_DOMAIN,
-    ]);
-  });
-
   it('leaves provisioning artifact columns untouched by an update', async () => {
     const tenantId = await insertTenantWithDomain({
       sanityProjectId: MOCK_SANITY_PROJECT_ID,
@@ -500,9 +520,7 @@ describe(updateTenantDetails, () => {
       'every core step has succeeded',
       {
         provisioningSteps: stepsWith({
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: DONE_STEP,
+          ...EARLY_STEPS_DONE,
           [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: DONE_STEP,
           [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: DONE_STEP,
         }),
@@ -512,9 +530,7 @@ describe(updateTenantDetails, () => {
       'every core step has succeeded and OWNER_ELEVATION is FAILED',
       {
         provisioningSteps: stepsWith({
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: DONE_STEP,
+          ...EARLY_STEPS_DONE,
           [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: DONE_STEP,
           [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: DONE_STEP,
           [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: FAILED_STEP,
@@ -560,9 +576,7 @@ describe(updateTenantDetails, () => {
       const tenantId = await insertTenantWithDomain({
         domain: MOCK_TENANT_DOMAIN,
         provisioningSteps: stepsWith({
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: DONE_STEP,
+          ...EARLY_STEPS_DONE,
           [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: FAILED_STEP,
           ...laterSteps,
         }),
@@ -609,25 +623,4 @@ describe(updateTenantDetails, () => {
       `updateTenantDetails: no tenant found for id "${MOCK_MISSING_TENANT_ID}".`,
     );
   });
-
-  it.each([
-    ['a scheme-prefixed value', 'https://acme-new.com'],
-    ['a trailing-slash value', 'acme-new.com/'],
-    ['a whitespace-padded value', ' acme-new.com '],
-  ])(
-    'returns domain-invalid for %s primaryDomain and applies no changes',
-    async (_description, primaryDomain) => {
-      const tenantId = await insertTenantWithDomain();
-
-      const result = await updateTenantDetails(tenantId, {
-        ...validInput,
-        name: NEW_NAME,
-        primaryDomain,
-      });
-
-      expect(result).toEqual({ outcome: 'domain-invalid' });
-      expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
-      expect(await readDomains(tenantId)).toEqual([MOCK_TENANT_DOMAIN]);
-    },
-  );
 });

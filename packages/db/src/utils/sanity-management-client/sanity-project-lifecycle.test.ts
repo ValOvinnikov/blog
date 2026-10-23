@@ -54,24 +54,26 @@ function projectResponse(isDisabledByUser: boolean): Response {
 }
 
 describe(deleteSanityProject, () => {
-  it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
-    fetchMock.mockResolvedValue(emptyResponse());
+  describe('when Sanity deletes the project', () => {
+    beforeEach(() => {
+      fetchMock.mockResolvedValue(emptyResponse());
+    });
 
-    await deleteSanityProject(INPUT);
+    it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
+      await deleteSanityProject(INPUT);
 
-    const { init } = firstFetchCall(fetchMock);
-    expect(init.signal).toBeInstanceOf(AbortSignal);
-  });
+      const { init } = firstFetchCall(fetchMock);
+      expect(init.signal).toBeInstanceOf(AbortSignal);
+    });
 
-  it('DELETEs the project', async () => {
-    fetchMock.mockResolvedValue(emptyResponse());
+    it('DELETEs the project', async () => {
+      const result = await deleteSanityProject(INPUT);
 
-    const result = await deleteSanityProject(INPUT);
-
-    expect(result).toEqual(toOutcome(SANITY_PROJECT_DELETE_OUTCOME.DELETED));
-    const { url, method } = firstFetchCall(fetchMock);
-    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.project);
-    expect(method).toBe(HTTP_METHOD.DELETE);
+      expect(result).toEqual(toOutcome(SANITY_PROJECT_DELETE_OUTCOME.DELETED));
+      const { url, method } = firstFetchCall(fetchMock);
+      expect(url).toBe(MOCK_SANITY_EXPECTED_URL.project);
+      expect(method).toBe(HTTP_METHOD.DELETE);
+    });
   });
 
   it('treats a 404 as already gone rather than an error', async () => {
@@ -133,39 +135,6 @@ describe.each([
 ])(
   '$name',
   ({ run, isDisabledByUser, outcome, alreadyOutcome, goneOutcome }) => {
-    it('GETs, then PATCHes isDisabledByUser to the opposite value', async () => {
-      fetchMock
-        .mockResolvedValueOnce(projectResponse(isDisabledByUser))
-        .mockResolvedValueOnce(jsonResponse({}));
-
-      const result = await run(INPUT);
-
-      expect(result).toEqual(toOutcome(outcome));
-      expect(fetchMock).toHaveBeenCalledTimes(2);
-      const get = nthFetchCall(fetchMock, 0);
-      expect(get.url).toBe(MOCK_SANITY_EXPECTED_URL.project);
-      expect(get.method).toBe(HTTP_METHOD.GET);
-      const patch = nthFetchCall(fetchMock, 1);
-      expect(patch.url).toBe(MOCK_SANITY_EXPECTED_URL.project);
-      expect(patch.method).toBe(HTTP_METHOD.PATCH);
-      expect(patch.body).toEqual({ isDisabledByUser: !isDisabledByUser });
-    });
-
-    it('sends an abort signal on both the GET and the PATCH', async () => {
-      fetchMock
-        .mockResolvedValueOnce(projectResponse(isDisabledByUser))
-        .mockResolvedValueOnce(jsonResponse({}));
-
-      await run(INPUT);
-
-      expect(nthFetchCall(fetchMock, 0).init.signal).toBeInstanceOf(
-        AbortSignal,
-      );
-      expect(nthFetchCall(fetchMock, 1).init.signal).toBeInstanceOf(
-        AbortSignal,
-      );
-    });
-
     it('skips the PATCH when the project is already in the target state', async () => {
       fetchMock.mockResolvedValueOnce(projectResponse(!isDisabledByUser));
 
@@ -200,23 +169,58 @@ describe.each([
       );
     });
 
-    it('throws when the PATCH fails', async () => {
-      fetchMock
-        .mockResolvedValueOnce(projectResponse(isDisabledByUser))
-        .mockResolvedValueOnce(
+    describe('when the project is in the opposite state', () => {
+      beforeEach(() => {
+        fetchMock.mockResolvedValueOnce(projectResponse(isDisabledByUser));
+      });
+
+      describe('and the PATCH succeeds', () => {
+        beforeEach(() => {
+          fetchMock.mockResolvedValueOnce(jsonResponse({}));
+        });
+
+        it('GETs, then PATCHes isDisabledByUser to the opposite value', async () => {
+          const result = await run(INPUT);
+
+          expect(result).toEqual(toOutcome(outcome));
+          expect(fetchMock).toHaveBeenCalledTimes(2);
+          const get = nthFetchCall(fetchMock, 0);
+          expect(get.url).toBe(MOCK_SANITY_EXPECTED_URL.project);
+          expect(get.method).toBe(HTTP_METHOD.GET);
+          const patch = nthFetchCall(fetchMock, 1);
+          expect(patch.url).toBe(MOCK_SANITY_EXPECTED_URL.project);
+          expect(patch.method).toBe(HTTP_METHOD.PATCH);
+          expect(patch.body).toEqual({ isDisabledByUser: !isDisabledByUser });
+        });
+
+        it('sends an abort signal on both the GET and the PATCH', async () => {
+          await run(INPUT);
+
+          expect(nthFetchCall(fetchMock, 0).init.signal).toBeInstanceOf(
+            AbortSignal,
+          );
+          expect(nthFetchCall(fetchMock, 1).init.signal).toBeInstanceOf(
+            AbortSignal,
+          );
+        });
+      });
+
+      it('throws when the PATCH fails', async () => {
+        fetchMock.mockResolvedValueOnce(
           textResponse(
             MOCK_SERVER_ERROR_BODY,
             HTTP_STATUS.INTERNAL_SERVER_ERROR,
           ),
         );
 
-      await expect(run(INPUT)).rejects.toThrow(
-        managementApiError(
-          HTTP_METHOD.PATCH,
-          HTTP_STATUS.INTERNAL_SERVER_ERROR,
-          MOCK_SERVER_ERROR_BODY,
-        ),
-      );
+        await expect(run(INPUT)).rejects.toThrow(
+          managementApiError(
+            HTTP_METHOD.PATCH,
+            HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            MOCK_SERVER_ERROR_BODY,
+          ),
+        );
+      });
     });
   },
 );

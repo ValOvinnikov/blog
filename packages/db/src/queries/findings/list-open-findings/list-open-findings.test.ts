@@ -22,6 +22,18 @@ const db = useQueryTestDb(getDbMock);
 const MOCK_PLATFORM_FINDING_IDENTIFIER = 'platform-wide';
 const MOCK_TENANT_NAME = 'Acme';
 
+async function openPlatformWideFinding(
+  details?: Record<string, unknown>,
+): Promise<void> {
+  await openFinding({
+    source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+    kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
+    severity: FINDING_SEVERITY.INFO,
+    identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
+    details,
+  });
+}
+
 afterEach(async () => {
   await db().delete(schema.findings);
   await db().delete(schema.tenants);
@@ -45,12 +57,7 @@ describe(listOpenFindings, () => {
       severity: FINDING_SEVERITY.CRITICAL,
       identifier: 'still-open',
     });
-    await openFinding({
-      source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
-      kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
-      severity: FINDING_SEVERITY.INFO,
-      identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
-    });
+    await openPlatformWideFinding();
     expect(resolved.ok).toBe(true);
     if (!resolved.ok) return;
     await resolveFinding(resolved.data.finding.id);
@@ -75,12 +82,7 @@ describe(listOpenFindings, () => {
       identifier: 'tenant-scoped',
       details: { invalidDocumentCount: 1 },
     });
-    await openFinding({
-      source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
-      kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
-      severity: FINDING_SEVERITY.INFO,
-      identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
-    });
+    await openPlatformWideFinding();
 
     const result = await listOpenFindings();
 
@@ -99,13 +101,7 @@ describe(listOpenFindings, () => {
   it('carries the contrast result on a contrast finding and on no other', async () => {
     const failingRun = mockContrastResult({ tag: 'v1.2.0' });
     await recordContrastResult(failingRun);
-    await openFinding({
-      source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
-      kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
-      severity: FINDING_SEVERITY.INFO,
-      identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
-      details: { reason: 'two owners' },
-    });
+    await openPlatformWideFinding({ reason: 'two owners' });
 
     const result = await listOpenFindings();
 

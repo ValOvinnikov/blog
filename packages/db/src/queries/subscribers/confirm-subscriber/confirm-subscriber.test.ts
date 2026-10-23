@@ -46,55 +46,10 @@ describe(confirmSubscriber, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('flips a pending subscriber to active and stamps confirmedAt', async () => {
-    const pending = await insertPendingSubscriber(tenantId);
-
-    const result = await confirmSubscriber(tenantId, pending.confirmationToken);
-
-    expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.CONFIRMED);
-    if (result.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
-      throw new Error(EXPECTED_CONFIRMED);
-    expect(result.subscriber.status).toBe('active');
-    expect(result.subscriber.confirmedAt).not.toBeNull();
-
-    const [row] = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, pending.id));
-    expect(row?.status).toBe('active');
-  });
-
-  it('reports already confirmed on a repeat confirm, keeping the first confirmedAt', async () => {
-    const pending = await insertPendingSubscriber(tenantId);
-    const first = await confirmSubscriber(tenantId, pending.confirmationToken);
-    if (first.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
-      throw new Error(EXPECTED_CONFIRMED);
-
-    const second = await confirmSubscriber(tenantId, pending.confirmationToken);
-
-    expect(second).toEqual({
-      outcome: SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
-      subscriber: first.subscriber,
-    });
-  });
-
   it('returns not-found for an unrecognized token', async () => {
     const result = await confirmSubscriber(tenantId, faker.string.uuid());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
-  });
-
-  it('treats the stored hash like an unknown token', async () => {
-    const pending = await insertPendingSubscriber(tenantId);
-
-    const result = await confirmSubscriber(
-      tenantId,
-      pending.confirmationTokenHash,
-    );
-
-    expect(result).toEqual(
-      await confirmSubscriber(tenantId, faker.string.uuid()),
-    );
   });
 
   it("returns not-found for another tenant's token", async () => {
@@ -110,29 +65,84 @@ describe(confirmSubscriber, () => {
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 
-  it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
-    const pending = await insertPendingSubscriber(tenantId);
+  describe('with a pending subscriber', () => {
+    let pending: Awaited<ReturnType<typeof insertPendingSubscriber>>;
 
-    const [first, second] = await Promise.all([
-      confirmSubscriber(tenantId, pending.confirmationToken),
-      confirmSubscriber(tenantId, pending.confirmationToken),
-    ]);
+    beforeEach(async () => {
+      pending = await insertPendingSubscriber(tenantId);
+    });
 
-    const outcomes = [first.outcome, second.outcome].sort();
-    expect(outcomes).toEqual([
-      SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
-      SUBSCRIBER_OUTCOME.CONFIRMED,
-    ]);
+    it('flips a pending subscriber to active and stamps confirmedAt', async () => {
+      const result = await confirmSubscriber(
+        tenantId,
+        pending.confirmationToken,
+      );
 
-    const confirmed =
-      first.outcome === SUBSCRIBER_OUTCOME.CONFIRMED ? first : second;
-    if (confirmed.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED) {
-      throw new Error('expected one confirmed outcome');
-    }
-    const [row] = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, pending.id));
-    expect(row?.confirmedAt).toEqual(confirmed.subscriber.confirmedAt);
+      expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.CONFIRMED);
+      if (result.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
+        throw new Error(EXPECTED_CONFIRMED);
+      expect(result.subscriber.status).toBe('active');
+      expect(result.subscriber.confirmedAt).not.toBeNull();
+
+      const [row] = await db()
+        .select()
+        .from(schema.subscribers)
+        .where(eq(schema.subscribers.id, pending.id));
+      expect(row?.status).toBe('active');
+    });
+
+    it('reports already confirmed on a repeat confirm, keeping the first confirmedAt', async () => {
+      const first = await confirmSubscriber(
+        tenantId,
+        pending.confirmationToken,
+      );
+      if (first.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
+        throw new Error(EXPECTED_CONFIRMED);
+
+      const second = await confirmSubscriber(
+        tenantId,
+        pending.confirmationToken,
+      );
+
+      expect(second).toEqual({
+        outcome: SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
+        subscriber: first.subscriber,
+      });
+    });
+
+    it('treats the stored hash like an unknown token', async () => {
+      const result = await confirmSubscriber(
+        tenantId,
+        pending.confirmationTokenHash,
+      );
+
+      expect(result).toEqual(
+        await confirmSubscriber(tenantId, faker.string.uuid()),
+      );
+    });
+
+    it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
+      const [first, second] = await Promise.all([
+        confirmSubscriber(tenantId, pending.confirmationToken),
+        confirmSubscriber(tenantId, pending.confirmationToken),
+      ]);
+
+      const outcomes = [first.outcome, second.outcome].sort();
+      expect(outcomes).toEqual([
+        SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
+        SUBSCRIBER_OUTCOME.CONFIRMED,
+      ]);
+
+      const confirmed =
+        first.outcome === SUBSCRIBER_OUTCOME.CONFIRMED ? first : second;
+      if (confirmed.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED) {
+        throw new Error('expected one confirmed outcome');
+      }
+      const [row] = await db()
+        .select()
+        .from(schema.subscribers)
+        .where(eq(schema.subscribers.id, pending.id));
+      expect(row?.confirmedAt).toEqual(confirmed.subscriber.confirmedAt);
+    });
   });
 });

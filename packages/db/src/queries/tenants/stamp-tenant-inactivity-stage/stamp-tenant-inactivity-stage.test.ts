@@ -5,6 +5,7 @@ import {
   TENANT_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
@@ -29,24 +30,40 @@ afterEach(async () => {
 });
 
 describe(stampTenantInactivityStage, () => {
-  it('stamps the warning once', async () => {
-    const tenant = await insertTestTenant(db(), {
-      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+  describe('a tenant last active at the reference time', () => {
+    let tenant: TTenant;
+
+    beforeEach(async () => {
+      tenant = await insertTestTenant(db(), {
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+      });
     });
 
-    const first = await stampTenantInactivityStage(
-      tenant.id,
-      INACTIVITY_STAGE.SUSPENSION_WARNING,
-      DAY_23,
-    );
-    const second = await stampTenantInactivityStage(
-      tenant.id,
-      INACTIVITY_STAGE.SUSPENSION_WARNING,
-      DAY_23,
-    );
+    it('stamps the warning once', async () => {
+      const first = await stampTenantInactivityStage(
+        tenant.id,
+        INACTIVITY_STAGE.SUSPENSION_WARNING,
+        DAY_23,
+      );
+      const second = await stampTenantInactivityStage(
+        tenant.id,
+        INACTIVITY_STAGE.SUSPENSION_WARNING,
+        DAY_23,
+      );
 
-    expect(first?.inactivityWarnedAt).toEqual(DAY_23);
-    expect(second).toBeNull();
+      expect(first?.inactivityWarnedAt).toEqual(DAY_23);
+      expect(second).toBeNull();
+    });
+
+    it('refuses a stage the tenant is not yet due for', async () => {
+      const stamped = await stampTenantInactivityStage(
+        tenant.id,
+        INACTIVITY_STAGE.SUSPENSION,
+        DAY_30,
+      );
+
+      expect(stamped).toBeNull();
+    });
   });
 
   it('suspends a warned tenant for inactivity', async () => {
@@ -64,20 +81,6 @@ describe(stampTenantInactivityStage, () => {
     expect(stamped?.status).toBe(TENANT_STATUS.SUSPENDED);
     expect(stamped?.suspendedAt).toEqual(DAY_30);
     expect(stamped?.suspensionReason).toBe(SUSPENSION_REASON.INACTIVITY);
-  });
-
-  it('refuses a stage the tenant is not yet due for', async () => {
-    const tenant = await insertTestTenant(db(), {
-      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
-    });
-
-    const stamped = await stampTenantInactivityStage(
-      tenant.id,
-      INACTIVITY_STAGE.SUSPENSION,
-      DAY_30,
-    );
-
-    expect(stamped).toBeNull();
   });
 
   it('never sends the deletion notice to a tenant an operator suspended', async () => {

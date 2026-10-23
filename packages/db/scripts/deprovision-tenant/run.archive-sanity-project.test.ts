@@ -47,20 +47,22 @@ const fetchMock = vi.fn();
 const MOCK_TENANT = mockTenant();
 const MOCK_SANITY_PROJECT_ID = MOCK_TENANT.sanityProjectId;
 
+function sanityProjectResponse(isDisabledByUser: boolean): Response {
+  return new Response(
+    JSON.stringify({
+      id: MOCK_SANITY_PROJECT_ID,
+      isDisabled: false,
+      isDisabledByUser,
+    }),
+    { status: HTTP_STATUS.OK },
+  );
+}
+
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);
   fetchMock
     .mockReset()
-    .mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({
-          id: MOCK_SANITY_PROJECT_ID,
-          isDisabled: false,
-          isDisabledByUser: false,
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    )
+    .mockResolvedValueOnce(sanityProjectResponse(false))
     .mockResolvedValueOnce(
       new Response(JSON.stringify({ isDisabledByUser: true }), {
         status: HTTP_STATUS.OK,
@@ -100,16 +102,7 @@ describe(runSteps, () => {
   });
 
   it('does not call PATCH again when the project is already archived', async () => {
-    fetchMock.mockReset().mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({
-          id: MOCK_SANITY_PROJECT_ID,
-          isDisabled: false,
-          isDisabledByUser: true,
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    );
+    fetchMock.mockReset().mockResolvedValueOnce(sanityProjectResponse(true));
 
     const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 

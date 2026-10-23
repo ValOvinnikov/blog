@@ -61,16 +61,17 @@ async function readAuditEvent(db: PgliteDatabase<typeof schema>, id: string) {
 
 describe('0053_scrub_emails_from_audit_and_findings_details', () => {
   let db: PgliteDatabase<typeof schema>;
+  let tenant: Awaited<ReturnType<typeof insertReplayTenant>>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     db = drizzle(new PGlite(), { schema });
-  });
+    await migrateUpToScrub(db);
+    tenant = await insertReplayTenant(db);
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
     'drops the owner email from a tenant creation event and keeps the event itself',
     async () => {
-      await migrateUpToScrub(db);
-      const tenant = await insertReplayTenant(db);
       const created = await insertAuditEvent(db, {
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
@@ -95,8 +96,6 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
   it(
     'records that a tenant details save changed the owner email, without the address',
     async () => {
-      await migrateUpToScrub(db);
-      const tenant = await insertReplayTenant(db);
       const updated = await insertAuditEvent(db, {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
@@ -117,8 +116,6 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
   it(
     'replaces an email config save with the names of the fields it wrote',
     async () => {
-      await migrateUpToScrub(db);
-      const tenant = await insertReplayTenant(db);
       const saved = await insertAuditEvent(db, {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
@@ -148,8 +145,6 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
   it(
     'removes email-valued keys and masks addresses inside longer text in findings',
     async () => {
-      await migrateUpToScrub(db);
-      const tenant = await insertReplayTenant(db);
       const [finding] = await db
         .insert(findings)
         .values({
@@ -185,8 +180,6 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
   it(
     'changes nothing when it runs a second time',
     async () => {
-      await migrateUpToScrub(db);
-      const tenant = await insertReplayTenant(db);
       await insertAuditEvent(db, {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,

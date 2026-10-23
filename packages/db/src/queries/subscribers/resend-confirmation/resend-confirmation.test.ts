@@ -31,7 +31,7 @@ async function insertUser(
 }
 
 describe(resendConfirmation, () => {
-  let user: Awaited<ReturnType<typeof insertUser>>;
+  let user: schema.TUser;
   let tenantId: string;
 
   beforeEach(async () => {
@@ -39,34 +39,37 @@ describe(resendConfirmation, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns the pending subscriber and a token without changing the row', async () => {
-    const [subscriber] = await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL })
-      .returning();
-    if (!subscriber) throw new Error('failed to seed a subscriber row');
+  describe('with a pending subscriber', () => {
+    let subscriber: schema.TSubscriber;
 
-    const result = await resendConfirmation(tenantId, user.id);
+    beforeEach(async () => {
+      const [inserted] = await db()
+        .insert(schema.subscribers)
+        .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL })
+        .returning();
+      if (!inserted) throw new Error('failed to seed a subscriber row');
+      subscriber = inserted;
+    });
 
-    expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.PENDING);
-    if (result.outcome !== SUBSCRIBER_OUTCOME.PENDING) return;
-    expect(result.subscriberId).toBe(subscriber.id);
-    const [row] = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, subscriber.id));
-    expect(row).toEqual(subscriber);
-  });
+    it('returns the pending subscriber and a token without changing the row', async () => {
+      const result = await resendConfirmation(tenantId, user.id);
 
-  it('mints a fresh token on every call', async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL });
+      expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.PENDING);
+      if (result.outcome !== SUBSCRIBER_OUTCOME.PENDING) return;
+      expect(result.subscriberId).toBe(subscriber.id);
+      const [row] = await db()
+        .select()
+        .from(schema.subscribers)
+        .where(eq(schema.subscribers.id, subscriber.id));
+      expect(row).toEqual(subscriber);
+    });
 
-    const first = await resendConfirmation(tenantId, user.id);
-    const second = await resendConfirmation(tenantId, user.id);
+    it('mints a fresh token on every call', async () => {
+      const first = await resendConfirmation(tenantId, user.id);
+      const second = await resendConfirmation(tenantId, user.id);
 
-    expect(second).not.toEqual(first);
+      expect(second).not.toEqual(first);
+    });
   });
 
   it('returns not-pending for an already-active subscriber', async () => {

@@ -4,10 +4,12 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
+import type { TValueOf } from '@blog/config/utils';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { mockTenantSanityCredentials } from '@blog/db/testing/tenant-sanity-credentials/fixtures';
 import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 
+import type { TSanityValidationResult } from './lib/run-sanity-documents-validate';
 import {
   DOCUMENT_VALIDATION_IDENTIFIER,
   hasSystemicFailures,
@@ -60,6 +62,30 @@ const MOCK_FINDING_ID = 'finding-1';
 const MOCK_DOCUMENT_TYPE = 'page_post';
 const MOCK_DOCUMENT_ID = 'doc-1';
 
+function invalidDocument(
+  level: TSanityValidationResult['level'],
+  documentId = MOCK_DOCUMENT_ID,
+): TSanityValidationResult {
+  return { documentId, documentType: MOCK_DOCUMENT_TYPE, level, markers: [] };
+}
+
+function openedFinding(id: string, isNewlyOpened: boolean) {
+  return { ok: true, data: { finding: { id }, isNewlyOpened } };
+}
+
+function openFindingFrom(
+  source: TValueOf<typeof FINDING_SOURCE>,
+  kind: TValueOf<typeof FINDING_KIND>,
+) {
+  return {
+    id: MOCK_FINDING_ID,
+    tenantId: MOCK_TENANT.id,
+    source,
+    kind,
+    status: FINDING_STATUS.OPEN,
+  };
+}
+
 beforeEach(() => {
   listActiveTenantsMock.mockReset().mockResolvedValue([]);
   getTenantByIdMock.mockReset();
@@ -68,12 +94,11 @@ beforeEach(() => {
     .mockResolvedValue(MOCK_CREDENTIALS);
   validateTenantDocumentsMock.mockReset().mockReturnValue([]);
   listFindingsForTenantMock.mockReset().mockResolvedValue([]);
-  openFindingMock.mockReset().mockImplementation(() =>
-    Promise.resolve({
-      ok: true,
-      data: { finding: { id: MOCK_FINDING_ID }, isNewlyOpened: true },
-    }),
-  );
+  openFindingMock
+    .mockReset()
+    .mockImplementation(() =>
+      Promise.resolve(openedFinding(MOCK_FINDING_ID, true)),
+    );
   resolveFindingMock
     .mockReset()
     .mockResolvedValue({ ok: true, data: { id: MOCK_FINDING_ID } });
@@ -94,81 +119,58 @@ describe(runValidation, () => {
     });
   });
 
-  it('tallies clean, warning and critical outcomes across tenants', async () => {
-    listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS);
-    validateTenantDocumentsMock
-      .mockReturnValueOnce([])
-      .mockReturnValueOnce([
-        {
-          documentId: MOCK_DOCUMENT_ID,
-          documentType: MOCK_DOCUMENT_TYPE,
-          level: 'warning',
-          markers: [],
-        },
-      ])
-      .mockReturnValueOnce([
-        {
-          documentId: 'doc-2',
-          documentType: MOCK_DOCUMENT_TYPE,
-          level: 'error',
-          markers: [],
-        },
-      ]);
-
-    const summary = await runValidation();
-
-    expect(summary).toEqual({
-      checked: 3,
-      clean: 1,
-      warning: 1,
-      critical: 1,
-      skipped: 0,
-      errors: 0,
+  describe('with three active tenants', () => {
+    beforeEach(() => {
+      listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS);
     });
-  });
 
-  it("one tenant's failure does not abort the sweep for the rest", async () => {
-    listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS);
-    validateTenantDocumentsMock
-      .mockReturnValueOnce([])
-      .mockImplementationOnce(() => {
-        throw new Error('sanity CLI crashed');
-      })
-      .mockReturnValueOnce([]);
+    it('tallies clean, warning and critical outcomes across tenants', async () => {
+      validateTenantDocumentsMock
+        .mockReturnValueOnce([])
+        .mockReturnValueOnce([invalidDocument('warning')])
+        .mockReturnValueOnce([invalidDocument('error', 'doc-2')]);
 
-    const summary = await runValidation();
+      const summary = await runValidation();
 
-    expect(summary).toEqual({
-      checked: 3,
-      clean: 2,
-      warning: 0,
-      critical: 0,
-      skipped: 0,
-      errors: 1,
+      expect(summary).toEqual({
+        checked: 3,
+        clean: 1,
+        warning: 1,
+        critical: 1,
+        skipped: 0,
+        errors: 0,
+      });
     });
-    expect(validateTenantDocumentsMock).toHaveBeenCalledTimes(3);
-    expect(hasSystemicFailures(summary)).toBe(true);
+
+    it("one tenant's failure does not abort the sweep for the rest", async () => {
+      validateTenantDocumentsMock
+        .mockReturnValueOnce([])
+        .mockImplementationOnce(() => {
+          throw new Error('sanity CLI crashed');
+        })
+        .mockReturnValueOnce([]);
+
+      const summary = await runValidation();
+
+      expect(summary).toEqual({
+        checked: 3,
+        clean: 2,
+        warning: 0,
+        critical: 0,
+        skipped: 0,
+        errors: 1,
+      });
+      expect(validateTenantDocumentsMock).toHaveBeenCalledTimes(3);
+      expect(hasSystemicFailures(summary)).toBe(true);
+    });
   });
 
   it('notifies operators only when the finding is newly opened, not on a repeat open', async () => {
     listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS.slice(0, 2));
-    validateTenantDocumentsMock.mockReturnValue([
-      {
-        documentId: MOCK_DOCUMENT_ID,
-        documentType: MOCK_DOCUMENT_TYPE,
-        level: 'warning',
-        markers: [],
-      },
-    ]);
+    validateTenantDocumentsMock.mockReturnValue([invalidDocument('warning')]);
     openFindingMock
-      .mockResolvedValueOnce({
-        ok: true,
-        data: { finding: { id: 'f1' }, isNewlyOpened: true },
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        data: { finding: { id: 'f2' }, isNewlyOpened: false },
-      });
+      .mockResolvedValueOnce(openedFinding('f1', true))
+      .mockResolvedValueOnce(openedFinding('f2', false));
 
     await runValidation();
 
@@ -210,14 +212,7 @@ describe(runValidation, () => {
     });
 
     it('opens a finding for a tenant with invalid documents', async () => {
-      const invalidDocuments = [
-        {
-          documentId: MOCK_DOCUMENT_ID,
-          documentType: MOCK_DOCUMENT_TYPE,
-          level: 'error',
-          markers: [],
-        },
-      ];
+      const invalidDocuments = [invalidDocument('error')];
       validateTenantDocumentsMock.mockReturnValue(invalidDocuments);
 
       await runValidation();
@@ -242,13 +237,10 @@ describe(runValidation, () => {
 
       it('resolves a previously open finding once the tenant validates clean again', async () => {
         listFindingsForTenantMock.mockResolvedValue([
-          {
-            id: MOCK_FINDING_ID,
-            tenantId: MOCK_TENANT.id,
-            source: FINDING_SOURCE.DOCUMENT_VALIDATION,
-            kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
-            status: FINDING_STATUS.OPEN,
-          },
+          openFindingFrom(
+            FINDING_SOURCE.DOCUMENT_VALIDATION,
+            FINDING_KIND.SCHEMA_VALIDATION_ERROR,
+          ),
         ]);
 
         await runValidation();
@@ -258,13 +250,10 @@ describe(runValidation, () => {
 
       it('does not resolve an open finding from a different source/kind', async () => {
         listFindingsForTenantMock.mockResolvedValue([
-          {
-            id: MOCK_FINDING_ID,
-            tenantId: MOCK_TENANT.id,
-            source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
-            kind: FINDING_KIND.OWNER_CHECK_STALLED,
-            status: FINDING_STATUS.OPEN,
-          },
+          openFindingFrom(
+            FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+            FINDING_KIND.OWNER_CHECK_STALLED,
+          ),
         ]);
 
         await runValidation();
@@ -278,7 +267,6 @@ describe(runValidation, () => {
 describe(runValidationForTenant, () => {
   it('validates only the given tenant', async () => {
     getTenantByIdMock.mockResolvedValue(MOCK_TENANT);
-    validateTenantDocumentsMock.mockReturnValue([]);
 
     const summary = await runValidationForTenant(MOCK_TENANT.id);
 

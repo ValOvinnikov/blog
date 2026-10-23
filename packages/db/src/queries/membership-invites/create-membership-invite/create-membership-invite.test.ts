@@ -52,50 +52,54 @@ describe(createMembershipInvite, () => {
     );
   });
 
-  it.each([
-    { variant: 'the same', email: MOCK_INVITE_EMAIL },
-    { variant: 'a differently cased', email: MOCK_INVITE_EMAIL.toUpperCase() },
-    { variant: 'a space-padded', email: `  ${MOCK_INVITE_EMAIL}  ` },
-  ])(
-    'returns the pending invite for $variant email instead of a duplicate',
-    async ({ email }) => {
-      const first = await createMembershipInvite(
+  describe('with a pending invite', () => {
+    let first: Awaited<ReturnType<typeof createMembershipInvite>>;
+
+    beforeEach(async () => {
+      first = await createMembershipInvite(
+        tenantId,
+        MOCK_INVITE_EMAIL,
+        MEMBERSHIP_ROLE.OWNER,
+      );
+    });
+
+    it.each([
+      { variant: 'the same', email: MOCK_INVITE_EMAIL },
+      {
+        variant: 'a differently cased',
+        email: MOCK_INVITE_EMAIL.toUpperCase(),
+      },
+      { variant: 'a space-padded', email: `  ${MOCK_INVITE_EMAIL}  ` },
+    ])(
+      'returns the pending invite for $variant email instead of a duplicate',
+      async ({ email }) => {
+        const second = await createMembershipInvite(
+          tenantId,
+          email,
+          MEMBERSHIP_ROLE.EDITOR,
+        );
+
+        expect(second.outcome).toBe(ALREADY_PENDING);
+        expect(second.invite).toEqual(first.invite);
+        const rows = await db().select().from(schema.membershipInvites);
+        expect(rows).toHaveLength(1);
+      },
+    );
+
+    it('reports already-consumed for a duplicate invite whose original was already consumed', async () => {
+      await db()
+        .update(schema.membershipInvites)
+        .set({ consumedAt: new Date() })
+        .where(eq(schema.membershipInvites.id, first.invite.id));
+
+      const second = await createMembershipInvite(
         tenantId,
         MOCK_INVITE_EMAIL,
         MEMBERSHIP_ROLE.OWNER,
       );
 
-      const second = await createMembershipInvite(
-        tenantId,
-        email,
-        MEMBERSHIP_ROLE.EDITOR,
-      );
-
-      expect(second.outcome).toBe(ALREADY_PENDING);
-      expect(second.invite).toEqual(first.invite);
-      const rows = await db().select().from(schema.membershipInvites);
-      expect(rows).toHaveLength(1);
-    },
-  );
-
-  it('reports already-consumed for a duplicate invite whose original was already consumed', async () => {
-    const first = await createMembershipInvite(
-      tenantId,
-      MOCK_INVITE_EMAIL,
-      MEMBERSHIP_ROLE.OWNER,
-    );
-    await db()
-      .update(schema.membershipInvites)
-      .set({ consumedAt: new Date() })
-      .where(eq(schema.membershipInvites.id, first.invite.id));
-
-    const second = await createMembershipInvite(
-      tenantId,
-      MOCK_INVITE_EMAIL,
-      MEMBERSHIP_ROLE.OWNER,
-    );
-
-    expect(second.outcome).toBe('already-consumed');
+      expect(second.outcome).toBe('already-consumed');
+    });
   });
 
   it('allows the same email to hold a distinct pending invite on a different tenant', async () => {

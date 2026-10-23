@@ -65,42 +65,42 @@ describe(erasePersonalData, () => {
     });
   });
 
-  it("keeps everyone else's rows", async () => {
-    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
-
-    const result = await erasePersonalData(MOCK_INVITE_EMAIL);
-
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
-        erased: ONE_OF_EACH,
-      },
+  describe('once the mailbox has been erased', () => {
+    beforeEach(async () => {
+      await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
     });
-  });
 
-  it('keeps an audit event but clears its email', async () => {
-    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
+    it("keeps everyone else's rows", async () => {
+      const result = await erasePersonalData(MOCK_INVITE_EMAIL);
 
-    const anonymised = await db()
-      .select({ actorId: schema.auditEvents.actorId })
-      .from(schema.auditEvents)
-      .where(isNull(schema.auditEvents.actorEmail));
+      expect(result).toEqual({
+        ok: true,
+        data: {
+          emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
+          erased: ONE_OF_EACH,
+        },
+      });
+    });
 
-    expect(anonymised).toEqual([{ actorId: MOCK_PERSONAL_DATA_ACTOR_ID }]);
-  });
+    it('keeps an audit event but clears its email', async () => {
+      const anonymised = await db()
+        .select({ actorId: schema.auditEvents.actorId })
+        .from(schema.auditEvents)
+        .where(isNull(schema.auditEvents.actorEmail));
 
-  it('finds nothing left to erase on a second run', async () => {
-    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
+      expect(anonymised).toEqual([{ actorId: MOCK_PERSONAL_DATA_ACTOR_ID }]);
+    });
 
-    const result = await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
+    it('finds nothing left to erase on a second run', async () => {
+      const result = await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-        erased: NONE,
-      },
+      expect(result).toEqual({
+        ok: true,
+        data: {
+          emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+          erased: NONE,
+        },
+      });
     });
   });
 

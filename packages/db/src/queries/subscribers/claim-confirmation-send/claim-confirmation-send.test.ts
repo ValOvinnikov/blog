@@ -50,59 +50,66 @@ describe(claimConfirmationSend, () => {
     return row;
   }
 
-  it('claims a pending subscriber that has never been sent a confirmation', async () => {
-    const { id } = await insertSubscriber();
+  describe('with a pending subscriber', () => {
+    let subscriber: schema.TSubscriber;
 
-    const claim = await claimConfirmationSend(id, COOLDOWN_MS);
+    beforeEach(async () => {
+      subscriber = await insertSubscriber();
+    });
 
-    expect(claim?.claimedAt).toBeInstanceOf(Date);
-    expect((await readRow(id)).confirmationSentAt).toEqual(claim?.claimedAt);
-  });
+    it('claims a pending subscriber that has never been sent a confirmation', async () => {
+      const claim = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
 
-  it('leaves the stored token hashes untouched', async () => {
-    const { id, confirmationTokenHash, unsubscribeTokenHash } =
-      await insertSubscriber();
+      expect(claim?.claimedAt).toBeInstanceOf(Date);
+      expect((await readRow(subscriber.id)).confirmationSentAt).toEqual(
+        claim?.claimedAt,
+      );
+    });
 
-    const claim = await claimConfirmationSend(id, COOLDOWN_MS);
+    it('leaves the stored token hashes untouched', async () => {
+      const { id, confirmationTokenHash, unsubscribeTokenHash } = subscriber;
 
-    expect(claim).not.toBeNull();
-    const row = await readRow(id);
-    expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
-    expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);
-  });
+      const claim = await claimConfirmationSend(id, COOLDOWN_MS);
 
-  it('refuses a second claim inside the cooldown and keeps the first send time', async () => {
-    const { id } = await insertSubscriber();
-    const first = await claimConfirmationSend(id, COOLDOWN_MS);
-    if (!first) throw new Error(NO_CLAIM_ERROR);
+      expect(claim).not.toBeNull();
+      const row = await readRow(id);
+      expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
+      expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);
+    });
 
-    await expect(claimConfirmationSend(id, COOLDOWN_MS)).resolves.toBeNull();
-    expect((await readRow(id)).confirmationSentAt).toEqual(first.claimedAt);
-  });
+    it('refuses a second claim inside the cooldown and keeps the first send time', async () => {
+      const first = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
+      if (!first) throw new Error(NO_CLAIM_ERROR);
 
-  it('claims again with a fresh token once the last send is older than the cooldown', async () => {
-    const { id } = await insertSubscriber();
-    const first = await claimConfirmationSend(id, COOLDOWN_MS);
-    await db()
-      .update(schema.subscribers)
-      .set({ confirmationSentAt: new Date(Date.now() - COOLDOWN_MS - 1000) })
-      .where(eq(schema.subscribers.id, id));
+      await expect(
+        claimConfirmationSend(subscriber.id, COOLDOWN_MS),
+      ).resolves.toBeNull();
+      expect((await readRow(subscriber.id)).confirmationSentAt).toEqual(
+        first.claimedAt,
+      );
+    });
 
-    const second = await claimConfirmationSend(id, COOLDOWN_MS);
+    it('claims again with a fresh token once the last send is older than the cooldown', async () => {
+      const first = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
+      await db()
+        .update(schema.subscribers)
+        .set({ confirmationSentAt: new Date(Date.now() - COOLDOWN_MS - 1000) })
+        .where(eq(schema.subscribers.id, subscriber.id));
 
-    expect(second?.claimedAt).toBeInstanceOf(Date);
-    expect(second?.confirmationToken).not.toBe(first?.confirmationToken);
-  });
+      const second = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
 
-  it('lets exactly one of two concurrent claims through', async () => {
-    const { id } = await insertSubscriber();
+      expect(second?.claimedAt).toBeInstanceOf(Date);
+      expect(second?.confirmationToken).not.toBe(first?.confirmationToken);
+    });
 
-    const results = await Promise.all([
-      claimConfirmationSend(id, COOLDOWN_MS),
-      claimConfirmationSend(id, COOLDOWN_MS),
-    ]);
+    it('lets exactly one of two concurrent claims through', async () => {
+      const results = await Promise.all([
+        claimConfirmationSend(subscriber.id, COOLDOWN_MS),
+        claimConfirmationSend(subscriber.id, COOLDOWN_MS),
+      ]);
 
-    expect(results.filter((result) => result !== null)).toHaveLength(1);
+      expect(results.filter((result) => result !== null)).toHaveLength(1);
+    });
   });
 
   it('never claims an active subscriber', async () => {

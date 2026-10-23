@@ -32,22 +32,6 @@ const createProjectInput = {
 const fetchMock = useFetchFake();
 
 describe(createSanityProject, () => {
-  it('POSTs to /projects with the display name and organization id', async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ id: MOCK_SANITY_PROJECT_ID }));
-
-    const result = await createSanityProject(createProjectInput);
-
-    const { url, body, headers, method } = firstFetchCall(fetchMock);
-    expect(result).toEqual({ id: MOCK_SANITY_PROJECT_ID });
-    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.projects);
-    expect(method).toBe(HTTP_METHOD.POST);
-    expect(body).toEqual({
-      displayName: createProjectInput.displayName,
-      organizationId: createProjectInput.organizationId,
-    });
-    expect(headers['Authorization']).toBe(`Bearer ${MOCK_SANITY_TOKEN}`);
-  });
-
   it('throws with the response status and body on failure', async () => {
     fetchMock.mockResolvedValue(
       textResponse('nope', HTTP_STATUS.PAYMENT_REQUIRED),
@@ -58,12 +42,30 @@ describe(createSanityProject, () => {
     );
   });
 
-  it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ id: MOCK_SANITY_PROJECT_ID }));
+  describe('when Sanity creates the project', () => {
+    beforeEach(() => {
+      fetchMock.mockResolvedValue(jsonResponse({ id: MOCK_SANITY_PROJECT_ID }));
+    });
 
-    await createSanityProject(createProjectInput);
+    it('POSTs to /projects with the display name and organization id', async () => {
+      const result = await createSanityProject(createProjectInput);
 
-    expect(firstFetchCall(fetchMock).init.signal).toBeInstanceOf(AbortSignal);
+      const { url, body, headers, method } = firstFetchCall(fetchMock);
+      expect(result).toEqual({ id: MOCK_SANITY_PROJECT_ID });
+      expect(url).toBe(MOCK_SANITY_EXPECTED_URL.projects);
+      expect(method).toBe(HTTP_METHOD.POST);
+      expect(body).toEqual({
+        displayName: createProjectInput.displayName,
+        organizationId: createProjectInput.organizationId,
+      });
+      expect(headers['Authorization']).toBe(`Bearer ${MOCK_SANITY_TOKEN}`);
+    });
+
+    it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
+      await createSanityProject(createProjectInput);
+
+      expect(firstFetchCall(fetchMock).init.signal).toBeInstanceOf(AbortSignal);
+    });
   });
 });
 

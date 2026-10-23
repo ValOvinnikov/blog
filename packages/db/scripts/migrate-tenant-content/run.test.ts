@@ -58,7 +58,6 @@ beforeEach(() => {
   isTenantMigrationLedgerEmptyMock.mockReset().mockReturnValue(false);
   runTenantMigrationDeployMock.mockReset();
   exportTenantDatasetMock.mockReset();
-  vi.unstubAllEnvs();
 });
 
 describe(runMigration, () => {
@@ -156,39 +155,49 @@ describe(runMigration, () => {
       expect(runTenantMigrationDeployMock).toHaveBeenCalledTimes(1);
     });
 
-    it('exports the tenant dataset before migrating it when an export directory is set', async () => {
-      vi.stubEnv('TENANT_EXPORT_DIR', EXPORT_DIR);
-      const calls: string[] = [];
-      exportTenantDatasetMock.mockImplementation(() => calls.push(EXPORT_CALL));
-      runTenantMigrationDeployMock.mockImplementation(() =>
-        calls.push(DEPLOY_CALL),
-      );
-
-      await runMigration();
-
-      expect(exportTenantDatasetMock).toHaveBeenCalledWith(
-        MOCK_CREDENTIALS,
-        `${EXPORT_DIR}/${MOCK_TENANT.id}.tar.gz`,
-      );
-      expect(calls).toEqual([EXPORT_CALL, DEPLOY_CALL]);
-    });
-
-    it('does not migrate a tenant whose export failed, and counts it as an error', async () => {
-      vi.stubEnv('TENANT_EXPORT_DIR', EXPORT_DIR);
-      exportTenantDatasetMock.mockImplementation(() => {
-        throw new Error('export failed');
+    describe('with an export directory set', () => {
+      beforeEach(() => {
+        vi.stubEnv('TENANT_EXPORT_DIR', EXPORT_DIR);
       });
 
-      const summary = await runMigration();
-
-      expect(summary).toEqual({
-        checked: 1,
-        migrated: 0,
-        backfilled: 0,
-        skipped: 0,
-        errors: 1,
+      afterEach(() => {
+        vi.unstubAllEnvs();
       });
-      expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
+
+      it('exports the tenant dataset before migrating it when an export directory is set', async () => {
+        const calls: string[] = [];
+        exportTenantDatasetMock.mockImplementation(() =>
+          calls.push(EXPORT_CALL),
+        );
+        runTenantMigrationDeployMock.mockImplementation(() =>
+          calls.push(DEPLOY_CALL),
+        );
+
+        await runMigration();
+
+        expect(exportTenantDatasetMock).toHaveBeenCalledWith(
+          MOCK_CREDENTIALS,
+          `${EXPORT_DIR}/${MOCK_TENANT.id}.tar.gz`,
+        );
+        expect(calls).toEqual([EXPORT_CALL, DEPLOY_CALL]);
+      });
+
+      it('does not migrate a tenant whose export failed, and counts it as an error', async () => {
+        exportTenantDatasetMock.mockImplementation(() => {
+          throw new Error('export failed');
+        });
+
+        const summary = await runMigration();
+
+        expect(summary).toEqual({
+          checked: 1,
+          migrated: 0,
+          backfilled: 0,
+          skipped: 0,
+          errors: 1,
+        });
+        expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
+      });
     });
 
     it.each([
@@ -225,7 +234,6 @@ describe(runMigration, () => {
 describe(runMigrationForTenant, () => {
   it('migrates only the given tenant', async () => {
     getTenantByIdMock.mockResolvedValue(MOCK_TENANT);
-    isTenantMigrationLedgerEmptyMock.mockReturnValue(false);
 
     const summary = await runMigrationForTenant(MOCK_TENANT.id);
 

@@ -4,6 +4,7 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
+import type { TContrastResultBody } from '@blog/config/types';
 import { listOpenFindings } from '@blog/db/queries/findings/list-open-findings';
 import * as schema from '@blog/db/schema';
 import {
@@ -26,9 +27,15 @@ afterEach(async () => {
 });
 
 describe(recordContrastResult, () => {
-  it('records a failing run as an open, platform-wide critical finding', async () => {
-    const failingRun = mockContrastResult();
+  let failingRun: TContrastResultBody;
+  let passingRun: TContrastResultBody;
 
+  beforeEach(() => {
+    failingRun = mockContrastResult();
+    passingRun = mockPassingContrastResult();
+  });
+
+  it('records a failing run as an open, platform-wide critical finding', async () => {
     const finding = await recordContrastResult(failingRun);
 
     const { tenantId, source, kind, severity, status, resolvedAt, details } =
@@ -45,7 +52,7 @@ describe(recordContrastResult, () => {
   });
 
   it('records a passing run as resolved without listing it among open findings', async () => {
-    const finding = await recordContrastResult(mockPassingContrastResult());
+    const finding = await recordContrastResult(passingRun);
 
     expect(finding.status).toBe(FINDING_STATUS.RESOLVED);
     expect(finding.resolvedAt).toBeInstanceOf(Date);
@@ -53,22 +60,19 @@ describe(recordContrastResult, () => {
   });
 
   it('closes a failing SHA on a later passing run and keeps the same row', async () => {
-    const failingRun = mockContrastResult();
-    const passingRun = mockPassingContrastResult({ sha: failingRun.sha });
+    const laterPassingRun = mockPassingContrastResult({ sha: failingRun.sha });
 
     const failed = await recordContrastResult(failingRun);
-    const passed = await recordContrastResult(passingRun);
+    const passed = await recordContrastResult(laterPassingRun);
 
     expect(passed.id).toBe(failed.id);
     expect(passed.status).toBe(FINDING_STATUS.RESOLVED);
-    expect(passed.details).toEqual(passingRun);
+    expect(passed.details).toEqual(laterPassingRun);
     expect(await db().select().from(schema.findings)).toHaveLength(1);
     expect(await listOpenFindings()).toEqual([]);
   });
 
   it('reopens the same row when a passing SHA later fails', async () => {
-    const passingRun = mockPassingContrastResult();
-
     const passed = await recordContrastResult(passingRun);
     const failed = await recordContrastResult(
       mockContrastResult({ sha: passingRun.sha }),
@@ -81,7 +85,6 @@ describe(recordContrastResult, () => {
 
   it('keeps a recorded tag when a re-run carries none', async () => {
     const tag = `v${faker.system.semver()}`;
-    const passingRun = mockPassingContrastResult();
 
     await recordContrastResult({ ...passingRun, tag });
     const rerun = await recordContrastResult(passingRun);
@@ -90,8 +93,8 @@ describe(recordContrastResult, () => {
   });
 
   it('keeps each SHA on its own row', async () => {
-    await recordContrastResult(mockContrastResult());
-    await recordContrastResult(mockPassingContrastResult());
+    await recordContrastResult(failingRun);
+    await recordContrastResult(passingRun);
 
     expect(await db().select().from(schema.findings)).toHaveLength(2);
   });

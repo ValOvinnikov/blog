@@ -1,5 +1,6 @@
 import { TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_TENANT_VALUES } from '@blog/db/testing/tenants/fixtures';
 
@@ -11,15 +12,23 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+async function insertTenant(
+  overrides: Parameters<typeof insertTestTenant>[1] = {},
+) {
+  await insertTestTenant(db(), {
+    ...MOCK_TENANT_VALUES,
+    status: TENANT_STATUS.ACTIVE,
+    ...overrides,
+  });
+}
+
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
 describe(listActiveTenants, () => {
   it('includes an ACTIVE, non-deprovisioned tenant', async () => {
-    await db()
-      .insert(schema.tenants)
-      .values({ ...MOCK_TENANT_VALUES, status: TENANT_STATUS.ACTIVE });
+    await insertTenant();
 
     const result = await listActiveTenants();
 
@@ -36,9 +45,7 @@ describe(listActiveTenants, () => {
       { status: TENANT_STATUS.ACTIVE, deprovisionedAt: new Date() },
     ],
   ])('excludes %s', async (_description, overrides) => {
-    await db()
-      .insert(schema.tenants)
-      .values({ ...MOCK_TENANT_VALUES, ...overrides });
+    await insertTenant(overrides);
 
     const result = await listActiveTenants();
 

@@ -1,6 +1,7 @@
 import { ERROR_CODE, SANITY_LOGIN_PROVIDER } from '@blog/config/constants';
 import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import { getTenantOwnerAccess } from '@blog/db/queries/tenants/get-tenant-owner-access';
+import type { TTenantOwnerAccess } from '@blog/db/queries/tenants/tenant-owner-access';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -64,38 +65,40 @@ describe(setTenantOwnerAccess, () => {
     });
   });
 
-  it('clears a field set to null', async () => {
-    const ownerAccess = mockTenantOwnerAccess();
-    const { id } = await insertTestTenant(
-      db(),
-      toTenantOwnerAccessColumns(ownerAccess),
-    );
-    const { sanityInviteId } = mockTenantOwnerAccess();
+  describe('a tenant with owner access stored', () => {
+    let ownerAccess: TTenantOwnerAccess;
+    let id: string;
 
-    await setTenantOwnerAccess(id, {
-      sanityInviteId,
-      inviteAcceptedAt: null,
-      siteReadySentAt: null,
+    beforeEach(async () => {
+      ownerAccess = mockTenantOwnerAccess();
+      ({ id } = await insertTestTenant(
+        db(),
+        toTenantOwnerAccessColumns(ownerAccess),
+      ));
     });
 
-    expect(await getTenantOwnerAccess(id)).toEqual({
-      ...ownerAccess,
-      sanityInviteId,
-      inviteAcceptedAt: undefined,
-      siteReadySentAt: undefined,
+    it('clears a field set to null', async () => {
+      const { sanityInviteId } = mockTenantOwnerAccess();
+
+      await setTenantOwnerAccess(id, {
+        sanityInviteId,
+        inviteAcceptedAt: null,
+        siteReadySentAt: null,
+      });
+
+      expect(await getTenantOwnerAccess(id)).toEqual({
+        ...ownerAccess,
+        sanityInviteId,
+        inviteAcceptedAt: undefined,
+        siteReadySentAt: undefined,
+      });
     });
-  });
 
-  it('leaves every owner access field untouched given an empty input', async () => {
-    const ownerAccess = mockTenantOwnerAccess();
-    const { id } = await insertTestTenant(
-      db(),
-      toTenantOwnerAccessColumns(ownerAccess),
-    );
-
-    expect(await setTenantOwnerAccess(id, {})).toEqual({
-      ok: true,
-      data: ownerAccess,
+    it('leaves every owner access field untouched given an empty input', async () => {
+      expect(await setTenantOwnerAccess(id, {})).toEqual({
+        ok: true,
+        data: ownerAccess,
+      });
     });
   });
 
