@@ -8,7 +8,7 @@ import { Textarea } from '@blog/ui/components/atoms/textarea';
 import { ContactFormField } from '@web/modules/contact-form/components/contact-form-field/contact-form-field';
 import { ContactFormSuccess } from '@web/modules/contact-form/components/contact-form-success/contact-form-success';
 import {
-  type TContactFormLocales,
+  type TUseContactFormProps,
   useContactForm,
 } from '@web/modules/contact-form/hooks/use-contact-form/use-contact-form';
 import type { TContactRefusal } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
@@ -29,7 +29,7 @@ const REFUSAL_MESSAGE_KEYS = {
   [ACTION_OUTCOME.SERVER_ERROR]: 'errorServer',
 } as const satisfies Record<TContactRefusal, string>;
 
-export type TContactFormProps = TContactFormLocales & {
+export type TContactFormProps = TUseContactFormProps & {
   successMessage: string;
   privacyNote?: ReactNode;
 };
@@ -39,6 +39,7 @@ export const ContactForm = ({
   privacyNote,
   currentLocale,
   defaultLocale,
+  submitMessage,
 }: TContactFormProps) => {
   const t = useTranslations('contactForm');
   const id = useId();
@@ -52,7 +53,7 @@ export const ContactForm = ({
     refusal,
     changeField,
     submit,
-  } = useContactForm({ currentLocale, defaultLocale });
+  } = useContactForm({ currentLocale, defaultLocale, submitMessage });
   const s = contactFormVariants();
 
   const isSent = status === FORM_STATUS.SUCCESS;
