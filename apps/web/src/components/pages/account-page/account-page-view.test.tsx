@@ -1,6 +1,6 @@
 import { ToastProvider } from '@web/context/toast-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
-import { makeAccountPageView } from '@web/testing/pages/account-page/fixtures';
+import { mockAccountPageView } from '@web/testing/pages/account-page/fixtures';
 
 import {
   AccountPageView,
@@ -14,7 +14,7 @@ vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 const setup = (overrides?: Partial<IAccountPageViewProps>) =>
   renderElement(
     <ToastProvider>
-      <AccountPageView {...makeAccountPageView(overrides)} />
+      <AccountPageView {...mockAccountPageView(overrides)} />
     </ToastProvider>,
   );
 

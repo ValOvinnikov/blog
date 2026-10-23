@@ -2,7 +2,7 @@ import { errorResult } from '@blog/utils';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { MOCK_CTA_MODULE_ID } from '@web/testing/modules/cta/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { CtaModule } from './cta-module';
 
@@ -40,7 +40,7 @@ describe(`<${CtaModule.name}/>`, () => {
   it('fetches the module with the resolved tenant Sanity context', () => {
     expect(getCtaMock).toHaveBeenCalledWith(
       MOCK_CTA_MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 });

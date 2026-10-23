@@ -2,7 +2,7 @@ import { queries } from '@blog/db';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
-import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 
 import { IdentitySection } from './identity-section';
 
@@ -27,7 +27,7 @@ const LAST_METHOD_NOTE = "Last remaining method — can't unlink";
 describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: ACCOUNT_USER,
+      user: MOCK_ACCOUNT_USER,
     });
   });
 
@@ -51,7 +51,7 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(getLinkedProvidersMock).toHaveBeenCalledWith(ACCOUNT_USER.id);
+    expect(getLinkedProvidersMock).toHaveBeenCalledWith(MOCK_ACCOUNT_USER.id);
     expect(
       screen.getByRole('heading', { level: 2, name: SECTION_HEADING }),
     ).toBeVisible();
@@ -106,7 +106,7 @@ describe(`<${IdentitySection.name}/>`, () => {
       await setup();
 
       expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
-        ACCOUNT_USER.name,
+        MOCK_ACCOUNT_USER.name,
       );
       expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
     });

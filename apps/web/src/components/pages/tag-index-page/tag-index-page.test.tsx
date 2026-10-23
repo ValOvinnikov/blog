@@ -8,14 +8,18 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_CTA_HEADING,
+  MOCK_SECOND_CTA_HEADING,
+  mockCtaModuleData,
+} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  DEFAULT_TENANT_SANITY_CONTEXT,
-  DEFAULT_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
@@ -41,13 +45,11 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.tagIndex.v1.getIndexPage);
 
 const SUPPORTING_TEXT = 'Browse every post by tag.';
-const CTA_HEADING = 'Join the list';
-const SECOND_CTA_HEADING = 'Write for us';
 const HERO_HEADING = 'Every tag we write about';
 
 const tagIndexPage: TTagIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
-  headingBlock: makeHeadingBlock({
+  headingBlock: mockHeadingBlock({
     heading: 'Tags',
     supportingText: SUPPORTING_TEXT,
   }),
@@ -71,8 +73,9 @@ describe(`<${TagIndexPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) =>
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({
-            heading: id === 'cta-1' ? CTA_HEADING : SECOND_CTA_HEADING,
+          headingBlock: mockHeadingBlock({
+            heading:
+              id === 'cta-1' ? MOCK_CTA_HEADING : MOCK_SECOND_CTA_HEADING,
           }),
         }),
       ),
@@ -106,7 +109,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
 
     it('redirects to / when this language has no tag index page', async () => {
       vi.mocked(getRequestContext).mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         locale: LOCALE_ISO_CODES.NL,
         liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       });
@@ -126,9 +129,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
     });
 
     it('fetches the index page with the tenant context', () => {
-      expect(getIndexPageMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
-      );
+      expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
     });
 
     it('renders the heading and supporting text inside main', () => {
@@ -170,9 +171,11 @@ describe(`<${TagIndexPage.name}/>`, () => {
 
     const main = screen.getByRole('main');
     const regions = within(main).getAllByRole('region');
-    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    const ctaRegion = within(main).getByRole('region', {
+      name: MOCK_CTA_HEADING,
+    });
     const secondCtaRegion = within(main).getByRole('region', {
-      name: SECOND_CTA_HEADING,
+      name: MOCK_SECOND_CTA_HEADING,
     });
     expect(regions).toEqual([ctaRegion, secondCtaRegion]);
   });

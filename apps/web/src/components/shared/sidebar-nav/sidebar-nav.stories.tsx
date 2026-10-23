@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
-  mockSidebarNavBackLink,
-  mockSidebarNavContentsItems,
-  mockSidebarNavItems,
-  mockSidebarNavNestedItems,
+  MOCK_SIDEBAR_NAV_BACK_LINK,
+  MOCK_SIDEBAR_NAV_CONTENTS_ITEMS,
+  MOCK_SIDEBAR_NAV_ITEMS,
+  MOCK_SIDEBAR_NAV_LABEL,
+  MOCK_SIDEBAR_NAV_NESTED_ITEMS,
+  MOCK_SIDEBAR_NAV_PRICING_ITEM,
 } from '@web/testing/shared/sidebar-nav/fixtures';
 import { userEvent, within } from 'storybook/test';
 
@@ -15,9 +17,9 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
-    items: mockSidebarNavItems,
-    activeKey: '/modules/pricing',
-    label: 'In this section',
+    items: MOCK_SIDEBAR_NAV_ITEMS,
+    activeKey: MOCK_SIDEBAR_NAV_PRICING_ITEM.href,
+    label: MOCK_SIDEBAR_NAV_LABEL,
     ariaCurrent: 'page',
     hasRootItem: true,
   },
@@ -34,16 +36,16 @@ export const DesktopRootActive: TStory = {
 
 export const DesktopNestedSection: TStory = {
   args: {
-    items: mockSidebarNavNestedItems,
+    items: MOCK_SIDEBAR_NAV_NESTED_ITEMS,
     activeKey: '/modules/blog-hero/split-left',
     label: 'Blog hero layouts',
-    backLink: mockSidebarNavBackLink,
+    backLink: MOCK_SIDEBAR_NAV_BACK_LINK,
   },
 };
 
 export const DesktopPostContents: TStory = {
   args: {
-    items: mockSidebarNavContentsItems,
+    items: MOCK_SIDEBAR_NAV_CONTENTS_ITEMS,
     activeKey: '#configuration',
     label: 'Contents',
     ariaCurrent: 'location',
@@ -59,7 +61,7 @@ export const DesktopItemHover: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const links = canvas.getAllByRole('link', {
-      name: mockSidebarNavItems.at(0)?.label,
+      name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label,
     });
     await userEvent.hover(links.at(0)!);
   },
@@ -68,7 +70,9 @@ export const DesktopItemHover: TStory = {
 export const DesktopCurrentItemHover: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const links = canvas.getAllByRole('link', { name: 'Pricing' });
+    const links = canvas.getAllByRole('link', {
+      name: MOCK_SIDEBAR_NAV_PRICING_ITEM.label,
+    });
     await userEvent.hover(links.at(0)!);
   },
 };
@@ -82,7 +86,7 @@ export const MobileOpen: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: /In this section/ }),
+      canvas.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) }),
     );
   },
 };
@@ -113,10 +117,10 @@ export const MobileOpenItemHover: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: /In this section/ }),
+      canvas.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) }),
     );
     const links = canvas.getAllByRole('link', {
-      name: mockSidebarNavItems.at(0)?.label,
+      name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label,
     });
     await userEvent.hover(links.at(-1)!);
   },
@@ -127,10 +131,10 @@ export const MobileOpenItemFocus: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole('button', { name: /In this section/ }),
+      canvas.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) }),
     );
     const links = canvas.getAllByRole('link', {
-      name: mockSidebarNavItems.at(0)?.label,
+      name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label,
     });
     links.at(-1)!.focus();
   },

@@ -17,11 +17,12 @@ import {
   within,
 } from '@web/testing/custom-render';
 import {
-  mockPostDetail,
-  POST_DETAIL_AUTHOR_IMAGE,
+  MOCK_POST_DETAIL,
+  MOCK_POST_DETAIL_AUTHOR_IMAGE,
 } from '@web/testing/pages/blog-post-page/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -60,13 +61,13 @@ const AUTHOR_PROFILE_URL = '/blog/tag/writers';
 
 const setup = customRenderServerAsync(
   PostArticle,
-  { slug: mockPostDetail.slug },
+  { slug: MOCK_POST_DETAIL.slug },
   { wrapper: ToastProvider },
 );
 
 describe(`<${PostArticle.name}/>`, () => {
   beforeEach(() => {
-    getPostMock.mockResolvedValue(okResult(mockPostDetail));
+    getPostMock.mockResolvedValue(okResult(MOCK_POST_DETAIL));
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
     vi.mocked(useSession).mockReturnValue({
       data: { user: { id: 'user-1' }, expires: '' },
@@ -86,15 +87,15 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPostMock.mockResolvedValueOnce(errorResult(new Error('boom')));
+    getPostMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).toHaveBeenCalledWith(
-      'post_article.fetch_failed',
-      expect.objectContaining({ slug: mockPostDetail.slug }),
-    );
+    expect(logger.error).toHaveBeenCalledWith('post_article.fetch_failed', {
+      slug: MOCK_POST_DETAIL.slug,
+      error: MOCK_ERROR,
+    });
   });
 
   describe('with bookmarks enabled', () => {
@@ -104,7 +105,7 @@ describe(`<${PostArticle.name}/>`, () => {
 
     it('renders the bookmark toggle and share button in the header meta strip', async () => {
       getPostMock.mockResolvedValueOnce(
-        okResult({ ...mockPostDetail, tags: [], heroImage: undefined }),
+        okResult({ ...MOCK_POST_DETAIL, tags: [], heroImage: undefined }),
       );
 
       await setup();
@@ -126,15 +127,15 @@ describe(`<${PostArticle.name}/>`, () => {
       await waitFor(() =>
         expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
       );
-      expect(getBookmarkStatus).toHaveBeenCalledWith(mockPostDetail.id);
+      expect(getBookmarkStatus).toHaveBeenCalledWith(MOCK_POST_DETAIL.id);
     });
   });
 
   it('renders the topic eyebrow as plain text when the topic has no topic page', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
-        ...mockPostDetail,
-        topic: { ...mockPostDetail.topic, slug: undefined },
+        ...MOCK_POST_DETAIL,
+        topic: { ...MOCK_POST_DETAIL.topic, slug: undefined },
       }),
     );
 
@@ -149,9 +150,9 @@ describe(`<${PostArticle.name}/>`, () => {
   it('links the author to whatever href the service resolved', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
-        ...mockPostDetail,
+        ...MOCK_POST_DETAIL,
         author: {
-          ...mockPostDetail.author,
+          ...MOCK_POST_DETAIL.author,
           profileUrl: AUTHOR_PROFILE_URL,
         },
       }),
@@ -175,7 +176,7 @@ describe(`<${PostArticle.name}/>`, () => {
       dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
     };
     getPostMock.mockResolvedValueOnce(
-      okResult({ ...mockPostDetail, heroImage }),
+      okResult({ ...MOCK_POST_DETAIL, heroImage }),
     );
 
     await setup();
@@ -185,12 +186,15 @@ describe(`<${PostArticle.name}/>`, () => {
 
   it('renders the contents rail once the body has 3+ H2 headings', async () => {
     const body: TPortableTextBody = [
-      portableTextBlock('Getting started', { style: 'h2' }),
-      portableTextBlock('Intro.'),
-      portableTextBlock('Configuration', { style: 'h2', key: 'configuration' }),
-      portableTextBlock('Deployment', { style: 'h2' }),
+      mockPortableTextBlock('Getting started', { style: 'h2' }),
+      mockPortableTextBlock('Intro.'),
+      mockPortableTextBlock('Configuration', {
+        style: 'h2',
+        key: 'configuration',
+      }),
+      mockPortableTextBlock('Deployment', { style: 'h2' }),
     ];
-    getPostMock.mockResolvedValueOnce(okResult({ ...mockPostDetail, body }));
+    getPostMock.mockResolvedValueOnce(okResult({ ...MOCK_POST_DETAIL, body }));
 
     await setup();
 
@@ -203,7 +207,7 @@ describe(`<${PostArticle.name}/>`, () => {
   it('renders the post tags as links to routes.tag(slug)', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
-        ...mockPostDetail,
+        ...MOCK_POST_DETAIL,
         tags: [
           { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
           { id: 'tag-2', title: 'React', slug: 'react' },
@@ -226,7 +230,7 @@ describe(`<${PostArticle.name}/>`, () => {
   it('omits a tag with no tag page from the footer', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
-        ...mockPostDetail,
+        ...MOCK_POST_DETAIL,
         tags: [
           { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
           { id: 'tag-2', title: 'React', slug: undefined },
@@ -247,8 +251,8 @@ describe(`<${PostArticle.name}/>`, () => {
 
     it('fetches the post for the given slug with the tenant context', async () => {
       expect(getPostMock).toHaveBeenCalledWith(
-        mockPostDetail.slug,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_POST_DETAIL.slug,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -299,8 +303,8 @@ describe(`<${PostArticle.name}/>`, () => {
 
     it('builds the author avatar at a fixed 64x64 crop, not the full-size asset', async () => {
       const expectedAvatarUrl = urlForSanityImage(
-        POST_DETAIL_AUTHOR_IMAGE,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_POST_DETAIL_AUTHOR_IMAGE,
+        MOCK_TENANT_SANITY_CONTEXT,
         { width: 64, height: 64, fit: 'crop', quality: 75 },
       );
 

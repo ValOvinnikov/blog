@@ -1,9 +1,9 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeBookmarksPageView } from '@web/testing/pages/bookmarks-page/fixtures';
+import { mockBookmarksPageView } from '@web/testing/pages/bookmarks-page/fixtures';
 
 import { BookmarksPageView } from './bookmarks-page-view';
 
-const setup = customRender(BookmarksPageView, makeBookmarksPageView());
+const setup = customRender(BookmarksPageView, mockBookmarksPageView());
 
 describe(`<${BookmarksPageView.name}/>`, () => {
   describe('with default props', () => {

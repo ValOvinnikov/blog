@@ -2,7 +2,11 @@ import { SITE_MESSAGES } from '@blog/config';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { render, screen } from '@web/testing/custom-render';
 import { AppProviders } from '@web/testing/providers';
-import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import {
+  MOCK_VOICE_LINK_HREF,
+  MOCK_VOICE_LINK_TEXT,
+  mockFormattedVoiceRich,
+} from '@web/testing/shared/voice/fixtures';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 
 import { LocaleNotFoundPage } from './locale-not-found-page';
@@ -13,10 +17,7 @@ describe(`<${LocaleNotFoundPage.name}/>`, () => {
       <VoiceRichProvider
         values={{
           ...resolveVoiceRichFields({}, SITE_MESSAGES),
-          notFoundSupportingText: makeFormattedVoiceRich({
-            linkText: 'search the archive',
-            href: '/blog',
-          }),
+          notFoundSupportingText: mockFormattedVoiceRich(),
         }}
       >
         <LocaleNotFoundPage />
@@ -24,11 +25,13 @@ describe(`<${LocaleNotFoundPage.name}/>`, () => {
       { wrapper: AppProviders },
     );
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Page not found' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'search the archive' }),
-    ).toHaveAttribute('href', '/blog');
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Page not found',
+    });
+    const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
+
+    expect(heading).toBeVisible();
+    expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
   });
 });

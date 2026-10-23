@@ -1,6 +1,6 @@
 import type { ISanityImage } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
 
 import { renderPostLeadImage } from './render-post-lead-image';
 
@@ -16,11 +16,11 @@ const sanityImage: ISanityImage = {
 const RenderPostLeadImageHarness = ({
   post,
 }: {
-  post: ReturnType<typeof makePostCard>;
+  post: ReturnType<typeof mockPostCard>;
 }) => <>{renderPostLeadImage(post)}</>;
 
 const setup = customRender(RenderPostLeadImageHarness, {
-  post: makePostCard({ heroImage: sanityImage }),
+  post: mockPostCard({ heroImage: sanityImage }),
 });
 
 describe('renderPostLeadImage', () => {
@@ -40,7 +40,7 @@ describe('renderPostLeadImage', () => {
   });
 
   it('renders nothing for a post with no hero image', () => {
-    setup({ post: makePostCard({ heroImage: undefined }) });
+    setup({ post: mockPostCard({ heroImage: undefined }) });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });

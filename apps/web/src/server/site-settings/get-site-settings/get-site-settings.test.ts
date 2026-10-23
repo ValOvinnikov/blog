@@ -1,5 +1,5 @@
 import { okResult } from '@blog/utils';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getSiteSettings } from './get-site-settings';
 
@@ -26,7 +26,7 @@ describe(getSiteSettings, () => {
     await getSiteSettings();
 
     expect(getSiteSettingsMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

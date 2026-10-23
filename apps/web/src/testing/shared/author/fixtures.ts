@@ -1,6 +1,6 @@
 import type { TPostCardAuthor } from '@blog/service';
 
-export const makePostCardAuthor = (
+export const mockPostCardAuthor = (
   overrides: Partial<TPostCardAuthor> = {},
 ): TPostCardAuthor => {
   return {

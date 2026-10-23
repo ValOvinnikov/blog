@@ -9,7 +9,8 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SiteFooter } from './site-footer';
@@ -89,7 +90,7 @@ describe(SiteFooter, () => {
     getFooterMock.mockResolvedValue(
       okResult({ social: [], showRssFeed: true }),
     );
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     getTranslationsMock.mockResolvedValue(translate);
   });
 
@@ -100,7 +101,7 @@ describe(SiteFooter, () => {
 
     it('forwards the tenant Sanity context to the footer loader', async () => {
       expect(getFooterMock).toHaveBeenCalledWith(
-        DEFAULT_REQUEST_CONTEXT.sanityContext,
+        MOCK_REQUEST_CONTEXT.sanityContext,
       );
     });
 
@@ -171,9 +172,9 @@ describe(SiteFooter, () => {
     ).toBeVisible();
   });
 
-  it('shows the language switcher in the footer when its toggle is on and several languages are live', async () => {
+  it('shows the language switcher when its toggle is on and languages are live', async () => {
     getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
     getFooterMock.mockResolvedValue(
@@ -203,14 +204,14 @@ describe(SiteFooter, () => {
 
   describe('when the footer fails to load', () => {
     it('logs footer.layout_fetch_failed and renders without social links', async () => {
-      getFooterMock.mockResolvedValue(errorResult('boom'));
+      getFooterMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       await setup();
 
       expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'footer.layout_fetch_failed',
-        expect.anything(),
+        { error: MOCK_ERROR },
       );
     });
   });

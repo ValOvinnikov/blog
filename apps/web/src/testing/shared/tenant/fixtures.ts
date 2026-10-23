@@ -3,21 +3,21 @@ import type { TTenantSanityContext } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import type { TRequestContext } from '@web/server/request-context/request-context';
 
-export const DEFAULT_TENANT_ID = faker.string.uuid();
+export const MOCK_TENANT_ID = faker.string.uuid();
 
-export const DEFAULT_TENANT_BASE_URL = 'https://example.com';
+export const MOCK_TENANT_BASE_URL = 'https://example.com';
 
-export const DEFAULT_TENANT_SANITY_CONTEXT: TTenantSanityContext = {
+export const MOCK_TENANT_SANITY_CONTEXT: TTenantSanityContext = {
   projectId: 'default-tenant-project',
   dataset: 'default-tenant-dataset',
   token: 'default-tenant-token',
 };
 
-export const DEFAULT_REQUEST_CONTEXT: TRequestContext = {
-  tenantId: DEFAULT_TENANT_ID,
+export const MOCK_REQUEST_CONTEXT: TRequestContext = {
+  tenantId: MOCK_TENANT_ID,
   locale: LOCALE_ISO_CODES.EN,
-  sanityContext: DEFAULT_TENANT_SANITY_CONTEXT,
-  metadataBase: new URL(DEFAULT_TENANT_BASE_URL),
+  sanityContext: MOCK_TENANT_SANITY_CONTEXT,
+  metadataBase: new URL(MOCK_TENANT_BASE_URL),
   defaultLocale: LOCALE_ISO_CODES.EN,
   liveLocales: [LOCALE_ISO_CODES.EN],
 };

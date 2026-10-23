@@ -1,5 +1,9 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { mockPostHeadings } from '@web/testing/shared/post-table-of-contents/fixtures';
+import {
+  MOCK_CONFIGURATION_HEADING,
+  MOCK_GETTING_STARTED_HEADING,
+  MOCK_POST_HEADINGS,
+} from '@web/testing/shared/post-table-of-contents/fixtures';
 
 import { PostTableOfContents } from './post-table-of-contents';
 
@@ -13,7 +17,12 @@ vi.mock('@web/hooks/use-active-heading-id', () => ({
   useActiveHeadingId: useActiveHeadingIdMock,
 }));
 
-const setup = customRender(PostTableOfContents, { headings: mockPostHeadings });
+const ARIA_CURRENT = 'aria-current';
+const NAV_NAME = 'Contents';
+
+const setup = customRender(PostTableOfContents, {
+  headings: MOCK_POST_HEADINGS,
+});
 
 describe(`<${PostTableOfContents.name}/>`, () => {
   describe('before any heading is active', () => {
@@ -23,63 +32,71 @@ describe(`<${PostTableOfContents.name}/>`, () => {
     });
 
     it('renders a "Contents" nav landmark', () => {
-      expect(screen.getByRole('navigation', { name: 'Contents' })).toBeVisible();
+      const nav = screen.getByRole('navigation', { name: NAV_NAME });
+
+      expect(nav).toBeVisible();
     });
 
     it('renders every heading as a link to its anchor', () => {
-      mockPostHeadings.forEach((heading) => {
-        expect(
-          screen.getByRole('link', { name: heading.text }),
-        ).toHaveAttribute('href', `#${heading.key}`);
+      MOCK_POST_HEADINGS.forEach((heading) => {
+        const link = screen.getByRole('link', { name: heading.text });
+
+        expect(link).toHaveAttribute('href', `#${heading.key}`);
       });
     });
 
     it('shows the mobile selector defaulting to the first heading', () => {
-      expect(
-        screen.getByRole('button', { name: 'Contents Getting started' }),
-      ).toBeVisible();
+      const selector = screen.getByRole('button', {
+        name: `${NAV_NAME} ${MOCK_GETTING_STARTED_HEADING.text}`,
+      });
+
+      expect(selector).toBeVisible();
     });
 
     it('marks the first heading as the current location', () => {
-      expect(
-        screen.getByRole('link', { name: 'Getting started' }),
-      ).toHaveAttribute('aria-current', 'location');
-      mockPostHeadings.slice(1).forEach((heading) => {
-        expect(
-          screen.getByRole('link', { name: heading.text }),
-        ).not.toHaveAttribute('aria-current');
+      const firstLink = screen.getByRole('link', {
+        name: MOCK_GETTING_STARTED_HEADING.text,
+      });
+
+      expect(firstLink).toHaveAttribute(ARIA_CURRENT, 'location');
+      MOCK_POST_HEADINGS.slice(1).forEach((heading) => {
+        const link = screen.getByRole('link', { name: heading.text });
+
+        expect(link).not.toHaveAttribute(ARIA_CURRENT);
       });
     });
 
     it('passes the heading ids to useActiveHeadingId in document order', () => {
-      expect(useActiveHeadingIdMock).toHaveBeenCalledWith([
-        'getting-started',
-        'prerequisites',
-        'configuration',
-        'deployment',
-      ]);
+      expect(useActiveHeadingIdMock).toHaveBeenCalledWith(
+        MOCK_POST_HEADINGS.map((heading) => heading.key),
+      );
     });
   });
 
   describe('once useActiveHeadingId reports a heading', () => {
     beforeEach(() => {
-      useActiveHeadingIdMock.mockReturnValue('configuration');
+      useActiveHeadingIdMock.mockReturnValue(MOCK_CONFIGURATION_HEADING.key);
       setup();
     });
 
     it('marks that heading as the current location, and no other', () => {
-      expect(
-        screen.getByRole('link', { name: 'Configuration' }),
-      ).toHaveAttribute('aria-current', 'location');
-      expect(
-        screen.getByRole('link', { name: 'Getting started' }),
-      ).not.toHaveAttribute('aria-current');
+      const activeLink = screen.getByRole('link', {
+        name: MOCK_CONFIGURATION_HEADING.text,
+      });
+      const firstLink = screen.getByRole('link', {
+        name: MOCK_GETTING_STARTED_HEADING.text,
+      });
+
+      expect(activeLink).toHaveAttribute(ARIA_CURRENT, 'location');
+      expect(firstLink).not.toHaveAttribute(ARIA_CURRENT);
     });
 
     it('shows that heading in the mobile selector', () => {
-      expect(
-        screen.getByRole('button', { name: 'Contents Configuration' }),
-      ).toBeVisible();
+      const selector = screen.getByRole('button', {
+        name: `${NAV_NAME} ${MOCK_CONFIGURATION_HEADING.text}`,
+      });
+
+      expect(selector).toBeVisible();
     });
   });
 });

@@ -1,20 +1,29 @@
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
-import { mockSidebarNavItems } from '@web/testing/shared/sidebar-nav/fixtures';
+import {
+  MOCK_SIDEBAR_NAV_ITEMS,
+  MOCK_SIDEBAR_NAV_LABEL,
+  MOCK_SIDEBAR_NAV_PRICING_ITEM,
+} from '@web/testing/shared/sidebar-nav/fixtures';
 
 import { SidebarNav } from './sidebar-nav';
 
 vi.mock('@web/i18n/navigation');
 
+const ARIA_CURRENT = 'aria-current';
+const ARIA_EXPANDED = 'aria-expanded';
+const ITEM_COUNT = MOCK_SIDEBAR_NAV_ITEMS.length;
+const PRICING_LABEL = MOCK_SIDEBAR_NAV_PRICING_ITEM.label;
+
 const setup = customRender(SidebarNav, {
-  items: mockSidebarNavItems,
-  activeKey: '/modules/pricing',
-  label: 'In this section',
+  items: MOCK_SIDEBAR_NAV_ITEMS,
+  activeKey: MOCK_SIDEBAR_NAV_PRICING_ITEM.href,
+  label: MOCK_SIDEBAR_NAV_LABEL,
   ariaCurrent: 'page',
 });
 
 const getMobileTrigger = () =>
-  screen.getByRole('button', { name: /In this section/ });
+  screen.getByRole('button', { name: new RegExp(MOCK_SIDEBAR_NAV_LABEL) });
 
 describe(`<${SidebarNav.name}/>`, () => {
   describe('with an active item', () => {
@@ -28,119 +37,120 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('renders a single nav landmark named by its label', () => {
-      expect(
-        screen.getAllByRole('navigation', { name: 'In this section' }),
-      ).toHaveLength(1);
+      const navs = screen.getAllByRole('navigation', {
+        name: MOCK_SIDEBAR_NAV_LABEL,
+      });
+
+      expect(navs).toHaveLength(1);
     });
 
-    it('labels the desktop list with a real heading that names the nav landmark', () => {
+    it('labels the desktop list with a heading that names the nav landmark', () => {
       const heading = screen.getByRole('heading', {
         level: 2,
-        name: 'In this section',
+        name: MOCK_SIDEBAR_NAV_LABEL,
       });
-      expect(
-        screen.getByRole('navigation', { name: 'In this section' }),
-      ).toContainElement(heading);
+      const nav = screen.getByRole('navigation', {
+        name: MOCK_SIDEBAR_NAV_LABEL,
+      });
+
+      expect(nav).toContainElement(heading);
     });
 
     it('shows the active item in the mobile selector', () => {
-      expect(
-        screen.getByRole('button', { name: 'In this section Pricing' }),
-      ).toBeVisible();
+      const selector = screen.getByRole('button', {
+        name: `${MOCK_SIDEBAR_NAV_LABEL} ${PRICING_LABEL}`,
+      });
+
+      expect(selector).toBeVisible();
     });
 
-    it('renders every item as a link to its href in the always-visible desktop list, in order', () => {
-      expect(
-        screen.getAllByRole('link').map((link) => link.getAttribute('href')),
-      ).toEqual(mockSidebarNavItems.map(({ href }) => href));
+    it('renders every item as a link to its href in the desktop list, in order', () => {
+      const hrefs = screen
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href'));
+
+      expect(hrefs).toEqual(MOCK_SIDEBAR_NAV_ITEMS.map(({ href }) => href));
     });
 
-    it('marks only the item whose href matches activeKey with the given aria-current', () => {
-      expect(screen.getByRole('link', { name: 'Pricing' })).toHaveAttribute(
-        'aria-current',
-        'page',
-      );
-      mockSidebarNavItems
-        .filter(({ label }) => label !== 'Pricing')
-        .forEach(({ label }) => {
-          expect(screen.getByRole('link', { name: label })).not.toHaveAttribute(
-            'aria-current',
-          );
-        });
+    it('marks only the item whose href matches activeKey with aria-current', () => {
+      const activeLink = screen.getByRole('link', { name: PRICING_LABEL });
+
+      expect(activeLink).toHaveAttribute(ARIA_CURRENT, 'page');
+      MOCK_SIDEBAR_NAV_ITEMS.filter(
+        ({ label }) => label !== PRICING_LABEL,
+      ).forEach(({ label }) => {
+        const link = screen.getByRole('link', { name: label });
+
+        expect(link).not.toHaveAttribute(ARIA_CURRENT);
+      });
     });
 
     it('starts with the mobile disclosure closed and its links hidden', () => {
-      expect(getMobileTrigger()).toHaveAttribute('aria-expanded', 'false');
-      expect(screen.getAllByRole('link')).toHaveLength(
-        mockSidebarNavItems.length,
-      );
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT);
     });
 
-    it('opens the mobile disclosure on trigger click, exposing its links as plain links', async () => {
-      await user.click(getMobileTrigger());
+    it('opens the mobile disclosure on trigger click, exposing plain links', async () => {
+      await user.click(trigger);
 
-      expect(getMobileTrigger()).toHaveAttribute('aria-expanded', 'true');
-      expect(screen.getAllByRole('link')).toHaveLength(
-        mockSidebarNavItems.length * 2,
-      );
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT * 2);
     });
 
     it('never puts WAI-ARIA menu roles on either copy of the list', async () => {
-      await user.click(getMobileTrigger());
+      await user.click(trigger);
 
-      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-      expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
+      const menu = screen.queryByRole('menu');
+      const menuItem = screen.queryByRole('menuitem');
+
+      expect(menu).not.toBeInTheDocument();
+      expect(menuItem).not.toBeInTheDocument();
     });
 
-    it('lets Tab move through the open mobile disclosure and out, without trapping focus', async () => {
-      await user.click(getMobileTrigger());
+    it('lets Tab leave the open mobile disclosure without trapping focus', async () => {
+      await user.click(trigger);
 
       const lastLinkInPanel = screen
-        .getAllByRole('link', { name: mockSidebarNavItems.at(-1)?.label })
+        .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(-1)?.label })
         .at(-1);
+      const firstDesktopLink = screen
+        .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label })
+        .at(0);
       lastLinkInPanel?.focus();
 
       await user.tab();
 
       expect(lastLinkInPanel).not.toHaveFocus();
-      expect(
-        screen
-          .getAllByRole('link', { name: mockSidebarNavItems.at(0)?.label })
-          .at(0),
-      ).not.toHaveFocus();
+      expect(firstDesktopLink).not.toHaveFocus();
     });
 
     it('closes the mobile disclosure on Escape', async () => {
       await user.click(trigger);
       fireEvent.keyDown(document, { key: 'Escape' });
 
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
-      expect(screen.getAllByRole('link')).toHaveLength(
-        mockSidebarNavItems.length,
-      );
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT);
     });
 
     it('closes the mobile disclosure on an outside click', async () => {
       await user.click(trigger);
       fireEvent.mouseDown(document.body);
 
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
-      expect(screen.getAllByRole('link')).toHaveLength(
-        mockSidebarNavItems.length,
-      );
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT);
     });
 
     it('closes the mobile disclosure when one of its links is clicked', async () => {
       await user.click(trigger);
       const panelLink = screen
-        .getAllByRole('link', { name: mockSidebarNavItems.at(0)?.label })
+        .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label })
         .at(-1)!;
       await user.click(panelLink);
 
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
-      expect(
-        screen.getAllByRole('list', { hidden: true }).at(-1),
-      ).not.toBeVisible();
+      const panelList = screen.getAllByRole('list', { hidden: true }).at(-1);
+
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(panelList).not.toBeVisible();
     });
   });
 
@@ -150,10 +160,9 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('marks the active item with aria-current="location"', () => {
-      expect(screen.getByRole('link', { name: 'Pricing' })).toHaveAttribute(
-        'aria-current',
-        'location',
-      );
+      const activeLink = screen.getByRole('link', { name: PRICING_LABEL });
+
+      expect(activeLink).toHaveAttribute(ARIA_CURRENT, 'location');
     });
   });
 
@@ -164,7 +173,7 @@ describe(`<${SidebarNav.name}/>`, () => {
 
     it('marks no item current', () => {
       screen.getAllByRole('link').forEach((link) => {
-        expect(link).not.toHaveAttribute('aria-current');
+        expect(link).not.toHaveAttribute(ARIA_CURRENT);
       });
     });
   });

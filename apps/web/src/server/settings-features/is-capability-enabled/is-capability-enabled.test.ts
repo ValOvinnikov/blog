@@ -7,8 +7,8 @@ import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_ID,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
 
 import {
@@ -125,15 +125,13 @@ describe(isCapabilityEnabled, () => {
   it("reads both entitlements for the request context's tenant", async () => {
     await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
 
-    expect(getTenantPlan).toHaveBeenCalledWith(DEFAULT_TENANT_ID);
-    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
-    );
+    expect(getTenantPlan).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('reads the unresolved-tenant placeholder, never undefined, when the request has no tenant', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       tenantId: undefined,
     });
 

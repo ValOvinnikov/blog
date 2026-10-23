@@ -1,26 +1,34 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildBreadcrumbListSchema } from './build-breadcrumb-list-schema';
 
+const HOME_LABEL = 'Home';
+const TOPIC_LABEL = 'Engineering';
+const POST_LABEL = 'Hello World';
+const TOPIC_HREF = '/topics/engineering';
+const POST_HREF = '/blog/hello-world';
+const BASE_URL = 'https://example.com';
+const BLOG_BASE_URL = 'https://blog.example.com';
+
 const trail: IBreadcrumbItem[] = [
-  { label: 'Home', href: '/' },
-  { label: 'Engineering', href: '/topics/engineering' },
-  { label: 'Hello World', href: '/blog/hello-world' },
+  { label: HOME_LABEL, href: '/' },
+  { label: TOPIC_LABEL, href: TOPIC_HREF },
+  { label: POST_LABEL, href: POST_HREF },
 ];
 
 vi.mock('@web/server/request-context/request-context');
 
-const mockContext = (overrides: Partial<typeof DEFAULT_REQUEST_CONTEXT>) =>
+const mockContext = (overrides: Partial<typeof MOCK_REQUEST_CONTEXT>) =>
   vi
     .mocked(getRequestContext)
-    .mockResolvedValue({ ...DEFAULT_REQUEST_CONTEXT, ...overrides });
+    .mockResolvedValue({ ...MOCK_REQUEST_CONTEXT, ...overrides });
 
 describe(buildBreadcrumbListSchema, () => {
   beforeEach(() => {
-    mockContext({ metadataBase: new URL('https://example.com') });
+    mockContext({ metadataBase: new URL(BASE_URL) });
   });
 
   it('builds a BreadcrumbList schema from the trail', async () => {
@@ -33,20 +41,20 @@ describe(buildBreadcrumbListSchema, () => {
         {
           '@type': 'ListItem',
           position: 1,
-          name: 'Home',
-          item: 'https://example.com/',
+          name: HOME_LABEL,
+          item: `${BASE_URL}/`,
         },
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'Engineering',
-          item: 'https://example.com/topics/engineering',
+          name: TOPIC_LABEL,
+          item: `${BASE_URL}${TOPIC_HREF}`,
         },
         {
           '@type': 'ListItem',
           position: 3,
-          name: 'Hello World',
-          item: 'https://example.com/blog/hello-world',
+          name: POST_LABEL,
+          item: `${BASE_URL}${POST_HREF}`,
         },
       ],
     });
@@ -61,13 +69,13 @@ describe(buildBreadcrumbListSchema, () => {
   });
 
   it('builds absolute item URLs from the base URL and each item href', async () => {
-    mockContext({ metadataBase: new URL('https://blog.example.com') });
+    mockContext({ metadataBase: new URL(BLOG_BASE_URL) });
     const schema = await buildBreadcrumbListSchema(trail);
 
     expect(schema?.itemListElement.map((item) => item.item)).toEqual([
-      'https://blog.example.com/',
-      'https://blog.example.com/topics/engineering',
-      'https://blog.example.com/blog/hello-world',
+      `${BLOG_BASE_URL}/`,
+      `${BLOG_BASE_URL}${TOPIC_HREF}`,
+      `${BLOG_BASE_URL}${POST_HREF}`,
     ]);
   });
 
@@ -84,9 +92,9 @@ describe(buildBreadcrumbListSchema, () => {
     const schema = await buildBreadcrumbListSchema(trail);
 
     expect(schema?.itemListElement.map((item) => item.item)).toEqual([
-      'https://example.com/nl',
-      'https://example.com/nl/topics/engineering',
-      'https://example.com/nl/blog/hello-world',
+      `${BASE_URL}/nl`,
+      `${BASE_URL}/nl${TOPIC_HREF}`,
+      `${BASE_URL}/nl${POST_HREF}`,
     ]);
   });
 
@@ -99,9 +107,9 @@ describe(buildBreadcrumbListSchema, () => {
     const schema = await buildBreadcrumbListSchema(trail);
 
     expect(schema?.itemListElement.map((item) => item.item)).toEqual([
-      'https://example.com/',
-      'https://example.com/topics/engineering',
-      'https://example.com/blog/hello-world',
+      `${BASE_URL}/`,
+      `${BASE_URL}${TOPIC_HREF}`,
+      `${BASE_URL}${POST_HREF}`,
     ]);
   });
 });

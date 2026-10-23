@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 
 import { buildNotFoundMetadata } from './build-not-found-metadata';
@@ -44,7 +44,7 @@ describe(buildNotFoundMetadata, () => {
     );
 
     const metadata = await buildNotFoundMetadata({
-      tenant: DEFAULT_TENANT_ID,
+      tenant: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.EN,
     });
 
@@ -55,7 +55,7 @@ describe(buildNotFoundMetadata, () => {
     expect(resolveTenantMessages).toHaveBeenCalledWith(
       SITE_MESSAGES_BY_LOCALE.EN,
       LOCALE_ISO_CODES.EN,
-      DEFAULT_TENANT_ID,
+      MOCK_TENANT_ID,
     );
   });
 
@@ -65,7 +65,7 @@ describe(buildNotFoundMetadata, () => {
     );
 
     const metadata = await buildNotFoundMetadata({
-      tenant: DEFAULT_TENANT_ID,
+      tenant: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
     });
 
@@ -76,7 +76,7 @@ describe(buildNotFoundMetadata, () => {
     expect(resolveTenantMessages).toHaveBeenCalledWith(
       SITE_MESSAGES_BY_LOCALE.NL,
       LOCALE_ISO_CODES.NL,
-      DEFAULT_TENANT_ID,
+      MOCK_TENANT_ID,
     );
   });
 });

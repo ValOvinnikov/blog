@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeAccountPageView } from '@web/testing/pages/account-page/fixtures';
+import { mockAccountPageView } from '@web/testing/pages/account-page/fixtures';
 
 import { AccountPageView } from './account-page-view';
 
@@ -7,7 +7,7 @@ const meta = {
   title: 'Pages/AccountPageView',
   component: AccountPageView,
   tags: ['autodocs'],
-  args: makeAccountPageView(),
+  args: mockAccountPageView(),
 } satisfies Meta<typeof AccountPageView>;
 
 export default meta;

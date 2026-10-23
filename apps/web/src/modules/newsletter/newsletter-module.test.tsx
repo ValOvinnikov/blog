@@ -8,7 +8,7 @@ import {
   mockNewsletterModule,
 } from '@web/testing/modules/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
 
@@ -87,7 +87,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
     it('fetches the module with the resolved tenant Sanity context', () => {
       expect(getNewsletterMock).toHaveBeenCalledWith(
         MOCK_NEWSLETTER_MODULE_ID,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 

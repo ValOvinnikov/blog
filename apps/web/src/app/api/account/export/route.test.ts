@@ -1,5 +1,5 @@
 import { HTTP_STATUS } from '@blog/config/constants';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 const { authMock, exportAccountDataMock, resolveTenantIdMock, headersMock } =
   vi.hoisted(() => ({
@@ -33,7 +33,7 @@ describe('GET /api/account/export', () => {
     authMock.mockResolvedValue({ user: { id: USER_ID } });
     exportAccountDataMock.mockReset();
     resolveTenantIdMock.mockReset();
-    resolveTenantIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+    resolveTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     headersMock.mockReset();
     headersMock.mockResolvedValue(new Headers({ host: HOST }));
     ({ GET } = await import('./route'));
@@ -70,10 +70,7 @@ describe('GET /api/account/export', () => {
     );
     expect(json.profile).toEqual(PROFILE);
     expect(json.bookmarks[0].postId).toBe('post-1');
-    expect(exportAccountDataMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
-      USER_ID,
-    );
+    expect(exportAccountDataMock).toHaveBeenCalledWith(MOCK_TENANT_ID, USER_ID);
   });
 
   it('returns 404 without querying the db when no tenant resolves', async () => {

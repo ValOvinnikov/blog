@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
-import { makePrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
+import { mockPrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
 
 import { PrivacySection } from './privacy-section';
 
@@ -12,7 +12,7 @@ vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 const setup = () =>
   renderElement(
     <ToastProvider>
-      <PrivacySection {...makePrivacySection()} />
+      <PrivacySection {...mockPrivacySection()} />
     </ToastProvider>,
   );
 

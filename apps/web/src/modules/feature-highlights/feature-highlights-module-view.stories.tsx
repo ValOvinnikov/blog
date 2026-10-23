@@ -2,8 +2,8 @@ import { BRAND_VARIANT, CONTENT_ALIGNMENT, MEDIA_ORDER } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { FeatureHighlightsModuleView } from './feature-highlights-module-view';
 
@@ -12,7 +12,7 @@ const highlights = [
     id: 'highlight-1',
     heading: 'Ship faster',
     body: [
-      portableTextBlock(
+      mockPortableTextBlock(
         'Every page ships pre-rendered, with ISR keeping content fresh.',
       ),
     ],
@@ -25,7 +25,7 @@ const highlights = [
   mockFeatureHighlightItem({
     id: 'highlight-2',
     heading: 'Built for scale',
-    body: [portableTextBlock('Multi-tenant from the ground up.')],
+    body: [mockPortableTextBlock('Multi-tenant from the ground up.')],
     action: undefined,
   }),
 ];
@@ -35,25 +35,27 @@ const sixHighlights = [
   mockFeatureHighlightItem({
     id: 'highlight-3',
     heading: 'Secure by default',
-    body: [portableTextBlock('Every tenant is isolated at the data layer.')],
+    body: [
+      mockPortableTextBlock('Every tenant is isolated at the data layer.'),
+    ],
     action: undefined,
   }),
   mockFeatureHighlightItem({
     id: 'highlight-4',
     heading: 'Observable in production',
-    body: [portableTextBlock('Structured logs, from day one.')],
+    body: [mockPortableTextBlock('Structured logs, from day one.')],
     action: undefined,
   }),
   mockFeatureHighlightItem({
     id: 'highlight-5',
     heading: 'Composable content',
-    body: [portableTextBlock('A page-builder for every landing page.')],
+    body: [mockPortableTextBlock('A page-builder for every landing page.')],
     action: undefined,
   }),
   mockFeatureHighlightItem({
     id: 'highlight-6',
     heading: 'Accessible by construction',
-    body: [portableTextBlock('Semantic HTML and real focus states.')],
+    body: [mockPortableTextBlock('Semantic HTML and real focus states.')],
     action: undefined,
   }),
 ];
@@ -79,7 +81,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Why teams choose us' }),
+    headingBlock: mockHeadingBlock({ heading: 'Why teams choose us' }),
     highlights,
     ctaButtons: [],
     mediaOrder: MEDIA_ORDER.FIRST,

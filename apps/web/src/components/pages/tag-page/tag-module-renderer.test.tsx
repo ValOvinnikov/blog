@@ -1,6 +1,10 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
@@ -81,12 +85,10 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TagModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+  headingBlock: mockHeadingBlock({ heading: 'TypeScript' }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
-
-const POST_LIST_ID = 'post-list-1';
 
 describe(`<${TagModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'TypeScript' });
@@ -95,7 +97,7 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
     setup,
     modules: [
       { id: 'cta-1', type: 'module_cta' },
-      { id: POST_LIST_ID, type: 'module_postList' },
+      { id: MOCK_POST_LIST_ID, type: 'module_postList' },
     ],
     expectedTestIds: ['stub-hero', 'stub-cta', 'stub-post-list'],
   });
@@ -114,9 +116,9 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: POST_LIST_ID, type: 'module_postList' },
+      { id: MOCK_POST_LIST_ID, type: 'module_postList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'content-1', type: 'module_content' },

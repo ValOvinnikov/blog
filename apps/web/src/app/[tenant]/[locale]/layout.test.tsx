@@ -19,8 +19,8 @@ import {
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_ID,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -70,7 +70,7 @@ const THEME_TOKENS = {
 };
 
 const makeParams = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
-  Promise.resolve({ tenant: DEFAULT_TENANT_ID, locale });
+  Promise.resolve({ tenant: MOCK_TENANT_ID, locale });
 
 const renderLayout = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
   LocaleLayout({
@@ -87,7 +87,7 @@ describe('LocaleLayout', () => {
       okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
     );
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     isProductionEnvironmentMock.mockReturnValue(true);
   });
 
@@ -136,7 +136,7 @@ describe('LocaleLayout', () => {
     it("sets metadataBase to the tenant's base URL", async () => {
       const metadata = await generateMetadata({ params: makeParams() });
 
-      expect(metadata.metadataBase).toBe(DEFAULT_REQUEST_CONTEXT.metadataBase);
+      expect(metadata.metadataBase).toBe(MOCK_REQUEST_CONTEXT.metadataBase);
     });
 
     describe('when site settings fail to load the metadata', () => {
@@ -162,7 +162,7 @@ describe('LocaleLayout', () => {
 
   it('declares the served language on the document', async () => {
     getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });
 
@@ -181,7 +181,7 @@ describe('LocaleLayout', () => {
   it('forwards the entered tenant to the theme token loader', async () => {
     await renderLayout();
 
-    expect(getThemeTokensMock).toHaveBeenCalledWith(DEFAULT_TENANT_ID);
+    expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('composes the providers around the header, page content and footer, with analytics beside them', async () => {

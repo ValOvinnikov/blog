@@ -7,7 +7,8 @@ import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SiteHeader } from './site-header';
@@ -92,7 +93,7 @@ describe(SiteHeader, () => {
     );
     getNavigationMock.mockResolvedValue(okResult({ items: [] }));
     getBrandLogoUrlMock.mockResolvedValue(undefined);
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     isReaderAccountEnabledMock.mockResolvedValue(true);
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
@@ -113,11 +114,11 @@ describe(SiteHeader, () => {
         ),
       ).toHaveAttribute('src', LOOK_LOGO_URL);
       expect(getBrandLogoUrlMock).toHaveBeenCalledWith(
-        DEFAULT_REQUEST_CONTEXT.tenantId,
+        MOCK_REQUEST_CONTEXT.tenantId,
       );
     });
 
-    it('shows the default mark when no Look logo is uploaded, even with a Studio brand logo', async () => {
+    it('shows the default mark without a Look logo, despite a Studio logo', async () => {
       getSiteSettingsMock.mockResolvedValue(
         okResult({ brand: { name: 'Blog', logo: STUDIO_LOGO } }) as never,
       );
@@ -135,7 +136,7 @@ describe(SiteHeader, () => {
   describe('with several live languages and the switcher on', () => {
     beforeEach(async () => {
       getRequestContextMock.mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       });
       getNavigationMock.mockResolvedValue(
@@ -152,7 +153,7 @@ describe(SiteHeader, () => {
       ).toBeVisible();
     });
 
-    it('puts the language pill and theme toggle in the open phone menu panel, and the account entry in its own row after them', async () => {
+    it('puts the language pill and theme toggle before the account row in the phone menu', async () => {
       await userEvent.click(
         screen.getByRole('button', { name: TOGGLE_NAVIGATION_MENU }),
       );
@@ -247,7 +248,7 @@ describe(SiteHeader, () => {
 
   it('hides the language switcher when its toggle is off', async () => {
     getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
 
@@ -303,7 +304,7 @@ describe(SiteHeader, () => {
 
     it('forwards the tenant Sanity context to the navigation loader', async () => {
       expect(getNavigationMock).toHaveBeenCalledWith(
-        DEFAULT_REQUEST_CONTEXT.sanityContext,
+        MOCK_REQUEST_CONTEXT.sanityContext,
       );
     });
 
@@ -314,14 +315,14 @@ describe(SiteHeader, () => {
 
   describe('when navigation fails to load', () => {
     it('logs navigation.layout_fetch_failed and still renders the header', async () => {
-      getNavigationMock.mockResolvedValue(errorResult('boom'));
+      getNavigationMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       await setup();
 
       expect(screen.getByRole('banner')).toBeVisible();
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'navigation.layout_fetch_failed',
-        expect.anything(),
+        { error: MOCK_ERROR },
       );
     });
   });

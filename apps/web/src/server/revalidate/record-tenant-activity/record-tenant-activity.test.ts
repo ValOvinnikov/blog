@@ -2,7 +2,7 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { TENANT_ACTIVITY_TOUCH_FAILED_EVENT } from '@web/constants/revalidate';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { recordTenantActivity } from './record-tenant-activity';
@@ -27,13 +27,11 @@ describe(recordTenantActivity, () => {
   });
 
   it("moves the tenant's last activity to the given time", async () => {
-    touchTenantActivityMock.mockResolvedValue(
-      okResult({ id: DEFAULT_TENANT_ID }),
-    );
+    touchTenantActivityMock.mockResolvedValue(okResult({ id: MOCK_TENANT_ID }));
 
-    await recordTenantActivity(DEFAULT_TENANT_ID, AT);
+    await recordTenantActivity(MOCK_TENANT_ID, AT);
 
-    expect(touchTenantActivityMock).toHaveBeenCalledWith(DEFAULT_TENANT_ID, AT);
+    expect(touchTenantActivityMock).toHaveBeenCalledWith(MOCK_TENANT_ID, AT);
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
@@ -42,12 +40,12 @@ describe(recordTenantActivity, () => {
     touchTenantActivityMock.mockRejectedValue(error);
 
     await expect(
-      recordTenantActivity(DEFAULT_TENANT_ID, AT),
+      recordTenantActivity(MOCK_TENANT_ID, AT),
     ).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
       TENANT_ACTIVITY_TOUCH_FAILED_EVENT,
-      { tenantId: DEFAULT_TENANT_ID, error },
+      { tenantId: MOCK_TENANT_ID, error },
     );
   });
 
@@ -57,12 +55,12 @@ describe(recordTenantActivity, () => {
     );
 
     await expect(
-      recordTenantActivity(DEFAULT_TENANT_ID, AT),
+      recordTenantActivity(MOCK_TENANT_ID, AT),
     ).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
       TENANT_ACTIVITY_TOUCH_FAILED_EVENT,
-      { tenantId: DEFAULT_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
+      { tenantId: MOCK_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
     );
   });
 });

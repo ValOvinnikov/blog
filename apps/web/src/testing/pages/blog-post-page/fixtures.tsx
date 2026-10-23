@@ -6,12 +6,12 @@ const POST_TITLE = 'Hello World';
 const POST_EXCERPT = 'A sufficiently long excerpt for the card.';
 const HERO_IMAGE_ALT = 'A hero image';
 
-export const POST_DETAIL_AUTHOR_IMAGE = mockSanityImage({
+export const MOCK_POST_DETAIL_AUTHOR_IMAGE = mockSanityImage({
   assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-400x400-jpg',
   alt: 'Jane Doe',
 });
 
-export const mockPostDetail: TPostDetail = {
+export const MOCK_POST_DETAIL: TPostDetail = {
   id: 'post-1',
   title: POST_TITLE,
   slug: 'hello-world',
@@ -42,7 +42,7 @@ export const mockPostDetail: TPostDetail = {
     id: 'author-1',
     name: 'Jane Doe',
     profileUrl: '/jane-doe',
-    image: POST_DETAIL_AUTHOR_IMAGE,
+    image: MOCK_POST_DETAIL_AUTHOR_IMAGE,
     role: 'Writer',
     bio: [
       {

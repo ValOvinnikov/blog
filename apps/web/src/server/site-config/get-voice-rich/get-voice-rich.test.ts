@@ -3,7 +3,7 @@ import { errorResult, okResult } from '@blog/utils';
 import { VOICE_RICH_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { getVoiceRich } from './get-voice-rich';
@@ -56,7 +56,7 @@ describe(getVoiceRich, () => {
     getSiteConfigMock.mockResolvedValue(
       okResult({
         voiceOverridesByLocale: {
-          [DEFAULT_REQUEST_CONTEXT.locale]: { blogListEmpty: override },
+          [MOCK_REQUEST_CONTEXT.locale]: { blogListEmpty: override },
         },
       }),
     );
@@ -87,7 +87,7 @@ describe(getVoiceRich, () => {
   it("returns the request language's override in a non-default language", async () => {
     const override = richTextOf('Noch keine Beiträge.');
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.DE,
     });
     getSiteConfigMock.mockResolvedValue(
@@ -108,7 +108,7 @@ describe(getVoiceRich, () => {
 
   it('returns the catalog default in a language with no override of its own', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.DE,
     });
     getSiteConfigMock.mockResolvedValue(
@@ -130,13 +130,13 @@ describe(getVoiceRich, () => {
     await getVoiceRich(FIELD_ID);
 
     expect(getSiteConfigMock).toHaveBeenCalledWith(
-      DEFAULT_REQUEST_CONTEXT.tenantId,
+      MOCK_REQUEST_CONTEXT.tenantId,
     );
   });
 
   it('reads no tenant from the request headers when the route resolved no tenant', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       tenantId: undefined,
     });
 

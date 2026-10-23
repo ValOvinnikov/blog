@@ -1,9 +1,9 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeIdentitySectionView } from '@web/testing/pages/account-page/identity-section-fixtures';
+import { mockIdentitySectionView } from '@web/testing/pages/account-page/identity-section-fixtures';
 
 import { IdentitySectionView } from './identity-section-view';
 
-const setup = customRender(IdentitySectionView, makeIdentitySectionView());
+const setup = customRender(IdentitySectionView, mockIdentitySectionView());
 
 describe(`<${IdentitySectionView.name}/>`, () => {
   describe('with default props', () => {
@@ -45,7 +45,7 @@ describe(`<${IdentitySectionView.name}/>`, () => {
 
   it('shows no linked-status label for a row that is not linked', () => {
     setup({
-      providerRows: makeIdentitySectionView().providerRows.map((row) =>
+      providerRows: mockIdentitySectionView().providerRows.map((row) =>
         row.id === 'google' ? { ...row, isLinked: false } : row,
       ),
     });
@@ -56,7 +56,7 @@ describe(`<${IdentitySectionView.name}/>`, () => {
 
   it('renders the last-method notice instead of the control when isLastMethod is true', () => {
     setup({
-      providerRows: makeIdentitySectionView().providerRows.map((row) =>
+      providerRows: mockIdentitySectionView().providerRows.map((row) =>
         row.id === 'github' ? { ...row, isLastMethod: true } : row,
       ),
     });

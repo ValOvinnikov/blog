@@ -1,6 +1,10 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
@@ -66,12 +70,10 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TagIndexModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Tags' }),
+  headingBlock: mockHeadingBlock({ heading: 'Tags' }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
-
-const TAXONOMY_LIST_ID = 'taxonomy-list-1';
 
 describe(`<${TagIndexModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'Tags' });
@@ -79,7 +81,7 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
   testHeroBeforeModules({
     setup,
     modules: [
-      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
     ],
     expectedTestIds: ['stub-hero', 'stub-taxonomy-list', 'stub-cta'],
@@ -92,14 +94,14 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'post-list-1', type: 'module_postList' },
+    unknownModule: { id: MOCK_POST_LIST_ID, type: 'module_postList' },
     description:
       'renders nothing and warns once for a module absent from the tag-index allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },

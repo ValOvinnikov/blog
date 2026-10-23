@@ -5,7 +5,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_CONTENT_MODULE_ID } from '@web/testing/modules/content/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModule } from './content-module';
 
@@ -44,7 +44,7 @@ describe(`<${ContentModule.name}/>`, () => {
 
     expect(getContentMock).toHaveBeenCalledWith(
       MOCK_CONTENT_MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

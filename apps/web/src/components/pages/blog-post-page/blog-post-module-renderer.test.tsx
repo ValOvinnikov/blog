@@ -1,6 +1,7 @@
 import type { TPagePostType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { customRender, screen } from '@web/testing/custom-render';
+import { MOCK_TAXONOMY_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';
@@ -65,7 +66,7 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
         { id: 'newsletter-1', type: 'module_newsletter' },
         { id: 'cta-1', type: 'module_cta' },
         { id: 'post-latest-1', type: 'module_postLatest' },
-        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+        { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       ],
     });
 

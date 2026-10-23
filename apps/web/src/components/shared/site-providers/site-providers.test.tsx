@@ -5,7 +5,7 @@ import {
 } from '@blog/config';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
@@ -65,7 +65,7 @@ const render = async (): Promise<{
 
 describe(SiteProviders, () => {
   beforeEach(() => {
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
     resolveTenantMessagesMock.mockImplementation((messages) =>
@@ -73,7 +73,7 @@ describe(SiteProviders, () => {
     );
   });
 
-  it('passes the messages, locale, now, and timeZone explicitly to NextIntlClientProvider', async () => {
+  it('passes messages, locale, now and timeZone to NextIntlClientProvider', async () => {
     const { intl } = await render();
 
     expect(intl.type).toBe(NextIntlClientProvider);
@@ -95,14 +95,14 @@ describe(SiteProviders, () => {
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       realMessages,
       LOCALE_ISO_CODES.EN,
-      DEFAULT_REQUEST_CONTEXT.tenantId,
+      MOCK_REQUEST_CONTEXT.tenantId,
     );
     expect(intl.props.messages).toBe(tenantMessages);
   });
 
   it("applies the tenant voice pack in another language to that language's messages", async () => {
     getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });
 
@@ -111,7 +111,7 @@ describe(SiteProviders, () => {
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       SITE_MESSAGES_BY_LOCALE.NL,
       LOCALE_ISO_CODES.NL,
-      DEFAULT_REQUEST_CONTEXT.tenantId,
+      MOCK_REQUEST_CONTEXT.tenantId,
     );
     expect(intl.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
   });

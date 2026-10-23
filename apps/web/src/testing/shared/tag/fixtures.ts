@@ -1,11 +1,11 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import type { TTagDetailPage } from '@blog/service';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 type TTagDetailPageTag = TTagDetailPage['tag'];
 
-export const makeTag = (
+export const mockTag = (
   overrides: Partial<TTagDetailPageTag> = {},
 ): TTagDetailPageTag => {
   return {
@@ -17,15 +17,15 @@ export const makeTag = (
   };
 };
 
-export const makeTagDetailPage = (
+export const mockTagDetailPage = (
   overrides: Partial<TTagDetailPage> = {},
 ): TTagDetailPage => {
-  const tag = makeTag();
+  const tag = mockTag();
 
   return {
     tag,
     headingAlignment: CONTENT_ALIGNMENT.LEFT,
-    headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+    headingBlock: mockHeadingBlock({ heading: 'TypeScript' }),
     hero: undefined,
     modules: [],
     faqs: [],

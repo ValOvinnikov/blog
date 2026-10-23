@@ -1,6 +1,7 @@
 import type { TFaqPageQuestion } from '@blog/service';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { customRender, screen } from '@web/testing/custom-render';
+import { MOCK_FAQ_PAGE_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
 
 import { FaqPageSchema } from './faq-page-schema';
 
@@ -16,7 +17,7 @@ describe(`<${FaqPageSchema.name}/>`, () => {
 
     const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(script).toHaveAttribute('type', 'application/ld+json');
-    expect(script.textContent).toContain('"@type":"FAQPage"');
+    expect(script.textContent).toContain(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
   });
 
   it('renders nothing when there are no FAQ questions', () => {

@@ -1,6 +1,7 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_TAXONOMY_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
@@ -66,12 +67,10 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TopicIndexModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Topics' }),
+  headingBlock: mockHeadingBlock({ heading: 'Topics' }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
-
-const TAXONOMY_LIST_ID = 'taxonomy-list-1';
 
 describe(`<${TopicIndexModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'Topics' });
@@ -80,7 +79,7 @@ describe(`<${TopicIndexModuleRenderer.name}/>`, () => {
     setup,
     modules: [
       { id: 'cta-1', type: 'module_cta' },
-      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
     ],
     expectedTestIds: ['stub-hero', 'stub-cta', 'stub-taxonomy-list'],
   });
@@ -99,7 +98,7 @@ describe(`<${TopicIndexModuleRenderer.name}/>`, () => {
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },

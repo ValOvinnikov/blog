@@ -3,12 +3,12 @@ import { urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
-  LANDING_PAGE_OG_IMAGE,
-  mockLandingPage,
+  MOCK_LANDING_PAGE_OG_IMAGE,
+  MOCK_LANDING_PAGE,
 } from '@web/testing/pages/landing-page/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -29,8 +29,8 @@ const NL_ABOUT_PATH = '/nl/over-ons';
 const NL_ABOUT_SLUG = 'over-ons';
 
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
-  LANDING_PAGE_OG_IMAGE,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_LANDING_PAGE_OG_IMAGE,
+  MOCK_TENANT_SANITY_CONTEXT,
 );
 
 const { EN, NL, DE } = LOCALE_ISO_CODES;
@@ -39,7 +39,7 @@ describe('buildLandingPageMetadata', () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       liveLocales: [EN, NL],
     });
   });
@@ -47,7 +47,7 @@ describe('buildLandingPageMetadata', () => {
   it('adds no languages when the only translation is the page itself', async () => {
     getLandingPageMock.mockResolvedValue(
       okResult({
-        ...mockLandingPage,
+        ...MOCK_LANDING_PAGE,
         translations: [{ language: EN, slug: 'about-us' }],
       }),
     );
@@ -60,7 +60,7 @@ describe('buildLandingPageMetadata', () => {
   it('uses the full path of a nested page for its canonical and hreflang', async () => {
     getLandingPageMock.mockResolvedValue(
       okResult({
-        ...mockLandingPage,
+        ...MOCK_LANDING_PAGE,
         path: FAQ_SLUG,
         translations: [
           { language: EN, slug: FAQ_SLUG },
@@ -80,7 +80,7 @@ describe('buildLandingPageMetadata', () => {
   it('leaves a non-live translation out of the hreflang list', async () => {
     getLandingPageMock.mockResolvedValue(
       okResult({
-        ...mockLandingPage,
+        ...MOCK_LANDING_PAGE,
         translations: [
           { language: EN, slug: 'about-us' },
           { language: NL, slug: NL_ABOUT_SLUG },
@@ -101,7 +101,7 @@ describe('buildLandingPageMetadata', () => {
   it('adds no languages when the only other translation is non-live', async () => {
     getLandingPageMock.mockResolvedValue(
       okResult({
-        ...mockLandingPage,
+        ...MOCK_LANDING_PAGE,
         translations: [
           { language: EN, slug: 'about-us' },
           { language: DE, slug: 'ueber-uns' },
@@ -116,12 +116,12 @@ describe('buildLandingPageMetadata', () => {
 
   it('omits x-default when no translation exists in the default language', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       liveLocales: [EN, NL, DE],
     });
     getLandingPageMock.mockResolvedValue(
       okResult({
-        ...mockLandingPage,
+        ...MOCK_LANDING_PAGE,
         translations: [
           { language: NL, slug: NL_ABOUT_SLUG },
           { language: DE, slug: 'ueber-uns' },
@@ -141,7 +141,7 @@ describe('buildLandingPageMetadata', () => {
     beforeEach(() => {
       getLandingPageMock.mockResolvedValue(
         okResult({
-          ...mockLandingPage,
+          ...MOCK_LANDING_PAGE,
           translations: [
             { language: EN, slug: 'about-us' },
             { language: NL, slug: NL_ABOUT_SLUG },
@@ -152,7 +152,7 @@ describe('buildLandingPageMetadata', () => {
 
     it('treats only the current language as live when the tenant has no live list', async () => {
       vi.mocked(getRequestContext).mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         liveLocales: undefined,
       });
 
@@ -186,7 +186,7 @@ describe('buildLandingPageMetadata', () => {
   describe('for a page with no translations', () => {
     beforeEach(() => {
       getLandingPageMock.mockResolvedValue(
-        okResult({ ...mockLandingPage, translations: [] }),
+        okResult({ ...MOCK_LANDING_PAGE, translations: [] }),
       );
     });
 
@@ -207,7 +207,7 @@ describe('buildLandingPageMetadata', () => {
 
   describe('for a page with the default fixture', () => {
     beforeEach(() => {
-      getLandingPageMock.mockResolvedValue(okResult(mockLandingPage));
+      getLandingPageMock.mockResolvedValue(okResult(MOCK_LANDING_PAGE));
     });
 
     it('forwards the path to getLandingPage, the loader LandingPage reads', async () => {
@@ -233,13 +233,13 @@ describe('buildLandingPageMetadata', () => {
   describe('for the Dutch translation of a page', () => {
     beforeEach(() => {
       vi.mocked(getRequestContext).mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         locale: NL,
         liveLocales: [EN, NL],
       });
       getLandingPageMock.mockResolvedValue(
         okResult({
-          ...mockLandingPage,
+          ...MOCK_LANDING_PAGE,
           slug: NL_ABOUT_SLUG,
           translations: [
             { language: EN, slug: 'about-us' },

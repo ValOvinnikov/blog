@@ -11,8 +11,8 @@ import {
   MOCK_FEATURE_LIST_ITEMS,
 } from '@web/testing/modules/feature-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureListModule } from './feature-list-module';
 
@@ -36,7 +36,7 @@ vi.mock('@web/server/request-context/request-context');
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
   ctaButtons: [],
   imageShape: CARD_IMAGE_SHAPE.WIDE,
   displayMode: DISPLAY_MODE.GRID,
@@ -66,7 +66,7 @@ describe(`<${FeatureListModule.name}/>`, () => {
     it('fetches the module by id with the tenant Sanity context', () => {
       expect(getFeatureListMock).toHaveBeenCalledWith(
         MODULE_ID,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 

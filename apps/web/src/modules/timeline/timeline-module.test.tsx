@@ -11,8 +11,8 @@ import {
   mockTimelineItem,
 } from '@web/testing/modules/timeline/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TimelineModule } from './timeline-module';
 
@@ -36,7 +36,7 @@ vi.mock('@web/server/request-context/request-context');
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_TIMELINE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_TIMELINE_HEADING }),
   markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
   orientation: TIMELINE_ORIENTATION.VERTICAL,
   itemAlignment: CONTENT_ALIGNMENT.LEFT,
@@ -63,7 +63,7 @@ describe(`<${TimelineModule.name}/>`, () => {
 
     expect(getTimelineModuleMock).toHaveBeenCalledWith(
       MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

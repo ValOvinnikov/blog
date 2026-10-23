@@ -1,6 +1,10 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   testFeatureListModule,
   testHeadingWithoutHero,
@@ -98,7 +102,7 @@ const HERO_STATEMENT_TEST_ID = 'stub-hero-statement';
 
 const setup = customRenderAsync(HomeModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
@@ -147,7 +151,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'post-list-1', type: 'module_postList' },
+    unknownModule: { id: MOCK_POST_LIST_ID, type: 'module_postList' },
     description:
       'renders nothing and warns once for a module absent from the home page allow-list',
   });
@@ -160,7 +164,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
       { id: 'content-1', type: 'module_content' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-latest-1', type: 'module_postLatest' },
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
     ],
   });

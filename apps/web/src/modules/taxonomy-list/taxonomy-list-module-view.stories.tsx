@@ -5,7 +5,7 @@ import {
   MOCK_TAGS_LIST_ITEMS,
   MOCK_TOPICS_LIST_ITEMS,
 } from '@web/testing/modules/taxonomy-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
@@ -30,7 +30,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
+    headingBlock: mockHeadingBlock({ heading: 'Browse by topic' }),
     items: MOCK_TOPICS_LIST_ITEMS,
     layout: undefined,
     contentAlignment: undefined,
@@ -50,7 +50,7 @@ export const Default: TStory = {};
 
 export const Tags: TStory = {
   args: {
-    headingBlock: makeHeadingBlock({ heading: 'Browse by tag' }),
+    headingBlock: mockHeadingBlock({ heading: 'Browse by tag' }),
     items: MOCK_TAGS_LIST_ITEMS,
     titleId: 'tag-list-title',
     dataTestId: 'taxonomy-list-module-tag-list-1',

@@ -5,8 +5,8 @@ import { errorResult, okResult } from '@blog/utils';
 import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -34,7 +34,7 @@ describe(redirectMovedLandingPage, () => {
 
   it('redirects permanently to the destination in the request language', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });
     getRedirectMock.mockResolvedValueOnce(
@@ -57,7 +57,7 @@ describe(redirectMovedLandingPage, () => {
 
   it('redirects temporarily when the redirect is temporary', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });
     getRedirectMock.mockResolvedValueOnce(
@@ -80,7 +80,7 @@ describe(redirectMovedLandingPage, () => {
 
     expect(getRedirectMock).toHaveBeenCalledWith(
       ['old', 'faq'],
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

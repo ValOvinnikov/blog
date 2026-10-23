@@ -4,7 +4,7 @@ import { TENANT_PLAN } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
-import { DEFAULT_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 import { setRequestLocale } from 'next-intl/server';
 
 import type * as TModule from './request-context';
@@ -187,7 +187,7 @@ describe('request-context', () => {
         tenantId: undefined,
         locale: LOCALE_ISO_CODES.NL,
         sanityContext: { ...PLATFORM_CONTEXT, locale: LOCALE_ISO_CODES.NL },
-        metadataBase: new URL(DEFAULT_TENANT_BASE_URL),
+        metadataBase: new URL(MOCK_TENANT_BASE_URL),
         defaultLocale: undefined,
         liveLocales: undefined,
       });
@@ -246,7 +246,7 @@ describe('request-context', () => {
         LOCALE_ISO_CODES.EN,
       );
 
-      expect(metadataBase).toEqual(new URL(DEFAULT_TENANT_BASE_URL));
+      expect(metadataBase).toEqual(new URL(MOCK_TENANT_BASE_URL));
     });
 
     it('falls back to the site URL for a deprovisioned tenant', async () => {
@@ -259,7 +259,7 @@ describe('request-context', () => {
         LOCALE_ISO_CODES.EN,
       );
 
-      expect(metadataBase).toEqual(new URL(DEFAULT_TENANT_BASE_URL));
+      expect(metadataBase).toEqual(new URL(MOCK_TENANT_BASE_URL));
     });
   });
 

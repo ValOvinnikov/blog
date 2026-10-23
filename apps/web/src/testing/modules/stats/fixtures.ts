@@ -1,6 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import type { TStatItem, TStatsModule } from '@blog/service';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const mockStatItem = (
   overrides: Partial<TStatItem> = {},
@@ -21,7 +21,7 @@ export const mockStatsModule = (
   overrides: Partial<TStatsModule> = {},
 ): TStatsModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'By the numbers' }),
+  headingBlock: mockHeadingBlock({ heading: 'By the numbers' }),
   stats: MOCK_STAT_ITEMS,
   footnote: undefined,
   ctaButtons: [],

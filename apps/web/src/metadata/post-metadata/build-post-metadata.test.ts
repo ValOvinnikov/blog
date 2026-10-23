@@ -6,8 +6,8 @@ import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -26,7 +26,7 @@ vi.mock('@web/server/request-context/request-context');
 const ogImage = mockSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   ogImage,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 );
 
 const TITLE = 'Hello World';
@@ -149,7 +149,7 @@ describe(buildPostMetadata, () => {
 
     beforeEach(() => {
       vi.mocked(getRequestContext).mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         locale: NL,
         liveLocales: [EN, NL],
       });

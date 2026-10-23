@@ -1,14 +1,14 @@
 import type { TFeatureHighlightItem } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 export const mockFeatureHighlightItem = (
   overrides: Partial<TFeatureHighlightItem> = {},
 ): TFeatureHighlightItem => ({
   id: 'highlight-1',
   heading: 'Fast by default',
-  body: [portableTextBlock('Every page ships pre-rendered.')],
+  body: [mockPortableTextBlock('Every page ships pre-rendered.')],
   image: mockSanityImage(),
   action: undefined,
   ...overrides,

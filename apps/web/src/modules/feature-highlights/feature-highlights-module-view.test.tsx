@@ -4,7 +4,7 @@ import {
   MOCK_FEATURE_HIGHLIGHTS_HEADING,
   mockFeatureHighlightItem,
 } from '@web/testing/modules/feature-highlights/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FeatureHighlightsModuleView } from './feature-highlights-module-view';
 
@@ -21,7 +21,7 @@ const dataTestId = 'feature-highlights-module-feature-highlights-1';
 
 const setup = customRender(FeatureHighlightsModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_FEATURE_HIGHLIGHTS_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_HIGHLIGHTS_HEADING }),
   highlights,
   ctaButtons: [],
   mediaOrder: MEDIA_ORDER.FIRST,

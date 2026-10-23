@@ -1,12 +1,26 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
+import {
+  mockLandingSectionNavigation,
+  MOCK_SECTION_FAQ_PATH,
+  MOCK_SECTION_FAQ_TITLE,
+  MOCK_SECTION_PRICING_PATH,
+  MOCK_SECTION_PRICING_TITLE,
+  MOCK_SECTION_ROOT_PATH,
+  MOCK_SECTION_ROOT_TITLE,
+} from '@web/testing/pages/landing-page/fixtures';
 
 import { SectionNavigation } from './section-navigation';
 
 vi.mock('@web/i18n/navigation');
 
+const ARIA_CURRENT = 'aria-current';
+const NAV_NAME = 'In this section';
+const AUTHORED_TITLE = 'Guides';
+const PARENT_TITLE = 'Library';
+const BACK_LINK_NAME = `Back to ${PARENT_TITLE}`;
+
 const setup = customRender(SectionNavigation, {
-  sectionNavigation: makeLandingSectionNavigation(),
+  sectionNavigation: mockLandingSectionNavigation(),
 });
 
 describe(`<${SectionNavigation.name}/>`, () => {
@@ -16,98 +30,118 @@ describe(`<${SectionNavigation.name}/>`, () => {
     });
 
     it('renders an "In this section" nav landmark', () => {
-      expect(
-        screen.getByRole('navigation', { name: 'In this section' }),
-      ).toBeVisible();
+      const nav = screen.getByRole('navigation', { name: NAV_NAME });
+
+      expect(nav).toBeVisible();
     });
 
     it('links the section root first, then its pages in the given order', () => {
-      expect(
-        screen
-          .getAllByRole('link')
-          .map((link) => [link.textContent, link.getAttribute('href')]),
-      ).toEqual([
-        ['Modules', '/modules'],
-        ['FAQ', '/modules/faq'],
-        ['Pricing', '/modules/pricing'],
+      const links = screen
+        .getAllByRole('link')
+        .map((link) => [link.textContent, link.getAttribute('href')]);
+
+      expect(links).toEqual([
+        [MOCK_SECTION_ROOT_TITLE, `/${MOCK_SECTION_ROOT_PATH}`],
+        [MOCK_SECTION_FAQ_TITLE, `/${MOCK_SECTION_FAQ_PATH}`],
+        [MOCK_SECTION_PRICING_TITLE, `/${MOCK_SECTION_PRICING_PATH}`],
       ]);
     });
 
     it('marks the current page with aria-current="page", and no other', () => {
-      expect(screen.getByRole('link', { name: 'FAQ' })).toHaveAttribute(
-        'aria-current',
-        'page',
-      );
-      expect(screen.getByRole('link', { name: 'Modules' })).not.toHaveAttribute(
-        'aria-current',
-      );
-      expect(screen.getByRole('link', { name: 'Pricing' })).not.toHaveAttribute(
-        'aria-current',
-      );
+      const currentLink = screen.getByRole('link', {
+        name: MOCK_SECTION_FAQ_TITLE,
+      });
+      const rootLink = screen.getByRole('link', {
+        name: MOCK_SECTION_ROOT_TITLE,
+      });
+      const pricingLink = screen.getByRole('link', {
+        name: MOCK_SECTION_PRICING_TITLE,
+      });
+
+      expect(currentLink).toHaveAttribute(ARIA_CURRENT, 'page');
+      expect(rootLink).not.toHaveAttribute(ARIA_CURRENT);
+      expect(pricingLink).not.toHaveAttribute(ARIA_CURRENT);
     });
   });
 
   describe('on the section root', () => {
     beforeEach(() => {
       setup({
-        sectionNavigation: makeLandingSectionNavigation({
-          root: { title: 'Modules', path: 'modules', isCurrent: true },
-          pages: [{ title: 'FAQ', path: 'modules/faq', isCurrent: false }],
+        sectionNavigation: mockLandingSectionNavigation({
+          root: {
+            title: MOCK_SECTION_ROOT_TITLE,
+            path: MOCK_SECTION_ROOT_PATH,
+            isCurrent: true,
+          },
+          pages: [
+            {
+              title: MOCK_SECTION_FAQ_TITLE,
+              path: MOCK_SECTION_FAQ_PATH,
+              isCurrent: false,
+            },
+          ],
         }),
       });
     });
 
     it('marks the section root as the current page', () => {
-      expect(screen.getByRole('link', { name: 'Modules' })).toHaveAttribute(
-        'aria-current',
-        'page',
-      );
+      const rootLink = screen.getByRole('link', {
+        name: MOCK_SECTION_ROOT_TITLE,
+      });
+
+      expect(rootLink).toHaveAttribute(ARIA_CURRENT, 'page');
     });
 
     it('shows the section root in the mobile selector', () => {
-      expect(
-        screen.getByRole('button', { name: 'In this section Modules' }),
-      ).toBeVisible();
+      const selector = screen.getByRole('button', {
+        name: `${NAV_NAME} ${MOCK_SECTION_ROOT_TITLE}`,
+      });
+
+      expect(selector).toBeVisible();
     });
   });
 
   describe('with an authored section title', () => {
     beforeEach(() => {
       setup({
-        sectionNavigation: makeLandingSectionNavigation({ title: 'Guides' }),
+        sectionNavigation: mockLandingSectionNavigation({
+          title: AUTHORED_TITLE,
+        }),
       });
     });
 
     it('names the nav landmark with the authored title', () => {
-      expect(screen.getByRole('navigation', { name: 'Guides' })).toBeVisible();
+      const nav = screen.getByRole('navigation', { name: AUTHORED_TITLE });
+
+      expect(nav).toBeVisible();
     });
 
     it('does not fall back to "In this section"', () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'In this section' }),
-      ).not.toBeInTheDocument();
+      const defaultNav = screen.queryByRole('navigation', { name: NAV_NAME });
+
+      expect(defaultNav).not.toBeInTheDocument();
     });
   });
 
   describe('in a section nested inside another section', () => {
     beforeEach(() => {
       setup({
-        sectionNavigation: makeLandingSectionNavigation({
-          parentSection: { title: 'Library', path: 'library' },
+        sectionNavigation: mockLandingSectionNavigation({
+          parentSection: { title: PARENT_TITLE, path: 'library' },
         }),
       });
     });
 
     it('starts with a back link to the parent section', () => {
-      expect(screen.getAllByRole('link').at(0)).toBe(
-        screen.getByRole('link', { name: 'Back to Library' }),
-      );
+      const backLink = screen.getByRole('link', { name: BACK_LINK_NAME });
+
+      expect(screen.getAllByRole('link').at(0)).toBe(backLink);
     });
 
     it("points the back link at the parent section's path", () => {
-      expect(
-        screen.getByRole('link', { name: 'Back to Library' }),
-      ).toHaveAttribute('href', '/library');
+      const backLink = screen.getByRole('link', { name: BACK_LINK_NAME });
+
+      expect(backLink).toHaveAttribute('href', '/library');
     });
   });
 
@@ -117,9 +151,9 @@ describe(`<${SectionNavigation.name}/>`, () => {
     });
 
     it('renders no back link', () => {
-      expect(
-        screen.queryByRole('link', { name: /^Back to/ }),
-      ).not.toBeInTheDocument();
+      const backLink = screen.queryByRole('link', { name: /^Back to/ });
+
+      expect(backLink).not.toBeInTheDocument();
     });
   });
 });

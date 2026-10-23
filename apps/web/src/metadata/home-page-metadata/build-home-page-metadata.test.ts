@@ -2,7 +2,7 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildHomePageMetadata } from './build-home-page-metadata';
@@ -32,7 +32,7 @@ describe('buildHomePageMetadata', () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       liveLocales: [EN, NL],
     });
   });
@@ -87,7 +87,7 @@ describe('buildHomePageMetadata', () => {
 
   it('points a non-default Home canonical at its own prefixed address', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: NL,
       liveLocales: [EN, NL],
     });

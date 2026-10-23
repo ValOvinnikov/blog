@@ -1,6 +1,6 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 
 import { PostIndexTopicChips } from './post-index-topic-chips';
 
@@ -25,7 +25,7 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
 
   it('renders the topic chip row from the fetched topics', async () => {
     getTopicsSafelyMock.mockResolvedValue([
-      makeTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
+      mockTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
     ]);
 
     await setup();
@@ -54,7 +54,7 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
 
     it('forwards the request context Sanity context to getTopicsSafely', async () => {
       expect(getTopicsSafelyMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
   });

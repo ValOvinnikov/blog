@@ -1,7 +1,7 @@
 import { ACTION_OUTCOME, ERROR_CODE, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 
@@ -44,7 +44,7 @@ describe('getBookmarkStatus', () => {
   beforeEach(() => {
     authMock.mockReset();
     getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+    getRequestTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     isBookmarkedMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
@@ -68,7 +68,7 @@ describe('getBookmarkStatus', () => {
 
     await expect(getBookmarkStatus('post-1')).resolves.toBe(true);
     expect(isBookmarkedMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
+      MOCK_TENANT_ID,
       'user-1',
       'post-1',
     );
@@ -80,7 +80,7 @@ describe('setBookmarkStatus', () => {
     authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     resolveWritableTenantMock.mockReset();
-    resolveWritableTenantMock.mockResolvedValue(okResult(DEFAULT_TENANT_ID));
+    resolveWritableTenantMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
   });
@@ -126,7 +126,7 @@ describe('setBookmarkStatus', () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(addBookmarkMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
+      MOCK_TENANT_ID,
       'user-1',
       'post-1',
     );
@@ -148,7 +148,7 @@ describe('setBookmarkStatus', () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(removeBookmarkMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
+      MOCK_TENANT_ID,
       'user-1',
       'post-1',
     );
