@@ -7,6 +7,7 @@ import {
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
+import { BREADCRUMBS_HOME_ICON_TEST_ID } from '@blog/ui/constants/breadcrumbs';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
 
@@ -42,7 +43,11 @@ export const Breadcrumbs = ({
           const isFirst = index === 0;
           const content = isFirst ? (
             <>
-              <Icon name={ICONS.HOUSE} size={SIZE.SM} />
+              <Icon
+                name={ICONS.HOUSE}
+                size={SIZE.SM}
+                dataTestId={BREADCRUMBS_HOME_ICON_TEST_ID}
+              />
               <span className={s.homeLabel()}>{label}</span>
             </>
           ) : (

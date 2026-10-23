@@ -1341,11 +1341,16 @@ and the send button is the action. Labels, the button and errors are fixed
 `CONTACT_FORM` capability is off or the tenant is not active; otherwise its
 `'use client'` `ContactForm` leaf sits in a 560px column positioned by
 `contentAlignment`, and on a sent message it is replaced by the success
-message, while an error keeps what the visitor typed. The
-`submitContactMessage` server action checks, in order, BotID, a honeypot, the
+message, while an error keeps what the visitor typed. The form posts through
+an inline Server Action in `ContactFormModule` that captures the page's
+document id (from the home or landing page's module context) and the locale
+code; Next encrypts captured values, so the browser cannot change them. That
+action calls the server-only `submitContactMessage`, which is never a
+`'use server'` export itself and checks, in order, BotID, a honeypot, the
 rate limit (5 per 10 minutes per address), the tenant and capability, and the
 fields (name 1–100 characters with line breaks folded, a valid email, message
-10–5,000), then stores a `leads` row and emails the recipient from
+10–5,000), then stores a `leads` row with the page's path, document id and
+locale code and emails the recipient from
 `getContactRecipient` with Reply-To set to the visitor. A lead whose email
 fails still answers `SUCCESS`, and the failure is logged once. The visitor is never
 emailed.

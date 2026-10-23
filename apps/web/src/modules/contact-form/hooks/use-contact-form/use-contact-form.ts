@@ -5,10 +5,10 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config';
 import { usePublicPathname } from '@web/hooks/use-public-pathname';
-import {
-  submitContactMessage,
-  type TContactRefusal,
-  type TSubmitContactResult,
+import type {
+  TContactMessageInput,
+  TContactRefusal,
+  TSubmitContactResult,
 } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import {
@@ -29,15 +29,24 @@ const SERVER_ERROR: TSubmitContactResult = {
   outcome: ACTION_OUTCOME.SERVER_ERROR,
 };
 
-export type TContactFormLocales = {
+type TContactFormLocales = {
   currentLocale: TLocaleIsoCode;
   defaultLocale: TLocaleIsoCode;
+};
+
+export type TSubmitContactMessage = (
+  input: TContactMessageInput,
+) => Promise<TSubmitContactResult>;
+
+export type TUseContactFormProps = TContactFormLocales & {
+  submitMessage: TSubmitContactMessage;
 };
 
 export const useContactForm = ({
   currentLocale,
   defaultLocale,
-}: TContactFormLocales) => {
+  submitMessage,
+}: TUseContactFormProps) => {
   const sourcePath = toLocalizedPathname({
     href: usePublicPathname(),
     locale: currentLocale,
@@ -79,7 +88,7 @@ export const useContactForm = ({
     }
 
     setStatus(FORM_STATUS.SUBMITTING);
-    const result = await submitContactMessage({
+    const result = await submitMessage({
       ...fields,
       website,
       sourcePath,

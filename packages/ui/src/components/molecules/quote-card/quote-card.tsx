@@ -6,6 +6,7 @@ import {
   type TBrandVariant,
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { QUOTE_CARD_CAPTION_TEST_ID } from '@blog/ui/constants/quote-card';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -62,7 +63,10 @@ const QuoteCardRoot = ({
       {unmatched.map((node, i) => (
         <Fragment key={i}>{node}</Fragment>
       ))}
-      <figcaption className={s.caption()}>
+      <figcaption
+        className={s.caption()}
+        data-testid={QUOTE_CARD_CAPTION_TEST_ID}
+      >
         {slots.Avatar}
         <div className={s.person()}>
           {slots.Name && cloneElement(slots.Name, { isSpotlight, tone })}
