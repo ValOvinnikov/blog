@@ -1,5 +1,9 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import {
+  customRender,
+  isInaccessible,
+  screen,
+} from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_ACTIONS,
@@ -17,7 +21,6 @@ import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const BIO_TEXT = 'Jane writes about design systems.';
 const SUPPORTING_TEXT = 'Building better products.';
-const ARIA_HIDDEN_SELECTOR = '[aria-hidden="true"]';
 
 const bio = [mockPortableTextBlock(BIO_TEXT)];
 
@@ -107,7 +110,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     expect(image).not.toBeInTheDocument();
     expect(authorInitials).toBeVisible();
     expect(headingInitials).not.toBeInTheDocument();
-    expect(avatarName.closest(ARIA_HIDDEN_SELECTOR)).toBeNull();
+    expect(isInaccessible(avatarName)).toBe(false);
   });
 
   it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.BANNER])(
@@ -130,7 +133,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     const avatarName = screen.getByText(MOCK_HERO_PROFILE_AVATAR_NAME);
     expect(image).not.toBeInTheDocument();
     expect(initials).not.toBeInTheDocument();
-    expect(avatarName.closest(ARIA_HIDDEN_SELECTOR)).toBeNull();
+    expect(isInaccessible(avatarName)).toBe(false);
   });
 
   it('renders no social list without social links', () => {
