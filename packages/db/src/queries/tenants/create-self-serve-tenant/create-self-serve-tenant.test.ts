@@ -279,7 +279,9 @@ describe(createSelfServeTenant, () => {
         OTHER_DOMAIN,
       );
 
-      expect(result).toEqual(errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT));
+      expect(result).toEqual(
+        errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT),
+      );
       await expectOnlyFirstSiteStored();
     });
   });
@@ -296,7 +298,9 @@ describe(createSelfServeTenant, () => {
 
         const result = await submitAs(OWNER_ID, email, OTHER_DOMAIN);
 
-        expect(result).toEqual(errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT));
+        expect(result).toEqual(
+          errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT),
+        );
         expect(await db().select().from(schema.tenants)).toHaveLength(1);
         expect(await db().select().from(schema.auditEvents)).toHaveLength(1);
       },

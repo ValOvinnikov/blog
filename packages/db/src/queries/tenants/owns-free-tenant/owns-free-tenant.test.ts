@@ -71,7 +71,11 @@ describe(ownsFreeTenant, () => {
   });
 
   it('is true when the tenant sits in an account stored under a +tag address', async () => {
-    await seedMember({}, MEMBERSHIP_ROLE.OWNER, MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL);
+    await seedMember(
+      {},
+      MEMBERSHIP_ROLE.OWNER,
+      MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
+    );
 
     expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_ONE);
   });
@@ -117,7 +121,9 @@ describe(ownsFreeTenant, () => {
   it('is false for a different person than the owner', async () => {
     await seedMember();
 
-    expect(await ownsFreeTenant(MOCK_SELF_SERVE_OTHER_EMAIL)).toEqual(OWNS_NONE);
+    expect(await ownsFreeTenant(MOCK_SELF_SERVE_OTHER_EMAIL)).toEqual(
+      OWNS_NONE,
+    );
   });
 
   it('fails with DB_INVALID_EMAIL for a value that is not an address', async () => {
