@@ -1,22 +1,18 @@
 import { AUDIT_ACTION } from '@blog/config';
-import { makeAuditEvent } from '@platform/testing/audit-events/fixtures';
+import {
+  makeAuditEvent,
+  MOCK_AUDIT_ACTOR_EMAIL,
+  MOCK_AUDIT_EVENT_AT,
+} from '@platform/testing/audit-events/fixtures';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { RecentActivityCard } from './recent-activity-card';
 
 const render = renderWithIntl;
 
-describe(RecentActivityCard, () => {
+describe(`<${RecentActivityCard.name}/>`, () => {
   afterEach(() => {
     vi.useRealTimers();
-  });
-
-  it("nests the card's title one level under the page's own h1", () => {
-    render(<RecentActivityCard events={[]} />);
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
-    ).toBeVisible();
   });
 
   it('renders recent activity events with actor email and a generic per-action label', () => {
@@ -32,14 +28,20 @@ describe(RecentActivityCard, () => {
       />,
     );
 
-    expect(screen.getByText('Settings updated')).toBeVisible();
-    expect(screen.getByText('Tenant created')).toBeVisible();
-    expect(screen.getAllByText('vo@valstack.dev')).toHaveLength(2);
-
+    const settingsUpdatedLabel = screen.getByText('Settings updated');
+    const createdLabel = screen.getByText('Tenant created');
+    const actorEmails = screen.getAllByText(MOCK_AUDIT_ACTOR_EMAIL);
     const activityTimes = screen.getAllByText('5m ago');
+
+    expect(settingsUpdatedLabel).toBeVisible();
+    expect(createdLabel).toBeVisible();
+    expect(actorEmails).toHaveLength(2);
     expect(activityTimes).toHaveLength(2);
     for (const time of activityTimes) {
-      expect(time).toHaveAttribute('dateTime', '2026-08-24T12:00:00.000Z');
+      expect(time).toHaveAttribute(
+        'dateTime',
+        MOCK_AUDIT_EVENT_AT.toISOString(),
+      );
     }
   });
 
@@ -48,12 +50,29 @@ describe(RecentActivityCard, () => {
       <RecentActivityCard events={[makeAuditEvent({ actorEmail: null })]} />,
     );
 
-    expect(screen.getByText('Deleted account')).toBeVisible();
+    const deletedAccountLabel = screen.getByText('Deleted account');
+
+    expect(deletedAccountLabel).toBeVisible();
   });
 
-  it('shows an empty state when there is no recorded activity', () => {
-    render(<RecentActivityCard events={[]} />);
+  describe('with no activity', () => {
+    beforeEach(() => {
+      render(<RecentActivityCard events={[]} />);
+    });
 
-    expect(screen.getByText('No activity recorded yet.')).toBeVisible();
+    it("nests the card's title one level under the page's own h1", () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Recent activity',
+      });
+
+      expect(heading).toBeVisible();
+    });
+
+    it('shows an empty state when there is no recorded activity', () => {
+      const emptyState = screen.getByText('No activity recorded yet.');
+
+      expect(emptyState).toBeVisible();
+    });
   });
 });

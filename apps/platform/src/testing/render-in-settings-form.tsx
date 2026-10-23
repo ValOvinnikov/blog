@@ -10,9 +10,17 @@ type TSettingsFormTestState = {
   isPending?: boolean;
 };
 
-const ARCHIVED_NOTICE_ID = 'archived-notice';
+export const ARCHIVED_NOTICE_ID = 'archived-notice';
+
+export const SAVE_CHANGES = 'Save changes';
+export const ALL_CHANGES_SAVED = 'All changes saved';
+export const UNSAVED_CHANGES = 'Unsaved changes';
+export const ONE_FIELD_NEEDS_ATTENTION = '1 field needs attention';
+export const GO_TO_THE_FIRST_ONE = 'Go to the first one';
 
 export const ARCHIVED_NOTICE_TEXT = 'This tenant is archived';
+
+export const ARCHIVED_NOTICE_DESCRIPTION = `${ARCHIVED_NOTICE_TEXT} Deprovisioned Aug 26, 2026. Everything on these pages is read-only.`;
 
 export const customRenderInSettingsForm = <P extends object>(
   Component: ComponentType<P>,
