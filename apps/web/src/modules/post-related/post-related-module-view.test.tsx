@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_POST_RELATED_HEADING } from '@web/testing/modules/post-related/fixtures';
@@ -58,6 +59,11 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
       const pagination = screen.queryByRole('navigation');
       expect(pagination).not.toBeInTheDocument();
     });
+
+    it('renders no media region when hasImages is not given', () => {
+      const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+      expect(media).not.toBeInTheDocument();
+    });
   });
 
   it('renders a media region for each item when hasImages is true', () => {
@@ -66,7 +72,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    const media = screen.getByTestId('media-card-media');
+    const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
     const image = screen.getByTestId('post-image');
     expect(media).toBeVisible();
     expect(image).toBeVisible();

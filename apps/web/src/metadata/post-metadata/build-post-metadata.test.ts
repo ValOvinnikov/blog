@@ -3,6 +3,7 @@ import { type TPostDetail, urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
@@ -135,7 +136,7 @@ describe(buildPostMetadata, () => {
     });
 
     it('returns empty metadata when the post fetch fails', async () => {
-      getPostPageMock.mockResolvedValue(errorResult(new Error('boom')));
+      getPostPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       const metadata = await buildPostMetadata(SLUG);
 

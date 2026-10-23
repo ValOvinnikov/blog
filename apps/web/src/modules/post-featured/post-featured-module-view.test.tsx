@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { MOCK_POST_FEATURED_HEADING } from '@web/testing/modules/post-featured/fixtures';
 import {
@@ -18,8 +19,6 @@ const DATA_TEST_ID = 'post-featured-module-featured-1';
 const LEAD_TEST_ID = `${DATA_TEST_ID}-lead`;
 const TAIL_TEST_ID = `${DATA_TEST_ID}-tail`;
 const TAIL_GRID_TEST_ID = `${DATA_TEST_ID}-tail-grid`;
-const MEDIA_TEST_ID = 'media-card-media';
-
 const leadPost = mockPostListItem({
   id: 'post-1',
   title: MOCK_LEAD_POST_TITLE,
@@ -80,7 +79,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     });
 
     it('renders no card media by default', () => {
-      const media = screen.queryByTestId(MEDIA_TEST_ID);
+      const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
       expect(media).not.toBeInTheDocument();
     });
 
@@ -146,7 +145,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
   it('renders the lead card media when images are enabled', () => {
     setup({ hasImages: true });
 
-    const media = screen.getByTestId(MEDIA_TEST_ID);
+    const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
     const leadImage = screen.getByTestId('lead-image');
     expect(media).toBeVisible();
     expect(leadImage).toBeVisible();

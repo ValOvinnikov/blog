@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_POST_LIST_HEADING,
@@ -63,6 +64,11 @@ describe(`<${PostListModuleView.name}/>`, () => {
       const pagination = screen.queryByRole('navigation');
       expect(pagination).not.toBeInTheDocument();
     });
+
+    it('renders no media region when hasImages is not given', () => {
+      const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+      expect(media).not.toBeInTheDocument();
+    });
   });
 
   it('renders the pager inside the section', () => {
@@ -106,7 +112,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    const media = screen.getByTestId('media-card-media');
+    const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
     const image = screen.getByTestId('post-image');
     expect(media).toBeVisible();
     expect(image).toBeVisible();

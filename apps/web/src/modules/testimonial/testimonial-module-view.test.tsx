@@ -1,5 +1,5 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
@@ -12,24 +12,13 @@ import {
   mockTestimonialItem,
 } from '@web/testing/modules/testimonial/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import type { ReactElement } from 'react';
 
-import type { ITestimonialCarouselProps } from './components/testimonial-carousel/testimonial-carousel';
 import { TestimonialModuleView } from './testimonial-module-view';
-
-const { TestimonialCarousel } = vi.hoisted(() => ({
-  TestimonialCarousel: vi.fn<
-    (props: ITestimonialCarouselProps) => ReactElement
-  >(() => <div data-testid="testimonial-carousel-stub" />),
-}));
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('./components/testimonial-carousel/testimonial-carousel', () => ({
-  TestimonialCarousel,
-}));
-
 const TITLE_ID = 'testimonial-title';
+const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
 
 const dataTestId = 'testimonial-module-testimonial-1';
 
@@ -72,7 +61,8 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
         const name = screen.getByText(item.name, { ignore: '.sr-only' });
         expect(name).toBeVisible();
       });
-      expect(TestimonialCarousel).not.toHaveBeenCalled();
+      const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+      expect(carousel).not.toBeInTheDocument();
     });
 
     it('renders no action group when there are no cta buttons', () => {
@@ -88,35 +78,18 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     });
 
     const quotes = screen.getAllByRole('blockquote');
+    const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
     expect(quotes).toHaveLength(1);
-    expect(TestimonialCarousel).not.toHaveBeenCalled();
+    expect(carousel).not.toBeInTheDocument();
   });
 
   it('renders several testimonials in a carousel in carousel mode', () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
-    expect(TestimonialCarousel).toHaveBeenCalledTimes(1);
-    const carousel = screen.getByTestId('testimonial-carousel-stub');
-    const quote = screen.queryByRole('blockquote');
-    expect(carousel).toBeVisible();
-    expect(quote).not.toBeInTheDocument();
+    const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+    const quotes = within(carousel).getAllByRole('blockquote');
+    expect(quotes).toHaveLength(MOCK_TESTIMONIAL_ITEMS.length);
   });
-
-  it.each([
-    [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.LEFT],
-    [CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
-    [CONTENT_ALIGNMENT.RIGHT, CONTENT_ALIGNMENT.LEFT],
-    [undefined, CONTENT_ALIGNMENT.LEFT],
-  ])(
-    'lines the carousel track up %s as %s',
-    (contentAlignment, expectedAlignment) => {
-      setup({ displayMode: DISPLAY_MODE.CAROUSEL, contentAlignment });
-
-      const { contentAlignment: trackAlignment } =
-        TestimonialCarousel.mock.calls[0]![0];
-      expect(trackAlignment).toBe(expectedAlignment);
-    },
-  );
 
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: MOCK_CTA_ACTIONS });

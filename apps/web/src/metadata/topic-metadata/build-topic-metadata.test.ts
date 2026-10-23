@@ -1,13 +1,15 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { urlForSanityImage } from '@blog/service';
+import { type TTopicDetailPage, urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import { makeTopicDetailPage } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildTopicMetadata } from './build-topic-metadata';
@@ -43,9 +45,9 @@ const seo = mockSeo({
   ogImage,
 });
 
-const resolveTopicPageWith = (overrides: Record<string, unknown> = {}) =>
+const resolveTopicPageWith = (overrides: Partial<TTopicDetailPage> = {}) =>
   getTopicPageMock.mockResolvedValue(
-    okResult({ topic: {}, modules: [], seo, translations: [], ...overrides }),
+    okResult(makeTopicDetailPage({ seo, ...overrides })),
   );
 
 describe(buildTopicMetadata, () => {
@@ -90,14 +92,14 @@ describe(buildTopicMetadata, () => {
 
   describe('when the topic fetch fails', () => {
     beforeEach(() => {
-      getTopicPageMock.mockResolvedValue(errorResult(new Error('boom')));
+      getTopicPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
     });
 
     it.each([
-      { slug: 'engineering', page: undefined },
-      { slug: 'missing', page: 2 },
+      { slug: 'engineering', page: undefined, scope: 'the first page' },
+      { slug: 'missing', page: 2, scope: 'page 2' },
     ])(
-      'returns empty metadata on page $page when the fetch fails',
+      'returns empty metadata on $scope when the fetch fails',
       async ({ slug, page }) => {
         const metadata = await buildTopicMetadata(slug, page);
 

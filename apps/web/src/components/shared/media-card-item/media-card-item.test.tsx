@@ -1,19 +1,14 @@
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { renderElement, screen } from '@web/testing/custom-render';
+import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 
-import { MediaCardItem, type IMediaCardData } from './media-card-item';
+import { MediaCardItem } from './media-card-item';
 
 vi.mock('@web/i18n/navigation');
 
-const item: IMediaCardData = {
-  id: 'post-1',
-  href: '/blog/hello-world',
-  title: 'Hello World',
-  excerpt: 'An excerpt.',
-  publishedAt: '2026-01-15T00:00:00.000Z',
-  formattedDate: 'January 15, 2026',
-  readingTime: '4 min',
-  topic: { title: 'Engineering' },
-};
+const item = mockPostListItem();
+const POST_IMAGE_TEST_ID = 'post-image';
+const LEAD_CARD_TEST_ID = 'lead-card';
 
 describe(`<${MediaCardItem.name}/>`, () => {
   describe('with the base item', () => {
@@ -22,63 +17,78 @@ describe(`<${MediaCardItem.name}/>`, () => {
     });
 
     it('renders the title linked via SmartLink to item.href', () => {
-      const link = screen.getByRole('link', { name: 'Hello World' });
-      expect(link).toHaveAttribute('href', '/blog/hello-world');
+      const link = screen.getByRole('link', { name: item.title });
+      expect(link).toHaveAttribute('href', item.href);
     });
 
     it('defaults to heading level 3', () => {
-      expect(
-        screen.getByRole('heading', { level: 3, name: 'Hello World' }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: item.title,
+      });
+      expect(heading).toBeVisible();
     });
 
     it('renders no media region when hasImage is omitted', () => {
-      expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+      const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+      expect(media).not.toBeInTheDocument();
     });
 
     it('renders the formatted date and reading time', () => {
-      expect(screen.getByText('January 15, 2026')).toBeVisible();
-      expect(screen.getByText(/4 min/)).toBeVisible();
+      const date = screen.getByText(item.formattedDate);
+      const readingTime = screen.getByText(item.readingTime ?? '', {
+        exact: false,
+      });
+      expect(date).toBeVisible();
+      expect(readingTime).toBeVisible();
     });
 
     it('renders the topic in the footer', () => {
-      expect(screen.getByText(/engineering/)).toBeVisible();
+      const topic = screen.getByText(item.topic.title, { exact: false });
+      expect(topic).toBeVisible();
     });
 
     it('renders no dataTestId on the underlying MediaCard when omitted', () => {
-      expect(screen.getByRole('article')).not.toHaveAttribute('data-testid');
+      const article = screen.getByRole('article');
+      expect(article).not.toHaveAttribute('data-testid');
     });
   });
 
   it('renders the title at the given headingLevel', () => {
     renderElement(<MediaCardItem item={item} headingLevel={2} />);
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Hello World' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: item.title,
+    });
+    expect(heading).toBeVisible();
   });
 
   it('renders the pre-rendered image node inside MediaCard.Media when hasImage is true', () => {
     renderElement(
       <MediaCardItem
-        item={{ ...item, image: <div data-testid="post-image" /> }}
+        item={{ ...item, image: <div data-testid={POST_IMAGE_TEST_ID} /> }}
         hasImage={true}
       />,
     );
 
-    expect(screen.getByTestId('media-card-media')).toBeVisible();
-    expect(screen.getByTestId('post-image')).toBeVisible();
+    const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+    const image = screen.getByTestId(POST_IMAGE_TEST_ID);
+    expect(media).toBeVisible();
+    expect(image).toBeVisible();
   });
 
   it('renders no media region when hasImage is true but the item has no image', () => {
     renderElement(<MediaCardItem item={item} hasImage={true} />);
 
-    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+    const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+    expect(media).not.toBeInTheDocument();
   });
 
   it('forwards dataTestId to the underlying MediaCard', () => {
-    renderElement(<MediaCardItem item={item} dataTestId="lead-card" />);
+    renderElement(<MediaCardItem item={item} dataTestId={LEAD_CARD_TEST_ID} />);
 
-    expect(screen.getByTestId('lead-card')).toBeVisible();
+    const card = screen.getByTestId(LEAD_CARD_TEST_ID);
+    expect(card).toBeVisible();
   });
 });

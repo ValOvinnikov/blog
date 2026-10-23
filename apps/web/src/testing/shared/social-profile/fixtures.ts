@@ -2,9 +2,14 @@ import { SOCIAL_PLATFORMS } from '@blog/config';
 import type { TSocialProfile } from '@blog/service';
 import { faker } from '@faker-js/faker';
 
-export const mockSocialProfile = (
-  overrides: Partial<TSocialProfile['link']> = {},
-): TSocialProfile => ({
+type TMockSocialProfileOverrides = Partial<Omit<TSocialProfile, 'link'>> & {
+  link?: Partial<TSocialProfile['link']>;
+};
+
+export const mockSocialProfile = ({
+  link,
+  ...overrides
+}: TMockSocialProfileOverrides = {}): TSocialProfile => ({
   platform: SOCIAL_PLATFORMS.GITHUB,
   link: {
     label: faker.company.name(),
@@ -12,6 +17,7 @@ export const mockSocialProfile = (
     target: undefined,
     platform: undefined,
     ariaLabel: undefined,
-    ...overrides,
+    ...link,
   },
+  ...overrides,
 });

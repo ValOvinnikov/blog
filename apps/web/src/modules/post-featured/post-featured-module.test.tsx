@@ -1,15 +1,13 @@
-import { BRAND_VARIANT } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { MOCK_POST_FEATURED_HEADING } from '@web/testing/modules/post-featured/fixtures';
+import { mockPostFeaturedModuleData } from '@web/testing/modules/post-featured/fixtures';
 import {
   MOCK_LEAD_POST_TITLE,
   MOCK_SECOND_POST_TITLE,
   MOCK_THIRD_POST_TITLE,
 } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
@@ -39,19 +37,6 @@ const setup = customRenderAsync(PostFeaturedModule, {
   id: MODULE_ID,
 });
 
-const mockPostFeaturedResult = (
-  posts: ReturnType<typeof makePostCard>[],
-  showImages = false,
-) =>
-  okResult({
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: MOCK_POST_FEATURED_HEADING }),
-    posts,
-    layout: undefined,
-    contentAlignment: undefined,
-    showImages,
-  });
-
 describe(`<${PostFeaturedModule.name}/>`, () => {
   beforeEach(() => {
     getPostFeaturedMock.mockReset();
@@ -61,7 +46,9 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     let container: HTMLElement;
 
     beforeEach(async () => {
-      getPostFeaturedMock.mockResolvedValue(mockPostFeaturedResult([]));
+      getPostFeaturedMock.mockResolvedValue(
+        okResult(mockPostFeaturedModuleData()),
+      );
       ({ container } = await setup());
     });
 
@@ -87,11 +74,15 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
 
   it('renders the first post as a lead card and the rest in a tail grid', async () => {
     getPostFeaturedMock.mockResolvedValue(
-      mockPostFeaturedResult([
-        makePostCard({ id: 'post-1', title: MOCK_LEAD_POST_TITLE }),
-        makePostCard({ id: 'post-2', title: MOCK_SECOND_POST_TITLE }),
-        makePostCard({ id: 'post-3', title: MOCK_THIRD_POST_TITLE }),
-      ]),
+      okResult(
+        mockPostFeaturedModuleData({
+          posts: [
+            makePostCard({ id: 'post-1', title: MOCK_LEAD_POST_TITLE }),
+            makePostCard({ id: 'post-2', title: MOCK_SECOND_POST_TITLE }),
+            makePostCard({ id: 'post-3', title: MOCK_THIRD_POST_TITLE }),
+          ],
+        }),
+      ),
     );
 
     await setup();
@@ -111,20 +102,22 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
 
   it('sizes the lead image differently from the tail card images', async () => {
     getPostFeaturedMock.mockResolvedValue(
-      mockPostFeaturedResult(
-        [
-          makePostCard({
-            id: 'post-1',
-            title: MOCK_LEAD_POST_TITLE,
-            heroImage: mockSanityImage({ alt: LEAD_IMAGE_ALT }),
-          }),
-          makePostCard({
-            id: 'post-2',
-            title: MOCK_SECOND_POST_TITLE,
-            heroImage: mockSanityImage({ alt: TAIL_IMAGE_ALT }),
-          }),
-        ],
-        true,
+      okResult(
+        mockPostFeaturedModuleData({
+          posts: [
+            makePostCard({
+              id: 'post-1',
+              title: MOCK_LEAD_POST_TITLE,
+              heroImage: mockSanityImage({ alt: LEAD_IMAGE_ALT }),
+            }),
+            makePostCard({
+              id: 'post-2',
+              title: MOCK_SECOND_POST_TITLE,
+              heroImage: mockSanityImage({ alt: TAIL_IMAGE_ALT }),
+            }),
+          ],
+          showImages: true,
+        }),
       ),
     );
 
@@ -150,12 +143,16 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
 
   it('renders no post images when images are turned off', async () => {
     getPostFeaturedMock.mockResolvedValue(
-      mockPostFeaturedResult([
-        makePostCard({
-          id: 'post-1',
-          heroImage: mockSanityImage(),
+      okResult(
+        mockPostFeaturedModuleData({
+          posts: [
+            makePostCard({
+              id: 'post-1',
+              heroImage: mockSanityImage(),
+            }),
+          ],
         }),
-      ]),
+      ),
     );
 
     await setup();

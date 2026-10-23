@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import type { THeroStatementModule } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -29,7 +30,9 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const mockHeroStatementData = (overrides: Record<string, unknown> = {}) => ({
+const mockHeroStatementData = (
+  overrides: Partial<THeroStatementModule> = {},
+): THeroStatementModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,

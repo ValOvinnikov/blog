@@ -3,6 +3,7 @@ import { type TTagDetailPage, urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import {
@@ -99,14 +100,14 @@ describe(buildTagMetadata, () => {
 
   describe('when the tag fetch fails', () => {
     beforeEach(() => {
-      getTagPageMock.mockResolvedValue(errorResult(new Error('boom')));
+      getTagPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
     });
 
     it.each([
-      { slug: 'typescript', page: undefined },
-      { slug: 'missing', page: 2 },
+      { slug: 'typescript', page: undefined, scope: 'the first page' },
+      { slug: 'missing', page: 2, scope: 'page 2' },
     ])(
-      'returns empty metadata on page $page when the fetch fails',
+      'returns empty metadata on $scope when the fetch fails',
       async ({ slug, page }) => {
         const metadata = await buildTagMetadata(slug, page);
 

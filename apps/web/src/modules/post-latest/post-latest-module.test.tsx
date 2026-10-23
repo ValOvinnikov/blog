@@ -1,9 +1,8 @@
-import { BRAND_VARIANT } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockPostLatestModuleData } from '@web/testing/modules/post-latest/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
@@ -28,15 +27,6 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const mockPostLatestData = (overrides: Record<string, unknown> = {}) => ({
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock(),
-  posts: [],
-  layout: undefined,
-  contentAlignment: undefined,
-  ...overrides,
-});
-
 const setup = customRenderAsync(PostLatestModule, {
   id: MODULE_ID,
 });
@@ -44,7 +34,7 @@ const setup = customRenderAsync(PostLatestModule, {
 describe(`<${PostLatestModule.name}/>`, () => {
   beforeEach(() => {
     getPostLatestMock.mockReset();
-    getPostLatestMock.mockResolvedValue(okResult(mockPostLatestData()));
+    getPostLatestMock.mockResolvedValue(okResult(mockPostLatestModuleData()));
   });
 
   it('fetches the module with the resolved tenant Sanity context', async () => {
@@ -72,7 +62,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
   it('renders the resolved posts and no pagination nav', async () => {
     getPostLatestMock.mockResolvedValue(
-      okResult(mockPostLatestData({ posts: [POST] })),
+      okResult(mockPostLatestModuleData({ posts: [POST] })),
     );
 
     await setup();
@@ -87,7 +77,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
     const sanityImage = mockSanityImage();
     getPostLatestMock.mockResolvedValue(
       okResult(
-        mockPostLatestData({
+        mockPostLatestModuleData({
           posts: [makePostCard({ heroImage: sanityImage })],
           showImages: true,
         }),
@@ -103,7 +93,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
   it('renders no post images when showImages is false', async () => {
     getPostLatestMock.mockResolvedValue(
       okResult(
-        mockPostLatestData({
+        mockPostLatestModuleData({
           posts: [makePostCard({ heroImage: mockSanityImage() })],
           showImages: false,
         }),

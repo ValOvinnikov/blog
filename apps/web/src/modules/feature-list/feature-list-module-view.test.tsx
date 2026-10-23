@@ -4,7 +4,7 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
@@ -16,24 +16,13 @@ import {
   MOCK_FEATURE_LIST_ITEMS,
 } from '@web/testing/modules/feature-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import type { ReactElement } from 'react';
 
-import type { IFeatureListCarouselProps } from './components/feature-list-carousel/feature-list-carousel';
 import { FeatureListModuleView } from './feature-list-module-view';
-
-const { FeatureListCarousel } = vi.hoisted(() => ({
-  FeatureListCarousel: vi.fn<
-    (props: IFeatureListCarouselProps) => ReactElement
-  >(() => <div data-testid="feature-list-carousel-stub" />),
-}));
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('./components/feature-list-carousel/feature-list-carousel', () => ({
-  FeatureListCarousel,
-}));
-
 const TITLE_ID = 'feature-list-title';
+const CAROUSEL_LABEL = `${MOCK_FEATURE_LIST_HEADING} carousel`;
 
 const dataTestId = 'feature-list-module-feature-list-1';
 
@@ -96,16 +85,15 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     (displayMode, expectedCarousel) => {
       setup({ displayMode });
 
-      expect(FeatureListCarousel).toHaveBeenCalledTimes(
-        expectedCarousel ? 1 : 0,
-      );
       if (expectedCarousel) {
-        const carousel = screen.getByTestId('feature-list-carousel-stub');
-        const article = screen.queryByRole('article');
-        const { items } = FeatureListCarousel.mock.calls[0]![0];
-        expect(carousel).toBeVisible();
-        expect(items).toEqual(MOCK_FEATURE_LIST_ITEMS);
-        expect(article).not.toBeInTheDocument();
+        const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+        const articles = within(carousel).getAllByRole('article');
+        expect(articles).toHaveLength(MOCK_FEATURE_LIST_ITEMS.length);
+      } else {
+        const carousel = screen.queryByRole('region', {
+          name: CAROUSEL_LABEL,
+        });
+        expect(carousel).not.toBeInTheDocument();
       }
     },
   );

@@ -21,15 +21,31 @@ export const mockPostListItem = (
   };
 };
 
-export const mockPostListModuleData = (
-  overrides: Partial<TPostListModule> = {},
-): TPostListModule => ({
+type TPostModuleBase = Pick<
+  TPostListModule,
+  | 'brandVariant'
+  | 'headingBlock'
+  | 'posts'
+  | 'layout'
+  | 'contentAlignment'
+  | 'showImages'
+>;
+
+export const mockPostModuleBase = (
+  heading: string = MOCK_POST_LIST_HEADING,
+): TPostModuleBase => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
+  headingBlock: makeHeadingBlock({ heading }),
   posts: [],
   layout: undefined,
   contentAlignment: undefined,
   showImages: false,
+});
+
+export const mockPostListModuleData = (
+  overrides: Partial<TPostListModule> = {},
+): TPostListModule => ({
+  ...mockPostModuleBase(),
   currentPage: 1,
   totalPages: 1,
   ...overrides,

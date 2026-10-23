@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
+import type { THeroProfileModule } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -15,7 +16,7 @@ import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtur
 import { HeroProfileModule } from './hero-profile-module';
 
 const HEADLINE = "Hi, I'm Jane";
-const GITHUB_PROFILE = mockSocialProfile({ target: '_blank' });
+const GITHUB_PROFILE = mockSocialProfile({ link: { target: '_blank' } });
 
 const { getHeroProfileMock } = vi.hoisted(() => ({
   getHeroProfileMock: vi.fn(),
@@ -31,12 +32,15 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const mockHeroProfileData = (overrides: Record<string, unknown> = {}) => ({
+const mockHeroProfileData = (
+  overrides: Partial<THeroProfileModule> = {},
+): THeroProfileModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
   headingBlock: makeHeadingBlock({ heading: HEADLINE }),
   avatarName: MOCK_HERO_PROFILE_AVATAR_NAME,
+  bio: undefined,
   sanityImage: undefined,
   socialLinks: [],
   ctaButtons: [],
@@ -116,5 +120,32 @@ describe(`<${HeroProfileModule.name}/>`, () => {
       `social-icon-${SOCIAL_PLATFORMS.GITHUB}`,
     );
     expect(icon).toBeVisible();
+  });
+
+  it('renders one list item per resolved social link', async () => {
+    getHeroProfileMock.mockResolvedValue(
+      okResult(
+        mockHeroProfileData({
+          socialLinks: [
+            GITHUB_PROFILE,
+            mockSocialProfile({ platform: SOCIAL_PLATFORMS.X }),
+            mockSocialProfile({ platform: SOCIAL_PLATFORMS.LINKEDIN }),
+          ],
+        }),
+      ),
+    );
+
+    await setup();
+
+    const list = screen.getByRole('list', { name: 'Profiles' });
+    const items = within(list).getAllByRole('listitem');
+    expect(items).toHaveLength(3);
+  });
+
+  it('renders no social links list when socialLinks is empty', async () => {
+    await setup();
+
+    const list = screen.queryByRole('list');
+    expect(list).not.toBeInTheDocument();
   });
 });

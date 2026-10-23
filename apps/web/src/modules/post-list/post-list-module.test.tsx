@@ -1,12 +1,9 @@
-import {
-  BRAND_VARIANT,
-  NEXT_NAVIGATION_ERROR,
-  TAXONOMY_KIND,
-} from '@blog/config';
+import { NEXT_NAVIGATION_ERROR, TAXONOMY_KIND } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
@@ -35,17 +32,6 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
-const mockPostListData = (overrides: Record<string, unknown> = {}) => ({
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-  posts: [],
-  layout: undefined,
-  contentAlignment: undefined,
-  currentPage: 1,
-  totalPages: 1,
-  ...overrides,
-});
-
 const FIRST_POST = makePostCard();
 const TAG = makeTag();
 const TAG_ARCHIVE = {
@@ -71,7 +57,7 @@ const TAG_TITLE_ID = 'tag-posts-title';
 describe(`<${PostListModule.name}/>`, () => {
   beforeEach(() => {
     getPostListMock.mockReset();
-    getPostListMock.mockResolvedValue(okResult(mockPostListData()));
+    getPostListMock.mockResolvedValue(okResult(mockPostListModuleData()));
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -91,7 +77,7 @@ describe(`<${PostListModule.name}/>`, () => {
   it('fetches the module for the requested page', async () => {
     getPostListMock.mockResolvedValue(
       okResult(
-        mockPostListData({
+        mockPostListModuleData({
           currentPage: 2,
           totalPages: 2,
         }),
@@ -134,7 +120,7 @@ describe(`<${PostListModule.name}/>`, () => {
   it('renders a translated pager with correct hrefs', async () => {
     getPostListMock.mockResolvedValue(
       okResult(
-        mockPostListData({
+        mockPostListModuleData({
           posts: [FIRST_POST],
           currentPage: 2,
           totalPages: 3,
@@ -157,7 +143,7 @@ describe(`<${PostListModule.name}/>`, () => {
   it('calls notFound() when an explicit page exceeds totalPages', async () => {
     getPostListMock.mockResolvedValue(
       okResult(
-        mockPostListData({
+        mockPostListModuleData({
           currentPage: 5,
         }),
       ),
@@ -182,7 +168,7 @@ describe(`<${PostListModule.name}/>`, () => {
     const sanityImage = mockSanityImage();
     getPostListMock.mockResolvedValue(
       okResult(
-        mockPostListData({
+        mockPostListModuleData({
           posts: [
             {
               ...FIRST_POST,
@@ -203,7 +189,7 @@ describe(`<${PostListModule.name}/>`, () => {
   it('renders no post images when showImages is false', async () => {
     getPostListMock.mockResolvedValue(
       okResult(
-        mockPostListData({
+        mockPostListModuleData({
           posts: [
             {
               ...FIRST_POST,
@@ -250,7 +236,7 @@ describe(`<${PostListModule.name}/>`, () => {
     async ({ archive, heading, titleId, navName, previousHref, nextHref }) => {
       getPostListMock.mockResolvedValue(
         okResult(
-          mockPostListData({
+          mockPostListModuleData({
             headingBlock: makeHeadingBlock({ heading }),
             posts: [FIRST_POST],
             currentPage: 2,
@@ -288,7 +274,7 @@ describe(`<${PostListModule.name}/>`, () => {
   it('derives the empty message from a tag archive', async () => {
     getPostListMock.mockResolvedValue(
       okResult(
-        mockPostListData({
+        mockPostListModuleData({
           headingBlock: makeHeadingBlock({ heading: TAG_HEADING }),
         }),
       ),
@@ -312,7 +298,7 @@ describe(`<${PostListModule.name}/>`, () => {
   it('keeps the blog-archive defaults without an archive', async () => {
     getPostListMock.mockResolvedValue(
       okResult(
-        mockPostListData({
+        mockPostListModuleData({
           headingBlock: makeHeadingBlock({ heading: 'All posts' }),
         }),
       ),

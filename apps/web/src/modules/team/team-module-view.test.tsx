@@ -4,7 +4,7 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
@@ -17,22 +17,13 @@ import {
   mockTeamMember,
 } from '@web/testing/modules/team/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import type { ReactElement } from 'react';
 
-import type { ITeamCarouselProps } from './components/team-carousel/team-carousel';
 import { TeamModuleView } from './team-module-view';
-
-const { TeamCarousel } = vi.hoisted(() => ({
-  TeamCarousel: vi.fn<(props: ITeamCarouselProps) => ReactElement>(() => (
-    <div data-testid="team-carousel-stub" />
-  )),
-}));
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('./components/team-carousel/team-carousel', () => ({ TeamCarousel }));
-
 const TITLE_ID = 'team-title';
+const CAROUSEL_LABEL = `${MOCK_TEAM_HEADING} carousel`;
 
 const dataTestId = 'team-module-team-1';
 
@@ -100,14 +91,15 @@ describe(`<${TeamModuleView.name}/>`, () => {
     (displayMode, expectedCarousel) => {
       setup({ displayMode });
 
-      expect(TeamCarousel).toHaveBeenCalledTimes(expectedCarousel ? 1 : 0);
       if (expectedCarousel) {
-        const carousel = screen.getByTestId('team-carousel-stub');
-        const article = screen.queryByRole('article');
-        const { members } = TeamCarousel.mock.calls[0]![0];
-        expect(carousel).toBeVisible();
-        expect(members).toEqual(MOCK_TEAM_MEMBERS);
-        expect(article).not.toBeInTheDocument();
+        const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+        const articles = within(carousel).getAllByRole('article');
+        expect(articles).toHaveLength(MOCK_TEAM_MEMBERS.length);
+      } else {
+        const carousel = screen.queryByRole('region', {
+          name: CAROUSEL_LABEL,
+        });
+        expect(carousel).not.toBeInTheDocument();
       }
     },
   );
@@ -122,10 +114,13 @@ describe(`<${TeamModuleView.name}/>`, () => {
         level: 3,
         name: 'Jordan Reyes',
       });
+      const carousel = screen.queryByRole('region', {
+        name: CAROUSEL_LABEL,
+      });
       const grid = screen.queryByTestId(`${dataTestId}-grid`);
       expect(spotlight).toBeVisible();
       expect(heading).toBeVisible();
-      expect(TeamCarousel).not.toHaveBeenCalled();
+      expect(carousel).not.toBeInTheDocument();
       expect(grid).not.toBeInTheDocument();
     },
   );

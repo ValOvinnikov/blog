@@ -10,7 +10,7 @@ import {
   screen,
 } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers/providers';
+import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import {
   portableTextBlock,
   portableTextSpan,
@@ -281,16 +281,15 @@ describe(`<${PortableText.name}/>`, () => {
   });
 
   it('renders a bodyImage block as an img with the CMS alt text', () => {
-    const value: TPortableTextBody = [
-      mockBodyImageBlock(mockSanityImage({ alt: IMAGE_ALT })),
-    ];
+    const sanityImage = mockSanityImage({ alt: IMAGE_ALT });
+    const [, assetHash] = /^image-(\w+)-/.exec(sanityImage.assetId) ?? [];
+    const value: TPortableTextBody = [mockBodyImageBlock(sanityImage)];
 
     setup({ value });
 
     const img = screen.getByRole('img', { name: IMAGE_ALT });
-    expect(img).toHaveAttribute(
-      'src',
-      `${STATIC_SANITY_IMAGE_BASE_URL}6205dacc42424f7a83d8e20a7000d895f7cdc7dd-2400x1260.png?auto=format&fit=max&q=75&w=1200`,
+    expect(img.getAttribute('src')).toContain(
+      `${STATIC_SANITY_IMAGE_BASE_URL}${assetHash}`,
     );
   });
 

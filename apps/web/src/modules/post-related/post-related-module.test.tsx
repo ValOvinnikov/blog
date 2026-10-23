@@ -1,10 +1,8 @@
-import { BRAND_VARIANT } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { MOCK_POST_RELATED_HEADING } from '@web/testing/modules/post-related/fixtures';
+import { mockPostRelatedModuleData } from '@web/testing/modules/post-related/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -33,16 +31,6 @@ const FIRST_POST_TITLE = 'First post';
 const POST_RELATED_ID = 'post-related-1';
 const ANCHOR_POST_ID = 'anchor-post-1';
 
-const mockPostRelatedData = (overrides: Record<string, unknown> = {}) => ({
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_POST_RELATED_HEADING }),
-  posts: [],
-  layout: undefined,
-  contentAlignment: undefined,
-  showImages: false,
-  ...overrides,
-});
-
 const setup = customRenderAsync(PostRelatedModule, {
   id: POST_RELATED_ID,
   context: { post: { id: ANCHOR_POST_ID } },
@@ -51,7 +39,7 @@ const setup = customRenderAsync(PostRelatedModule, {
 describe(`<${PostRelatedModule.name}/>`, () => {
   beforeEach(() => {
     getPostRelatedMock.mockReset();
-    getPostRelatedMock.mockResolvedValue(okResult(mockPostRelatedData()));
+    getPostRelatedMock.mockResolvedValue(okResult(mockPostRelatedModuleData()));
   });
 
   it('fetches posts related to the anchor post', async () => {
@@ -93,7 +81,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   it('renders the resolved posts and no pagination nav', async () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
-        mockPostRelatedData({
+        mockPostRelatedModuleData({
           posts: [makePostCard({ title: FIRST_POST_TITLE })],
         }),
       ),
@@ -111,7 +99,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     const sanityImage = mockSanityImage();
     getPostRelatedMock.mockResolvedValue(
       okResult(
-        mockPostRelatedData({
+        mockPostRelatedModuleData({
           posts: [makePostCard({ heroImage: sanityImage })],
           showImages: true,
         }),
@@ -127,7 +115,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   it('renders no post images when showImages is false', async () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
-        mockPostRelatedData({
+        mockPostRelatedModuleData({
           posts: [makePostCard({ heroImage: mockSanityImage() })],
         }),
       ),
@@ -137,5 +125,22 @@ describe(`<${PostRelatedModule.name}/>`, () => {
 
     const image = screen.queryByRole('img');
     expect(image).not.toBeInTheDocument();
+  });
+
+  it('renders a related post whose excerpt is absent, without throwing', async () => {
+    getPostRelatedMock.mockResolvedValue(
+      okResult(
+        mockPostRelatedModuleData({
+          posts: [
+            makePostCard({ title: FIRST_POST_TITLE, excerpt: undefined }),
+          ],
+        }),
+      ),
+    );
+
+    await setup();
+
+    const postTitle = screen.getByText(FIRST_POST_TITLE);
+    expect(postTitle).toBeVisible();
   });
 });

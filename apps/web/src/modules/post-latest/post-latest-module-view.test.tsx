@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_POST_LIST_HEADING,
@@ -64,6 +65,11 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       expect(pagination).not.toBeInTheDocument();
     });
 
+    it('renders no media region when hasImages is not given', () => {
+      const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+      expect(media).not.toBeInTheDocument();
+    });
+
     it('renders no carousel when displayMode is GRID', () => {
       const carousel = screen.queryByRole('region', {
         name: CAROUSEL_LABEL,
@@ -78,7 +84,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    const media = screen.getByTestId('media-card-media');
+    const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
     const image = screen.getByTestId('post-image');
     expect(media).toBeVisible();
     expect(image).toBeVisible();
