@@ -23,7 +23,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const LEAD = {
+const MOCK_LEAD = {
   name: MOCK_LEAD_NAME,
   email: MOCK_LEAD_EMAIL,
   message: MOCK_LEAD_MESSAGE,
@@ -49,20 +49,20 @@ describe(createLead, () => {
   });
 
   it('stores an unread lead and returns only its id', async () => {
-    const created = await createLead({ tenantId, ...LEAD });
+    const created = await createLead({ tenantId, ...MOCK_LEAD });
 
     const row = await readOnlyLead();
     const { id, name, email, message, sourcePath, readAt } = row;
     expect(created).toEqual({ id });
     expect({ name, email, message, sourcePath, readAt }).toEqual({
-      ...LEAD,
+      ...MOCK_LEAD,
       readAt: null,
     });
     expect(row.tenantId).toBe(tenantId);
   });
 
   it('stores the name, email and message encrypted, and the email index', async () => {
-    await createLead({ tenantId, ...LEAD });
+    await createLead({ tenantId, ...MOCK_LEAD });
 
     const { nameEncrypted, emailEncrypted, messageEncrypted, emailIndex } =
       await readOnlyLead();
@@ -86,7 +86,7 @@ describe(createLead, () => {
     ],
     ['leaves empty', {}],
   ])('%s the source document and locale', async (_case, source) => {
-    await createLead({ tenantId, ...LEAD, ...source });
+    await createLead({ tenantId, ...MOCK_LEAD, ...source });
 
     const { sourceDocumentId, sourceLocale } = await readOnlyLead();
     expect({ sourceDocumentId, sourceLocale }).toEqual({
@@ -98,12 +98,12 @@ describe(createLead, () => {
 
   it('rejects a tenant that does not exist', async () => {
     await expect(
-      createLead({ tenantId: faker.string.uuid(), ...LEAD }),
+      createLead({ tenantId: faker.string.uuid(), ...MOCK_LEAD }),
     ).rejects.toThrow();
   });
 
   it('is removed when its tenant is deleted', async () => {
-    await createLead({ tenantId, ...LEAD });
+    await createLead({ tenantId, ...MOCK_LEAD });
 
     await db().delete(schema.tenants);
 

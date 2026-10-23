@@ -21,7 +21,7 @@ const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
 const NOT_PENDING = toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING);
-const CONFIRMATION_TOKEN = faker.string.uuid() as ReturnType<
+const MOCK_CONFIRMATION_TOKEN = faker.string.uuid() as ReturnType<
   typeof crypto.randomUUID
 >;
 
@@ -47,7 +47,7 @@ describe(resendConfirmation, () => {
       MOCK_SUBSCRIBER_EMAIL,
     );
 
-    vi.spyOn(crypto, 'randomUUID').mockReturnValueOnce(CONFIRMATION_TOKEN);
+    vi.spyOn(crypto, 'randomUUID').mockReturnValueOnce(MOCK_CONFIRMATION_TOKEN);
 
     const result = await resendConfirmation(tenantId, userId);
 
@@ -55,7 +55,7 @@ describe(resendConfirmation, () => {
       ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
       subscriberId: subscriber.id,
       email: MOCK_SUBSCRIBER_EMAIL,
-      confirmationToken: CONFIRMATION_TOKEN,
+      confirmationToken: MOCK_CONFIRMATION_TOKEN,
     });
     expect(await db().select().from(schema.subscribers)).toEqual([subscriber]);
   });

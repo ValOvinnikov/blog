@@ -18,6 +18,8 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
+const MOCK_CONFIRMED_AT = new Date('2026-10-23T09:00:00Z');
+
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
@@ -31,6 +33,7 @@ async function readSubscriber(id: string): Promise<schema.TSubscriber> {
 }
 
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.subscribers);
   await db().delete(schema.tenants);
 });
@@ -55,12 +58,13 @@ describe(confirmSubscriber, () => {
   });
 
   it('activates a pending subscriber and stamps the confirmation time', async () => {
+    vi.useFakeTimers({ now: MOCK_CONFIRMED_AT });
     const result = await confirmSubscriber(tenantId, confirmationToken);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED));
     const { status, confirmedAt } = await readSubscriber(subscriberId);
     expect(status).toBe('active');
-    expect(confirmedAt).toBeInstanceOf(Date);
+    expect(confirmedAt).toEqual(MOCK_CONFIRMED_AT);
   });
 
   it('reports a second confirm as already confirmed and keeps the first time', async () => {

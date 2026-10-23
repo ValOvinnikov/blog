@@ -1,8 +1,14 @@
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+  MOCK_USER_EMAIL,
+  MOCK_USER_NAME,
+} from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { exportAccountData } from './export-account-data';
 
@@ -10,13 +16,11 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-const USER_ID = 'user-1';
-const OTHER_USER_ID = 'user-2';
-const OLDER_POST_ID = 'post-older';
-const NEWER_POST_ID = 'post-newer';
-const OTHER_POST_ID = 'post-other';
-const PROFILE = { name: 'Jane Doe', email: 'jane@example.com' };
-const AVATAR_URL = 'https://example.com/avatar.png';
+const MOCK_UNKNOWN_USER_ID = faker.string.uuid();
+const MOCK_OLDER_POST_ID = 'post-older';
+const MOCK_NEWER_POST_ID = 'post-newer';
+const MOCK_OTHER_POST_ID = 'post-other';
+const MOCK_AVATAR_URL = 'https://example.com/avatar.png';
 
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
@@ -34,65 +38,84 @@ afterEach(async () => {
 
 describe(exportAccountData, () => {
   it('returns nothing for an unknown user', async () => {
-    expect(await exportAccountData(tenantId, USER_ID)).toBeUndefined();
+    expect(
+      await exportAccountData(tenantId, MOCK_UNKNOWN_USER_ID),
+    ).toBeUndefined();
   });
 
   it("exports the decrypted profile and this tenant's bookmarks, newest first", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    await db()
-      .insert(schema.users)
-      .values([
-        {
-          id: USER_ID,
-          ...PROFILE,
-          ...userPersonalColumns(PROFILE),
-          image: AVATAR_URL,
-        },
-        { id: OTHER_USER_ID },
-      ]);
+    const { id: userId } = await insertTestUser(db(), {
+      name: MOCK_USER_NAME,
+      email: MOCK_USER_EMAIL,
+      ...userPersonalColumns({ name: MOCK_USER_NAME, email: MOCK_USER_EMAIL }),
+      image: MOCK_AVATAR_URL,
+    });
+    const { id: otherUserId } = await insertTestUser(db());
     await db()
       .insert(schema.bookmarks)
       .values([
         {
           tenantId,
-          userId: USER_ID,
-          postId: OLDER_POST_ID,
+          userId,
+          postId: MOCK_OLDER_POST_ID,
           createdAt: new Date(2026, 0, 1),
         },
         {
           tenantId,
-          userId: USER_ID,
-          postId: NEWER_POST_ID,
+          userId,
+          postId: MOCK_NEWER_POST_ID,
           createdAt: new Date(2026, 0, 2),
         },
-        { tenantId, userId: OTHER_USER_ID, postId: OTHER_POST_ID },
-        { tenantId: otherTenantId, userId: USER_ID, postId: OTHER_POST_ID },
+        { tenantId, userId: otherUserId, postId: MOCK_OTHER_POST_ID },
+        { tenantId: otherTenantId, userId, postId: MOCK_OTHER_POST_ID },
       ]);
 
-    const result = await exportAccountData(tenantId, USER_ID);
+    const result = await exportAccountData(tenantId, userId);
 
     expect(result).toEqual({
       profile: {
-        id: USER_ID,
-        ...PROFILE,
+        id: userId,
+        name: MOCK_USER_NAME,
+        email: MOCK_USER_EMAIL,
         emailVerified: undefined,
-        image: AVATAR_URL,
+        image: MOCK_AVATAR_URL,
       },
       bookmarks: [
-        { postId: NEWER_POST_ID, createdAt: new Date(2026, 0, 2) },
-        { postId: OLDER_POST_ID, createdAt: new Date(2026, 0, 1) },
+        { postId: MOCK_NEWER_POST_ID, createdAt: new Date(2026, 0, 2) },
+        { postId: MOCK_OLDER_POST_ID, createdAt: new Date(2026, 0, 1) },
       ],
     });
   });
 
   it('exports unset profile fields as undefined and no bookmarks', async () => {
-    await db().insert(schema.users).values({ id: USER_ID });
+    const { id: userId } = await insertTestUser(db());
 
-    const result = await exportAccountData(tenantId, USER_ID);
+    const result = await exportAccountData(tenantId, userId);
 
     expect(result).toEqual({
       profile: {
-        id: USER_ID,
+        id: userId,
+        name: undefined,
+        email: undefined,
+        emailVerified: undefined,
+        image: undefined,
+      },
+      bookmarks: [],
+    });
+  });
+
+  it('exports no name or email when only the plain columns are set', async () => {
+    const { id: userId } = await insertTestUser(db(), {
+      name: MOCK_USER_NAME,
+      email: MOCK_USER_EMAIL,
+    });
+
+    const result = await exportAccountData(tenantId, userId);
+
+    expect(result).toEqual({
+      profile: {
+        id: userId,
         name: undefined,
         email: undefined,
         emailVerified: undefined,

@@ -28,6 +28,7 @@ async function readSubscribers(): Promise<schema.TSubscriber[]> {
 }
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await db().delete(schema.subscribers);
   await db().delete(schema.tenants);
 });
@@ -133,7 +134,15 @@ describe(createPendingSubscriber, () => {
       MOCK_SUBSCRIBER_EMAIL,
     );
 
-    expect(result.ok && result.data.outcome).toBe(SUBSCRIBER_OUTCOME.CREATED);
+    const created = (await readSubscribers()).find(
+      ({ tenantId: rowTenantId }) => rowTenantId === tenantId,
+    );
+    expect(result).toEqual(
+      okResult({
+        outcome: SUBSCRIBER_OUTCOME.CREATED,
+        subscriber: { id: created?.id, email: MOCK_SUBSCRIBER_EMAIL },
+      }),
+    );
     expect(await readSubscribers()).toHaveLength(2);
   });
 
@@ -160,10 +169,7 @@ describe(createPendingSubscriber, () => {
     const noRows = {
       from: () => ({ where: () => Promise.resolve([]) }),
     } as unknown as ReturnType<ReturnType<typeof db>['select']>;
-    const selectSpy = vi
-      .spyOn(db(), 'select')
-      .mockReturnValueOnce(noRows)
-      .mockReturnValueOnce(noRows);
+    vi.spyOn(db(), 'select').mockImplementation(() => noRows);
 
     const result = await createPendingSubscriber(
       tenantId,
@@ -171,6 +177,5 @@ describe(createPendingSubscriber, () => {
     );
 
     expect(result).toEqual(errorResult(ERROR_CODE.DB_NOT_FOUND));
-    selectSpy.mockRestore();
   });
 });
