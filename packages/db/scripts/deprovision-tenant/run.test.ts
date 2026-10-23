@@ -98,7 +98,7 @@ beforeEach(() => {
 });
 
 describe(runSteps, () => {
-  it('runs every step in CORE_DEPROVISIONING_STEPS order', async () => {
+  it('runs every step in order, revoking tokens before clearing artifacts and archiving before purging and invalidating', async () => {
     const callOrder: TDeprovisioningStep[] = [];
     for (const [step, mock] of STEP_MOCKS) {
       mock.mockImplementation(async () => {
@@ -108,7 +108,7 @@ describe(runSteps, () => {
 
     await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
-    expect(callOrder).toEqual(CORE_DEPROVISIONING_STEPS);
+    expect(callOrder).toEqual(STEP_MOCKS.map(([step]) => step));
   });
 
   it('reports RUNNING for each step in exactly CORE_DEPROVISIONING_STEPS order', async () => {

@@ -71,7 +71,7 @@ describe(claimConfirmationSend, () => {
 
       const claim = await claimConfirmationSend(id, COOLDOWN_MS);
 
-      expect(claim).not.toBeNull();
+      expect(claim?.confirmationToken).toEqual(expect.any(String));
       const row = await readRow(id);
       expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
       expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);

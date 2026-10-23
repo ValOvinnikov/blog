@@ -12,12 +12,15 @@ const { execFileSyncMock } = vi.hoisted(() => ({ execFileSyncMock: vi.fn() }));
 
 vi.mock('node:child_process', () => ({ execFileSync: execFileSyncMock }));
 
-const EXEC_ENV = { ...process.env, ...MOCK_TENANT_MIGRATE_CLI_ENV };
+const EXEC_OPTIONS = {
+  env: { ...process.env, ...MOCK_TENANT_MIGRATE_CLI_ENV },
+  stdio: 'inherit',
+};
 
 function lastExecCall() {
-  const [command, args, { env }] = execFileSyncMock.mock.lastCall ?? [];
+  const [command, args, { env, stdio }] = execFileSyncMock.mock.lastCall ?? [];
 
-  return { command, args, env };
+  return { command, args, env, stdio };
 }
 const MIGRATE_SCRIPT = 'scripts/migrate.mjs';
 const MOCK_EXPORT_DESTINATION = '/tmp/exports/t1.tar.gz';
@@ -36,7 +39,7 @@ describe(runTenantMigrationDeploy, () => {
     expect(lastExecCall()).toEqual({
       command: 'node',
       args: [MIGRATE_SCRIPT, 'deploy', '--yes'],
-      env: EXEC_ENV,
+      ...EXEC_OPTIONS,
     });
   });
 
@@ -46,7 +49,7 @@ describe(runTenantMigrationDeploy, () => {
     expect(lastExecCall()).toEqual({
       command: 'node',
       args: [MIGRATE_SCRIPT, 'deploy', '--yes', '--backfill'],
-      env: EXEC_ENV,
+      ...EXEC_OPTIONS,
     });
   });
 
@@ -72,7 +75,7 @@ describe(exportTenantDataset, () => {
     expect(lastExecCall()).toEqual({
       command: 'node',
       args: [MIGRATE_SCRIPT, 'export', MOCK_EXPORT_DESTINATION],
-      env: EXEC_ENV,
+      ...EXEC_OPTIONS,
     });
   });
 });

@@ -338,10 +338,9 @@ describe(updateTenantDetails, () => {
 
       expect(result).toEqual({ outcome: DOMAIN_TAKEN });
       expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
-      expect(await readDomains(tenantId)).toEqual([
-        ACME_ALT_DOMAIN,
-        MOCK_TENANT_DOMAIN,
-      ]);
+      expect(await readDomains(tenantId)).toEqual(
+        [ACME_ALT_DOMAIN, MOCK_TENANT_DOMAIN].sort(),
+      );
     });
 
     it.each([

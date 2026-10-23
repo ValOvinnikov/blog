@@ -31,6 +31,7 @@ useTenantTokenEncryptionKey();
 const { sanityProjectId, sanityDataset } = MOCK_TENANT_VALUES;
 
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.tenants);
 });
 

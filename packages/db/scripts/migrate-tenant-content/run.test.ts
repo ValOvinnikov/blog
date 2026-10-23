@@ -142,6 +142,9 @@ describe(runMigration, () => {
         skipped: 0,
         errors: 0,
       });
+      expect(getTenantSanityWriteCredentialsMock).toHaveBeenCalledWith(
+        MOCK_TENANT.id,
+      );
       expect(runTenantMigrationDeployMock).toHaveBeenCalledWith({
         ...MOCK_CREDENTIALS,
         backfill: ledgerEmpty,

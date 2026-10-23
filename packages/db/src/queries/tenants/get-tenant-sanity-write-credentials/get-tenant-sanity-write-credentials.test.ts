@@ -51,6 +51,7 @@ async function insertTenant(): Promise<TTenant> {
 }
 
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.tenants);
 });
 

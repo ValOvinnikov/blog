@@ -106,9 +106,13 @@ describe(unsubscribeByToken, () => {
     });
 
     it('returns not-found on a second use of the same token', async () => {
-      await unsubscribeByToken(tenantId, unsubscribeToken);
+      const first = await unsubscribeByToken(tenantId, unsubscribeToken);
       const second = await unsubscribeByToken(tenantId, unsubscribeToken);
 
+      expect(first).toEqual({
+        ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+        subscriber,
+      });
       expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
     });
 

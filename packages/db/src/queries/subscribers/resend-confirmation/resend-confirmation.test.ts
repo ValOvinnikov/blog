@@ -54,9 +54,11 @@ describe(resendConfirmation, () => {
     it('returns the pending subscriber and a token without changing the row', async () => {
       const result = await resendConfirmation(tenantId, user.id);
 
-      expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.PENDING);
-      if (result.outcome !== SUBSCRIBER_OUTCOME.PENDING) return;
-      expect(result.subscriberId).toBe(subscriber.id);
+      expect(result).toEqual({
+        ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
+        subscriberId: subscriber.id,
+        confirmationToken: expect.any(String),
+      });
       const [row] = await db()
         .select()
         .from(schema.subscribers)
