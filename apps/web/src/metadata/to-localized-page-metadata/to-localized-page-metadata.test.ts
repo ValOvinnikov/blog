@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES, LOCALE_OPEN_GRAPH_TAGS, routes } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { mockRequestContextOnce } from '@web/testing/server/request-context/mock-request-context-once';
 import {
   MOCK_DE_POST_SLUG,
   MOCK_EN_POST_SLUG,
@@ -23,11 +24,6 @@ const { EN, NL, DE } = LOCALE_ISO_CODES;
 const EN_PAGE = { language: EN, href: EN_POST_PATH };
 const NL_PAGE = { language: NL, href: NL_POST_PATH };
 const DE_PAGE = { language: DE, href: DE_POST_PATH };
-
-const mockContextOnce = (overrides: Partial<typeof MOCK_REQUEST_CONTEXT>) =>
-  vi
-    .mocked(getRequestContext)
-    .mockResolvedValueOnce({ ...MOCK_REQUEST_CONTEXT, ...overrides });
 
 const buildFor = (
   translations: readonly TLanguagePage[],
@@ -62,7 +58,7 @@ describe(toLocalizedPageMetadata, () => {
   });
 
   it('emits the request language and its own prefixed canonical on a translation', async () => {
-    mockContextOnce({ locale: NL, liveLocales: [EN, NL] });
+    mockRequestContextOnce({ locale: NL, liveLocales: [EN, NL] });
 
     const metadata = await buildFor([EN_PAGE, NL_PAGE], NL_POST_PATH);
 
@@ -106,7 +102,7 @@ describe(toLocalizedPageMetadata, () => {
   });
 
   it('omits x-default when no translation exists in the default language', async () => {
-    mockContextOnce({ liveLocales: [EN, NL, DE] });
+    mockRequestContextOnce({ liveLocales: [EN, NL, DE] });
 
     const metadata = await buildFor([NL_PAGE, DE_PAGE]);
 
@@ -132,7 +128,7 @@ describe(toLocalizedPageMetadata, () => {
       context: { liveLocales: undefined },
     },
   ])('lists no hreflang when $case', async ({ translations, context }) => {
-    if (context) mockContextOnce(context);
+    if (context) mockRequestContextOnce(context);
 
     const metadata = await buildFor(translations);
 

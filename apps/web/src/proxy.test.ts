@@ -4,7 +4,6 @@ import {
   HTTP_STATUS,
   type THttpMethod,
 } from '@blog/config/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { TENANT_ID_HEADER } from '@web/server/tenant/constants/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
@@ -12,6 +11,7 @@ import {
   MOCK_TENANT_BASE_URL,
   MOCK_TENANT_HOST,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { NextRequest, NextResponse } from 'next/server';
@@ -60,7 +60,7 @@ const tenantRouting = (
   defaultLocale: TLocaleIsoCode = LOCALE_ISO_CODES.EN,
   liveLocales: TLocaleIsoCode[] = [defaultLocale],
 ) => ({
-  tenant: { id: tenantId } as TTenant,
+  tenant: mockTenant({ id: tenantId }),
   tenantId,
   defaultLocale,
   liveLocales,
@@ -72,8 +72,6 @@ const TAG_RSS_PATH = routes.tagRssFeed(MOCK_TAG_SLUG);
 const SITE_RSS_PATH = routes.rssFeed();
 const BOTID_PREFIX =
   '/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3';
-const SERVICE_UNAVAILABLE_STATUS = 503;
-const TEMPORARY_REDIRECT_STATUS = 307;
 const BLOG_POST_PATH = '/blog/hello-world';
 const REWRITE_HEADER = 'x-middleware-rewrite';
 const SPOOFED_TENANT = 'spoofed-tenant';
@@ -429,7 +427,7 @@ describe('proxy tenant lookup failure', () => {
   it('returns a controlled 503 instead of throwing when resolveTenantId rejects', async () => {
     const response = await proxy(buildRequest(MOCK_TENANT_HOST));
 
-    expect(response.status).toBe(SERVICE_UNAVAILABLE_STATUS);
+    expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
   });
 
   it('never calls next-intl, even with a spoofed tenant header, when the lookup fails', async () => {
@@ -454,7 +452,7 @@ describe('proxy tenant lookup failure', () => {
     isProductionEnvironmentMock.mockReturnValue(true);
     const response = await proxy(buildRequest(MOCK_TENANT_HOST));
 
-    expect(response.status).toBe(SERVICE_UNAVAILABLE_STATUS);
+    expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
   });
 
   it('does not log when a host resolves to no tenant, unlike a lookup failure', async () => {
@@ -480,7 +478,7 @@ describe('proxy language routing', () => {
       buildRequest(MOCK_TENANT_HOST, undefined, '/nl/blog/hello'),
     );
 
-    expect(response.status).toBe(TEMPORARY_REDIRECT_STATUS);
+    expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(new URL(response.headers.get('location') ?? '').pathname).toBe(
       '/blog/hello',
     );
@@ -570,7 +568,7 @@ describe('proxy language detection', () => {
       'accept-language': DUTCH_ACCEPT_LANGUAGE,
     });
 
-    expect(response.status).toBe(TEMPORARY_REDIRECT_STATUS);
+    expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(response.headers.get('location')).toBe(
       `https://${MOCK_TENANT_HOST}${DUTCH_ABOUT_PATH}?ref=mail`,
     );
@@ -582,7 +580,7 @@ describe('proxy language detection', () => {
       'accept-language': DUTCH_ACCEPT_LANGUAGE,
     });
 
-    expect(response.status).toBe(TEMPORARY_REDIRECT_STATUS);
+    expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(response.headers.get('cache-control')).toBe('private, no-store');
   });
 

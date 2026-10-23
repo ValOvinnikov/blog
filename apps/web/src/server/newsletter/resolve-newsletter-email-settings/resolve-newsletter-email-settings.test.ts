@@ -4,7 +4,11 @@ import {
   type TLocaleIsoCode,
   type TMaybeUndefined,
 } from '@blog/config';
-import { mockEmailConfig } from '@web/testing/server/newsletter/fixtures';
+import {
+  MOCK_AUTHORED_SUBJECT,
+  mockEmailConfig,
+  mockEmailTemplate,
+} from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -43,7 +47,6 @@ vi.mock('@blog/db', () => ({
 
 const DEFAULT_ADDRESS = 'onboarding@resend.dev';
 const DEFAULT_FROM_ADDRESS = `Newsletter <${DEFAULT_ADDRESS}>`;
-const AUTHORED_SUBJECT = 'Confirm your subscription';
 const TENANT_LOGO_URL = 'https://cdn.example.com/tenant-logo.png';
 const TEMPLATE_LOGO_URL = 'https://cdn.example.com/template-logo.png';
 const SENDER_NAME = 'Zeta Times';
@@ -51,17 +54,8 @@ const REPLY_TO_ADDRESS = 'support@example.com';
 const FOOTER_POSTAL_ADDRESS = '123 Main St, Springfield';
 const AUTHORED_BODY: unknown[] = [];
 
-const mockEmailTemplate = (overrides: Record<string, unknown> = {}) => ({
-  tenantId: MOCK_TENANT_ID,
-  templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-  subject: AUTHORED_SUBJECT,
-  body: AUTHORED_BODY,
-  logoAssetUrl: undefined,
-  ...overrides,
-});
-
 const DEFAULT_SETTINGS = {
-  subject: AUTHORED_SUBJECT,
+  subject: MOCK_AUTHORED_SUBJECT,
   body: AUTHORED_BODY,
   logoImageUrl: undefined,
   footerPostalAddress: undefined,

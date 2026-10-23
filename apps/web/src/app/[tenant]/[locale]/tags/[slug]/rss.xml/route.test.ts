@@ -13,7 +13,11 @@ import { errorResult, okResult } from '@blog/utils';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
-import { mockTag, mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import {
+  MOCK_TAG_SLUG,
+  mockTag,
+  mockTagDetailPage,
+} from '@web/testing/shared/tag/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
   MOCK_TENANT_ID,
@@ -67,12 +71,11 @@ const { EN, NL } = LOCALE_ISO_CODES;
 
 const tenant = { ...MOCK_TENANT_SANITY_CONTEXT, defaultLocale: EN };
 
-const TAG_SLUG = 'typescript';
-const TAG = mockTag({ slug: TAG_SLUG, description: undefined });
+const TAG = mockTag({ description: undefined });
 const TAG_DESCRIPTION = 'The latest TypeScript posts.';
 
 const paramsFor = (locale: string = EN) =>
-  Promise.resolve({ tenant: MOCK_TENANT_ID, locale, slug: TAG_SLUG });
+  Promise.resolve({ tenant: MOCK_TENANT_ID, locale, slug: MOCK_TAG_SLUG });
 
 const getFeed = (locale?: string) =>
   GET(new Request(MOCK_TENANT_BASE_URL), { params: paramsFor(locale) });
@@ -123,7 +126,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     expect(items[0]?.link).toBe(
       `${MOCK_TENANT_BASE_URL}${routes.post(POST_SLUG)}`,
     );
-    expect(getTagPageMock).toHaveBeenCalledWith(TAG_SLUG, {
+    expect(getTagPageMock).toHaveBeenCalledWith(MOCK_TAG_SLUG, {
       ...tenant,
       locale: EN,
     });
@@ -176,7 +179,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     const response = await getFeed(NL);
     const { items } = parseRssFeed(await response.text());
 
-    expect(getTagPageMock).toHaveBeenCalledWith(TAG_SLUG, localizedTenant);
+    expect(getTagPageMock).toHaveBeenCalledWith(MOCK_TAG_SLUG, localizedTenant);
     expect(getPublishedPostsByTagMock).toHaveBeenCalledWith(
       TAG.id,
       localizedTenant,
@@ -193,7 +196,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     expect(channel.language).toBe(LOCALE_BCP47_TAGS.NL);
     expect(channel.link).toBe(`${MOCK_TENANT_BASE_URL}/nl`);
     expect(selfLink.href).toBe(
-      `${MOCK_TENANT_BASE_URL}/nl${routes.tagRssFeed(TAG_SLUG)}`,
+      `${MOCK_TENANT_BASE_URL}/nl${routes.tagRssFeed(MOCK_TAG_SLUG)}`,
     );
   });
 

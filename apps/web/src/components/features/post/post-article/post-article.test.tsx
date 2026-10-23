@@ -22,6 +22,7 @@ import {
 } from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -61,7 +62,11 @@ const SAVE_POST = 'Save post';
 const SHARE = /Share/;
 const TOPIC_TITLE = 'Engineering';
 const AUTHOR_NAME = 'Jane Doe';
-const TYPESCRIPT_TAG = { id: 'tag-1', title: 'TypeScript', slug: 'typescript' };
+const TYPESCRIPT_TAG = {
+  id: 'tag-1',
+  title: 'TypeScript',
+  slug: MOCK_TAG_SLUG,
+};
 const REACT_TAG_TITLE = 'React';
 
 const setup = customRenderServerAsync(

@@ -1,13 +1,11 @@
 import {
   ACTION_OUTCOME,
-  EMAIL_TEMPLATE_TYPE,
   PRESET_ID,
   resolveTenantEmailBrand,
   SUBSCRIBER_OUTCOME,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db/constants';
-import { type TSendEmailInput } from '@blog/email';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
@@ -16,11 +14,14 @@ import {
 } from '@web/constants/newsletter';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import {
+  firstSentEmail,
+  MOCK_CONFIRMATION_SUBJECT,
   MOCK_CONFIRMATION_TOKEN,
   MOCK_REPLY_TO,
   MOCK_UNSUBSCRIBE_HEADERS,
   MOCK_UNSUBSCRIBE_TOKEN,
   mockEmailConfig,
+  mockEmailTemplate,
 } from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -123,10 +124,7 @@ const session = {
   user: { id: USER_ID, email: SESSION_EMAIL },
 };
 
-const sentEmail = (): TSendEmailInput => {
-  const [[email]] = sendEmailMock.mock.calls as [[TSendEmailInput]];
-  return email;
-};
+const sentEmail = () => firstSentEmail(sendEmailMock);
 
 describe('unsubscribeAction', () => {
   let unsubscribeAction: TActions['unsubscribeAction'];
@@ -243,13 +241,7 @@ describe('resendConfirmationAction', () => {
     getEmailConfigMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset();
-    getEmailTemplateMock.mockResolvedValue({
-      tenantId: MOCK_TENANT_ID,
-      templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-      subject: faker.lorem.sentence(),
-      body: [],
-      logoAssetUrl: undefined,
-    });
+    getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
     ({ resendConfirmationAction } =
       await import('./newsletter-subscription-actions'));
   });
@@ -375,6 +367,38 @@ describe('resendConfirmationAction', () => {
 
     const { replyTo, headers } = sentEmail();
     expect(replyTo).toBe(MOCK_REPLY_TO);
+    expect(headers).toEqual(MOCK_UNSUBSCRIBE_HEADERS);
+  });
+
+  it('drops a malformed stored reply-to address rather than blocking the resend', async () => {
+    getEmailConfigMock.mockResolvedValue(
+      mockEmailConfig({ replyToAddress: faker.lorem.word() }),
+    );
+
+    const result = await resendConfirmationAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(sentEmail().replyTo).toBeUndefined();
+  });
+
+  it('still sends the confirmation email when the email settings lookup rejects', async () => {
+    getEmailConfigMock.mockRejectedValue(MOCK_ERROR);
+
+    const result = await resendConfirmationAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(sentEmail().to).toBe(SESSION_EMAIL);
+  });
+
+  it('falls back to the default subject when the authored-copy lookup rejects', async () => {
+    getEmailTemplateMock.mockRejectedValue(MOCK_ERROR);
+
+    const result = await resendConfirmationAction();
+
+    const { to, subject, headers } = sentEmail();
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(to).toBe(SESSION_EMAIL);
+    expect(subject).toBe(MOCK_CONFIRMATION_SUBJECT);
     expect(headers).toEqual(MOCK_UNSUBSCRIBE_HEADERS);
   });
 });

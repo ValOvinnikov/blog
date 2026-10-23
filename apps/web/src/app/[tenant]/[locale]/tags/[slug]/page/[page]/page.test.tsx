@@ -8,7 +8,11 @@ import { okResult } from '@blog/utils';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { mockTag, mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import {
+  MOCK_TAG_SLUG,
+  mockTag,
+  mockTagDetailPage,
+} from '@web/testing/shared/tag/fixtures';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -39,14 +43,13 @@ vi.mock('@web/i18n/navigation');
 
 const permanentRedirectMock = vi.mocked(permanentRedirect);
 
-const SLUG = 'typescript';
-const { title: TITLE } = mockTag({ slug: SLUG });
+const { title: TITLE } = mockTag();
 
 const paramsFor = (page: string) =>
   Promise.resolve({
     tenant: MOCK_TENANT_ID,
     locale: LOCALE_ISO_CODES.EN,
-    slug: SLUG,
+    slug: MOCK_TAG_SLUG,
     page,
   });
 
@@ -75,7 +78,7 @@ describe('TagNumberedPage', () => {
 
       expect(metadata.title).toBe(`${TITLE} – Page 2`);
       expect(getTagPageMock).toHaveBeenCalledWith(
-        SLUG,
+        MOCK_TAG_SLUG,
         MOCK_TENANT_SANITY_CONTEXT,
       );
     });
@@ -86,7 +89,7 @@ describe('TagNumberedPage', () => {
 
     expect(enterRequestContext).toHaveBeenCalled();
     expect(permanentRedirectMock).toHaveBeenCalledWith({
-      href: routes.tag(SLUG),
+      href: routes.tag(MOCK_TAG_SLUG),
       locale: LOCALE_ISO_CODES.EN,
     });
   });

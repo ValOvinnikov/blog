@@ -1,7 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
@@ -68,10 +67,12 @@ describe(resolveRequestTenant, () => {
       }),
     );
     vi.mocked(resolveTenant).mockResolvedValue(TENANT);
-    vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
-      id: MOCK_OTHER_TENANT_ID,
-      primaryDomain: OTHER_HOST,
-    } as TTenant);
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
+      mockTenant({
+        id: MOCK_OTHER_TENANT_ID,
+        primaryDomain: OTHER_HOST,
+      }),
+    );
 
     await expect(resolveRequestTenant()).resolves.toEqual(TENANT);
     expect(resolveTenant).toHaveBeenCalledTimes(1);

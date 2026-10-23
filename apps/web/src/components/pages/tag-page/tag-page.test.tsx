@@ -13,7 +13,10 @@ import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures'
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
-import { mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import {
+  MOCK_TAG_SLUG,
+  mockTagDetailPage,
+} from '@web/testing/shared/tag/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -45,14 +48,12 @@ const resolveTagPageWith = (overrides: Partial<TTagDetailPage>) =>
 
 const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
-const TAG_SLUG = 'typescript';
-
 const TAG_TITLE = 'TypeScript';
 
 const POST_LIST_ID = 'list-1';
 
 const setup = customRenderServerAsync(TagPage, {
-  slug: TAG_SLUG,
+  slug: MOCK_TAG_SLUG,
 });
 
 const SUPPORTING_TEXT = 'Posts about TypeScript.';
@@ -80,7 +81,7 @@ describe(`<${TagPage.name}/>`, () => {
 
     it('fetches the tag for the given slug with the tenant context', () => {
       expect(getTagPageMock).toHaveBeenCalledWith(
-        TAG_SLUG,
+        MOCK_TAG_SLUG,
         MOCK_TENANT_SANITY_CONTEXT,
       );
     });
@@ -127,7 +128,7 @@ describe(`<${TagPage.name}/>`, () => {
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith('tag_page.fetch_failed', {
-      slug: TAG_SLUG,
+      slug: MOCK_TAG_SLUG,
       error: MOCK_ERROR,
     });
   });

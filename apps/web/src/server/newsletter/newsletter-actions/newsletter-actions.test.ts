@@ -2,18 +2,14 @@ import {
   ACTION_OUTCOME,
   CAPABILITY,
   SUBSCRIBER_OUTCOME,
-  EMAIL_TEMPLATE_TYPE,
   ERROR_CODE,
   LOCALE_ISO_CODES,
   PRESET_ID,
   resolveTenantEmailBrand,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
-import {
-  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
-  TENANT_PLAN,
-} from '@blog/db/constants';
-import { escapeHtml, type TSendEmailInput } from '@blog/email';
+import { TENANT_PLAN } from '@blog/db/constants';
+import { escapeHtml } from '@blog/email';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
@@ -23,12 +19,15 @@ import {
 } from '@web/constants/newsletter';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import {
+  firstSentEmail,
+  MOCK_CONFIRMATION_SUBJECT,
   MOCK_CONFIRMATION_TOKEN,
   MOCK_REPLY_TO,
   MOCK_UNSUBSCRIBE_HEADERS,
   MOCK_UNSUBSCRIBE_TOKEN,
   MOCK_UNSUBSCRIBE_URL,
   mockEmailConfig,
+  mockEmailTemplate,
 } from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
@@ -137,11 +136,6 @@ vi.mock('@web/utils/env/env', () => ({
 
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
-const CONFIRMATION_SUBJECT =
-  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
-    EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION
-  ].subject;
-
 const COOKIE_SET_FAILED_EVENT = 'newsletter.subscribed_cookie_set_failed';
 const CONFIRM_URL = `${MOCK_TENANT_BASE_URL}/api/newsletter/confirm?token=${MOCK_CONFIRMATION_TOKEN}`;
 const subscriber = mockSubscriber({
@@ -164,10 +158,7 @@ const DEFAULT_BRAND = resolveTenantEmailBrand({
   accentHue: faker.number.int({ max: 359 }),
 });
 
-const sentEmail = (): TSendEmailInput => {
-  const [[email]] = sendEmailMock.mock.calls as [[TSendEmailInput]];
-  return email;
-};
+const sentEmail = () => firstSentEmail(sendEmailMock);
 
 describe('subscribeToNewsletterAction', () => {
   let subscribeToNewsletterAction: typeof import('./newsletter-actions').subscribeToNewsletterAction;
@@ -198,13 +189,7 @@ describe('subscribeToNewsletterAction', () => {
     getEmailConfigMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset();
-    getEmailTemplateMock.mockResolvedValue({
-      tenantId: MOCK_TENANT_ID,
-      templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-      subject: faker.lorem.sentence(),
-      body: [],
-      logoAssetUrl: undefined,
-    });
+    getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
     claimConfirmationSendMock.mockResolvedValue(CLAIM);
     releaseConfirmationSendMock.mockResolvedValue(undefined);
     commitConfirmationTokenMock.mockResolvedValue(undefined);
@@ -409,7 +394,7 @@ describe('subscribeToNewsletterAction', () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     const { to, subject, headers } = sentEmail();
     expect(to).toBe(EMAIL);
-    expect(subject).toBe(CONFIRMATION_SUBJECT);
+    expect(subject).toBe(MOCK_CONFIRMATION_SUBJECT);
     expect(headers).toEqual(MOCK_UNSUBSCRIBE_HEADERS);
   });
 

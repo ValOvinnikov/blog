@@ -92,11 +92,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/http-methods.ts`
 
-- **HTTP_METHOD**: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
+- **HTTP_METHOD**: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`
 
 ### `@blog/config/constants` — `packages/config/src/constants/http-statuses.ts`
 
-- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `SEE_OTHER`=`303`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `CONFLICT`=`409`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`
+- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `CONFLICT`=`409`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
 
 ### `@blog/config/constants` — `packages/config/src/constants/icon.ts`
 
@@ -133,6 +133,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/newsletter-result.ts`
 
 - **NEWSLETTER_RESULT**: `CONFIRMED`, `CONFIRM_INVALID`, `CONFIRM_UNAVAILABLE`, `CONFIRM_FAILED`, `UNSUBSCRIBED`, `UNSUBSCRIBE_INVALID`, `UNSUBSCRIBE_FAILED`
+
+### `@blog/config/constants` — `packages/config/src/constants/next-dynamic-error.ts`
+
+- **NEXT_DYNAMIC_ERROR**: `DYNAMIC_SERVER_USAGE`
 
 ### `@blog/config/constants` — `packages/config/src/constants/next-navigation-error.ts`
 

@@ -1,10 +1,7 @@
 import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@blog/config';
 import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
-import { getRequestContext } from '@web/server/request-context/request-context';
-import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_BASE_URL,
-} from '@web/testing/shared/tenant/fixtures';
+import { mockRequestContextOnce } from '@web/testing/server/request-context/mock-request-context-once';
+import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 
 import { buildBreadcrumbListSchema } from './build-breadcrumb-list-schema';
 
@@ -21,11 +18,6 @@ const trail: IBreadcrumbItem[] = [
 ];
 
 vi.mock('@web/server/request-context/request-context');
-
-const mockContextOnce = (overrides: Partial<typeof MOCK_REQUEST_CONTEXT>) =>
-  vi
-    .mocked(getRequestContext)
-    .mockResolvedValueOnce({ ...MOCK_REQUEST_CONTEXT, ...overrides });
 
 describe(buildBreadcrumbListSchema, () => {
   it('builds a BreadcrumbList schema from the trail', async () => {
@@ -58,7 +50,7 @@ describe(buildBreadcrumbListSchema, () => {
   });
 
   it('returns undefined when there is no base URL to make item URLs absolute', async () => {
-    mockContextOnce({ metadataBase: undefined });
+    mockRequestContextOnce({ metadataBase: undefined });
 
     const schema = await buildBreadcrumbListSchema(trail);
 
@@ -84,7 +76,7 @@ describe(buildBreadcrumbListSchema, () => {
       expected: [HOME_PATH, TOPIC_PATH, POST_PATH],
     },
   ])('$case', async ({ context, expected }) => {
-    mockContextOnce(context);
+    mockRequestContextOnce(context);
 
     const schema = await buildBreadcrumbListSchema(trail);
 

@@ -1,10 +1,9 @@
 import { okResult } from '@blog/utils';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTagPage } from './get-tag-page';
-
-const TAG_SLUG = 'typescript';
 
 const { getTagPageMock } = vi.hoisted(() => ({ getTagPageMock: vi.fn() }));
 
@@ -22,10 +21,10 @@ describe(getTagPage, () => {
   it('forwards the slug and the resolved tenant context to the tag page service', async () => {
     getTagPageMock.mockResolvedValue(okResult());
 
-    await getTagPage(TAG_SLUG);
+    await getTagPage(MOCK_TAG_SLUG);
 
     expect(getTagPageMock).toHaveBeenCalledWith(
-      TAG_SLUG,
+      MOCK_TAG_SLUG,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
@@ -34,7 +33,7 @@ describe(getTagPage, () => {
     const result = okResult({ tag: { title: 'TypeScript' } });
     getTagPageMock.mockResolvedValue(result);
 
-    await expect(getTagPage(TAG_SLUG)).resolves.toBe(result);
+    await expect(getTagPage(MOCK_TAG_SLUG)).resolves.toBe(result);
   });
 
   describe('memoization', () => {
@@ -51,8 +50,8 @@ describe(getTagPage, () => {
 
       const { getTagPage: freshGetTagPage } = await import('./get-tag-page');
 
-      await freshGetTagPage(TAG_SLUG);
-      await freshGetTagPage(TAG_SLUG);
+      await freshGetTagPage(MOCK_TAG_SLUG);
+      await freshGetTagPage(MOCK_TAG_SLUG);
 
       expect(getTagPageMock).toHaveBeenCalledTimes(1);
     });
