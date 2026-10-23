@@ -37,17 +37,14 @@ describe('with both personal data keys configured', () => {
   });
 
   it.each([
-    ['personal', personalEmailColumns, testPersonalEmailIndex],
-    ['account', accountEmailColumns, testAccountEmailIndex],
-  ])(
-    'gives a %s email its encrypted form and its index',
-    (_kind, columns, index) => {
-      const { emailEncrypted, emailIndex } = columns(EMAIL);
+    [personalEmailColumns, testPersonalEmailIndex],
+    [accountEmailColumns, testAccountEmailIndex],
+  ])('%o gives an email its encrypted form and its index', (columns, index) => {
+    const { emailEncrypted, emailIndex } = columns(EMAIL);
 
-      expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
-      expect(emailIndex).toBe(index(EMAIL));
-    },
-  );
+    expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
+    expect(emailIndex).toBe(index(EMAIL));
+  });
 
   it.each([
     [requirePersonalEmailIndex, testPersonalEmailIndex],
