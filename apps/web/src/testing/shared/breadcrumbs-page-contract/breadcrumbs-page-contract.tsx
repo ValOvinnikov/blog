@@ -116,7 +116,9 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
 
     await setup();
 
-    expect(screen.getByTestId(JSON_LD_SCRIPT_TEST_ID).textContent).toContain(
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
+
+    expect(script.textContent).toContain(
       `"item":"https://example.com/nl${itemPath}"`,
     );
   });
@@ -138,9 +140,9 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
 
     await setup();
 
-    expect(
-      screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID),
-    ).not.toBeInTheDocument();
+    const script = screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID);
+
+    expect(script).not.toBeInTheDocument();
   });
 };
 
@@ -176,9 +178,8 @@ export const testBreadcrumbsJsonLdTrail = <TData,>({
 
     await setup();
 
-    const schema = JSON.parse(
-      screen.getByTestId(JSON_LD_SCRIPT_TEST_ID).textContent ?? '',
-    );
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
+    const schema = JSON.parse(script.textContent ?? '');
     expect(schema.itemListElement).toEqual(
       expectedTrail.map(({ name, path }, index) => ({
         '@type': 'ListItem',

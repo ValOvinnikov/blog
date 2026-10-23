@@ -90,8 +90,11 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
       await setup();
 
       const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-      expect(within(nav).getByRole('link', { name: SITE_NAME })).toBeVisible();
-      expect(within(nav).queryByText(TOPIC_TITLE)).not.toBeInTheDocument();
+      const siteNameLink = within(nav).getByRole('link', { name: SITE_NAME });
+      const topicTitleText = within(nav).queryByText(TOPIC_TITLE);
+
+      expect(siteNameLink).toBeVisible();
+      expect(topicTitleText).not.toBeInTheDocument();
     });
   });
 });

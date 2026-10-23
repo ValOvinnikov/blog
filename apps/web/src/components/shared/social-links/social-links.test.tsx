@@ -16,7 +16,9 @@ describe(`<${SocialLinks.name}/>`, () => {
 
     const list = screen.getByRole('list', { name: LIST_NAME });
 
-    expect(within(list).queryAllByRole('listitem')).toHaveLength(0);
+    const listitems = within(list).queryAllByRole('listitem');
+
+    expect(listitems).toHaveLength(0);
   });
 
   it('renders one list item per profile, each exposing its own accessible name', () => {
@@ -30,7 +32,9 @@ describe(`<${SocialLinks.name}/>`, () => {
       name: 'LinkedIn profile',
     });
 
-    expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+    const listitems = within(list).getAllByRole('listitem');
+
+    expect(listitems).toHaveLength(2);
     expect(githubLink).toHaveAttribute('href', MOCK_GITHUB_PROFILE.link.href);
     expect(linkedInLink).toHaveAttribute(
       'href',

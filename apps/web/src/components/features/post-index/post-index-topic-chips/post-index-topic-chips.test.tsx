@@ -31,13 +31,13 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
     await setup();
 
     const nav = screen.getByRole('navigation', { name: 'Topics' });
-    expect(within(nav).getByRole('link', { name: 'All' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-    expect(
-      within(nav).getByRole('link', { name: 'Engineering' }),
-    ).toHaveAttribute('href', '/topics/engineering');
+    const allLink = within(nav).getByRole('link', { name: 'All' });
+    const engineeringLink = within(nav).getByRole('link', {
+      name: 'Engineering',
+    });
+
+    expect(allLink).toHaveAttribute('href', '/blog');
+    expect(engineeringLink).toHaveAttribute('href', '/topics/engineering');
   });
 
   describe('with no topics', () => {
@@ -47,9 +47,9 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
     });
 
     it('renders nothing when there are no topics', async () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'Topics' }),
-      ).not.toBeInTheDocument();
+      const topicsNav = screen.queryByRole('navigation', { name: 'Topics' });
+
+      expect(topicsNav).not.toBeInTheDocument();
     });
 
     it('forwards the request context Sanity context to getTopicsSafely', async () => {
