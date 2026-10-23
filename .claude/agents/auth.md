@@ -157,6 +157,9 @@ Run once, after all work is complete: `pnpm --filter @blog/auth type-check`,
   you fixed in passing in touched files, and what you found and left, each
   with `file:line` (CLAUDE.md → "Examine before you change"). Write "nothing
   found" only after reading them.
+  A test file you touch is pruned (`testing-practices` → "When you touch a
+  test file"): list each test removed or moved, with the test that still
+  asserts its behaviour.
 - The exported surface — names, types, what each piece configures.
 - What each consuming app must now do, precisely enough that `web` and
   `platform-app` act without re-reading this layer.
