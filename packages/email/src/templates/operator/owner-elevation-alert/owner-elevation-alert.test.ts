@@ -1,15 +1,15 @@
 import {
-  ESCAPED_UNSAFE_MARKUP,
-  TEST_TENANT_ID,
-  TEST_TENANT_NAME,
-  UNSAFE_MARKUP,
+  MOCK_ESCAPED_UNSAFE_MARKUP,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+  MOCK_UNSAFE_MARKUP,
 } from '@blog/email/testing/email-fixtures';
 
 import { buildOwnerElevationAlertEmail } from './owner-elevation-alert';
 
 const ALERT = {
-  tenantName: TEST_TENANT_NAME,
-  tenantId: TEST_TENANT_ID,
+  tenantName: MOCK_TENANT_NAME,
+  tenantId: MOCK_TENANT_ID,
   outcome: 'STALLED',
 } as const;
 
@@ -17,21 +17,21 @@ describe('buildOwnerElevationAlertEmail', () => {
   it('escapes the tenant name', () => {
     const { html } = buildOwnerElevationAlertEmail({
       ...ALERT,
-      tenantName: UNSAFE_MARKUP,
+      tenantName: MOCK_UNSAFE_MARKUP,
     });
 
-    expect(html).not.toContain(UNSAFE_MARKUP);
-    expect(html).toContain(`<strong>${ESCAPED_UNSAFE_MARKUP}</strong>`);
+    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
+    expect(html).toContain(`<strong>${MOCK_ESCAPED_UNSAFE_MARKUP}</strong>`);
   });
 
   it('escapes the tenant id', () => {
     const { html } = buildOwnerElevationAlertEmail({
       ...ALERT,
-      tenantId: UNSAFE_MARKUP,
+      tenantId: MOCK_UNSAFE_MARKUP,
     });
 
-    expect(html).not.toContain(UNSAFE_MARKUP);
-    expect(html).toContain(`<code>${ESCAPED_UNSAFE_MARKUP}</code>`);
+    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
+    expect(html).toContain(`<code>${MOCK_ESCAPED_UNSAFE_MARKUP}</code>`);
   });
 
   describe('for a stalled elevation', () => {

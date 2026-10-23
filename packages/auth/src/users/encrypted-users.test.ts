@@ -1,8 +1,8 @@
 import {
-  TEST_PROVIDER,
-  TEST_PROVIDER_ACCOUNT_ID,
-  TEST_SESSION_TOKEN,
-  TEST_USER_ID,
+  MOCK_PROVIDER,
+  MOCK_PROVIDER_ACCOUNT_ID,
+  MOCK_SESSION_TOKEN,
+  MOCK_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
 import { queries } from '@blog/db';
 import type { TUser } from '@blog/db/schema/auth';
@@ -41,14 +41,14 @@ const PLAIN_EMAIL = 'plain-reader@example.com';
 const PLAIN_NAME = 'Plain Name';
 
 const signedUpUser = (): AdapterUser => ({
-  id: TEST_USER_ID,
+  id: MOCK_USER_ID,
   email: EMAIL,
   name: NAME,
   emailVerified: null,
 });
 
 const storedUser = (): TUser & AdapterUser => ({
-  id: TEST_USER_ID,
+  id: MOCK_USER_ID,
   email: PLAIN_EMAIL,
   name: PLAIN_NAME,
   emailVerified: null,
@@ -73,7 +73,7 @@ function buildAdapter() {
     getUserByEmail: vi.fn(async () => stored),
     getUserByAccount: vi.fn(async () => stored),
     getSessionAndUser: vi.fn(async (sessionToken: string) => ({
-      session: { sessionToken, userId: TEST_USER_ID, expires: new Date() },
+      session: { sessionToken, userId: MOCK_USER_ID, expires: new Date() },
       user: stored,
     })),
   } satisfies Adapter;
@@ -82,10 +82,16 @@ function buildAdapter() {
 const decrypted = { email: EMAIL, name: NAME };
 
 describe(withEncryptedUsers, () => {
-  it('writes a new user with the encrypted email, its index and the encrypted name', async () => {
-    const adapter = buildAdapter();
+  let adapter: ReturnType<typeof buildAdapter>;
+  let encryptedAdapter: ReturnType<typeof withEncryptedUsers>;
 
-    await withEncryptedUsers(adapter).createUser?.(signedUpUser());
+  beforeEach(() => {
+    adapter = buildAdapter();
+    encryptedAdapter = withEncryptedUsers(adapter);
+  });
+
+  it('writes a new user with the encrypted email, its index and the encrypted name', async () => {
+    await encryptedAdapter.createUser?.(signedUpUser());
 
     expect(adapter.createUser).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -99,17 +105,14 @@ describe(withEncryptedUsers, () => {
   });
 
   it('returns the created user with the email and name read from the encrypted columns', async () => {
-    const created =
-      await withEncryptedUsers(buildAdapter()).createUser?.(signedUpUser());
+    const created = await encryptedAdapter.createUser?.(signedUpUser());
 
     expect(created).toMatchObject(decrypted);
   });
 
   it('encrypts a changed email and name on update', async () => {
-    const adapter = buildAdapter();
-
-    const updated = await withEncryptedUsers(adapter).updateUser?.({
-      id: TEST_USER_ID,
+    const updated = await encryptedAdapter.updateUser?.({
+      id: MOCK_USER_ID,
       email: CHANGED_EMAIL,
       name: null,
     });
@@ -124,31 +127,29 @@ describe(withEncryptedUsers, () => {
   });
 
   it('leaves the encrypted columns alone when an update sets neither email nor name', async () => {
-    const adapter = buildAdapter();
     const emailVerified = new Date();
 
-    await withEncryptedUsers(adapter).updateUser?.({
-      id: TEST_USER_ID,
+    await encryptedAdapter.updateUser?.({
+      id: MOCK_USER_ID,
       emailVerified,
     });
 
     expect(adapter.updateUser).toHaveBeenCalledWith({
-      id: TEST_USER_ID,
+      id: MOCK_USER_ID,
       emailVerified,
     });
   });
 
   it('reads a user by id from the encrypted columns', async () => {
-    const user =
-      await withEncryptedUsers(buildAdapter()).getUser?.(TEST_USER_ID);
+    const user = await encryptedAdapter.getUser?.(MOCK_USER_ID);
 
     expect(user).toMatchObject(decrypted);
   });
 
   it('reads a user by provider account from the encrypted columns', async () => {
-    const user = await withEncryptedUsers(buildAdapter()).getUserByAccount?.({
-      provider: TEST_PROVIDER,
-      providerAccountId: TEST_PROVIDER_ACCOUNT_ID,
+    const user = await encryptedAdapter.getUserByAccount?.({
+      provider: MOCK_PROVIDER,
+      providerAccountId: MOCK_PROVIDER_ACCOUNT_ID,
     });
 
     expect(user).toMatchObject(decrypted);
@@ -156,18 +157,15 @@ describe(withEncryptedUsers, () => {
 
   it("reads the session's user from the encrypted columns", async () => {
     const found =
-      await withEncryptedUsers(buildAdapter()).getSessionAndUser?.(
-        TEST_SESSION_TOKEN,
-      );
+      await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
 
     expect(found?.user).toMatchObject(decrypted);
   });
 
   it('looks a user up by email index, never through the plain column', async () => {
-    const adapter = buildAdapter();
     getUserByEmailIndexMock.mockResolvedValue(storedUser());
 
-    const user = await withEncryptedUsers(adapter).getUserByEmail?.(EMAIL);
+    const user = await encryptedAdapter.getUserByEmail?.(EMAIL);
 
     expect(getUserByEmailIndexMock).toHaveBeenCalledWith(EMAIL);
     expect(adapter.getUserByEmail).not.toHaveBeenCalled();
@@ -177,8 +175,7 @@ describe(withEncryptedUsers, () => {
   it('finds no user when no index matches', async () => {
     getUserByEmailIndexMock.mockResolvedValue(undefined);
 
-    const user =
-      await withEncryptedUsers(buildAdapter()).getUserByEmail?.(EMAIL);
+    const user = await encryptedAdapter.getUserByEmail?.(EMAIL);
 
     expect(user).toBeNull();
   });
@@ -187,7 +184,7 @@ describe(withEncryptedUsers, () => {
     const adapter = { getUser: vi.fn(async () => signedUpUser()) };
 
     await expect(
-      withEncryptedUsers(adapter).getUser?.(TEST_USER_ID),
+      withEncryptedUsers(adapter).getUser?.(MOCK_USER_ID),
     ).rejects.toThrow();
   });
 });

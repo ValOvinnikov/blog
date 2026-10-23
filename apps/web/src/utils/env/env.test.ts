@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { KEY_ENCODING } from '@blog/utils/encryption';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 const REVALIDATE_SECRET = 'revalidate-secret';
 const ANTHROPIC_KEY = 'anthropic-key';
@@ -66,30 +66,17 @@ describe('env', () => {
     restoreEnv();
   });
 
-  it('leaves SANITY_REVALIDATE_SECRET undefined when absent', async () => {
-    delete process.env['SANITY_REVALIDATE_SECRET'];
+  it.each([
+    'SANITY_REVALIDATE_SECRET',
+    'ANTHROPIC_API_KEY',
+    'SANITY_GENERATE_SECRET',
+    'WEB_ANALYTICS_ENABLED',
+  ] as const)('leaves %s undefined when absent', async (key) => {
+    delete process.env[key];
 
     const { env } = await importEnvOnServer();
 
-    expect(env.SANITY_REVALIDATE_SECRET).toBeUndefined();
-  });
-
-  it('leaves ANTHROPIC_API_KEY and SANITY_GENERATE_SECRET undefined when absent (the skim pipeline stays disabled)', async () => {
-    delete process.env['ANTHROPIC_API_KEY'];
-    delete process.env['SANITY_GENERATE_SECRET'];
-
-    const { env } = await importEnvOnServer();
-
-    expect(env.ANTHROPIC_API_KEY).toBeUndefined();
-    expect(env.SANITY_GENERATE_SECRET).toBeUndefined();
-  });
-
-  it('leaves WEB_ANALYTICS_ENABLED undefined when absent (Analytics/SpeedInsights stay omitted)', async () => {
-    delete process.env['WEB_ANALYTICS_ENABLED'];
-
-    const { env } = await importEnvOnServer();
-
-    expect(env.WEB_ANALYTICS_ENABLED).toBeUndefined();
+    expect(env[key]).toBeUndefined();
   });
 
   it('parses WEB_ANALYTICS_ENABLED when set to "true"', async () => {
@@ -109,12 +96,12 @@ describe('env', () => {
   });
 
   it('accepts personal-data keys that are 32 bytes of base64', async () => {
-    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] = `v1:${TEST_ENCRYPTION_KEY}`;
-    process.env['PERSONAL_DATA_INDEX_KEY'] = TEST_ENCRYPTION_KEY;
+    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] = `v1:${MOCK_ENCRYPTION_KEY}`;
+    process.env['PERSONAL_DATA_INDEX_KEY'] = MOCK_ENCRYPTION_KEY;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.PERSONAL_DATA_INDEX_KEY).toBe(TEST_ENCRYPTION_KEY);
+    expect(env.PERSONAL_DATA_INDEX_KEY).toBe(MOCK_ENCRYPTION_KEY);
   });
 
   it('rejects a PERSONAL_DATA_INDEX_KEY shorter than 32 bytes', async () => {
@@ -125,7 +112,7 @@ describe('env', () => {
 
   it('rejects a PERSONAL_DATA_ENCRYPTION_KEY with a short key in an older version', async () => {
     process.env['PERSONAL_DATA_ENCRYPTION_KEY'] =
-      `v2:${TEST_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
+      `v2:${MOCK_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
 
     await expect(importEnvOnServer()).rejects.toThrow();
   });

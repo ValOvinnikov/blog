@@ -1,18 +1,19 @@
+import {
+  MOCK_BODY_HTML,
+  MOCK_ESCAPED_SCRIPT_MARKUP,
+  MOCK_JAVASCRIPT_URL,
+  MOCK_LINK_HTML,
+  MOCK_LOGO_URL,
+  MOCK_SCRIPT_MARKUP,
+  MOCK_TENANT_NAME,
+} from '@blog/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
+
 import { buildTenantShell, type TTenantEmailBrand } from './tenant-shell';
 
-const BRAND: TTenantEmailBrand = {
-  surface: '#ffffff',
-  surface2: '#f8f8fb',
-  border: '#e4e4ec',
-  text: '#1f1f2b',
-  textMuted: '#6b6b7a',
-  brandPrimary: '#3355dd',
-  brandPrimarySolid: '#3355dd',
-  brandPrimaryContrast: '#ffffff',
-  logo1: '#3355dd',
-  logo2: '#5577ee',
-  logo3: '#88aaff',
-};
+const PREHEADER_STYLE = 'display:none';
+const INVITED_BODY_HTML =
+  '<p>You have been invited to <strong>Acme</strong>.</p>';
 
 describe('buildTenantShell', () => {
   describe('with only a brand, a brand name and body HTML', () => {
@@ -20,19 +21,19 @@ describe('buildTenantShell', () => {
 
     beforeEach(() => {
       html = buildTenantShell({
-        brand: BRAND,
+        brand: MOCK_TENANT_EMAIL_BRAND,
         brandName: 'Acme',
-        bodyHtml: '<p>Body</p>',
+        bodyHtml: MOCK_BODY_HTML,
       });
     });
 
     it('omits the preheader block entirely when no preview text is given', () => {
-      expect(html).not.toContain('display:none');
+      expect(html).not.toContain(PREHEADER_STYLE);
     });
 
     it('inlines the given brand hex tokens rather than referencing CSS custom properties', () => {
-      expect(html).toContain(BRAND.surface);
-      expect(html).toContain(BRAND.border);
+      expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.surface);
+      expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.border);
       expect(html).not.toContain('var(--');
     });
 
@@ -42,9 +43,9 @@ describe('buildTenantShell', () => {
 
     it('renders no actionHtml given for an email with no action', () => {
       const withUndefinedActionHtml = buildTenantShell({
-        brand: BRAND,
+        brand: MOCK_TENANT_EMAIL_BRAND,
         brandName: 'Acme',
-        bodyHtml: '<p>Body</p>',
+        bodyHtml: MOCK_BODY_HTML,
         actionHtml: undefined,
       });
 
@@ -53,9 +54,9 @@ describe('buildTenantShell', () => {
 
     it('renders no structuralHtml given for an email with no locked structural content', () => {
       const withUndefinedStructuralHtml = buildTenantShell({
-        brand: BRAND,
+        brand: MOCK_TENANT_EMAIL_BRAND,
         brandName: 'Acme',
-        bodyHtml: '<p>Body</p>',
+        bodyHtml: MOCK_BODY_HTML,
         structuralHtml: undefined,
       });
 
@@ -64,9 +65,9 @@ describe('buildTenantShell', () => {
 
     it('renders no logo image given for an email with no uploaded logo', () => {
       const withUndefinedLogo = buildTenantShell({
-        brand: BRAND,
+        brand: MOCK_TENANT_EMAIL_BRAND,
         brandName: 'Acme',
-        bodyHtml: '<p>Body</p>',
+        bodyHtml: MOCK_BODY_HTML,
         logoImageUrl: undefined,
       });
 
@@ -77,9 +78,9 @@ describe('buildTenantShell', () => {
 
     it('renders no footer postal address given for a send with no obligation to carry one', () => {
       const withUndefinedAddress = buildTenantShell({
-        brand: BRAND,
+        brand: MOCK_TENANT_EMAIL_BRAND,
         brandName: 'Acme',
-        bodyHtml: '<p>Body</p>',
+        bodyHtml: MOCK_BODY_HTML,
         footerPostalAddress: undefined,
       });
 
@@ -89,68 +90,71 @@ describe('buildTenantShell', () => {
 
   it('wraps the given body HTML in a full HTML document', () => {
     const html = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme Blog',
-      bodyHtml: '<p>Hello there.</p>',
+      brand: MOCK_TENANT_EMAIL_BRAND,
+      brandName: MOCK_TENANT_NAME,
+      bodyHtml: MOCK_BODY_HTML,
     });
 
     expect(html).toContain('<!doctype html>');
     expect(html).toContain('<html lang="en">');
-    expect(html).toContain('<p>Hello there.</p>');
+    expect(html).toContain(MOCK_BODY_HTML);
   });
 
   it('passes bodyHtml through unescaped, since callers already escape their own interpolated values', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
-      bodyHtml: '<p><a href="https://example.com">Confirm</a></p>',
+      bodyHtml: `<p>${MOCK_LINK_HTML}</p>`,
     });
 
-    expect(html).toContain('<a href="https://example.com">Confirm</a>');
+    expect(html).toContain(MOCK_LINK_HTML);
   });
 
   it('escapes the brand name wherever it is interpolated', () => {
     const html = buildTenantShell({
-      brand: BRAND,
-      brandName: '<script>alert(1)</script>',
-      bodyHtml: '<p>Body</p>',
+      brand: MOCK_TENANT_EMAIL_BRAND,
+      brandName: MOCK_SCRIPT_MARKUP,
+      bodyHtml: MOCK_BODY_HTML,
     });
 
-    expect(html).not.toContain('<script>alert(1)</script>');
-    expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+    expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
+    expect(html).toContain(MOCK_ESCAPED_SCRIPT_MARKUP);
   });
 
   it('includes a hidden preheader with the escaped preview text when given', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
       previewText: 'Confirm your <email>',
-      bodyHtml: '<p>Body</p>',
+      bodyHtml: MOCK_BODY_HTML,
     });
 
-    expect(html).toContain('display:none');
+    expect(html).toContain(PREHEADER_STYLE);
     expect(html).toContain('Confirm your &lt;email&gt;');
   });
 
   it('renders a different tenant palette in the output for a different brand', () => {
-    const otherBrand: TTenantEmailBrand = { ...BRAND, border: '#ff00ff' };
+    const otherBrand: TTenantEmailBrand = {
+      ...MOCK_TENANT_EMAIL_BRAND,
+      border: '#ff00ff',
+    };
 
     const html = buildTenantShell({
       brand: otherBrand,
       brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
+      bodyHtml: MOCK_BODY_HTML,
     });
 
     expect(html).toContain('#ff00ff');
-    expect(html).not.toContain(BRAND.border);
+    expect(html).not.toContain(MOCK_TENANT_EMAIL_BRAND.border);
   });
 
   it('renders byte-identical output for an actionless email', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
       previewText: 'Preview text',
-      bodyHtml: '<p>Body</p>',
+      bodyHtml: MOCK_BODY_HTML,
     });
 
     expect(html).toMatchInlineSnapshot(
@@ -160,16 +164,14 @@ describe('buildTenantShell', () => {
 
   it('renders actionHtml between the body and the footer when given', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      actionHtml: '<a href="https://example.com">Confirm</a>',
+      bodyHtml: MOCK_BODY_HTML,
+      actionHtml: MOCK_LINK_HTML,
     });
 
-    const bodyIndex = html.indexOf('<p>Body</p>');
-    const actionIndex = html.indexOf(
-      '<a href="https://example.com">Confirm</a>',
-    );
+    const bodyIndex = html.indexOf(MOCK_BODY_HTML);
+    const actionIndex = html.indexOf(MOCK_LINK_HTML);
     const footerIndex = html.indexOf('&copy;');
 
     expect(bodyIndex).toBeLessThan(actionIndex);
@@ -178,20 +180,16 @@ describe('buildTenantShell', () => {
 
   it('renders structuralHtml between the body and the action when both are given', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      structuralHtml: '<p>You have been invited to <strong>Acme</strong>.</p>',
-      actionHtml: '<a href="https://example.com">Confirm</a>',
+      bodyHtml: MOCK_BODY_HTML,
+      structuralHtml: INVITED_BODY_HTML,
+      actionHtml: MOCK_LINK_HTML,
     });
 
-    const bodyIndex = html.indexOf('<p>Body</p>');
-    const structuralIndex = html.indexOf(
-      '<p>You have been invited to <strong>Acme</strong>.</p>',
-    );
-    const actionIndex = html.indexOf(
-      '<a href="https://example.com">Confirm</a>',
-    );
+    const bodyIndex = html.indexOf(MOCK_BODY_HTML);
+    const structuralIndex = html.indexOf(INVITED_BODY_HTML);
+    const actionIndex = html.indexOf(MOCK_LINK_HTML);
     const footerIndex = html.indexOf('&copy;');
 
     expect(bodyIndex).toBeLessThan(structuralIndex);
@@ -201,16 +199,14 @@ describe('buildTenantShell', () => {
 
   it('renders structuralHtml between the body and the footer for an email with no action', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      structuralHtml: '<p>You have been invited to <strong>Acme</strong>.</p>',
+      bodyHtml: MOCK_BODY_HTML,
+      structuralHtml: INVITED_BODY_HTML,
     });
 
-    const bodyIndex = html.indexOf('<p>Body</p>');
-    const structuralIndex = html.indexOf(
-      '<p>You have been invited to <strong>Acme</strong>.</p>',
-    );
+    const bodyIndex = html.indexOf(MOCK_BODY_HTML);
+    const structuralIndex = html.indexOf(INVITED_BODY_HTML);
     const footerIndex = html.indexOf('&copy;');
 
     expect(bodyIndex).toBeLessThan(structuralIndex);
@@ -219,13 +215,13 @@ describe('buildTenantShell', () => {
 
   it('renders an img tag with explicit dimensions and escaped alt text when a logo URL is given', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme <Blog>',
-      bodyHtml: '<p>Body</p>',
-      logoImageUrl: 'https://cdn.example.com/logo.png',
+      bodyHtml: MOCK_BODY_HTML,
+      logoImageUrl: MOCK_LOGO_URL,
     });
 
-    expect(html).toContain('<img src="https://cdn.example.com/logo.png"');
+    expect(html).toContain(`<img src="${MOCK_LOGO_URL}"`);
     expect(html).toContain('width="32" height="32"');
     expect(html).toContain('alt="Acme &lt;Blog&gt; logo"');
     expect(html).not.toContain('<svg');
@@ -233,10 +229,10 @@ describe('buildTenantShell', () => {
 
   it('falls back to the generated mark when the logo URL fails sanitization', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      logoImageUrl: 'javascript:alert(1)',
+      bodyHtml: MOCK_BODY_HTML,
+      logoImageUrl: MOCK_JAVASCRIPT_URL,
     });
 
     expect(html).not.toContain('<img');
@@ -245,9 +241,9 @@ describe('buildTenantShell', () => {
 
   it('renders the escaped postal address beneath the copyright line in the footer', () => {
     const html = buildTenantShell({
-      brand: BRAND,
+      brand: MOCK_TENANT_EMAIL_BRAND,
       brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
+      bodyHtml: MOCK_BODY_HTML,
       footerPostalAddress: '123 Main St <Suite 4>, Springfield',
     });
 
@@ -266,7 +262,7 @@ describe('buildTenantShell', () => {
       // tenant email must not silently fall back to the platform palette.
       return buildTenantShell({
         brandName: 'Acme',
-        bodyHtml: '<p>Body</p>',
+        bodyHtml: MOCK_BODY_HTML,
       });
     }
 

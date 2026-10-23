@@ -1,11 +1,14 @@
+import { LOG_LEVEL } from '@blog/insight/logger/logger';
+import { MOCK_EVENT, MOCK_SERVICE } from '@blog/insight/testing/fixtures';
+
 import { createLokiSink } from './loki-sink';
 
 const PUSH_URL = 'https://logs-prod-012.grafana.net/loki/api/v1/push';
 
 const LINE = {
-  service: 'web',
-  level: 'error',
-  event: 'request.failed',
+  service: MOCK_SERVICE,
+  level: LOG_LEVEL.ERROR,
+  event: MOCK_EVENT,
   status: 500,
   ts: '2026-10-15T12:00:00.000Z',
 };
@@ -71,7 +74,7 @@ describe(createLokiSink, () => {
     expect(sentBody()).toEqual({
       streams: [
         {
-          stream: { service: 'web', level: 'error' },
+          stream: { service: MOCK_SERVICE, level: LOG_LEVEL.ERROR },
           values: [['1792065600000000000', JSON.stringify(LINE)]],
         },
       ],
@@ -82,7 +85,7 @@ describe(createLokiSink, () => {
     await push({ ...LINE, service: undefined });
 
     expect(sentBody()).toMatchObject({
-      streams: [{ stream: { level: 'error' } }],
+      streams: [{ stream: { level: LOG_LEVEL.ERROR } }],
     });
     expect(JSON.stringify(sentBody())).not.toContain('"service"');
   });

@@ -1,10 +1,26 @@
 import { registerLogSink, type TLogSink } from '@blog/insight/sink/log-sink';
 import {
-  LINE_SEPARATOR,
-  PARAGRAPH_SEPARATOR,
+  MOCK_ERROR_MESSAGE,
+  MOCK_EVENT,
+  MOCK_LINE_SEPARATOR,
+  MOCK_PARAGRAPH_SEPARATOR,
+  MOCK_SERVICE,
 } from '@blog/insight/testing/fixtures';
 
 import { createLogger, LOG_LEVEL } from './logger';
+
+const SIGNED_IN_EVENT = 'user.signed_in';
+const REAL_EVENT = 'real.event';
+const BARE_EVENT = 'bare.event';
+const NESTED_ERROR_MESSAGE = 'nested boom';
+const FIRST_FAILURE_MESSAGE = 'first failure';
+const SECOND_FAILURE_MESSAGE = 'second failure';
+const NOT_AN_ERROR = 'not an error';
+const WITHIN_LIMIT_MESSAGE = 'within limit';
+const DEEP_CONTEXT_EVENT = 'deep.context';
+const MIXED_TYPES_EVENT = 'mixed.types';
+const NULL_PROTO_ERROR_MESSAGE = 'null-proto boom';
+const RETRY_EVENT = 'retry.scheduled';
 
 function captureCall(spy: ReturnType<typeof vi.spyOn>): string {
   const call = spy.mock.calls.at(-1);
@@ -34,16 +50,16 @@ describe(createLogger, () => {
   });
 
   it('emits a single-line JSON object via the matching console method', () => {
-    const logger = createLogger({ service: 'web' });
-    logger.info('user.signed_in', { userId: 'u_1' });
+    const logger = createLogger({ service: MOCK_SERVICE });
+    logger.info(SIGNED_IN_EVENT, { userId: 'u_1' });
 
     const line = captureCall(infoSpy);
     expect(line.includes('\n')).toBe(false);
 
     const parsed = JSON.parse(line) as Record<string, unknown>;
     expect(parsed.level).toBe(LOG_LEVEL.INFO);
-    expect(parsed.event).toBe('user.signed_in');
-    expect(parsed.service).toBe('web');
+    expect(parsed.event).toBe(SIGNED_IN_EVENT);
+    expect(parsed.service).toBe(MOCK_SERVICE);
     expect(parsed.userId).toBe('u_1');
     expect(typeof parsed.ts).toBe('string');
   });
@@ -78,7 +94,7 @@ describe(createLogger, () => {
     });
 
     it('does not let a spoofed reserved field in context override level/event/ts', () => {
-      logger.error('real.event', {
+      logger.error(REAL_EVENT, {
         level: 'not-a-real-level',
         event: 'spoofed',
         ts: 'fake',
@@ -89,7 +105,7 @@ describe(createLogger, () => {
         unknown
       >;
       expect(parsed.level).toBe(LOG_LEVEL.ERROR);
-      expect(parsed.event).toBe('real.event');
+      expect(parsed.event).toBe(REAL_EVENT);
       expect(typeof parsed.ts).toBe('string');
       expect(parsed.ts).not.toBe('fake');
     });
@@ -98,7 +114,7 @@ describe(createLogger, () => {
       const error = new Error('boom\nwith a newline');
       error.stack = `Error: boom\n${'  at fakeFrame ()\n'.repeat(500)}`;
 
-      logger.error('request.failed', { error });
+      logger.error(MOCK_EVENT, { error });
 
       const line = captureCall(errorSpy);
       const parsed = JSON.parse(line) as {
@@ -108,18 +124,6 @@ describe(createLogger, () => {
       expect(parsed.error.message).toBe('boom with a newline');
       expect(parsed.error.stack.endsWith('...[truncated]')).toBe(true);
       expect(parsed.error.stack.length).toBeLessThan(error.stack.length);
-    });
-
-    it('leaves a short stack untouched', () => {
-      const error = new Error('boom');
-      error.stack = 'Error: boom\n  at short ()';
-
-      logger.error('request.failed', { error });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        error: { stack: string };
-      };
-      expect(parsed.error.stack).toBe(error.stack);
     });
 
     it('keeps the name of an Error, and its string digest and code', () => {
@@ -139,12 +143,12 @@ describe(createLogger, () => {
     });
 
     it('leaves out a digest or code that is not a string', () => {
-      const error = Object.assign(new Error('boom'), {
+      const error = Object.assign(new Error(MOCK_ERROR_MESSAGE), {
         digest: 42,
         code: { nested: true },
       });
 
-      logger.error('request.failed', { error });
+      logger.error(MOCK_EVENT, { error });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as {
         error: Record<string, unknown>;
@@ -154,27 +158,27 @@ describe(createLogger, () => {
     });
 
     it('logs an Error without a digest or code as its name, message and stack', () => {
-      const error = new Error('boom');
+      const error = new Error(MOCK_ERROR_MESSAGE);
       error.stack = 'Error: boom\n  at short ()';
 
-      logger.error('request.failed', { error });
+      logger.error(MOCK_EVENT, { error });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as {
         error: Record<string, unknown>;
       };
       expect(parsed.error).toEqual({
         name: 'Error',
-        message: 'boom',
-        stack: 'Error: boom\n  at short ()',
+        message: MOCK_ERROR_MESSAGE,
+        stack: error.stack,
       });
     });
 
     it('strips control characters from a digest', () => {
-      const error = Object.assign(new Error('boom'), {
+      const error = Object.assign(new Error(MOCK_ERROR_MESSAGE), {
         digest: 'abc\ninjected',
       });
 
-      logger.error('request.failed', { error });
+      logger.error(MOCK_EVENT, { error });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as {
         error: { digest: string };
@@ -194,10 +198,10 @@ describe(createLogger, () => {
     });
 
     it('does not throw when called with no context and no base context', () => {
-      expect(() => logger.error('bare.event')).not.toThrow();
-      expect(() => logger.warn('bare.event')).not.toThrow();
-      expect(() => logger.info('bare.event')).not.toThrow();
-      expect(() => logger.debug('bare.event')).not.toThrow();
+      expect(() => logger.error(BARE_EVENT)).not.toThrow();
+      expect(() => logger.warn(BARE_EVENT)).not.toThrow();
+      expect(() => logger.info(BARE_EVENT)).not.toThrow();
+      expect(() => logger.debug(BARE_EVENT)).not.toThrow();
     });
 
     it('is a no-op for debug in production', () => {
@@ -215,32 +219,32 @@ describe(createLogger, () => {
     });
 
     it('unwraps an Error nested one level deep inside a plain object', () => {
-      const cause = new Error('nested boom');
+      const cause = new Error(NESTED_ERROR_MESSAGE);
       cause.stack = 'Error: nested boom\n  at somewhere ()';
 
-      logger.error('request.failed', { details: { cause } });
+      logger.error(MOCK_EVENT, { details: { cause } });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as {
         details: { cause: { message: string; stack: string } };
       };
-      expect(parsed.details.cause.message).toBe('nested boom');
+      expect(parsed.details.cause.message).toBe(NESTED_ERROR_MESSAGE);
       expect(parsed.details.cause.stack).toBe(cause.stack);
     });
 
     it('unwraps Errors nested inside an array', () => {
-      const first = new Error('first failure');
-      const second = new Error('second failure');
+      const first = new Error(FIRST_FAILURE_MESSAGE);
+      const second = new Error(SECOND_FAILURE_MESSAGE);
 
       logger.error('batch.failed', {
-        errors: [first, second, 'not an error'],
+        errors: [first, second, NOT_AN_ERROR],
       });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as {
         errors: [{ message: string }, { message: string }, string];
       };
-      expect(parsed.errors[0].message).toBe('first failure');
-      expect(parsed.errors[1].message).toBe('second failure');
-      expect(parsed.errors[2]).toBe('not an error');
+      expect(parsed.errors[0].message).toBe(FIRST_FAILURE_MESSAGE);
+      expect(parsed.errors[1].message).toBe(SECOND_FAILURE_MESSAGE);
+      expect(parsed.errors[2]).toBe(NOT_AN_ERROR);
     });
 
     it('terminates without hanging or throwing on a cyclic context object', () => {
@@ -259,14 +263,14 @@ describe(createLogger, () => {
     });
 
     it('still unwraps an Error nested just within the depth limit', () => {
-      const error = new Error('within limit');
+      const error = new Error(WITHIN_LIMIT_MESSAGE);
 
       let value: unknown = { error };
       for (let i = 0; i < 4; i++) {
         value = { nested: value };
       }
 
-      logger.error('deep.context', { deep: value });
+      logger.error(DEEP_CONTEXT_EVENT, { deep: value });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as Record<
         string,
@@ -277,7 +281,7 @@ describe(createLogger, () => {
         cursor = cursor.nested as Record<string, unknown>;
       }
       expect((cursor.error as { message: string }).message).toBe(
-        'within limit',
+        WITHIN_LIMIT_MESSAGE,
       );
     });
 
@@ -289,7 +293,9 @@ describe(createLogger, () => {
         value = { nested: value };
       }
 
-      expect(() => logger.error('deep.context', { deep: value })).not.toThrow();
+      expect(() =>
+        logger.error(DEEP_CONTEXT_EVENT, { deep: value }),
+      ).not.toThrow();
 
       const parsed = JSON.parse(captureCall(errorSpy)) as Record<
         string,
@@ -314,37 +320,31 @@ describe(createLogger, () => {
       expect(parsed.text).toBe(multiline);
     });
 
-    it('neutralizes a raw U+2028 in a plain string context value', () => {
-      const withSeparator = `first line${LINE_SEPARATOR}second line`;
-      logger.error('note', { text: withSeparator });
+    it.each([
+      ['U+2028', MOCK_LINE_SEPARATOR],
+      ['U+2029', MOCK_PARAGRAPH_SEPARATOR],
+    ])(
+      'neutralizes a raw %s in a plain string context value',
+      (_name, separator) => {
+        logger.error('note', { text: `first${separator}second` });
 
-      const line = captureCall(errorSpy);
-      expect(line.includes(LINE_SEPARATOR)).toBe(false);
+        const line = captureCall(errorSpy);
+        expect(line.includes(separator)).toBe(false);
 
-      const parsed = JSON.parse(line) as Record<string, unknown>;
-      expect(parsed.text).toBe('first line second line');
-    });
-
-    it('neutralizes a raw U+2029 in a plain string context value', () => {
-      const withSeparator = `first para${PARAGRAPH_SEPARATOR}second para`;
-      logger.error('note', { text: withSeparator });
-
-      const line = captureCall(errorSpy);
-      expect(line.includes(PARAGRAPH_SEPARATOR)).toBe(false);
-
-      const parsed = JSON.parse(line) as Record<string, unknown>;
-      expect(parsed.text).toBe('first para second para');
-    });
+        const parsed = JSON.parse(line) as Record<string, unknown>;
+        expect(parsed.text).toBe('first second');
+      },
+    );
 
     it('neutralizes U+2028/U+2029 in a string nested inside a plain object and an array', () => {
       logger.error('note', {
-        details: { message: `nested${LINE_SEPARATOR}message` },
-        items: [`array${PARAGRAPH_SEPARATOR}item`],
+        details: { message: `nested${MOCK_LINE_SEPARATOR}message` },
+        items: [`array${MOCK_PARAGRAPH_SEPARATOR}item`],
       });
 
       const line = captureCall(errorSpy);
-      expect(line.includes(LINE_SEPARATOR)).toBe(false);
-      expect(line.includes(PARAGRAPH_SEPARATOR)).toBe(false);
+      expect(line.includes(MOCK_LINE_SEPARATOR)).toBe(false);
+      expect(line.includes(MOCK_PARAGRAPH_SEPARATOR)).toBe(false);
 
       const parsed = JSON.parse(line) as {
         details: { message: string };
@@ -370,7 +370,7 @@ describe(createLogger, () => {
     it('passes a Date nested in context through untouched instead of recursing into it', () => {
       const date = new Date('2024-01-01T00:00:00.000Z');
 
-      logger.error('mixed.types', { date });
+      logger.error(MIXED_TYPES_EVENT, { date });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as { date: string };
       expect(parsed.date).toBe(date.toISOString());
@@ -384,7 +384,7 @@ describe(createLogger, () => {
         ) {}
       }
 
-      logger.error('mixed.types', { point: new Point(1, 2) });
+      logger.error(MIXED_TYPES_EVENT, { point: new Point(1, 2) });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as {
         point: { x: number; y: number };
@@ -393,18 +393,18 @@ describe(createLogger, () => {
     });
 
     it('treats an Object.create(null) value as a plain object and recurses into it', () => {
-      const cause = new Error('null-proto boom');
+      const cause = new Error(NULL_PROTO_ERROR_MESSAGE);
       const nullProtoObj: Record<string, unknown> = Object.create(
         null,
       ) as Record<string, unknown>;
       nullProtoObj.cause = cause;
 
-      logger.error('request.failed', { details: nullProtoObj });
+      logger.error(MOCK_EVENT, { details: nullProtoObj });
 
       const parsed = JSON.parse(captureCall(errorSpy)) as {
         details: { cause: { message: string } };
       };
-      expect(parsed.details.cause.message).toBe('null-proto boom');
+      expect(parsed.details.cause.message).toBe(NULL_PROTO_ERROR_MESSAGE);
     });
   });
 
@@ -417,7 +417,7 @@ describe(createLogger, () => {
       vi.stubEnv('NODE_ENV', 'test');
       sink = vi.fn<TLogSink>();
       unregister = registerLogSink(sink);
-      logger = createLogger({ service: 'web' });
+      logger = createLogger({ service: MOCK_SERVICE });
     });
 
     afterEach(() => {
@@ -425,21 +425,21 @@ describe(createLogger, () => {
     });
 
     it('hands the sink the same error line it writes to the console', () => {
-      logger.error('request.failed', { status: 500 });
+      logger.error(MOCK_EVENT, { status: 500 });
 
       expect(sink).toHaveBeenCalledTimes(1);
       expect(sink).toHaveBeenCalledWith(JSON.parse(captureCall(errorSpy)));
     });
 
     it('hands the sink the same warn line it writes to the console', () => {
-      logger.warn('retry.scheduled', { attempt: 2 });
+      logger.warn(RETRY_EVENT, { attempt: 2 });
 
       expect(sink).toHaveBeenCalledTimes(1);
       expect(sink).toHaveBeenCalledWith(JSON.parse(captureCall(warnSpy)));
     });
 
     it('never hands info or debug lines to the sink', () => {
-      logger.info('user.signed_in');
+      logger.info(SIGNED_IN_EVENT);
       logger.debug('cache.hit');
 
       expect(infoSpy).toHaveBeenCalledTimes(1);
@@ -449,7 +449,7 @@ describe(createLogger, () => {
 
     it('stops handing lines to a sink once it is unregistered', () => {
       unregister();
-      logger.error('request.failed');
+      logger.error(MOCK_EVENT);
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(sink).not.toHaveBeenCalled();
@@ -460,14 +460,14 @@ describe(createLogger, () => {
         throw new Error('sink down');
       });
 
-      expect(() => logger.error('request.failed')).not.toThrow();
+      expect(() => logger.error(MOCK_EVENT)).not.toThrow();
       expect(errorSpy).toHaveBeenCalledTimes(1);
     });
 
     it('keeps the logging call silent when a sink rejects', async () => {
       sink.mockRejectedValue(new Error('sink down'));
 
-      expect(() => logger.warn('retry.scheduled')).not.toThrow();
+      expect(() => logger.warn(RETRY_EVENT)).not.toThrow();
       await Promise.resolve();
 
       expect(warnSpy).toHaveBeenCalledTimes(1);
@@ -481,7 +481,7 @@ describe(createLogger, () => {
         throw new Error('sink down');
       });
 
-      logger.error('request.failed');
+      logger.error(MOCK_EVENT);
       unregisterHealthy();
 
       expect(healthySink).toHaveBeenCalledTimes(1);

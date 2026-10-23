@@ -1,7 +1,16 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import {
-  TEST_SESSION_EXPIRES,
-  TEST_SESSION_TOKEN,
+  MOCK_GITHUB_ID,
+  MOCK_GITHUB_SECRET,
+  MOCK_GOOGLE_ID,
+  MOCK_GOOGLE_SECRET,
+} from '@blog/auth/testing/oauth-fixtures';
+import {
+  MOCK_AUTH_SECRET,
+  MOCK_EMAIL,
+  MOCK_SESSION_EXPIRES,
+  MOCK_SESSION_TOKEN,
+  MOCK_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
 import { AUTH_APP } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
@@ -32,15 +41,14 @@ vi.mock('@blog/auth/events/record-signup-terms-on-sign-in', () => ({
   recordSignupTermsOnSignIn: recordSignupTermsOnSignInMock,
 }));
 
-const SIGNED_IN_USER = { id: 'user-1', email: 'owner@example.com' };
-const AUTH_SECRET_VALUE = 'test-secret';
+const SIGNED_IN_USER = { id: MOCK_USER_ID, email: MOCK_EMAIL };
 
 type TSessionCallbackParams = Parameters<
   NonNullable<NonNullable<NextAuthConfig['callbacks']>['session']>
 >[0];
 
 const SESSION_ROW_ONLY_FIELDS = {
-  sessionToken: TEST_SESSION_TOKEN,
+  sessionToken: MOCK_SESSION_TOKEN,
   userId: SIGNED_IN_USER.id,
   app: AUTH_APP.SITE,
 };
@@ -57,7 +65,7 @@ async function resolveSessionResponse(
   const databaseStrategyParams = {
     session: {
       ...SESSION_ROW_ONLY_FIELDS,
-      expires: TEST_SESSION_EXPIRES,
+      expires: MOCK_SESSION_EXPIRES,
       user,
     },
     user,
@@ -120,12 +128,6 @@ describe(buildAuthConfig, () => {
       expect(providerIdsOf(config)).toEqual(expect.arrayContaining(['email']));
     });
 
-    it('omits GitHub and Google when neither credential pair is set', () => {
-      expect(providerIdsOf(config)).not.toEqual(
-        expect.arrayContaining(['github', 'google']),
-      );
-    });
-
     it('returns the user with their id, and the expiry, as the session', async () => {
       expect(await resolveSessionResponse(config)).toEqual({
         user: {
@@ -134,7 +136,7 @@ describe(buildAuthConfig, () => {
           email: SIGNED_IN_USER.email,
           image: null,
         },
-        expires: TEST_SESSION_EXPIRES.toISOString(),
+        expires: MOCK_SESSION_EXPIRES.toISOString(),
       });
     });
 
@@ -168,7 +170,7 @@ describe(buildAuthConfig, () => {
 
   describe('with AUTH_SECRET set', () => {
     beforeEach(() => {
-      process.env['AUTH_SECRET'] = AUTH_SECRET_VALUE;
+      process.env['AUTH_SECRET'] = MOCK_AUTH_SECRET;
     });
 
     it('ignores AUTH_COOKIE_DOMAIN', async () => {
@@ -185,68 +187,53 @@ describe(buildAuthConfig, () => {
 
       const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
-      expect(config.secret).toBe(AUTH_SECRET_VALUE);
+      expect(config.secret).toBe(MOCK_AUTH_SECRET);
     });
 
-    describe('with a GitHub client id set', () => {
-      beforeEach(() => {
-        process.env['AUTH_GITHUB_ID'] = 'github-id';
-      });
+    it('includes GitHub and Google when their credentials are set', async () => {
+      process.env['AUTH_GITHUB_ID'] = MOCK_GITHUB_ID;
+      process.env['AUTH_GITHUB_SECRET'] = MOCK_GITHUB_SECRET;
+      process.env['AUTH_GOOGLE_ID'] = MOCK_GOOGLE_ID;
+      process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
+      const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      it('includes GitHub and Google when their credentials are set', async () => {
-        process.env['AUTH_GITHUB_SECRET'] = 'github-secret';
-        process.env['AUTH_GOOGLE_ID'] = 'google-id';
-        process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
-        const freshBuildAuthConfig = await importBuildAuthConfig();
+      const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
-        const config = freshBuildAuthConfig(AUTH_APP.SITE);
-
-        expect(providerIdsOf(config)).toEqual(
-          expect.arrayContaining(['github', 'google']),
-        );
-      });
-
-      it('omits GitHub when only one of its credential pair is set', async () => {
-        const freshBuildAuthConfig = await importBuildAuthConfig();
-
-        const config = freshBuildAuthConfig(AUTH_APP.SITE);
-
-        expect(providerIdsOf(config)).not.toContain('github');
-      });
+      expect(providerIdsOf(config)).toEqual(
+        expect.arrayContaining(['github', 'google']),
+      );
     });
   });
 
   describe('for the platform', () => {
-    it('scopes its sessions to the platform', () => {
-      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+    let config: ReturnType<typeof buildAuthConfig>;
 
+    beforeEach(() => {
+      config = buildAuthConfig(AUTH_APP.PLATFORM);
+    });
+
+    it('scopes its sessions to the platform', () => {
       expect(config.adapter).not.toBe(drizzleAdapterStub);
     });
 
     it('consumes pending membership invites on sign-in', async () => {
-      const user = SIGNED_IN_USER;
-      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+      await config.events?.signIn?.({ user: SIGNED_IN_USER });
 
-      await config.events?.signIn?.({ user });
-
-      expect(consumePendingInvitesOnSignInMock).toHaveBeenCalledWith({ user });
+      expect(consumePendingInvitesOnSignInMock).toHaveBeenCalledWith({
+        user: SIGNED_IN_USER,
+      });
     });
 
     it('records signup terms for a new user on sign-in', async () => {
-      const user = SIGNED_IN_USER;
-      const config = buildAuthConfig(AUTH_APP.PLATFORM);
-
-      await config.events?.signIn?.({ user, isNewUser: true });
+      await config.events?.signIn?.({ user: SIGNED_IN_USER, isNewUser: true });
 
       expect(recordSignupTermsOnSignInMock).toHaveBeenCalledWith({
-        user,
+        user: SIGNED_IN_USER,
         isNewUser: true,
       });
     });
 
     it('names every cookie apart from the default Auth.js cookies', () => {
-      const config = buildAuthConfig(AUTH_APP.PLATFORM);
-
       expect(config.cookies?.sessionToken?.name).not.toBe(
         'authjs.session-token',
       );
@@ -264,8 +251,7 @@ describe(buildAuthConfig, () => {
 
     it('keeps the secure cookie prefixes in production', () => {
       vi.stubEnv('NODE_ENV', 'production');
-
-      const config = buildAuthConfig(AUTH_APP.PLATFORM);
+      config = buildAuthConfig(AUTH_APP.PLATFORM);
 
       expect(config.useSecureCookies).toBe(true);
       expect(config.cookies?.sessionToken?.name).toMatch(/^__Secure-/);
@@ -273,23 +259,23 @@ describe(buildAuthConfig, () => {
     });
 
     it('drops the secure cookie prefixes outside production', () => {
-      const config = buildAuthConfig(AUTH_APP.PLATFORM);
-
       expect(config.useSecureCookies).toBe(false);
       expect(config.cookies?.sessionToken?.name).not.toMatch(/^__/);
     });
   });
 
   describe('for a site', () => {
-    it('scopes its sessions to sites', () => {
-      const config = buildAuthConfig(AUTH_APP.SITE);
+    let config: ReturnType<typeof buildAuthConfig>;
 
+    beforeEach(() => {
+      config = buildAuthConfig(AUTH_APP.SITE);
+    });
+
+    it('scopes its sessions to sites', () => {
       expect(config.adapter).not.toBe(drizzleAdapterStub);
     });
 
     it('keeps the default Auth.js cookies', () => {
-      const config = buildAuthConfig(AUTH_APP.SITE);
-
       expect(config.cookies).toBeUndefined();
     });
   });

@@ -12,7 +12,7 @@ import {
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 import { addBlockedIdentity } from './add-blocked-identity';
 
@@ -25,7 +25,7 @@ const OTHER_REASON = 'Another reason';
 const db = useQueryTestDb(getDbMock);
 
 beforeEach(() => {
-  vi.stubEnv('PERSONAL_DATA_INDEX_KEY', TEST_ENCRYPTION_KEY);
+  vi.stubEnv('PERSONAL_DATA_INDEX_KEY', MOCK_ENCRYPTION_KEY);
 });
 
 afterEach(async () => {
@@ -150,26 +150,28 @@ describe(addBlockedIdentity, () => {
     expect(rows).toHaveLength(2);
   });
 
-  it('refuses a malformed address', async () => {
+  it.each([
+    [
+      'address',
+      BLOCKED_IDENTITY_KIND.ADDRESS,
+      NOT_AN_ADDRESS,
+      ERROR_CODE.DB_INVALID_EMAIL,
+    ],
+    [
+      'domain',
+      BLOCKED_IDENTITY_KIND.DOMAIN,
+      NOT_A_DOMAIN,
+      ERROR_CODE.DB_INVALID_DOMAIN,
+    ],
+  ])('refuses a malformed %s', async (_name, kind, identity, error) => {
     const result = await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: NOT_AN_ADDRESS,
+      kind,
+      identity,
       reason: BLOCK_REASON,
       createdByAdminId,
     });
 
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_INVALID_EMAIL });
-  });
-
-  it('refuses a malformed domain', async () => {
-    const result = await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: NOT_A_DOMAIN,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
-
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN });
+    expect(result).toEqual({ ok: false, error });
   });
 
   it('keeps the entry when the admin who added it is removed', async () => {
