@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getLandingPage } from './get-landing-page';
@@ -16,7 +17,7 @@ describe(getLandingPage, () => {
   });
 
   it('forwards the path segments and the resolved tenant context to the landing page service', async () => {
-    getPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getPageMock.mockResolvedValue(okResult());
 
     await getLandingPage('modules/faq');
 
@@ -27,7 +28,7 @@ describe(getLandingPage, () => {
   });
 
   it('returns the raw TResult from getPage unchanged', async () => {
-    const result = { ok: true, data: { title: 'About Us' } };
+    const result = okResult({ title: 'About Us' });
     getPageMock.mockResolvedValue(result);
 
     await expect(getLandingPage('about-us')).resolves.toBe(result);
@@ -42,7 +43,7 @@ describe('getLandingPage memoization', () => {
 
   it('dedupes the page query across one render pass with the same arguments', async () => {
     getPageMock.mockReset();
-    getPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getPageMock.mockResolvedValue(okResult());
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();

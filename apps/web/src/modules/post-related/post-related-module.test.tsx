@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -57,17 +58,16 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     loggerWarnMock.mockReset();
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostRelatedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,
-      },
-    });
+      }),
+    );
   });
 
   it('calls getPostRelated with the module id, anchor post id and tenant context', async () => {
@@ -93,10 +93,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPostRelatedMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -110,17 +107,16 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   });
 
   it('renders the resolved posts and no pagination nav', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostRelatedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -130,17 +126,16 @@ describe(`<${PostRelatedModule.name}/>`, () => {
 
   it('renders each post image when showImages is true', async () => {
     const sanityImage = makeSanityImage();
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostRelatedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost({ heroImage: sanityImage })],
         layout: undefined,
         contentAlignment: undefined,
         showImages: true,
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -148,17 +143,16 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   });
 
   it('renders no post images when showImages is false', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostRelatedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost({ heroImage: makeSanityImage() })],
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -166,17 +160,16 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   });
 
   it('renders a related post whose excerpt is absent, without throwing', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostRelatedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
         posts: [makePost({ excerpt: undefined })],
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,
-      },
-    });
+      }),
+    );
 
     await setup();
 

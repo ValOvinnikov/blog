@@ -4,6 +4,7 @@ import {
   routes,
   SOCIAL_PLATFORMS,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
@@ -82,14 +83,12 @@ const MASTODON_URL = 'https://mastodon.social/@example';
 
 describe(SiteFooter, () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'Blog', logo: undefined } },
-    } as never);
-    getFooterMock.mockResolvedValue({
-      ok: true,
-      data: { social: [], showRssFeed: true },
-    });
+    getSiteSettingsMock.mockResolvedValue(
+      okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
+    );
+    getFooterMock.mockResolvedValue(
+      okResult({ social: [], showRssFeed: true }),
+    );
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     getTranslationsMock.mockResolvedValue(translate);
   });
@@ -122,10 +121,9 @@ describe(SiteFooter, () => {
   });
 
   it('leaves the RSS feed link out when the editor switched it off', async () => {
-    getFooterMock.mockResolvedValue({
-      ok: true,
-      data: { social: [], showRssFeed: false },
-    });
+    getFooterMock.mockResolvedValue(
+      okResult({ social: [], showRssFeed: false }),
+    );
 
     await setup();
 
@@ -135,14 +133,13 @@ describe(SiteFooter, () => {
   });
 
   it('renders a mapped social link icon-only, named after its platform', async () => {
-    getFooterMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getFooterMock.mockResolvedValue(
+      okResult({
         social: [
           makeSocial(SOCIAL_PLATFORMS.LINKEDIN, 'LinkedIn', LINKEDIN_URL),
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -156,14 +153,13 @@ describe(SiteFooter, () => {
   });
 
   it('renders an icon-only social link for a platform outside the original 6-key set', async () => {
-    getFooterMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getFooterMock.mockResolvedValue(
+      okResult({
         social: [
           makeSocial(SOCIAL_PLATFORMS.MASTODON, 'Mastodon', MASTODON_URL),
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -180,10 +176,9 @@ describe(SiteFooter, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
-    getFooterMock.mockResolvedValue({
-      ok: true,
-      data: { social: [], showLanguageSwitcher: true },
-    });
+    getFooterMock.mockResolvedValue(
+      okResult({ social: [], showLanguageSwitcher: true }),
+    );
 
     await setup();
 
@@ -195,10 +190,9 @@ describe(SiteFooter, () => {
   });
 
   it('shows no language switcher with one live language, whatever the toggle says', async () => {
-    getFooterMock.mockResolvedValue({
-      ok: true,
-      data: { social: [], showLanguageSwitcher: true },
-    });
+    getFooterMock.mockResolvedValue(
+      okResult({ social: [], showLanguageSwitcher: true }),
+    );
 
     await setup();
 
@@ -209,7 +203,7 @@ describe(SiteFooter, () => {
 
   describe('when the footer fails to load', () => {
     it('logs footer.layout_fetch_failed and renders without social links', async () => {
-      getFooterMock.mockResolvedValue({ ok: false, error: 'boom' });
+      getFooterMock.mockResolvedValue(errorResult('boom'));
 
       await setup();
 

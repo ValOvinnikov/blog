@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -9,6 +10,12 @@ import {
 } from '@web/testing/shared/tenant/fixtures';
 
 import { PostFeaturedModule } from './post-featured-module';
+
+const MODULE_ID = 'post-featured-1';
+const SECOND_POST_TITLE = 'Second post';
+const THIRD_POST_TITLE = 'Third post';
+const LEAD_IMAGE_ALT = 'Lead image';
+const TAIL_IMAGE_ALT = 'Tail image';
 
 const { getPostFeaturedMock } = vi.hoisted(() => ({
   getPostFeaturedMock: vi.fn(),
@@ -40,7 +47,7 @@ const makePost = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const setup = customRenderAsync(PostFeaturedModule, {
-  id: 'post-featured-1',
+  id: MODULE_ID,
 });
 
 describe(`<${PostFeaturedModule.name}/>`, () => {
@@ -52,24 +59,23 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
 
   describe('when the module has no posts', () => {
     beforeEach(() => {
-      getPostFeaturedMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getPostFeaturedMock.mockResolvedValue(
+        okResult({
           brandVariant: BRAND_VARIANT.PRIMARY,
           headingBlock: makeHeadingBlock({ heading: 'Featured' }),
           posts: [],
           layout: undefined,
           contentAlignment: undefined,
           showImages: false,
-        },
-      });
+        }),
+      );
     });
 
     it('calls getPostFeatured with the module id and resolved tenant Sanity context', async () => {
       await setup();
 
       expect(getPostFeaturedMock).toHaveBeenCalledWith(
-        'post-featured-1',
+        MODULE_ID,
         DEFAULT_TENANT_SANITY_CONTEXT,
       );
     });
@@ -82,10 +88,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPostFeaturedMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -93,27 +96,26 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
   });
 
   it('renders the first post as a lead card and the rest in a tail grid', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostFeaturedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({ id: 'post-1', title: 'Lead post' }),
-          makePost({ id: 'post-2', title: 'Second post' }),
-          makePost({ id: 'post-3', title: 'Third post' }),
+          makePost({ id: 'post-2', title: SECOND_POST_TITLE }),
+          makePost({ id: 'post-3', title: THIRD_POST_TITLE }),
         ],
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,
-      },
-    });
+      }),
+    );
 
     await setup();
 
     expect(screen.getByText('Lead post')).toBeVisible();
-    expect(screen.getByText('Second post')).toBeVisible();
-    expect(screen.getByText('Third post')).toBeVisible();
+    expect(screen.getByText(SECOND_POST_TITLE)).toBeVisible();
+    expect(screen.getByText(THIRD_POST_TITLE)).toBeVisible();
     const tailGrid = screen.getByTestId(
       'post-featured-module-post-featured-1-tail-grid',
     );
@@ -122,33 +124,32 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
   });
 
   it('renders the lead image sized differently from the tail card images', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostFeaturedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({
             id: 'post-1',
             title: 'Lead post',
-            heroImage: makeSanityImage({ alt: 'Lead image' }),
+            heroImage: makeSanityImage({ alt: LEAD_IMAGE_ALT }),
           }),
           makePost({
             id: 'post-2',
-            title: 'Second post',
-            heroImage: makeSanityImage({ alt: 'Tail image' }),
+            title: SECOND_POST_TITLE,
+            heroImage: makeSanityImage({ alt: TAIL_IMAGE_ALT }),
           }),
         ],
         layout: undefined,
         contentAlignment: undefined,
         showImages: true,
-      },
-    });
+      }),
+    );
 
     await setup();
 
-    const leadImage = screen.getByRole('img', { name: 'Lead image' });
-    const tailImage = screen.getByRole('img', { name: 'Tail image' });
+    const leadImage = screen.getByRole('img', { name: LEAD_IMAGE_ALT });
+    const tailImage = screen.getByRole('img', { name: TAIL_IMAGE_ALT });
 
     expect(leadImage).toHaveAttribute(
       'sizes',
@@ -166,9 +167,8 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
   });
 
   it('renders no post images when showImages is false', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostFeaturedMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
@@ -180,8 +180,8 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,
-      },
-    });
+      }),
+    );
 
     await setup();
 

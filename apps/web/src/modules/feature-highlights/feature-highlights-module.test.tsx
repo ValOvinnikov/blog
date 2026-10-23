@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, MEDIA_ORDER } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
@@ -6,6 +7,8 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureHighlightsModule } from './feature-highlights-module';
+
+const MODULE_ID = 'feature-highlights-1';
 
 const { getFeatureHighlightsModuleMock } = vi.hoisted(() => ({
   getFeatureHighlightsModuleMock: vi.fn(),
@@ -37,7 +40,7 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(FeatureHighlightsModule, {
-  id: 'feature-highlights-1',
+  id: MODULE_ID,
 });
 
 describe(`<${FeatureHighlightsModule.name}/>`, () => {
@@ -57,24 +60,22 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getFeatureHighlightsModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, highlights: [] },
-    });
+    getFeatureHighlightsModuleMock.mockResolvedValue(
+      okResult({ ...baseModule, highlights: [] }),
+    );
 
     await setup();
 
     expect(getFeatureHighlightsModuleMock).toHaveBeenCalledWith(
-      'feature-highlights-1',
+      MODULE_ID,
       tenant,
     );
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getFeatureHighlightsModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getFeatureHighlightsModuleMock.mockResolvedValue(
+      errorResult(new Error('boom')),
+    );
 
     const { container } = await setup();
 
@@ -92,10 +93,9 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
         heading: 'Built for scale',
       }),
     ];
-    getFeatureHighlightsModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, highlights },
-    });
+    getFeatureHighlightsModuleMock.mockResolvedValue(
+      okResult({ ...baseModule, highlights }),
+    );
 
     await setup();
 

@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -48,7 +49,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getPostsByIdsMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([]);
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
+    getPostsByIdsMock.mockResolvedValue(okResult([]));
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -105,13 +106,12 @@ describe(`<${BookmarksPage.name}/>`, () => {
       { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
       { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
     ]);
-    getPostsByIdsMock.mockResolvedValue({
-      ok: true,
-      data: [
+    getPostsByIdsMock.mockResolvedValue(
+      okResult([
         { ...makePostCard({ id: 'post-1', slug: 'first' }), language: EN },
         { ...makePostCard({ id: 'post-2', slug: 'second' }), language: EN },
-      ],
-    });
+      ]),
+    );
 
     await setup();
 
@@ -134,9 +134,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
       { userId: 'user-1', postId: 'post-nl', createdAt: new Date() },
       { userId: 'user-1', postId: 'post-en', createdAt: new Date() },
     ]);
-    getPostsByIdsMock.mockResolvedValue({
-      ok: true,
-      data: [
+    getPostsByIdsMock.mockResolvedValue(
+      okResult([
         {
           ...makePostCard({ id: 'post-nl', slug: 'mijn-artikel' }),
           language: NL,
@@ -145,8 +144,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
           ...makePostCard({ id: 'post-en', slug: 'my-article' }),
           language: EN,
         },
-      ],
-    });
+      ]),
+    );
     vi.mocked(getRequestContext).mockResolvedValueOnce({
       ...DEFAULT_REQUEST_CONTEXT,
       locale: NL,
@@ -188,10 +187,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     listBookmarksMock.mockResolvedValue([
       { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
     ]);
-    getPostsByIdsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPostsByIdsMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 

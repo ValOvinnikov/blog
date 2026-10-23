@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTopicPage } from './get-topic-page';
@@ -16,7 +17,7 @@ describe(getTopicPage, () => {
   });
 
   it('forwards the slug and the resolved tenant context to the topic page service', async () => {
-    getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTopicPageMock.mockResolvedValue(okResult());
 
     await getTopicPage('engineering');
 
@@ -27,7 +28,7 @@ describe(getTopicPage, () => {
   });
 
   it('returns the raw TResult from getTopicPage unchanged', async () => {
-    const result = { ok: true, data: { topic: { title: 'Engineering' } } };
+    const result = okResult({ topic: { title: 'Engineering' } });
     getTopicPageMock.mockResolvedValue(result);
 
     await expect(getTopicPage('engineering')).resolves.toBe(result);
@@ -42,7 +43,7 @@ describe('getTopicPage memoization', () => {
 
   it('dedupes the topic-page query across one render pass with the same arguments', async () => {
     getTopicPageMock.mockReset();
-    getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTopicPageMock.mockResolvedValue(okResult());
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();

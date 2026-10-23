@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -9,6 +10,12 @@ import {
 } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
+
+const MODULE_ID = 'post-latest-1';
+const POST_SLUG = 'first-post';
+const POST_TITLE = 'First post';
+const POST_EXCERPT = 'An excerpt';
+const PUBLISHED_AT = '2026-01-01T00:00:00.000Z';
 
 const { getPostLatestMock } = vi.hoisted(() => ({
   getPostLatestMock: vi.fn(),
@@ -29,7 +36,7 @@ vi.mock('@web/server/request-context/request-context');
 const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(PostLatestModule, {
-  id: 'post-latest-1',
+  id: MODULE_ID,
 });
 
 describe(`<${PostLatestModule.name}/>`, () => {
@@ -37,23 +44,22 @@ describe(`<${PostLatestModule.name}/>`, () => {
     getPostLatestMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getPostLatestMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostLatestMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
-      },
-    });
+      }),
+    );
   });
 
   it('calls getPostLatest with the module id and resolved tenant Sanity context', async () => {
     await setup();
 
     expect(getPostLatestMock).toHaveBeenCalledWith(
-      'post-latest-1',
+      MODULE_ID,
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });
@@ -70,14 +76,11 @@ describe(`<${PostLatestModule.name}/>`, () => {
     });
     await setup();
 
-    expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1', tenant);
+    expect(getPostLatestMock).toHaveBeenCalledWith(MODULE_ID, tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getPostLatestMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPostLatestMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -91,47 +94,45 @@ describe(`<${PostLatestModule.name}/>`, () => {
   });
 
   it('renders the resolved posts and no pagination nav', async () => {
-    getPostLatestMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostLatestMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
+            slug: POST_SLUG,
+            title: POST_TITLE,
+            excerpt: POST_EXCERPT,
+            publishedAt: PUBLISHED_AT,
             topic: { id: 'topic-1', title: 'News', slug: 'news' },
             readingTimeMinutes: 2,
           },
         ],
         layout: undefined,
         contentAlignment: undefined,
-      },
-    });
+      }),
+    );
 
     await setup();
 
-    expect(screen.getByText('First post')).toBeVisible();
+    expect(screen.getByText(POST_TITLE)).toBeVisible();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
   it('renders each post image when showImages is true', async () => {
     const sanityImage = makeSanityImage();
-    getPostLatestMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostLatestMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
+            slug: POST_SLUG,
+            title: POST_TITLE,
+            excerpt: POST_EXCERPT,
+            publishedAt: PUBLISHED_AT,
             topic: { id: 'topic-1', title: 'News', slug: 'news' },
             readingTimeMinutes: 2,
             heroImage: sanityImage,
@@ -140,8 +141,8 @@ describe(`<${PostLatestModule.name}/>`, () => {
         layout: undefined,
         contentAlignment: undefined,
         showImages: true,
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -149,18 +150,17 @@ describe(`<${PostLatestModule.name}/>`, () => {
   });
 
   it('renders no post images when showImages is false', async () => {
-    getPostLatestMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostLatestMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
+            slug: POST_SLUG,
+            title: POST_TITLE,
+            excerpt: POST_EXCERPT,
+            publishedAt: PUBLISHED_AT,
             topic: { id: 'topic-1', title: 'News', slug: 'news' },
             readingTimeMinutes: 2,
             heroImage: makeSanityImage(),
@@ -169,8 +169,8 @@ describe(`<${PostLatestModule.name}/>`, () => {
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,
-      },
-    });
+      }),
+    );
 
     await setup();
 

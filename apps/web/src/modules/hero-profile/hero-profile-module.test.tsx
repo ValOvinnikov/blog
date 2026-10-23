@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -7,6 +8,10 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroProfileModule } from './hero-profile-module';
+
+const HEADLINE = "Hi, I'm Jane";
+const MODULE_ID = 'hero-profile-1';
+const GITHUB_URL = 'https://github.com/example';
 
 const { getHeroProfileMock } = vi.hoisted(() => ({
   getHeroProfileMock: vi.fn(),
@@ -28,7 +33,7 @@ const makeHeroProfileData = (overrides: Record<string, unknown> = {}) => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: "Hi, I'm Jane" }),
+  headingBlock: makeHeadingBlock({ heading: HEADLINE }),
   avatarName: 'Jamie Rivera',
   sanityImage: undefined,
   socialLinks: [],
@@ -41,7 +46,7 @@ const makeHeroProfileData = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const setup = customRenderAsync(HeroProfileModule, {
-  id: 'hero-profile-1',
+  id: MODULE_ID,
 });
 
 describe(`<${HeroProfileModule.name}/>`, () => {
@@ -49,10 +54,7 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     getHeroProfileMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getHeroProfileMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroProfileData(),
-    });
+    getHeroProfileMock.mockResolvedValue(okResult(makeHeroProfileData()));
   });
 
   it('forwards the resolved tenant Sanity context to getHeroProfile', async () => {
@@ -67,14 +69,11 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     });
     await setup();
 
-    expect(getHeroProfileMock).toHaveBeenCalledWith('hero-profile-1', tenant);
+    expect(getHeroProfileMock).toHaveBeenCalledWith(MODULE_ID, tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getHeroProfileMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getHeroProfileMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -85,16 +84,15 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     await setup();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: "Hi, I'm Jane" }),
+      screen.getByRole('heading', { level: 1, name: HEADLINE }),
     ).toBeVisible();
   });
 
   it('renders the hero image src from the configured Sanity CDN base URL', async () => {
     const sanityImage = makeSanityImage();
-    getHeroProfileMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroProfileData({ sanityImage }),
-    });
+    getHeroProfileMock.mockResolvedValue(
+      okResult(makeHeroProfileData({ sanityImage })),
+    );
 
     await setup();
 
@@ -105,10 +103,9 @@ describe(`<${HeroProfileModule.name}/>`, () => {
   });
 
   it('renders no social links list when socialLinks is empty', async () => {
-    getHeroProfileMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroProfileData({ socialLinks: [] }),
-    });
+    getHeroProfileMock.mockResolvedValue(
+      okResult(makeHeroProfileData({ socialLinks: [] })),
+    );
 
     await setup();
 
@@ -116,29 +113,30 @@ describe(`<${HeroProfileModule.name}/>`, () => {
   });
 
   it('renders a labelled list of social links with their targets and named icons', async () => {
-    getHeroProfileMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroProfileData({
-        socialLinks: [
-          {
-            platform: SOCIAL_PLATFORMS.GITHUB,
-            link: {
-              label: 'GitHub',
-              href: 'https://github.com/example',
-              target: '_blank',
-              platform: undefined,
-              ariaLabel: undefined,
+    getHeroProfileMock.mockResolvedValue(
+      okResult(
+        makeHeroProfileData({
+          socialLinks: [
+            {
+              platform: SOCIAL_PLATFORMS.GITHUB,
+              link: {
+                label: 'GitHub',
+                href: GITHUB_URL,
+                target: '_blank',
+                platform: undefined,
+                ariaLabel: undefined,
+              },
             },
-          },
-        ],
-      }),
-    });
+          ],
+        }),
+      ),
+    );
 
     await setup();
 
     const list = screen.getByRole('list', { name: 'Profiles' });
     const link = within(list).getByRole('link', { name: 'GitHub profile' });
-    expect(link).toHaveAttribute('href', 'https://github.com/example');
+    expect(link).toHaveAttribute('href', GITHUB_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(
       within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.GITHUB}`),
@@ -146,43 +144,44 @@ describe(`<${HeroProfileModule.name}/>`, () => {
   });
 
   it('renders one list item per resolved social link', async () => {
-    getHeroProfileMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroProfileData({
-        socialLinks: [
-          {
-            platform: SOCIAL_PLATFORMS.GITHUB,
-            link: {
-              label: 'GitHub',
-              href: 'https://github.com/example',
-              target: '_blank',
-              platform: undefined,
-              ariaLabel: undefined,
+    getHeroProfileMock.mockResolvedValue(
+      okResult(
+        makeHeroProfileData({
+          socialLinks: [
+            {
+              platform: SOCIAL_PLATFORMS.GITHUB,
+              link: {
+                label: 'GitHub',
+                href: GITHUB_URL,
+                target: '_blank',
+                platform: undefined,
+                ariaLabel: undefined,
+              },
             },
-          },
-          {
-            platform: SOCIAL_PLATFORMS.X,
-            link: {
-              label: 'X',
-              href: 'https://x.com/example',
-              target: '_blank',
-              platform: undefined,
-              ariaLabel: undefined,
+            {
+              platform: SOCIAL_PLATFORMS.X,
+              link: {
+                label: SOCIAL_PLATFORMS.X,
+                href: 'https://x.com/example',
+                target: '_blank',
+                platform: undefined,
+                ariaLabel: undefined,
+              },
             },
-          },
-          {
-            platform: SOCIAL_PLATFORMS.LINKEDIN,
-            link: {
-              label: 'LinkedIn',
-              href: 'https://linkedin.com/in/example',
-              target: '_blank',
-              platform: undefined,
-              ariaLabel: undefined,
+            {
+              platform: SOCIAL_PLATFORMS.LINKEDIN,
+              link: {
+                label: 'LinkedIn',
+                href: 'https://linkedin.com/in/example',
+                target: '_blank',
+                platform: undefined,
+                ariaLabel: undefined,
+              },
             },
-          },
-        ],
-      }),
-    });
+          ],
+        }),
+      ),
+    );
 
     await setup();
 

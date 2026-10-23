@@ -14,6 +14,7 @@ import {
   TENANT_PLAN,
 } from '@blog/db/constants';
 import { escapeHtml, LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import {
@@ -160,10 +161,9 @@ describe('subscribeToNewsletterAction', () => {
 
   beforeEach(async () => {
     createPendingSubscriberMock.mockReset();
-    createPendingSubscriberMock.mockResolvedValue({
-      ok: true,
-      data: { outcome: SUBSCRIBER_OUTCOME.CREATED, subscriber },
-    });
+    createPendingSubscriberMock.mockResolvedValue(
+      okResult({ outcome: SUBSCRIBER_OUTCOME.CREATED, subscriber }),
+    );
     sendEmailMock.mockReset();
     sendEmailMock.mockResolvedValue(undefined);
     resolveTenantEmailIdentityMock.mockReset();
@@ -175,17 +175,13 @@ describe('subscribeToNewsletterAction', () => {
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue(SITE_URL);
     getTenantPlanMock.mockReset();
-    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.GROWTH });
+    getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.GROWTH));
     getEffectiveSettingsFeaturesMock.mockReset();
-    getEffectiveSettingsFeaturesMock.mockResolvedValue({
-      ok: true,
-      data: { [CAPABILITY.NEWSLETTER]: true },
-    });
+    getEffectiveSettingsFeaturesMock.mockResolvedValue(
+      okResult({ [CAPABILITY.NEWSLETTER]: true }),
+    );
     resolveWritableTenantMock.mockReset();
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: true,
-      tenantId: TENANT_ID,
-    });
+    resolveWritableTenantMock.mockResolvedValue(okResult(TENANT_ID));
     getEmailConfigMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset();
@@ -283,13 +279,12 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('re-sends the confirmation email and returns SUCCESS for a pending subscriber', async () => {
-    createPendingSubscriberMock.mockResolvedValue({
-      ok: true,
-      data: {
+    createPendingSubscriberMock.mockResolvedValue(
+      okResult({
         outcome: SUBSCRIBER_OUTCOME.ALREADY_PENDING,
         subscriber,
-      },
-    });
+      }),
+    );
     const result = await subscribeToNewsletterAction(EMAIL);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -298,13 +293,12 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('answers SUCCESS to a second sign-up inside the cooldown without emailing again', async () => {
-    createPendingSubscriberMock.mockResolvedValue({
-      ok: true,
-      data: {
+    createPendingSubscriberMock.mockResolvedValue(
+      okResult({
         outcome: SUBSCRIBER_OUTCOME.ALREADY_PENDING,
         subscriber,
-      },
-    });
+      }),
+    );
     claimConfirmationSendMock
       .mockResolvedValueOnce(CLAIM)
       .mockResolvedValueOnce(null);
@@ -330,13 +324,12 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns ALREADY_SUBSCRIBED without sending an email for an active subscriber', async () => {
-    createPendingSubscriberMock.mockResolvedValue({
-      ok: true,
-      data: {
+    createPendingSubscriberMock.mockResolvedValue(
+      okResult({
         outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
         subscriber: { ...subscriber, status: 'active' as const },
-      },
-    });
+      }),
+    );
     const result = await subscribeToNewsletterAction(EMAIL);
 
     expect(result).toEqual({ outcome: NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED });
@@ -345,10 +338,9 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns SERVER_ERROR without touching the db when no tenant resolves', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
+    );
     const result = await subscribeToNewsletterAction(EMAIL);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
@@ -358,10 +350,9 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns UNAVAILABLE without touching the db when the tenant is not ACTIVE', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.INACTIVE,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
+    );
     const result = await subscribeToNewsletterAction(EMAIL);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
@@ -433,10 +424,9 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns UNAVAILABLE without storing or emailing when the capability is off', async () => {
-    getEffectiveSettingsFeaturesMock.mockResolvedValue({
-      ok: true,
-      data: { [CAPABILITY.NEWSLETTER]: false },
-    });
+    getEffectiveSettingsFeaturesMock.mockResolvedValue(
+      okResult({ [CAPABILITY.NEWSLETTER]: false }),
+    );
     const result = await subscribeToNewsletterAction(EMAIL);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
@@ -446,7 +436,7 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns UNAVAILABLE without storing when the plan does not entitle the newsletter', async () => {
-    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.FREE });
+    getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.FREE));
     const result = await subscribeToNewsletterAction(EMAIL);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
@@ -483,10 +473,9 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns SERVER_ERROR and logs when createPendingSubscriber fails', async () => {
-    createPendingSubscriberMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    createPendingSubscriberMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
     const result = await subscribeToNewsletterAction(EMAIL);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
@@ -571,13 +560,12 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('still returns ALREADY_SUBSCRIBED, logging, when marking the cookie throws', async () => {
-    createPendingSubscriberMock.mockResolvedValue({
-      ok: true,
-      data: {
+    createPendingSubscriberMock.mockResolvedValue(
+      okResult({
         outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
         subscriber: { ...subscriber, status: 'active' as const },
-      },
-    });
+      }),
+    );
     markNewsletterSubscribedMock.mockRejectedValue(
       new Error(faker.lorem.sentence()),
     );

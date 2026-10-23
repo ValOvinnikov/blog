@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -7,6 +8,9 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroStatementModule } from './hero-statement-module';
+
+const MODULE_ID = 'hero-statement-1';
+const STATEMENT = 'Hello World';
 
 const { getHeroStatementMock } = vi.hoisted(() => ({
   getHeroStatementMock: vi.fn(),
@@ -39,7 +43,7 @@ const makeHeroStatementData = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const setup = customRenderAsync(HeroStatementModule, {
-  id: 'hero-statement-1',
+  id: MODULE_ID,
 });
 
 describe(`<${HeroStatementModule.name}/>`, () => {
@@ -59,24 +63,15 @@ describe(`<${HeroStatementModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getHeroStatementMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroStatementData(),
-    });
+    getHeroStatementMock.mockResolvedValue(okResult(makeHeroStatementData()));
 
     await setup();
 
-    expect(getHeroStatementMock).toHaveBeenCalledWith(
-      'hero-statement-1',
-      tenant,
-    );
+    expect(getHeroStatementMock).toHaveBeenCalledWith(MODULE_ID, tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getHeroStatementMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getHeroStatementMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -84,26 +79,26 @@ describe(`<${HeroStatementModule.name}/>`, () => {
   });
 
   it('renders the resolved heading', async () => {
-    getHeroStatementMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroStatementData({
-        headingBlock: makeHeadingBlock({ heading: 'Hello World' }),
-      }),
-    });
+    getHeroStatementMock.mockResolvedValue(
+      okResult(
+        makeHeroStatementData({
+          headingBlock: makeHeadingBlock({ heading: STATEMENT }),
+        }),
+      ),
+    );
 
     await setup();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Hello World' }),
+      screen.getByRole('heading', { level: 1, name: STATEMENT }),
     ).toBeVisible();
   });
 
   it('renders the hero image src from the configured Sanity CDN base URL', async () => {
     const sanityImage = makeSanityImage();
-    getHeroStatementMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroStatementData({ sanityImage }),
-    });
+    getHeroStatementMock.mockResolvedValue(
+      okResult(makeHeroStatementData({ sanityImage })),
+    );
 
     await setup();
 

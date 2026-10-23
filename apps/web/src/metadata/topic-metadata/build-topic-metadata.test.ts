@@ -1,8 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -34,7 +35,7 @@ const TOPIC_PATH = '/topics/engineering';
 const NL_DESIGN_TOPIC_PATH = '/nl/topics/ontwerp';
 const EN_DESIGN_TOPIC_PATH = '/topics/design';
 
-const seo = makeSeo({
+const seo = mockSeo({
   title: 'Engineering',
   description: DESCRIPTION,
   ogTitle: OG_TITLE,
@@ -49,10 +50,9 @@ describe('buildTopicMetadata', () => {
 
   describe('when the topic resolves', () => {
     beforeEach(() => {
-      getTopicPageMock.mockResolvedValue({
-        ok: true,
-        data: { topic: {}, modules: [], seo, translations: [] },
-      });
+      getTopicPageMock.mockResolvedValue(
+        okResult({ topic: {}, modules: [], seo, translations: [] }),
+      );
     });
 
     it('forwards the slug to getTopicPage, the loader TopicPage reads', async () => {
@@ -86,10 +86,7 @@ describe('buildTopicMetadata', () => {
 
   describe('when the topic fetch fails', () => {
     beforeEach(() => {
-      getTopicPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getTopicPageMock.mockResolvedValue(errorResult(new Error('boom')));
     });
 
     it('returns empty metadata when the topic fetch fails', async () => {
@@ -106,15 +103,14 @@ describe('buildTopicMetadata', () => {
   });
 
   it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTopicPageMock.mockResolvedValue(
+      okResult({
         topic: {},
         modules: [],
-        seo: makeSeo({ ogTitle: undefined }),
+        seo: mockSeo({ ogTitle: undefined }),
         translations: [],
-      },
-    });
+      }),
+    );
 
     const metadata = await buildTopicMetadata('engineering', 2);
 
@@ -123,7 +119,7 @@ describe('buildTopicMetadata', () => {
   });
 
   it('returns empty metadata without logging when the topic simply does not exist', async () => {
-    getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTopicPageMock.mockResolvedValue(okResult());
 
     const metadata = await buildTopicMetadata('missing');
 
@@ -142,9 +138,8 @@ describe('buildTopicMetadata per language', () => {
       locale: NL,
       liveLocales: [EN, NL],
     });
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTopicPageMock.mockResolvedValue(
+      okResult({
         topic: {},
         modules: [],
         seo,
@@ -153,8 +148,8 @@ describe('buildTopicMetadata per language', () => {
           { language: NL, slug: 'ontwerp' },
           { language: DE, slug: 'gestaltung' },
         ],
-      },
-    });
+      }),
+    );
   });
 
   afterEach(() => {

@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import {
   customRenderServerAsync,
@@ -55,27 +56,27 @@ const HERO_HEADING = 'All about news';
 
 describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        headingBlock: makeHeadingBlock({
-          heading: 'News',
-          supportingText: SUPPORTING_TEXT,
+    getTopicPageMock.mockResolvedValue(
+      okResult(
+        makeTopicDetailPage({
+          topic: makeTopic({ title: 'News', slug: 'news' }),
+          headingBlock: makeHeadingBlock({
+            heading: 'News',
+            supportingText: SUPPORTING_TEXT,
+          }),
         }),
-      }),
-    });
-    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
-      ok: true,
-      data: [
+      ),
+    );
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
+      okResult([
         makeTopicWithPostCount({ title: 'News', slug: 'news' }),
         makeTopicWithPostCount({
           id: 'topic-2',
           title: 'Design',
           slug: 'design',
         }),
-      ],
-    });
+      ]),
+    );
   });
 
   describe('with the default topic', () => {
@@ -132,10 +133,7 @@ describe(`<${TopicPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getTopicPageMock.mockResolvedValueOnce(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -147,7 +145,7 @@ describe(`<${TopicPage.name}/>`, () => {
   });
 
   it('calls notFound() without logging when the topic does not exist', async () => {
-    getTopicPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getTopicPageMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -156,19 +154,21 @@ describe(`<${TopicPage.name}/>`, () => {
   });
 
   it('renders the authored modules inside main', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        modules: [{ id: 'cta-1', type: 'module_cta' }],
-      }),
-    });
-    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
-      ok: true,
-      data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
-      }),
-    });
+    getTopicPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTopicDetailPage({
+          topic: makeTopic({ title: 'News', slug: 'news' }),
+          modules: [{ id: 'cta-1', type: 'module_cta' }],
+        }),
+      ),
+    );
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
+      okResult(
+        makeCtaModuleData({
+          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+        }),
+      ),
+    );
 
     await setup();
 
@@ -180,18 +180,18 @@ describe(`<${TopicPage.name}/>`, () => {
   });
 
   it('renders the hero in place of the topic heading when one is set', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        hero: { id: 'hero-1', type: 'module_heroBlog' },
-      }),
-    });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
-      ok: true,
-      data: makeHeroBlogData({ heading: HERO_HEADING }),
-    });
+    getTopicPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTopicDetailPage({
+          topic: makeTopic({ title: 'News', slug: 'news' }),
+          headingBlock: makeHeadingBlock({ heading: 'News' }),
+          hero: { id: 'hero-1', type: 'module_heroBlog' },
+        }),
+      ),
+    );
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
+      okResult(makeHeroBlogData({ heading: HERO_HEADING })),
+    );
 
     await setup();
 
@@ -209,17 +209,17 @@ describe(`<${TopicPage.name}/>`, () => {
   ])(
     'loads post lists for page $expected of the topic archive',
     async ({ page, expected }) => {
-      getTopicPageMock.mockResolvedValueOnce({
-        ok: true,
-        data: makeTopicDetailPage({
-          topic: makeTopic({ title: 'News', slug: 'news' }),
-          modules: [{ id: 'list-1', type: 'module_postList' }],
-        }),
-      });
-      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getTopicPageMock.mockResolvedValueOnce(
+        okResult(
+          makeTopicDetailPage({
+            topic: makeTopic({ title: 'News', slug: 'news' }),
+            modules: [{ id: 'list-1', type: 'module_postList' }],
+          }),
+        ),
+      );
+      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+        errorResult(new Error('boom')),
+      );
 
       await expect(setup({ page })).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -235,17 +235,17 @@ describe(`<${TopicPage.name}/>`, () => {
   );
 
   it('names the topic in an empty post list', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        modules: [{ id: 'list-1', type: 'module_postList' }],
-      }),
-    });
-    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
-      ok: true,
-      data: makePostListModuleData(),
-    });
+    getTopicPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTopicDetailPage({
+          topic: makeTopic({ title: 'News', slug: 'news' }),
+          modules: [{ id: 'list-1', type: 'module_postList' }],
+        }),
+      ),
+    );
+    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+      okResult(makePostListModuleData()),
+    );
 
     await setup();
 
@@ -253,19 +253,20 @@ describe(`<${TopicPage.name}/>`, () => {
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        faqs: [
-          {
-            id: 'faq-1',
-            question: 'Do you offer a free trial?',
-            answer: 'Yes.',
-          },
-        ],
-      }),
-    });
+    getTopicPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTopicDetailPage({
+          topic: makeTopic({ title: 'News', slug: 'news' }),
+          faqs: [
+            {
+              id: 'faq-1',
+              question: 'Do you offer a free trial?',
+              answer: 'Yes.',
+            },
+          ],
+        }),
+      ),
+    );
 
     await setup();
 

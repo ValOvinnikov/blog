@@ -1,9 +1,13 @@
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeStatsModule } from '@web/testing/modules/stats/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { StatsModule } from './stats-module';
+
+const READERS_LABEL = 'Monthly readers';
+const TTFB_LABEL = 'Median TTFB';
 
 const { getStatsModuleMock } = vi.hoisted(() => ({
   getStatsModuleMock: vi.fn(),
@@ -44,7 +48,7 @@ describe(`<${StatsModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getStatsModuleMock.mockResolvedValue({ ok: true, data: makeStatsModule() });
+    getStatsModuleMock.mockResolvedValue(okResult(makeStatsModule()));
 
     await setup();
 
@@ -52,10 +56,7 @@ describe(`<${StatsModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getStatsModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getStatsModuleMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -63,29 +64,30 @@ describe(`<${StatsModule.name}/>`, () => {
   });
 
   it('renders the resolved stat figures', async () => {
-    getStatsModuleMock.mockResolvedValue({
-      ok: true,
-      data: makeStatsModule({
-        stats: [
-          {
-            id: 'stat-1',
-            value: '2.4M',
-            label: 'Monthly readers',
-            description: undefined,
-          },
-          {
-            id: 'stat-2',
-            value: '<50ms',
-            label: 'Median TTFB',
-            description: undefined,
-          },
-        ],
-      }),
-    });
+    getStatsModuleMock.mockResolvedValue(
+      okResult(
+        makeStatsModule({
+          stats: [
+            {
+              id: 'stat-1',
+              value: '2.4M',
+              label: READERS_LABEL,
+              description: undefined,
+            },
+            {
+              id: 'stat-2',
+              value: '<50ms',
+              label: TTFB_LABEL,
+              description: undefined,
+            },
+          ],
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(screen.getByText('Monthly readers')).toBeVisible();
-    expect(screen.getByText('Median TTFB')).toBeVisible();
+    expect(screen.getByText(READERS_LABEL)).toBeVisible();
+    expect(screen.getByText(TTFB_LABEL)).toBeVisible();
   });
 });
