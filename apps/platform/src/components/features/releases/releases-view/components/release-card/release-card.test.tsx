@@ -41,7 +41,7 @@ const setup = customRender(ReleaseCard, {
   hasChanges: true,
   migrations: makeReleaseCandidate().migrations,
   isOverrideRequired: false,
-  releaseRun: okResult(undefined),
+  releaseRun: okResult(),
 });
 
 describe(`<${ReleaseCard.name}/>`, () => {
@@ -53,7 +53,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     startReleaseActionMock
       .mockReset()
       .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
-    getReleaseRunActionMock.mockReset().mockResolvedValue(okResult(undefined));
+    getReleaseRunActionMock.mockReset().mockResolvedValue(okResult());
   });
 
   afterEach(() => {

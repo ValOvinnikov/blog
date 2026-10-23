@@ -42,7 +42,7 @@ export const getReleaseRun = async (): Promise<
 > => {
   const latest = await getLatestWorkflowRun(RELEASE_WORKFLOW_FILE);
   if (!latest.ok) return toReleaseFailure(latest.error);
-  if (!latest.data) return okResult(undefined);
+  if (!latest.data) return okResult();
 
   const { id, htmlUrl, title, createdAt } = latest.data;
   const status = toReleaseRunStatus(latest.data);

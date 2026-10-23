@@ -63,9 +63,7 @@ describe(removeBlockedIdentityAction, () => {
     listBlockedIdentitiesMock
       .mockReset()
       .mockResolvedValue(okResult([DOMAIN_ENTRY, ADDRESS_ENTRY]));
-    removeBlockedIdentityMock
-      .mockReset()
-      .mockResolvedValue(okResult(undefined));
+    removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     recordAuditEventMock.mockReset();
   });
 

@@ -50,7 +50,7 @@ export const getLatestWorkflowRun = async (
   );
 
   if (!result.ok && result.error === 'notFound') {
-    return okResult(undefined);
+    return okResult();
   }
 
   return result;

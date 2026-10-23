@@ -26,7 +26,7 @@ vi.mock('@platform/server/releases/get-release-run-action', () => ({
 
 const setup = customRender(ReleasesView, {
   result: okResult(makeReleaseCandidate()),
-  releaseRun: okResult(undefined),
+  releaseRun: okResult(),
 });
 
 describe(`<${ReleasesView.name}/>`, () => {

@@ -104,9 +104,7 @@ describe('tenant suspension actions', () => {
       .mockReset()
       .mockResolvedValue(okResult({ entry: ENTRY, created: true }));
     recordSignupBlockAddedMock.mockReset();
-    removeBlockedIdentityMock
-      .mockReset()
-      .mockResolvedValue(okResult(undefined));
+    removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     vi.mocked(logger.error).mockReset();
     recordAuditEventMock.mockReset();
     revalidateSiteConfigMock.mockReset();
