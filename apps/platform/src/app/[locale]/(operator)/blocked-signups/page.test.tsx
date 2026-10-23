@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import { okResult } from '@blog/utils';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import {
   BLOCKED_ADDRESS_ENTRY_ID,
@@ -45,17 +46,16 @@ const setup = customRenderAsync(BlockedSignupsPage, {});
 describe(BlockedSignupsPage, () => {
   beforeEach(() => {
     requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
-    listBlockedIdentitiesMock.mockReset().mockResolvedValue({
-      ok: true,
-      data: [
+    listBlockedIdentitiesMock.mockReset().mockResolvedValue(
+      okResult([
         makeBlockedIdentityListing(),
         makeBlockedIdentityListing({
           id: BLOCKED_ADDRESS_ENTRY_ID,
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
           value: BLOCKED_ADDRESS_HASH,
         }),
-      ],
-    });
+      ]),
+    );
   });
 
   it('404s for anyone who is not a super admin without reading the list', async () => {

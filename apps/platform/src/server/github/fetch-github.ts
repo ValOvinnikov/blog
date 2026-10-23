@@ -1,3 +1,5 @@
+import { HTTP_STATUS } from '@blog/config';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { logger } from '@platform/utils/logger/logger';
 
 import { readGitHubCredentials } from './read-github-credentials';
@@ -7,12 +9,11 @@ const GITHUB_TIMEOUT_MS = 5000;
 export type TGitHubFailureReason =
   'notConfigured' | 'rateLimited' | 'notFound' | 'githubError';
 
-export type TGitHubResult<T> =
-  { ok: true; data: T } | { ok: false; reason: TGitHubFailureReason };
+export type TGitHubResult<T> = TResult<T, TGitHubFailureReason>;
 
 const isRateLimited = (response: Response): boolean =>
   response.status === 429 ||
-  (response.status === 403 &&
+  (response.status === HTTP_STATUS.FORBIDDEN &&
     response.headers.get('x-ratelimit-remaining') === '0');
 
 /** Never throws; a rate limit is logged at warn and a missing resource not at all. */
@@ -24,7 +25,7 @@ export const fetchGitHub = async (
 
   if (!credentials) {
     logger.error('github.not_configured');
-    return { ok: false, reason: 'notConfigured' };
+    return errorResult('notConfigured');
   }
 
   const { token, owner, repo } = credentials;
@@ -42,22 +43,23 @@ export const fetchGitHub = async (
       },
     );
 
-    if (response.ok) return { ok: true, data: response };
-    if (response.status === 404) return { ok: false, reason: 'notFound' };
+    if (response.ok) return okResult(response);
+    if (response.status === HTTP_STATUS.NOT_FOUND)
+      return errorResult('notFound');
 
     if (isRateLimited(response)) {
       logger.warn('github.rate_limited', { path });
-      return { ok: false, reason: 'rateLimited' };
+      return errorResult('rateLimited');
     }
 
     logger.error('github.request_failed', {
       path,
       responseStatus: response.status,
     });
-    return { ok: false, reason: 'githubError' };
+    return errorResult('githubError');
   } catch (error) {
     logger.error('github.request_error', { path, error });
-    return { ok: false, reason: 'githubError' };
+    return errorResult('githubError');
   }
 };
 
@@ -70,9 +72,9 @@ export const fetchGitHubJson = async <T>(
   if (!result.ok) return result;
 
   try {
-    return { ok: true, data: parse(await result.data.json()) };
+    return okResult(parse(await result.data.json()));
   } catch (error) {
     logger.error('github.unexpected_response', { path, error });
-    return { ok: false, reason: 'githubError' };
+    return errorResult('githubError');
   }
 };

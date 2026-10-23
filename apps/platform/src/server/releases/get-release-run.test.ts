@@ -117,6 +117,6 @@ describe(getReleaseRun, () => {
   it('fails the read when GitHub answers with an error', async () => {
     github.respond(runsPath, () => githubJson({}, 500));
 
-    expect(await getReleaseRun()).toEqual({ ok: false, reason: 'githubError' });
+    expect(await getReleaseRun()).toEqual({ ok: false, error: 'githubError' });
   });
 });

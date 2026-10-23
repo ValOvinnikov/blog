@@ -35,7 +35,7 @@ export const ReleasesView = ({ result, releaseRun }: TReleasesViewProps) => {
     return (
       <div className={root()}>
         <PageHeader title={t('title')} description={t('description')} />
-        <ReleaseUnavailable reason={result.reason} />
+        <ReleaseUnavailable reason={result.error} />
       </div>
     );
   }

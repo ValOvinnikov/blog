@@ -55,7 +55,7 @@ describe(getLatestReleaseTag, () => {
 
     expect(await getLatestReleaseTag()).toEqual({
       ok: false,
-      reason: 'tagListIncomplete',
+      error: 'tagListIncomplete',
     });
     expect(github.fetchMock).toHaveBeenCalledTimes(10);
   });

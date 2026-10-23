@@ -35,7 +35,7 @@ describe(getDbMigrationJournal, () => {
 
     expect(await getDbMigrationJournal(ref)).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: 'githubError',
     });
   });
 });

@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { okResult } from '@blog/utils';
 import {
   RELEASE_RUN_STATUS,
   RELEASE_WORKFLOW_FILE,
@@ -40,8 +41,8 @@ export const getReleaseRun = async (): Promise<
   TReleaseResult<TMaybeUndefined<TReleaseRun>>
 > => {
   const latest = await getLatestWorkflowRun(RELEASE_WORKFLOW_FILE);
-  if (!latest.ok) return toReleaseFailure(latest.reason);
-  if (!latest.data) return { ok: true, data: undefined };
+  if (!latest.ok) return toReleaseFailure(latest.error);
+  if (!latest.data) return okResult(undefined);
 
   const { id, htmlUrl, title, createdAt } = latest.data;
   const status = toReleaseRunStatus(latest.data);
@@ -49,14 +50,17 @@ export const getReleaseRun = async (): Promise<
   let isTenantMigrationFailed = false;
   if (status === RELEASE_RUN_STATUS.FAILED) {
     const failedJobs = await listFailedJobNames(id);
-    if (!failedJobs.ok) return toReleaseFailure(failedJobs.reason);
+    if (!failedJobs.ok) return toReleaseFailure(failedJobs.error);
     isTenantMigrationFailed = failedJobs.data.some((name) =>
       name.includes(TENANT_MIGRATION_JOB_NAME),
     );
   }
 
-  return {
-    ok: true,
-    data: { status, title, url: htmlUrl, createdAt, isTenantMigrationFailed },
-  };
+  return okResult({
+    status,
+    title,
+    url: htmlUrl,
+    createdAt,
+    isTenantMigrationFailed,
+  });
 };

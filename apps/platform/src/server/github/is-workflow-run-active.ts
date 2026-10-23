@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { z } from 'zod';
 
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
@@ -19,8 +20,8 @@ export const isWorkflowRunActive = async (
         .workflow_runs.some(({ status }) => status !== 'completed'),
   );
 
-  if (!result.ok && result.reason === 'notFound') {
-    return { ok: true, data: false };
+  if (!result.ok && result.error === 'notFound') {
+    return okResult(false);
   }
 
   return result;

@@ -7,6 +7,7 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth, signIn } from '@platform/server/auth/auth';
@@ -104,7 +105,7 @@ describe('createTenantAction', () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     signInMock.mockReset();
-    signInMock.mockResolvedValue({ ok: true });
+    signInMock.mockResolvedValue(okResult());
     getUserByEmailMock.mockReset();
     getUserByEmailMock.mockResolvedValue({
       id: OWNER_USER_ID,
@@ -117,10 +118,7 @@ describe('createTenantAction', () => {
       DOMAIN_AVAILABILITY.AVAILABLE,
     );
     createTenantDraftMock.mockReset();
-    createTenantDraftMock.mockResolvedValue({
-      ok: true,
-      data: { id: TENANT_ID },
-    });
+    createTenantDraftMock.mockResolvedValue(okResult({ id: TENANT_ID }));
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
@@ -222,7 +220,7 @@ describe('createTenantAction', () => {
 
   it('logs an error but still redirects when the owner-invite email fails to send', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
-    signInMock.mockResolvedValue({ ok: false, error: 'EmailSignInError' });
+    signInMock.mockResolvedValue(errorResult('EmailSignInError'));
 
     await expect(
       createTenantAction({
@@ -389,10 +387,9 @@ describe('createTenantAction', () => {
   });
 
   it('returns a generic error and logs on any other createTenantDraft failure', async () => {
-    createTenantDraftMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    createTenantDraftMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await createTenantAction(validInput);
 

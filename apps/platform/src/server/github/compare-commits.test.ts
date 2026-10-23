@@ -108,7 +108,7 @@ describe(compareCommits, () => {
 
     expect(await compareCommits(base, head)).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: 'githubError',
     });
   });
 });

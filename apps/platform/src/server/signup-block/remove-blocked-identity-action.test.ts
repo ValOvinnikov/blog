@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
@@ -61,10 +62,10 @@ describe(removeBlockedIdentityAction, () => {
     requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
     listBlockedIdentitiesMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: [DOMAIN_ENTRY, ADDRESS_ENTRY] });
+      .mockResolvedValue(okResult([DOMAIN_ENTRY, ADDRESS_ENTRY]));
     removeBlockedIdentityMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: undefined });
+      .mockResolvedValue(okResult(undefined));
     recordAuditEventMock.mockReset();
   });
 
@@ -118,10 +119,9 @@ describe(removeBlockedIdentityAction, () => {
   });
 
   it('refuses an entry removed by someone else meanwhile and records nothing', async () => {
-    removeBlockedIdentityMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    removeBlockedIdentityMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await removeBlockedIdentityAction(DOMAIN_ENTRY.id);
 

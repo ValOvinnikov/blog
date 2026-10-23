@@ -13,6 +13,7 @@ import {
 } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import { okResult } from '@blog/utils';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -87,7 +88,7 @@ describe(saveVoiceOverridesAction, () => {
       logoAssetUrl: 'https://blob.example.com/logo.png',
       faviconAssetUrl: 'https://blob.example.com/favicon.png',
     });
-    upsertSiteConfigMock.mockResolvedValue({ ok: true });
+    upsertSiteConfigMock.mockResolvedValue(okResult());
     requireTenantMembershipMock.mockResolvedValue({
       tenant,
       membership: { role: MEMBERSHIP_ROLE.OWNER },

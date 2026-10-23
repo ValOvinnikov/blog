@@ -72,7 +72,7 @@ describe(getReleaseCandidate, () => {
 
   const candidate = async () => {
     const result = await getReleaseCandidate();
-    if (!result.ok) throw new Error(result.reason);
+    if (!result.ok) throw new Error(result.error);
     return result.data;
   };
 
@@ -242,7 +242,7 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'noReleaseTag',
+      error: 'noReleaseTag',
     });
   });
 
@@ -257,7 +257,7 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'tagListIncomplete',
+      error: 'tagListIncomplete',
     });
   });
 
@@ -266,7 +266,7 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'notConfigured',
+      error: 'notConfigured',
     });
   });
 
@@ -278,7 +278,7 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: 'githubError',
     });
   });
 
@@ -287,7 +287,7 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'rateLimited',
+      error: 'rateLimited',
     });
   });
 
@@ -297,7 +297,7 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'dbError',
+      error: 'dbError',
     });
   });
 });

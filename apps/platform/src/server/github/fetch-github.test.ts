@@ -35,13 +35,13 @@ describe(fetchGitHub, () => {
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'notConfigured',
+      error: 'notConfigured',
     });
     expect(github.fetchMock).not.toHaveBeenCalled();
   });
 
   it('returns notFound for a 404 without logging it', async () => {
-    expect(await fetchGitHub(path)).toEqual({ ok: false, reason: 'notFound' });
+    expect(await fetchGitHub(path)).toEqual({ ok: false, error: 'notFound' });
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
@@ -57,7 +57,7 @@ describe(fetchGitHub, () => {
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'rateLimited',
+      error: 'rateLimited',
     });
     expect(loggerWarnMock).toHaveBeenCalledWith('github.rate_limited', {
       path,
@@ -70,7 +70,7 @@ describe(fetchGitHub, () => {
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'rateLimited',
+      error: 'rateLimited',
     });
   });
 
@@ -79,7 +79,7 @@ describe(fetchGitHub, () => {
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: 'githubError',
     });
     expect(loggerErrorMock).toHaveBeenCalledWith('github.request_failed', {
       path,
@@ -93,7 +93,7 @@ describe(fetchGitHub, () => {
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: 'githubError',
     });
     expect(loggerErrorMock).toHaveBeenCalledWith('github.request_error', {
       path,
@@ -122,6 +122,6 @@ describe(fetchGitHubJson, () => {
       await fetchGitHubJson(path, () => {
         throw new Error('unexpected');
       }),
-    ).toEqual({ ok: false, reason: 'githubError' });
+    ).toEqual({ ok: false, error: 'githubError' });
   });
 });

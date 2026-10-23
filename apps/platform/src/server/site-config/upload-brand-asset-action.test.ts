@@ -10,6 +10,7 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -109,14 +110,13 @@ describe(uploadBrandAssetAction, () => {
       user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: true,
-      asset: {
+    validateBrandAssetUploadMock.mockResolvedValue(
+      okResult({
         buffer: Buffer.from('bytes'),
         contentType: 'image/png',
         extension: 'png',
-      },
-    });
+      }),
+    );
     putMock.mockResolvedValue({
       url: UPLOADED_LOGO_URL,
     });
@@ -129,13 +129,12 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('re-resolves the tenant from the session before touching Blob or the db', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: false,
-      error: {
+    validateBrandAssetUploadMock.mockResolvedValue(
+      errorResult({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
-      },
-    });
+      }),
+    );
 
     await uploadBrandAssetAction(
       TENANT_ID,
@@ -162,13 +161,12 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('returns the validation error and never calls Blob when validation fails', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: false,
-      error: {
+    validateBrandAssetUploadMock.mockResolvedValue(
+      errorResult({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED,
-      },
-    });
+      }),
+    );
 
     const result = await uploadBrandAssetAction(
       TENANT_ID,

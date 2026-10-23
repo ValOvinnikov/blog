@@ -1,10 +1,10 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
+import type { TResult } from '@blog/utils';
 import { useState, useTransition } from 'react';
 
-export type TConfirmDialogActionResult =
-  { ok: true } | { ok: false; error?: string };
+export type TConfirmDialogActionResult = TResult<void, TMaybeUndefined<string>>;
 
 export type TUseConfirmDialogArgs = {
   onConfirm: (confirmValue: string) => Promise<TConfirmDialogActionResult>;
