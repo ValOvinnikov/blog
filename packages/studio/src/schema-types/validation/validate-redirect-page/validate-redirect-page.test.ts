@@ -2,7 +2,6 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
 import {
   AUTOMATIC_REDIRECT_EDITED_WARNING,
   REDIRECT_DESTINATION_UNPUBLISHED_ERROR,
@@ -11,69 +10,58 @@ import {
   validateRedirectDestinationPage,
   validateRedirectSourcePage,
 } from '@blog/studio/schema-types/validation/validate-redirect-page/validate-redirect-page';
-import { evaluate, parse } from 'groq-js';
-import type { SanityDocument, ValidationContext } from 'sanity';
+import {
+  MOCK_REDIRECT_SOURCE,
+  mockPage,
+  mockRedirect,
+} from '@blog/studio/testing/mock-documents';
+import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const page = (
-  _type: string,
-  _id: string,
-  slug: string,
-  { parent, language = EN }: { parent?: string; language?: string } = {},
-) => ({
-  _id,
-  _type,
-  language,
-  title: `Title ${_id}`,
-  slug: { current: slug },
-  ...(parent ? { parent: { _ref: parent } } : {}),
-});
-
-const redirect = (
-  _id: string,
-  fields: Record<string, unknown> = {},
-): SanityDocument =>
-  ({
-    _id,
-    _type: REDIRECT_TYPE,
-    language: EN,
-    source: '/old',
-    destination: '/new',
-    ...fields,
-  }) as unknown as SanityDocument;
-
-const createContext = (
-  document: SanityDocument,
-  dataset: unknown[],
-  fetchError?: Error,
-) =>
-  ({
-    document,
-    getClient: () => ({
-      withConfig: () => ({
-        fetch: async (query: string, params: Record<string, unknown>) => {
-          if (fetchError) throw fetchError;
-          return (await evaluate(parse(query), { dataset, params })).get();
-        },
-      }),
-    }),
-  }) as unknown as ValidationContext;
+const ELSEWHERE_PATH = '/elsewhere';
+const SERVICES_DESIGN_PATH = '/services/design';
 
 const PAGES = [
-  page(PAGE_LANDING_TYPE, 'services', 'services'),
-  page(PAGE_LANDING_TYPE, 'design', 'design', { parent: 'services' }),
-  page(PAGE_LANDING_TYPE, 'design-nl', 'design', { language: NL }),
-  page(PAGE_POST_TYPE, 'hello', 'hello'),
-  page(PAGE_TOPIC_TYPE, 'news', 'news'),
+  mockPage({
+    _type: PAGE_LANDING_TYPE,
+    _id: 'services',
+    slug: 'services',
+    language: EN,
+  }),
+  mockPage({
+    _type: PAGE_LANDING_TYPE,
+    _id: 'design',
+    slug: 'design',
+    language: EN,
+    parent: 'services',
+  }),
+  mockPage({
+    _type: PAGE_LANDING_TYPE,
+    _id: 'design-nl',
+    slug: 'design',
+    language: NL,
+  }),
+  mockPage({
+    _type: PAGE_POST_TYPE,
+    _id: 'hello',
+    slug: 'hello',
+    language: EN,
+  }),
+  mockPage({
+    _type: PAGE_TOPIC_TYPE,
+    _id: 'news',
+    slug: 'news',
+    language: EN,
+  }),
 ];
 
 describe(validateRedirectDestinationPage, () => {
-  const document = redirect('drafts.r1');
+  const document = mockRedirect({ _id: 'drafts.r1' });
 
   it.each([
     '/services',
-    '/services/design',
+    SERVICES_DESIGN_PATH,
     '/blog/hello',
     '/topics/news',
     '/topics/news/page/2',
@@ -83,7 +71,10 @@ describe(validateRedirectDestinationPage, () => {
     '/account',
   ])('passes %s, where a page is live', async (path) => {
     await expect(
-      validateRedirectDestinationPage(path, createContext(document, PAGES)),
+      validateRedirectDestinationPage(
+        path,
+        mockGroqValidationContext(PAGES, { document }),
+      ),
     ).resolves.toBe(true);
   });
 
@@ -96,66 +87,84 @@ describe(validateRedirectDestinationPage, () => {
     '/tags/news',
   ])('blocks %s, where no page is published', async (path) => {
     await expect(
-      validateRedirectDestinationPage(path, createContext(document, PAGES)),
+      validateRedirectDestinationPage(
+        path,
+        mockGroqValidationContext(PAGES, { document }),
+      ),
     ).resolves.toBe(REDIRECT_DESTINATION_UNPUBLISHED_ERROR);
   });
 
   it('blocks a page that is only published in another language', async () => {
     const dataset = [
-      page(PAGE_LANDING_TYPE, 'about-nl', 'about', { language: NL }),
+      mockPage({
+        _type: PAGE_LANDING_TYPE,
+        _id: 'about-nl',
+        slug: 'about',
+        language: NL,
+      }),
     ];
 
     await expect(
       validateRedirectDestinationPage(
         '/about',
-        createContext(document, dataset),
+        mockGroqValidationContext(dataset, { document }),
       ),
     ).resolves.toBe(REDIRECT_DESTINATION_UNPUBLISHED_ERROR);
   });
 
-  it('passes when the page lookup fails', async () => {
+  it('passes a destination when the page lookup fails', async () => {
     await expect(
       validateRedirectDestinationPage(
         '/missing',
-        createContext(document, PAGES, new Error('network')),
+        mockGroqValidationContext(PAGES, {
+          document,
+          fetchError: new Error('network'),
+        }),
       ),
     ).resolves.toBe(true);
   });
 });
 
 describe(validateRedirectSourcePage, () => {
-  const document = redirect('drafts.r1');
+  const document = mockRedirect({ _id: 'drafts.r1' });
 
   it('warns when a page is published at the source', async () => {
     await expect(
       validateRedirectSourcePage(
-        '/services/design',
-        createContext(document, PAGES),
+        SERVICES_DESIGN_PATH,
+        mockGroqValidationContext(PAGES, { document }),
       ),
     ).resolves.toBe(REDIRECT_SOURCE_SHADOWED_WARNING);
   });
 
   it('passes a source with no published page', async () => {
     await expect(
-      validateRedirectSourcePage('/old-design', createContext(document, PAGES)),
+      validateRedirectSourcePage(
+        '/old-design',
+        mockGroqValidationContext(PAGES, { document }),
+      ),
     ).resolves.toBe(true);
   });
 
-  it('passes when the page lookup fails', async () => {
+  it('passes a source when the page lookup fails', async () => {
     await expect(
       validateRedirectSourcePage(
         '/services',
-        createContext(document, PAGES, new Error('network')),
+        mockGroqValidationContext(PAGES, {
+          document,
+          fetchError: new Error('network'),
+        }),
       ),
     ).resolves.toBe(true);
   });
 });
 
 describe(validateAutomaticRedirectUnchanged, () => {
-  const published = redirect('r1', { isAutomatic: true });
+  const published = mockRedirect({ _id: 'r1', isAutomatic: true });
 
   it('warns when the source of an automatic redirect is changed', async () => {
-    const draft = redirect('drafts.r1', {
+    const draft = mockRedirect({
+      _id: 'drafts.r1',
       isAutomatic: true,
       source: '/older',
     });
@@ -163,43 +172,46 @@ describe(validateAutomaticRedirectUnchanged, () => {
     await expect(
       validateAutomaticRedirectUnchanged('source')(
         '/older',
-        createContext(draft, [published]),
+        mockGroqValidationContext([published], { document: draft }),
       ),
     ).resolves.toBe(AUTOMATIC_REDIRECT_EDITED_WARNING);
   });
 
   it('warns when the destination of an automatic redirect is changed', async () => {
-    const draft = redirect('drafts.r1', {
+    const draft = mockRedirect({
+      _id: 'drafts.r1',
       isAutomatic: true,
-      destination: '/elsewhere',
+      destination: ELSEWHERE_PATH,
     });
 
     await expect(
       validateAutomaticRedirectUnchanged('destination')(
-        '/elsewhere',
-        createContext(draft, [published]),
+        ELSEWHERE_PATH,
+        mockGroqValidationContext([published], { document: draft }),
       ),
     ).resolves.toBe(AUTOMATIC_REDIRECT_EDITED_WARNING);
   });
 
   it('passes an automatic redirect left as it was created', async () => {
-    const draft = redirect('drafts.r1', { isAutomatic: true });
+    const draft = mockRedirect({ _id: 'drafts.r1', isAutomatic: true });
 
     await expect(
       validateAutomaticRedirectUnchanged('source')(
-        '/old',
-        createContext(draft, [published]),
+        MOCK_REDIRECT_SOURCE,
+        mockGroqValidationContext([published], { document: draft }),
       ),
     ).resolves.toBe(true);
   });
 
   it('passes a changed manual redirect', async () => {
-    const draft = redirect('drafts.r1', { source: '/older' });
+    const draft = mockRedirect({ _id: 'drafts.r1', source: '/older' });
 
     await expect(
       validateAutomaticRedirectUnchanged('source')(
         '/older',
-        createContext(draft, [redirect('r1')]),
+        mockGroqValidationContext([mockRedirect({ _id: 'r1' })], {
+          document: draft,
+        }),
       ),
     ).resolves.toBe(true);
   });
