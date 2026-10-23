@@ -76,6 +76,7 @@ export const StepList = ({ steps, className }: TStepListProps) => {
                 <span className={stepTitle()}>{title}</span>
                 <span
                   className={stepStatusLive()}
+                  role="status"
                   aria-live="polite"
                   data-testid={`step-status-live-${key}`}
                 >

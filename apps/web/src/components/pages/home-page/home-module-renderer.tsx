@@ -1,4 +1,5 @@
 import type {
+  CONTENT_ALIGNMENT,
   THeadingBlock,
   TMaybeUndefined,
   TPageHomeType,
@@ -55,13 +56,17 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
 };
 
 export interface IHomeModuleRendererProps {
+  homePageId: string;
   hero: TMaybeUndefined<TModule<TPageHomeType>>;
   headingBlock: THeadingBlock;
-  headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
+  headingAlignment: TContentAlignmentOf<
+    typeof CONTENT_ALIGNMENT.LEFT | typeof CONTENT_ALIGNMENT.CENTER
+  >;
   modules: TModule[];
 }
 
 export const HomeModuleRenderer = async ({
+  homePageId,
   hero,
   headingBlock,
   headingAlignment,
@@ -76,7 +81,11 @@ export const HomeModuleRenderer = async ({
       {heroNode ?? (
         <PageHeading headingBlock={headingBlock} align={headingAlignment} />
       )}
-      {renderModules({ modules, map: HOME_MAP })}
+      {renderModules({
+        modules,
+        map: HOME_MAP,
+        context: { homePage: { id: homePageId } },
+      })}
     </>
   );
 };
