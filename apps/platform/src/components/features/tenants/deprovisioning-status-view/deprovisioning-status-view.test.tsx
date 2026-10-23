@@ -43,21 +43,51 @@ vi.mock(
   }),
 );
 
+type TWrapperProps = {
+  tenant: TClientTenant;
+  deprovisionRequestedAt?: string;
+  headingLevel?: 3;
+};
+
 const Wrapper = ({
   tenant,
   deprovisionRequestedAt,
   headingLevel,
-}: {
-  tenant: TClientTenant;
-  deprovisionRequestedAt?: string;
-  headingLevel?: 3;
-}) => {
+}: TWrapperProps) => {
   const poll = useDeprovisioningPoll(tenant, {
     isEnabled: true,
     deprovisionRequestedAt,
   });
   return <DeprovisioningStatusView poll={poll} headingLevel={headingLevel} />;
 };
+
+const renderView = (
+  deprovisioningSteps: TClientTenant['deprovisioningSteps'],
+  props: Omit<TWrapperProps, 'tenant'> = {},
+) =>
+  render(
+    <Wrapper tenant={makeClientTenant({ deprovisioningSteps })} {...props} />,
+  );
+
+const idleRunSteps = () => ({
+  ...idleDeprovisioningSteps(),
+  run: { startedAt: MOCK_RUN_STARTED_AT },
+});
+
+const runningSteps = () => ({
+  ...idleRunSteps(),
+  [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  },
+});
+
+const doneRunSteps = () => ({
+  ...doneDeprovisioningSteps(),
+  run: {
+    startedAt: MOCK_RUN_STARTED_AT,
+    finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
+  },
+});
 
 describe(`<${DeprovisioningStatusView.name}/>`, () => {
   beforeEach(() => {
@@ -70,32 +100,39 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     vi.useRealTimers();
   });
 
-  it('says no run has started yet in the Run card before any run exists', () => {
-    const tenant = makeClientTenant({ deprovisioningSteps: null });
-    render(<Wrapper tenant={tenant} />);
+  describe('before any run exists', () => {
+    beforeEach(() => {
+      renderView(null);
+    });
 
-    expect(screen.getByText('No run has started yet.')).toBeVisible();
-  });
+    it('says no run has started yet in the Run card before any run exists', () => {
+      expect(screen.getByText('No run has started yet.')).toBeVisible();
+    });
 
-  it('shows the full step list under the Starting badge, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
-    const tenant = makeClientTenant({ deprovisioningSteps: null });
-    render(<Wrapper tenant={tenant} />);
+    it('shows the full step list under the Starting badge, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
+      expect(screen.getByText('Starting…')).toBeVisible();
+      expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
+      expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
+      expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
+      expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
+      expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
+      expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
+      expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
+      expect(screen.getAllByText('Queued').length).toBe(7);
+      expect(screen.queryByText('Not started')).not.toBeInTheDocument();
+    });
 
-    expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
-    expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
-    expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
-    expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
-    expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
-    expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
-    expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(7);
-    expect(screen.queryByText('Not started')).not.toBeInTheDocument();
+    it('renders a fallback Run card header carrying the overall status badge when no run exists yet', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Run' }),
+      ).toBeVisible();
+      expect(screen.getByText('Starting…')).toBeVisible();
+    });
   });
 
   it('shows the Starting badge and full step list, not the old failure, for a retry dispatched after a FAILED run', () => {
-    const tenant = makeClientTenant({
-      deprovisioningSteps: {
+    renderView(
+      {
         ...idleDeprovisioningSteps(),
         [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -106,12 +143,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
           finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
         },
       },
-    });
-    render(
-      <Wrapper
-        tenant={tenant}
-        deprovisionRequestedAt={MOCK_RUN_PLUS_7_MIN_AT}
-      />,
+      { deprovisionRequestedAt: MOCK_RUN_PLUS_7_MIN_AT },
     );
 
     expect(screen.getByText('Starting…')).toBeVisible();
@@ -119,96 +151,40 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('titles the card "Deprovisioning progress" and renders every step in order', () => {
-    const tenant = makeClientTenant({
-      deprovisioningSteps: {
-        ...idleDeprovisioningSteps(),
-        run: { startedAt: MOCK_RUN_STARTED_AT },
-      },
+  describe('with an idle run', () => {
+    beforeEach(() => {
+      renderView(idleRunSteps());
     });
-    render(<Wrapper tenant={tenant} />);
 
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: /^Deprovisioning progress/,
-      }),
-    ).toBeVisible();
-    expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
-    expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
-    expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
-    expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
-    expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
-    expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
-    expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
-  });
-
-  it('shows a 0 of 7 done badge in the steps card summary when nothing has completed yet', () => {
-    const tenant = makeClientTenant({
-      deprovisioningSteps: {
-        ...idleDeprovisioningSteps(),
-        run: { startedAt: MOCK_RUN_STARTED_AT },
-      },
+    it('titles the card "Deprovisioning progress" and renders every step in order', () => {
+      expect(
+        screen.getByRole('heading', {
+          level: 2,
+          name: /^Deprovisioning progress/,
+        }),
+      ).toBeVisible();
+      expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
+      expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
+      expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
+      expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
+      expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
+      expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
+      expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
     });
-    render(<Wrapper tenant={tenant} />);
 
-    expect(screen.getByText('0 of 7 done')).toBeVisible();
-  });
-
-  it('shows the Running badge while a step is in progress, with no error card', () => {
-    const tenant = makeClientTenant({
-      deprovisioningSteps: {
-        ...idleDeprovisioningSteps(),
-        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-        run: { startedAt: MOCK_RUN_STARTED_AT },
-      },
+    it('shows a 0 of 7 done badge in the steps card summary when nothing has completed yet', () => {
+      expect(screen.getByText('0 of 7 done')).toBeVisible();
     });
-    render(<Wrapper tenant={tenant} />);
 
-    expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it('shows the Complete badge once every step is done', () => {
-    const tenant = makeClientTenant({
-      deprovisioningSteps: {
-        ...doneDeprovisioningSteps(),
-        run: {
-          startedAt: MOCK_RUN_STARTED_AT,
-          finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
-        },
-      },
+    it('renders the run card once a run exists', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Run' }),
+      ).toBeVisible();
     });
-    render(<Wrapper tenant={tenant} />);
-
-    expect(screen.getAllByText('Complete').length).toBeGreaterThan(0);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it('renders the run card once a run exists', () => {
-    const tenant = makeClientTenant({
-      deprovisioningSteps: {
-        ...idleDeprovisioningSteps(),
-        run: { startedAt: MOCK_RUN_STARTED_AT },
-      },
-    });
-    render(<Wrapper tenant={tenant} />);
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Run' }),
-    ).toBeVisible();
   });
 
   it('nests the steps and run headings at a caller-supplied level', () => {
-    const tenant = makeClientTenant({
-      deprovisioningSteps: {
-        ...idleDeprovisioningSteps(),
-        run: { startedAt: MOCK_RUN_STARTED_AT },
-      },
-    });
-    render(<Wrapper tenant={tenant} headingLevel={3} />);
+    renderView(idleRunSteps(), { headingLevel: 3 });
 
     expect(
       screen.getByRole('heading', {
@@ -222,33 +198,33 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
   });
 
-  it('renders a fallback Run card header carrying the overall status badge when no run exists yet', () => {
-    const tenant = makeClientTenant({ deprovisioningSteps: null });
-    render(<Wrapper tenant={tenant} />);
+  it('shows the Running badge while a step is in progress, with no error card', () => {
+    renderView(runningSteps());
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Run' }),
-    ).toBeVisible();
-    expect(screen.getByText('Starting…')).toBeVisible();
+    expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('shows the Complete badge once every step is done', () => {
+    renderView(doneRunSteps());
+
+    expect(screen.getAllByText('Complete').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   describe('a failed step', () => {
-    const renderFailed = (error: string) => {
-      const tenant = makeClientTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error,
-          },
-          run: {
-            startedAt: MOCK_RUN_STARTED_AT,
-            finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
-          },
+    const renderFailed = (error: string) =>
+      renderView({
+        ...idleDeprovisioningSteps(),
+        [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error,
+        },
+        run: {
+          startedAt: MOCK_RUN_STARTED_AT,
+          finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
         },
       });
-      render(<Wrapper tenant={tenant} />);
-    };
 
     it('shows the Failed badge, the failing step, and the raw error under Technical details', () => {
       const rawError =
@@ -292,56 +268,24 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       screen.getByRole('button', { name: /Deprovisioning progress/ });
 
     it('is expanded while the run is not done', () => {
-      const tenant = makeClientTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-          run: { startedAt: MOCK_RUN_STARTED_AT },
-        },
-      });
-      render(<Wrapper tenant={tenant} />);
+      renderView(runningSteps());
 
       expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
-      const tenant = makeClientTenant({
-        deprovisioningSteps: {
-          ...doneDeprovisioningSteps(),
-          run: {
-            startedAt: MOCK_RUN_STARTED_AT,
-            finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
-          },
-        },
-      });
-      render(<Wrapper tenant={tenant} />);
+      renderView(doneRunSteps());
 
       expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
-      const runningSteps = {
-        ...idleDeprovisioningSteps(),
-        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-        run: { startedAt: MOCK_RUN_STARTED_AT },
-      };
-      const tenant = makeClientTenant({ deprovisioningSteps: runningSteps });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
-        deprovisioningSteps: {
-          ...doneDeprovisioningSteps(),
-          run: {
-            startedAt: MOCK_RUN_STARTED_AT,
-            finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
-          },
-        },
+        deprovisioningSteps: doneRunSteps(),
         deprovisionedAt: new Date(MOCK_RUN_PLUS_2_MIN_AT),
       });
       const user = userEvent.setup();
-      render(<Wrapper tenant={tenant} />);
+      renderView(runningSteps());
 
       expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
 

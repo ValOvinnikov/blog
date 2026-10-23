@@ -10,8 +10,8 @@ import { getTenantProvisioningStatusAction } from '@platform/server/provisioning
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import {
   act,
+  customRender,
   fireEvent,
-  renderWithIntl,
   screen,
   waitFor,
   within,
@@ -27,13 +27,12 @@ import {
   MOCK_RUN_PLUS_6_MIN_AT,
   MOCK_RUN_PLUS_7_MIN_AT,
   MOCK_RUN_STARTED_AT,
+  mockDoneProvisioningSteps,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ProvisioningStatusView } from './provisioning-status-view';
-
-const render = renderWithIntl;
 
 const STEP_POLL_INTERVAL_MS = 1500;
 const STEP_REVEAL_DWELL_MS = 800;
@@ -63,6 +62,65 @@ const QUEUED_PROVISIONING_WORKFLOW_STARTING_UP =
   'Queued — the provisioning workflow is starting up';
 const QUEUED_RUN_ELAPSED = 'queued-run-elapsed';
 const ARIA_EXPANDED = 'aria-expanded';
+const RUNNING = 'Running…';
+const FIRST_STEP_LIVE = `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`;
+
+const renderView = customRender(ProvisioningStatusView, {
+  tenant: makeClientTenant(),
+  ownerEmail: MOCK_OWNER_EMAIL,
+});
+
+const firstStepRunningSteps = () => ({
+  ...idleProvisioningSteps(),
+  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  },
+});
+
+const firstStepDoneSteps = () => ({
+  ...idleProvisioningSteps(),
+  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+  },
+});
+
+const mapDomainFailedSteps = (error = DOMAINS_API_ERROR) => ({
+  ...idleProvisioningSteps(),
+  [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    error,
+  },
+});
+
+const failedRunTenant = (error = DOMAINS_API_ERROR) =>
+  makeClientTenant({
+    provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+    provisioningSteps: mapDomainFailedSteps(error),
+  });
+
+const provisioningFirstStepRunningTenant = () =>
+  makeClientTenant({
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+    provisioningSteps: firstStepRunningSteps(),
+  });
+
+const queuedRunTenant = () =>
+  makeClientTenant({
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+    provisioningSteps: {
+      ...idleProvisioningSteps(),
+      run: { admittedAt: AT_20261015_1300 } as TProvisioningRun,
+    },
+  });
+
+const pollAndReveal = async () => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+  });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
+  });
+};
 
 describe(`<${ProvisioningStatusView.name}/>`, () => {
   let user: UserEvent;
@@ -78,13 +136,18 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     vi.useRealTimers();
   });
 
+  const clickStartResolvingWith = async (
+    result: Awaited<ReturnType<typeof retryProvisioningStepAction>>,
+  ) => {
+    retryProvisioningStepActionMock.mockResolvedValue(result);
+    renderView();
+    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
+  };
+
   it('never lets a rendered poll loop schedule a real setInterval, even for a test that never advances timers', () => {
-    const tenant = makeClientTenant();
     expect(vi.getTimerCount()).toBe(0);
 
-    const { unmount } = render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
+    const { unmount } = renderView();
 
     expect(vi.isFakeTimers()).toBe(true);
     expect(vi.getTimerCount()).toBeGreaterThan(0);
@@ -95,10 +158,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('titles the page "Provisioning" and names the tenant in the description', () => {
-    const tenant = makeClientTenant({ name: 'Acme Inc.' });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
+    renderView({ tenant: makeClientTenant({ name: 'Acme Inc.' }) });
 
     const provisioningHeading = screen.getByRole('heading', {
       level: 1,
@@ -112,24 +172,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     expect(acmeIncEachText).toBeVisible();
   });
 
-  it('shows the archived notice for a deprovisioned tenant', () => {
-    const tenant = makeClientTenant({
-      deprovisionedAt: MOCK_ARCHIVED_AT,
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const thisTenantIsText = screen.getByText(THIS_TENANT_IS_ARCHIVED);
-
-    expect(thisTenantIsText).toBeVisible();
-  });
-
   it('does not show the archived notice for a live tenant', () => {
-    const tenant = makeClientTenant({ deprovisionedAt: null });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
+    renderView({ tenant: makeClientTenant({ deprovisionedAt: null }) });
 
     const thisTenantIsText = screen.queryByText(THIS_TENANT_IS_ARCHIVED);
 
@@ -137,25 +181,21 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('renders the overall status badge in the Run card header, not the page header', () => {
-    const tenant = makeClientTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+    renderView({
+      tenant: makeClientTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...firstStepRunningSteps(),
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
-        run: { startedAt: MOCK_RUN_STARTED_AT },
-      },
+      }),
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
 
     const runningText = within(
       screen.getByRole('heading', { name: 'Provisioning' }),
-    ).queryByText('Running…');
+    ).queryByText(RUNNING);
     const runningText2 = within(screen.getByTestId(RUN_STATUS_LIVE)).getByText(
-      'Running…',
+      RUNNING,
     );
 
     expect(runningText).not.toBeInTheDocument();
@@ -163,8 +203,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
-    const tenant = makeClientTenant();
-    render(<ProvisioningStatusView tenant={tenant} ownerEmail={undefined} />);
+    renderView({ ownerEmail: undefined });
 
     const ownerText = screen.getByText('Owner');
     const invitedPendingText = screen.getByText(INVITED_PENDING);
@@ -173,62 +212,93 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     expect(invitedPendingText).toBeVisible();
   });
 
-  it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
-    const tenant = makeClientTenant();
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const invitedPendingText = screen.queryByText(INVITED_PENDING);
-
-    expect(invitedPendingText).not.toBeInTheDocument();
-  });
-
-  it('renders no complementary landmark around the main content', () => {
-    const tenant = makeClientTenant();
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const complementary = screen.queryByRole('complementary');
-
-    expect(complementary).not.toBeInTheDocument();
-  });
-
-  it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
+  describe('with every step idle', () => {
+    beforeEach(() => {
+      renderView();
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
 
-    const sidebar = screen.getByTestId(PROVISIONING_STEPS);
-    const stepsHeading = within(sidebar).getByRole('heading', {
-      level: 2,
-      name: /^Steps/,
+    it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
+      const invitedPendingText = screen.queryByText(INVITED_PENDING);
+
+      expect(invitedPendingText).not.toBeInTheDocument();
     });
-    const n0Of6Text = within(sidebar).getByText('0 of 6 done');
 
-    expect(stepsHeading).toBeVisible();
-    expect(n0Of6Text).toBeVisible();
+    it('renders no complementary landmark around the main content', () => {
+      const complementary = screen.queryByRole('complementary');
+
+      expect(complementary).not.toBeInTheDocument();
+    });
+
+    it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
+      const sidebar = screen.getByTestId(PROVISIONING_STEPS);
+      const stepsHeading = within(sidebar).getByRole('heading', {
+        level: 2,
+        name: /^Steps/,
+      });
+      const n0Of6Text = within(sidebar).getByText('0 of 6 done');
+
+      expect(stepsHeading).toBeVisible();
+      expect(n0Of6Text).toBeVisible();
+    });
+
+    it('lists all six provisioning steps in order, in operator language', () => {
+      const headings = [
+        'Create workspace',
+        'Seed content',
+        'Issue read credentials',
+        'Connect domain',
+        'Wire up CMS to website',
+        'Confirm content is ready',
+      ];
+      for (const heading of headings) {
+        const headingElement = screen.getByText(heading);
+
+        expect(headingElement).toBeVisible();
+      }
+    });
+
+    it('does not render a parsed error card when no step has failed', () => {
+      const alert = screen.queryByRole('alert');
+
+      expect(alert).not.toBeInTheDocument();
+    });
+
+    it('shows a Start provisioning action when every step is idle', () => {
+      const startProvisioningButtons = screen.getAllByRole('button', {
+        name: START_PROVISIONING,
+      });
+
+      expect(startProvisioningButtons).toHaveLength(1);
+    });
+
+    it('says no run has started yet in the Run card before any run exists', () => {
+      const noRunHasText = screen.getByText('No run has started yet.');
+
+      expect(noRunHasText).toBeVisible();
+    });
+
+    it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
+      await user.click(
+        screen.getByRole('button', { name: START_PROVISIONING }),
+      );
+
+      await waitFor(() => {
+        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
+      });
+    });
   });
 
   it("reflects the steps card's completion badge count from the tenant's actual step statuses", () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    renderView({
+      tenant: makeClientTenant({
+        provisioningSteps: {
+          ...firstStepDoneSteps(),
+          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
         },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-      },
+      }),
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
 
     const n2Of6Text = within(screen.getByTestId(PROVISIONING_STEPS)).getByText(
       '2 of 6 done',
@@ -237,103 +307,75 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     expect(n2Of6Text).toBeVisible();
   });
 
-  it('lists all six provisioning steps in order, in operator language', () => {
-    const tenant = makeClientTenant();
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const headings = [
-      'Create workspace',
-      'Seed content',
-      'Issue read credentials',
-      'Connect domain',
-      'Wire up CMS to website',
-      'Confirm content is ready',
-    ];
-    for (const heading of headings) {
-      const headingElement = screen.getByText(heading);
-
-      expect(headingElement).toBeVisible();
-    }
-  });
-
-  it('shows the current status for a running step', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      },
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const firstRunningText = screen.getAllByText('Running…')[0];
-
-    expect(firstRunningText).toBeVisible();
-  });
-
-  it("shows a running step's number in its circle instead of a spinner", () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      },
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const statusList = screen.queryAllByRole('status');
-    const n1Text = screen.getByText('1', {
-      selector: HIDDEN_ICON_SELECTOR,
+  describe('with the first step running', () => {
+    beforeEach(() => {
+      renderView({
+        tenant: makeClientTenant({
+          provisioningSteps: firstStepRunningSteps(),
+        }),
+      });
     });
 
-    expect(statusList).toHaveLength(0);
-    expect(n1Text).toBeVisible();
+    it('shows the current status for a running step', () => {
+      const firstRunningText = screen.getAllByText(RUNNING)[0];
+
+      expect(firstRunningText).toBeVisible();
+    });
+
+    it("shows a running step's number in its circle instead of a spinner", () => {
+      const statusList = screen.queryAllByRole('status');
+      const n1Text = screen.getByText('1', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+
+      expect(statusList).toHaveLength(0);
+      expect(n1Text).toBeVisible();
+    });
+
+    it('hides the Start provisioning action once any step has progressed past idle', () => {
+      const startProvisioningButton = screen.queryByRole('button', {
+        name: START_PROVISIONING,
+      });
+
+      expect(startProvisioningButton).not.toBeInTheDocument();
+    });
   });
 
   it('exposes exactly one accessible announcement per step across all four statuses', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: {
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+    renderView({
+      tenant: makeClientTenant({
+        provisioningSteps: {
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+          },
+          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'Vercel deploy failed',
+          },
+          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+          },
+          [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+          },
+          [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+          },
         },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel deploy failed',
-        },
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-        [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-      },
+      }),
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
 
     const statusList = screen.queryAllByRole('status');
 
     expect(statusList).toHaveLength(0);
 
-    for (const text of [NOT_STARTED, 'Running…', 'Complete', 'Failed']) {
+    for (const text of [NOT_STARTED, RUNNING, 'Complete', 'Failed']) {
       for (const element of screen.getAllByText(text)) {
         expect(element).not.toHaveAttribute('aria-hidden');
       }
@@ -359,19 +401,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('shows a single Retry button in the Run card header for a failed step, with no per-step Retry buttons in the sidebar', () => {
-    const tenant = makeClientTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: VERCEL_DOMAINS_FAILURE,
-        },
-      },
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
+    renderView({ tenant: failedRunTenant(VERCEL_DOMAINS_FAILURE) });
 
     const retryProvisioningButtons = screen.getAllByRole('button', {
       name: RETRY_PROVISIONING,
@@ -389,18 +419,11 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it("no longer renders a step's raw error text inline in the sidebar", () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: VERCEL_DOMAINS_FAILURE,
-        },
-      },
+    renderView({
+      tenant: makeClientTenant({
+        provisioningSteps: mapDomainFailedSteps(VERCEL_DOMAINS_FAILURE),
+      }),
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
 
     const vercelApiPostText = within(
       screen.getByTestId(PROVISIONING_STEPS),
@@ -409,37 +432,20 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     expect(vercelApiPostText).not.toBeInTheDocument();
   });
 
-  it('does not render a parsed error card when no step has failed', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const alert = screen.queryByRole('alert');
-
-    expect(alert).not.toBeInTheDocument();
-  });
-
   describe('parsed provisioning error card', () => {
     const renderFailed = (error: string) => {
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error,
+      renderView({
+        tenant: makeClientTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+          provisioningSteps: {
+            ...idleProvisioningSteps(),
+            [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+              status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+              error,
+            },
           },
-        },
+        }),
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
     };
 
     it('maps a 403 permission failure to a friendly headline and next step, with the raw text under Technical details', () => {
@@ -509,27 +515,17 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   describe('a stale FAILED step while a retried run is genuinely in progress', () => {
-    const staleFailedTenant = () =>
-      makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: DOMAINS_API_ERROR,
-          },
-        },
+    beforeEach(() => {
+      renderView({
+        tenant: makeClientTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+          provisioningSteps: mapDomainFailedSteps(),
+        }),
       });
+    });
 
     it('shows a running indicator, not the stale Failed state, in the overall status badge', () => {
-      render(
-        <ProvisioningStatusView
-          tenant={staleFailedTenant()}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
-
-      const runningCount = screen.getAllByText('Running…').length;
+      const runningCount = screen.getAllByText(RUNNING).length;
       const failedText = screen.queryByText('Failed');
       const alert = screen.queryByRole('alert');
 
@@ -539,13 +535,6 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('renders the stale step with its pending number instead of the failed glyph', () => {
-      render(
-        <ProvisioningStatusView
-          tenant={staleFailedTenant()}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
-
       const failureMark = screen.queryByText('!', {
         selector: HIDDEN_ICON_SELECTOR,
       });
@@ -558,13 +547,6 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('shows no Retry button while the run is genuinely in progress', () => {
-      render(
-        <ProvisioningStatusView
-          tenant={staleFailedTenant()}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
-
       const retryProvisioningButton = screen.queryByRole('button', {
         name: RETRY_PROVISIONING,
       });
@@ -574,19 +556,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('re-dispatches the workflow for this tenant when Retry is clicked', async () => {
-    const tenant = makeClientTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: DOMAINS_API_ERROR,
-        },
-      },
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
+    renderView({ tenant: failedRunTenant() });
 
     await user.click(screen.getByRole('button', { name: RETRY_PROVISIONING }));
 
@@ -595,146 +565,59 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
   });
 
-  it('shows a Start provisioning action when every step is idle', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const startProvisioningButtons = screen.getAllByRole('button', {
-      name: START_PROVISIONING,
-    });
-
-    expect(startProvisioningButtons).toHaveLength(1);
-  });
-
-  it('says no run has started yet in the Run card before any run exists', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const noRunHasText = screen.getByText('No run has started yet.');
-
-    expect(noRunHasText).toBeVisible();
-  });
-
-  it('hides the Start provisioning action once any step has progressed past idle', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      },
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const startProvisioningButton = screen.queryByRole('button', {
-      name: START_PROVISIONING,
-    });
-
-    expect(startProvisioningButton).not.toBeInTheDocument();
-  });
-
-  it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
-
-    await waitFor(() => {
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
-    });
-  });
-
-  it('immediately hides Start and shows the running badge before the dispatch resolves', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
+  describe('while the Start dispatch is still pending', () => {
     let resolveDispatch: TMaybeUndefined<
       (result: { outcome: typeof ACTION_OUTCOME.SUCCESS }) => void
     >;
-    retryProvisioningStepActionMock.mockReturnValue(
-      new Promise((resolve) => {
-        resolveDispatch = resolve;
-      }),
-    );
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
 
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
-
-    const startProvisioningButton = screen.queryByRole('button', {
-      name: START_PROVISIONING,
+    beforeEach(() => {
+      retryProvisioningStepActionMock.mockReturnValue(
+        new Promise((resolve) => {
+          resolveDispatch = resolve;
+        }),
+      );
+      renderView();
     });
-    const runningCount = screen.getAllByText('Running…').length;
 
-    expect(startProvisioningButton).not.toBeInTheDocument();
-    expect(runningCount).toBeGreaterThan(0);
-
-    await act(async () => {
-      resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
-      await Promise.resolve();
+    afterEach(async () => {
+      await act(async () => {
+        resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
+        await Promise.resolve();
+      });
     });
-  });
 
-  it('mounts the overall status live region before Start is ever clicked, so the first status change is announced', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
+    it('immediately hides Start and shows the running badge before the dispatch resolves', async () => {
+      await user.click(
+        screen.getByRole('button', { name: START_PROVISIONING }),
+      );
+
+      const startProvisioningButton = screen.queryByRole('button', {
+        name: START_PROVISIONING,
+      });
+      const runningCount = screen.getAllByText(RUNNING).length;
+
+      expect(startProvisioningButton).not.toBeInTheDocument();
+      expect(runningCount).toBeGreaterThan(0);
     });
-    let resolveDispatch: TMaybeUndefined<
-      (result: { outcome: typeof ACTION_OUTCOME.SUCCESS }) => void
-    >;
-    retryProvisioningStepActionMock.mockReturnValue(
-      new Promise((resolve) => {
-        resolveDispatch = resolve;
-      }),
-    );
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
 
-    const liveRegion = screen.getByTestId(RUN_STATUS_LIVE);
-    const notStartedText = within(liveRegion).getByText(NOT_STARTED);
+    it('mounts the overall status live region before Start is ever clicked, so the first status change is announced', async () => {
+      const liveRegion = screen.getByTestId(RUN_STATUS_LIVE);
+      const notStartedText = within(liveRegion).getByText(NOT_STARTED);
 
-    expect(notStartedText).toBeVisible();
+      expect(notStartedText).toBeVisible();
 
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
+      await user.click(
+        screen.getByRole('button', { name: START_PROVISIONING }),
+      );
 
-    const runningText = within(liveRegion).getByText('Running…');
+      const runningText = within(liveRegion).getByText(RUNNING);
 
-    expect(runningText).toBeVisible();
-
-    await act(async () => {
-      resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
-      await Promise.resolve();
+      expect(runningText).toBeVisible();
     });
   });
 
   it('shows a distinguishable error and re-enables Start when the dispatch fails, reverting the optimistic running state', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    retryProvisioningStepActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
+    await clickStartResolvingWith({ outcome: ACTION_OUTCOME.SERVER_ERROR });
 
     const couldNotStartText = await screen.findByText(
       "Couldn't start provisioning — try again.",
@@ -748,18 +631,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('shows a not-found-specific error when the tenant no longer exists server-side', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    retryProvisioningStepActionMock.mockResolvedValue({
+    await clickStartResolvingWith({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.NOT_FOUND,
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const couldNotFindText = await screen.findByText(
       "Couldn't find this tenant — refresh the page and try again.",
@@ -769,18 +644,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('shows a distinct, non-error notice when a run is already in progress', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    retryProvisioningStepActionMock.mockResolvedValue({
+    await clickStartResolvingWith({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const aProvisioningRunText = await screen.findByText(
       'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
@@ -791,111 +658,83 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     expect(alert).not.toBeInTheDocument();
   });
 
-  it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-      deprovisionedAt: MOCK_ARCHIVED_AT,
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const startButton = screen.getByRole('button', {
-      name: START_PROVISIONING,
-    });
-    expect(startButton).toBeDisabled();
-
-    await user.click(startButton);
-    expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
-  });
-
-  it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
-    const tenant = makeClientTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      deprovisionedAt: MOCK_ARCHIVED_AT,
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: DOMAINS_API_ERROR,
-        },
-      },
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const retryButton = screen.getByRole('button', {
-      name: RETRY_PROVISIONING,
-    });
-    expect(retryButton).toBeDisabled();
-
-    await user.click(retryButton);
-    expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
-  });
-
-  it('describes the disabled Start button with the archived notice, for a screen-reader user', () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-      deprovisionedAt: MOCK_ARCHIVED_AT,
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const startProvisioningButton = screen.getByRole('button', {
-      name: START_PROVISIONING,
-    });
-
-    expect(startProvisioningButton).toHaveAccessibleDescription(
-      /This tenant is archived/,
-    );
-  });
-
-  it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
-    const tenant = makeClientTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      deprovisionedAt: MOCK_ARCHIVED_AT,
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: DOMAINS_API_ERROR,
-        },
-      },
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    const retryProvisioningButton = screen.getByRole('button', {
-      name: RETRY_PROVISIONING,
-    });
-
-    expect(retryProvisioningButton).toHaveAccessibleDescription(
-      /This tenant is archived/,
-    );
-  });
-
   it('shows an archived-specific error if a dispatch is somehow still attempted against an archived tenant', async () => {
-    const tenant = makeClientTenant({
-      provisioningSteps: idleProvisioningSteps(),
-    });
-    retryProvisioningStepActionMock.mockResolvedValue({
+    await clickStartResolvingWith({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.ARCHIVED,
     });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
-    );
-
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
 
     const thisTenantIsText = await screen.findByText(
       "This tenant is archived; provisioning can't be started.",
     );
 
     expect(thisTenantIsText).toBeVisible();
+  });
+
+  describe('for an archived tenant with every step idle', () => {
+    beforeEach(() => {
+      renderView({
+        tenant: makeClientTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+      });
+    });
+
+    it('shows the archived notice for a deprovisioned tenant', () => {
+      const thisTenantIsText = screen.getByText(THIS_TENANT_IS_ARCHIVED);
+
+      expect(thisTenantIsText).toBeVisible();
+    });
+
+    it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
+      const startButton = screen.getByRole('button', {
+        name: START_PROVISIONING,
+      });
+      expect(startButton).toBeDisabled();
+
+      await user.click(startButton);
+      expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
+    });
+
+    it('describes the disabled Start button with the archived notice, for a screen-reader user', () => {
+      const startProvisioningButton = screen.getByRole('button', {
+        name: START_PROVISIONING,
+      });
+
+      expect(startProvisioningButton).toHaveAccessibleDescription(
+        /This tenant is archived/,
+      );
+    });
+  });
+
+  describe('for an archived tenant with a failed step', () => {
+    beforeEach(() => {
+      renderView({
+        tenant: makeClientTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+          deprovisionedAt: MOCK_ARCHIVED_AT,
+          provisioningSteps: mapDomainFailedSteps(),
+        }),
+      });
+    });
+
+    it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
+      const retryButton = screen.getByRole('button', {
+        name: RETRY_PROVISIONING,
+      });
+      expect(retryButton).toBeDisabled();
+
+      await user.click(retryButton);
+      expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
+    });
+
+    it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
+      const retryProvisioningButton = screen.getByRole('button', {
+        name: RETRY_PROVISIONING,
+      });
+
+      expect(retryProvisioningButton).toHaveAccessibleDescription(
+        /This tenant is archived/,
+      );
+    });
   });
 
   describe('live polling', () => {
@@ -908,131 +747,63 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       vi.useRealTimers();
     });
 
-    it('polls for fresh status while provisioning is not terminal, and re-renders on a new result', async () => {
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
-      });
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-        },
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
-
-      const sidebar = screen.getByTestId(PROVISIONING_STEPS);
-      const runningText = within(sidebar).getByText('Running…');
-
-      expect(runningText).toBeVisible();
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
+    describe('with the first step running and a poll that completes it', () => {
+      beforeEach(() => {
+        getTenantProvisioningStatusActionMock.mockResolvedValue({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+          provisioningSteps: firstStepDoneSteps(),
+        });
+        renderView({ tenant: provisioningFirstStepRunningTenant() });
       });
 
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
-        TENANT_ID,
-      );
-      const completeText = within(sidebar).getByText('Complete');
-      const runningText2 = within(sidebar).queryByText('Running…');
+      it('polls for fresh status while provisioning is not terminal, and re-renders on a new result', async () => {
+        const sidebar = screen.getByTestId(PROVISIONING_STEPS);
+        const runningText = within(sidebar).getByText(RUNNING);
 
-      expect(completeText).toBeVisible();
-      expect(runningText2).not.toBeInTheDocument();
+        expect(runningText).toBeVisible();
+
+        await pollAndReveal();
+
+        expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
+          TENANT_ID,
+        );
+        const completeText = within(sidebar).getByText('Complete');
+        const runningText2 = within(sidebar).queryByText(RUNNING);
+
+        expect(completeText).toBeVisible();
+        expect(runningText2).not.toBeInTheDocument();
+      });
+
+      it('announces a polled step-status transition through a stable aria-live region', async () => {
+        const liveRegion = screen.getByTestId(FIRST_STEP_LIVE);
+        const runningText = within(liveRegion).getByText(RUNNING);
+
+        expect(runningText).toBeVisible();
+
+        await pollAndReveal();
+
+        const completeText = within(liveRegion).getByText('Complete');
+
+        expect(completeText).toBeVisible();
+      });
     });
 
-    it('announces a polled step-status transition through a stable aria-live region', async () => {
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
-      });
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-        },
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
-
-      const liveRegion = screen.getByTestId(
-        `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
-      );
-      const runningText = within(liveRegion).getByText('Running…');
-
-      expect(runningText).toBeVisible();
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
-      });
-
-      const completeText = within(liveRegion).getByText('Complete');
-
-      expect(completeText).toBeVisible();
-    });
     it('shows a step that finished between two polls as running before it shows as complete', async () => {
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: idleProvisioningSteps(),
-      });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-        },
+        provisioningSteps: firstStepDoneSteps(),
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
-
-      const liveRegion = screen.getByTestId(
-        `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
+      renderView({
+        tenant: makeClientTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        }),
       });
 
-      const runningText = within(liveRegion).getByText('Running…');
+      const liveRegion = screen.getByTestId(FIRST_STEP_LIVE);
+
+      await pollAndReveal();
+
+      const runningText = within(liveRegion).getByText(RUNNING);
 
       expect(runningText).toBeVisible();
 
@@ -1047,19 +818,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
     it('says the run is queued, with a wait that keeps counting, until the workflow starts it', async () => {
       vi.setSystemTime(new Date('2026-10-15T13:00:05.000Z'));
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          run: { admittedAt: AT_20261015_1300 } as TProvisioningRun,
-        },
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
+      renderView({ tenant: queuedRunTenant() });
 
       const queuedTheProvisioningText = screen.getByText(
         QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
@@ -1068,11 +827,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       const startingText = within(
         screen.getByTestId(RUN_STATUS_LIVE),
       ).getByText('Starting…');
-      const queuedText = within(
-        screen.getByTestId(
-          `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
-        ),
-      ).getByText('Queued');
+      const queuedText = within(screen.getByTestId(FIRST_STEP_LIVE)).getByText(
+        'Queued',
+      );
 
       expect(queuedTheProvisioningText).toBeVisible();
       expect(queuedRunElapsed).toHaveTextContent('0:05 waiting');
@@ -1089,13 +846,6 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('drops the queued notice once the workflow has started the run', async () => {
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          run: { admittedAt: AT_20261015_1300 } as TProvisioningRun,
-        },
-      });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
@@ -1103,12 +853,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
           run: { startedAt: '2026-10-15T13:01:00.000Z' },
         },
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
+      renderView({ tenant: queuedRunTenant() });
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -1118,7 +863,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
       );
       const runningText = within(screen.getByTestId(RUN_STATUS_LIVE)).getByText(
-        'Running…',
+        RUNNING,
       );
 
       expect(queuedTheProvisioningText).not.toBeInTheDocument();
@@ -1138,78 +883,28 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
     it('is expanded while the run is not done', () => {
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
+      renderView({ tenant: provisioningFirstStepRunningTenant() });
 
       expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
-      const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
-          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
-          [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
-        },
+      renderView({
+        tenant: makeClientTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+          provisioningSteps: mockDoneProvisioningSteps(),
+        }),
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
 
       expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
-      const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
-      const tenant = makeClientTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
-      });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
-          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
-          [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
-        },
+        provisioningSteps: mockDoneProvisioningSteps(),
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
+      renderView({ tenant: provisioningFirstStepRunningTenant() });
 
       const disclosure = stepsToggle();
       expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
@@ -1245,96 +940,70 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       vi.useRealTimers();
     });
 
-    it("shows a done step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-      vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
-      const tenant = makeClientTenant({
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
-          },
-        },
+    describe('seven minutes into the run', () => {
+      beforeEach(() => {
+        vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
 
-      const timestamp = screen.getByText('6m ago');
-      expect(timestamp.tagName).toBe('TIME');
-      expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_1_MIN_AT);
-    });
+      describe('with the first step done a minute in', () => {
+        beforeEach(() => {
+          renderView({
+            tenant: makeClientTenant({
+              provisioningSteps: {
+                ...idleProvisioningSteps(),
+                [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+                  status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+                  updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
+                },
+              },
+            }),
+          });
+        });
 
-    it("keeps a step's timestamp outside the aria-live status region", () => {
-      vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
-      const tenant = makeClientTenant({
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
-          },
-        },
+        it("shows a done step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
+          const timestamp = screen.getByText('6m ago');
+          expect(timestamp.tagName).toBe('TIME');
+          expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_1_MIN_AT);
+        });
+
+        it("keeps a step's timestamp outside the aria-live status region", () => {
+          const liveRegions = [
+            ...screen.getAllByTestId(/^step-status-live-/),
+            screen.getByTestId(RUN_STATUS_LIVE),
+          ];
+          expect(liveRegions.length).toBeGreaterThan(0);
+          for (const region of liveRegions) {
+            expect(region).not.toHaveTextContent('6m ago');
+          }
+        });
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
 
-      const liveRegions = [
-        ...screen.getAllByTestId(/^step-status-live-/),
-        screen.getByTestId(RUN_STATUS_LIVE),
-      ];
-      expect(liveRegions.length).toBeGreaterThan(0);
-      for (const region of liveRegions) {
-        expect(region).not.toHaveTextContent('6m ago');
-      }
-    });
+      it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
+        renderView({
+          tenant: makeClientTenant({
+            provisioningSteps: {
+              ...idleProvisioningSteps(),
+              [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+                status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+                error: 'boom',
+                updatedAt: MOCK_RUN_PLUS_2_MIN_AT,
+              },
+            },
+          }),
+        });
 
-    it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-      vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
-      const tenant = makeClientTenant({
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'boom',
-            updatedAt: MOCK_RUN_PLUS_2_MIN_AT,
-          },
-        },
+        const timestamp = screen.getByText('5m ago');
+        expect(timestamp.tagName).toBe('TIME');
+        expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_2_MIN_AT);
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
-
-      const timestamp = screen.getByText('5m ago');
-      expect(timestamp.tagName).toBe('TIME');
-      expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_2_MIN_AT);
     });
 
     it('shows "now" for a running step instead of a timestamp', () => {
-      const tenant = makeClientTenant({
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+      renderView({
+        tenant: makeClientTenant({
+          provisioningSteps: firstStepRunningSteps(),
+        }),
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
 
       const nowText = screen.getByText('now');
       expect(nowText).toBeVisible();
@@ -1342,20 +1011,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('shows no timestamp for a done step with no recorded updatedAt', () => {
-      const tenant = makeClientTenant({
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-        },
+      renderView({
+        tenant: makeClientTenant({ provisioningSteps: firstStepDoneSteps() }),
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
 
       const d4Text = screen.queryByText(/\d{4}/);
 
@@ -1363,15 +1021,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('renders a Run card header with no run details for a tenant with no run', () => {
-      const tenant = makeClientTenant({
-        provisioningSteps: idleProvisioningSteps(),
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
+      renderView();
 
       const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
       const startedText = screen.queryByText('Started');
@@ -1384,22 +1034,18 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
     it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
       vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
-      const tenant = makeClientTenant({
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          run: {
-            startedAt: MOCK_RUN_STARTED_AT,
-            finishedAt: MOCK_RUN_PLUS_4_MIN_AT,
-            registry: 'production',
+      renderView({
+        tenant: makeClientTenant({
+          provisioningSteps: {
+            ...idleProvisioningSteps(),
+            run: {
+              startedAt: MOCK_RUN_STARTED_AT,
+              finishedAt: MOCK_RUN_PLUS_4_MIN_AT,
+              registry: 'production',
+            },
           },
-        },
+        }),
       });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail={MOCK_OWNER_EMAIL}
-        />,
-      );
 
       const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
       const n6mAgoAugText = screen.getByText(

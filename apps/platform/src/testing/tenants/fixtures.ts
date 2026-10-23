@@ -68,7 +68,7 @@ export const doneDeprovisioningSteps = (): TTenantDeprovisioningState => {
   };
 };
 
-const doneProvisioningSteps = (): TTenantProvisioningState => {
+export const mockDoneProvisioningSteps = (): TTenantProvisioningState => {
   const done: TProvisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
   };
@@ -157,7 +157,7 @@ export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     sanityDataset: 'production',
     locale: LOCALE_ISO_CODES.EN,
     provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    provisioningSteps: doneProvisioningSteps(),
+    provisioningSteps: mockDoneProvisioningSteps(),
     seededAt: TENANT_SEEDED_AT,
     webhookCreatedAt: TENANT_SEEDED_AT,
     ...overrides,
