@@ -17,6 +17,8 @@ import {
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   mockTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   MOCK_NEW_OWNER_EMAIL,
   MOCK_OWNER_EMAIL,
@@ -72,7 +74,7 @@ const OWNER_ALREADY_JOINED = 'owner-already-joined';
 
 const validInput = {
   name: MOCK_TENANT_NAME,
-  primaryDomain: 'acme.example.com',
+  primaryDomain: MOCK_TENANT_DOMAIN,
   plan: TENANT_PLAN.FREE,
   locale: LOCALE_ISO_CODES.EN,
 };
@@ -122,7 +124,7 @@ describe('updateTenantDetailsAction', () => {
 
   it('rejects a write against an archived tenant with no update or audit event', async () => {
     getTenantByIdMock.mockResolvedValue(
-      mockTenant({ deprovisionedAt: new Date('2026-08-26T00:00:00.000Z') }),
+      mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     );
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
@@ -325,11 +327,12 @@ describe('updateTenantDetailsAction', () => {
       ownerEmail: MOCK_NEW_OWNER_EMAIL,
     });
 
-    expect(insertAuditEventMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        details: { ...validInput, ownerEmailUpdated: true },
-      }),
-    );
+    const [event] = insertAuditEventMock.mock.lastCall ?? [];
+
+    expect(event.details).toStrictEqual({
+      ...validInput,
+      ownerEmailUpdated: true,
+    });
   });
 
   it('still returns the updated tenant when the audit write fails, and logs it', async () => {
@@ -340,13 +343,11 @@ describe('updateTenantDetailsAction', () => {
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'tenants.update_details_audit_failed',
-      expect.objectContaining({
-        targetId: MOCK_TENANT_ID,
-        error: expect.any(Error),
-      }),
-    );
+    const [eventName, context] = loggerErrorMock.mock.lastCall ?? [];
+
+    expect(eventName).toBe('tenants.update_details_audit_failed');
+    expect(context?.targetId).toBe(MOCK_TENANT_ID);
+    expect(context?.error).toBeInstanceOf(Error);
   });
 
   it('returns a generic error when the mutation throws', async () => {
