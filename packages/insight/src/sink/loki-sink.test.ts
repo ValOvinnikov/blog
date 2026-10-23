@@ -56,16 +56,13 @@ describe(createLokiSink, () => {
   it('posts the line to the push URL with basic auth', async () => {
     await push(LINE);
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      PUSH_URL,
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          Authorization: 'Basic MTIzNDU2OmdsY190b2tlbg==',
-          'Content-Type': 'application/json',
-        },
-      }),
-    );
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe(PUSH_URL);
+    expect(init?.method).toBe('POST');
+    expect(init?.headers).toEqual({
+      Authorization: 'Basic MTIzNDU2OmdsY190b2tlbg==',
+      'Content-Type': 'application/json',
+    });
   });
 
   it('sends one stream labelled by service and level, carrying the whole line', async () => {

@@ -28,6 +28,7 @@ import {
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
   TENANT_PLAN,
 } from '@blog/db/constants';
+import type { TSendEmailInput } from '@blog/email';
 
 import { buildMagicLinkProvider } from './magic-link-provider';
 
@@ -43,6 +44,7 @@ const ADMIN_EMAIL = 'admin@example.com';
 const SITE_CALLBACK_URL = `${SITE_ORIGIN}/api/auth/callback/email?token=${MOCK_TOKEN}`;
 const PLATFORM_CALLBACK_URL = `${PLATFORM_ORIGIN}/api/auth/callback/email?token=${MOCK_TOKEN}`;
 const PLATFORM_LAYOUT_MARK = '>Platform</td>';
+const COPYRIGHT_MARK = '&copy;';
 const CUSTOM_BODY_TEXT = 'Use the button below to get back in.';
 const ADVERSARIAL_LINK_KEY = 'adversarial-link';
 const SITE_LINK_HREF = `href="${SITE_CALLBACK_URL}"`;
@@ -65,6 +67,15 @@ function sendVerificationRequestFor(
   });
 }
 
+function sentEmail(): TSendEmailInput {
+  const email = sendEmailMock.mock.calls[0]?.[0];
+  if (!email) {
+    throw new Error('sendEmail was not called');
+  }
+
+  return email;
+}
+
 const {
   findPendingInviteByEmailMock,
   listTenantsByIdsMock,
@@ -82,7 +93,7 @@ const {
   getSiteConfigMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
-  sendEmailMock: vi.fn(),
+  sendEmailMock: vi.fn<(input: TSendEmailInput) => Promise<void>>(),
   isMagicLinkSendAllowedMock: vi.fn(),
   withMinimumDurationMock: vi.fn(),
 }));
@@ -169,10 +180,9 @@ describe(buildMagicLinkProvider, () => {
   it('checks the requested address before sending', async () => {
     await sendVerificationRequestFor(provider);
 
-    expect(isMagicLinkSendAllowedMock).toHaveBeenCalledWith(
-      MOCK_READER_EMAIL,
-      expect.any(Request),
-    );
+    const [address, request] = isMagicLinkSendAllowedMock.mock.calls[0] ?? [];
+    expect(address).toBe(MOCK_READER_EMAIL);
+    expect(request).toBeInstanceOf(Request);
   });
 
   it('identifies itself as the email provider', () => {
@@ -187,12 +197,13 @@ describe(buildMagicLinkProvider, () => {
   it("delivers the sign-in link through @blog/email's sendEmail", async () => {
     await sendVerificationRequestFor(provider);
 
-    expect(sendEmailMock).toHaveBeenCalledWith({
+    const { html, ...envelope } = sentEmail();
+    expect(envelope).toEqual({
       to: MOCK_READER_EMAIL,
       from: MOCK_FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.stringContaining(SITE_LINK_HREF),
     });
+    expect(html).toContain(SITE_LINK_HREF);
   });
 
   it('sends invite-flavored copy when the identifier has a pending invite', async () => {
@@ -211,19 +222,12 @@ describe(buildMagicLinkProvider, () => {
     await sendVerificationRequestFor(provider, { identifier: INVITED_EMAIL });
 
     expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(INVITED_EMAIL);
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: INVITED_EMAIL,
-        from: MOCK_FROM_ADDRESS,
-        subject: TENANT_INVITE_DEFAULTS.subject,
-        html: expect.stringContaining('Accept invite'),
-      }),
-    );
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        html: expect.stringContaining('<strong>Acme Blog</strong>'),
-      }),
-    );
+    const { to, from, subject, html } = sentEmail();
+    expect(to).toBe(INVITED_EMAIL);
+    expect(from).toBe(MOCK_FROM_ADDRESS);
+    expect(subject).toBe(TENANT_INVITE_DEFAULTS.subject);
+    expect(html).toContain('Accept invite');
+    expect(html).toContain(`<strong>${MOCK_TENANT_NAME}</strong>`);
   });
 
   it("sends a site's own sign-in email to an address with a pending invite", async () => {
@@ -240,12 +244,9 @@ describe(buildMagicLinkProvider, () => {
 
     await sendVerificationRequestFor(provider, { identifier: INVITED_EMAIL });
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject: MAGIC_LINK_DEFAULTS.subject,
-        html: expect.not.stringContaining(MOCK_TENANT_NAME),
-      }),
-    );
+    const { subject, html } = sentEmail();
+    expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
+    expect(html).not.toContain(MOCK_TENANT_NAME);
   });
 
   it('falls back to the generic copy and still delivers when the invite lookup throws', async () => {
@@ -256,12 +257,13 @@ describe(buildMagicLinkProvider, () => {
 
     await sendVerificationRequestFor(provider);
 
-    expect(sendEmailMock).toHaveBeenCalledWith({
+    const { html, ...envelope } = sentEmail();
+    expect(envelope).toEqual({
       to: MOCK_READER_EMAIL,
       from: MOCK_FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.stringContaining(SITE_LINK_HREF),
     });
+    expect(html).toContain(SITE_LINK_HREF);
   });
 
   it("sends the admin's sign-in email in the platform layout", async () => {
@@ -272,12 +274,9 @@ describe(buildMagicLinkProvider, () => {
       url: PLATFORM_CALLBACK_URL,
     });
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject: MAGIC_LINK_DEFAULTS.subject,
-        html: expect.stringContaining(PLATFORM_LAYOUT_MARK),
-      }),
-    );
+    const { subject, html } = sentEmail();
+    expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
+    expect(html).toContain(PLATFORM_LAYOUT_MARK);
   });
 
   it("sends the admin's invite email in the platform layout", async () => {
@@ -298,22 +297,15 @@ describe(buildMagicLinkProvider, () => {
       url: PLATFORM_CALLBACK_URL,
     });
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject: TENANT_INVITE_DEFAULTS.subject,
-        html: expect.stringContaining(PLATFORM_LAYOUT_MARK),
-      }),
-    );
+    const { subject, html } = sentEmail();
+    expect(subject).toBe(TENANT_INVITE_DEFAULTS.subject);
+    expect(html).toContain(PLATFORM_LAYOUT_MARK);
   });
 
   it("never sends a site's sign-in email in the platform layout", async () => {
     await sendVerificationRequestFor(provider);
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        html: expect.not.stringContaining('Platform'),
-      }),
-    );
+    expect(sentEmail().html).not.toContain('Platform');
   });
 
   it('still delivers, in the unnamed neutral shell, when the host resolves to no tenant', async () => {
@@ -321,12 +313,13 @@ describe(buildMagicLinkProvider, () => {
 
     await sendVerificationRequestFor(provider);
 
-    expect(sendEmailMock).toHaveBeenCalledWith({
+    const { html, ...envelope } = sentEmail();
+    expect(envelope).toEqual({
       to: MOCK_READER_EMAIL,
       from: MOCK_FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.not.stringContaining('&copy;'),
     });
+    expect(html).not.toContain(COPYRIGHT_MARK);
   });
 
   it('still delivers, in the unnamed neutral shell, when the tenant domain lookup throws', async () => {
@@ -334,12 +327,13 @@ describe(buildMagicLinkProvider, () => {
 
     await sendVerificationRequestFor(provider);
 
-    expect(sendEmailMock).toHaveBeenCalledWith({
+    const { html, ...envelope } = sentEmail();
+    expect(envelope).toEqual({
       to: MOCK_READER_EMAIL,
       from: MOCK_FROM_ADDRESS,
       subject: MAGIC_LINK_DEFAULTS.subject,
-      html: expect.not.stringContaining('&copy;'),
     });
+    expect(html).not.toContain(COPYRIGHT_MARK);
   });
 
   it("writes an invite sent from a tenant-less host in the invited tenant's default language", async () => {
@@ -360,13 +354,10 @@ describe(buildMagicLinkProvider, () => {
       url: PLATFORM_CALLBACK_URL,
     });
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject:
-          EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.ES][
-            EMAIL_TEMPLATE_TYPE.TENANT_INVITE
-          ].subject,
-      }),
+    expect(sentEmail().subject).toBe(
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.ES][
+        EMAIL_TEMPLATE_TYPE.TENANT_INVITE
+      ].subject,
     );
   });
 
@@ -379,13 +370,10 @@ describe(buildMagicLinkProvider, () => {
       })}`,
     });
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject:
-          EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
-            EMAIL_TEMPLATE_TYPE.MAGIC_LINK
-          ].subject,
-      }),
+    expect(sentEmail().subject).toBe(
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK
+      ].subject,
     );
   });
 
@@ -412,11 +400,7 @@ describe(buildMagicLinkProvider, () => {
         preset: PRESET_ID.CONSOLE,
         accentHue: 140,
       });
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          html: expect.stringContaining(expectedBrand.logo1),
-        }),
-      );
+      expect(sentEmail().html).toContain(expectedBrand.logo1);
     });
 
     it("applies the tenant's sender name and reply-to address", async () => {
@@ -429,12 +413,9 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          from: MOCK_SENDER_FROM_ADDRESS,
-          replyTo: MOCK_REPLY_TO,
-        }),
-      );
+      const { from, replyTo } = sentEmail();
+      expect(from).toBe(MOCK_SENDER_FROM_ADDRESS);
+      expect(replyTo).toBe(MOCK_REPLY_TO);
     });
 
     it('renders the resolved logo and footer postal address in the sent email', async () => {
@@ -450,18 +431,9 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          html: expect.stringContaining(
-            'src="https://cdn.example.com/template-logo.png"',
-          ),
-        }),
-      );
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          html: expect.stringContaining(MOCK_POSTAL_ADDRESS),
-        }),
-      );
+      const { html } = sentEmail();
+      expect(html).toContain(`src="${MOCK_TEMPLATE_LOGO_URL}"`);
+      expect(html).toContain(MOCK_POSTAL_ADDRESS);
     });
 
     it('still delivers with product defaults when the email-config lookup fails', async () => {
@@ -469,12 +441,9 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          from: MOCK_FROM_ADDRESS,
-          replyTo: undefined,
-        }),
-      );
+      const { from, replyTo } = sentEmail();
+      expect(from).toBe(MOCK_FROM_ADDRESS);
+      expect(replyTo).toBeUndefined();
     });
 
     it('still delivers with product defaults when the email-template lookup fails', async () => {
@@ -488,12 +457,9 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          from: MOCK_SENDER_FROM_ADDRESS,
-          subject: MAGIC_LINK_DEFAULTS.subject,
-        }),
-      );
+      const { from, subject } = sentEmail();
+      expect(from).toBe(MOCK_SENDER_FROM_ADDRESS);
+      expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
     });
 
     it('sends the authored subject and body once a tenant has edited its magic-link copy', async () => {
@@ -519,12 +485,9 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          subject: MOCK_SUBJECT,
-          html: expect.stringContaining(CUSTOM_BODY_TEXT),
-        }),
-      );
+      const { subject, html } = sentEmail();
+      expect(subject).toBe(MOCK_SUBJECT);
+      expect(html).toContain(CUSTOM_BODY_TEXT);
     });
 
     it('keeps the sign-in action outside an authored body that mimics its own url and label', async () => {
@@ -557,11 +520,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sendEmailMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          html: expect.stringContaining(SITE_LINK_HREF),
-        }),
-      );
+      expect(sentEmail().html).toContain(SITE_LINK_HREF);
     });
 
     it.each([

@@ -38,9 +38,7 @@ describe('oauth-providers', () => {
     it('excludes an id when neither credential is present', async () => {
       const { getEnabledOAuthProviderIds } = await importOAuthProviders();
 
-      expect(getEnabledOAuthProviderIds()).not.toEqual(
-        expect.arrayContaining(['github', 'google']),
-      );
+      expect(getEnabledOAuthProviderIds()).toEqual([]);
     });
 
     describe('with the GitHub credential pair set', () => {

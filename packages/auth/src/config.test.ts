@@ -112,7 +112,8 @@ describe(buildAuthConfig, () => {
     });
 
     it("binds the Drizzle adapter to @blog/db's Auth.js tables", () => {
-      expect(DrizzleAdapter).toHaveBeenCalledWith(expect.anything(), {
+      const [, tables] = vi.mocked(DrizzleAdapter).mock.calls[0] ?? [];
+      expect(tables).toEqual({
         usersTable: schema.users,
         accountsTable: schema.accounts,
         sessionsTable: schema.sessions,
@@ -125,7 +126,7 @@ describe(buildAuthConfig, () => {
     });
 
     it('always includes the magic-link email provider', () => {
-      expect(providerIdsOf(config)).toEqual(expect.arrayContaining(['email']));
+      expect(providerIdsOf(config)).toContain('email');
     });
 
     it('returns the user with their id, and the expiry, as the session', async () => {
@@ -199,9 +200,9 @@ describe(buildAuthConfig, () => {
 
       const config = freshBuildAuthConfig(AUTH_APP.SITE);
 
-      expect(providerIdsOf(config)).toEqual(
-        expect.arrayContaining(['github', 'google']),
-      );
+      const providerIds = providerIdsOf(config);
+      expect(providerIds).toContain('github');
+      expect(providerIds).toContain('google');
     });
   });
 
@@ -237,16 +238,15 @@ describe(buildAuthConfig, () => {
       expect(config.cookies?.sessionToken?.name).not.toBe(
         'authjs.session-token',
       );
-      expect(Object.keys(config.cookies ?? {})).toEqual(
-        expect.arrayContaining([
-          'sessionToken',
-          'callbackUrl',
-          'csrfToken',
-          'pkceCodeVerifier',
-          'state',
-          'nonce',
-        ]),
-      );
+      expect(Object.keys(config.cookies ?? {})).toEqual([
+        'sessionToken',
+        'callbackUrl',
+        'csrfToken',
+        'pkceCodeVerifier',
+        'state',
+        'nonce',
+        'webauthnChallenge',
+      ]);
     });
 
     it('keeps the secure cookie prefixes in production', () => {

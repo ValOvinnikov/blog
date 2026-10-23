@@ -93,15 +93,14 @@ describe(withEncryptedUsers, () => {
   it('writes a new user with the encrypted email, its index and the encrypted name', async () => {
     await encryptedAdapter.createUser?.(signedUpUser());
 
-    expect(adapter.createUser).toHaveBeenCalledWith(
-      expect.objectContaining({
-        email: EMAIL,
-        name: NAME,
-        emailIndex: testPersonalEmailIndex(EMAIL),
-        emailEncrypted: expect.not.stringContaining(EMAIL),
-        nameEncrypted: expect.not.stringContaining(NAME),
-      }),
-    );
+    const [created] = adapter.createUser.mock.calls[0] ?? [];
+    const { email, name, emailIndex, emailEncrypted, nameEncrypted } =
+      created as TUser;
+    expect(email).toBe(EMAIL);
+    expect(name).toBe(NAME);
+    expect(emailIndex).toBe(testPersonalEmailIndex(EMAIL));
+    expect(emailEncrypted).not.toContain(EMAIL);
+    expect(nameEncrypted).not.toContain(NAME);
   });
 
   it('returns the created user with the email and name read from the encrypted columns', async () => {
@@ -117,12 +116,10 @@ describe(withEncryptedUsers, () => {
       name: null,
     });
 
-    expect(adapter.updateUser).toHaveBeenCalledWith(
-      expect.objectContaining({
-        emailIndex: testPersonalEmailIndex(CHANGED_EMAIL),
-        nameEncrypted: null,
-      }),
-    );
+    const [changes] = adapter.updateUser.mock.calls[0] ?? [];
+    const { emailIndex, nameEncrypted } = changes as TUser;
+    expect(emailIndex).toBe(testPersonalEmailIndex(CHANGED_EMAIL));
+    expect(nameEncrypted).toBeNull();
     expect(updated).toMatchObject({ email: CHANGED_EMAIL, name: null });
   });
 

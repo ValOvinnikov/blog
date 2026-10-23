@@ -76,12 +76,11 @@ describe('env', () => {
     it('throws naming AUTH_SECRET when it is missing and validation is not skipped', async () => {
       await expect(importEnv()).rejects.toThrow();
 
-      expect(consoleError).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['AUTH_SECRET'] }),
-        ]),
+      const [, issues] = consoleError.mock.calls[0] ?? [];
+      const issuePaths = (issues as { path: string[] }[]).map(
+        ({ path }) => path,
       );
+      expect(issuePaths).toContainEqual([ENV_KEYS[0]]);
     });
   });
 
