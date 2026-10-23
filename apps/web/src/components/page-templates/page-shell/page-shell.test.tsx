@@ -21,9 +21,11 @@ describe(`<${PageShell.name}/>`, () => {
     const order = renderedTestIdOrder();
 
     const main = within(screen.getByRole('main'));
+    const crumbsInMain = main.queryByTestId('crumbs');
+    const contentInMain = main.getByTestId('content');
     expect(order).toEqual(['crumbs', 'content']);
-    expect(main.queryByTestId('crumbs')).not.toBeInTheDocument();
-    expect(main.getByTestId('content')).toBeVisible();
+    expect(crumbsInMain).not.toBeInTheDocument();
+    expect(contentInMain).toBeVisible();
   });
 
   it('renders Heading before Content, both inside main', () => {
