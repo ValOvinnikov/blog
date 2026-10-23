@@ -1,47 +1,53 @@
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { LANDING_PARENT_CHAIN_QUERY } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
-import { evaluate, parse } from 'groq-js';
+import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import type { SanityDocument } from 'sanity';
 
 import { isInsideSection } from './is-inside-section';
 
-const page = (_id: string, parent?: string, sectionNavigation?: boolean) => ({
-  _id,
-  _type: PAGE_LANDING_TYPE,
-  slug: { _type: 'slug', current: _id },
-  ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
-  ...(sectionNavigation === undefined ? {} : { sectionNavigation }),
-});
-
 const isParentInsideSection = async (dataset: object[], parentId: string) => {
-  const result = await evaluate(parse(LANDING_PARENT_CHAIN_QUERY), {
-    dataset,
-    params: { parentId },
+  const chain = await mockGroqFetch(dataset)(LANDING_PARENT_CHAIN_QUERY, {
+    parentId,
   });
 
-  return isInsideSection(await result.get());
+  return isInsideSection(chain);
 };
 
+const MODULES_ID = 'modules';
+
 describe(isInsideSection, () => {
+  let sectionModules: SanityDocument;
+  let faqWithoutSection: SanityDocument;
+
+  beforeEach(() => {
+    sectionModules = mockLandingPage({
+      _id: MODULES_ID,
+      sectionNavigation: true,
+    });
+    faqWithoutSection = mockLandingPage({
+      _id: 'faq',
+      parent: MODULES_ID,
+      sectionNavigation: false,
+    });
+  });
+
   it('is inside a section when the parent has section navigation on', async () => {
-    expect(
-      await isParentInsideSection(
-        [page('modules', undefined, true)],
-        'modules',
-      ),
-    ).toBe(true);
+    expect(await isParentInsideSection([sectionModules], MODULES_ID)).toBe(
+      true,
+    );
   });
 
   it('is inside a section when a higher ancestor has section navigation on', async () => {
-    const dataset = [
-      page('modules', undefined, true),
-      page('faq', 'modules', false),
-    ];
+    const dataset = [sectionModules, faqWithoutSection];
 
     expect(await isParentInsideSection(dataset, 'faq')).toBe(true);
   });
 
   it('is outside a section when no ancestor has section navigation on', async () => {
-    const dataset = [page('modules'), page('faq', 'modules', false)];
+    const dataset = [
+      mockLandingPage({ _id: MODULES_ID, slug: MODULES_ID }),
+      faqWithoutSection,
+    ];
 
     expect(await isParentInsideSection(dataset, 'faq')).toBe(false);
   });

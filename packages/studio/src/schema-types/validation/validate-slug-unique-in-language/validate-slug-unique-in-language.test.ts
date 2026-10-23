@@ -1,80 +1,82 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
-import { evaluate, parse } from 'groq-js';
+import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
 import type { SlugValidationContext } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-type TPage = { _id: string; language?: string; slug: string };
-
-const page = ({ _id, language, slug }: TPage) => ({
-  _id,
-  _type: PAGE_LANDING_TYPE,
-  slug: { _type: 'slug', current: slug },
-  ...(language ? { language } : {}),
-});
-
-const createContext = (
-  document: ReturnType<typeof page> | undefined,
-  dataset: ReturnType<typeof page>[],
-  fetchError?: Error,
-) => {
-  const getClient = () => ({
-    withConfig: () => ({
-      fetch: async (query: string, params: Record<string, unknown>) => {
-        if (fetchError) throw fetchError;
-        const result = await evaluate(parse(query), { dataset, params });
-        return result.get();
-      },
-    }),
-  });
-
-  return { document, getClient } as unknown as SlugValidationContext;
-};
+const OTHER_DRAFT_ID = 'drafts.other';
 
 describe(validateSlugUniqueInLanguage, () => {
-  const englishAbout = page({ _id: 'about-en', language: EN, slug: 'about' });
+  const englishAbout = mockLandingPage({
+    _id: 'about-en',
+    language: EN,
+    slug: 'about',
+  });
 
   it('allows the same slug in another language', async () => {
-    const dutch = page({ _id: 'drafts.about-nl', language: NL, slug: 'about' });
+    const dutch = mockLandingPage({
+      _id: 'drafts.about-nl',
+      language: NL,
+      slug: 'about',
+    });
 
     await expect(
       validateSlugUniqueInLanguage(
         'about',
-        createContext(dutch, [englishAbout]),
+        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
+          document: dutch,
+        }),
       ),
     ).resolves.toBe(true);
   });
 
   it('rejects a slug another page uses in the same language', async () => {
-    const other = page({ _id: 'drafts.other', language: EN, slug: 'about' });
+    const other = mockLandingPage({
+      _id: OTHER_DRAFT_ID,
+      language: EN,
+      slug: 'about',
+    });
 
     await expect(
       validateSlugUniqueInLanguage(
         'about',
-        createContext(other, [englishAbout]),
+        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
+          document: other,
+        }),
       ),
     ).resolves.toBe(false);
   });
 
   it('does not count the draft of the same page as a clash', async () => {
-    const draft = page({ _id: 'drafts.about-en', language: EN, slug: 'about' });
+    const draft = mockLandingPage({
+      _id: 'drafts.about-en',
+      language: EN,
+      slug: 'about',
+    });
 
     await expect(
       validateSlugUniqueInLanguage(
         'about',
-        createContext(draft, [englishAbout]),
+        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
+          document: draft,
+        }),
       ),
     ).resolves.toBe(true);
   });
 
   it('treats pages without a language as one language', async () => {
-    const legacy = page({ _id: 'legacy', slug: 'contact' });
-    const other = page({ _id: 'drafts.other', slug: 'contact' });
+    const legacy = mockLandingPage({ _id: 'legacy', slug: 'contact' });
+    const other = mockLandingPage({ _id: OTHER_DRAFT_ID, slug: 'contact' });
 
     await expect(
-      validateSlugUniqueInLanguage('contact', createContext(other, [legacy])),
+      validateSlugUniqueInLanguage(
+        'contact',
+        mockGroqValidationContext<SlugValidationContext>([legacy], {
+          document: other,
+        }),
+      ),
     ).resolves.toBe(false);
   });
 
@@ -82,18 +84,27 @@ describe(validateSlugUniqueInLanguage, () => {
     await expect(
       validateSlugUniqueInLanguage(
         'about',
-        createContext(undefined, [englishAbout]),
+        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
+          document: undefined,
+        }),
       ),
     ).resolves.toBe(true);
   });
 
   it('passes when the fetch fails', async () => {
-    const other = page({ _id: 'other', language: EN, slug: 'about' });
+    const other = mockLandingPage({
+      _id: 'other',
+      language: EN,
+      slug: 'about',
+    });
 
     await expect(
       validateSlugUniqueInLanguage(
         'about',
-        createContext(other, [englishAbout], new Error('network down')),
+        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
+          document: other,
+          fetchError: new Error('network down'),
+        }),
       ),
     ).resolves.toBe(true);
   });

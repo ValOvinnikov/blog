@@ -1,38 +1,36 @@
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { validateHasPage } from '@blog/studio/schema-types/validation/validate-has-page/validate-has-page';
-import { createMockCountContext } from '@blog/studio/testing/create-mock-count-context';
+import { mockDocument } from '@blog/studio/testing/mock-documents';
+import {
+  MOCK_TAXONOMY_REFERENCE_FIELD,
+  mockFetchContext,
+  type TMockFetchContext,
+} from '@blog/studio/testing/mock-validation-context';
 import type { SanityDocument } from 'sanity';
 
-const asDocument = (doc: Record<string, unknown>): SanityDocument =>
-  doc as unknown as SanityDocument;
-
-const PAGE_TYPE = PAGE_TAG_TYPE;
-const REFERENCE_FIELD = 'tag';
 const MISSING_PAGE_ERROR = 'No Tag Page references this tag yet.';
 
 describe('validateHasPage', () => {
   const validate = validateHasPage(
-    PAGE_TYPE,
-    REFERENCE_FIELD,
+    PAGE_TAG_TYPE,
+    MOCK_TAXONOMY_REFERENCE_FIELD,
     MISSING_PAGE_ERROR,
   );
 
   let document: SanityDocument;
 
   beforeEach(() => {
-    document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
+    document = mockDocument({ _id: 'tag-1', _type: 'blog_tag' });
   });
 
   describe('when no page references the term', () => {
-    let context: ReturnType<typeof createMockCountContext>['context'];
-    let fetchCalls: ReturnType<typeof createMockCountContext>['fetchCalls'];
-    let withConfigCalls: ReturnType<
-      typeof createMockCountContext
-    >['withConfigCalls'];
+    let context: TMockFetchContext['context'];
+    let fetchCalls: TMockFetchContext['fetchCalls'];
+    let withConfigCalls: TMockFetchContext['withConfigCalls'];
 
     beforeEach(() => {
-      ({ context, fetchCalls, withConfigCalls } = createMockCountContext(0));
+      ({ context, fetchCalls, withConfigCalls } = mockFetchContext(0));
     });
 
     it('passes without querying when the document has no id', async () => {
@@ -47,12 +45,12 @@ describe('validateHasPage', () => {
     });
 
     it('strips the drafts. prefix and queries the drafts perspective', async () => {
-      const document = asDocument({ _id: 'drafts.tag-1', _type: 'blog_tag' });
+      const document = mockDocument({ _id: 'drafts.tag-1', _type: 'blog_tag' });
 
       await validate(document, context);
 
       expect(fetchCalls[0]?.params).toEqual({
-        type: PAGE_TYPE,
+        type: PAGE_TAG_TYPE,
         id: 'tag-1',
       });
       expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
@@ -64,7 +62,7 @@ describe('validateHasPage', () => {
         'topic',
         'No Topic Page references this topic yet.',
       );
-      const document = asDocument({ _id: 'topic-1', _type: 'blog_topic' });
+      const document = mockDocument({ _id: 'topic-1', _type: 'blog_topic' });
 
       await validateTopic(document, context);
 
@@ -73,13 +71,13 @@ describe('validateHasPage', () => {
   });
 
   it('passes when a page references the term', async () => {
-    const { context } = createMockCountContext(1);
+    const { context } = mockFetchContext(1);
 
     await expect(validate(document, context)).resolves.toBe(true);
   });
 
   it('resolves to true, not the error, when the fetch rejects', async () => {
-    const { context } = createMockCountContext(new Error('network down'));
+    const { context } = mockFetchContext(new Error('network down'));
 
     await expect(validate(document, context)).resolves.toBe(true);
   });

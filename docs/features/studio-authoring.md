@@ -66,7 +66,7 @@ This is how content is modelled and edited in the Sanity Studio: the desk an edi
 - A cross-document validator reads through `getDraftsClient` and `fetchDraftsFailSafe`, which resolves a failed fetch to a fallback rather than blocking publish; the redirect validators use the published-perspective `getPublishedClient` with their own fallback on a failed fetch. `validateImageHasAsset` checks the asset reference itself, since `required()` on an image passes with only alt text or crop data; `validateImageAltFilled` requires alt only once an asset exists; `validateLocalizedMaxLength` applies a limit to every language.
 - `createSlugUrlPreviewInput(prefix)` shows the public path under a slug field. `EnabledStateBooleanInput` labels a switch "Enabled"/"Disabled" instead of repeating the field title.
 - The generated files are never hand-edited (deny-listed for edits); a wrong type means a wrong schema. Typegen can be non-deterministic, so it is re-run until the diff is minimal, and CI's `typegen` job fails on stale output.
-- Schema definitions get no unit tests; validators, structure helpers, inputs, previews and migrations do. `src/testing/` holds the fakes (`createMockValidationRule`, `createMockCountContext`, `getField`, `assertSatisfiesRequiredFields`).
+- Schema definitions get no unit tests; validators, structure helpers, inputs, previews and migrations do. `src/testing/` holds the shared fakes, named `mock<Thing>` / `MOCK_<THING>` (`mockLandingPage`, `mockGroqValidationContext`, `mockFetchContext`, `mockStructureNode`, …), and the helpers `getRecordedValidators`, `getField` and `assertSatisfiesRequiredFields`.
 
 ## Dependencies
 

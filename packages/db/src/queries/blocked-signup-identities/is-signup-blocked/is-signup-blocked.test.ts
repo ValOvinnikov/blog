@@ -10,7 +10,7 @@ import {
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 import { isSignupBlocked } from './is-signup-blocked';
 
@@ -32,7 +32,7 @@ afterEach(async () => {
 
 describe(isSignupBlocked, () => {
   beforeEach(async () => {
-    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', TEST_ENCRYPTION_KEY);
+    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', MOCK_ENCRYPTION_KEY);
     const { id: createdByAdminId } = await insertTestAdmin(db());
     await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
