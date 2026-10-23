@@ -1,7 +1,18 @@
-import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { ERROR_CODE } from '@blog/config/constants';
+import {
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_IDLE_DEPROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+  MOCK_RUN_AT,
+  MOCK_STEP_ERROR,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { updateDeprovisioningStep } from './update-deprovisioning-step';
 
@@ -11,37 +22,12 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-async function insertDeprovisioningTenant(): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-      deprovisioningSteps: {
-        REMOVE_DOMAIN: { status: 'IDLE' },
-        ARCHIVE_SANITY_PROJECT: { status: 'IDLE' },
-        REVOKE_SANITY_TOKENS: { status: 'IDLE' },
-        CLEAR_ARTIFACTS: { status: 'IDLE' },
-        ARCHIVE_TENANT: { status: 'IDLE' },
-        PURGE_READER_DATA: { status: 'IDLE' },
-        INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
-      },
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
-
-const NOW = '2026-09-02T12:00:00.000Z';
+const { REMOVE_DOMAIN, ARCHIVE_SANITY_PROJECT } = DEPROVISIONING_STEP;
+const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date(NOW));
+  vi.setSystemTime(new Date(MOCK_RUN_AT));
 });
 
 afterEach(async () => {
@@ -53,89 +39,69 @@ describe(updateDeprovisioningStep, () => {
   let tenantId: string;
 
   beforeEach(async () => {
-    tenantId = await insertDeprovisioningTenant();
+    ({ id: tenantId } = await insertTestTenant(db(), {
+      deprovisioningSteps: MOCK_IDLE_DEPROVISIONING_STEPS,
+    }));
   });
 
   it('updates only the given step, leaving every other step untouched', async () => {
-    const result = await updateDeprovisioningStep({
-      tenantId,
-      step: 'REMOVE_DOMAIN',
-      status: 'RUNNING',
-    });
+    const { deprovisioningSteps } = unwrapOk(
+      await updateDeprovisioningStep({
+        tenantId,
+        step: REMOVE_DOMAIN,
+        status: RUNNING,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps).toEqual({
-      REMOVE_DOMAIN: { status: 'RUNNING', updatedAt: NOW },
-      ARCHIVE_SANITY_PROJECT: { status: 'IDLE' },
-      REVOKE_SANITY_TOKENS: { status: 'IDLE' },
-      CLEAR_ARTIFACTS: { status: 'IDLE' },
-      ARCHIVE_TENANT: { status: 'IDLE' },
-      PURGE_READER_DATA: { status: 'IDLE' },
-      INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
+    expect(deprovisioningSteps).toEqual({
+      ...MOCK_IDLE_DEPROVISIONING_STEPS,
+      [REMOVE_DOMAIN]: { status: RUNNING, updatedAt: MOCK_RUN_AT },
     });
   });
 
-  it('does not clobber a previously-updated step when a later step is updated', async () => {
+  it('does not clobber an earlier updated step when a later one is updated', async () => {
     await updateDeprovisioningStep({
       tenantId,
-      step: 'REMOVE_DOMAIN',
-      status: 'DONE',
+      step: REMOVE_DOMAIN,
+      status: DONE,
     });
-    const result = await updateDeprovisioningStep({
-      tenantId,
-      step: 'ARCHIVE_SANITY_PROJECT',
-      status: 'RUNNING',
-    });
+    const { deprovisioningSteps } = unwrapOk(
+      await updateDeprovisioningStep({
+        tenantId,
+        step: ARCHIVE_SANITY_PROJECT,
+        status: RUNNING,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps).toEqual({
-      REMOVE_DOMAIN: { status: 'DONE', updatedAt: NOW },
-      ARCHIVE_SANITY_PROJECT: { status: 'RUNNING', updatedAt: NOW },
-      REVOKE_SANITY_TOKENS: { status: 'IDLE' },
-      CLEAR_ARTIFACTS: { status: 'IDLE' },
-      ARCHIVE_TENANT: { status: 'IDLE' },
-      PURGE_READER_DATA: { status: 'IDLE' },
-      INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
+    expect(deprovisioningSteps).toEqual({
+      ...MOCK_IDLE_DEPROVISIONING_STEPS,
+      [REMOVE_DOMAIN]: { status: DONE, updatedAt: MOCK_RUN_AT },
+      [ARCHIVE_SANITY_PROJECT]: { status: RUNNING, updatedAt: MOCK_RUN_AT },
     });
   });
 
   it('stores the error message only when one is supplied', async () => {
-    const result = await updateDeprovisioningStep({
-      tenantId,
-      step: 'ARCHIVE_SANITY_PROJECT',
-      status: 'FAILED',
-      error: 'Sanity Projects API returned 429',
-    });
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.['ARCHIVE_SANITY_PROJECT']).toEqual(
-      {
-        status: 'FAILED',
-        error: 'Sanity Projects API returned 429',
-        updatedAt: NOW,
-      },
+    const { deprovisioningSteps } = unwrapOk(
+      await updateDeprovisioningStep({
+        tenantId,
+        step: ARCHIVE_SANITY_PROJECT,
+        status: FAILED,
+        error: MOCK_STEP_ERROR,
+      }),
     );
-  });
 
-  it('omits error entirely when not supplied', async () => {
-    const result = await updateDeprovisioningStep({
-      tenantId,
-      step: 'REMOVE_DOMAIN',
-      status: 'DONE',
-    });
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.['REMOVE_DOMAIN']).toEqual({
-      status: 'DONE',
-      updatedAt: NOW,
+    expect(deprovisioningSteps?.[ARCHIVE_SANITY_PROJECT]).toEqual({
+      status: FAILED,
+      error: MOCK_STEP_ERROR,
+      updatedAt: MOCK_RUN_AT,
     });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await updateDeprovisioningStep({
-      tenantId: '00000000-0000-0000-0000-000000000000',
-      step: 'REMOVE_DOMAIN',
-      status: 'RUNNING',
+      tenantId: MOCK_MISSING_TENANT_ID,
+      step: REMOVE_DOMAIN,
+      status: RUNNING,
     });
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });

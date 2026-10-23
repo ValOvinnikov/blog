@@ -1,7 +1,13 @@
-import { CORE_DEPROVISIONING_STEPS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  CORE_DEPROVISIONING_STEPS,
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TDeprovisioningStep,
+} from '@blog/db/constants';
+import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import type { Mock } from 'vitest';
 
-import type { TDeprovisionEnv } from './lib/env';
 import { runDeprovisioning, runSteps } from './run';
 
 const { removeTenantDomainMock } = vi.hoisted(() => ({
@@ -63,20 +69,20 @@ vi.mock('./lib/report-deprovisioning-run', () => ({
   reportDeprovisioningRunFinish: reportDeprovisioningRunFinishMock,
 }));
 
-const baseTenant = { id: 'tenant-1', name: 'Acme' } as TTenant;
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'sanity-token',
-  vercelToken: 'vercel-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'proj-1',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
+const MOCK_TENANT = mockTenant();
+const MOCK_WRONG_CONFIRM = 'Wrong Name';
+const MOCK_STEP_ERROR = 'boom';
+const MOCK_REPORT_ERROR = 'db unreachable';
+
+const STEP_MOCKS: [TDeprovisioningStep, Mock][] = [
+  [DEPROVISIONING_STEP.REMOVE_DOMAIN, removeTenantDomainMock],
+  [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT, archiveTenantSanityProjectMock],
+  [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS, revokeTenantSanityTokensMock],
+  [DEPROVISIONING_STEP.CLEAR_ARTIFACTS, clearTenantArtifactsMock],
+  [DEPROVISIONING_STEP.ARCHIVE_TENANT, archiveTenantRowMock],
+  [DEPROVISIONING_STEP.PURGE_READER_DATA, purgeTenantReaderDataMock],
+  [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE, invalidateTenantCacheMock],
+];
 
 beforeEach(() => {
   removeTenantDomainMock.mockReset().mockResolvedValue(undefined);
@@ -92,69 +98,34 @@ beforeEach(() => {
 });
 
 describe(runSteps, () => {
-  it('runs every step, in order, on a clean run', async () => {
-    const result = await runSteps(baseTenant, env);
+  it('runs every step in order, revoking tokens before clearing artifacts and archiving before purging and invalidating', async () => {
+    const callOrder: TDeprovisioningStep[] = [];
+    for (const [step, mock] of STEP_MOCKS) {
+      mock.mockImplementation(async () => {
+        callOrder.push(step);
+      });
+    }
 
-    expect(result).toEqual({ ok: true });
-    expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
-    expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
-    expect(revokeTenantSanityTokensMock).toHaveBeenCalledTimes(1);
-    expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
-    expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
-    expect(purgeTenantReaderDataMock).toHaveBeenCalledTimes(1);
-    expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
+    await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
+
+    expect(callOrder).toEqual(STEP_MOCKS.map(([step]) => step));
   });
 
   it('reports RUNNING for each step in exactly CORE_DEPROVISIONING_STEPS order', async () => {
-    await runSteps(baseTenant, env);
+    await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     const reportedOrder = reportDeprovisioningStepStatusMock.mock.calls
       .map(([call]) => call as { step: string; status: string })
-      .filter((call) => call.status === 'RUNNING')
+      .filter((call) => call.status === TENANT_PROVISIONING_STEP_STATUS.RUNNING)
       .map((call) => call.step);
 
     expect(reportedOrder).toEqual(CORE_DEPROVISIONING_STEPS);
   });
 
-  it('runs revoke-sanity-tokens before clear-artifacts', async () => {
-    const callOrder: string[] = [];
-    revokeTenantSanityTokensMock.mockImplementation(async () => {
-      callOrder.push('revoke-sanity-tokens');
-    });
-    clearTenantArtifactsMock.mockImplementation(async () => {
-      callOrder.push('clear-artifacts');
-    });
-
-    await runSteps(baseTenant, env);
-
-    expect(callOrder).toEqual(['revoke-sanity-tokens', 'clear-artifacts']);
-  });
-
-  it('runs archive-tenant before purge-reader-data before invalidate-tenant-cache', async () => {
-    const callOrder: string[] = [];
-    archiveTenantRowMock.mockImplementation(async () => {
-      callOrder.push('archive-tenant');
-    });
-    purgeTenantReaderDataMock.mockImplementation(async () => {
-      callOrder.push('purge-reader-data');
-    });
-    invalidateTenantCacheMock.mockImplementation(async () => {
-      callOrder.push('invalidate-tenant-cache');
-    });
-
-    await runSteps(baseTenant, env);
-
-    expect(callOrder).toEqual([
-      'archive-tenant',
-      'purge-reader-data',
-      'invalidate-tenant-cache',
-    ]);
-  });
-
   it('reports failure but leaves the already-committed archive and purge untouched when invalidate-tenant-cache fails', async () => {
     invalidateTenantCacheMock.mockRejectedValue(new Error('missing config'));
 
-    const result = await runSteps(baseTenant, env);
+    const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: false });
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
@@ -163,56 +134,45 @@ describe(runSteps, () => {
   });
 
   it('passes the same tenant row and env through to every step', async () => {
-    await runSteps(baseTenant, env);
+    await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
-    for (const mock of [
-      removeTenantDomainMock,
-      archiveTenantSanityProjectMock,
-      revokeTenantSanityTokensMock,
-      clearTenantArtifactsMock,
-      archiveTenantRowMock,
-      purgeTenantReaderDataMock,
-      invalidateTenantCacheMock,
-    ]) {
-      expect(mock).toHaveBeenCalledWith(baseTenant, env);
+    for (const [, mock] of STEP_MOCKS) {
+      expect(mock).toHaveBeenCalledWith(MOCK_TENANT, MOCK_DEPROVISION_ENV);
     }
   });
 
   it('records the run start, RUNNING then DONE for every step, and the run finish on a clean run', async () => {
-    const result = await runSteps(baseTenant, env);
+    const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: true });
     expect(reportDeprovisioningRunStartMock).toHaveBeenCalledTimes(1);
     expect(reportDeprovisioningRunStartMock).toHaveBeenCalledWith({
-      tenantId: 'tenant-1',
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/run-42',
+      tenantId: MOCK_TENANT.id,
+      workflowRunUrl: `${MOCK_DEPROVISION_ENV.githubServerUrl}/${MOCK_DEPROVISION_ENV.githubRepository}/actions/runs/${MOCK_DEPROVISION_ENV.githubRunId}`,
     });
-    for (const step of [
-      'REMOVE_DOMAIN',
-      'ARCHIVE_SANITY_PROJECT',
-      'REVOKE_SANITY_TOKENS',
-      'CLEAR_ARTIFACTS',
-      'ARCHIVE_TENANT',
-      'PURGE_READER_DATA',
-      'INVALIDATE_TENANT_CACHE',
-    ]) {
+    for (const step of CORE_DEPROVISIONING_STEPS) {
       expect(reportDeprovisioningStepStatusMock).toHaveBeenCalledWith({
-        tenantId: 'tenant-1',
+        tenantId: MOCK_TENANT.id,
         step,
-        status: 'RUNNING',
+        status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       });
       expect(reportDeprovisioningStepStatusMock).toHaveBeenCalledWith({
-        tenantId: 'tenant-1',
+        tenantId: MOCK_TENANT.id,
         step,
-        status: 'DONE',
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
       });
     }
     expect(reportDeprovisioningRunFinishMock).toHaveBeenCalledTimes(1);
-    expect(reportDeprovisioningRunFinishMock).toHaveBeenCalledWith('tenant-1');
+    expect(reportDeprovisioningRunFinishMock).toHaveBeenCalledWith(
+      MOCK_TENANT.id,
+    );
   });
 
   it('writes nothing to deprovisioning step state during a dry run', async () => {
-    const result = await runSteps(baseTenant, { ...env, dryRun: true });
+    const result = await runSteps(MOCK_TENANT, {
+      ...MOCK_DEPROVISION_ENV,
+      dryRun: true,
+    });
 
     expect(result).toEqual({ ok: true });
     expect(reportDeprovisioningRunStartMock).not.toHaveBeenCalled();
@@ -222,10 +182,10 @@ describe(runSteps, () => {
 
   it('continues the teardown when a step-status write itself throws', async () => {
     reportDeprovisioningStepStatusMock.mockRejectedValueOnce(
-      new Error('db unreachable'),
+      new Error(MOCK_REPORT_ERROR),
     );
 
-    const result = await runSteps(baseTenant, env);
+    const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: true });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
@@ -235,10 +195,10 @@ describe(runSteps, () => {
 
   it('still runs archive-tenant when recording the run start itself throws', async () => {
     reportDeprovisioningRunStartMock.mockRejectedValueOnce(
-      new Error('db unreachable'),
+      new Error(MOCK_REPORT_ERROR),
     );
 
-    const result = await runSteps(baseTenant, env);
+    const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: true });
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
@@ -246,11 +206,13 @@ describe(runSteps, () => {
 
   describe('when archive-sanity-project throws', () => {
     beforeEach(() => {
-      archiveTenantSanityProjectMock.mockRejectedValue(new Error('boom'));
+      archiveTenantSanityProjectMock.mockRejectedValue(
+        new Error(MOCK_STEP_ERROR),
+      );
     });
 
     it('stops at the first failing step and never runs later steps', async () => {
-      const result = await runSteps(baseTenant, env);
+      const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
       expect(result).toEqual({ ok: false });
       expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
@@ -263,23 +225,48 @@ describe(runSteps, () => {
     });
 
     it('records FAILED with the error and the run finish when a step throws, and never reports later steps', async () => {
-      const result = await runSteps(baseTenant, env);
+      const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
       expect(result).toEqual({ ok: false });
-      expect(reportDeprovisioningStepStatusMock).toHaveBeenCalledWith({
-        tenantId: 'tenant-1',
-        step: 'ARCHIVE_SANITY_PROJECT',
-        status: 'FAILED',
-        error: 'boom',
-      });
-      expect(reportDeprovisioningStepStatusMock).not.toHaveBeenCalledWith(
-        expect.objectContaining({ step: 'REVOKE_SANITY_TOKENS' }),
-      );
+      expect(reportDeprovisioningStepStatusMock.mock.calls).toEqual([
+        [
+          {
+            tenantId: MOCK_TENANT.id,
+            step: DEPROVISIONING_STEP.REMOVE_DOMAIN,
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        ],
+        [
+          {
+            tenantId: MOCK_TENANT.id,
+            step: DEPROVISIONING_STEP.REMOVE_DOMAIN,
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+        ],
+        [
+          {
+            tenantId: MOCK_TENANT.id,
+            step: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        ],
+        [
+          {
+            tenantId: MOCK_TENANT.id,
+            step: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: MOCK_STEP_ERROR,
+          },
+        ],
+      ]);
       expect(reportDeprovisioningRunFinishMock).toHaveBeenCalledTimes(1);
     });
 
     it('never reports a step during a dry run even when the step itself throws', async () => {
-      const result = await runSteps(baseTenant, { ...env, dryRun: true });
+      const result = await runSteps(MOCK_TENANT, {
+        ...MOCK_DEPROVISION_ENV,
+        dryRun: true,
+      });
 
       expect(result).toEqual({ ok: false });
       expect(reportDeprovisioningStepStatusMock).not.toHaveBeenCalled();
@@ -291,9 +278,9 @@ describe(runSteps, () => {
 describe(runDeprovisioning, () => {
   it('throws before any step runs when confirm does not match the name', async () => {
     await expect(
-      runDeprovisioning(baseTenant, 'Wrong Name', env),
+      runDeprovisioning(MOCK_TENANT, MOCK_WRONG_CONFIRM, MOCK_DEPROVISION_ENV),
     ).rejects.toThrow(
-      'deprovision-tenant: --confirm="Wrong Name" does not match tenant name "Acme" — aborting before any destructive action.',
+      `deprovision-tenant: --confirm="${MOCK_WRONG_CONFIRM}" does not match tenant name "${MOCK_TENANT.name}" — aborting before any destructive action.`,
     );
 
     expect(removeTenantDomainMock).not.toHaveBeenCalled();
@@ -306,7 +293,11 @@ describe(runDeprovisioning, () => {
   });
 
   it('runs every step when confirm matches the name', async () => {
-    const result = await runDeprovisioning(baseTenant, 'Acme', env);
+    const result = await runDeprovisioning(
+      MOCK_TENANT,
+      MOCK_TENANT.name,
+      MOCK_DEPROVISION_ENV,
+    );
 
     expect(result).toEqual({ ok: true });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
@@ -316,9 +307,11 @@ describe(runDeprovisioning, () => {
   });
 
   it('skips every step without checking confirm when already deprovisioned', async () => {
-    const tenant = { ...baseTenant, deprovisionedAt: new Date() } as TTenant;
-
-    const result = await runDeprovisioning(tenant, 'Wrong Name', env);
+    const result = await runDeprovisioning(
+      { ...MOCK_TENANT, deprovisionedAt: new Date() },
+      MOCK_WRONG_CONFIRM,
+      MOCK_DEPROVISION_ENV,
+    );
 
     expect(result).toEqual({ ok: true, skipped: true });
     expect(removeTenantDomainMock).not.toHaveBeenCalled();
