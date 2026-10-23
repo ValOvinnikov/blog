@@ -28,7 +28,7 @@ import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normal
 import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
 import { requirePersonalEmailIndex } from '@blog/db/utils/personal-data/personal-data';
 import { uniqueViolationConstraint } from '@blog/db/utils/unique-violation/unique-violation';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 
 const REFUSAL_BY_CONSTRAINT: Partial<Record<string, TErrorCode>> = {
   [SELF_SERVE_FREE_OWNER_INDEX_NAME]: ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT,
@@ -51,22 +51,22 @@ export async function createSelfServeTenant(
   const { name, domain, locale, siteType, preset, accentHue, owner } = input;
 
   if (!isValidDomain(domain)) {
-    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+    return errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
   }
 
   const normalizedEmail = normalizeSignupEmail(owner.email);
   if (!normalizedEmail) {
-    return { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
+    return errorResult(ERROR_CODE.DB_INVALID_EMAIL);
   }
 
   const owned = await ownsFreeTenant(owner.email);
   if (!owned.ok) return owned;
   if (owned.data) {
-    return { ok: false, error: ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT };
+    return errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT);
   }
 
   if (await getTenantByDomain(domain)) {
-    return { ok: false, error: ERROR_CODE.DB_DUPLICATE_DOMAIN };
+    return errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN);
   }
 
   const db = getDb();
@@ -112,12 +112,12 @@ export async function createSelfServeTenant(
       },
     );
 
-    return { ok: true, data: tenant };
+    return okResult(tenant);
   } catch (error) {
     const constraint = uniqueViolationConstraint(error);
     const refusal =
       constraint === undefined ? undefined : REFUSAL_BY_CONSTRAINT[constraint];
-    if (refusal) return { ok: false, error: refusal };
+    if (refusal) return errorResult(refusal);
     throw error;
   }
 }

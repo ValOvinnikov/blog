@@ -16,7 +16,7 @@ import type { insertAuditEvent } from '@blog/db/queries/audit-events/insert-audi
 import type { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data';
 import * as schema from '@blog/db/schema';
-import { NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
+import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestUser } from '@blog/db/testing/fixtures';
 import {
   testPersonalEmailIndex,
@@ -24,19 +24,20 @@ import {
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
-  SELF_SERVE_DOMAIN as DOMAIN,
-  SELF_SERVE_MISSING_USER_ID,
-  SELF_SERVE_NAME as NAME,
-  SELF_SERVE_OTHER_DOMAIN as OTHER_DOMAIN,
-  SELF_SERVE_OTHER_EMAIL as OTHER_EMAIL,
-  SELF_SERVE_OTHER_USER_ID as OTHER_ID,
-  SELF_SERVE_OWNER_EMAIL as OWNER_EMAIL,
-  SELF_SERVE_OWNER_ID as OWNER_ID,
-  SELF_SERVE_OWNER_SHOUTED_EMAIL,
-  SELF_SERVE_OWNER_TAGGED_EMAIL,
-  SELF_SERVE_PADDED_DOMAIN,
-  SELF_SERVE_SCHEME_DOMAIN,
+  MOCK_SELF_SERVE_DOMAIN as DOMAIN,
+  MOCK_SELF_SERVE_MISSING_USER_ID,
+  MOCK_SELF_SERVE_NAME as NAME,
+  MOCK_SELF_SERVE_OTHER_DOMAIN as OTHER_DOMAIN,
+  MOCK_SELF_SERVE_OTHER_EMAIL as OTHER_EMAIL,
+  MOCK_SELF_SERVE_OTHER_USER_ID as OTHER_ID,
+  MOCK_SELF_SERVE_OWNER_EMAIL as OWNER_EMAIL,
+  MOCK_SELF_SERVE_OWNER_ID as OWNER_ID,
+  MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL,
+  MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
+  MOCK_SELF_SERVE_PADDED_DOMAIN,
+  MOCK_SELF_SERVE_SCHEME_DOMAIN,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { errorResult, okResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 import type { ownsFreeTenant } from '../owns-free-tenant';
@@ -225,7 +226,7 @@ describe(createSelfServeTenant, () => {
     it('records the normalised owner address index on the tenant', async () => {
       const result = await createSelfServeTenant({
         ...input,
-        owner: { userId: OWNER_ID, email: SELF_SERVE_OWNER_SHOUTED_EMAIL },
+        owner: { userId: OWNER_ID, email: MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL },
       });
 
       if (!result.ok) throw new Error(EXPECTED_OK);
@@ -265,26 +266,20 @@ describe(createSelfServeTenant, () => {
 
       const result = await submitAs(OTHER_ID, OTHER_EMAIL, DOMAIN);
 
-      expect(result).toEqual({
-        ok: false,
-        error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
-      });
+      expect(result).toEqual(errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN));
       await expectOnlyFirstSiteStored();
     });
 
     it('refuses the same address through the database index when the pre-check races', async () => {
-      ownsFreeTenantMock.mockResolvedValue({ ok: true, data: false });
+      ownsFreeTenantMock.mockResolvedValue(okResult(false));
 
       const result = await submitAs(
         OTHER_ID,
-        SELF_SERVE_OWNER_TAGGED_EMAIL,
+        MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
         OTHER_DOMAIN,
       );
 
-      expect(result).toEqual({
-        ok: false,
-        error: ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT,
-      });
+      expect(result).toEqual(errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT));
       await expectOnlyFirstSiteStored();
     });
   });
@@ -292,8 +287,8 @@ describe(createSelfServeTenant, () => {
   describe('refusals', () => {
     it.each([
       ['the same address', OWNER_EMAIL],
-      ['a +tag variant of it', SELF_SERVE_OWNER_TAGGED_EMAIL],
-      ['a differently cased variant', SELF_SERVE_OWNER_SHOUTED_EMAIL],
+      ['a +tag variant of it', MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL],
+      ['a differently cased variant', MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL],
     ])(
       'refuses a second Free tenant for %s and writes nothing',
       async (_, email) => {
@@ -301,38 +296,29 @@ describe(createSelfServeTenant, () => {
 
         const result = await submitAs(OWNER_ID, email, OTHER_DOMAIN);
 
-        expect(result).toEqual({
-          ok: false,
-          error: ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT,
-        });
+        expect(result).toEqual(errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT));
         expect(await db().select().from(schema.tenants)).toHaveLength(1);
         expect(await db().select().from(schema.auditEvents)).toHaveLength(1);
       },
     );
 
     it.each([
-      ['a scheme-prefixed value', SELF_SERVE_SCHEME_DOMAIN],
-      ['a whitespace-padded value', SELF_SERVE_PADDED_DOMAIN],
+      ['a scheme-prefixed value', MOCK_SELF_SERVE_SCHEME_DOMAIN],
+      ['a whitespace-padded value', MOCK_SELF_SERVE_PADDED_DOMAIN],
     ])('refuses %s as the domain and writes nothing', async (_, domain) => {
       const result = await createSelfServeTenant({ ...input, domain });
 
-      expect(result).toEqual({
-        ok: false,
-        error: ERROR_CODE.DB_INVALID_DOMAIN,
-      });
+      expect(result).toEqual(errorResult(ERROR_CODE.DB_INVALID_DOMAIN));
       expect(await db().select().from(schema.tenants)).toHaveLength(0);
     });
 
     it('refuses an owner email that is not an address and writes nothing', async () => {
       const result = await createSelfServeTenant({
         ...input,
-        owner: { userId: OWNER_ID, email: NOT_AN_ADDRESS },
+        owner: { userId: OWNER_ID, email: MOCK_NOT_AN_ADDRESS },
       });
 
-      expect(result).toEqual({
-        ok: false,
-        error: ERROR_CODE.DB_INVALID_EMAIL,
-      });
+      expect(result).toEqual(errorResult(ERROR_CODE.DB_INVALID_EMAIL));
       expect(await db().select().from(schema.tenants)).toHaveLength(0);
     });
   });
@@ -354,7 +340,7 @@ describe(createSelfServeTenant, () => {
     await expect(
       createSelfServeTenant({
         ...input,
-        owner: { userId: SELF_SERVE_MISSING_USER_ID, email: OTHER_EMAIL },
+        owner: { userId: MOCK_SELF_SERVE_MISSING_USER_ID, email: OTHER_EMAIL },
       }),
     ).rejects.toThrow();
 

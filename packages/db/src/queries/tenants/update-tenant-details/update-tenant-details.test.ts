@@ -25,13 +25,13 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { MOCK_SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_DOMAIN,
 } from '@blog/db/testing/tenants/fixtures';
+import { MOCK_SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
@@ -627,7 +627,7 @@ describe(updateTenantDetails, () => {
 
   it('refuses a move to FREE that would give a person a second Free site', async () => {
     const selfServeOwnerEmailIndex = testPersonalEmailIndex(
-      SELF_SERVE_OWNER_EMAIL,
+      MOCK_SELF_SERVE_OWNER_EMAIL,
     );
     const tenantId = await insertTenantWithDomain();
     await db()
@@ -642,7 +642,7 @@ describe(updateTenantDetails, () => {
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      name: 'New Name',
+      name: NEW_NAME,
       plan: TENANT_PLAN.FREE,
     });
 

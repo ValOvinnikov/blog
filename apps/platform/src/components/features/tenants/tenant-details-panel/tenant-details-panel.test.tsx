@@ -358,8 +358,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       renderPanel();
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      await user.type(nameInput, '!');
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, NEW_OWNER_EXAMPLE_COM);
       const saveChangesButton = screen.getByRole('button', {
         name: SAVE_CHANGES,
       });

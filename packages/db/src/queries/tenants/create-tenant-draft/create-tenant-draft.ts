@@ -9,7 +9,7 @@ import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import { okResult, type TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 
 export type TDraftOwner =
   { type: 'user'; userId: string } | { type: 'invite'; email: string };
