@@ -1,6 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { homePageQuery } from './query';
@@ -9,51 +8,31 @@ const EN_HOME_ID = 'en-home';
 const NL_HOME_ID = 'nl-home';
 
 describe('homePageQuery', () => {
-  it('parses a home page whose SEO openGraph has no image (null ogImage)', () => {
-    const raw = makeRawHomePage({
-      seo: {
-        metaTitle: 'Home',
-        metaDescription: null,
-        openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
-      },
-    });
-
+  it.each([
+    [
+      'whose SEO openGraph has no image',
+      makeRawHomePage({
+        seo: {
+          metaTitle: 'Home',
+          metaDescription: null,
+          openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
+        },
+      }),
+    ],
+    ['with a headingBlock and no hero', makeRawHomePage({ hero: null })],
+  ])('parses a home page %s', (_, raw) => {
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
 
-  it('rejects a home page with no authored SEO', () => {
-    const raw = { ...makeRawHomePage(), seo: null };
-
+  it.each([
+    ['authored SEO', { ...makeRawHomePage(), seo: null }],
+    ['heading block', { ...makeRawHomePage(), headingBlock: null }],
+  ])('rejects a home page with no %s', (_, raw) => {
     expect(() => homePageQuery.parse(raw)).toThrow();
   });
 
   it('parses null as no matching page_home document, rather than throwing', () => {
     expect(homePageQuery.parse(null)).toBeNull();
-  });
-
-  it('rejects a home page with no headingBlock', () => {
-    const raw = { ...makeRawHomePage(), headingBlock: null };
-
-    expect(() => homePageQuery.parse(raw)).toThrow();
-  });
-
-  it('parses a home page with a headingBlock heading and no hero', () => {
-    const raw = makeRawHomePage({
-      hero: null,
-      headingBlock: makeRawHeadingBlock('Welcome'),
-    });
-
-    expect(() => homePageQuery.parse(raw)).not.toThrow();
-  });
-
-  it('parses a home page with both a hero and a headingBlock heading', () => {
-    const raw = makeRawHomePage({
-      headingBlock: makeRawHeadingBlock('Welcome', {
-        supportingText: 'A subtitle',
-      }),
-    });
-
-    expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
 });
 
@@ -81,12 +60,12 @@ describe('homePageQuery language scoping', () => {
     home(NL_HOME_ID, 'Welkom', NL),
   ];
 
-  it("resolves each language's own Home", async () => {
-    expect(await run(dataset, EN)).toMatchObject({
-      headingBlock: { heading: 'Welcome' },
-    });
-    expect(await run(dataset, NL)).toMatchObject({
-      headingBlock: { heading: 'Welkom' },
+  it.each([
+    [EN, 'Welcome'],
+    [NL, 'Welkom'],
+  ])('resolves the %s Home for its own language', async (locale, heading) => {
+    expect(await run(dataset, locale)).toMatchObject({
+      headingBlock: { heading },
     });
   });
 
@@ -145,22 +124,19 @@ describe('homePageQuery template layout', () => {
     });
   }
 
-  it.each([EN, NL])(
-    'resolves the hero and modules of the template the %s Home references',
-    async (locale) => {
+  it.each([
+    [EN, EN_HOME_ID],
+    [NL, NL_HOME_ID],
+  ])(
+    'resolves the %s Home with its id and its template hero and modules',
+    async (locale, id) => {
       expect(await run(dataset, locale)).toMatchObject({
+        _id: id,
         hero: { _id: 'hero-1', _type: 'module_heroBlog' },
         modules: [{ _id: MODULE_ID, _type: 'module_postLatest' }],
       });
     },
   );
-
-  it.each([
-    [EN, EN_HOME_ID],
-    [NL, NL_HOME_ID],
-  ])('projects the id of the %s Home', async (locale, id) => {
-    expect(await run(dataset, locale)).toMatchObject({ _id: id });
-  });
 
   it('resolves no hero and no modules for a Home without a template', async () => {
     expect(await run([home(EN_HOME_ID, EN)], EN)).toMatchObject({
