@@ -12,6 +12,7 @@ import {
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -73,8 +74,8 @@ describe(getPostLatest, () => {
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
-            't:tenant-a:modules:postLatest',
-            't:tenant-a:module:post-latest-1',
+            mockCacheTag('modules:postLatest'),
+            mockCacheTag(`module:${MOCK_POST_LATEST_MODULE_ID}`),
           ],
         },
       });

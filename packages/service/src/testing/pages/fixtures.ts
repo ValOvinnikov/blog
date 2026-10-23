@@ -47,17 +47,19 @@ export const MOCK_TAG_PAGE_DESCRIPTION = 'Posts about TypeScript.';
 export const MOCK_ABOUT_PAGE_TITLE = 'About Us';
 export const MOCK_CURATED_SUPPORTING_TEXT = 'Hand-picked reads.';
 export const MOCK_TEMPLATE_REFERENCE = mockReference('template-a');
+export const MOCK_AUTHOR_ID = 'author-1';
+export const MOCK_AUTHOR_NAME = 'Jane Doe';
+export const MOCK_AUTHOR_AVATAR_ALT = 'Jane avatar';
 
-const AUTHOR_AVATAR_ALT = 'Jane avatar';
 const POST_LIST_MODULE_ID = 'post-list-1';
 
 export function mockRawAuthor(
   overrides: Partial<TRawPostDetail['author']> = {},
 ): TRawPostDetail['author'] {
   return {
-    _id: 'author-1',
-    name: 'Jane Doe',
-    image: mockRawSanityImage(AUTHOR_AVATAR_ALT),
+    _id: MOCK_AUTHOR_ID,
+    name: MOCK_AUTHOR_NAME,
+    image: mockRawSanityImage(MOCK_AUTHOR_AVATAR_ALT),
     profilePage: null,
     role: 'Writer',
     bio: null,

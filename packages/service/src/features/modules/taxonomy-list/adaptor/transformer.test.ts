@@ -18,6 +18,7 @@ import {
 } from '@blog/service/testing/modules/fixtures';
 import { MOCK_TOPIC_INDEX_HEADING } from '@blog/service/testing/pages/fixtures';
 import {
+  MOCK_POST_ID,
   mockRawHeadingBlock,
   mockRawPostLink,
   mockRawWideLayout,
@@ -182,7 +183,7 @@ describe(toTaxonomyListModule, () => {
               slug: NEWER_POST_SLUG,
             }),
             mockRawPostLink({
-              _id: 'post-1',
+              _id: MOCK_POST_ID,
               headingBlock: { heading: OLDER_POST_TITLE },
               slug: OLDER_POST_SLUG,
             }),
@@ -195,7 +196,7 @@ describe(toTaxonomyListModule, () => {
 
     expect(module.entries[0]?.latestPosts).toEqual([
       { id: 'post-2', title: NEWER_POST_TITLE, slug: NEWER_POST_SLUG },
-      { id: 'post-1', title: OLDER_POST_TITLE, slug: OLDER_POST_SLUG },
+      { id: MOCK_POST_ID, title: OLDER_POST_TITLE, slug: OLDER_POST_SLUG },
     ]);
   });
 

@@ -13,6 +13,7 @@ import {
   MOCK_POSTS_CACHE_TAG,
   MOCK_TAG_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -101,7 +102,7 @@ describe(getPostList, () => {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
             MOCK_MODULES_POST_LIST_CACHE_TAG,
-            't:tenant-a:module:post-list-1',
+            mockCacheTag(`module:${POST_LIST_ID}`),
           ],
         },
       });

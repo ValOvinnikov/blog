@@ -8,6 +8,7 @@ import {
   MOCK_HOME_PAGE_CACHE_TAG,
   MOCK_LINK_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -60,8 +61,8 @@ describe(getLogoWallModule, () => {
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
-            't:tenant-a:modules:logoWall',
-            't:tenant-a:module:logo-wall-1',
+            mockCacheTag('modules:logoWall'),
+            mockCacheTag(`module:${MOCK_LOGO_WALL_MODULE_ID}`),
             MOCK_LINK_CACHE_TAG,
             MOCK_HOME_PAGE_CACHE_TAG,
             MOCK_PAGE_LANDING_CACHE_TAG,

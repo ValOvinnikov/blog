@@ -13,6 +13,7 @@ import {
 import {
   MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
   MOCK_PAGE_TAG_INDEX_CACHE_TAG,
+  MOCK_TEMPLATE_TAG_INDEX_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   mockRawHeadingBlock,
@@ -126,7 +127,7 @@ describe(getIndexPage, () => {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
           MOCK_PAGE_TAG_INDEX_CACHE_TAG,
-          't:tenant-a:template_tagIndex',
+          MOCK_TEMPLATE_TAG_INDEX_CACHE_TAG,
           MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
         ],
       },

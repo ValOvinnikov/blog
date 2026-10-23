@@ -1,10 +1,10 @@
 import {
-  BRAND_TAGLINE_SEPARATOR_CHARS,
   BRAND_TAGLINE_SEPARATORS,
   SANITY_CONTENT_REVALIDATE_SECONDS,
 } from '@blog/config';
 import { mockRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   mockRawSanityImage,
   mockSanityImageView,
@@ -21,6 +21,7 @@ const BRAND_NAME = 'Awesome Blog';
 const BUILD_ITEM = 'build 2026.07';
 const ONLINE_ITEM = 'online';
 const LOGO_ALT = 'Logo';
+const DOT_TAGLINE = 'build 2026.07 · online';
 
 const tenant = mockTenant();
 
@@ -62,23 +63,33 @@ describe(getSiteSettings, () => {
   });
 
   it.each([
-    BRAND_TAGLINE_SEPARATORS.DOT,
-    BRAND_TAGLINE_SEPARATORS.PIPE,
-    BRAND_TAGLINE_SEPARATORS.BULLET,
-    BRAND_TAGLINE_SEPARATORS.SLASH,
-  ])('joins tagline items with the %s separator', async (separator) => {
-    mockRun.mockResolvedValueOnce(
-      mockSettingsWithBrand({
-        tagline: { items: taglineItems(BUILD_ITEM, ONLINE_ITEM), separator },
-      }),
-    );
+    { separator: BRAND_TAGLINE_SEPARATORS.DOT, tagline: DOT_TAGLINE },
+    {
+      separator: BRAND_TAGLINE_SEPARATORS.PIPE,
+      tagline: 'build 2026.07 | online',
+    },
+    {
+      separator: BRAND_TAGLINE_SEPARATORS.BULLET,
+      tagline: 'build 2026.07 • online',
+    },
+    {
+      separator: BRAND_TAGLINE_SEPARATORS.SLASH,
+      tagline: 'build 2026.07 / online',
+    },
+  ])(
+    'joins tagline items with the $separator separator',
+    async ({ separator, tagline }) => {
+      mockRun.mockResolvedValueOnce(
+        mockSettingsWithBrand({
+          tagline: { items: taglineItems(BUILD_ITEM, ONLINE_ITEM), separator },
+        }),
+      );
 
-    const result = await getSiteSettings(tenant);
+      const result = await getSiteSettings(tenant);
 
-    expect(result.brand.tagline).toBe(
-      `${BUILD_ITEM} ${BRAND_TAGLINE_SEPARATOR_CHARS[separator]} ${ONLINE_ITEM}`,
-    );
-  });
+      expect(result.brand.tagline).toBe(tagline);
+    },
+  );
 
   it('joins a single tagline item with no separator character', async () => {
     mockRun.mockResolvedValueOnce(
@@ -107,9 +118,7 @@ describe(getSiteSettings, () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.tagline).toBe(
-      `${BUILD_ITEM} ${BRAND_TAGLINE_SEPARATOR_CHARS.DOT} ${ONLINE_ITEM}`,
-    );
+    expect(result.brand.tagline).toBe(DOT_TAGLINE);
   });
 
   it.each([
@@ -155,7 +164,7 @@ describe(getSiteSettings, () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: ['t:tenant-a:site-settings'],
+        tags: [mockCacheTag('site-settings')],
       },
     });
   });

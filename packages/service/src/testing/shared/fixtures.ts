@@ -21,7 +21,6 @@ import type { TRawPortableTextBody } from '@blog/service/shared/transformers/por
 import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { TRawSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { TRawSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
-import { mockLocalizedEntry } from '@blog/service/testing/shared/localized';
 import type { InferFragmentType } from 'groqd';
 
 type TRawPostLink = InferFragmentType<typeof postLinkFragment>;
@@ -52,10 +51,6 @@ function mockImageDimensions() {
 
 export function mockReference(id: string, fields: { _key?: string } = {}) {
   return { _type: 'reference', _ref: id, ...fields };
-}
-
-export function mockTranslationLink(language: string, id: string) {
-  return mockLocalizedEntry(language, mockReference(id));
 }
 
 export function mockRawExternalLinkDocument(

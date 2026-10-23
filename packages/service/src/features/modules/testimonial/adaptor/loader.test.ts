@@ -8,6 +8,7 @@ import {
   MOCK_HOME_PAGE_CACHE_TAG,
   MOCK_LINK_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -72,9 +73,9 @@ describe(getTestimonialModule, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:testimonial',
-          `t:tenant-a:module:${MOCK_TESTIMONIAL_MODULE_ID}`,
-          't:tenant-a:block_testimonial',
+          mockCacheTag('modules:testimonial'),
+          mockCacheTag(`module:${MOCK_TESTIMONIAL_MODULE_ID}`),
+          mockCacheTag('block_testimonial'),
           MOCK_LINK_CACHE_TAG,
           MOCK_HOME_PAGE_CACHE_TAG,
           MOCK_PAGE_LANDING_CACHE_TAG,

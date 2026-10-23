@@ -15,6 +15,7 @@ import {
   MOCK_PAGE_POST_INDEX_CACHE_TAG,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -72,8 +73,8 @@ describe('getHero', () => {
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
-            't:tenant-a:modules:hero',
-            't:tenant-a:module:hero-1',
+            mockCacheTag('modules:hero'),
+            mockCacheTag(`module:${MOCK_HERO_MODULE_ID}`),
             ...POST_TAGS,
             MOCK_PAGE_POST_CACHE_TAG,
             MOCK_PAGE_LANDING_CACHE_TAG,

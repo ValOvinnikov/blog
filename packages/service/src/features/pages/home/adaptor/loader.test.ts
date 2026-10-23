@@ -8,7 +8,10 @@ import {
   mockHeroSlotView,
   mockRawHomePage,
 } from '@blog/service/testing/pages/fixtures';
-import { MOCK_HOME_PAGE_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_TEMPLATE_HOME_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getHomePageDocument } from './loader';
@@ -54,7 +57,7 @@ describe(getHomePageDocument, () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [MOCK_HOME_PAGE_CACHE_TAG, 't:tenant-a:template_home'],
+        tags: [MOCK_HOME_PAGE_CACHE_TAG, MOCK_TEMPLATE_HOME_CACHE_TAG],
       },
     });
   });

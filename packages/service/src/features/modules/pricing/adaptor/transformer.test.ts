@@ -3,7 +3,6 @@ import {
   CONTENT_ALIGNMENT,
   PRICE_PERIOD,
 } from '@blog/config/constants';
-import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
 import {
   MOCK_PRICING_FEATURE_KEY,
   MOCK_PRICING_FOOTNOTE,
@@ -15,6 +14,7 @@ import {
   MOCK_PRIORITY_SUPPORT_FEATURE,
   MOCK_SECOND_PRICING_FEATURE_KEY,
   MOCK_UNLIMITED_POSTS_FEATURE,
+  mockCtaButtonView,
   mockRawCtaButton,
   mockRawPricingModule,
   mockRawPricingPrice,
@@ -83,7 +83,7 @@ describe(toPricingModule, () => {
         ],
         priceLabel: undefined,
         features: [MOCK_UNLIMITED_POSTS_FEATURE, MOCK_PRIORITY_SUPPORT_FEATURE],
-        ctaButtons: toCtaButtons([mockRawCtaButton()]),
+        ctaButtons: [mockCtaButtonView()],
         highlightLabel: MOCK_PRICING_HIGHLIGHT_LABEL,
         footnote: MOCK_PRICING_TIER_FOOTNOTE,
       },

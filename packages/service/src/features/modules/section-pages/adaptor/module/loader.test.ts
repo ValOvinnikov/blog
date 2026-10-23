@@ -5,6 +5,7 @@ import {
   MOCK_SECTION_PAGES_MODULE_ID,
   mockRawSectionPagesModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockValidationError,
@@ -41,8 +42,8 @@ describe(getSectionPagesModuleDocument, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:sectionPages',
-          `t:tenant-a:module:${MOCK_SECTION_PAGES_MODULE_ID}`,
+          mockCacheTag('modules:sectionPages'),
+          mockCacheTag(`module:${MOCK_SECTION_PAGES_MODULE_ID}`),
         ],
       },
     });

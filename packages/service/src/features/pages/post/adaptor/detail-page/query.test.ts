@@ -14,9 +14,9 @@ import {
   mockRawBodyImageBlock,
   mockRawExternalLinkDocument,
   mockRawHeadingBlock,
-  mockTranslationLink,
 } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { mockTranslationLink } from '@blog/service/testing/shared/localized';
 
 import { postPageQuery } from './query';
 

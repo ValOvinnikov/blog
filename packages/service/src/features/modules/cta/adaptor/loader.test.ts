@@ -17,6 +17,7 @@ import {
   MOCK_PAGE_TOPIC_CACHE_TAG,
   MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -60,8 +61,8 @@ describe('getCta', () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:cta',
-          't:tenant-a:module:cta-1',
+          mockCacheTag('modules:cta'),
+          mockCacheTag(`module:${MOCK_CTA_MODULE_ID}`),
           MOCK_LINK_CACHE_TAG,
           MOCK_HOME_PAGE_CACHE_TAG,
           MOCK_PAGE_LANDING_CACHE_TAG,

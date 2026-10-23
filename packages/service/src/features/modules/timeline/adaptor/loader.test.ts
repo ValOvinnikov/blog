@@ -8,6 +8,7 @@ import {
   MOCK_HOME_PAGE_CACHE_TAG,
   MOCK_LINK_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -55,8 +56,8 @@ describe(getTimelineModule, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:timeline',
-          `t:tenant-a:module:${MOCK_TIMELINE_MODULE_ID}`,
+          mockCacheTag('modules:timeline'),
+          mockCacheTag(`module:${MOCK_TIMELINE_MODULE_ID}`),
           MOCK_LINK_CACHE_TAG,
           MOCK_HOME_PAGE_CACHE_TAG,
           MOCK_PAGE_LANDING_CACHE_TAG,

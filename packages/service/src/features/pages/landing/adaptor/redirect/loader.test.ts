@@ -1,6 +1,7 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { mockTenant } from '@blog/service/testing/tenant';
 
@@ -142,7 +143,7 @@ describe(getRedirect, () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: ['t:tenant-a:redirect'],
+        tags: [mockCacheTag('redirect')],
       },
     });
   });

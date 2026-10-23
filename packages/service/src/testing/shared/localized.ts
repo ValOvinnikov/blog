@@ -13,6 +13,10 @@ export function mockLocalizedEntry(language: string, value: unknown) {
   return { _key: language, language, value };
 }
 
+export function mockTranslationLink(language: string, id: string) {
+  return mockLocalizedEntry(language, mockReference(id));
+}
+
 export function mockLocalizedValues(
   type: string,
   values: Partial<Record<string, unknown>>,

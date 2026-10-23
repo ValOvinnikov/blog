@@ -12,11 +12,9 @@ import {
   mockTemplateLayoutDocuments,
   mockTemplatedPageDocument,
 } from '@blog/service/testing/pages/fixtures';
-import {
-  mockRawHeadingBlock,
-  mockTranslationLink,
-} from '@blog/service/testing/shared/fixtures';
+import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { mockTranslationLink } from '@blog/service/testing/shared/localized';
 
 import { tagPageQuery } from './query';
 

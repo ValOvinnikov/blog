@@ -1,7 +1,10 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockRawHeroStatementModule } from '@blog/service/testing/modules/fixtures';
-import { MOCK_LINK_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_LINK_CACHE_TAG,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
@@ -52,8 +55,8 @@ describe(getHeroStatement, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:heroStatement',
-          't:tenant-a:module:hero-statement-1',
+          mockCacheTag('modules:heroStatement'),
+          mockCacheTag(`module:${HERO_STATEMENT_ID}`),
           MOCK_LINK_CACHE_TAG,
         ],
       },

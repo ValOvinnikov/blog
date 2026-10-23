@@ -3,11 +3,9 @@ import {
   MOCK_TAG_ID,
   MOCK_TOPIC_ID,
 } from '@blog/service/testing/entities/fixtures';
-import {
-  mockReference,
-  mockTranslationLink,
-} from '@blog/service/testing/shared/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { mockTranslationLink } from '@blog/service/testing/shared/localized';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 

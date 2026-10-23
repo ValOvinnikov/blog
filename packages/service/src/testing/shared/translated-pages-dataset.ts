@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockTranslationLink } from '@blog/service/testing/shared/fixtures';
+import { mockTranslationLink } from '@blog/service/testing/shared/localized';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 

@@ -9,7 +9,10 @@ import {
   mockRawHeroRef,
   mockRawLandingPage,
 } from '@blog/service/testing/pages/fixtures';
-import { MOCK_PAGE_LANDING_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_TEMPLATE_LANDING_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
@@ -122,7 +125,7 @@ describe(getPageDocument, () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [MOCK_PAGE_LANDING_CACHE_TAG, 't:tenant-a:template_landing'],
+        tags: [MOCK_PAGE_LANDING_CACHE_TAG, MOCK_TEMPLATE_LANDING_CACHE_TAG],
       },
     });
   });

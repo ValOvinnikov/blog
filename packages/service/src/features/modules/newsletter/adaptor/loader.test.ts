@@ -8,6 +8,7 @@ import {
   MOCK_NEWSLETTER_MODULE_ID,
   mockRawNewsletterModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockValidationError,
@@ -51,8 +52,8 @@ describe(getNewsletter, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:newsletter',
-          't:tenant-a:module:newsletter-1',
+          mockCacheTag('modules:newsletter'),
+          mockCacheTag(`module:${MOCK_NEWSLETTER_MODULE_ID}`),
         ],
       },
     });

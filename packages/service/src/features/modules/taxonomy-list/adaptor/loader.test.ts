@@ -17,6 +17,7 @@ import {
   MOCK_POSTS_CACHE_TAG,
   MOCK_TAGS_CACHE_TAG,
   MOCK_TOPICS_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -73,7 +74,7 @@ describe(getTaxonomyList, () => {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
           MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
-          `t:tenant-a:module:${MOCK_TAXONOMY_LIST_MODULE_ID}`,
+          mockCacheTag(`module:${MOCK_TAXONOMY_LIST_MODULE_ID}`),
           MOCK_TOPICS_CACHE_TAG,
           MOCK_TAGS_CACHE_TAG,
           MOCK_POSTS_CACHE_TAG,

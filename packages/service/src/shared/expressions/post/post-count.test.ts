@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@blog/service/testing/shared/translated-posts-dataset';
 
@@ -10,7 +11,7 @@ describe('POST_COUNT_EXPRESSION', () => {
   it('counts published posts referencing the document in the request language', async () => {
     function count(locale: string): Promise<unknown> {
       return evaluateGroqExpression(
-        `*[_id == "topic-1"][0]{ "count": ${POST_COUNT_EXPRESSION} }.count`,
+        `*[_id == "${MOCK_TOPIC_ID}"][0]{ "count": ${POST_COUNT_EXPRESSION} }.count`,
         MOCK_TRANSLATED_POST_DOCUMENTS,
         null,
         { locale },

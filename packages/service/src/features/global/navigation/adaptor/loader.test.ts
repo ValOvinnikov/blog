@@ -4,7 +4,7 @@ import {
   mockRawNavigation,
 } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import {} from '@blog/service/testing/sanity/query/cache-tags';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   mockLinkView,
   mockRawExternalLinkDocument,
@@ -79,7 +79,7 @@ describe(getNavigation, () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: ['t:tenant-a:navigation', ...MOCK_LINKED_PAGE_CACHE_TAGS],
+        tags: [mockCacheTag('navigation'), ...MOCK_LINKED_PAGE_CACHE_TAGS],
       },
     });
   });

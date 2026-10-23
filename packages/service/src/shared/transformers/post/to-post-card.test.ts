@@ -1,17 +1,23 @@
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import {
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
 } from '@blog/service/testing/entities/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_AUTHOR_AVATAR_ALT,
+  MOCK_AUTHOR_ID,
+  MOCK_AUTHOR_NAME,
+  mockRawPostCard,
+} from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_POST_EXCERPT,
+  MOCK_POST_ID,
   MOCK_POST_PUBLISHED_AT,
   MOCK_POST_SLUG,
   MOCK_POST_TITLE,
   mockRawHeadingBlock,
   mockRawInternalLinkDocument,
+  mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
 
 import { toPostCard } from './to-post-card';
@@ -23,17 +29,17 @@ describe(toPostCard, () => {
     const result = toPostCard(raw);
 
     expect(result).toEqual({
-      id: 'post-1',
+      id: MOCK_POST_ID,
       title: MOCK_POST_TITLE,
       slug: MOCK_POST_SLUG,
       excerpt: MOCK_POST_EXCERPT,
       publishedAt: MOCK_POST_PUBLISHED_AT,
-      heroImage: toSanityImage(raw.heroImage),
+      heroImage: mockSanityImageView(),
       featured: false,
       author: {
-        id: raw.author._id,
-        name: raw.author.name,
-        image: toSanityImage(raw.author.image),
+        id: MOCK_AUTHOR_ID,
+        name: MOCK_AUTHOR_NAME,
+        image: mockSanityImageView(MOCK_AUTHOR_AVATAR_ALT),
         profileUrl: undefined,
       },
       topic: {

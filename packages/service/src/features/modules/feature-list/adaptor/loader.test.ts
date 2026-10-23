@@ -8,6 +8,7 @@ import {
   MOCK_HOME_PAGE_CACHE_TAG,
   MOCK_LINK_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
+  mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
@@ -75,9 +76,9 @@ describe(getFeatureList, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:featureList',
-          't:tenant-a:module:feature-list-1',
-          't:tenant-a:block_feature',
+          mockCacheTag('modules:featureList'),
+          mockCacheTag(`module:${MOCK_FEATURE_LIST_MODULE_ID}`),
+          mockCacheTag('block_feature'),
           MOCK_LINK_CACHE_TAG,
           MOCK_HOME_PAGE_CACHE_TAG,
           MOCK_PAGE_LANDING_CACHE_TAG,

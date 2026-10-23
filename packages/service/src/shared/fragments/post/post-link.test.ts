@@ -1,5 +1,6 @@
 import { q } from '@blog/service/sanity/query/query';
 import {
+  MOCK_POST_ID,
   MOCK_POST_SLUG,
   MOCK_POST_TITLE,
 } from '@blog/service/testing/shared/fixtures';
@@ -15,7 +16,7 @@ const postLinkDocQuery = q.star
 describe('postLinkFragment', () => {
   it('accepts a fully-projected post (heading and flattened slug.current present)', () => {
     const projected = {
-      _id: 'post-1',
+      _id: MOCK_POST_ID,
       headingBlock: { heading: MOCK_POST_TITLE },
       slug: MOCK_POST_SLUG,
     };

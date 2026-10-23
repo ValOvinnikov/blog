@@ -1,7 +1,7 @@
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import {
   mockRawSanityImage,
   mockRawSeo,
+  mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
 
 import { resolveSeo, type TRawSeo } from './resolve-seo';
@@ -33,7 +33,7 @@ describe(resolveSeo, () => {
       description: AUTHORED_DESCRIPTION,
       ogTitle: AUTHORED_OG_TITLE,
       ogDescription: AUTHORED_OG_DESCRIPTION,
-      ogImage: toSanityImage(mockRawSanityImage()),
+      ogImage: mockSanityImageView(),
     });
   });
 

@@ -1,6 +1,7 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockRawContactFormModule } from '@blog/service/testing/modules/fixtures';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockValidationError,
@@ -45,8 +46,8 @@ describe('getContactForm', () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
-          't:tenant-a:modules:contactForm',
-          't:tenant-a:module:contact-form-1',
+          mockCacheTag('modules:contactForm'),
+          mockCacheTag(`module:${CONTACT_FORM_ID}`),
         ],
       },
     });
