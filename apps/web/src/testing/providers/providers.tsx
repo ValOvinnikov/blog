@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
  * Fixed base URL every `SanityImage` renders against under Vitest or
  * Storybook — neither context resolves a real tenant to derive one from.
  */
-export const STATIC_SANITY_IMAGE_BASE_URL =
+export const MOCK_SANITY_IMAGE_BASE_URL =
   'https://cdn.sanity.io/images/test-project/test-dataset/';
 
 const CATALOG_VOICE_RICH = resolveVoiceRichFields({}, SITE_MESSAGES);
@@ -27,7 +27,7 @@ export interface IAppProvidersProps {
  */
 export const AppProviders = ({ children }: IAppProvidersProps) => (
   <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={SITE_MESSAGES}>
-    <SanityImageBaseUrlProvider baseUrl={STATIC_SANITY_IMAGE_BASE_URL}>
+    <SanityImageBaseUrlProvider baseUrl={MOCK_SANITY_IMAGE_BASE_URL}>
       <VoiceRichProvider values={CATALOG_VOICE_RICH}>
         <ConsentPreferencesProvider>{children}</ConsentPreferencesProvider>
       </VoiceRichProvider>

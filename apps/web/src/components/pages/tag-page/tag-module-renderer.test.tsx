@@ -1,6 +1,6 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
@@ -79,9 +79,11 @@ vi.mock('@web/modules/faq/faq-module', () => ({
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
+const PAGE_HEADING = 'TypeScript';
+
 const setup = customRenderAsync(TagModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
@@ -89,7 +91,7 @@ const setup = customRenderAsync(TagModuleRenderer, {
 const POST_LIST_ID = 'post-list-1';
 
 describe(`<${TagModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: 'TypeScript' });
+  testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
   testResolvedHero({ setup });
   testHeroBeforeModules({
     setup,
@@ -102,14 +104,14 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock,
-    headingText: 'TypeScript',
+    headingText: PAGE_HEADING,
   });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
     unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
-      'renders nothing and warns once for a module absent from the tag page allow-list',
+      'warns and renders nothing for a module off the tag page allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,

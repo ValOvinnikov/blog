@@ -5,8 +5,8 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_ID,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterSection } from './newsletter-section';
@@ -24,6 +24,8 @@ const getSubscriptionStatusMock = vi.mocked(
   queries.subscribers.getSubscriptionStatus,
 );
 
+const SECTION_HEADING = 'Newsletter';
+
 const setup = customRenderServerAsync(
   NewsletterSection,
   {},
@@ -37,28 +39,29 @@ describe(`<${NewsletterSection.name}/>`, () => {
     });
   });
 
-  it('renders nothing when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it.each([
+    [
+      'there is no session',
+      () => {
+        authMock.mockResolvedValue(null);
+      },
+    ],
+    [
+      'no tenant resolves',
+      () => {
+        vi.mocked(getRequestContext).mockResolvedValueOnce({
+          ...MOCK_REQUEST_CONTEXT,
+          tenantId: undefined,
+        });
+      },
+    ],
+  ])('renders nothing and skips the lookup when %s', async (_case, arrange) => {
+    arrange();
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
-    expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
-  });
-
-  it('renders nothing when no tenant resolves', async () => {
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
-      tenantId: undefined,
-    });
-
-    await setup();
-
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading', { name: SECTION_HEADING });
+    expect(heading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
@@ -67,9 +70,8 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading', { name: SECTION_HEADING });
+    expect(heading).not.toBeInTheDocument();
   });
 
   it('shows the active subscription with an unsubscribe button', async () => {
@@ -81,12 +83,17 @@ describe(`<${NewsletterSection.name}/>`, () => {
     await setup();
 
     expect(getSubscriptionStatusMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
+      MOCK_TENANT_ID,
       ACCOUNT_USER.id,
     );
-    expect(screen.getByText('Subscribed')).toBeVisible();
-    expect(screen.getByText(ACCOUNT_USER.email)).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
+    const status = screen.getByText('Subscribed');
+    const email = screen.getByText(ACCOUNT_USER.email);
+    const unsubscribeButton = screen.getByRole('button', {
+      name: 'Unsubscribe',
+    });
+    expect(status).toBeVisible();
+    expect(email).toBeVisible();
+    expect(unsubscribeButton).toBeVisible();
   });
 
   it('offers to resend the confirmation for a pending subscription', async () => {
@@ -97,9 +104,11 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Pending confirmation')).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Resend confirmation' }),
-    ).toBeVisible();
+    const status = screen.getByText('Pending confirmation');
+    const resendButton = screen.getByRole('button', {
+      name: 'Resend confirmation',
+    });
+    expect(status).toBeVisible();
+    expect(resendButton).toBeVisible();
   });
 });

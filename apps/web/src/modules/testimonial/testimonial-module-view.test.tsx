@@ -11,7 +11,7 @@ import {
   MOCK_TESTIMONIAL_ITEMS,
   mockTestimonialItem,
 } from '@web/testing/modules/testimonial/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TestimonialModuleView } from './testimonial-module-view';
 
@@ -24,7 +24,7 @@ const dataTestId = 'testimonial-module-testimonial-1';
 
 const setup = customRender(TestimonialModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
   testimonials: MOCK_TESTIMONIAL_ITEMS,
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,

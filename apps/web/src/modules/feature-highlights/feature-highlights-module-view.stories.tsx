@@ -2,7 +2,7 @@ import { BRAND_VARIANT, CONTENT_ALIGNMENT, MEDIA_ORDER } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { FeatureHighlightsModuleView } from './feature-highlights-module-view';
@@ -79,7 +79,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Why teams choose us' }),
+    headingBlock: mockHeadingBlock({ heading: 'Why teams choose us' }),
     highlights,
     ctaButtons: [],
     mediaOrder: MEDIA_ORDER.FIRST,

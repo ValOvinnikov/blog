@@ -1,5 +1,6 @@
 import { okResult } from '@blog/utils';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTagIndexPage } from './get-tag-index-page';
 
@@ -21,9 +22,7 @@ describe(getTagIndexPage, () => {
 
     await getTagIndexPage();
 
-    expect(getIndexPageMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
+    expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
   });
 
   it('returns the raw TResult from getIndexPage unchanged', async () => {
@@ -32,42 +31,26 @@ describe(getTagIndexPage, () => {
 
     await expect(getTagIndexPage()).resolves.toBe(result);
   });
-});
 
-describe('getTagIndexPage memoization', () => {
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
-  });
-
-  it('dedupes the index-page query across one render pass with the same arguments', async () => {
-    getIndexPageMock.mockReset();
-    getIndexPageMock.mockResolvedValue(okResult());
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: <T extends (...args: never[]) => unknown>(fn: T) => {
-          const cacheByArgs = new Map<string, unknown>();
-          return ((...args: never[]) => {
-            const key = JSON.stringify(args);
-            if (!cacheByArgs.has(key)) {
-              cacheByArgs.set(key, fn(...args));
-            }
-            return cacheByArgs.get(key);
-          }) as T;
-        },
-      };
+  describe('memoization', () => {
+    afterEach(() => {
+      vi.doUnmock('react');
+      vi.resetModules();
     });
-    vi.resetModules();
 
-    const { getTagIndexPage: freshGetTagIndexPage } =
-      await import('./get-tag-index-page');
+    it('dedupes the index-page query across one render pass with the same arguments', async () => {
+      getIndexPageMock.mockResolvedValue(okResult());
 
-    await freshGetTagIndexPage();
-    await freshGetTagIndexPage();
+      vi.doMock('react', withMemoizingReactCache);
+      vi.resetModules();
 
-    expect(getIndexPageMock).toHaveBeenCalledTimes(1);
+      const { getTagIndexPage: freshGetTagIndexPage } =
+        await import('./get-tag-index-page');
+
+      await freshGetTagIndexPage();
+      await freshGetTagIndexPage();
+
+      expect(getIndexPageMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

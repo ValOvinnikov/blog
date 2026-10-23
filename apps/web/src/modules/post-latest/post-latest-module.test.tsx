@@ -3,13 +3,13 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostLatestModuleData } from '@web/testing/modules/post-latest/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
 
 const MODULE_ID = 'post-latest-1';
-const POST = makePostCard();
+const POST = mockPostCard();
 
 const { getPostLatestMock } = vi.hoisted(() => ({
   getPostLatestMock: vi.fn(),
@@ -42,7 +42,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
     expect(getPostLatestMock).toHaveBeenCalledWith(
       MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
@@ -73,36 +73,25 @@ describe(`<${PostLatestModule.name}/>`, () => {
     expect(pagination).not.toBeInTheDocument();
   });
 
-  it('renders each post image when showImages is true', async () => {
-    const sanityImage = mockSanityImage();
-    getPostLatestMock.mockResolvedValue(
-      okResult(
-        mockPostLatestModuleData({
-          posts: [makePostCard({ heroImage: sanityImage })],
-          showImages: true,
-        }),
-      ),
-    );
+  it.each([
+    { showImages: true, imageCount: 1 },
+    { showImages: false, imageCount: 0 },
+  ])(
+    'renders $imageCount post images when showImages is $showImages',
+    async ({ showImages, imageCount }) => {
+      getPostLatestMock.mockResolvedValue(
+        okResult(
+          mockPostLatestModuleData({
+            posts: [mockPostCard({ heroImage: mockSanityImage() })],
+            showImages,
+          }),
+        ),
+      );
 
-    await setup();
+      await setup();
 
-    const image = screen.getByRole('img', { name: sanityImage.alt });
-    expect(image).toBeVisible();
-  });
-
-  it('renders no post images when showImages is false', async () => {
-    getPostLatestMock.mockResolvedValue(
-      okResult(
-        mockPostLatestModuleData({
-          posts: [makePostCard({ heroImage: mockSanityImage() })],
-          showImages: false,
-        }),
-      ),
-    );
-
-    await setup();
-
-    const image = screen.queryByRole('img');
-    expect(image).not.toBeInTheDocument();
-  });
+      const images = screen.queryAllByRole('img');
+      expect(images).toHaveLength(imageCount);
+    },
+  );
 });

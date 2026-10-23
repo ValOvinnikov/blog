@@ -7,7 +7,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   portableTextBlock,
   portableTextSpan,
@@ -79,7 +79,7 @@ const meta = {
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     variant: HERO_VARIANT.STACKED,
     eyebrow: 'Product designer',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: "Hi, I'm Jane",
       supportingText:
         'I design and build products for teams who care about craft.',

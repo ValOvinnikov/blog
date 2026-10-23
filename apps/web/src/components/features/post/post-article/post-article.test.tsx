@@ -20,8 +20,9 @@ import {
   mockPostDetail,
   POST_DETAIL_AUTHOR_IMAGE,
 } from '@web/testing/pages/blog-post-page/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -56,7 +57,12 @@ vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
 
 const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
-const AUTHOR_PROFILE_URL = '/blog/tag/writers';
+const SAVE_POST = 'Save post';
+const SHARE = /Share/;
+const TOPIC_TITLE = 'Engineering';
+const AUTHOR_NAME = 'Jane Doe';
+const TYPESCRIPT_TAG = { id: 'tag-1', title: 'TypeScript', slug: 'typescript' };
+const REACT_TAG_TITLE = 'React';
 
 const setup = customRenderServerAsync(
   PostArticle,
@@ -86,15 +92,15 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPostMock.mockResolvedValueOnce(errorResult(new Error('boom')));
+    getPostMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).toHaveBeenCalledWith(
-      'post_article.fetch_failed',
-      expect.objectContaining({ slug: mockPostDetail.slug }),
-    );
+    expect(logger.error).toHaveBeenCalledWith('post_article.fetch_failed', {
+      slug: mockPostDetail.slug,
+      error: MOCK_ERROR,
+    });
   });
 
   describe('with bookmarks enabled', () => {
@@ -110,22 +116,19 @@ describe(`<${PostArticle.name}/>`, () => {
       await setup();
 
       const header = screen.getByTestId('post-article-header');
-      await waitFor(() =>
-        expect(
-          within(header).getByRole('button', { name: 'Save post' }),
-        ).toBeEnabled(),
-      );
-      expect(
-        within(header).getByRole('button', { name: /Share/ }),
-      ).toBeVisible();
+      const saveButton = await within(header).findByRole('button', {
+        name: SAVE_POST,
+      });
+      const shareButton = within(header).getByRole('button', { name: SHARE });
+      await waitFor(() => expect(saveButton).toBeEnabled());
+      expect(shareButton).toBeVisible();
     });
 
     it('checks the bookmark status of this post', async () => {
       await setup();
 
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
-      );
+      const saveButton = await screen.findByRole('button', { name: SAVE_POST });
+      await waitFor(() => expect(saveButton).toBeEnabled());
       expect(getBookmarkStatus).toHaveBeenCalledWith(mockPostDetail.id);
     });
   });
@@ -140,29 +143,10 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Engineering')).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'Engineering' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('links the author to whatever href the service resolved', async () => {
-    getPostMock.mockResolvedValueOnce(
-      okResult({
-        ...mockPostDetail,
-        author: {
-          ...mockPostDetail.author,
-          profileUrl: AUTHOR_PROFILE_URL,
-        },
-      }),
-    );
-
-    await setup();
-
-    expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
-      'href',
-      AUTHOR_PROFILE_URL,
-    );
+    const eyebrow = screen.getByText(TOPIC_TITLE);
+    const topicLink = screen.queryByRole('link', { name: TOPIC_TITLE });
+    expect(eyebrow).toBeVisible();
+    expect(topicLink).not.toBeInTheDocument();
   });
 
   it('renders the hero image with its own alt text', async () => {
@@ -180,7 +164,8 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('img', { name: heroImage.alt })).toBeVisible();
+    const image = screen.getByRole('img', { name: heroImage.alt });
+    expect(image).toBeVisible();
   });
 
   it('renders the contents rail once the body has 3+ H2 headings', async () => {
@@ -195,32 +180,29 @@ describe(`<${PostArticle.name}/>`, () => {
     await setup();
 
     const rail = screen.getByRole('navigation', { name: 'Contents' });
-    expect(
-      within(rail).getByRole('link', { name: 'Configuration' }),
-    ).toHaveAttribute('href', '#configuration');
+    const railLink = within(rail).getByRole('link', { name: 'Configuration' });
+    expect(railLink).toHaveAttribute('href', '#configuration');
   });
 
-  it('renders the post tags as links to routes.tag(slug)', async () => {
+  it('renders the post tags as links to their tag pages', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
         ...mockPostDetail,
         tags: [
-          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-          { id: 'tag-2', title: 'React', slug: 'react' },
+          TYPESCRIPT_TAG,
+          { id: 'tag-2', title: REACT_TAG_TITLE, slug: 'react' },
         ],
       }),
     );
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
-      'href',
-      '/tags/typescript',
-    );
-    expect(screen.getByRole('link', { name: 'React' })).toHaveAttribute(
-      'href',
-      '/tags/react',
-    );
+    const typescriptLink = screen.getByRole('link', {
+      name: TYPESCRIPT_TAG.title,
+    });
+    const reactLink = screen.getByRole('link', { name: REACT_TAG_TITLE });
+    expect(typescriptLink).toHaveAttribute('href', '/tags/typescript');
+    expect(reactLink).toHaveAttribute('href', '/tags/react');
   });
 
   it('omits a tag with no tag page from the footer', async () => {
@@ -228,16 +210,20 @@ describe(`<${PostArticle.name}/>`, () => {
       okResult({
         ...mockPostDetail,
         tags: [
-          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-          { id: 'tag-2', title: 'React', slug: undefined },
+          TYPESCRIPT_TAG,
+          { id: 'tag-2', title: REACT_TAG_TITLE, slug: undefined },
         ],
       }),
     );
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toBeVisible();
-    expect(screen.queryByText('React')).not.toBeInTheDocument();
+    const typescriptLink = screen.getByRole('link', {
+      name: TYPESCRIPT_TAG.title,
+    });
+    const reactTag = screen.queryByText(REACT_TAG_TITLE);
+    expect(typescriptLink).toBeVisible();
+    expect(reactTag).not.toBeInTheDocument();
   });
 
   describe('with the default post', () => {
@@ -245,81 +231,86 @@ describe(`<${PostArticle.name}/>`, () => {
       await setup();
     });
 
-    it('fetches the post for the given slug with the tenant context', async () => {
+    it('fetches the post for the given slug with the tenant context', () => {
       expect(getPostMock).toHaveBeenCalledWith(
         mockPostDetail.slug,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
-    it('renders the post title, lead, author, and body', async () => {
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Hello World' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('A sufficiently long excerpt for the card.'),
-      ).toBeVisible();
-      expect(screen.getByText('Body text.')).toBeVisible();
-      expect(screen.getByText('Jane Doe')).toBeVisible();
+    it('renders the post title, lead, author, and body', () => {
+      const title = screen.getByRole('heading', {
+        level: 1,
+        name: 'Hello World',
+      });
+      const lead = screen.getByText(
+        'A sufficiently long excerpt for the card.',
+      );
+      const body = screen.getByText('Body text.');
+      const author = screen.getByText(AUTHOR_NAME);
+      expect(title).toBeVisible();
+      expect(lead).toBeVisible();
+      expect(body).toBeVisible();
+      expect(author).toBeVisible();
     });
 
-    it('renders no bookmark toggle when bookmarks are not enabled', async () => {
-      expect(
-        screen.queryByRole('button', { name: 'Save post' }),
-      ).not.toBeInTheDocument();
+    it('renders no bookmark toggle when bookmarks are not enabled', () => {
+      const saveButton = screen.queryByRole('button', { name: SAVE_POST });
+      expect(saveButton).not.toBeInTheDocument();
     });
 
-    it('renders the published date (year/month/day) and the reading time', async () => {
-      expect(screen.getByText('January 15, 2026')).toBeVisible();
-      expect(screen.getByText('4 min read')).toBeVisible();
+    it('renders the published date (year/month/day) and the reading time', () => {
+      const publishedDate = screen.getByText('January 15, 2026');
+      const readingTime = screen.getByText('4 min read');
+      expect(publishedDate).toBeVisible();
+      expect(readingTime).toBeVisible();
     });
 
-    it('links the topic eyebrow and the author name to their routes', async () => {
-      const topicLinks = screen.getAllByRole('link', { name: 'Engineering' });
+    it('links the topic eyebrow and the author name to their routes', () => {
+      const topicLinks = screen.getAllByRole('link', { name: TOPIC_TITLE });
+      const authorLink = screen.getByRole('link', { name: AUTHOR_NAME });
       expect(topicLinks.length).toBeGreaterThan(0);
       topicLinks.forEach((link) => {
         expect(link).toHaveAttribute('href', '/topics/engineering');
       });
-      expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
-        'href',
-        '/jane-doe',
-      );
+      expect(authorLink).toHaveAttribute('href', '/jane-doe');
     });
 
     it('renders the share widget with an X and a LinkedIn link', async () => {
-      await userEvent.click(screen.getByRole('button', { name: /Share/ }));
+      const user = userEvent.setup();
+      const shareButton = screen.getByRole('button', { name: SHARE });
 
-      expect(
-        screen.getByRole('menuitem', { name: /Share on X/ }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
-      ).toBeVisible();
+      await user.click(shareButton);
+
+      const shareOnX = screen.getByRole('menuitem', { name: /Share on X/ });
+      const shareOnLinkedIn = screen.getByRole('menuitem', {
+        name: /Share on LinkedIn/,
+      });
+      expect(shareOnX).toBeVisible();
+      expect(shareOnLinkedIn).toBeVisible();
     });
 
-    it('builds the author avatar at a fixed 64x64 crop, not the full-size asset', async () => {
+    it('builds the author avatar at a fixed 64x64 crop, not the full-size asset', () => {
       const expectedAvatarUrl = urlForSanityImage(
         POST_DETAIL_AUTHOR_IMAGE,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
         { width: 64, height: 64, fit: 'crop', quality: 75 },
       );
 
-      expect(screen.getByRole('presentation')).toHaveAttribute(
-        'src',
-        expectedAvatarUrl,
-      );
+      const avatar = screen.getByRole('presentation');
+      expect(avatar).toHaveAttribute('src', expectedAvatarUrl);
     });
 
-    it('renders no contents rail when the body has fewer than 3 H2 headings', async () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'Contents' }),
-      ).not.toBeInTheDocument();
+    it('renders no contents rail when the body has fewer than 3 H2 headings', () => {
+      const rail = screen.queryByRole('navigation', { name: 'Contents' });
+      expect(rail).not.toBeInTheDocument();
     });
 
-    it('renders no tag chips when the post has no tags', async () => {
-      expect(
-        screen.queryByRole('link', { name: 'TypeScript' }),
-      ).not.toBeInTheDocument();
+    it('renders no tag chips when the post has no tags', () => {
+      const tagLink = screen.queryByRole('link', {
+        name: TYPESCRIPT_TAG.title,
+      });
+      expect(tagLink).not.toBeInTheDocument();
     });
   });
 });

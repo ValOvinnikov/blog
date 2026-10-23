@@ -3,8 +3,8 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostRelatedModuleData } from '@web/testing/modules/post-related/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { PostRelatedModule } from './post-related-module';
@@ -48,7 +48,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     expect(getPostRelatedMock).toHaveBeenCalledWith(
       POST_RELATED_ID,
       ANCHOR_POST_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
@@ -82,7 +82,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
         mockPostRelatedModuleData({
-          posts: [makePostCard({ title: FIRST_POST_TITLE })],
+          posts: [mockPostCard({ title: FIRST_POST_TITLE })],
         }),
       ),
     );
@@ -95,44 +95,34 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     expect(pagination).not.toBeInTheDocument();
   });
 
-  it('renders each post image when showImages is true', async () => {
-    const sanityImage = mockSanityImage();
-    getPostRelatedMock.mockResolvedValue(
-      okResult(
-        mockPostRelatedModuleData({
-          posts: [makePostCard({ heroImage: sanityImage })],
-          showImages: true,
-        }),
-      ),
-    );
+  it.each([
+    { showImages: true, imageCount: 1 },
+    { showImages: false, imageCount: 0 },
+  ])(
+    'renders $imageCount post images when showImages is $showImages',
+    async ({ showImages, imageCount }) => {
+      getPostRelatedMock.mockResolvedValue(
+        okResult(
+          mockPostRelatedModuleData({
+            posts: [mockPostCard({ heroImage: mockSanityImage() })],
+            showImages,
+          }),
+        ),
+      );
 
-    await setup();
+      await setup();
 
-    const image = screen.getByRole('img', { name: sanityImage.alt });
-    expect(image).toBeVisible();
-  });
-
-  it('renders no post images when showImages is false', async () => {
-    getPostRelatedMock.mockResolvedValue(
-      okResult(
-        mockPostRelatedModuleData({
-          posts: [makePostCard({ heroImage: mockSanityImage() })],
-        }),
-      ),
-    );
-
-    await setup();
-
-    const image = screen.queryByRole('img');
-    expect(image).not.toBeInTheDocument();
-  });
+      const images = screen.queryAllByRole('img');
+      expect(images).toHaveLength(imageCount);
+    },
+  );
 
   it('renders a related post whose excerpt is absent, without throwing', async () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
         mockPostRelatedModuleData({
           posts: [
-            makePostCard({ title: FIRST_POST_TITLE, excerpt: undefined }),
+            mockPostCard({ title: FIRST_POST_TITLE, excerpt: undefined }),
           ],
         }),
       ),

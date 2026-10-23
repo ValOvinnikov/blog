@@ -4,7 +4,7 @@ import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -69,13 +69,14 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
 
     it('renders nothing when the request has no base URL', async () => {
       vi.mocked(getRequestContext).mockResolvedValueOnce({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         metadataBase: undefined,
       });
 
-      const { container } = await setup();
+      await setup();
 
-      expect(container).toBeEmptyDOMElement();
+      const script = screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID);
+      expect(script).not.toBeInTheDocument();
     });
 
     it('forwards the slug to getPostPage', async () => {

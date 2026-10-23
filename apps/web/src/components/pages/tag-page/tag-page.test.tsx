@@ -11,9 +11,10 @@ import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -40,11 +41,15 @@ vi.mock('@web/i18n/navigation');
 const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
 
 const resolveTagPageWith = (overrides: Partial<TTagDetailPage>) =>
-  getTagPageMock.mockResolvedValueOnce(okResult(makeTagDetailPage(overrides)));
+  getTagPageMock.mockResolvedValueOnce(okResult(mockTagDetailPage(overrides)));
 
 const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const TAG_SLUG = 'typescript';
+
+const TAG_TITLE = 'TypeScript';
+
+const POST_LIST_ID = 'list-1';
 
 const setup = customRenderServerAsync(TagPage, {
   slug: TAG_SLUG,
@@ -58,9 +63,9 @@ describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockResolvedValue(
       okResult(
-        makeTagDetailPage({
-          headingBlock: makeHeadingBlock({
-            heading: 'TypeScript',
+        mockTagDetailPage({
+          headingBlock: mockHeadingBlock({
+            heading: TAG_TITLE,
             supportingText: SUPPORTING_TEXT,
           }),
         }),
@@ -76,7 +81,7 @@ describe(`<${TagPage.name}/>`, () => {
     it('fetches the tag for the given slug with the tenant context', () => {
       expect(getTagPageMock).toHaveBeenCalledWith(
         TAG_SLUG,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -84,7 +89,7 @@ describe(`<${TagPage.name}/>`, () => {
       const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
         level: 1,
-        name: 'TypeScript',
+        name: TAG_TITLE,
       });
       const supportingText = within(main).getByText(SUPPORTING_TEXT);
       expect(heading).toBeVisible();
@@ -96,9 +101,9 @@ describe(`<${TagPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: 'Northwind Journal',
+        name: MOCK_SITE_SETTINGS.brand.name,
       });
-      const currentCrumb = within(breadcrumbs).getByText('TypeScript');
+      const currentCrumb = within(breadcrumbs).getByText(TAG_TITLE);
       const main = screen.getByRole('main');
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
@@ -143,7 +148,7 @@ describe(`<${TagPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: CTA_HEADING }),
         }),
       ),
     );
@@ -171,7 +176,7 @@ describe(`<${TagPage.name}/>`, () => {
     });
     const pageHeading = screen.queryByRole('heading', {
       level: 1,
-      name: 'TypeScript',
+      name: TAG_TITLE,
     });
     expect(heroHeading).toBeVisible();
     expect(pageHeading).not.toBeInTheDocument();
@@ -184,7 +189,7 @@ describe(`<${TagPage.name}/>`, () => {
     'loads post lists for page $expected of the tag archive',
     async ({ page, expected }) => {
       resolveTagPageWith({
-        modules: [{ id: 'list-1', type: 'module_postList' }],
+        modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
       });
       vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
         errorResult(MOCK_ERROR),
@@ -195,8 +200,8 @@ describe(`<${TagPage.name}/>`, () => {
       );
 
       expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
-        'list-1',
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        POST_LIST_ID,
+        MOCK_TENANT_SANITY_CONTEXT,
         expected,
         { termId: 'tag-1' },
       );
@@ -205,7 +210,7 @@ describe(`<${TagPage.name}/>`, () => {
 
   it('names the tag in an empty post list', async () => {
     resolveTagPageWith({
-      modules: [{ id: 'list-1', type: 'module_postList' }],
+      modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
     });
     vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
       okResult(mockPostListModuleData()),
@@ -213,7 +218,7 @@ describe(`<${TagPage.name}/>`, () => {
 
     await setup();
 
-    const emptyState = screen.getByText('No posts tagged TypeScript yet.');
+    const emptyState = screen.getByText(`No posts tagged ${TAG_TITLE} yet.`);
     expect(emptyState).toBeVisible();
   });
 

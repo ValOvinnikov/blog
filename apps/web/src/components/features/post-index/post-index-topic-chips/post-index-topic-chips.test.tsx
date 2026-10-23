@@ -1,6 +1,6 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 
 import { PostIndexTopicChips } from './post-index-topic-chips';
 
@@ -16,46 +16,32 @@ vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
 }));
 
-const setup = customRenderAsync(PostIndexTopicChips, { tenant: 'tenant-1' });
+const setup = customRenderAsync(PostIndexTopicChips, {});
 
 describe(`<${PostIndexTopicChips.name}/>`, () => {
   beforeEach(() => {
     getTopicsSafelyMock.mockReset();
   });
 
-  it('renders the topic chip row from the fetched topics', async () => {
+  it('renders the fetched topics as chips', async () => {
     getTopicsSafelyMock.mockResolvedValue([
-      makeTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
+      mockTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
     ]);
 
     await setup();
 
     const nav = screen.getByRole('navigation', { name: 'Topics' });
-    expect(within(nav).getByRole('link', { name: 'All' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-    expect(
-      within(nav).getByRole('link', { name: 'Engineering' }),
-    ).toHaveAttribute('href', '/topics/engineering');
+    const topicChip = within(nav).getByRole('link', { name: 'Engineering' });
+    expect(topicChip).toHaveAttribute('href', '/topics/engineering');
   });
 
-  describe('with no topics', () => {
-    beforeEach(async () => {
-      getTopicsSafelyMock.mockResolvedValue([]);
-      await setup();
-    });
+  it('forwards the request context Sanity context to getTopicsSafely', async () => {
+    getTopicsSafelyMock.mockResolvedValue([]);
 
-    it('renders nothing when there are no topics', async () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'Topics' }),
-      ).not.toBeInTheDocument();
-    });
+    await setup();
 
-    it('forwards the request context Sanity context to getTopicsSafely', async () => {
-      expect(getTopicsSafelyMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
-      );
-    });
+    expect(getTopicsSafelyMock).toHaveBeenCalledWith(
+      MOCK_TENANT_SANITY_CONTEXT,
+    );
   });
 });

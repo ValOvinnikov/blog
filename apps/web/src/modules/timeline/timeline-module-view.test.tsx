@@ -9,7 +9,7 @@ import {
   MOCK_TIMELINE_HEADING,
   mockTimelineItem,
 } from '@web/testing/modules/timeline/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TimelineModuleView } from './timeline-module-view';
 
@@ -26,7 +26,7 @@ const mockTimelineItems = (count: number) =>
 
 const setup = customRender(TimelineModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_TIMELINE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_TIMELINE_HEADING }),
   markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
   items: mockTimelineItems(3),
   orientation: TIMELINE_ORIENTATION.VERTICAL,

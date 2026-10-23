@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 
 import { buildNotFoundMetadata } from './build-not-found-metadata';
@@ -31,52 +31,41 @@ describe(buildNotFoundMetadata, () => {
   it('builds title and description from the base English copy by default', async () => {
     const metadata = await buildNotFoundMetadata();
 
-    expect(metadata).toEqual({
-      title: 'Page not found',
-      description: "The page you're looking for doesn't exist.",
-    });
+    const { heading, supportingText } = SITE_MESSAGES_BY_LOCALE.EN.notFound;
+
+    expect(metadata).toEqual({ title: heading, description: supportingText });
     expect(resolveTenantMessages).not.toHaveBeenCalled();
   });
 
-  it('uses the tenant’s voice overrides for heading and supporting text', async () => {
-    vi.mocked(resolveTenantMessages).mockResolvedValue(
-      withNotFoundOverrides(EN_HEADING, EN_SUPPORTING_TEXT),
-    );
-
-    const metadata = await buildNotFoundMetadata({
-      tenant: DEFAULT_TENANT_ID,
+  it.each([
+    {
       locale: LOCALE_ISO_CODES.EN,
-    });
-
-    expect(metadata).toEqual({
-      title: EN_HEADING,
-      description: EN_SUPPORTING_TEXT,
-    });
-    expect(resolveTenantMessages).toHaveBeenCalledWith(
-      SITE_MESSAGES_BY_LOCALE.EN,
-      LOCALE_ISO_CODES.EN,
-      DEFAULT_TENANT_ID,
-    );
-  });
-
-  it('resolves the tenant’s overrides in the served language', async () => {
-    vi.mocked(resolveTenantMessages).mockResolvedValue(
-      withNotFoundOverrides(NL_HEADING, NL_SUPPORTING_TEXT),
-    );
-
-    const metadata = await buildNotFoundMetadata({
-      tenant: DEFAULT_TENANT_ID,
+      heading: EN_HEADING,
+      supportingText: EN_SUPPORTING_TEXT,
+    },
+    {
       locale: LOCALE_ISO_CODES.NL,
-    });
+      heading: NL_HEADING,
+      supportingText: NL_SUPPORTING_TEXT,
+    },
+  ])(
+    'uses the tenant’s $locale voice overrides for the title and description',
+    async ({ locale, heading, supportingText }) => {
+      vi.mocked(resolveTenantMessages).mockResolvedValue(
+        withNotFoundOverrides(heading, supportingText),
+      );
 
-    expect(metadata).toEqual({
-      title: NL_HEADING,
-      description: NL_SUPPORTING_TEXT,
-    });
-    expect(resolveTenantMessages).toHaveBeenCalledWith(
-      SITE_MESSAGES_BY_LOCALE.NL,
-      LOCALE_ISO_CODES.NL,
-      DEFAULT_TENANT_ID,
-    );
-  });
+      const metadata = await buildNotFoundMetadata({
+        tenant: MOCK_TENANT_ID,
+        locale,
+      });
+
+      expect(metadata).toEqual({ title: heading, description: supportingText });
+      expect(resolveTenantMessages).toHaveBeenCalledWith(
+        SITE_MESSAGES_BY_LOCALE[locale],
+        locale,
+        MOCK_TENANT_ID,
+      );
+    },
+  );
 });

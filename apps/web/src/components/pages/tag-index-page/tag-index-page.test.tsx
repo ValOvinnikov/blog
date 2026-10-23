@@ -11,11 +11,12 @@ import {
 import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
-  DEFAULT_TENANT_SANITY_CONTEXT,
-  DEFAULT_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
@@ -41,14 +42,15 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.tagIndex.v1.getIndexPage);
 
 const SUPPORTING_TEXT = 'Browse every post by tag.';
+const PAGE_HEADING = 'Tags';
 const CTA_HEADING = 'Join the list';
 const SECOND_CTA_HEADING = 'Write for us';
 const HERO_HEADING = 'Every tag we write about';
 
 const tagIndexPage: TTagIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
-  headingBlock: makeHeadingBlock({
-    heading: 'Tags',
+  headingBlock: mockHeadingBlock({
+    heading: PAGE_HEADING,
     supportingText: SUPPORTING_TEXT,
   }),
   hero: undefined,
@@ -71,7 +73,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) =>
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({
+          headingBlock: mockHeadingBlock({
             heading: id === 'cta-1' ? CTA_HEADING : SECOND_CTA_HEADING,
           }),
         }),
@@ -106,7 +108,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
 
     it('redirects to / when this language has no tag index page', async () => {
       vi.mocked(getRequestContext).mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         locale: LOCALE_ISO_CODES.NL,
         liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       });
@@ -126,16 +128,14 @@ describe(`<${TagIndexPage.name}/>`, () => {
     });
 
     it('fetches the index page with the tenant context', () => {
-      expect(getIndexPageMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
-      );
+      expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
     });
 
     it('renders the heading and supporting text inside main', () => {
       const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
         level: 1,
-        name: 'Tags',
+        name: PAGE_HEADING,
       });
       const supportingText = within(main).getByText(SUPPORTING_TEXT);
       expect(heading).toBeVisible();
@@ -148,9 +148,9 @@ describe(`<${TagIndexPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: 'Northwind Journal',
+        name: MOCK_SITE_SETTINGS.brand.name,
       });
-      const currentCrumb = within(breadcrumbs).getByText('Tags');
+      const currentCrumb = within(breadcrumbs).getByText(PAGE_HEADING);
       const main = screen.getByRole('main');
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
@@ -193,7 +193,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
     });
     const pageHeading = screen.queryByRole('heading', {
       level: 1,
-      name: 'Tags',
+      name: PAGE_HEADING,
     });
     expect(heroHeading).toBeVisible();
     expect(pageHeading).not.toBeInTheDocument();

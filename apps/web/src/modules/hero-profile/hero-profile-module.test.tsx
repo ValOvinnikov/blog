@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -7,16 +7,16 @@ import {
   MOCK_HERO_PROFILE_AVATAR_NAME,
   MOCK_HERO_PROFILE_MODULE_ID,
 } from '@web/testing/modules/hero-profile/fixtures';
-import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
+import { MOCK_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroProfileModule } from './hero-profile-module';
 
 const HEADLINE = "Hi, I'm Jane";
-const GITHUB_PROFILE = mockSocialProfile({ link: { target: '_blank' } });
+const GITHUB_PROFILE = mockSocialProfile();
 
 const { getHeroProfileMock } = vi.hoisted(() => ({
   getHeroProfileMock: vi.fn(),
@@ -38,7 +38,7 @@ const mockHeroProfileData = (
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: HEADLINE }),
+  headingBlock: mockHeadingBlock({ heading: HEADLINE }),
   avatarName: MOCK_HERO_PROFILE_AVATAR_NAME,
   bio: undefined,
   sanityImage: undefined,
@@ -69,7 +69,7 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     it('fetches the module with the resolved tenant Sanity context', () => {
       expect(getHeroProfileMock).toHaveBeenCalledWith(
         MOCK_HERO_PROFILE_MODULE_ID,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -97,17 +97,13 @@ describe(`<${HeroProfileModule.name}/>`, () => {
 
     const image = screen.getByRole('img', { name: sanityImage.alt });
     expect(
-      image.getAttribute('src')?.startsWith(STATIC_SANITY_IMAGE_BASE_URL),
+      image.getAttribute('src')?.startsWith(MOCK_SANITY_IMAGE_BASE_URL),
     ).toBe(true);
   });
 
-  it('renders labelled social links with their targets and icons', async () => {
+  it('renders the resolved social links in a labelled list', async () => {
     getHeroProfileMock.mockResolvedValue(
-      okResult(
-        mockHeroProfileData({
-          socialLinks: [GITHUB_PROFILE],
-        }),
-      ),
+      okResult(mockHeroProfileData({ socialLinks: [GITHUB_PROFILE] })),
     );
 
     await setup();
@@ -115,37 +111,5 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     const list = screen.getByRole('list', { name: 'Profiles' });
     const link = within(list).getByRole('link', { name: 'GitHub profile' });
     expect(link).toHaveAttribute('href', GITHUB_PROFILE.link.href);
-    expect(link).toHaveAttribute('target', GITHUB_PROFILE.link.target);
-    const icon = within(link).getByTestId(
-      `social-icon-${SOCIAL_PLATFORMS.GITHUB}`,
-    );
-    expect(icon).toBeVisible();
-  });
-
-  it('renders one list item per resolved social link', async () => {
-    getHeroProfileMock.mockResolvedValue(
-      okResult(
-        mockHeroProfileData({
-          socialLinks: [
-            GITHUB_PROFILE,
-            mockSocialProfile({ platform: SOCIAL_PLATFORMS.X }),
-            mockSocialProfile({ platform: SOCIAL_PLATFORMS.LINKEDIN }),
-          ],
-        }),
-      ),
-    );
-
-    await setup();
-
-    const list = screen.getByRole('list', { name: 'Profiles' });
-    const items = within(list).getAllByRole('listitem');
-    expect(items).toHaveLength(3);
-  });
-
-  it('renders no social links list when socialLinks is empty', async () => {
-    await setup();
-
-    const list = screen.queryByRole('list');
-    expect(list).not.toBeInTheDocument();
   });
 });

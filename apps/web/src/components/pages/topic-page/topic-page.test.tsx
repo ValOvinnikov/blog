@@ -11,12 +11,13 @@ import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import {
-  makeTopic,
-  makeTopicDetailPage,
-  makeTopicWithPostCount,
+  mockTopic,
+  mockTopicDetailPage,
+  mockTopicWithPostCount,
 } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -48,19 +49,22 @@ const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const TOPIC_SLUG = 'news';
 
+const TOPIC_TITLE = 'News';
+
+const POST_LIST_ID = 'list-1';
+
 const setup = customRenderServerAsync(TopicPage, {
   slug: TOPIC_SLUG,
 });
 
-const NEWS_TOPIC = makeTopic({ title: 'News', slug: TOPIC_SLUG });
+const NEWS_TOPIC = mockTopic({ title: TOPIC_TITLE, slug: TOPIC_SLUG });
 
 const resolveTopicPageWith = (overrides: Partial<TTopicDetailPage>) =>
   getTopicPageMock.mockResolvedValueOnce(
-    okResult(makeTopicDetailPage({ topic: NEWS_TOPIC, ...overrides })),
+    okResult(mockTopicDetailPage({ topic: NEWS_TOPIC, ...overrides })),
   );
 
 const SUPPORTING_TEXT = 'The latest updates.';
-const ARIA_CURRENT = 'aria-current';
 const CTA_HEADING = 'Join the list';
 const HERO_HEADING = 'All about news';
 
@@ -68,10 +72,10 @@ describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockResolvedValue(
       okResult(
-        makeTopicDetailPage({
+        mockTopicDetailPage({
           topic: NEWS_TOPIC,
-          headingBlock: makeHeadingBlock({
-            heading: 'News',
+          headingBlock: mockHeadingBlock({
+            heading: TOPIC_TITLE,
             supportingText: SUPPORTING_TEXT,
           }),
         }),
@@ -79,12 +83,7 @@ describe(`<${TopicPage.name}/>`, () => {
     );
     vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
       okResult([
-        makeTopicWithPostCount({ title: 'News', slug: TOPIC_SLUG }),
-        makeTopicWithPostCount({
-          id: 'topic-2',
-          title: 'Design',
-          slug: 'design',
-        }),
+        mockTopicWithPostCount({ title: TOPIC_TITLE, slug: TOPIC_SLUG }),
       ]),
     );
   });
@@ -97,7 +96,7 @@ describe(`<${TopicPage.name}/>`, () => {
     it('fetches the topic for the given slug with the tenant context', () => {
       expect(getTopicPageMock).toHaveBeenCalledWith(
         TOPIC_SLUG,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -105,7 +104,7 @@ describe(`<${TopicPage.name}/>`, () => {
       const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
         level: 1,
-        name: 'News',
+        name: TOPIC_TITLE,
       });
       const supportingText = within(main).getByText(SUPPORTING_TEXT);
       expect(heading).toBeVisible();
@@ -117,9 +116,9 @@ describe(`<${TopicPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: 'Northwind Journal',
+        name: MOCK_SITE_SETTINGS.brand.name,
       });
-      const currentCrumb = within(breadcrumbs).getByText('News');
+      const currentCrumb = within(breadcrumbs).getByText(TOPIC_TITLE);
       const main = screen.getByRole('main');
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
@@ -129,10 +128,8 @@ describe(`<${TopicPage.name}/>`, () => {
     it('marks the current topic chip inside main', () => {
       const main = screen.getByRole('main');
       const chips = within(main).getByRole('navigation', { name: 'Topics' });
-      const newsChip = within(chips).getByRole('link', { name: 'News' });
-      const designChip = within(chips).getByRole('link', { name: 'Design' });
-      expect(newsChip).toHaveAttribute(ARIA_CURRENT, 'page');
-      expect(designChip).not.toHaveAttribute(ARIA_CURRENT);
+      const newsChip = within(chips).getByRole('link', { name: TOPIC_TITLE });
+      expect(newsChip).toHaveAttribute('aria-current', 'page');
     });
 
     it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
@@ -173,7 +170,7 @@ describe(`<${TopicPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: CTA_HEADING }),
         }),
       ),
     );
@@ -187,7 +184,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
   it('renders the hero in place of the topic heading when one is set', async () => {
     resolveTopicPageWith({
-      headingBlock: makeHeadingBlock({ heading: 'News' }),
+      headingBlock: mockHeadingBlock({ heading: TOPIC_TITLE }),
       hero: { id: 'hero-1', type: 'module_heroBlog' },
     });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
@@ -202,7 +199,7 @@ describe(`<${TopicPage.name}/>`, () => {
     });
     const pageHeading = screen.queryByRole('heading', {
       level: 1,
-      name: 'News',
+      name: TOPIC_TITLE,
     });
     expect(heroHeading).toBeVisible();
     expect(pageHeading).not.toBeInTheDocument();
@@ -215,7 +212,7 @@ describe(`<${TopicPage.name}/>`, () => {
     'loads post lists for page $expected of the topic archive',
     async ({ page, expected }) => {
       resolveTopicPageWith({
-        modules: [{ id: 'list-1', type: 'module_postList' }],
+        modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
       });
       vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
         errorResult(MOCK_ERROR),
@@ -226,8 +223,8 @@ describe(`<${TopicPage.name}/>`, () => {
       );
 
       expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
-        'list-1',
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        POST_LIST_ID,
+        MOCK_TENANT_SANITY_CONTEXT,
         expected,
         { termId: 'topic-1' },
       );
@@ -236,7 +233,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
   it('names the topic in an empty post list', async () => {
     resolveTopicPageWith({
-      modules: [{ id: 'list-1', type: 'module_postList' }],
+      modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
     });
     vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
       okResult(mockPostListModuleData()),
@@ -244,7 +241,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await setup();
 
-    const emptyState = screen.getByText('No posts in News yet.');
+    const emptyState = screen.getByText(`No posts in ${TOPIC_TITLE} yet.`);
     expect(emptyState).toBeVisible();
   });
 

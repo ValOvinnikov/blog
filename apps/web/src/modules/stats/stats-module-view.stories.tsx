@@ -5,7 +5,7 @@ import {
   MOCK_STAT_ITEMS,
   mockStatItem,
 } from '@web/testing/modules/stats/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { StatsModuleView } from './stats-module-view';
 
@@ -67,7 +67,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'By the numbers' }),
+    headingBlock: mockHeadingBlock({ heading: 'By the numbers' }),
     stats: stats.slice(0, 2),
     footnote: undefined,
     ctaButtons: [],

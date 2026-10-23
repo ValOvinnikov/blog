@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockLogoItem } from '@web/testing/modules/logo-wall/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
 
@@ -75,7 +75,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Trusted by' }),
+    headingBlock: mockHeadingBlock({ heading: 'Trusted by' }),
     logos,
     ctaButtons: [],
     displayMode: DISPLAY_MODE.GRID,

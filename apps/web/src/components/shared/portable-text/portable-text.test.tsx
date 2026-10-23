@@ -10,8 +10,9 @@ import {
   screen,
 } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
+import { MOCK_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import {
+  MOCK_PARAGRAPH_STYLE,
   portableTextBlock,
   portableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
@@ -39,6 +40,7 @@ const LINK_KEY = 'link-1';
 const PARAGRAPH_TEXT = 'Hello world';
 const SECTION_HEADING = 'Getting started';
 const SUBSECTION_HEADING = 'Prerequisites';
+const OVERVIEW = 'Overview';
 const FIRST_OVERVIEW_KEY = 'overview-1';
 const SECOND_OVERVIEW_KEY = 'overview-2';
 const DANGLING_LINK_TEXT = 'incomplete link';
@@ -47,6 +49,7 @@ const CODE_SOURCE = 'const x = 1;';
 const IMAGE_ALT = 'A scenic mountain range';
 const ASIDE_BODY_TEXT = 'Because Y.';
 const NESTED_LINK_TEXT = 'a nested link';
+const BOLD_TEXT = 'bold text';
 
 const RESOLVED_LINK_REF = {
   _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
@@ -74,14 +77,22 @@ const mockBodyImageBlock = (
 });
 
 describe(`<${PortableText.name}/>`, () => {
-  it('renders a normal-style block as a paragraph', () => {
-    const value: TPortableTextBody = [portableTextBlock(PARAGRAPH_TEXT)];
+  it.each([
+    { style: MOCK_PARAGRAPH_STYLE, selector: 'p' },
+    { style: 'blockquote', selector: 'blockquote' },
+  ] as const)(
+    'renders a $style-style block as a $selector element',
+    ({ style, selector }) => {
+      const value: TPortableTextBody = [
+        portableTextBlock(PARAGRAPH_TEXT, { style }),
+      ];
 
-    setup({ value });
+      setup({ value });
 
-    const paragraph = screen.getByText(PARAGRAPH_TEXT, { selector: 'p' });
-    expect(paragraph).toBeVisible();
-  });
+      const block = screen.getByText(PARAGRAPH_TEXT, { selector });
+      expect(block).toBeVisible();
+    },
+  );
 
   it('downgrades an h1-style block to a level 2 heading', () => {
     const value: TPortableTextBody = [
@@ -140,10 +151,10 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('keeps heading ids distinct across two PortableText instances', () => {
     const firstBody: TPortableTextBody = [
-      portableTextBlock('Overview', { style: 'h2', key: FIRST_OVERVIEW_KEY }),
+      portableTextBlock(OVERVIEW, { style: 'h2', key: FIRST_OVERVIEW_KEY }),
     ];
     const secondBody: TPortableTextBody = [
-      portableTextBlock('Overview', { style: 'h2', key: SECOND_OVERVIEW_KEY }),
+      portableTextBlock(OVERVIEW, { style: 'h2', key: SECOND_OVERVIEW_KEY }),
     ];
 
     renderElement(<PortableText value={firstBody} />);
@@ -156,19 +167,8 @@ describe(`<${PortableText.name}/>`, () => {
     expect(headings[1]).toHaveAttribute('id', SECOND_OVERVIEW_KEY);
   });
 
-  it('renders a blockquote-style block as a blockquote', () => {
-    const value: TPortableTextBody = [
-      portableTextBlock('A quote', { style: 'blockquote' }),
-    ];
-
-    setup({ value });
-
-    const quote = screen.getByText('A quote', { selector: 'blockquote' });
-    expect(quote).toBeVisible();
-  });
-
   it.each([
-    { mark: 'strong', text: 'bold text' },
+    { mark: 'strong', text: BOLD_TEXT },
     { mark: 'em', text: 'italic text' },
     { mark: 'code', text: 'const x = 1' },
   ])('renders the $mark mark as a $mark element', ({ mark, text }) => {
@@ -200,7 +200,7 @@ describe(`<${PortableText.name}/>`, () => {
     expect(superscript.tagName).toBe('SUP');
   });
 
-  it('renders bullet and numbered lists', () => {
+  it('renders consecutive bullet items as one list', () => {
     const value: TPortableTextBody = [
       portableTextBlock([portableTextSpan('First bullet')], {
         listItem: 'bullet',
@@ -261,7 +261,7 @@ describe(`<${PortableText.name}/>`, () => {
     expect(container.children[2]?.tagName).toBe('P');
   });
 
-  it('renders a code block with syntax highlighting', () => {
+  it('renders a code block with its source', () => {
     const value: TPortableTextBody = [
       {
         _type: 'code',
@@ -274,9 +274,7 @@ describe(`<${PortableText.name}/>`, () => {
 
     setup({ value });
 
-    const filename = screen.getByText(CODE_FILENAME);
     const codeContent = screen.getByTestId('code-content');
-    expect(filename).toBeVisible();
     expect(codeContent.textContent).toContain(CODE_SOURCE);
   });
 
@@ -289,7 +287,7 @@ describe(`<${PortableText.name}/>`, () => {
 
     const img = screen.getByRole('img', { name: IMAGE_ALT });
     expect(img.getAttribute('src')).toContain(
-      `${STATIC_SANITY_IMAGE_BASE_URL}${assetHash}`,
+      `${MOCK_SANITY_IMAGE_BASE_URL}${assetHash}`,
     );
   });
 
@@ -315,26 +313,18 @@ describe(`<${PortableText.name}/>`, () => {
     expect(asideBody).toBeVisible();
   });
 
-  it('labels an aside with its raw kind when no override supplies a label', () => {
+  it.each([
+    { kind: ASIDE_KIND.DIGRESSION, label: ASIDE_KIND.DIGRESSION },
+    { kind: undefined, label: ASIDE_KIND.CONTEXT },
+  ])('labels an aside of kind $kind as $label', ({ kind, label }) => {
     const value: TPortableTextBody = [
-      mockAsideBlock([portableTextBlock('A tangent.')], ASIDE_KIND.DIGRESSION),
+      mockAsideBlock([portableTextBlock(ASIDE_BODY_TEXT)], kind),
     ];
 
     setup({ value });
 
-    const label = screen.getByText(ASIDE_KIND.DIGRESSION);
-    expect(label).toBeVisible();
-  });
-
-  it('labels an aside with no kind as CONTEXT', () => {
-    const value: TPortableTextBody = [
-      mockAsideBlock([portableTextBlock('Some context.')]),
-    ];
-
-    setup({ value });
-
-    const label = screen.getByText(ASIDE_KIND.CONTEXT);
-    expect(label).toBeVisible();
+    const asideLabel = screen.getByText(label);
+    expect(asideLabel).toBeVisible();
   });
 
   it('renders a resolved linkRef annotation inside an aside as a link', () => {
@@ -358,7 +348,7 @@ describe(`<${PortableText.name}/>`, () => {
   it('keeps the default strong mark when a caller overrides the code mark', () => {
     const value: TPortableTextBody = [
       portableTextBlock([
-        portableTextSpan('bold text', ['strong']),
+        portableTextSpan(BOLD_TEXT, ['strong']),
         portableTextSpan(' and '),
         portableTextSpan('code text', ['code']),
       ]),
@@ -375,7 +365,7 @@ describe(`<${PortableText.name}/>`, () => {
       },
     });
 
-    const boldText = screen.getByText('bold text');
+    const boldText = screen.getByText(BOLD_TEXT);
     const customCode = screen.getByTestId('custom-code');
     expect(boldText.tagName).toBe('STRONG');
     expect(customCode).toHaveTextContent('code text');

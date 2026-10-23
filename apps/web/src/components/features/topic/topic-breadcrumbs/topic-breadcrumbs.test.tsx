@@ -9,12 +9,15 @@ import {
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { makeTopic } from '@web/testing/shared/topic/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { mockTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
-const SITE_NAME = 'Northwind Journal';
-const TOPIC_HREF = '/topics/news';
+const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
+const TOPIC_SLUG = 'news';
+const TOPIC_TITLE = 'News';
+const TOPIC_HREF = `/topics/${TOPIC_SLUG}`;
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -30,11 +33,11 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-const topic = makeTopic({ title: 'News', slug: 'news' });
+const topic = mockTopic({ title: TOPIC_TITLE, slug: TOPIC_SLUG });
 const successData = { topic, modules: [], seo: mockSeo() };
 
 const setup = customRenderAsync(TopicBreadcrumbs, {
-  slug: 'news',
+  slug: TOPIC_SLUG,
 });
 
 describe(`<${TopicBreadcrumbs.name}/>`, () => {
@@ -53,7 +56,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     setup,
     successData,
     linkSteps: [{ label: SITE_NAME, href: '/' }],
-    currentLabel: 'News',
+    currentLabel: TOPIC_TITLE,
   });
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getTopicPageMock,
@@ -67,7 +70,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     successData,
     expectedTrail: [
       { name: SITE_NAME, path: '/' },
-      { name: 'News', path: TOPIC_HREF },
+      { name: TOPIC_TITLE, path: TOPIC_HREF },
     ],
   });
   testNoJsonLdWithoutBaseUrl({
@@ -80,6 +83,6 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     setup,
     successData,
     description: 'forwards the slug to getTopicPage',
-    expectedArgs: ['news'],
+    expectedArgs: [TOPIC_SLUG],
   });
 });

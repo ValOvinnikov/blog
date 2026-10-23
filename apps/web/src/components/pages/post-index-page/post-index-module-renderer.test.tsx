@@ -1,6 +1,6 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
@@ -83,7 +83,7 @@ const POST_LIST_ID = 'post-list-1';
 
 const setup = customRenderAsync(PostIndexModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
@@ -120,7 +120,7 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
     loggerWarnMock,
     unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
-      'renders nothing and warns once for a module absent from the post index allow-list',
+      'warns and renders nothing for a module off the post index allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,

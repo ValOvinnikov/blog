@@ -1,6 +1,6 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   testFeatureListModule,
   testHeadingWithoutHero,
@@ -95,10 +95,11 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const PAGE_HEADING = 'Welcome to the blog';
 const HERO_STATEMENT_TEST_ID = 'stub-hero-statement';
+const STATEMENT_HERO = { id: 'hero-1', type: 'module_heroStatement' } as const;
 
 const setup = customRenderAsync(HomeModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
@@ -106,19 +107,18 @@ const setup = customRenderAsync(HomeModuleRenderer, {
 describe(`<${HomeModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
 
-  it('renders the resolved hero, with exactly one h1, when the hero has content', async () => {
-    await setup({ hero: { id: 'hero-1', type: 'module_heroStatement' } });
+  it('renders the resolved hero, with exactly one h1, when it has content', async () => {
+    await setup({ hero: STATEMENT_HERO });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
+    const hero = screen.getByTestId(HERO_STATEMENT_TEST_ID);
     expect(headings).toHaveLength(1);
-    expect(screen.getByTestId(HERO_STATEMENT_TEST_ID)).toHaveTextContent(
-      'hero-1',
-    );
+    expect(hero).toHaveTextContent(STATEMENT_HERO.id);
   });
 
   it('renders the resolved hero before the modules when the page has both', async () => {
     await setup({
-      hero: { id: 'hero-1', type: 'module_heroStatement' },
+      hero: STATEMENT_HERO,
       modules: [
         { id: 'cta-1', type: 'module_cta' },
         { id: 'content-1', type: 'module_content' },
@@ -133,13 +133,14 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     ]);
   });
 
-  it('falls back to the page heading, still one h1, when the hero resolves to nothing', async () => {
+  it('falls back to the page heading when the hero resolves to nothing', async () => {
     await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
+    const hero = screen.queryByTestId('stub-hero');
     expect(headings[0]).toHaveTextContent(PAGE_HEADING);
-    expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
+    expect(hero).not.toBeInTheDocument();
   });
 
   testHeroProfileHero({ setup, loggerWarnMock });
@@ -149,7 +150,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     loggerWarnMock,
     unknownModule: { id: 'post-list-1', type: 'module_postList' },
     description:
-      'renders nothing and warns once for a module absent from the home page allow-list',
+      'warns and renders nothing for a module off the home page allow-list',
   });
   testFeatureListModule({ setup, loggerWarnMock });
   testTestimonialModule({ setup, loggerWarnMock });

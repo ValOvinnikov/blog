@@ -9,7 +9,7 @@ import {
   MOCK_HERO_PROFILE_AVATAR_NAME,
   MOCK_HERO_PROFILE_MODULE_ID,
 } from '@web/testing/modules/hero-profile/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
 
@@ -32,7 +32,7 @@ const setup = customRender(HeroProfileModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading }),
+  headingBlock: mockHeadingBlock({ heading }),
   avatarName: MOCK_HERO_PROFILE_AVATAR_NAME,
   sanityImage: undefined,
   bio: undefined,
@@ -158,7 +158,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
 
   it('renders the bio after the supporting text and before the actions', () => {
     setup({
-      headingBlock: makeHeadingBlock({
+      headingBlock: mockHeadingBlock({
         heading,
         supportingText: SUPPORTING_TEXT,
       }),

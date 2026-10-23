@@ -4,10 +4,10 @@ import type {
   TTopicDetailPage,
   TTopicWithPostCount,
 } from '@blog/service';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
-export const makeTopic = (overrides: Partial<TTopic> = {}): TTopic => {
+export const mockTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   return {
     id: 'topic-1',
     title: 'Engineering',
@@ -17,25 +17,25 @@ export const makeTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   };
 };
 
-export const makeTopicWithPostCount = (
+export const mockTopicWithPostCount = (
   overrides: Partial<TTopicWithPostCount> = {},
 ): TTopicWithPostCount => {
   return {
-    ...makeTopic(),
+    ...mockTopic(),
     postCount: 0,
     ...overrides,
   };
 };
 
-export const makeTopicDetailPage = (
+export const mockTopicDetailPage = (
   overrides: Partial<TTopicDetailPage> = {},
 ): TTopicDetailPage => {
-  const topic = makeTopic();
+  const topic = mockTopic();
 
   return {
     topic,
     headingAlignment: CONTENT_ALIGNMENT.LEFT,
-    headingBlock: makeHeadingBlock({ heading: 'Engineering' }),
+    headingBlock: mockHeadingBlock({ heading: 'Engineering' }),
     hero: undefined,
     modules: [],
     faqs: [],

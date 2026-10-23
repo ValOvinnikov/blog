@@ -7,7 +7,7 @@ import {
 } from '@blog/config';
 import type { TCtaButton, TCtaModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   portableTextBlock,
   portableTextSpan,
@@ -66,7 +66,7 @@ export const mockCtaModuleData = (
   brandVariant: BRAND_VARIANT.PRIMARY,
   bandTone: BRAND_VARIANT.SECONDARY,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Get started' }),
+  headingBlock: mockHeadingBlock({ heading: 'Get started' }),
   content: undefined,
   image: undefined,
   contentPosition: undefined,

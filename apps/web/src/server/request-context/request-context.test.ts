@@ -1,10 +1,13 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { TENANT_PLAN } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
-import { DEFAULT_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_TENANT_BASE_URL,
+  MOCK_TENANT_HOST,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
 import { setRequestLocale } from 'next-intl/server';
 
 import type * as TModule from './request-context';
@@ -47,8 +50,7 @@ vi.mock(
 );
 
 const NO_TENANT_ENTERED = 'with no tenant entered';
-
-const TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
+const UNSERVED_LOCALE = 'xx';
 
 const PLATFORM_CONTEXT = {
   projectId: 'platform-project',
@@ -62,17 +64,6 @@ const TENANT_CREDENTIALS = {
   token: 'tenant-token',
   defaultLocale: LOCALE_ISO_CODES.EN,
 };
-
-const buildTenantRow = (overrides: Partial<TTenant> = {}): TTenant =>
-  ({
-    id: TENANT_ID,
-    primaryDomain: 'acme.example.com',
-    locale: LOCALE_ISO_CODES.EN,
-    additionalLocales: [LOCALE_ISO_CODES.NL],
-    plan: TENANT_PLAN.GROWTH,
-    deprovisionedAt: null,
-    ...overrides,
-  }) as TTenant;
 
 const params = (tenant: string, locale: string) =>
   Promise.resolve({ tenant, locale });
@@ -91,7 +82,7 @@ const enterAndRead = async (tenant: string, locale: string) => {
 
 describe('request-context', () => {
   beforeEach(() => {
-    getTenantByIdMock.mockResolvedValue(buildTenantRow());
+    getTenantByIdMock.mockResolvedValue(mockTenant());
     toTenantSanityCredentialsMock.mockReturnValue(TENANT_CREDENTIALS);
     selectLiveLocalesMock.mockReturnValue([
       LOCALE_ISO_CODES.EN,
@@ -107,24 +98,24 @@ describe('request-context', () => {
   });
 
   it("serves the entered tenant's context in the entered locale", async () => {
-    const row = buildTenantRow();
+    const row = mockTenant();
     getTenantByIdMock.mockResolvedValue(row);
 
-    await expect(enterAndRead(TENANT_ID, LOCALE_ISO_CODES.NL)).resolves.toEqual(
-      {
-        tenantId: TENANT_ID,
-        locale: LOCALE_ISO_CODES.NL,
-        sanityContext: { ...TENANT_CREDENTIALS, locale: LOCALE_ISO_CODES.NL },
-        metadataBase: new URL('https://acme.example.com'),
-        defaultLocale: LOCALE_ISO_CODES.EN,
-        liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
-      },
-    );
+    await expect(
+      enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
+    ).resolves.toEqual({
+      tenantId: MOCK_TENANT_ID,
+      locale: LOCALE_ISO_CODES.NL,
+      sanityContext: { ...TENANT_CREDENTIALS, locale: LOCALE_ISO_CODES.NL },
+      metadataBase: new URL(`https://${MOCK_TENANT_HOST}`),
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+    });
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(row);
   });
 
   it('sets the next-intl request locale', async () => {
-    await enterAndRead(TENANT_ID, LOCALE_ISO_CODES.NL);
+    await enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL);
 
     expect(vi.mocked(setRequestLocale)).toHaveBeenCalledWith(
       LOCALE_ISO_CODES.NL,
@@ -140,12 +131,12 @@ describe('request-context', () => {
     });
 
     it('reads the tenants row once however often it is entered and read', async () => {
-      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
-      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
+      await enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN));
+      await enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN));
       await Promise.all([getRequestContext(), getRequestContext()]);
 
       expect(getTenantByIdMock).toHaveBeenCalledTimes(1);
-      expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_ID, {
+      expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         includeArchived: true,
       });
     });
@@ -156,15 +147,15 @@ describe('request-context', () => {
       );
 
       await expect(
-        enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN)),
+        enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN)),
       ).rejects.toThrow(/different route params/);
     });
 
     it('refuses a second entry with a different locale', async () => {
-      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
+      await enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN));
 
       await expect(
-        enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.NL)),
+        enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL)),
       ).rejects.toThrow(/different route params/);
     });
 
@@ -174,7 +165,7 @@ describe('request-context', () => {
   });
 
   it('throws a 404 for a locale the site does not serve', async () => {
-    await expect(enterAndRead(TENANT_ID, 'xx')).rejects.toThrow(
+    await expect(enterAndRead(MOCK_TENANT_ID, UNSERVED_LOCALE)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
   });
@@ -187,7 +178,7 @@ describe('request-context', () => {
         tenantId: undefined,
         locale: LOCALE_ISO_CODES.NL,
         sanityContext: { ...PLATFORM_CONTEXT, locale: LOCALE_ISO_CODES.NL },
-        metadataBase: new URL(DEFAULT_TENANT_BASE_URL),
+        metadataBase: new URL(MOCK_TENANT_BASE_URL),
         defaultLocale: undefined,
         liveLocales: undefined,
       });
@@ -202,7 +193,7 @@ describe('request-context', () => {
 
     it('throws a 404 in production', async () => {
       await expect(
-        enterAndRead(TENANT_ID, LOCALE_ISO_CODES.EN),
+        enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
       ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
@@ -210,7 +201,7 @@ describe('request-context', () => {
       isProductionEnvironmentMock.mockReturnValue(false);
 
       const { sanityContext } = await enterAndRead(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         LOCALE_ISO_CODES.EN,
       );
 
@@ -224,9 +215,9 @@ describe('request-context', () => {
   it('throws a 404 in production when the tenant id matches no row', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    await expect(enterAndRead(TENANT_ID, LOCALE_ISO_CODES.EN)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(
+      enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
   it('never queries a tenant id that is not UUID-shaped', async () => {
@@ -242,24 +233,24 @@ describe('request-context', () => {
       isTenantServableMock.mockReturnValue(false);
 
       const { metadataBase } = await enterAndRead(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         LOCALE_ISO_CODES.EN,
       );
 
-      expect(metadataBase).toEqual(new URL(DEFAULT_TENANT_BASE_URL));
+      expect(metadataBase).toEqual(new URL(MOCK_TENANT_BASE_URL));
     });
 
     it('falls back to the site URL for a deprovisioned tenant', async () => {
       getTenantByIdMock.mockResolvedValue(
-        buildTenantRow({ deprovisionedAt: new Date('2026-01-01') }),
+        mockTenant({ deprovisionedAt: new Date('2026-01-01') }),
       );
 
       const { metadataBase } = await enterAndRead(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         LOCALE_ISO_CODES.EN,
       );
 
-      expect(metadataBase).toEqual(new URL(DEFAULT_TENANT_BASE_URL));
+      expect(metadataBase).toEqual(new URL(MOCK_TENANT_BASE_URL));
     });
   });
 
@@ -274,21 +265,23 @@ describe('request-context', () => {
 
     it('serves the entered language when it is live', async () => {
       await expect(
-        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
+        enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
       ).resolves.toEqual({
-        tenantId: TENANT_ID,
+        tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.NL,
       });
     });
 
     it("falls back to the tenant's default language for an invalid one", async () => {
       getTenantByIdMock.mockResolvedValue(
-        buildTenantRow({ locale: LOCALE_ISO_CODES.DE }),
+        mockTenant({ locale: LOCALE_ISO_CODES.DE }),
       );
       selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.DE]);
 
-      await expect(enterAndReadNotFound(TENANT_ID, 'xx')).resolves.toEqual({
-        tenantId: TENANT_ID,
+      await expect(
+        enterAndReadNotFound(MOCK_TENANT_ID, UNSERVED_LOCALE),
+      ).resolves.toEqual({
+        tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.DE,
       });
     });
@@ -297,8 +290,9 @@ describe('request-context', () => {
       selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
 
       await expect(
-        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
-      ).resolves.toMatchObject({
+        enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toEqual({
+        tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.EN,
       });
     });
@@ -307,12 +301,15 @@ describe('request-context', () => {
       toTenantSanityCredentialsMock.mockReturnValue(undefined);
 
       await expect(
-        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
-      ).resolves.toMatchObject({ locale: LOCALE_ISO_CODES.NL });
+        enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toEqual({
+        tenantId: MOCK_TENANT_ID,
+        locale: LOCALE_ISO_CODES.NL,
+      });
     });
 
     it('shares the tenants row read with the request context', async () => {
-      await enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.EN);
+      await enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN);
 
       expect(getTenantByIdMock).toHaveBeenCalledTimes(1);
     });
@@ -322,8 +319,11 @@ describe('request-context', () => {
       getTenantByIdMock.mockRejectedValue(error);
 
       await expect(
-        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
-      ).resolves.toMatchObject({ locale: LOCALE_ISO_CODES.NL });
+        enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toEqual({
+        tenantId: MOCK_TENANT_ID,
+        locale: LOCALE_ISO_CODES.NL,
+      });
       const { logger } = await import('@web/utils/logger/logger');
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'request_context.not_found_tenant_load_failed',
@@ -346,8 +346,9 @@ describe('request-context', () => {
 
       it('falls back to English for an invalid language', async () => {
         await expect(
-          enterAndReadNotFound(UNRESOLVED_TENANT_PLACEHOLDER, 'xx'),
-        ).resolves.toMatchObject({
+          enterAndReadNotFound(UNRESOLVED_TENANT_PLACEHOLDER, UNSERVED_LOCALE),
+        ).resolves.toEqual({
+          tenantId: undefined,
           locale: LOCALE_ISO_CODES.EN,
         });
       });
@@ -361,20 +362,15 @@ describe('request-context', () => {
       await expect(peekVoiceTenant()).resolves.toBe(undefined);
     });
 
-    it('resolves the entered tenant in its default language', async () => {
+    it.each([
+      ['its default language', LOCALE_ISO_CODES.EN],
+      ['a language other than the default', LOCALE_ISO_CODES.NL],
+    ])('resolves the entered tenant in %s', async (_, locale) => {
       const { enterRequestContext, peekVoiceTenant } =
         await loadRequestContext();
-      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
+      await enterRequestContext(params(MOCK_TENANT_ID, locale));
 
-      await expect(peekVoiceTenant()).resolves.toBe(TENANT_ID);
-    });
-
-    it('resolves the entered tenant in a language other than the default', async () => {
-      const { enterRequestContext, peekVoiceTenant } =
-        await loadRequestContext();
-      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.NL));
-
-      await expect(peekVoiceTenant()).resolves.toBe(TENANT_ID);
+      await expect(peekVoiceTenant()).resolves.toBe(MOCK_TENANT_ID);
     });
 
     it('resolves no tenant when none was entered', async () => {
@@ -391,10 +387,12 @@ describe('request-context', () => {
       const { enterRequestContext, getNotFoundContext, peekVoiceTenant } =
         await loadRequestContext();
       const notFoundContext = getNotFoundContext();
-      await enterRequestContext(params(TENANT_ID, 'xx')).catch(() => {});
+      await enterRequestContext(params(MOCK_TENANT_ID, UNSERVED_LOCALE)).catch(
+        () => {},
+      );
       await notFoundContext;
 
-      await expect(peekVoiceTenant()).resolves.toBe(TENANT_ID);
+      await expect(peekVoiceTenant()).resolves.toBe(MOCK_TENANT_ID);
     });
 
     it('resolves the not-found tenant when its Sanity credentials 404 the layout', async () => {
@@ -402,12 +400,12 @@ describe('request-context', () => {
       const { enterRequestContext, getNotFoundContext, peekVoiceTenant } =
         await loadRequestContext();
       const notFoundContext = getNotFoundContext();
-      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN)).catch(
-        () => {},
-      );
+      await enterRequestContext(
+        params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
+      ).catch(() => {});
       await notFoundContext;
 
-      await expect(peekVoiceTenant()).resolves.toBe(TENANT_ID);
+      await expect(peekVoiceTenant()).resolves.toBe(MOCK_TENANT_ID);
     });
   });
 });

@@ -8,7 +8,7 @@ import {
   mockUnresolvedHeroBlogData,
 } from '@web/testing/modules/hero-blog/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { HeroBlogModule } from './hero-blog-module';
@@ -48,7 +48,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
 
     expect(getHeroBlogMock).toHaveBeenCalledWith(
       MOCK_HERO_BLOG_MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

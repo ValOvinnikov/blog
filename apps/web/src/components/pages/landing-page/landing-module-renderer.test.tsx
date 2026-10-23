@@ -1,6 +1,6 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testFeatureListModule,
@@ -109,18 +109,21 @@ vi.mock('@web/modules/section-pages/section-pages-module', () => ({
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
+const PAGE_HEADING = 'About Us';
+const LANDING_PAGE = { id: 'modules', path: 'modules' };
+
 const setup = customRenderAsync(LandingModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'About Us' }),
+  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
-  landingPage: { id: 'modules', path: 'modules' },
+  landingPage: LANDING_PAGE,
 });
 
 const SECTION_PAGES_ID = 'section-pages-1';
 
 describe(`<${LandingModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: 'About Us' });
+  testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
   testResolvedHero({ setup });
   testHeroBeforeModules({
     setup,
@@ -133,7 +136,7 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock,
-    headingText: 'About Us',
+    headingText: PAGE_HEADING,
   });
   testHeroProfileHero({ setup, loggerWarnMock });
   testWarnsForUnknownModule({
@@ -141,23 +144,19 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
     loggerWarnMock,
     unknownModule: { id: 'post-list-1', type: 'module_postList' },
     description:
-      'renders nothing and warns once for a module absent from the landing page allow-list',
+      'warns and renders nothing for a module off the landing page allow-list',
   });
   testFeatureListModule({ setup, loggerWarnMock });
 
-  it('renders the section pages module with the landing page as its context', async () => {
+  it('renders the section pages module with the landing page as context', async () => {
     await setup({
       modules: [{ id: SECTION_PAGES_ID, type: 'module_sectionPages' }],
     });
 
-    expect(screen.getByTestId('stub-section-pages')).toHaveTextContent(
-      SECTION_PAGES_ID,
-    );
+    const sectionPages = screen.getByTestId('stub-section-pages');
+    expect(sectionPages).toHaveTextContent(SECTION_PAGES_ID);
     expect(sectionPagesModuleMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: SECTION_PAGES_ID,
-        context: { landingPage: { id: 'modules', path: 'modules' } },
-      }),
+      { id: SECTION_PAGES_ID, context: { landingPage: LANDING_PAGE } },
       undefined,
     );
   });

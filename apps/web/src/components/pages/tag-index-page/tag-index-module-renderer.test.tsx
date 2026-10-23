@@ -1,6 +1,6 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
@@ -64,9 +64,11 @@ vi.mock('@web/modules/content/content-module', () => ({
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
+const PAGE_HEADING = 'Tags';
+
 const setup = customRenderAsync(TagIndexModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Tags' }),
+  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
@@ -74,7 +76,7 @@ const setup = customRenderAsync(TagIndexModuleRenderer, {
 const TAXONOMY_LIST_ID = 'taxonomy-list-1';
 
 describe(`<${TagIndexModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: 'Tags' });
+  testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
   testResolvedHero({ setup });
   testHeroBeforeModules({
     setup,
@@ -87,14 +89,14 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock,
-    headingText: 'Tags',
+    headingText: PAGE_HEADING,
   });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
     unknownModule: { id: 'post-list-1', type: 'module_postList' },
     description:
-      'renders nothing and warns once for a module absent from the tag-index allow-list',
+      'warns and renders nothing for a module off the tag-index allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,

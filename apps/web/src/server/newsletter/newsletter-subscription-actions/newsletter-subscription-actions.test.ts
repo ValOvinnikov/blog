@@ -1,17 +1,13 @@
 import {
   ACTION_OUTCOME,
   EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
   PRESET_ID,
   resolveTenantEmailBrand,
   SUBSCRIBER_OUTCOME,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
-import {
-  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
-  TENANT_STATUS,
-} from '@blog/db/constants';
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
+import { TENANT_STATUS } from '@blog/db/constants';
+import { type TSendEmailInput } from '@blog/email';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
@@ -19,6 +15,18 @@ import {
   UNSUBSCRIBE_FAILED_EVENT,
 } from '@web/constants/newsletter';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import {
+  MOCK_CONFIRMATION_TOKEN,
+  MOCK_REPLY_TO,
+  MOCK_UNSUBSCRIBE_HEADERS,
+  MOCK_UNSUBSCRIBE_TOKEN,
+  mockEmailConfig,
+} from '@web/testing/server/newsletter/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_TENANT_BASE_URL,
+  MOCK_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 const {
@@ -30,7 +38,6 @@ const {
   sendEmailMock,
   resolveTenantEmailIdentityMock,
   clearNewsletterSubscribedCookieMock,
-
   resolveWritableTenantMock,
   resolveRequestTenantMock,
   getEmailConfigMock,
@@ -98,12 +105,8 @@ vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 
-const TENANT_ID = faker.string.uuid();
 const USER_ID = faker.string.uuid();
 const SUBSCRIBER_ID = faker.string.uuid();
-const SITE_URL = `https://${faker.internet.domainName()}`;
-const CONFIRMATION_TOKEN = faker.string.alphanumeric(16);
-const UNSUBSCRIBE_TOKEN = faker.string.alphanumeric(16);
 
 vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
@@ -114,15 +117,15 @@ const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 type TActions = typeof import('./newsletter-subscription-actions');
 
 const SESSION_EMAIL = faker.internet.email();
-const REPLY_TO_ADDRESS = faker.internet.email();
-const UNSUBSCRIBE_HEADER = `<${SITE_URL}/api/newsletter/unsubscribe?token=${UNSUBSCRIBE_TOKEN}>`;
-const DEFAULT_CONFIRMATION_SUBJECT =
-  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
-    EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION
-  ].subject;
-
+const NO_SESSION = 'there is no session';
+const NO_TENANT = 'no tenant resolves';
 const session = {
   user: { id: USER_ID, email: SESSION_EMAIL },
+};
+
+const sentEmail = (): TSendEmailInput => {
+  const [[email]] = sendEmailMock.mock.calls as [[TSendEmailInput]];
+  return email;
 };
 
 describe('unsubscribeAction', () => {
@@ -137,41 +140,40 @@ describe('unsubscribeAction', () => {
     clearNewsletterSubscribedCookieMock.mockResolvedValue(undefined);
     resolveRequestTenantMock.mockReset();
     resolveRequestTenantMock.mockResolvedValue({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
     });
     ({ unsubscribeAction } = await import('./newsletter-subscription-actions'));
   });
 
-  it('returns SERVER_ERROR without unsubscribing when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it.each([
+    [NO_SESSION, () => authMock.mockResolvedValue(null)],
+    [NO_TENANT, () => resolveRequestTenantMock.mockResolvedValue(undefined)],
+  ])(
+    'returns SERVER_ERROR without unsubscribing when %s',
+    async (_, arrange) => {
+      arrange();
 
-    await expect(unsubscribeAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(unsubscribeMock).not.toHaveBeenCalled();
-    expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
-  });
-
-  it('returns SERVER_ERROR without unsubscribing when no tenant resolves', async () => {
-    resolveRequestTenantMock.mockResolvedValue(undefined);
-
-    await expect(unsubscribeAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(unsubscribeMock).not.toHaveBeenCalled();
-    expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
-  });
+      await expect(unsubscribeAction()).resolves.toEqual({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      expect(unsubscribeMock).not.toHaveBeenCalled();
+      expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
+    },
+  );
 
   it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
     'unsubscribes the session user when the tenant is %s',
     async (status) => {
-      resolveRequestTenantMock.mockResolvedValue({ id: TENANT_ID, status });
+      resolveRequestTenantMock.mockResolvedValue({
+        id: MOCK_TENANT_ID,
+        status,
+      });
 
       await expect(unsubscribeAction()).resolves.toEqual({
         outcome: ACTION_OUTCOME.SUCCESS,
       });
-      expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
+      expect(unsubscribeMock).toHaveBeenCalledWith(MOCK_TENANT_ID, USER_ID);
     },
   );
 
@@ -179,35 +181,32 @@ describe('unsubscribeAction', () => {
     await expect(unsubscribeAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
+    expect(unsubscribeMock).toHaveBeenCalledWith(MOCK_TENANT_ID, USER_ID);
     expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledTimes(1);
   });
 
   it('returns SERVER_ERROR, logs and keeps the cookie when the db write throws', async () => {
-    const error = new Error('boom');
-    unsubscribeMock.mockRejectedValue(error);
+    unsubscribeMock.mockRejectedValue(MOCK_ERROR);
 
     await expect(unsubscribeAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       UNSUBSCRIBE_FAILED_EVENT,
-      { error },
+      { error: MOCK_ERROR },
     );
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
   });
 
   it('still returns SUCCESS, logging, when clearing the cookie throws', async () => {
-    clearNewsletterSubscribedCookieMock.mockRejectedValue(
-      new Error('cookie store down'),
-    );
+    clearNewsletterSubscribedCookieMock.mockRejectedValue(MOCK_ERROR);
 
     await expect(unsubscribeAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       'newsletter.subscribed_cookie_clear_failed',
-      expect.objectContaining({ error: expect.any(Error) }),
+      { error: MOCK_ERROR },
     );
   });
 });
@@ -222,11 +221,11 @@ describe('resendConfirmationAction', () => {
     resendConfirmationMock.mockResolvedValue({
       outcome: SUBSCRIBER_OUTCOME.PENDING,
       subscriberId: SUBSCRIBER_ID,
-      confirmationToken: CONFIRMATION_TOKEN,
+      confirmationToken: MOCK_CONFIRMATION_TOKEN,
     });
     commitConfirmationTokenMock.mockReset();
     commitConfirmationTokenMock.mockResolvedValue(undefined);
-    mintNewsletterUnsubscribeTokenMock.mockReturnValue(UNSUBSCRIBE_TOKEN);
+    mintNewsletterUnsubscribeTokenMock.mockReturnValue(MOCK_UNSUBSCRIBE_TOKEN);
     sendEmailMock.mockReset();
     sendEmailMock.mockResolvedValue(undefined);
     resolveTenantEmailIdentityMock.mockReset();
@@ -238,14 +237,14 @@ describe('resendConfirmationAction', () => {
       brandName: faker.company.name(),
     });
     getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue(SITE_URL);
+    getTenantBaseUrlMock.mockResolvedValue(MOCK_TENANT_BASE_URL);
     resolveWritableTenantMock.mockReset();
-    resolveWritableTenantMock.mockResolvedValue(okResult(TENANT_ID));
+    resolveWritableTenantMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
     getEmailConfigMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset();
     getEmailTemplateMock.mockResolvedValue({
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
       subject: faker.lorem.sentence(),
       body: [],
@@ -255,45 +254,37 @@ describe('resendConfirmationAction', () => {
       await import('./newsletter-subscription-actions'));
   });
 
-  it('returns SERVER_ERROR without resending when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it.each([
+    [
+      ACTION_OUTCOME.SERVER_ERROR,
+      NO_SESSION,
+      () => authMock.mockResolvedValue(null),
+    ],
+    [
+      ACTION_OUTCOME.SERVER_ERROR,
+      'the session has no email',
+      () => authMock.mockResolvedValue({ user: { id: USER_ID } }),
+    ],
+    [
+      ACTION_OUTCOME.SERVER_ERROR,
+      NO_TENANT,
+      () =>
+        resolveWritableTenantMock.mockResolvedValue(
+          errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
+        ),
+    ],
+    [
+      ACTION_OUTCOME.UNAVAILABLE,
+      'the tenant is not ACTIVE',
+      () =>
+        resolveWritableTenantMock.mockResolvedValue(
+          errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
+        ),
+    ],
+  ])('returns %s without resending when %s', async (outcome, _, arrange) => {
+    arrange();
 
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
-    expect(sendEmailMock).not.toHaveBeenCalled();
-  });
-
-  it('returns SERVER_ERROR without resending when the session has no email', async () => {
-    authMock.mockResolvedValue({ user: { id: USER_ID } });
-
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
-  });
-
-  it('returns SERVER_ERROR without resending when no tenant resolves', async () => {
-    resolveWritableTenantMock.mockResolvedValue(
-      errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
-    );
-
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(resendConfirmationMock).not.toHaveBeenCalled();
-    expect(sendEmailMock).not.toHaveBeenCalled();
-  });
-
-  it('returns UNAVAILABLE without resending when the tenant is not ACTIVE', async () => {
-    resolveWritableTenantMock.mockResolvedValue(
-      errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
-    );
-
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.UNAVAILABLE,
-    });
+    await expect(resendConfirmationAction()).resolves.toEqual({ outcome });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
@@ -302,19 +293,16 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, USER_ID);
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: SESSION_EMAIL,
-        html: expect.stringContaining(
-          `${SITE_URL}/api/newsletter/confirm?token=${CONFIRMATION_TOKEN}`,
-        ),
-        headers: {
-          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
-          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
-        },
-      }),
+    expect(resendConfirmationMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      USER_ID,
     );
+    const { to, html, headers } = sentEmail();
+    expect(to).toBe(SESSION_EMAIL);
+    expect(html).toContain(
+      `${MOCK_TENANT_BASE_URL}/api/newsletter/confirm?token=${MOCK_CONFIRMATION_TOKEN}`,
+    );
+    expect(headers).toEqual(MOCK_UNSUBSCRIBE_HEADERS);
   });
 
   it('stores the new confirm token only once the email is sent', async () => {
@@ -322,7 +310,7 @@ describe('resendConfirmationAction', () => {
 
     expect(commitConfirmationTokenMock).toHaveBeenCalledWith(
       SUBSCRIBER_ID,
-      CONFIRMATION_TOKEN,
+      MOCK_CONFIRMATION_TOKEN,
     );
     expect(sendEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
       commitConfirmationTokenMock.mock.invocationCallOrder[0] ?? 0,
@@ -349,12 +337,9 @@ describe('resendConfirmationAction', () => {
 
     await resendConfirmationAction();
 
-    expect(resolveTenantEmailIdentityMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        html: expect.stringContaining(tenantBrand.logo1),
-      }),
-    );
+    expect(resolveTenantEmailIdentityMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    const { html } = sentEmail();
+    expect(html).toContain(tenantBrand.logo1);
   });
 
   it('returns SERVER_ERROR without sending when the db reports not-pending', async () => {
@@ -369,83 +354,27 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR and logs when sending the confirmation email throws', async () => {
-    sendEmailMock.mockRejectedValue(new Error('resend down'));
+    sendEmailMock.mockRejectedValue(MOCK_ERROR);
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       CONFIRMATION_RESEND_FAILED_EVENT,
-      { error: expect.any(Error) },
+      { error: MOCK_ERROR },
     );
     expect(commitConfirmationTokenMock).not.toHaveBeenCalled();
   });
 
   it('sends with a validated reply-to while preserving the List-Unsubscribe headers', async () => {
-    getEmailConfigMock.mockResolvedValue({
-      tenantId: TENANT_ID,
-      logoAssetUrl: undefined,
-      senderName: undefined,
-      replyToAddress: REPLY_TO_ADDRESS,
-      footerPostalAddress: undefined,
-    });
+    getEmailConfigMock.mockResolvedValue(
+      mockEmailConfig({ replyToAddress: MOCK_REPLY_TO }),
+    );
 
     await resendConfirmationAction();
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        replyTo: REPLY_TO_ADDRESS,
-        headers: {
-          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
-          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
-        },
-      }),
-    );
-  });
-
-  it('drops a malformed stored reply-to address rather than blocking the resend', async () => {
-    getEmailConfigMock.mockResolvedValue({
-      tenantId: TENANT_ID,
-      logoAssetUrl: undefined,
-      senderName: undefined,
-      replyToAddress: faker.lorem.word(),
-      footerPostalAddress: undefined,
-    });
-
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({ replyTo: undefined }),
-    );
-  });
-
-  it('still sends the confirmation email when the email settings lookup rejects', async () => {
-    getEmailConfigMock.mockRejectedValue(new Error('db down'));
-
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({ to: SESSION_EMAIL }),
-    );
-  });
-
-  it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
-    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
-
-    await expect(resendConfirmationAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: SESSION_EMAIL,
-        subject: DEFAULT_CONFIRMATION_SUBJECT,
-        headers: {
-          'List-Unsubscribe': UNSUBSCRIBE_HEADER,
-          'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
-        },
-      }),
-    );
+    const { replyTo, headers } = sentEmail();
+    expect(replyTo).toBe(MOCK_REPLY_TO);
+    expect(headers).toEqual(MOCK_UNSUBSCRIBE_HEADERS);
   });
 });

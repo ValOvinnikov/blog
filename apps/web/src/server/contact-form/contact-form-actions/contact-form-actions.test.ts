@@ -1,8 +1,14 @@
 import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_STATUS,
+  type TTenantStatus,
+} from '@blog/db/constants';
 import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import {
@@ -59,11 +65,12 @@ vi.mock(
   () => ({ getEffectiveSettingsFeatures: getEffectiveSettingsFeaturesMock }),
 );
 
-const TENANT_ID = faker.string.uuid();
 const NAME = faker.person.fullName();
 const EMAIL = faker.internet.email();
 const MESSAGE = faker.lorem.sentences(2);
 const SOURCE_PATH = `/${faker.lorem.slug()}`;
+const LEAD_ID = faker.string.uuid();
+const CREATED_AT = faker.date.recent();
 
 const makeInput = (
   overrides: Partial<TContactMessageInput> = {},
@@ -76,7 +83,21 @@ const makeInput = (
   ...overrides,
 });
 
-describe('submitContactMessage', () => {
+const STORED_LEAD = {
+  tenantId: MOCK_TENANT_ID,
+  name: NAME,
+  email: EMAIL,
+  message: MESSAGE,
+  sourcePath: SOURCE_PATH,
+};
+
+const tenantWithStatus = (status: TTenantStatus) => ({
+  id: MOCK_TENANT_ID,
+  status,
+  deprovisionedAt: null,
+});
+
+describe(submitContactMessage, () => {
   beforeEach(() => {
     isBotOrUnverifiedMock.mockResolvedValue(false);
     isRateLimitedMock.mockResolvedValue(false);
@@ -84,14 +105,12 @@ describe('submitContactMessage', () => {
     getEffectiveSettingsFeaturesMock.mockResolvedValue(
       okResult({ [CAPABILITY.CONTACT_FORM]: true }),
     );
-    resolveRequestTenantMock.mockResolvedValue({
-      id: TENANT_ID,
-      status: TENANT_STATUS.ACTIVE,
-      deprovisionedAt: null,
-    });
+    resolveRequestTenantMock.mockResolvedValue(
+      tenantWithStatus(TENANT_STATUS.ACTIVE),
+    );
     createLeadMock.mockImplementation(async (input) => ({
-      id: faker.string.uuid(),
-      createdAt: new Date(),
+      id: LEAD_ID,
+      createdAt: CREATED_AT,
       ...input,
     }));
     sendContactNotificationMock.mockResolvedValue(undefined);
@@ -100,43 +119,57 @@ describe('submitContactMessage', () => {
   it('stores the lead, notifies the owner and answers success', async () => {
     const result = await submitContactMessage(makeInput());
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(createLeadMock).toHaveBeenCalledWith(STORED_LEAD);
+    expect(sendContactNotificationMock).toHaveBeenCalledWith({
+      id: LEAD_ID,
+      createdAt: CREATED_AT,
+      ...STORED_LEAD,
     });
+  });
 
-    expect(createLeadMock).toHaveBeenCalledWith({
-      tenantId: TENANT_ID,
-      name: NAME,
-      email: EMAIL,
-      message: MESSAGE,
-      sourcePath: SOURCE_PATH,
-    });
-    expect(sendContactNotificationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ tenantId: TENANT_ID, name: NAME }),
+  it('checks the rate limit and capability against the resolved tenant', async () => {
+    await submitContactMessage(makeInput());
+
+    expect(isRateLimitedMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getTenantPlanMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getEffectiveSettingsFeaturesMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
     );
   });
 
-  it("gates on the resolved tenant's capability without a request context", async () => {
+  it.each([
+    ['a bot', () => isBotOrUnverifiedMock.mockResolvedValue(true)],
+    ['a rate-limited address', () => isRateLimitedMock.mockResolvedValue(true)],
+    [
+      'a suspended tenant',
+      () =>
+        resolveRequestTenantMock.mockResolvedValue(
+          tenantWithStatus(TENANT_STATUS.SUSPENDED),
+        ),
+    ],
+    [
+      'a plan that does not entitle the contact form',
+      () => getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.FREE)),
+    ],
+    [
+      'the contact form capability switched off',
+      () =>
+        getEffectiveSettingsFeaturesMock.mockResolvedValue(
+          okResult({ [CAPABILITY.CONTACT_FORM]: false }),
+        ),
+    ],
+  ])('blocks %s without storing or sending', async (_, arrange) => {
+    arrange();
+
     const result = await submitContactMessage(makeInput());
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(getTenantPlanMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(getEffectiveSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID);
-  });
-
-  it('blocks a bot without storing or sending', async () => {
-    isBotOrUnverifiedMock.mockResolvedValue(true);
-
-    const result = await submitContactMessage(makeInput());
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.BLOCKED,
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
     expect(createLeadMock).not.toHaveBeenCalled();
     expect(sendContactNotificationMock).not.toHaveBeenCalled();
   });
 
-  it('blocks a filled honeypot without storing or sending', async () => {
+  it('blocks a filled honeypot before the rate limit, without storing or sending', async () => {
     const result = await submitContactMessage(
       makeInput({ website: faker.internet.url() }),
     );
@@ -147,66 +180,12 @@ describe('submitContactMessage', () => {
     expect(sendContactNotificationMock).not.toHaveBeenCalled();
   });
 
-  it('blocks a rate-limited address without storing or sending', async () => {
-    isRateLimitedMock.mockResolvedValue(true);
-
-    const result = await submitContactMessage(makeInput());
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.BLOCKED,
-    });
-    expect(isRateLimitedMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(createLeadMock).not.toHaveBeenCalled();
-    expect(sendContactNotificationMock).not.toHaveBeenCalled();
-  });
-
-  it('blocks a suspended tenant without storing or sending', async () => {
-    resolveRequestTenantMock.mockResolvedValue({
-      id: TENANT_ID,
-      status: TENANT_STATUS.SUSPENDED,
-      deprovisionedAt: null,
-    });
-
-    const result = await submitContactMessage(makeInput());
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.BLOCKED,
-    });
-    expect(createLeadMock).not.toHaveBeenCalled();
-  });
-
-  it('blocks when the plan does not entitle the contact form', async () => {
-    getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.FREE));
-
-    const result = await submitContactMessage(makeInput());
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.BLOCKED,
-    });
-    expect(createLeadMock).not.toHaveBeenCalled();
-  });
-
-  it('blocks when the contact form capability is off', async () => {
-    getEffectiveSettingsFeaturesMock.mockResolvedValue(
-      okResult({ [CAPABILITY.CONTACT_FORM]: false }),
-    );
-
-    const result = await submitContactMessage(makeInput());
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.BLOCKED,
-    });
-    expect(createLeadMock).not.toHaveBeenCalled();
-  });
-
   it('answers server-error when no tenant resolves', async () => {
     resolveRequestTenantMock.mockResolvedValue(undefined);
 
     const result = await submitContactMessage(makeInput());
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 
   it('names every invalid field without storing or sending', async () => {
@@ -248,9 +227,10 @@ describe('submitContactMessage', () => {
       makeInput({ name: `${firstName}\r\n${injected}` }),
     );
 
-    expect(createLeadMock).toHaveBeenCalledWith(
-      expect.objectContaining({ name: `${firstName} ${injected}` }),
-    );
+    expect(createLeadMock).toHaveBeenCalledWith({
+      ...STORED_LEAD,
+      name: `${firstName} ${injected}`,
+    });
   });
 
   it('stores the site root when the source path is not a local path', async () => {
@@ -260,36 +240,31 @@ describe('submitContactMessage', () => {
       }),
     );
 
-    expect(createLeadMock).toHaveBeenCalledWith(
-      expect.objectContaining({ sourcePath: '/' }),
-    );
+    expect(createLeadMock).toHaveBeenCalledWith({
+      ...STORED_LEAD,
+      sourcePath: '/',
+    });
   });
 
   it('still answers sent and logs once when the notification email fails', async () => {
-    sendContactNotificationMock.mockRejectedValue(
-      new Error(faker.lorem.sentence()),
-    );
+    sendContactNotificationMock.mockRejectedValue(MOCK_ERROR);
 
     const result = await submitContactMessage(makeInput());
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(vi.mocked(logger.error)).toHaveBeenCalledOnce();
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       'contact_form.notification_send_failed',
-      expect.objectContaining({ error: expect.any(Error) }),
+      { leadId: LEAD_ID, error: MOCK_ERROR },
     );
   });
 
   it('answers server-error without emailing when the lead cannot be stored', async () => {
-    createLeadMock.mockRejectedValue(new Error(faker.lorem.sentence()));
+    createLeadMock.mockRejectedValue(MOCK_ERROR);
 
     const result = await submitContactMessage(makeInput());
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(sendContactNotificationMock).not.toHaveBeenCalled();
   });
 });

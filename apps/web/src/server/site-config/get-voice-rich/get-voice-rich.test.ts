@@ -1,9 +1,10 @@
-import { LOCALE_ISO_CODES, type TVoicePortableText } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { VOICE_RICH_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { getVoiceRich } from './get-voice-rich';
@@ -32,15 +33,6 @@ const BASE_MESSAGES = {
   blogListPage: { empty: CATALOG_EMPTY },
 };
 
-const richTextOf = (text: string): TVoicePortableText => [
-  {
-    _type: 'block',
-    _key: 'a',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'a1', text }],
-  },
-];
-
 describe(getVoiceRich, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
@@ -51,26 +43,60 @@ describe(getVoiceRich, () => {
     );
   });
 
-  it('returns the stored override for the given field id', async () => {
-    const override = richTextOf(OVERRIDE_EMPTY);
-    getSiteConfigMock.mockResolvedValue(
-      okResult({
-        voiceOverridesByLocale: {
-          [DEFAULT_REQUEST_CONTEXT.locale]: { blogListEmpty: override },
+  it.each([MOCK_REQUEST_CONTEXT.locale, LOCALE_ISO_CODES.DE])(
+    'returns the stored override in the request language %s',
+    async (locale) => {
+      const overrides = {
+        [MOCK_REQUEST_CONTEXT.locale]: mockVoiceRichText(OVERRIDE_EMPTY),
+        [LOCALE_ISO_CODES.DE]: mockVoiceRichText('Noch keine Beiträge.'),
+      };
+      vi.mocked(getRequestContext).mockResolvedValueOnce({
+        ...MOCK_REQUEST_CONTEXT,
+        locale,
+      });
+      getSiteConfigMock.mockResolvedValue(
+        okResult({
+          voiceOverridesByLocale: {
+            [MOCK_REQUEST_CONTEXT.locale]: {
+              blogListEmpty: overrides[MOCK_REQUEST_CONTEXT.locale],
+            },
+            [LOCALE_ISO_CODES.DE]: {
+              blogListEmpty: overrides[LOCALE_ISO_CODES.DE],
+            },
+          },
+        }),
+      );
+
+      const result = await getVoiceRich(FIELD_ID);
+
+      expect(result).toBe(overrides[locale]);
+    },
+  );
+
+  it.each([
+    ['no language has an override', {}],
+    [
+      'the request language has none of its own',
+      {
+        [LOCALE_ISO_CODES.EN]: {
+          blogListEmpty: mockVoiceRichText(OVERRIDE_EMPTY),
         },
-      }),
-    );
+      },
+    ],
+  ])(
+    'returns the catalog default as one paragraph when %s',
+    async (_, voiceOverridesByLocale) => {
+      vi.mocked(getRequestContext).mockResolvedValueOnce({
+        ...MOCK_REQUEST_CONTEXT,
+        locale: LOCALE_ISO_CODES.DE,
+      });
+      getSiteConfigMock.mockResolvedValue(okResult({ voiceOverridesByLocale }));
 
-    const result = await getVoiceRich(FIELD_ID);
+      const result = await getVoiceRich(FIELD_ID);
 
-    expect(result).toBe(override);
-  });
-
-  it('falls back to the catalog default wrapped as one paragraph when there is no override', async () => {
-    const result = await getVoiceRich(FIELD_ID);
-
-    expect(result[0]?.children[0]?.text).toBe(CATALOG_EMPTY);
-  });
+      expect(result[0]?.children[0]?.text).toBe(CATALOG_EMPTY);
+    },
+  );
 
   it('falls back to the catalog default and logs when the site config fetch fails', async () => {
     getSiteConfigMock.mockResolvedValue(errorResult(FETCH_ERROR));
@@ -84,59 +110,17 @@ describe(getVoiceRich, () => {
     );
   });
 
-  it("returns the request language's override in a non-default language", async () => {
-    const override = richTextOf('Noch keine Beiträge.');
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.DE,
-    });
-    getSiteConfigMock.mockResolvedValue(
-      okResult({
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            blogListEmpty: richTextOf(OVERRIDE_EMPTY),
-          },
-          [LOCALE_ISO_CODES.DE]: { blogListEmpty: override },
-        },
-      }),
-    );
-
-    const result = await getVoiceRich(FIELD_ID);
-
-    expect(result).toBe(override);
-  });
-
-  it('returns the catalog default in a language with no override of its own', async () => {
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.DE,
-    });
-    getSiteConfigMock.mockResolvedValue(
-      okResult({
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            blogListEmpty: richTextOf(OVERRIDE_EMPTY),
-          },
-        },
-      }),
-    );
-
-    const result = await getVoiceRich(FIELD_ID);
-
-    expect(result[0]?.children[0]?.text).toBe(CATALOG_EMPTY);
-  });
-
   it("reads the site config of the request context's tenant", async () => {
     await getVoiceRich(FIELD_ID);
 
     expect(getSiteConfigMock).toHaveBeenCalledWith(
-      DEFAULT_REQUEST_CONTEXT.tenantId,
+      MOCK_REQUEST_CONTEXT.tenantId,
     );
   });
 
   it('reads no tenant from the request headers when the route resolved no tenant', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       tenantId: undefined,
     });
 

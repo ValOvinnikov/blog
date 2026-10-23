@@ -8,7 +8,9 @@ import {
   within,
 } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -64,7 +66,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     it('fetches the post for the given slug with the tenant context', () => {
       expect(getPostMock).toHaveBeenCalledWith(
         mockPostDetail.slug,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -72,38 +74,39 @@ describe(`<${BlogPostPage.name}/>`, () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Engineering' }),
-      ).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      const homeCrumb = within(breadcrumbs).getByRole('link', {
+        name: MOCK_SITE_SETTINGS.brand.name,
+      });
+      const topicCrumb = within(breadcrumbs).getByRole('link', {
+        name: 'Engineering',
+      });
+      const main = screen.getByRole('main');
+      expect(homeCrumb).toBeVisible();
+      expect(topicCrumb).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
     });
 
     it('renders the post article inside main', () => {
       const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', {
-          level: 1,
-          name: mockPostDetail.title,
-        }),
-      ).toBeVisible();
-      expect(within(main).getByText('Body text.')).toBeVisible();
+      const title = within(main).getByRole('heading', {
+        level: 1,
+        name: mockPostDetail.title,
+      });
+      const body = within(main).getByText('Body text.');
+      expect(title).toBeVisible();
+      expect(body).toBeVisible();
     });
 
-    it('renders exactly one h1, from the post', () => {
-      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-      expect(
-        screen.getByRole('heading', { level: 1, name: mockPostDetail.title }),
-      ).toBeVisible();
+    it('renders exactly one h1', () => {
+      const h1s = screen.getAllByRole('heading', { level: 1 });
+      expect(h1s).toHaveLength(1);
     });
 
     it('renders no reading-depth control without a skim or asides', () => {
-      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('region', { name: SUMMARY_REGION_NAME }),
-      ).not.toBeInTheDocument();
+      const depthControl = screen.queryByRole('radiogroup');
+      const skim = screen.queryByRole('region', { name: SUMMARY_REGION_NAME });
+      expect(depthControl).not.toBeInTheDocument();
+      expect(skim).not.toBeInTheDocument();
     });
   });
 
@@ -119,15 +122,15 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPostMock.mockResolvedValueOnce(errorResult(new Error('boom')));
+    getPostMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).toHaveBeenCalledWith(
-      'blog_post_page.fetch_failed',
-      expect.objectContaining({ slug: mockPostDetail.slug }),
-    );
+    expect(logger.error).toHaveBeenCalledWith('blog_post_page.fetch_failed', {
+      slug: mockPostDetail.slug,
+      error: MOCK_ERROR,
+    });
   });
 
   it('renders the reading-depth control once the post has asides', async () => {
@@ -137,7 +140,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: 'Deep' })).toBeVisible();
+    const deepOption = screen.getByRole('radio', { name: 'Deep' });
+    expect(deepOption).toBeVisible();
   });
 
   it('renders the 30s option and the skim panel once the post has a skim', async () => {
@@ -155,10 +159,13 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: '30s' })).toBeVisible();
-    const skim = within(screen.getByRole('main')).getByRole('region', {
+    const skimOption = screen.getByRole('radio', { name: '30s' });
+    const main = screen.getByRole('main');
+    const skim = within(main).getByRole('region', {
       name: SUMMARY_REGION_NAME,
     });
-    expect(within(skim).getByText('First.')).toBeVisible();
+    const firstTakeaway = within(skim).getByText('First.');
+    expect(skimOption).toBeVisible();
+    expect(firstTakeaway).toBeVisible();
   });
 });

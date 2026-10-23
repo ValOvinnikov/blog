@@ -17,10 +17,11 @@ import {
   mockLandingPage,
 } from '@web/testing/pages/landing-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -55,6 +56,8 @@ const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const LANDING_PATH = 'about-us';
 
+const PAGE_HEADING = 'About Us';
+
 const setup = customRenderServerAsync(LandingPage, {
   path: LANDING_PATH,
 });
@@ -76,14 +79,14 @@ describe(`<${LandingPage.name}/>`, () => {
       await setup();
     });
 
-    it('renders the page without a redirect lookup when the page exists', () => {
+    it('skips the redirect lookup when the page exists', () => {
       expect(getRedirectMock).not.toHaveBeenCalled();
     });
 
     it('fetches the page for the given path with the tenant context', () => {
       expect(getPageMock).toHaveBeenCalledWith(
         [LANDING_PATH],
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -92,9 +95,9 @@ describe(`<${LandingPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: 'Northwind Journal',
+        name: MOCK_SITE_SETTINGS.brand.name,
       });
-      const currentCrumb = within(breadcrumbs).getByText('About Us');
+      const currentCrumb = within(breadcrumbs).getByText(PAGE_HEADING);
       const main = screen.getByRole('main');
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
@@ -137,7 +140,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
       expect(permanentRedirect).toHaveBeenCalledWith({
         href: MOVED_DESTINATION,
-        locale: DEFAULT_REQUEST_CONTEXT.locale,
+        locale: MOCK_REQUEST_CONTEXT.locale,
       });
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     });
@@ -166,10 +169,10 @@ describe(`<${LandingPage.name}/>`, () => {
 
   it('calls notFound() when the slug exists only in another language', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
       sanityContext: {
-        ...DEFAULT_TENANT_SANITY_CONTEXT,
+        ...MOCK_TENANT_SANITY_CONTEXT,
         locale: LOCALE_ISO_CODES.NL,
       },
     });
@@ -186,8 +189,8 @@ describe(`<${LandingPage.name}/>`, () => {
 
   it('renders the page heading and supporting text inside main', async () => {
     resolvePageWith({
-      headingBlock: makeHeadingBlock({
-        heading: 'About Us',
+      headingBlock: mockHeadingBlock({
+        heading: PAGE_HEADING,
         supportingText: SUPPORTING_TEXT,
       }),
     });
@@ -197,7 +200,7 @@ describe(`<${LandingPage.name}/>`, () => {
     const main = screen.getByRole('main');
     const heading = within(main).getByRole('heading', {
       level: 1,
-      name: 'About Us',
+      name: PAGE_HEADING,
     });
     const supportingText = within(main).getByText(SUPPORTING_TEXT);
     expect(heading).toBeVisible();
@@ -226,7 +229,7 @@ describe(`<${LandingPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: CTA_HEADING }),
         }),
       ),
     );
@@ -254,7 +257,7 @@ describe(`<${LandingPage.name}/>`, () => {
     });
     const pageHeading = screen.queryByRole('heading', {
       level: 1,
-      name: 'About Us',
+      name: PAGE_HEADING,
     });
     expect(heroHeading).toBeVisible();
     expect(pageHeading).not.toBeInTheDocument();

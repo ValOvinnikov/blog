@@ -1,14 +1,19 @@
 import type { TVoicePortableText } from '@blog/config';
 import { renderElement, screen } from '@web/testing/custom-render';
-import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 
 import { VoiceRichText } from './voice-rich-text';
 
 vi.mock('@web/i18n/navigation');
 
-const LINKED_VALUE = makeFormattedVoiceRich({
-  linkText: 'the guide',
-  href: 'https://example.com',
+const LINK_TEXT = 'the guide';
+const LINK_HREF = 'https://example.com';
+const FIRST_LINE = 'First line';
+const SECOND_LINE = 'Second line';
+
+const LINKED_VALUE = mockFormattedVoiceRich({
+  linkText: LINK_TEXT,
+  href: LINK_HREF,
 });
 
 const TWO_BLOCK_VALUE: TVoicePortableText = [
@@ -16,13 +21,13 @@ const TWO_BLOCK_VALUE: TVoicePortableText = [
     _type: 'block',
     _key: 'b1',
     style: 'normal',
-    children: [{ _type: 'span', _key: 's1', text: 'First line' }],
+    children: [{ _type: 'span', _key: 's1', text: FIRST_LINE }],
   },
   {
     _type: 'block',
     _key: 'b2',
     style: 'normal',
-    children: [{ _type: 'span', _key: 's2', text: 'Second line' }],
+    children: [{ _type: 'span', _key: 's2', text: SECOND_LINE }],
   },
 ];
 
@@ -37,30 +42,34 @@ describe(`<${VoiceRichText.name}/>`, () => {
   it('renders an authored link as a working link', () => {
     renderInParagraph(LINKED_VALUE);
 
-    expect(screen.getByRole('link', { name: 'the guide' })).toHaveAttribute(
-      'href',
-      'https://example.com',
-    );
+    const link = screen.getByRole('link', { name: LINK_TEXT });
+    expect(link).toHaveAttribute('href', LINK_HREF);
   });
 
   it('renders bold and italic marks', () => {
     renderInParagraph(LINKED_VALUE);
 
-    expect(screen.getByText('bold', { selector: 'strong' })).toBeVisible();
-    expect(screen.getByText('italic', { selector: 'em' })).toBeVisible();
+    const bold = screen.getByText('bold', { selector: 'strong' });
+    const italic = screen.getByText('italic', { selector: 'em' });
+    expect(bold).toBeVisible();
+    expect(italic).toBeVisible();
   });
 
   it('adds no paragraph of its own for a single block', () => {
     renderInParagraph(LINKED_VALUE);
 
-    expect(screen.getAllByRole('paragraph')).toHaveLength(1);
+    const paragraphs = screen.getAllByRole('paragraph');
+    expect(paragraphs).toHaveLength(1);
   });
 
-  it('renders each block of a multi-block value as its own line inside the one paragraph', () => {
+  it('renders each block of a multi-block value inside the one paragraph', () => {
     renderInParagraph(TWO_BLOCK_VALUE);
 
-    expect(screen.getAllByRole('paragraph')).toHaveLength(1);
-    expect(screen.getByText('First line', { selector: 'span' })).toBeVisible();
-    expect(screen.getByText('Second line', { selector: 'span' })).toBeVisible();
+    const paragraphs = screen.getAllByRole('paragraph');
+    const firstLine = screen.getByText(FIRST_LINE, { selector: 'span' });
+    const secondLine = screen.getByText(SECOND_LINE, { selector: 'span' });
+    expect(paragraphs).toHaveLength(1);
+    expect(firstLine).toBeVisible();
+    expect(secondLine).toBeVisible();
   });
 });

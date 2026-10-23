@@ -11,7 +11,7 @@ import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockTeamMember } from '@web/testing/modules/team/fixtures';
 import { makeLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { TeamModuleView } from './team-module-view';
@@ -101,7 +101,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Meet the team' }),
+    headingBlock: mockHeadingBlock({ heading: 'Meet the team' }),
     members,
     showBios: false,
     showSocialLinks: false,

@@ -5,7 +5,7 @@ import {
   MOCK_SECOND_TOPIC_POST_TITLE,
   MOCK_TOPIC_LIST_ITEM,
 } from '@web/testing/modules/taxonomy-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
@@ -19,7 +19,7 @@ const LATEST_LABEL = 'Latest';
 
 const setup = customRender(TaxonomyListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: HEADING }),
+  headingBlock: mockHeadingBlock({ heading: HEADING }),
   items: [MOCK_TOPIC_LIST_ITEM],
   layout: undefined,
   contentAlignment: undefined,
