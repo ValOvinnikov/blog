@@ -1,4 +1,5 @@
 import { errorResult, okResult } from '@blog/utils';
+import { RELEASE_FAILURE } from '@platform/constants/release';
 import {
   compareCommits,
   type TCommitComparison,
@@ -27,7 +28,7 @@ export const getCandidateComparison = async (): Promise<
   ]);
   if (!lastTag.ok) return toReleaseFailure(lastTag.error);
   if (!headSha.ok) return toReleaseFailure(headSha.error);
-  if (!lastTag.data) return errorResult('noReleaseTag');
+  if (!lastTag.data) return errorResult(RELEASE_FAILURE.NO_RELEASE_TAG);
 
   const comparison = await compareCommits(lastTag.data, headSha.data);
   if (!comparison.ok) return toReleaseFailure(comparison.error);

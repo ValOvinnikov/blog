@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
   githubCompareJson,
   githubJson,
@@ -99,7 +100,7 @@ describe(compareCommits, () => {
     );
   });
 
-  it('fails with githubError when a later page errors', async () => {
+  it('fails with GITHUB_ERROR when a later page errors', async () => {
     const commits = Array.from({ length: 150 }, makeCommit);
     respondCompare(commits, []);
     github.respond(`/compare/${base}...${head}?per_page=100&page=2`, () =>
@@ -108,7 +109,7 @@ describe(compareCommits, () => {
 
     expect(await compareCommits(base, head)).toEqual({
       ok: false,
-      error: 'githubError',
+      error: GITHUB_FAILURE.GITHUB_ERROR,
     });
   });
 });

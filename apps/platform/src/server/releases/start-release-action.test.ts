@@ -9,11 +9,13 @@ import {
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
   CONTRAST_STATUS,
   RELEASE_FIELD_ERROR,
   RELEASE_REFUSAL,
   RELEASE_RUN_STATUS,
+  RELEASE_FAILURE,
 } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
@@ -256,7 +258,9 @@ describe('startReleaseAction', () => {
   );
 
   it('is unavailable when the candidate cannot be read', async () => {
-    getCandidateComparisonMock.mockResolvedValue(errorResult('rateLimited'));
+    getCandidateComparisonMock.mockResolvedValue(
+      errorResult(GITHUB_FAILURE.RATE_LIMITED),
+    );
 
     expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,
@@ -265,7 +269,9 @@ describe('startReleaseAction', () => {
   });
 
   it('is unavailable when the contrast status cannot be read', async () => {
-    resolveContrastStatusMock.mockResolvedValue(errorResult('dbError'));
+    resolveContrastStatusMock.mockResolvedValue(
+      errorResult(RELEASE_FAILURE.DB_ERROR),
+    );
 
     expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,

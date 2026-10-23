@@ -8,6 +8,7 @@ import {
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
@@ -114,7 +115,9 @@ describe('startContrastCheckAction', () => {
   });
 
   it('is unavailable when the head commit cannot be read', async () => {
-    getBranchHeadShaMock.mockResolvedValue(errorResult('githubError'));
+    getBranchHeadShaMock.mockResolvedValue(
+      errorResult(GITHUB_FAILURE.GITHUB_ERROR),
+    );
 
     const result = await startContrastCheckAction();
 
@@ -123,7 +126,9 @@ describe('startContrastCheckAction', () => {
   });
 
   it('is unavailable when the active run status cannot be read', async () => {
-    isWorkflowRunActiveMock.mockResolvedValue(errorResult('rateLimited'));
+    isWorkflowRunActiveMock.mockResolvedValue(
+      errorResult(GITHUB_FAILURE.RATE_LIMITED),
+    );
 
     const result = await startContrastCheckAction();
 

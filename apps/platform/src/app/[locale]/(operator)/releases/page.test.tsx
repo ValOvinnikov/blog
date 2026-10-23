@@ -1,6 +1,7 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
@@ -64,7 +65,9 @@ describe(ReleasesPage, () => {
   });
 
   it('says the release information is unavailable when the read fails', async () => {
-    getReleaseCandidateMock.mockResolvedValue(errorResult('rateLimited'));
+    getReleaseCandidateMock.mockResolvedValue(
+      errorResult(GITHUB_FAILURE.RATE_LIMITED),
+    );
 
     await setup();
 

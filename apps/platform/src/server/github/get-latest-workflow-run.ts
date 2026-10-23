@@ -1,5 +1,6 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { okResult } from '@blog/utils';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import { z } from 'zod';
 
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
@@ -49,7 +50,7 @@ export const getLatestWorkflowRun = async (
     },
   );
 
-  if (!result.ok && result.error === 'notFound') {
+  if (!result.ok && result.error === GITHUB_FAILURE.NOT_FOUND) {
     return okResult();
   }
 

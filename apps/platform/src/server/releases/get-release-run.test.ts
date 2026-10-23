@@ -1,4 +1,5 @@
 import type { TMaybeNull } from '@blog/config';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import { RELEASE_RUN_STATUS } from '@platform/constants/release';
 import {
   githubJson,
@@ -117,6 +118,9 @@ describe(getReleaseRun, () => {
   it('fails the read when GitHub answers with an error', async () => {
     github.respond(runsPath, () => githubJson({}, 500));
 
-    expect(await getReleaseRun()).toEqual({ ok: false, error: 'githubError' });
+    expect(await getReleaseRun()).toEqual({
+      ok: false,
+      error: GITHUB_FAILURE.GITHUB_ERROR,
+    });
   });
 });

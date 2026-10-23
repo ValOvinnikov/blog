@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
   githubJson,
   useGitHubFetch,
@@ -29,13 +30,13 @@ describe(getDbMigrationJournal, () => {
     });
   });
 
-  it('returns githubError when the journal is not valid JSON', async () => {
+  it('returns GITHUB_ERROR when the journal is not valid JSON', async () => {
     const content = Buffer.from('not json').toString('base64');
     github.respond(JOURNAL_PATH, () => githubJson({ content }));
 
     expect(await getDbMigrationJournal(ref)).toEqual({
       ok: false,
-      error: 'githubError',
+      error: GITHUB_FAILURE.GITHUB_ERROR,
     });
   });
 });

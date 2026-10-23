@@ -4,10 +4,12 @@ import {
   isReleaseVersionGreater,
   parseReleaseVersion,
 } from '@blog/utils/version';
+import type { TGitHubFailure } from '@platform/constants/github';
+import { RELEASE_FAILURE } from '@platform/constants/release';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
-import { fetchGitHubJson, type TGitHubFailureReason } from './fetch-github';
+import { fetchGitHubJson } from './fetch-github';
 
 const TAG_REF_PREFIX = 'refs/tags/';
 
@@ -17,14 +19,14 @@ const MAX_TAG_PAGES = 10;
 
 const tagRefsSchema = z.array(z.object({ ref: z.string() }));
 
-/** A list still full at the page cap is `tagListIncomplete`, never a read of a different latest tag. */
+/** A list still full at the page cap is `TAG_LIST_INCOMPLETE`, never a read of a different latest tag. */
 export type TLatestReleaseTagResult = TResult<
   TMaybeUndefined<string>,
-  TGitHubFailureReason | 'tagListIncomplete'
+  TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE
 >;
 
 const listReleaseTagRefs = async (): Promise<
-  TResult<string[], TGitHubFailureReason | 'tagListIncomplete'>
+  TResult<string[], TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE>
 > => {
   const refs: string[] = [];
 
@@ -40,7 +42,7 @@ const listReleaseTagRefs = async (): Promise<
   }
 
   logger.warn('github.tag_list_incomplete', { pageCap: MAX_TAG_PAGES });
-  return errorResult('tagListIncomplete');
+  return errorResult(RELEASE_FAILURE.TAG_LIST_INCOMPLETE);
 };
 
 export const getLatestReleaseTag =

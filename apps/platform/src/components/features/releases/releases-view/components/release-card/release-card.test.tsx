@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import type * as releaseConstants from '@platform/constants/release';
 import { RELEASE_RUN_STATUS } from '@platform/constants/release';
 import { act, customRender, screen } from '@platform/testing/custom-render';
@@ -129,7 +130,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
   });
 
   it('says the release state is unavailable when GitHub cannot be read', () => {
-    setup({ releaseRun: errorResult('githubError') });
+    setup({ releaseRun: errorResult(GITHUB_FAILURE.GITHUB_ERROR) });
 
     expect(screen.getByText('Release status is unavailable')).toBeVisible();
   });

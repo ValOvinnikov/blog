@@ -1,6 +1,7 @@
 import { RELEASE_CHANGE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
-import { CONTRAST_STATUS } from '@platform/constants/release';
+import { GITHUB_FAILURE } from '@platform/constants/github';
+import { CONTRAST_STATUS, RELEASE_FAILURE } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -179,7 +180,7 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('says GitHub is unreachable and retries by refreshing', async () => {
     const refresh = mockRouterRefresh();
-    setup({ result: errorResult('githubError') });
+    setup({ result: errorResult(GITHUB_FAILURE.GITHUB_ERROR) });
 
     expect(
       screen.getByText('Release information is unavailable'),
@@ -196,7 +197,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   });
 
   it('reports an incomplete tag list instead of a latest release', () => {
-    setup({ result: errorResult('tagListIncomplete') });
+    setup({ result: errorResult(RELEASE_FAILURE.TAG_LIST_INCOMPLETE) });
 
     expect(screen.getByText(/too long to read in full/)).toBeVisible();
     expect(screen.queryByText('v1.4.0')).not.toBeInTheDocument();
