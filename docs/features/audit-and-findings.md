@@ -168,7 +168,7 @@ Nothing is configurable. Only admins (any role) see either record.
   [platform-shell](./platform-shell.md), [look](./look.md),
   [voice](./voice.md), [email](./email.md).
 - Env: `DATABASE_URL` (CI: `TENANT_REGISTRY_DATABASE_URL`),
-  `TENANT_TOKEN_ENCRYPTION_KEY`; the alert needs `ADMIN_APP_BASE_URL` and
+  `TENANT_TOKEN_ENCRYPTION_KEY`; the alert needs `PLATFORM_APP_BASE_URL` and
   `OPERATOR_ALERT_SECRET` and is skipped without either.
 
 ## Entry points

@@ -478,7 +478,7 @@ git commit -m "feat(platform): add the internal operator-alert endpoint"
 **Interfaces:**
 
 - Consumes: `TOperatorAlertBody` and `OPERATOR_ALERT_KIND` from `@blog/config/constants` (Task 3). `@blog/db` already depends on `@blog/config`, so no dependency changes.
-- Produces: `postOperatorAlert(body: TOperatorAlertBody): Promise<void>` — reads `ADMIN_APP_BASE_URL` and `OPERATOR_ALERT_SECRET`, POSTs, **never throws**.
+- Produces: `postOperatorAlert(body: TOperatorAlertBody): Promise<void>` — reads `PLATFORM_APP_BASE_URL` and `OPERATOR_ALERT_SECRET`, POSTs, **never throws**.
 
 Note `packages/db/scripts/lib/` is a new directory — every existing script keeps its own private `lib/`, and this is the first module shared across two of them. Confirm `packages/db`'s tsconfig/vitest alias resolves it before writing the test.
 
@@ -633,7 +633,7 @@ Expected: no output. If `RESEND_API_KEY` still appears in a script's env reader,
 
 - [ ] **Step 3: Swap the workflow env**
 
-In both workflows, remove `RESEND_API_KEY` from the step env and add `ADMIN_APP_BASE_URL` and `OPERATOR_ALERT_SECRET`. Pass secrets via `env:`, never interpolated into `run:` — the same rule `.github/actions/setup/action.yml` follows for `install-filter`.
+In both workflows, remove `RESEND_API_KEY` from the step env and add `PLATFORM_APP_BASE_URL` and `OPERATOR_ALERT_SECRET`. Pass secrets via `env:`, never interpolated into `run:` — the same rule `.github/actions/setup/action.yml` follows for `install-filter`.
 
 - [ ] **Step 4: Update the prose that names `db` as an email sender**
 

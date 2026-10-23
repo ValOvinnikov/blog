@@ -10,7 +10,7 @@ import { notifyOperatorsOfDocumentValidationFailure } from './notify-operators';
 const MOCK_TENANT = mockTenant();
 
 beforeEach(() => {
-  vi.stubEnv('ADMIN_APP_BASE_URL', 'https://platform.example.com');
+  vi.stubEnv('PLATFORM_APP_BASE_URL', 'https://platform.example.com');
   vi.stubEnv('OPERATOR_ALERT_SECRET', 'shared-secret');
 });
 

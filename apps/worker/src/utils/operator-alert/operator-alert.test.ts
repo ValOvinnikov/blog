@@ -11,7 +11,7 @@ import { logger } from '@worker/utils/logger/logger';
 
 import { postOperatorAlert } from './operator-alert';
 
-const { adminAppBaseUrl } = MOCK_PROVISION_ENV;
+const { platformAppBaseUrl } = MOCK_PROVISION_ENV;
 
 const ALERT = {
   kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
@@ -28,7 +28,7 @@ const fetchMock = vi.fn();
 describe(postOperatorAlert, () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', fetchMock);
-    mockEnv.ADMIN_APP_BASE_URL = adminAppBaseUrl;
+    mockEnv.PLATFORM_APP_BASE_URL = platformAppBaseUrl;
     mockEnv.OPERATOR_ALERT_SECRET = 'alert-secret';
     fetchMock.mockResolvedValue(new Response('{}', { status: HTTP_STATUS.OK }));
   });
@@ -41,7 +41,9 @@ describe(postOperatorAlert, () => {
     await expect(postOperatorAlert(ALERT)).resolves.toBe(true);
 
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    expect(String(url)).toBe(`${adminAppBaseUrl}/api/internal/operator-alert`);
+    expect(String(url)).toBe(
+      `${platformAppBaseUrl}/api/internal/operator-alert`,
+    );
     expect(init.method).toBe(HTTP_METHOD.POST);
     expect(init.headers).toEqual(
       expect.objectContaining({ Authorization: 'Bearer alert-secret' }),
