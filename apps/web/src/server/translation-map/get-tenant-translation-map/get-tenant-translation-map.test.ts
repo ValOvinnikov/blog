@@ -1,6 +1,7 @@
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { service } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { logger } from '@web/utils/logger/logger';
 
 import { getTenantTranslationMap } from './get-tenant-translation-map';
@@ -38,7 +39,7 @@ describe(getTenantTranslationMap, () => {
   });
 
   it("loads the tenant's map with its own Sanity credentials", async () => {
-    getTranslationMap.mockResolvedValue({ ok: true, data: translationMap });
+    getTranslationMap.mockResolvedValue(okResult(translationMap));
 
     await expect(getTenantTranslationMap(tenant)).resolves.toBe(translationMap);
     expect(getTranslationMap).toHaveBeenCalledWith(credentials);
@@ -52,10 +53,9 @@ describe(getTenantTranslationMap, () => {
   });
 
   it('logs and is undefined when the map fails to load', async () => {
-    getTranslationMap.mockResolvedValue({
-      ok: false,
-      error: new Error('down'),
-    } as never);
+    getTranslationMap.mockResolvedValue(
+      errorResult(new Error('down')) as never,
+    );
 
     await expect(getTenantTranslationMap(tenant)).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith('translation_map.fetch_failed', {

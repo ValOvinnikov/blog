@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TTopicIndexPage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
@@ -92,22 +93,20 @@ describe(`<${TopicIndexPage.name}/>`, () => {
 
   beforeEach(() => {
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getIndexPageMock.mockResolvedValue({ ok: true, data: topicIndexPage });
-    vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) => ({
-      ok: true,
-      data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({
-          heading: id === 'cta-1' ? CTA_HEADING : SECOND_CTA_HEADING,
+    getIndexPageMock.mockResolvedValue(okResult(topicIndexPage));
+    vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) =>
+      okResult(
+        makeCtaModuleData({
+          headingBlock: makeHeadingBlock({
+            heading: id === 'cta-1' ? CTA_HEADING : SECOND_CTA_HEADING,
+          }),
         }),
-      }),
-    }));
+      ),
+    );
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getIndexPageMock.mockResolvedValueOnce(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -119,7 +118,7 @@ describe(`<${TopicIndexPage.name}/>`, () => {
   });
 
   it('calls notFound() without logging when the index page does not exist', async () => {
-    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getIndexPageMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -133,7 +132,7 @@ describe(`<${TopicIndexPage.name}/>`, () => {
       locale: LOCALE_ISO_CODES.NL,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
-    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getIndexPageMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
@@ -142,16 +141,15 @@ describe(`<${TopicIndexPage.name}/>`, () => {
   });
 
   it('renders the authored modules inside main in order', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getIndexPageMock.mockResolvedValueOnce(
+      okResult({
         ...topicIndexPage,
         modules: [
           { id: 'cta-1', type: 'module_cta' },
           { id: 'cta-2', type: 'module_cta' },
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -163,17 +161,15 @@ describe(`<${TopicIndexPage.name}/>`, () => {
   });
 
   it('renders the hero in place of the heading when one is set', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getIndexPageMock.mockResolvedValueOnce(
+      okResult({
         ...topicIndexPage,
         hero: { id: 'hero-1', type: 'module_heroBlog' },
-      },
-    });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
-      ok: true,
-      data: makeHeroBlogData({ heading: HERO_HEADING }),
-    });
+      }),
+    );
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
+      okResult(makeHeroBlogData({ heading: HERO_HEADING })),
+    );
 
     await setup();
 

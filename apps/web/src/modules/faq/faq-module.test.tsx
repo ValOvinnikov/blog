@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFaqQuestion } from '@web/testing/modules/faq/fixtures';
@@ -6,6 +7,9 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FaqModule } from './faq-module';
+
+const REFUNDS_QUESTION = 'Do you offer refunds?';
+const TRIAL_QUESTION = 'Is there a free trial?';
 
 const { getFaqModuleMock } = vi.hoisted(() => ({
   getFaqModuleMock: vi.fn(),
@@ -54,10 +58,9 @@ describe(`<${FaqModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getFaqModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, questions: [] },
-    });
+    getFaqModuleMock.mockResolvedValue(
+      okResult({ ...baseModule, questions: [] }),
+    );
 
     await setup();
 
@@ -65,10 +68,7 @@ describe(`<${FaqModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getFaqModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getFaqModuleMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -77,21 +77,16 @@ describe(`<${FaqModule.name}/>`, () => {
 
   it('renders the resolved questions as accordion triggers', async () => {
     const questions = [
-      makeFaqQuestion({ id: 'faq-a', question: 'Do you offer refunds?' }),
-      makeFaqQuestion({ id: 'faq-b', question: 'Is there a free trial?' }),
+      makeFaqQuestion({ id: 'faq-a', question: REFUNDS_QUESTION }),
+      makeFaqQuestion({ id: 'faq-b', question: TRIAL_QUESTION }),
     ];
-    getFaqModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, questions },
-    });
+    getFaqModuleMock.mockResolvedValue(okResult({ ...baseModule, questions }));
 
     await setup();
 
     expect(
-      screen.getByRole('button', { name: 'Do you offer refunds?' }),
+      screen.getByRole('button', { name: REFUNDS_QUESTION }),
     ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Is there a free trial?' }),
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: TRIAL_QUESTION })).toBeVisible();
   });
 });

@@ -1,5 +1,6 @@
 import { queries } from '@blog/db';
 import { service, type TTenantSanityContext } from '@blog/service';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { routing } from '@web/i18n/routing';
 import { buildPostPublishPaths } from '@web/utils/build-post-publish-paths';
 import { logger } from '@web/utils/logger/logger';
@@ -12,12 +13,10 @@ const DERIVABLE_REVALIDATE_TYPES = new Set<string>([POST_TYPE]);
 export const isDerivableRevalidateType = (type: string): boolean =>
   DERIVABLE_REVALIDATE_TYPES.has(type);
 
-export type TDeriveRevalidatePathsResult =
-  | { ok: true; paths: string[] }
-  | {
-      ok: false;
-      reason: 'unsupported_type' | 'document_not_found' | 'fetch_failed';
-    };
+export type TDeriveRevalidatePathsResult = TResult<
+  string[],
+  'unsupported_type' | 'document_not_found' | 'fetch_failed'
+>;
 
 export type TDeriveRevalidatePathsInput = {
   type: string;
@@ -55,11 +54,11 @@ const deriveBlogPostPublishPaths = async ({
       id,
       error: postsResult.error,
     });
-    return { ok: false, reason: 'fetch_failed' };
+    return errorResult('fetch_failed');
   }
   const [post] = postsResult.data;
   if (!post) {
-    return { ok: false, reason: 'document_not_found' };
+    return errorResult('document_not_found');
   }
 
   if (!blogParamsResult.ok) {
@@ -67,35 +66,35 @@ const deriveBlogPostPublishPaths = async ({
       id,
       error: blogParamsResult.error,
     });
-    return { ok: false, reason: 'fetch_failed' };
+    return errorResult('fetch_failed');
   }
   if (!tagSlugsResult.ok) {
     logger.error('revalidate.tag_params_lookup_failed', {
       id,
       error: tagSlugsResult.error,
     });
-    return { ok: false, reason: 'fetch_failed' };
+    return errorResult('fetch_failed');
   }
   if (!tagPaginationParamsResult.ok) {
     logger.error('revalidate.tag_pagination_lookup_failed', {
       id,
       error: tagPaginationParamsResult.error,
     });
-    return { ok: false, reason: 'fetch_failed' };
+    return errorResult('fetch_failed');
   }
   if (!topicSlugsResult.ok) {
     logger.error('revalidate.topic_params_lookup_failed', {
       id,
       error: topicSlugsResult.error,
     });
-    return { ok: false, reason: 'fetch_failed' };
+    return errorResult('fetch_failed');
   }
   if (!topicPaginationParamsResult.ok) {
     logger.error('revalidate.topic_pagination_lookup_failed', {
       id,
       error: topicPaginationParamsResult.error,
     });
-    return { ok: false, reason: 'fetch_failed' };
+    return errorResult('fetch_failed');
   }
 
   const paths = buildPostPublishPaths({
@@ -109,7 +108,7 @@ const deriveBlogPostPublishPaths = async ({
     topicPaginationParams: topicPaginationParamsResult.data,
   });
 
-  return { ok: true, paths };
+  return okResult(paths);
 };
 
 /**
@@ -124,5 +123,5 @@ export const deriveRevalidatePaths = async (
   if (input.type === POST_TYPE) {
     return deriveBlogPostPublishPaths(input);
   }
-  return { ok: false, reason: 'unsupported_type' };
+  return errorResult('unsupported_type');
 };

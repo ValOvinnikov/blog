@@ -1,4 +1,5 @@
 import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import userEvent from '@testing-library/user-event';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
@@ -86,11 +87,10 @@ const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
 
 describe(SiteHeader, () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'Blog', logo: undefined } },
-    } as never);
-    getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
+    getSiteSettingsMock.mockResolvedValue(
+      okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
+    );
+    getNavigationMock.mockResolvedValue(okResult({ items: [] }));
     getBrandLogoUrlMock.mockResolvedValue(undefined);
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     isReaderAccountEnabledMock.mockResolvedValue(true);
@@ -101,10 +101,9 @@ describe(SiteHeader, () => {
   describe('the brand logo', () => {
     it("shows the tenant's Look logo, not the Studio brand logo", async () => {
       getBrandLogoUrlMock.mockResolvedValue(LOOK_LOGO_URL);
-      getSiteSettingsMock.mockResolvedValue({
-        ok: true,
-        data: { brand: { name: 'Blog', logo: STUDIO_LOGO } },
-      } as never);
+      getSiteSettingsMock.mockResolvedValue(
+        okResult({ brand: { name: 'Blog', logo: STUDIO_LOGO } }) as never,
+      );
 
       await setup();
 
@@ -119,10 +118,9 @@ describe(SiteHeader, () => {
     });
 
     it('shows the default mark when no Look logo is uploaded, even with a Studio brand logo', async () => {
-      getSiteSettingsMock.mockResolvedValue({
-        ok: true,
-        data: { brand: { name: 'Blog', logo: STUDIO_LOGO } },
-      } as never);
+      getSiteSettingsMock.mockResolvedValue(
+        okResult({ brand: { name: 'Blog', logo: STUDIO_LOGO } }) as never,
+      );
 
       await setup();
 
@@ -140,10 +138,9 @@ describe(SiteHeader, () => {
         ...DEFAULT_REQUEST_CONTEXT,
         liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       });
-      getNavigationMock.mockResolvedValue({
-        ok: true,
-        data: { items: [], showLanguageSwitcher: true },
-      });
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [], showLanguageSwitcher: true }),
+      );
       await setup();
     });
 
@@ -262,10 +259,9 @@ describe(SiteHeader, () => {
   });
 
   it('shows no language switcher with one live language, whatever the toggle says', async () => {
-    getNavigationMock.mockResolvedValue({
-      ok: true,
-      data: { items: [], showLanguageSwitcher: true },
-    });
+    getNavigationMock.mockResolvedValue(
+      okResult({ items: [], showLanguageSwitcher: true }),
+    );
 
     await setup();
 
@@ -318,7 +314,7 @@ describe(SiteHeader, () => {
 
   describe('when navigation fails to load', () => {
     it('logs navigation.layout_fetch_failed and still renders the header', async () => {
-      getNavigationMock.mockResolvedValue({ ok: false, error: 'boom' });
+      getNavigationMock.mockResolvedValue(errorResult('boom'));
 
       await setup();
 

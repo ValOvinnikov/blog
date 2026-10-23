@@ -7,6 +7,7 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import type { TFeedPost } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
@@ -83,18 +84,19 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
       tenant,
     });
     getTenantBaseUrlMock.mockResolvedValue(DEFAULT_TENANT_BASE_URL);
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: undefined,
-        },
-      }),
-    });
-    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [post] });
+    getTagPageMock.mockResolvedValue(
+      okResult(
+        makeTagDetailPage({
+          tag: {
+            id: 'tag-1',
+            title: 'TypeScript',
+            slug: 'typescript',
+            description: undefined,
+          },
+        }),
+      ),
+    );
+    getPublishedPostsByTagMock.mockResolvedValue(okResult([post]));
     ({ GET } = await import('./route'));
     ({ logger } = await import('@web/utils/logger/logger'));
   });
@@ -108,17 +110,18 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: TAG_DESCRIPTION,
-        },
-      }),
-    });
+    getTagPageMock.mockResolvedValue(
+      okResult(
+        makeTagDetailPage({
+          tag: {
+            id: 'tag-1',
+            title: 'TypeScript',
+            slug: 'typescript',
+            description: TAG_DESCRIPTION,
+          },
+        }),
+      ),
+    );
     const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
       params,
     });
@@ -147,7 +150,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
-    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [] });
+    getPublishedPostsByTagMock.mockResolvedValue(okResult([]));
     const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
       params,
     });
@@ -160,7 +163,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('calls notFound() when the tag fetch fails', async () => {
-    getTagPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getTagPageMock.mockResolvedValue(errorResult(new Error('boom')));
     await expect(
       GET(new Request(DEFAULT_TENANT_BASE_URL), { params }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
@@ -170,7 +173,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('calls notFound() without logging when the tag simply does not exist', async () => {
-    getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTagPageMock.mockResolvedValue(okResult());
     await expect(
       GET(new Request(DEFAULT_TENANT_BASE_URL), { params }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
@@ -181,14 +184,10 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('calls notFound() when the posts fetch fails', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage(),
-    });
-    getPublishedPostsByTagMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage()));
+    getPublishedPostsByTagMock.mockResolvedValue(
+      errorResult(new Error('boom')),
+    );
     await expect(
       GET(new Request(DEFAULT_TENANT_BASE_URL), { params }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);

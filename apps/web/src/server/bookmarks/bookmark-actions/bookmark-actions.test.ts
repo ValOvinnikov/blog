@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME, ERROR_CODE, TENANT_WRITE_REFUSAL } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
@@ -79,10 +80,7 @@ describe('setBookmarkStatus', () => {
     authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     resolveWritableTenantMock.mockReset();
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: true,
-      tenantId: DEFAULT_TENANT_ID,
-    });
+    resolveWritableTenantMock.mockResolvedValue(okResult(DEFAULT_TENANT_ID));
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
   });
@@ -98,10 +96,9 @@ describe('setBookmarkStatus', () => {
   });
 
   it('returns SERVER_ERROR without writing when no tenant resolves', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
+    );
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
@@ -111,10 +108,9 @@ describe('setBookmarkStatus', () => {
   });
 
   it('returns UNAVAILABLE without writing when the tenant is not ACTIVE', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.INACTIVE,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
+    );
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,
@@ -124,7 +120,7 @@ describe('setBookmarkStatus', () => {
   });
 
   it('adds a bookmark for the signed-in user when isBookmarked is true', async () => {
-    addBookmarkMock.mockResolvedValue({ ok: true, data: {} });
+    addBookmarkMock.mockResolvedValue(okResult({}));
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -138,10 +134,7 @@ describe('setBookmarkStatus', () => {
   });
 
   it('returns SERVER_ERROR when addBookmark resolves a typed failure', async () => {
-    addBookmarkMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    addBookmarkMock.mockResolvedValue(errorResult(ERROR_CODE.DB_NOT_FOUND));
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,

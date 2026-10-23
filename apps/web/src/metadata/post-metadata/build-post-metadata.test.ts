@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { type TPostDetail, urlForSanityImage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
@@ -83,7 +84,7 @@ describe('buildPostMetadata', () => {
 
   describe('when the post resolves', () => {
     beforeEach(() => {
-      getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
+      getPostPageMock.mockResolvedValue(okResult(basePost));
     });
 
     it('forwards the slug to getPostPage, the loader BlogPostPage reads', async () => {
@@ -124,7 +125,7 @@ describe('buildPostMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata without logging when no page_post matches the slug', async () => {
-      getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
+      getPostPageMock.mockResolvedValue(okResult());
 
       const metadata = await buildPostMetadata('missing');
 
@@ -133,10 +134,7 @@ describe('buildPostMetadata', () => {
     });
 
     it('returns empty metadata when the post fetch fails', async () => {
-      getPostPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getPostPageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       const metadata = await buildPostMetadata(SLUG);
 
@@ -155,9 +153,8 @@ describe('buildPostMetadata per language', () => {
       locale: NL,
       liveLocales: [EN, NL],
     });
-    getPostPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostPageMock.mockResolvedValue(
+      okResult({
         ...basePost,
         slug: NL_SLUG,
         translations: [
@@ -165,8 +162,8 @@ describe('buildPostMetadata per language', () => {
           { language: NL, slug: NL_SLUG },
           { language: DE, slug: 'mein-artikel' },
         ],
-      },
-    });
+      }),
+    );
   });
 
   afterEach(() => {

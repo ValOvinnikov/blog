@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TBlogIndexPage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
@@ -65,13 +66,12 @@ const setup = customRenderServerAsync(PostIndexPage, {
 describe(`<${PostIndexPage.name}/>`, () => {
   beforeEach(() => {
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getIndexPageMock.mockResolvedValue({ ok: true, data: indexPage });
-    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
-      ok: true,
-      data: [
+    getIndexPageMock.mockResolvedValue(okResult(indexPage));
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
+      okResult([
         makeTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
-      ],
-    });
+      ]),
+    );
   });
 
   describe('with the default index page', () => {
@@ -119,10 +119,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getIndexPageMock.mockResolvedValueOnce(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -134,7 +131,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
   });
 
   it('calls notFound() without logging when the index page does not exist', async () => {
-    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getIndexPageMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -148,7 +145,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
       locale: LOCALE_ISO_CODES.NL,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
-    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getIndexPageMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
@@ -157,16 +154,19 @@ describe(`<${PostIndexPage.name}/>`, () => {
   });
 
   it('renders the authored modules inside main', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: { ...indexPage, modules: [{ id: 'cta-1', type: 'module_cta' }] },
-    });
-    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
-      ok: true,
-      data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+    getIndexPageMock.mockResolvedValueOnce(
+      okResult({
+        ...indexPage,
+        modules: [{ id: 'cta-1', type: 'module_cta' }],
       }),
-    });
+    );
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
+      okResult(
+        makeCtaModuleData({
+          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+        }),
+      ),
+    );
 
     await setup();
 
@@ -178,14 +178,15 @@ describe(`<${PostIndexPage.name}/>`, () => {
   });
 
   it('renders the hero in place of the page heading when one is set', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: { ...indexPage, hero: { id: 'hero-1', type: 'module_heroBlog' } },
-    });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
-      ok: true,
-      data: makeHeroBlogData({ heading: HERO_HEADING }),
-    });
+    getIndexPageMock.mockResolvedValueOnce(
+      okResult({
+        ...indexPage,
+        hero: { id: 'hero-1', type: 'module_heroBlog' },
+      }),
+    );
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
+      okResult(makeHeroBlogData({ heading: HERO_HEADING })),
+    );
 
     await setup();
 
@@ -198,17 +199,15 @@ describe(`<${PostIndexPage.name}/>`, () => {
   });
 
   it('loads post lists for the current page with no archive scope', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getIndexPageMock.mockResolvedValueOnce(
+      okResult({
         ...indexPage,
         modules: [{ id: 'list-1', type: 'module_postList' }],
-      },
-    });
-    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
+      }),
+    );
+    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+      errorResult(new Error('boom')),
+    );
 
     await expect(setup({ page: 2 })).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,

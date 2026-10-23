@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -55,10 +56,7 @@ describe(`<${HomePage.name}/>`, () => {
 
   describe('when the page cannot be rendered', () => {
     it('calls notFound() and logs when the fetch fails', async () => {
-      getHomePageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getHomePageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -72,7 +70,7 @@ describe(`<${HomePage.name}/>`, () => {
     });
 
     it('calls notFound() without logging when the home page simply does not exist', async () => {
-      getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+      getHomePageMock.mockResolvedValue(okResult());
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -89,7 +87,7 @@ describe(`<${HomePage.name}/>`, () => {
       locale: LOCALE_ISO_CODES.NL,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
-    getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+    getHomePageMock.mockResolvedValue(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
@@ -99,15 +97,14 @@ describe(`<${HomePage.name}/>`, () => {
 
   describe('with a hero and modules', () => {
     beforeEach(async () => {
-      getHomePageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getHomePageMock.mockResolvedValue(
+        okResult({
           headingBlock: makeHeadingBlock({ heading: HEADING }),
           hero: { id: 'hero-1', type: 'module_hero' },
           modules: [{ id: 'module-1', type: 'module_content' }],
           faqs: [],
-        },
-      });
+        }),
+      );
 
       await setup();
     });
@@ -135,15 +132,14 @@ describe(`<${HomePage.name}/>`, () => {
   });
 
   it('dispatches HomeModuleRenderer with no hero when the page has none', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getHomePageMock.mockResolvedValue(
+      okResult({
         headingBlock: makeHeadingBlock({ heading: HEADING }),
         hero: undefined,
         modules: [],
         faqs: [],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -166,15 +162,14 @@ describe(`<${HomePage.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getHomePageMock.mockResolvedValue(
+      okResult({
         headingBlock: makeHeadingBlock(),
         hero: undefined,
         modules: [],
         faqs: [],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -182,15 +177,14 @@ describe(`<${HomePage.name}/>`, () => {
   });
 
   it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getHomePageMock.mockResolvedValue(
+      okResult({
         headingBlock: makeHeadingBlock(),
         hero: undefined,
         modules: [],
         faqs: [],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -200,9 +194,8 @@ describe(`<${HomePage.name}/>`, () => {
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getHomePageMock.mockResolvedValue(
+      okResult({
         headingBlock: makeHeadingBlock(),
         hero: undefined,
         modules: [],
@@ -213,8 +206,8 @@ describe(`<${HomePage.name}/>`, () => {
             answer: 'Yes.',
           },
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 

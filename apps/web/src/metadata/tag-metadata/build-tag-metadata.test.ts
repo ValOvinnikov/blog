@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
@@ -46,10 +47,7 @@ const seo = makeSeo({
 describe('buildTagMetadata', () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({ seo }),
-    });
+    getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage({ seo })));
   });
 
   it('forwards the slug to getTagPage, the loader TagPage reads', async () => {
@@ -87,10 +85,9 @@ describe('buildTagMetadata', () => {
   });
 
   it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({ seo: makeSeo({ ogTitle: undefined }) }),
-    });
+    getTagPageMock.mockResolvedValue(
+      okResult(makeTagDetailPage({ seo: makeSeo({ ogTitle: undefined }) })),
+    );
 
     const metadata = await buildTagMetadata('typescript', 2);
 
@@ -100,10 +97,7 @@ describe('buildTagMetadata', () => {
 
   describe('when the tag fetch fails', () => {
     beforeEach(() => {
-      getTagPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getTagPageMock.mockResolvedValue(errorResult(new Error('boom')));
     });
 
     it('returns empty metadata when the tag fetch fails', async () => {
@@ -120,7 +114,7 @@ describe('buildTagMetadata', () => {
   });
 
   it('returns empty metadata without logging when the tag simply does not exist', async () => {
-    getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTagPageMock.mockResolvedValue(okResult());
 
     const metadata = await buildTagMetadata('missing');
 
@@ -139,17 +133,18 @@ describe('buildTagMetadata per language', () => {
       locale: NL,
       liveLocales: [EN, NL],
     });
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({
-        seo,
-        translations: [
-          { language: EN, slug: 'design' },
-          { language: NL, slug: 'ontwerp' },
-          { language: DE, slug: 'gestaltung' },
-        ],
-      }),
-    });
+    getTagPageMock.mockResolvedValue(
+      okResult(
+        makeTagDetailPage({
+          seo,
+          translations: [
+            { language: EN, slug: 'design' },
+            { language: NL, slug: 'ontwerp' },
+            { language: DE, slug: 'gestaltung' },
+          ],
+        }),
+      ),
+    );
   });
 
   afterEach(() => {

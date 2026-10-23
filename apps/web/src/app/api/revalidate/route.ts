@@ -2,6 +2,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TTenantSanityContext } from '@blog/service';
+import { errorResult, type TResult } from '@blog/utils';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   PATH_PURGE_FALLBACK_EVENT,
@@ -49,28 +50,23 @@ const isRevalidateWebhookBody = (
   );
 };
 
-type TResolvedRevalidatePaths =
-  { ok: true; paths: string[] } | { ok: false; reason: string };
-
 const resolveDerivedRevalidatePaths = async (
   type: string,
   id: string,
   tenantId: TMaybeUndefined<string>,
   tenant: TMaybeUndefined<TTenantSanityContext>,
-): Promise<TResolvedRevalidatePaths> => {
+): Promise<TResult<string[], string>> => {
   if (!tenantId) {
-    return { ok: false, reason: 'tenant_unresolved' };
+    return errorResult('tenant_unresolved');
   }
   if (!isDerivableRevalidateType(type)) {
-    return { ok: false, reason: 'unsupported_type' };
+    return errorResult('unsupported_type');
   }
   if (!tenant) {
-    return { ok: false, reason: 'fetch_failed' };
+    return errorResult('fetch_failed');
   }
 
-  const derived = await deriveRevalidatePaths({ type, id, tenantId, tenant });
-  if (derived.ok) return derived;
-  return { ok: false, reason: derived.reason };
+  return deriveRevalidatePaths({ type, id, tenantId, tenant });
 };
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -217,7 +213,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       tenantSanity,
     );
     if (derived.ok) {
-      for (const path of derived.paths) {
+      for (const path of derived.data) {
         revalidatePath(path);
       }
     } else {
@@ -225,7 +221,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         type,
         id,
         tenantId,
-        reason: derived.reason,
+        reason: derived.error,
       });
       revalidatePath('/', 'layout');
     }

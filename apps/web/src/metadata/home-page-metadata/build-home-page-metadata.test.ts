@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -18,16 +19,14 @@ vi.mock('@web/server/request-context/request-context');
 
 const { EN, NL, DE } = LOCALE_ISO_CODES;
 
-const homePage = (translations: string[]) => ({
-  ok: true,
-  data: {
+const homePage = (translations: string[]) =>
+  okResult({
     hero: undefined,
     modules: [],
     faqs: [],
     seo: makeSeo({ title: 'Home' }),
     translations,
-  },
-});
+  });
 
 describe('buildHomePageMetadata', () => {
   beforeEach(() => {
@@ -40,10 +39,7 @@ describe('buildHomePageMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the fetch fails', async () => {
-      getHomePageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getHomePageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       expect(await buildHomePageMetadata()).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
@@ -53,7 +49,7 @@ describe('buildHomePageMetadata', () => {
     });
 
     it('returns empty metadata without logging when this language has no Home', async () => {
-      getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+      getHomePageMock.mockResolvedValue(okResult());
 
       expect(await buildHomePageMetadata()).toEqual({});
       expect(vi.mocked(logger.error)).not.toHaveBeenCalled();

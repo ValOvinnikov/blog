@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
@@ -627,10 +628,9 @@ describe('POST /api/revalidate', () => {
       });
 
       it('purges each derived path instead of the whole site when derivation succeeds', async () => {
-        deriveRevalidatePathsMock.mockResolvedValue({
-          ok: true,
-          paths: [TENANT_HOME_PATH, TENANT_POST_PATH],
-        });
+        deriveRevalidatePathsMock.mockResolvedValue(
+          okResult([TENANT_HOME_PATH, TENANT_POST_PATH]),
+        );
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           VALID_SIGNATURE,
@@ -692,10 +692,9 @@ describe('POST /api/revalidate', () => {
       });
 
       it('falls back to the whole-site purge and logs when the paths cannot be derived', async () => {
-        deriveRevalidatePathsMock.mockResolvedValue({
-          ok: false,
-          reason: 'document_not_found',
-        });
+        deriveRevalidatePathsMock.mockResolvedValue(
+          errorResult('document_not_found'),
+        );
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           VALID_SIGNATURE,

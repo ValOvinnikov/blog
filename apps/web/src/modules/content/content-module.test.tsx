@@ -1,11 +1,14 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, within } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModule } from './content-module';
+
+const IMAGE_ALT = 'A scenic mountain range';
 
 const { getContentMock } = vi.hoisted(() => ({
   getContentMock: vi.fn(),
@@ -44,14 +47,13 @@ describe(`<${ContentModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getContentMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getContentMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         body: [],
         layout: undefined,
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -59,7 +61,7 @@ describe(`<${ContentModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getContentMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getContentMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -69,24 +71,23 @@ describe(`<${ContentModule.name}/>`, () => {
   it('renders a body image resolving through the Sanity CDN', async () => {
     const body: TPortableTextBody = [
       {
-        _type: 'bodyImage',
+        _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
         _key: 'image-1',
         layout: undefined,
-        image: makeSanityImage({ alt: 'A scenic mountain range' }),
+        image: makeSanityImage({ alt: IMAGE_ALT }),
       },
     ];
 
-    getContentMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getContentMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         body,
         layout: undefined,
-      },
-    });
+      }),
+    );
     const { container } = await setup();
     const img = within(container).getByRole('img', {
-      name: 'A scenic mountain range',
+      name: IMAGE_ALT,
     });
     expect(img.getAttribute('src')).toContain('cdn.sanity.io');
   });

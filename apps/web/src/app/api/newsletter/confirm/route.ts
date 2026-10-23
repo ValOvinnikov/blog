@@ -22,7 +22,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   try {
     const tenant = await resolveWritableTenant('newsletter.confirm');
     if (!tenant.ok) {
-      if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+      if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
         logger.warn('newsletter.confirm_tenant_not_active');
         return redirectToNewsletterResult(
           request,
@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
 
     const result = await queries.subscribers.confirmSubscriber(
-      tenant.tenantId,
+      tenant.data,
       token,
     );
 

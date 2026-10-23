@@ -12,6 +12,7 @@ import {
   TENANT_STATUS,
 } from '@blog/db/constants';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
   CONFIRMATION_RESEND_FAILED_EVENT,
@@ -239,10 +240,7 @@ describe('resendConfirmationAction', () => {
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue(SITE_URL);
     resolveWritableTenantMock.mockReset();
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: true,
-      tenantId: TENANT_ID,
-    });
+    resolveWritableTenantMock.mockResolvedValue(okResult(TENANT_ID));
     getEmailConfigMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset();
@@ -277,10 +275,9 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns SERVER_ERROR without resending when no tenant resolves', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
+    );
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
@@ -290,10 +287,9 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns UNAVAILABLE without resending when the tenant is not ACTIVE', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.INACTIVE,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
+    );
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,

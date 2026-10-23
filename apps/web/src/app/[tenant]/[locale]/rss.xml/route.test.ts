@@ -1,10 +1,24 @@
 /**
  * @vitest-environment jsdom
  */
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { HTTP_STATUS, LOCALE_ISO_CODES } from '@blog/config';
 import type { TFeedPost } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
+
+const FEED_URL = 'https://example.com/rss.xml';
+const XML_CONTENT_TYPE = 'application/xml';
+const ESCAPED_POST_TITLE = 'Hello & Welcome';
+const ESCAPED_POST_EXCERPT = 'A <first> post.';
+const BASE_URL = 'https://example.com';
+const SITE_DESCRIPTION = 'A blog about things';
+const CHANNEL_TITLE_SELECTOR = 'channel > title';
+const CHANNEL_DESCRIPTION_SELECTOR = 'channel > description';
+const ITEM_LINK_SELECTOR = 'item > link';
+const SITE_TAGLINE = 'Notes · Essays';
+const CHANNEL_LANGUAGE_SELECTOR = 'channel > language';
+const CHANNEL_LINK_SELECTOR = 'channel > link';
 
 const {
   getAllPublishedPostsMock,
@@ -48,7 +62,7 @@ const tenant = {
   defaultLocale: EN,
 };
 
-const request = new Request('https://example.com/rss.xml');
+const request = new Request(FEED_URL);
 
 const paramsFor = (locale: string) =>
   Promise.resolve({ tenant: 'tenant-1', locale });
@@ -62,13 +76,13 @@ const getFeed = async (locale: string = EN) => {
 const getFeedDocument = async (locale: string = EN) =>
   new DOMParser().parseFromString(
     await (await getFeed(locale)).text(),
-    'application/xml',
+    XML_CONTENT_TYPE,
   );
 
 const post: TFeedPost = {
-  title: 'Hello & Welcome',
+  title: ESCAPED_POST_TITLE,
   slug: 'hello-welcome',
-  excerpt: 'A <first> post.',
+  excerpt: ESCAPED_POST_EXCERPT,
   publishedAt: '2026-01-15T00:00:00Z',
 };
 
@@ -78,13 +92,12 @@ describe('GET /[locale]/rss.xml', () => {
       isResolvable: true,
       tenant,
     });
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
-    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'My Blog' } },
-    });
+    getTenantBaseUrlMock.mockResolvedValue(BASE_URL);
+    getIndexPageMock.mockResolvedValue(okResult());
+    getAllPublishedPostsMock.mockResolvedValue(okResult([]));
+    getSiteSettingsMock.mockResolvedValue(
+      okResult({ brand: { name: 'My Blog' } }),
+    );
   });
 
   afterEach(() => {
@@ -98,14 +111,13 @@ describe('GET /[locale]/rss.xml', () => {
 
   describe('when the feed has a post', () => {
     beforeEach(() => {
-      getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [post] });
+      getAllPublishedPostsMock.mockResolvedValue(okResult([post]));
     });
 
     it('returns a valid RSS 2.0 feed with the correct content type', async () => {
-      getIndexPageMock.mockResolvedValue({
-        ok: true,
-        data: { seo: { description: 'A blog about things' } },
-      });
+      getIndexPageMock.mockResolvedValue(
+        okResult({ seo: { description: SITE_DESCRIPTION } }),
+      );
       const response = await getFeed();
       const xml = await response.text();
 
@@ -113,20 +125,22 @@ describe('GET /[locale]/rss.xml', () => {
         'application/rss+xml; charset=utf-8',
       );
 
-      const doc = new DOMParser().parseFromString(xml, 'application/xml');
+      const doc = new DOMParser().parseFromString(xml, XML_CONTENT_TYPE);
       expect(doc.querySelector('parsererror')).toBeNull();
-      expect(doc.querySelector('channel > title')?.textContent).toBe('My Blog');
-      expect(doc.querySelector('channel > description')?.textContent).toBe(
-        'A blog about things',
+      expect(doc.querySelector(CHANNEL_TITLE_SELECTOR)?.textContent).toBe(
+        'My Blog',
+      );
+      expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
+        SITE_DESCRIPTION,
       );
       expect(doc.querySelector('item > title')?.textContent).toBe(
-        'Hello & Welcome',
+        ESCAPED_POST_TITLE,
       );
-      expect(doc.querySelector('item > link')?.textContent).toBe(
+      expect(doc.querySelector(ITEM_LINK_SELECTOR)?.textContent).toBe(
         'https://example.com/blog/hello-welcome',
       );
       expect(doc.querySelector('item > description')?.textContent).toBe(
-        'A <first> post.',
+        ESCAPED_POST_EXCERPT,
       );
       expect(doc.querySelector('item > pubDate')?.textContent).toBe(
         new Date(post.publishedAt).toUTCString(),
@@ -137,74 +151,70 @@ describe('GET /[locale]/rss.xml', () => {
       const response = await getFeed(NL);
       const doc = new DOMParser().parseFromString(
         await response.text(),
-        'application/xml',
+        XML_CONTENT_TYPE,
       );
 
-      expect(doc.querySelector('item > link')?.textContent).toBe(
+      expect(doc.querySelector(ITEM_LINK_SELECTOR)?.textContent).toBe(
         'https://example.com/nl/blog/hello-welcome',
       );
     });
   });
 
   it('falls back to a generic channel title and description when site settings fail', async () => {
-    getSiteSettingsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getSiteSettingsMock.mockResolvedValue(errorResult(new Error('boom')));
     const doc = await getFeedDocument();
 
-    expect(doc.querySelector('channel > title')?.textContent).toBe('Blog');
-    expect(doc.querySelector('channel > description')?.textContent).toBe(
+    expect(doc.querySelector(CHANNEL_TITLE_SELECTOR)?.textContent).toBe('Blog');
+    expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
       'The latest posts.',
     );
   });
 
   it('describes the channel with the brand tagline when the index page has no description', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: { seo: { description: undefined } },
-    });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'My Blog', tagline: 'Notes · Essays' } },
-    });
+    getIndexPageMock.mockResolvedValue(
+      okResult({ seo: { description: undefined } }),
+    );
+    getSiteSettingsMock.mockResolvedValue(
+      okResult({ brand: { name: 'My Blog', tagline: SITE_TAGLINE } }),
+    );
     const doc = await getFeedDocument();
 
-    expect(doc.querySelector('channel > description')?.textContent).toBe(
-      'Notes · Essays',
+    expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
+      SITE_TAGLINE,
     );
   });
 
   it('describes the channel with the brand tagline when the index page fails to load', async () => {
-    getIndexPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'My Blog', tagline: 'Notes · Essays' } },
-    });
+    getIndexPageMock.mockResolvedValue(errorResult(new Error('boom')));
+    getSiteSettingsMock.mockResolvedValue(
+      okResult({ brand: { name: 'My Blog', tagline: SITE_TAGLINE } }),
+    );
     const doc = await getFeedDocument();
 
-    expect(doc.querySelector('channel > description')?.textContent).toBe(
-      'Notes · Essays',
+    expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
+      SITE_TAGLINE,
     );
   });
 
   it('carries the language, home link and self link of an unprefixed default-language feed', async () => {
     const doc = await getFeedDocument();
 
-    expect(doc.querySelector('channel > language')?.textContent).toBe('en');
-    expect(doc.querySelector('channel > link')?.textContent).toBe(
-      'https://example.com',
+    expect(doc.querySelector(CHANNEL_LANGUAGE_SELECTOR)?.textContent).toBe(
+      'en',
     );
-    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(
-      'https://example.com/rss.xml',
+    expect(doc.querySelector(CHANNEL_LINK_SELECTOR)?.textContent).toBe(
+      BASE_URL,
     );
+    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(FEED_URL);
   });
 
   it('carries the language, home link and self link of a prefixed feed', async () => {
     const doc = await getFeedDocument(NL);
 
-    expect(doc.querySelector('channel > language')?.textContent).toBe('nl');
-    expect(doc.querySelector('channel > link')?.textContent).toBe(
+    expect(doc.querySelector(CHANNEL_LANGUAGE_SELECTOR)?.textContent).toBe(
+      'nl',
+    );
+    expect(doc.querySelector(CHANNEL_LINK_SELECTOR)?.textContent).toBe(
       'https://example.com/nl',
     );
     expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(
@@ -213,13 +223,10 @@ describe('GET /[locale]/rss.xml', () => {
   });
 
   it('returns an empty feed (no items) when the posts fetch fails', async () => {
-    getAllPublishedPostsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getAllPublishedPostsMock.mockResolvedValue(errorResult(new Error('boom')));
     const response = await getFeed();
     const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const doc = new DOMParser().parseFromString(xml, XML_CONTENT_TYPE);
 
     expect(doc.querySelectorAll('item')).toHaveLength(0);
   });
@@ -236,7 +243,7 @@ describe('GET /[locale]/rss.xml', () => {
   it('returns a 404 for a language the site does not support', async () => {
     const response = await getFeed('xx');
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(getAllPublishedPostsMock).not.toHaveBeenCalled();
   });
 
@@ -244,7 +251,7 @@ describe('GET /[locale]/rss.xml', () => {
     getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
     const response = await getFeed();
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
     expect(getAllPublishedPostsMock).not.toHaveBeenCalled();
   });
 });

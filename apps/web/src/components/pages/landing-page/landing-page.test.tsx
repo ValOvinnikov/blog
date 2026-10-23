@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -58,8 +59,8 @@ const HERO_HEADING = 'Meet the team';
 
 describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
-    getPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-    getRedirectMock.mockResolvedValue({ ok: true, data: undefined });
+    getPageMock.mockResolvedValue(okResult(mockLandingPage));
+    getRedirectMock.mockResolvedValue(okResult());
   });
 
   describe('with an existing page', () => {
@@ -107,17 +108,16 @@ describe(`<${LandingPage.name}/>`, () => {
 
   describe('when no page matches the path', () => {
     beforeEach(() => {
-      getPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+      getPageMock.mockResolvedValueOnce(okResult());
     });
 
     it('redirects permanently when the missing path has moved', async () => {
-      getRedirectMock.mockResolvedValueOnce({
-        ok: true,
-        data: {
+      getRedirectMock.mockResolvedValueOnce(
+        okResult({
           destination: MOVED_DESTINATION,
           status: REDIRECT_STATUS.PERMANENT,
-        },
-      });
+        }),
+      );
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
@@ -141,7 +141,7 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPageMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
+    getPageMock.mockResolvedValueOnce(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -161,10 +161,11 @@ describe(`<${LandingPage.name}/>`, () => {
         locale: LOCALE_ISO_CODES.NL,
       },
     });
-    getPageMock.mockImplementation(async (_segments, tenant) => ({
-      ok: true,
-      data: tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
-    }));
+    getPageMock.mockImplementation(async (_segments, tenant) =>
+      okResult(
+        tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
+      ),
+    );
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -172,16 +173,15 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('renders the page heading and supporting text inside main', async () => {
-    getPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPageMock.mockResolvedValueOnce(
+      okResult({
         ...mockLandingPage,
         headingBlock: makeHeadingBlock({
           heading: 'About Us',
           supportingText: SUPPORTING_TEXT,
         }),
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -193,13 +193,12 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('renders the section navigation inside main with the current page marked', async () => {
-    getPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPageMock.mockResolvedValueOnce(
+      okResult({
         ...mockLandingPage,
         sectionNavigation: makeLandingSectionNavigation(),
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -213,19 +212,19 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('renders the authored modules inside main', async () => {
-    getPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPageMock.mockResolvedValueOnce(
+      okResult({
         ...mockLandingPage,
         modules: [{ id: 'cta-1', type: 'module_cta' }],
-      },
-    });
-    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
-      ok: true,
-      data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
       }),
-    });
+    );
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
+      okResult(
+        makeCtaModuleData({
+          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+        }),
+      ),
+    );
 
     await setup();
 
@@ -237,17 +236,15 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('renders the hero in place of the page heading when one is set', async () => {
-    getPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPageMock.mockResolvedValueOnce(
+      okResult({
         ...mockLandingPage,
         hero: { id: 'hero-1', type: 'module_heroBlog' },
-      },
-    });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
-      ok: true,
-      data: makeHeroBlogData({ heading: HERO_HEADING }),
-    });
+      }),
+    );
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
+      okResult(makeHeroBlogData({ heading: HERO_HEADING })),
+    );
 
     await setup();
 
@@ -260,9 +257,8 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    getPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPageMock.mockResolvedValueOnce(
+      okResult({
         ...mockLandingPage,
         faqs: [
           {
@@ -271,8 +267,8 @@ describe(`<${LandingPage.name}/>`, () => {
             answer: 'Yes.',
           },
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 

@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -52,16 +53,15 @@ describe('buildPostIndexMetadata', () => {
 
   describe('when the index page resolves', () => {
     beforeEach(() => {
-      getPostIndexPageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getPostIndexPageMock.mockResolvedValue(
+        okResult({
           title: 'Blog',
           headingBlock: makeHeadingBlock({ heading: 'Blog' }),
           seo,
           modules: [],
           translations: [LOCALE_ISO_CODES.EN],
-        },
-      });
+        }),
+      );
     });
 
     it('reads the page through getPostIndexPage, the loader PostIndexPage reads', async () => {
@@ -102,10 +102,7 @@ describe('buildPostIndexMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the index page fetch fails', async () => {
-      getPostIndexPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getPostIndexPageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       const metadata = await buildPostIndexMetadata(1);
 
@@ -117,7 +114,7 @@ describe('buildPostIndexMetadata', () => {
     });
 
     it('returns empty metadata without logging when the index page simply does not exist', async () => {
-      getPostIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+      getPostIndexPageMock.mockResolvedValue(okResult());
 
       const metadata = await buildPostIndexMetadata(1);
 
@@ -139,15 +136,14 @@ describe('buildPostIndexMetadata', () => {
 
     it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {
       const translations = [EN, NL, DE];
-      getPostIndexPageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getPostIndexPageMock.mockResolvedValue(
+        okResult({
           headingBlock: makeHeadingBlock({ heading: 'Blog' }),
           seo,
           modules: [],
           translations,
-        },
-      });
+        }),
+      );
 
       const metadata = await buildPostIndexMetadata(1);
 
@@ -160,15 +156,14 @@ describe('buildPostIndexMetadata', () => {
 
     it('lists no hreflang past page 1', async () => {
       const translations = [EN, NL];
-      getPostIndexPageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getPostIndexPageMock.mockResolvedValue(
+        okResult({
           headingBlock: makeHeadingBlock({ heading: 'Blog' }),
           seo,
           modules: [],
           translations,
-        },
-      });
+        }),
+      );
 
       const metadata = await buildPostIndexMetadata(2);
 
@@ -178,16 +173,15 @@ describe('buildPostIndexMetadata', () => {
   });
 
   it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostIndexPageMock.mockResolvedValue(
+      okResult({
         title: 'Blog',
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo: makeSeo({ title: 'The Blog', ogTitle: undefined }),
         modules: [],
         translations: [LOCALE_ISO_CODES.EN],
-      },
-    });
+      }),
+    );
 
     const metadata = await buildPostIndexMetadata(2);
 
