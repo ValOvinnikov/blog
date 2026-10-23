@@ -4,7 +4,7 @@ import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -37,7 +37,7 @@ const OG_DESCRIPTION = 'All the posts OG.';
 const PAGE_TWO_OG_TITLE = 'The Blog OG – Page 2';
 const OG_TITLE = 'The Blog OG';
 
-const seo = makeSeo({
+const seo = mockSeo({
   title: 'The Blog',
   description: DESCRIPTION,
   ogTitle: OG_TITLE,
@@ -177,7 +177,7 @@ describe('buildPostIndexMetadata', () => {
       okResult({
         title: 'Blog',
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        seo: makeSeo({ title: 'The Blog', ogTitle: undefined }),
+        seo: mockSeo({ title: 'The Blog', ogTitle: undefined }),
         modules: [],
         translations: [LOCALE_ISO_CODES.EN],
       }),

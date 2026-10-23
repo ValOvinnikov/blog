@@ -3,7 +3,7 @@ import { type TPostDetail, urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -50,7 +50,7 @@ const basePost: TPostDetail = {
   postTakeaways: undefined,
   hasAsides: false,
   modules: [],
-  seo: makeSeo({
+  seo: mockSeo({
     title: TITLE,
     description: EXCERPT,
     ogTitle: OG_TITLE,

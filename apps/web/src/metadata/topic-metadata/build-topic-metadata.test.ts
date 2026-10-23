@@ -3,7 +3,7 @@ import { urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -35,7 +35,7 @@ const TOPIC_PATH = '/topics/engineering';
 const NL_DESIGN_TOPIC_PATH = '/nl/topics/ontwerp';
 const EN_DESIGN_TOPIC_PATH = '/topics/design';
 
-const seo = makeSeo({
+const seo = mockSeo({
   title: 'Engineering',
   description: DESCRIPTION,
   ogTitle: OG_TITLE,
@@ -107,7 +107,7 @@ describe('buildTopicMetadata', () => {
       okResult({
         topic: {},
         modules: [],
-        seo: makeSeo({ ogTitle: undefined }),
+        seo: mockSeo({ ogTitle: undefined }),
         translations: [],
       }),
     );

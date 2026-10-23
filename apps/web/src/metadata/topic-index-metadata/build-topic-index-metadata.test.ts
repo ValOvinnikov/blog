@@ -3,7 +3,7 @@ import { urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -35,7 +35,7 @@ const DESCRIPTION = 'Browse every post by topic.';
 const OG_DESCRIPTION = 'Browse every post by topic OG.';
 const NL_TOPICS_PATH = '/nl/topics';
 
-const seo = makeSeo({
+const seo = mockSeo({
   title: 'Topics',
   description: DESCRIPTION,
   ogTitle: 'Topics OG',

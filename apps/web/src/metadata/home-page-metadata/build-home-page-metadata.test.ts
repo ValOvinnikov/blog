@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -24,7 +24,7 @@ const homePage = (translations: string[]) =>
     hero: undefined,
     modules: [],
     faqs: [],
-    seo: makeSeo({ title: 'Home' }),
+    seo: mockSeo({ title: 'Home' }),
     translations,
   });
 

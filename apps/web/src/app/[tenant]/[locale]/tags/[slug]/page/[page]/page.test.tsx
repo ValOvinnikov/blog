@@ -7,12 +7,11 @@ import { okResult } from '@blog/utils';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
+import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import TagNumberedPage, { generateMetadata, revalidate } from './page';
-
-const TAG_DESCRIPTION = 'Posts about TypeScript.';
 
 const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
@@ -81,24 +80,7 @@ describe('TagNumberedPage', () => {
     });
 
     it('builds metadata for page 2', async () => {
-      getTagPageMock.mockResolvedValue(
-        okResult({
-          tag: {
-            id: 'tag-1',
-            title: 'TypeScript',
-            slug: 'typescript',
-            description: TAG_DESCRIPTION,
-          },
-          modules: [],
-          seo: {
-            title: 'TypeScript',
-            description: TAG_DESCRIPTION,
-            ogTitle: 'TypeScript',
-            ogDescription: TAG_DESCRIPTION,
-            ogImage: undefined,
-          },
-        }),
-      );
+      getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage()));
 
       const metadata = await generateMetadata({
         params: Promise.resolve({

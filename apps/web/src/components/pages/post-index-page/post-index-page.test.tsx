@@ -11,7 +11,7 @@ import {
 import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_TENANT_SANITY_CONTEXT,
   DEFAULT_REQUEST_CONTEXT,
@@ -55,7 +55,7 @@ const indexPage: TBlogIndexPage = {
   }),
   hero: undefined,
   modules: [],
-  seo: makeSeo(),
+  seo: mockSeo(),
   translations: [LOCALE_ISO_CODES.EN],
 };
 

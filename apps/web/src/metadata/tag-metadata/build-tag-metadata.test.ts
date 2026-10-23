@@ -3,7 +3,7 @@ import { urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
@@ -36,7 +36,7 @@ const PAGE_TWO_TITLE = 'TypeScript – Page 2';
 const NL_DESIGN_TAG_PATH = '/nl/tags/ontwerp';
 const EN_DESIGN_TAG_PATH = '/tags/design';
 
-const seo = makeSeo({
+const seo = mockSeo({
   title: 'TypeScript',
   description: DESCRIPTION,
   ogTitle: 'TypeScript',
@@ -86,7 +86,7 @@ describe('buildTagMetadata', () => {
 
   it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getTagPageMock.mockResolvedValue(
-      okResult(makeTagDetailPage({ seo: makeSeo({ ogTitle: undefined }) })),
+      okResult(makeTagDetailPage({ seo: mockSeo({ ogTitle: undefined }) })),
     );
 
     const metadata = await buildTagMetadata('typescript', 2);

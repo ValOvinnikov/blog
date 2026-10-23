@@ -5,20 +5,15 @@ import { HTTP_STATUS, LOCALE_ISO_CODES } from '@blog/config';
 import type { TFeedPost } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
-import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
+import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 const FEED_URL = 'https://example.com/rss.xml';
-const XML_CONTENT_TYPE = 'application/xml';
 const ESCAPED_POST_TITLE = 'Hello & Welcome';
 const ESCAPED_POST_EXCERPT = 'A <first> post.';
 const BASE_URL = 'https://example.com';
 const SITE_DESCRIPTION = 'A blog about things';
-const CHANNEL_TITLE_SELECTOR = 'channel > title';
-const CHANNEL_DESCRIPTION_SELECTOR = 'channel > description';
-const ITEM_LINK_SELECTOR = 'item > link';
 const SITE_TAGLINE = 'Notes · Essays';
-const CHANNEL_LANGUAGE_SELECTOR = 'channel > language';
-const CHANNEL_LINK_SELECTOR = 'channel > link';
 
 const {
   getAllPublishedPostsMock,
@@ -73,11 +68,8 @@ const getFeed = async (locale: string = EN) => {
   return GET(request, { params: paramsFor(locale) });
 };
 
-const getFeedDocument = async (locale: string = EN) =>
-  new DOMParser().parseFromString(
-    await (await getFeed(locale)).text(),
-    XML_CONTENT_TYPE,
-  );
+const getParsedFeed = async (locale: string = EN) =>
+  parseRssFeed(await (await getFeed(locale)).text());
 
 const post: TFeedPost = {
   title: ESCAPED_POST_TITLE,
@@ -116,7 +108,7 @@ describe('GET /[locale]/rss.xml', () => {
 
     it('returns a valid RSS 2.0 feed with the correct content type', async () => {
       getIndexPageMock.mockResolvedValue(
-        okResult({ seo: { description: SITE_DESCRIPTION } }),
+        okResult({ seo: mockSeo({ description: SITE_DESCRIPTION }) }),
       );
       const response = await getFeed();
       const xml = await response.text();
@@ -125,63 +117,45 @@ describe('GET /[locale]/rss.xml', () => {
         'application/rss+xml; charset=utf-8',
       );
 
-      const doc = new DOMParser().parseFromString(xml, XML_CONTENT_TYPE);
-      expect(doc.querySelector('parsererror')).toBeNull();
-      expect(doc.querySelector(CHANNEL_TITLE_SELECTOR)?.textContent).toBe(
-        'My Blog',
-      );
-      expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
-        SITE_DESCRIPTION,
-      );
-      expect(doc.querySelector('item > title')?.textContent).toBe(
-        ESCAPED_POST_TITLE,
-      );
-      expect(doc.querySelector(ITEM_LINK_SELECTOR)?.textContent).toBe(
-        'https://example.com/blog/hello-welcome',
-      );
-      expect(doc.querySelector('item > description')?.textContent).toBe(
-        ESCAPED_POST_EXCERPT,
-      );
-      expect(doc.querySelector('item > pubDate')?.textContent).toBe(
-        new Date(post.publishedAt).toUTCString(),
-      );
+      const feed = parseRssFeed(xml);
+      expect(feed.isWellFormed).toBe(true);
+      expect(feed.title).toBe('My Blog');
+      expect(feed.description).toBe(SITE_DESCRIPTION);
+      expect(feed.items).toEqual([
+        {
+          title: ESCAPED_POST_TITLE,
+          link: 'https://example.com/blog/hello-welcome',
+          description: ESCAPED_POST_EXCERPT,
+          pubDate: new Date(post.publishedAt).toUTCString(),
+        },
+      ]);
     });
 
     it('links each item to the post in the feed language', async () => {
-      const response = await getFeed(NL);
-      const doc = new DOMParser().parseFromString(
-        await response.text(),
-        XML_CONTENT_TYPE,
-      );
+      const { items } = await getParsedFeed(NL);
 
-      expect(doc.querySelector(ITEM_LINK_SELECTOR)?.textContent).toBe(
-        'https://example.com/nl/blog/hello-welcome',
-      );
+      expect(items[0]?.link).toBe('https://example.com/nl/blog/hello-welcome');
     });
   });
 
   it('falls back to a generic channel title and description when site settings fail', async () => {
     getSiteSettingsMock.mockResolvedValue(errorResult(new Error('boom')));
-    const doc = await getFeedDocument();
+    const { title, description } = await getParsedFeed();
 
-    expect(doc.querySelector(CHANNEL_TITLE_SELECTOR)?.textContent).toBe('Blog');
-    expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
-      'The latest posts.',
-    );
+    expect(title).toBe('Blog');
+    expect(description).toBe('The latest posts.');
   });
 
   it('describes the channel with the brand tagline when the index page has no description', async () => {
     getIndexPageMock.mockResolvedValue(
-      okResult({ seo: { description: undefined } }),
+      okResult({ seo: mockSeo({ description: undefined }) }),
     );
     getSiteSettingsMock.mockResolvedValue(
       okResult({ brand: { name: 'My Blog', tagline: SITE_TAGLINE } }),
     );
-    const doc = await getFeedDocument();
+    const { description } = await getParsedFeed();
 
-    expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
-      SITE_TAGLINE,
-    );
+    expect(description).toBe(SITE_TAGLINE);
   });
 
   it('describes the channel with the brand tagline when the index page fails to load', async () => {
@@ -189,46 +163,32 @@ describe('GET /[locale]/rss.xml', () => {
     getSiteSettingsMock.mockResolvedValue(
       okResult({ brand: { name: 'My Blog', tagline: SITE_TAGLINE } }),
     );
-    const doc = await getFeedDocument();
+    const { description } = await getParsedFeed();
 
-    expect(doc.querySelector(CHANNEL_DESCRIPTION_SELECTOR)?.textContent).toBe(
-      SITE_TAGLINE,
-    );
+    expect(description).toBe(SITE_TAGLINE);
   });
 
   it('carries the language, home link and self link of an unprefixed default-language feed', async () => {
-    const doc = await getFeedDocument();
+    const { language, link, selfLink } = await getParsedFeed();
 
-    expect(doc.querySelector(CHANNEL_LANGUAGE_SELECTOR)?.textContent).toBe(
-      'en',
-    );
-    expect(doc.querySelector(CHANNEL_LINK_SELECTOR)?.textContent).toBe(
-      BASE_URL,
-    );
-    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(FEED_URL);
+    expect(language).toBe('en');
+    expect(link).toBe(BASE_URL);
+    expect(selfLink).toBe(FEED_URL);
   });
 
   it('carries the language, home link and self link of a prefixed feed', async () => {
-    const doc = await getFeedDocument(NL);
+    const { language, link, selfLink } = await getParsedFeed(NL);
 
-    expect(doc.querySelector(CHANNEL_LANGUAGE_SELECTOR)?.textContent).toBe(
-      'nl',
-    );
-    expect(doc.querySelector(CHANNEL_LINK_SELECTOR)?.textContent).toBe(
-      'https://example.com/nl',
-    );
-    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(
-      'https://example.com/nl/rss.xml',
-    );
+    expect(language).toBe('nl');
+    expect(link).toBe('https://example.com/nl');
+    expect(selfLink).toBe('https://example.com/nl/rss.xml');
   });
 
   it('returns an empty feed (no items) when the posts fetch fails', async () => {
     getAllPublishedPostsMock.mockResolvedValue(errorResult(new Error('boom')));
-    const response = await getFeed();
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, XML_CONTENT_TYPE);
+    const { items } = await getParsedFeed();
 
-    expect(doc.querySelectorAll('item')).toHaveLength(0);
+    expect(items).toHaveLength(0);
   });
 
   it('forwards the tenant Sanity context in the requested language to every loader', async () => {

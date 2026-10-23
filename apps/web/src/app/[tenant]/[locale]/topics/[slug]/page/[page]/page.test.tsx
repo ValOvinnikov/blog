@@ -8,11 +8,10 @@ import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { makeTopicDetailPage } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
 import TopicNumberedPage, { generateMetadata, revalidate } from './page';
-
-const TOPIC_DESCRIPTION = 'Posts about building things.';
 
 const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
@@ -81,24 +80,7 @@ describe('TopicNumberedPage', () => {
     });
 
     it('builds metadata for page 2', async () => {
-      getTopicPageMock.mockResolvedValue(
-        okResult({
-          topic: {
-            id: 'topic-1',
-            title: 'Engineering',
-            slug: 'engineering',
-            description: TOPIC_DESCRIPTION,
-          },
-          modules: [],
-          seo: {
-            title: 'Engineering',
-            description: TOPIC_DESCRIPTION,
-            ogTitle: 'Engineering',
-            ogDescription: TOPIC_DESCRIPTION,
-            ogImage: undefined,
-          },
-        }),
-      );
+      getTopicPageMock.mockResolvedValue(okResult(makeTopicDetailPage()));
 
       const metadata = await generateMetadata({
         params: Promise.resolve({
