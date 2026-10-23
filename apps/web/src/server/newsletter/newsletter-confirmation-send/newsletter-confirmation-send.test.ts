@@ -85,7 +85,7 @@ const CONFIRM_URL = `${SITE_URL}/api/newsletter/confirm?token=${CONFIRMATION_TOK
 const UNSUBSCRIBE_URL = `${SITE_URL}/api/newsletter/unsubscribe?token=${UNSUBSCRIBE_TOKEN}`;
 
 const sentEmail = () => {
-  const [[email]] = sendEmailMock.mock.calls;
+  const [email] = sendEmailMock.mock.lastCall ?? [];
   return email;
 };
 
