@@ -40,6 +40,34 @@ test('collectLiterals skips every exempt position', () => {
   assert.deepEqual(values(source), []);
 });
 
+test('collectLiterals skips test-table titles through modifier chains, for and tagged templates', () => {
+  const source = [
+    "it.skip('title', () => {});",
+    "describe.only('title', () => {});",
+    "test.concurrent('title', () => {});",
+    "it.skip.each([[1]])('%s', () => {});",
+    "it.only.each([[1]])('%s', () => {});",
+    "describe.concurrent.each([[1]])('$name', () => {});",
+    "test.sequential.each([[1]])('%s', () => {});",
+    "it.for([[1]])('%s', () => {});",
+    "suite.skip.for([[1]])('%s', () => {});",
+    "it.each`a|b`('$a', () => {});",
+    "describe.skip.each`a|b`('$a', () => {});",
+    "it.each`\n a | b\n ${1} | ${2}\n`('$a', () => {});",
+  ].join('\n');
+  assert.deepEqual(values(source), []);
+});
+
+test('collectLiterals still collects titles of calls that are not test tables', () => {
+  const source = [
+    "other.each([[1]])('%s', () => {});",
+    "other.skip('title', () => {});",
+    "it.each([[1]]).extra('%s');",
+    "list.for`a|b`('$a');",
+  ].join('\n');
+  assert.deepEqual(values(source), ['%s', 'title', '%s', 'a|b', '$a']);
+});
+
 test('collectLiterals skips values an outside standard spells', () => {
   const source = [
     "process.env.NODE_ENV === 'production';",
