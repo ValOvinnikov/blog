@@ -114,7 +114,7 @@ describe(subscribeToNewsletterAction, () => {
   });
 
   it.each([
-    ['new', SUBSCRIBER_OUTCOME.CREATED],
+    ['brand-new', SUBSCRIBER_OUTCOME.CREATED],
     ['pending', SUBSCRIBER_OUTCOME.ALREADY_PENDING],
   ])(
     'sends a %s subscriber the confirmation and marks them subscribed',
