@@ -1,14 +1,17 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
+import {
+  MOCK_TESTIMONIAL_HEADING,
+  MOCK_TESTIMONIAL_ITEMS,
+  MOCK_TESTIMONIAL_MODULE_ID,
+  mockTestimonialItem,
+} from '@web/testing/modules/testimonial/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TestimonialModule } from './testimonial-module';
-
-const MODULE_ID = 'testimonial-1';
 
 const { getTestimonialModuleMock } = vi.hoisted(() => ({
   getTestimonialModuleMock: vi.fn(),
@@ -26,11 +29,9 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'What our customers say' }),
+  headingBlock: makeHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
@@ -39,40 +40,32 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(TestimonialModule, {
-  id: MODULE_ID,
+  id: MOCK_TESTIMONIAL_MODULE_ID,
 });
 
 describe(`<${TestimonialModule.name}/>`, () => {
   beforeEach(() => {
     getTestimonialModuleMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls getTestimonialModule with the module id and the tenant Sanity context', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
+  it('fetches the module by id with the tenant Sanity context', async () => {
     getTestimonialModuleMock.mockResolvedValue(
       okResult({
         ...baseModule,
-        testimonials: [makeTestimonialItem({ id: MODULE_ID })],
+        testimonials: [mockTestimonialItem({ id: MOCK_TESTIMONIAL_MODULE_ID })],
       }),
     );
 
     await setup();
 
-    expect(getTestimonialModuleMock).toHaveBeenCalledWith(MODULE_ID, tenant);
+    expect(getTestimonialModuleMock).toHaveBeenCalledWith(
+      MOCK_TESTIMONIAL_MODULE_ID,
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getTestimonialModuleMock.mockResolvedValue(errorResult(new Error('boom')));
+    getTestimonialModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -80,16 +73,13 @@ describe(`<${TestimonialModule.name}/>`, () => {
   });
 
   it('renders the resolved testimonials', async () => {
-    const testimonials = [
-      makeTestimonialItem({ id: MODULE_ID }),
-      makeTestimonialItem({ id: 'testimonial-2' }),
-    ];
     getTestimonialModuleMock.mockResolvedValue(
-      okResult({ ...baseModule, testimonials }),
+      okResult({ ...baseModule, testimonials: MOCK_TESTIMONIAL_ITEMS }),
     );
 
     await setup();
 
-    expect(screen.getAllByRole('blockquote')).toHaveLength(2);
+    const quotes = screen.getAllByRole('blockquote');
+    expect(quotes).toHaveLength(2);
   });
 });

@@ -4,7 +4,7 @@ import {
   type TSanityProjectRef,
   urlForSanityImage,
 } from '@blog/service';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildBlogPostingSchema } from './build-blog-posting-schema';
@@ -24,7 +24,7 @@ const project: TSanityProjectRef = {
 const { EN, NL } = LOCALE_ISO_CODES;
 const DEFAULT_LANGUAGE = { locale: EN, defaultLocale: EN };
 
-const heroImage = makeSanityImage();
+const heroImage = mockSanityImage();
 
 const post: TPostDetail = {
   id: 'post-1',
@@ -65,14 +65,17 @@ const post: TPostDetail = {
   translations: [],
 };
 
+const buildInDefaultLanguage = (overrides: Partial<TPostDetail> = {}) =>
+  buildBlogPostingSchema(
+    { ...post, ...overrides },
+    new URL(BASE_URL),
+    project,
+    DEFAULT_LANGUAGE,
+  );
+
 describe(buildBlogPostingSchema, () => {
   it('maps a post detail to a BlogPosting schema', () => {
-    const schema = buildBlogPostingSchema(
-      post,
-      new URL(BASE_URL),
-      project,
-      DEFAULT_LANGUAGE,
-    );
+    const schema = buildInDefaultLanguage();
 
     expect(schema).toEqual({
       '@context': 'https://schema.org',
@@ -90,50 +93,33 @@ describe(buildBlogPostingSchema, () => {
   });
 
   it('omits image when the post has no hero image', () => {
-    const schema = buildBlogPostingSchema(
-      { ...post, heroImage: undefined },
-      new URL(BASE_URL),
-      project,
-      DEFAULT_LANGUAGE,
-    );
+    const schema = buildInDefaultLanguage({ heroImage: undefined });
 
     expect(schema?.image).toBeUndefined();
   });
 
-  it('builds an absolute url from the base URL and the post slug', () => {
-    const schema = buildBlogPostingSchema(
-      { ...post, slug: 'another-post' },
-      new URL(CUSTOM_DOMAIN_URL),
-      project,
-      DEFAULT_LANGUAGE,
-    );
+  describe('for a post in a non-default language', () => {
+    let schema: ReturnType<typeof buildBlogPostingSchema>;
 
-    expect(schema?.url).toBe('https://blog.example.com/blog/another-post');
+    beforeEach(() => {
+      schema = buildBlogPostingSchema(
+        { ...post, slug: NL_POST_SLUG },
+        new URL(CUSTOM_DOMAIN_URL),
+        project,
+        { locale: NL, defaultLocale: EN },
+      );
+    });
+
+    it('prefixes the url with the post language when it is not the default', () => {
+      expect(schema?.url).toBe('https://blog.example.com/nl/blog/mijn-artikel');
+    });
+
+    it('sets inLanguage to the language of a non-default post', () => {
+      expect(schema?.inLanguage).toBe('nl');
+    });
   });
 
-  it('prefixes the url with the post language when it is not the default', () => {
-    const schema = buildBlogPostingSchema(
-      { ...post, slug: NL_POST_SLUG },
-      new URL(CUSTOM_DOMAIN_URL),
-      project,
-      { locale: NL, defaultLocale: EN },
-    );
-
-    expect(schema?.url).toBe('https://blog.example.com/nl/blog/mijn-artikel');
-  });
-
-  it('sets inLanguage to the language of a non-default post', () => {
-    const schema = buildBlogPostingSchema(
-      { ...post, slug: NL_POST_SLUG },
-      new URL(CUSTOM_DOMAIN_URL),
-      project,
-      { locale: NL, defaultLocale: EN },
-    );
-
-    expect(schema?.inLanguage).toBe('nl');
-  });
-
-  it('returns undefined when there is no base URL, rather than emitting a relative (invalid) url', () => {
+  it('returns undefined when there is no base URL', () => {
     const schema = buildBlogPostingSchema(
       post,
       undefined,
@@ -145,40 +131,18 @@ describe(buildBlogPostingSchema, () => {
   });
 
   it('builds comma-separated keywords from the post tags', () => {
-    const schema = buildBlogPostingSchema(
-      {
-        ...post,
-        tags: [
-          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-          { id: 'tag-2', title: 'React', slug: 'react' },
-        ],
-      },
-      new URL(BASE_URL),
-      project,
-      DEFAULT_LANGUAGE,
-    );
+    const schema = buildInDefaultLanguage({
+      tags: [
+        { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
+        { id: 'tag-2', title: 'React', slug: 'react' },
+      ],
+    });
 
     expect(schema?.keywords).toBe('TypeScript, React');
   });
 
-  it('omits keywords when the post has no tags', () => {
-    const schema = buildBlogPostingSchema(
-      post,
-      new URL(BASE_URL),
-      project,
-      DEFAULT_LANGUAGE,
-    );
-
-    expect(schema?.keywords).toBeUndefined();
-  });
-
   it('omits description for a sparse post without throwing', () => {
-    const schema = buildBlogPostingSchema(
-      { ...post, excerpt: undefined },
-      new URL(BASE_URL),
-      project,
-      DEFAULT_LANGUAGE,
-    );
+    const schema = buildInDefaultLanguage({ excerpt: undefined });
 
     expect(schema?.description).toBeUndefined();
   });

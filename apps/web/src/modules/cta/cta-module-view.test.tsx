@@ -1,17 +1,24 @@
 import { customRender, screen } from '@web/testing/custom-render';
 import {
-  ctaActionsDemo,
-  ctaContentDemo,
-  makeCtaModuleData,
+  MOCK_CTA_ACTIONS,
+  MOCK_CTA_CONTENT,
+  MOCK_CTA_MODULE_ID,
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION,
+  mockCtaModuleData,
 } from '@web/testing/modules/cta/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
 vi.mock('@web/i18n/navigation');
 
+const {
+  headingBlock: { heading: CTA_HEADING },
+} = mockCtaModuleData();
+
 const setup = customRender(CtaModuleView, {
-  id: 'cta-1',
-  ...makeCtaModuleData(),
+  id: MOCK_CTA_MODULE_ID,
+  ...mockCtaModuleData(),
 });
 
 describe(`<${CtaModuleView.name}/>`, () => {
@@ -21,11 +28,13 @@ describe(`<${CtaModuleView.name}/>`, () => {
     });
 
     it('labels the section by its heading', () => {
-      expect(screen.getByRole('region', { name: 'Get started' })).toBeVisible();
+      const region = screen.getByRole('region', { name: CTA_HEADING });
+      expect(region).toBeVisible();
     });
 
     it('renders no image when none is authored', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      const image = screen.queryByRole('img');
+      expect(image).not.toBeInTheDocument();
     });
   });
 
@@ -36,34 +45,36 @@ describe(`<${CtaModuleView.name}/>`, () => {
     const headingIds = screen
       .getAllByRole('heading', {
         level: 2,
-        name: 'Get started',
+        name: CTA_HEADING,
       })
       .map(({ id }) => id);
+    const regions = screen.getAllByRole('region', { name: CTA_HEADING });
     expect(new Set(headingIds).size).toBe(2);
-    expect(screen.getAllByRole('region', { name: 'Get started' })).toHaveLength(
-      2,
-    );
+    expect(regions).toHaveLength(2);
   });
 
-  it('renders the authored ctaButtons as links, in order', () => {
-    setup({ ctaButtons: ctaActionsDemo });
+  it('renders the authored actions as links, in order', () => {
+    setup({ ctaButtons: MOCK_CTA_ACTIONS });
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(2);
-    expect(links[0]).toHaveTextContent('Subscribe now');
-    expect(links[1]).toHaveTextContent('Learn more');
+    expect(links[0]).toHaveTextContent(MOCK_CTA_PRIMARY_ACTION.link.label);
+    expect(links[1]).toHaveTextContent(MOCK_CTA_SECONDARY_ACTION.link.label);
   });
 
-  it('renders no buttons when ctaButtons is empty', () => {
+  it('renders no actions when none are authored', () => {
     setup({ ctaButtons: [] });
 
-    expect(screen.queryAllByRole('link')).toHaveLength(0);
+    const links = screen.queryAllByRole('link');
+    expect(links).toHaveLength(0);
   });
 
-  it('renders the optional content field via PortableText', () => {
-    setup({ content: ctaContentDemo });
+  it('renders the optional rich-text content', () => {
+    setup({ content: MOCK_CTA_CONTENT });
 
-    expect(screen.getByText('14-day trial')).toBeVisible();
-    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+    const trialText = screen.getByText('14-day trial');
+    const listItems = screen.getAllByRole('listitem');
+    expect(trialText).toBeVisible();
+    expect(listItems).toHaveLength(2);
   });
 });

@@ -5,11 +5,14 @@ import {
   DISPLAY_MODE,
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
+import {
+  MOCK_FEATURE_LIST_HEADING,
+  MOCK_FEATURE_LIST_ITEMS,
+} from '@web/testing/modules/feature-list/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureListModule } from './feature-list-module';
 
@@ -31,11 +34,9 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Why choose us' }),
+  headingBlock: makeHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
   ctaButtons: [],
   imageShape: CARD_IMAGE_SHAPE.WIDE,
   displayMode: DISPLAY_MODE.GRID,
@@ -51,52 +52,35 @@ const setup = customRenderAsync(FeatureListModule, {
 describe(`<${FeatureListModule.name}/>`, () => {
   beforeEach(() => {
     getFeatureListMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls getFeatureList with the module id and the tenant Sanity context', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
+  describe('when the module resolves', () => {
+    beforeEach(async () => {
+      getFeatureListMock.mockResolvedValue(
+        okResult({ ...baseModule, items: MOCK_FEATURE_LIST_ITEMS }),
+      );
+
+      await setup();
     });
-    getFeatureListMock.mockResolvedValue(
-      okResult({
-        ...baseModule,
-        items: [
-          makeFeatureListItem({ id: 'feature-1' }),
-          makeFeatureListItem({ id: 'feature-2' }),
-        ],
-      }),
-    );
 
-    await setup();
+    it('fetches the module by id with the tenant Sanity context', () => {
+      expect(getFeatureListMock).toHaveBeenCalledWith(
+        MODULE_ID,
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
 
-    expect(getFeatureListMock).toHaveBeenCalledWith(MODULE_ID, tenant);
+    it('renders the resolved feature cards', () => {
+      const articles = screen.getAllByRole('article');
+      expect(articles).toHaveLength(2);
+    });
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getFeatureListMock.mockResolvedValue(errorResult(new Error('boom')));
+    getFeatureListMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders the resolved feature cards', async () => {
-    const items = [
-      makeFeatureListItem({ id: 'feature-1' }),
-      makeFeatureListItem({ id: 'feature-2' }),
-    ];
-    getFeatureListMock.mockResolvedValue(okResult({ ...baseModule, items }));
-
-    await setup();
-
-    expect(screen.getAllByRole('article')).toHaveLength(2);
   });
 });

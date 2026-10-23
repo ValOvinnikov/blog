@@ -1,11 +1,11 @@
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeSectionPagesModule } from '@web/testing/modules/section-pages/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+  MOCK_SECTION_PAGE_TITLE,
+  mockSectionPagesModule,
+} from '@web/testing/modules/section-pages/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SectionPagesModule } from './section-pages-module';
@@ -28,7 +28,6 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerWarnMock = vi.mocked(logger.warn);
 const loggerErrorMock = vi.mocked(logger.error);
 
@@ -43,12 +42,8 @@ describe(`<${SectionPagesModule.name}/>`, () => {
   beforeEach(() => {
     getSectionPagesModuleMock.mockReset();
     getSectionPagesModuleMock.mockResolvedValue(
-      okResult(makeSectionPagesModule()),
+      okResult(mockSectionPagesModule()),
     );
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    loggerWarnMock.mockReset();
-    loggerErrorMock.mockReset();
   });
 
   describe('with the landing page context', () => {
@@ -66,16 +61,14 @@ describe(`<${SectionPagesModule.name}/>`, () => {
     });
 
     it('renders a card per section page linking to its full path', async () => {
-      expect(screen.getByRole('link', { name: 'FAQ' })).toHaveAttribute(
-        'href',
-        '/modules/faq',
-      );
+      const link = screen.getByRole('link', { name: MOCK_SECTION_PAGE_TITLE });
+      expect(link).toHaveAttribute('href', '/modules/faq');
     });
   });
 
   it('renders nothing when the page has no children', async () => {
     getSectionPagesModuleMock.mockResolvedValue(
-      okResult(makeSectionPagesModule({ pages: [] })),
+      okResult(mockSectionPagesModule({ pages: [] })),
     );
 
     const { container } = await setup();
@@ -84,7 +77,7 @@ describe(`<${SectionPagesModule.name}/>`, () => {
   });
 
   it('renders nothing and logs an error when the fetch fails', async () => {
-    getSectionPagesModuleMock.mockResolvedValue(errorResult(new Error('boom')));
+    getSectionPagesModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 

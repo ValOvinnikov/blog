@@ -1,23 +1,21 @@
-import type { ILink } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import {
+  MOCK_LOGO_LINK,
+  mockLogoItem,
+} from '@web/testing/modules/logo-wall/fixtures';
 
 import { LogoWallTile } from './logo-wall-tile';
 
 vi.mock('@web/i18n/navigation');
 
-const item = makeLogoItem();
+const LINK_ARIA_LABEL = 'Visit the Acme Corp website';
+const LOGO_TEST_ID = 'logo-wall-tile-logo';
+const LOGO_ASPECT_PROPERTY = '--logo-aspect';
 
-const link: ILink = {
-  label: 'Visit Acme Corp',
-  href: 'https://acme.example.com',
-  target: undefined,
-  platform: undefined,
-  ariaLabel: undefined,
-};
+const item = mockLogoItem();
 
-const darkImage = makeSanityImage({
+const darkImage = mockSanityImage({
   assetId: 'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
   alt: item.name,
 });
@@ -31,112 +29,90 @@ describe(`<${LogoWallTile.name}/>`, () => {
     });
 
     it('renders the logo image with the company name as its alt', () => {
-      expect(screen.getByRole('img', { name: item.name })).toBeVisible();
+      const logoImage = screen.getByRole('img', { name: item.name });
+      expect(logoImage).toBeVisible();
     });
 
     it('renders no link when the item has none', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      const link = screen.queryByRole('link');
+      expect(link).not.toBeInTheDocument();
     });
   });
 
-  it('names the link by the company when the item link has no ariaLabel', () => {
-    setup({ logo: makeLogoItem({ link }) });
-
-    expect(screen.getByRole('link', { name: item.name })).toHaveAttribute(
-      'href',
-      'https://acme.example.com',
-    );
-  });
-
-  it('exposes the link under its ariaLabel override when the item link sets one', () => {
+  it('names the link by its aria label override when one is set', () => {
     setup({
-      logo: makeLogoItem({
-        link: { ...link, ariaLabel: 'Visit the Acme Corp website' },
+      logo: mockLogoItem({
+        link: { ...MOCK_LOGO_LINK, ariaLabel: LINK_ARIA_LABEL },
       }),
     });
 
-    expect(
-      screen.getByRole('link', { name: 'Visit the Acme Corp website' }),
-    ).toHaveAttribute('href', 'https://acme.example.com');
+    const link = screen.getByRole('link', {
+      name: LINK_ARIA_LABEL,
+    });
+    expect(link).toHaveAttribute('href', MOCK_LOGO_LINK.href);
   });
 
-  it('renders the logo as decorative when the item has a link', () => {
-    setup({ logo: makeLogoItem({ link }) });
+  describe('with a linked logo', () => {
+    beforeEach(() => {
+      setup({ logo: mockLogoItem({ link: MOCK_LOGO_LINK }) });
+    });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    it('names the link by the company when it has no aria label override', () => {
+      const link = screen.getByRole('link', { name: item.name });
+      expect(link).toHaveAttribute('href', MOCK_LOGO_LINK.href);
+    });
+
+    it('renders the logo as decorative when the item has a link', () => {
+      const logoImage = screen.queryByRole('img');
+      expect(logoImage).not.toBeInTheDocument();
+    });
   });
 
   it('pins the logo to the asset aspect ratio', () => {
     setup({
-      logo: makeLogoItem({
-        image: makeSanityImage({
+      logo: mockLogoItem({
+        image: mockSanityImage({
           dimensions: { width: 2400, height: 1260, aspectRatio: 2400 / 1260 },
         }),
       }),
     });
 
-    expect(
-      screen
-        .getByTestId('logo-wall-tile-logo')
-        .style.getPropertyValue('--logo-aspect'),
-    ).toBe(String(2400 / 1260));
+    const logo = screen.getByTestId(LOGO_TEST_ID);
+    expect(logo.style.getPropertyValue(LOGO_ASPECT_PROPERTY)).toBe(
+      String(2400 / 1260),
+    );
   });
 
-  it('falls back to the contained layout when the asset has no dimensions', () => {
-    setup({
-      logo: makeLogoItem({
-        image: makeSanityImage({ dimensions: undefined }),
-      }),
-    });
+  it.each([
+    ['the asset has no dimensions', undefined],
+    [
+      'the aspect ratio is not positive',
+      { width: 0, height: 0, aspectRatio: 0 },
+    ],
+    [
+      'the asset aspect ratio is not finite',
+      { width: Infinity, height: 0, aspectRatio: Infinity },
+    ],
+  ])('falls back to the contained layout when %s', (_, dimensions) => {
+    setup({ logo: mockLogoItem({ image: mockSanityImage({ dimensions }) }) });
 
-    expect(
-      screen
-        .getByTestId('logo-wall-tile-logo')
-        .style.getPropertyValue('--logo-aspect'),
-    ).toBe('');
+    const logo = screen.getByTestId(LOGO_TEST_ID);
+    expect(logo.style.getPropertyValue(LOGO_ASPECT_PROPERTY)).toBe('');
   });
 
-  it('falls back to the contained layout when the aspect ratio is not positive', () => {
-    setup({
-      logo: makeLogoItem({
-        image: makeSanityImage({
-          dimensions: { width: 0, height: 0, aspectRatio: 0 },
-        }),
-      }),
-    });
+  it('renders the dark-background logo beside the regular one when set', () => {
+    setup({ logo: mockLogoItem({ imageDark: darkImage }) });
 
-    expect(
-      screen
-        .getByTestId('logo-wall-tile-logo')
-        .style.getPropertyValue('--logo-aspect'),
-    ).toBe('');
-  });
-
-  it('falls back to the contained layout when the asset aspect ratio is not finite', () => {
-    setup({
-      logo: makeLogoItem({
-        image: makeSanityImage({
-          dimensions: { width: Infinity, height: 0, aspectRatio: Infinity },
-        }),
-      }),
-    });
-
-    expect(
-      screen
-        .getByTestId('logo-wall-tile-logo')
-        .style.getPropertyValue('--logo-aspect'),
-    ).toBe('');
-  });
-
-  it('renders the dark-background logo alongside the regular one when the item has one', () => {
-    setup({ logo: makeLogoItem({ imageDark: darkImage }) });
-
-    expect(screen.getAllByRole('img', { name: item.name })).toHaveLength(2);
+    const logoImages = screen.getAllByRole('img', { name: item.name });
+    expect(logoImages).toHaveLength(2);
   });
 
   it('renders one link for a linked item with a dark-background logo', () => {
-    setup({ logo: makeLogoItem({ imageDark: darkImage, link }) });
+    setup({
+      logo: mockLogoItem({ imageDark: darkImage, link: MOCK_LOGO_LINK }),
+    });
 
-    expect(screen.getAllByRole('link')).toHaveLength(1);
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(1);
   });
 });

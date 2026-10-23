@@ -3,7 +3,7 @@ import type { TNewsletterModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-export const makeNewsletterModule = (
+export const mockNewsletterModule = (
   overrides: Partial<TNewsletterModule> = {},
 ): TNewsletterModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -18,3 +18,5 @@ export const makeNewsletterModule = (
   contentAlignment: undefined,
   ...overrides,
 });
+
+export const MOCK_NEWSLETTER_MODULE_ID = faker.string.uuid();

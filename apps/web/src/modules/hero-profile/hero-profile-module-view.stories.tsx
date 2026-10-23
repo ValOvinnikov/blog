@@ -1,7 +1,12 @@
-import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  HERO_VARIANT,
+  PORTABLE_TEXT_BLOCK_TYPE,
+  SOCIAL_PLATFORMS,
+} from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   portableTextBlock,
@@ -23,7 +28,7 @@ const bioDemo = [
     {
       markDefs: [
         {
-          _type: 'linkRef',
+          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
           _key: 'link-1',
           link: { href: 'https://example.com', target: undefined },
         },
@@ -80,10 +85,10 @@ const meta = {
         'I design and build products for teams who care about craft.',
     }),
     avatarName: 'Jane Cooper',
-    sanityImage: makeSanityImage(),
+    sanityImage: mockSanityImage(),
     bio: bioDemo,
     socialLinks,
-    ctaButtons: ctaActionsDemo.slice(0, 1),
+    ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
     contentPosition: undefined,
     contentAlignment: undefined,
     mediaOrder: undefined,
@@ -118,7 +123,7 @@ export const SplitNoPhoto: TStory = {
 export const Banner: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
-    ctaButtons: ctaActionsDemo,
+    ctaButtons: MOCK_CTA_ACTIONS,
   },
 };
 

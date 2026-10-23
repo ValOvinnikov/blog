@@ -1,14 +1,14 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, MEDIA_ORDER } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { FeatureHighlightsModuleView } from './feature-highlights-module-view';
 
 const highlights = [
-  makeFeatureHighlightItem({
+  mockFeatureHighlightItem({
     id: 'highlight-1',
     heading: 'Ship faster',
     body: [
@@ -17,12 +17,12 @@ const highlights = [
       ),
     ],
     action: {
-      variant: ctaActionsDemo[0]!.variant,
-      appearance: ctaActionsDemo[0]!.appearance,
-      link: { ...ctaActionsDemo[0]!.link, label: 'Learn more' },
+      variant: MOCK_CTA_ACTIONS[0]!.variant,
+      appearance: MOCK_CTA_ACTIONS[0]!.appearance,
+      link: { ...MOCK_CTA_ACTIONS[0]!.link, label: 'Learn more' },
     },
   }),
-  makeFeatureHighlightItem({
+  mockFeatureHighlightItem({
     id: 'highlight-2',
     heading: 'Built for scale',
     body: [portableTextBlock('Multi-tenant from the ground up.')],
@@ -32,25 +32,25 @@ const highlights = [
 
 const sixHighlights = [
   ...highlights,
-  makeFeatureHighlightItem({
+  mockFeatureHighlightItem({
     id: 'highlight-3',
     heading: 'Secure by default',
     body: [portableTextBlock('Every tenant is isolated at the data layer.')],
     action: undefined,
   }),
-  makeFeatureHighlightItem({
+  mockFeatureHighlightItem({
     id: 'highlight-4',
     heading: 'Observable in production',
     body: [portableTextBlock('Structured logs, from day one.')],
     action: undefined,
   }),
-  makeFeatureHighlightItem({
+  mockFeatureHighlightItem({
     id: 'highlight-5',
     heading: 'Composable content',
     body: [portableTextBlock('A page-builder for every landing page.')],
     action: undefined,
   }),
-  makeFeatureHighlightItem({
+  mockFeatureHighlightItem({
     id: 'highlight-6',
     heading: 'Accessible by construction',
     body: [portableTextBlock('Semantic HTML and real focus states.')],
@@ -104,7 +104,7 @@ export const SixRows: TStory = {
 };
 
 export const WithModuleActions: TStory = {
-  args: { ctaButtons: ctaActionsDemo },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const CenterAligned: TStory = {

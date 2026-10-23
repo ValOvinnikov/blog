@@ -1,8 +1,9 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
@@ -25,7 +26,7 @@ vi.mock(
 
 vi.mock('@web/server/request-context/request-context');
 
-const ogImage = makeSanityImage();
+const ogImage = mockSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   ogImage,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -43,25 +44,30 @@ const seo = mockSeo({
   ogImage,
 });
 
-describe('buildTopicIndexMetadata', () => {
+const resolveIndexPageWith = (
+  translations: TLocaleIsoCode[] = [LOCALE_ISO_CODES.EN],
+) =>
+  getTopicIndexPageMock.mockResolvedValue(
+    okResult({
+      headingBlock: { heading: 'Topics' },
+      seo,
+      modules: [],
+      translations,
+    }),
+  );
+
+describe(buildTopicIndexMetadata, () => {
   beforeEach(() => {
     getTopicIndexPageMock.mockReset();
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    vi.mocked(getRequestContext).mockReset();
   });
 
   describe('when the index page resolves', () => {
     beforeEach(() => {
-      getTopicIndexPageMock.mockResolvedValue(
-        okResult({
-          headingBlock: { heading: 'Topics' },
-          seo,
-          modules: [],
-          translations: [LOCALE_ISO_CODES.EN],
-        }),
-      );
+      resolveIndexPageWith();
     });
 
-    it('reads the page through getTopicIndexPage, the loader TopicIndexPage reads', async () => {
+    it('reads the same index page the topic index renders', async () => {
       await buildTopicIndexMetadata();
 
       expect(getTopicIndexPageMock).toHaveBeenCalledWith();
@@ -83,18 +89,18 @@ describe('buildTopicIndexMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the index page fetch fails', async () => {
-      getTopicIndexPageMock.mockResolvedValue(errorResult(new Error('boom')));
+      getTopicIndexPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       const metadata = await buildTopicIndexMetadata();
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'topic_index_metadata.fetch_failed',
-        expect.objectContaining({ error: expect.any(Error) }),
+        { error: MOCK_ERROR },
       );
     });
 
-    it('returns empty metadata without logging when the index page simply does not exist', async () => {
+    it('returns empty metadata without logging when there is no index page', async () => {
       getTopicIndexPageMock.mockResolvedValue(okResult());
 
       const metadata = await buildTopicIndexMetadata();
@@ -104,7 +110,7 @@ describe('buildTopicIndexMetadata', () => {
     });
   });
 
-  it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {
+  it('lists each live translated language as hreflang, canonical to its prefix', async () => {
     const { EN, NL, DE } = LOCALE_ISO_CODES;
     const translations = [EN, NL, DE];
     vi.mocked(getRequestContext).mockResolvedValue({
@@ -112,14 +118,7 @@ describe('buildTopicIndexMetadata', () => {
       locale: NL,
       liveLocales: [EN, NL],
     });
-    getTopicIndexPageMock.mockResolvedValue(
-      okResult({
-        headingBlock: { heading: 'Topics' },
-        seo,
-        modules: [],
-        translations,
-      }),
-    );
+    resolveIndexPageWith(translations);
 
     const metadata = await buildTopicIndexMetadata();
 

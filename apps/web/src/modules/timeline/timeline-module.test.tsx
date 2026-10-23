@@ -5,11 +5,14 @@ import {
   TIMELINE_ORIENTATION,
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeTimelineItem } from '@web/testing/modules/timeline/fixtures';
+import {
+  MOCK_TIMELINE_HEADING,
+  mockTimelineItem,
+} from '@web/testing/modules/timeline/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TimelineModule } from './timeline-module';
 
@@ -31,11 +34,9 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'How we work' }),
+  headingBlock: makeHeadingBlock({ heading: MOCK_TIMELINE_HEADING }),
   markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
   orientation: TIMELINE_ORIENTATION.VERTICAL,
   itemAlignment: CONTENT_ALIGNMENT.LEFT,
@@ -51,31 +52,23 @@ const setup = customRenderAsync(TimelineModule, {
 describe(`<${TimelineModule.name}/>`, () => {
   beforeEach(() => {
     getTimelineModuleMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls getTimelineModule with the module id and tenant context', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
+  it('fetches the module with the tenant Sanity context', async () => {
     getTimelineModuleMock.mockResolvedValue(
       okResult({ ...baseModule, items: [] }),
     );
 
     await setup();
 
-    expect(getTimelineModuleMock).toHaveBeenCalledWith(MODULE_ID, tenant);
+    expect(getTimelineModuleMock).toHaveBeenCalledWith(
+      MODULE_ID,
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getTimelineModuleMock.mockResolvedValue(errorResult(new Error('boom')));
+    getTimelineModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -87,15 +80,17 @@ describe(`<${TimelineModule.name}/>`, () => {
       okResult({
         ...baseModule,
         items: [
-          makeTimelineItem({ id: 'a', heading: 'Kick-off' }),
-          makeTimelineItem({ id: 'b', heading: 'Delivery' }),
+          mockTimelineItem({ id: 'a', heading: 'Kick-off' }),
+          mockTimelineItem({ id: 'b', heading: 'Delivery' }),
         ],
       }),
     );
 
     await setup();
 
-    expect(screen.getByRole('heading', { name: 'Kick-off' })).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Delivery' })).toBeVisible();
+    const firstHeading = screen.getByRole('heading', { name: 'Kick-off' });
+    const secondHeading = screen.getByRole('heading', { name: 'Delivery' });
+    expect(firstHeading).toBeVisible();
+    expect(secondHeading).toBeVisible();
   });
 });

@@ -2,7 +2,8 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { type TPostDetail, urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
@@ -22,7 +23,7 @@ vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const ogImage = makeSanityImage();
+const ogImage = mockSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   ogImage,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -77,9 +78,10 @@ const basePost: TPostDetail = {
   translations: [],
 };
 
-describe('buildPostMetadata', () => {
+describe(buildPostMetadata, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
+    vi.mocked(getRequestContext).mockReset();
   });
 
   describe('when the post resolves', () => {
@@ -87,13 +89,13 @@ describe('buildPostMetadata', () => {
       getPostPageMock.mockResolvedValue(okResult(basePost));
     });
 
-    it('forwards the slug to getPostPage, the loader BlogPostPage reads', async () => {
+    it('reads the same post the post page renders', async () => {
       await buildPostMetadata(SLUG);
 
       expect(getPostPageMock).toHaveBeenCalledWith(SLUG);
     });
 
-    it('passes the already-resolved seo through to toMetadata', async () => {
+    it('builds the metadata from the resolved seo', async () => {
       const metadata = await buildPostMetadata(SLUG);
 
       expect(metadata.title).toBe(TITLE);
@@ -106,7 +108,7 @@ describe('buildPostMetadata', () => {
       ]);
     });
 
-    it('sets openGraph.publishedTime from post.publishedAt', async () => {
+    it('sets the OG published time from the publish date', async () => {
       const metadata = await buildPostMetadata(SLUG);
 
       expect(
@@ -114,7 +116,7 @@ describe('buildPostMetadata', () => {
       ).toBe(PUBLISHED_AT);
     });
 
-    it('sets openGraph.authors from post.author.name', async () => {
+    it('sets the OG authors from the author name', async () => {
       const metadata = await buildPostMetadata(SLUG);
 
       expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
@@ -124,7 +126,7 @@ describe('buildPostMetadata', () => {
   });
 
   describe('when no metadata can be built', () => {
-    it('returns empty metadata without logging when no page_post matches the slug', async () => {
+    it('returns empty metadata without logging when no post matches', async () => {
       getPostPageMock.mockResolvedValue(okResult());
 
       const metadata = await buildPostMetadata('missing');
@@ -134,52 +136,47 @@ describe('buildPostMetadata', () => {
     });
 
     it('returns empty metadata when the post fetch fails', async () => {
-      getPostPageMock.mockResolvedValue(errorResult(new Error('boom')));
+      getPostPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       const metadata = await buildPostMetadata(SLUG);
 
       expect(metadata).toEqual({});
     });
   });
-});
 
-describe('buildPostMetadata per language', () => {
-  const { EN, NL, DE } = LOCALE_ISO_CODES;
+  describe('for a Dutch-language request', () => {
+    const { EN, NL, DE } = LOCALE_ISO_CODES;
 
-  beforeEach(() => {
-    getPostPageMock.mockReset();
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
+    beforeEach(() => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        locale: NL,
+        liveLocales: [EN, NL],
+      });
+      getPostPageMock.mockResolvedValue(
+        okResult({
+          ...basePost,
+          slug: NL_SLUG,
+          translations: [
+            { language: EN, slug: 'my-article' },
+            { language: NL, slug: NL_SLUG },
+            { language: DE, slug: 'mein-artikel' },
+          ],
+        }),
+      );
     });
-    getPostPageMock.mockResolvedValue(
-      okResult({
-        ...basePost,
-        slug: NL_SLUG,
-        translations: [
-          { language: EN, slug: 'my-article' },
-          { language: NL, slug: NL_SLUG },
-          { language: DE, slug: 'mein-artikel' },
-        ],
-      }),
-    );
-  });
 
-  afterEach(() => {
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-  });
+    it('lists each live translation as hreflang, canonical to its prefix', async () => {
+      const metadata = await buildPostMetadata(NL_SLUG);
 
-  it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
-    const metadata = await buildPostMetadata(NL_SLUG);
-
-    expect(metadata.alternates).toMatchObject({
-      canonical: NL_POST_PATH,
-      languages: {
-        en: EN_POST_PATH,
-        nl: NL_POST_PATH,
-        'x-default': EN_POST_PATH,
-      },
+      expect(metadata.alternates).toMatchObject({
+        canonical: NL_POST_PATH,
+        languages: {
+          en: EN_POST_PATH,
+          nl: NL_POST_PATH,
+          'x-default': EN_POST_PATH,
+        },
+      });
     });
   });
 });

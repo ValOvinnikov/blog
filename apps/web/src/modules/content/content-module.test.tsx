@@ -1,10 +1,11 @@
 import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
-import { customRenderAsync, within } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { MOCK_CONTENT_MODULE_ID } from '@web/testing/modules/content/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModule } from './content-module';
 
@@ -24,44 +25,31 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const setup = customRenderAsync(ContentModule, {
-  id: 'content-1',
+  id: MOCK_CONTENT_MODULE_ID,
 });
+
+const mockContentResult = (body: TPortableTextBody = []) =>
+  okResult({ brandVariant: BRAND_VARIANT.PRIMARY, body, layout: undefined });
 
 describe(`<${ContentModule.name}/>`, () => {
   beforeEach(() => {
     getContentMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('forwards the resolved tenant Sanity context to getContent', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
-    getContentMock.mockResolvedValue(
-      okResult({
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        body: [],
-        layout: undefined,
-      }),
-    );
+  it('fetches the module with the resolved tenant Sanity context', async () => {
+    getContentMock.mockResolvedValue(mockContentResult());
 
     await setup();
 
-    expect(getContentMock).toHaveBeenCalledWith('content-1', tenant);
+    expect(getContentMock).toHaveBeenCalledWith(
+      MOCK_CONTENT_MODULE_ID,
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getContentMock.mockResolvedValue(errorResult(new Error('boom')));
+    getContentMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -74,21 +62,14 @@ describe(`<${ContentModule.name}/>`, () => {
         _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
         _key: 'image-1',
         layout: undefined,
-        image: makeSanityImage({ alt: IMAGE_ALT }),
+        image: mockSanityImage({ alt: IMAGE_ALT }),
       },
     ];
 
-    getContentMock.mockResolvedValue(
-      okResult({
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        body,
-        layout: undefined,
-      }),
-    );
-    const { container } = await setup();
-    const img = within(container).getByRole('img', {
-      name: IMAGE_ALT,
-    });
-    expect(img.getAttribute('src')).toContain('cdn.sanity.io');
+    getContentMock.mockResolvedValue(mockContentResult(body));
+    await setup();
+
+    const image = screen.getByRole('img', { name: IMAGE_ALT });
+    expect(image.getAttribute('src')).toContain('cdn.sanity.io');
   });
 });

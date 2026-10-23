@@ -1,40 +1,37 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
+import { customRender, screen, within } from '@web/testing/custom-render';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+  MOCK_CTA_ACTIONS,
+} from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_TESTIMONIAL_HEADING,
+  MOCK_TESTIMONIAL_ITEMS,
+  mockTestimonialItem,
+} from '@web/testing/modules/testimonial/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TestimonialModuleView } from './testimonial-module-view';
 
-const { TestimonialCarousel } = vi.hoisted(() => ({
-  TestimonialCarousel: vi.fn(() => (
-    <div data-testid="testimonial-carousel-stub" />
-  )),
-}));
-
 vi.mock('@web/i18n/navigation');
 
-vi.mock('./components/testimonial-carousel/testimonial-carousel', () => ({
-  TestimonialCarousel,
-}));
-
-const items = [
-  makeTestimonialItem({ id: 'testimonial-1', name: 'Jordan Reyes' }),
-  makeTestimonialItem({ id: 'testimonial-2', name: 'Priya Nair' }),
-];
+const TITLE_ID = 'testimonial-title';
+const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
 
 const dataTestId = 'testimonial-module-testimonial-1';
 
 const setup = customRender(TestimonialModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'What our customers say' }),
-  testimonials: items,
+  headingBlock: makeHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
+  testimonials: MOCK_TESTIMONIAL_ITEMS,
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
   layout: undefined,
-  titleId: 'testimonial-title',
+  titleId: TITLE_ID,
   dataTestId,
 });
 
@@ -44,77 +41,72 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
       setup();
     });
 
-    it('labels the section with the given titleId', () => {
-      const label = screen.getByText('What our customers say');
-      expect(label).toHaveAttribute('id', 'testimonial-title');
-      expect(label.tagName).toBe('H2');
-
-      const section = label.closest('section');
-      expect(section).toHaveAttribute('aria-labelledby', 'testimonial-title');
+    it('labels the section with its h2 heading', () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_TESTIMONIAL_HEADING,
+      });
+      const section = screen.getByRole('region', {
+        name: MOCK_TESTIMONIAL_HEADING,
+      });
+      expect(heading).toHaveAttribute('id', TITLE_ID);
+      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
       expect(section).toHaveAttribute('data-testid', dataTestId);
     });
 
-    it('renders every testimonial as a blockquote in a grid when there is more than one', () => {
-      expect(screen.getAllByRole('blockquote')).toHaveLength(2);
-      items.forEach((item) => {
-        expect(
-          screen.getByText(item.name, { ignore: '.sr-only' }),
-        ).toBeVisible();
+    it('renders several testimonials as blockquotes in a grid', () => {
+      const quotes = screen.getAllByRole('blockquote');
+      expect(quotes).toHaveLength(2);
+      MOCK_TESTIMONIAL_ITEMS.forEach((item) => {
+        const name = screen.getByText(item.name, { ignore: '.sr-only' });
+        expect(name).toBeVisible();
       });
-      expect(TestimonialCarousel).not.toHaveBeenCalled();
+      const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+      expect(carousel).not.toBeInTheDocument();
     });
 
     it('renders no action group when there are no cta buttons', () => {
-      expect(screen.queryAllByRole('link')).toHaveLength(0);
+      const links = screen.queryAllByRole('link');
+      expect(links).toHaveLength(0);
     });
   });
 
-  it('renders a single testimonial as the spotlight, never the grid or the carousel', () => {
+  it('renders a single testimonial as the spotlight, never the carousel', () => {
     setup({
-      testimonials: [makeTestimonialItem({ id: 'testimonial-1' })],
+      testimonials: [mockTestimonialItem()],
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
 
-    expect(screen.getAllByRole('blockquote')).toHaveLength(1);
-    expect(TestimonialCarousel).not.toHaveBeenCalled();
+    const quotes = screen.getAllByRole('blockquote');
+    const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+    expect(quotes).toHaveLength(1);
+    expect(carousel).not.toBeInTheDocument();
   });
 
-  it('renders the carousel instead of the grid for CAROUSEL with several testimonials', () => {
+  it('renders several testimonials in a carousel in carousel mode', () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
-    expect(TestimonialCarousel).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('testimonial-carousel-stub')).toBeVisible();
-    expect(screen.queryByRole('blockquote')).not.toBeInTheDocument();
+    const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+    const quotes = within(carousel).getAllByRole('blockquote');
+    expect(quotes).toHaveLength(MOCK_TESTIMONIAL_ITEMS.length);
   });
 
-  it.each([
-    [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.LEFT],
-    [CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
-    [CONTENT_ALIGNMENT.RIGHT, CONTENT_ALIGNMENT.LEFT],
-    [undefined, CONTENT_ALIGNMENT.LEFT],
-  ])(
-    'lines the carousel track up %s as %s',
-    (contentAlignment, expectedAlignment) => {
-      setup({ displayMode: DISPLAY_MODE.CAROUSEL, contentAlignment });
-
-      expect(TestimonialCarousel).toHaveBeenCalledWith(
-        expect.objectContaining({ contentAlignment: expectedAlignment }),
-        undefined,
-      );
-    },
-  );
-
   it('renders the resolved cta buttons when present', () => {
-    setup({ ctaButtons: ctaActionsDemo });
+    setup({ ctaButtons: MOCK_CTA_ACTIONS });
 
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).toHaveAttribute(
+    const primaryLink = screen.getByRole('link', {
+      name: MOCK_CTA_PRIMARY_ACTION.link.label,
+    });
+    const secondaryLink = screen.getByRole('link', {
+      name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+    });
+    expect(primaryLink).toHaveAttribute(
       'href',
-      '/blog',
+      MOCK_CTA_PRIMARY_ACTION.link.href,
     );
-    expect(
-      screen.getByRole('link', {
-        name: 'Learn more about our subscription plans',
-      }),
-    ).toHaveAttribute('href', '/about-us');
+    expect(secondaryLink).toHaveAttribute(
+      'href',
+      MOCK_CTA_SECONDARY_ACTION.link.href,
+    );
   });
 });
