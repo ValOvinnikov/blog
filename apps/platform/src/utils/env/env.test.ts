@@ -1,5 +1,5 @@
 import { KEY_ENCODING } from '@blog/utils/encryption';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 const RESEND_KEY = 'resend-key';
 const WEB_URL = 'https://example.com';
@@ -86,12 +86,12 @@ describe('env', () => {
   });
 
   it('accepts personal-data keys that are 32 bytes of base64', async () => {
-    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] = `v1:${TEST_ENCRYPTION_KEY}`;
-    process.env['PERSONAL_DATA_INDEX_KEY'] = TEST_ENCRYPTION_KEY;
+    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] = `v1:${MOCK_ENCRYPTION_KEY}`;
+    process.env['PERSONAL_DATA_INDEX_KEY'] = MOCK_ENCRYPTION_KEY;
 
     const { env } = await importEnvOnServer();
 
-    expect(env.PERSONAL_DATA_INDEX_KEY).toBe(TEST_ENCRYPTION_KEY);
+    expect(env.PERSONAL_DATA_INDEX_KEY).toBe(MOCK_ENCRYPTION_KEY);
   });
 
   it('rejects a PERSONAL_DATA_INDEX_KEY shorter than 32 bytes', async () => {
@@ -102,7 +102,7 @@ describe('env', () => {
 
   it('rejects a PERSONAL_DATA_ENCRYPTION_KEY with a short key in an older version', async () => {
     process.env['PERSONAL_DATA_ENCRYPTION_KEY'] =
-      `v2:${TEST_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
+      `v2:${MOCK_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
 
     await expect(importEnvOnServer()).rejects.toThrow();
   });

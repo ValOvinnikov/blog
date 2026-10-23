@@ -1,10 +1,10 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, PRICE_PERIOD } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
-  makePricingPrice,
-  makePricingTier,
-  pricingLabels,
+  mockPricingPrice,
+  mockPricingTier,
+  MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
@@ -14,55 +14,55 @@ import { PricingModuleView } from './pricing-module-view';
 const features = ['Unlimited posts', 'Custom domain', 'Email support'];
 
 const tiers = [
-  makePricingTier({
+  mockPricingTier({
     id: 'free',
     name: 'Free',
     description: 'For trying things out.',
-    prices: [makePricingPrice({ amount: 0 })],
+    prices: [mockPricingPrice({ amount: 0 })],
     features,
-    ctaButtons: ctaActionsDemo.slice(0, 1),
+    ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
   }),
-  makePricingTier({
+  mockPricingTier({
     id: 'pro',
     name: 'Pro',
     description: 'For growing publications.',
     prices: [
-      makePricingPrice({ period: PRICE_PERIOD.MONTH, amount: 49.99 }),
-      makePricingPrice({
+      mockPricingPrice({ period: PRICE_PERIOD.MONTH, amount: 49.99 }),
+      mockPricingPrice({
         period: PRICE_PERIOD.YEAR,
         amount: 490,
         compareAtAmount: 599.88,
       }),
-      makePricingPrice({ period: PRICE_PERIOD.ONE_TIME, amount: 99 }),
+      mockPricingPrice({ period: PRICE_PERIOD.ONE_TIME, amount: 99 }),
     ],
     features,
     highlightLabel: 'Most popular',
-    ctaButtons: ctaActionsDemo.slice(0, 1),
+    ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
     footnote: 'Billed in GBP.',
   }),
-  makePricingTier({
+  mockPricingTier({
     id: 'team',
     name: 'Team',
     description: 'For teams.',
     prices: [
-      makePricingPrice({
+      mockPricingPrice({
         period: PRICE_PERIOD.MONTH,
         amount: 149,
         isStartingAt: true,
       }),
-      makePricingPrice({ period: PRICE_PERIOD.YEAR, amount: 1490 }),
+      mockPricingPrice({ period: PRICE_PERIOD.YEAR, amount: 1490 }),
     ],
     features,
-    ctaButtons: ctaActionsDemo.slice(0, 1),
+    ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
   }),
-  makePricingTier({
+  mockPricingTier({
     id: 'enterprise',
     name: 'Enterprise',
     description: 'Custom contracts.',
     prices: [],
     priceLabel: 'Contact us',
     features,
-    ctaButtons: ctaActionsDemo.slice(1),
+    ctaButtons: MOCK_CTA_ACTIONS.slice(1),
   }),
 ];
 
@@ -71,7 +71,7 @@ const panelsFor = (selected: typeof tiers) =>
     tiers: selected,
     locale: 'en-GB',
     currency: 'GBP',
-    labels: pricingLabels,
+    labels: MOCK_PRICING_LABELS,
   });
 
 const meta = {
@@ -123,12 +123,12 @@ export const SinglePeriodNoSwitch: TStory = {
   args: {
     panels: panelsFor([
       tiers[0]!,
-      makePricingTier({
+      mockPricingTier({
         id: 'one-time',
         name: 'Workshop',
         prices: [
-          makePricingPrice({ period: PRICE_PERIOD.SESSION, amount: 120 }),
-          makePricingPrice({ period: PRICE_PERIOD.HOUR, amount: 40 }),
+          mockPricingPrice({ period: PRICE_PERIOD.SESSION, amount: 120 }),
+          mockPricingPrice({ period: PRICE_PERIOD.HOUR, amount: 40 }),
         ],
         features,
       }),
@@ -140,7 +140,7 @@ export const SinglePeriodNoSwitch: TStory = {
 export const WithFootnoteAndActions: TStory = {
   args: {
     footnote: 'Prices include VAT where applicable.',
-    ctaButtons: ctaActionsDemo,
+    ctaButtons: MOCK_CTA_ACTIONS,
   },
 };
 

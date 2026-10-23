@@ -1,21 +1,36 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import {
-  makeRawCtaButton,
-  makeRawTestimonialItem,
-  makeRawTestimonialModule,
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+  PORTABLE_TEXT_BLOCK_TYPE,
+} from '@blog/config/constants';
+import {
+  mockCtaButtonView,
+  mockRawCtaButton,
+  mockRawTestimonialItem,
+  mockRawTestimonialModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
-  makeRawExternalLinkDocument,
-  makeRawInternalLinkDocument,
-  makeRawPortableTextMarkDef,
-  makeRawSanityImage,
+  MOCK_EXTERNAL_URL,
+  mockLinkView,
+  mockRawExternalLinkDocument,
+  mockRawInternalLinkDocument,
+  mockRawPortableTextMarkDef,
+  mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
 import { toTestimonialModule } from './transformer';
 
-describe('toTestimonialModule', () => {
+const NAME = 'Alex Chen';
+const LINK_LABEL = 'Their site';
+const CASE_STUDY_TEXT = 'the case study';
+const CASE_STUDY_URL = 'https://example.com/case-study';
+const MARK_KEY = 'mark-1';
+const IMAGE_ALT = 'A portrait';
+
+describe(toTestimonialModule, () => {
   it('maps brandVariant and displayMode straight through', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
@@ -26,8 +41,8 @@ describe('toTestimonialModule', () => {
     expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
   });
 
-  it('leaves contentAlignment and layout undefined when unset (no faked default)', () => {
-    const raw = makeRawTestimonialModule({
+  it('leaves contentAlignment and layout undefined when unset', () => {
+    const raw = mockRawTestimonialModule({
       contentAlignment: null,
       layout: null,
     });
@@ -39,7 +54,7 @@ describe('toTestimonialModule', () => {
   });
 
   it('passes through an authored cardAlignment and contentAlignment', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       cardAlignment: CONTENT_ALIGNMENT.CENTER,
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
@@ -51,10 +66,10 @@ describe('toTestimonialModule', () => {
   });
 
   it('keeps the quotes in authored order', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       testimonials: [
-        makeRawTestimonialItem({ _id: 'quote-b' }),
-        makeRawTestimonialItem({ _id: 'quote-a' }),
+        mockRawTestimonialItem({ _id: 'quote-b' }),
+        mockRawTestimonialItem({ _id: 'quote-a' }),
       ],
     });
 
@@ -67,10 +82,10 @@ describe('toTestimonialModule', () => {
   });
 
   it('transforms a quote with neither image nor link', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       testimonials: [
-        makeRawTestimonialItem({
-          name: 'Alex Chen',
+        mockRawTestimonialItem({
+          name: NAME,
           role: null,
           image: null,
           link: null,
@@ -80,30 +95,30 @@ describe('toTestimonialModule', () => {
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]).toMatchObject({ name: 'Alex Chen' });
+    expect(module.testimonials[0]?.name).toBe(NAME);
     expect(module.testimonials[0]?.image).toBeUndefined();
     expect(module.testimonials[0]?.link).toBeUndefined();
   });
 
   it('resolves an image when present', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       testimonials: [
-        makeRawTestimonialItem({ image: makeRawSanityImage('A portrait') }),
+        mockRawTestimonialItem({ image: mockRawSanityImage(IMAGE_ALT) }),
       ],
     });
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]?.image?.alt).toBe('A portrait');
+    expect(module.testimonials[0]?.image?.alt).toBe(IMAGE_ALT);
   });
 
   it('resolves a link to an ILink', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       testimonials: [
-        makeRawTestimonialItem({
-          link: makeRawExternalLinkDocument({
-            label: 'Their site',
-            url: 'https://example.com',
+        mockRawTestimonialItem({
+          link: mockRawExternalLinkDocument({
+            label: LINK_LABEL,
+            url: MOCK_EXTERNAL_URL,
           }),
         }),
       ],
@@ -111,35 +126,31 @@ describe('toTestimonialModule', () => {
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]?.link).toEqual({
-      label: 'Their site',
-      href: 'https://example.com',
-      target: undefined,
-      platform: undefined,
-      ariaLabel: undefined,
-    });
+    expect(module.testimonials[0]?.link).toEqual(
+      mockLinkView({ label: LINK_LABEL, href: MOCK_EXTERNAL_URL }),
+    );
   });
 
   it('drops an unresolvable link while keeping the item', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       testimonials: [
-        makeRawTestimonialItem({
-          name: 'Sam Okafor',
-          link: makeRawInternalLinkDocument({ internalReference: null }),
+        mockRawTestimonialItem({
+          name: NAME,
+          link: mockRawInternalLinkDocument({ internalReference: null }),
         }),
       ],
     });
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]?.name).toBe('Sam Okafor');
+    expect(module.testimonials[0]?.name).toBe(NAME);
     expect(module.testimonials[0]?.link).toBeUndefined();
   });
 
   it('resolves an inline link mark inside the quote', () => {
-    const raw = makeRawTestimonialModule({
+    const raw = mockRawTestimonialModule({
       testimonials: [
-        makeRawTestimonialItem({
+        mockRawTestimonialItem({
           quote: [
             {
               _type: 'block',
@@ -150,16 +161,14 @@ describe('toTestimonialModule', () => {
                 {
                   _type: 'span',
                   _key: 'span-2',
-                  text: 'the case study',
-                  marks: ['mark-1'],
+                  text: CASE_STUDY_TEXT,
+                  marks: [MARK_KEY],
                 },
               ],
               markDefs: [
-                makeRawPortableTextMarkDef({
-                  _key: 'mark-1',
-                  link: makeRawExternalLinkDocument({
-                    url: 'https://example.com/case-study',
-                  }),
+                mockRawPortableTextMarkDef({
+                  _key: MARK_KEY,
+                  link: mockRawExternalLinkDocument({ url: CASE_STUDY_URL }),
                 }),
               ],
             },
@@ -170,16 +179,19 @@ describe('toTestimonialModule', () => {
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]?.quote[0]?.markDefs?.[0]).toMatchObject({
-      _key: 'mark-1',
-      link: { href: 'https://example.com/case-study' },
-    });
+    expect(module.testimonials[0]?.quote[0]?.markDefs).toEqual([
+      {
+        _key: MARK_KEY,
+        _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+        link: { href: CASE_STUDY_URL },
+      },
+    ]);
   });
 
-  it('drops an inline link mark that cannot resolve, keeping the quote text', () => {
-    const raw = makeRawTestimonialModule({
+  it('drops an unresolvable inline link mark, keeping the quote text', () => {
+    const raw = mockRawTestimonialModule({
       testimonials: [
-        makeRawTestimonialItem({
+        mockRawTestimonialItem({
           quote: [
             {
               _type: 'block',
@@ -189,12 +201,12 @@ describe('toTestimonialModule', () => {
                 {
                   _type: 'span',
                   _key: 'span-1',
-                  text: 'the case study',
-                  marks: ['mark-1'],
+                  text: CASE_STUDY_TEXT,
+                  marks: [MARK_KEY],
                 },
               ],
               markDefs: [
-                makeRawPortableTextMarkDef({ _key: 'mark-1', link: null }),
+                mockRawPortableTextMarkDef({ _key: MARK_KEY, link: null }),
               ],
             },
           ],
@@ -205,7 +217,7 @@ describe('toTestimonialModule', () => {
     const module = toTestimonialModule(raw);
 
     expect(module.testimonials[0]?.quote[0]?.children?.[0]?.text).toBe(
-      'the case study',
+      CASE_STUDY_TEXT,
     );
     expect(
       module.testimonials[0]?.quote[0]?.markDefs?.[0]?.link,
@@ -213,7 +225,7 @@ describe('toTestimonialModule', () => {
   });
 
   it('returns an empty array for an absent ctaButtons field', () => {
-    const raw = makeRawTestimonialModule({ ctaButtons: null });
+    const raw = mockRawTestimonialModule({ ctaButtons: null });
 
     const module = toTestimonialModule(raw);
 
@@ -221,15 +233,12 @@ describe('toTestimonialModule', () => {
   });
 
   it('maps authored ctaButtons', () => {
-    const raw = makeRawTestimonialModule({
-      ctaButtons: [makeRawCtaButton()],
+    const raw = mockRawTestimonialModule({
+      ctaButtons: [mockRawCtaButton()],
     });
 
     const module = toTestimonialModule(raw);
 
-    expect(module.ctaButtons).toHaveLength(1);
-    expect(module.ctaButtons[0]).toMatchObject({
-      link: { label: 'Subscribe', href: '/newsletter' },
-    });
+    expect(module.ctaButtons).toEqual([mockCtaButtonView()]);
   });
 });

@@ -1,52 +1,58 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_POST_RELATED_MODULE_ID,
+  mockRawPostRelatedModule,
+} from '@blog/service/testing/modules/fixtures';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPostRelatedModuleDocument } from './loader';
+import { postRelatedModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(getPostRelatedModuleDocument, () => {
   it('resolves the module document fields, including its limit', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostRelatedModule({ limit: 6 }));
+    mockRun.mockResolvedValueOnce(mockRawPostRelatedModule({ limit: 6 }));
 
-    const module = await getPostRelatedModuleDocument('post-related-1', tenant);
+    const module = await getPostRelatedModuleDocument(
+      MOCK_POST_RELATED_MODULE_ID,
+      tenant,
+    );
 
     expect(module.limit).toBe(6);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
     await expect(
-      getPostRelatedModuleDocument('missing', tenant),
+      getPostRelatedModuleDocument(MOCK_MISSING_ID, tenant),
     ).rejects.toThrow();
   });
 
   it('threads tenant context into the module query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostRelatedModule({ limit: 3 }));
+    mockRun.mockResolvedValueOnce(mockRawPostRelatedModule());
 
-    await getPostRelatedModuleDocument('post-related-1', tenant);
+    await getPostRelatedModuleDocument(MOCK_POST_RELATED_MODULE_ID, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        parameters: { id: 'post-related-1' },
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:postRelated',
-            't:tenant-a:module:post-related-1',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(postRelatedModuleQuery, {
+      parameters: { id: MOCK_POST_RELATED_MODULE_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          mockCacheTag('modules:postRelated'),
+          mockCacheTag(`module:${MOCK_POST_RELATED_MODULE_ID}`),
+        ],
+      },
+    });
   });
 });

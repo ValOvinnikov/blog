@@ -1,13 +1,21 @@
-import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import { ERROR_CODE } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
   WORKER_PROVISIONING_STEP,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_IDLE_PROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+  MOCK_RUN_AT,
+  MOCK_STEP_ERROR,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { updateProvisioningStep } from './update-provisioning-step';
 
@@ -17,38 +25,14 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-async function insertDraftTenant(): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-      provisioningStatus: 'PENDING',
-      provisioningSteps: {
-        SANITY_PROJECT: { status: 'IDLE' },
-        SEED_CONTENT: { status: 'IDLE' },
-        PERSIST_TOKEN: { status: 'IDLE' },
-        MAP_DOMAIN: { status: 'IDLE' },
-        CREATE_WEBHOOK: { status: 'IDLE' },
-        VERIFY_CONTENT: { status: 'IDLE' },
-        OWNER_ELEVATION: { status: 'IDLE' },
-      },
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
-
-const NOW = '2026-09-02T12:00:00.000Z';
+const { SANITY_PROJECT, SEED_CONTENT, MAP_DOMAIN, OWNER_ELEVATION } =
+  TENANT_PROVISIONING_STEP;
+const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
+const { STALLED } = ELEVATE_TENANT_OWNER_OUTCOME;
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date(NOW));
+  vi.setSystemTime(new Date(MOCK_RUN_AT));
 });
 
 afterEach(async () => {
@@ -60,179 +44,166 @@ describe(updateProvisioningStep, () => {
   let tenantId: string;
 
   beforeEach(async () => {
-    tenantId = await insertDraftTenant();
+    ({ id: tenantId } = await insertTestTenant(db(), {
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+      provisioningSteps: MOCK_IDLE_PROVISIONING_STEPS,
+    }));
   });
 
   it('updates only the given step, leaving every other step untouched', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'SANITY_PROJECT',
-      status: 'RUNNING',
-    });
+    const { provisioningSteps } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: SANITY_PROJECT,
+        status: RUNNING,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps).toEqual({
-      SANITY_PROJECT: { status: 'RUNNING', updatedAt: NOW },
-      SEED_CONTENT: { status: 'IDLE' },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
+    expect(provisioningSteps).toEqual({
+      ...MOCK_IDLE_PROVISIONING_STEPS,
+      [SANITY_PROJECT]: { status: RUNNING, updatedAt: MOCK_RUN_AT },
     });
   });
 
-  it('does not clobber a previously-updated step when a later step is updated', async () => {
+  it('does not clobber an earlier updated step when a later one is updated', async () => {
     await updateProvisioningStep({
       tenantId,
-      step: 'SANITY_PROJECT',
-      status: 'DONE',
+      step: SANITY_PROJECT,
+      status: DONE,
     });
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'SEED_CONTENT',
-      status: 'RUNNING',
-    });
+    const { provisioningSteps } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: SEED_CONTENT,
+        status: RUNNING,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps).toEqual({
-      SANITY_PROJECT: { status: 'DONE', updatedAt: NOW },
-      SEED_CONTENT: { status: 'RUNNING', updatedAt: NOW },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
+    expect(provisioningSteps).toEqual({
+      ...MOCK_IDLE_PROVISIONING_STEPS,
+      [SANITY_PROJECT]: { status: DONE, updatedAt: MOCK_RUN_AT },
+      [SEED_CONTENT]: { status: RUNNING, updatedAt: MOCK_RUN_AT },
     });
   });
 
   it('stores the error message only when one is supplied', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'SANITY_PROJECT',
-      status: 'FAILED',
-      error: 'Sanity Projects API returned 429',
-    });
+    const { provisioningSteps } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: SANITY_PROJECT,
+        status: FAILED,
+        error: MOCK_STEP_ERROR,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
-      status: 'FAILED',
-      error: 'Sanity Projects API returned 429',
-      updatedAt: NOW,
+    expect(provisioningSteps?.[SANITY_PROJECT]).toEqual({
+      status: FAILED,
+      error: MOCK_STEP_ERROR,
+      updatedAt: MOCK_RUN_AT,
     });
   });
 
   it('stores the detail only when one is supplied', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'OWNER_ELEVATION',
-      status: 'DONE',
-      detail: 'STALLED',
-    });
+    const { provisioningSteps } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: OWNER_ELEVATION,
+        status: DONE,
+        detail: STALLED,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.['OWNER_ELEVATION']).toEqual({
-      status: 'DONE',
-      detail: 'STALLED',
-      updatedAt: NOW,
-    });
-  });
-
-  it('omits detail entirely when not supplied, leaving prior step state unaffected', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'SANITY_PROJECT',
-      status: 'DONE',
-    });
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
-      status: 'DONE',
-      updatedAt: NOW,
+    expect(provisioningSteps?.[OWNER_ELEVATION]).toEqual({
+      status: DONE,
+      detail: STALLED,
+      updatedAt: MOCK_RUN_AT,
     });
   });
 
   it('leaves the overall provisioningStatus untouched when not supplied', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'SANITY_PROJECT',
-      status: 'DONE',
-    });
+    const { provisioningStatus } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: SANITY_PROJECT,
+        status: DONE,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningStatus).toBe('PENDING');
+    expect(provisioningStatus).toBe(TENANT_PROVISIONING_STATUS.PENDING);
   });
 
   it('updates the overall provisioningStatus when supplied on the last step', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'MAP_DOMAIN',
-      status: 'DONE',
-      provisioningStatus: 'READY',
-    });
+    const { provisioningStatus, provisioningSteps } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: MAP_DOMAIN,
+        status: DONE,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningStatus).toBe('READY');
-    expect(result.data.provisioningSteps?.['MAP_DOMAIN']).toEqual({
-      status: 'DONE',
-      updatedAt: NOW,
+    expect(provisioningStatus).toBe(TENANT_PROVISIONING_STATUS.READY);
+    expect(provisioningSteps?.[MAP_DOMAIN]).toEqual({
+      status: DONE,
+      updatedAt: MOCK_RUN_AT,
     });
   });
 
   it('leaves lastNotifiedOwnerElevationOutcome untouched when not supplied', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'OWNER_ELEVATION',
-      status: 'DONE',
-      detail: 'STALLED',
-    });
+    const { lastNotifiedOwnerElevationOutcome } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: OWNER_ELEVATION,
+        status: DONE,
+        detail: STALLED,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.lastNotifiedOwnerElevationOutcome).toBeNull();
+    expect(lastNotifiedOwnerElevationOutcome).toBeNull();
   });
 
-  it('writes lastNotifiedOwnerElevationOutcome alongside the step detail when supplied', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: 'OWNER_ELEVATION',
-      status: 'DONE',
-      detail: 'STALLED',
-      notifiedOwnerElevationOutcome: 'STALLED',
-    });
+  it('records the notified owner-elevation outcome alongside the step detail', async () => {
+    const { lastNotifiedOwnerElevationOutcome, provisioningSteps } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: OWNER_ELEVATION,
+        status: DONE,
+        detail: STALLED,
+        notifiedOwnerElevationOutcome: STALLED,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.lastNotifiedOwnerElevationOutcome).toBe('STALLED');
-    expect(result.data.provisioningSteps?.['OWNER_ELEVATION']).toEqual({
-      status: 'DONE',
-      detail: 'STALLED',
-      updatedAt: NOW,
+    expect(lastNotifiedOwnerElevationOutcome).toBe(STALLED);
+    expect(provisioningSteps?.[OWNER_ELEVATION]).toEqual({
+      status: DONE,
+      detail: STALLED,
+      updatedAt: MOCK_RUN_AT,
     });
   });
 
   it('adds a worker unit step alongside the existing steps', async () => {
-    const result = await updateProvisioningStep({
-      tenantId,
-      step: WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE,
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    });
+    const { provisioningSteps } = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE,
+        status: DONE,
+      }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps).toMatchObject({
+    expect(provisioningSteps).toEqual({
+      ...MOCK_IDLE_PROVISIONING_STEPS,
       [WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        updatedAt: NOW,
-      },
-      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+        status: DONE,
+        updatedAt: MOCK_RUN_AT,
       },
     });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await updateProvisioningStep({
-      tenantId: '00000000-0000-0000-0000-000000000000',
-      step: 'SANITY_PROJECT',
-      status: 'RUNNING',
+      tenantId: MOCK_MISSING_TENANT_ID,
+      step: SANITY_PROJECT,
+      status: RUNNING,
     });
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });

@@ -1,54 +1,81 @@
-import { CTA_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_CTA_MODULE_ID,
+  mockRawCtaModule,
+} from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
-  localizedStrings,
-  localizedValues,
-  paragraphBlocks,
+  MOCK_DUTCH_TEXT,
+  MOCK_ENGLISH_TEXT,
+  MOCK_IMAGE_ASSET_DOCUMENT,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockLocalizedListedText,
+  mockLocalizedStrings,
+  mockLocalizedValues,
 } from '@blog/service/testing/shared/localized';
 
 import { ctaModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const ctaDocument = {
-  _id: 'cta-1',
-  _type: 'module_cta',
-  variant: CTA_VARIANT.SPLIT,
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({ [EN]: 'Subscribe', [NL]: 'Abonneer' }),
-    supportingText: localizedValues('internationalizedArrayTextValue', {
-      [EN]: 'New posts weekly.',
-      [NL]: 'Wekelijks nieuwe berichten.',
-    }),
-  },
-  footnote: localizedStrings({
-    [EN]: 'Unsubscribe any time.',
-    [NL]: 'Altijd opzegbaar.',
-  }),
-  image: {
-    _type: 'localizedImageWithAlt',
-    asset: { _type: 'reference', _ref: 'image-1' },
-    alt: localizedStrings({ [EN]: 'A letter', [NL]: 'Een brief' }),
-  },
-  eyebrow: localizedStrings({ [EN]: 'Newsletter', [NL]: 'Nieuwsbrief' }),
-  content: localizedValues('internationalizedArrayListedTextValue', {
-    [EN]: paragraphBlocks('Read on.'),
-    [NL]: paragraphBlocks('Lees verder.'),
-  }),
+const EN_COPY = {
+  eyebrow: 'Newsletter',
+  heading: 'Subscribe',
+  supportingText: 'New posts weekly.',
+  footnote: 'Unsubscribe any time.',
+  alt: 'A letter',
+  content: MOCK_ENGLISH_TEXT,
 };
 
-const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
+const NL_COPY = {
+  eyebrow: 'Nieuwsbrief',
+  heading: 'Abonneer',
+  supportingText: 'Wekelijks nieuwe berichten.',
+  footnote: 'Altijd opzegbaar.',
+  alt: 'Een brief',
+  content: MOCK_DUTCH_TEXT,
+};
+
+const ctaDocument = {
+  _id: MOCK_CTA_MODULE_ID,
+  _type: 'module_cta',
+  variant: CTA_VARIANT.SPLIT,
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockLocalizedHeadingBlock(
+    {
+      [EN]: EN_COPY.heading,
+      [NL]: NL_COPY.heading,
+    },
+    {
+      supportingText: mockLocalizedValues('internationalizedArrayTextValue', {
+        [EN]: EN_COPY.supportingText,
+        [NL]: NL_COPY.supportingText,
+      }),
+    },
+  ),
+  footnote: mockLocalizedStrings({
+    [EN]: EN_COPY.footnote,
+    [NL]: NL_COPY.footnote,
+  }),
+  image: mockLocalizedImage({ [EN]: EN_COPY.alt, [NL]: NL_COPY.alt }),
+  eyebrow: mockLocalizedStrings({
+    [EN]: EN_COPY.eyebrow,
+    [NL]: NL_COPY.eyebrow,
+  }),
+  content: mockLocalizedListedText({
+    [EN]: EN_COPY.content,
+    [NL]: NL_COPY.content,
+  }),
+};
 
 async function runCta(document: Record<string, unknown>, locale: string) {
   const raw = await evaluateGroqExpression(
     ctaModuleQuery.query,
-    [document, imageAsset],
+    [document, MOCK_IMAGE_ASSET_DOCUMENT],
     undefined,
-    { id: 'cta-1', locale, defaultLocale: EN },
+    { id: MOCK_CTA_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return ctaModuleQuery.parse(raw);
@@ -56,40 +83,31 @@ async function runCta(document: Record<string, unknown>, locale: string) {
 
 describe('ctaModuleQuery', () => {
   it('parses a CTA document without a bandTone', () => {
-    const raw = makeRawCtaModule({ bandTone: null });
+    const raw = mockRawCtaModule({ bandTone: null });
 
     expect(() => ctaModuleQuery.parse(raw)).not.toThrow();
   });
 
-  it('picks eyebrow, heading and content in the visitor language', async () => {
-    const cta = await runCta(ctaDocument, NL);
+  it.each([
+    ['picks them in the visitor language', NL, NL_COPY],
+    ['falls back to the default language', FR, EN_COPY],
+  ])(
+    'eyebrow, heading, footnote, image alt and content: %s',
+    async (_, locale, copy) => {
+      const cta = await runCta(ctaDocument, locale);
 
-    expect(cta).toMatchObject({
-      eyebrow: 'Nieuwsbrief',
-      headingBlock: {
-        heading: 'Abonneer',
-        supportingText: 'Wekelijks nieuwe berichten.',
-      },
-      footnote: 'Altijd opzegbaar.',
-      image: { alt: 'Een brief' },
-      content: [{ children: [{ text: 'Lees verder.' }] }],
-    });
-  });
-
-  it('falls back to the default language for eyebrow, heading and content', async () => {
-    const cta = await runCta(ctaDocument, FR);
-
-    expect(cta).toMatchObject({
-      eyebrow: 'Newsletter',
-      headingBlock: {
-        heading: 'Subscribe',
-        supportingText: 'New posts weekly.',
-      },
-      footnote: 'Unsubscribe any time.',
-      image: { alt: 'A letter' },
-      content: [{ children: [{ text: 'Read on.' }] }],
-    });
-  });
+      expect(cta).toMatchObject({
+        eyebrow: copy.eyebrow,
+        headingBlock: {
+          heading: copy.heading,
+          supportingText: copy.supportingText,
+        },
+        footnote: copy.footnote,
+        image: { alt: copy.alt },
+        content: [{ children: [{ text: copy.content }] }],
+      });
+    },
+  );
 
   it('leaves optional localized fields null when no language has a value', async () => {
     const cta = await runCta(
@@ -98,10 +116,7 @@ describe('ctaModuleQuery', () => {
         eyebrow: undefined,
         content: undefined,
         footnote: undefined,
-        headingBlock: {
-          _type: 'moduleHeadingBlock',
-          heading: localizedStrings({ [EN]: 'Subscribe' }),
-        },
+        headingBlock: mockLocalizedHeadingBlock({ [EN]: EN_COPY.heading }),
       },
       NL,
     );

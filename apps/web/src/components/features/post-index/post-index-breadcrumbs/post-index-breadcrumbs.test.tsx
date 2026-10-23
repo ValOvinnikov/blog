@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testNotFoundOnFetchFailure,
@@ -34,7 +35,7 @@ const setup = customRenderAsync(PostIndexBreadcrumbs, {});
 describe(`<${PostIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getPostIndexPageMock.mockReset();
-    getPostIndexPageMock.mockResolvedValue({ ok: true, data: indexPage });
+    getPostIndexPageMock.mockResolvedValue(okResult(indexPage));
   });
 
   testStaticBreadcrumbsContract({

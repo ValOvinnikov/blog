@@ -1,15 +1,19 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
+import {
+  MOCK_HERO_STATEMENT_HEADING,
+  MOCK_HERO_STATEMENT_MODULE_ID,
+} from '@web/testing/modules/hero-statement/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { HeroStatementModuleView } from './hero-statement-module-view';
 
 const setup = customRender(HeroStatementModuleView, {
-  id: 'hero-statement-1',
+  id: MOCK_HERO_STATEMENT_MODULE_ID,
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Build faster, ship sooner' }),
+  headingBlock: makeHeadingBlock({ heading: MOCK_HERO_STATEMENT_HEADING }),
   sanityImage: undefined,
   ctaButtons: [],
   contentPosition: undefined,
@@ -22,15 +26,15 @@ describe(`<${HeroStatementModuleView.name}/>`, () => {
   it('names the section by its top-level heading', () => {
     setup();
 
-    expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: 'Build faster, ship sooner',
-      }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('region', { name: 'Build faster, ship sooner' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: MOCK_HERO_STATEMENT_HEADING,
+    });
+    const region = screen.getByRole('region', {
+      name: MOCK_HERO_STATEMENT_HEADING,
+    });
+    expect(heading).toBeVisible();
+    expect(region).toBeVisible();
   });
 
   it('gives two instances of the same module distinct heading ids', () => {
@@ -40,12 +44,13 @@ describe(`<${HeroStatementModuleView.name}/>`, () => {
     const headingIds = screen
       .getAllByRole('heading', {
         level: 1,
-        name: 'Build faster, ship sooner',
+        name: MOCK_HERO_STATEMENT_HEADING,
       })
       .map(({ id }) => id);
+    const regions = screen.getAllByRole('region', {
+      name: MOCK_HERO_STATEMENT_HEADING,
+    });
     expect(new Set(headingIds).size).toBe(2);
-    expect(
-      screen.getAllByRole('region', { name: 'Build faster, ship sooner' }),
-    ).toHaveLength(2);
+    expect(regions).toHaveLength(2);
   });
 });

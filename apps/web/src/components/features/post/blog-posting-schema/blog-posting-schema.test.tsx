@@ -1,4 +1,5 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -32,7 +33,7 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
 
   describe('when the post cannot be resolved', () => {
     it('calls notFound() without logging when no page_post matches the slug', async () => {
-      getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
+      getPostPageMock.mockResolvedValue(okResult());
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -43,10 +44,7 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
     });
 
     it('calls notFound() when the fetch fails', async () => {
-      getPostPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getPostPageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -58,7 +56,7 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
 
   describe('when the post exists', () => {
     beforeEach(() => {
-      getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+      getPostPageMock.mockResolvedValue(okResult(mockPostDetail));
     });
 
     it('renders the JSON-LD BlogPosting schema script', async () => {

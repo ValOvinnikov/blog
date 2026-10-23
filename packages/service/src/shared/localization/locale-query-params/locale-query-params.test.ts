@@ -1,9 +1,10 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { buildLocaleQueryParams } from './locale-query-params';
 
 const { EN, NL } = LOCALE_ISO_CODES;
-const tenant = { projectId: 'p', dataset: 'production', token: 't' };
+const tenant = mockTenant();
 
 describe(buildLocaleQueryParams, () => {
   it('passes the requested and default languages through', () => {

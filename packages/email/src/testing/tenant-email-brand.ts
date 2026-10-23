@@ -1,6 +1,6 @@
 import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell/tenant-shell';
 
-export const TENANT_EMAIL_BRAND: TTenantEmailBrand = {
+export const MOCK_TENANT_EMAIL_BRAND: TTenantEmailBrand = {
   surface: '#ffffff',
   surface2: '#f8f8fb',
   border: '#e4e4ec',

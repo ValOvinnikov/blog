@@ -80,16 +80,12 @@ export const useLookSave = ({
           clear: () => clearBrandAssetAction(tenantId, kind),
         });
         if (!result.ok) {
-          setBrandImageError({
-            failure: result.failure,
-            operation: result.operation,
-            kind,
-          });
+          setBrandImageError({ ...result.error, kind });
           invalidControls?.(vals).revealFirst?.();
           focusAfterSave(brandAssetFieldIds[kind]);
-          return finish(result.failure.outcome);
+          return finish(result.error.failure.outcome);
         }
-        savedImages[kind] = result.image;
+        savedImages[kind] = result.data;
       }
 
       const { outcome } = await updateLookAction(tenantId, {

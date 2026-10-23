@@ -1,181 +1,106 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
-import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
 import {
-  makeRawAuthor,
-  makeRawPostDetail,
+  ASIDE_KIND,
+  LOCALE_ISO_CODES,
+  PORTABLE_TEXT_BLOCK_TYPE,
+} from '@blog/config/constants';
+import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
+import { mockRawTopic } from '@blog/service/testing/entities/fixtures';
+import {
+  mockRawAuthor,
+  mockRawPostDetail,
 } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawExternalLinkDocument,
-  makeRawHeadingBlock,
+  MOCK_POST_TITLE,
+  mockRawBodyImageBlock,
+  mockRawExternalLinkDocument,
+  mockRawHeadingBlock,
 } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { mockTranslationLink } from '@blog/service/testing/shared/localized';
 
 import { postPageQuery } from './query';
 
+const EN_SLUG = 'my-article';
+const NL_SLUG = 'mijn-artikel';
+const EN_ID = 'article-en';
+const NL_ID = 'article-nl';
+const MODULE_REFS: TRawPostDetail['modules'] = [
+  { _id: 'related-1', _type: 'module_postRelated' },
+];
+
+function parseBody(body: unknown[]) {
+  const raw = mockRawPostDetail({ body: body as TRawPostDetail['body'] });
+
+  return postPageQuery.parse(raw)?.body;
+}
+
 describe('postPageQuery', () => {
   it('parses a post whose optional fields are all absent', () => {
-    const raw = makeRawPostDetail({
+    const raw = mockRawPostDetail({
       heroImage: null,
       featured: null,
-      author: makeRawAuthor({ role: null }),
-      topic: makeRawTopic({ description: null }),
+      author: mockRawAuthor({ role: null }),
+      topic: mockRawTopic({ description: null }),
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('throws when a post has no authored SEO', () => {
-    const raw = { ...makeRawPostDetail(), seo: null };
+  it.each([
+    ['authored SEO', { seo: null }],
+    ['heading block', { headingBlock: null }],
+    ['an author', { author: null }],
+    ['a topic', { topic: null }],
+    ['any content', { body: null }],
+  ])('throws when a post has no %s', (_, unset) => {
+    const raw = { ...mockRawPostDetail(), ...unset };
 
     expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a post whose author has no image', () => {
-    const raw = makeRawPostDetail({
-      author: makeRawAuthor({ image: null }),
+    const raw = mockRawPostDetail({
+      author: mockRawAuthor({ image: null }),
     });
 
-    expect(() => postPageQuery.parse(raw)).not.toThrow();
     expect(postPageQuery.parse(raw)?.author?.image).toBeNull();
   });
 
-  it('resolves a bodyImage block, deref-ing its asset and keeping layout', () => {
-    const raw = makeRawPostDetail({
-      body: [
-        {
-          _type: 'bodyImage',
-          _key: 'image-1',
-          asset: {
-            _id: 'image-abc123-800x600-jpg',
-            metadata: {
-              lqip: null,
-              dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-            },
-          },
-          hotspot: null,
-          crop: null,
-          alt: 'A diagram',
-          layout: 'FLOAT_LEFT',
-        },
-      ],
-    });
-
-    const parsed = postPageQuery.parse(raw);
-
-    expect(parsed?.body?.[0]).toMatchObject({
-      _type: 'bodyImage',
-      layout: 'FLOAT_LEFT',
-      asset: { _id: 'image-abc123-800x600-jpg' },
-    });
+  it.each([
+    ['a resolved bodyImage block, keeping layout', mockRawBodyImageBlock()],
+    [
+      'a bodyImage block with no asset selected and no layout',
+      mockRawBodyImageBlock({ asset: null, layout: null }),
+    ],
+    [
+      'a bodyImage block with no alt text',
+      mockRawBodyImageBlock({ alt: null }),
+    ],
+  ])('keeps %s', (_, block) => {
+    expect(parseBody([block])).toEqual([block]);
   });
 
   it('parses null as no matching page_post document, rather than throwing', () => {
     expect(postPageQuery.parse(null)).toBeNull();
   });
 
-  it('parses a post with no page-builder modules', () => {
-    const raw = makeRawPostDetail({ modules: null });
+  it.each([
+    ['no page-builder modules', null],
+    ['page-builder modules set', MODULE_REFS],
+  ])('parses a post with %s', (_, modules) => {
+    const raw = mockRawPostDetail({ modules });
 
-    expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.modules).toBeNull();
+    expect(postPageQuery.parse(raw)?.modules).toEqual(modules);
   });
 
-  it('parses a post with page-builder modules set', () => {
-    const raw = makeRawPostDetail({
-      modules: [{ _id: 'related-1', _type: 'module_postRelated' }],
-    });
-
-    const parsed = postPageQuery.parse(raw);
-
-    expect(parsed?.modules).toEqual([
-      { _id: 'related-1', _type: 'module_postRelated' },
-    ]);
-  });
-
-  it('parses a post whose only optional heading field, supportingText, is absent', () => {
-    const raw = makeRawPostDetail({
-      headingBlock: makeRawHeadingBlock('Hello World'),
+  it('parses a post whose heading has no supportingText', () => {
+    const raw = mockRawPostDetail({
+      headingBlock: mockRawHeadingBlock(MOCK_POST_TITLE),
     });
 
     const parsed = postPageQuery.parse(raw);
 
     expect(parsed?.headingBlock?.supportingText).toBeNull();
-  });
-
-  it('throws when a post has no headingBlock', () => {
-    const raw = { ...makeRawPostDetail(), headingBlock: null };
-
-    expect(() => postPageQuery.parse(raw)).toThrow();
-  });
-
-  it('throws when a post has no author', () => {
-    const raw = { ...makeRawPostDetail(), author: null };
-
-    expect(() => postPageQuery.parse(raw)).toThrow();
-  });
-
-  it('throws when a post has no topic', () => {
-    const raw = { ...makeRawPostDetail(), topic: null };
-
-    expect(() => postPageQuery.parse(raw)).toThrow();
-  });
-
-  it('throws when a post has no content', () => {
-    const raw = { ...makeRawPostDetail(), body: null };
-
-    expect(() => postPageQuery.parse(raw)).toThrow();
-  });
-
-  it('allows a bodyImage body block with no asset selected and no layout', () => {
-    const raw = makeRawPostDetail({
-      body: [
-        {
-          _type: 'bodyImage',
-          _key: 'image-1',
-          asset: null,
-          hotspot: null,
-          crop: null,
-          alt: 'A diagram',
-          layout: null,
-        },
-      ],
-    });
-
-    expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.body?.[0]).toMatchObject({
-      _type: 'bodyImage',
-      layout: null,
-      asset: null,
-    });
-  });
-
-  it('allows a bodyImage body block with no alt text', () => {
-    const raw = makeRawPostDetail({
-      body: [
-        {
-          _type: 'bodyImage',
-          _key: 'image-1',
-          asset: {
-            _id: 'image-abc123-800x600-jpg',
-            metadata: {
-              lqip: null,
-              dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-            },
-          },
-          hotspot: null,
-          crop: null,
-          alt: null,
-          layout: 'FLOAT_LEFT',
-        },
-      ],
-    });
-
-    expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.body?.[0]).toMatchObject({
-      _type: 'bodyImage',
-      alt: null,
-    });
   });
 
   it('keeps every field of a rich text block intact', () => {
@@ -187,29 +112,24 @@ describe('postPageQuery', () => {
       level: 1,
       markDefs: [
         {
-          _type: 'linkRef',
+          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
           _key: 'link-1',
-          link: makeRawExternalLinkDocument(),
+          link: mockRawExternalLinkDocument(),
         },
       ],
       children: [
         { _type: 'span', _key: 'span-1', text: 'Hello', marks: ['strong'] },
       ],
     };
-    const raw = makeRawPostDetail({
-      body: [richBlock] as TRawPostDetail['body'],
-    });
 
-    const parsed = postPageQuery.parse(raw);
-
-    expect(parsed?.body?.[0]).toEqual(richBlock);
+    expect(parseBody([richBlock])).toEqual([richBlock]);
   });
 
-  it('keeps a rich aside block intact alongside a resolved bodyImage block', () => {
+  it('keeps a rich aside block intact alongside a bodyImage block', () => {
     const asideBlock = {
-      _type: 'aside',
+      _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
       _key: 'aside-1',
-      kind: 'WHY_NOT',
+      kind: ASIDE_KIND.WHY_NOT,
       body: [
         {
           _type: 'block',
@@ -220,33 +140,12 @@ describe('postPageQuery', () => {
         },
       ],
     };
-    const bodyImageBlock = {
-      _type: 'bodyImage',
-      _key: 'image-1',
-      asset: {
-        _id: 'image-abc123-800x600-jpg',
-        metadata: {
-          lqip: null,
-          dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-        },
-      },
-      hotspot: null,
-      crop: null,
-      alt: 'A diagram',
-      layout: 'FLOAT_LEFT',
-    };
-    const raw = makeRawPostDetail({
-      body: [asideBlock, bodyImageBlock] as TRawPostDetail['body'],
-    });
+    const bodyImageBlock = mockRawBodyImageBlock();
 
-    const parsed = postPageQuery.parse(raw);
-
-    expect(parsed?.body?.[0]).toEqual(asideBlock);
-    expect(parsed?.body?.[1]).toMatchObject({
-      _type: 'bodyImage',
-      layout: 'FLOAT_LEFT',
-      asset: { _id: 'image-abc123-800x600-jpg' },
-    });
+    expect(parseBody([asideBlock, bodyImageBlock])).toEqual([
+      asideBlock,
+      bodyImageBlock,
+    ]);
   });
 });
 
@@ -268,22 +167,17 @@ describe('postPageQuery language scoping', () => {
     };
   }
 
-  function link(language: string, id: string) {
-    return {
-      _key: language,
-      language,
-      value: { _type: 'reference', _ref: id },
-    };
-  }
-
   const dataset = [
-    post('article-en', 'my-article', EN),
-    post('article-nl', 'mijn-artikel', NL),
+    post(EN_ID, EN_SLUG, EN),
+    post(NL_ID, NL_SLUG, NL),
     post('scheduled-nl', 'later', NL, '2999-01-01T00:00:00Z'),
     {
       _id: 'meta-article',
       _type: 'translation.metadata',
-      translations: [link(EN, 'article-en'), link(NL, 'article-nl')],
+      translations: [
+        mockTranslationLink(EN, EN_ID),
+        mockTranslationLink(NL, NL_ID),
+      ],
     },
   ];
 
@@ -296,9 +190,9 @@ describe('postPageQuery language scoping', () => {
   }
 
   it('resolves a slug only in the language the post is authored in', async () => {
-    expect(await run('mijn-artikel', NL)).toMatchObject({ _id: 'article-nl' });
-    expect(await run('mijn-artikel', EN)).toBeNull();
-    expect(await run('my-article', FR)).toBeNull();
+    expect(await run(NL_SLUG, NL)).toMatchObject({ _id: NL_ID });
+    expect(await run(NL_SLUG, EN)).toBeNull();
+    expect(await run(EN_SLUG, FR)).toBeNull();
   });
 
   it('hard-404s a scheduled post', async () => {
@@ -306,10 +200,10 @@ describe('postPageQuery language scoping', () => {
   });
 
   it('returns the linked translations with their languages and slugs', async () => {
-    expect(await run('mijn-artikel', NL)).toMatchObject({
+    expect(await run(NL_SLUG, NL)).toMatchObject({
       translations: [
-        { language: EN, slug: 'my-article' },
-        { language: NL, slug: 'mijn-artikel' },
+        { language: EN, slug: EN_SLUG },
+        { language: NL, slug: NL_SLUG },
       ],
     });
   });

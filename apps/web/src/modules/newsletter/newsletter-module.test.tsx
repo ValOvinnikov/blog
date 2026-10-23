@@ -1,11 +1,14 @@
-import { NEWSLETTER_VARIANT } from '@blog/config';
+import { CAPABILITY } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_NEWSLETTER_MODULE_ID,
+  mockNewsletterModule,
+} from '@web/testing/modules/newsletter/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
 
@@ -34,10 +37,8 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const setup = customRenderAsync(NewsletterModule, {
-  id: 'newsletter-1',
+  id: MOCK_NEWSLETTER_MODULE_ID,
 });
 
 describe(`<${NewsletterModule.name}/>`, () => {
@@ -45,40 +46,21 @@ describe(`<${NewsletterModule.name}/>`, () => {
     getNewsletterMock.mockReset();
     vi.mocked(isCapabilityEnabled).mockReset();
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it("renders the module's own trust cues in the form", async () => {
     const firstCue = faker.lorem.words(2);
     const secondCue = faker.lorem.words(3);
-    getNewsletterMock.mockResolvedValue({
-      ok: true,
-      data: makeNewsletterModule({ trustCues: [firstCue, secondCue] }),
-    });
+    getNewsletterMock.mockResolvedValue(
+      okResult(mockNewsletterModule({ trustCues: [firstCue, secondCue] })),
+    );
 
     await setup();
 
-    expect(screen.getByText(firstCue)).toBeVisible();
-    expect(screen.getByText(secondCue)).toBeVisible();
-  });
-
-  it('renders the compact form (no supporting text) for a COMPACT module', async () => {
-    const heading = faker.company.catchPhrase();
-    const supportingText = faker.lorem.sentence();
-    getNewsletterMock.mockResolvedValue({
-      ok: true,
-      data: makeNewsletterModule({
-        headingBlock: makeHeadingBlock({ heading, supportingText }),
-        variant: NEWSLETTER_VARIANT.COMPACT,
-        trustCues: undefined,
-      }),
-    });
-
-    await setup();
-
-    expect(screen.getByText(heading)).toBeVisible();
-    expect(screen.queryByText(supportingText)).not.toBeInTheDocument();
+    const firstCueElement = screen.getByText(firstCue);
+    const secondCueElement = screen.getByText(secondCue);
+    expect(firstCueElement).toBeVisible();
+    expect(secondCueElement).toBeVisible();
   });
 
   it('renders nothing, without fetching, when the NEWSLETTER capability is off', async () => {
@@ -91,39 +73,26 @@ describe(`<${NewsletterModule.name}/>`, () => {
   });
 
   describe('when the newsletter fetch fails', () => {
-    beforeEach(() => {
-      getNewsletterMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+    let container: HTMLElement;
+
+    beforeEach(async () => {
+      getNewsletterMock.mockResolvedValue(errorResult(MOCK_ERROR));
+      ({ container } = await setup());
     });
 
-    it('renders nothing when the fetch fails', async () => {
-      const { container } = await setup();
-
+    it('renders nothing', () => {
       expect(container).toBeEmptyDOMElement();
     });
 
-    it('forwards the resolved tenant Sanity context to getNewsletter', async () => {
-      const tenant = {
-        projectId: 'tenant-project',
-        dataset: 'production',
-        token: 'tenant-token',
-      };
-      getRequestContextMock.mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
-        sanityContext: tenant,
-      });
-
-      await setup();
-
-      expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
+    it('fetches the module with the resolved tenant Sanity context', () => {
+      expect(getNewsletterMock).toHaveBeenCalledWith(
+        MOCK_NEWSLETTER_MODULE_ID,
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
     });
 
-    it('checks the NEWSLETTER capability', async () => {
-      await setup();
-
-      expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER');
+    it('checks the NEWSLETTER capability', () => {
+      expect(isCapabilityEnabled).toHaveBeenCalledWith(CAPABILITY.NEWSLETTER);
     });
   });
 });

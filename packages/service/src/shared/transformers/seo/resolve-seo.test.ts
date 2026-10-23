@@ -1,65 +1,64 @@
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  mockRawSanityImage,
+  mockRawSeo,
+  mockSanityImageView,
+} from '@blog/service/testing/shared/fixtures';
 
 import { resolveSeo, type TRawSeo } from './resolve-seo';
 
-function makeAuthoredSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
-  return {
-    metaTitle: 'Authored title',
-    metaDescription: 'Authored description',
+const AUTHORED_TITLE = 'Authored title';
+const AUTHORED_DESCRIPTION = 'Authored description';
+const AUTHORED_OG_TITLE = 'Authored OG title';
+const AUTHORED_OG_DESCRIPTION = 'Authored OG description';
+
+function mockAuthoredSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
+  return mockRawSeo({
+    metaTitle: AUTHORED_TITLE,
+    metaDescription: AUTHORED_DESCRIPTION,
     openGraph: {
-      ogTitle: 'Authored OG title',
-      ogDescription: 'Authored OG description',
-      ogImage: makeRawSanityImage('OG image'),
+      ogTitle: AUTHORED_OG_TITLE,
+      ogDescription: AUTHORED_OG_DESCRIPTION,
+      ogImage: mockRawSanityImage(),
     },
     ...overrides,
-  };
+  });
 }
 
 describe(resolveSeo, () => {
   it('uses authored values when present', () => {
-    const result = resolveSeo(makeAuthoredSeo());
+    const result = resolveSeo(mockAuthoredSeo());
 
-    expect(result.title).toBe('Authored title');
-    expect(result.description).toBe('Authored description');
-    expect(result.ogTitle).toBe('Authored OG title');
-    expect(result.ogDescription).toBe('Authored OG description');
-    expect(result.ogImage).toEqual(
-      expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
-    );
+    expect(result).toEqual({
+      title: AUTHORED_TITLE,
+      description: AUTHORED_DESCRIPTION,
+      ogTitle: AUTHORED_OG_TITLE,
+      ogDescription: AUTHORED_OG_DESCRIPTION,
+      ogImage: mockSanityImageView(),
+    });
   });
 
   it('leaves metaDescription undefined when unauthored, with no fallback', () => {
-    const result = resolveSeo(makeAuthoredSeo({ metaDescription: null }));
+    const result = resolveSeo(mockAuthoredSeo({ metaDescription: null }));
 
     expect(result.description).toBeUndefined();
   });
 
-  it('leaves ogTitle/ogDescription undefined when unauthored, without inheriting the meta title/description', () => {
-    const result = resolveSeo(
-      makeAuthoredSeo({
-        openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
-      }),
-    );
+  it.each([
+    {
+      openGraphState: 'an empty',
+      openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
+    },
+    { openGraphState: 'an absent', openGraph: null },
+  ])(
+    'leaves every og field unset for $openGraphState openGraph, with no fallback',
+    ({ openGraph }) => {
+      const { ogTitle, ogDescription, ogImage } = resolveSeo(
+        mockAuthoredSeo({ openGraph }),
+      );
 
-    expect(result.ogTitle).toBeUndefined();
-    expect(result.ogDescription).toBeUndefined();
-  });
-
-  it('treats an absent openGraph object the same as an empty one', () => {
-    const result = resolveSeo(makeAuthoredSeo({ openGraph: null }));
-
-    expect(result.ogTitle).toBeUndefined();
-    expect(result.ogDescription).toBeUndefined();
-    expect(result.ogImage).toBeUndefined();
-  });
-
-  it('leaves ogImage undefined when unauthored, with no site or content fallback', () => {
-    const result = resolveSeo(
-      makeAuthoredSeo({
-        openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
-      }),
-    );
-
-    expect(result.ogImage).toBeUndefined();
-  });
+      expect(ogTitle).toBeUndefined();
+      expect(ogDescription).toBeUndefined();
+      expect(ogImage).toBeUndefined();
+    },
+  );
 });

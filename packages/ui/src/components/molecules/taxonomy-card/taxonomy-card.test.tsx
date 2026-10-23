@@ -1,8 +1,16 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_TOPIC } from '@blog/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { AnchorHTMLAttributes } from 'react';
 
 import { TaxonomyCard } from './taxonomy-card';
+
+const DESCRIPTION = 'Posts about building things.';
+const TAXONOMY_CARD_TEST_ID = 'taxonomy-card';
+const FIRST_POST_TITLE = 'First post';
+const FIRST_POST_HREF = '/posts/first';
+const SECOND_POST_TITLE = 'Second post';
+const SECOND_POST_HREF = '/posts/second';
 
 faker.seed(123);
 
@@ -26,54 +34,52 @@ describe(`<${TaxonomyCard.name}/>`, () => {
   });
 
   it('renders description when provided', () => {
-    setup({ description: 'Posts about building things.' });
-    expect(screen.getByText('Posts about building things.')).toBeVisible();
+    setup({ description: DESCRIPTION });
+    const description = screen.getByText(DESCRIPTION);
+    expect(description).toBeVisible();
   });
 
   it('does not render a description element when omitted', () => {
     setup();
-    expect(screen.queryByText(/posts about/i)).not.toBeInTheDocument();
+    const description = screen.queryByText(/posts about/i);
+    expect(description).not.toBeInTheDocument();
   });
 
   it('renders the pre-formatted post count label as visible text', () => {
     setup({ postCountLabel: '1 post' });
-    expect(screen.getByText('1 post')).toBeVisible();
+    const postCount = screen.getByText('1 post');
+    expect(postCount).toBeVisible();
   });
 
-  it("composes the link's accessible name from the visible title followed by the post count", () => {
-    setup({ title: 'Engineering', postCountLabel: '5 posts' });
+  it('names the link by the visible title followed by the post count', () => {
+    setup({ title: MOCK_TOPIC.label, postCountLabel: '5 posts' });
     const link = screen.getByRole('link');
-    expect(link).toHaveAccessibleName('Engineering, 5 posts');
+    expect(link).toHaveAccessibleName(`${MOCK_TOPIC.label}, 5 posts`);
   });
 
   it('honours a custom accessibleNameSeparator when composing the accessible name', () => {
     setup({
-      title: 'Engineering',
+      title: MOCK_TOPIC.label,
       postCountLabel: '5 posts',
       accessibleNameSeparator: ' — ',
     });
-    expect(
-      screen.getByRole('link', { name: 'Engineering — 5 posts' }),
-    ).toBeVisible();
+    const link = screen.getByRole('link', {
+      name: `${MOCK_TOPIC.label} — 5 posts`,
+    });
+    expect(link).toBeVisible();
   });
 
   it('renders the link via the linkAs component when provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
-      <a href={href} data-testid="custom-link">
-        {children}
-      </a>
-    );
-    setup({ linkAs: CustomLink });
+    setup({ linkAs: MockLink });
 
-    expect(screen.getByTestId('custom-link')).toBeVisible();
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLink).toBeVisible();
   });
 
   it('forwards data-testid to the root element', () => {
-    setup({ dataTestId: 'taxonomy-card' });
-    expect(screen.getByTestId('taxonomy-card')).toBeVisible();
+    setup({ dataTestId: TAXONOMY_CARD_TEST_ID });
+    const card = screen.getByTestId(TAXONOMY_CARD_TEST_ID);
+    expect(card).toBeVisible();
   });
 
   it('renders TaxonomyCard.Posts as a labelled list of post links', () => {
@@ -82,22 +88,21 @@ describe(`<${TaxonomyCard.name}/>`, () => {
         <TaxonomyCard.Posts
           ariaLabel="Latest posts"
           posts={[
-            { id: '1', title: 'First post', href: '/posts/first' },
-            { id: '2', title: 'Second post', href: '/posts/second' },
+            { id: '1', title: FIRST_POST_TITLE, href: FIRST_POST_HREF },
+            { id: '2', title: SECOND_POST_TITLE, href: SECOND_POST_HREF },
           ]}
         />
       ),
     });
 
-    expect(screen.getByRole('list', { name: 'Latest posts' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'First post' })).toHaveAttribute(
-      'href',
-      '/posts/first',
-    );
-    expect(screen.getByRole('link', { name: 'Second post' })).toHaveAttribute(
-      'href',
-      '/posts/second',
-    );
+    const postList = screen.getByRole('list', { name: 'Latest posts' });
+    const firstPostLink = screen.getByRole('link', { name: FIRST_POST_TITLE });
+    const secondPostLink = screen.getByRole('link', {
+      name: SECOND_POST_TITLE,
+    });
+    expect(postList).toBeVisible();
+    expect(firstPostLink).toHaveAttribute('href', FIRST_POST_HREF);
+    expect(secondPostLink).toHaveAttribute('href', SECOND_POST_HREF);
   });
 
   it('renders nothing for TaxonomyCard.Posts when posts is empty', () => {
@@ -105,21 +110,22 @@ describe(`<${TaxonomyCard.name}/>`, () => {
       children: <TaxonomyCard.Posts ariaLabel="Latest posts" posts={[]} />,
     });
 
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    const postList = screen.queryByRole('list');
+    expect(postList).not.toBeInTheDocument();
   });
 
   it('resolves a post link to its own href rather than the taxonomy term href', () => {
     setup({
-      href: '/topics/engineering',
+      href: MOCK_TOPIC.href,
       children: (
         <TaxonomyCard.Posts
           ariaLabel="Latest posts"
-          posts={[{ id: '1', title: 'First post', href: '/posts/first' }]}
+          posts={[{ id: '1', title: FIRST_POST_TITLE, href: FIRST_POST_HREF }]}
         />
       ),
     });
 
-    const postLink = screen.getByRole('link', { name: 'First post' });
-    expect(postLink).toHaveAttribute('href', '/posts/first');
+    const postLink = screen.getByRole('link', { name: FIRST_POST_TITLE });
+    expect(postLink).toHaveAttribute('href', FIRST_POST_HREF);
   });
 });

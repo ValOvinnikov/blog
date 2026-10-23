@@ -27,7 +27,7 @@ describe(resolveWritableTenant, () => {
   it('returns the tenant id for an ACTIVE tenant', async () => {
     await expect(resolveWritableTenant(SITE)).resolves.toEqual({
       ok: true,
-      tenantId: 'tenant-1',
+      data: 'tenant-1',
     });
   });
 
@@ -41,7 +41,7 @@ describe(resolveWritableTenant, () => {
 
       await expect(resolveWritableTenant(SITE)).resolves.toEqual({
         ok: false,
-        reason: TENANT_WRITE_REFUSAL.INACTIVE,
+        error: TENANT_WRITE_REFUSAL.INACTIVE,
       });
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.warn).not.toHaveBeenCalled();
@@ -53,7 +53,7 @@ describe(resolveWritableTenant, () => {
 
     await expect(resolveWritableTenant(SITE)).resolves.toEqual({
       ok: false,
-      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
+      error: TENANT_WRITE_REFUSAL.UNRESOLVED,
     });
     expect(logger.error).toHaveBeenCalledWith('tenant_write.unresolved', {
       site: SITE,

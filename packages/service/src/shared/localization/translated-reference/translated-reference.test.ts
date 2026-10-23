@@ -1,10 +1,18 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_ABOUT_EN_PAGE_ID,
+  MOCK_ABOUT_NL_PAGE_ID,
+  MOCK_ABOUT_TRANSLATION_METADATA,
+  mockLandingPageDocument,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { translatedReference } from './translated-reference';
 
+const CONTACT_EN_PAGE_ID = 'contact-en';
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const localeQ = q.parameters<TLocaleQueryParams>();
@@ -41,27 +49,11 @@ const query = localeQ.star
     ),
   }));
 
-function page(id: string, language: string) {
-  return { _id: id, _type: 'page_landing', language };
-}
-
-function translation(id: string, language: string) {
-  return {
-    _key: language,
-    language,
-    value: { _type: 'reference', _ref: id },
-  };
-}
-
 const dataset = [
-  page('about-en', EN),
-  page('about-nl', NL),
-  page('contact-en', EN),
-  {
-    _id: 'meta-about',
-    _type: 'translation.metadata',
-    translations: [translation('about-en', EN), translation('about-nl', NL)],
-  },
+  mockLandingPageDocument(MOCK_ABOUT_EN_PAGE_ID, EN),
+  mockLandingPageDocument(MOCK_ABOUT_NL_PAGE_ID, NL),
+  mockLandingPageDocument(CONTACT_EN_PAGE_ID, EN),
+  MOCK_ABOUT_TRANSLATION_METADATA,
 ];
 
 function resolveId(pageId: string, locale: string): Promise<unknown> {
@@ -71,7 +63,7 @@ function resolveId(pageId: string, locale: string): Promise<unknown> {
       {
         _id: 'link-1',
         _type: 'link',
-        internalReference: { _type: 'reference', _ref: pageId },
+        internalReference: mockReference(pageId),
       },
       ...dataset,
     ],
@@ -82,26 +74,26 @@ function resolveId(pageId: string, locale: string): Promise<unknown> {
 
 describe(translatedReference, () => {
   it('resolves to the translation in the requested language', async () => {
-    expect(await resolveId('about-en', NL)).toMatchObject({
-      target: { _id: 'about-nl' },
+    expect(await resolveId(MOCK_ABOUT_EN_PAGE_ID, NL)).toMatchObject({
+      target: { _id: MOCK_ABOUT_NL_PAGE_ID },
     });
   });
 
   it('falls back to the default-language page when no translation exists', async () => {
-    expect(await resolveId('about-en', FR)).toMatchObject({
-      target: { _id: 'about-en' },
+    expect(await resolveId(MOCK_ABOUT_EN_PAGE_ID, FR)).toMatchObject({
+      target: { _id: MOCK_ABOUT_EN_PAGE_ID },
     });
   });
 
   it('resolves from a translation back to the requested language', async () => {
-    expect(await resolveId('about-nl', EN)).toMatchObject({
-      target: { _id: 'about-en' },
+    expect(await resolveId(MOCK_ABOUT_NL_PAGE_ID, EN)).toMatchObject({
+      target: { _id: MOCK_ABOUT_EN_PAGE_ID },
     });
   });
 
   it('resolves to the referenced page when it has no translations at all', async () => {
-    expect(await resolveId('contact-en', NL)).toMatchObject({
-      target: { _id: 'contact-en' },
+    expect(await resolveId(CONTACT_EN_PAGE_ID, NL)).toMatchObject({
+      target: { _id: CONTACT_EN_PAGE_ID },
     });
   });
 });

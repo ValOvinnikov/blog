@@ -1,34 +1,27 @@
+import {
+  MOCK_TENANT_MIGRATE_CLI_ENV,
+  MOCK_TENANT_MIGRATE_PARAMS,
+} from '@blog/db/testing/migrate-tenant-content/fixtures';
+
 import { isTenantMigrationLedgerEmpty } from './read-tenant-migration-ledger';
 
 const { execFileSyncMock } = vi.hoisted(() => ({ execFileSyncMock: vi.fn() }));
 
 vi.mock('node:child_process', () => ({ execFileSync: execFileSyncMock }));
 
-const params = {
-  projectId: 'proj-1',
-  dataset: 'production',
-  token: 'write-token',
-};
-
 beforeEach(() => {
   execFileSyncMock.mockReset().mockReturnValue('[]');
 });
 
 describe(isTenantMigrationLedgerEmpty, () => {
-  it('is empty when no migrationState document exists yet', () => {
-    expect(isTenantMigrationLedgerEmpty(params)).toBe(true);
-  });
+  it.each([
+    ['no migrationState document exists yet', []],
+    ['the ledger exists with no applied entries', [{ applied: [] }]],
+    ['the ledger document has no applied field at all', [{}]],
+  ])('is empty when %s', (_case, ledger) => {
+    execFileSyncMock.mockReturnValue(JSON.stringify(ledger));
 
-  it('is empty when the ledger exists with no applied entries', () => {
-    execFileSyncMock.mockReturnValue(JSON.stringify([{ applied: [] }]));
-
-    expect(isTenantMigrationLedgerEmpty(params)).toBe(true);
-  });
-
-  it('is empty when the ledger document has no applied field at all', () => {
-    execFileSyncMock.mockReturnValue(JSON.stringify([{}]));
-
-    expect(isTenantMigrationLedgerEmpty(params)).toBe(true);
+    expect(isTenantMigrationLedgerEmpty(MOCK_TENANT_MIGRATE_PARAMS)).toBe(true);
   });
 
   it('is not empty once the ledger has recorded an applied migration', () => {
@@ -45,15 +38,19 @@ describe(isTenantMigrationLedgerEmpty, () => {
       ]),
     );
 
-    expect(isTenantMigrationLedgerEmpty(params)).toBe(false);
+    expect(isTenantMigrationLedgerEmpty(MOCK_TENANT_MIGRATE_PARAMS)).toBe(
+      false,
+    );
   });
 
   it('overrides the per-tenant Sanity env vars for the CLI invocation', () => {
-    isTenantMigrationLedgerEmpty(params);
+    isTenantMigrationLedgerEmpty(MOCK_TENANT_MIGRATE_PARAMS);
 
-    expect(execFileSyncMock).toHaveBeenCalledWith(
-      'pnpm',
-      [
+    const [command, args, { env }] = execFileSyncMock.mock.lastCall ?? [];
+
+    expect({ command, args, env }).toEqual({
+      command: 'pnpm',
+      args: [
         'exec',
         'sanity',
         'documents',
@@ -62,14 +59,8 @@ describe(isTenantMigrationLedgerEmpty, () => {
         '--api-version',
         '2024-08-01',
       ],
-      expect.objectContaining({
-        env: expect.objectContaining({
-          SANITY_STUDIO_PROJECT_ID: 'proj-1',
-          SANITY_STUDIO_DATASET: 'production',
-          SANITY_AUTH_TOKEN: 'write-token',
-        }),
-      }),
-    );
+      env: { ...process.env, ...MOCK_TENANT_MIGRATE_CLI_ENV },
+    });
   });
 
   it('propagates a systemic CLI failure', () => {
@@ -78,6 +69,8 @@ describe(isTenantMigrationLedgerEmpty, () => {
       throw error;
     });
 
-    expect(() => isTenantMigrationLedgerEmpty(params)).toThrow(error);
+    expect(() =>
+      isTenantMigrationLedgerEmpty(MOCK_TENANT_MIGRATE_PARAMS),
+    ).toThrow(error);
   });
 });

@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTagPage } from './get-tag-page';
@@ -16,7 +17,7 @@ describe(getTagPage, () => {
   });
 
   it('forwards the slug and the resolved tenant context to the tag page service', async () => {
-    getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTagPageMock.mockResolvedValue(okResult());
 
     await getTagPage('typescript');
 
@@ -27,7 +28,7 @@ describe(getTagPage, () => {
   });
 
   it('returns the raw TResult from getTagPage unchanged', async () => {
-    const result = { ok: true, data: { tag: { title: 'TypeScript' } } };
+    const result = okResult({ tag: { title: 'TypeScript' } });
     getTagPageMock.mockResolvedValue(result);
 
     await expect(getTagPage('typescript')).resolves.toBe(result);
@@ -42,7 +43,7 @@ describe('getTagPage memoization', () => {
 
   it('dedupes the tag-page query across one render pass with the same arguments', async () => {
     getTagPageMock.mockReset();
-    getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTagPageMock.mockResolvedValue(okResult());
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();

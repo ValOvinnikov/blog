@@ -1,82 +1,75 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
 import {
+  DISPLAY_MODE,
+  LOCALE_ISO_CODES,
+  POST_SOURCE,
+} from '@blog/config/constants';
+import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
+import {
+  MOCK_DUTCH_MODULE_HEADING,
+  MOCK_ENGLISH_MODULE_HEADING,
+  MOCK_MODULE_ID,
+  mockModuleDocument,
+  mockRawPostFeaturedModule,
+} from '@blog/service/testing/modules/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  MOCK_DESIGN_EN_POST_ID,
+  MOCK_DESIGN_NL_POST_ID,
+  MOCK_LAUNCH_EN_POST_ID,
+  MOCK_ONLY_EN_POST_ID,
+  MOCK_PINNED_POST_DOCUMENTS,
+  MOCK_SCHEDULED_NL_POST_ID,
+  MOCK_SOLO_NL_POST_ID,
   toIds,
-  pinnedPostDocuments,
 } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { postFeaturedModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const moduleDocument = {
-  _id: 'module-1',
+const moduleDocument = mockModuleDocument({
   _type: 'module_postFeatured',
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({
-      [EN]: 'Latest posts',
-      [NL]: 'Nieuwste berichten',
-    }),
-  },
-  postSource: 'PINNED',
+  postSource: POST_SOURCE.PINNED,
   posts: [],
-};
+});
 
 async function runPostFeatured(locale: string) {
   const raw = await evaluateGroqExpression(
     postFeaturedModuleQuery.query,
     [moduleDocument],
     undefined,
-    { id: 'module-1', locale, defaultLocale: EN },
+    { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return postFeaturedModuleQuery.parse(raw);
 }
 
 describe('postFeaturedModuleQuery', () => {
-  it('filters to module_postFeatured documents by id', () => {
-    expect(postFeaturedModuleQuery.query).toContain(
-      '_type == "module_postFeatured"',
-    );
-    expect(postFeaturedModuleQuery.query).toContain('_id == $id');
-  });
-
   it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawPostFeaturedModule(), headingBlock: null };
+    const raw = { ...mockRawPostFeaturedModule(), headingBlock: null };
 
     expect(() => postFeaturedModuleQuery.parse(raw)).toThrow();
   });
 
-  it('projects postSource and limit', () => {
-    expect(postFeaturedModuleQuery.query).toContain('postSource');
-    expect(postFeaturedModuleQuery.query).toContain('limit');
+  it('defaults showImages and displayMode for a document authored without them', async () => {
+    const { showImages, displayMode } = await runPostFeatured(EN);
+
+    expect(showImages).toBe(true);
+    expect(displayMode).toBe(DISPLAY_MODE.GRID);
   });
 
-  it('coalesces showImages to true for documents authored before the field existed', () => {
-    expect(postFeaturedModuleQuery.query).toContain(
-      'coalesce(showImages, true)',
-    );
-  });
-
-  it('coalesces displayMode to GRID for documents authored before the field existed', () => {
-    expect(postFeaturedModuleQuery.query).toContain(
-      'coalesce(displayMode, "GRID")',
-    );
-  });
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runPostFeatured(NL);
 
-    expect(headingBlock.heading).toBe('Nieuwste berichten');
+    expect(headingBlock.heading).toBe(MOCK_DUTCH_MODULE_HEADING);
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runPostFeatured(FR);
 
-    expect(headingBlock.heading).toBe('Latest posts');
+    expect(headingBlock.heading).toBe(MOCK_ENGLISH_MODULE_HEADING);
   });
 });
 
@@ -87,9 +80,9 @@ describe('postFeaturedModuleQuery language scoping', () => {
   ): Promise<string[]> {
     const raw = (await evaluateGroqExpression(
       postFeaturedModuleQuery.query,
-      [{ ...moduleDocument, ...module }, ...pinnedPostDocuments],
+      [{ ...moduleDocument, ...module }, ...MOCK_PINNED_POST_DOCUMENTS],
       undefined,
-      { id: 'module-1', locale, defaultLocale: EN },
+      { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
     )) as { posts: unknown[] };
 
     return toIds(
@@ -102,82 +95,72 @@ describe('postFeaturedModuleQuery language scoping', () => {
   }
 
   const pinned = {
-    postSource: 'PINNED',
+    postSource: POST_SOURCE.PINNED,
     posts: [
-      { _key: 'a', _type: 'reference', _ref: 'only-en' },
-      { _key: 'b', _type: 'reference', _ref: 'design-en' },
+      mockReference(MOCK_ONLY_EN_POST_ID, { _key: 'a' }),
+      mockReference(MOCK_DESIGN_EN_POST_ID, { _key: 'b' }),
     ],
   };
 
   it('keeps pinned posts in authored order in their own language', async () => {
-    expect(await runPosts(pinned, EN)).toEqual(['only-en', 'design-en']);
+    expect(await runPosts(pinned, EN)).toEqual([
+      MOCK_ONLY_EN_POST_ID,
+      MOCK_DESIGN_EN_POST_ID,
+    ]);
   });
 
   it('swaps a pinned post for its translation and drops one with none', async () => {
-    expect(await runPosts(pinned, NL)).toEqual(['design-nl']);
+    expect(await runPosts(pinned, NL)).toEqual([MOCK_DESIGN_NL_POST_ID]);
   });
 
-  it('keeps a pinned post without a translation group in its own language', async () => {
-    expect(
-      await runPosts(
-        {
-          postSource: 'PINNED',
-          posts: [{ _key: 'a', _type: 'reference', _ref: 'solo-nl' }],
-        },
-        NL,
-      ),
-    ).toEqual(['solo-nl']);
-  });
+  it.each([
+    [
+      'keeps a pinned post with no translation group in its own language',
+      MOCK_SOLO_NL_POST_ID,
+      NL,
+      [MOCK_SOLO_NL_POST_ID],
+    ],
+    [
+      'drops a pinned post with no translation group in another language',
+      MOCK_SOLO_NL_POST_ID,
+      EN,
+      [],
+    ],
+    [
+      'drops a pinned post whose translation is scheduled',
+      MOCK_LAUNCH_EN_POST_ID,
+      NL,
+      [],
+    ],
+    ['drops a pinned scheduled post', MOCK_SCHEDULED_NL_POST_ID, NL, []],
+  ])('%s', async (_, ref, locale, expected) => {
+    const ids = await runPosts(
+      {
+        postSource: POST_SOURCE.PINNED,
+        posts: [mockReference(ref, { _key: 'a' })],
+      },
+      locale,
+    );
 
-  it('drops a pinned post without a translation group in another language', async () => {
-    expect(
-      await runPosts(
-        {
-          postSource: 'PINNED',
-          posts: [{ _key: 'a', _type: 'reference', _ref: 'solo-nl' }],
-        },
-        EN,
-      ),
-    ).toEqual([]);
-  });
-
-  it('drops a pinned post whose translation is scheduled', async () => {
-    expect(
-      await runPosts(
-        {
-          postSource: 'PINNED',
-          posts: [{ _key: 'a', _type: 'reference', _ref: 'launch-en' }],
-        },
-        NL,
-      ),
-    ).toEqual([]);
-  });
-
-  it('drops a pinned scheduled post', async () => {
-    expect(
-      await runPosts(
-        {
-          postSource: 'PINNED',
-          posts: [{ _key: 'a', _type: 'reference', _ref: 'scheduled-nl' }],
-        },
-        NL,
-      ),
-    ).toEqual([]);
+    expect(ids).toEqual(expected);
   });
 
   it('falls back to the newest featured posts in the request language', async () => {
-    const newest = { postSource: 'NEWEST_FEATURED' };
+    const newest = { postSource: POST_SOURCE.NEWEST_FEATURED };
 
-    expect(await runPosts(newest, EN)).toEqual(['only-en', 'design-en']);
-    expect(await runPosts(newest, NL)).toEqual(['design-nl']);
+    expect(await runPosts(newest, EN)).toEqual([
+      MOCK_ONLY_EN_POST_ID,
+      MOCK_DESIGN_EN_POST_ID,
+    ]);
+    expect(await runPosts(newest, NL)).toEqual([MOCK_DESIGN_NL_POST_ID]);
   });
 });
 
 describe('postFeaturedModuleQuery parsed posts', () => {
   const topic = {
-    _id: 'topic-1',
+    _id: MOCK_TOPIC_ID,
     _type: 'blog_topic',
-    title: localizedStrings({ [EN]: 'Design' }),
+    title: mockLocalizedStrings({ [EN]: 'Design' }),
   };
   const author = { _id: 'person-1', _type: 'person', name: 'Ada' };
 
@@ -190,8 +173,8 @@ describe('postFeaturedModuleQuery parsed posts', () => {
       publishedAt,
       slug: { current: id },
       headingBlock: { _type: 'pageHeadingBlock', heading: id },
-      author: { _type: 'reference', _ref: 'person-1' },
-      topic: { _type: 'reference', _ref: 'topic-1' },
+      author: mockReference('person-1'),
+      topic: mockReference(MOCK_TOPIC_ID),
     };
   }
 
@@ -207,7 +190,7 @@ describe('postFeaturedModuleQuery parsed posts', () => {
         postDocument('newer-nl', NL, '2026-01-03T00:00:00Z'),
       ],
       undefined,
-      { id: 'module-1', locale: EN, defaultLocale: EN },
+      { id: MOCK_MODULE_ID, locale: EN, defaultLocale: EN },
     );
 
     return postFeaturedModuleQuery
@@ -216,17 +199,16 @@ describe('postFeaturedModuleQuery parsed posts', () => {
   }
 
   it('keeps the newest featured posts through parsing', async () => {
-    expect(await runParsedPosts({ postSource: 'NEWEST_FEATURED' })).toEqual([
-      'newer-en',
-      'older-en',
-    ]);
+    expect(
+      await runParsedPosts({ postSource: POST_SOURCE.NEWEST_FEATURED }),
+    ).toEqual(['newer-en', 'older-en']);
   });
 
   it('keeps pinned posts through parsing', async () => {
     expect(
       await runParsedPosts({
-        postSource: 'PINNED',
-        posts: [{ _key: 'a', _type: 'reference', _ref: 'older-en' }],
+        postSource: POST_SOURCE.PINNED,
+        posts: [mockReference('older-en', { _key: 'a' })],
       }),
     ).toEqual(['older-en']);
   });

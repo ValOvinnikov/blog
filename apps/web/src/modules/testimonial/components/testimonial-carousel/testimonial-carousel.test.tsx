@@ -1,21 +1,19 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
-import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
+import {
+  MOCK_TESTIMONIAL_HEADING,
+  MOCK_TESTIMONIAL_ITEMS,
+} from '@web/testing/modules/testimonial/fixtures';
 
 import { TestimonialCarousel } from './testimonial-carousel';
 
 vi.mock('@web/i18n/navigation');
 
-const items = [
-  makeTestimonialItem({ id: 'testimonial-1', name: 'Jordan Reyes' }),
-  makeTestimonialItem({ id: 'testimonial-2', name: 'Priya Nair' }),
-];
-
 const setup = customRender(TestimonialCarousel, {
-  items,
+  items: MOCK_TESTIMONIAL_ITEMS,
   align: 'left',
   tone: BRAND_VARIANT.PRIMARY,
-  title: 'What our customers say',
+  title: MOCK_TESTIMONIAL_HEADING,
 });
 
 describe(`<${TestimonialCarousel.name}/>`, () => {
@@ -23,19 +21,19 @@ describe(`<${TestimonialCarousel.name}/>`, () => {
     setup();
 
     const region = screen.getByRole('region', {
-      name: 'What our customers say carousel',
+      name: `${MOCK_TESTIMONIAL_HEADING} carousel`,
     });
-    expect(within(region).getAllByRole('blockquote')).toHaveLength(
-      items.length,
-    );
-    items.forEach((item) => {
-      expect(
-        within(region).getByText(item.name, { ignore: '.sr-only' }),
-      ).toBeVisible();
+    const quotes = within(region).getAllByRole('blockquote');
+    expect(quotes).toHaveLength(MOCK_TESTIMONIAL_ITEMS.length);
+    MOCK_TESTIMONIAL_ITEMS.forEach((item) => {
+      const name = within(region).getByText(item.name, { ignore: '.sr-only' });
+      expect(name).toBeVisible();
     });
-    expect(
-      await screen.findByRole('button', { name: 'Previous slide' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
+    const previousButton = await screen.findByRole('button', {
+      name: 'Previous slide',
+    });
+    const nextButton = screen.getByRole('button', { name: 'Next slide' });
+    expect(previousButton).toBeVisible();
+    expect(nextButton).toBeVisible();
   });
 });

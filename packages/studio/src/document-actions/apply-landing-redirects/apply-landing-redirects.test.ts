@@ -1,31 +1,17 @@
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
 import { applyLandingRedirects } from '@blog/studio/document-actions/apply-landing-redirects/apply-landing-redirects';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
-import { evaluate, parse } from 'groq-js';
-import type { SanityClient } from 'sanity';
+import {
+  mockLandingPage,
+  mockRedirect,
+} from '@blog/studio/testing/mock-documents';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import type { SanityClient, SanityDocument } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const page = (
-  _id: string,
-  slug: string,
-  parent?: string,
-  language: string = EN,
-) => ({
-  _id,
-  _type: PAGE_LANDING_TYPE,
-  language,
-  slug: { _type: 'slug', current: slug },
-  ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
-});
-
-const redirect = (
-  _id: string,
-  source: string,
-  destination: string,
-  language: string = EN,
-) => ({ _id, _type: REDIRECT_TYPE, language, source, destination });
+const FAQ_DRAFT_ID = 'drafts.faq';
+const QUESTIONS_PATH = '/questions';
 
 const createClient = (dataset: unknown[]) => {
   const operations: unknown[] = [];
@@ -50,8 +36,7 @@ const createClient = (dataset: unknown[]) => {
     },
   };
   const client = {
-    fetch: async (query: string, params: Record<string, unknown>) =>
-      (await evaluate(parse(query), { dataset, params })).get(),
+    fetch: mockGroqFetch(dataset),
     transaction: () => transaction,
   } as unknown as Pick<SanityClient, 'fetch' | 'transaction'>;
 
@@ -59,16 +44,33 @@ const createClient = (dataset: unknown[]) => {
 };
 
 describe(applyLandingRedirects, () => {
+  let faq: SanityDocument;
+  let help: SanityDocument;
+  let faqDraft: SanityDocument;
+
+  beforeEach(() => {
+    faq = mockLandingPage({ _id: 'faq', slug: 'faq', language: EN });
+    help = mockLandingPage({ _id: 'help', slug: 'help', language: EN });
+    faqDraft = mockLandingPage({
+      _id: FAQ_DRAFT_ID,
+      slug: 'faq',
+      language: EN,
+    });
+  });
+
   describe('with a single faq page', () => {
     let client: ReturnType<typeof createClient>['client'];
     let operations: ReturnType<typeof createClient>['operations'];
 
     beforeEach(() => {
-      ({ client, operations } = createClient([page('faq', 'faq')]));
+      ({ client, operations } = createClient([faq]));
     });
 
     it('redirects a renamed page from its old path with an automatic, permanent redirect', async () => {
-      await applyLandingRedirects(client, page('drafts.faq', 'questions'));
+      await applyLandingRedirects(
+        client,
+        mockLandingPage({ _id: FAQ_DRAFT_ID, slug: 'questions', language: EN }),
+      );
 
       expect(operations).toEqual([
         {
@@ -76,7 +78,7 @@ describe(applyLandingRedirects, () => {
             _type: REDIRECT_TYPE,
             language: EN,
             source: '/faq',
-            destination: '/questions',
+            destination: QUESTIONS_PATH,
             isPrefix: false,
             status: REDIRECT_STATUS.PERMANENT,
             isAutomatic: true,
@@ -87,19 +89,24 @@ describe(applyLandingRedirects, () => {
     });
 
     it('writes nothing when the path is unchanged', async () => {
-      await applyLandingRedirects(client, page('drafts.faq', 'faq'));
+      await applyLandingRedirects(client, faqDraft);
 
       expect(operations).toEqual([]);
     });
   });
 
   it('redirects a re-parented page to its path under the new parent', async () => {
-    const { client, operations } = createClient([
-      page('help', 'help'),
-      page('faq', 'faq'),
-    ]);
+    const { client, operations } = createClient([help, faq]);
 
-    await applyLandingRedirects(client, page('drafts.faq', 'faq', 'help'));
+    await applyLandingRedirects(
+      client,
+      mockLandingPage({
+        _id: FAQ_DRAFT_ID,
+        slug: 'faq',
+        parent: 'help',
+        language: EN,
+      }),
+    );
 
     expect(operations).toContainEqual({
       create: expect.objectContaining({
@@ -112,12 +119,25 @@ describe(applyLandingRedirects, () => {
 
   it('makes a prefix redirect when a renamed parent has sub-pages', async () => {
     const { client, operations } = createClient([
-      page('modules', 'modules'),
-      page('faq', 'faq', 'modules'),
-      page('pricing', 'pricing', 'modules'),
+      mockLandingPage({ _id: 'modules', slug: 'modules', language: EN }),
+      mockLandingPage({
+        _id: 'faq',
+        slug: 'faq',
+        parent: 'modules',
+        language: EN,
+      }),
+      mockLandingPage({
+        _id: 'pricing',
+        slug: 'pricing',
+        parent: 'modules',
+        language: EN,
+      }),
     ]);
 
-    await applyLandingRedirects(client, page('drafts.modules', 'catalog'));
+    await applyLandingRedirects(
+      client,
+      mockLandingPage({ _id: 'drafts.modules', slug: 'catalog', language: EN }),
+    );
 
     expect(operations).toEqual([
       {
@@ -133,14 +153,28 @@ describe(applyLandingRedirects, () => {
 
   it('collapses and clears existing redirects in the same language only', async () => {
     const { client, operations } = createClient([
-      page('faq', 'faq', 'help'),
-      page('help', 'help'),
-      redirect('r1', '/questions', '/help/faq'),
-      redirect('r2', '/faq', '/help/faq'),
-      redirect('r3', '/questions', '/help/faq', NL),
+      mockLandingPage({
+        _id: 'faq',
+        slug: 'faq',
+        parent: 'help',
+        language: EN,
+      }),
+      help,
+      mockRedirect({
+        _id: 'r1',
+        source: QUESTIONS_PATH,
+        destination: '/help/faq',
+      }),
+      mockRedirect({ _id: 'r2', source: '/faq', destination: '/help/faq' }),
+      mockRedirect({
+        _id: 'r3',
+        source: QUESTIONS_PATH,
+        destination: '/help/faq',
+        language: NL,
+      }),
     ]);
 
-    await applyLandingRedirects(client, page('drafts.faq', 'faq'));
+    await applyLandingRedirects(client, faqDraft);
 
     expect(operations).toEqual([
       { delete: 'r2' },
@@ -158,7 +192,7 @@ describe(applyLandingRedirects, () => {
   it('writes nothing on a first publish', async () => {
     const { client, operations } = createClient([]);
 
-    await applyLandingRedirects(client, page('drafts.faq', 'faq'));
+    await applyLandingRedirects(client, faqDraft);
 
     expect(operations).toEqual([]);
   });

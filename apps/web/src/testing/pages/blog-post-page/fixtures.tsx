@@ -1,18 +1,23 @@
 import type { TPostDetail } from '@blog/service';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
-export const POST_DETAIL_AUTHOR_IMAGE = makeSanityImage({
+const POST_TITLE = 'Hello World';
+const POST_EXCERPT = 'A sufficiently long excerpt for the card.';
+const HERO_IMAGE_ALT = 'A hero image';
+
+export const POST_DETAIL_AUTHOR_IMAGE = mockSanityImage({
   assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-400x400-jpg',
   alt: 'Jane Doe',
 });
 
 export const mockPostDetail: TPostDetail = {
   id: 'post-1',
-  title: 'Hello World',
+  title: POST_TITLE,
   slug: 'hello-world',
-  excerpt: 'A sufficiently long excerpt for the card.',
+  excerpt: POST_EXCERPT,
   publishedAt: '2026-01-15T00:00:00Z',
-  heroImage: makeSanityImage({ alt: 'A hero image' }),
+  heroImage: mockSanityImage({ alt: HERO_IMAGE_ALT }),
   featured: false,
   body: [
     {
@@ -26,13 +31,13 @@ export const mockPostDetail: TPostDetail = {
   postTakeaways: undefined,
   hasAsides: false,
   modules: [{ id: 'related-1', type: 'module_postRelated' }],
-  seo: {
-    title: 'Hello World',
-    description: 'A sufficiently long excerpt for the card.',
-    ogTitle: 'Hello World',
-    ogDescription: 'A sufficiently long excerpt for the card.',
-    ogImage: makeSanityImage({ alt: 'A hero image' }),
-  },
+  seo: mockSeo({
+    title: POST_TITLE,
+    description: POST_EXCERPT,
+    ogTitle: POST_TITLE,
+    ogDescription: POST_EXCERPT,
+    ogImage: mockSanityImage({ alt: HERO_IMAGE_ALT }),
+  }),
   author: {
     id: 'author-1',
     name: 'Jane Doe',

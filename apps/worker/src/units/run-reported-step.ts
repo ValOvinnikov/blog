@@ -6,6 +6,7 @@ import {
 import { getTenantById } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
+import { errorResult, okResult, type TResult } from '@blog/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { reportStep } from '@worker/utils/provisioning-report/provisioning-report';
@@ -14,7 +15,7 @@ import { FatalError, getStepMetadata } from 'workflow';
 export type TUnitContext = { runId: string; isOneShot?: boolean };
 
 export type TUnitResult<TStep extends string = TTenantProvisioningStep> =
-  { ok: true } | { ok: false; failedStep: TStep };
+  TResult<void, TStep>;
 
 export type TStepReporter<TStep extends string> = {
   failedEvent: string;
@@ -94,7 +95,7 @@ export async function runStepWithReporter<TStep extends string>(
       status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
       error: message,
     });
-    return { ok: false, failedStep: step };
+    return errorResult(step);
   }
 
   await report({
@@ -102,5 +103,5 @@ export async function runStepWithReporter<TStep extends string>(
     step,
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
   });
-  return { ok: true };
+  return okResult();
 }

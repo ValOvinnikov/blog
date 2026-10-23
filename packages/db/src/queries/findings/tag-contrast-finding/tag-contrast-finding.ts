@@ -2,7 +2,7 @@ import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { buildContrastDedupeKey } from '@blog/db/queries/findings/contrast-dedupe-key';
 import { findings, type TFinding } from '@blog/db/schema/findings';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 
 export async function tagContrastFinding(
@@ -20,8 +20,8 @@ export async function tagContrastFinding(
     .returning();
 
   if (!tagged) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: tagged };
+  return okResult(tagged);
 }

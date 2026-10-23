@@ -6,7 +6,9 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
@@ -63,14 +65,8 @@ describe('startContrastCheckAction', () => {
     authMock.mockReset().mockResolvedValue({
       user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
     });
-    getBranchHeadShaMock.mockReset().mockResolvedValue({
-      ok: true,
-      data: headSha,
-    });
-    isWorkflowRunActiveMock.mockReset().mockResolvedValue({
-      ok: true,
-      data: false,
-    });
+    getBranchHeadShaMock.mockReset().mockResolvedValue(okResult(headSha));
+    isWorkflowRunActiveMock.mockReset().mockResolvedValue(okResult(false));
     dispatchContrastWorkflowMock.mockReset().mockResolvedValue(true);
     insertAuditEventMock.mockReset().mockResolvedValue({ id: 'event-1' });
     ({ startContrastCheckAction } =
@@ -106,7 +102,7 @@ describe('startContrastCheckAction', () => {
   });
 
   it('refuses, dispatching and recording nothing, while a run is in progress', async () => {
-    isWorkflowRunActiveMock.mockResolvedValue({ ok: true, data: true });
+    isWorkflowRunActiveMock.mockResolvedValue(okResult(true));
 
     const result = await startContrastCheckAction();
 
@@ -119,10 +115,9 @@ describe('startContrastCheckAction', () => {
   });
 
   it('is unavailable when the head commit cannot be read', async () => {
-    getBranchHeadShaMock.mockResolvedValue({
-      ok: false,
-      reason: 'githubError',
-    });
+    getBranchHeadShaMock.mockResolvedValue(
+      errorResult(GITHUB_FAILURE.GITHUB_ERROR),
+    );
 
     const result = await startContrastCheckAction();
 
@@ -131,10 +126,9 @@ describe('startContrastCheckAction', () => {
   });
 
   it('is unavailable when the active run status cannot be read', async () => {
-    isWorkflowRunActiveMock.mockResolvedValue({
-      ok: false,
-      reason: 'rateLimited',
-    });
+    isWorkflowRunActiveMock.mockResolvedValue(
+      errorResult(GITHUB_FAILURE.RATE_LIMITED),
+    );
 
     const result = await startContrastCheckAction();
 

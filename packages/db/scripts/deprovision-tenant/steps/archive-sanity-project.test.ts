@@ -1,9 +1,7 @@
 import { SANITY_PROJECT_ARCHIVE_OUTCOME } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 import { toOutcome } from '@blog/utils/to-outcome';
-
-import type { TDeprovisionEnv } from '../lib/env';
 
 import { archiveTenantSanityProject } from './archive-sanity-project';
 
@@ -18,40 +16,8 @@ vi.mock(
   }),
 );
 
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
-
-function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj123',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'enc',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'READY',
-    provisioningSteps: null,
-    seededAt: new Date(),
-    deprovisionedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  } as TTenant;
-}
+const MOCK_TENANT = mockTenant();
+const MOCK_ARCHIVE_ERROR = 'network error';
 
 beforeEach(() => {
   archiveSanityProjectMock
@@ -61,25 +27,28 @@ beforeEach(() => {
 
 describe(archiveTenantSanityProject, () => {
   it('archives the Sanity project when one is set', async () => {
-    await archiveTenantSanityProject(baseTenant(), env);
+    await archiveTenantSanityProject(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(archiveSanityProjectMock).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
+      token: MOCK_DEPROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_TENANT.sanityProjectId,
     });
   });
 
   it('skips when no Sanity project id is set', async () => {
     await archiveTenantSanityProject(
-      baseTenant({ sanityProjectId: null }),
-      env,
+      { ...MOCK_TENANT, sanityProjectId: null },
+      MOCK_DEPROVISION_ENV,
     );
 
     expect(archiveSanityProjectMock).not.toHaveBeenCalled();
   });
 
   it('does not call the API in dry-run mode', async () => {
-    await archiveTenantSanityProject(baseTenant(), { ...env, dryRun: true });
+    await archiveTenantSanityProject(MOCK_TENANT, {
+      ...MOCK_DEPROVISION_ENV,
+      dryRun: true,
+    });
 
     expect(archiveSanityProjectMock).not.toHaveBeenCalled();
   });
@@ -90,16 +59,16 @@ describe(archiveTenantSanityProject, () => {
     );
 
     await expect(
-      archiveTenantSanityProject(baseTenant(), env),
+      archiveTenantSanityProject(MOCK_TENANT, MOCK_DEPROVISION_ENV),
     ).resolves.toBeUndefined();
     expect(archiveSanityProjectMock).toHaveBeenCalledTimes(1);
   });
 
   it('throws on a genuine archiving failure', async () => {
-    archiveSanityProjectMock.mockRejectedValue(new Error('network error'));
+    archiveSanityProjectMock.mockRejectedValue(new Error(MOCK_ARCHIVE_ERROR));
 
-    await expect(archiveTenantSanityProject(baseTenant(), env)).rejects.toThrow(
-      'network error',
-    );
+    await expect(
+      archiveTenantSanityProject(MOCK_TENANT, MOCK_DEPROVISION_ENV),
+    ).rejects.toThrow(MOCK_ARCHIVE_ERROR);
   });
 });

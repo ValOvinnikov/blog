@@ -2,6 +2,7 @@ import {
   DEPROVISIONING_STEP,
   type TDeprovisioningStep,
 } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils/result';
 import { UNKNOWN_RUN_ERROR } from '@worker/constants/provisioning';
 import {
   beginDeprovisioning,
@@ -26,23 +27,22 @@ export async function runDeprovisioningSequence(
   ctx: TUnitContext,
 ): Promise<TDeprovisioningOutcome> {
   if (!(await beginDeprovisioning(tenantId))) {
-    return { ok: true, skipped: true };
+    return okResult({ skipped: true });
   }
 
-  let outcome: TDeprovisioningOutcome = { ok: true };
+  let outcome: TDeprovisioningOutcome = okResult({ skipped: false });
   try {
     for (const step of DEPROVISIONING_ORDER) {
       const result = await runDeprovisioningStep(tenantId, ctx, step);
       if (!result.ok) {
-        outcome = result;
+        outcome = errorResult({ failedStep: result.error });
         break;
       }
     }
   } catch (error) {
-    outcome = {
-      ok: false,
-      error: error instanceof Error ? error.message : UNKNOWN_RUN_ERROR,
-    };
+    outcome = errorResult({
+      message: error instanceof Error ? error.message : UNKNOWN_RUN_ERROR,
+    });
   }
 
   await finishDeprovisioning(tenantId, ctx, outcome);

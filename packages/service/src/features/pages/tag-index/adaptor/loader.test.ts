@@ -1,105 +1,103 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawTagIndexPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawHeadingBlock,
-  makeRawSeo,
+  MOCK_TAG_INDEX_HEADING,
+  mockHeroSlotView,
+  mockRawCtaRef,
+  mockRawHeroRef,
+  mockRawTagIndexPage,
+  mockRawTaxonomyListRef,
+  mockTaxonomyListSlotView,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
+  MOCK_PAGE_TAG_INDEX_CACHE_TAG,
+  MOCK_TEMPLATE_TAG_INDEX_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  mockRawHeadingBlock,
+  mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getIndexPage } from './loader';
+import { tagIndexPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const SUPPORTING_TEXT = 'Find posts by keyword.';
+const META_TITLE = 'Tags — Blog';
 
-describe('getIndexPage', () => {
+const tenant = mockTenant();
+
+async function loadIndexPage(
+  overrides: Parameters<typeof mockRawTagIndexPage>[0] = {},
+) {
+  mockRun.mockResolvedValueOnce(mockRawTagIndexPage(overrides));
+  const result = await getIndexPage(tenant);
+  if (!result) throw new Error('expected a tag index page');
+
+  return result;
+}
+
+describe(getIndexPage, () => {
   it('exposes the headingBlock from the page_tagIndex singleton', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagIndexPage({
-        headingBlock: makeRawHeadingBlock('Browse by tag', {
-          supportingText: 'Find posts by keyword.',
-        }),
-        seo: makeRawSeo({
-          metaTitle: 'Tags — Blog',
-          metaDescription: 'Find posts by keyword.',
-        }),
+    const { headingBlock, seo } = await loadIndexPage({
+      headingBlock: mockRawHeadingBlock(MOCK_TAG_INDEX_HEADING, {
+        supportingText: SUPPORTING_TEXT,
       }),
-    );
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a tag index page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'Browse by tag',
-      supportingText: 'Find posts by keyword.',
+      seo: mockRawSeo({
+        metaTitle: META_TITLE,
+        metaDescription: SUPPORTING_TEXT,
+      }),
     });
-    expect(result.seo.title).toBe('Tags — Blog');
-    expect(result.seo.description).toBe('Find posts by keyword.');
+
+    expect(headingBlock).toEqual({
+      heading: MOCK_TAG_INDEX_HEADING,
+      supportingText: SUPPORTING_TEXT,
+    });
+    expect(seo.title).toBe(META_TITLE);
+    expect(seo.description).toBe(SUPPORTING_TEXT);
   });
 
-  it('maps the thin page-builder modules array to module refs', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagIndexPage({
-        modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
-      }),
-    );
+  it.each([
+    [
+      'maps the thin page-builder modules array to module refs',
+      [mockRawTaxonomyListRef()],
+      [mockTaxonomyListSlotView()],
+    ],
+    ['defaults modules to an empty array when the page has none', null, []],
+  ])('%s', async (_, modules, expected) => {
+    const result = await loadIndexPage({ modules });
 
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a tag index page');
-
-    expect(result.modules).toEqual([
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
-    ]);
+    expect(result.modules).toEqual(expected);
   });
 
-  it('defaults modules to an empty array when the page has none', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagIndexPage({ modules: null }));
+  it.each([
+    ['leaves hero undefined when page_tagIndex.hero is unset', null, undefined],
+    [
+      'maps a set page_tagIndex.hero to a hero slot',
+      mockRawHeroRef(),
+      mockHeroSlotView(),
+    ],
+  ])('%s', async (_, hero, expected) => {
+    const result = await loadIndexPage({ hero });
 
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a tag index page');
-
-    expect(result.modules).toEqual([]);
-  });
-
-  it('leaves hero undefined when page_tagIndex.hero is unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagIndexPage({ hero: null }));
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a tag index page');
-
-    expect(result.hero).toBeUndefined();
-  });
-
-  it('maps a set page_tagIndex.hero to a hero slot', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagIndexPage({
-        hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-      }),
-    );
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a tag index page');
-
-    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
+    expect(result.hero).toEqual(expected);
   });
 
   it('rejects when page_tagIndex.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawTagIndexPage({
-        hero: { _id: 'cta-1', _type: 'module_cta' as never },
+      mockRawTagIndexPage({
+        hero: mockRawCtaRef() as never,
       }),
     );
 
     await expect(getIndexPage(tenant)).rejects.toThrow();
   });
 
-  it('resolves undefined, rather than rejecting, when no page_tagIndex document exists', async () => {
+  it('resolves undefined when no page_tagIndex document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const result = await getIndexPage(tenant);
@@ -107,15 +105,10 @@ describe('getIndexPage', () => {
     expect(result).toBeUndefined();
   });
 
-  it('lists the page translations, counting a page with no language as the default', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagIndexPage({
-        translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
-      }),
-    );
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a tag index page');
+  it('lists the page translations, a page with no language as the default', async () => {
+    const result = await loadIndexPage({
+      translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
+    });
 
     expect(result.translations).toEqual([
       LOCALE_ISO_CODES.EN,
@@ -124,22 +117,20 @@ describe('getIndexPage', () => {
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagIndexPage());
+    mockRun.mockResolvedValueOnce(mockRawTagIndexPage());
 
     await getIndexPage(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:page_tagIndex',
-            't:tenant-a:template_tagIndex',
-            't:tenant-a:modules:taxonomyList',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(tagIndexPageQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_PAGE_TAG_INDEX_CACHE_TAG,
+          MOCK_TEMPLATE_TAG_INDEX_CACHE_TAG,
+          MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

@@ -68,7 +68,7 @@ export const doneDeprovisioningSteps = (): TTenantDeprovisioningState => {
   };
 };
 
-const doneProvisioningSteps = (): TTenantProvisioningState => {
+export const mockDoneProvisioningSteps = (): TTenantProvisioningState => {
   const done: TProvisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
   };
@@ -84,18 +84,63 @@ const doneProvisioningSteps = (): TTenantProvisioningState => {
   };
 };
 
-export const TENANT_ID = faker.string.uuid();
-export const TENANT_NAME = 'Acme Inc.';
-export const TENANT_PRIMARY_DOMAIN = 'acme.example.com';
+export const mockFirstStepRunningProvisioningSteps =
+  (): TTenantProvisioningState => ({
+    ...idleProvisioningSteps(),
+    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+    },
+  });
 
-const TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
+export const mockFirstStepDoneProvisioningSteps =
+  (): TTenantProvisioningState => ({
+    ...idleProvisioningSteps(),
+    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
+  });
+
+export const mockMapDomainFailedProvisioningSteps = (
+  error: string,
+): TTenantProvisioningState => ({
+  ...idleProvisioningSteps(),
+  [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    error,
+  },
+});
+
+export const TENANT_ID = faker.string.uuid();
+export const MOCK_TENANT_NAME = 'Acme Inc.';
+export const MOCK_TENANT_DOMAIN = 'acme.example.com';
+export const MOCK_TENANT_URL = `https://${MOCK_TENANT_DOMAIN}`;
+export const MOCK_OTHER_TENANT_ID = faker.string.uuid();
+export const MOCK_OTHER_TENANT_NAME = 'Globex Corp.';
+export const MOCK_OTHER_TENANT_DOMAIN = 'globex.example.org';
+export const MOCK_SITE_NAME = 'Northwind Field Notes';
+export const MOCK_CUSTOM_DOMAIN = 'northwind.example.dev';
+export const MOCK_CUSTOM_DOMAIN_URL = `https://${MOCK_CUSTOM_DOMAIN}`;
+export const MOCK_OWNER_EMAIL = 'tenant-owner@example.com';
+export const MOCK_INVITED_OWNER_EMAIL = 'invited-owner@example.com';
+export const INVITED_PENDING_TEXT = 'Invited, pending';
+export const MOCK_OWNER_JOINED_AT = new Date('2026-08-12T09:00:00.000Z');
+export const MOCK_ARCHIVED_AT = new Date('2026-08-26T09:00:00.000Z');
+export const MOCK_RUN_STARTED_AT = '2026-08-12T14:18:30.000Z';
+export const MOCK_RUN_PLUS_1_MIN_AT = '2026-08-12T14:19:30.000Z';
+export const MOCK_RUN_PLUS_2_MIN_AT = '2026-08-12T14:20:30.000Z';
+export const MOCK_RUN_PLUS_4_MIN_AT = '2026-08-12T14:22:30.000Z';
+export const MOCK_RUN_PLUS_6_MIN_AT = '2026-08-12T14:24:30.000Z';
+export const MOCK_RUN_PLUS_7_MIN_AT = '2026-08-12T14:25:30.000Z';
+
+export const MOCK_SANITY_PROJECT_ID = 'proj-1';
+export const MOCK_TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
 const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
 
 export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
     id: TENANT_ID,
-    name: TENANT_NAME,
-    primaryDomain: TENANT_PRIMARY_DOMAIN,
+    name: MOCK_TENANT_NAME,
+    primaryDomain: MOCK_TENANT_DOMAIN,
     sanityProjectId: null,
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
@@ -120,7 +165,7 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     ownerInviteHeadsUpSentAt: null,
     ownerInviteNudgeSentAt: null,
     ownerSiteReadySentAt: null,
-    lastActivityAt: TENANT_CREATED_AT,
+    lastActivityAt: MOCK_TENANT_CREATED_AT,
     inactivityWarnedAt: null,
     suspendedAt: null,
     deletionNotifiedAt: null,
@@ -129,19 +174,19 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     seededAt: null,
     webhookCreatedAt: null,
     deprovisionedAt: null,
-    createdAt: TENANT_CREATED_AT,
-    updatedAt: TENANT_CREATED_AT,
+    createdAt: MOCK_TENANT_CREATED_AT,
+    updatedAt: MOCK_TENANT_CREATED_AT,
     ...overrides,
   };
 };
 
 export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return makeTenant({
-    sanityProjectId: 'proj-1',
+    sanityProjectId: MOCK_SANITY_PROJECT_ID,
     sanityDataset: 'production',
     locale: LOCALE_ISO_CODES.EN,
     provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    provisioningSteps: doneProvisioningSteps(),
+    provisioningSteps: mockDoneProvisioningSteps(),
     seededAt: TENANT_SEEDED_AT,
     webhookCreatedAt: TENANT_SEEDED_AT,
     ...overrides,
@@ -151,3 +196,7 @@ export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
 export const makeClientTenant = (
   overrides: Partial<TTenant> = {},
 ): TClientTenant => toClientTenant(makeTenant(overrides));
+export const OWNER_EMAIL_LABEL = 'Owner email';
+export const PRIMARY_DOMAIN_LABEL = 'Primary domain';
+export const REACTIVATE_TENANT_LABEL = 'Reactivate tenant';
+export const CONFIRM_TENANT_NAME_LABEL = `Type "${MOCK_TENANT_NAME}" to confirm`;

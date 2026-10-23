@@ -26,14 +26,32 @@ not to test", and treats "nothing to add" as a complete outcome.
   `src/testing/`**, mirroring the source tree
   (`apps/web/src/components/pages/blog-post-page/` →
   `apps/web/src/testing/pages/blog-post-page/fixtures.tsx`). Export small
-  `make*` builders taking a `Partial<…>` overrides param, and import them
-  through the workspace alias (`@web/testing/…`), never a relative path.
-  Service builders return the raw `TRaw*` shape
-  (`makeRawPostCard` from `@blog/service/testing/pages/fixtures`). A fixture
-  one test file uses stays inline; it moves to `testing/` in the change that
+  builders taking a `Partial<…>` overrides param, named per "Fixture
+  naming", and import them through the workspace alias (`@web/testing/…`),
+  never a relative path. Service builders return the raw `TRaw*` shape. A
+  fixture one test file uses stays inline; it moves to `testing/` in the change that
   adds a second consumer — a story or any other test file counts. A fixture
   literal repeated across files is the same case: it becomes a builder.
   Story-only view-model data follows `web-storybook`.
+- **Fixture naming — required.** A function exported from `testing/`, a
+  `fixtures` file or `__mocks__/` that returns fake data is named
+  `mock<Thing>`; a fixed fake value exported from one is `MOCK_<THING>`. The
+  prefix keeps a fixture from reading as, or colliding with, product code
+  (`makeAsideTypeComponent` is a product factory).
+
+  ```ts
+  export const mockContactFormModule = (overrides = {}) => ({ … }); // ✅
+  export const MOCK_TENANT_ID = faker.string.uuid(); // ✅
+  export const makeContactFormModule = (overrides = {}) => ({ … }); // ❌
+  export const TEST_TENANT_ID = faker.string.uuid(); // ❌
+  ```
+
+  Render and setup helpers (`customRender`, `renderElement`,
+  `renderWithIntl`) are not fixtures and keep their names. Existing `make…`,
+  `get…` and `test…` fixtures are renamed when their workspace's rename
+  lands, never in a file the diff merely touches; a new fixture is named by
+  the rule from the start.
+
 - **Check `testing/` for a builder before writing a mock literal — required.**
   Before hand-rolling an object shaped like a domain entity (SEO, tag,
   author, post, category, tenant, membership, …), grep the workspace's
@@ -146,7 +164,7 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
 
   ```ts
   expect(updateProvisioningStep).toHaveBeenCalledWith({
-    tenantId: TEST_TENANT_ID,
+    tenantId: MOCK_TENANT_ID,
     step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     detail: ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
@@ -482,6 +500,30 @@ tenant)`) is fine: that call is the contract with the outside.
   component wraps the pure one instead of filling its slot — fix the
   structure (`web-component-practices`) and test the real tree.
 
+## When you touch a test file (mandatory)
+
+Test files carry no size budget, so this pass is what keeps them small.
+Every test file a diff creates or edits is pruned in that diff — the whole
+file, not only the cases the change adds. A test file the diff does not touch
+is left alone; this is never a sweep.
+
+- **A duplicate is deleted** — a test asserting the same behaviour as
+  another test in the file, however its arrangement differs.
+- **Behaviour another unit owns moves to that unit.** A case exercising a
+  hook, provider or shared component that has its own test file moves there
+  (or is deleted when that file already asserts it); the touched file keeps
+  one wiring test proving it uses the unit.
+- **Cases that differ only in input and expected output become one
+  `it.each` table.**
+- **A test "What not to test" bans is deleted** — a source-back assertion, a
+  class assertion, a Studio schema test.
+
+Report every test removed or moved with the test that still asserts its
+behaviour (file and `it` title). A removal whose behaviour is asserted
+nowhere else is blocking in review (`code-review-practices` §6), unless the
+test was deleted for failing "What not to test". The reviewer's mechanical
+scan names each touched test file over 500 lines, which gets this pass first.
+
 ## Coverage strategy
 
 Many fast unit tests (`ui`, `service`, migrations), few heavier route tests.
@@ -500,6 +542,7 @@ have a test? Report gaps rather than leaving them silent.
       no network, no real time.
 - [ ] Fixtures from `testing/` builders; inputs and expectations use existing
       consts; no value written twice; no const's own value asserted.
+- [ ] A new exported fixture is `mock<Thing>()` or `MOCK_<THING>`.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
 - [ ] No asymmetric matcher (`expect.objectContaining`, `expect.any`, …) inside
       an assertion; every expected value is exact.
@@ -507,5 +550,8 @@ have a test? Report gaps rather than leaving them silent.
       `expect(…)` anywhere in a file the change creates or touches.
 - [ ] Every `it` title is behaviour, 80 characters or fewer.
 - [ ] No arrangement repeated across `it`s; no prop bag rendered 3+ times.
+- [ ] Every touched test file pruned: no duplicate, no case another unit
+      owns, no untabled repeat; each removal reported with where its
+      behaviour is still asserted.
 - [ ] Migrations: transform correctness + idempotency.
 - [ ] `pnpm --filter <pkg> test` passes.

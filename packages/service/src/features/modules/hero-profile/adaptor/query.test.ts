@@ -1,25 +1,33 @@
-import { HERO_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { MOCK_HERO_MODULE_ID } from '@blog/service/testing/pages/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  mockLocalizedHeadingBlock,
+  mockLocalizedStrings,
+} from '@blog/service/testing/shared/localized';
 
 import { heroProfileModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
+const EN_EYEBROW = 'Founder';
+const NL_EYEBROW = 'Oprichter';
+
 const person = { _id: 'person-1', _type: 'person', name: 'Jane Doe' };
 
 const heroDocument = {
-  _id: 'hero-1',
+  _id: MOCK_HERO_MODULE_ID,
   _type: 'module_heroProfile',
-  brandVariant: 'PRIMARY',
+  brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({ [EN]: 'Meet Jane', [NL]: 'Maak kennis' }),
-  },
-  eyebrow: localizedStrings({ [EN]: 'Founder', [NL]: 'Oprichter' }),
-  author: { _type: 'reference', _ref: 'person-1' },
+  headingBlock: mockLocalizedHeadingBlock({
+    [EN]: 'Meet Jane',
+    [NL]: 'Maak kennis',
+  }),
+  eyebrow: mockLocalizedStrings({ [EN]: EN_EYEBROW, [NL]: NL_EYEBROW }),
+  author: mockReference(person._id),
 };
 
 async function runHero(document: Record<string, unknown>, locale: string) {
@@ -27,39 +35,26 @@ async function runHero(document: Record<string, unknown>, locale: string) {
     heroProfileModuleQuery.query,
     [document, person],
     undefined,
-    { id: 'hero-1', locale, defaultLocale: EN },
+    { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return heroProfileModuleQuery.parse(raw);
 }
 
 describe('heroProfileModuleQuery', () => {
-  it('picks the eyebrow in the visitor language', async () => {
-    const hero = await runHero(heroDocument, NL);
+  it.each([
+    ['picks the eyebrow in the visitor language', NL, NL_EYEBROW],
+    ['falls back to the default-language eyebrow', FR, EN_EYEBROW],
+  ])('%s', async (_, locale, expected) => {
+    const hero = await runHero(heroDocument, locale);
 
-    expect(hero.eyebrow).toBe('Oprichter');
-  });
-
-  it('falls back to the default-language eyebrow when the visitor language is missing', async () => {
-    const hero = await runHero(heroDocument, FR);
-
-    expect(hero.eyebrow).toBe('Founder');
+    expect(hero.eyebrow).toBe(expected);
   });
 
   it('leaves the eyebrow null when no language has a value', async () => {
     const hero = await runHero({ ...heroDocument, eyebrow: undefined }, NL);
 
     expect(hero.eyebrow).toBeNull();
-  });
-
-  it('defaults the display toggles to true for documents authored before they existed', async () => {
-    const hero = await runHero(heroDocument, EN);
-
-    expect(hero).toMatchObject({
-      showSocialLinks: true,
-      showRole: true,
-      showBio: true,
-    });
   });
 
   it('loads the hero without an image when Studio left an image with no asset', async () => {
@@ -73,13 +68,27 @@ describe('heroProfileModuleQuery', () => {
 
     expect(hero).toMatchObject({
       image: { asset: null, alt: null },
-      eyebrow: 'Founder',
+      eyebrow: EN_EYEBROW,
     });
   });
 
-  it('resolves the author reference', async () => {
-    const hero = await runHero(heroDocument, EN);
+  describe('in the default language', () => {
+    let hero: Awaited<ReturnType<typeof runHero>>;
 
-    expect(hero.author).toMatchObject({ _id: 'person-1', name: 'Jane Doe' });
+    beforeEach(async () => {
+      hero = await runHero(heroDocument, EN);
+    });
+
+    it('shows role, bio and social links for a document authored without the toggles', () => {
+      expect(hero).toMatchObject({
+        showSocialLinks: true,
+        showRole: true,
+        showBio: true,
+      });
+    });
+
+    it('resolves the author reference', () => {
+      expect(hero.author).toMatchObject({ _id: person._id, name: person.name });
+    });
   });
 });

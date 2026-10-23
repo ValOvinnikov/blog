@@ -1,14 +1,14 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TestimonialModuleView } from './testimonial-module-view';
 
 const testimonials = [
-  makeTestimonialItem({
+  mockTestimonialItem({
     id: 'testimonial-1',
     name: 'Jordan Reyes',
     role: 'VP Engineering, Acme Co.',
@@ -20,16 +20,23 @@ const testimonials = [
       ariaLabel: undefined,
     },
   }),
-  makeTestimonialItem({
+  mockTestimonialItem({
     id: 'testimonial-2',
     name: 'Priya Nair',
     role: 'Head of Product, Nimbus',
   }),
-  makeTestimonialItem({
+  mockTestimonialItem({
     id: 'testimonial-3',
     name: 'Marco Duarte',
     role: 'Founder, Lighthouse Studio',
   }),
+];
+
+const moreTestimonials = [
+  mockTestimonialItem({ id: 'testimonial-4', name: 'Sana Ito' }),
+  mockTestimonialItem({ id: 'testimonial-5', name: 'Wale Adebayo' }),
+  mockTestimonialItem({ id: 'testimonial-6', name: 'Elin Kask' }),
+  mockTestimonialItem({ id: 'testimonial-7', name: 'Tomas Berg' }),
 ];
 
 const meta = {
@@ -78,7 +85,7 @@ export const WithImages: TStory = {
   args: {
     testimonials: testimonials.map((item) => ({
       ...item,
-      image: makeSanityImage(),
+      image: mockSanityImage(),
     })),
   },
 };
@@ -91,7 +98,7 @@ export const SpotlightCenterAligned: TStory = {
   args: {
     testimonials: [testimonials[0]!],
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    ctaButtons: ctaActionsDemo,
+    ctaButtons: MOCK_CTA_ACTIONS,
   },
 };
 
@@ -108,7 +115,7 @@ export const CarouselFitsCenter: TStory = {
 };
 
 export const WithActions: TStory = {
-  args: { ctaButtons: ctaActionsDemo },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const CenterAligned: TStory = {
@@ -120,23 +127,13 @@ export const CenterAligned: TStory = {
 
 export const FiveTestimonials: TStory = {
   args: {
-    testimonials: [
-      ...testimonials,
-      makeTestimonialItem({ id: 'testimonial-4', name: 'Sana Ito' }),
-      makeTestimonialItem({ id: 'testimonial-5', name: 'Wale Adebayo' }),
-    ],
+    testimonials: [...testimonials, ...moreTestimonials.slice(0, 2)],
   },
 };
 
 export const SevenTestimonialsLastCardCentred: TStory = {
   args: {
-    testimonials: [
-      ...testimonials,
-      makeTestimonialItem({ id: 'testimonial-4', name: 'Sana Ito' }),
-      makeTestimonialItem({ id: 'testimonial-5', name: 'Wale Adebayo' }),
-      makeTestimonialItem({ id: 'testimonial-6', name: 'Elin Kask' }),
-      makeTestimonialItem({ id: 'testimonial-7', name: 'Tomas Berg' }),
-    ],
+    testimonials: [...testimonials, ...moreTestimonials],
   },
 };
 

@@ -1,17 +1,21 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
 
 import { defaultLanguageValue } from './default-language-value';
 
+const { EN, NL } = LOCALE_ISO_CODES;
+
 describe(defaultLanguageValue, () => {
   beforeEach(() => {
-    setDefaultLanguage('EN');
+    setDefaultLanguage(EN);
   });
 
   it('returns the default language entry even when another language comes first', () => {
     expect(
       defaultLanguageValue([
-        { _key: 'NL', language: 'NL', value: 'Over ons' },
-        { _key: 'EN', language: 'EN', value: 'About' },
+        mockLocalizedValue(NL, 'Over ons'),
+        mockLocalizedValue(EN, 'About'),
       ]),
     ).toBe('About');
   });
@@ -19,8 +23,8 @@ describe(defaultLanguageValue, () => {
   it('returns nothing when the default language entry is blank', () => {
     expect(
       defaultLanguageValue([
-        { _key: 'NL', language: 'NL', value: 'Over ons' },
-        { _key: 'EN', language: 'EN', value: '  ' },
+        mockLocalizedValue(NL, 'Over ons'),
+        mockLocalizedValue(EN, '  '),
       ]),
     ).toBeUndefined();
   });

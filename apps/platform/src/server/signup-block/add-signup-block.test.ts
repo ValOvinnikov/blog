@@ -1,6 +1,7 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -37,10 +38,8 @@ const DOMAIN_BLOCK = {
   admin: ADMIN,
 };
 
-const outcomeOf = (created: boolean) => ({
-  ok: true,
-  data: { entry: makeBlockedIdentity(), created },
-});
+const outcomeOf = (created: boolean) =>
+  okResult({ entry: makeBlockedIdentity(), created });
 
 describe(addSignupBlock, () => {
   beforeEach(() => {
@@ -85,7 +84,7 @@ describe(addSignupBlock, () => {
   });
 
   it('records no audit event when the entry could not be stored', async () => {
-    const failure = { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+    const failure = errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
     addBlockedIdentityMock.mockResolvedValue(failure);
 
     const result = await addSignupBlock(DOMAIN_BLOCK);

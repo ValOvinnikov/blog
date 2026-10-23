@@ -1,24 +1,31 @@
-import { TIMELINE_MARKER_STYLE, TIMELINE_ORIENTATION } from '@blog/config';
 import {
-  makeRawTimelineItem,
-  makeRawTimelineModule,
+  TIMELINE_MARKER_STYLE,
+  TIMELINE_ORIENTATION,
+} from '@blog/config/constants';
+import {
+  mockRawTimelineItem,
+  mockRawTimelineModule,
 } from '@blog/service/testing/modules/fixtures';
 
 import { toTimelineModule } from './transformer';
 
+const FIRST_ID = 'block-timeline-a';
+const SECOND_ID = 'block-timeline-b';
+const FIRST_MARKER = '2019';
+
 describe(toTimelineModule, () => {
-  it('maps a Labelled module in authored order, with each item marker, heading and body', () => {
-    const raw = makeRawTimelineModule({
+  it('maps a Labelled module in authored order, with each item marker and heading', () => {
+    const raw = mockRawTimelineModule({
       markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
       orientation: TIMELINE_ORIENTATION.HORIZONTAL,
       items: [
-        makeRawTimelineItem({
-          _key: 'block-timeline-a',
-          marker: '2019',
+        mockRawTimelineItem({
+          _key: FIRST_ID,
+          marker: FIRST_MARKER,
           heading: 'Founded',
         }),
-        makeRawTimelineItem({
-          _key: 'block-timeline-b',
+        mockRawTimelineItem({
+          _key: SECOND_ID,
           marker: '2023',
           heading: 'Series A',
         }),
@@ -29,41 +36,31 @@ describe(toTimelineModule, () => {
 
     expect(module.markerStyle).toBe(TIMELINE_MARKER_STYLE.LABELLED);
     expect(module.orientation).toBe(TIMELINE_ORIENTATION.HORIZONTAL);
-    expect(module.items).toEqual([
-      expect.objectContaining({
-        id: 'block-timeline-a',
-        marker: '2019',
-        heading: 'Founded',
-      }),
-      expect.objectContaining({
-        id: 'block-timeline-b',
-        marker: '2023',
-        heading: 'Series A',
-      }),
+    expect(
+      module.items.map(({ id, marker, heading }) => ({ id, marker, heading })),
+    ).toEqual([
+      { id: FIRST_ID, marker: FIRST_MARKER, heading: 'Founded' },
+      { id: SECOND_ID, marker: '2023', heading: 'Series A' },
     ]);
     expect(module.items[0]?.body?.[0]?.children?.[0]?.text).toBe(
       'The project begins.',
     );
   });
 
-  it('drops every item marker on a Numbered module, even one left over from Labelled', () => {
-    const raw = makeRawTimelineModule({
+  it('drops every item marker on a Numbered module, even a leftover one', () => {
+    const raw = mockRawTimelineModule({
       markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
       items: [
-        makeRawTimelineItem({ _key: 'block-timeline-a', marker: '2019' }),
-        makeRawTimelineItem({ _key: 'block-timeline-b', marker: null }),
+        mockRawTimelineItem({ _key: FIRST_ID, marker: FIRST_MARKER }),
+        mockRawTimelineItem({ _key: SECOND_ID, marker: null }),
       ],
     });
 
     const module = toTimelineModule(raw);
 
-    expect(module.items.map((item) => item.marker)).toEqual([
-      undefined,
-      undefined,
-    ]);
-    expect(module.items.map((item) => item.id)).toEqual([
-      'block-timeline-a',
-      'block-timeline-b',
+    expect(module.items.map(({ id, marker }) => ({ id, marker }))).toEqual([
+      { id: FIRST_ID, marker: undefined },
+      { id: SECOND_ID, marker: undefined },
     ]);
   });
 });

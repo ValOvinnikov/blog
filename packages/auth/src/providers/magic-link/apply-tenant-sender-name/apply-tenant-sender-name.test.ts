@@ -1,31 +1,38 @@
+import {
+  MOCK_FROM_ADDRESS,
+  MOCK_SENDER_FROM_ADDRESS,
+  MOCK_SENDER_NAME,
+  MOCK_VERIFIED_DOMAIN_FROM_ADDRESS,
+} from '@blog/auth/testing/magic-link-fixtures';
+
 import { applyTenantSenderName } from './apply-tenant-sender-name';
 
 describe(applyTenantSenderName, () => {
   it('returns the from address unchanged when no sender name is given', () => {
-    expect(
-      applyTenantSenderName('Sign in <onboarding@resend.dev>', undefined),
-    ).toBe('Sign in <onboarding@resend.dev>');
+    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, undefined)).toBe(
+      MOCK_FROM_ADDRESS,
+    );
   });
 
   it('overrides the display name, keeping the configured address', () => {
     expect(
       applyTenantSenderName(
-        'Sign in <sign-in@mail.valstack.dev>',
-        'Acme Support',
+        MOCK_VERIFIED_DOMAIN_FROM_ADDRESS,
+        MOCK_SENDER_NAME,
       ),
     ).toBe('Acme Support <sign-in@mail.valstack.dev>');
   });
 
   it('overrides the display name on the default Resend testing sender', () => {
-    expect(
-      applyTenantSenderName('Sign in <onboarding@resend.dev>', 'Acme Support'),
-    ).toBe('Acme Support <onboarding@resend.dev>');
+    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_SENDER_NAME)).toBe(
+      MOCK_SENDER_FROM_ADDRESS,
+    );
   });
 
   it('strips angle brackets and newlines from the sender name to avoid header injection', () => {
     expect(
       applyTenantSenderName(
-        'Sign in <onboarding@resend.dev>',
+        MOCK_FROM_ADDRESS,
         'Acme <evil@attacker.example>\r\nBcc: victim@example.com',
       ),
     ).toBe(
@@ -34,8 +41,8 @@ describe(applyTenantSenderName, () => {
   });
 
   it('falls back to the original from address when the sanitized sender name is empty', () => {
-    expect(applyTenantSenderName('Sign in <onboarding@resend.dev>', '<>')).toBe(
-      'Sign in <onboarding@resend.dev>',
+    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, '<>')).toBe(
+      MOCK_FROM_ADDRESS,
     );
   });
 });

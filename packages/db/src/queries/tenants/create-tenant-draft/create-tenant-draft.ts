@@ -9,7 +9,7 @@ import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import type { TResult } from '@blog/utils';
+import { okResult, type TResult } from '@blog/utils';
 
 export type TDraftOwner =
   { type: 'user'; userId: string } | { type: 'invite'; email: string };
@@ -26,7 +26,7 @@ export async function createTenantDraft(
   input: TCreateTenantDraftInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
   if (!isValidDomain(input.domain)) {
-    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+    return errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
   }
 
   const db = getDb();
@@ -82,5 +82,5 @@ export async function createTenantDraft(
     },
   );
 
-  return { ok: true, data: tenant };
+  return okResult(tenant);
 }

@@ -3,99 +3,73 @@ import {
   HTTP_STATUS,
   OPERATOR_ALERT_KIND,
 } from '@blog/config/constants';
-import { makeTenant } from '@blog/db/testing/tenants/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 
 import { notifyOperatorsOfDocumentValidationFailure } from './notify-operators';
 
-const originalEnv: Record<string, string | undefined> = {};
+const MOCK_TENANT = mockTenant();
 
 beforeEach(() => {
-  originalEnv['ADMIN_APP_BASE_URL'] = process.env['ADMIN_APP_BASE_URL'];
-  originalEnv['OPERATOR_ALERT_SECRET'] = process.env['OPERATOR_ALERT_SECRET'];
-  process.env['ADMIN_APP_BASE_URL'] = 'https://platform.example.com';
-  process.env['OPERATOR_ALERT_SECRET'] = 'shared-secret';
+  vi.stubEnv('ADMIN_APP_BASE_URL', 'https://platform.example.com');
+  vi.stubEnv('OPERATOR_ALERT_SECRET', 'shared-secret');
 });
 
 afterEach(() => {
-  for (const [key, value] of Object.entries(originalEnv)) {
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
+  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
-const tenant = makeTenant();
-
 describe(notifyOperatorsOfDocumentValidationFailure, () => {
-  it('resolves without throwing when the platform responds with a failure status', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
-        ),
-    );
+  it.each([
+    [
+      'the platform responds with a failure status',
+      () =>
+        vi
+          .fn()
+          .mockResolvedValue(
+            new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
+          ),
+    ],
+    [
+      'fetch itself rejects',
+      () => vi.fn().mockRejectedValue(new Error('ECONNRESET')),
+    ],
+  ])('resolves without throwing when %s', async (_case, mockFetch) => {
+    vi.stubGlobal('fetch', mockFetch());
 
     await expect(
       notifyOperatorsOfDocumentValidationFailure({
-        tenant,
-        invalidDocumentCount: 1,
-        severity: FINDING_SEVERITY.WARNING,
-      }),
-    ).resolves.toBeUndefined();
-  });
-
-  it('resolves without throwing when fetch itself rejects', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('ECONNRESET')));
-
-    await expect(
-      notifyOperatorsOfDocumentValidationFailure({
-        tenant,
+        tenant: MOCK_TENANT,
         invalidDocumentCount: 1,
         severity: FINDING_SEVERITY.CRITICAL,
       }),
     ).resolves.toBeUndefined();
   });
 
-  describe('when the platform accepts the alert', () => {
-    let fetchMock: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-      fetchMock = vi
+  it.each([
+    [FINDING_SEVERITY.CRITICAL, true],
+    [FINDING_SEVERITY.WARNING, false],
+  ])(
+    'posts a DOCUMENT_VALIDATION alert for %s severity with isCritical %s',
+    async (severity, isCritical) => {
+      const fetchMock = vi
         .fn()
         .mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
       vi.stubGlobal('fetch', fetchMock);
-    });
 
-    it('posts a DOCUMENT_VALIDATION alert with isCritical true for CRITICAL severity', async () => {
       await notifyOperatorsOfDocumentValidationFailure({
-        tenant,
+        tenant: MOCK_TENANT,
         invalidDocumentCount: 3,
-        severity: FINDING_SEVERITY.CRITICAL,
+        severity,
       });
 
       const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
       expect(JSON.parse(init.body)).toEqual({
         kind: OPERATOR_ALERT_KIND.DOCUMENT_VALIDATION,
-        tenantId: tenant.id,
+        tenantId: MOCK_TENANT.id,
         invalidDocumentCount: 3,
-        isCritical: true,
+        isCritical,
       });
-    });
-
-    it('posts isCritical false for WARNING severity', async () => {
-      await notifyOperatorsOfDocumentValidationFailure({
-        tenant,
-        invalidDocumentCount: 1,
-        severity: FINDING_SEVERITY.WARNING,
-      });
-
-      const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
-      expect(JSON.parse(init.body)).toMatchObject({ isCritical: false });
-    });
-  });
+    },
+  );
 });

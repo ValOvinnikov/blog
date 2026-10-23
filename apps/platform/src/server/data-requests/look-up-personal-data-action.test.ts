@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { okResult } from '@blog/utils';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import {
   DATA_REQUEST_EMAIL,
@@ -33,7 +34,7 @@ describe(lookUpPersonalDataAction, () => {
     requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
     findPersonalDataMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: makePersonalDataMatches() });
+      .mockResolvedValue(okResult(makePersonalDataMatches()));
   });
 
   it('rejects a caller who is not a super admin before searching', async () => {

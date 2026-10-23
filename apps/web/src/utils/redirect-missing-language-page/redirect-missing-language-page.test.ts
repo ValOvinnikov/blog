@@ -1,4 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { redirect } from 'next/navigation';
@@ -24,9 +25,9 @@ describe(redirectMissingLanguagePage, () => {
   });
 
   it('redirects to / when a non-default language has no page of its own', async () => {
-    await expect(
-      redirectMissingLanguagePage({ ok: true, data: undefined }),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    await expect(redirectMissingLanguagePage(okResult())).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
     expect(redirect).toHaveBeenCalledWith('/');
   });
@@ -34,19 +35,19 @@ describe(redirectMissingLanguagePage, () => {
   it('does not redirect when the default language has no page', async () => {
     inLanguage(EN);
 
-    await redirectMissingLanguagePage({ ok: true, data: undefined });
+    await redirectMissingLanguagePage(okResult());
 
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('does not redirect when the language has its page', async () => {
-    await redirectMissingLanguagePage({ ok: true, data: { title: 'Blog' } });
+    await redirectMissingLanguagePage(okResult({ title: 'Blog' }));
 
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('does not redirect when the fetch failed', async () => {
-    await redirectMissingLanguagePage({ ok: false, error: new Error('boom') });
+    await redirectMissingLanguagePage(errorResult(new Error('boom')));
 
     expect(redirect).not.toHaveBeenCalled();
   });

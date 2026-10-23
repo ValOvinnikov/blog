@@ -1,4 +1,5 @@
 import { RELEASE_CHANGE } from '@blog/config';
+import { okResult } from '@blog/utils';
 import type { TContrastStatus } from '@platform/constants/release';
 import type { TComparedCommit } from '@platform/server/github/compare-commits';
 
@@ -49,17 +50,14 @@ export const getReleaseCandidate = async (): Promise<
   if (!migrations.ok) return migrations;
   if (!contrastStatus.ok) return contrastStatus;
 
-  return {
-    ok: true,
-    data: {
-      headSha,
-      lastTag,
-      commits,
-      totalCommits,
-      isFileListTruncated,
-      changes,
-      migrations: migrations.data,
-      contrastStatus: contrastStatus.data,
-    },
-  };
+  return okResult({
+    headSha,
+    lastTag,
+    commits,
+    totalCommits,
+    isFileListTruncated,
+    changes,
+    migrations: migrations.data,
+    contrastStatus: contrastStatus.data,
+  });
 };

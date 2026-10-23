@@ -1,8 +1,10 @@
+import { mockListModuleRefs } from '@blog/service/testing/pages/fixtures';
+
 import { indexPageParamsQuery } from './query';
 
 describe('indexPageParamsQuery', () => {
   it('parses the blog page total post count and its module ids', () => {
-    const raw = { blogPosts: { total: 12 }, moduleRefs: [{ _ref: 'list-1' }] };
+    const raw = { blogPosts: { total: 12 }, moduleRefs: mockListModuleRefs() };
 
     expect(() => indexPageParamsQuery.parse(raw)).not.toThrow();
   });

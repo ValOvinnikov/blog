@@ -90,6 +90,12 @@ D | grep -nE '^\+[[:space:]]*\* [A-Z][A-Za-z0-9]+ — '
 D | awk '/^\+[[:space:]]*\/\*\*/{n=0;b=1;next} b&&/^\+[[:space:]]*\*\//{b=0;if(n>=3)print FNR": doc block of "n" lines";next} b&&/^\+/{n++}'
 D | grep -nE '^\+ {4,}// '
 
+# Touched test files over 500 lines (testing-practices → "When you touch a
+# test file"). Not blocking by itself: read each hit first for the §6 pruning
+# findings.
+( git diff "$BASE"...HEAD --name-only --diff-filter=d; git diff --name-only --diff-filter=d ) \
+  | grep -E '\.test\.tsx?$' | sort -u | xargs -r wc -l | awk '$2 != "total" && $1 > 500'
+
 # Any comment in a test file (testing-practices "What not to test" → "No
 # comments in a test file").
 D | awk '/^\+\+\+ b\//{t=($0 ~ /\.test\.tsx?$/)} t&&/^\+[[:space:]]*(\/\/|\/\*\*|\*[[:space:]])/{print FNR": "$0}'
@@ -204,11 +210,24 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   literal copied out of the file under test is **blocking** — delete it. A
   class assertion is the same mistake, prop-driven or not
   (→ `testing-practices` "What not to test").
-- Sibling cases differing only in input and expected value are one `it.each`.
+- **Touched test files are pruned (blocking).** Read every test file the
+  diff creates or edits in full. A duplicate test, a case exercising a unit
+  that has its own test file beyond one wiring test, or sibling cases
+  differing only in input and expected value that are not one `it.each` is
+  blocking — anywhere in the file, not only in the hunks. So is a removed
+  test whose behaviour no remaining test asserts, unless it failed "What not
+  to test". Check the agent's **Examined** section lists each removal and
+  where its behaviour is still asserted (→ `testing-practices` "When you
+  touch a test file").
 - **Test setup (blocking on what the diff adds)** → `testing-practices`
   "Where tests live", "Rendering and arrangement", "What to fake"; repetition
   already on `main` that the diff adds nothing to is filed (`CLAUDE.md`
   "Duplication that already existed is filed, not fixed inline").
+- A fixture the diff adds to `testing/`, a `fixtures` file or `__mocks__/`
+  that is not named `mock<Thing>` (a builder) or `MOCK_<THING>` (a fixed
+  value) is a finding; render and setup helpers are exempt, and existing
+  fixtures it does not add are left to their workspace's rename
+  (→ `testing-practices` "Fixture naming").
 - A `screen` query inside `expect(…)` in any test file the diff creates or
   touches is **blocking** — the asserted element is a named `const` first,
   and a touched file is converted whole (→ `testing-practices` "Name the

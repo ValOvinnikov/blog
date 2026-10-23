@@ -3,7 +3,7 @@ import { getDb } from '@blog/db/client';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 
 // Reverses `archiveTenant`, but `status` only moves out of ARCHIVED — a
@@ -26,13 +26,13 @@ export async function reactivateTenant(
       .returning();
 
     if (!tenant) {
-      return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+      return errorResult(ERROR_CODE.DB_NOT_FOUND);
     }
 
-    return { ok: true, data: tenant };
+    return okResult(tenant);
   } catch (error) {
     if (isFreeOwnerViolation(error)) {
-      return { ok: false, error: ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT };
+      return errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT);
     }
     throw error;
   }

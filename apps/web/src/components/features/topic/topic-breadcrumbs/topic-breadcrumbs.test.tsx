@@ -8,9 +8,13 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
+
+const SITE_NAME = 'Northwind Journal';
+const TOPIC_HREF = '/topics/news';
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -27,7 +31,7 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
 }));
 
 const topic = makeTopic({ title: 'News', slug: 'news' });
-const successData = { topic, modules: [], seo: {} };
+const successData = { topic, modules: [], seo: mockSeo() };
 
 const setup = customRenderAsync(TopicBreadcrumbs, {
   slug: 'news',
@@ -48,22 +52,22 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
-    linkSteps: [{ label: 'Northwind Journal', href: '/' }],
+    linkSteps: [{ label: SITE_NAME, href: '/' }],
     currentLabel: 'News',
   });
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
-    itemPath: '/topics/news',
+    itemPath: TOPIC_HREF,
   });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
     expectedTrail: [
-      { name: 'Northwind Journal', path: '/' },
-      { name: 'News', path: '/topics/news' },
+      { name: SITE_NAME, path: '/' },
+      { name: 'News', path: TOPIC_HREF },
     ],
   });
   testNoJsonLdWithoutBaseUrl({

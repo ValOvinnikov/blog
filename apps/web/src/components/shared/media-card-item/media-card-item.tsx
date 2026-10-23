@@ -2,6 +2,7 @@ import { type IWithDataTestId } from '@blog/config';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import type { ReactNode } from 'react';
 
 interface IMediaCardTopicData {
@@ -44,7 +45,7 @@ export const MediaCardItem = ({
     dataTestId={dataTestId}
   >
     {hasImage && Boolean(item.image) && (
-      <MediaCard.Media dataTestId="media-card-media">
+      <MediaCard.Media dataTestId={MEDIA_CARD_MEDIA_TEST_ID}>
         {item.image}
       </MediaCard.Media>
     )}

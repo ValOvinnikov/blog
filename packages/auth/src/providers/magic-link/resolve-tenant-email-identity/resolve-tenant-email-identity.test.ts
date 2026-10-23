@@ -1,8 +1,15 @@
+import {
+  MOCK_DB_ERROR_MESSAGE,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@blog/auth/testing/magic-link-fixtures';
 import { resolveTenantEmailBrand } from '@blog/config';
 import { LOCALE_ISO_CODES, PRESET_ID } from '@blog/config/constants';
 import { TENANT_PLAN } from '@blog/db/constants';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
+
+const TENANT_HOST = 'acme.example.com';
 
 const { getTenantByDomainMock, getSiteConfigMock } = vi.hoisted(() => ({
   getTenantByDomainMock: vi.fn(),
@@ -24,8 +31,8 @@ describe(resolveTenantEmailIdentity, () => {
     getTenantByDomainMock.mockReset();
     getSiteConfigMock.mockReset();
     getTenantByDomainMock.mockResolvedValue({
-      id: 'tenant-1',
-      name: 'Acme Blog',
+      id: MOCK_TENANT_ID,
+      name: MOCK_TENANT_NAME,
       locale: LOCALE_ISO_CODES.NL,
       additionalLocales: [LOCALE_ISO_CODES.FR],
       plan: TENANT_PLAN.GROWTH,
@@ -39,7 +46,7 @@ describe(resolveTenantEmailIdentity, () => {
       logoHue: undefined,
     });
 
-    const result = await resolveTenantEmailIdentity('acme.example.com');
+    const result = await resolveTenantEmailIdentity(TENANT_HOST);
 
     expect(result).toEqual({
       brand: resolveTenantEmailBrand({
@@ -47,8 +54,8 @@ describe(resolveTenantEmailIdentity, () => {
         accentHue: 140,
         logoHue: undefined,
       }),
-      brandName: 'Acme Blog',
-      tenantId: 'tenant-1',
+      brandName: MOCK_TENANT_NAME,
+      tenantId: MOCK_TENANT_ID,
       defaultLocale: LOCALE_ISO_CODES.NL,
       liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.FR],
     });
@@ -66,23 +73,23 @@ describe(resolveTenantEmailIdentity, () => {
   it('resolves to undefined when the matched tenant has no site config yet', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
-    const result = await resolveTenantEmailIdentity('acme.example.com');
+    const result = await resolveTenantEmailIdentity(TENANT_HOST);
 
     expect(result).toBeUndefined();
   });
 
   it('resolves to undefined rather than throwing when the tenant lookup fails', async () => {
-    getTenantByDomainMock.mockRejectedValue(new Error('db error'));
+    getTenantByDomainMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
 
-    const result = await resolveTenantEmailIdentity('acme.example.com');
+    const result = await resolveTenantEmailIdentity(TENANT_HOST);
 
     expect(result).toBeUndefined();
   });
 
   it('resolves to undefined rather than throwing when the site config lookup fails', async () => {
-    getSiteConfigMock.mockRejectedValue(new Error('db error'));
+    getSiteConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
 
-    const result = await resolveTenantEmailIdentity('acme.example.com');
+    const result = await resolveTenantEmailIdentity(TENANT_HOST);
 
     expect(result).toBeUndefined();
   });

@@ -1,53 +1,61 @@
+import {
+  NEWSLETTER_VARIANT,
+  SANITY_CONTENT_REVALIDATE_SECONDS,
+} from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_NEWSLETTER_HEADING,
+  MOCK_NEWSLETTER_MODULE_ID,
+  mockRawNewsletterModule,
+} from '@blog/service/testing/modules/fixtures';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getNewsletter } from './loader';
+import { newsletterModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('getNewsletter', () => {
+describe(getNewsletter, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(mockRawNewsletterModule());
+  });
+
   it('maps the newsletter module document', async () => {
-    mockRun.mockResolvedValueOnce(makeRawNewsletterModule());
+    const newsletter = await getNewsletter(MOCK_NEWSLETTER_MODULE_ID, tenant);
 
-    const newsletter = await getNewsletter('newsletter-1', tenant);
-
-    expect(newsletter.headingBlock.heading).toBe('Stay in the loop');
+    expect(newsletter.headingBlock.heading).toBe(MOCK_NEWSLETTER_HEADING);
     expect(newsletter.headingBlock.supportingText).toBe(
       'Get new posts in your inbox.',
     );
-    expect(newsletter.variant).toBe('FULL');
+    expect(newsletter.variant).toBe(NEWSLETTER_VARIANT.FULL);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getNewsletter('missing', tenant)).rejects.toThrow();
+    await expect(getNewsletter(MOCK_MISSING_ID, tenant)).rejects.toThrow();
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue(makeRawNewsletterModule());
+  it('threads tenant context into the query and scopes the tags to it', async () => {
+    await getNewsletter(MOCK_NEWSLETTER_MODULE_ID, tenant);
 
-    await getNewsletter('newsletter-1', tenant);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:newsletter',
-            't:tenant-a:module:newsletter-1',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(newsletterModuleQuery, {
+      parameters: { id: MOCK_NEWSLETTER_MODULE_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          mockCacheTag('modules:newsletter'),
+          mockCacheTag(`module:${MOCK_NEWSLETTER_MODULE_ID}`),
+        ],
+      },
+    });
   });
 });

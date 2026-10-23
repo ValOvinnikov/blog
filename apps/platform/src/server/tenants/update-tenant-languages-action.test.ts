@@ -6,6 +6,7 @@ import {
   LOCALE_ISO_CODES,
 } from '@blog/config';
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -66,10 +67,7 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('saves the languages and audits the change', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue({
-      ok: true,
-      data: [NL, FR],
-    });
+    setTenantAdditionalLocalesMock.mockResolvedValue(okResult([NL, FR]));
 
     const result = await updateTenantLanguagesAction(TENANT_ID, [NL, FR]);
 
@@ -89,7 +87,7 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('refreshes the public site for the tenant after saving', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue({ ok: true, data: [NL] });
+    setTenantAdditionalLocalesMock.mockResolvedValue(okResult([NL]));
 
     await updateTenantLanguagesAction(TENANT_ID, [NL]);
 
@@ -107,10 +105,9 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('reports a save over the plan limit without auditing it', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
-    });
+    setTenantAdditionalLocalesMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED),
+    );
 
     const result = await updateTenantLanguagesAction(TENANT_ID, [NL, FR]);
 
@@ -127,10 +124,9 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('reports the default language among the additional ones as invalid input', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED,
-    });
+    setTenantAdditionalLocalesMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED),
+    );
 
     const result = await updateTenantLanguagesAction(TENANT_ID, [NL]);
 
@@ -142,10 +138,9 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('refuses a save for a tenant that no longer exists, without a warning', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    setTenantAdditionalLocalesMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await updateTenantLanguagesAction(TENANT_ID, [NL]);
 

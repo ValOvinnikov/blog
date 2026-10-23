@@ -1,7 +1,7 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 export async function removeBlockedIdentity(
@@ -15,8 +15,8 @@ export async function removeBlockedIdentity(
     .returning({ id: blockedSignupIdentities.id });
 
   if (deleted.length === 0) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: undefined };
+  return okResult();
 }

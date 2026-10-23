@@ -2,10 +2,10 @@ import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
 import {
-  BLOCK_REASON,
-  BLOCKED_ADDRESS,
-  BLOCKED_ADDRESS_INDEX,
-  BLOCKED_DOMAIN,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_ADDRESS,
+  MOCK_BLOCKED_ADDRESS_INDEX,
+  MOCK_BLOCKED_DOMAIN,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import {
   applyMigrationFile,
@@ -36,18 +36,18 @@ describe('0052_remove_plain_hash_blocked_addresses', () => {
       await db.insert(blockedSignupIdentities).values([
         {
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-          value: sha256Hex(BLOCKED_ADDRESS),
-          reason: BLOCK_REASON,
+          value: sha256Hex(MOCK_BLOCKED_ADDRESS),
+          reason: MOCK_BLOCK_REASON,
         },
         {
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-          value: BLOCKED_ADDRESS_INDEX,
-          reason: BLOCK_REASON,
+          value: MOCK_BLOCKED_ADDRESS_INDEX,
+          reason: MOCK_BLOCK_REASON,
         },
         {
           kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-          value: BLOCKED_DOMAIN,
-          reason: BLOCK_REASON,
+          value: MOCK_BLOCKED_DOMAIN,
+          reason: MOCK_BLOCK_REASON,
         },
       ]);
 
@@ -62,8 +62,11 @@ describe('0052_remove_plain_hash_blocked_addresses', () => {
         .orderBy(blockedSignupIdentities.kind);
 
       expect(rows).toEqual([
-        { kind: BLOCKED_IDENTITY_KIND.ADDRESS, value: BLOCKED_ADDRESS_INDEX },
-        { kind: BLOCKED_IDENTITY_KIND.DOMAIN, value: BLOCKED_DOMAIN },
+        {
+          kind: BLOCKED_IDENTITY_KIND.ADDRESS,
+          value: MOCK_BLOCKED_ADDRESS_INDEX,
+        },
+        { kind: BLOCKED_IDENTITY_KIND.DOMAIN, value: MOCK_BLOCKED_DOMAIN },
       ]);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,

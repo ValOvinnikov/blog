@@ -5,7 +5,7 @@ import {
   HERO_VARIANT,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
 
@@ -56,7 +56,7 @@ const meta = {
     heading: 'Building a Design System from Scratch',
     supportingText:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
-    sanityImage: makeSanityImage(),
+    sanityImage: mockSanityImage(),
     ctaButtons: [primaryButton],
     contentPosition: undefined,
     contentAlignment: undefined,

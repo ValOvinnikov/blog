@@ -1,21 +1,19 @@
 import { BRAND_VARIANT, CARD_IMAGE_SHAPE } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
-import { makeTeamMember } from '@web/testing/modules/team/fixtures';
+import {
+  MOCK_TEAM_HEADING,
+  MOCK_TEAM_MEMBERS,
+} from '@web/testing/modules/team/fixtures';
 
 import { TeamCarousel } from './team-carousel';
 
 vi.mock('@web/i18n/navigation');
 
-const members = [
-  makeTeamMember({ id: 'team-member-1', name: 'Jordan Reyes' }),
-  makeTeamMember({ id: 'team-member-2', name: 'Casey Morgan' }),
-];
-
 const setup = customRender(TeamCarousel, {
-  members,
+  members: MOCK_TEAM_MEMBERS,
   imageShape: CARD_IMAGE_SHAPE.CIRCLE,
   align: 'left',
-  title: 'Meet the team',
+  title: MOCK_TEAM_HEADING,
   tone: BRAND_VARIANT.PRIMARY,
 });
 
@@ -24,19 +22,22 @@ describe(`<${TeamCarousel.name}/>`, () => {
     setup();
 
     const region = screen.getByRole('region', {
-      name: 'Meet the team carousel',
+      name: `${MOCK_TEAM_HEADING} carousel`,
     });
-    expect(within(region).getAllByRole('heading', { level: 3 })).toHaveLength(
-      members.length,
-    );
-    members.forEach((member) => {
-      expect(
-        within(region).getByRole('heading', { level: 3, name: member.name }),
-      ).toBeVisible();
+    const cardHeadings = within(region).getAllByRole('heading', { level: 3 });
+    expect(cardHeadings).toHaveLength(MOCK_TEAM_MEMBERS.length);
+    MOCK_TEAM_MEMBERS.forEach((member) => {
+      const cardHeading = within(region).getByRole('heading', {
+        level: 3,
+        name: member.name,
+      });
+      expect(cardHeading).toBeVisible();
     });
-    expect(
-      await screen.findByRole('button', { name: 'Previous slide' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
+    const previousButton = await screen.findByRole('button', {
+      name: 'Previous slide',
+    });
+    const nextButton = screen.getByRole('button', { name: 'Next slide' });
+    expect(previousButton).toBeVisible();
+    expect(nextButton).toBeVisible();
   });
 });

@@ -1,7 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-
-import type { TDeprovisionEnv } from '../lib/env';
+import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 
 import { clearTenantArtifacts } from './clear-artifacts';
 
@@ -13,40 +11,7 @@ vi.mock('@blog/db/queries/tenants', () => ({
   clearTenantProvisioningArtifacts: clearTenantProvisioningArtifactsMock,
 }));
 
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
-
-function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj123',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'enc',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'READY',
-    provisioningSteps: null,
-    seededAt: new Date(),
-    deprovisionedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  } as TTenant;
-}
+const MOCK_TENANT = mockTenant();
 
 beforeEach(() => {
   clearTenantProvisioningArtifactsMock.mockReset().mockResolvedValue(undefined);
@@ -54,15 +19,18 @@ beforeEach(() => {
 
 describe(clearTenantArtifacts, () => {
   it('clears the persisted provisioning columns for the tenant', async () => {
-    await clearTenantArtifacts(baseTenant(), env);
+    await clearTenantArtifacts(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(clearTenantProvisioningArtifactsMock).toHaveBeenCalledWith(
-      'tenant-1',
+      MOCK_TENANT.id,
     );
   });
 
   it('does not write to the row in dry-run mode', async () => {
-    await clearTenantArtifacts(baseTenant(), { ...env, dryRun: true });
+    await clearTenantArtifacts(MOCK_TENANT, {
+      ...MOCK_DEPROVISION_ENV,
+      dryRun: true,
+    });
 
     expect(clearTenantProvisioningArtifactsMock).not.toHaveBeenCalled();
   });
