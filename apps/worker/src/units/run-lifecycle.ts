@@ -5,10 +5,8 @@ import {
 } from '@blog/db/constants';
 import { setTenantProvisioningStatus } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
-import {
-  PROVISIONING_UNIT_MAX_RETRIES,
-  UNKNOWN_RUN_ERROR,
-} from '@worker/constants/provisioning';
+import type { TResult } from '@blog/utils/result';
+import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import {
   recordProvisioningAuditEvent,
@@ -18,8 +16,13 @@ import {
 
 import type { TUnitContext } from './run-reported-step';
 
-export type TRunOutcome<TStep extends string = TTenantProvisioningStep> =
-  { ok: true } | { ok: false; failedStep?: TStep; error?: string };
+type TRunFailure<TStep extends string = TTenantProvisioningStep> =
+  { failedStep: TStep } | { message: string };
+
+export type TRunOutcome<
+  TStep extends string = TTenantProvisioningStep,
+  T = void,
+> = TResult<T, TRunFailure<TStep>>;
 
 export async function beginRun(tenantId: string): Promise<void> {
   'use step';
@@ -39,11 +42,11 @@ export async function finishRun(
   const { runId } = ctx;
   await reportRunFinish(tenantId);
 
-  if (!outcome.ok && outcome.failedStep === undefined) {
+  if (!outcome.ok && 'message' in outcome.error) {
     logger.error('provisioning.run_failed', {
       tenantId,
       runId,
-      error: sanitizeLogMessage(outcome.error ?? UNKNOWN_RUN_ERROR),
+      error: sanitizeLogMessage(outcome.error.message),
     });
     const marked = await setTenantProvisioningStatus(
       tenantId,
@@ -64,9 +67,9 @@ export async function finishRun(
     action: outcome.ok
       ? AUDIT_ACTION.PROVISIONED
       : AUDIT_ACTION.PROVISIONING_FAILED,
-    ...(outcome.ok || outcome.failedStep === undefined
+    ...(outcome.ok || 'message' in outcome.error
       ? {}
-      : { failedStep: outcome.failedStep }),
+      : { failedStep: outcome.error.failedStep }),
   });
 }
 

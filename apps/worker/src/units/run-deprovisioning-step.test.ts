@@ -23,6 +23,7 @@ import {
 } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { deleteVercelProjectDomain } from '@blog/db/utils/vercel-client/vercel-project-domains';
+import { errorResult, okResult } from '@blog/utils/result';
 import {
   DEPROVISIONING_STEP_FAILED_EVENT,
   DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
@@ -89,14 +90,10 @@ describe(runDeprovisioningStep, () => {
   beforeEach(() => {
     onAttempt(1);
     vi.mocked(getTenantById).mockResolvedValue(PROVISIONED_TENANT);
-    vi.mocked(updateDeprovisioningStep).mockResolvedValue({
-      ok: true,
-      data: PROVISIONED_TENANT,
-    });
-    vi.mocked(archiveTenant).mockResolvedValue({
-      ok: true,
-      data: PROVISIONED_TENANT,
-    });
+    vi.mocked(updateDeprovisioningStep).mockResolvedValue(
+      okResult(PROVISIONED_TENANT),
+    );
+    vi.mocked(archiveTenant).mockResolvedValue(okResult(PROVISIONED_TENANT));
     vi.mocked(listSanityRobotTokens).mockResolvedValue([]);
     vi.mocked(purgeTenantReaderData).mockResolvedValue(READER_DATA_COUNTS);
   });
@@ -104,6 +101,7 @@ describe(runDeprovisioningStep, () => {
   it("removes the tenant's domain from the web project and reports the step done", async () => {
     await expect(run(DEPROVISIONING_STEP.REMOVE_DOMAIN)).resolves.toEqual({
       ok: true,
+      data: undefined,
     });
 
     expect(deleteVercelProjectDomain).toHaveBeenCalledWith({
@@ -132,7 +130,7 @@ describe(runDeprovisioningStep, () => {
 
     await expect(
       run(DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT),
-    ).resolves.toEqual({ ok: true });
+    ).resolves.toEqual({ ok: true, data: undefined });
 
     expect(archiveSanityProject).not.toHaveBeenCalled();
   });
@@ -160,7 +158,7 @@ describe(runDeprovisioningStep, () => {
 
     await expect(
       run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
-    ).resolves.toEqual({ ok: true });
+    ).resolves.toEqual({ ok: true, data: undefined });
 
     expect(logger.error).toHaveBeenCalledWith(
       DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
@@ -222,10 +220,9 @@ describe(runDeprovisioningStep, () => {
   });
 
   it('rethrows a failure on an attempt that still has retries left', async () => {
-    vi.mocked(archiveTenant).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(archiveTenant).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     await expect(run(DEPROVISIONING_STEP.ARCHIVE_TENANT)).rejects.toThrow(
       /could not be archived/,
@@ -242,7 +239,7 @@ describe(runDeprovisioningStep, () => {
       run(DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE),
     ).resolves.toEqual({
       ok: false,
-      failedStep: DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
+      error: DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
     });
 
     expect(reportedStatuses()).toEqual([

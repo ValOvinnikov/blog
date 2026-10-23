@@ -10,6 +10,7 @@ import {
   finishProvisioningRun,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
+import { errorResult, okResult } from '@blog/utils/result';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { TEST_ENQUEUE_SECRET } from '@worker/testing/enqueue/fixtures';
 import { signedRequest as signedRequestTo } from '@worker/testing/enqueue/sign-enqueue-request';
@@ -50,18 +51,11 @@ function enqueueRequest(tenantId: string = TEST_TENANT_ID): Request {
 describe('POST /api/provision', () => {
   beforeEach(() => {
     mockEnv.WORKER_ENQUEUE_SECRET = TEST_ENQUEUE_SECRET;
-    vi.mocked(beginTenantProvisioning).mockResolvedValue({
-      ok: true,
-      data: { tenant: makeTenant(), previousProvisioningStatus: null },
-    });
-    vi.mocked(updateProvisioningStep).mockResolvedValue({
-      ok: true,
-      data: makeTenant(),
-    });
-    vi.mocked(finishProvisioningRun).mockResolvedValue({
-      ok: true,
-      data: makeTenant(),
-    });
+    vi.mocked(beginTenantProvisioning).mockResolvedValue(
+      okResult({ tenant: makeTenant(), previousProvisioningStatus: null }),
+    );
+    vi.mocked(updateProvisioningStep).mockResolvedValue(okResult(makeTenant()));
+    vi.mocked(finishProvisioningRun).mockResolvedValue(okResult(makeTenant()));
     vi.mocked(start).mockResolvedValue({ runId: 'run-1' } as never);
   });
 
@@ -143,10 +137,9 @@ describe('POST /api/provision', () => {
   });
 
   it('answers 409 and starts no run while one is already in progress', async () => {
-    vi.mocked(beginTenantProvisioning).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-    });
+    vi.mocked(beginTenantProvisioning).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_ALREADY_PROVISIONING),
+    );
 
     const response = await POST(enqueueRequest());
 
@@ -158,10 +151,9 @@ describe('POST /api/provision', () => {
   });
 
   it('answers 404 for a tenant that does not exist', async () => {
-    vi.mocked(beginTenantProvisioning).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(beginTenantProvisioning).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const response = await POST(enqueueRequest());
 
@@ -171,10 +163,9 @@ describe('POST /api/provision', () => {
   });
 
   it('answers 500 when the guard fails for another reason', async () => {
-    vi.mocked(beginTenantProvisioning).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
-    });
+    vi.mocked(beginTenantProvisioning).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN),
+    );
 
     const response = await POST(enqueueRequest());
 

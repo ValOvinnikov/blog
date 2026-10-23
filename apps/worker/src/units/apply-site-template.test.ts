@@ -11,6 +11,7 @@ import {
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
 import type * as TenantsQueries from '@blog/db/queries/tenants';
+import { errorResult } from '@blog/utils/result';
 import { seedTenantContent } from '@worker/steps/seed-content';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { FatalError, getStepMetadata } from 'workflow';
@@ -49,16 +50,15 @@ describe(applySiteTemplate, () => {
       attempt: 1,
     } as ReturnType<typeof getStepMetadata>);
     vi.mocked(getTenantById).mockResolvedValue(makeTenant());
-    vi.mocked(updateProvisioningStep).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(updateProvisioningStep).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
   });
 
   it('seeds the tenant and reports SEED_CONTENT running then done', async () => {
     const result = await applySiteTemplate(TEST_TENANT_ID, CTX);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, data: undefined });
     expect(seedTenantContent).toHaveBeenCalledOnce();
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,

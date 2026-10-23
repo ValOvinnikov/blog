@@ -29,6 +29,7 @@ import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { errorResult, okResult } from '@blog/utils/result';
 import { OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT } from '@worker/constants/owner-access';
 import { freezeClock, TEST_NOW } from '@worker/testing/clock/frozen-clock';
 import {
@@ -108,18 +109,9 @@ describe(checkOwnerAccess, () => {
     vi.mocked(listSanityProjectAcl).mockResolvedValue([
       aclEntry(SANITY_PROJECT_ROLE.VIEWER),
     ]);
-    vi.mocked(setTenantOwnerAccess).mockResolvedValue({
-      ok: true,
-      data: {} as never,
-    });
-    vi.mocked(updateProvisioningStep).mockResolvedValue({
-      ok: true,
-      data: makeTenant(),
-    });
-    vi.mocked(touchTenantActivity).mockResolvedValue({
-      ok: true,
-      data: makeTenant(),
-    });
+    vi.mocked(setTenantOwnerAccess).mockResolvedValue(okResult({} as never));
+    vi.mocked(updateProvisioningStep).mockResolvedValue(okResult(makeTenant()));
+    vi.mocked(touchTenantActivity).mockResolvedValue(okResult(makeTenant()));
     vi.mocked(postOperatorAlert).mockResolvedValue(true);
   });
 
@@ -215,10 +207,9 @@ describe(checkOwnerAccess, () => {
     });
 
     it('still grants access and logs when the inactivity clock cannot be reset', async () => {
-      vi.mocked(touchTenantActivity).mockResolvedValue({
-        ok: false,
-        error: ERROR_CODE.DB_NOT_FOUND,
-      });
+      vi.mocked(touchTenantActivity).mockResolvedValue(
+        errorResult(ERROR_CODE.DB_NOT_FOUND),
+      );
 
       const outcome = await checkOwnerAccess(TEST_TENANT_ID);
 
@@ -230,10 +221,9 @@ describe(checkOwnerAccess, () => {
     });
 
     it('fails the attempt when recording the access fails', async () => {
-      vi.mocked(setTenantOwnerAccess).mockResolvedValue({
-        ok: false,
-        error: ERROR_CODE.DB_NOT_FOUND,
-      });
+      vi.mocked(setTenantOwnerAccess).mockResolvedValue(
+        errorResult(ERROR_CODE.DB_NOT_FOUND),
+      );
 
       await expect(checkOwnerAccess(TEST_TENANT_ID)).rejects.toThrow(
         /could not be recorded/,

@@ -7,6 +7,7 @@ import {
   getTenantById,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
+import { errorResult } from '@blog/utils/result';
 import { verifyTenantSeededContent } from '@worker/steps/verify-seeded-content';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { getStepMetadata } from 'workflow';
@@ -36,16 +37,15 @@ describe(verifyTenant, () => {
       attempt: 1,
     } as ReturnType<typeof getStepMetadata>);
     vi.mocked(getTenantById).mockResolvedValue(makeTenant());
-    vi.mocked(updateProvisioningStep).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(updateProvisioningStep).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
   });
 
   it('verifies the seeded content and reports VERIFY_CONTENT done', async () => {
     const result = await verifyTenant(TEST_TENANT_ID, CTX);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, data: undefined });
     expect(verifyTenantSeededContent).toHaveBeenCalledOnce();
     expect(updateProvisioningStep).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -67,7 +67,7 @@ describe(verifyTenant, () => {
 
     expect(result).toEqual({
       ok: false,
-      failedStep: TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+      error: TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
     });
   });
 });

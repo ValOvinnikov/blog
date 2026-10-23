@@ -1,4 +1,5 @@
 import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils/result';
 import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { applySiteTemplate } from '@worker/units/apply-site-template';
 import { ensureInfrastructure } from '@worker/units/ensure-infrastructure';
@@ -30,10 +31,10 @@ describe(provisionTenant, () => {
     vi.mocked(getWorkflowMetadata).mockReturnValue({
       workflowRunId: CTX.runId,
     } as ReturnType<typeof getWorkflowMetadata>);
-    vi.mocked(ensureInfrastructure).mockResolvedValue({ ok: true });
-    vi.mocked(inviteOwner).mockResolvedValue({ ok: true });
-    vi.mocked(applySiteTemplate).mockResolvedValue({ ok: true });
-    vi.mocked(verifyTenant).mockResolvedValue({ ok: true });
+    vi.mocked(ensureInfrastructure).mockResolvedValue(okResult());
+    vi.mocked(inviteOwner).mockResolvedValue(okResult());
+    vi.mocked(applySiteTemplate).mockResolvedValue(okResult());
+    vi.mocked(verifyTenant).mockResolvedValue(okResult());
   });
 
   it('runs the units in order between beginning and finishing the run', async () => {
@@ -43,19 +44,19 @@ describe(provisionTenant, () => {
     });
     vi.mocked(ensureInfrastructure).mockImplementation(async () => {
       order.push('infrastructure');
-      return { ok: true };
+      return okResult();
     });
     vi.mocked(inviteOwner).mockImplementation(async () => {
       order.push('invite');
-      return { ok: true };
+      return okResult();
     });
     vi.mocked(applySiteTemplate).mockImplementation(async () => {
       order.push('template');
-      return { ok: true };
+      return okResult();
     });
     vi.mocked(verifyTenant).mockImplementation(async () => {
       order.push('verify');
-      return { ok: true };
+      return okResult();
     });
     vi.mocked(finishRun).mockImplementation(async () => {
       order.push('finish');
@@ -76,8 +77,11 @@ describe(provisionTenant, () => {
   it('finishes the run as successful when every unit succeeds', async () => {
     const outcome = await provisionTenant(TEST_TENANT_ID);
 
-    expect(outcome).toEqual({ ok: true });
-    expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, { ok: true });
+    expect(outcome).toEqual({ ok: true, data: undefined });
+    expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
+      ok: true,
+      data: undefined,
+    });
   });
 
   it('starts the owner access check once a run succeeds', async () => {
@@ -87,13 +91,10 @@ describe(provisionTenant, () => {
   });
 
   describe('when a unit reports a failure', () => {
-    const failure = {
-      ok: false,
-      failedStep: TENANT_PROVISIONING_STEP.SEED_CONTENT,
-    } as const;
-
     beforeEach(() => {
-      vi.mocked(applySiteTemplate).mockResolvedValue(failure);
+      vi.mocked(applySiteTemplate).mockResolvedValue(
+        errorResult(TENANT_PROVISIONING_STEP.SEED_CONTENT),
+      );
     });
 
     it('stops without running the later units', async () => {
@@ -106,7 +107,10 @@ describe(provisionTenant, () => {
     it('finishes the run with the failing step', async () => {
       await expect(provisionTenant(TEST_TENANT_ID)).rejects.toThrow();
 
-      expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, failure);
+      expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
+        ok: false,
+        error: { failedStep: TENANT_PROVISIONING_STEP.SEED_CONTENT },
+      });
     });
 
     it('ends the run in a fatal error so it is not retried', async () => {
@@ -127,7 +131,7 @@ describe(provisionTenant, () => {
 
     expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
       ok: false,
-      error: NO_PROJECT,
+      error: { message: NO_PROJECT },
     });
     expect(applySiteTemplate).not.toHaveBeenCalled();
   });
@@ -142,7 +146,7 @@ describe(provisionTenant, () => {
 
       expect(finishRun).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
         ok: false,
-        error: REGISTRY_UNREACHABLE,
+        error: { message: REGISTRY_UNREACHABLE },
       });
     });
 

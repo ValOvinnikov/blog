@@ -4,6 +4,7 @@ import {
   getTenantById,
   startDeprovisioningRun,
 } from '@blog/db/queries/tenants';
+import { errorResult, okResult } from '@blog/utils/result';
 import { DEPROVISIONING_RUN_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
@@ -28,10 +29,7 @@ vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
 describe(beginDeprovisioning, () => {
   beforeEach(() => {
     vi.mocked(getTenantById).mockResolvedValue(makeTenant());
-    vi.mocked(startDeprovisioningRun).mockResolvedValue({
-      ok: true,
-      data: makeTenant(),
-    });
+    vi.mocked(startDeprovisioningRun).mockResolvedValue(okResult(makeTenant()));
   });
 
   it('records the run start for a tenant still to deprovision', async () => {
@@ -54,14 +52,17 @@ describe(beginDeprovisioning, () => {
 describe(finishDeprovisioning, () => {
   beforeEach(() => {
     vi.mocked(getTenantById).mockResolvedValue(ARCHIVED_TENANT);
-    vi.mocked(finishDeprovisioningRun).mockResolvedValue({
-      ok: true,
-      data: ARCHIVED_TENANT,
-    });
+    vi.mocked(finishDeprovisioningRun).mockResolvedValue(
+      okResult(ARCHIVED_TENANT),
+    );
   });
 
   it('records the run finish and alerts the operators after a successful run', async () => {
-    await finishDeprovisioning(TEST_TENANT_ID, CTX, { ok: true });
+    await finishDeprovisioning(
+      TEST_TENANT_ID,
+      CTX,
+      okResult({ skipped: false }),
+    );
 
     expect(finishDeprovisioningRun).toHaveBeenCalledWith({
       tenantId: TEST_TENANT_ID,
@@ -72,10 +73,11 @@ describe(finishDeprovisioning, () => {
   });
 
   it('alerts nobody after a failed step', async () => {
-    await finishDeprovisioning(TEST_TENANT_ID, CTX, {
-      ok: false,
-      failedStep: DEPROVISIONING_STEP.ARCHIVE_TENANT,
-    });
+    await finishDeprovisioning(
+      TEST_TENANT_ID,
+      CTX,
+      errorResult({ failedStep: DEPROVISIONING_STEP.ARCHIVE_TENANT }),
+    );
 
     expect(finishDeprovisioningRun).toHaveBeenCalled();
     expect(alertOperatorsToDeleteSanityProject).not.toHaveBeenCalled();
@@ -83,10 +85,11 @@ describe(finishDeprovisioning, () => {
   });
 
   it('logs a run that failed outside any step', async () => {
-    await finishDeprovisioning(TEST_TENANT_ID, CTX, {
-      ok: false,
-      error: CRASH,
-    });
+    await finishDeprovisioning(
+      TEST_TENANT_ID,
+      CTX,
+      errorResult({ message: CRASH }),
+    );
 
     expect(logger.error).toHaveBeenCalledWith(DEPROVISIONING_RUN_FAILED_EVENT, {
       tenantId: TEST_TENANT_ID,

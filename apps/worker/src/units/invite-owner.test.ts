@@ -9,6 +9,7 @@ import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { okResult } from '@blog/utils/result';
 import {
   makeOwnerAccessTarget,
   OWNER_EMAIL,
@@ -59,16 +60,13 @@ describe(inviteOwner, () => {
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
     vi.mocked(listSanityProjectInvites).mockResolvedValue([PENDING_INVITE]);
-    vi.mocked(setTenantOwnerAccess).mockResolvedValue({
-      ok: true,
-      data: {} as never,
-    });
+    vi.mocked(setTenantOwnerAccess).mockResolvedValue(okResult({} as never));
   });
 
   it("records the owner's pending invite without sending a second one", async () => {
     const result = await inviteOwner(TEST_TENANT_ID, CTX);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, data: undefined });
     expect(createSanityProjectInvite).not.toHaveBeenCalled();
     expect(setTenantOwnerAccess).toHaveBeenCalledWith(TEST_TENANT_ID, {
       sanityInviteId: 'invite-1',
@@ -116,7 +114,7 @@ describe(inviteOwner, () => {
 
       const result = await inviteOwner(TEST_TENANT_ID, CTX);
 
-      expect(result).toEqual({ ok: true });
+      expect(result).toEqual({ ok: true, data: undefined });
       expect(logger.error).toHaveBeenCalledWith('owner_access.invite_failed', {
         tenantId: TEST_TENANT_ID,
         runId: CTX.runId,

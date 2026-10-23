@@ -11,6 +11,7 @@ import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { okResult } from '@blog/utils/result';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 import {
   makeSanityOwner,
@@ -70,10 +71,7 @@ describe(resendOwnerInvite, () => {
           createdAt: SENT_AT,
         },
       ]);
-    vi.mocked(setTenantOwnerAccess).mockResolvedValue({
-      ok: true,
-      data: {} as never,
-    });
+    vi.mocked(setTenantOwnerAccess).mockResolvedValue(okResult({} as never));
   });
 
   it("revokes the owner's previous invite and only theirs", async () => {

@@ -4,6 +4,7 @@ import {
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
+import { errorResult, okResult, type TResult } from '@blog/utils/result';
 import {
   ENQUEUE_ERROR,
   type TEnqueueError,
@@ -12,9 +13,6 @@ import { env } from '@worker/utils/env/env';
 import { z } from 'zod';
 
 const tenantRequestBodySchema = z.object({ tenantId: z.uuid() });
-
-type TSignedTenantRequest =
-  { ok: true; tenantId: string } | { ok: false; response: Response };
 
 export function respond(
   status: THttpStatus,
@@ -31,12 +29,12 @@ export function respondError(
 }
 
 function reject(status: THttpStatus, error: TEnqueueError) {
-  return { ok: false, response: respondError(status, error) } as const;
+  return errorResult(respondError(status, error));
 }
 
 export async function readSignedTenantRequest(
   request: Request,
-): Promise<TSignedTenantRequest> {
+): Promise<TResult<string, Response>> {
   const secret = env.WORKER_ENQUEUE_SECRET;
   const rawBody = await request.text();
 
@@ -63,5 +61,5 @@ export async function readSignedTenantRequest(
   if (!parsed.success) {
     return reject(HTTP_STATUS.BAD_REQUEST, ENQUEUE_ERROR.INVALID_BODY);
   }
-  return { ok: true, tenantId: parsed.data.tenantId };
+  return okResult(parsed.data.tenantId);
 }
