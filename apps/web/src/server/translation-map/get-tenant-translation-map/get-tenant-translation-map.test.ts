@@ -2,6 +2,7 @@ import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { service } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { TRANSLATION_MAP_FETCH_FAILED_EVENT } from '@web/constants/translation-map';
 import { logger } from '@web/utils/logger/logger';
 
 import { getTenantTranslationMap } from './get-tenant-translation-map';
@@ -58,9 +59,12 @@ describe(getTenantTranslationMap, () => {
     );
 
     await expect(getTenantTranslationMap(tenant)).resolves.toBeUndefined();
-    expect(logger.error).toHaveBeenCalledWith('translation_map.fetch_failed', {
-      error: expect.any(Error),
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      TRANSLATION_MAP_FETCH_FAILED_EVENT,
+      {
+        error: expect.any(Error),
+      },
+    );
   });
 
   it('logs and is undefined when the credentials cannot be decrypted', async () => {

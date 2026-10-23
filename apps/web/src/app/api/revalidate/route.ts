@@ -5,8 +5,11 @@ import type { TTenantSanityContext } from '@blog/service';
 import { errorResult, type TResult } from '@blog/utils';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
+  FETCH_FAILED_REASON,
   PATH_PURGE_FALLBACK_EVENT,
   TENANT_LOOKUP_FAILED_MESSAGE,
+  TENANT_UNRESOLVED_REASON,
+  UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
 import {
   deriveRevalidatePaths,
@@ -57,13 +60,13 @@ const resolveDerivedRevalidatePaths = async (
   tenant: TMaybeUndefined<TTenantSanityContext>,
 ): Promise<TResult<string[], string>> => {
   if (!tenantId) {
-    return errorResult('tenant_unresolved');
+    return errorResult(TENANT_UNRESOLVED_REASON);
   }
   if (!isDerivableRevalidateType(type)) {
-    return errorResult('unsupported_type');
+    return errorResult(UNSUPPORTED_TYPE_REASON);
   }
   if (!tenant) {
-    return errorResult('fetch_failed');
+    return errorResult(FETCH_FAILED_REASON);
   }
 
   return deriveRevalidatePaths({ type, id, tenantId, tenant });

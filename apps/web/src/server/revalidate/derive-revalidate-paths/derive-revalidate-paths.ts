@@ -1,6 +1,17 @@
 import { queries } from '@blog/db';
 import { service, type TTenantSanityContext } from '@blog/service';
 import { errorResult, okResult, type TResult } from '@blog/utils';
+import {
+  BLOG_PAGINATION_LOOKUP_FAILED_EVENT,
+  DOCUMENT_NOT_FOUND_REASON,
+  FETCH_FAILED_REASON,
+  POST_LOOKUP_FAILED_EVENT,
+  TAG_PAGINATION_LOOKUP_FAILED_EVENT,
+  TAG_PARAMS_LOOKUP_FAILED_EVENT,
+  TOPIC_PAGINATION_LOOKUP_FAILED_EVENT,
+  TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
+  UNSUPPORTED_TYPE_REASON,
+} from '@web/constants/revalidate';
 import { routing } from '@web/i18n/routing';
 import { buildPostPublishPaths } from '@web/utils/build-post-publish-paths';
 import { logger } from '@web/utils/logger/logger';
@@ -15,7 +26,9 @@ export const isDerivableRevalidateType = (type: string): boolean =>
 
 export type TDeriveRevalidatePathsResult = TResult<
   string[],
-  'unsupported_type' | 'document_not_found' | 'fetch_failed'
+  | typeof UNSUPPORTED_TYPE_REASON
+  | typeof DOCUMENT_NOT_FOUND_REASON
+  | typeof FETCH_FAILED_REASON
 >;
 
 export type TDeriveRevalidatePathsInput = {
@@ -50,51 +63,51 @@ const deriveBlogPostPublishPaths = async ({
   ]);
 
   if (!postsResult.ok) {
-    logger.error('revalidate.post_lookup_failed', {
+    logger.error(POST_LOOKUP_FAILED_EVENT, {
       id,
       error: postsResult.error,
     });
-    return errorResult('fetch_failed');
+    return errorResult(FETCH_FAILED_REASON);
   }
   const [post] = postsResult.data;
   if (!post) {
-    return errorResult('document_not_found');
+    return errorResult(DOCUMENT_NOT_FOUND_REASON);
   }
 
   if (!blogParamsResult.ok) {
-    logger.error('revalidate.blog_pagination_lookup_failed', {
+    logger.error(BLOG_PAGINATION_LOOKUP_FAILED_EVENT, {
       id,
       error: blogParamsResult.error,
     });
-    return errorResult('fetch_failed');
+    return errorResult(FETCH_FAILED_REASON);
   }
   if (!tagSlugsResult.ok) {
-    logger.error('revalidate.tag_params_lookup_failed', {
+    logger.error(TAG_PARAMS_LOOKUP_FAILED_EVENT, {
       id,
       error: tagSlugsResult.error,
     });
-    return errorResult('fetch_failed');
+    return errorResult(FETCH_FAILED_REASON);
   }
   if (!tagPaginationParamsResult.ok) {
-    logger.error('revalidate.tag_pagination_lookup_failed', {
+    logger.error(TAG_PAGINATION_LOOKUP_FAILED_EVENT, {
       id,
       error: tagPaginationParamsResult.error,
     });
-    return errorResult('fetch_failed');
+    return errorResult(FETCH_FAILED_REASON);
   }
   if (!topicSlugsResult.ok) {
-    logger.error('revalidate.topic_params_lookup_failed', {
+    logger.error(TOPIC_PARAMS_LOOKUP_FAILED_EVENT, {
       id,
       error: topicSlugsResult.error,
     });
-    return errorResult('fetch_failed');
+    return errorResult(FETCH_FAILED_REASON);
   }
   if (!topicPaginationParamsResult.ok) {
-    logger.error('revalidate.topic_pagination_lookup_failed', {
+    logger.error(TOPIC_PAGINATION_LOOKUP_FAILED_EVENT, {
       id,
       error: topicPaginationParamsResult.error,
     });
-    return errorResult('fetch_failed');
+    return errorResult(FETCH_FAILED_REASON);
   }
 
   const paths = buildPostPublishPaths({
@@ -123,5 +136,5 @@ export const deriveRevalidatePaths = async (
   if (input.type === POST_TYPE) {
     return deriveBlogPostPublishPaths(input);
   }
-  return errorResult('unsupported_type');
+  return errorResult(UNSUPPORTED_TYPE_REASON);
 };
