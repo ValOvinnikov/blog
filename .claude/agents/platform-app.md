@@ -446,6 +446,9 @@ turn.
   in passing in files the diff touches, and what you found and left, each with
   `file:line` (CLAUDE.md → "Examine before you change"). Write "nothing found"
   only after reading them.
+  A test file you touch is pruned (`testing-practices` → "When you touch a
+  test file"): list each test removed or moved, with the test that still
+  asserts its behaviour.
 - Routes and Server Actions created or changed.
 - The `@blog/db` functions you consumed, and any you needed that don't exist.
 - Any `@blog/ui` component composed in `site-preview/`, and any gap you worked

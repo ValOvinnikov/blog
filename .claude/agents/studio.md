@@ -274,6 +274,9 @@ Run once, after all schema work is complete:
   you fixed in passing in touched files, and what you found and left, each
   with `file:line` (CLAUDE.md → "Examine before you change"). Write "nothing
   found" only after reading them.
+  A test file you touch is pruned (`testing-practices` → "When you touch a
+  test file"): list each test removed or moved, with the test that still
+  asserts its behaviour.
 - The exact names of new/changed types as they appear in `types.ts`
   (`Page_post`, `Module_heroBlog`, `Settings_site`).
 - A field-by-field breakdown for every new/changed type — name, type, and

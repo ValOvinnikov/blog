@@ -482,6 +482,30 @@ tenant)`) is fine: that call is the contract with the outside.
   component wraps the pure one instead of filling its slot — fix the
   structure (`web-component-practices`) and test the real tree.
 
+## When you touch a test file (mandatory)
+
+Test files carry no size budget, so this pass is what keeps them small.
+Every test file a diff creates or edits is pruned in that diff — the whole
+file, not only the cases the change adds. A test file the diff does not touch
+is left alone; this is never a sweep.
+
+- **A duplicate is deleted** — a test asserting the same behaviour as
+  another test in the file, however its arrangement differs.
+- **Behaviour another unit owns moves to that unit.** A case exercising a
+  hook, provider or shared component that has its own test file moves there
+  (or is deleted when that file already asserts it); the touched file keeps
+  one wiring test proving it uses the unit.
+- **Cases that differ only in input and expected output become one
+  `it.each` table.**
+- **A test "What not to test" bans is deleted** — a source-back assertion, a
+  class assertion, a Studio schema test.
+
+Report every test removed or moved with the test that still asserts its
+behaviour (file and `it` title). A removal whose behaviour is asserted
+nowhere else is blocking in review (`code-review-practices` §6), unless the
+test was deleted for failing "What not to test". The reviewer's mechanical
+scan names each touched test file over 500 lines, which gets this pass first.
+
 ## Coverage strategy
 
 Many fast unit tests (`ui`, `service`, migrations), few heavier route tests.
@@ -507,5 +531,8 @@ have a test? Report gaps rather than leaving them silent.
       `expect(…)` anywhere in a file the change creates or touches.
 - [ ] Every `it` title is behaviour, 80 characters or fewer.
 - [ ] No arrangement repeated across `it`s; no prop bag rendered 3+ times.
+- [ ] Every touched test file pruned: no duplicate, no case another unit
+      owns, no untabled repeat; each removal reported with where its
+      behaviour is still asserted.
 - [ ] Migrations: transform correctness + idempotency.
 - [ ] `pnpm --filter <pkg> test` passes.
