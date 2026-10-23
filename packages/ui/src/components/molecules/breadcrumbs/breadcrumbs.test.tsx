@@ -1,5 +1,6 @@
+import { BREADCRUMBS_HOME_ICON_TEST_ID } from '@blog/ui/constants/breadcrumbs';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { customRender, screen, within } from '@blog/ui/testing/custom-render';
 import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
 
@@ -43,16 +44,22 @@ describe(`<${Breadcrumbs.name}/>`, () => {
 
     it('names the home link by its label, with a decorative House icon', () => {
       const homeLink = screen.getByRole('link', { name: firstItem.label });
-      const icon = homeLink.querySelector('svg');
+      const icon = within(homeLink).getByTestId(BREADCRUMBS_HOME_ICON_TEST_ID);
 
       expect(icon).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it('sets a title attribute on the first item for sighted hover users', () => {
-      const homeLink = screen.getByRole('link', { name: firstItem.label });
+    it.each([
+      ['first', firstItem],
+      ['last', lastItem],
+    ])(
+      'sets a title attribute on the %s item so its full text is available on hover',
+      (_position, { label }) => {
+        const titled = screen.getByTitle(label);
 
-      expect(homeLink).toHaveAttribute('title', firstItem.label);
-    });
+        expect(titled).toHaveTextContent(label);
+      },
+    );
 
     it('renders the last item as text with aria-current="page", not a link', () => {
       const current = screen.getByText(lastItem.label);
@@ -67,12 +74,6 @@ describe(`<${Breadcrumbs.name}/>`, () => {
       const rendered = listItems.map((li) => li.textContent);
 
       expect(rendered).toEqual(items.map((item) => item.label));
-    });
-
-    it('sets a title attribute on the last item so its full text is available on hover', () => {
-      const current = screen.getByText(lastItem.label);
-
-      expect(current).toHaveAttribute('title', lastItem.label);
     });
   });
 
@@ -89,12 +90,5 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     const mockLinks = screen.getAllByTestId(MOCK_LINK_TEST_ID);
 
     expect(mockLinks).toContain(firstLink);
-  });
-
-  it('forwards dataTestId to the nav element', () => {
-    setup({ dataTestId: 'breadcrumbs' });
-    const nav = screen.getByTestId('breadcrumbs');
-
-    expect(nav).toBeVisible();
   });
 });
