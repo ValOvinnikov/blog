@@ -139,17 +139,15 @@ describe.each([personalDataIndex, accountEmailIndex])('%o', (indexEmail) => {
 describe('email index normalisation', () => {
   it.each([
     {
-      name: 'personalDataIndex',
       indexEmail: personalDataIndex,
       variant: ' Reader+news@Example.com',
     },
     {
-      name: 'accountEmailIndex',
       indexEmail: accountEmailIndex,
       variant: ' Reader@Example.com ',
     },
   ])(
-    '$name indexes $variant the same as the address',
+    '$indexEmail.name indexes $variant the same as the address',
     ({ indexEmail, variant }) => {
       expect(indexEmail(variant, KEY_V1)).toBe(indexEmail(ADDRESS, KEY_V1));
     },
@@ -157,12 +155,11 @@ describe('email index normalisation', () => {
 
   it.each([
     {
-      name: 'accountEmailIndex',
       indexEmail: accountEmailIndex,
       variant: 'reader+news@example.com',
     },
   ])(
-    '$name indexes $variant differently from the address',
+    '$indexEmail.name indexes $variant differently from the address',
     ({ indexEmail, variant }) => {
       expect(indexEmail(variant, KEY_V1)).not.toBe(indexEmail(ADDRESS, KEY_V1));
     },
