@@ -231,6 +231,9 @@ Run once, after all work is complete:
   you fixed in passing in touched files, and what you found and left, each
   with `file:line` (CLAUDE.md → "Examine before you change"). Write "nothing
   found" only after reading them.
+  A test file you touch is pruned (`testing-practices` → "When you touch a
+  test file"): list each test removed or moved, with the test that still
+  asserts its behaviour.
 - Exported functions and signatures
   (`queries.bookmarks.addBookmark(tenantId, userId, postId): Promise<TResult<TBookmark, TErrorCode>>`).
 - View-model types the calling app's agent (`web` or `platform-app`) will

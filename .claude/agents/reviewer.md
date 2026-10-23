@@ -100,6 +100,17 @@ it ships. Make the search a deliberate step:
 - Code that is coincidentally similar, or that sharing would couple when it
   should stay independent, is not a duplicate — say so rather than flag it.
 
+## Touched test files are pruned
+
+Every test file the diff creates or edits is read in full against
+`testing-practices` → "When you touch a test file", starting with the ones
+§0's over-500-lines scan names. A duplicate test, a case another unit with
+its own test file owns, an untabled set of input/output repeats, or a removed
+test whose behaviour no remaining test asserts is blocking (§6). Cross-check
+each removal the implementing agent's **Examined** section lists against the
+test it names as still asserting it. Test files the diff does not touch are
+out of scope.
+
 ## Report format
 
 Open with `Reviewed N files against <base>`. If N differs from the count the

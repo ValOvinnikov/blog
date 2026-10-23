@@ -1113,6 +1113,30 @@ launch. Pre-1.0 (`0.y.z`): bump MINOR freely for notable changes, PATCH for
 fixes. Only tag commits already green on `main`. Rollback = re-tag an earlier
 commit or redeploy a prior Vercel build.
 
+### The personal-data backfill — between two releases
+
+Sign-in reads users only through their encrypted email, so a production
+release that ships that reader before `db:backfill-personal-data` has run
+against production fails every existing user's sign-in with "User has no
+encrypted email" (Auth.js reports it as `error=Configuration`). The workflow
+cannot run the backfill for you: `migrate-db` is followed straight by the app
+deploys, with no gap to fill the columns in between. So the first production
+release that contains the readers ships in two tags:
+
+1. **Tag the expand.** Tag a green `main` commit that contains the encrypted
+   columns (migration `0055_add_personal_data_encrypted_columns`, PR #5703)
+   and the backfill CLI (PR #5736), but not the readers (PR #5766). The apps
+   keep reading the plain columns and start writing both forms.
+2. **Back up, then backfill production.** With the owner's go-ahead, follow
+   `packages/db/scripts/backfill-personal-data/README.md` against the
+   production database, using the exact `PERSONAL_DATA_ENCRYPTION_KEY` and
+   `PERSONAL_DATA_INDEX_KEY` values `web-prod` and `platform-prod` hold. A
+   different key fills the columns with values nothing can read. Run it from
+   a checkout of `main`, dry run first. The run must end with
+   `0 row(s) still missing` for every table.
+3. **Tag the readers.** Tag the commit with PR #5766 (or later), then sign in
+   on both production sites ("Post-deploy verification").
+
 ---
 
 ## Post-deploy verification
