@@ -49,12 +49,9 @@ describe(`<${Breadcrumbs.name}/>`, () => {
       expect(icon).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it.each([
-      ['first', firstItem],
-      ['last', lastItem],
-    ])(
-      'sets a title attribute on the %s item so its full text is available on hover',
-      (_position, { label }) => {
+    it.each([firstItem, lastItem])(
+      'sets a title attribute on the "$label" item so its full text is available on hover',
+      ({ label }) => {
         const titled = screen.getByTitle(label);
 
         expect(titled).toHaveTextContent(label);
