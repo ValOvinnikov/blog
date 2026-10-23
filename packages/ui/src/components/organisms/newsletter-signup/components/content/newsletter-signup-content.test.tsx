@@ -1,22 +1,21 @@
 import { FORM_STATUS } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import {
+  MOCK_NEWSLETTER_EMAIL_LABEL,
+  MOCK_NEWSLETTER_SUBMIT_LABEL,
+  mockNewsletterSignupArgs,
+} from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
 
 import { NewsletterSignupContent } from './newsletter-signup-content';
 
+const ERROR_MESSAGE_ID = 'newsletter-content-error';
+
 faker.seed(123);
 
-const SUBMIT_LABEL = faker.lorem.word();
-const EMAIL_LABEL = faker.lorem.words(2);
-
 const baseArgs = {
-  email: '',
-  onChange: vi.fn(),
-  onSubmit: vi.fn(),
-  submitLabel: SUBMIT_LABEL,
-  emailAriaLabel: EMAIL_LABEL,
-  status: FORM_STATUS.IDLE,
+  ...mockNewsletterSignupArgs(),
   inputPrompt: (
     <span data-testid="newsletter-signup-content-prompt" aria-hidden="true">
       $
@@ -36,15 +35,19 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('renders a labeled email field and submit button', () => {
-      const emailField = screen.getByRole('textbox', { name: EMAIL_LABEL });
-      const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+      const emailField = screen.getByRole('textbox', {
+        name: MOCK_NEWSLETTER_EMAIL_LABEL,
+      });
+      const submitButton = screen.getByRole('button', {
+        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+      });
 
       expect(emailField).toBeVisible();
       expect(submitButton).toBeVisible();
     });
 
     it('associates the email field with its accessible label', () => {
-      const emailField = screen.getByLabelText(EMAIL_LABEL);
+      const emailField = screen.getByLabelText(MOCK_NEWSLETTER_EMAIL_LABEL);
 
       expect(emailField).toHaveAttribute('type', 'email');
     });
@@ -56,7 +59,9 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('submits through a real submit control, not an onClick shortcut', () => {
-      const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+      const submitButton = screen.getByRole('button', {
+        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+      });
 
       expect(submitButton).toHaveAttribute('type', 'submit');
     });
@@ -79,7 +84,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
       name: 'clicking the submit button',
       submit: async () => {
         const submitButton = screen.getByRole('button', {
-          name: SUBMIT_LABEL,
+          name: MOCK_NEWSLETTER_SUBMIT_LABEL,
         });
         await userEvent.click(submitButton);
       },
@@ -107,7 +112,9 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
 
     it('disables the field and button and marks the button busy while submitting', () => {
       const emailField = screen.getByRole('textbox');
-      const button = screen.getByRole('button', { name: SUBMIT_LABEL });
+      const button = screen.getByRole('button', {
+        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+      });
 
       expect(emailField).toBeDisabled();
       expect(button).toBeDisabled();
@@ -115,7 +122,9 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('shows the Spinner atom inside the button while submitting', () => {
-      const button = screen.getByRole('button', { name: SUBMIT_LABEL });
+      const button = screen.getByRole('button', {
+        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+      });
       const spinner = screen.getByTestId('newsletter-signup-spinner');
 
       expect(spinner).toBeVisible();
@@ -154,11 +163,11 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     expect(alert).not.toBeInTheDocument();
   });
 
-  it('associates the email field with the error message via its accessible description', () => {
+  it('describes the email field by the error message', () => {
     setup({
       status: FORM_STATUS.ERROR,
       errorMessage,
-      errorMessageId: 'newsletter-content-error',
+      errorMessageId: ERROR_MESSAGE_ID,
     });
 
     const emailField = screen.getByRole('textbox');
@@ -167,7 +176,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
   });
 
   it('has no accessible description or aria-describedby when there is no error', () => {
-    setup({ errorMessageId: 'newsletter-content-error' });
+    setup({ errorMessageId: ERROR_MESSAGE_ID });
 
     const emailField = screen.getByRole('textbox');
 
