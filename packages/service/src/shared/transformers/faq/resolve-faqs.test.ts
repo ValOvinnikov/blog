@@ -1,54 +1,62 @@
 import {
-  makeRawFaqModuleQuestions,
-  makeRawFaqQuestionItem,
+  MOCK_FAQ_QUESTION_ID,
+  MOCK_SECOND_FAQ_QUESTION_ID,
+  mockFaqView,
+  mockRawFaqModuleQuestions,
+  mockRawFaqQuestionItem,
 } from '@blog/service/testing/modules/fixtures';
 
 import { resolveFaqs } from './resolve-faqs';
 
 describe(resolveFaqs, () => {
   it('returns an empty array when the page has no FAQ module', () => {
-    expect(resolveFaqs([])).toEqual([]);
+    const faqs = resolveFaqs([]);
+
+    expect(faqs).toEqual([]);
   });
 
   it('flattens the questions of several modules in first-seen order', () => {
     const faqs = resolveFaqs([
-      makeRawFaqModuleQuestions({
-        questions: [makeRawFaqQuestionItem({ _id: 'block-faq-1' })],
+      mockRawFaqModuleQuestions({
+        questions: [mockRawFaqQuestionItem({ _id: MOCK_FAQ_QUESTION_ID })],
       }),
-      makeRawFaqModuleQuestions({
-        questions: [makeRawFaqQuestionItem({ _id: 'block-faq-2' })],
+      mockRawFaqModuleQuestions({
+        questions: [
+          mockRawFaqQuestionItem({ _id: MOCK_SECOND_FAQ_QUESTION_ID }),
+        ],
       }),
     ]);
 
-    expect(faqs.map(({ id }) => id)).toEqual(['block-faq-1', 'block-faq-2']);
+    expect(faqs.map(({ id }) => id)).toEqual([
+      MOCK_FAQ_QUESTION_ID,
+      MOCK_SECOND_FAQ_QUESTION_ID,
+    ]);
   });
 
   it('turns the answer blocks into plain text', () => {
-    const [faq] = resolveFaqs([makeRawFaqModuleQuestions()]);
+    const [faq] = resolveFaqs([mockRawFaqModuleQuestions()]);
 
-    expect(faq).toEqual({
-      id: 'block-faq-1',
-      question: 'How long does onboarding take?',
-      answer: 'Most teams are live within a week.',
-    });
+    expect(faq).toEqual(mockFaqView());
   });
 
   it('dedupes a question referenced by two modules, keeping its first occurrence', () => {
-    const module = makeRawFaqModuleQuestions();
+    const module = mockRawFaqModuleQuestions();
 
-    expect(resolveFaqs([module, module])).toHaveLength(1);
+    const faqs = resolveFaqs([module, module]);
+
+    expect(faqs).toHaveLength(1);
   });
 
   it('drops a question with no text in either language', () => {
     const faqs = resolveFaqs([
-      makeRawFaqModuleQuestions({
+      mockRawFaqModuleQuestions({
         questions: [
-          makeRawFaqQuestionItem({
+          mockRawFaqQuestionItem({
             _id: 'no-question',
             question: null as never,
           }),
-          makeRawFaqQuestionItem({ _id: 'no-answer', answer: null as never }),
-          makeRawFaqQuestionItem({ _id: 'empty-answer', answer: [] }),
+          mockRawFaqQuestionItem({ _id: 'no-answer', answer: null as never }),
+          mockRawFaqQuestionItem({ _id: 'empty-answer', answer: [] }),
         ],
       }),
     ]);
@@ -57,8 +65,8 @@ describe(resolveFaqs, () => {
   });
 
   it('keeps a module whose questions are unset out of the list', () => {
-    expect(
-      resolveFaqs([makeRawFaqModuleQuestions({ questions: null })]),
-    ).toEqual([]);
+    const faqs = resolveFaqs([mockRawFaqModuleQuestions({ questions: null })]);
+
+    expect(faqs).toEqual([]);
   });
 });

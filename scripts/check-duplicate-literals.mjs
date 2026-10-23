@@ -75,6 +75,20 @@ const isFirstArgumentOf = (node, names) => {
   );
 };
 
+const isTestTableTitle = (node) => {
+  const { parent } = node;
+  if (!ts.isCallExpression(parent) || parent.arguments[0] !== node) {
+    return false;
+  }
+  const table = parent.expression;
+  return (
+    ts.isCallExpression(table) &&
+    ts.isPropertyAccessExpression(table.expression) &&
+    table.expression.name.text === 'each' &&
+    TEST_TITLE_CALLEES.has(calleeName(table.expression.expression))
+  );
+};
+
 const isInsideClassOrJsxAttribute = (node) => {
   for (let current = node.parent; current; current = current.parent) {
     if (ts.isJsxAttribute(current)) {
@@ -165,6 +179,7 @@ const isExemptLiteral = (node) => {
     (parent.name === node && !ts.isElementAccessExpression(parent)) ||
     isFirstArgumentOf(node, MODULE_PATH_CALLEES) ||
     isFirstArgumentOf(node, TEST_TITLE_CALLEES) ||
+    isTestTableTitle(node) ||
     isFirstArgumentOf(node, ROLE_QUERY_CALLEES) ||
     isInsideClassOrJsxAttribute(node) ||
     isEnvComparisonOperand(node) ||

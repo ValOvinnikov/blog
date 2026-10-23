@@ -1,23 +1,28 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawContactFormModule } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockRawContactFormModule } from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getContactForm } from './loader';
+import { contactFormModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const CONTACT_FORM_ID = 'contact-form-1';
+
+const tenant = mockTenant();
 
 describe('getContactForm', () => {
-  it('maps the contact form module document', async () => {
-    mockRun.mockResolvedValueOnce(makeRawContactFormModule());
+  beforeEach(() => {
+    mockRun.mockResolvedValue(mockRawContactFormModule());
+  });
 
-    const contactForm = await getContactForm('contact-form-1', tenant);
+  it('maps the contact form module document', async () => {
+    const contactForm = await getContactForm(CONTACT_FORM_ID, tenant);
 
     expect(contactForm.headingBlock.heading).toBe('Get in touch');
     expect(contactForm.successMessage).toBe(
@@ -26,27 +31,24 @@ describe('getContactForm', () => {
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getContactForm('missing', tenant)).rejects.toThrow();
+    await expect(getContactForm(MOCK_MISSING_ID, tenant)).rejects.toThrow();
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue(makeRawContactFormModule());
+    await getContactForm(CONTACT_FORM_ID, tenant);
 
-    await getContactForm('contact-form-1', tenant);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:contactForm',
-            't:tenant-a:module:contact-form-1',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(contactFormModuleQuery, {
+      parameters: { id: CONTACT_FORM_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          't:tenant-a:modules:contactForm',
+          't:tenant-a:module:contact-form-1',
+        ],
+      },
+    });
   });
 });

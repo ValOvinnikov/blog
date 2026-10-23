@@ -7,31 +7,57 @@ import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detai
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
 import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
+import type { TModule } from '@blog/service/shared/transformers/module/to-module';
+import type { TRawPersonCard } from '@blog/service/shared/transformers/person/to-person-card';
 import type { TRawPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 import {
-  makeRawTag,
-  makeRawTopic,
+  MOCK_TAG_SLUG,
+  MOCK_TAG_TITLE,
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+  mockRawTag,
+  mockRawTopic,
 } from '@blog/service/testing/entities/fixtures';
 import {
-  makeRawHeadingBlock,
-  makeRawSanityImage,
-  makeRawSeo,
+  MOCK_CONTENT_MODULE_ID,
+  MOCK_CTA_MODULE_ID,
+  MOCK_POST_LIST_PAGE_SIZE,
+  MOCK_TAXONOMY_LIST_MODULE_ID,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_POST_EXCERPT,
+  MOCK_POST_ID,
+  MOCK_POST_PUBLISHED_AT,
+  MOCK_POST_SLUG,
+  MOCK_POST_TITLE,
+  mockRawHeadingBlock,
+  mockRawSanityImage,
+  mockRawSeo,
+  mockReference,
 } from '@blog/service/testing/shared/fixtures';
+import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
 
-export const RAW_HOME_PAGE_ID = 'home-1';
+export const MOCK_HOME_PAGE_ID = 'home-1';
+export const MOCK_LIST_MODULE_ID = 'list-1';
+export const MOCK_HERO_MODULE_ID = 'hero-1';
+export const MOCK_POST_LATEST_MODULE_ID = 'post-latest-1';
+export const MOCK_TOPIC_INDEX_HEADING = 'Browse by topic';
+export const MOCK_TAG_INDEX_HEADING = 'Browse by tag';
+export const MOCK_TAG_PAGE_DESCRIPTION = 'Posts about TypeScript.';
+export const MOCK_ABOUT_PAGE_TITLE = 'About Us';
+export const MOCK_CURATED_SUPPORTING_TEXT = 'Hand-picked reads.';
+export const MOCK_TEMPLATE_REFERENCE = mockReference('template-a');
 
 const AUTHOR_AVATAR_ALT = 'Jane avatar';
-const POST_SLUG = 'hello-world';
-const TAXONOMY_LIST_MODULE_ID = 'taxonomy-list-1';
 const POST_LIST_MODULE_ID = 'post-list-1';
 
-export function makeRawAuthor(
+export function mockRawAuthor(
   overrides: Partial<TRawPostDetail['author']> = {},
 ): TRawPostDetail['author'] {
   return {
     _id: 'author-1',
     name: 'Jane Doe',
-    image: makeRawSanityImage(AUTHOR_AVATAR_ALT),
+    image: mockRawSanityImage(AUTHOR_AVATAR_ALT),
     profilePage: null,
     role: 'Writer',
     bio: null,
@@ -40,167 +66,262 @@ export function makeRawAuthor(
   };
 }
 
-function makeRawPostSummary() {
+export function mockRawPersonCard(
+  overrides: Partial<TRawPersonCard> = {},
+): TRawPersonCard {
+  const { _id, name } = mockRawAuthor();
+
+  return { _id, name, image: null, profilePage: null, ...overrides };
+}
+
+export function mockRawHeroRef() {
+  return { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroBlog' } as const;
+}
+
+export function mockHeroSlotView() {
+  return { id: MOCK_HERO_MODULE_ID, type: 'module_heroBlog' };
+}
+
+export function mockRawTaxonomyListRef() {
   return {
-    _id: 'post-1',
-    headingBlock: makeRawHeadingBlock('Hello World', {
-      supportingText: 'A sufficiently long excerpt for the card.',
-    }),
-    slug: POST_SLUG,
-    publishedAt: '2026-01-15T00:00:00Z',
-    heroImage: makeRawSanityImage(),
-    featured: false,
-    topic: {
-      _id: 'topic-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: 'Engineering posts',
+    _id: MOCK_TAXONOMY_LIST_MODULE_ID,
+    _type: 'module_taxonomyList',
+  } as const;
+}
+
+export function mockTaxonomyListSlotView(): TModule {
+  const { _id: id, _type: type } = mockRawTaxonomyListRef();
+
+  return { id, type };
+}
+
+export function mockRawCtaRef() {
+  return { _id: MOCK_CTA_MODULE_ID, _type: 'module_cta' } as const;
+}
+
+export function mockCtaSlotView(): TModule {
+  const { _id: id, _type: type } = mockRawCtaRef();
+
+  return { id, type };
+}
+
+export function mockRawContentRef() {
+  return { _id: MOCK_CONTENT_MODULE_ID, _type: 'module_content' } as const;
+}
+
+export function mockContentSlotView(): TModule {
+  const { _id: id, _type: type } = mockRawContentRef();
+
+  return { id, type };
+}
+
+export function mockListModuleRefs() {
+  return [{ _ref: MOCK_LIST_MODULE_ID }];
+}
+
+export function mockListModulePageSize() {
+  return { _id: MOCK_LIST_MODULE_ID, pageSize: MOCK_POST_LIST_PAGE_SIZE };
+}
+
+export function mockRawPostLatestRef() {
+  return {
+    _id: MOCK_POST_LATEST_MODULE_ID,
+    _type: 'module_postLatest',
+  } as const;
+}
+
+export function mockTemplatedPageDocument({
+  template,
+  ...fields
+}: { _type: string; template?: typeof MOCK_TEMPLATE_REFERENCE } & Record<
+  string,
+  unknown
+>) {
+  return { _id: 'page-a', ...fields, ...(template ? { template } : {}) };
+}
+
+export function mockIndexPageDocument({
+  _type,
+  heading,
+  language,
+}: {
+  _type: string;
+  heading: string;
+  language?: string;
+}) {
+  return {
+    _id: language === LOCALE_ISO_CODES.NL ? `${_type}-nl` : _type,
+    _type,
+    headingBlock: { heading },
+    ...(language ? { language } : {}),
+  };
+}
+
+export function mockTemplateLayoutDocuments({ _type }: { _type: string }) {
+  return [
+    {
+      _id: MOCK_TEMPLATE_REFERENCE._ref,
+      _type,
+      hero: mockReference(MOCK_HERO_MODULE_ID),
+      modules: [
+        mockReference(MOCK_POST_LATEST_MODULE_ID, {
+          _key: MOCK_POST_LATEST_MODULE_ID,
+        }),
+      ],
     },
+    mockRawHeroRef(),
+    mockRawPostLatestRef(),
+  ];
+}
+
+function mockRawPostSummary() {
+  return {
+    _id: MOCK_POST_ID,
+    headingBlock: mockRawHeadingBlock(MOCK_POST_TITLE, {
+      supportingText: MOCK_POST_EXCERPT,
+    }),
+    slug: MOCK_POST_SLUG,
+    publishedAt: MOCK_POST_PUBLISHED_AT,
+    heroImage: mockRawSanityImage(),
+    featured: false,
+    topic: mockRawTopic(),
     wordCount: 400,
   };
 }
 
-export function makeRawPostCard(
+export function mockRawPostCard(
   overrides: Partial<TRawPostCard> = {},
 ): TRawPostCard {
-  const { _id, name, image, profilePage } = makeRawAuthor();
-
   return {
-    ...makeRawPostSummary(),
-    author: { _id, name, image, profilePage },
+    ...mockRawPostSummary(),
+    author: mockRawPersonCard({ image: mockRawAuthor().image }),
     ...overrides,
   };
 }
 
-export function makeRawPostDetail(
+export function mockRawPostDetail(
   overrides: Partial<TRawPostDetail> = {},
 ): TRawPostDetail {
   return {
-    ...makeRawPostSummary(),
+    ...mockRawPostSummary(),
     body: [],
     postTakeaways: null,
-    seo: makeRawSeo(),
-    author: makeRawAuthor(),
-    tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+    seo: mockRawSeo(),
+    author: mockRawAuthor(),
+    tags: [mockRawTag()],
     modules: [],
-    translations: [{ language: LOCALE_ISO_CODES.EN, slug: POST_SLUG }],
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_POST_SLUG }],
     ...overrides,
   };
 }
 
-export function makeRawHomePage(
+export function mockRawHomePage(
   overrides: Partial<TRawHomePage> = {},
 ): TRawHomePage {
   return {
-    _id: RAW_HOME_PAGE_ID,
-    headingBlock: makeRawHeadingBlock('Welcome'),
+    _id: MOCK_HOME_PAGE_ID,
+    headingBlock: mockRawHeadingBlock('Welcome'),
     contentAlignment: null,
-    hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-    modules: [
-      { _id: 'post-latest-1', _type: 'module_postLatest' },
-      { _id: 'cta-1', _type: 'module_cta' },
-    ],
-    seo: makeRawSeo(),
+    hero: mockRawHeroRef(),
+    modules: [mockRawPostLatestRef(), mockRawCtaRef()],
+    seo: mockRawSeo(),
     translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
 
-export function makeRawBlogPage(
+export function mockRawBlogPage(
   overrides: Partial<NonNullable<TRawBlogPage>> = {},
 ): NonNullable<TRawBlogPage> {
   return {
-    headingBlock: makeRawHeadingBlock('The Blog', {
+    headingBlock: mockRawHeadingBlock('The Blog', {
       supportingText: 'Notes on building things.',
     }),
     contentAlignment: null,
     hero: null,
     modules: [],
-    seo: makeRawSeo(),
+    seo: mockRawSeo(),
     translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
 
-export function makeRawTopicIndexPage(
+export function mockRawTopicIndexPage(
   overrides: Partial<TRawTopicIndexPage> = {},
 ): TRawTopicIndexPage {
   return {
-    headingBlock: makeRawHeadingBlock('Browse by topic'),
+    headingBlock: mockRawHeadingBlock(MOCK_TOPIC_INDEX_HEADING),
     contentAlignment: null,
     hero: null,
-    modules: [{ _id: TAXONOMY_LIST_MODULE_ID, _type: 'module_taxonomyList' }],
-    seo: makeRawSeo(),
+    modules: [mockRawTaxonomyListRef()],
+    seo: mockRawSeo(),
     translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
 
-export function makeRawTagIndexPage(
+export function mockRawTagIndexPage(
   overrides: Partial<TRawTagIndexPage> = {},
 ): TRawTagIndexPage {
   return {
-    headingBlock: makeRawHeadingBlock('Browse by tag'),
+    headingBlock: mockRawHeadingBlock(MOCK_TAG_INDEX_HEADING),
     contentAlignment: null,
     hero: null,
-    modules: [{ _id: TAXONOMY_LIST_MODULE_ID, _type: 'module_taxonomyList' }],
-    seo: makeRawSeo(),
+    modules: [mockRawTaxonomyListRef()],
+    seo: mockRawSeo(),
     translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
 
-export function makeRawTopicPage(
+export function mockRawTopicPage(
   overrides: Partial<TRawTopicPage> = {},
 ): TRawTopicPage {
   return {
-    topic: makeRawTopic(),
-    headingBlock: makeRawHeadingBlock('Engineering'),
+    topic: mockRawTopic(),
+    headingBlock: mockRawHeadingBlock(MOCK_TOPIC_TITLE),
     contentAlignment: null,
     hero: null,
     modules: [{ _id: POST_LIST_MODULE_ID, _type: 'module_postList' }],
-    seo: makeRawSeo(),
-    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'engineering' }],
+    seo: mockRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_TOPIC_SLUG }],
     ...overrides,
   };
 }
 
-export function makeRawTagPage(
+export function mockRawTagPage(
   overrides: Partial<TRawTagPage> = {},
 ): TRawTagPage {
   return {
-    tag: { ...makeRawTag(), description: 'Posts about TypeScript.' },
-    headingBlock: makeRawHeadingBlock('TypeScript'),
+    tag: { ...mockRawTag(), description: MOCK_TAG_PAGE_DESCRIPTION },
+    headingBlock: mockRawHeadingBlock(MOCK_TAG_TITLE),
     contentAlignment: null,
     hero: null,
     modules: [{ _id: POST_LIST_MODULE_ID, _type: 'module_postList' }],
-    seo: makeRawSeo(),
-    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'typescript' }],
+    seo: mockRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_TAG_SLUG }],
     ...overrides,
   };
 }
 
-export function makeRawLandingPage(
+export function mockRawLandingPage(
   overrides: Partial<TRawLandingPage> = {},
 ): TRawLandingPage {
   return {
-    _id: 'about',
-    path: 'about',
-    headingBlock: makeRawHeadingBlock('About Us'),
+    _id: MOCK_ABOUT_SLUG,
+    path: MOCK_ABOUT_SLUG,
+    headingBlock: mockRawHeadingBlock(MOCK_ABOUT_PAGE_TITLE),
     contentAlignment: null,
     hero: null,
-    modules: [
-      { _id: 'content-1', _type: 'module_content' },
-      { _id: 'cta-1', _type: 'module_cta' },
-    ],
-    seo: makeRawSeo(),
-    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'about' }],
+    modules: [mockRawContentRef(), mockRawCtaRef()],
+    seo: mockRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_ABOUT_SLUG }],
     showSectionNavigation: null,
     sectionChain: [
       {
-        _id: 'about',
-        title: 'About Us',
-        path: 'about',
+        _id: MOCK_ABOUT_SLUG,
+        title: MOCK_ABOUT_PAGE_TITLE,
+        path: MOCK_ABOUT_SLUG,
         sectionNavigation: false,
         sectionNavigationTitle: null,
         children: null,

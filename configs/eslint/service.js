@@ -1,3 +1,5 @@
+import checkFile from 'eslint-plugin-check-file';
+
 import base from './base.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 
@@ -40,6 +42,16 @@ export default [
             },
           ],
         },
+      ],
+    },
+  },
+  {
+    plugins: { 'check-file': checkFile },
+    rules: {
+      'check-file/folder-naming-convention': [
+        'error',
+        { 'src/**/': 'KEBAB_CASE' },
+        { ignoreWords: ['__mocks__'] },
       ],
     },
   },

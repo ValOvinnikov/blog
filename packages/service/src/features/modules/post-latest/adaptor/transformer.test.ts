@@ -1,11 +1,14 @@
 import {
   BRAND_VARIANT,
-  CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
-} from '@blog/config';
-import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@blog/config/constants';
+import { mockRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_POST_ID,
+  mockRawWideLayout,
+} from '@blog/service/testing/shared/fixtures';
 
 import {
   toPostLatestModule,
@@ -14,15 +17,9 @@ import {
 
 const rawPosts: TRawPostLatestModulePosts = [];
 
-describe('toPostLatestModule', () => {
-  let raw: ReturnType<typeof makeRawPostLatestModule>;
-
-  beforeEach(() => {
-    raw = makeRawPostLatestModule();
-  });
-
+describe(toPostLatestModule, () => {
   it('maps headingBlock straight through', () => {
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(mockRawPostLatestModule(), rawPosts);
 
     expect(module.headingBlock).toEqual({
       heading: 'Latest',
@@ -30,107 +27,50 @@ describe('toPostLatestModule', () => {
     });
   });
 
-  it('maps brandVariant straight through', () => {
-    raw = makeRawPostLatestModule({
-      brandVariant: BRAND_VARIANT.SECONDARY,
-    });
+  it.each([
+    { brandVariant: BRAND_VARIANT.SECONDARY },
+    { contentAlignment: CONTENT_ALIGNMENT.CENTER },
+    { showImages: true },
+    { showImages: false },
+    { displayMode: DISPLAY_MODE.CAROUSEL },
+  ])('maps an authored %o straight through', (authored) => {
+    const module = toPostLatestModule(
+      mockRawPostLatestModule(authored),
+      rawPosts,
+    );
 
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
+    expect(module).toMatchObject(authored);
   });
 
-  it('leaves contentAlignment undefined when unset (no faked default)', () => {
-    raw = makeRawPostLatestModule({ contentAlignment: null });
+  it.each([
+    [{ contentAlignment: null }, { contentAlignment: undefined }],
+    [{ layout: null }, { layout: undefined }],
+  ])('maps an unset %o to %o', (unset, expected) => {
+    const module = toPostLatestModule(mockRawPostLatestModule(unset), rawPosts);
 
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.contentAlignment).toBeUndefined();
-  });
-
-  it('maps contentAlignment when authored', () => {
-    raw = makeRawPostLatestModule({
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
+    expect(module).toMatchObject(expected);
   });
 
   it('maps a fully-authored layout object 1:1', () => {
-    raw = makeRawPostLatestModule({
-      layout: {
-        spacingTop: 'MD',
-        spacingBottom: 'MD',
-        containerWidth: CONTAINER_WIDTH.WIDE,
-        dividerTop: true,
-        dividerBottom: true,
-      },
-    });
+    const layout = mockRawWideLayout();
+    const raw = mockRawPostLatestModule({ layout });
 
     const module = toPostLatestModule(raw, rawPosts);
 
-    expect(module.layout).toEqual({
-      spacingTop: 'MD',
-      spacingBottom: 'MD',
-      containerWidth: CONTAINER_WIDTH.WIDE,
-      dividerTop: true,
-      dividerBottom: true,
-    });
+    expect(module.layout).toEqual(layout);
   });
 
-  it('leaves layout undefined when the field is unset (no faked default)', () => {
-    raw = makeRawPostLatestModule({ layout: null });
+  it('maps each post to a post card', () => {
+    const module = toPostLatestModule(mockRawPostLatestModule(), [
+      mockRawPostCard(),
+    ]);
 
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.layout).toBeUndefined();
-  });
-
-  it('maps posts through toPostCard', () => {
-    const module = toPostLatestModule(raw, [makeRawPostCard({ _id: 'a' })]);
-
-    expect(module.posts.map((p) => p.id)).toEqual(['a']);
+    expect(module.posts.map((p) => p.id)).toEqual([MOCK_POST_ID]);
   });
 
   it('returns an empty posts array when nothing resolves', () => {
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(mockRawPostLatestModule(), rawPosts);
 
     expect(module.posts).toEqual([]);
-  });
-
-  it('passes showImages through when true', () => {
-    raw = makeRawPostLatestModule({ showImages: true });
-
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.showImages).toBe(true);
-  });
-
-  it('passes showImages through when false', () => {
-    raw = makeRawPostLatestModule({ showImages: false });
-
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.showImages).toBe(false);
-  });
-
-  it('passes an authored CAROUSEL displayMode through', () => {
-    raw = makeRawPostLatestModule({
-      displayMode: DISPLAY_MODE.CAROUSEL,
-    });
-
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
-  });
-
-  it('passes the read-time GRID default through when the field is absent from the document', () => {
-    raw = makeRawPostLatestModule({ displayMode: DISPLAY_MODE.GRID });
-
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.displayMode).toBe(DISPLAY_MODE.GRID);
   });
 });

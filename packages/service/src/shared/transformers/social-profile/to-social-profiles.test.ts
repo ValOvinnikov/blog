@@ -1,53 +1,50 @@
 import { SOCIAL_PLATFORMS } from '@blog/config';
 import {
-  makeRawExternalLinkDocument,
-  makeRawSocialProfile,
+  mockRawExternalLinkDocument,
+  mockRawSocialProfile,
 } from '@blog/service/testing/shared/fixtures';
 
 import { toSocialProfiles } from './to-social-profiles';
 
-describe(toSocialProfiles, () => {
-  it('returns an empty array for a null/undefined raw list', () => {
-    expect(toSocialProfiles(null)).toEqual([]);
-    expect(toSocialProfiles(undefined)).toEqual([]);
-  });
+const X_URL = 'https://x.com/janedoe';
 
-  it('returns an empty array for an empty raw list', () => {
-    expect(toSocialProfiles([])).toEqual([]);
+describe(toSocialProfiles, () => {
+  it.each([null, undefined, []])('returns an empty array for %j', (raw) => {
+    const result = toSocialProfiles(raw);
+
+    expect(result).toEqual([]);
   });
 
   it('maps every resolvable profile', () => {
+    const githubProfile = mockRawSocialProfile();
     const raw = [
-      makeRawSocialProfile({ platform: SOCIAL_PLATFORMS.GITHUB }),
-      makeRawSocialProfile({
+      githubProfile,
+      mockRawSocialProfile({
         platform: SOCIAL_PLATFORMS.X,
-        link: makeRawExternalLinkDocument({ url: 'https://x.com/janedoe' }),
+        link: mockRawExternalLinkDocument({ url: X_URL }),
       }),
     ];
 
-    expect(toSocialProfiles(raw)).toEqual([
-      {
-        platform: SOCIAL_PLATFORMS.GITHUB,
-        link: expect.objectContaining({ href: 'https://github.com/janedoe' }),
-      },
-      {
-        platform: SOCIAL_PLATFORMS.X,
-        link: expect.objectContaining({ href: 'https://x.com/janedoe' }),
-      },
+    const result = toSocialProfiles(raw);
+
+    expect(result.map(({ platform, link }) => [platform, link.href])).toEqual([
+      [SOCIAL_PLATFORMS.GITHUB, githubProfile.link.url],
+      [SOCIAL_PLATFORMS.X, X_URL],
     ]);
   });
 
   it('drops entries whose link cannot resolve to an href', () => {
     const raw = [
-      makeRawSocialProfile({
-        link: makeRawExternalLinkDocument({ url: null }),
+      mockRawSocialProfile({
+        link: mockRawExternalLinkDocument({ url: null }),
       }),
-      makeRawSocialProfile({ platform: SOCIAL_PLATFORMS.X }),
+      mockRawSocialProfile({ platform: SOCIAL_PLATFORMS.X }),
     ];
 
     const result = toSocialProfiles(raw);
 
-    expect(result).toHaveLength(1);
-    expect(result[0]?.platform).toBe(SOCIAL_PLATFORMS.X);
+    expect(result.map(({ platform }) => platform)).toEqual([
+      SOCIAL_PLATFORMS.X,
+    ]);
   });
 });

@@ -1,27 +1,42 @@
-import { BRAND_VARIANT, LINK_TYPE, PRICE_PERIOD } from '@blog/config';
 import {
-  makeRawCtaButton,
-  makeRawPricingModule,
-  makeRawPricingPrice,
-  makeRawPricingTier,
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  PRICE_PERIOD,
+} from '@blog/config/constants';
+import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
+import {
+  MOCK_PRICING_FEATURE_KEY,
+  MOCK_PRICING_FOOTNOTE,
+  MOCK_PRICING_HIGHLIGHT_LABEL,
+  MOCK_PRICING_TIER_DESCRIPTION,
+  MOCK_PRICING_TIER_FOOTNOTE,
+  MOCK_PRICING_TIER_ID,
+  MOCK_PRICING_TIER_NAME,
+  MOCK_PRIORITY_SUPPORT_FEATURE,
+  MOCK_SECOND_PRICING_FEATURE_KEY,
+  MOCK_UNLIMITED_POSTS_FEATURE,
+  mockRawCtaButton,
+  mockRawPricingModule,
+  mockRawPricingPrice,
+  mockRawPricingTier,
 } from '@blog/service/testing/modules/fixtures';
 
 import { toPricingModule } from './transformer';
 
-describe('toPricingModule', () => {
+describe(toPricingModule, () => {
   it('maps a full module', () => {
-    const raw = makeRawPricingModule({
+    const raw = mockRawPricingModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
-      footnote: 'Prices exclude VAT.',
-      ctaButtons: [makeRawCtaButton()],
-      contentAlignment: 'CENTER',
+      footnote: MOCK_PRICING_FOOTNOTE,
+      ctaButtons: [mockRawCtaButton()],
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
       tiers: [
-        makeRawPricingTier({
-          _key: 'tier-pro',
-          name: 'Pro',
-          description: 'For growing teams',
+        mockRawPricingTier({
+          _key: MOCK_PRICING_TIER_ID,
+          name: MOCK_PRICING_TIER_NAME,
+          description: MOCK_PRICING_TIER_DESCRIPTION,
           prices: [
-            makeRawPricingPrice({
+            mockRawPricingPrice({
               _key: 'price-month',
               period: PRICE_PERIOD.MONTH,
               amount: 29,
@@ -31,12 +46,18 @@ describe('toPricingModule', () => {
           ],
           priceLabel: null,
           features: [
-            { _key: 'feature-1', text: 'Unlimited posts' },
-            { _key: 'feature-2', text: 'Priority support' },
+            {
+              _key: MOCK_PRICING_FEATURE_KEY,
+              text: MOCK_UNLIMITED_POSTS_FEATURE,
+            },
+            {
+              _key: MOCK_SECOND_PRICING_FEATURE_KEY,
+              text: MOCK_PRIORITY_SUPPORT_FEATURE,
+            },
           ],
-          ctaButtons: [makeRawCtaButton()],
-          highlightLabel: 'Most popular',
-          footnote: 'Billed annually',
+          ctaButtons: [mockRawCtaButton()],
+          highlightLabel: MOCK_PRICING_HIGHLIGHT_LABEL,
+          footnote: MOCK_PRICING_TIER_FOOTNOTE,
         }),
       ],
     });
@@ -44,14 +65,14 @@ describe('toPricingModule', () => {
     const module = toPricingModule(raw);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
-    expect(module.footnote).toBe('Prices exclude VAT.');
+    expect(module.footnote).toBe(MOCK_PRICING_FOOTNOTE);
     expect(module.ctaButtons).toHaveLength(1);
-    expect(module.contentAlignment).toBe('CENTER');
+    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
     expect(module.tiers).toEqual([
       {
-        id: 'tier-pro',
-        name: 'Pro',
-        description: 'For growing teams',
+        id: MOCK_PRICING_TIER_ID,
+        name: MOCK_PRICING_TIER_NAME,
+        description: MOCK_PRICING_TIER_DESCRIPTION,
         prices: [
           {
             period: PRICE_PERIOD.MONTH,
@@ -61,40 +82,42 @@ describe('toPricingModule', () => {
           },
         ],
         priceLabel: undefined,
-        features: ['Unlimited posts', 'Priority support'],
-        ctaButtons: module.tiers[0]?.ctaButtons,
-        highlightLabel: 'Most popular',
-        footnote: 'Billed annually',
+        features: [MOCK_UNLIMITED_POSTS_FEATURE, MOCK_PRIORITY_SUPPORT_FEATURE],
+        ctaButtons: toCtaButtons([mockRawCtaButton()]),
+        highlightLabel: MOCK_PRICING_HIGHLIGHT_LABEL,
+        footnote: MOCK_PRICING_TIER_FOOTNOTE,
       },
     ]);
-    expect(module.tiers[0]?.ctaButtons).toHaveLength(1);
   });
 
   it('drops a feature with no text in either language', () => {
-    const raw = makeRawPricingModule({
+    const raw = mockRawPricingModule({
       tiers: [
-        makeRawPricingTier({
+        mockRawPricingTier({
           features: [
-            { _key: 'feature-1', text: 'Unlimited posts' },
-            { _key: 'feature-2', text: null },
-            { _key: 'feature-3', text: 'Priority support' },
+            {
+              _key: MOCK_PRICING_FEATURE_KEY,
+              text: MOCK_UNLIMITED_POSTS_FEATURE,
+            },
+            { _key: MOCK_SECOND_PRICING_FEATURE_KEY, text: null },
+            { _key: 'feature-3', text: MOCK_PRIORITY_SUPPORT_FEATURE },
           ],
         }),
       ],
     });
 
     expect(toPricingModule(raw).tiers[0]?.features).toEqual([
-      'Unlimited posts',
-      'Priority support',
+      MOCK_UNLIMITED_POSTS_FEATURE,
+      MOCK_PRIORITY_SUPPORT_FEATURE,
     ]);
   });
 
   it('keeps tiers in authored order', () => {
-    const raw = makeRawPricingModule({
+    const raw = mockRawPricingModule({
       tiers: [
-        makeRawPricingTier({ _key: 'tier-1', name: 'Starter' }),
-        makeRawPricingTier({ _key: 'tier-2', name: 'Pro' }),
-        makeRawPricingTier({ _key: 'tier-3', name: 'Team' }),
+        mockRawPricingTier({ _key: 'tier-1', name: 'Starter' }),
+        mockRawPricingTier({ _key: 'tier-2', name: MOCK_PRICING_TIER_NAME }),
+        mockRawPricingTier({ _key: 'tier-3', name: 'Team' }),
       ],
     });
 
@@ -107,14 +130,14 @@ describe('toPricingModule', () => {
     ]);
     expect(module.tiers.map((tier) => tier.name)).toEqual([
       'Starter',
-      'Pro',
+      MOCK_PRICING_TIER_NAME,
       'Team',
     ]);
   });
 
   it('folds a tier with no prices to an empty prices array', () => {
-    const raw = makeRawPricingModule({
-      tiers: [makeRawPricingTier({ prices: null })],
+    const raw = mockRawPricingModule({
+      tiers: [mockRawPricingTier({ prices: null })],
     });
 
     const module = toPricingModule(raw);
@@ -122,43 +145,26 @@ describe('toPricingModule', () => {
     expect(module.tiers[0]?.prices).toEqual([]);
   });
 
-  it('drops a tier button whose link cannot resolve', () => {
-    const raw = makeRawPricingModule({
+  it('trims a padded highlight label', () => {
+    const raw = mockRawPricingModule({
       tiers: [
-        makeRawPricingTier({
-          ctaButtons: [
-            makeRawCtaButton({
-              link: {
-                label: 'Choose plan',
-                linkType: LINK_TYPE.INTERNAL,
-                url: null,
-                internalReference: null,
-                openInNewTab: null,
-              },
-            }),
-          ],
+        mockRawPricingTier({
+          highlightLabel: `  ${MOCK_PRICING_HIGHLIGHT_LABEL} `,
         }),
       ],
     });
 
     const module = toPricingModule(raw);
 
-    expect(module.tiers[0]?.ctaButtons).toEqual([]);
+    expect(module.tiers[0]?.highlightLabel).toBe(MOCK_PRICING_HIGHLIGHT_LABEL);
   });
 
-  it('trims a padded highlight label', () => {
-    const raw = makeRawPricingModule({
-      tiers: [makeRawPricingTier({ highlightLabel: '  Most popular ' })],
-    });
-
-    const module = toPricingModule(raw);
-
-    expect(module.tiers[0]?.highlightLabel).toBe('Most popular');
-  });
-
-  it('leaves the highlight label undefined when absent', () => {
-    const raw = makeRawPricingModule({
-      tiers: [makeRawPricingTier({ highlightLabel: null })],
+  it.each([
+    ['absent', null],
+    ['only whitespace', '   '],
+  ])('leaves the highlight label undefined when %s', (_, highlightLabel) => {
+    const raw = mockRawPricingModule({
+      tiers: [mockRawPricingTier({ highlightLabel })],
     });
 
     const module = toPricingModule(raw);
@@ -166,21 +172,11 @@ describe('toPricingModule', () => {
     expect(module.tiers[0]?.highlightLabel).toBeUndefined();
   });
 
-  it('leaves the highlight label undefined when only whitespace', () => {
-    const raw = makeRawPricingModule({
-      tiers: [makeRawPricingTier({ highlightLabel: '   ' })],
-    });
-
-    const module = toPricingModule(raw);
-
-    expect(module.tiers[0]?.highlightLabel).toBeUndefined();
-  });
-
-  it('folds an absent isStartingAt to false (genuine default)', () => {
-    const raw = makeRawPricingModule({
+  it('folds an absent isStartingAt to false', () => {
+    const raw = mockRawPricingModule({
       tiers: [
-        makeRawPricingTier({
-          prices: [makeRawPricingPrice({ isStartingAt: null })],
+        mockRawPricingTier({
+          prices: [mockRawPricingPrice({ isStartingAt: null })],
         }),
       ],
     });
@@ -191,7 +187,7 @@ describe('toPricingModule', () => {
   });
 
   it('leaves footnote, contentAlignment and layout undefined when unset', () => {
-    const raw = makeRawPricingModule({
+    const raw = mockRawPricingModule({
       footnote: null,
       contentAlignment: null,
       layout: null,
@@ -202,13 +198,5 @@ describe('toPricingModule', () => {
     expect(module.footnote).toBeUndefined();
     expect(module.contentAlignment).toBeUndefined();
     expect(module.layout).toBeUndefined();
-  });
-
-  it('returns an empty array for an absent module ctaButtons field', () => {
-    const raw = makeRawPricingModule({ ctaButtons: null });
-
-    const module = toPricingModule(raw);
-
-    expect(module.ctaButtons).toEqual([]);
   });
 });

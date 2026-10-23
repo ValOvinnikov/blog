@@ -1,24 +1,46 @@
 import {
   BRAND_VARIANT,
-  CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
-} from '@blog/config';
+} from '@blog/config/constants';
 import {
-  makeRawTaxonomyEntry,
-  makeRawTaxonomyListModule,
+  MOCK_TAG_ID,
+  MOCK_TAG_TITLE,
+  MOCK_TOPIC_DESCRIPTION,
+  MOCK_TOPIC_ID,
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+} from '@blog/service/testing/entities/fixtures';
+import {
+  mockRawTaxonomyEntry,
+  mockRawTaxonomyListModule,
 } from '@blog/service/testing/modules/fixtures';
+import { MOCK_TOPIC_INDEX_HEADING } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawHeadingBlock,
-  makeRawPostLink,
+  mockRawHeadingBlock,
+  mockRawPostLink,
+  mockRawWideLayout,
 } from '@blog/service/testing/shared/fixtures';
 
 import { toTaxonomyListModule } from './transformer';
 
-describe('toTaxonomyListModule', () => {
+const SUPPORTING_TEXT = 'Pick a subject.';
+const ALPHA = 'Alpha';
+const BETA = 'Beta';
+const NEWER_POST_TITLE = 'Newer post';
+const NEWER_POST_SLUG = 'newer-post';
+const OLDER_POST_TITLE = 'Older post';
+const OLDER_POST_SLUG = 'older-post';
+const LAYOUT = mockRawWideLayout();
+const ALPHA_BETA_ENTRIES = [
+  mockRawTaxonomyEntry({ _id: MOCK_TOPIC_ID, title: ALPHA }),
+  mockRawTaxonomyEntry({ _id: 'topic-2', title: BETA }),
+];
+
+describe(toTaxonomyListModule, () => {
   it('maps brandVariant straight through', () => {
-    const raw = makeRawTaxonomyListModule({
+    const raw = mockRawTaxonomyListModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
@@ -28,112 +50,71 @@ describe('toTaxonomyListModule', () => {
   });
 
   it('maps headingBlock when authored', () => {
-    const raw = makeRawTaxonomyListModule({
-      headingBlock: makeRawHeadingBlock('Browse by topic', {
-        supportingText: 'Pick a subject.',
+    const raw = mockRawTaxonomyListModule({
+      headingBlock: mockRawHeadingBlock(MOCK_TOPIC_INDEX_HEADING, {
+        supportingText: SUPPORTING_TEXT,
       }),
     });
 
     const module = toTaxonomyListModule(raw);
 
     expect(module.headingBlock).toEqual({
-      heading: 'Browse by topic',
-      supportingText: 'Pick a subject.',
+      heading: MOCK_TOPIC_INDEX_HEADING,
+      supportingText: SUPPORTING_TEXT,
     });
   });
 
-  it('leaves contentAlignment undefined when unset (no faked default)', () => {
-    const raw = makeRawTaxonomyListModule({ contentAlignment: null });
+  it.each([
+    [null, undefined],
+    [CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
+  ])('maps a contentAlignment of %s to %s', (contentAlignment, expected) => {
+    const raw = mockRawTaxonomyListModule({ contentAlignment });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.contentAlignment).toBeUndefined();
+    expect(module.contentAlignment).toBe(expected);
   });
 
-  it('maps contentAlignment when authored', () => {
-    const raw = makeRawTaxonomyListModule({
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    });
+  it.each([
+    ['a fully-authored layout 1:1', LAYOUT, LAYOUT],
+    ['an unset layout to undefined', null, undefined],
+  ])('maps %s', (_case, layout, expected) => {
+    const raw = mockRawTaxonomyListModule({ layout });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
+    expect(module.layout).toEqual(expected);
   });
 
-  it('maps a fully-authored layout object 1:1', () => {
-    const raw = makeRawTaxonomyListModule({
-      layout: {
-        spacingTop: 'MD',
-        spacingBottom: 'MD',
-        containerWidth: CONTAINER_WIDTH.WIDE,
-        dividerTop: true,
-        dividerBottom: true,
-      },
-    });
+  it.each([
+    [TAXONOMY_KIND.TOPICS, MOCK_TOPIC_ID, MOCK_TOPIC_TITLE],
+    [TAXONOMY_KIND.TAGS, MOCK_TAG_ID, MOCK_TAG_TITLE],
+  ])(
+    'maps the entries when the resolved taxonomy is %s',
+    (taxonomy, id, title) => {
+      const raw = mockRawTaxonomyListModule({
+        taxonomy,
+        entries: [mockRawTaxonomyEntry({ _id: id, title })],
+      });
 
-    const module = toTaxonomyListModule(raw);
+      const module = toTaxonomyListModule(raw);
 
-    expect(module.layout).toEqual({
-      spacingTop: 'MD',
-      spacingBottom: 'MD',
-      containerWidth: CONTAINER_WIDTH.WIDE,
-      dividerTop: true,
-      dividerBottom: true,
-    });
-  });
-
-  it('leaves layout undefined when unset (no faked default)', () => {
-    const raw = makeRawTaxonomyListModule({ layout: null });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.layout).toBeUndefined();
-  });
-
-  it('maps topic entries when the resolved taxonomy is TOPICS', () => {
-    const raw = makeRawTaxonomyListModule({
-      taxonomy: TAXONOMY_KIND.TOPICS,
-      entries: [makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Engineering' })],
-    });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.taxonomy).toBe(TAXONOMY_KIND.TOPICS);
-    expect(module.entries).toEqual([
-      {
-        id: 'topic-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: 'Engineering posts',
-        postCount: 0,
-        latestPosts: [],
-      },
-    ]);
-  });
-
-  it('maps tag entries when the resolved taxonomy is TAGS', () => {
-    const raw = makeRawTaxonomyListModule({
-      taxonomy: TAXONOMY_KIND.TAGS,
-      entries: [makeRawTaxonomyEntry({ _id: 'tag-1', title: 'TypeScript' })],
-    });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.taxonomy).toBe(TAXONOMY_KIND.TAGS);
-    expect(module.entries).toEqual([
-      {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'engineering',
-        description: 'Engineering posts',
-        postCount: 0,
-        latestPosts: [],
-      },
-    ]);
-  });
+      expect(module.taxonomy).toBe(taxonomy);
+      expect(module.entries).toEqual([
+        {
+          id,
+          title,
+          slug: MOCK_TOPIC_SLUG,
+          description: MOCK_TOPIC_DESCRIPTION,
+          postCount: 0,
+          latestPosts: [],
+        },
+      ]);
+    },
+  );
 
   it('degrades to an empty module when no taxonomy is authored', () => {
-    const raw = makeRawTaxonomyListModule({ taxonomy: null, entries: null });
+    const raw = mockRawTaxonomyListModule({ taxonomy: null, entries: null });
 
     const module = toTaxonomyListModule(raw);
 
@@ -142,43 +123,25 @@ describe('toTaxonomyListModule', () => {
   });
 
   it('keeps ALPHABETICAL order as returned by the query', () => {
-    const raw = makeRawTaxonomyListModule({
+    const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
       sortOrder: TAXONOMY_SORT.ALPHABETICAL,
-      entries: [
-        makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Alpha' }),
-        makeRawTaxonomyEntry({ _id: 'topic-2', title: 'Beta' }),
-      ],
+      entries: ALPHA_BETA_ENTRIES,
     });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.entries.map((entry) => entry.title)).toEqual([
-      'Alpha',
-      'Beta',
-    ]);
+    expect(module.entries.map((entry) => entry.title)).toEqual([ALPHA, BETA]);
   });
 
-  it('orders MOST_POSTS by postCount descending, ties broken by title ascending', () => {
-    const raw = makeRawTaxonomyListModule({
+  it('orders MOST_POSTS by postCount descending, ties by title ascending', () => {
+    const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
       sortOrder: TAXONOMY_SORT.MOST_POSTS,
       entries: [
-        makeRawTaxonomyEntry({
-          _id: 'topic-1',
-          title: 'Beta',
-          postCount: 3,
-        }),
-        makeRawTaxonomyEntry({
-          _id: 'topic-2',
-          title: 'Gamma',
-          postCount: 5,
-        }),
-        makeRawTaxonomyEntry({
-          _id: 'topic-3',
-          title: 'Alpha',
-          postCount: 3,
-        }),
+        mockRawTaxonomyEntry({ _id: MOCK_TOPIC_ID, title: BETA, postCount: 3 }),
+        mockRawTaxonomyEntry({ _id: 'topic-2', title: 'Gamma', postCount: 5 }),
+        mockRawTaxonomyEntry({ _id: 'topic-3', title: ALPHA, postCount: 3 }),
       ],
     });
 
@@ -186,58 +149,42 @@ describe('toTaxonomyListModule', () => {
 
     expect(module.entries.map((entry) => entry.title)).toEqual([
       'Gamma',
-      'Alpha',
-      'Beta',
+      ALPHA,
+      BETA,
     ]);
   });
 
-  it('cuts entries to limit when authored', () => {
-    const raw = makeRawTaxonomyListModule({
+  it.each([
+    [1, [ALPHA]],
+    [null, [ALPHA, BETA]],
+  ])('cuts the entries to a limit of %s', (limit, titles) => {
+    const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
-      limit: 1,
-      entries: [
-        makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Alpha' }),
-        makeRawTaxonomyEntry({ _id: 'topic-2', title: 'Beta' }),
-      ],
+      limit,
+      entries: ALPHA_BETA_ENTRIES,
     });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.entries).toHaveLength(1);
-    expect(module.entries[0]?.title).toBe('Alpha');
+    expect(module.entries.map((entry) => entry.title)).toEqual(titles);
   });
 
-  it('does not cut entries when limit is unset', () => {
-    const raw = makeRawTaxonomyListModule({
-      taxonomy: TAXONOMY_KIND.TOPICS,
-      limit: null,
-      entries: [
-        makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Alpha' }),
-        makeRawTaxonomyEntry({ _id: 'topic-2', title: 'Beta' }),
-      ],
-    });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.entries).toHaveLength(2);
-  });
-
-  it('maps two latest posts per entry, newest first as returned by the query', () => {
-    const raw = makeRawTaxonomyListModule({
+  it('maps the latest posts per entry, newest first as returned by the query', () => {
+    const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
       entries: [
-        makeRawTaxonomyEntry({
-          _id: 'topic-1',
+        mockRawTaxonomyEntry({
+          _id: MOCK_TOPIC_ID,
           latestPosts: [
-            makeRawPostLink({
+            mockRawPostLink({
               _id: 'post-2',
-              headingBlock: { heading: 'Newer post' },
-              slug: 'newer-post',
+              headingBlock: { heading: NEWER_POST_TITLE },
+              slug: NEWER_POST_SLUG,
             }),
-            makeRawPostLink({
+            mockRawPostLink({
               _id: 'post-1',
-              headingBlock: { heading: 'Older post' },
-              slug: 'older-post',
+              headingBlock: { heading: OLDER_POST_TITLE },
+              slug: OLDER_POST_SLUG,
             }),
           ],
         }),
@@ -247,51 +194,19 @@ describe('toTaxonomyListModule', () => {
     const module = toTaxonomyListModule(raw);
 
     expect(module.entries[0]?.latestPosts).toEqual([
-      { id: 'post-2', title: 'Newer post', slug: 'newer-post' },
-      { id: 'post-1', title: 'Older post', slug: 'older-post' },
+      { id: 'post-2', title: NEWER_POST_TITLE, slug: NEWER_POST_SLUG },
+      { id: 'post-1', title: OLDER_POST_TITLE, slug: OLDER_POST_SLUG },
     ]);
   });
 
-  it('maps a single latest post per entry', () => {
-    const raw = makeRawTaxonomyListModule({
-      taxonomy: TAXONOMY_KIND.TOPICS,
-      entries: [
-        makeRawTaxonomyEntry({
-          _id: 'topic-1',
-          latestPosts: [makeRawPostLink({ _id: 'post-1' })],
-        }),
-      ],
-    });
+  it.each([true, false])(
+    'passes showLatestPosts %s through',
+    (showLatestPosts) => {
+      const raw = mockRawTaxonomyListModule({ showLatestPosts });
 
-    const module = toTaxonomyListModule(raw);
+      const module = toTaxonomyListModule(raw);
 
-    expect(module.entries[0]?.latestPosts).toHaveLength(1);
-  });
-
-  it('leaves latestPosts empty for a term with no posts', () => {
-    const raw = makeRawTaxonomyListModule({
-      taxonomy: TAXONOMY_KIND.TOPICS,
-      entries: [makeRawTaxonomyEntry({ _id: 'topic-1', latestPosts: [] })],
-    });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.entries[0]?.latestPosts).toEqual([]);
-  });
-
-  it('passes showLatestPosts through when authored false', () => {
-    const raw = makeRawTaxonomyListModule({ showLatestPosts: false });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.showLatestPosts).toBe(false);
-  });
-
-  it('passes showLatestPosts through when authored true', () => {
-    const raw = makeRawTaxonomyListModule({ showLatestPosts: true });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.showLatestPosts).toBe(true);
-  });
+      expect(module.showLatestPosts).toBe(showLatestPosts);
+    },
+  );
 });

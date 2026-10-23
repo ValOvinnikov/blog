@@ -1,86 +1,84 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getRedirect } from './loader';
 import { redirectsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
 const { EN, NL } = LOCALE_ISO_CODES;
-const tenant = makeTenant();
+const FAQ_DESTINATION = '/modules/faq';
+const tenant = mockTenant();
 
 function permanent(destination: string) {
   return { destination, status: REDIRECT_STATUS.PERMANENT };
 }
 
 const redirects = [
-  { source: '/old-faq', destination: '/modules/faq', isPrefix: false },
+  { source: '/old-faq', destination: FAQ_DESTINATION, isPrefix: false },
   { source: '/old', destination: '/new', isPrefix: true },
   { source: '/old/deep', destination: '/elsewhere', isPrefix: true },
   { source: '/flat', destination: '/target', isPrefix: null },
   { source: '/legacy', destination: '/', isPrefix: true },
 ];
 
-describe('getRedirect', () => {
+describe(getRedirect, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(redirects);
   });
 
-  it('resolves an exact source to its destination', async () => {
-    await expect(getRedirect(['old-faq'], tenant)).resolves.toEqual(
-      permanent('/modules/faq'),
-    );
-  });
-
-  it('rebases a path beneath a prefix source onto its destination', async () => {
-    await expect(getRedirect(['old', 'faq'], tenant)).resolves.toEqual(
+  it.each([
+    [
+      'resolves an exact source to its destination',
+      ['old-faq'],
+      permanent(FAQ_DESTINATION),
+    ],
+    [
+      'rebases a path beneath a prefix source onto its destination',
+      ['old', 'faq'],
       permanent('/new/faq'),
-    );
-  });
-
-  it('prefers the longest matching prefix', async () => {
-    await expect(getRedirect(['old', 'deep', 'page'], tenant)).resolves.toEqual(
+    ],
+    [
+      'prefers the longest matching prefix',
+      ['old', 'deep', 'page'],
       permanent('/elsewhere/page'),
-    );
+    ],
+    [
+      'does not rebase paths beneath a source that is not a prefix',
+      ['flat', 'child'],
+      undefined,
+    ],
+    [
+      'does not treat a source as a prefix of a sibling sharing its start',
+      ['older'],
+      undefined,
+    ],
+    [
+      'rebases onto the home page without doubling the slash',
+      ['legacy', 'faq'],
+      permanent('/faq'),
+    ],
+    [
+      'rebases a nested path onto a prefix destination',
+      ['old', 'a', 'b'],
+      permanent('/new/a/b'),
+    ],
+    ['resolves undefined when no redirect matches', ['unknown'], undefined],
+  ])('%s', async (_, segments, expected) => {
+    await expect(getRedirect(segments, tenant)).resolves.toEqual(expected);
   });
 
   it('prefers an exact source over a prefix that also matches', async () => {
-    mockRun.mockResolvedValue([
+    mockRun.mockResolvedValueOnce([
       { source: '/old', destination: '/new', isPrefix: true },
       { source: '/old/faq', destination: '/help', isPrefix: false },
     ]);
 
     await expect(getRedirect(['old', 'faq'], tenant)).resolves.toEqual(
       permanent('/help'),
-    );
-  });
-
-  it('does not rebase paths beneath a source that is not a prefix', async () => {
-    await expect(getRedirect(['flat', 'child'], tenant)).resolves.toBe(
-      undefined,
-    );
-  });
-
-  it('does not treat a source as a prefix of a sibling sharing its start', async () => {
-    await expect(getRedirect(['older'], tenant)).resolves.toBe(undefined);
-  });
-
-  it('rebases onto the home page without doubling the slash', async () => {
-    await expect(getRedirect(['legacy', 'faq'], tenant)).resolves.toEqual(
-      permanent('/faq'),
-    );
-  });
-
-  it('rebases a nested path onto a prefix destination', async () => {
-    await expect(getRedirect(['old', 'a', 'b'], tenant)).resolves.toEqual(
-      permanent('/new/a/b'),
     );
   });
 
@@ -96,46 +94,33 @@ describe('getRedirect', () => {
   );
 
   it('refuses an exact destination that would leave the site', async () => {
-    mockRun.mockResolvedValue([
+    mockRun.mockResolvedValueOnce([
       { source: '/old', destination: '//evil.com', isPrefix: false },
     ]);
 
     await expect(getRedirect(['old'], tenant)).resolves.toBe(undefined);
   });
 
-  it('reports the status of a temporary redirect', async () => {
-    mockRun.mockResolvedValue([
-      {
-        source: '/sale',
-        destination: '/offers',
-        isPrefix: false,
-        status: REDIRECT_STATUS.TEMPORARY,
-      },
+  it.each([
+    [
+      'the status of a temporary redirect',
+      REDIRECT_STATUS.TEMPORARY,
+      REDIRECT_STATUS.TEMPORARY,
+    ],
+    ['a redirect with no status as permanent', null, REDIRECT_STATUS.PERMANENT],
+  ])('reports %s', async (_, status, expectedStatus) => {
+    mockRun.mockResolvedValueOnce([
+      { source: '/sale', destination: '/offers', isPrefix: false, status },
     ]);
 
     await expect(getRedirect(['sale'], tenant)).resolves.toEqual({
       destination: '/offers',
-      status: REDIRECT_STATUS.TEMPORARY,
+      status: expectedStatus,
     });
   });
 
-  it('reports a redirect with no status as permanent', async () => {
-    mockRun.mockResolvedValue([
-      {
-        source: '/sale',
-        destination: '/offers',
-        isPrefix: false,
-        status: null,
-      },
-    ]);
-
-    await expect(getRedirect(['sale'], tenant)).resolves.toEqual(
-      permanent('/offers'),
-    );
-  });
-
   it('carries the status of a matched prefix redirect', async () => {
-    mockRun.mockResolvedValue([
+    mockRun.mockResolvedValueOnce([
       {
         source: '/old',
         destination: '/new',
@@ -150,20 +135,16 @@ describe('getRedirect', () => {
     });
   });
 
-  it('resolves undefined when no redirect matches', async () => {
-    await expect(getRedirect(['unknown'], tenant)).resolves.toBe(undefined);
-  });
-
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     await getRedirect(['old-faq'], tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:redirect'] }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(redirectsQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: ['t:tenant-a:redirect'],
+      },
+    });
   });
 });
 

@@ -1,83 +1,94 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_RECENT_POSTS_HEADING,
+  mockRawPostLatestModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_POST_LATEST_MODULE_ID,
+  mockRawPostCard,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_AUTHOR_CACHE_TAG,
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_TOPIC_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockRawHeadingBlock,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPostLatest } from './loader';
+import { postLatestModulePostsQuery } from './posts.query';
+import { postLatestModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const LIMIT = 3;
 
-describe('getPostLatest', () => {
-  it('bounds the posts query by the module limit and maps the result', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawPostLatestModule({
-          headingBlock: makeRawHeadingBlock('Recent writing'),
-          limit: 3,
-        }),
-      )
-      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
+const tenant = mockTenant();
 
-    const postLatest = await getPostLatest('post-latest-1', tenant);
-
-    expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
-    expect(postLatest.headingBlock.heading).toBe('Recent writing');
-    expect(postLatest.posts.map((p) => p.id)).toEqual(['a']);
-  });
-
-  it('returns an empty list when no posts resolve', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
-      .mockResolvedValueOnce([]);
-
-    const postLatest = await getPostLatest('post-latest-1', tenant);
-
-    expect(postLatest.posts).toEqual([]);
-  });
-
+describe(getPostLatest, () => {
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getPostLatest('missing', tenant)).rejects.toThrow();
+    await expect(getPostLatest(MOCK_MISSING_ID, tenant)).rejects.toThrow();
   });
 
-  it('threads tenant context into both queries and scopes their tags to it', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
-      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
+  describe('with a resolved module', () => {
+    beforeEach(() => {
+      mockRun
+        .mockResolvedValueOnce(
+          mockRawPostLatestModule({
+            headingBlock: mockRawHeadingBlock(MOCK_RECENT_POSTS_HEADING),
+            limit: LIMIT,
+          }),
+        )
+        .mockResolvedValueOnce([mockRawPostCard({ _id: 'a' })]);
+    });
 
-    await getPostLatest('post-latest-1', tenant);
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
+    it('bounds the posts query by the module limit and maps the result', async () => {
+      const postLatest = await getPostLatest(
+        MOCK_POST_LATEST_MODULE_ID,
         tenant,
-        next: expect.objectContaining({
+      );
+
+      const [postsQuery] = mockRun.mock.calls[1] ?? [];
+
+      expect(postsQuery.query).toBe(postLatestModulePostsQuery(LIMIT).query);
+      expect(postLatest.headingBlock.heading).toBe(MOCK_RECENT_POSTS_HEADING);
+      expect(postLatest.posts.map((p) => p.id)).toEqual(['a']);
+    });
+
+    it('threads tenant context into both queries and scopes their tags to it', async () => {
+      await getPostLatest(MOCK_POST_LATEST_MODULE_ID, tenant);
+
+      const [, postsOptions] = mockRun.mock.calls[1] ?? [];
+
+      expect(mockRun).toHaveBeenNthCalledWith(1, postLatestModuleQuery, {
+        parameters: { id: MOCK_POST_LATEST_MODULE_ID },
+        tenant,
+        next: {
+          revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
             't:tenant-a:modules:postLatest',
             't:tenant-a:module:post-latest-1',
           ],
-        }),
-      }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
+        },
+      });
+      expect(postsOptions).toEqual({
         tenant,
-        next: expect.objectContaining({
-          tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
-        }),
-      }),
-    );
+        next: {
+          revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+          tags: [
+            MOCK_POSTS_CACHE_TAG,
+            MOCK_AUTHOR_CACHE_TAG,
+            MOCK_TOPIC_CACHE_TAG,
+          ],
+        },
+      });
+    });
   });
 });

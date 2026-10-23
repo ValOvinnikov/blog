@@ -1,76 +1,97 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawHeroModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_FEATURED_POST_ID,
+  mockRawHeroModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_HERO_MODULE_ID,
+  mockRawPostCard,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_AUTHOR_CACHE_TAG,
+  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_PAGE_POST_CACHE_TAG,
+  MOCK_PAGE_POST_INDEX_CACHE_TAG,
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_TOPIC_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  MOCK_POST_HREF,
+  MOCK_POST_TITLE,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
+import { heroFallbackFeaturedPostQuery } from './featured-post.query';
 import { getHero } from './loader';
+import { heroModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const POST_TAGS = [
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_AUTHOR_CACHE_TAG,
+  MOCK_TOPIC_CACHE_TAG,
+];
+
+const tenant = mockTenant();
 
 describe('getHero', () => {
-  it('resolves the hero using the configured featured post', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawHeroModule({
-          featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
-        }),
-      )
-      .mockResolvedValueOnce(null);
-
-    const hero = await getHero('hero-1', tenant);
-
-    expect(hero.title).toBe('Hello World');
-    expect(hero.primaryAction?.href).toBe('/blog/hello-world');
-  });
-
   it('propagates when the hero document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getHero('missing', tenant)).rejects.toThrow();
+    await expect(getHero(MOCK_MISSING_ID, tenant)).rejects.toThrow();
   });
 
-  it('threads tenant context into both queries and scopes their tags to it', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawHeroModule())
-      .mockResolvedValueOnce(null);
+  describe('when the hero document resolves', () => {
+    beforeEach(() => {
+      mockRun
+        .mockResolvedValueOnce(
+          mockRawHeroModule({
+            featuredPost: mockRawPostCard({ _id: MOCK_FEATURED_POST_ID }),
+          }),
+        )
+        .mockResolvedValueOnce(null);
+    });
 
-    await getHero('hero-1', tenant);
+    it('resolves the hero using the configured featured post', async () => {
+      const hero = await getHero(MOCK_HERO_MODULE_ID, tenant);
 
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
+      expect(hero.title).toBe(MOCK_POST_TITLE);
+      expect(hero.primaryAction?.href).toBe(MOCK_POST_HREF);
+    });
+
+    it('threads tenant context into both queries and scopes their tags to it', async () => {
+      await getHero(MOCK_HERO_MODULE_ID, tenant);
+
+      expect(mockRun).toHaveBeenNthCalledWith(1, heroModuleQuery, {
+        parameters: { id: MOCK_HERO_MODULE_ID },
         tenant,
-        next: expect.objectContaining({
+        next: {
+          revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
             't:tenant-a:modules:hero',
             't:tenant-a:module:hero-1',
-            't:tenant-a:posts',
-            't:tenant-a:author',
-            't:tenant-a:topic',
-            't:tenant-a:page_post',
-            't:tenant-a:page_landing',
-            't:tenant-a:page_postIndex',
+            ...POST_TAGS,
+            MOCK_PAGE_POST_CACHE_TAG,
+            MOCK_PAGE_LANDING_CACHE_TAG,
+            MOCK_PAGE_POST_INDEX_CACHE_TAG,
           ],
-        }),
-      }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
-        }),
-      }),
-    );
+        },
+      });
+      expect(mockRun).toHaveBeenNthCalledWith(
+        2,
+        heroFallbackFeaturedPostQuery,
+        {
+          tenant,
+          next: {
+            revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+            tags: POST_TAGS,
+          },
+        },
+      );
+    });
   });
 });

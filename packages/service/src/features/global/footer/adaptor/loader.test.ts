@@ -1,32 +1,39 @@
-import { makeRawFooter } from '@blog/service/testing/global/fixtures';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { SOCIAL_PLATFORMS } from '@blog/config/constants';
+import {
+  MOCK_LINKED_PAGE_CACHE_TAGS,
+  mockRawFooter,
+} from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  mockLinkView,
+  mockRawExternalLinkDocument,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getFooter } from './loader';
+import { footerQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const GITHUB_URL = 'https://github.com/val';
 
-describe('getFooter', () => {
+const tenant = mockTenant();
+
+describe(getFooter, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawFooter());
+    mockRun.mockResolvedValue(mockRawFooter());
   });
 
   it('throws when the footer document does not exist', async () => {
-    mockRun.mockResolvedValue(null);
+    mockRun.mockResolvedValueOnce(null);
 
     await expect(getFooter(tenant)).rejects.toThrow();
   });
 
   it('defaults social to an empty array when none are set', async () => {
-    mockRun.mockResolvedValue(makeRawFooter({ social: null }));
+    mockRun.mockResolvedValueOnce(mockRawFooter({ social: null }));
 
     const result = await getFooter(tenant);
 
@@ -34,14 +41,14 @@ describe('getFooter', () => {
   });
 
   it('maps raw social links into a domain object', async () => {
-    mockRun.mockResolvedValue(
-      makeRawFooter({
+    mockRun.mockResolvedValueOnce(
+      mockRawFooter({
         social: [
           {
-            platform: 'GITHUB',
-            link: makeRawExternalLinkDocument({
+            platform: SOCIAL_PLATFORMS.GITHUB,
+            link: mockRawExternalLinkDocument({
               label: 'GitHub',
-              url: 'https://github.com/val',
+              url: GITHUB_URL,
             }),
           },
         ],
@@ -52,68 +59,50 @@ describe('getFooter', () => {
 
     expect(result.social).toEqual([
       {
-        platform: 'GITHUB',
-        link: {
-          label: 'GitHub',
-          href: 'https://github.com/val',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
+        platform: SOCIAL_PLATFORMS.GITHUB,
+        link: mockLinkView({ label: 'GitHub', href: GITHUB_URL }),
       },
     ]);
   });
 
-  it('leaves the language switcher toggle undefined when unset', async () => {
+  it.each([
+    ['undefined when unset', {}, undefined],
+    ['through when set', { showLanguageSwitcher: true }, true],
+  ])(
+    'passes the language switcher toggle %s',
+    async (_, overrides, expected) => {
+      mockRun.mockResolvedValueOnce(mockRawFooter(overrides));
+
+      const result = await getFooter(tenant);
+
+      expect(result.showLanguageSwitcher).toBe(expected);
+    },
+  );
+
+  it.each([
+    ['shows the RSS feed when the switch was never set', {}, true],
+    [
+      'hides the RSS feed when the switch is off',
+      { showRssFeed: false },
+      false,
+    ],
+  ])('%s', async (_, overrides, expected) => {
+    mockRun.mockResolvedValueOnce(mockRawFooter(overrides));
+
     const result = await getFooter(tenant);
 
-    expect(result.showLanguageSwitcher).toBeUndefined();
-  });
-
-  it('passes the language switcher toggle through when set', async () => {
-    mockRun.mockResolvedValue(makeRawFooter({ showLanguageSwitcher: true }));
-
-    const result = await getFooter(tenant);
-
-    expect(result.showLanguageSwitcher).toBe(true);
-  });
-
-  it('shows the RSS feed when the switch was never set', async () => {
-    const result = await getFooter(tenant);
-
-    expect(result.showRssFeed).toBe(true);
-  });
-
-  it('hides the RSS feed when the switch is off', async () => {
-    mockRun.mockResolvedValue(makeRawFooter({ showRssFeed: false }));
-
-    const result = await getFooter(tenant);
-
-    expect(result.showRssFeed).toBe(false);
+    expect(result.showRssFeed).toBe(expected);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     await getFooter(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:footer',
-            't:tenant-a:page_post',
-            't:tenant-a:page_landing',
-            't:tenant-a:page_postIndex',
-            't:tenant-a:link',
-            't:tenant-a:homePage',
-            't:tenant-a:page_topic',
-            't:tenant-a:page_topicIndex',
-            't:tenant-a:page_tag',
-            't:tenant-a:page_tagIndex',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(footerQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: ['t:tenant-a:footer', ...MOCK_LINKED_PAGE_CACHE_TAGS],
+      },
+    });
   });
 });

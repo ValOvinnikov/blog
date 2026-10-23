@@ -1,6 +1,42 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  MOCK_TAG_ID,
+  MOCK_TOPIC_ID,
+} from '@blog/service/testing/entities/fixtures';
+import {
+  mockReference,
+  mockTranslationLink,
+} from '@blog/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 const { EN, NL } = LOCALE_ISO_CODES;
+
+export const MOCK_DESIGN_EN_POST_ID = 'design-en';
+export const MOCK_DESIGN_NL_POST_ID = 'design-nl';
+export const MOCK_NOTES_EN_POST_ID = 'notes-en';
+export const MOCK_ONLY_EN_POST_ID = 'only-en';
+export const MOCK_SCHEDULED_NL_POST_ID = 'scheduled-nl';
+export const MOCK_SOLO_NL_POST_ID = 'solo-nl';
+export const MOCK_LAUNCH_EN_POST_ID = 'launch-en';
+const LAUNCH_NL_POST_ID = 'launch-nl';
+
+export const MOCK_HERO_IMAGE_FIELD = 'heroImage';
+export const MOCK_WORD_COUNT_FIELD = 'wordCount';
+export const MOCK_FEED_UNPROJECTED_FIELDS = [
+  'author->',
+  MOCK_HERO_IMAGE_FIELD,
+  'topic->',
+  MOCK_WORD_COUNT_FIELD,
+];
+
+export const MOCK_PUBLISHED_FEED_SLUGS: Record<string, string[]> = {
+  [EN]: [MOCK_ONLY_EN_POST_ID, MOCK_DESIGN_EN_POST_ID, MOCK_NOTES_EN_POST_ID],
+  [NL]: [MOCK_DESIGN_NL_POST_ID],
+};
+
+const PUBLISHED_AT_LATER = '2026-01-02T00:00:00Z';
+const PUBLISHED_AT_FUTURE = '2999-01-01T00:00:00Z';
+const TRANSLATION_METADATA_TYPE = 'translation.metadata';
 
 function post(
   id: string,
@@ -14,50 +50,67 @@ function post(
     language,
     featured,
     publishedAt,
-    topic: { _type: 'reference', _ref: 'topic-1' },
-    tags: [{ _key: 'tag-1', _type: 'reference', _ref: 'tag-1' }],
+    topic: mockReference(MOCK_TOPIC_ID),
+    tags: [mockReference(MOCK_TAG_ID, { _key: MOCK_TAG_ID })],
   };
 }
 
-function link(language: string, id: string) {
-  return { _key: language, language, value: { _type: 'reference', _ref: id } };
-}
-
-export const translatedPostDocuments = [
-  { _id: 'topic-1', _type: 'blog_topic' },
-  { _id: 'tag-1', _type: 'blog_tag' },
-  post('design-en', EN, {
+export const MOCK_TRANSLATED_POST_DOCUMENTS = [
+  { _id: MOCK_TOPIC_ID, _type: 'blog_topic' },
+  { _id: MOCK_TAG_ID, _type: 'blog_tag' },
+  post(MOCK_DESIGN_EN_POST_ID, EN, {
     featured: true,
-    publishedAt: '2026-01-02T00:00:00Z',
+    publishedAt: PUBLISHED_AT_LATER,
   }),
-  post('design-nl', NL, {
+  post(MOCK_DESIGN_NL_POST_ID, NL, {
     featured: true,
-    publishedAt: '2026-01-02T00:00:00Z',
+    publishedAt: PUBLISHED_AT_LATER,
   }),
-  post('notes-en', EN),
-  post('only-en', EN, { featured: true, publishedAt: '2026-01-03T00:00:00Z' }),
-  post('scheduled-nl', NL, { publishedAt: '2999-01-01T00:00:00Z' }),
+  post(MOCK_NOTES_EN_POST_ID, EN),
+  post(MOCK_ONLY_EN_POST_ID, EN, {
+    featured: true,
+    publishedAt: '2026-01-03T00:00:00Z',
+  }),
+  post(MOCK_SCHEDULED_NL_POST_ID, NL, { publishedAt: PUBLISHED_AT_FUTURE }),
   {
     _id: 'meta-design',
-    _type: 'translation.metadata',
-    translations: [link(EN, 'design-en'), link(NL, 'design-nl')],
+    _type: TRANSLATION_METADATA_TYPE,
+    translations: [
+      mockTranslationLink(EN, MOCK_DESIGN_EN_POST_ID),
+      mockTranslationLink(NL, MOCK_DESIGN_NL_POST_ID),
+    ],
   },
 ];
 
-export const pinnedPostDocuments = [
-  ...translatedPostDocuments,
-  post('solo-nl', NL),
-  post('launch-en', EN),
-  post('launch-nl', NL, { publishedAt: '2999-01-01T00:00:00Z' }),
+export const MOCK_PINNED_POST_DOCUMENTS = [
+  ...MOCK_TRANSLATED_POST_DOCUMENTS,
+  post(MOCK_SOLO_NL_POST_ID, NL),
+  post(MOCK_LAUNCH_EN_POST_ID, EN),
+  post(LAUNCH_NL_POST_ID, NL, { publishedAt: PUBLISHED_AT_FUTURE }),
   {
     _id: 'meta-launch',
-    _type: 'translation.metadata',
-    translations: [link(EN, 'launch-en'), link(NL, 'launch-nl')],
+    _type: TRANSLATION_METADATA_TYPE,
+    translations: [
+      mockTranslationLink(EN, MOCK_LAUNCH_EN_POST_ID),
+      mockTranslationLink(NL, LAUNCH_NL_POST_ID),
+    ],
   },
 ];
 
 export function toIds(posts: unknown): string[] {
   return (posts as ({ _id: string } | null)[]).flatMap((post) =>
     post ? [post._id] : [],
+  );
+}
+
+export function evaluateRelatedPostsQuery(
+  query: string,
+  params: Record<string, unknown>,
+): Promise<unknown> {
+  return evaluateGroqExpression(
+    query,
+    MOCK_TRANSLATED_POST_DOCUMENTS,
+    undefined,
+    { currentId: MOCK_NOTES_EN_POST_ID, defaultLocale: EN, ...params },
   );
 }

@@ -1,39 +1,51 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawTestimonialModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_TESTIMONIAL_MODULE_ID,
+  mockRawTestimonialModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_LINK_CACHE_TAG,
+  MOCK_PAGE_LANDING_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockRawHeadingBlock,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getTestimonialModule } from './loader';
+import { testimonialModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const HEADING = 'Kind words';
+const tenant = mockTenant();
 
 describe(getTestimonialModule, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawTestimonialModule());
+    mockRun.mockResolvedValue(
+      mockRawTestimonialModule({ headingBlock: mockRawHeadingBlock(HEADING) }),
+    );
   });
 
-  it('resolves the module in a single round trip — exactly one runQuery call', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTestimonialModule({
-        headingBlock: makeRawHeadingBlock('What people say'),
-      }),
+  it('resolves the module in a single round trip', async () => {
+    const testimonial = await getTestimonialModule(
+      MOCK_TESTIMONIAL_MODULE_ID,
+      tenant,
     );
 
-    const testimonial = await getTestimonialModule('testimonial-1', tenant);
-
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(testimonial.headingBlock.heading).toBe('What people say');
+    expect(testimonial.headingBlock.heading).toBe(HEADING);
   });
 
   it('returns the referenced quotes in authored order', async () => {
-    const testimonial = await getTestimonialModule('testimonial-1', tenant);
+    const testimonial = await getTestimonialModule(
+      MOCK_TESTIMONIAL_MODULE_ID,
+      tenant,
+    );
 
     expect(testimonial.testimonials.map((item) => item.id)).toEqual([
       'block-testimonial-1',
@@ -42,32 +54,32 @@ describe(getTestimonialModule, () => {
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getTestimonialModule('missing', tenant)).rejects.toThrow();
+    await expect(
+      getTestimonialModule(MOCK_MISSING_ID, tenant),
+    ).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    await getTestimonialModule('testimonial-1', tenant);
+    await getTestimonialModule(MOCK_TESTIMONIAL_MODULE_ID, tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:testimonial',
-            't:tenant-a:module:testimonial-1',
-            't:tenant-a:block_testimonial',
-            't:tenant-a:link',
-            't:tenant-a:homePage',
-            't:tenant-a:page_landing',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(testimonialModuleQuery, {
+      parameters: { id: MOCK_TESTIMONIAL_MODULE_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          't:tenant-a:modules:testimonial',
+          `t:tenant-a:module:${MOCK_TESTIMONIAL_MODULE_ID}`,
+          't:tenant-a:block_testimonial',
+          MOCK_LINK_CACHE_TAG,
+          MOCK_HOME_PAGE_CACHE_TAG,
+          MOCK_PAGE_LANDING_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

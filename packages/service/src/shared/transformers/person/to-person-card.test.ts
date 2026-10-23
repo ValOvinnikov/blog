@@ -1,41 +1,47 @@
 import {
-  makeRawExternalLinkDocument,
-  makeRawSanityImage,
+  mockRawAuthor,
+  mockRawPersonCard,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  mockRawExternalLinkDocument,
+  mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
-import { toPersonCard, type TRawPersonCard } from './to-person-card';
+import { toPersonCard } from './to-person-card';
 
-function makeRaw(overrides: Partial<TRawPersonCard> = {}): TRawPersonCard {
-  return {
-    _id: 'person-1',
-    name: 'Jamie Rivera',
-    image: null,
-    profilePage: null,
-    ...overrides,
-  };
-}
+const HEADSHOT_ALT = 'Jamie headshot';
+const PROFILE_URL = 'https://example.com/team/jamie';
+
+const { _id, name } = mockRawAuthor();
 
 describe(toPersonCard, () => {
   it('maps everything absent', () => {
-    const result = toPersonCard(makeRaw());
+    const result = toPersonCard(mockRawPersonCard());
 
-    expect(result.image).toBeUndefined();
-    expect(result.profileUrl).toBeUndefined();
+    expect(result).toEqual({
+      id: _id,
+      name,
+      image: undefined,
+      profileUrl: undefined,
+    });
   });
 
   it('maps everything populated', () => {
-    const result = toPersonCard(
-      makeRaw({
-        image: makeRawSanityImage('Jamie headshot'),
-        profilePage: makeRawExternalLinkDocument({
-          url: 'https://example.com/team/jamie',
-        }),
+    const {
+      id,
+      name: cardName,
+      image,
+      profileUrl,
+    } = toPersonCard(
+      mockRawPersonCard({
+        image: mockRawSanityImage(HEADSHOT_ALT),
+        profilePage: mockRawExternalLinkDocument({ url: PROFILE_URL }),
       }),
     );
 
-    expect(result.id).toBe('person-1');
-    expect(result.name).toBe('Jamie Rivera');
-    expect(result.image).toMatchObject({ alt: 'Jamie headshot' });
-    expect(result.profileUrl).toBe('https://example.com/team/jamie');
+    expect(id).toBe(_id);
+    expect(cardName).toBe(name);
+    expect(image?.alt).toBe(HEADSHOT_ALT);
+    expect(profileUrl).toBe(PROFILE_URL);
   });
 });

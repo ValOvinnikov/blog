@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { MOCK_TAG_SLUG } from '@blog/service/testing/entities/fixtures';
 
 import { toPaginationParams } from './to-pagination-params';
 
@@ -8,21 +9,21 @@ describe(toPaginationParams, () => {
   it('returns pages 2..totalPages for each page with a full corpus', () => {
     expect(
       toPaginationParams([
-        { slug: 'typescript', language: EN, pageSize: 9, postCount: 20 },
+        { slug: MOCK_TAG_SLUG, language: EN, pageSize: 9, postCount: 20 },
         { slug: 'react', language: EN, pageSize: 9, postCount: 9 },
       ]),
     ).toEqual([
-      { slug: 'typescript', language: EN, page: '2' },
-      { slug: 'typescript', language: EN, page: '3' },
+      { slug: MOCK_TAG_SLUG, language: EN, page: '2' },
+      { slug: MOCK_TAG_SLUG, language: EN, page: '3' },
     ]);
   });
 
   it('keeps each page in its own language', () => {
     expect(
       toPaginationParams([
-        { slug: 'typescript', language: NL, pageSize: 9, postCount: 10 },
+        { slug: MOCK_TAG_SLUG, language: NL, pageSize: 9, postCount: 10 },
       ]),
-    ).toEqual([{ slug: 'typescript', language: NL, page: '2' }]);
+    ).toEqual([{ slug: MOCK_TAG_SLUG, language: NL, page: '2' }]);
   });
 
   it('contributes no entries for a page with zero posts', () => {
@@ -36,7 +37,7 @@ describe(toPaginationParams, () => {
   it('contributes no entries for a page that fits on one page', () => {
     expect(
       toPaginationParams([
-        { slug: 'typescript', language: EN, pageSize: 9, postCount: 5 },
+        { slug: MOCK_TAG_SLUG, language: EN, pageSize: 9, postCount: 5 },
       ]),
     ).toEqual([]);
   });

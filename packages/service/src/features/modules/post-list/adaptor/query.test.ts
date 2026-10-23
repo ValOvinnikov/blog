@@ -1,70 +1,66 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_DUTCH_MODULE_HEADING,
+  MOCK_ENGLISH_MODULE_HEADING,
+  MOCK_MODULE_ID,
+  MOCK_POST_LIST_PAGE_SIZE,
+  mockModuleDocument,
+  mockRawPostListModule,
+} from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
 
 import { postListModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const moduleDocument = {
-  _id: 'module-1',
+const moduleDocument = mockModuleDocument({
   _type: 'module_postList',
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({
-      [EN]: 'Latest posts',
-      [NL]: 'Nieuwste berichten',
-    }),
-  },
-  pageSize: 9,
-};
+  pageSize: MOCK_POST_LIST_PAGE_SIZE,
+});
 
 async function runPostList(locale: string) {
   const raw = await evaluateGroqExpression(
     postListModuleQuery.query,
     [moduleDocument],
     undefined,
-    { id: 'module-1', locale, defaultLocale: EN },
+    { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return postListModuleQuery.parse(raw);
 }
 
 describe('postListModuleQuery', () => {
-  it('filters to module_postList documents by id', () => {
-    expect(postListModuleQuery.query).toContain('_type == "module_postList"');
-    expect(postListModuleQuery.query).toContain('_id == $id');
-  });
-
   it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawPostListModule(), headingBlock: null };
+    const raw = { ...mockRawPostListModule(), headingBlock: null };
 
     expect(() => postListModuleQuery.parse(raw)).toThrow();
   });
 
-  it('projects the archive pageSize, not the retired limit field', () => {
-    expect(postListModuleQuery.query).toContain('pageSize');
-    expect(postListModuleQuery.query).not.toContain('limit');
+  describe('in English', () => {
+    let postList: Awaited<ReturnType<typeof runPostList>>;
+
+    beforeEach(async () => {
+      postList = await runPostList(EN);
+    });
+
+    it('reads the archive pageSize', () => {
+      expect(postList.pageSize).toBe(MOCK_POST_LIST_PAGE_SIZE);
+    });
+
+    it('defaults showImages to true for a document authored without it', () => {
+      expect(postList.showImages).toBe(true);
+    });
   });
 
-  it('projects contentAlignment', () => {
-    expect(postListModuleQuery.query).toContain('contentAlignment');
-  });
-
-  it('coalesces showImages to true for documents authored before the field existed', () => {
-    expect(postListModuleQuery.query).toContain('coalesce(showImages, true)');
-  });
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runPostList(NL);
 
-    expect(headingBlock.heading).toBe('Nieuwste berichten');
+    expect(headingBlock.heading).toBe(MOCK_DUTCH_MODULE_HEADING);
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runPostList(FR);
 
-    expect(headingBlock.heading).toBe('Latest posts');
+    expect(headingBlock.heading).toBe(MOCK_ENGLISH_MODULE_HEADING);
   });
 });

@@ -1,101 +1,105 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawHeadingBlock,
-  makeRawSeo,
+  MOCK_ENGLISH_MODULE_HEADING,
+  MOCK_NEWSLETTER_MODULE_ID,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  mockHeroSlotView,
+  mockRawBlogPage,
+  mockRawCtaRef,
+  mockRawHeroRef,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_PAGE_POST_INDEX_CACHE_TAG,
+  MOCK_TEMPLATE_POST_INDEX_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  mockRawHeadingBlock,
+  mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getIndexPage } from './loader';
+import { blogPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const SUPPORTING_TEXT = 'Fresh from the team.';
+const META_TITLE = 'Latest posts — Blog';
 
-describe('getIndexPage', () => {
+const tenant = mockTenant();
+
+async function loadIndexPage(
+  overrides: Parameters<typeof mockRawBlogPage>[0] = {},
+) {
+  mockRun.mockResolvedValueOnce(mockRawBlogPage(overrides));
+  const result = await getIndexPage(tenant);
+  if (!result) throw new Error('expected a blog index page');
+
+  return result;
+}
+
+describe(getIndexPage, () => {
   it('exposes the headingBlock from the page_postIndex singleton', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawBlogPage({
-        headingBlock: makeRawHeadingBlock('Latest posts', {
-          supportingText: 'Fresh from the team.',
-        }),
-        seo: makeRawSeo({
-          metaTitle: 'Latest posts — Blog',
-          metaDescription: 'Fresh from the team.',
-        }),
+    const { headingBlock, seo } = await loadIndexPage({
+      headingBlock: mockRawHeadingBlock(MOCK_ENGLISH_MODULE_HEADING, {
+        supportingText: SUPPORTING_TEXT,
       }),
-    );
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'Latest posts',
-      supportingText: 'Fresh from the team.',
+      seo: mockRawSeo({
+        metaTitle: META_TITLE,
+        metaDescription: SUPPORTING_TEXT,
+      }),
     });
-    expect(result.seo.title).toBe('Latest posts — Blog');
-    expect(result.seo.description).toBe('Fresh from the team.');
+
+    expect(headingBlock).toEqual({
+      heading: MOCK_ENGLISH_MODULE_HEADING,
+      supportingText: SUPPORTING_TEXT,
+    });
+    expect(seo.title).toBe(META_TITLE);
+    expect(seo.description).toBe(SUPPORTING_TEXT);
   });
 
-  it('maps the thin page-builder modules array to module refs', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawBlogPage({
-        modules: [{ _id: 'newsletter-1', _type: 'module_newsletter' }],
-      }),
-    );
+  it.each([
+    [
+      'maps the thin page-builder modules array to module refs',
+      [{ _id: MOCK_NEWSLETTER_MODULE_ID, _type: 'module_newsletter' } as const],
+      [{ id: MOCK_NEWSLETTER_MODULE_ID, type: 'module_newsletter' }],
+    ],
+    ['defaults modules to an empty array when the page has none', null, []],
+  ])('%s', async (_, modules, expected) => {
+    const result = await loadIndexPage({ modules });
 
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
-
-    expect(result.modules).toEqual([
-      { id: 'newsletter-1', type: 'module_newsletter' },
-    ]);
+    expect(result.modules).toEqual(expected);
   });
 
-  it('leaves hero undefined when page_postIndex.hero is unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawBlogPage({ hero: null }));
+  it.each([
+    [
+      'leaves hero undefined when page_postIndex.hero is unset',
+      null,
+      undefined,
+    ],
+    [
+      'maps a set page_postIndex.hero to a hero slot',
+      mockRawHeroRef(),
+      mockHeroSlotView(),
+    ],
+  ])('%s', async (_, hero, expected) => {
+    const result = await loadIndexPage({ hero });
 
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
-
-    expect(result.hero).toBeUndefined();
-  });
-
-  it('maps a set page_postIndex.hero to a hero slot', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawBlogPage({ hero: { _id: 'hero-1', _type: 'module_heroBlog' } }),
-    );
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
-
-    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
+    expect(result.hero).toEqual(expected);
   });
 
   it('rejects when page_postIndex.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawBlogPage({ hero: { _id: 'cta-1', _type: 'module_cta' as never } }),
+      mockRawBlogPage({ hero: mockRawCtaRef() as never }),
     );
 
     await expect(getIndexPage(tenant)).rejects.toThrow();
   });
 
-  it('defaults modules to an empty array when the page has none', async () => {
-    mockRun.mockResolvedValueOnce(makeRawBlogPage({ modules: null }));
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
-
-    expect(result.modules).toEqual([]);
-  });
-
-  it('resolves undefined, rather than rejecting, when no page_postIndex document exists', async () => {
+  it('resolves undefined when no page_postIndex document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const result = await getIndexPage(tenant);
@@ -103,15 +107,10 @@ describe('getIndexPage', () => {
     expect(result).toBeUndefined();
   });
 
-  it('lists the page translations, counting a page with no language as the default', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawBlogPage({
-        translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
-      }),
-    );
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
+  it('lists the page translations, a page with no language as the default', async () => {
+    const result = await loadIndexPage({
+      translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
+    });
 
     expect(result.translations).toEqual([
       LOCALE_ISO_CODES.EN,
@@ -120,18 +119,19 @@ describe('getIndexPage', () => {
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawBlogPage());
+    mockRun.mockResolvedValueOnce(mockRawBlogPage());
 
     await getIndexPage(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: ['t:tenant-a:page_postIndex', 't:tenant-a:template_postIndex'],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(blogPageQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_PAGE_POST_INDEX_CACHE_TAG,
+          MOCK_TEMPLATE_POST_INDEX_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

@@ -1,4 +1,9 @@
 import { q } from '@blog/service/sanity/query/query';
+import {
+  MOCK_TAG_ID,
+  MOCK_TAG_SLUG,
+  MOCK_TAG_TITLE,
+} from '@blog/service/testing/entities/fixtures';
 
 import { tagFragment } from './tag';
 
@@ -9,7 +14,11 @@ const tagDocQuery = q.star
 
 describe('tagFragment', () => {
   it('accepts a fully-projected tag (title and resolved slug present)', () => {
-    const projected = { _id: 'tag-1', title: 'TypeScript', slug: 'typescript' };
+    const projected = {
+      _id: MOCK_TAG_ID,
+      title: MOCK_TAG_TITLE,
+      slug: MOCK_TAG_SLUG,
+    };
 
     expect(tagDocQuery.parse(projected)).toEqual(projected);
   });

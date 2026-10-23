@@ -1,4 +1,9 @@
 import { q } from '@blog/service/sanity/query/query';
+import {
+  MOCK_POST_SLUG,
+  MOCK_POST_TITLE,
+} from '@blog/service/testing/shared/fixtures';
+import { MOCK_WORD_COUNT_FIELD } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { postLinkFragment } from './post-link';
 
@@ -11,8 +16,8 @@ describe('postLinkFragment', () => {
   it('accepts a fully-projected post (heading and flattened slug.current present)', () => {
     const projected = {
       _id: 'post-1',
-      headingBlock: { heading: 'Hello World' },
-      slug: 'hello-world',
+      headingBlock: { heading: MOCK_POST_TITLE },
+      slug: MOCK_POST_SLUG,
     };
 
     expect(postLinkDocQuery.parse(projected)).toEqual(projected);
@@ -39,7 +44,7 @@ describe('postLinkFragment', () => {
   });
 
   it('projects only _id, headingBlock.heading and slug.current', () => {
-    expect(postLinkDocQuery.query).not.toContain('wordCount');
+    expect(postLinkDocQuery.query).not.toContain(MOCK_WORD_COUNT_FIELD);
     expect(postLinkDocQuery.query).not.toContain('publishedAt');
     expect(postLinkDocQuery.query).not.toContain('supportingText');
   });

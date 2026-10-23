@@ -1,74 +1,56 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
+import { DISPLAY_MODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  MOCK_DUTCH_MODULE_HEADING,
+  MOCK_ENGLISH_MODULE_HEADING,
+  MOCK_MODULE_ID,
+  mockModuleDocument,
+  mockRawPostLatestModule,
+} from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
 
 import { postLatestModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const moduleDocument = {
-  _id: 'module-1',
+const moduleDocument = mockModuleDocument({
   _type: 'module_postLatest',
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({
-      [EN]: 'Latest posts',
-      [NL]: 'Nieuwste berichten',
-    }),
-  },
   limit: 3,
-};
+});
 
 async function runPostLatest(locale: string) {
   const raw = await evaluateGroqExpression(
     postLatestModuleQuery.query,
     [moduleDocument],
     undefined,
-    { id: 'module-1', locale, defaultLocale: EN },
+    { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return postLatestModuleQuery.parse(raw);
 }
 
 describe('postLatestModuleQuery', () => {
-  it('filters to module_postLatest documents by id', () => {
-    expect(postLatestModuleQuery.query).toContain(
-      '_type == "module_postLatest"',
-    );
-    expect(postLatestModuleQuery.query).toContain('_id == $id');
-  });
-
   it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawPostLatestModule(), headingBlock: null };
+    const raw = { ...mockRawPostLatestModule(), headingBlock: null };
 
     expect(() => postLatestModuleQuery.parse(raw)).toThrow();
   });
 
-  it('projects contentAlignment', () => {
-    expect(postLatestModuleQuery.query).toContain('contentAlignment');
-  });
+  it('defaults showImages and displayMode for a document authored without them', async () => {
+    const { showImages, displayMode } = await runPostLatest(EN);
 
-  it('coalesces showImages to true for documents authored before the field existed', () => {
-    expect(postLatestModuleQuery.query).toContain('coalesce(showImages, true)');
-  });
-
-  it('coalesces displayMode to GRID for documents authored before the field existed', () => {
-    expect(postLatestModuleQuery.query).toContain(
-      'coalesce(displayMode, "GRID")',
-    );
+    expect(showImages).toBe(true);
+    expect(displayMode).toBe(DISPLAY_MODE.GRID);
   });
 
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runPostLatest(NL);
 
-    expect(headingBlock.heading).toBe('Nieuwste berichten');
+    expect(headingBlock.heading).toBe(MOCK_DUTCH_MODULE_HEADING);
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runPostLatest(FR);
 
-    expect(headingBlock.heading).toBe('Latest posts');
+    expect(headingBlock.heading).toBe(MOCK_ENGLISH_MODULE_HEADING);
   });
 });

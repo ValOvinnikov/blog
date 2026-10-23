@@ -1,65 +1,79 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
-  makeRawCtaButton,
-  makeRawCtaModule,
+  MOCK_CTA_BUTTON_URL,
+  MOCK_CTA_MODULE_ID,
+  mockRawCtaButton,
+  mockRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_LINK_CACHE_TAG,
+  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_PAGE_POST_CACHE_TAG,
+  MOCK_PAGE_POST_INDEX_CACHE_TAG,
+  MOCK_PAGE_TAG_CACHE_TAG,
+  MOCK_PAGE_TAG_INDEX_CACHE_TAG,
+  MOCK_PAGE_TOPIC_CACHE_TAG,
+  MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
+  MOCK_TOPIC_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getCta } from './loader';
+import { ctaModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe('getCta', () => {
-  it('maps the cta module document', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawCtaModule({ ctaButtons: [makeRawCtaButton()] }),
+  beforeEach(() => {
+    mockRun.mockResolvedValue(
+      mockRawCtaModule({ ctaButtons: [mockRawCtaButton()] }),
     );
+  });
 
-    const cta = await getCta('cta-1', tenant);
+  it('maps the cta module document', async () => {
+    const cta = await getCta(MOCK_CTA_MODULE_ID, tenant);
 
     expect(cta.headingBlock.heading).toBe('Subscribe to the newsletter');
-    expect(cta.ctaButtons?.[0]?.link.href).toBe('/newsletter');
+    expect(cta.ctaButtons?.[0]?.link.href).toBe(MOCK_CTA_BUTTON_URL);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getCta('missing', tenant)).rejects.toThrow();
+    await expect(getCta(MOCK_MISSING_ID, tenant)).rejects.toThrow();
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue(makeRawCtaModule());
+    await getCta(MOCK_CTA_MODULE_ID, tenant);
 
-    await getCta('cta-1', tenant);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:cta',
-            't:tenant-a:module:cta-1',
-            't:tenant-a:link',
-            't:tenant-a:homePage',
-            't:tenant-a:page_landing',
-            't:tenant-a:page_post',
-            't:tenant-a:page_postIndex',
-            't:tenant-a:page_topic',
-            't:tenant-a:page_topicIndex',
-            't:tenant-a:page_tag',
-            't:tenant-a:page_tagIndex',
-            't:tenant-a:topic',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(ctaModuleQuery, {
+      parameters: { id: MOCK_CTA_MODULE_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          't:tenant-a:modules:cta',
+          't:tenant-a:module:cta-1',
+          MOCK_LINK_CACHE_TAG,
+          MOCK_HOME_PAGE_CACHE_TAG,
+          MOCK_PAGE_LANDING_CACHE_TAG,
+          MOCK_PAGE_POST_CACHE_TAG,
+          MOCK_PAGE_POST_INDEX_CACHE_TAG,
+          MOCK_PAGE_TOPIC_CACHE_TAG,
+          MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
+          MOCK_PAGE_TAG_CACHE_TAG,
+          MOCK_PAGE_TAG_INDEX_CACHE_TAG,
+          MOCK_TOPIC_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

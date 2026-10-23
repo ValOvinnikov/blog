@@ -1,65 +1,97 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
-  makeRawPricingModule,
-  makeRawPricingPrice,
-  makeRawPricingTier,
+  BRAND_VARIANT,
+  LOCALE_ISO_CODES,
+  PRICE_PERIOD,
+} from '@blog/config/constants';
+import {
+  MOCK_PRICING_FEATURE_KEY,
+  MOCK_PRICING_FOOTNOTE,
+  MOCK_PRICING_HIGHLIGHT_LABEL,
+  MOCK_PRICING_MODULE_ID,
+  MOCK_PRICING_TIER_DESCRIPTION,
+  MOCK_PRICING_TIER_FOOTNOTE,
+  MOCK_PRICING_TIER_ID,
+  MOCK_PRICING_TIER_NAME,
+  MOCK_PRIORITY_SUPPORT_FEATURE,
+  MOCK_SECOND_PRICING_FEATURE_KEY,
+  MOCK_UNLIMITED_POSTS_FEATURE,
+  mockRawPricingModule,
+  mockRawPricingPrice,
+  mockRawPricingTier,
 } from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  mockLocalizedHeadingBlock,
+  mockLocalizedStrings,
+} from '@blog/service/testing/shared/localized';
 
 import { pricingModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
+const TIER_TYPE = 'pricingTier';
+const FEATURE_TYPE = 'pricingFeature';
+const ENTERPRISE = 'Enterprise';
+const DUTCH_UNLIMITED_POSTS = 'Onbeperkt berichten';
+const DUTCH_MOST_POPULAR = 'Populairst';
+const CONTACT_US = 'Contact us';
+const DUTCH_CONTACT_US = 'Neem contact op';
+const DUTCH_VAT_FOOTNOTE = 'Prijzen exclusief btw.';
+
 const pricingDocument = {
-  _id: 'pricing-1',
+  _id: MOCK_PRICING_MODULE_ID,
   _type: 'module_pricing',
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({ [EN]: 'Plans', [NL]: 'Abonnementen' }),
-  },
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockLocalizedHeadingBlock({
+    [EN]: 'Plans',
+    [NL]: 'Abonnementen',
+  }),
   tiers: [
     {
-      _key: 'tier-pro',
-      _type: 'pricingTier',
-      name: localizedStrings({ [EN]: 'Pro', [NL]: 'Professioneel' }),
-      description: localizedStrings({ [EN]: 'For growing teams' }),
-      prices: [{ _key: 'price-1', period: 'MONTH', amount: 29 }],
+      _key: MOCK_PRICING_TIER_ID,
+      _type: TIER_TYPE,
+      name: mockLocalizedStrings({
+        [EN]: MOCK_PRICING_TIER_NAME,
+        [NL]: 'Professioneel',
+      }),
+      description: mockLocalizedStrings({
+        [EN]: MOCK_PRICING_TIER_DESCRIPTION,
+      }),
+      prices: [{ _key: 'price-1', period: PRICE_PERIOD.MONTH, amount: 29 }],
       features: [
         {
-          _key: 'feature-1',
-          _type: 'pricingFeature',
-          text: localizedStrings({
-            [EN]: 'Unlimited posts',
-            [NL]: 'Onbeperkt berichten',
+          _key: MOCK_PRICING_FEATURE_KEY,
+          _type: FEATURE_TYPE,
+          text: mockLocalizedStrings({
+            [EN]: MOCK_UNLIMITED_POSTS_FEATURE,
+            [NL]: DUTCH_UNLIMITED_POSTS,
           }),
         },
         {
-          _key: 'feature-2',
-          _type: 'pricingFeature',
-          text: localizedStrings({ [EN]: 'Priority support' }),
+          _key: MOCK_SECOND_PRICING_FEATURE_KEY,
+          _type: FEATURE_TYPE,
+          text: mockLocalizedStrings({ [EN]: MOCK_PRIORITY_SUPPORT_FEATURE }),
         },
       ],
-      highlightLabel: localizedStrings({
-        [EN]: 'Most popular',
-        [NL]: 'Populairst',
+      highlightLabel: mockLocalizedStrings({
+        [EN]: MOCK_PRICING_HIGHLIGHT_LABEL,
+        [NL]: DUTCH_MOST_POPULAR,
       }),
-      footnote: localizedStrings({ [EN]: 'Billed annually' }),
+      footnote: mockLocalizedStrings({ [EN]: MOCK_PRICING_TIER_FOOTNOTE }),
     },
     {
       _key: 'tier-enterprise',
-      _type: 'pricingTier',
-      name: localizedStrings({ [EN]: 'Enterprise' }),
-      priceLabel: localizedStrings({
-        [EN]: 'Contact us',
-        [NL]: 'Neem contact op',
+      _type: TIER_TYPE,
+      name: mockLocalizedStrings({ [EN]: ENTERPRISE }),
+      priceLabel: mockLocalizedStrings({
+        [EN]: CONTACT_US,
+        [NL]: DUTCH_CONTACT_US,
       }),
     },
   ],
-  footnote: localizedStrings({
-    [EN]: 'Prices exclude VAT.',
-    [NL]: 'Prijzen exclusief btw.',
+  footnote: mockLocalizedStrings({
+    [EN]: MOCK_PRICING_FOOTNOTE,
+    [NL]: DUTCH_VAT_FOOTNOTE,
   }),
 };
 
@@ -68,75 +100,55 @@ async function runPricing(document: Record<string, unknown>, locale: string) {
     pricingModuleQuery.query,
     [document],
     undefined,
-    { id: 'pricing-1', locale, defaultLocale: EN },
+    { id: MOCK_PRICING_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return pricingModuleQuery.parse(raw);
 }
 
 describe('pricingModuleQuery', () => {
-  it('filters to module_pricing documents by id', () => {
-    expect(pricingModuleQuery.query).toContain('_type == "module_pricing"');
-    expect(pricingModuleQuery.query).toContain('_id == $id');
-  });
-
-  it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawPricingModule(), headingBlock: null };
-
-    expect(() => pricingModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a module with no tiers', () => {
-    const raw = { ...makeRawPricingModule(), tiers: null };
-
-    expect(() => pricingModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a tier with no name', () => {
-    const raw = {
-      ...makeRawPricingModule(),
-      tiers: [{ ...makeRawPricingTier(), name: null }],
-    };
+  it.each([
+    ['a module with no headingBlock', { headingBlock: null }],
+    ['a module with no tiers', { tiers: null }],
+    [
+      'a tier with no name',
+      { tiers: [{ ...mockRawPricingTier(), name: null }] },
+    ],
+    [
+      'a price with no period',
+      {
+        tiers: [
+          {
+            ...mockRawPricingTier(),
+            prices: [{ ...mockRawPricingPrice(), period: null }],
+          },
+        ],
+      },
+    ],
+    [
+      'a price with no amount',
+      {
+        tiers: [
+          {
+            ...mockRawPricingTier(),
+            prices: [{ ...mockRawPricingPrice(), amount: null }],
+          },
+        ],
+      },
+    ],
+  ])('rejects %s', (_, overrides) => {
+    const raw = { ...mockRawPricingModule(), ...overrides };
 
     expect(() => pricingModuleQuery.parse(raw)).toThrow();
   });
 
   it('parses a tier with no prices', () => {
     const raw = {
-      ...makeRawPricingModule(),
-      tiers: [{ ...makeRawPricingTier(), prices: null }],
+      ...mockRawPricingModule(),
+      tiers: [{ ...mockRawPricingTier(), prices: null }],
     };
 
-    expect(() => pricingModuleQuery.parse(raw)).not.toThrow();
     expect(pricingModuleQuery.parse(raw).tiers?.[0]?.prices).toBeNull();
-  });
-
-  it('rejects a price with no period', () => {
-    const raw = {
-      ...makeRawPricingModule(),
-      tiers: [
-        {
-          ...makeRawPricingTier(),
-          prices: [{ ...makeRawPricingPrice(), period: null }],
-        },
-      ],
-    };
-
-    expect(() => pricingModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a price with no amount', () => {
-    const raw = {
-      ...makeRawPricingModule(),
-      tiers: [
-        {
-          ...makeRawPricingTier(),
-          prices: [{ ...makeRawPricingPrice(), amount: null }],
-        },
-      ],
-    };
-
-    expect(() => pricingModuleQuery.parse(raw)).toThrow();
   });
 
   it('picks the heading, footnote and every tier text in the visitor language', async () => {
@@ -144,19 +156,22 @@ describe('pricingModuleQuery', () => {
 
     expect(pricing).toMatchObject({
       headingBlock: { heading: 'Abonnementen' },
-      footnote: 'Prijzen exclusief btw.',
+      footnote: DUTCH_VAT_FOOTNOTE,
       tiers: [
         {
           name: 'Professioneel',
-          description: 'For growing teams',
+          description: MOCK_PRICING_TIER_DESCRIPTION,
           features: [
-            { _key: 'feature-1', text: 'Onbeperkt berichten' },
-            { _key: 'feature-2', text: 'Priority support' },
+            { _key: MOCK_PRICING_FEATURE_KEY, text: DUTCH_UNLIMITED_POSTS },
+            {
+              _key: MOCK_SECOND_PRICING_FEATURE_KEY,
+              text: MOCK_PRIORITY_SUPPORT_FEATURE,
+            },
           ],
-          highlightLabel: 'Populairst',
-          footnote: 'Billed annually',
+          highlightLabel: DUTCH_MOST_POPULAR,
+          footnote: MOCK_PRICING_TIER_FOOTNOTE,
         },
-        { name: 'Enterprise', priceLabel: 'Neem contact op' },
+        { name: ENTERPRISE, priceLabel: DUTCH_CONTACT_US },
       ],
     });
   });
@@ -166,17 +181,23 @@ describe('pricingModuleQuery', () => {
 
     expect(pricing).toMatchObject({
       headingBlock: { heading: 'Plans' },
-      footnote: 'Prices exclude VAT.',
+      footnote: MOCK_PRICING_FOOTNOTE,
       tiers: [
         {
-          name: 'Pro',
+          name: MOCK_PRICING_TIER_NAME,
           features: [
-            { _key: 'feature-1', text: 'Unlimited posts' },
-            { _key: 'feature-2', text: 'Priority support' },
+            {
+              _key: MOCK_PRICING_FEATURE_KEY,
+              text: MOCK_UNLIMITED_POSTS_FEATURE,
+            },
+            {
+              _key: MOCK_SECOND_PRICING_FEATURE_KEY,
+              text: MOCK_PRIORITY_SUPPORT_FEATURE,
+            },
           ],
-          highlightLabel: 'Most popular',
+          highlightLabel: MOCK_PRICING_HIGHLIGHT_LABEL,
         },
-        { name: 'Enterprise', priceLabel: 'Contact us' },
+        { name: ENTERPRISE, priceLabel: CONTACT_US },
       ],
     });
   });
@@ -190,7 +211,7 @@ describe('pricingModuleQuery', () => {
           ...pricingDocument,
           tiers: [
             first,
-            { ...second, name: localizedStrings({ [FR]: 'Entreprise' }) },
+            { ...second, name: mockLocalizedStrings({ [FR]: 'Entreprise' }) },
           ],
         },
         NL,

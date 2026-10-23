@@ -1,33 +1,30 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { MOCK_LIST_MODULE_ID } from '@blog/service/testing/pages/fixtures';
+import { MOCK_MODULES_POST_LIST_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPostListPageSizes } from './loader';
+import { postListPageSizeQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(getPostListPageSizes, () => {
-  it('passes the ids as the query parameter and scopes cache tags to the tenant', async () => {
+  it('queries the ids with cache tags scoped to the tenant', async () => {
     mockRun.mockResolvedValueOnce([]);
 
-    await getPostListPageSizes(['list-1', 'list-2'], tenant);
+    await getPostListPageSizes([MOCK_LIST_MODULE_ID, 'list-2'], tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        parameters: { ids: ['list-1', 'list-2'] },
-        tenant,
-        next: expect.objectContaining({
-          tags: ['t:tenant-a:modules:postList'],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledExactlyOnceWith(postListPageSizeQuery, {
+      parameters: { ids: [MOCK_LIST_MODULE_ID, 'list-2'] },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_MODULES_POST_LIST_CACHE_TAG],
+      },
+    });
   });
 
   it('makes no request when given no ids', async () => {

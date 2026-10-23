@@ -1,17 +1,17 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { translatedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
+import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { POST_COUNT_EXPRESSION, postCountParser } from './post-count';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
 describe('POST_COUNT_EXPRESSION', () => {
-  it('counts the published posts referencing the enclosing document in the request language', async () => {
+  it('counts published posts referencing the document in the request language', async () => {
     function count(locale: string): Promise<unknown> {
       return evaluateGroqExpression(
         `*[_id == "topic-1"][0]{ "count": ${POST_COUNT_EXPRESSION} }.count`,
-        translatedPostDocuments,
+        MOCK_TRANSLATED_POST_DOCUMENTS,
         null,
         { locale },
       );

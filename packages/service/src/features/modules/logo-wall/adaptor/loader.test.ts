@@ -1,73 +1,73 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawLogoWallModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_LOGO_WALL_MODULE_ID,
+  mockRawLogoWallModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_LINK_CACHE_TAG,
+  MOCK_PAGE_LANDING_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getLogoWallModule } from './loader';
+import { logoWallModuleQuery } from './query';
+import type { TLogoWallModule } from './types';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(getLogoWallModule, () => {
-  beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawLogoWallModule());
-  });
-
-  it('resolves the module in a single round trip — exactly one runQuery call', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawLogoWallModule({
-        headingBlock: makeRawHeadingBlock('Trusted by'),
-      }),
-    );
-
-    const logoWall = await getLogoWallModule('logo-wall-1', tenant);
-
-    expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(logoWall.headingBlock.heading).toBe('Trusted by');
-  });
-
-  it('returns the referenced logos in authored order', async () => {
-    const logoWall = await getLogoWallModule('logo-wall-1', tenant);
-
-    expect(logoWall.logos.map((logo) => logo.id)).toEqual([
-      'block-logo-1',
-      'block-logo-2',
-      'block-logo-3',
-    ]);
-  });
-
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getLogoWallModule('missing', tenant)).rejects.toThrow();
+    await expect(getLogoWallModule(MOCK_MISSING_ID, tenant)).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
-  it('threads tenant context and scopes cache tags to it', async () => {
-    await getLogoWallModule('logo-wall-1', tenant);
+  describe('with a resolved module', () => {
+    let logoWall: TLogoWallModule;
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
+    beforeEach(async () => {
+      mockRun.mockResolvedValue(mockRawLogoWallModule());
+
+      logoWall = await getLogoWallModule(MOCK_LOGO_WALL_MODULE_ID, tenant);
+    });
+
+    it('resolves the module in a single round trip', () => {
+      expect(mockRun).toHaveBeenCalledTimes(1);
+      expect(logoWall.headingBlock.heading).toBe('Trusted by');
+    });
+
+    it('returns the referenced logos in authored order', () => {
+      expect(logoWall.logos.map((logo) => logo.id)).toEqual([
+        'block-logo-1',
+        'block-logo-2',
+        'block-logo-3',
+      ]);
+    });
+
+    it('threads tenant context and scopes cache tags to it', () => {
+      expect(mockRun).toHaveBeenCalledWith(logoWallModuleQuery, {
+        parameters: { id: MOCK_LOGO_WALL_MODULE_ID },
         tenant,
-        next: expect.objectContaining({
+        next: {
+          revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
             't:tenant-a:modules:logoWall',
             't:tenant-a:module:logo-wall-1',
-            't:tenant-a:link',
-            't:tenant-a:homePage',
-            't:tenant-a:page_landing',
+            MOCK_LINK_CACHE_TAG,
+            MOCK_HOME_PAGE_CACHE_TAG,
+            MOCK_PAGE_LANDING_CACHE_TAG,
           ],
-        }),
-      }),
-    );
+        },
+      });
+    });
   });
 });

@@ -1,5 +1,21 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_ABOUT_EN_PAGE_ID,
+  MOCK_ABOUT_NL_PAGE_ID,
+  MOCK_ABOUT_NL_SLUG,
+  MOCK_ABOUT_SLUG,
+  MOCK_ABOUT_TRANSLATION_METADATA_ID,
+  MOCK_PRICING_EN_PAGE_ID,
+  MOCK_PRICING_NL_PAGE_ID,
+  MOCK_PRICING_NL_SLUG,
+  MOCK_PRICING_SLUG,
+  MOCK_TEAM_EN_PAGE_ID,
+  MOCK_TEAM_NL_PAGE_ID,
+  MOCK_TEAM_SLUG,
+  mockLandingPageDocument,
+  mockTranslationMetadata,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { translationMapQuery } from './query';
 import {
@@ -10,38 +26,31 @@ import {
 
 const { EN, NL, DE } = LOCALE_ISO_CODES;
 
-function page(id: string, language: string, slug?: string) {
-  return {
-    _id: id,
-    _type: 'page_landing',
-    language,
-    ...(slug ? { slug: { current: slug } } : {}),
-  };
-}
-
-function metadata(id: string, ...targets: [string, string][]) {
-  return {
-    _id: id,
-    _type: 'translation.metadata',
-    translations: targets.map(([language, ref]) => ({
-      _key: language,
-      language,
-      value: { _type: 'reference', _ref: ref },
-    })),
-  };
-}
-
 const dataset = [
-  page('about-en', EN, 'about'),
-  page('about-nl', NL, 'over-ons'),
-  page('about-de', DE, 'ueber-uns'),
-  page('pricing-en', EN, 'pricing'),
-  page('drafts.pricing-nl', NL, 'prijzen'),
-  page('team-en', EN, 'team'),
-  page('team-nl', NL),
-  metadata('meta-about', [EN, 'about-en'], [NL, 'about-nl'], [DE, 'about-de']),
-  metadata('meta-pricing', [EN, 'pricing-en'], [NL, 'pricing-nl']),
-  metadata('meta-team', [EN, 'team-en'], [NL, 'team-nl']),
+  mockLandingPageDocument(MOCK_ABOUT_EN_PAGE_ID, EN, MOCK_ABOUT_SLUG),
+  mockLandingPageDocument(MOCK_ABOUT_NL_PAGE_ID, NL, MOCK_ABOUT_NL_SLUG),
+  mockLandingPageDocument('about-de', DE, 'ueber-uns'),
+  mockLandingPageDocument(MOCK_PRICING_EN_PAGE_ID, EN, MOCK_PRICING_SLUG),
+  mockLandingPageDocument(
+    `drafts.${MOCK_PRICING_NL_PAGE_ID}`,
+    NL,
+    MOCK_PRICING_NL_SLUG,
+  ),
+  mockLandingPageDocument(MOCK_TEAM_EN_PAGE_ID, EN, MOCK_TEAM_SLUG),
+  mockLandingPageDocument(MOCK_TEAM_NL_PAGE_ID, NL),
+  mockTranslationMetadata(MOCK_ABOUT_TRANSLATION_METADATA_ID, [
+    [EN, MOCK_ABOUT_EN_PAGE_ID],
+    [NL, MOCK_ABOUT_NL_PAGE_ID],
+    [DE, 'about-de'],
+  ]),
+  mockTranslationMetadata('meta-pricing', [
+    [EN, MOCK_PRICING_EN_PAGE_ID],
+    [NL, MOCK_PRICING_NL_PAGE_ID],
+  ]),
+  mockTranslationMetadata('meta-team', [
+    [EN, MOCK_TEAM_EN_PAGE_ID],
+    [NL, MOCK_TEAM_NL_PAGE_ID],
+  ]),
 ];
 
 function groupWithSlug(
@@ -69,9 +78,9 @@ describe('toTranslationMap', () => {
   it('groups every language of a translated page with its slug', async () => {
     const { groups } = await buildMap(dataset);
 
-    expect(groupWithSlug(groups, EN, 'about')).toEqual([
-      { documentType: 'page_landing', language: EN, slug: 'about' },
-      { documentType: 'page_landing', language: NL, slug: 'over-ons' },
+    expect(groupWithSlug(groups, EN, MOCK_ABOUT_SLUG)).toEqual([
+      { documentType: 'page_landing', language: EN, slug: MOCK_ABOUT_SLUG },
+      { documentType: 'page_landing', language: NL, slug: MOCK_ABOUT_NL_SLUG },
       { documentType: 'page_landing', language: DE, slug: 'ueber-uns' },
     ]);
   });
@@ -79,21 +88,25 @@ describe('toTranslationMap', () => {
   it('drops a translation that exists only as a draft', async () => {
     const { groups } = await buildMap(dataset);
 
-    expect(groupWithSlug(groups, EN, 'pricing')).toEqual([
-      { documentType: 'page_landing', language: EN, slug: 'pricing' },
+    expect(groupWithSlug(groups, EN, MOCK_PRICING_SLUG)).toEqual([
+      { documentType: 'page_landing', language: EN, slug: MOCK_PRICING_SLUG },
     ]);
   });
 
   it('drops a published translation that has no slug', async () => {
     const { groups } = await buildMap(dataset);
 
-    expect(groupWithSlug(groups, EN, 'team')).toEqual([
-      { documentType: 'page_landing', language: EN, slug: 'team' },
+    expect(groupWithSlug(groups, EN, MOCK_TEAM_SLUG)).toEqual([
+      { documentType: 'page_landing', language: EN, slug: MOCK_TEAM_SLUG },
     ]);
   });
 
   it('is empty for a tenant with no translations', async () => {
-    expect(await buildMap([page('about-en', EN, 'about')])).toEqual({
+    expect(
+      await buildMap([
+        mockLandingPageDocument(MOCK_ABOUT_EN_PAGE_ID, EN, MOCK_ABOUT_SLUG),
+      ]),
+    ).toEqual({
       groups: [],
       homeLanguages: [],
       postIndexLanguages: [],
@@ -145,9 +158,9 @@ describe('findTranslationGroup', () => {
       findTranslationGroup(map, {
         documentType: 'page_landing',
         language: NL,
-        slug: 'over-ons',
+        slug: MOCK_ABOUT_NL_SLUG,
       }),
-    ).toEqual(groupWithSlug(map.groups, EN, 'about'));
+    ).toEqual(groupWithSlug(map.groups, EN, MOCK_ABOUT_SLUG));
   });
 
   it('is undefined when the slug matches no member', async () => {
@@ -157,7 +170,7 @@ describe('findTranslationGroup', () => {
       findTranslationGroup(map, {
         documentType: 'page_landing',
         language: NL,
-        slug: 'about',
+        slug: MOCK_ABOUT_SLUG,
       }),
     ).toBeUndefined();
   });
@@ -169,7 +182,7 @@ describe('findTranslationGroup', () => {
       findTranslationGroup(map, {
         documentType: 'post',
         language: EN,
-        slug: 'about',
+        slug: MOCK_ABOUT_SLUG,
       }),
     ).toBeUndefined();
   });
