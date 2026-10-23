@@ -1,6 +1,6 @@
 import { AUDIT_ACTION } from '@blog/config';
 import {
-  makeAuditEvent,
+  mockAuditEvent,
   MOCK_AUDIT_ACTOR_EMAIL,
   MOCK_AUDIT_EVENT_AT,
 } from '@platform/testing/audit-events/fixtures';
@@ -22,8 +22,8 @@ describe(`<${RecentActivityCard.name}/>`, () => {
     render(
       <RecentActivityCard
         events={[
-          makeAuditEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
-          makeAuditEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
+          mockAuditEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
+          mockAuditEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
         ]}
       />,
     );
@@ -47,7 +47,7 @@ describe(`<${RecentActivityCard.name}/>`, () => {
 
   it("names a deleted account in place of an actor's cleared email", () => {
     render(
-      <RecentActivityCard events={[makeAuditEvent({ actorEmail: null })]} />,
+      <RecentActivityCard events={[mockAuditEvent({ actorEmail: null })]} />,
     );
 
     const deletedAccountLabel = screen.getByText('Deleted account');

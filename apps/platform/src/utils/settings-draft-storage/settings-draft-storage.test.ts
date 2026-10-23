@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import {
   clearSettingsDraft,
@@ -9,7 +9,10 @@ import {
   type TStoredSettingsDraft,
 } from './settings-draft-storage';
 
-const KEY = settingsDraftStorageKey({ tenantId: TENANT_ID, page: 'voice' });
+const KEY = settingsDraftStorageKey({
+  tenantId: MOCK_TENANT_ID,
+  page: 'voice',
+});
 
 const DRAFT: TStoredSettingsDraft = {
   values: { tagline: 'Mine' },
@@ -61,10 +64,14 @@ describe('settings draft storage', () => {
 
   it.each([
     ['tenant', { tenantId: 'tenant-2', page: 'voice' }],
-    ['page', { tenantId: TENANT_ID, page: 'features' }],
+    ['page', { tenantId: MOCK_TENANT_ID, page: 'features' }],
     [
       'language',
-      { tenantId: TENANT_ID, page: 'voice', language: LOCALE_ISO_CODES.DE },
+      {
+        tenantId: MOCK_TENANT_ID,
+        page: 'voice',
+        language: LOCALE_ISO_CODES.DE,
+      },
     ],
   ])('keeps a draft apart per %s', (_, key) => {
     writeSettingsDraft(KEY, DRAFT);

@@ -2,7 +2,7 @@ import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -58,8 +58,8 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
-        tenant: { id: TENANT_ID },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
+        tenant: { id: MOCK_TENANT_ID },
       },
     ]);
 
@@ -71,8 +71,8 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('renders the picker for multiple memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
-        tenant: { id: TENANT_ID, name: 'Acme Inc.' },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
+        tenant: { id: MOCK_TENANT_ID, name: 'Acme Inc.' },
       },
       {
         membership: { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2' },

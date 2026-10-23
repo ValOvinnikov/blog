@@ -4,11 +4,11 @@ import {
 } from '@blog/db/constants';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  idleDeprovisioningSteps,
-  makeClientTenant,
+  mockIdleDeprovisioningSteps,
+  mockClientTenant,
   MOCK_RUN_PLUS_1_MIN_AT,
   MOCK_RUN_STARTED_AT,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantDangerPageContent } from './tenant-danger-page-content';
@@ -44,7 +44,7 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
 const runStarted = { startedAt: MOCK_RUN_STARTED_AT };
 
 const failedSteps = {
-  ...idleDeprovisioningSteps(),
+  ...mockIdleDeprovisioningSteps(),
   [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
     status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
     error: 'boom',
@@ -76,7 +76,7 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
   it('sends no status requests and shows no progress for a tenant that has never been deprovisioned', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({ deprovisionedAt: null })}
+        tenant={mockClientTenant({ deprovisionedAt: null })}
       />,
     );
 
@@ -94,7 +94,7 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
   it('shows the starting state and keeps the trigger aria-disabled while a pending request has no run yet', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({
+        tenant={mockClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: null,
         })}
@@ -114,7 +114,7 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     const triggerAfterPoll = getTrigger();
 
     expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
     );
     expect(triggerAfterPoll).toHaveAttribute(ARIA_DISABLED, 'true');
   });
@@ -126,10 +126,10 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     });
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({
+        tenant={mockClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: {
-            ...idleDeprovisioningSteps(),
+            ...mockIdleDeprovisioningSteps(),
             run: runStarted,
           },
         })}
@@ -151,7 +151,7 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
   it('keeps the trigger enabled and does not poll for a run that had already failed', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({
+        tenant={mockClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: failedSteps,
         })}

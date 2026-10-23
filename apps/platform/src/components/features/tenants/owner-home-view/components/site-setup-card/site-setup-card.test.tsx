@@ -10,9 +10,9 @@ import { retryProvisioningStepAction } from '@platform/server/provisioning/retry
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  idleProvisioningSteps,
-  makeClientTenant,
-  TENANT_ID,
+  mockIdleProvisioningSteps,
+  mockClientTenant,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -27,10 +27,10 @@ const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
 );
 
-const failedTenant = makeClientTenant({
+const failedTenant = mockClientTenant({
   provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
   provisioningSteps: {
-    ...idleProvisioningSteps(),
+    ...mockIdleProvisioningSteps(),
     [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
       status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
       error: 'boom',
@@ -55,12 +55,12 @@ describe(`<${SiteSetupCard.name}/>`, () => {
     retryProvisioningStepActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockReset().mockResolvedValue({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps: idleProvisioningSteps(),
+      provisioningSteps: mockIdleProvisioningSteps(),
     });
   });
 
   it('lists the setup steps', () => {
-    setup({ tenant: makeClientTenant() });
+    setup({ tenant: mockClientTenant() });
 
     const settingUpYourSiteHeading = screen.getByRole('heading', {
       level: 2,
@@ -101,7 +101,9 @@ describe(`<${SiteSetupCard.name}/>`, () => {
     it('restarts the setup on Try again', async () => {
       await clickTryAgain();
 
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
     });
 
     it('reports a retry that could not start', async () => {

@@ -1,142 +1,81 @@
 import { usePathname } from '@platform/i18n/navigation';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { TenantBreadcrumb } from './tenant-breadcrumb';
 
 vi.mock('@platform/i18n/navigation');
 
-const render = renderWithIntl;
+const setup = (pathname: string) => {
+  vi.mocked(usePathname).mockReturnValue(pathname);
+  renderWithIntl(
+    <TenantBreadcrumb
+      tenantId={MOCK_TENANT_ID}
+      tenantName={MOCK_TENANT_NAME}
+    />,
+  );
+};
 
-const DANGER_ZONE = 'Danger zone';
+const TENANT_PATH = `/tenants/${MOCK_TENANT_ID}`;
 
 describe(TenantBreadcrumb, () => {
   it('renders Platform and a linked Tenants ancestor, plus a linked tenant name', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/look`);
+    setup(`${TENANT_PATH}/look`);
 
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
+    const platform = screen.getByText('Platform');
+    const platformLink = screen.queryByRole('link', { name: 'Platform' });
+    const tenantsLink = screen.getByRole('link', { name: 'Tenants' });
+    const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
+    expect(platform).toBeVisible();
+    expect(platformLink).not.toBeInTheDocument();
+    expect(tenantsLink).toHaveAttribute('href', '/tenants');
+    expect(tenantLink).toHaveAttribute('href', TENANT_PATH);
+  });
 
-    expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Platform' })).toBeNull();
-    expect(screen.getByRole('link', { name: 'Tenants' })).toHaveAttribute(
-      'href',
-      '/tenants',
-    );
-    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toHaveAttribute(
-      'href',
-      `/tenants/${TENANT_ID}`,
-    );
+  it.each([
+    [adminRoutes.look(MOCK_TENANT_ID), 'Look'],
+    [adminRoutes.voice(MOCK_TENANT_ID), 'Voice'],
+    [adminRoutes.features(MOCK_TENANT_ID), 'Features'],
+    [adminRoutes.tenantDomain(MOCK_TENANT_ID), 'Domain'],
+    [adminRoutes.email(MOCK_TENANT_ID), 'Email'],
+    [adminRoutes.tenantStudio(MOCK_TENANT_ID), 'Studio'],
+    [`${adminRoutes.tenantStudio(MOCK_TENANT_ID)}/structure/post`, 'Studio'],
+    [adminRoutes.tenantProvisioning(MOCK_TENANT_ID), 'Provisioning'],
+    [adminRoutes.tenantDanger(MOCK_TENANT_ID), 'Danger zone'],
+  ])('shows %s as the unlinked current item %s', (pathname, leaf) => {
+    setup(pathname);
+
+    const current = screen.getByText(leaf);
+    const currentLink = screen.queryByRole('link', { name: leaf });
+    const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
+    expect(current).toBeVisible();
+    expect(currentLink).not.toBeInTheDocument();
+    expect(tenantLink).toHaveAttribute('href', TENANT_PATH);
   });
 
   it('shows the tenant name as the unlinked current item on the overview route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}`);
+    setup(TENANT_PATH);
 
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Acme Inc.')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Acme Inc.' })).toBeNull();
-  });
-
-  it('shows Look as the current item on the look route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/look`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Look')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Look' })).toBeNull();
-  });
-
-  it('shows Voice as the current item on the voice route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/voice`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Voice')).toBeVisible();
-  });
-
-  it('shows Features as the current item on the features route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/features`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Features')).toBeVisible();
-  });
-
-  it('shows Domain as the current item on the domain route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/domain`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Domain')).toBeVisible();
-  });
-
-  it('shows Studio as the current item on the studio route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/studio`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Studio')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Studio' })).toBeNull();
-  });
-
-  it('shows Provisioning as the current item on the provisioning route', () => {
-    vi.mocked(usePathname).mockReturnValue(
-      `/tenants/${TENANT_ID}/provisioning`,
-    );
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Provisioning')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Provisioning' })).toBeNull();
-  });
-
-  it('shows Danger zone as the current item on the danger route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/danger`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText(DANGER_ZONE)).toBeVisible();
-    expect(screen.queryByRole('link', { name: DANGER_ZONE })).toBeNull();
+    const tenantName = screen.getByText(MOCK_TENANT_NAME);
+    const tenantLink = screen.queryByRole('link', { name: MOCK_TENANT_NAME });
+    const overview = screen.queryByText('Overview');
+    expect(tenantName).toBeVisible();
+    expect(tenantLink).not.toBeInTheDocument();
+    expect(overview).not.toBeInTheDocument();
   });
 
   it('omits the leaf on an unmatched route, making the tenant name the current item', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/unlisted`);
+    setup(`${TENANT_PATH}/unlisted`);
 
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Acme Inc.')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Acme Inc.' })).toBeNull();
-    expect(screen.queryByText('Features')).not.toBeInTheDocument();
-  });
-
-  it('shows Email as the current item on the email route, with the tenant name linked', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}/email`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Email')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toHaveAttribute(
-      'href',
-      `/tenants/${TENANT_ID}`,
-    );
-  });
-
-  it('shows Studio as the current item on a Studio sub-route', () => {
-    vi.mocked(usePathname).mockReturnValue(
-      `/tenants/${TENANT_ID}/studio/structure/post`,
-    );
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.getByText('Studio')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toBeVisible();
-  });
-
-  it('adds no Overview crumb on the overview route', () => {
-    vi.mocked(usePathname).mockReturnValue(`/tenants/${TENANT_ID}`);
-
-    render(<TenantBreadcrumb tenantId={TENANT_ID} tenantName="Acme Inc." />);
-
-    expect(screen.queryByText('Overview')).not.toBeInTheDocument();
+    const tenantName = screen.getByText(MOCK_TENANT_NAME);
+    const tenantLink = screen.queryByRole('link', { name: MOCK_TENANT_NAME });
+    const features = screen.queryByText('Features');
+    expect(tenantName).toBeVisible();
+    expect(tenantLink).not.toBeInTheDocument();
+    expect(features).not.toBeInTheDocument();
   });
 });

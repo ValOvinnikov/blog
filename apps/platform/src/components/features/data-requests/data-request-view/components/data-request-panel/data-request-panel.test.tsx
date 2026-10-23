@@ -6,10 +6,10 @@ import {
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
-  DATA_REQUEST_EMAIL,
-  DATA_REQUEST_SITE_NAME,
-  makeDataRequestMatch,
-  makePersonalDataExport,
+  MOCK_DATA_REQUEST_EMAIL,
+  MOCK_DATA_REQUEST_SITE_NAME,
+  mockDataRequestMatch,
+  mockPersonalDataExport,
 } from '@platform/testing/data-requests/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -49,7 +49,7 @@ const ERASE_BUTTON = { name: 'Erase' };
 const ERASE_CONFIRM_BUTTON = { name: 'Erase data' };
 const EXPORT_BUTTON = { name: 'Download export' };
 const RESULTS_TABLE = { name: 'Stored records' };
-const BLOCK_MATCH = makeDataRequestMatch({
+const BLOCK_MATCH = mockDataRequestMatch({
   key: 'SIGNUP_BLOCK-block-1',
   kind: DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
   siteName: undefined,
@@ -64,7 +64,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
   const lookUp = async () => {
     const emailField = screen.getByRole('textbox', EMAIL_FIELD);
     const findButton = screen.getByRole('button', FIND_BUTTON);
-    await user.type(emailField, DATA_REQUEST_EMAIL);
+    await user.type(emailField, MOCK_DATA_REQUEST_EMAIL);
     await user.click(findButton);
   };
 
@@ -84,7 +84,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     user = userEvent.setup();
     lookUpPersonalDataActionMock.mockReset().mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
-      matches: [makeDataRequestMatch(), BLOCK_MATCH],
+      matches: [mockDataRequestMatch(), BLOCK_MATCH],
     });
     exportPersonalDataActionMock.mockReset();
     erasePersonalDataActionMock.mockReset();
@@ -97,12 +97,12 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
     const table = await screen.findByRole('region', RESULTS_TABLE);
     const subscriberKind = within(table).getByText('Subscriber');
-    const siteName = within(table).getByText(DATA_REQUEST_SITE_NAME);
+    const siteName = within(table).getByText(MOCK_DATA_REQUEST_SITE_NAME);
     const blockKind = within(table).getByText('Sign-up block');
     const hashedEmail = within(table).getByText('Stored as a hash');
 
     expect(lookUpPersonalDataActionMock).toHaveBeenCalledWith({
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
     });
     expect(subscriberKind).toBeVisible();
     expect(siteName).toBeVisible();
@@ -145,7 +145,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
   });
 
   it('downloads the export for the searched email', async () => {
-    const data = makePersonalDataExport();
+    const data = mockPersonalDataExport();
     exportPersonalDataActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
       data,
@@ -156,12 +156,12 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     await user.click(exportButton);
 
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
     });
     expect(downloadJsonMock).toHaveBeenCalledWith(
       expect.any(HTMLAnchorElement),
       DATA_REQUEST_EXPORT_FILE_NAME,
-      { email: DATA_REQUEST_EMAIL, ...data },
+      { email: MOCK_DATA_REQUEST_EMAIL, ...data },
     );
   });
 
@@ -176,14 +176,14 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
     expect(confirmButton).toBeDisabled();
 
-    await user.type(confirmField, DATA_REQUEST_EMAIL);
+    await user.type(confirmField, MOCK_DATA_REQUEST_EMAIL);
     await user.click(confirmButton);
 
     const toast = await screen.findByText('2 records erased.');
     const table = screen.queryByRole('region', RESULTS_TABLE);
 
     expect(erasePersonalDataActionMock).toHaveBeenCalledWith({
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
     });
     expect(toast).toBeVisible();
     expect(table).not.toBeInTheDocument();
@@ -196,7 +196,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     await lookUp();
 
     const { dialog, confirmField, confirmButton } = await openEraseDialog();
-    await user.type(confirmField, DATA_REQUEST_EMAIL);
+    await user.type(confirmField, MOCK_DATA_REQUEST_EMAIL);
     await user.click(confirmButton);
 
     const error = await within(dialog).findByText(

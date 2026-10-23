@@ -5,7 +5,7 @@ type TGitHubRoute = [pathPrefix: string, response: (path: string) => Response];
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 
-export const githubJson = (body: unknown, status = 200): Response =>
+export const mockGitHubResponse = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
@@ -21,12 +21,12 @@ export const githubPage = <T>(items: T[], path: string): T[] => {
   return items.slice((page - 1) * perPage, page * perPage);
 };
 
-export const githubCompareJson = (
+export const mockGitHubCompareResponse = (
   path: string,
   commits: unknown[],
   files: unknown[],
 ): Response =>
-  githubJson({
+  mockGitHubResponse({
     total_commits: commits.length,
     commits: githubPage(commits, path),
     files: githubPage(files.slice(0, GITHUB_COMPARE_FILE_LIMIT), path),
@@ -48,7 +48,7 @@ export const useGitHubFetch = () => {
         '',
       );
       const route = routes.find(([prefix]) => path.startsWith(prefix));
-      return route ? route[1](path) : githubJson({}, 404);
+      return route ? route[1](path) : mockGitHubResponse({}, 404);
     });
     vi.stubGlobal('fetch', fetchMock);
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = `ghp_${faker.string.alphanumeric(36)}`;
@@ -65,3 +65,6 @@ export const useGitHubFetch = () => {
     },
   };
 };
+
+export const RELEASE_TAGS_PATH = '/git/matching-refs/tags/v';
+export const MAIN_BRANCH_PATH = '/branches/main';

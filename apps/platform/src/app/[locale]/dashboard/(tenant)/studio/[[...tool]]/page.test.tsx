@@ -7,9 +7,9 @@ import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { makeMembership } from '@platform/testing/memberships/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -52,7 +52,7 @@ vi.mock('@blog/studio', () => ({
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const membership = makeMembership();
+const membership = mockMembership();
 
 const setup = customRenderAsync(DashboardStudioPage, {});
 
@@ -60,8 +60,8 @@ const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
   listMembershipsWithTenantsForUserMock.mockResolvedValue([
     {
       membership,
-      tenant: makeTenant({
-        id: TENANT_ID,
+      tenant: mockTenant({
+        id: MOCK_TENANT_ID,
         name: 'Acme Inc.',
         sanityProjectId: 'proj-acme',
         sanityDataset: 'production',

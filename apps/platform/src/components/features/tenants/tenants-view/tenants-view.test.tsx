@@ -1,11 +1,16 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
 
 import { TenantsView } from './tenants-view';
 
 const render = renderWithIntl;
 
-const tenant = makeTenant();
+const tenant = mockTenant();
+const ARIA_PRESSED = 'aria-pressed';
+const EMAIL_ALERTS_NOT_CONFIGURED = 'Email alerts not configured';
 
 describe(TenantsView, () => {
   describe('with default props', () => {
@@ -20,13 +25,15 @@ describe(TenantsView, () => {
     });
 
     it('renders the real tenant row', () => {
-      expect(screen.getByRole('heading', { name: 'Tenants' })).toBeVisible();
-      expect(screen.getByText('Acme Inc.')).toBeVisible();
+      const heading = screen.getByRole('heading', { name: 'Tenants' });
+      const tenantName = screen.getByText(MOCK_TENANT_NAME);
+      expect(heading).toBeVisible();
+      expect(tenantName).toBeVisible();
     });
 
     it("renders the description's code chunk as a real <code> element", () => {
       const code = screen.getByText('tenants', { selector: 'code' });
-      expect(code.tagName).toBe('CODE');
+      expect(code).toBeVisible();
     });
 
     it('links add-tenant to the wizard', () => {
@@ -35,16 +42,13 @@ describe(TenantsView, () => {
     });
 
     it('shows the archived-tenants toggle set to Active by default', () => {
-      expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute(
-        'aria-pressed',
-        'true',
-      );
+      const activeToggle = screen.getByRole('button', { name: 'Active' });
+      expect(activeToggle).toHaveAttribute(ARIA_PRESSED, 'true');
     });
 
     it('renders no email-alerts banner when email alerting is configured', () => {
-      expect(
-        screen.queryByText('Email alerts not configured'),
-      ).not.toBeInTheDocument();
+      const banner = screen.queryByText(EMAIL_ALERTS_NOT_CONFIGURED);
+      expect(banner).not.toBeInTheDocument();
     });
   });
 
@@ -57,10 +61,8 @@ describe(TenantsView, () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const allToggle = screen.getByRole('button', { name: 'All' });
+    expect(allToggle).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
   it('renders the email-alerts banner when email alerting is not configured', () => {
@@ -72,11 +74,11 @@ describe(TenantsView, () => {
       />,
     );
 
-    expect(screen.getByText('Email alerts not configured')).toBeVisible();
-    expect(
-      screen.getByText(
-        "RESEND_API_KEY isn't set, so operators won't be emailed when a tenant needs attention — check this page manually.",
-      ),
-    ).toBeVisible();
+    const bannerTitle = screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED);
+    const bannerBody = screen.getByText(
+      "RESEND_API_KEY isn't set, so operators won't be emailed when a tenant needs attention — check this page manually.",
+    );
+    expect(bannerTitle).toBeVisible();
+    expect(bannerBody).toBeVisible();
   });
 });

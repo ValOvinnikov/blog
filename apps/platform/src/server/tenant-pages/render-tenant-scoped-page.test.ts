@@ -1,33 +1,23 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { makeMembership } from '@platform/testing/memberships/fixtures';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
 
 import { renderTenantScopedPage } from './render-tenant-scoped-page';
 
+const RENDERED_CONTENT = 'rendered content';
+
 describe('renderTenantScopedPage', () => {
-  it('resolves the tenant and hands it to the page content renderer', async () => {
-    const tenant = makeTenant();
-    const resolveTenant = vi.fn().mockResolvedValue({ tenant });
-    const PageContent = vi.fn().mockResolvedValue('rendered content');
+  it('hands the page content everything the resolver returned and returns its render', async () => {
+    const context = { tenant: mockTenant(), membership: mockMembership() };
+    const resolveTenant = vi.fn().mockResolvedValue(context);
+    const PageContent = vi.fn().mockResolvedValue(RENDERED_CONTENT);
 
     const result = await renderTenantScopedPage(resolveTenant, PageContent);
 
     expect(resolveTenant).toHaveBeenCalledWith();
-    expect(PageContent).toHaveBeenCalledWith({ tenant });
-    expect(result).toBe('rendered content');
-  });
-
-  it('hands the page content everything the resolver returned', async () => {
-    const context = { tenant: makeTenant(), membership: makeMembership() };
-    const PageContent = vi.fn().mockResolvedValue('rendered content');
-
-    await renderTenantScopedPage(
-      vi.fn().mockResolvedValue(context),
-      PageContent,
-    );
-
     expect(PageContent).toHaveBeenCalledWith(context);
+    expect(result).toBe(RENDERED_CONTENT);
   });
 
   it('propagates a redirect thrown by the resolver without calling the content renderer', async () => {
@@ -46,7 +36,7 @@ describe('renderTenantScopedPage', () => {
 
 describe('renderTenantScopedPage with a plan-gated page', () => {
   it("answers 404 when the tenant's plan cannot use the page", async () => {
-    const tenant = makeTenant({ plan: TENANT_PLAN.FREE });
+    const tenant = mockTenant({ plan: TENANT_PLAN.FREE });
     const PageContent = vi.fn();
 
     await expect(
@@ -61,8 +51,8 @@ describe('renderTenantScopedPage with a plan-gated page', () => {
   });
 
   it("renders the page when the tenant's plan can use it", async () => {
-    const tenant = makeTenant({ plan: TENANT_PLAN.GROWTH });
-    const PageContent = vi.fn().mockResolvedValue('rendered content');
+    const tenant = mockTenant({ plan: TENANT_PLAN.GROWTH });
+    const PageContent = vi.fn().mockResolvedValue(RENDERED_CONTENT);
 
     await expect(
       renderTenantScopedPage(
@@ -70,6 +60,6 @@ describe('renderTenantScopedPage with a plan-gated page', () => {
         PageContent,
         'languages',
       ),
-    ).resolves.toBe('rendered content');
+    ).resolves.toBe(RENDERED_CONTENT);
   });
 });

@@ -12,7 +12,7 @@ import {
   ARCHIVED_NOTICE_TEXT,
   customRenderInSettingsForm,
 } from '@platform/testing/render-in-settings-form';
-import { SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import {
   buildVoiceDraft,
   localeDraftOf,
@@ -24,6 +24,9 @@ import {
 import { VoiceField, type TVoiceFieldProps } from './voice-field';
 
 const { EN } = LOCALE_ISO_CODES;
+const HEADING = 'Heading';
+const SUPPORTING_TEXT = 'Supporting text';
+const ARIA_INVALID = 'aria-invalid';
 
 const fieldById = (id: TVoiceFieldId) =>
   VOICE_FIELDS.find((field) => field.id === id)!;
@@ -52,7 +55,7 @@ const VoiceFieldInEditor = ({
       openListFieldId={undefined}
       setOpenListFieldId={vi.fn()}
       setFieldValue={vi.fn()}
-      specimenTheme={SITE_PREVIEW_THEME}
+      specimenTheme={MOCK_SITE_PREVIEW_THEME}
     >
       <VoiceField field={field} />
     </VoiceEditorProvider>
@@ -69,7 +72,7 @@ describe(`<${VoiceField.name}/>`, () => {
   it('labels a text field and describes it with its hint', () => {
     setup();
 
-    const input = screen.getByRole('textbox', { name: 'Heading' });
+    const input = screen.getByRole('textbox', { name: HEADING });
     expect(input).toHaveAttribute(
       'placeholder',
       SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
@@ -85,7 +88,7 @@ describe(`<${VoiceField.name}/>`, () => {
       },
     });
 
-    expect(screen.getByRole('textbox', { name: 'Heading' })).toBeVisible();
+    expect(screen.getByRole('textbox', { name: HEADING })).toBeVisible();
   });
 
   it('names a rich list field without a visible label for screen readers', () => {
@@ -99,7 +102,7 @@ describe(`<${VoiceField.name}/>`, () => {
     setup({ field: fieldById('notFoundSupportingText'), value: null });
 
     expect(
-      screen.getByRole('textbox', { name: 'Supporting text' }),
+      screen.getByRole('textbox', { name: SUPPORTING_TEXT }),
     ).toBeVisible();
     expect(screen.getAllByRole('button')).toHaveLength(3);
   });
@@ -119,11 +122,12 @@ describe(`<${VoiceField.name}/>`, () => {
     ).toHaveAttribute('rows', '3');
   });
 
-  it('describes the field with its error and marks it invalid', () => {
+  it('describes an invalid field with its error and gives it its input id', () => {
     setup({ errors: { notFoundHeading: 'Must be 100 characters or fewer.' } });
 
-    const input = screen.getByRole('textbox', { name: 'Heading' });
-    expect(input).toHaveAttribute('aria-invalid', 'true');
+    const input = screen.getByRole('textbox', { name: HEADING });
+    expect(input).toHaveAttribute(ARIA_INVALID, 'true');
+    expect(input).toHaveAttribute('id', 'voice-field-notFoundHeading');
     expect(input).toHaveAccessibleDescription(
       'Also the browser tab title Must be 100 characters or fewer.',
     );
@@ -139,7 +143,7 @@ describe(`<${VoiceField.name}/>`, () => {
     );
   });
 
-  it('offers no editing controls on a read-only rich field', () => {
+  it('announces a read-only rich field as read-only, with no editing controls', () => {
     setup(
       {
         field: fieldById('notFoundSupportingText'),
@@ -148,26 +152,16 @@ describe(`<${VoiceField.name}/>`, () => {
       { isArchived: true },
     );
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
-  });
-
-  it('announces a read-only rich field as read-only rather than disabled', () => {
-    setup(
-      {
-        field: fieldById('notFoundSupportingText'),
-        value: null,
-      },
-      { isArchived: true },
-    );
-
-    const editor = screen.getByRole('textbox', { name: 'Supporting text' });
+    const editor = screen.getByRole('textbox', { name: SUPPORTING_TEXT });
+    const editingControl = screen.queryByRole('button');
+    expect(editingControl).not.toBeInTheDocument();
     expect(editor).toHaveAttribute('aria-readonly', 'true');
     expect(editor).not.toHaveAttribute('aria-disabled');
   });
 
   it.each([
-    ['text', 'notFoundHeading', 'Heading'],
-    ['rich', 'notFoundSupportingText', 'Supporting text'],
+    ['text', 'notFoundHeading', HEADING],
+    ['rich', 'notFoundSupportingText', SUPPORTING_TEXT],
   ] as const)(
     'describes a read-only %s field with the archived notice',
     (_kind, id, name) => {
@@ -179,14 +173,6 @@ describe(`<${VoiceField.name}/>`, () => {
     },
   );
 
-  it('gives an invalid text field its input id so the save bar can focus it', () => {
-    setup({ errors: { notFoundHeading: 'Must be 80 characters or fewer.' } });
-
-    const input = screen.getByRole('textbox', { name: 'Heading' });
-    expect(input).toHaveAttribute('id', 'voice-field-notFoundHeading');
-    expect(input).toHaveAttribute('aria-invalid', 'true');
-  });
-
   it('gives an invalid rich field its input id so the save bar can focus it', () => {
     setup({
       field: fieldById('notFoundSupportingText'),
@@ -194,8 +180,8 @@ describe(`<${VoiceField.name}/>`, () => {
       errors: { notFoundSupportingText: 'Must be 300 characters or fewer.' },
     });
 
-    const editor = screen.getByRole('textbox', { name: 'Supporting text' });
+    const editor = screen.getByRole('textbox', { name: SUPPORTING_TEXT });
     expect(editor).toHaveAttribute('id', 'voice-field-notFoundSupportingText');
-    expect(editor).toHaveAttribute('aria-invalid', 'true');
+    expect(editor).toHaveAttribute(ARIA_INVALID, 'true');
   });
 });

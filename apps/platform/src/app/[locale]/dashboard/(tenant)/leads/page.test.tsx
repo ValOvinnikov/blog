@@ -2,9 +2,9 @@ import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE, TENANT_PLAN, ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { makeLead } from '@platform/testing/leads/fixtures';
+import { mockLead } from '@platform/testing/leads/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -45,7 +45,7 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const membership = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
 };
 
@@ -57,7 +57,10 @@ const useTenant = ({
   role?: string;
 }) =>
   listMembershipsWithTenantsForUserMock.mockResolvedValue([
-    { membership: { ...membership, role }, tenant: { id: TENANT_ID, plan } },
+    {
+      membership: { ...membership, role },
+      tenant: { id: MOCK_TENANT_ID, plan },
+    },
   ]);
 
 const setup = customRenderAsync(DashboardLeadsPage, {
@@ -77,10 +80,10 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: { id: TENANT_ID, plan: TENANT_PLAN.GROWTH } },
+      { membership, tenant: { id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH } },
     ]);
     listLeadsMock.mockResolvedValue({
-      leads: [makeLead({ name: ADA_LOVELACE })],
+      leads: [mockLead({ name: ADA_LOVELACE })],
       total: 1,
     });
   });
@@ -107,7 +110,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     await setup({ searchParams: Promise.resolve({ page: '1' }) });
 
     expect(listLeadsMock).toHaveBeenCalledWith({
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       page: 1,
       pageSize: 25,
     });
@@ -117,7 +120,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
 
   it('reads the requested page from the query string', async () => {
     listLeadsMock.mockResolvedValue({
-      leads: [makeLead()],
+      leads: [mockLead()],
       total: 40,
     });
 

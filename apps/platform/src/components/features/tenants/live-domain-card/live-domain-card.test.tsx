@@ -1,8 +1,8 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  makeClientTenant,
-  TENANT_ID,
+  mockClientTenant,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { Suspense } from 'react';
 
@@ -22,7 +22,7 @@ vi.mock(
 );
 
 const render = async () => {
-  const tenant = makeClientTenant({ id: TENANT_ID });
+  const tenant = mockClientTenant({ id: MOCK_TENANT_ID });
   await act(async () => {
     renderWithIntl(
       <Suspense>
@@ -31,7 +31,7 @@ const render = async () => {
           domainVerificationStatus={Promise.resolve(
             DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
           )}
-          dnsHref={`/tenants/${TENANT_ID}/domain`}
+          dnsHref={`/tenants/${MOCK_TENANT_ID}/domain`}
         />
       </Suspense>,
     );

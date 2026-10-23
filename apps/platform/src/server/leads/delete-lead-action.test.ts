@@ -2,7 +2,10 @@ import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockReadyTenant,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { deleteLeadAction } from './delete-lead-action';
@@ -24,11 +27,11 @@ describe(deleteLeadAction, () => {
   });
 
   it("deletes the lead inside the session's tenant after re-checking membership", async () => {
-    const result = await deleteLeadAction(TENANT_ID, LEAD_ID);
+    const result = await deleteLeadAction(MOCK_TENANT_ID, LEAD_ID);
 
-    expect(requireTenantMembership).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(deleteLeadMock).toHaveBeenCalledWith({
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       id: LEAD_ID,
     });
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -37,7 +40,7 @@ describe(deleteLeadAction, () => {
   it('deletes nothing for an editor', async () => {
     vi.mocked(requireTenantMembership).mockImplementationOnce(
       async (tenantId) => ({
-        tenant: makeReadyTenant({ id: tenantId }),
+        tenant: mockReadyTenant({ id: tenantId }),
         membership: {
           id: 'membership-2',
           userId: 'user-2',
@@ -48,7 +51,7 @@ describe(deleteLeadAction, () => {
       }),
     );
 
-    await expect(deleteLeadAction(TENANT_ID, LEAD_ID)).rejects.toThrow(
+    await expect(deleteLeadAction(MOCK_TENANT_ID, LEAD_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
@@ -56,7 +59,7 @@ describe(deleteLeadAction, () => {
   });
 
   it('rejects an id that is not a uuid without touching the gate or the database', async () => {
-    const result = await deleteLeadAction(TENANT_ID, 'not-a-uuid');
+    const result = await deleteLeadAction(MOCK_TENANT_ID, 'not-a-uuid');
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -81,7 +84,7 @@ describe(deleteLeadAction, () => {
       new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
     );
 
-    await expect(deleteLeadAction(TENANT_ID, LEAD_ID)).rejects.toThrow(
+    await expect(deleteLeadAction(MOCK_TENANT_ID, LEAD_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
@@ -91,7 +94,7 @@ describe(deleteLeadAction, () => {
   it('reports a lead that is not in that tenant as not found', async () => {
     deleteLeadMock.mockResolvedValue(false);
 
-    const result = await deleteLeadAction(TENANT_ID, LEAD_ID);
+    const result = await deleteLeadAction(MOCK_TENANT_ID, LEAD_ID);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -102,13 +105,13 @@ describe(deleteLeadAction, () => {
   it('reports failure and logs when the delete throws', async () => {
     deleteLeadMock.mockRejectedValue(new Error('db unavailable'));
 
-    const result = await deleteLeadAction(TENANT_ID, LEAD_ID);
+    const result = await deleteLeadAction(MOCK_TENANT_ID, LEAD_ID);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       'leads.delete_failed',
       expect.objectContaining({
-        tenantId: TENANT_ID,
+        tenantId: MOCK_TENANT_ID,
         error: expect.any(Error),
       }),
     );

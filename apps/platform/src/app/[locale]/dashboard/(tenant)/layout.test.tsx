@@ -3,7 +3,7 @@ import { TENANT_PLAN, MEMBERSHIP_ROLE, ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -53,7 +53,7 @@ vi.mock('next/headers', () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const tenant1 = {
-  id: TENANT_ID,
+  id: MOCK_TENANT_ID,
   name: 'Acme Inc.',
   primaryDomain: 'acme.com',
   plan: TENANT_PLAN.FREE,
@@ -67,7 +67,7 @@ const tenant2 = {
 const membership1 = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
 };
 const membership2 = {
@@ -119,7 +119,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('hides Leads from a plan without the contact form and no stored leads', async () => {
-    mockCookie(TENANT_ID);
+    mockCookie(MOCK_TENANT_ID);
 
     await setup();
 
@@ -129,7 +129,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('keeps Leads for a downgraded owner who still has stored leads', async () => {
-    mockCookie(TENANT_ID);
+    mockCookie(MOCK_TENANT_ID);
     listLeadsMock.mockResolvedValue({ leads: [], total: 3 });
 
     await setup();
@@ -213,7 +213,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('hides Languages and Team from a FREE tenant', async () => {
-    mockCookie(TENANT_ID);
+    mockCookie(MOCK_TENANT_ID);
 
     await setup();
 

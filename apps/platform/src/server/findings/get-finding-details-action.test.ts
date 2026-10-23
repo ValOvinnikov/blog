@@ -1,7 +1,7 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { getFindingDetailsAction } from './get-finding-details-action';
 
@@ -32,7 +32,7 @@ describe(getFindingDetailsAction, () => {
     );
 
     await expect(
-      getFindingDetailsAction(TENANT_ID, 'finding-1'),
+      getFindingDetailsAction(MOCK_TENANT_ID, 'finding-1'),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     expect(getFindingDetailsMock).not.toHaveBeenCalled();
   });
@@ -42,10 +42,13 @@ describe(getFindingDetailsAction, () => {
       step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
     });
 
-    const result = await getFindingDetailsAction(TENANT_ID, 'finding-1');
+    const result = await getFindingDetailsAction(MOCK_TENANT_ID, 'finding-1');
 
-    expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(getFindingDetailsMock).toHaveBeenCalledWith(TENANT_ID, 'finding-1');
+    expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getFindingDetailsMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      'finding-1',
+    );
     expect(result).toEqual({ step: TENANT_PROVISIONING_STEP.MAP_DOMAIN });
   });
 });

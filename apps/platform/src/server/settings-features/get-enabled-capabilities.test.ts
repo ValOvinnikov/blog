@@ -1,6 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { getEnabledCapabilities } from './get-enabled-capabilities';
 
@@ -37,11 +37,13 @@ describe(getEnabledCapabilities, () => {
     });
 
     const result = await getEnabledCapabilities({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       plan: TENANT_PLAN.GROWTH,
     });
 
-    expect(getSettingsFeaturesOrDefaultsMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSettingsFeaturesOrDefaultsMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
     expect(result).toContain(CAPABILITY.NEWSLETTER);
   });
 
@@ -52,7 +54,7 @@ describe(getEnabledCapabilities, () => {
     });
 
     const result = await getEnabledCapabilities({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       plan: TENANT_PLAN.GROWTH,
     });
 
@@ -67,7 +69,7 @@ describe(getEnabledCapabilities, () => {
     });
 
     const result = await getEnabledCapabilities({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       plan: TENANT_PLAN.FREE,
     });
 

@@ -1,16 +1,22 @@
 import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import type { CSSProperties } from 'react';
 
 import { LookSample } from './look-sample';
 
 const render = renderWithIntl;
 
+const STATIC_ITEM_TITLE = 'Charting the next season';
+const CURRENT_CODE_TEST_ID = 'sample-language-code-current';
+const LANGUAGE_MENU = 'Language: English';
+const TENANT_ACCENT = 'oklch(0.7 0.16 28)';
+
 const BASE_PROPS = {
-  tenantName: 'Acme Inc.',
+  tenantName: MOCK_TENANT_NAME,
   logoSrc: undefined,
-  theme: SITE_PREVIEW_THEME,
+  theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
   hasReaderAccounts: true,
@@ -36,7 +42,7 @@ describe(LookSample, () => {
     });
 
     it('renders the tenant name and a @blog/ui Button primitive', () => {
-      expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
+      expect(screen.getAllByText(MOCK_TENANT_NAME).length).toBeGreaterThan(0);
       expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
     });
 
@@ -51,11 +57,11 @@ describe(LookSample, () => {
       expect(
         screen.getByRole('heading', {
           level: 4,
-          name: 'Charting the next season',
+          name: STATIC_ITEM_TITLE,
         }),
       ).toBeVisible();
       expect(
-        screen.queryByRole('link', { name: 'Charting the next season' }),
+        screen.queryByRole('link', { name: STATIC_ITEM_TITLE }),
       ).not.toBeInTheDocument();
       expect(
         screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
@@ -63,7 +69,7 @@ describe(LookSample, () => {
     });
 
     it('opens with a header carrying the brand and two nav links', () => {
-      expect(screen.getByRole('banner')).toHaveTextContent('Acme Inc.');
+      expect(screen.getByRole('banner')).toHaveTextContent(MOCK_TENANT_NAME);
       expect(screen.getByRole('link', { name: 'Posts' })).toBeVisible();
       expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
     });
@@ -78,17 +84,17 @@ describe(LookSample, () => {
     });
 
     it('shows every live language as a code with compact codes', () => {
-      const current = screen.getByTestId('sample-language-code-current');
+      const current = screen.getByTestId(CURRENT_CODE_TEST_ID);
       expect(current).toHaveAttribute('aria-current', 'page');
       expect(current).toHaveTextContent('English');
       expect(
         screen.queryByRole('link', { name: 'English' }),
       ).not.toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Français' })).toHaveTextContent(
-        'FR',
+        LOCALE_ISO_CODES.FR,
       );
       expect(
-        screen.queryByRole('button', { name: 'Language: English' }),
+        screen.queryByRole('button', { name: LANGUAGE_MENU }),
       ).not.toBeInTheDocument();
     });
   });
@@ -98,10 +104,10 @@ describe(LookSample, () => {
       <LookSample
         {...BASE_PROPS}
         theme={{
-          ...SITE_PREVIEW_THEME,
+          ...MOCK_SITE_PREVIEW_THEME,
           isDark: true,
           tokenStyle: {
-            '--brand-primary': 'oklch(0.7 0.16 28)',
+            '--brand-primary': TENANT_ACCENT,
           } as CSSProperties,
         }}
       />,
@@ -109,7 +115,7 @@ describe(LookSample, () => {
 
     const button = screen.getByRole('button', { name: 'Subscribe' });
     expect(getComputedStyle(button).getPropertyValue('--brand-primary')).toBe(
-      'oklch(0.7 0.16 28)',
+      TENANT_ACCENT,
     );
   });
 
@@ -118,7 +124,7 @@ describe(LookSample, () => {
       <LookSample {...BASE_PROPS} logoSrc="https://cdn.example.com/logo.svg" />,
     );
 
-    expect(screen.getByRole('img', { name: 'Acme Inc.' })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: MOCK_TENANT_NAME })).toHaveAttribute(
       'src',
       'https://cdn.example.com/logo.svg',
     );
@@ -128,7 +134,7 @@ describe(LookSample, () => {
     render(
       <LookSample
         {...BASE_PROPS}
-        theme={{ ...SITE_PREVIEW_THEME, isDark: true }}
+        theme={{ ...MOCK_SITE_PREVIEW_THEME, isDark: true }}
       />,
     );
 
@@ -149,7 +155,7 @@ describe(LookSample, () => {
     render(<LookSample {...BASE_PROPS} isNarrow={true} />);
 
     const header = screen.getByRole('banner');
-    expect(header).toHaveTextContent('Acme Inc.');
+    expect(header).toHaveTextContent(MOCK_TENANT_NAME);
     expect(screen.getByRole('button', { name: 'Sign in' })).toHaveTextContent(
       '',
     );
@@ -157,9 +163,7 @@ describe(LookSample, () => {
     expect(
       screen.queryByRole('link', { name: 'Posts' }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId('sample-language-code-current'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId(CURRENT_CODE_TEST_ID)).not.toBeInTheDocument();
   });
 
   it('keeps the narrow bar to the brand and the menu button without reader accounts', () => {
@@ -182,8 +186,8 @@ describe(LookSample, () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Language: English' }),
-    ).toHaveTextContent('EN');
+      screen.getByRole('button', { name: LANGUAGE_MENU }),
+    ).toHaveTextContent(LOCALE_ISO_CODES.EN);
     expect(
       screen.queryByRole('link', { name: 'Français' }),
     ).not.toBeInTheDocument();
@@ -198,8 +202,8 @@ describe(LookSample, () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Language: English' }),
-    ).not.toHaveTextContent('EN');
+      screen.getByRole('button', { name: LANGUAGE_MENU }),
+    ).not.toHaveTextContent(LOCALE_ISO_CODES.EN);
   });
 
   it('falls back to the code menu when compact codes would show more than four languages', () => {
@@ -217,8 +221,8 @@ describe(LookSample, () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Language: English' }),
-    ).toHaveTextContent('EN');
+      screen.getByRole('button', { name: LANGUAGE_MENU }),
+    ).toHaveTextContent(LOCALE_ISO_CODES.EN);
   });
 
   it('shows no switcher with one live language', () => {

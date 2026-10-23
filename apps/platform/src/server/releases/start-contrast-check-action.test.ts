@@ -11,8 +11,11 @@ import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
-import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import {
+  MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_EMAIL,
+} from '@platform/testing/admins/operator';
 import type { Session } from 'next-auth';
 
 const {
@@ -61,9 +64,9 @@ describe('startContrastCheckAction', () => {
     headSha = faker.git.commitSha();
     requireSuperAdminMock
       .mockReset()
-      .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
+      .mockResolvedValue(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     authMock.mockReset().mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     getBranchHeadShaMock.mockReset().mockResolvedValue(okResult(headSha));
     isWorkflowRunActiveMock.mockReset().mockResolvedValue(okResult(false));
@@ -92,8 +95,8 @@ describe('startContrastCheckAction', () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchContrastWorkflowMock).toHaveBeenCalledOnce();
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.CONTRAST_CHECK_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: headSha,

@@ -2,7 +2,7 @@ import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LanguagesSettings } from './languages-settings';
@@ -18,7 +18,7 @@ mockRouterRefresh();
 const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
 
 const setup = customRender(LanguagesSettings, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   defaultLocale: EN,
   locales: { stored: [], live: [], limit: 2 },
 });
@@ -79,10 +79,10 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     await waitFor(() => {
-      expect(updateTenantLanguagesActionMock).toHaveBeenCalledWith(TENANT_ID, [
-        NL,
-        FR,
-      ]);
+      expect(updateTenantLanguagesActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        [NL, FR],
+      );
     });
   });
 

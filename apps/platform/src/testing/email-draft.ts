@@ -7,9 +7,9 @@ import {
 
 const { EN, FR } = LOCALE_ISO_CODES;
 
-export const EMAIL_DRAFT_LIVE_LOCALES = [EN, FR];
+export const MOCK_EMAIL_DRAFT_LIVE_LOCALES = [EN, FR];
 
-export const EMAIL_BODY: TEmailTemplateBlock[] = [
+export const MOCK_EMAIL_BODY: TEmailTemplateBlock[] = [
   {
     _type: 'block',
     _key: 'k1',
@@ -19,7 +19,7 @@ export const EMAIL_BODY: TEmailTemplateBlock[] = [
   },
 ];
 
-export const buildTestEmailDraft = (): TEmailDraft =>
+export const mockEmailDraft = (): TEmailDraft =>
   buildEmailDraft({
     sender: {
       senderName: '',
@@ -41,5 +41,5 @@ export const buildTestEmailDraft = (): TEmailDraft =>
       TENANT_INVITE: undefined,
       NEWSLETTER_CONFIRMATION: undefined,
     },
-    liveLocales: EMAIL_DRAFT_LIVE_LOCALES,
+    liveLocales: MOCK_EMAIL_DRAFT_LIVE_LOCALES,
   });

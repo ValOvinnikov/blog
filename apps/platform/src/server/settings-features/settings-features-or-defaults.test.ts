@@ -1,5 +1,5 @@
 import { PRESET_ID } from '@blog/config';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { getSettingsFeaturesOrDefaults } from './settings-features-or-defaults';
 
@@ -37,9 +37,11 @@ describe(getSettingsFeaturesOrDefaults, () => {
       preset: PRESET_ID.EDITORIAL,
     });
 
-    const result = await getSettingsFeaturesOrDefaults(TENANT_ID);
+    const result = await getSettingsFeaturesOrDefaults(MOCK_TENANT_ID);
 
-    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
     expect(result).toEqual({ values: saved, savedAt: updatedAt });
   });
 
@@ -49,7 +51,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
       preset: PRESET_ID.EDITORIAL,
     });
 
-    const result = await getSettingsFeaturesOrDefaults(TENANT_ID);
+    const result = await getSettingsFeaturesOrDefaults(MOCK_TENANT_ID);
 
     expect(result).toEqual({
       values: {
@@ -71,7 +73,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
       preset: undefined,
     });
 
-    const result = await getSettingsFeaturesOrDefaults(TENANT_ID);
+    const result = await getSettingsFeaturesOrDefaults(MOCK_TENANT_ID);
 
     expect(result).toEqual({
       values: {

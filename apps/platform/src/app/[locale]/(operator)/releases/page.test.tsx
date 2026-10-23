@@ -2,11 +2,11 @@ import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { GITHUB_FAILURE } from '@platform/constants/github';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
-  makeReleaseCandidate,
-  makeReleaseRun,
+  mockReleaseCandidate,
+  mockReleaseRun,
 } from '@platform/testing/releases/fixtures';
 
 import ReleasesPage from './page';
@@ -50,13 +50,13 @@ describe(ReleasesPage, () => {
   beforeEach(() => {
     requireSuperAdminMock
       .mockReset()
-      .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
+      .mockResolvedValue(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     getReleaseCandidateMock.mockReset();
-    getReleaseRunMock.mockReset().mockResolvedValue(okResult(makeReleaseRun()));
+    getReleaseRunMock.mockReset().mockResolvedValue(okResult(mockReleaseRun()));
   });
 
   it('renders the release candidate for a super-admin', async () => {
-    getReleaseCandidateMock.mockResolvedValue(okResult(makeReleaseCandidate()));
+    getReleaseCandidateMock.mockResolvedValue(okResult(mockReleaseCandidate()));
 
     await setup();
 

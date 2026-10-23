@@ -3,7 +3,7 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -27,7 +27,7 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantByIdLayout, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
   children: <div>tenant content</div>,
 });
 
@@ -67,7 +67,7 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
 
   it('renders the gated content bare, with no AdminShell chrome, for an operator', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });

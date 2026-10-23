@@ -3,7 +3,10 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_DOMAIN,
+} from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -36,11 +39,9 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantDetailLayout, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
   children: <div>tenant content</div>,
 });
-
-const ACME_EXAMPLE_COM = 'acme.example.com';
 
 describe(`<${TenantDetailLayout.name}/>`, () => {
   beforeEach(() => {
@@ -57,9 +58,9 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
       createdAt: new Date(),
     });
     getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       name: 'Acme Inc.',
-      primaryDomain: ACME_EXAMPLE_COM,
+      primaryDomain: MOCK_TENANT_DOMAIN,
     });
   });
 
@@ -95,14 +96,14 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
   it('renders no tenant switcher in the sidebar', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       slug: 'acme',
       name: 'Acme Inc.',
-      primaryDomain: ACME_EXAMPLE_COM,
+      primaryDomain: MOCK_TENANT_DOMAIN,
     });
 
     await setup();
 
-    expect(screen.queryByText(ACME_EXAMPLE_COM)).not.toBeInTheDocument();
+    expect(screen.queryByText(MOCK_TENANT_DOMAIN)).not.toBeInTheDocument();
   });
 });

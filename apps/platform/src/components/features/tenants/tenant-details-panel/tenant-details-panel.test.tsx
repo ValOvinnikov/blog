@@ -15,14 +15,14 @@ import {
   SAVE_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
-  makeClientTenant,
+  mockClientTenant,
   MOCK_ARCHIVED_AT,
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
   OWNER_EMAIL_LABEL,
   PRIMARY_DOMAIN_LABEL,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -76,7 +76,7 @@ const LOCKED_THIS_TENANT_IS_ARCHIVED = 'Locked — this tenant is archived.';
 const ACME_LTD = 'Acme Ltd';
 const SAVE_AND_LEAVE = 'Save and leave';
 
-const DEFAULT_TENANT = makeClientTenant();
+const DEFAULT_TENANT = mockClientTenant();
 
 const detailsValuesOf = (
   tenant: TClientTenant,
@@ -116,7 +116,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('every field unlocked (fieldLocks={})', () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
       renderPanel({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           name: MOCK_TENANT_NAME,
           primaryDomain: MOCK_TENANT_DOMAIN,
           plan: TENANT_PLAN.FREE,
@@ -150,7 +150,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('renders the plan field label as a plain span, not a <label htmlFor> pointing nowhere, while still exposing the accessible name via ariaLabel', () => {
-      renderPanel({ tenant: makeClientTenant({ plan: TENANT_PLAN.FREE }) });
+      renderPanel({ tenant: mockClientTenant({ plan: TENANT_PLAN.FREE }) });
 
       const planLabelText = screen.getByText('Plan');
       expect(planLabelText.tagName).toBe('SPAN');
@@ -180,10 +180,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('saves the edited values and refreshes on success, sending the unchanged owner email as an ordinary field', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ name: ACME_RENAMED }),
+        tenant: mockClientTenant({ name: ACME_RENAMED }),
       });
-      const tenant = makeClientTenant({
-        id: TENANT_ID,
+      const tenant = mockClientTenant({
+        id: MOCK_TENANT_ID,
         name: MOCK_TENANT_NAME,
       });
       renderPanel({ tenant });
@@ -198,7 +198,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           detailsValuesOf(tenant, { name: ACME_RENAMED }),
         );
       });
@@ -208,9 +208,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('submits the edited owner email value', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant(),
+        tenant: mockClientTenant(),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID });
+      const tenant = mockClientTenant({ id: MOCK_TENANT_ID });
       renderPanel({ tenant });
 
       const ownerEmailInput = screen.getByRole('textbox', {
@@ -225,7 +225,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           detailsValuesOf(tenant, { ownerEmail: NEW_OWNER_EXAMPLE_COM }),
         );
       });
@@ -308,10 +308,13 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
+        tenant: mockClientTenant({ id: MOCK_TENANT_ID, name: ACME_RENAMED }),
       });
       renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_TENANT_NAME,
+        }),
       });
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -356,7 +359,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
       });
-      renderPanel({ tenant: makeClientTenant({ id: TENANT_ID }) });
+      renderPanel({ tenant: mockClientTenant({ id: MOCK_TENANT_ID }) });
 
       const ownerEmailInput = screen.getByRole('textbox', {
         name: OWNER_EMAIL_LABEL,
@@ -423,7 +426,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('renders every other field as editable when only one field is locked', () => {
       renderPanel({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           name: MOCK_TENANT_NAME,
           primaryDomain: MOCK_TENANT_DOMAIN,
           plan: TENANT_PLAN.FREE,
@@ -447,13 +450,13 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('lets the operator correct the unlocked field that caused the failure and save it', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({
-          id: TENANT_ID,
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
           primaryDomain: NEW_DOMAIN_EXAMPLE_COM,
         }),
       });
-      const tenant = makeClientTenant({
-        id: TENANT_ID,
+      const tenant = mockClientTenant({
+        id: MOCK_TENANT_ID,
         name: MOCK_TENANT_NAME,
         primaryDomain: 'taken-domain.example.com',
       });
@@ -476,7 +479,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           detailsValuesOf(tenant, { primaryDomain: NEW_DOMAIN_EXAMPLE_COM }),
         );
       });
@@ -486,7 +489,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('renders the plan control locked with a "provisioning succeeded" reason once every step is DONE', () => {
       render(
         <TenantDetailsPanel
-          tenant={makeClientTenant({ plan: TENANT_PLAN.GROWTH })}
+          tenant={mockClientTenant({ plan: TENANT_PLAN.GROWTH })}
           fieldLocks={{ plan: { kind: 'succeeded' } }}
           owner={OWNER}
         />,
@@ -506,10 +509,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('saves the default language chosen from the supported list', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ locale: LOCALE_ISO_CODES.NL }),
+        tenant: mockClientTenant({ locale: LOCALE_ISO_CODES.NL }),
       });
-      const tenant = makeClientTenant({
-        id: TENANT_ID,
+      const tenant = mockClientTenant({
+        id: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.EN,
       });
       renderPanel({ tenant });
@@ -523,7 +526,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           detailsValuesOf(tenant, { locale: LOCALE_ISO_CODES.NL }),
         );
       });
@@ -539,7 +542,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           },
         },
       });
-      renderPanel({ tenant: makeClientTenant({ id: TENANT_ID }) });
+      renderPanel({ tenant: mockClientTenant({ id: MOCK_TENANT_ID }) });
 
       const primaryDomainInput = screen.getByRole('textbox', {
         name: PRIMARY_DOMAIN_LABEL,
@@ -565,7 +568,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('every field locked (RUNNING/SUCCEEDED)', () => {
     it('disables every control and disables Save, since nothing can become dirty', () => {
       renderPanel({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           name: MOCK_TENANT_NAME,
           primaryDomain: MOCK_TENANT_DOMAIN,
           plan: TENANT_PLAN.GROWTH,
@@ -652,7 +655,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('enables once a field is edited, and disables again once edited back to the original value', async () => {
-      renderPanel({ tenant: makeClientTenant({ name: MOCK_TENANT_NAME }) });
+      renderPanel({ tenant: mockClientTenant({ name: MOCK_TENANT_NAME }) });
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
 
@@ -671,7 +674,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('stays disabled and announces the pending state to assistive tech while a save is in flight, even with dirty values', async () => {
       let resolveAction: (value: {
         outcome: typeof ACTION_OUTCOME.SUCCESS;
-        tenant: ReturnType<typeof makeClientTenant>;
+        tenant: ReturnType<typeof mockClientTenant>;
       }) => void = () => {};
       updateTenantDetailsActionMock.mockImplementation(
         () =>
@@ -680,7 +683,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           }),
       );
       renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_TENANT_NAME,
+        }),
       });
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -701,7 +707,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       resolveAction({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
+        tenant: mockClientTenant({ id: MOCK_TENANT_ID, name: ACME_RENAMED }),
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
     });
@@ -709,10 +715,13 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('returns to disabled after a successful save applies the refreshed tenant', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
+        tenant: mockClientTenant({ id: MOCK_TENANT_ID, name: ACME_RENAMED }),
       });
       const { rerender } = renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_TENANT_NAME,
+        }),
       });
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -727,7 +736,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       rerender(
         panel({
-          tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
+          tenant: mockClientTenant({ id: MOCK_TENANT_ID, name: ACME_RENAMED }),
         }),
       );
 
@@ -767,7 +776,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     let tenant: TClientTenant;
 
     beforeEach(() => {
-      tenant = makeClientTenant({ deprovisionedAt: MOCK_ARCHIVED_AT });
+      tenant = mockClientTenant({ deprovisionedAt: MOCK_ARCHIVED_AT });
     });
 
     describe('on its own', () => {
@@ -913,7 +922,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       it('saves the edits before leaving on Save and leave', async () => {
         updateTenantDetailsActionMock.mockResolvedValue({
           outcome: ACTION_OUTCOME.SUCCESS,
-          tenant: makeClientTenant(),
+          tenant: mockClientTenant(),
         });
 
         const tenantsLink = screen.getByRole('link', { name: 'Tenants' });

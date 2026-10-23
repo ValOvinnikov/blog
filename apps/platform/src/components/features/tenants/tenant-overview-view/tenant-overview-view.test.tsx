@@ -12,7 +12,7 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import {
-  makeAuditEvent,
+  mockAuditEvent,
   MOCK_AUDIT_ACTOR_EMAIL,
 } from '@platform/testing/audit-events/fixtures';
 import {
@@ -21,7 +21,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { makeFinding } from '@platform/testing/findings/fixtures';
+import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -29,8 +29,8 @@ import {
   SAVE_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
-  idleProvisioningSteps,
-  makeTenant,
+  mockIdleProvisioningSteps,
+  mockTenant,
   MOCK_ARCHIVED_AT,
   MOCK_INVITED_OWNER_EMAIL,
   MOCK_OWNER_EMAIL,
@@ -42,7 +42,7 @@ import {
   mockFirstStepRunningProvisioningSteps,
   PRIMARY_DOMAIN_LABEL,
   REACTIVATE_TENANT_LABEL,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantOverviewView } from './tenant-overview-view';
@@ -109,7 +109,7 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
 
-const setup = async ({ tenant = makeTenant() } = {}) => {
+const setup = async ({ tenant = mockTenant() } = {}) => {
   const ui = await TenantOverviewView({ tenant });
   await act(async () => {
     renderWithIntl(ui);
@@ -152,7 +152,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('renders the tenant name and status/plan badges', async () => {
     await setup({
-      tenant: makeTenant({
+      tenant: mockTenant({
         name: MOCK_TENANT_NAME,
         status: TENANT_STATUS.ACTIVE,
       }),
@@ -173,7 +173,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('renders the provisioning banner', async () => {
     await setup({
-      tenant: makeTenant({
+      tenant: mockTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
         provisioningSteps: Object.fromEntries(
           Object.values(TENANT_PROVISIONING_STEP).map((step) => [
@@ -189,7 +189,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('relocates the tenant details panel here as the Identity card', async () => {
-    await setup({ tenant: makeTenant({ name: MOCK_TENANT_NAME }) });
+    await setup({ tenant: mockTenant({ name: MOCK_TENANT_NAME }) });
 
     const detailsTitle = screen.getByText(TENANT_DETAILS);
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -200,7 +200,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('locks every tenant details field while a step is running, saying why', async () => {
     await setup({
-      tenant: makeTenant({
+      tenant: mockTenant({
         provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       }),
     });
@@ -217,9 +217,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('locks primaryDomain once MAP_DOMAIN is done and a later step failed', async () => {
     await setup({
-      tenant: makeTenant({
+      tenant: mockTenant({
         provisioningSteps: {
-          ...idleProvisioningSteps(),
+          ...mockIdleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
           },
@@ -254,9 +254,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('locks every field once a dispatch begins, before any step reports', async () => {
     await setup({
-      tenant: makeTenant({
+      tenant: mockTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: idleProvisioningSteps(),
+        provisioningSteps: mockIdleProvisioningSteps(),
       }),
     });
 
@@ -270,10 +270,10 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('keeps the provisioning banner and details panel in sync off one poll', async () => {
-    const tenant = makeTenant({
+    const tenant = mockTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
-        ...idleProvisioningSteps(),
+        ...mockIdleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
@@ -319,27 +319,27 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.VERIFIED,
     );
-    listAuditEventsForTargetMock.mockResolvedValue([makeAuditEvent()]);
-    listFindingsForTenantMock.mockResolvedValue([makeFinding()]);
+    listAuditEventsForTargetMock.mockResolvedValue([mockAuditEvent()]);
+    listFindingsForTenantMock.mockResolvedValue([mockFinding()]);
 
     await setup({
-      tenant: makeTenant({
-        id: TENANT_ID,
+      tenant: mockTenant({
+        id: MOCK_TENANT_ID,
         primaryDomain: MOCK_TENANT_DOMAIN,
         sanityProjectId: MOCK_SANITY_PROJECT_ID,
       }),
     });
 
     expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
     );
     expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
       AUDIT_TARGET_TYPE.TENANT,
-      TENANT_ID,
+      MOCK_TENANT_ID,
       { limit: 5 },
     );
     expect(listFindingsForTenantMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       FINDING_STATUS.OPEN,
     );
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
@@ -378,7 +378,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('always renders "Open site", linking to the tenant\'s live domain', async () => {
-    await setup({ tenant: makeTenant() });
+    await setup({ tenant: mockTenant() });
 
     const link = screen.getByRole('link', {
       name: 'Open site (opens in new tab)',
@@ -418,7 +418,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   describe('archived tenant', () => {
-    const archivedTenant = makeTenant({
+    const archivedTenant = mockTenant({
       deprovisionedAt: MOCK_ARCHIVED_AT,
     });
 
@@ -440,7 +440,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('does not show the archived notice for a live tenant', async () => {
-    await setup({ tenant: makeTenant({ deprovisionedAt: null }) });
+    await setup({ tenant: mockTenant({ deprovisionedAt: null }) });
 
     const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
     expect(archivedNotice).not.toBeInTheDocument();
@@ -448,7 +448,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   describe('suspension', () => {
     it('offers a super admin the Suspend action on an active tenant', async () => {
-      await setup({ tenant: makeTenant({ status: TENANT_STATUS.ACTIVE }) });
+      await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
 
       const suspendButton = screen.getByRole('button', {
         name: SUSPEND_TENANT,
@@ -457,7 +457,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     it('offers a super admin the Reactivate action on a suspended tenant', async () => {
-      await setup({ tenant: makeTenant({ status: TENANT_STATUS.SUSPENDED }) });
+      await setup({ tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }) });
 
       const reactivateButton = screen.getByRole('button', {
         name: REACTIVATE_TENANT_LABEL,
@@ -476,7 +476,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         requireAdminMock.mockResolvedValue({ id: 'admin-1', role });
 
         await setup({
-          tenant: makeTenant({ status: TENANT_STATUS.SUSPENDED }),
+          tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }),
         });
 
         const reactivateButton = screen.queryByRole('button', {
@@ -488,7 +488,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     it('offers neither action on an archived tenant', async () => {
       await setup({
-        tenant: makeTenant({
+        tenant: mockTenant({
           status: TENANT_STATUS.ARCHIVED,
           deprovisionedAt: MOCK_ARCHIVED_AT,
         }),

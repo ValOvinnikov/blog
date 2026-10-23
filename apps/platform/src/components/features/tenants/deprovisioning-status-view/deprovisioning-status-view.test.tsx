@@ -5,9 +5,9 @@ import {
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  doneDeprovisioningSteps,
-  idleDeprovisioningSteps,
-  makeClientTenant,
+  mockDoneDeprovisioningSteps,
+  mockIdleDeprovisioningSteps,
+  mockClientTenant,
   MOCK_RUN_PLUS_1_MIN_AT,
   MOCK_RUN_PLUS_2_MIN_AT,
   MOCK_RUN_PLUS_7_MIN_AT,
@@ -77,11 +77,11 @@ const renderView = (
   props: Omit<TWrapperProps, 'tenant'> = {},
 ) =>
   render(
-    <Wrapper tenant={makeClientTenant({ deprovisioningSteps })} {...props} />,
+    <Wrapper tenant={mockClientTenant({ deprovisioningSteps })} {...props} />,
   );
 
 const idleRunSteps = () => ({
-  ...idleDeprovisioningSteps(),
+  ...mockIdleDeprovisioningSteps(),
   run: { startedAt: MOCK_RUN_STARTED_AT },
 });
 
@@ -93,7 +93,7 @@ const runningSteps = () => ({
 });
 
 const doneRunSteps = () => ({
-  ...doneDeprovisioningSteps(),
+  ...mockDoneDeprovisioningSteps(),
   run: {
     startedAt: MOCK_RUN_STARTED_AT,
     finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
@@ -149,7 +149,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   it('shows the Starting badge and full step list, not the old failure, for a retry dispatched after a FAILED run', () => {
     renderView(
       {
-        ...idleDeprovisioningSteps(),
+        ...mockIdleDeprovisioningSteps(),
         [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
           error: 'Sanity Access API returned 403',
@@ -241,7 +241,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   describe('a failed step', () => {
     const renderFailed = (error: string) =>
       renderView({
-        ...idleDeprovisioningSteps(),
+        ...mockIdleDeprovisioningSteps(),
         [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
           error,

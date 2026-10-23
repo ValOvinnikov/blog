@@ -1,13 +1,15 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
-import { MOCK_CUSTOM_DOMAIN } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_CUSTOM_DOMAIN,
+  MOCK_VERCEL_A_RECORD,
+} from '@platform/testing/tenants/fixtures';
 
 import { DomainVerificationCard } from './domain-verification-card';
 
 const AWAITING_DNS = 'Awaiting DNS';
 const CHECKED_JUST_NOW = 'Checked just now';
-const A_RECORD_VALUE = '76.76.21.21';
 const CNAME_RECORD_VALUE = 'cname.vercel-dns.com';
 
 const render = (projectDomain: TProjectDomain) =>
@@ -44,13 +46,13 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     await render({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [
-        { type: 'A', name: '@', value: A_RECORD_VALUE },
+        { type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD },
         { type: 'CNAME', name: 'www', value: CNAME_RECORD_VALUE },
       ],
     });
 
     const table = await screen.findByRole('table');
-    const aRecord = screen.getByText(A_RECORD_VALUE);
+    const aRecord = screen.getByText(MOCK_VERCEL_A_RECORD);
     const cnameRecord = screen.getByText(CNAME_RECORD_VALUE);
 
     expect(table).toBeVisible();
@@ -91,7 +93,7 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
   it('asks for the records only alongside the table', async () => {
     await render({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: A_RECORD_VALUE }],
+      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
     });
 
     const instructions = await screen.findByText(

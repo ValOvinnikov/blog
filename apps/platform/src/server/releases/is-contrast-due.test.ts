@@ -2,9 +2,11 @@ import { FINDING_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { CONTRAST_WORKFLOW_FILE } from '@platform/constants/release';
 import {
-  githubCompareJson,
-  githubJson,
+  mockGitHubCompareResponse,
+  mockGitHubResponse,
   useGitHubFetch,
+  MAIN_BRANCH_PATH,
+  RELEASE_TAGS_PATH,
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
@@ -29,8 +31,6 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const MAIN_BRANCH_PATH = '/branches/main';
-
 const renderingFile = {
   filename: 'apps/web/src/app/page.tsx',
   status: 'modified',
@@ -43,20 +43,20 @@ describe(isContrastDue, () => {
 
   const compare = (files: unknown[]) => {
     github.respond(`/compare/${lastTag}...${headSha}`, (path) =>
-      githubCompareJson(path, [], files),
+      mockGitHubCompareResponse(path, [], files),
     );
   };
 
   beforeEach(() => {
     headSha = faker.git.commitSha();
-    github.respond('/git/matching-refs/tags/v', () =>
-      githubJson([{ ref: `refs/tags/${lastTag}` }]),
+    github.respond(RELEASE_TAGS_PATH, () =>
+      mockGitHubResponse([{ ref: `refs/tags/${lastTag}` }]),
     );
     github.respond(MAIN_BRANCH_PATH, () =>
-      githubJson({ commit: { sha: headSha } }),
+      mockGitHubResponse({ commit: { sha: headSha } }),
     );
     github.respond(`/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`, () =>
-      githubJson({ workflow_runs: [] }),
+      mockGitHubResponse({ workflow_runs: [] }),
     );
     getContrastFindingMock.mockReset().mockResolvedValue(undefined);
     getLatestPassingContrastShaMock.mockReset().mockResolvedValue(undefined);
@@ -93,7 +93,7 @@ describe(isContrastDue, () => {
   });
 
   it('is not due when GitHub cannot be reached', async () => {
-    github.respond(MAIN_BRANCH_PATH, () => githubJson({}, 500));
+    github.respond(MAIN_BRANCH_PATH, () => mockGitHubResponse({}, 500));
 
     expect(await isContrastDue()).toBe(false);
   });
