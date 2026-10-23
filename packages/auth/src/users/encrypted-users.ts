@@ -37,11 +37,16 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
         return user && decryptUser(user);
       }),
     getUserByEmail: async (email) => {
-      const user = await queries.users.getUserByEmailIndex(email);
-      const found = user && decryptUser(user);
-      return found && normalizeEmail(found.email) === normalizeEmail(email)
-        ? found
-        : null;
+      const candidates = await queries.users.getUsersByEmailIndex(email);
+      const requested = normalizeEmail(email);
+      const readable = candidates
+        .filter(({ emailEncrypted }) => emailEncrypted !== null)
+        .map(decryptUser);
+      return (
+        readable.find(
+          ({ email: found }) => normalizeEmail(found) === requested,
+        ) ?? null
+      );
     },
     getUserByAccount:
       getUserByAccount &&
