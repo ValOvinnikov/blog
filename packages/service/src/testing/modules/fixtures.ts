@@ -51,6 +51,7 @@ import type {
 } from '@blog/service/shared/transformers/cta/to-cta-button';
 import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import {
+  MOCK_AUTHOR_ID,
   MOCK_TOPIC_DESCRIPTION,
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
@@ -225,7 +226,7 @@ export function mockRawHeroProfileModule(
     showRole: true,
     showBio: true,
     author: {
-      _id: 'author-1',
+      _id: MOCK_AUTHOR_ID,
       name: PERSON_NAME,
       image: null,
       profilePage: null,

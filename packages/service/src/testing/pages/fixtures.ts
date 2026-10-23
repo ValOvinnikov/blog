@@ -11,6 +11,9 @@ import type { TModule } from '@blog/service/shared/transformers/module/to-module
 import type { TRawPersonCard } from '@blog/service/shared/transformers/person/to-person-card';
 import type { TRawPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 import {
+  MOCK_AUTHOR_AVATAR_ALT,
+  MOCK_AUTHOR_ID,
+  MOCK_AUTHOR_NAME,
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
   MOCK_TOPIC_SLUG,
@@ -47,9 +50,6 @@ export const MOCK_TAG_PAGE_DESCRIPTION = 'Posts about TypeScript.';
 export const MOCK_ABOUT_PAGE_TITLE = 'About Us';
 export const MOCK_CURATED_SUPPORTING_TEXT = 'Hand-picked reads.';
 export const MOCK_TEMPLATE_REFERENCE = mockReference('template-a');
-export const MOCK_AUTHOR_ID = 'author-1';
-export const MOCK_AUTHOR_NAME = 'Jane Doe';
-export const MOCK_AUTHOR_AVATAR_ALT = 'Jane avatar';
 
 const POST_LIST_MODULE_ID = 'post-list-1';
 

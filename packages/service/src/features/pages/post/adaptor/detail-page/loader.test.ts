@@ -9,6 +9,8 @@ import {
   MOCK_SKIM_TAKEAWAYS,
 } from '@blog/service/testing/editorial/fixtures';
 import {
+  MOCK_AUTHOR_AVATAR_ALT,
+  MOCK_AUTHOR_NAME,
   MOCK_TAG_ID,
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
@@ -61,7 +63,6 @@ vi.mock('@blog/service/sanity/query/query');
 const GITHUB_URL = 'https://github.com/janedoe';
 const PUBLISHED_AT = '2026-02-01T00:00:00Z';
 const PAGE_POST_SLUG = 'page-post-slug';
-const AVATAR_ALT = 'Jane avatar';
 const META_TITLE = 'Authored Title';
 const META_DESCRIPTION = 'Authored description';
 
@@ -118,7 +119,7 @@ describe(getPost, () => {
     const { author } = await loadPost({
       author: mockRawAuthor({
         _id: 'author-9',
-        image: mockRawSanityImage(AVATAR_ALT),
+        image: mockRawSanityImage(MOCK_AUTHOR_AVATAR_ALT),
         profilePage: mockRawInternalLinkDocument({
           internalReference: { _type: 'page_landing', slug: 'jane-doe' },
         }),
@@ -128,9 +129,9 @@ describe(getPost, () => {
 
     expect(author).toEqual({
       id: 'author-9',
-      name: 'Jane Doe',
+      name: MOCK_AUTHOR_NAME,
       profileUrl: '/jane-doe',
-      image: mockSanityImageView(AVATAR_ALT),
+      image: mockSanityImageView(MOCK_AUTHOR_AVATAR_ALT),
       role: 'Editor',
       bio: undefined,
       socialLinks: [],

@@ -14,6 +14,9 @@ import {
   mockRawHeadingBlock,
 } from '@blog/service/testing/shared/fixtures';
 
+export const MOCK_AUTHOR_ID = 'author-1';
+export const MOCK_AUTHOR_NAME = 'Jane Doe';
+export const MOCK_AUTHOR_AVATAR_ALT = 'Jane avatar';
 export const MOCK_DOCUMENT_ID = 'page_post-1';
 export const MOCK_TAG_ID = 'tag-1';
 export const MOCK_TAG_TITLE = 'TypeScript';

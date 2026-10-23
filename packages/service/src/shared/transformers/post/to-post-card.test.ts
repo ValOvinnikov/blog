@@ -1,14 +1,12 @@
 import {
+  MOCK_AUTHOR_AVATAR_ALT,
+  MOCK_AUTHOR_ID,
+  MOCK_AUTHOR_NAME,
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
 } from '@blog/service/testing/entities/fixtures';
-import {
-  MOCK_AUTHOR_AVATAR_ALT,
-  MOCK_AUTHOR_ID,
-  MOCK_AUTHOR_NAME,
-  mockRawPostCard,
-} from '@blog/service/testing/pages/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_POST_EXCERPT,
   MOCK_POST_ID,
