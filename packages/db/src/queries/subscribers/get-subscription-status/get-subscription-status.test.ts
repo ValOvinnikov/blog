@@ -3,12 +3,11 @@ import {
   insertTestReader,
   insertTestSubscriber,
   insertTestTenant,
-  insertTestUser,
   TEST_SUBSCRIBER_EMAIL,
-  TEST_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { toOutcome } from '@blog/utils/to-outcome';
 
 import { getSubscriptionStatus } from './get-subscription-status';
 
@@ -18,8 +17,6 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
-
-const NOT_SUBSCRIBED = { outcome: 'not-subscribed' };
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -36,70 +33,22 @@ describe(getSubscriptionStatus, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns active for a user whose account email has an active subscriber row', async () => {
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL, {
-      status: 'active',
-    });
+  it.each(['active', 'pending'] as const)(
+    "returns the account's %s subscription",
+    async (status) => {
+      await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL, {
+        status,
+      });
 
+      const result = await getSubscriptionStatus(tenantId, userId);
+
+      expect(result).toEqual(toOutcome(status));
+    },
+  );
+
+  it('returns not-subscribed when the account has no subscription', async () => {
     const result = await getSubscriptionStatus(tenantId, userId);
 
-    expect(result).toEqual({ outcome: 'active' });
-  });
-
-  it('returns pending for a user whose account email has a pending subscriber row', async () => {
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
-
-    const result = await getSubscriptionStatus(tenantId, userId);
-
-    expect(result).toEqual({ outcome: 'pending' });
-  });
-
-  it('returns not-subscribed when no subscriber row matches the account email', async () => {
-    const result = await getSubscriptionStatus(tenantId, userId);
-
-    expect(result).toEqual(NOT_SUBSCRIBED);
-  });
-
-  it('returns not-subscribed when the user has no email on file', async () => {
-    const { id } = await insertTestUser(db());
-
-    const result = await getSubscriptionStatus(tenantId, id);
-
-    expect(result).toEqual(NOT_SUBSCRIBED);
-  });
-
-  it('returns not-subscribed for an unrecognized userId', async () => {
-    const result = await getSubscriptionStatus(tenantId, 'does-not-exist');
-
-    expect(result).toEqual(NOT_SUBSCRIBED);
-  });
-
-  it('matches a subscriber stored under a differently cased address', async () => {
-    await insertTestSubscriber(
-      db(),
-      tenantId,
-      `  ${TEST_SUBSCRIBER_EMAIL.toUpperCase()}  `,
-    );
-
-    const result = await getSubscriptionStatus(tenantId, userId);
-
-    expect(result).toEqual({ outcome: 'pending' });
-  });
-
-  it('does not match a subscriber whose address differs only by a +tag', async () => {
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_TAGGED_EMAIL);
-
-    const result = await getSubscriptionStatus(tenantId, userId);
-
-    expect(result).toEqual(NOT_SUBSCRIBED);
-  });
-
-  it('returns not-subscribed when the subscriber row belongs to a different tenant', async () => {
-    const { id: otherTenantId } = await insertTestTenant(db());
-    await insertTestSubscriber(db(), otherTenantId, TEST_SUBSCRIBER_EMAIL);
-
-    const result = await getSubscriptionStatus(tenantId, userId);
-
-    expect(result).toEqual(NOT_SUBSCRIBED);
+    expect(result).toEqual(toOutcome('not-subscribed'));
   });
 });

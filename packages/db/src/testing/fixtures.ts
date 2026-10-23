@@ -24,7 +24,7 @@ export const TEST_SUBSCRIBER_TAGGED_EMAIL = TEST_SUBSCRIBER_EMAIL.replace(
   '+news@',
 );
 export const TEST_INVITE_EMAIL = faker.internet.email().toLowerCase();
-export const TEST_LEAD_NAME = 'Ada Lovelace';
+export const TEST_LEAD_NAME = 'Jane Doe';
 export const TEST_LEAD_EMAIL = 'lead@example.com';
 export const TEST_LEAD_MESSAGE = 'I would like to talk about a project.';
 

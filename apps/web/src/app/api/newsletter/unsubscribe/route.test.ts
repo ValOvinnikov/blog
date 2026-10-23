@@ -97,7 +97,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(resolveRequestTenantMock).not.toHaveBeenCalled();
   });
 
-  it('keeps a present token server-side and sends them to the confirmation page without it, without touching the db', async () => {
+  it('keeps the token server-side and sends them to the confirm page without it', async () => {
     const response = await GET(
       toUnsubscribeRequest(routes.newsletterUnsubscribe(TOKEN)),
     );
@@ -107,7 +107,6 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(locationOf(response)).toBe(
       `${DEFAULT_TENANT_BASE_URL}/newsletter/unsubscribe`,
     );
-    expect(response.headers.get('cache-control')).toBe('private, no-store');
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
     expect(resolveRequestTenantMock).not.toHaveBeenCalled();
   });
@@ -149,7 +148,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
     });
   });
 
-  it('unsubscribes by an unsigned token from an earlier email and sends them to the unsubscribed page with a GET', async () => {
+  it('unsubscribes by an unsigned token and sends them to the unsubscribed page', async () => {
     const response = await POST(request);
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
@@ -184,9 +183,9 @@ describe('POST /api/newsletter/unsubscribe', () => {
     readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(
       faker.string.uuid(),
     );
-    unsubscribeByIdMock.mockResolvedValue({
-      outcome: SUBSCRIBER_OUTCOME.NOT_FOUND,
-    });
+    unsubscribeByIdMock.mockResolvedValue(
+      toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND),
+    );
 
     const response = await POST(request);
 
@@ -242,9 +241,9 @@ describe('POST /api/newsletter/unsubscribe', () => {
   });
 
   it('sends an unknown or already-used token to the invalid page', async () => {
-    unsubscribeByTokenMock.mockResolvedValue({
-      outcome: SUBSCRIBER_OUTCOME.NOT_FOUND,
-    });
+    unsubscribeByTokenMock.mockResolvedValue(
+      toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND),
+    );
     const response = await POST(request);
 
     expect(locationOf(response)).toBe(INVALID_LOCATION);

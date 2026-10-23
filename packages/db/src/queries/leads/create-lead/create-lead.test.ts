@@ -1,13 +1,18 @@
 import { LOCALE_BCP47_TAGS } from '@blog/config';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  TEST_LEAD_EMAIL,
+  TEST_LEAD_MESSAGE,
+  TEST_LEAD_NAME,
+} from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { eq } from 'drizzle-orm';
+import { faker } from '@faker-js/faker';
 
 import { createLead } from './create-lead';
 
@@ -19,18 +24,15 @@ const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
 const LEAD = {
-  name: 'Ada Lovelace',
-  email: 'ada@example.com',
-  message: 'I would like to talk about a project.',
+  name: TEST_LEAD_NAME,
+  email: TEST_LEAD_EMAIL,
+  message: TEST_LEAD_MESSAGE,
   sourcePath: '/en/contact',
 };
 
-async function readLead(id: string): Promise<schema.TLead> {
-  const [row] = await db()
-    .select()
-    .from(schema.leads)
-    .where(eq(schema.leads.id, id));
-  if (!row) throw new Error(`No lead "${id}".`);
+async function readOnlyLead(): Promise<schema.TLead> {
+  const [row, ...others] = await db().select().from(schema.leads);
+  if (!row || others.length > 0) throw new Error('Expected exactly one lead.');
   return row;
 }
 
@@ -46,60 +48,57 @@ describe(createLead, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns only the id of the lead it stored', async () => {
+  it('stores an unread lead and returns only its id', async () => {
     const created = await createLead({ tenantId, ...LEAD });
 
-    expect(created).toEqual({ id: expect.any(String) });
-    const rows = await db().select().from(schema.leads);
-    expect(rows).toHaveLength(1);
-  });
-
-  it('stores the lead with a creation time', async () => {
-    const { id } = await createLead({ tenantId, ...LEAD });
-
-    const lead = await readLead(id);
-
-    expect(lead).toMatchObject({ tenantId, ...LEAD });
-    expect(lead.createdAt).toBeInstanceOf(Date);
-  });
-
-  it('stores the name, email and message encrypted beside the plain values, with an email index', async () => {
-    const { id } = await createLead({ tenantId, ...LEAD });
-
-    const lead = await readLead(id);
-
-    expect({
-      name: decryptTestPersonalValue(lead.nameEncrypted),
-      email: decryptTestPersonalValue(lead.emailEncrypted),
-      message: decryptTestPersonalValue(lead.messageEncrypted),
-    }).toEqual({ name: LEAD.name, email: LEAD.email, message: LEAD.message });
-    expect(lead.emailIndex).toBe(testPersonalEmailIndex(LEAD.email));
-  });
-
-  it('stores the source page document id and locale when given', async () => {
-    const source = {
-      sourceDocumentId: 'page-contact',
-      sourceLocale: LOCALE_BCP47_TAGS.EN,
-    };
-
-    const { id } = await createLead({ tenantId, ...LEAD, ...source });
-
-    expect(await readLead(id)).toMatchObject(source);
-  });
-
-  it('stores a new lead unread and with no source page document id or locale', async () => {
-    const { id } = await createLead({ tenantId, ...LEAD });
-
-    expect(await readLead(id)).toMatchObject({
+    const row = await readOnlyLead();
+    const { id, name, email, message, sourcePath, readAt } = row;
+    expect(created).toEqual({ id });
+    expect({ name, email, message, sourcePath, readAt }).toEqual({
+      ...LEAD,
       readAt: null,
-      sourceDocumentId: null,
-      sourceLocale: null,
+    });
+    expect(row.tenantId).toBe(tenantId);
+  });
+
+  it('stores the name, email and message encrypted, and the email index', async () => {
+    await createLead({ tenantId, ...LEAD });
+
+    const { nameEncrypted, emailEncrypted, messageEncrypted, emailIndex } =
+      await readOnlyLead();
+    expect({
+      name: decryptTestPersonalValue(nameEncrypted),
+      email: decryptTestPersonalValue(emailEncrypted),
+      message: decryptTestPersonalValue(messageEncrypted),
+      emailIndex,
+    }).toEqual({
+      name: TEST_LEAD_NAME,
+      email: TEST_LEAD_EMAIL,
+      message: TEST_LEAD_MESSAGE,
+      emailIndex: testPersonalEmailIndex(TEST_LEAD_EMAIL),
     });
   });
 
-  it('rejects a tenantId with no matching tenants row', async () => {
+  it.each([
+    [
+      'stores',
+      { sourceDocumentId: 'page-contact', sourceLocale: LOCALE_BCP47_TAGS.EN },
+    ],
+    ['leaves empty', {}],
+  ])('%s the source document and locale', async (_case, source) => {
+    await createLead({ tenantId, ...LEAD, ...source });
+
+    const { sourceDocumentId, sourceLocale } = await readOnlyLead();
+    expect({ sourceDocumentId, sourceLocale }).toEqual({
+      sourceDocumentId: null,
+      sourceLocale: null,
+      ...source,
+    });
+  });
+
+  it('rejects a tenant that does not exist', async () => {
     await expect(
-      createLead({ tenantId: '00000000-0000-0000-0000-000000000000', ...LEAD }),
+      createLead({ tenantId: faker.string.uuid(), ...LEAD }),
     ).rejects.toThrow();
   });
 
@@ -108,7 +107,6 @@ describe(createLead, () => {
 
     await db().delete(schema.tenants);
 
-    const rows = await db().select().from(schema.leads);
-    expect(rows).toHaveLength(0);
+    expect(await db().select().from(schema.leads)).toEqual([]);
   });
 });

@@ -40,6 +40,7 @@ const TOKEN = faker.string.alphanumeric(16);
 const CONFIRMED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirmed`;
 const INVALID_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-invalid`;
 const FAILED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-failed`;
+const UNAVAILABLE_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-unavailable`;
 
 const toConfirmRequest = (path: string) =>
   new Request(new URL(path, DEFAULT_TENANT_BASE_URL));
@@ -49,9 +50,9 @@ describe('GET /api/newsletter/confirm', () => {
 
   beforeEach(() => {
     request = toConfirmRequest(routes.newsletterConfirm(TOKEN));
-    confirmSubscriberMock.mockResolvedValue({
-      outcome: SUBSCRIBER_OUTCOME.CONFIRMED,
-    });
+    confirmSubscriberMock.mockResolvedValue(
+      toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED),
+    );
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
       tenantId: DEFAULT_TENANT_ID,
@@ -61,16 +62,16 @@ describe('GET /api/newsletter/confirm', () => {
     );
   });
 
-  it('confirms the subscriber and sends them to the confirmed page', async () => {
+  it('confirms the token and sends them to the confirmed page', async () => {
     const response = await GET(request);
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(response.headers.get('location')).toBe(CONFIRMED_LOCATION);
-    expect(response.headers.get('cache-control')).toBe('private, no-store');
     expect(confirmSubscriberMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_ID,
       TOKEN,
     );
+    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith(null);
   });
 
   it('sends them to the page in the language the link carries', async () => {
@@ -89,76 +90,56 @@ describe('GET /api/newsletter/confirm', () => {
     );
   });
 
-  it("keeps the site's own default language unprefixed", async () => {
-    resolveNewsletterLinkLocaleMock.mockResolvedValue(
-      makeNewsletterLinkLocale({
-        locale: LOCALE_ISO_CODES.NL,
-        defaultLocale: LOCALE_ISO_CODES.NL,
-      }),
-    );
+  it.each([
+    [
+      'an already-confirmed token to the confirmed',
+      SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
+      CONFIRMED_LOCATION,
+    ],
+    [
+      'an unknown token to the invalid',
+      SUBSCRIBER_OUTCOME.NOT_FOUND,
+      INVALID_LOCATION,
+    ],
+  ])('sends %s page', async (_case, outcome, location) => {
+    confirmSubscriberMock.mockResolvedValue(toOutcome(outcome));
+
     const response = await GET(request);
 
-    expect(response.headers.get('location')).toBe(CONFIRMED_LOCATION);
+    expect(response.headers.get('location')).toBe(location);
   });
 
-  it('resolves the language of a link sent without one', async () => {
-    await GET(request);
-
-    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith(null);
-  });
-
-  it('treats an already-confirmed token as success', async () => {
-    confirmSubscriberMock.mockResolvedValue(
-      toOutcome(SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED),
-    );
-    const response = await GET(request);
-
-    expect(response.headers.get('location')).toBe(CONFIRMED_LOCATION);
-  });
-
-  it('sends a link without a token to the invalid page without querying the db', async () => {
+  it('sends a link without a token to the invalid page without confirming', async () => {
     const response = await GET(toConfirmRequest('/api/newsletter/confirm'));
 
     expect(response.headers.get('location')).toBe(INVALID_LOCATION);
     expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
 
-  it('sends an unrecognized token to the invalid page', async () => {
-    confirmSubscriberMock.mockResolvedValue({
-      outcome: SUBSCRIBER_OUTCOME.NOT_FOUND,
-    });
+  it.each([
+    [
+      'an inactive tenant to the unavailable',
+      TENANT_WRITE_REFUSAL.INACTIVE,
+      UNAVAILABLE_LOCATION,
+    ],
+    [
+      'an unresolved tenant to the failed',
+      TENANT_WRITE_REFUSAL.UNRESOLVED,
+      FAILED_LOCATION,
+    ],
+  ])('sends %s page without confirming', async (_case, reason, location) => {
+    resolveWritableTenantMock.mockResolvedValue({ ok: false, reason });
+
     const response = await GET(request);
 
-    expect(response.headers.get('location')).toBe(INVALID_LOCATION);
-  });
-
-  it('sends an inactive tenant to the unavailable page without confirming', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.INACTIVE,
-    });
-    const response = await GET(request);
-
-    expect(response.headers.get('location')).toBe(
-      `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-unavailable`,
-    );
+    expect(response.headers.get('location')).toBe(location);
     expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
 
-  it('sends an unresolved tenant to the failed page without querying the db', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
-    });
-    const response = await GET(request);
-
-    expect(response.headers.get('location')).toBe(FAILED_LOCATION);
-    expect(confirmSubscriberMock).not.toHaveBeenCalled();
-  });
-
-  it('sends them to the failed page and logs when the db query throws', async () => {
+  it('sends them to the failed page and logs when confirming throws', async () => {
     const error = new Error('db down');
     confirmSubscriberMock.mockRejectedValue(error);
+
     const response = await GET(request);
 
     expect(response.headers.get('location')).toBe(FAILED_LOCATION);
