@@ -346,6 +346,9 @@ Run once, after all work is complete:
   you fixed in passing in touched files, and what you found and left, each
   with `file:line` (CLAUDE.md → "Examine before you change"). Write "nothing
   found" only after reading them.
+  A test file you touch is pruned (`testing-practices` → "When you touch a
+  test file"): list each test removed or moved, with the test that still
+  asserts its behaviour.
 - Exported functions and signatures
   (`service.pages.post.v1.getPost(slug: string, tenant: TTenantSanityContext)`).
 - View-model types `ui`/`web` will consume (`TPostDetail`).

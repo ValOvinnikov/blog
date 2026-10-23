@@ -262,8 +262,9 @@ ticket itself. Then sort what you find:
 - **Mechanical drift in a file the diff already touches is fixed in the same
   change** — a comment that fails the comment test, a type `@blog/config`
   already exports, a dead import or export, a pattern a later convention
-  replaced. This is the steady-state rule comments already follow, applied to
-  every convention.
+  replaced, a test file not yet pruned (`testing-practices` → "When you
+  touch a test file"). This is the steady-state rule comments already follow,
+  applied to every convention.
 - **Everything else is reported, not fixed** — drift in a file the diff does
   not touch, a behaviour change, a design call. It goes in the agent's
   **Examined** report section with `file:line`. The orchestrator lands it in
