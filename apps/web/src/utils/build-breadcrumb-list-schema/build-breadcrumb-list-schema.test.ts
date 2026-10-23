@@ -9,11 +9,13 @@ const HOME_PATH = routes.home();
 const NL_PREFIX = `/${LOCALE_BCP47_TAGS.NL}`;
 const TOPIC_PATH = '/topics/engineering';
 const POST_PATH = '/blog/hello-world';
+const HOME_LABEL = 'Home';
+const TOPIC_LABEL = 'Engineering';
 const POST_LABEL = 'Hello World';
 
 const trail: IBreadcrumbItem[] = [
-  { label: 'Home', href: HOME_PATH },
-  { label: 'Engineering', href: TOPIC_PATH },
+  { label: HOME_LABEL, href: HOME_PATH },
+  { label: TOPIC_LABEL, href: TOPIC_PATH },
   { label: POST_LABEL, href: POST_PATH },
 ];
 
@@ -30,13 +32,13 @@ describe(buildBreadcrumbListSchema, () => {
         {
           '@type': 'ListItem',
           position: 1,
-          name: 'Home',
+          name: HOME_LABEL,
           item: `${MOCK_TENANT_BASE_URL}${HOME_PATH}`,
         },
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'Engineering',
+          name: TOPIC_LABEL,
           item: `${MOCK_TENANT_BASE_URL}${TOPIC_PATH}`,
         },
         {
