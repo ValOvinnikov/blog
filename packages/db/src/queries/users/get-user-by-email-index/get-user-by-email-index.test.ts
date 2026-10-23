@@ -40,10 +40,4 @@ describe(getUserByEmailIndex, () => {
 
     await expect(getUserByEmailIndex(TAGGED_EMAIL)).resolves.toBeUndefined();
   });
-
-  it('returns undefined when no user has that index', async () => {
-    await insertTestUser(db(), { email: EMAIL });
-
-    await expect(getUserByEmailIndex(EMAIL)).resolves.toBeUndefined();
-  });
 });

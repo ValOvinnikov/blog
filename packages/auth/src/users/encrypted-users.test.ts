@@ -4,6 +4,7 @@ import {
   TEST_SESSION_TOKEN,
   TEST_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
+import type { TNullable } from '@blog/config/types';
 import { queries } from '@blog/db';
 import type { TUser } from '@blog/db/schema/auth';
 import {
@@ -139,29 +140,25 @@ describe(withEncryptedUsers, () => {
     });
   });
 
-  it('reads a user by id from the encrypted columns', async () => {
-    const user =
-      await withEncryptedUsers(buildAdapter()).getUser?.(TEST_USER_ID);
+  it.each<[string, (adapter: Adapter) => Promise<TNullable<AdapterUser>>]>([
+    ['by id', async (adapter) => adapter.getUser?.(TEST_USER_ID)],
+    [
+      'by provider account',
+      async (adapter) =>
+        adapter.getUserByAccount?.({
+          provider: TEST_PROVIDER,
+          providerAccountId: TEST_PROVIDER_ACCOUNT_ID,
+        }),
+    ],
+    [
+      'for a session',
+      async (adapter) =>
+        (await adapter.getSessionAndUser?.(TEST_SESSION_TOKEN))?.user,
+    ],
+  ])('reads a user %s from the encrypted columns', async (_label, read) => {
+    const user = await read(withEncryptedUsers(buildAdapter()));
 
     expect(user).toMatchObject(decrypted);
-  });
-
-  it('reads a user by provider account from the encrypted columns', async () => {
-    const user = await withEncryptedUsers(buildAdapter()).getUserByAccount?.({
-      provider: TEST_PROVIDER,
-      providerAccountId: TEST_PROVIDER_ACCOUNT_ID,
-    });
-
-    expect(user).toMatchObject(decrypted);
-  });
-
-  it("reads the session's user from the encrypted columns", async () => {
-    const found =
-      await withEncryptedUsers(buildAdapter()).getSessionAndUser?.(
-        TEST_SESSION_TOKEN,
-      );
-
-    expect(found?.user).toMatchObject(decrypted);
   });
 
   it('looks a user up by email index, never through the plain column', async () => {
@@ -175,23 +172,16 @@ describe(withEncryptedUsers, () => {
     expect(user).toMatchObject(decrypted);
   });
 
-  it('finds the user for another casing of the address', async () => {
-    getUserByEmailIndexMock.mockResolvedValue(storedUser());
-
-    const user = await withEncryptedUsers(buildAdapter()).getUserByEmail?.(
-      EMAIL.toUpperCase(),
-    );
-
-    expect(user).toMatchObject(decrypted);
-  });
-
-  it('finds no user when the stored email is not the requested address', async () => {
+  it.each([
+    ['another casing of the address', EMAIL.toUpperCase(), EMAIL],
+    ['a +tag variant of the stored address', TAGGED_EMAIL, null],
+  ])('resolves %s by email', async (_label, requested, expected) => {
     getUserByEmailIndexMock.mockResolvedValue(storedUser());
 
     const user =
-      await withEncryptedUsers(buildAdapter()).getUserByEmail?.(TAGGED_EMAIL);
+      await withEncryptedUsers(buildAdapter()).getUserByEmail?.(requested);
 
-    expect(user).toBeNull();
+    expect(user?.email ?? null).toBe(expected);
   });
 
   it('finds no user when no index matches', async () => {

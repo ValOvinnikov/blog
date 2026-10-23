@@ -1,10 +1,10 @@
+import type { TMaybeNull } from '@blog/config/types';
 import {
   decryptTestPersonalValue,
   testAccountEmailIndex,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
-import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
 import { faker } from '@faker-js/faker';
 
 import {
@@ -18,62 +18,42 @@ import {
 } from './personal-data';
 
 const EMAIL = faker.internet.email().toLowerCase();
-const TAGGED_EMAIL = taggedMixedCaseAddress(EMAIL);
 
 describe('with both personal data keys configured', () => {
   usePersonalDataKeys();
 
   it('encrypts a value so only the keyring reads it back', () => {
-    const encrypted = encryptPersonalValue(EMAIL);
-
-    expect(encrypted).not.toContain(EMAIL);
-    expect(decryptTestPersonalValue(encrypted)).toBe(EMAIL);
-  });
-
-  it('decrypts a value it encrypted', () => {
     const encrypted = encryptPersonalValue(EMAIL) ?? '';
 
+    expect(encrypted).not.toContain(EMAIL);
     expect(decryptPersonalValue(encrypted)).toBe(EMAIL);
   });
 
-  it('gives an email its encrypted form and its index', () => {
-    const { emailEncrypted, emailIndex } = personalEmailColumns(EMAIL);
-
-    expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
-    expect(emailIndex).toBe(testPersonalEmailIndex(EMAIL));
+  it.each<[string, () => TMaybeNull<string>, string]>([
+    ['an encrypted value', () => encryptPersonalValue(EMAIL), ''],
+    ['the plain value of a row not yet encrypted', () => null, EMAIL],
+  ])('reads %s', (_label, encrypted, plain) => {
+    expect(readPersonalValue(encrypted(), plain)).toBe(EMAIL);
   });
 
-  it('reads an encrypted value back', () => {
-    expect(readPersonalValue(encryptPersonalValue(EMAIL), '')).toBe(EMAIL);
-  });
+  it.each([
+    ['personal', personalEmailColumns, testPersonalEmailIndex],
+    ['account', accountEmailColumns, testAccountEmailIndex],
+  ])(
+    'gives a %s email its encrypted form and its index',
+    (_kind, columns, index) => {
+      const { emailEncrypted, emailIndex } = columns(EMAIL);
 
-  it('reads the plain value of a row not yet encrypted', () => {
-    expect(readPersonalValue(null, EMAIL)).toBe(EMAIL);
-  });
+      expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
+      expect(emailIndex).toBe(index(EMAIL));
+    },
+  );
 
-  it('indexes an email for lookup', () => {
-    expect(requirePersonalEmailIndex(EMAIL)).toBe(
-      testPersonalEmailIndex(EMAIL),
-    );
-  });
-
-  it('gives an account email its encrypted form and its exact-address index', () => {
-    const { emailEncrypted, emailIndex } = accountEmailColumns(EMAIL);
-
-    expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
-    expect(emailIndex).toBe(testAccountEmailIndex(EMAIL));
-  });
-
-  it('indexes a +tag variant of an account email apart from the address', () => {
-    expect(requireAccountEmailIndex(TAGGED_EMAIL)).not.toBe(
-      requireAccountEmailIndex(EMAIL),
-    );
-  });
-
-  it('indexes a +tag variant of a personal email with the address', () => {
-    expect(requirePersonalEmailIndex(TAGGED_EMAIL)).toBe(
-      requirePersonalEmailIndex(EMAIL),
-    );
+  it.each([
+    [requirePersonalEmailIndex, testPersonalEmailIndex],
+    [requireAccountEmailIndex, testAccountEmailIndex],
+  ])('%o indexes an email for lookup', (requireIndex, index) => {
+    expect(requireIndex(EMAIL)).toBe(index(EMAIL));
   });
 });
 

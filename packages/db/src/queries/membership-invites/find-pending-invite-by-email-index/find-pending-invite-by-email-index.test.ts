@@ -58,21 +58,23 @@ describe(findPendingInviteByEmailIndex, () => {
     );
   });
 
-  it('never matches an invite sent to an address by a +tag variant of it', async () => {
-    await insertInvite(null);
+  it.each([
+    [
+      'an address by a +tag variant of it',
+      TEST_INVITE_EMAIL,
+      TAGGED_INVITE_EMAIL,
+    ],
+    ['a +tag variant by the address', TAGGED_INVITE_EMAIL, TEST_INVITE_EMAIL],
+  ])(
+    'never matches an invite sent to %s',
+    async (_label, sentTo, requested) => {
+      await insertInvite(null, sentTo);
 
-    await expect(
-      findPendingInviteByEmailIndex(TAGGED_INVITE_EMAIL),
-    ).resolves.toEqual([]);
-  });
-
-  it('never matches an invite sent to a +tag variant by the address', async () => {
-    await insertInvite(null, TAGGED_INVITE_EMAIL);
-
-    await expect(
-      findPendingInviteByEmailIndex(TEST_INVITE_EMAIL),
-    ).resolves.toEqual([]);
-  });
+      await expect(findPendingInviteByEmailIndex(requested)).resolves.toEqual(
+        [],
+      );
+    },
+  );
 
   it('matches an invite not yet backfilled by its plain email', async () => {
     const { id: tenantId } = await insertTestTenant(db());

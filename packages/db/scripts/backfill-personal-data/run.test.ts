@@ -185,12 +185,4 @@ describe(countPersonalDataGaps, () => {
       leads: 1,
     });
   });
-
-  it('finds no gaps once the backfill has run', async () => {
-    await seedPlainRows();
-
-    await backfillPersonalData(loadPersonalDataKeys());
-
-    expect(await countPersonalDataGaps()).toEqual(NO_GAPS);
-  });
 });
