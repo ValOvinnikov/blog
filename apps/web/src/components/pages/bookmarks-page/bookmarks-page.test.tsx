@@ -162,10 +162,12 @@ describe(`<${BookmarksPage.name}/>`, () => {
   it('renders the catalog empty message when there are no bookmarks', async () => {
     await setup();
 
+    const emptyMessage = screen.getByText(
+      'No bookmarks yet — save a post to find it here.',
+    );
+
     expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('bookmarksEmpty');
-    expect(
-      screen.getByText('No bookmarks yet — save a post to find it here.'),
-    ).toBeVisible();
+    expect(emptyMessage).toBeVisible();
   });
 
   it('renders the tenant-authored empty message with its formatting and link', async () => {
@@ -175,12 +177,13 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('link', { name: LINK_TEXT })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-    expect(screen.getByText('bold', { selector: 'strong' })).toBeVisible();
-    expect(screen.getByText('italic', { selector: 'em' })).toBeVisible();
+    const inlineLink = screen.getByRole('link', { name: LINK_TEXT });
+    const boldText = screen.getByText('bold', { selector: 'strong' });
+    const italicText = screen.getByText('italic', { selector: 'em' });
+
+    expect(inlineLink).toHaveAttribute('href', '/blog');
+    expect(boldText).toBeVisible();
+    expect(italicText).toBeVisible();
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {

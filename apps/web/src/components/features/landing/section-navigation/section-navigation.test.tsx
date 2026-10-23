@@ -135,7 +135,9 @@ describe(`<${SectionNavigation.name}/>`, () => {
     it('starts with a back link to the parent section', () => {
       const backLink = screen.getByRole('link', { name: BACK_LINK_NAME });
 
-      expect(screen.getAllByRole('link').at(0)).toBe(backLink);
+      const firstLink = screen.getAllByRole('link').at(0);
+
+      expect(firstLink).toBe(backLink);
     });
 
     it("points the back link at the parent section's path", () => {

@@ -42,9 +42,11 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
@@ -56,9 +58,11 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
@@ -67,9 +71,11 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
   });
 
   it('shows the active subscription with an unsubscribe button', async () => {
@@ -80,13 +86,19 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
+    const subscribedText = screen.getByText('Subscribed');
+    const userEmailText = screen.getByText(MOCK_ACCOUNT_USER.email);
+    const unsubscribeButton = screen.getByRole('button', {
+      name: 'Unsubscribe',
+    });
+
     expect(getSubscriptionStatusMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_ACCOUNT_USER.id,
     );
-    expect(screen.getByText('Subscribed')).toBeVisible();
-    expect(screen.getByText(MOCK_ACCOUNT_USER.email)).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
+    expect(subscribedText).toBeVisible();
+    expect(userEmailText).toBeVisible();
+    expect(unsubscribeButton).toBeVisible();
   });
 
   it('offers to resend the confirmation for a pending subscription', async () => {
@@ -97,9 +109,12 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Pending confirmation')).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Resend confirmation' }),
-    ).toBeVisible();
+    const pendingConfirmationText = screen.getByText('Pending confirmation');
+    const resendConfirmationButton = screen.getByRole('button', {
+      name: 'Resend confirmation',
+    });
+
+    expect(pendingConfirmationText).toBeVisible();
+    expect(resendConfirmationButton).toBeVisible();
   });
 });

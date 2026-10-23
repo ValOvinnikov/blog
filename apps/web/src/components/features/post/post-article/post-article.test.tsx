@@ -111,22 +111,22 @@ describe(`<${PostArticle.name}/>`, () => {
       await setup();
 
       const header = screen.getByTestId('post-article-header');
-      await waitFor(() =>
-        expect(
-          within(header).getByRole('button', { name: 'Save post' }),
-        ).toBeEnabled(),
-      );
-      expect(
-        within(header).getByRole('button', { name: /Share/ }),
-      ).toBeVisible();
+      const saveButton = await within(header).findByRole('button', {
+        name: 'Save post',
+      });
+      await waitFor(() => expect(saveButton).toBeEnabled());
+      const shareButton = within(header).getByRole('button', { name: /Share/ });
+
+      expect(shareButton).toBeVisible();
     });
 
     it('checks the bookmark status of this post', async () => {
       await setup();
 
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
-      );
+      const saveButton = await screen.findByRole('button', {
+        name: 'Save post',
+      });
+      await waitFor(() => expect(saveButton).toBeEnabled());
       expect(getBookmarkStatus).toHaveBeenCalledWith(MOCK_POST_DETAIL.id);
     });
   });
@@ -141,10 +141,11 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Engineering')).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'Engineering' }),
-    ).not.toBeInTheDocument();
+    const engineeringText = screen.getByText('Engineering');
+    const engineeringLink = screen.queryByRole('link', { name: 'Engineering' });
+
+    expect(engineeringText).toBeVisible();
+    expect(engineeringLink).not.toBeInTheDocument();
   });
 
   it('links the author to whatever href the service resolved', async () => {
@@ -160,10 +161,9 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
-      'href',
-      AUTHOR_PROFILE_URL,
-    );
+    const janeDoeLink = screen.getByRole('link', { name: 'Jane Doe' });
+
+    expect(janeDoeLink).toHaveAttribute('href', AUTHOR_PROFILE_URL);
   });
 
   it('renders the hero image with its own alt text', async () => {
@@ -181,7 +181,9 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('img', { name: heroImage.alt })).toBeVisible();
+    const heroImageElement = screen.getByRole('img', { name: heroImage.alt });
+
+    expect(heroImageElement).toBeVisible();
   });
 
   it('renders the contents rail once the body has 3+ H2 headings', async () => {
@@ -199,9 +201,11 @@ describe(`<${PostArticle.name}/>`, () => {
     await setup();
 
     const rail = screen.getByRole('navigation', { name: 'Contents' });
-    expect(
-      within(rail).getByRole('link', { name: 'Configuration' }),
-    ).toHaveAttribute('href', '#configuration');
+    const configurationLink = within(rail).getByRole('link', {
+      name: 'Configuration',
+    });
+
+    expect(configurationLink).toHaveAttribute('href', '#configuration');
   });
 
   it('renders the post tags as links to routes.tag(slug)', async () => {
@@ -217,14 +221,11 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
-      'href',
-      '/tags/typescript',
-    );
-    expect(screen.getByRole('link', { name: 'React' })).toHaveAttribute(
-      'href',
-      '/tags/react',
-    );
+    const typeScriptLink = screen.getByRole('link', { name: 'TypeScript' });
+    const reactLink = screen.getByRole('link', { name: 'React' });
+
+    expect(typeScriptLink).toHaveAttribute('href', '/tags/typescript');
+    expect(reactLink).toHaveAttribute('href', '/tags/react');
   });
 
   it('omits a tag with no tag page from the footer', async () => {
@@ -240,8 +241,11 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toBeVisible();
-    expect(screen.queryByText('React')).not.toBeInTheDocument();
+    const typeScriptLink = screen.getByRole('link', { name: 'TypeScript' });
+    const reactText = screen.queryByText('React');
+
+    expect(typeScriptLink).toBeVisible();
+    expect(reactText).not.toBeInTheDocument();
   });
 
   describe('with the default post', () => {
@@ -257,25 +261,36 @@ describe(`<${PostArticle.name}/>`, () => {
     });
 
     it('renders the post title, lead, author, and body', async () => {
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Hello World' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('A sufficiently long excerpt for the card.'),
-      ).toBeVisible();
-      expect(screen.getByText('Body text.')).toBeVisible();
-      expect(screen.getByText('Jane Doe')).toBeVisible();
+      const helloWorldHeading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Hello World',
+      });
+      const leadText = screen.getByText(
+        'A sufficiently long excerpt for the card.',
+      );
+      const bodyText = screen.getByText('Body text.');
+      const janeDoeText = screen.getByText('Jane Doe');
+
+      expect(helloWorldHeading).toBeVisible();
+      expect(leadText).toBeVisible();
+      expect(bodyText).toBeVisible();
+      expect(janeDoeText).toBeVisible();
     });
 
     it('renders no bookmark toggle when bookmarks are not enabled', async () => {
-      expect(
-        screen.queryByRole('button', { name: 'Save post' }),
-      ).not.toBeInTheDocument();
+      const savePostButton = screen.queryByRole('button', {
+        name: 'Save post',
+      });
+
+      expect(savePostButton).not.toBeInTheDocument();
     });
 
     it('renders the published date (year/month/day) and the reading time', async () => {
-      expect(screen.getByText('January 15, 2026')).toBeVisible();
-      expect(screen.getByText('4 min read')).toBeVisible();
+      const publishedDateText = screen.getByText('January 15, 2026');
+      const readingTimeText = screen.getByText('4 min read');
+
+      expect(publishedDateText).toBeVisible();
+      expect(readingTimeText).toBeVisible();
     });
 
     it('links the topic eyebrow and the author name to their routes', async () => {
@@ -284,21 +299,24 @@ describe(`<${PostArticle.name}/>`, () => {
       topicLinks.forEach((link) => {
         expect(link).toHaveAttribute('href', '/topics/engineering');
       });
-      expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
-        'href',
-        '/jane-doe',
-      );
+      const janeDoeLink = screen.getByRole('link', { name: 'Jane Doe' });
+
+      expect(janeDoeLink).toHaveAttribute('href', '/jane-doe');
     });
 
     it('renders the share widget with an X and a LinkedIn link', async () => {
-      await userEvent.click(screen.getByRole('button', { name: /Share/ }));
+      const shareButton = screen.getByRole('button', { name: /Share/ });
+      await userEvent.click(shareButton);
 
-      expect(
-        screen.getByRole('menuitem', { name: /Share on X/ }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
-      ).toBeVisible();
+      const shareOnXMenuItem = screen.getByRole('menuitem', {
+        name: /Share on X/,
+      });
+      const shareOnLinkedInMenuItem = screen.getByRole('menuitem', {
+        name: /Share on LinkedIn/,
+      });
+
+      expect(shareOnXMenuItem).toBeVisible();
+      expect(shareOnLinkedInMenuItem).toBeVisible();
     });
 
     it('builds the author avatar at a fixed 64x64 crop, not the full-size asset', async () => {
@@ -308,22 +326,23 @@ describe(`<${PostArticle.name}/>`, () => {
         { width: 64, height: 64, fit: 'crop', quality: 75 },
       );
 
-      expect(screen.getByRole('presentation')).toHaveAttribute(
-        'src',
-        expectedAvatarUrl,
-      );
+      const avatarImage = screen.getByRole('presentation');
+
+      expect(avatarImage).toHaveAttribute('src', expectedAvatarUrl);
     });
 
     it('renders no contents rail when the body has fewer than 3 H2 headings', async () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'Contents' }),
-      ).not.toBeInTheDocument();
+      const contentsNav = screen.queryByRole('navigation', {
+        name: 'Contents',
+      });
+
+      expect(contentsNav).not.toBeInTheDocument();
     });
 
     it('renders no tag chips when the post has no tags', async () => {
-      expect(
-        screen.queryByRole('link', { name: 'TypeScript' }),
-      ).not.toBeInTheDocument();
+      const typeScriptLink = screen.queryByRole('link', { name: 'TypeScript' });
+
+      expect(typeScriptLink).not.toBeInTheDocument();
     });
   });
 });

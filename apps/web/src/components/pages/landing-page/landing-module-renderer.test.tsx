@@ -154,9 +154,9 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
       modules: [{ id: SECTION_PAGES_ID, type: 'module_sectionPages' }],
     });
 
-    expect(screen.getByTestId('stub-section-pages')).toHaveTextContent(
-      SECTION_PAGES_ID,
-    );
+    const stubSectionPages = screen.getByTestId('stub-section-pages');
+
+    expect(stubSectionPages).toHaveTextContent(SECTION_PAGES_ID);
     expect(sectionPagesModuleMock).toHaveBeenCalledWith(
       {
         id: SECTION_PAGES_ID,

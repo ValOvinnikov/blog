@@ -75,38 +75,50 @@ describe(`<${BlogPostPage.name}/>`, () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Engineering' }),
-      ).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      const northwindJournalLink = within(breadcrumbs).getByRole('link', {
+        name: 'Northwind Journal',
+      });
+      const engineeringLink = within(breadcrumbs).getByRole('link', {
+        name: 'Engineering',
+      });
+      const main = screen.getByRole('main');
+
+      expect(northwindJournalLink).toBeVisible();
+      expect(engineeringLink).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
     });
 
     it('renders the post article inside main', () => {
       const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', {
-          level: 1,
-          name: MOCK_POST_DETAIL.title,
-        }),
-      ).toBeVisible();
-      expect(within(main).getByText('Body text.')).toBeVisible();
+      const titleHeading = within(main).getByRole('heading', {
+        level: 1,
+        name: MOCK_POST_DETAIL.title,
+      });
+      const bodyText = within(main).getByText('Body text.');
+
+      expect(titleHeading).toBeVisible();
+      expect(bodyText).toBeVisible();
     });
 
     it('renders exactly one h1, from the post', () => {
-      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-      expect(
-        screen.getByRole('heading', { level: 1, name: MOCK_POST_DETAIL.title }),
-      ).toBeVisible();
+      const h1Headings = screen.getAllByRole('heading', { level: 1 });
+      const titleHeading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_POST_DETAIL.title,
+      });
+
+      expect(h1Headings).toHaveLength(1);
+      expect(titleHeading).toBeVisible();
     });
 
     it('renders no reading-depth control without a skim or asides', () => {
-      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('region', { name: SUMMARY_REGION_NAME }),
-      ).not.toBeInTheDocument();
+      const radiogroup = screen.queryByRole('radiogroup');
+      const summaryRegion = screen.queryByRole('region', {
+        name: SUMMARY_REGION_NAME,
+      });
+
+      expect(radiogroup).not.toBeInTheDocument();
+      expect(summaryRegion).not.toBeInTheDocument();
     });
   });
 
@@ -140,7 +152,9 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: 'Deep' })).toBeVisible();
+    const deepRadio = screen.getByRole('radio', { name: 'Deep' });
+
+    expect(deepRadio).toBeVisible();
   });
 
   it('renders the 30s option and the skim panel once the post has a skim', async () => {
@@ -158,10 +172,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: '30s' })).toBeVisible();
+    const thirtySecondRadio = screen.getByRole('radio', { name: '30s' });
+
+    expect(thirtySecondRadio).toBeVisible();
     const skim = within(screen.getByRole('main')).getByRole('region', {
       name: SUMMARY_REGION_NAME,
     });
-    expect(within(skim).getByText('First.')).toBeVisible();
+    const firstText = within(skim).getByText('First.');
+
+    expect(firstText).toBeVisible();
   });
 });

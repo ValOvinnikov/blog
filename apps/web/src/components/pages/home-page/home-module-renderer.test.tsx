@@ -114,10 +114,10 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     await setup({ hero: { id: 'hero-1', type: 'module_heroStatement' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
+    const heroStatement = screen.getByTestId(HERO_STATEMENT_TEST_ID);
+
     expect(headings).toHaveLength(1);
-    expect(screen.getByTestId(HERO_STATEMENT_TEST_ID)).toHaveTextContent(
-      'hero-1',
-    );
+    expect(heroStatement).toHaveTextContent('hero-1');
   });
 
   it('renders the resolved hero before the modules when the page has both', async () => {
@@ -141,9 +141,11 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
+    const stubHero = screen.queryByTestId('stub-hero');
+
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent(PAGE_HEADING);
-    expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
+    expect(stubHero).not.toBeInTheDocument();
   });
 
   testHeroProfileHero({ setup, loggerWarnMock });

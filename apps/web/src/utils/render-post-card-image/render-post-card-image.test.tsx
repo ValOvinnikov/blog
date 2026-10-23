@@ -35,13 +35,17 @@ describe('renderPostCardImage', () => {
     });
 
     it('never sets priority/fetchpriority on a grid image', () => {
-      expect(screen.getByRole('img')).not.toHaveAttribute('fetchpriority');
+      const img = screen.getByRole('img');
+
+      expect(img).not.toHaveAttribute('fetchpriority');
     });
   });
 
   it('renders nothing for a post with no hero image', () => {
     setup({ post: mockPostCard({ heroImage: undefined }) });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const img = screen.queryByRole('img');
+
+    expect(img).not.toBeInTheDocument();
   });
 });

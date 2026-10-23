@@ -12,34 +12,51 @@ describe(`<${IdentitySectionView.name}/>`, () => {
     });
 
     it('renders the panel heading as a level-2 heading', () => {
-      expect(
-        screen.getByRole('heading', { level: 2, name: /Connected accounts/ }),
-      ).toBeVisible();
+      const connectedAccountsHeading = screen.getByRole('heading', {
+        level: 2,
+        name: /Connected accounts/,
+      });
+
+      expect(connectedAccountsHeading).toBeVisible();
     });
 
     it('renders each provider name as a level-3 heading', () => {
-      expect(
-        screen.getByRole('heading', { level: 3, name: 'GitHub' }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 3, name: 'Google' }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 3, name: 'Email link' }),
-      ).toBeVisible();
+      const gitHubHeading = screen.getByRole('heading', {
+        level: 3,
+        name: 'GitHub',
+      });
+      const googleHeading = screen.getByRole('heading', {
+        level: 3,
+        name: 'Google',
+      });
+      const emailLinkHeading = screen.getByRole('heading', {
+        level: 3,
+        name: 'Email link',
+      });
+
+      expect(gitHubHeading).toBeVisible();
+      expect(googleHeading).toBeVisible();
+      expect(emailLinkHeading).toBeVisible();
     });
 
     it('shows the linked-status label for a linked row', () => {
-      expect(screen.getAllByText('Linked').length).toBeGreaterThan(0);
+      const linkedLabels = screen.getAllByText('Linked');
+
+      expect(linkedLabels.length).toBeGreaterThan(0);
     });
 
     it('renders the given control for a row that is not the last remaining method', () => {
-      expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
+      const unlinkButton = screen.getByRole('button', { name: 'Unlink' });
+
+      expect(unlinkButton).toBeVisible();
     });
 
     it('renders the given display-name control inside the display-name row', () => {
-      expect(screen.getByText('Display name')).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+      const displayNameText = screen.getByText('Display name');
+      const saveButton = screen.getByRole('button', { name: 'Save' });
+
+      expect(displayNameText).toBeVisible();
+      expect(saveButton).toBeVisible();
     });
   });
 
@@ -61,11 +78,12 @@ describe(`<${IdentitySectionView.name}/>`, () => {
       ),
     });
 
-    expect(
-      screen.getByText("Last remaining method — can't unlink"),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Unlink' }),
-    ).not.toBeInTheDocument();
+    const lastRemainingMethodText = screen.getByText(
+      "Last remaining method — can't unlink",
+    );
+    const unlinkButton = screen.queryByRole('button', { name: 'Unlink' });
+
+    expect(lastRemainingMethodText).toBeVisible();
+    expect(unlinkButton).not.toBeInTheDocument();
   });
 });

@@ -87,7 +87,9 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
       ] as unknown as TModule<TPagePostType>[],
     });
 
-    expect(screen.queryByText('hero-1')).not.toBeInTheDocument();
+    const heroText = screen.queryByText('hero-1');
+
+    expect(heroText).not.toBeInTheDocument();
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
     expect(loggerWarnMock).toHaveBeenCalledWith(
       'module_renderer.unknown_module_type',
@@ -101,8 +103,8 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
       context: { post: { id: 'post-1' } },
     });
 
-    expect(screen.getByTestId(POST_RELATED_TEST_ID)).toHaveTextContent(
-      'related-1:post-1',
-    );
+    const relatedPosts = screen.getByTestId(POST_RELATED_TEST_ID);
+
+    expect(relatedPosts).toHaveTextContent('related-1:post-1');
   });
 });

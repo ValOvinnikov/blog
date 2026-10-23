@@ -22,9 +22,12 @@ describe(`<${PrivacySection.name}/>`, () => {
   });
 
   it('renders the panel heading as a level-2 heading', () => {
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Privacy' }),
-    ).toBeVisible();
+    const privacyHeading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Privacy',
+    });
+
+    expect(privacyHeading).toBeVisible();
   });
 
   it('renders the export row as a download link to the export route', () => {
@@ -38,12 +41,10 @@ describe(`<${PrivacySection.name}/>`, () => {
     const deleteButton = screen.getByRole('button', { name: 'Delete account' });
     expect(deleteButton).toBeDisabled();
 
-    await user.type(
-      screen.getByRole('textbox', {
-        name: 'Type your handle to confirm deletion',
-      }),
-      'jane',
-    );
+    const handleTextbox = screen.getByRole('textbox', {
+      name: 'Type your handle to confirm deletion',
+    });
+    await user.type(handleTextbox, 'jane');
 
     expect(deleteButton).toBeEnabled();
   });

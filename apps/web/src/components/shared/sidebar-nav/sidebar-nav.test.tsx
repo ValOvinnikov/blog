@@ -86,15 +86,19 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('starts with the mobile disclosure closed and its links hidden', () => {
+      const links = screen.getAllByRole('link');
+
       expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT);
+      expect(links).toHaveLength(ITEM_COUNT);
     });
 
     it('opens the mobile disclosure on trigger click, exposing plain links', async () => {
       await user.click(trigger);
 
+      const links = screen.getAllByRole('link');
+
       expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT * 2);
+      expect(links).toHaveLength(ITEM_COUNT * 2);
     });
 
     it('never puts WAI-ARIA menu roles on either copy of the list', async () => {
@@ -128,16 +132,20 @@ describe(`<${SidebarNav.name}/>`, () => {
       await user.click(trigger);
       fireEvent.keyDown(document, { key: 'Escape' });
 
+      const links = screen.getAllByRole('link');
+
       expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT);
+      expect(links).toHaveLength(ITEM_COUNT);
     });
 
     it('closes the mobile disclosure on an outside click', async () => {
       await user.click(trigger);
       fireEvent.mouseDown(document.body);
 
+      const links = screen.getAllByRole('link');
+
       expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(screen.getAllByRole('link')).toHaveLength(ITEM_COUNT);
+      expect(links).toHaveLength(ITEM_COUNT);
     });
 
     it('closes the mobile disclosure when one of its links is clicked', async () => {
@@ -172,7 +180,9 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('marks no item current', () => {
-      screen.getAllByRole('link').forEach((link) => {
+      const links = screen.getAllByRole('link');
+
+      links.forEach((link) => {
         expect(link).not.toHaveAttribute(ARIA_CURRENT);
       });
     });
