@@ -9,6 +9,7 @@ import {
   fillAndSendContactForm,
   getContactFormFields,
 } from '@web/testing/modules/contact-form/contact-form-fields';
+import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';
 
 import { ContactForm } from './contact-form';
 
@@ -17,33 +18,30 @@ vi.mock('@web/i18n/navigation');
 const { EN, NL } = LOCALE_ISO_CODES;
 const { submitLabel, errorEmail } = SITE_MESSAGES.contactForm;
 
-const SUCCESS_MESSAGE = faker.lorem.sentence();
-const NAME = faker.person.fullName();
-const EMAIL = faker.internet.email();
-const MESSAGE = faker.lorem.sentences(2);
-const PRIVACY_NOTE = faker.lorem.sentence();
-const PATHNAME = `/${faker.lorem.slug()}`;
+const MOCK_SUCCESS_MESSAGE = faker.lorem.sentence();
+const MOCK_PRIVACY_NOTE = faker.lorem.sentence();
+const MOCK_PATHNAME = `/${faker.lorem.slug()}`;
 
 const submitMessage = vi.fn<TSubmitContactMessage>();
 
 const setup = customRender(ContactForm, {
-  successMessage: SUCCESS_MESSAGE,
+  successMessage: MOCK_SUCCESS_MESSAGE,
   submitMessage,
   currentLocale: EN,
   defaultLocale: EN,
 });
 
-const TYPED = { name: NAME, email: EMAIL, message: MESSAGE };
-const SENT_INPUT = { ...TYPED, website: '' };
+const MOCK_SENT_INPUT = { ...MOCK_CONTACT_MESSAGE, website: '' };
 
-const fillAndSend = (user: UserEvent) => fillAndSendContactForm(user, TYPED);
+const fillAndSend = (user: UserEvent) =>
+  fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
 
 describe(`<${ContactForm.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.mocked(usePathname).mockReturnValue(PATHNAME);
+    vi.mocked(usePathname).mockReturnValue(MOCK_PATHNAME);
     submitMessage.mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
@@ -53,8 +51,8 @@ describe(`<${ContactForm.name}/>`, () => {
     await fillAndSend(user);
 
     expect(submitMessage).toHaveBeenCalledWith({
-      ...SENT_INPUT,
-      sourcePath: PATHNAME,
+      ...MOCK_SENT_INPUT,
+      sourcePath: MOCK_PATHNAME,
     });
   });
 
@@ -67,7 +65,7 @@ describe(`<${ContactForm.name}/>`, () => {
     await fillAndSend(user);
 
     expect(submitMessage).toHaveBeenCalledWith({
-      ...SENT_INPUT,
+      ...MOCK_SENT_INPUT,
       sourcePath: '/nl/contact',
     });
   });
@@ -94,7 +92,7 @@ describe(`<${ContactForm.name}/>`, () => {
 
     await fillAndSend(user);
 
-    await waitFor(() => expect(status).toHaveTextContent(SUCCESS_MESSAGE));
+    await waitFor(() => expect(status).toHaveTextContent(MOCK_SUCCESS_MESSAGE));
   });
 
   it.each([
@@ -112,9 +110,9 @@ describe(`<${ContactForm.name}/>`, () => {
       const { nameField, emailField, messageField } = getContactFormFields();
 
       expect(alert).toHaveTextContent(text);
-      expect(nameField).toHaveValue(NAME);
-      expect(emailField).toHaveValue(EMAIL);
-      expect(messageField).toHaveValue(MESSAGE);
+      expect(nameField).toHaveValue(MOCK_CONTACT_MESSAGE.name);
+      expect(emailField).toHaveValue(MOCK_CONTACT_MESSAGE.email);
+      expect(messageField).toHaveValue(MOCK_CONTACT_MESSAGE.message);
     },
   );
 
@@ -162,9 +160,9 @@ describe(`<${ContactForm.name}/>`, () => {
   });
 
   it('renders the privacy note under the send button', () => {
-    setup({ privacyNote: PRIVACY_NOTE });
+    setup({ privacyNote: MOCK_PRIVACY_NOTE });
 
-    const privacyNote = screen.getByText(PRIVACY_NOTE);
+    const privacyNote = screen.getByText(MOCK_PRIVACY_NOTE);
 
     expect(privacyNote).toBeVisible();
   });

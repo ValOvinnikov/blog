@@ -1,15 +1,15 @@
 import { ACTION_OUTCOME, CAPABILITY, LOCALE_ISO_CODES } from '@blog/config';
 import type { queries } from '@blog/db';
-import {
-  TENANT_PLAN,
-  TENANT_STATUS,
-  type TTenantStatus,
-} from '@blog/db/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
+import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import {
@@ -67,45 +67,32 @@ vi.mock(
   () => ({ getEffectiveSettingsFeatures: getEffectiveSettingsFeaturesMock }),
 );
 
-const NAME = faker.person.fullName();
-const EMAIL = faker.internet.email();
-const MESSAGE = faker.lorem.sentences(2);
-const SOURCE_PATH = `/${faker.lorem.slug()}`;
-const LEAD_ID = faker.string.uuid();
-const CREATED_AT = faker.date.recent();
-const SOURCE: TContactMessageSource = {
+const MOCK_SOURCE_PATH = `/${faker.lorem.slug()}`;
+const MOCK_LEAD_ID = faker.string.uuid();
+const MOCK_CREATED_AT = faker.date.recent();
+const MOCK_SOURCE: TContactMessageSource = {
   sourceDocumentId: faker.string.uuid(),
   sourceLocale: LOCALE_ISO_CODES.NL,
 };
 
-const makeInput = (
+const mockInput = (
   overrides: Partial<TContactMessageInput> = {},
 ): TContactMessageInput => ({
-  name: NAME,
-  email: EMAIL,
-  message: MESSAGE,
+  ...MOCK_CONTACT_MESSAGE,
   website: '',
-  sourcePath: SOURCE_PATH,
+  sourcePath: MOCK_SOURCE_PATH,
   ...overrides,
 });
 
-const STORED_LEAD: queries.leads.TCreateLeadInput = {
+const MOCK_STORED_LEAD: queries.leads.TCreateLeadInput = {
   tenantId: MOCK_TENANT_ID,
-  name: NAME,
-  email: EMAIL,
-  message: MESSAGE,
-  sourcePath: SOURCE_PATH,
-  ...SOURCE,
+  ...MOCK_CONTACT_MESSAGE,
+  sourcePath: MOCK_SOURCE_PATH,
+  ...MOCK_SOURCE,
 };
 
-const submit = (input: TContactMessageInput = makeInput()) =>
-  submitContactMessage(input, SOURCE);
-
-const tenantWithStatus = (status: TTenantStatus) => ({
-  id: MOCK_TENANT_ID,
-  status,
-  deprovisionedAt: null,
-});
+const submit = (input: TContactMessageInput = mockInput()) =>
+  submitContactMessage(input, MOCK_SOURCE);
 
 describe(submitContactMessage, () => {
   beforeEach(() => {
@@ -115,12 +102,10 @@ describe(submitContactMessage, () => {
     getEffectiveSettingsFeaturesMock.mockResolvedValue(
       okResult({ [CAPABILITY.CONTACT_FORM]: true }),
     );
-    resolveRequestTenantMock.mockResolvedValue(
-      tenantWithStatus(TENANT_STATUS.ACTIVE),
-    );
+    resolveRequestTenantMock.mockResolvedValue(mockTenant());
     createLeadMock.mockImplementation(async (input) => ({
-      id: LEAD_ID,
-      createdAt: CREATED_AT,
+      id: MOCK_LEAD_ID,
+      createdAt: MOCK_CREATED_AT,
       ...input,
     }));
     sendContactNotificationMock.mockResolvedValue(undefined);
@@ -130,11 +115,11 @@ describe(submitContactMessage, () => {
     const result = await submit();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(createLeadMock).toHaveBeenCalledWith(STORED_LEAD);
+    expect(createLeadMock).toHaveBeenCalledWith(MOCK_STORED_LEAD);
     expect(sendContactNotificationMock).toHaveBeenCalledWith({
-      id: LEAD_ID,
-      createdAt: CREATED_AT,
-      ...STORED_LEAD,
+      id: MOCK_LEAD_ID,
+      createdAt: MOCK_CREATED_AT,
+      ...MOCK_STORED_LEAD,
     });
   });
 
@@ -155,7 +140,7 @@ describe(submitContactMessage, () => {
       'a suspended tenant',
       () =>
         resolveRequestTenantMock.mockResolvedValue(
-          tenantWithStatus(TENANT_STATUS.SUSPENDED),
+          mockTenant({ status: TENANT_STATUS.SUSPENDED }),
         ),
     ],
     [
@@ -180,7 +165,7 @@ describe(submitContactMessage, () => {
   });
 
   it('blocks a filled honeypot before the rate limit, without storing or sending', async () => {
-    const result = await submit(makeInput({ website: faker.internet.url() }));
+    const result = await submit(mockInput({ website: faker.internet.url() }));
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
     expect(isRateLimitedMock).not.toHaveBeenCalled();
@@ -198,7 +183,7 @@ describe(submitContactMessage, () => {
 
   it('names every invalid field without storing or sending', async () => {
     const result = await submit(
-      makeInput({
+      mockInput({
         name: ' ',
         email: faker.lorem.word(),
         message: faker.string.alpha(9),
@@ -217,7 +202,7 @@ describe(submitContactMessage, () => {
   });
 
   it('treats a field that is not text as empty', async () => {
-    const result = await submit(makeInput({ name: 42 as unknown as string }));
+    const result = await submit(mockInput({ name: 42 as unknown as string }));
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -229,23 +214,23 @@ describe(submitContactMessage, () => {
     const firstName = faker.person.firstName();
     const injected = `Bcc: ${faker.internet.email()}`;
 
-    await submit(makeInput({ name: `${firstName}\r\n${injected}` }));
+    await submit(mockInput({ name: `${firstName}\r\n${injected}` }));
 
     expect(createLeadMock).toHaveBeenCalledWith({
-      ...STORED_LEAD,
+      ...MOCK_STORED_LEAD,
       name: `${firstName} ${injected}`,
     });
   });
 
   it('stores the site root when the source path is not a local path', async () => {
     await submit(
-      makeInput({
+      mockInput({
         sourcePath: `//${faker.internet.domainName()}/${faker.lorem.slug()}`,
       }),
     );
 
     expect(createLeadMock).toHaveBeenCalledWith({
-      ...STORED_LEAD,
+      ...MOCK_STORED_LEAD,
       sourcePath: '/',
     });
   });
@@ -259,7 +244,7 @@ describe(submitContactMessage, () => {
     expect(vi.mocked(logger.error)).toHaveBeenCalledOnce();
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       'contact_form.notification_send_failed',
-      { leadId: LEAD_ID, error: MOCK_ERROR },
+      { leadId: MOCK_LEAD_ID, error: MOCK_ERROR },
     );
   });
 

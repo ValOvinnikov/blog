@@ -51,18 +51,18 @@ vi.mock('./home-module-renderer', () => ({
 
 const setup = customRenderAsync(HomePage, {});
 
-const HEADING = 'Welcome to the blog';
+const MOCK_HEADING = 'Welcome to the blog';
 const HOME_MODULE_RENDERER_TEST_ID = 'home-module-renderer';
-const HOME_PAGE_ID = faker.string.uuid();
+const MOCK_HOME_PAGE_ID = faker.string.uuid();
 
-const HERO = { id: 'hero-1', type: 'module_hero' };
-const CONTENT_MODULE = { id: 'module-1', type: 'module_content' };
+const MOCK_HERO = { id: 'hero-1', type: 'module_hero' };
+const MOCK_CONTENT_MODULE = { id: 'module-1', type: 'module_content' };
 
 const resolveHomePageWith = (overrides: Record<string, unknown> = {}) =>
   getHomePageMock.mockResolvedValue(
     okResult({
-      id: HOME_PAGE_ID,
-      headingBlock: mockHeadingBlock({ heading: HEADING }),
+      id: MOCK_HOME_PAGE_ID,
+      headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
       hero: undefined,
       modules: [],
       faqs: [],
@@ -120,8 +120,8 @@ describe(`<${HomePage.name}/>`, () => {
   describe('with a hero and modules', () => {
     beforeEach(async () => {
       resolveHomePageWith({
-        hero: HERO,
-        modules: [CONTENT_MODULE],
+        hero: MOCK_HERO,
+        modules: [MOCK_CONTENT_MODULE],
       });
 
       await setup();
@@ -134,19 +134,19 @@ describe(`<${HomePage.name}/>`, () => {
       expect(main).toContainElement(renderer);
     });
 
-    it("dispatches the module renderer with the page's id and fetched hero, heading, modules", () => {
+    it("dispatches the module renderer with the page's id, hero, heading, modules", () => {
       const renderer = screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID);
 
       expect(homeModuleRendererMock).toHaveBeenCalledWith(
         {
-          homePageId: HOME_PAGE_ID,
-          hero: HERO,
-          headingBlock: mockHeadingBlock({ heading: HEADING }),
-          modules: [CONTENT_MODULE],
+          homePageId: MOCK_HOME_PAGE_ID,
+          hero: MOCK_HERO,
+          headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
+          modules: [MOCK_CONTENT_MODULE],
         },
         undefined,
       );
-      expect(renderer).toHaveTextContent(`${HERO.id} — 1 modules`);
+      expect(renderer).toHaveTextContent(`${MOCK_HERO.id} — 1 modules`);
     });
   });
 
@@ -159,14 +159,14 @@ describe(`<${HomePage.name}/>`, () => {
 
     expect(homeModuleRendererMock).toHaveBeenCalledWith(
       {
-        homePageId: HOME_PAGE_ID,
+        homePageId: MOCK_HOME_PAGE_ID,
         hero: undefined,
-        headingBlock: mockHeadingBlock({ heading: HEADING }),
+        headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
         modules: [],
       },
       undefined,
     );
-    expect(renderer).toHaveTextContent(`${HEADING} — 0 modules`);
+    expect(renderer).toHaveTextContent(`${MOCK_HEADING} — 0 modules`);
   });
 
   it('forwards the request context Sanity context to getHomePage', async () => {
@@ -202,6 +202,6 @@ describe(`<${HomePage.name}/>`, () => {
 
     const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
 
-    expect(script.textContent).toContain(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
+    expect(script).toHaveTextContent(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
   });
 });
