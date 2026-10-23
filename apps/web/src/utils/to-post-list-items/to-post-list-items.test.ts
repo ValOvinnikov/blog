@@ -1,22 +1,29 @@
 import type { TPostCard } from '@blog/service';
 import {
-  makePostCard,
-  makePostCardTopic,
+  mockPostCard,
+  mockPostCardTopic,
 } from '@web/testing/shared/post/fixtures';
 import { getFormatter } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 import { toPostListItems } from './to-post-list-items';
 
+const POST_ID = 'post-1';
+const POST_TITLE = 'Hello World';
+const POST_EXCERPT = 'An excerpt.';
+const FRENCH_DATE = '15 janvier 2026';
+const PUBLISHED_AT = '2026-01-15T00:00:00.000Z';
+const FORMATTED_DATE = 'January 15, 2026';
+
 describe('toPostListItems', () => {
   it('maps a post card into the href/formattedDate shape MediaCardItem expects', async () => {
-    const topic = makePostCardTopic({ title: 'Engineering' });
-    const post = makePostCard({
-      id: 'post-1',
+    const topic = mockPostCardTopic({ title: 'Engineering' });
+    const post = mockPostCard({
+      id: POST_ID,
       slug: 'hello-world',
-      title: 'Hello World',
-      excerpt: 'An excerpt.',
-      publishedAt: '2026-01-15T00:00:00.000Z',
+      title: POST_TITLE,
+      excerpt: POST_EXCERPT,
+      publishedAt: PUBLISHED_AT,
       topic,
       readingTimeMinutes: 2,
     });
@@ -24,12 +31,12 @@ describe('toPostListItems', () => {
     const [item] = await toPostListItems([post]);
 
     expect(item).toEqual({
-      id: 'post-1',
+      id: POST_ID,
       href: '/blog/hello-world',
-      title: 'Hello World',
-      excerpt: 'An excerpt.',
-      publishedAt: '2026-01-15T00:00:00.000Z',
-      formattedDate: 'January 15, 2026',
+      title: POST_TITLE,
+      excerpt: POST_EXCERPT,
+      publishedAt: PUBLISHED_AT,
+      formattedDate: FORMATTED_DATE,
       readingTime: '2 min',
       topic,
     });
@@ -39,21 +46,21 @@ describe('toPostListItems', () => {
     let post: TPostCard;
 
     beforeEach(() => {
-      post = makePostCard({ publishedAt: '2026-01-15T00:00:00.000Z' });
+      post = mockPostCard({ publishedAt: PUBLISHED_AT });
     });
 
     it('formats the date via next-intl getFormatter, using the request-scoped locale', async () => {
       vi.mocked(getFormatter).mockResolvedValueOnce({
-        dateTime: () => '15 janvier 2026',
+        dateTime: () => FRENCH_DATE,
       } as unknown as Awaited<ReturnType<typeof getFormatter>>);
 
       const [item] = await toPostListItems([post]);
 
-      expect(item?.formattedDate).toBe('15 janvier 2026');
+      expect(item?.formattedDate).toBe(FRENCH_DATE);
     });
 
     it('calls dateTime with the published date and the year/month/day format', async () => {
-      const dateTimeMock = vi.fn().mockReturnValue('January 15, 2026');
+      const dateTimeMock = vi.fn().mockReturnValue(FORMATTED_DATE);
 
       vi.mocked(getFormatter).mockResolvedValueOnce({
         dateTime: dateTimeMock,
@@ -69,20 +76,12 @@ describe('toPostListItems', () => {
     });
   });
 
-  it('derives readingTime from readingTimeMinutes', async () => {
-    const post = makePostCard({ readingTimeMinutes: 5 });
-
-    const [item] = await toPostListItems([post]);
-
-    expect(item?.readingTime).toBe('5 min');
-  });
-
   it('maps an empty list to an empty list', async () => {
     expect(await toPostListItems([])).toEqual([]);
   });
 
   it('maps a post card with no excerpt, without throwing', async () => {
-    const post = makePostCard({ excerpt: undefined });
+    const post = mockPostCard({ excerpt: undefined });
 
     const [item] = await toPostListItems([post]);
 
@@ -93,7 +92,7 @@ describe('toPostListItems', () => {
     let post: TPostCard;
 
     beforeEach(() => {
-      post = makePostCard({ id: 'post-1' });
+      post = mockPostCard({ id: POST_ID });
     });
 
     it('sets image from renderImage when given', async () => {

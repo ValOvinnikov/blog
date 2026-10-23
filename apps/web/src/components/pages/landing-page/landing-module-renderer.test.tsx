@@ -1,6 +1,10 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
   testFeatureListModule,
@@ -111,7 +115,7 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(LandingModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'About Us' }),
+  headingBlock: mockHeadingBlock({ heading: 'About Us' }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
   landingPage: { id: 'modules', path: 'modules' },
@@ -139,7 +143,7 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'post-list-1', type: 'module_postList' },
+    unknownModule: { id: MOCK_POST_LIST_ID, type: 'module_postList' },
     description:
       'renders nothing and warns once for a module absent from the landing page allow-list',
   });
@@ -150,14 +154,14 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
       modules: [{ id: SECTION_PAGES_ID, type: 'module_sectionPages' }],
     });
 
-    expect(screen.getByTestId('stub-section-pages')).toHaveTextContent(
-      SECTION_PAGES_ID,
-    );
+    const stubSectionPages = screen.getByTestId('stub-section-pages');
+
+    expect(stubSectionPages).toHaveTextContent(SECTION_PAGES_ID);
     expect(sectionPagesModuleMock).toHaveBeenCalledWith(
-      expect.objectContaining({
+      {
         id: SECTION_PAGES_ID,
         context: { landingPage: { id: 'modules', path: 'modules' } },
-      }),
+      },
       undefined,
     );
   });
@@ -169,7 +173,7 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
       { id: 'content-1', type: 'module_content' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-latest-1', type: 'module_postLatest' },
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
     ],
   });

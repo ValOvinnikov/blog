@@ -5,7 +5,7 @@ import {
   MOCK_NEWSLETTER_MODULE_ID,
   mockNewsletterModule,
 } from '@web/testing/modules/newsletter/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -25,7 +25,7 @@ const content = faker.lorem.sentences(2);
 const setup = customRender(NewsletterModuleView, {
   id: MOCK_NEWSLETTER_MODULE_ID,
   ...mockNewsletterModule({
-    headingBlock: makeHeadingBlock({ heading, supportingText }),
+    headingBlock: mockHeadingBlock({ heading, supportingText }),
     trustCues: [firstCue, secondCue],
   }),
 });

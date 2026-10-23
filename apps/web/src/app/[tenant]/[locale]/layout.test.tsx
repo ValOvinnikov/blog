@@ -7,7 +7,7 @@ import {
   RADIUS_SCALE,
   type TLocaleIsoCode,
 } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
+import { errorResult } from '@blog/utils';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
@@ -18,9 +18,10 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_ID,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -42,12 +43,7 @@ const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock(
-  '@web/server/site-settings/get-site-settings/get-site-settings',
-  () => ({
-    getSiteSettings: vi.fn(),
-  }),
-);
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -70,7 +66,7 @@ const THEME_TOKENS = {
 };
 
 const makeParams = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
-  Promise.resolve({ tenant: DEFAULT_TENANT_ID, locale });
+  Promise.resolve({ tenant: MOCK_TENANT_ID, locale });
 
 const renderLayout = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
   LocaleLayout({
@@ -79,15 +75,11 @@ const renderLayout = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
   }) as unknown as Promise<TAnyElement>;
 
 const settingsFailure = () =>
-  getSiteSettingsMock.mockResolvedValue(errorResult('boom') as never);
+  getSiteSettingsMock.mockResolvedValueOnce(errorResult('boom') as never);
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockResolvedValue(
-      okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
-    );
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     isProductionEnvironmentMock.mockReturnValue(true);
   });
 
@@ -103,7 +95,10 @@ describe('LocaleLayout', () => {
 
       expect(metadata).toEqual(
         expect.objectContaining({
-          title: { default: 'Blog', template: '%s | Blog' },
+          title: {
+            default: MOCK_SITE_SETTINGS.brand.name,
+            template: `%s | ${MOCK_SITE_SETTINGS.brand.name}`,
+          },
         }),
       );
       expect(metadata).not.toHaveProperty('description');
@@ -136,7 +131,7 @@ describe('LocaleLayout', () => {
     it("sets metadataBase to the tenant's base URL", async () => {
       const metadata = await generateMetadata({ params: makeParams() });
 
-      expect(metadata.metadataBase).toBe(DEFAULT_REQUEST_CONTEXT.metadataBase);
+      expect(metadata.metadataBase).toBe(MOCK_REQUEST_CONTEXT.metadataBase);
     });
 
     describe('when site settings fail to load the metadata', () => {
@@ -161,8 +156,8 @@ describe('LocaleLayout', () => {
   });
 
   it('declares the served language on the document', async () => {
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+    getRequestContextMock.mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });
 
@@ -181,7 +176,7 @@ describe('LocaleLayout', () => {
   it('forwards the entered tenant to the theme token loader', async () => {
     await renderLayout();
 
-    expect(getThemeTokensMock).toHaveBeenCalledWith(DEFAULT_TENANT_ID);
+    expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('composes the providers around the header, page content and footer, with analytics beside them', async () => {

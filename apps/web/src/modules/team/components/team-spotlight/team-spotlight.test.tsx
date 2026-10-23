@@ -6,7 +6,7 @@ import {
   MOCK_TEAM_MEMBER_PROFILE_URL,
   mockTeamMember,
 } from '@web/testing/modules/team/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { TeamSpotlight } from './team-spotlight';
 
@@ -75,7 +75,7 @@ describe(`<${TeamSpotlight.name}/>`, () => {
     setup({
       member: mockTeamMember({
         role: MEMBER_ROLE,
-        bio: [portableTextBlock(MOCK_TEAM_MEMBER_BIO)],
+        bio: [mockPortableTextBlock(MOCK_TEAM_MEMBER_BIO)],
       }),
     });
 

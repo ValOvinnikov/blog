@@ -1,6 +1,7 @@
-import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS, SITE_MESSAGES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TLandingPage } from '@blog/service';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { permanentRedirect } from '@web/i18n/navigation';
@@ -10,17 +11,21 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_CTA_HEADING,
+  mockCtaModuleData,
+} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import {
-  makeLandingSectionNavigation,
-  mockLandingPage,
+  mockLandingSectionNavigation,
+  MOCK_LANDING_PAGE,
 } from '@web/testing/pages/landing-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_FAQ_PAGE_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -48,10 +53,8 @@ const getRedirectMock = vi.mocked(service.pages.landing.v1.getRedirect);
 
 const resolvePageWith = (overrides: Partial<TLandingPage>) =>
   getPageMock.mockResolvedValueOnce(
-    okResult({ ...mockLandingPage, ...overrides }),
+    okResult({ ...MOCK_LANDING_PAGE, ...overrides }),
   );
-
-const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const LANDING_PATH = 'about-us';
 
@@ -59,15 +62,14 @@ const setup = customRenderServerAsync(LandingPage, {
   path: LANDING_PATH,
 });
 
-const SECTION_NAV_NAME = 'In this section';
+const SECTION_NAV_NAME = SITE_MESSAGES.sectionNavigation.label;
 const MOVED_DESTINATION = '/company/about';
 const SUPPORTING_TEXT = 'Who we are.';
-const CTA_HEADING = 'Join the list';
 const HERO_HEADING = 'Meet the team';
 
 describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
-    getPageMock.mockResolvedValue(okResult(mockLandingPage));
+    getPageMock.mockResolvedValue(okResult(MOCK_LANDING_PAGE));
     getRedirectMock.mockResolvedValue(okResult());
   });
 
@@ -83,7 +85,7 @@ describe(`<${LandingPage.name}/>`, () => {
     it('fetches the page for the given path with the tenant context', () => {
       expect(getPageMock).toHaveBeenCalledWith(
         [LANDING_PATH],
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -112,7 +114,7 @@ describe(`<${LandingPage.name}/>`, () => {
       const scripts = screen.getAllByTestId(JSON_LD_SCRIPT_TEST_ID);
       expect(
         scripts.some((script) =>
-          script.textContent?.includes(FAQ_PAGE_JSON_LD),
+          script.textContent?.includes(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT),
         ),
       ).toBe(false);
     });
@@ -137,7 +139,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
       expect(permanentRedirect).toHaveBeenCalledWith({
         href: MOVED_DESTINATION,
-        locale: DEFAULT_REQUEST_CONTEXT.locale,
+        locale: MOCK_REQUEST_CONTEXT.locale,
       });
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     });
@@ -166,16 +168,16 @@ describe(`<${LandingPage.name}/>`, () => {
 
   it('calls notFound() when the slug exists only in another language', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
       sanityContext: {
-        ...DEFAULT_TENANT_SANITY_CONTEXT,
+        ...MOCK_TENANT_SANITY_CONTEXT,
         locale: LOCALE_ISO_CODES.NL,
       },
     });
     getPageMock.mockImplementation(async (_segments, tenant) =>
       okResult(
-        tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
+        tenant.locale === LOCALE_ISO_CODES.EN ? MOCK_LANDING_PAGE : undefined,
       ),
     );
 
@@ -186,7 +188,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
   it('renders the page heading and supporting text inside main', async () => {
     resolvePageWith({
-      headingBlock: makeHeadingBlock({
+      headingBlock: mockHeadingBlock({
         heading: 'About Us',
         supportingText: SUPPORTING_TEXT,
       }),
@@ -206,7 +208,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
   it('marks the current page in the section navigation inside main', async () => {
     resolvePageWith({
-      sectionNavigation: makeLandingSectionNavigation(),
+      sectionNavigation: mockLandingSectionNavigation(),
     });
 
     await setup();
@@ -216,7 +218,7 @@ describe(`<${LandingPage.name}/>`, () => {
       name: SECTION_NAV_NAME,
     });
     const faqLink = within(sectionNav).getByRole('link', { name: 'FAQ' });
-    expect(faqLink).toHaveAttribute('aria-current', 'page');
+    expect(faqLink).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('renders the authored modules inside main', async () => {
@@ -226,7 +228,7 @@ describe(`<${LandingPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: MOCK_CTA_HEADING }),
         }),
       ),
     );
@@ -234,7 +236,9 @@ describe(`<${LandingPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    const ctaRegion = within(main).getByRole('region', {
+      name: MOCK_CTA_HEADING,
+    });
     expect(ctaRegion).toBeVisible();
   });
 
@@ -275,7 +279,9 @@ describe(`<${LandingPage.name}/>`, () => {
 
     const scripts = screen.getAllByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(
-      scripts.some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+      scripts.some((script) =>
+        script.textContent?.includes(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT),
+      ),
     ).toBe(true);
   });
 });

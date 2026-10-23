@@ -1,6 +1,11 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_SECOND_TOPIC,
+  mockTopicWithPostCount,
+} from '@web/testing/shared/topic/fixtures';
 
 import { TopicChips } from './topic-chips';
 
@@ -16,8 +21,12 @@ vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
 }));
 
+const NAV_NAME = SITE_MESSAGES.topicChipList.ariaLabel;
+const NEWS_SLUG = 'news';
+const newsTopic = mockTopicWithPostCount({ title: 'News', slug: NEWS_SLUG });
+
 const setup = customRenderAsync(TopicChips, {
-  activeSlug: 'news',
+  activeSlug: NEWS_SLUG,
 });
 
 describe(`<${TopicChips.name}/>`, () => {
@@ -26,28 +35,22 @@ describe(`<${TopicChips.name}/>`, () => {
   });
 
   it('renders the topic chip row with the current topic highlighted', async () => {
-    getTopicsSafelyMock.mockResolvedValue([
-      makeTopicWithPostCount({ title: 'News', slug: 'news' }),
-      makeTopicWithPostCount({
-        id: 'topic-2',
-        title: 'Design',
-        slug: 'design',
-      }),
-    ]);
+    getTopicsSafelyMock.mockResolvedValue([newsTopic, MOCK_SECOND_TOPIC]);
 
     await setup();
 
-    const nav = screen.getByRole('navigation', { name: 'Topics' });
-    expect(within(nav).getByRole('link', { name: 'News' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(
-      within(nav).getByRole('link', { name: 'Design' }),
-    ).not.toHaveAttribute('aria-current');
-    expect(within(nav).getByRole('link', { name: 'All' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    const nav = screen.getByRole('navigation', { name: NAV_NAME });
+    const currentLink = within(nav).getByRole('link', {
+      name: newsTopic.title,
+    });
+    const designLink = within(nav).getByRole('link', {
+      name: MOCK_SECOND_TOPIC.title,
+    });
+    const allLink = within(nav).getByRole('link', { name: 'All' });
+
+    expect(currentLink).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(designLink).not.toHaveAttribute(ARIA_CURRENT);
+    expect(allLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   describe('with no topics', () => {
@@ -56,15 +59,15 @@ describe(`<${TopicChips.name}/>`, () => {
       await setup();
     });
 
-    it('renders nothing when there are no topics', async () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'Topics' }),
-      ).not.toBeInTheDocument();
+    it('renders nothing when there are no topics', () => {
+      const nav = screen.queryByRole('navigation', { name: NAV_NAME });
+
+      expect(nav).not.toBeInTheDocument();
     });
 
-    it('forwards the request context Sanity context to getTopicsSafely', async () => {
+    it('forwards the request context Sanity context to getTopicsSafely', () => {
       expect(getTopicsSafelyMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
   });

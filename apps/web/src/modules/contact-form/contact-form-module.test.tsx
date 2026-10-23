@@ -7,8 +7,8 @@ import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/cons
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockContactFormModule } from '@web/testing/modules/contact-form/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContactFormModule } from './contact-form-module';
 
@@ -64,7 +64,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
     getContactFormMock.mockResolvedValue(
       okResult(
         mockContactFormModule({
-          headingBlock: makeHeadingBlock({ heading: HEADING }),
+          headingBlock: mockHeadingBlock({ heading: HEADING }),
         }),
       ),
     );
@@ -116,8 +116,8 @@ describe(`<${ContactFormModule.name}/>`, () => {
   it.each([
     {
       route: 'a resolved tenant',
-      tenantId: DEFAULT_REQUEST_CONTEXT.tenantId,
-      expected: DEFAULT_REQUEST_CONTEXT.tenantId,
+      tenantId: MOCK_REQUEST_CONTEXT.tenantId,
+      expected: MOCK_REQUEST_CONTEXT.tenantId,
     },
     {
       route: 'no tenant',
@@ -128,7 +128,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
     'resolves the expected tenant when the route found $route',
     async ({ tenantId, expected }) => {
       vi.mocked(getRequestContext).mockResolvedValueOnce({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         tenantId,
       });
 

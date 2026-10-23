@@ -11,7 +11,7 @@ import {
   TENANT_UNRESOLVED_REASON,
   UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SANITY_OPERATION_HEADER, SANITY_PROJECT_ID_HEADER } from './route';
@@ -125,7 +125,7 @@ const TENANT_SANITY_CONTEXT = {
   dataset: faker.lorem.word(),
   token: faker.string.alphanumeric(32),
 };
-const TENANT_HOME_PATH = `/${DEFAULT_TENANT_ID}/${EN}`;
+const TENANT_HOME_PATH = `/${MOCK_TENANT_ID}/${EN}`;
 const TENANT_POST_PATH = `${TENANT_HOME_PATH}/blog/${faker.lorem.slug()}`;
 const HERO_MODULE_TAG = `module:${faker.string.uuid()}`;
 const CTA_MODULE_TAG = `module:${faker.string.uuid()}`;
@@ -157,7 +157,7 @@ describe('POST /api/revalidate', () => {
     revalidatePathMock.mockReset();
     getTenantIdBySanityProjectIdMock.mockReset();
     getTenantByIdMock.mockReset();
-    getTenantByIdMock.mockResolvedValue({ id: DEFAULT_TENANT_ID });
+    getTenantByIdMock.mockResolvedValue({ id: MOCK_TENANT_ID });
     getTenantSanityCredentialsMock.mockReset();
     removeBookmarksForPostMock.mockReset();
     isDerivableRevalidateTypeMock.mockReset();
@@ -274,7 +274,7 @@ describe('POST /api/revalidate', () => {
 
     describe('tenant activity', () => {
       it("records the publishing tenant's activity", async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           VALID_SIGNATURE,
@@ -284,13 +284,13 @@ describe('POST /api/revalidate', () => {
 
         expect(response.status).toBe(HTTP_STATUS.OK);
         expect(recordTenantActivityMock).toHaveBeenCalledWith(
-          DEFAULT_TENANT_ID,
+          MOCK_TENANT_ID,
           expect.any(Date),
         );
       });
 
       it('records no activity for an archived tenant', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         getTenantByIdMock.mockResolvedValue(undefined);
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
@@ -315,7 +315,7 @@ describe('POST /api/revalidate', () => {
 
     describe('archived tenant', () => {
       it('ignores the event and revalidates nothing when the resolved tenant is archived', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         getTenantByIdMock.mockResolvedValue(undefined);
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
@@ -357,7 +357,7 @@ describe('POST /api/revalidate', () => {
         const response = await POST(request);
         const json = await response.json();
 
-        expect(response.status).toBe(502);
+        expect(response.status).toBe(HTTP_STATUS.BAD_GATEWAY);
         expect(response.status).not.toBe(HTTP_STATUS.OK);
         expect(json).toEqual({ message: TENANT_LOOKUP_FAILED_MESSAGE });
         expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -370,7 +370,7 @@ describe('POST /api/revalidate', () => {
       });
 
       it('returns a non-2xx and revalidates nothing when getTenantById throws', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         getTenantByIdMock.mockRejectedValue(
           new Error(CONNECTION_ERROR_MESSAGE),
         );
@@ -382,14 +382,14 @@ describe('POST /api/revalidate', () => {
         const response = await POST(request);
         const json = await response.json();
 
-        expect(response.status).toBe(502);
+        expect(response.status).toBe(HTTP_STATUS.BAD_GATEWAY);
         expect(response.status).not.toBe(HTTP_STATUS.OK);
         expect(json).toEqual({ message: TENANT_LOOKUP_FAILED_MESSAGE });
         expect(revalidateTagMock).not.toHaveBeenCalled();
         expect(revalidatePathMock).not.toHaveBeenCalled();
         expect(loggerErrorMock).toHaveBeenCalledWith(
           'revalidate.tenant_by_id_lookup_failed',
-          expect.objectContaining({ tenantId: DEFAULT_TENANT_ID }),
+          expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
         );
       });
     });
@@ -411,7 +411,7 @@ describe('POST /api/revalidate', () => {
       });
 
       it('records no tenant activity for an invalid signature', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           INVALID_SIGNATURE,
@@ -475,7 +475,7 @@ describe('POST /api/revalidate', () => {
 
     describe('bookmark cleanup on delete', () => {
       beforeEach(() => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
       });
 
       it('removes bookmarks for a deleted page_post with a resolvable tenant', async () => {
@@ -495,7 +495,7 @@ describe('POST /api/revalidate', () => {
           TENANT_PROJECT_ID,
         );
         expect(removeBookmarksForPostMock).toHaveBeenCalledWith(
-          DEFAULT_TENANT_ID,
+          MOCK_TENANT_ID,
           POST_ID,
         );
         expect(json.bookmarksRemoved).toBe(3);
@@ -626,7 +626,7 @@ describe('POST /api/revalidate', () => {
 
     describe('resolved path purge', () => {
       beforeEach(() => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         isDerivableRevalidateTypeMock.mockReturnValue(true);
         getTenantSanityCredentialsMock.mockResolvedValue(TENANT_SANITY_CONTEXT);
       });
@@ -757,7 +757,7 @@ describe('POST /api/revalidate', () => {
           await POST(request);
 
           expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith(
-            DEFAULT_TENANT_ID,
+            MOCK_TENANT_ID,
           );
         });
       });
@@ -765,7 +765,7 @@ describe('POST /api/revalidate', () => {
 
     describe('referencing module purge', () => {
       const withTenant = async (type: string, id: string) => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(DEFAULT_TENANT_ID);
+        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         getTenantSanityCredentialsMock.mockResolvedValue(TENANT_SANITY_CONTEXT);
         return POST(
           makeRequest({ _type: type, _id: id }, VALID_SIGNATURE, {
@@ -811,7 +811,7 @@ describe('POST /api/revalidate', () => {
           expect.objectContaining({
             type: 'page_topic',
             id: TOPIC_ID,
-            tenantId: DEFAULT_TENANT_ID,
+            tenantId: MOCK_TENANT_ID,
             tenant: expect.objectContaining({ projectId: TENANT_PROJECT_ID }),
           }),
         );

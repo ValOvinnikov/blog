@@ -10,8 +10,8 @@ import type { TFeedPost } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
-import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
+import { mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 const {
@@ -80,10 +80,10 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
       isResolvable: true,
       tenant,
     });
-    getTenantBaseUrlMock.mockResolvedValue(DEFAULT_TENANT_BASE_URL);
+    getTenantBaseUrlMock.mockResolvedValue(MOCK_TENANT_BASE_URL);
     getTagPageMock.mockResolvedValue(
       okResult(
-        makeTagDetailPage({
+        mockTagDetailPage({
           tag: {
             id: 'tag-1',
             title: 'TypeScript',
@@ -109,7 +109,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
     getTagPageMock.mockResolvedValue(
       okResult(
-        makeTagDetailPage({
+        mockTagDetailPage({
           tag: {
             id: 'tag-1',
             title: 'TypeScript',
@@ -119,7 +119,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
         }),
       ),
     );
-    const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
+    const response = await GET(new Request(MOCK_TENANT_BASE_URL), {
       params,
     });
     const xml = await response.text();
@@ -133,9 +133,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     expect(channel.title).toBe('TypeScript');
     expect(channel.description).toBe(TAG_DESCRIPTION);
     expect(items[0]?.title).toBe(POST_TITLE);
-    expect(items[0]?.link).toBe(
-      `${DEFAULT_TENANT_BASE_URL}/blog/hello-welcome`,
-    );
+    expect(items[0]?.link).toBe(`${MOCK_TENANT_BASE_URL}/blog/hello-welcome`);
     expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
       ...tenant,
       locale: EN,
@@ -144,7 +142,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
     getPublishedPostsByTagMock.mockResolvedValue(okResult([]));
-    const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
+    const response = await GET(new Request(MOCK_TENANT_BASE_URL), {
       params,
     });
     const { channel } = parseRssFeed(await response.text());
@@ -155,7 +153,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   it('calls notFound() when the tag fetch fails', async () => {
     getTagPageMock.mockResolvedValue(errorResult(new Error('boom')));
     await expect(
-      GET(new Request(DEFAULT_TENANT_BASE_URL), { params }),
+      GET(new Request(MOCK_TENANT_BASE_URL), { params }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
@@ -165,7 +163,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   it('calls notFound() without logging when the tag simply does not exist', async () => {
     getTagPageMock.mockResolvedValue(okResult());
     await expect(
-      GET(new Request(DEFAULT_TENANT_BASE_URL), { params }),
+      GET(new Request(MOCK_TENANT_BASE_URL), { params }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
@@ -174,19 +172,19 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('calls notFound() when the posts fetch fails', async () => {
-    getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage()));
+    getTagPageMock.mockResolvedValue(okResult(mockTagDetailPage()));
     getPublishedPostsByTagMock.mockResolvedValue(
       errorResult(new Error('boom')),
     );
     await expect(
-      GET(new Request(DEFAULT_TENANT_BASE_URL), { params }),
+      GET(new Request(MOCK_TENANT_BASE_URL), { params }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
   it('resolves the tag and its posts in the feed language and links posts in it', async () => {
-    const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
+    const response = await GET(new Request(MOCK_TENANT_BASE_URL), {
       params: paramsFor(NL),
     });
     const { items } = parseRssFeed(await response.text());
@@ -201,7 +199,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('carries the language, home link and self link of the feed', async () => {
-    const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
+    const response = await GET(new Request(MOCK_TENANT_BASE_URL), {
       params: paramsFor(NL),
     });
     const { channel, selfLink } = parseRssFeed(await response.text());
@@ -214,7 +212,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('returns a 404 for a language the site does not support', async () => {
-    const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
+    const response = await GET(new Request(MOCK_TENANT_BASE_URL), {
       params: paramsFor('xx'),
     });
 
@@ -224,7 +222,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
 
   it('returns a 404 without querying any content when the host is unresolvable', async () => {
     getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
-    const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
+    const response = await GET(new Request(MOCK_TENANT_BASE_URL), {
       params,
     });
 

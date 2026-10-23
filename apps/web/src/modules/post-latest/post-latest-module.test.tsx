@@ -3,13 +3,13 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostLatestModuleData } from '@web/testing/modules/post-latest/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
 
 const MODULE_ID = 'post-latest-1';
-const POST = makePostCard();
+const POST = mockPostCard();
 
 const { getPostLatestMock } = vi.hoisted(() => ({
   getPostLatestMock: vi.fn(),
@@ -42,7 +42,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
     expect(getPostLatestMock).toHaveBeenCalledWith(
       MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
@@ -78,7 +78,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
     getPostLatestMock.mockResolvedValue(
       okResult(
         mockPostLatestModuleData({
-          posts: [makePostCard({ heroImage: sanityImage })],
+          posts: [mockPostCard({ heroImage: sanityImage })],
           showImages: true,
         }),
       ),
@@ -94,7 +94,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
     getPostLatestMock.mockResolvedValue(
       okResult(
         mockPostLatestModuleData({
-          posts: [makePostCard({ heroImage: mockSanityImage() })],
+          posts: [mockPostCard({ heroImage: mockSanityImage() })],
           showImages: false,
         }),
       ),

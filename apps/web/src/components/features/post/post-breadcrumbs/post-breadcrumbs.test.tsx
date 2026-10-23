@@ -1,6 +1,6 @@
 import { okResult } from '@blog/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
+import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   testBreadcrumbsJsonLdSchema,
   testBreadcrumbsJsonLdTrail,
@@ -9,13 +9,15 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
 
-const POST_SLUG = 'hello-world';
-const SITE_NAME = 'Northwind Journal';
-const TOPIC_HREF = '/topics/engineering';
-const POST_TITLE = 'Hello World';
+const POST_SLUG = MOCK_POST_DETAIL.slug;
+const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
+const TOPIC_HREF = `/topics/${MOCK_POST_DETAIL.topic.slug}`;
+const POST_TITLE = MOCK_POST_DETAIL.title;
+const TOPIC_TITLE = MOCK_POST_DETAIL.topic.title;
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -45,33 +47,33 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
   testBreadcrumbsTrail({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: mockPostDetail,
+    successData: MOCK_POST_DETAIL,
     linkSteps: [
       { label: SITE_NAME, href: '/' },
-      { label: 'Engineering', href: TOPIC_HREF },
+      { label: TOPIC_TITLE, href: TOPIC_HREF },
     ],
     currentLabel: POST_TITLE,
   });
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: mockPostDetail,
+    successData: MOCK_POST_DETAIL,
     itemPath: TOPIC_HREF,
   });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: mockPostDetail,
+    successData: MOCK_POST_DETAIL,
     expectedTrail: [
       { name: SITE_NAME, path: '/' },
-      { name: 'Engineering', path: TOPIC_HREF },
-      { name: POST_TITLE, path: '/blog/hello-world' },
+      { name: TOPIC_TITLE, path: TOPIC_HREF },
+      { name: POST_TITLE, path: `/blog/${POST_SLUG}` },
     ],
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: mockPostDetail,
+    successData: MOCK_POST_DETAIL,
     description: 'forwards the slug to getPostPage',
     expectedArgs: [POST_SLUG],
   });
@@ -80,16 +82,19 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     it('omits the topic crumb', async () => {
       getPostPageMock.mockResolvedValue(
         okResult({
-          ...mockPostDetail,
-          topic: { ...mockPostDetail.topic, slug: undefined },
+          ...MOCK_POST_DETAIL,
+          topic: { ...MOCK_POST_DETAIL.topic, slug: undefined },
         }),
       );
 
       await setup();
 
       const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-      expect(within(nav).getByRole('link', { name: SITE_NAME })).toBeVisible();
-      expect(within(nav).queryByText('Engineering')).not.toBeInTheDocument();
+      const siteNameLink = within(nav).getByRole('link', { name: SITE_NAME });
+      const topicTitleText = within(nav).queryByText(TOPIC_TITLE);
+
+      expect(siteNameLink).toBeVisible();
+      expect(topicTitleText).not.toBeInTheDocument();
     });
   });
 });

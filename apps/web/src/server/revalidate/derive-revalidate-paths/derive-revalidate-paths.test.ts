@@ -11,13 +11,13 @@ import {
   TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
   UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { makeTag } from '@web/testing/shared/tag/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { mockTag } from '@web/testing/shared/tag/fixtures';
 import {
-  DEFAULT_TENANT_ID,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
-import { makeTopic } from '@web/testing/shared/topic/fixtures';
+import { mockTopic } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import {
@@ -82,17 +82,17 @@ vi.mock('@blog/service', () => ({
 
 const loggerErrorMock = vi.mocked(logger.error);
 
-const post = makePostCard();
-const tag = makeTag();
-const topic = makeTopic();
+const post = mockPostCard();
+const tag = mockTag();
+const topic = mockTopic();
 const UNRELATED_TAG_SLUG = 'unrelated-tag';
-const LOCALE_ROOT = `/${DEFAULT_TENANT_ID}/${LOCALE_ISO_CODES.EN}`;
+const LOCALE_ROOT = `/${MOCK_TENANT_ID}/${LOCALE_ISO_CODES.EN}`;
 
 const postInput = {
   type: POST_TYPE,
   id: post.id,
-  tenantId: DEFAULT_TENANT_ID,
-  tenant: DEFAULT_TENANT_SANITY_CONTEXT,
+  tenantId: MOCK_TENANT_ID,
+  tenant: MOCK_TENANT_SANITY_CONTEXT,
 };
 
 describe('isDerivableRevalidateType', () => {

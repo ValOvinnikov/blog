@@ -7,7 +7,7 @@ import {
 import { queries } from '@blog/db';
 import { errorResult, okResult } from '@blog/utils';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
@@ -34,7 +34,7 @@ describe(resolveTenantEmailIdentity, () => {
       okResult({ preset: PRESET_ID.CONSOLE, accentHue: 40 } as never),
     );
 
-    const identity = await resolveTenantEmailIdentity(DEFAULT_TENANT_ID);
+    const identity = await resolveTenantEmailIdentity(MOCK_TENANT_ID);
 
     expect(identity.brandName).toBe(TENANT_NAME);
     expect(identity.brand).toEqual(
@@ -47,7 +47,7 @@ describe(resolveTenantEmailIdentity, () => {
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const identity = await resolveTenantEmailIdentity(DEFAULT_TENANT_ID);
+    const identity = await resolveTenantEmailIdentity(MOCK_TENANT_ID);
 
     expect(identity.brand).toEqual(
       resolveTenantEmailBrand({
@@ -57,7 +57,7 @@ describe(resolveTenantEmailIdentity, () => {
     );
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
       'tenant_email_identity.site_config_fetch_failed',
-      { tenantId: DEFAULT_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
+      { tenantId: MOCK_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
     );
   });
 
@@ -65,12 +65,12 @@ describe(resolveTenantEmailIdentity, () => {
     vi.mocked(getSiteConfig).mockResolvedValue(okResult());
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
 
-    const identity = await resolveTenantEmailIdentity(DEFAULT_TENANT_ID);
+    const identity = await resolveTenantEmailIdentity(MOCK_TENANT_ID);
 
     expect(identity.brandName).toBe('Newsletter');
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
       'tenant_email_identity.tenant_row_not_found',
-      { tenantId: DEFAULT_TENANT_ID },
+      { tenantId: MOCK_TENANT_ID },
     );
   });
 });

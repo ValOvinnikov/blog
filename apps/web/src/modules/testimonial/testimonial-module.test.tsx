@@ -8,8 +8,8 @@ import {
   mockTestimonialItem,
 } from '@web/testing/modules/testimonial/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TestimonialModule } from './testimonial-module';
 
@@ -31,7 +31,7 @@ vi.mock('@web/server/request-context/request-context');
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
@@ -60,7 +60,7 @@ describe(`<${TestimonialModule.name}/>`, () => {
 
     expect(getTestimonialModuleMock).toHaveBeenCalledWith(
       MOCK_TESTIMONIAL_MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

@@ -8,16 +8,19 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_CTA_HEADING,
+  mockCtaModuleData,
+} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  DEFAULT_TENANT_SANITY_CONTEXT,
-  DEFAULT_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
-import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
 
@@ -45,12 +48,11 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.blog.v1.getIndexPage);
 
 const SUPPORTING_TEXT = 'Notes from the team.';
-const CTA_HEADING = 'Join the list';
 const HERO_HEADING = 'Everything we write';
 
 const indexPage: TBlogIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
-  headingBlock: makeHeadingBlock({
+  headingBlock: mockHeadingBlock({
     heading: 'Blog',
     supportingText: SUPPORTING_TEXT,
   }),
@@ -75,7 +77,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     getIndexPageMock.mockResolvedValue(okResult(indexPage));
     vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
       okResult([
-        makeTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
+        mockTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
       ]),
     );
   });
@@ -86,9 +88,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
 
     it('fetches the index page with the tenant context', () => {
-      expect(getIndexPageMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
-      );
+      expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
     });
 
     it('renders the page heading and supporting text inside main', () => {
@@ -125,7 +125,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
       });
       expect(engineeringChip).toHaveAttribute('href', '/topics/engineering');
       expect(service.entities.topics.v1.getTopics).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
   });
@@ -157,7 +157,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     it('redirects to / when this language has no post index page', async () => {
       vi.mocked(getRequestContext).mockResolvedValue({
-        ...DEFAULT_REQUEST_CONTEXT,
+        ...MOCK_REQUEST_CONTEXT,
         locale: LOCALE_ISO_CODES.NL,
         liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       });
@@ -178,7 +178,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: MOCK_CTA_HEADING }),
         }),
       ),
     );
@@ -186,7 +186,9 @@ describe(`<${PostIndexPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    const ctaRegion = within(main).getByRole('region', {
+      name: MOCK_CTA_HEADING,
+    });
     expect(ctaRegion).toBeVisible();
   });
 
@@ -226,7 +228,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
       'list-1',
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
       2,
       undefined,
     );

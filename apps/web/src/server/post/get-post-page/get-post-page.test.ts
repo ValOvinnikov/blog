@@ -1,5 +1,5 @@
 import { okResult } from '@blog/utils';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostPage } from './get-post-page';
 
@@ -25,7 +25,7 @@ describe(getPostPage, () => {
 
     expect(getPostMock).toHaveBeenCalledWith(
       POST_SLUG,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

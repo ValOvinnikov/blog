@@ -1,5 +1,5 @@
 import { okResult } from '@blog/utils';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTagIndexPage } from './get-tag-index-page';
 
@@ -21,9 +21,7 @@ describe(getTagIndexPage, () => {
 
     await getTagIndexPage();
 
-    expect(getIndexPageMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
+    expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
   });
 
   it('returns the raw TResult from getIndexPage unchanged', async () => {

@@ -22,7 +22,7 @@ import {
   NEWSLETTER_OUTCOME,
 } from '@web/constants/newsletter';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
-import { makeSubscriber } from '@web/testing/shared/subscriber/fixtures';
+import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { getLocale } from 'next-intl/server';
 
@@ -137,7 +137,7 @@ const DEFAULT_CONFIRMATION_SUBJECT =
 
 const COOKIE_SET_FAILED_EVENT = 'newsletter.subscribed_cookie_set_failed';
 
-const subscriber = makeSubscriber({
+const subscriber = mockSubscriber({
   id: faker.string.uuid(),
   email: EMAIL,
   status: 'pending',

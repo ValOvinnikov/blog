@@ -7,8 +7,8 @@ import { okResult } from '@blog/utils';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeTopicDetailPage } from '@web/testing/shared/topic/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockTopicDetailPage } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
 import TopicNumberedPage, { generateMetadata, revalidate } from './page';
@@ -80,7 +80,7 @@ describe('TopicNumberedPage', () => {
     });
 
     it('builds metadata for page 2', async () => {
-      getTopicPageMock.mockResolvedValue(okResult(makeTopicDetailPage()));
+      getTopicPageMock.mockResolvedValue(okResult(mockTopicDetailPage()));
 
       const metadata = await generateMetadata({
         params: Promise.resolve({
@@ -94,7 +94,7 @@ describe('TopicNumberedPage', () => {
       expect(metadata.title).toBe('Engineering – Page 2');
       expect(getTopicPageMock).toHaveBeenCalledWith(
         'engineering',
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
   });

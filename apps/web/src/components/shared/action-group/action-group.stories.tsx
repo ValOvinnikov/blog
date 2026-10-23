@@ -1,29 +1,24 @@
-import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
+import { CTA_ACTION_APPEARANCE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+} from '@web/testing/modules/cta/fixtures';
 import { onDarkDecorators } from '@web/testing/shared/on-dark/decorators';
 
 import { ActionGroup } from './action-group';
 
 const shortAction = {
-  variant: CTA_ACTION_VARIANT.PRIMARY,
-  appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-  link: {
-    label: 'Go',
-    href: '/blog',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
+  ...MOCK_CTA_PRIMARY_ACTION,
+  link: { ...MOCK_CTA_PRIMARY_ACTION.link, label: 'Go' },
 };
 
 const longAction = {
-  variant: CTA_ACTION_VARIANT.SECONDARY,
-  appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+  ...MOCK_CTA_SECONDARY_ACTION,
   link: {
-    label: 'Learn more about our subscription plans',
-    href: '/about-us',
-    target: undefined,
-    platform: undefined,
+    ...MOCK_CTA_SECONDARY_ACTION.link,
+    label: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
     ariaLabel: undefined,
   },
 };

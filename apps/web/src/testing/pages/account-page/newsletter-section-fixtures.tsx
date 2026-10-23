@@ -2,7 +2,7 @@ import { SIZE } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import type { INewsletterSectionViewProps } from '@web/components/pages/account-page/sections/newsletter-section/newsletter-section-view';
 
-export const makeNewsletterSectionView = (
+export const mockNewsletterSectionView = (
   overrides: Partial<INewsletterSectionViewProps> = {},
 ): INewsletterSectionViewProps => {
   return {

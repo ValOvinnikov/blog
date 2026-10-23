@@ -1,7 +1,7 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -40,7 +40,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
+    headingBlock: mockHeadingBlock({ heading: 'Related reading' }),
     items,
     layout: undefined,
     contentAlignment: undefined,

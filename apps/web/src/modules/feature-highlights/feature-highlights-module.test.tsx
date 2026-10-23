@@ -6,8 +6,8 @@ import {
   MOCK_FEATURE_HIGHLIGHTS_HEADING,
 } from '@web/testing/modules/feature-highlights/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureHighlightsModule } from './feature-highlights-module';
 
@@ -33,7 +33,7 @@ vi.mock('@web/server/request-context/request-context');
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_FEATURE_HIGHLIGHTS_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_HIGHLIGHTS_HEADING }),
   ctaButtons: [],
   mediaOrder: MEDIA_ORDER.FIRST,
   contentAlignment: undefined,
@@ -58,7 +58,7 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
 
     expect(getFeatureHighlightsModuleMock).toHaveBeenCalledWith(
       MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

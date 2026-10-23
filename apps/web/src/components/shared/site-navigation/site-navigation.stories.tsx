@@ -1,7 +1,6 @@
 import {
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
-  type ILink,
   type TMaybeNull,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
@@ -9,35 +8,18 @@ import { AccountRow, AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
+import {
+  MOCK_BLOG_LINK,
+  MOCK_HOME_LINK,
+  MOCK_TOPICS_LINK,
+} from '@web/testing/shared/link/fixtures';
 import type { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { userEvent, within } from 'storybook/test';
 
 import { SiteNavigation } from './site-navigation';
 
-const links: ILink[] = [
-  {
-    label: 'Home',
-    href: '/',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-  {
-    label: 'Blog',
-    href: '/blog',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-  {
-    label: 'Topics',
-    href: '/topics',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-];
+const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_TOPICS_LINK];
 
 const meta = {
   title: 'Components/SiteNavigation',
@@ -96,6 +78,8 @@ const headerControls = {
   actions: <AuthMenu oauthProviderIds={['github']} />,
 };
 
+const SESSION_EXPIRES = '2099-01-01';
+
 const withSession = (
   session: TMaybeNull<Session>,
 ): NonNullable<TStory['decorators']> => [
@@ -112,7 +96,7 @@ const withSignedOutSession = withSession(null);
 
 const withSignedInSession = withSession({
   user: { id: 'reader-1', name: 'Ada Lovelace', email: 'ada@example.com' },
-  expires: '2099-01-01',
+  expires: SESSION_EXPIRES,
 });
 
 export const HeaderControls: TStory = {
@@ -141,7 +125,7 @@ export const AccountMenuLongEmail: TStory = {
       name: 'Augusta Ada King, Countess of Lovelace',
       email: 'augusta.ada.king.countess.of.lovelace@analytical-engines.org',
     },
-    expires: '2099-01-01',
+    expires: SESSION_EXPIRES,
   }),
   args: headerControls,
   play: async ({ canvasElement }) => {

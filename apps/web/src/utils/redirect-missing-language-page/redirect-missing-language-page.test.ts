@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { redirect } from 'next/navigation';
 
 import { redirectMissingLanguagePage } from './redirect-missing-language-page';
@@ -12,7 +12,7 @@ const { EN, NL } = LOCALE_ISO_CODES;
 
 const inLanguage = (locale: typeof EN | typeof NL) => {
   vi.mocked(getRequestContext).mockResolvedValue({
-    ...DEFAULT_REQUEST_CONTEXT,
+    ...MOCK_REQUEST_CONTEXT,
     locale,
     defaultLocale: EN,
     liveLocales: [EN, NL],

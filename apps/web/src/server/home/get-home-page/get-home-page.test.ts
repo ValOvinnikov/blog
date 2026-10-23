@@ -1,5 +1,5 @@
 import { okResult } from '@blog/utils';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getHomePage } from './get-home-page';
 
@@ -21,7 +21,7 @@ describe(getHomePage, () => {
 
     await getHomePage();
 
-    expect(getHomePageMock).toHaveBeenCalledWith(DEFAULT_TENANT_SANITY_CONTEXT);
+    expect(getHomePageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
   });
 
   it('returns the raw TResult from getHomePage unchanged', async () => {

@@ -9,9 +9,9 @@ import {
 } from '@web/testing/modules/hero-profile/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroProfileModule } from './hero-profile-module';
 
@@ -38,7 +38,7 @@ const mockHeroProfileData = (
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: HEADLINE }),
+  headingBlock: mockHeadingBlock({ heading: HEADLINE }),
   avatarName: MOCK_HERO_PROFILE_AVATAR_NAME,
   bio: undefined,
   sanityImage: undefined,
@@ -69,7 +69,7 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     it('fetches the module with the resolved tenant Sanity context', () => {
       expect(getHeroProfileMock).toHaveBeenCalledWith(
         MOCK_HERO_PROFILE_MODULE_ID,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 

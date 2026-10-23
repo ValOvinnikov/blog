@@ -1,7 +1,7 @@
 import { ICONS } from '@blog/config';
 import type { TFeatureListItem } from '@blog/service';
 import { faker } from '@faker-js/faker';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const mockFeatureListItem = (
   overrides: Partial<TFeatureListItem> = {},
@@ -23,6 +23,6 @@ export const MOCK_FEATURE_LIST_ITEMS: TFeatureListItem[] = [
   mockFeatureListItem(),
   mockFeatureListItem({
     id: faker.string.uuid(),
-    headingBlock: makeHeadingBlock({ heading: 'Built for scale' }),
+    headingBlock: mockHeadingBlock({ heading: 'Built for scale' }),
   }),
 ];

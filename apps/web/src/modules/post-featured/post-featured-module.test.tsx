@@ -8,8 +8,8 @@ import {
   MOCK_THIRD_POST_TITLE,
 } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostFeaturedModule } from './post-featured-module';
 
@@ -55,7 +55,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     it('fetches the module by id with the resolved tenant Sanity context', () => {
       expect(getPostFeaturedMock).toHaveBeenCalledWith(
         MODULE_ID,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -77,9 +77,9 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       okResult(
         mockPostFeaturedModuleData({
           posts: [
-            makePostCard({ id: 'post-1', title: MOCK_LEAD_POST_TITLE }),
-            makePostCard({ id: 'post-2', title: MOCK_SECOND_POST_TITLE }),
-            makePostCard({ id: 'post-3', title: MOCK_THIRD_POST_TITLE }),
+            mockPostCard({ id: 'post-1', title: MOCK_LEAD_POST_TITLE }),
+            mockPostCard({ id: 'post-2', title: MOCK_SECOND_POST_TITLE }),
+            mockPostCard({ id: 'post-3', title: MOCK_THIRD_POST_TITLE }),
           ],
         }),
       ),
@@ -105,12 +105,12 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       okResult(
         mockPostFeaturedModuleData({
           posts: [
-            makePostCard({
+            mockPostCard({
               id: 'post-1',
               title: MOCK_LEAD_POST_TITLE,
               heroImage: mockSanityImage({ alt: LEAD_IMAGE_ALT }),
             }),
-            makePostCard({
+            mockPostCard({
               id: 'post-2',
               title: MOCK_SECOND_POST_TITLE,
               heroImage: mockSanityImage({ alt: TAIL_IMAGE_ALT }),
@@ -146,7 +146,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       okResult(
         mockPostFeaturedModuleData({
           posts: [
-            makePostCard({
+            mockPostCard({
               id: 'post-1',
               heroImage: mockSanityImage(),
             }),

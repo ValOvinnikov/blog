@@ -9,14 +9,14 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
 const items = [
   mockFeatureListItem({
     id: 'feature-1',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: 'Ship faster',
       supportingText:
         'Every page ships pre-rendered, with ISR keeping content fresh.',
@@ -32,7 +32,7 @@ const items = [
   }),
   mockFeatureListItem({
     id: 'feature-2',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: 'Built for scale',
       supportingText: 'Multi-tenant from the ground up.',
     }),
@@ -40,7 +40,7 @@ const items = [
   }),
   mockFeatureListItem({
     id: 'feature-3',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: 'Secure by default',
       supportingText: 'Every tenant is isolated at the data layer.',
     }),
@@ -77,7 +77,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Why teams choose us' }),
+    headingBlock: mockHeadingBlock({ heading: 'Why teams choose us' }),
     items,
     ctaButtons: [],
     imageShape: CARD_IMAGE_SHAPE.WIDE,

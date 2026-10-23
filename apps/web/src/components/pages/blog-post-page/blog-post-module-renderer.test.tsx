@@ -1,6 +1,7 @@
 import type { TPagePostType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { customRender, screen } from '@web/testing/custom-render';
+import { MOCK_TAXONOMY_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';
@@ -65,7 +66,7 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
         { id: 'newsletter-1', type: 'module_newsletter' },
         { id: 'cta-1', type: 'module_cta' },
         { id: 'post-latest-1', type: 'module_postLatest' },
-        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+        { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       ],
     });
 
@@ -86,7 +87,9 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
       ] as unknown as TModule<TPagePostType>[],
     });
 
-    expect(screen.queryByText('hero-1')).not.toBeInTheDocument();
+    const heroText = screen.queryByText('hero-1');
+
+    expect(heroText).not.toBeInTheDocument();
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
     expect(loggerWarnMock).toHaveBeenCalledWith(
       'module_renderer.unknown_module_type',
@@ -100,8 +103,8 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
       context: { post: { id: 'post-1' } },
     });
 
-    expect(screen.getByTestId(POST_RELATED_TEST_ID)).toHaveTextContent(
-      'related-1:post-1',
-    );
+    const relatedPosts = screen.getByTestId(POST_RELATED_TEST_ID);
+
+    expect(relatedPosts).toHaveTextContent('related-1:post-1');
   });
 });

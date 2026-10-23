@@ -1,7 +1,7 @@
 import type { ISanityImage } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import type { Metadata } from 'next';
 import {
   resolveOpenGraph,
@@ -33,7 +33,7 @@ const ogImage: ISanityImage = {
 
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   ogImage,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 );
 
 const seo = mockSeo({

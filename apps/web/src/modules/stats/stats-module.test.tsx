@@ -5,7 +5,7 @@ import {
   mockStatsModule,
 } from '@web/testing/modules/stats/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { StatsModule } from './stats-module';
 
@@ -40,7 +40,7 @@ describe(`<${StatsModule.name}/>`, () => {
 
     expect(getStatsModuleMock).toHaveBeenCalledWith(
       'stats-1',
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

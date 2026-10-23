@@ -5,11 +5,11 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { makeTag } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { mockTag } from '@web/testing/shared/tag/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -32,8 +32,8 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
-const FIRST_POST = makePostCard();
-const TAG = makeTag();
+const FIRST_POST = mockPostCard();
+const TAG = mockTag();
 const TAG_ARCHIVE = {
   id: TAG.id,
   kind: TAXONOMY_KIND.TAGS,
@@ -88,7 +88,7 @@ describe(`<${PostListModule.name}/>`, () => {
 
     expect(getPostListMock).toHaveBeenCalledWith(
       MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
       2,
       undefined,
     );
@@ -99,7 +99,7 @@ describe(`<${PostListModule.name}/>`, () => {
 
     expect(getPostListMock).toHaveBeenCalledWith(
       MODULE_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
       1,
       undefined,
     );
@@ -107,7 +107,7 @@ describe(`<${PostListModule.name}/>`, () => {
 
   it('renders an authored link in the empty message', async () => {
     vi.mocked(getVoiceRich).mockResolvedValueOnce(
-      makeFormattedVoiceRich({ linkText: BROWSE_TOPICS, href: '/topics' }),
+      mockFormattedVoiceRich({ linkText: BROWSE_TOPICS, href: '/topics' }),
     );
 
     await setup();
@@ -237,7 +237,7 @@ describe(`<${PostListModule.name}/>`, () => {
       getPostListMock.mockResolvedValue(
         okResult(
           mockPostListModuleData({
-            headingBlock: makeHeadingBlock({ heading }),
+            headingBlock: mockHeadingBlock({ heading }),
             posts: [FIRST_POST],
             currentPage: 2,
             totalPages: 3,
@@ -258,7 +258,7 @@ describe(`<${PostListModule.name}/>`, () => {
       expect(nav).toBeVisible();
       expect(getPostListMock).toHaveBeenCalledWith(
         MODULE_ID,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
         2,
         { termId: archive.id },
       );
@@ -275,7 +275,7 @@ describe(`<${PostListModule.name}/>`, () => {
     getPostListMock.mockResolvedValue(
       okResult(
         mockPostListModuleData({
-          headingBlock: makeHeadingBlock({ heading: TAG_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: TAG_HEADING }),
         }),
       ),
     );
@@ -299,7 +299,7 @@ describe(`<${PostListModule.name}/>`, () => {
     getPostListMock.mockResolvedValue(
       okResult(
         mockPostListModuleData({
-          headingBlock: makeHeadingBlock({ heading: 'All posts' }),
+          headingBlock: mockHeadingBlock({ heading: 'All posts' }),
         }),
       ),
     );

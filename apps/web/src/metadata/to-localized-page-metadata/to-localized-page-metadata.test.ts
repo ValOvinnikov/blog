@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { toLocalizedPageMetadata } from './to-localized-page-metadata';
 
@@ -14,7 +14,7 @@ const { EN, NL, DE } = LOCALE_ISO_CODES;
 describe(toLocalizedPageMetadata, () => {
   beforeEach(() => {
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       liveLocales: [EN, NL],
     });
   });
@@ -37,7 +37,7 @@ describe(toLocalizedPageMetadata, () => {
 
   it('emits the request language as og:locale on a non-default translation', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: NL,
       liveLocales: [EN, NL],
     });

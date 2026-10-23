@@ -5,7 +5,7 @@ import {
   mockSectionPagesModule,
 } from '@web/testing/modules/section-pages/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SectionPagesModule } from './section-pages-module';
@@ -56,7 +56,7 @@ describe(`<${SectionPagesModule.name}/>`, () => {
         SECTION_PAGES_ID,
         'modules',
         'modules',
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 

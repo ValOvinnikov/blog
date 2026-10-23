@@ -7,8 +7,8 @@ import { okResult } from '@blog/utils';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import TagNumberedPage, { generateMetadata, revalidate } from './page';
@@ -80,7 +80,7 @@ describe('TagNumberedPage', () => {
     });
 
     it('builds metadata for page 2', async () => {
-      getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage()));
+      getTagPageMock.mockResolvedValue(okResult(mockTagDetailPage()));
 
       const metadata = await generateMetadata({
         params: Promise.resolve({
@@ -94,7 +94,7 @@ describe('TagNumberedPage', () => {
       expect(metadata.title).toBe('TypeScript – Page 2');
       expect(getTagPageMock).toHaveBeenCalledWith(
         'typescript',
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
   });
