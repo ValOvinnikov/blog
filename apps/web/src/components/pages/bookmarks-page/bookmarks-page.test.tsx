@@ -1,14 +1,9 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR, routes } from '@blog/config';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import {
-  MOCK_EN_POST_SLUG,
-  MOCK_NL_POST_SLUG,
-  mockPostCard,
-} from '@web/testing/shared/post/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_ID,
@@ -44,15 +39,6 @@ vi.mock('@blog/service', () => ({
 
 const { EN, NL } = LOCALE_ISO_CODES;
 const LINK_TEXT = 'browse the blog';
-const LINK_HREF = '/blog';
-const USER_ID = 'user-1';
-const SAVED_AT = new Date();
-
-const bookmarkOf = (postId: string) => ({
-  userId: USER_ID,
-  postId,
-  createdAt: SAVED_AT,
-});
 
 const setup = customRenderAsync(BookmarksPage, {});
 
@@ -61,56 +47,64 @@ describe(`<${BookmarksPage.name}/>`, () => {
     authMock.mockReset();
     listBookmarksMock.mockReset();
     getPostsByIdsMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: USER_ID } });
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([]);
     getPostsByIdsMock.mockResolvedValue(okResult([]));
   });
 
-  it.each([
-    [
-      'there is no session',
-      () => {
-        authMock.mockResolvedValue(null);
-      },
-    ],
-    [
-      'no tenant resolves',
-      () => {
-        vi.mocked(getRequestContext).mockResolvedValueOnce({
-          ...MOCK_REQUEST_CONTEXT,
-          tenantId: undefined,
-        });
-      },
-    ],
-  ])(
-    'redirects home without querying bookmarks when %s',
-    async (_case, arrange) => {
-      arrange();
+  it('redirects home without querying bookmarks when there is no session', async () => {
+    authMock.mockResolvedValue(null);
 
-      await expect(setup()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-      );
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-      expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
-      expect(listBookmarksMock).not.toHaveBeenCalled();
-      expect(getPostsByIdsMock).not.toHaveBeenCalled();
-    },
-  );
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(listBookmarksMock).not.toHaveBeenCalled();
+    expect(getPostsByIdsMock).not.toHaveBeenCalled();
+  });
 
-  it("queries the user's bookmarks for the tenant and resolves their posts", async () => {
+  it('redirects home without querying bookmarks when no tenant resolves', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      tenantId: undefined,
+    });
+
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(listBookmarksMock).not.toHaveBeenCalled();
+    expect(getPostsByIdsMock).not.toHaveBeenCalled();
+  });
+
+  it('resolves the signed-in user and tenant bookmarks into posts', async () => {
     await setup();
 
-    expect(listBookmarksMock).toHaveBeenCalledWith(MOCK_TENANT_ID, USER_ID);
+    expect(listBookmarksMock).toHaveBeenCalledWith(MOCK_TENANT_ID, 'user-1');
     expect(getPostsByIdsMock).toHaveBeenCalledWith(
       [],
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
+  it('forwards the request context Sanity context to getPostsByIds', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
+
+    await setup();
+
+    expect(getPostsByIdsMock).toHaveBeenCalledWith([], tenant);
+  });
+
   it('re-sorts resolved posts back into bookmark-recency order before rendering', async () => {
     listBookmarksMock.mockResolvedValue([
-      bookmarkOf('post-2'),
-      bookmarkOf('post-1'),
+      { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
+      { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
     ]);
     getPostsByIdsMock.mockResolvedValue(
       okResult([
@@ -135,19 +129,19 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(links[1]).toHaveAttribute('href', '/blog/first');
   });
 
-  it('links each bookmark in the language it was saved in', async () => {
+  it('links each bookmark to the language it was saved in, whatever the page language', async () => {
     listBookmarksMock.mockResolvedValue([
-      bookmarkOf('post-nl'),
-      bookmarkOf('post-en'),
+      { userId: 'user-1', postId: 'post-nl', createdAt: new Date() },
+      { userId: 'user-1', postId: 'post-en', createdAt: new Date() },
     ]);
     getPostsByIdsMock.mockResolvedValue(
       okResult([
         {
-          ...mockPostCard({ id: 'post-nl', slug: MOCK_NL_POST_SLUG }),
+          ...mockPostCard({ id: 'post-nl', slug: 'mijn-artikel' }),
           language: NL,
         },
         {
-          ...mockPostCard({ id: 'post-en', slug: MOCK_EN_POST_SLUG }),
+          ...mockPostCard({ id: 'post-en', slug: 'my-article' }),
           language: EN,
         },
       ]),
@@ -161,37 +155,42 @@ describe(`<${BookmarksPage.name}/>`, () => {
     await setup();
 
     const links = screen.getAllByRole('link');
-    expect(links[0]).toHaveAttribute(
-      'href',
-      `/nl${routes.post(MOCK_NL_POST_SLUG)}`,
-    );
-    expect(links[1]).toHaveAttribute('href', routes.post(MOCK_EN_POST_SLUG));
+    expect(links[0]).toHaveAttribute('href', '/nl/blog/mijn-artikel');
+    expect(links[1]).toHaveAttribute('href', '/blog/my-article');
   });
 
   it('renders the catalog empty message when there are no bookmarks', async () => {
     await setup();
 
-    expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('bookmarksEmpty');
     const emptyMessage = screen.getByText(
       'No bookmarks yet — save a post to find it here.',
     );
+
+    expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('bookmarksEmpty');
     expect(emptyMessage).toBeVisible();
   });
 
-  it('renders the tenant-authored empty message with its link', async () => {
+  it('renders the tenant-authored empty message with its formatting and link', async () => {
     vi.mocked(getVoiceRich).mockResolvedValueOnce(
-      mockFormattedVoiceRich({ linkText: LINK_TEXT, href: LINK_HREF }),
+      mockFormattedVoiceRich({ linkText: LINK_TEXT, href: '/blog' }),
     );
 
     await setup();
 
-    const link = screen.getByRole('link', { name: LINK_TEXT });
-    expect(link).toHaveAttribute('href', LINK_HREF);
+    const inlineLink = screen.getByRole('link', { name: LINK_TEXT });
+    const boldText = screen.getByText('bold', { selector: 'strong' });
+    const italicText = screen.getByText('italic', { selector: 'em' });
+
+    expect(inlineLink).toHaveAttribute('href', '/blog');
+    expect(boldText).toBeVisible();
+    expect(italicText).toBeVisible();
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {
-    listBookmarksMock.mockResolvedValue([bookmarkOf('post-1')]);
-    getPostsByIdsMock.mockResolvedValue(errorResult(MOCK_ERROR));
+    listBookmarksMock.mockResolvedValue([
+      { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
+    ]);
+    getPostsByIdsMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 

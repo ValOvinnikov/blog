@@ -4,7 +4,7 @@ import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
 import {
   CONFIRM_TENANT_NAME_LABEL,
-  makeClientTenant,
+  mockClientTenant,
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
@@ -23,7 +23,7 @@ vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
 
 const DELETE_TENANT_DIALOG_TITLE = `Delete ${MOCK_TENANT_NAME}`;
 
-const TENANT = makeClientTenant({
+const TENANT = mockClientTenant({
   deprovisionedAt: MOCK_ARCHIVED_AT,
 });
 

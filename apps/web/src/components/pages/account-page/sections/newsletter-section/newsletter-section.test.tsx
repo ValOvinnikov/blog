@@ -3,7 +3,7 @@ import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
-import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_ID,
@@ -24,8 +24,6 @@ const getSubscriptionStatusMock = vi.mocked(
   queries.subscribers.getSubscriptionStatus,
 );
 
-const SECTION_HEADING = 'Newsletter';
-
 const setup = customRenderServerAsync(
   NewsletterSection,
   {},
@@ -35,33 +33,36 @@ const setup = customRenderServerAsync(
 describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: ACCOUNT_USER,
+      user: MOCK_ACCOUNT_USER,
     });
   });
 
-  it.each([
-    [
-      'there is no session',
-      () => {
-        authMock.mockResolvedValue(null);
-      },
-    ],
-    [
-      'no tenant resolves',
-      () => {
-        vi.mocked(getRequestContext).mockResolvedValueOnce({
-          ...MOCK_REQUEST_CONTEXT,
-          tenantId: undefined,
-        });
-      },
-    ],
-  ])('renders nothing and skips the lookup when %s', async (_case, arrange) => {
-    arrange();
+  it('renders nothing when there is no session', async () => {
+    authMock.mockResolvedValue(null);
 
     await setup();
 
-    const heading = screen.queryByRole('heading', { name: SECTION_HEADING });
-    expect(heading).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
+    expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing when no tenant resolves', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      tenantId: undefined,
+    });
+
+    await setup();
+
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
@@ -70,45 +71,50 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    const heading = screen.queryByRole('heading', { name: SECTION_HEADING });
-    expect(heading).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
   });
 
   it('shows the active subscription with an unsubscribe button', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'active',
-      subscriber: { email: ACCOUNT_USER.email },
+      subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();
 
-    expect(getSubscriptionStatusMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      ACCOUNT_USER.id,
-    );
-    const status = screen.getByText('Subscribed');
-    const email = screen.getByText(ACCOUNT_USER.email);
+    const subscribedText = screen.getByText('Subscribed');
+    const userEmailText = screen.getByText(MOCK_ACCOUNT_USER.email);
     const unsubscribeButton = screen.getByRole('button', {
       name: 'Unsubscribe',
     });
-    expect(status).toBeVisible();
-    expect(email).toBeVisible();
+
+    expect(getSubscriptionStatusMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_ACCOUNT_USER.id,
+    );
+    expect(subscribedText).toBeVisible();
+    expect(userEmailText).toBeVisible();
     expect(unsubscribeButton).toBeVisible();
   });
 
   it('offers to resend the confirmation for a pending subscription', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'pending',
-      subscriber: { email: ACCOUNT_USER.email },
+      subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();
 
-    const status = screen.getByText('Pending confirmation');
-    const resendButton = screen.getByRole('button', {
+    const pendingConfirmationText = screen.getByText('Pending confirmation');
+    const resendConfirmationButton = screen.getByRole('button', {
       name: 'Resend confirmation',
     });
-    expect(status).toBeVisible();
-    expect(resendButton).toBeVisible();
+
+    expect(pendingConfirmationText).toBeVisible();
+    expect(resendConfirmationButton).toBeVisible();
   });
 });

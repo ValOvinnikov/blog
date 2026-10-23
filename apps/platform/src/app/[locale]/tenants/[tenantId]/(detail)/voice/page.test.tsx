@@ -3,7 +3,10 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockReadyTenant,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -33,7 +36,7 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(VoicePage, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
 describe(`<${VoicePage.name}/>`, () => {
@@ -48,7 +51,9 @@ describe(`<${VoicePage.name}/>`, () => {
       id: 'admin-1',
       role: ADMIN_ROLE.ADMIN,
     });
-    getTenantByIdMock.mockResolvedValue(makeReadyTenant({ id: TENANT_ID }));
+    getTenantByIdMock.mockResolvedValue(
+      mockReadyTenant({ id: MOCK_TENANT_ID }),
+    );
   });
 
   it('404s when the signed-in user has no admins row', async () => {
@@ -65,7 +70,7 @@ describe(`<${VoicePage.name}/>`, () => {
 
     await setup();
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(screen.getByRole('heading', { name: 'Voice' })).toBeVisible();
   });
 });

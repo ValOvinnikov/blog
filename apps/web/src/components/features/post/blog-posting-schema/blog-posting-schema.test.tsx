@@ -3,7 +3,7 @@ import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
+import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -56,7 +56,7 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
 
   describe('when the post exists', () => {
     beforeEach(() => {
-      getPostPageMock.mockResolvedValue(okResult(mockPostDetail));
+      getPostPageMock.mockResolvedValue(okResult(MOCK_POST_DETAIL));
     });
 
     it('renders the JSON-LD BlogPosting schema script', async () => {
@@ -73,10 +73,9 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
         metadataBase: undefined,
       });
 
-      await setup();
+      const { container } = await setup();
 
-      const script = screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID);
-      expect(script).not.toBeInTheDocument();
+      expect(container).toBeEmptyDOMElement();
     });
 
     it('forwards the slug to getPostPage', async () => {

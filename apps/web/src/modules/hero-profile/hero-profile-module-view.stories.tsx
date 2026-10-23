@@ -9,21 +9,23 @@ import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  portableTextBlock,
-  portableTextSpan,
+  mockPortableTextBlock,
+  mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const bioDemo = [
-  portableTextBlock(
+  mockPortableTextBlock(
     'Jane has spent the last decade designing developer tools, with a focus on making complex systems feel approachable.',
   ),
-  portableTextBlock(
+  mockPortableTextBlock(
     [
-      portableTextSpan('Outside of work, she writes about design systems on '),
-      portableTextSpan('her blog', ['link-1']),
-      portableTextSpan('.'),
+      mockPortableTextSpan(
+        'Outside of work, she writes about design systems on ',
+      ),
+      mockPortableTextSpan('her blog', ['link-1']),
+      mockPortableTextSpan('.'),
     ],
     {
       markDefs: [

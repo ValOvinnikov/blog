@@ -2,6 +2,10 @@ import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
+import {
   testFallsBackToHeadingWithoutHero,
   testFeatureListModule,
   testHeadingWithoutHero,
@@ -109,21 +113,18 @@ vi.mock('@web/modules/section-pages/section-pages-module', () => ({
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
-const PAGE_HEADING = 'About Us';
-const LANDING_PAGE = { id: 'modules', path: 'modules' };
-
 const setup = customRenderAsync(LandingModuleRenderer, {
   hero: undefined,
-  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: 'About Us' }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
-  landingPage: LANDING_PAGE,
+  landingPage: { id: 'modules', path: 'modules' },
 });
 
 const SECTION_PAGES_ID = 'section-pages-1';
 
 describe(`<${LandingModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
+  testHeadingWithoutHero({ setup, headingText: 'About Us' });
   testResolvedHero({ setup });
   testHeroBeforeModules({
     setup,
@@ -136,27 +137,31 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock,
-    headingText: PAGE_HEADING,
+    headingText: 'About Us',
   });
   testHeroProfileHero({ setup, loggerWarnMock });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'post-list-1', type: 'module_postList' },
+    unknownModule: { id: MOCK_POST_LIST_ID, type: 'module_postList' },
     description:
-      'warns and renders nothing for a module off the landing page allow-list',
+      'renders nothing and warns once for a module absent from the landing page allow-list',
   });
   testFeatureListModule({ setup, loggerWarnMock });
 
-  it('renders the section pages module with the landing page as context', async () => {
+  it('renders the section pages module with the landing page as its context', async () => {
     await setup({
       modules: [{ id: SECTION_PAGES_ID, type: 'module_sectionPages' }],
     });
 
-    const sectionPages = screen.getByTestId('stub-section-pages');
-    expect(sectionPages).toHaveTextContent(SECTION_PAGES_ID);
+    const stubSectionPages = screen.getByTestId('stub-section-pages');
+
+    expect(stubSectionPages).toHaveTextContent(SECTION_PAGES_ID);
     expect(sectionPagesModuleMock).toHaveBeenCalledWith(
-      { id: SECTION_PAGES_ID, context: { landingPage: LANDING_PAGE } },
+      {
+        id: SECTION_PAGES_ID,
+        context: { landingPage: { id: 'modules', path: 'modules' } },
+      },
       undefined,
     );
   });
@@ -168,7 +173,7 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
       { id: 'content-1', type: 'module_content' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-latest-1', type: 'module_postLatest' },
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
     ],
   });

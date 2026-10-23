@@ -2,7 +2,7 @@ import { Prose } from '@blog/ui/components/atoms/prose';
 import { Article } from '@blog/ui/components/organisms/article';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { PortableText } from '@web/components/shared/portable-text';
-import { fullBleedImageDemo } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_FULL_BLEED_IMAGE_DEMO } from '@web/testing/shared/portable-text/fixtures';
 
 import { postArticleVariants } from './post-article-variants';
 
@@ -20,8 +20,8 @@ const meta = {
       </Article.Body>
     </Article>
   ),
-  args: { body: fullBleedImageDemo },
-} satisfies Meta<{ body: typeof fullBleedImageDemo }>;
+  args: { body: MOCK_FULL_BLEED_IMAGE_DEMO },
+} satisfies Meta<{ body: typeof MOCK_FULL_BLEED_IMAGE_DEMO }>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;

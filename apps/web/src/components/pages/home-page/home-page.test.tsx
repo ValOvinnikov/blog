@@ -5,6 +5,7 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_FAQ_PAGE_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -52,6 +53,9 @@ const setup = customRenderAsync(HomePage, {});
 const HEADING = 'Welcome to the blog';
 const HOME_MODULE_RENDERER_TEST_ID = 'home-module-renderer';
 
+const HERO = { id: 'hero-1', type: 'module_hero' };
+const CONTENT_MODULE = { id: 'module-1', type: 'module_content' };
+
 const resolveHomePageWith = (overrides: Record<string, unknown> = {}) =>
   getHomePageMock.mockResolvedValue(
     okResult({
@@ -84,7 +88,7 @@ describe(`<${HomePage.name}/>`, () => {
       );
     });
 
-    it('calls notFound() without logging when there is no home page', async () => {
+    it('calls notFound() without logging when the home page does not exist', async () => {
       getHomePageMock.mockResolvedValue(okResult());
 
       await expect(setup()).rejects.toThrow(
@@ -113,35 +117,54 @@ describe(`<${HomePage.name}/>`, () => {
   describe('with a hero and modules', () => {
     beforeEach(async () => {
       resolveHomePageWith({
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [{ id: 'module-1', type: 'module_content' }],
+        hero: HERO,
+        modules: [CONTENT_MODULE],
       });
 
       await setup();
     });
 
-    it('renders the module renderer inside the main landmark', () => {
+    it('renders the module renderer inside a single main landmark', () => {
       const main = screen.getByRole('main');
       const renderer = screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID);
+
       expect(main).toContainElement(renderer);
     });
 
-    it('renders the fetched hero and modules', () => {
+    it('dispatches the module renderer with the fetched hero, heading, modules', () => {
       const renderer = screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID);
-      expect(renderer).toHaveTextContent('hero-1 — 1 modules');
+
+      expect(homeModuleRendererMock).toHaveBeenCalledWith(
+        {
+          hero: HERO,
+          headingBlock: mockHeadingBlock({ heading: HEADING }),
+          modules: [CONTENT_MODULE],
+        },
+        undefined,
+      );
+      expect(renderer).toHaveTextContent(`${HERO.id} — 1 modules`);
     });
   });
 
-  it('renders the page heading when the page has no hero', async () => {
+  it('dispatches the module renderer with no hero when the page has none', async () => {
     resolveHomePageWith();
 
     await setup();
 
     const renderer = screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID);
+
+    expect(homeModuleRendererMock).toHaveBeenCalledWith(
+      {
+        hero: undefined,
+        headingBlock: mockHeadingBlock({ heading: HEADING }),
+        modules: [],
+      },
+      undefined,
+    );
     expect(renderer).toHaveTextContent(`${HEADING} — 0 modules`);
   });
 
-  it('fetches the home page with the tenant context', async () => {
+  it('forwards the request context Sanity context to getHomePage', async () => {
     resolveHomePageWith();
 
     await setup();
@@ -155,6 +178,7 @@ describe(`<${HomePage.name}/>`, () => {
     await setup();
 
     const script = screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID);
+
     expect(script).not.toBeInTheDocument();
   });
 
@@ -172,6 +196,7 @@ describe(`<${HomePage.name}/>`, () => {
     await setup();
 
     const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
-    expect(script.textContent).toContain('"@type":"FAQPage"');
+
+    expect(script.textContent).toContain(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
   });
 });

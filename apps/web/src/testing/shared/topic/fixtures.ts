@@ -4,6 +4,7 @@ import type {
   TTopicDetailPage,
   TTopicWithPostCount,
 } from '@blog/service';
+import { faker } from '@faker-js/faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
@@ -26,6 +27,37 @@ export const mockTopicWithPostCount = (
     ...overrides,
   };
 };
+
+export const MOCK_ENGINEERING_TOPIC = mockTopicWithPostCount({
+  description: undefined,
+  postCount: 3,
+});
+
+const [SECOND_TOPIC_TITLE, THIRD_TOPIC_TITLE] = faker.helpers.uniqueArray(
+  faker.lorem.word,
+  2,
+);
+
+const [SECOND_TOPIC_SLUG, THIRD_TOPIC_SLUG] = faker.helpers.uniqueArray(
+  faker.lorem.slug,
+  2,
+);
+
+export const MOCK_SECOND_TOPIC = mockTopicWithPostCount({
+  id: faker.string.uuid(),
+  title: SECOND_TOPIC_TITLE!,
+  slug: SECOND_TOPIC_SLUG!,
+  description: undefined,
+  postCount: 1,
+});
+
+export const MOCK_THIRD_TOPIC = mockTopicWithPostCount({
+  id: faker.string.uuid(),
+  title: THIRD_TOPIC_TITLE!,
+  slug: THIRD_TOPIC_SLUG!,
+  description: undefined,
+  postCount: 2,
+});
 
 export const mockTopicDetailPage = (
   overrides: Partial<TTopicDetailPage> = {},

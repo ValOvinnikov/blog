@@ -1,6 +1,11 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import {
+  MOCK_SECOND_TOPIC,
+  mockTopicWithPostCount,
+} from '@web/testing/shared/topic/fixtures';
 
 import { TopicChips } from './topic-chips';
 
@@ -16,10 +21,12 @@ vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
 }));
 
-const ACTIVE_SLUG = 'news';
+const NAV_NAME = SITE_MESSAGES.topicChipList.ariaLabel;
+const NEWS_SLUG = 'news';
+const newsTopic = mockTopicWithPostCount({ title: 'News', slug: NEWS_SLUG });
 
 const setup = customRenderAsync(TopicChips, {
-  activeSlug: ACTIVE_SLUG,
+  activeSlug: NEWS_SLUG,
 });
 
 describe(`<${TopicChips.name}/>`, () => {
@@ -27,25 +34,41 @@ describe(`<${TopicChips.name}/>`, () => {
     getTopicsSafelyMock.mockReset();
   });
 
-  it('marks the active topic chip as the current page', async () => {
-    getTopicsSafelyMock.mockResolvedValue([
-      mockTopicWithPostCount({ title: 'News', slug: ACTIVE_SLUG }),
-    ]);
+  it('renders the topic chip row with the current topic highlighted', async () => {
+    getTopicsSafelyMock.mockResolvedValue([newsTopic, MOCK_SECOND_TOPIC]);
 
     await setup();
 
-    const nav = screen.getByRole('navigation', { name: 'Topics' });
-    const activeChip = within(nav).getByRole('link', { name: 'News' });
-    expect(activeChip).toHaveAttribute('aria-current', 'page');
+    const nav = screen.getByRole('navigation', { name: NAV_NAME });
+    const currentLink = within(nav).getByRole('link', {
+      name: newsTopic.title,
+    });
+    const designLink = within(nav).getByRole('link', {
+      name: MOCK_SECOND_TOPIC.title,
+    });
+    const allLink = within(nav).getByRole('link', { name: 'All' });
+
+    expect(currentLink).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(designLink).not.toHaveAttribute(ARIA_CURRENT);
+    expect(allLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
-  it('forwards the request context Sanity context to getTopicsSafely', async () => {
-    getTopicsSafelyMock.mockResolvedValue([]);
+  describe('with no topics', () => {
+    beforeEach(async () => {
+      getTopicsSafelyMock.mockResolvedValue([]);
+      await setup();
+    });
 
-    await setup();
+    it('renders nothing when there are no topics', () => {
+      const nav = screen.queryByRole('navigation', { name: NAV_NAME });
 
-    expect(getTopicsSafelyMock).toHaveBeenCalledWith(
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
+      expect(nav).not.toBeInTheDocument();
+    });
+
+    it('forwards the request context Sanity context to getTopicsSafely', () => {
+      expect(getTopicsSafelyMock).toHaveBeenCalledWith(
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
   });
 });

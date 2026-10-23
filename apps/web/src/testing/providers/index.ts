@@ -1,1 +1,1 @@
-export { AppProviders, MOCK_SANITY_IMAGE_BASE_URL } from './providers';
+export { AppProviders, STATIC_SANITY_IMAGE_BASE_URL } from './providers';

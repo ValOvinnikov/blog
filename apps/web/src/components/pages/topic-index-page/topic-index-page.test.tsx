@@ -8,12 +8,15 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_CTA_HEADING,
+  MOCK_SECOND_CTA_HEADING,
+  mockCtaModuleData,
+} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_TENANT_SANITY_CONTEXT,
   MOCK_REQUEST_CONTEXT,
@@ -42,15 +45,12 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.topicIndex.v1.getIndexPage);
 
 const SUPPORTING_TEXT = 'Browse every post by topic.';
-const PAGE_HEADING = 'Topics';
-const CTA_HEADING = 'Join the list';
-const SECOND_CTA_HEADING = 'Write for us';
 const HERO_HEADING = 'Every topic we write about';
 
 const topicIndexPage: TTopicIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   headingBlock: mockHeadingBlock({
-    heading: PAGE_HEADING,
+    heading: 'Topics',
     supportingText: SUPPORTING_TEXT,
   }),
   hero: undefined,
@@ -80,7 +80,7 @@ describe(`<${TopicIndexPage.name}/>`, () => {
       const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
         level: 1,
-        name: PAGE_HEADING,
+        name: 'Topics',
       });
       const supportingText = within(main).getByText(SUPPORTING_TEXT);
       expect(heading).toBeVisible();
@@ -93,9 +93,9 @@ describe(`<${TopicIndexPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: MOCK_SITE_SETTINGS.brand.name,
+        name: 'Northwind Journal',
       });
-      const currentCrumb = within(breadcrumbs).getByText(PAGE_HEADING);
+      const currentCrumb = within(breadcrumbs).getByText('Topics');
       const main = screen.getByRole('main');
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
@@ -110,7 +110,8 @@ describe(`<${TopicIndexPage.name}/>`, () => {
       okResult(
         mockCtaModuleData({
           headingBlock: mockHeadingBlock({
-            heading: id === 'cta-1' ? CTA_HEADING : SECOND_CTA_HEADING,
+            heading:
+              id === 'cta-1' ? MOCK_CTA_HEADING : MOCK_SECOND_CTA_HEADING,
           }),
         }),
       ),
@@ -170,9 +171,11 @@ describe(`<${TopicIndexPage.name}/>`, () => {
 
     const main = screen.getByRole('main');
     const regions = within(main).getAllByRole('region');
-    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    const ctaRegion = within(main).getByRole('region', {
+      name: MOCK_CTA_HEADING,
+    });
     const secondCtaRegion = within(main).getByRole('region', {
-      name: SECOND_CTA_HEADING,
+      name: MOCK_SECOND_CTA_HEADING,
     });
     expect(regions).toEqual([ctaRegion, secondCtaRegion]);
   });
@@ -193,7 +196,7 @@ describe(`<${TopicIndexPage.name}/>`, () => {
     });
     const pageHeading = screen.queryByRole('heading', {
       level: 1,
-      name: PAGE_HEADING,
+      name: 'Topics',
     });
     expect(heroHeading).toBeVisible();
     expect(pageHeading).not.toBeInTheDocument();

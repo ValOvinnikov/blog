@@ -2,7 +2,7 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  makeTenant,
+  mockTenant,
   MOCK_CUSTOM_DOMAIN,
   MOCK_CUSTOM_DOMAIN_URL,
   MOCK_SITE_NAME,
@@ -14,7 +14,7 @@ const render = renderWithIntl;
 
 describe(`<${YourSiteCard.name}/>`, () => {
   it('shows the name, public domain, plan and locale as plain values', () => {
-    const tenant = makeTenant({
+    const tenant = mockTenant({
       name: MOCK_SITE_NAME,
       primaryDomain: MOCK_CUSTOM_DOMAIN,
       plan: TENANT_PLAN.GROWTH,
@@ -36,7 +36,7 @@ describe(`<${YourSiteCard.name}/>`, () => {
   });
 
   it('links the public domain out to the live site', () => {
-    const tenant = makeTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN });
+    const tenant = mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN });
     render(<YourSiteCard tenant={tenant} />);
 
     const siteLink = screen.getByRole('link', {
@@ -47,7 +47,7 @@ describe(`<${YourSiteCard.name}/>`, () => {
   });
 
   it("nests the card's title one level under the page's own h1", () => {
-    render(<YourSiteCard tenant={makeTenant()} />);
+    render(<YourSiteCard tenant={mockTenant()} />);
 
     const heading = screen.getByRole('heading', {
       level: 2,

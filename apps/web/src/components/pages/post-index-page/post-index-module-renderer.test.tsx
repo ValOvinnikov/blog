@@ -2,6 +2,10 @@ import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
+import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testRendersAllowedModulesInOrder,
@@ -79,8 +83,6 @@ vi.mock('@web/modules/post-latest/post-latest-module', () => ({
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const PAGE_HEADING = 'Notes on building things';
-const POST_LIST_ID = 'post-list-1';
-
 const setup = customRenderAsync(PostIndexModuleRenderer, {
   hero: undefined,
   headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
@@ -120,13 +122,13 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
     loggerWarnMock,
     unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
-      'warns and renders nothing for a module off the post index allow-list',
+      'renders nothing and warns once for a module absent from the post index allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: POST_LIST_ID, type: 'module_postList' },
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: MOCK_POST_LIST_ID, type: 'module_postList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
@@ -137,13 +139,13 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
 
   it('forwards the given context to the modules', async () => {
     await setup({
-      modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
+      modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
       context: { page: 2 },
     });
 
     expect(postListModuleMock).toHaveBeenCalledWith(
       {
-        id: POST_LIST_ID,
+        id: MOCK_POST_LIST_ID,
         context: { page: 2 },
       },
       undefined,

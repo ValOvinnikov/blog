@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeBookmarksPageView } from '@web/testing/pages/bookmarks-page/fixtures';
+import { mockBookmarksPageView } from '@web/testing/pages/bookmarks-page/fixtures';
 
 import { BookmarksPageView } from './bookmarks-page-view';
 
@@ -7,7 +7,7 @@ const meta = {
   title: 'Pages/BookmarksPageView',
   component: BookmarksPageView,
   tags: ['autodocs'],
-  args: makeBookmarksPageView(),
+  args: mockBookmarksPageView(),
 } satisfies Meta<typeof BookmarksPageView>;
 
 export default meta;

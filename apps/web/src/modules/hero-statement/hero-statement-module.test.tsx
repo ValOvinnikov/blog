@@ -7,7 +7,7 @@ import {
   MOCK_HERO_STATEMENT_HEADING,
   MOCK_HERO_STATEMENT_MODULE_ID,
 } from '@web/testing/modules/hero-statement/fixtures';
-import { MOCK_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
+import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -99,7 +99,7 @@ describe(`<${HeroStatementModule.name}/>`, () => {
 
     const image = screen.getByRole('img', { name: sanityImage.alt });
     expect(
-      image.getAttribute('src')?.startsWith(MOCK_SANITY_IMAGE_BASE_URL),
+      image.getAttribute('src')?.startsWith(STATIC_SANITY_IMAGE_BASE_URL),
     ).toBe(true);
   });
 });

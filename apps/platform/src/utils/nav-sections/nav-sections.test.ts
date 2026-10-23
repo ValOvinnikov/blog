@@ -2,7 +2,7 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
@@ -87,16 +87,16 @@ describe('operatorNavSections', () => {
 
 describe('tenantNavSections', () => {
   it("labels the main section with the tenant's name, not its id", () => {
-    const [tenant] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
 
     expect(tenant!.label).toBe('Tenant · Acme Co');
-    expect(tenant!.label).not.toContain(TENANT_ID);
+    expect(tenant!.label).not.toContain(MOCK_TENANT_ID);
   });
 
   it('gives the main, content, configuration and platform sections distinct labels', () => {
     const [tenant, content, configuration, platform] = tenantNavSections(
       t,
-      TENANT_ID,
+      MOCK_TENANT_ID,
       TENANT_NAME,
     );
     const labels = [
@@ -112,27 +112,31 @@ describe('tenantNavSections', () => {
   });
 
   it('gives Overview a real href as the only item in the main section', () => {
-    const [tenant] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
 
     expect(tenant!.items.map((item) => item.label)).toEqual(['Overview']);
     expect(tenant!.items[0]).toMatchObject({
       label: 'Overview',
-      href: adminRoutes.tenantOverview(TENANT_ID),
+      href: adminRoutes.tenantOverview(MOCK_TENANT_ID),
     });
   });
 
   it('puts Studio alone in the Content section, with a real href and no badge', () => {
-    const [, content] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+    const [, content] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
 
     expect(content!.items.map((item) => item.label)).toEqual(['Studio']);
     expect(content!.items[0]).toMatchObject({
-      href: adminRoutes.tenantStudio(TENANT_ID),
+      href: adminRoutes.tenantStudio(MOCK_TENANT_ID),
     });
     expect(content!.items[0]?.badge).toBeUndefined();
   });
 
   it('gives Look, Voice, Features, Domain and Email distinct real hrefs in the Configuration section', () => {
-    const [, , configuration] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+    const [, , configuration] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      TENANT_NAME,
+    );
     const look = configuration!.items.find((item) => item.label === 'Look');
     const voice = configuration!.items.find((item) => item.label === 'Voice');
     const features = configuration!.items.find(
@@ -141,40 +145,47 @@ describe('tenantNavSections', () => {
     const domain = configuration!.items.find((item) => item.label === 'Domain');
     const email = configuration!.items.find((item) => item.label === 'Email');
 
-    expect(look?.href).toBe(adminRoutes.look(TENANT_ID));
-    expect(voice?.href).toBe(adminRoutes.voice(TENANT_ID));
-    expect(features?.href).toBe(adminRoutes.features(TENANT_ID));
+    expect(look?.href).toBe(adminRoutes.look(MOCK_TENANT_ID));
+    expect(voice?.href).toBe(adminRoutes.voice(MOCK_TENANT_ID));
+    expect(features?.href).toBe(adminRoutes.features(MOCK_TENANT_ID));
     expect(
       configuration!.items.find((item) => item.label === 'Leads')?.href,
-    ).toBe(adminRoutes.leads(TENANT_ID));
-    expect(domain?.href).toBe(adminRoutes.tenantDomain(TENANT_ID));
-    expect(email?.href).toBe(adminRoutes.email(TENANT_ID));
+    ).toBe(adminRoutes.leads(MOCK_TENANT_ID));
+    expect(domain?.href).toBe(adminRoutes.tenantDomain(MOCK_TENANT_ID));
+    expect(email?.href).toBe(adminRoutes.email(MOCK_TENANT_ID));
     expect(look?.href).not.toBe(voice?.href);
   });
 
-  it('leaves Look and Voice unbadged, now that both have shipped', () => {
-    const [, , configuration] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
-    const look = configuration!.items.find((item) => item.label === 'Look');
-    const voice = configuration!.items.find((item) => item.label === 'Voice');
-
-    expect(look?.badge).toBeUndefined();
-    expect(voice?.badge).toBeUndefined();
-  });
-
-  it('leaves Features, Languages, Domain and Email unbadged', () => {
-    const [, , configuration] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+  it('leaves Look, Voice, Features, Languages, Domain and Email unbadged', () => {
+    const shippedLabels = [
+      'Look',
+      'Voice',
+      'Features',
+      'Languages',
+      'Domain',
+      'Email',
+    ];
+    const [, , configuration] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      TENANT_NAME,
+    );
     const shipped = configuration!.items.filter((item) =>
-      ['Features', 'Languages', 'Domain', 'Email'].includes(item.label),
+      shippedLabels.includes(item.label),
     );
 
-    expect(shipped).toHaveLength(4);
+    expect(shipped.map((item) => item.label)).toEqual(shippedLabels);
     for (const item of shipped) {
       expect(item.badge).toBeUndefined();
     }
   });
 
   it('shows Subscribers, Comments and Team as non-interactive "Coming soon" entries', () => {
-    const [, , configuration] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+    const [, , configuration] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      TENANT_NAME,
+    );
     const comingSoon = configuration!.items.filter(
       (item) => item.badge?.label === COMING_SOON_LABEL,
     );
@@ -190,7 +201,7 @@ describe('tenantNavSections', () => {
   });
 
   it('carries no "this milestone" or "later" badge on any entry', () => {
-    const labels = tenantNavSections(t, TENANT_ID, TENANT_NAME).flatMap(
+    const labels = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME).flatMap(
       (section) => section.items.map((item) => item.badge?.label),
     );
 
@@ -199,7 +210,11 @@ describe('tenantNavSections', () => {
   });
 
   it('lists the ten Configuration destinations, Look through Team, with no Studio', () => {
-    const [, , configuration] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+    const [, , configuration] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      TENANT_NAME,
+    );
 
     expect(configuration!.items.map((item) => item.label)).toEqual([
       'Look',
@@ -216,18 +231,18 @@ describe('tenantNavSections', () => {
   });
 
   it('gives Provisioning and Danger zone real hrefs in the platform-only section, each badged "platform"', () => {
-    const [, , , platform] = tenantNavSections(t, TENANT_ID, TENANT_NAME);
+    const [, , , platform] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
 
     expect(platform!.items.map((item) => item.label)).toEqual([
       PROVISIONING_LABEL,
       DANGER_ZONE_LABEL,
     ]);
     expect(platform!.items[0]).toMatchObject({
-      href: adminRoutes.tenantProvisioning(TENANT_ID),
+      href: adminRoutes.tenantProvisioning(MOCK_TENANT_ID),
       badge: { label: PLATFORM_BADGE_LABEL, tone: 'neutral', hasDot: false },
     });
     expect(platform!.items[1]).toMatchObject({
-      href: adminRoutes.tenantDanger(TENANT_ID),
+      href: adminRoutes.tenantDanger(MOCK_TENANT_ID),
       badge: { label: PLATFORM_BADGE_LABEL, tone: 'neutral', hasDot: false },
     });
   });
@@ -373,7 +388,7 @@ describe('nav section icons', () => {
   it('has a registered glyph for every icon a nav item references', () => {
     const items = [
       ...operatorNavSections(t, ADMIN_ROLE.SUPERADMIN),
-      ...tenantNavSections(t, TENANT_ID, 'Acme'),
+      ...tenantNavSections(t, MOCK_TENANT_ID, 'Acme'),
       ...dashboardNavSections(t, EVERY_PAGE),
     ].flatMap((section) => section.items);
 

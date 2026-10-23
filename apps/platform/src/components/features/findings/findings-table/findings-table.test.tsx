@@ -6,12 +6,12 @@ import {
 } from '@blog/config/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  makeFinding,
+  mockFinding,
   MOCK_FINDING_LAST_SEEN_AT,
 } from '@platform/testing/findings/fixtures';
 import {
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { FindingsTable } from './findings-table';
@@ -26,7 +26,7 @@ describe(`<${FindingsTable.name}/>`, () => {
     render(
       <FindingsTable
         findings={[
-          makeFinding({
+          mockFinding({
             source: FINDING_SOURCE.DOCUMENT_VALIDATION,
             kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
             severity: FINDING_SEVERITY.WARNING,
@@ -50,7 +50,7 @@ describe(`<${FindingsTable.name}/>`, () => {
   });
 
   it('names the scrollable table region after the page', () => {
-    render(<FindingsTable findings={[makeFinding()]} />);
+    render(<FindingsTable findings={[mockFinding()]} />);
 
     const region = screen.getByRole('region', { name: 'Findings' });
     const table = screen.getByRole('table');
@@ -59,17 +59,19 @@ describe(`<${FindingsTable.name}/>`, () => {
   });
 
   it("links a finding's tenant name to that tenant's overview page", () => {
-    render(<FindingsTable findings={[makeFinding({ tenantId: TENANT_ID })]} />);
+    render(
+      <FindingsTable findings={[mockFinding({ tenantId: MOCK_TENANT_ID })]} />,
+    );
 
     const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
 
-    expect(tenantLink).toHaveAttribute('href', `/tenants/${TENANT_ID}`);
+    expect(tenantLink).toHaveAttribute('href', `/tenants/${MOCK_TENANT_ID}`);
   });
 
   it('shows a platform-wide placeholder instead of a tenant link for a tenant-less finding', () => {
     render(
       <FindingsTable
-        findings={[makeFinding({ tenantId: null, tenantName: null })]}
+        findings={[mockFinding({ tenantId: null, tenantName: null })]}
       />,
     );
 
@@ -84,7 +86,7 @@ describe(`<${FindingsTable.name}/>`, () => {
     render(
       <FindingsTable
         findings={[
-          makeFinding({
+          mockFinding({
             tenantId: null,
             tenantName: null,
             source: FINDING_SOURCE.CONTRAST_CHECK,

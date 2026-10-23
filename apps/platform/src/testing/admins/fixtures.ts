@@ -5,7 +5,7 @@ const ADMIN_GRANTED_AT = '2026-04-01T00:00:00.000Z';
 
 export const MOCK_ADMIN_EMAIL = 'platform-admin@example.com';
 
-export const makeAdmin = (overrides: Partial<TAdmin> = {}): TAdmin => ({
+export const mockAdmin = (overrides: Partial<TAdmin> = {}): TAdmin => ({
   id: 'admin-1',
   userId: 'user-1',
   role: ADMIN_ROLE.ADMIN,

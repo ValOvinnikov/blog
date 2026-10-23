@@ -1,7 +1,7 @@
 import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -26,7 +26,7 @@ export const itGatesToSuperAdmins = (
   beforeEach(() => {
     authMock
       .mockReset()
-      .mockResolvedValue({ user: { id: makeAdmin().userId } });
+      .mockResolvedValue({ user: { id: mockAdmin().userId } });
     getAdminByUserIdMock.mockReset();
   });
 
@@ -41,7 +41,7 @@ export const itGatesToSuperAdmins = (
   it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
     '404s for a %s',
     async (role) => {
-      getAdminByUserIdMock.mockResolvedValue(makeAdmin({ role }));
+      getAdminByUserIdMock.mockResolvedValue(mockAdmin({ role }));
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -57,7 +57,7 @@ export const itGatesToSuperAdmins = (
 
   it('renders the page for a SUPERADMIN', async () => {
     getAdminByUserIdMock.mockResolvedValue(
-      makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
     );
 
     await setup();

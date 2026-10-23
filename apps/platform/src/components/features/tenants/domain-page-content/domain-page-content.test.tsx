@@ -3,9 +3,10 @@ import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-a
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
-  makeTenant,
+  mockTenant,
   MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
+  MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
 
 import { DomainPageContent } from './domain-page-content';
@@ -17,7 +18,7 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 const getProjectDomainMock = vi.mocked(getProjectDomain);
 
 const render = async (
-  tenant = makeTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+  tenant = mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
 ) => {
   const ui = await DomainPageContent({ tenant });
   await act(async () => {
@@ -30,7 +31,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     getProjectDomainMock.mockReset();
     getProjectDomainMock.mockResolvedValue({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
+      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
     });
   });
 
@@ -87,7 +88,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
 
   it('shows the archived notice for a deprovisioned tenant', async () => {
     await render(
-      makeTenant({
+      mockTenant({
         primaryDomain: MOCK_CUSTOM_DOMAIN,
         deprovisionedAt: MOCK_ARCHIVED_AT,
       }),

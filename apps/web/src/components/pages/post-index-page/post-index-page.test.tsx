@@ -8,12 +8,14 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_CTA_HEADING,
+  mockCtaModuleData,
+} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_TENANT_SANITY_CONTEXT,
   MOCK_REQUEST_CONTEXT,
@@ -46,14 +48,12 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.blog.v1.getIndexPage);
 
 const SUPPORTING_TEXT = 'Notes from the team.';
-const PAGE_HEADING = 'Blog';
-const CTA_HEADING = 'Join the list';
 const HERO_HEADING = 'Everything we write';
 
 const indexPage: TBlogIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   headingBlock: mockHeadingBlock({
-    heading: PAGE_HEADING,
+    heading: 'Blog',
     supportingText: SUPPORTING_TEXT,
   }),
   hero: undefined,
@@ -95,7 +95,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
       const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
         level: 1,
-        name: PAGE_HEADING,
+        name: 'Blog',
       });
       const supportingText = within(main).getByText(SUPPORTING_TEXT);
       expect(heading).toBeVisible();
@@ -108,9 +108,9 @@ describe(`<${PostIndexPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: MOCK_SITE_SETTINGS.brand.name,
+        name: 'Northwind Journal',
       });
-      const currentCrumb = within(breadcrumbs).getByText(PAGE_HEADING);
+      const currentCrumb = within(breadcrumbs).getByText('Blog');
       const main = screen.getByRole('main');
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
@@ -178,7 +178,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
         mockCtaModuleData({
-          headingBlock: mockHeadingBlock({ heading: CTA_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: MOCK_CTA_HEADING }),
         }),
       ),
     );
@@ -186,7 +186,9 @@ describe(`<${PostIndexPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    const ctaRegion = within(main).getByRole('region', {
+      name: MOCK_CTA_HEADING,
+    });
     expect(ctaRegion).toBeVisible();
   });
 
@@ -206,7 +208,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
     const pageHeading = screen.queryByRole('heading', {
       level: 1,
-      name: PAGE_HEADING,
+      name: 'Blog',
     });
     expect(heroHeading).toBeVisible();
     expect(pageHeading).not.toBeInTheDocument();

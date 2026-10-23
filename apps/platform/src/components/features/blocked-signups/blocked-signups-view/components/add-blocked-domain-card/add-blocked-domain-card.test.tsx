@@ -1,8 +1,8 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { SIGNUP_BLOCK_FIELD_ERROR } from '@platform/constants/signup-block';
 import {
-  BLOCK_REASON,
-  BLOCKED_DOMAIN,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_DOMAIN,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -39,8 +39,8 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
 
     const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
     const reasonField = screen.getByRole('textbox', REASON_FIELD);
-    await user.type(domainField, BLOCKED_DOMAIN);
-    await user.type(reasonField, BLOCK_REASON);
+    await user.type(domainField, MOCK_BLOCKED_DOMAIN);
+    await user.type(reasonField, MOCK_BLOCK_REASON);
   });
 
   it('submits the entered domain and reason, then clears the form', async () => {
@@ -48,8 +48,8 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     await user.click(submit);
 
     expect(addBlockedDomainActionMock).toHaveBeenCalledWith({
-      domain: BLOCKED_DOMAIN,
-      reason: BLOCK_REASON,
+      domain: MOCK_BLOCKED_DOMAIN,
+      reason: MOCK_BLOCK_REASON,
     });
     const domainField = await screen.findByRole('textbox', DOMAIN_FIELD);
 
@@ -74,7 +74,7 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
 
     expect(error).toBeVisible();
-    expect(domainField).toHaveValue(BLOCKED_DOMAIN);
+    expect(domainField).toHaveValue(MOCK_BLOCKED_DOMAIN);
     expect(refreshMock).not.toHaveBeenCalled();
   });
 
@@ -90,7 +90,7 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     const reasonField = screen.getByRole('textbox', REASON_FIELD);
 
     expect(error).toBeVisible();
-    expect(reasonField).toHaveValue(BLOCK_REASON);
+    expect(reasonField).toHaveValue(MOCK_BLOCK_REASON);
     expect(refreshMock).not.toHaveBeenCalled();
   });
 });

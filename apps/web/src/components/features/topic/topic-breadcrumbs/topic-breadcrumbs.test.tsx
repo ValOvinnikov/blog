@@ -15,9 +15,7 @@ import { mockTopic } from '@web/testing/shared/topic/fixtures';
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
 const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
-const TOPIC_SLUG = 'news';
-const TOPIC_TITLE = 'News';
-const TOPIC_HREF = `/topics/${TOPIC_SLUG}`;
+const TOPIC_HREF = '/topics/news';
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -33,11 +31,11 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-const topic = mockTopic({ title: TOPIC_TITLE, slug: TOPIC_SLUG });
+const topic = mockTopic({ title: 'News', slug: 'news' });
 const successData = { topic, modules: [], seo: mockSeo() };
 
 const setup = customRenderAsync(TopicBreadcrumbs, {
-  slug: TOPIC_SLUG,
+  slug: 'news',
 });
 
 describe(`<${TopicBreadcrumbs.name}/>`, () => {
@@ -56,7 +54,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     setup,
     successData,
     linkSteps: [{ label: SITE_NAME, href: '/' }],
-    currentLabel: TOPIC_TITLE,
+    currentLabel: 'News',
   });
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getTopicPageMock,
@@ -70,7 +68,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     successData,
     expectedTrail: [
       { name: SITE_NAME, path: '/' },
-      { name: TOPIC_TITLE, path: TOPIC_HREF },
+      { name: 'News', path: TOPIC_HREF },
     ],
   });
   testNoJsonLdWithoutBaseUrl({
@@ -83,6 +81,6 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     setup,
     successData,
     description: 'forwards the slug to getTopicPage',
-    expectedArgs: [TOPIC_SLUG],
+    expectedArgs: ['news'],
   });
 });

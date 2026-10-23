@@ -1,8 +1,8 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import {
-  buildTestEmailDraft,
-  EMAIL_BODY,
-  EMAIL_DRAFT_LIVE_LOCALES,
+  mockEmailDraft,
+  MOCK_EMAIL_BODY,
+  MOCK_EMAIL_DRAFT_LIVE_LOCALES,
 } from '@platform/testing/email-draft';
 import {
   EMAIL_SENDER_ITEM,
@@ -26,28 +26,30 @@ describe('change tracking', () => {
   let saved: TEmailDraft;
 
   beforeEach(() => {
-    saved = buildTestEmailDraft();
+    saved = mockEmailDraft();
   });
 
   it('reports no changes for an untouched draft', () => {
-    expect(countEmailDraftChanges(saved, saved, EMAIL_DRAFT_LIVE_LOCALES)).toBe(
-      0,
-    );
-    expect(listCopyChanges(saved, saved, EMAIL_DRAFT_LIVE_LOCALES)).toEqual([]);
+    expect(
+      countEmailDraftChanges(saved, saved, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
+    ).toBe(0);
+    expect(
+      listCopyChanges(saved, saved, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
+    ).toEqual([]);
   });
 
   it('counts subject and body edits per language', () => {
     const draft = withCopy(
       saved,
       { templateType: MAGIC_LINK, locale: FR },
-      { subject: 'Connexion', body: EMAIL_BODY },
+      { subject: 'Connexion', body: MOCK_EMAIL_BODY },
     );
 
     expect(countLanguageChanges(saved, draft, FR)).toBe(2);
     expect(countLanguageChanges(saved, draft, EN)).toBe(0);
-    expect(listCopyChanges(saved, draft, EMAIL_DRAFT_LIVE_LOCALES)).toEqual([
-      { templateType: MAGIC_LINK, locale: FR },
-    ]);
+    expect(
+      listCopyChanges(saved, draft, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
+    ).toEqual([{ templateType: MAGIC_LINK, locale: FR }]);
   });
 
   it('counts sender fields and staged logos', () => {
@@ -57,9 +59,9 @@ describe('change tracking', () => {
       { url: 'blob:logo', file: new File(['x'], 'logo.png') },
     );
 
-    expect(countEmailDraftChanges(saved, draft, EMAIL_DRAFT_LIVE_LOCALES)).toBe(
-      2,
-    );
+    expect(
+      countEmailDraftChanges(saved, draft, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
+    ).toBe(2);
   });
 
   it('adds up shared and per-language changes to the total', () => {
@@ -74,7 +76,7 @@ describe('change tracking', () => {
       countSharedChanges(saved, draft) +
         countLanguageChanges(saved, draft, EN) +
         countLanguageChanges(saved, draft, FR),
-    ).toBe(countEmailDraftChanges(saved, draft, EMAIL_DRAFT_LIVE_LOCALES));
+    ).toBe(countEmailDraftChanges(saved, draft, MOCK_EMAIL_DRAFT_LIVE_LOCALES));
   });
 });
 
@@ -82,7 +84,7 @@ describe('resolveItemStatus', () => {
   let saved: TEmailDraft;
 
   beforeEach(() => {
-    saved = buildTestEmailDraft();
+    saved = mockEmailDraft();
   });
 
   it('marks a template customised only in the languages it was written in', () => {

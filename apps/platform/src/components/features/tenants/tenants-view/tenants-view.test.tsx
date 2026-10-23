@@ -1,6 +1,6 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  makeTenant,
+  mockTenant,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -9,7 +9,7 @@ import { TenantsView } from './tenants-view';
 
 const render = renderWithIntl;
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 const ARIA_PRESSED = 'aria-pressed';
 const PRESSED = 'true';

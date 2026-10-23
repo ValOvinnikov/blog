@@ -10,7 +10,7 @@ import {
   MOCK_HERO_PROFILE_MODULE_ID,
 } from '@web/testing/modules/hero-profile/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
@@ -19,7 +19,7 @@ const BIO_TEXT = 'Jane writes about design systems.';
 const SUPPORTING_TEXT = 'Building better products.';
 const ARIA_HIDDEN_SELECTOR = '[aria-hidden="true"]';
 
-const bio = [portableTextBlock(BIO_TEXT)];
+const bio = [mockPortableTextBlock(BIO_TEXT)];
 
 const sanityImage = mockSanityImage();
 

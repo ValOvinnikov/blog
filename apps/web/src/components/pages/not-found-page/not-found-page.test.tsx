@@ -1,13 +1,17 @@
 import { SITE_MESSAGES } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
-import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import {
+  MOCK_VOICE_BOLD_TEXT,
+  MOCK_VOICE_ITALIC_TEXT,
+  MOCK_VOICE_LINK_HREF,
+  MOCK_VOICE_LINK_TEXT,
+  mockFormattedVoiceRich,
+} from '@web/testing/shared/voice/fixtures';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 
 import { NotFoundPage } from './not-found-page';
 
-const HOME_LINK_NAME = 'Return home';
-const VOICED_LINK_TEXT = 'search the archive';
-const VOICED_LINK_HREF = '/blog';
+const RETURN_HOME = 'Return home';
 
 const setup = customRender(NotFoundPage, {
   supportingText: resolveVoiceRichFields({}, SITE_MESSAGES)
@@ -22,6 +26,7 @@ describe(`<${NotFoundPage.name}/>`, () => {
 
     it('renders the eyebrow', () => {
       const eyebrow = screen.getByText('404');
+
       expect(eyebrow).toBeVisible();
     });
 
@@ -30,6 +35,7 @@ describe(`<${NotFoundPage.name}/>`, () => {
         level: 1,
         name: 'Page not found',
       });
+
       expect(heading).toBeVisible();
     });
 
@@ -37,30 +43,37 @@ describe(`<${NotFoundPage.name}/>`, () => {
       const supportingText = screen.getByText(
         "The page you're looking for doesn't exist.",
       );
+
       expect(supportingText).toBeVisible();
     });
 
     it('renders a link back home', () => {
-      const link = screen.getByRole('link', { name: HOME_LINK_NAME });
+      const link = screen.getByRole('link', { name: RETURN_HOME });
+
       expect(link).toHaveAttribute('href', '/');
     });
 
     it('renders the decorative arrow icon inside the link', () => {
-      const link = screen.getByRole('link', { name: HOME_LINK_NAME });
-      const arrowIcon = within(link).getByTestId('not-found-arrow-icon');
-      expect(arrowIcon).toBeVisible();
+      const link = screen.getByRole('link', { name: RETURN_HOME });
+      const icon = within(link).getByTestId('not-found-arrow-icon');
+
+      expect(icon).toBeVisible();
     });
   });
 
-  it('renders tenant-authored supporting text with its link', () => {
-    setup({
-      supportingText: mockFormattedVoiceRich({
-        linkText: VOICED_LINK_TEXT,
-        href: VOICED_LINK_HREF,
-      }),
+  it('renders tenant-authored supporting text with its formatting and link', () => {
+    setup({ supportingText: mockFormattedVoiceRich() });
+
+    const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
+    const bold = screen.getByText(MOCK_VOICE_BOLD_TEXT, {
+      selector: 'strong',
+    });
+    const italic = screen.getByText(MOCK_VOICE_ITALIC_TEXT, {
+      selector: 'em',
     });
 
-    const link = screen.getByRole('link', { name: VOICED_LINK_TEXT });
-    expect(link).toHaveAttribute('href', VOICED_LINK_HREF);
+    expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
+    expect(bold).toBeVisible();
+    expect(italic).toBeVisible();
   });
 });

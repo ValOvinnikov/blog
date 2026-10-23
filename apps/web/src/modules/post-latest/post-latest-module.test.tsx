@@ -73,25 +73,36 @@ describe(`<${PostLatestModule.name}/>`, () => {
     expect(pagination).not.toBeInTheDocument();
   });
 
-  it.each([
-    { showImages: true, imageCount: 1 },
-    { showImages: false, imageCount: 0 },
-  ])(
-    'renders $imageCount post images when showImages is $showImages',
-    async ({ showImages, imageCount }) => {
-      getPostLatestMock.mockResolvedValue(
-        okResult(
-          mockPostLatestModuleData({
-            posts: [mockPostCard({ heroImage: mockSanityImage() })],
-            showImages,
-          }),
-        ),
-      );
+  it('renders each post image when showImages is true', async () => {
+    const sanityImage = mockSanityImage();
+    getPostLatestMock.mockResolvedValue(
+      okResult(
+        mockPostLatestModuleData({
+          posts: [mockPostCard({ heroImage: sanityImage })],
+          showImages: true,
+        }),
+      ),
+    );
 
-      await setup();
+    await setup();
 
-      const images = screen.queryAllByRole('img');
-      expect(images).toHaveLength(imageCount);
-    },
-  );
+    const image = screen.getByRole('img', { name: sanityImage.alt });
+    expect(image).toBeVisible();
+  });
+
+  it('renders no post images when showImages is false', async () => {
+    getPostLatestMock.mockResolvedValue(
+      okResult(
+        mockPostLatestModuleData({
+          posts: [mockPostCard({ heroImage: mockSanityImage() })],
+          showImages: false,
+        }),
+      ),
+    );
+
+    await setup();
+
+    const image = screen.queryByRole('img');
+    expect(image).not.toBeInTheDocument();
+  });
 });

@@ -6,7 +6,7 @@ import {
   MOCK_TEAM_MEMBER_PROFILE_URL,
   mockTeamMember,
 } from '@web/testing/modules/team/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
 
 import { TeamMemberCard } from './team-member-card';
@@ -68,7 +68,7 @@ describe(`<${TeamMemberCard.name}/>`, () => {
 
     setup({
       member: mockTeamMember({
-        bio: [portableTextBlock(MOCK_TEAM_MEMBER_BIO)],
+        bio: [mockPortableTextBlock(MOCK_TEAM_MEMBER_BIO)],
         socialLinks: [GITHUB_PROFILE],
       }),
     });

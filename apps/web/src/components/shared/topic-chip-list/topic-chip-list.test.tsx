@@ -1,25 +1,19 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
+import {
+  MOCK_SECOND_TOPIC,
+  MOCK_ENGINEERING_TOPIC,
+  mockTopicWithPostCount,
+} from '@web/testing/shared/topic/fixtures';
 
 import { TopicChipList } from './topic-chip-list';
 
 vi.mock('@web/i18n/navigation');
 
-const topics = [
-  {
-    id: 'topic-1',
-    title: 'Engineering',
-    slug: 'engineering',
-    description: undefined,
-    postCount: 3,
-  },
-  {
-    id: 'topic-2',
-    title: 'Design',
-    slug: 'design',
-    description: undefined,
-    postCount: 1,
-  },
-];
+const { ariaLabel: NAV_NAME, all: ALL_CHIP_NAME } = SITE_MESSAGES.topicChipList;
+
+const topics = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC];
 
 const setup = customRender(TopicChipList, { topics });
 
@@ -30,80 +24,76 @@ describe(`<${TopicChipList.name}/>`, () => {
     });
 
     it('renders a Topics nav landmark', () => {
-      expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
+      const nav = screen.getByRole('navigation', { name: NAV_NAME });
+
+      expect(nav).toBeVisible();
     });
 
     it('renders an "All" chip linking to the blog index', () => {
-      expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
-        'href',
-        '/blog',
-      );
+      const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
+
+      expect(allLink).toHaveAttribute('href', '/blog');
     });
 
-    it('renders one chip per topic linking to its archive', () => {
-      expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-        'href',
-        '/topics/engineering',
-      );
-      expect(screen.getByRole('link', { name: 'Design' })).toHaveAttribute(
-        'href',
-        '/topics/design',
-      );
-    });
+    it.each(topics.map((topic, index) => ({ position: index + 1, topic })))(
+      'renders chip $position linking to its archive',
+      ({ topic: { title, slug } }) => {
+        const link = screen.getByRole('link', { name: title });
+
+        expect(link).toHaveAttribute('href', `/topics/${slug}`);
+      },
+    );
 
     it('marks "All" as the current page when no activeSlug is given', () => {
-      expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
-        'aria-current',
-        'page',
-      );
-      expect(
-        screen.getByRole('link', { name: 'Engineering' }),
-      ).not.toHaveAttribute('aria-current');
+      const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
+      const engineeringLink = screen.getByRole('link', {
+        name: MOCK_ENGINEERING_TOPIC.title,
+      });
+
+      expect(allLink).toHaveAttribute(ARIA_CURRENT, 'page');
+      expect(engineeringLink).not.toHaveAttribute(ARIA_CURRENT);
     });
   });
 
   it('renders nothing when there are no topics', () => {
     setup({ topics: [] });
 
-    expect(
-      screen.queryByRole('navigation', { name: 'Topics' }),
-    ).not.toBeInTheDocument();
+    const nav = screen.queryByRole('navigation', { name: NAV_NAME });
+
+    expect(nav).not.toBeInTheDocument();
   });
 
-  it('marks the matching topic chip as the current page when activeSlug is given', () => {
-    setup({ activeSlug: 'engineering' });
+  it('marks the matching topic chip as the current page for an activeSlug', () => {
+    setup({ activeSlug: MOCK_ENGINEERING_TOPIC.slug });
 
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(screen.getByRole('link', { name: 'All' })).not.toHaveAttribute(
-      'aria-current',
-    );
-    expect(screen.getByRole('link', { name: 'Design' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    const engineeringLink = screen.getByRole('link', {
+      name: MOCK_ENGINEERING_TOPIC.title,
+    });
+    const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
+    const designLink = screen.getByRole('link', {
+      name: MOCK_SECOND_TOPIC.title,
+    });
+
+    expect(engineeringLink).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(allLink).not.toHaveAttribute(ARIA_CURRENT);
+    expect(designLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('renders a topic with no archive page as plain text, never current', () => {
-    setup({
-      topics: [
-        ...topics,
-        {
-          id: 'topic-3',
-          title: 'Culture',
-          slug: undefined,
-          description: undefined,
-          postCount: 2,
-        },
-      ],
+    const archivelessTopic = mockTopicWithPostCount({
+      id: 'topic-4',
+      title: 'Culture',
+      slug: undefined,
+    });
+    setup({ topics: [...topics, archivelessTopic] });
+
+    const chip = screen.getByText(archivelessTopic.title);
+    const chipLink = screen.queryByRole('link', {
+      name: archivelessTopic.title,
     });
 
-    const chip = screen.getByText('Culture');
     expect(chip).toBeVisible();
-    expect(chip).not.toHaveAttribute('aria-current');
-    expect(
-      screen.queryByRole('link', { name: 'Culture' }),
-    ).not.toBeInTheDocument();
+    expect(chip).not.toHaveAttribute(ARIA_CURRENT);
+    expect(chipLink).not.toBeInTheDocument();
   });
 });

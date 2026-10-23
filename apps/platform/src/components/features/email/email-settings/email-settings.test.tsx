@@ -27,11 +27,11 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
-import { BLOB_STAGED_LOGO } from '@platform/testing/site-config/fixtures';
-import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
+import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
+import { MOCK_TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
 import {
   MOCK_ARCHIVED_AT,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import {
   buildEmailDraft,
@@ -110,7 +110,7 @@ const INITIAL_DRAFT = buildEmailDraft({
 });
 
 const setup = customRender(EmailSettings, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   initialDraft: INITIAL_DRAFT,
   defaultLocale: EN,
   liveLocales: LIVE_LOCALES,
@@ -180,7 +180,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       outcome: ACTION_OUTCOME.SUCCESS,
       to: MOCK_ADMIN_EMAIL,
     });
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
 
   afterEach(() => {
@@ -280,10 +280,13 @@ describe(`<${EmailSettings.name}/>`, () => {
       await user.click(saveButton);
 
       await waitFor(() =>
-        expect(updateEmailConfigActionMock).toHaveBeenCalledWith(TENANT_ID, {
-          ...BLANK_SENDER_INPUT,
-          contactRecipient: MOCK_CONTACT_RECIPIENT,
-        }),
+        expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          {
+            ...BLANK_SENDER_INPUT,
+            contactRecipient: MOCK_CONTACT_RECIPIENT,
+          },
+        ),
       );
     });
   });
@@ -327,7 +330,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       await waitFor(() => expect(refresh).toHaveBeenCalled());
       expect(updateEmailTemplateActionMock).toHaveBeenCalledTimes(1);
       expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         FR,
         { subject: FRENCH_SUBJECT, body: null },
@@ -377,7 +380,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       );
 
       expect(confirmation).toBeVisible();
-      expect(sendTestEmailActionMock).toHaveBeenCalledWith(TENANT_ID, {
+      expect(sendTestEmailActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         copy: {
           subject: FRENCH_SUBJECT,
@@ -436,7 +439,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       const [tenantId, logoTarget, formData] =
         uploadEmailLogoActionMock.mock.lastCall ?? [];
 
-      expect(tenantId).toBe(TENANT_ID);
+      expect(tenantId).toBe(MOCK_TENANT_ID);
       expect(logoTarget).toEqual({ type: 'tenant' });
       expect(formData).toBeInstanceOf(FormData);
     });
@@ -581,7 +584,7 @@ describe(`<${EmailSettings.name}/>`, () => {
     await user.click(saveButton);
 
     await waitFor(() =>
-      expect(updateEmailConfigActionMock).toHaveBeenCalledWith(TENANT_ID, {
+      expect(updateEmailConfigActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         ...BLANK_SENDER_INPUT,
         contactRecipient: null,
       }),
@@ -640,7 +643,7 @@ describe(`<${EmailSettings.name}/>`, () => {
 
   it('shows a restored message in the template already open', async () => {
     writeSettingsDraft(
-      settingsDraftStorageKey({ tenantId: TENANT_ID, page: 'email' }),
+      settingsDraftStorageKey({ tenantId: MOCK_TENANT_ID, page: 'email' }),
       {
         values: withCopy(
           INITIAL_DRAFT,

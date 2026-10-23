@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -80,7 +81,7 @@ export const testBreadcrumbsTrail = <TData,>({
     });
 
     const currentEl = within(nav).getByText(currentLabel);
-    expect(currentEl).toHaveAttribute('aria-current', 'page');
+    expect(currentEl).toHaveAttribute(ARIA_CURRENT, 'page');
     expect(currentEl.tagName).not.toBe('A');
   });
 };
@@ -116,7 +117,9 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
 
     await setup();
 
-    expect(screen.getByTestId(JSON_LD_SCRIPT_TEST_ID).textContent).toContain(
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
+
+    expect(script.textContent).toContain(
       `"item":"https://example.com/nl${itemPath}"`,
     );
   });
@@ -138,9 +141,9 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
 
     await setup();
 
-    expect(
-      screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID),
-    ).not.toBeInTheDocument();
+    const script = screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID);
+
+    expect(script).not.toBeInTheDocument();
   });
 };
 
@@ -176,9 +179,8 @@ export const testBreadcrumbsJsonLdTrail = <TData,>({
 
     await setup();
 
-    const schema = JSON.parse(
-      screen.getByTestId(JSON_LD_SCRIPT_TEST_ID).textContent ?? '',
-    );
+    const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
+    const schema = JSON.parse(script.textContent ?? '');
     expect(schema.itemListElement).toEqual(
       expectedTrail.map(({ name, path }, index) => ({
         '@type': 'ListItem',

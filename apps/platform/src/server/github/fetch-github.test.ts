@@ -7,7 +7,7 @@ import {
   GITHUB_RATE_LIMIT_REMAINING_HEADER,
 } from '@platform/constants/github';
 import {
-  githubJson,
+  mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { logger } from '@platform/utils/logger/logger';
@@ -29,7 +29,7 @@ describe(fetchGitHub, () => {
   });
 
   it('returns the response for a 2xx', async () => {
-    github.respond(path, () => githubJson({}));
+    github.respond(path, () => mockGitHubResponse({}));
 
     expect(await fetchGitHub(path)).toEqual(
       expect.objectContaining({ ok: true }),
@@ -125,7 +125,7 @@ describe(fetchGitHubJson, () => {
 
   it('returns the parsed body', async () => {
     const value = faker.lorem.word();
-    github.respond(path, () => githubJson({ value }));
+    github.respond(path, () => mockGitHubResponse({ value }));
 
     expect(
       await fetchGitHubJson(path, (body) => (body as { value: string }).value),
@@ -133,7 +133,7 @@ describe(fetchGitHubJson, () => {
   });
 
   it('returns GITHUB_ERROR when the body does not parse', async () => {
-    github.respond(path, () => githubJson({}));
+    github.respond(path, () => mockGitHubResponse({}));
 
     expect(
       await fetchGitHubJson(path, () => {

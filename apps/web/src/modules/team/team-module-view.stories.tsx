@@ -10,9 +10,9 @@ import { LandingPageLayout } from '@web/components/pages/landing-page/landing-pa
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockTeamMember } from '@web/testing/modules/team/fixtures';
-import { makeLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
+import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { TeamModuleView } from './team-module-view';
 
@@ -44,7 +44,7 @@ const moreMembers = [
 ];
 
 const bio = [
-  portableTextBlock(
+  mockPortableTextBlock(
     'Leads the engineering org with a focus on reliability and developer experience.',
   ),
 ];
@@ -303,7 +303,7 @@ export const SquarePhotosNextToSidebar: TStory = {
     (Story) => (
       <LandingPageLayout
         topBlock={null}
-        sectionNavigation={makeLandingSectionNavigation()}
+        sectionNavigation={mockLandingSectionNavigation()}
       >
         <Story />
       </LandingPageLayout>

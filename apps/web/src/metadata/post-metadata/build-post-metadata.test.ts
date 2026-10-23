@@ -2,7 +2,7 @@ import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { type TPostDetail } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
+import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_DE_POST_SLUG,
@@ -35,14 +35,14 @@ const {
   excerpt: EXCERPT,
   publishedAt,
   author,
-} = mockPostDetail;
+} = MOCK_POST_DETAIL;
 const OG_TITLE = 'Hello World OG';
 const OG_DESCRIPTION = 'A sufficiently long excerpt for the card OG.';
 const NL_POST_PATH = `/nl${routes.post(MOCK_NL_POST_SLUG)}`;
 const EN_POST_PATH = routes.post(MOCK_EN_POST_SLUG);
 
 const basePost: TPostDetail = {
-  ...mockPostDetail,
+  ...MOCK_POST_DETAIL,
   seo: mockSeo({
     title: TITLE,
     description: EXCERPT,

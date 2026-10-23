@@ -1,5 +1,11 @@
-import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
-import { DENSITY, FONT_CHOICE, RADIUS_SCALE } from '@blog/config/constants';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  LOCALE_ISO_CODES,
+  RADIUS_SCALE,
+  SITE_MESSAGES_BY_LOCALE,
+  type TThemeTokens,
+} from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -40,7 +46,7 @@ const messages = SITE_MESSAGES_BY_LOCALE.EN;
 const voicedMessages = { notFound: { commandNotFound: 'command not found' } };
 const voicedSupportingText = mockFormattedVoiceRich();
 
-const THEME_TOKENS = {
+const THEME_TOKENS: TThemeTokens = {
   accentHue: 250,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
   bodyFont: FONT_CHOICE.NEWSREADER,
@@ -48,13 +54,7 @@ const THEME_TOKENS = {
   density: DENSITY.DEFAULT,
 };
 
-const DEFAULT_THEME_TOKENS = {
-  accentHue: 200,
-  headingFont: FONT_CHOICE.SPACE_GROTESK,
-  bodyFont: FONT_CHOICE.NEWSREADER,
-  radiusScale: RADIUS_SCALE.MD,
-  density: DENSITY.DEFAULT,
-};
+const DEFAULT_THEME_TOKENS: TThemeTokens = { ...THEME_TOKENS, accentHue: 200 };
 
 describe(`<${StandaloneNotFoundPage.name}/>`, () => {
   beforeEach(() => {
@@ -115,7 +115,7 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
       );
     });
 
-    it('wraps NotFoundPage in its own intl provider with the voiced messages', async () => {
+    it('wraps NotFoundPage in its own NextIntlClientProvider', async () => {
       const ui = await StandaloneNotFoundPage({ tenant: MOCK_TENANT_ID });
       const provider = ui.props.children;
 

@@ -1,13 +1,13 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_POST_LIST_HEADING } from '@web/testing/modules/post-list/fixtures';
+import {
+  MOCK_LATEST_POSTS_SUPPORTING_TEXT,
+  mockHeadingBlock,
+} from '@web/testing/shared/heading-block/fixtures';
 
 import { ModuleHeading } from './module-heading';
-
-const LATEST_POSTS = 'Latest posts';
-const WHY_CHOOSE_US = 'Why choose us';
-const SUPPORTING_TEXT = 'Fresh from the blog, updated weekly.';
 
 const meta = {
   title: 'Components/ModuleHeading',
@@ -28,7 +28,7 @@ const meta = {
     },
   },
   args: {
-    headingBlock: mockHeadingBlock({ heading: LATEST_POSTS }),
+    headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
     id: 'module-heading-story-title',
     level: 2,
     align: undefined,
@@ -37,6 +37,8 @@ const meta = {
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
+
+const WHY_CHOOSE_US_HEADING = 'Why choose us';
 
 const longHeadingBlock = mockHeadingBlock({
   heading: 'Everything you need to plan, write and ship a great post',
@@ -48,22 +50,22 @@ export const Default: TStory = {};
 
 export const NoSupportingText: TStory = {
   args: {
-    headingBlock: mockHeadingBlock({ heading: LATEST_POSTS }),
+    headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   },
 };
 
 export const SectionVariantNoSupportingText: TStory = {
   args: {
     variant: 'section',
-    headingBlock: mockHeadingBlock({ heading: WHY_CHOOSE_US }),
+    headingBlock: mockHeadingBlock({ heading: WHY_CHOOSE_US_HEADING }),
   },
 };
 
 export const WithSupportingText: TStory = {
   args: {
     headingBlock: mockHeadingBlock({
-      heading: LATEST_POSTS,
-      supportingText: SUPPORTING_TEXT,
+      heading: MOCK_POST_LIST_HEADING,
+      supportingText: MOCK_LATEST_POSTS_SUPPORTING_TEXT,
     }),
   },
 };
@@ -93,8 +95,8 @@ export const SectionVariant: TStory = {
   args: {
     variant: 'section',
     headingBlock: mockHeadingBlock({
-      heading: WHY_CHOOSE_US,
-      supportingText: SUPPORTING_TEXT,
+      heading: WHY_CHOOSE_US_HEADING,
+      supportingText: MOCK_LATEST_POSTS_SUPPORTING_TEXT,
     }),
   },
 };

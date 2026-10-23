@@ -3,6 +3,10 @@ import { TAXONOMY_KIND } from '@blog/config/constants';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
+import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testRendersAllowedModulesInOrder,
@@ -79,33 +83,20 @@ vi.mock('@web/modules/faq/faq-module', () => ({
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
-const PAGE_HEADING = 'News';
-
 const setup = customRenderAsync(TopicModuleRenderer, {
   hero: undefined,
-  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: 'News' }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 
-const POST_LIST_ID = 'post-list-1';
-const MODULE_CONTEXT = {
-  page: 2,
-  archive: {
-    id: 'topic-1',
-    kind: TAXONOMY_KIND.TOPICS,
-    slug: 'news',
-    name: PAGE_HEADING,
-  },
-};
-
 describe(`<${TopicModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
+  testHeadingWithoutHero({ setup, headingText: 'News' });
   testResolvedHero({ setup });
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock,
-    headingText: PAGE_HEADING,
+    headingText: 'News',
   });
 
   it('renders the given children between the hero and the modules', async () => {
@@ -128,14 +119,14 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
     loggerWarnMock,
     unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
-      'warns and renders nothing for a module off the topic page allow-list',
+      'renders nothing and warns once for a module absent from the topic page allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: POST_LIST_ID, type: 'module_postList' },
+      { id: MOCK_POST_LIST_ID, type: 'module_postList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'content-1', type: 'module_content' },
@@ -145,12 +136,31 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
 
   it('forwards the given context to the modules', async () => {
     await setup({
-      modules: [{ id: POST_LIST_ID, type: 'module_postList' }],
-      context: MODULE_CONTEXT,
+      modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
+      context: {
+        page: 2,
+        archive: {
+          id: 'topic-1',
+          kind: TAXONOMY_KIND.TOPICS,
+          slug: 'news',
+          name: 'News',
+        },
+      },
     });
 
     expect(postListModuleMock).toHaveBeenCalledWith(
-      { id: POST_LIST_ID, context: MODULE_CONTEXT },
+      {
+        id: MOCK_POST_LIST_ID,
+        context: {
+          page: 2,
+          archive: {
+            id: 'topic-1',
+            kind: TAXONOMY_KIND.TOPICS,
+            slug: 'news',
+            name: 'News',
+          },
+        },
+      },
       undefined,
     );
   });

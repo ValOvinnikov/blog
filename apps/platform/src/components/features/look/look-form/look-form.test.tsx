@@ -30,7 +30,7 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
-  BLOB_STAGED_LOGO,
+  MOCK_STAGED_LOGO_BLOB_URL,
   CURRENT_LOGO,
   MOCK_LOGO_URL,
   REPLACE_LOGO,
@@ -39,7 +39,7 @@ import {
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import {
   defaultLookFormValues,
@@ -116,12 +116,12 @@ const pickLogo = async (user: UserEvent) => {
   await user.upload(logoInput, LOGO_FILE);
   await waitFor(() => {
     const logo = screen.getByAltText(CURRENT_LOGO);
-    expect(logo).toHaveAttribute('src', BLOB_STAGED_LOGO);
+    expect(logo).toHaveAttribute('src', MOCK_STAGED_LOGO_BLOB_URL);
   });
 };
 
 const setup = customRender(LookForm, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   tenantName: MOCK_TENANT_NAME,
   initialValues: defaultLookFormValues(),
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
@@ -174,7 +174,7 @@ describe(`<${LookForm.name}/>`, () => {
     clearBrandAssetActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
 
   afterEach(() => {
@@ -277,7 +277,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateLookActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           savedLookValues({ headerControlStyle: HEADER_CONTROL_STYLE.SOFT }),
         );
       });
@@ -302,7 +302,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateLookActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           savedLookValues({
             languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
           }),
@@ -369,7 +369,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() => {
         expect(updateLookActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           savedLookValues({ cardStyle: CARD_STYLE.OUTLINED }),
         );
       });
@@ -444,7 +444,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         it('saves the current form state through updateLookAction', async () => {
           await waitFor(() => {
-            expect(updateLookActionMock).toHaveBeenCalledWith(TENANT_ID, {
+            expect(updateLookActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
               preset: PRESET_ID.CONSOLE,
               accentHue: 251,
               logoHue: null,
@@ -811,7 +811,7 @@ describe(`<${LookForm.name}/>`, () => {
       ),
     );
     writeSettingsDraft(
-      settingsDraftStorageKey({ tenantId: TENANT_ID, page: 'look' }),
+      settingsDraftStorageKey({ tenantId: MOCK_TENANT_ID, page: 'look' }),
       {
         values: { ...olderValues, accentHue: 260 },
         baseline: olderValues,
@@ -839,7 +839,7 @@ describe(`<${LookForm.name}/>`, () => {
         });
         const logo = screen.getByAltText(CURRENT_LOGO);
         expect(brandHeading).toBeVisible();
-        expect(logo).toHaveAttribute('src', BLOB_STAGED_LOGO);
+        expect(logo).toHaveAttribute('src', MOCK_STAGED_LOGO_BLOB_URL);
         expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
       });
 
@@ -853,7 +853,7 @@ describe(`<${LookForm.name}/>`, () => {
         expect(savedNote).toBeVisible();
         const [uploadCall] = uploadBrandAssetActionMock.mock.calls;
         const [uploadTenantId, uploadKind, uploadForm] = uploadCall ?? [];
-        expect(uploadTenantId).toBe(TENANT_ID);
+        expect(uploadTenantId).toBe(MOCK_TENANT_ID);
         expect(uploadKind).toBe('logo');
         expect(uploadForm).toBeInstanceOf(FormData);
         expect(uploadBrandAssetActionMock).toHaveBeenCalledTimes(1);
@@ -942,7 +942,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         await waitFor(() => {
           expect(clearBrandAssetActionMock).toHaveBeenCalledWith(
-            TENANT_ID,
+            MOCK_TENANT_ID,
             'logo',
           );
         });

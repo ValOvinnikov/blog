@@ -3,20 +3,20 @@ import { IdentitySectionView } from '@web/components/pages/account-page/sections
 import { NewsletterSectionView } from '@web/components/pages/account-page/sections/newsletter-section/newsletter-section-view';
 import { PrivacySection } from '@web/components/pages/account-page/sections/privacy-section';
 
-import { makeIdentitySectionView } from './identity-section-fixtures';
-import { makeNewsletterSectionView } from './newsletter-section-fixtures';
-import { makePrivacySection } from './privacy-section-fixtures';
+import { mockIdentitySectionView } from './identity-section-fixtures';
+import { mockNewsletterSectionView } from './newsletter-section-fixtures';
+import { mockPrivacySection } from './privacy-section-fixtures';
 
-export const makeAccountPageView = (
+export const mockAccountPageView = (
   overrides: Partial<IAccountPageViewProps> = {},
 ): IAccountPageViewProps => {
   return {
     heading: 'Account',
-    identitySection: <IdentitySectionView {...makeIdentitySectionView()} />,
+    identitySection: <IdentitySectionView {...mockIdentitySectionView()} />,
     newsletterSection: (
-      <NewsletterSectionView {...makeNewsletterSectionView()} />
+      <NewsletterSectionView {...mockNewsletterSectionView()} />
     ),
-    privacySection: <PrivacySection {...makePrivacySection()} />,
+    privacySection: <PrivacySection {...mockPrivacySection()} />,
     ...overrides,
   };
 };

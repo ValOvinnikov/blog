@@ -3,7 +3,7 @@ import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -39,7 +39,7 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const membership = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
 };
 
@@ -55,7 +55,7 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: { id: TENANT_ID, plan: TENANT_PLAN.FREE } },
+      { membership, tenant: { id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE } },
     ]);
   });
 
@@ -76,7 +76,9 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
 
     await setup();
 
-    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
   });
 });

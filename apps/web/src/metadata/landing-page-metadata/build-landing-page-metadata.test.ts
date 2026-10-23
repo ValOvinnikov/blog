@@ -3,8 +3,8 @@ import { urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
-  LANDING_PAGE_OG_IMAGE,
-  mockLandingPage,
+  MOCK_LANDING_PAGE_OG_IMAGE,
+  MOCK_LANDING_PAGE,
 } from '@web/testing/pages/landing-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -29,7 +29,7 @@ const FAQ_PATH = 'modules/faq';
 const NL_FAQ_PATH = 'modules/vragen';
 const MISSING_PATH = 'missing';
 
-const { path: LANDING_PATH, seo: LANDING_SEO } = mockLandingPage;
+const { path: LANDING_PATH, seo: LANDING_SEO } = MOCK_LANDING_PAGE;
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
@@ -45,7 +45,7 @@ describe(buildLandingPageMetadata, () => {
   it('lists each translation under its full nested path, canonical to its own', async () => {
     getLandingPageMock.mockResolvedValue(
       okResult({
-        ...mockLandingPage,
+        ...MOCK_LANDING_PAGE,
         path: FAQ_PATH,
         translations: [
           { language: EN, slug: FAQ_PATH },
@@ -68,7 +68,7 @@ describe(buildLandingPageMetadata, () => {
 
   describe('for a page with the default fixture', () => {
     beforeEach(() => {
-      getLandingPageMock.mockResolvedValue(okResult(mockLandingPage));
+      getLandingPageMock.mockResolvedValue(okResult(MOCK_LANDING_PAGE));
     });
 
     it('forwards the path to getLandingPage, the loader LandingPage reads', async () => {
@@ -92,7 +92,7 @@ describe(buildLandingPageMetadata, () => {
       expect(metadata.openGraph?.images).toEqual([
         {
           url: urlForSanityImage(
-            LANDING_PAGE_OG_IMAGE,
+            MOCK_LANDING_PAGE_OG_IMAGE,
             MOCK_TENANT_SANITY_CONTEXT,
           ),
         },

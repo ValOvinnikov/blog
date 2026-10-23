@@ -1,6 +1,12 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
+import { ARIA_LIVE_ASSERTIVE_SELECTOR } from '@web/testing/shared/aria/constants';
+import {
+  MOCK_ERROR_DIGEST,
+  MOCK_ERROR_WITH_DIGEST,
+} from '@web/testing/shared/error/fixtures';
 
 import { GlobalErrorPage } from './global-error-page';
 
@@ -12,9 +18,14 @@ vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: reportClientErrorMock,
 }));
 
-const error = Object.assign(new Error('root layout blew up'), {
-  digest: 'digest-456',
-});
+const {
+  title: HEADING,
+  announcement: ANNOUNCEMENT,
+  retry: TRY_AGAIN,
+  goHome: GO_HOME,
+} = SITE_MESSAGES.localeErrorPage;
+
+const error = MOCK_ERROR_WITH_DIGEST;
 const reset = vi.fn();
 
 const setup = customRender(GlobalErrorPage, { error, reset });
@@ -26,64 +37,67 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
     });
 
     it('renders a heading and a try-again action', () => {
-      expect(
-        screen.getByRole('heading', { name: 'Something went wrong' }),
-      ).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
+      const heading = screen.getByRole('heading', { name: HEADING });
+      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
+
+      expect(heading).toBeVisible();
+      expect(tryAgainButton).toBeVisible();
     });
 
     it('reports the error on mount, with its digest', () => {
       expect(reportClientErrorMock).toHaveBeenCalledWith(
         'global_error_boundary.render_failed',
         error,
-        { digest: 'digest-456' },
+        { digest: MOCK_ERROR_DIGEST },
       );
     });
 
     it('calls reset when "Try again" is clicked', async () => {
       const user = userEvent.setup();
+      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
 
-      await user.click(screen.getByRole('button', { name: 'Try again' }));
+      await user.click(tryAgainButton);
 
       expect(reset).toHaveBeenCalledTimes(1);
     });
 
     it('renders "Go home" as a real link, not a button', () => {
-      const goHomeLink = screen.getByRole('link', { name: 'Go home' });
+      const goHomeLink = screen.getByRole('link', { name: GO_HOME });
+
       expect(goHomeLink).toBeVisible();
       expect(goHomeLink).toHaveAttribute('href', '/');
     });
 
     it('announces the error to assistive technology after mount', () => {
-      expect(
-        screen.getByText(
-          'Something went wrong. You can try again, or go home.',
-        ),
-      ).toBeVisible();
+      const liveRegion = screen.getByText(ANNOUNCEMENT, {
+        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      });
+
+      expect(liveRegion).toBeVisible();
     });
 
-    it('names both available actions in the announcement, matching the rendered controls', () => {
-      const announcement =
-        'Something went wrong. You can try again, or go home.'.toLowerCase();
+    it('names both actions in the announcement as the controls render them', () => {
       const tryAgainLabel =
-        screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
+        screen.getByRole('button', { name: TRY_AGAIN }).textContent ?? '';
       const goHomeLabel =
-        screen.getByRole('link', { name: 'Go home' }).textContent ?? '';
+        screen.getByRole('link', { name: GO_HOME }).textContent ?? '';
 
-      expect(announcement).toContain(tryAgainLabel.toLowerCase());
-      expect(announcement).toContain(goHomeLabel.toLowerCase());
+      expect(ANNOUNCEMENT.toLowerCase()).toContain(tryAgainLabel.toLowerCase());
+      expect(ANNOUNCEMENT.toLowerCase()).toContain(goHomeLabel.toLowerCase());
     });
 
     it('sets aria-atomic on the live region', () => {
-      expect(
-        screen.getByText(
-          'Something went wrong. You can try again, or go home.',
-        ),
-      ).toHaveAttribute('aria-atomic', 'true');
+      const liveRegion = screen.getByText(ANNOUNCEMENT, {
+        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      });
+
+      expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
     });
 
     it('moves focus to the page container on mount', () => {
-      expect(screen.getByRole('main')).toHaveFocus();
+      const main = screen.getByRole('main');
+
+      expect(main).toHaveFocus();
     });
   });
 
@@ -98,8 +112,8 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
   it('renders without the i18n provider, since it sits above it in the tree', () => {
     render(<GlobalErrorPage error={error} reset={reset} />);
 
-    expect(
-      screen.getByRole('heading', { name: 'Something went wrong' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { name: HEADING });
+
+    expect(heading).toBeVisible();
   });
 });

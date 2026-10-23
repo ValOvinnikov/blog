@@ -7,7 +7,7 @@ import {
   RADIUS_SCALE,
   type TLocaleIsoCode,
 } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
+import { errorResult } from '@blog/utils';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
@@ -18,6 +18,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_ID,
@@ -42,12 +43,7 @@ const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock(
-  '@web/server/site-settings/get-site-settings/get-site-settings',
-  () => ({
-    getSiteSettings: vi.fn(),
-  }),
-);
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -79,13 +75,10 @@ const renderLayout = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
   }) as unknown as Promise<TAnyElement>;
 
 const settingsFailure = () =>
-  getSiteSettingsMock.mockResolvedValue(errorResult('boom') as never);
+  getSiteSettingsMock.mockResolvedValueOnce(errorResult('boom') as never);
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockResolvedValue(
-      okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
-    );
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
     isProductionEnvironmentMock.mockReturnValue(true);
   });
@@ -102,7 +95,10 @@ describe('LocaleLayout', () => {
 
       expect(metadata).toEqual(
         expect.objectContaining({
-          title: { default: 'Blog', template: '%s | Blog' },
+          title: {
+            default: MOCK_SITE_SETTINGS.brand.name,
+            template: `%s | ${MOCK_SITE_SETTINGS.brand.name}`,
+          },
         }),
       );
       expect(metadata).not.toHaveProperty('description');

@@ -11,8 +11,12 @@ import { errorResult, okResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
+} from '@platform/testing/admins/operator';
+import { MOCK_BLOB_TOKEN } from '@platform/testing/blob/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -64,13 +68,12 @@ vi.mock('@vercel/blob', () => ({ put: putMock, del: delMock }));
 
 vi.mock('@platform/utils/env/env');
 
-const BLOB_TOKEN = 'test-token';
 const TENANT_LOGO_URL =
   'https://example.blob.vercel-storage.com/email-logo-new.png';
 const TEMPLATE_LOGO_URL =
   'https://example.blob.vercel-storage.com/email-logo-magic-link.png';
 
-Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
 
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
@@ -103,11 +106,11 @@ describe(uploadEmailLogoAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: TENANT_ID },
+      tenant: { id: MOCK_TENANT_ID },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     getEmailConfigMock.mockResolvedValue(undefined);
@@ -121,7 +124,7 @@ describe(uploadEmailLogoAction, () => {
 
   it('uploads and persists the tenant email logo under a unique name at a path distinct from the site logo', async () => {
     const result = await uploadEmailLogoAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -131,11 +134,11 @@ describe(uploadEmailLogoAction, () => {
       url: TENANT_LOGO_URL,
     });
     expect(putMock).toHaveBeenCalledWith(
-      `tenants/${TENANT_ID}/email-logo.png`,
+      `tenants/${MOCK_TENANT_ID}/email-logo.png`,
       VALID_ASSET.buffer,
       expect.objectContaining({ access: 'public', addRandomSuffix: true }),
     );
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith(TENANT_ID, {
+    expect(upsertEmailConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       logoAssetUrl: TENANT_LOGO_URL,
     });
   });
@@ -147,19 +150,19 @@ describe(uploadEmailLogoAction, () => {
     upsertEmailTemplateMock.mockResolvedValue({});
 
     const result = await uploadEmailLogoAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       { type: 'template', templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
     expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(putMock).toHaveBeenCalledWith(
-      `tenants/${TENANT_ID}/email-logo-magic_link.png`,
+      `tenants/${MOCK_TENANT_ID}/email-logo-magic_link.png`,
       VALID_ASSET.buffer,
       expect.objectContaining({ access: 'public', addRandomSuffix: true }),
     );
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       {
         logoAssetUrl: TEMPLATE_LOGO_URL,
@@ -176,7 +179,7 @@ describe(uploadEmailLogoAction, () => {
     );
 
     const result = await uploadEmailLogoAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.svg', { type: 'image/svg+xml' })),
     );
@@ -191,18 +194,18 @@ describe(uploadEmailLogoAction, () => {
 
   it('records exactly one SETTINGS_UPDATED audit event identifying the target', async () => {
     await uploadEmailLogoAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: {
         target: { type: 'tenant' },
         operation: 'upload',
@@ -215,7 +218,7 @@ describe(uploadEmailLogoAction, () => {
     upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await uploadEmailLogoAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       { type: 'tenant' },
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -229,7 +232,7 @@ describe(uploadEmailLogoAction, () => {
 
     try {
       const result = await uploadEmailLogoAction(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         { type: 'tenant' },
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       );
@@ -240,39 +243,29 @@ describe(uploadEmailLogoAction, () => {
       });
       expect(putMock).not.toHaveBeenCalled();
     } finally {
-      Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
+      Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
     }
   });
 
-  it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
-    requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    });
+  it.each([
+    NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+  ])(
+    'propagates the %s the tenant gate throws without writing',
+    async (gateError) => {
+      requireTenantMembershipMock.mockImplementation(() => {
+        throw new Error(gateError);
+      });
 
-    await expect(
-      uploadEmailLogoAction(
-        TENANT_ID,
-        { type: 'tenant' },
-        makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
-      ),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+      await expect(
+        uploadEmailLogoAction(
+          MOCK_TENANT_ID,
+          { type: 'tenant' },
+          makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+        ),
+      ).rejects.toThrow(gateError);
 
-    expect(putMock).not.toHaveBeenCalled();
-  });
-
-  it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
-    requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    });
-
-    await expect(
-      uploadEmailLogoAction(
-        TENANT_ID,
-        { type: 'tenant' },
-        makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
-      ),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-
-    expect(putMock).not.toHaveBeenCalled();
-  });
+      expect(putMock).not.toHaveBeenCalled();
+    },
+  );
 });

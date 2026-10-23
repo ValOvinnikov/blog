@@ -1,14 +1,16 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_POST_LIST_HEADING } from '@web/testing/modules/post-list/fixtures';
+import {
+  MOCK_LATEST_POSTS_SUPPORTING_TEXT,
+  mockHeadingBlock,
+} from '@web/testing/shared/heading-block/fixtures';
 
 import { ModuleHeading } from './module-heading';
 
-const HEADING = 'Latest posts';
 const HEADING_ID = 'section-title';
-const SUPPORTING_TEXT = 'Fresh from the blog.';
 
 const setup = customRender(ModuleHeading, {
-  headingBlock: mockHeadingBlock({ heading: HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   id: HEADING_ID,
   level: 2,
   align: undefined,
@@ -23,32 +25,39 @@ describe(`<${ModuleHeading.name}/>`, () => {
     it('renders the authored heading text at the given level and id', () => {
       const heading = screen.getByRole('heading', {
         level: 2,
-        name: HEADING,
+        name: MOCK_POST_LIST_HEADING,
       });
+
       expect(heading).toHaveAttribute('id', HEADING_ID);
     });
 
-    it('renders no supporting text when the block has none', () => {
-      const supportingText = screen.queryByText(/./, { selector: 'p' });
-      expect(supportingText).not.toBeInTheDocument();
+    it('renders no supporting text paragraph when supportingText is absent', () => {
+      const paragraph = screen.queryByText(/./, { selector: 'p' });
+
+      expect(paragraph).not.toBeInTheDocument();
     });
   });
 
   it('renders the heading tag at the given level', () => {
     setup({ level: 3 });
 
-    const heading = screen.getByRole('heading', { level: 3, name: HEADING });
+    const heading = screen.getByRole('heading', {
+      level: 3,
+      name: MOCK_POST_LIST_HEADING,
+    });
+
     expect(heading).toBeVisible();
   });
 
   it('renders the supporting text when given', () => {
     setup({
       headingBlock: mockHeadingBlock({
-        supportingText: SUPPORTING_TEXT,
+        supportingText: MOCK_LATEST_POSTS_SUPPORTING_TEXT,
       }),
     });
 
-    const supportingText = screen.getByText(SUPPORTING_TEXT);
+    const supportingText = screen.getByText(MOCK_LATEST_POSTS_SUPPORTING_TEXT);
+
     expect(supportingText).toBeVisible();
   });
 });

@@ -2,9 +2,9 @@ import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { MOCK_ADMIN_EMAIL } from '@platform/testing/admins/fixtures';
 import { screen } from '@platform/testing/custom-render';
 import { SEND_TEST_TO_ME } from '@platform/testing/email/fixtures';
-import { EMAIL_BODY } from '@platform/testing/email-draft';
+import { MOCK_EMAIL_BODY } from '@platform/testing/email-draft';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SendTestEmailButton } from './send-test-email-button';
@@ -18,11 +18,11 @@ vi.mock('@platform/server/email/send-test-email-action', () => ({
 }));
 
 const setup = customRenderInSettingsForm(SendTestEmailButton, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   email: {
     templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
     subject: 'Join Acme',
-    body: EMAIL_BODY,
+    body: MOCK_EMAIL_BODY,
     sender: {
       senderName: 'Acme Co',
       replyToAddress: '',
@@ -55,9 +55,9 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     );
 
     expect(confirmation).toBeVisible();
-    expect(sendTestEmailActionMock).toHaveBeenCalledWith(TENANT_ID, {
+    expect(sendTestEmailActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
-      copy: { subject: 'Join Acme', body: EMAIL_BODY },
+      copy: { subject: 'Join Acme', body: MOCK_EMAIL_BODY },
       sender: {
         senderName: 'Acme Co',
         replyToAddress: null,

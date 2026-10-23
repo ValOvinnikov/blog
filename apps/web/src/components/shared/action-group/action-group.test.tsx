@@ -1,98 +1,82 @@
-import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
+import { CTA_ACTION_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+} from '@web/testing/modules/cta/fixtures';
 
 import { ActionGroup } from './action-group';
 
-const primaryAction = {
-  variant: CTA_ACTION_VARIANT.PRIMARY,
-  appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-  link: {
-    label: 'Subscribe now',
-    href: '/blog',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-};
-
-const secondaryAction = {
-  variant: CTA_ACTION_VARIANT.SECONDARY,
-  appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-  link: {
-    label: 'Learn more',
-    href: '/about-us',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: 'Learn more about our subscription plans',
-  },
-};
-
 const setup = customRender(ActionGroup, {
-  actions: [primaryAction, secondaryAction],
+  actions: [MOCK_CTA_PRIMARY_ACTION, MOCK_CTA_SECONDARY_ACTION],
   isOnDark: undefined,
 });
 
 describe(`<${ActionGroup.name}/>`, () => {
-  beforeEach(() => {
-    setup();
-  });
-
-  it('renders every action in authored order', () => {
-    const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(2);
-    expect(links[0]).toHaveTextContent('Subscribe now');
-    expect(links[1]).toHaveTextContent('Learn more');
-  });
-
-  it('forwards the authored ariaLabel to the rendered link accessible name', () => {
-    expect(
-      screen.getByRole('link', {
-        name: 'Learn more about our subscription plans',
-      }),
-    ).toBeVisible();
-  });
-
-  it('falls back to the label as the accessible name when no ariaLabel is authored', () => {
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).toBeVisible();
-  });
-});
-
-describe('ActionGroup — hiddenLabelSuffix', () => {
-  const actionWithSuffix = {
-    variant: CTA_ACTION_VARIANT.PRIMARY,
-    appearance: undefined,
-    link: {
-      label: 'Read more',
-      href: '/blog/welcome-to-the-blog',
-      target: undefined,
-      platform: undefined,
-      ariaLabel: undefined,
-    },
-    hiddenLabelSuffix: 'Welcome to the blog',
-  };
-
-  const hiddenLabelSetup = customRender(ActionGroup, {
-    actions: [actionWithSuffix],
-    isOnDark: undefined,
-  });
-
-  it('renders a hiddenLabelSuffix as real (sr-only) text inside the accessible name', () => {
-    hiddenLabelSetup();
-
-    const link = screen.getByRole('link', {
-      name: 'Read more: Welcome to the blog',
-    });
-    expect(link).toBeVisible();
-    expect(link).toHaveTextContent('Read more: Welcome to the blog');
-  });
-
-  it('renders no suffix when hiddenLabelSuffix is unset', () => {
-    hiddenLabelSetup({
-      actions: [{ ...actionWithSuffix, hiddenLabelSuffix: undefined }],
+  describe('with authored actions', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    const link = screen.getByRole('link', { name: 'Read more' });
-    expect(link).toBeVisible();
-    expect(link).toHaveTextContent('Read more');
+    it('renders every action in authored order', () => {
+      const links = screen.getAllByRole('link');
+
+      expect(links).toHaveLength(2);
+      expect(links[0]).toHaveTextContent(MOCK_CTA_PRIMARY_ACTION.link.label);
+      expect(links[1]).toHaveTextContent(MOCK_CTA_SECONDARY_ACTION.link.label);
+    });
+
+    it('forwards the authored ariaLabel as the link accessible name', () => {
+      const link = screen.getByRole('link', {
+        name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+      });
+
+      expect(link).toBeVisible();
+    });
+
+    it('falls back to the label as the accessible name without an ariaLabel', () => {
+      const link = screen.getByRole('link', {
+        name: MOCK_CTA_PRIMARY_ACTION.link.label,
+      });
+
+      expect(link).toBeVisible();
+    });
+  });
+
+  describe('with a hiddenLabelSuffix', () => {
+    const LABEL = 'Read more';
+    const SUFFIX = 'Welcome to the blog';
+    const actionWithSuffix = {
+      variant: CTA_ACTION_VARIANT.PRIMARY,
+      appearance: undefined,
+      link: { ...MOCK_CTA_PRIMARY_ACTION.link, label: LABEL },
+      hiddenLabelSuffix: SUFFIX,
+    };
+
+    const setupWithSuffix = customRender(ActionGroup, {
+      actions: [actionWithSuffix],
+      isOnDark: undefined,
+    });
+
+    it('renders the suffix as real text inside the accessible name', () => {
+      setupWithSuffix();
+
+      const link = screen.getByRole('link', { name: `${LABEL}: ${SUFFIX}` });
+
+      expect(link).toBeVisible();
+      expect(link).toHaveTextContent(`${LABEL}: ${SUFFIX}`);
+    });
+
+    it('renders no suffix when hiddenLabelSuffix is unset', () => {
+      setupWithSuffix({
+        actions: [{ ...actionWithSuffix, hiddenLabelSuffix: undefined }],
+      });
+
+      const link = screen.getByRole('link', { name: LABEL });
+
+      expect(link).toBeVisible();
+      expect(link).toHaveTextContent(LABEL);
+    });
   });
 });

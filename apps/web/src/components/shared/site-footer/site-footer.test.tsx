@@ -1,16 +1,13 @@
-import {
-  LANGUAGE_SWITCHER_STYLE,
-  LOCALE_ISO_CODES,
-  routes,
-  SOCIAL_PLATFORMS,
-} from '@blog/config';
+import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_NOW } from '@web/testing/shared/now/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import {
+  MOCK_LINKEDIN_PROFILE,
+  MOCK_MASTODON_PROFILE,
+} from '@web/testing/shared/social-profile/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -25,9 +22,6 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
-  () => ({
-    getLanguageSwitcherStyle: vi.fn(),
-  }),
 );
 
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
@@ -56,38 +50,14 @@ const translate = (key: string, values?: Record<string, string>): string => {
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 
-vi.mocked(getLanguageSwitcherStyle).mockResolvedValue(
-  LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-);
-
 const setup = customRenderAsync(SiteFooter, {});
 
-const makeSocial = (platform: string, label: string, href: string) => ({
-  platform,
-  link: {
-    label,
-    href,
-    target: '_blank',
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-});
-
-const RSS_FEED = 'RSS feed';
-const LANGUAGE_NAV = 'Language';
-
-describe(`<${SiteFooter.name}/>`, () => {
+describe(SiteFooter, () => {
   beforeEach(() => {
-    vi.useFakeTimers({ now: MOCK_NOW, shouldAdvanceTime: true });
     getFooterMock.mockResolvedValue(
       okResult({ social: [], showRssFeed: true }),
     );
-    getRequestContextMock.mockResolvedValue(MOCK_REQUEST_CONTEXT);
     getTranslationsMock.mockResolvedValue(translate);
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   describe('with the default footer', () => {
@@ -95,26 +65,26 @@ describe(`<${SiteFooter.name}/>`, () => {
       await setup();
     });
 
-    it('forwards the tenant Sanity context to the footer loader', () => {
+    it('forwards the tenant Sanity context to the footer loader', async () => {
       expect(getFooterMock).toHaveBeenCalledWith(
         MOCK_REQUEST_CONTEXT.sanityContext,
       );
     });
 
-    it('shows the brand name and the current year in the copyright', () => {
+    it('shows the brand name and the current year in the copyright', async () => {
       const footer = screen.getByRole('contentinfo');
 
       expect(footer).toHaveTextContent(MOCK_SITE_SETTINGS.brand.name);
-      expect(footer).toHaveTextContent(String(MOCK_NOW.getFullYear()));
+      expect(footer).toHaveTextContent(String(new Date().getFullYear()));
     });
 
-    it('adds a visible RSS feed link to the footer nav', () => {
-      const link = screen.getByRole('link', { name: RSS_FEED });
-      const icon = within(link).getByTestId('rss-icon');
+    it('adds a visible RSS feed link to the footer nav', async () => {
+      const link = screen.getByRole('link', { name: 'RSS feed' });
+      const rssIcon = within(link).getByTestId('rss-icon');
 
       expect(link).toHaveAttribute('href', routes.rssFeed());
-      expect(link).toHaveAttribute('title', RSS_FEED);
-      expect(icon).toBeVisible();
+      expect(link).toHaveAttribute('title', 'RSS feed');
+      expect(rssIcon).toBeVisible();
     });
   });
 
@@ -125,37 +95,53 @@ describe(`<${SiteFooter.name}/>`, () => {
 
     await setup();
 
-    const link = screen.queryByRole('link', { name: RSS_FEED });
-    expect(link).not.toBeInTheDocument();
+    const rssLink = screen.queryByRole('link', { name: 'RSS feed' });
+
+    expect(rssLink).not.toBeInTheDocument();
   });
 
-  it.each([
-    [
-      SOCIAL_PLATFORMS.LINKEDIN,
-      'LinkedIn',
-      'https://www.linkedin.com/in/example',
-    ],
-    [SOCIAL_PLATFORMS.MASTODON, 'Mastodon', 'https://mastodon.social/@example'],
-  ])(
-    'renders a %s social link icon-only, named after its platform',
-    async (platform, label, href) => {
-      getFooterMock.mockResolvedValue(
-        okResult({ social: [makeSocial(platform, label, href)] }),
-      );
+  it('renders a mapped social link icon-only, named after its platform', async () => {
+    getFooterMock.mockResolvedValue(
+      okResult({
+        social: [MOCK_LINKEDIN_PROFILE],
+      }),
+    );
 
-      await setup();
+    await setup();
 
-      const link = screen.getByRole('link', { name: `${label} profile` });
-      const icon = within(link).getByTestId(`social-icon-${platform}`);
+    const linkName = `${MOCK_LINKEDIN_PROFILE.link.label} profile`;
+    const link = screen.getByRole('link', { name: linkName });
+    const icon = within(link).getByTestId(
+      `social-icon-${SOCIAL_PLATFORMS.LINKEDIN}`,
+    );
 
-      expect(link).toHaveAttribute('href', href);
-      expect(link).toHaveAttribute('title', `${label} profile`);
-      expect(icon).toBeVisible();
-    },
-  );
+    expect(link).toHaveAttribute('href', MOCK_LINKEDIN_PROFILE.link.href);
+    expect(link).toHaveAttribute('title', linkName);
+    expect(icon).toBeVisible();
+  });
 
-  it('shows the language switcher when toggled on with several live languages', async () => {
-    getRequestContextMock.mockResolvedValue({
+  it('renders an icon-only social link for a platform outside the original 6-key set', async () => {
+    getFooterMock.mockResolvedValue(
+      okResult({
+        social: [MOCK_MASTODON_PROFILE],
+      }),
+    );
+
+    await setup();
+
+    const link = screen.getByRole('link', {
+      name: `${MOCK_MASTODON_PROFILE.link.label} profile`,
+    });
+    const icon = within(link).getByTestId(
+      `social-icon-${SOCIAL_PLATFORMS.MASTODON}`,
+    );
+
+    expect(link).toHaveAttribute('href', MOCK_MASTODON_PROFILE.link.href);
+    expect(icon).toBeVisible();
+  });
+
+  it('shows the language switcher when its toggle is on and languages are live', async () => {
+    getRequestContextMock.mockResolvedValueOnce({
       ...MOCK_REQUEST_CONTEXT,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
@@ -166,10 +152,11 @@ describe(`<${SiteFooter.name}/>`, () => {
     await setup();
 
     const footer = screen.getByRole('contentinfo');
-    const switcher = within(footer).getByRole('navigation', {
-      name: LANGUAGE_NAV,
+    const languageNav = within(footer).getByRole('navigation', {
+      name: 'Language',
     });
-    expect(switcher).toBeVisible();
+
+    expect(languageNav).toBeVisible();
   });
 
   it('shows no language switcher with one live language, whatever the toggle says', async () => {
@@ -179,8 +166,9 @@ describe(`<${SiteFooter.name}/>`, () => {
 
     await setup();
 
-    const switcher = screen.queryByRole('navigation', { name: LANGUAGE_NAV });
-    expect(switcher).not.toBeInTheDocument();
+    const languageNav = screen.queryByRole('navigation', { name: 'Language' });
+
+    expect(languageNav).not.toBeInTheDocument();
   });
 
   describe('when the footer fails to load', () => {
@@ -189,7 +177,8 @@ describe(`<${SiteFooter.name}/>`, () => {
 
       await setup();
 
-      const rssLink = screen.getByRole('link', { name: RSS_FEED });
+      const rssLink = screen.getByRole('link', { name: 'RSS feed' });
+
       expect(rssLink).toBeVisible();
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'footer.layout_fetch_failed',

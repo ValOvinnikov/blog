@@ -15,7 +15,7 @@ import {
 import {
   MOCK_ARCHIVED_AT,
   MOCK_OTHER_TENANT_ID,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
@@ -35,7 +35,7 @@ const draftFor = (
   savedValues: TValues = SAVED,
   onRestore: (values: TValues) => void = vi.fn(),
 ): TSettingsForm<TValues>['draft'] => ({
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   page: 'voice',
   values,
   savedValues,

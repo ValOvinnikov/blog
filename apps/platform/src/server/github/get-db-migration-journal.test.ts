@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
-  githubJson,
+  mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 
@@ -22,7 +22,7 @@ describe(getDbMigrationJournal, () => {
     const content = Buffer.from(
       JSON.stringify({ version: '7', entries }),
     ).toString('base64');
-    github.respond(JOURNAL_PATH, () => githubJson({ content }));
+    github.respond(JOURNAL_PATH, () => mockGitHubResponse({ content }));
 
     expect(await getDbMigrationJournal(ref)).toEqual({
       ok: true,
@@ -32,7 +32,7 @@ describe(getDbMigrationJournal, () => {
 
   it('returns GITHUB_ERROR when the journal is not valid JSON', async () => {
     const content = Buffer.from('not json').toString('base64');
-    github.respond(JOURNAL_PATH, () => githubJson({ content }));
+    github.respond(JOURNAL_PATH, () => mockGitHubResponse({ content }));
 
     expect(await getDbMigrationJournal(ref)).toEqual({
       ok: false,

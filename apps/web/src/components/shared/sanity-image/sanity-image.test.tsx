@@ -5,7 +5,7 @@ import {
   renderElement,
   screen,
 } from '@web/testing/custom-render';
-import { MOCK_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
+import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 
 import { SanityImage } from './sanity-image';
 
@@ -64,8 +64,10 @@ describe(`<${SanityImage.name}/>`, () => {
     });
 
     it('renders the src and srcset against the default base URL', () => {
-      expect(img.getAttribute('src')).toContain(MOCK_SANITY_IMAGE_BASE_URL);
-      expect(img.getAttribute('srcset')).toContain(MOCK_SANITY_IMAGE_BASE_URL);
+      expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
+      expect(img.getAttribute('srcset')).toContain(
+        STATIC_SANITY_IMAGE_BASE_URL,
+      );
     });
 
     it('renders no fetchpriority attribute when priority is omitted', () => {
@@ -122,7 +124,7 @@ describe(`<${SanityImage.name}/>`, () => {
     expect(images).toHaveLength(1);
     expect(images[0]).not.toHaveAttribute('data-lqip');
     expect(images[0]?.getAttribute('src')).toContain(
-      MOCK_SANITY_IMAGE_BASE_URL,
+      STATIC_SANITY_IMAGE_BASE_URL,
     );
   });
 

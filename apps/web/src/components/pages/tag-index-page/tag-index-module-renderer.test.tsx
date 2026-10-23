@@ -2,6 +2,10 @@ import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
+import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testHeroBeforeModules,
@@ -64,24 +68,20 @@ vi.mock('@web/modules/content/content-module', () => ({
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
-const PAGE_HEADING = 'Tags';
-
 const setup = customRenderAsync(TagIndexModuleRenderer, {
   hero: undefined,
-  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: 'Tags' }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 
-const TAXONOMY_LIST_ID = 'taxonomy-list-1';
-
 describe(`<${TagIndexModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
+  testHeadingWithoutHero({ setup, headingText: 'Tags' });
   testResolvedHero({ setup });
   testHeroBeforeModules({
     setup,
     modules: [
-      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
     ],
     expectedTestIds: ['stub-hero', 'stub-taxonomy-list', 'stub-cta'],
@@ -89,19 +89,19 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock,
-    headingText: PAGE_HEADING,
+    headingText: 'Tags',
   });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'post-list-1', type: 'module_postList' },
+    unknownModule: { id: MOCK_POST_LIST_ID, type: 'module_postList' },
     description:
-      'warns and renders nothing for a module off the tag-index allow-list',
+      'renders nothing and warns once for a module absent from the tag-index allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },

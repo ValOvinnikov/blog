@@ -9,9 +9,13 @@ import type { TCtaButton, TCtaModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  portableTextBlock,
-  portableTextSpan,
+  mockPortableTextBlock,
+  mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
+
+export const MOCK_CTA_HEADING = 'Join the list';
+
+export const MOCK_SECOND_CTA_HEADING = 'Write for us';
 
 export const MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL =
   'Learn more about our subscription plans';
@@ -46,15 +50,17 @@ export const MOCK_CTA_ACTIONS: TCtaButton[] = [
 ];
 
 export const MOCK_CTA_CONTENT: TPortableTextBlock[] = [
-  portableTextBlock([
-    portableTextSpan('Cancel anytime — no credit card required to start your '),
-    portableTextSpan('14-day trial', ['strong']),
-    portableTextSpan('.'),
+  mockPortableTextBlock([
+    mockPortableTextSpan(
+      'Cancel anytime — no credit card required to start your ',
+    ),
+    mockPortableTextSpan('14-day trial', ['strong']),
+    mockPortableTextSpan('.'),
   ]),
-  portableTextBlock([portableTextSpan('Unlimited posts and drafts')], {
+  mockPortableTextBlock([mockPortableTextSpan('Unlimited posts and drafts')], {
     listItem: 'bullet',
   }),
-  portableTextBlock([portableTextSpan('Priority support')], {
+  mockPortableTextBlock([mockPortableTextSpan('Priority support')], {
     listItem: 'bullet',
   }),
 ];

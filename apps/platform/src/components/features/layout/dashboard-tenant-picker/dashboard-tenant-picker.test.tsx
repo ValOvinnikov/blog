@@ -4,11 +4,11 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import {
-  makeTenant,
+  mockTenant,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { DashboardTenantPicker } from './dashboard-tenant-picker';
@@ -18,8 +18,8 @@ vi.mock('@platform/server/auth/sign-out-action');
 const render = renderWithIntl;
 
 const tenants = [
-  makeTenant(),
-  makeTenant({
+  mockTenant(),
+  mockTenant({
     id: MOCK_OTHER_TENANT_ID,
     name: MOCK_OTHER_TENANT_NAME,
     primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
@@ -45,7 +45,7 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
       expect(acmeLink).toBeVisible();
       expect(acmeLink).toHaveAttribute(
         'href',
-        `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
+        `/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
       );
       expect(globexLink).toBeVisible();
       expect(globexLink).toHaveAttribute(

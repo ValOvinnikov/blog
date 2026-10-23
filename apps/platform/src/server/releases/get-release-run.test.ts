@@ -2,7 +2,7 @@ import type { TMaybeNull } from '@blog/config';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import { RELEASE_RUN_STATUS } from '@platform/constants/release';
 import {
-  githubJson,
+  mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 
@@ -37,11 +37,11 @@ describe(getReleaseRun, () => {
     conclusion: TMaybeNull<string> = null,
   ) =>
     github.respond(runsPath, () =>
-      githubJson({ workflow_runs: [workflowRun(status, conclusion)] }),
+      mockGitHubResponse({ workflow_runs: [workflowRun(status, conclusion)] }),
     );
 
   it('is undefined when the release workflow has never run', async () => {
-    github.respond(runsPath, () => githubJson({ workflow_runs: [] }));
+    github.respond(runsPath, () => mockGitHubResponse({ workflow_runs: [] }));
 
     expect(await getReleaseRun()).toEqual({ ok: true, data: undefined });
   });
@@ -75,7 +75,7 @@ describe(getReleaseRun, () => {
   it('says a tenant migration failed when that job of a failed run failed', async () => {
     respondWithRun('completed', 'failure');
     github.respond(jobsPath, () =>
-      githubJson({
+      mockGitHubResponse({
         jobs: [
           { name: GATE_JOB_NAME, conclusion: 'success' },
           {
@@ -101,7 +101,7 @@ describe(getReleaseRun, () => {
   it('does not blame a tenant migration when another job failed', async () => {
     respondWithRun('completed', 'failure');
     github.respond(jobsPath, () =>
-      githubJson({
+      mockGitHubResponse({
         jobs: [{ name: GATE_JOB_NAME, conclusion: 'failure' }],
       }),
     );
@@ -116,7 +116,7 @@ describe(getReleaseRun, () => {
   });
 
   it('fails the read when GitHub answers with an error', async () => {
-    github.respond(runsPath, () => githubJson({}, 500));
+    github.respond(runsPath, () => mockGitHubResponse({}, 500));
 
     expect(await getReleaseRun()).toEqual({
       ok: false,

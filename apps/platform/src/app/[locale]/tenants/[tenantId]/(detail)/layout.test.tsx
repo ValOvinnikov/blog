@@ -6,7 +6,7 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -41,7 +41,7 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantDetailLayout, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
   children: <div>tenant content</div>,
 });
 
@@ -60,7 +60,7 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
       createdAt: new Date(),
     });
     getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       name: MOCK_TENANT_NAME,
       primaryDomain: MOCK_TENANT_DOMAIN,
     });
@@ -103,7 +103,7 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
   it('renders no tenant switcher in the sidebar', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       slug: 'acme',
       name: MOCK_TENANT_NAME,
       primaryDomain: MOCK_TENANT_DOMAIN,

@@ -16,14 +16,14 @@ vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
 }));
 
-const setup = customRenderAsync(PostIndexTopicChips, {});
+const setup = customRenderAsync(PostIndexTopicChips, { tenant: 'tenant-1' });
 
 describe(`<${PostIndexTopicChips.name}/>`, () => {
   beforeEach(() => {
     getTopicsSafelyMock.mockReset();
   });
 
-  it('renders the fetched topics as chips', async () => {
+  it('renders the topic chip row from the fetched topics', async () => {
     getTopicsSafelyMock.mockResolvedValue([
       mockTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
     ]);
@@ -31,17 +31,31 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
     await setup();
 
     const nav = screen.getByRole('navigation', { name: 'Topics' });
-    const topicChip = within(nav).getByRole('link', { name: 'Engineering' });
-    expect(topicChip).toHaveAttribute('href', '/topics/engineering');
+    const allLink = within(nav).getByRole('link', { name: 'All' });
+    const engineeringLink = within(nav).getByRole('link', {
+      name: 'Engineering',
+    });
+
+    expect(allLink).toHaveAttribute('href', '/blog');
+    expect(engineeringLink).toHaveAttribute('href', '/topics/engineering');
   });
 
-  it('forwards the request context Sanity context to getTopicsSafely', async () => {
-    getTopicsSafelyMock.mockResolvedValue([]);
+  describe('with no topics', () => {
+    beforeEach(async () => {
+      getTopicsSafelyMock.mockResolvedValue([]);
+      await setup();
+    });
 
-    await setup();
+    it('renders nothing when there are no topics', async () => {
+      const topicsNav = screen.queryByRole('navigation', { name: 'Topics' });
 
-    expect(getTopicsSafelyMock).toHaveBeenCalledWith(
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
+      expect(topicsNav).not.toBeInTheDocument();
+    });
+
+    it('forwards the request context Sanity context to getTopicsSafely', async () => {
+      expect(getTopicsSafelyMock).toHaveBeenCalledWith(
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
   });
 });

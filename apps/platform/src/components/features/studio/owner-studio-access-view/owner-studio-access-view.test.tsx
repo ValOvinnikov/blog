@@ -2,7 +2,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OwnerStudioAccessView } from './owner-studio-access-view';
@@ -23,7 +23,7 @@ vi.mock('@platform/server/owner-access/resend-owner-invite-action', () => ({
 }));
 
 const setup = customRender(OwnerStudioAccessView, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   studioAccess: OWNER_STUDIO_ACCESS.INVITE_SENT,
 });
 
@@ -85,7 +85,7 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
         'Checking your access now. Refresh in a minute to see the result.',
       );
 
-      expect(checkOwnerAccessActionMock).toHaveBeenCalledWith(TENANT_ID);
+      expect(checkOwnerAccessActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(checkStartedText).toBeVisible();
       expect(refresh).toHaveBeenCalledOnce();
     });
@@ -97,7 +97,7 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
         'A new invite is on its way to your inbox.',
       );
 
-      expect(resendOwnerInviteActionMock).toHaveBeenCalledWith(TENANT_ID);
+      expect(resendOwnerInviteActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(inviteResentText).toBeVisible();
     });
 

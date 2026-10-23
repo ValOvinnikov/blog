@@ -11,3 +11,10 @@ export const MOCK_DYNAMIC_SERVER_USAGE_ERROR = Object.assign(
   ),
   { digest: NEXT_DYNAMIC_ERROR.DYNAMIC_SERVER_USAGE },
 );
+
+export const MOCK_ERROR_DIGEST = faker.string.uuid();
+
+export const MOCK_ERROR_WITH_DIGEST = Object.assign(
+  new Error(faker.lorem.sentence()),
+  { digest: MOCK_ERROR_DIGEST },
+);
