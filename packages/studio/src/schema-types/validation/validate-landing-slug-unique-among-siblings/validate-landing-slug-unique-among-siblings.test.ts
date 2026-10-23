@@ -1,98 +1,102 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { validateLandingSlugUniqueAmongSiblings } from '@blog/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
-import { evaluate, parse } from 'groq-js';
+import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
 import type { SlugValidationContext } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-type TPage = { _id: string; slug: string; parent?: string; language?: string };
-
-const page = ({ _id, slug, parent, language = EN }: TPage) => ({
-  _id,
-  _type: PAGE_LANDING_TYPE,
-  language,
-  slug: { _type: 'slug', current: slug },
-  ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
-});
-
-const createContext = (
-  document: ReturnType<typeof page> | undefined,
-  dataset: ReturnType<typeof page>[],
-  fetchError?: Error,
-) =>
-  ({
-    document,
-    getClient: () => ({
-      withConfig: () => ({
-        fetch: async (query: string, params: Record<string, unknown>) => {
-          if (fetchError) throw fetchError;
-          const result = await evaluate(parse(query), { dataset, params });
-          return result.get();
-        },
-      }),
-    }),
-  }) as unknown as SlugValidationContext;
+const OTHER_DRAFT_ID = 'drafts.other';
 
 describe(validateLandingSlugUniqueAmongSiblings, () => {
-  const modules = page({ _id: 'modules', slug: 'modules' });
-  const help = page({ _id: 'help', slug: 'help' });
-  const modulesFaq = page({
+  const modules = mockLandingPage({
+    _id: 'modules',
+    slug: 'modules',
+    language: EN,
+  });
+  const help = mockLandingPage({ _id: 'help', slug: 'help', language: EN });
+  const modulesFaq = mockLandingPage({
     _id: 'modules-faq',
     slug: 'faq',
     parent: 'modules',
+    language: EN,
   });
 
   it('allows the same slug under a different parent', async () => {
-    const helpFaq = page({
+    const helpFaq = mockLandingPage({
       _id: 'drafts.help-faq',
       slug: 'faq',
       parent: 'help',
+      language: EN,
     });
 
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'faq',
-        createContext(helpFaq, [modules, help, modulesFaq]),
+        mockGroqValidationContext<SlugValidationContext>(
+          [modules, help, modulesFaq],
+          { document: helpFaq },
+        ),
       ),
     ).resolves.toBe(true);
   });
 
   it('rejects a slug a sibling uses under the same parent', async () => {
-    const other = page({ _id: 'drafts.other', slug: 'faq', parent: 'modules' });
+    const other = mockLandingPage({
+      _id: OTHER_DRAFT_ID,
+      slug: 'faq',
+      parent: 'modules',
+      language: EN,
+    });
 
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'faq',
-        createContext(other, [modules, modulesFaq]),
+        mockGroqValidationContext<SlugValidationContext>(
+          [modules, modulesFaq],
+          { document: other },
+        ),
       ),
     ).resolves.toBe(false);
   });
 
   it('rejects a slug another top-level page uses', async () => {
-    const other = page({ _id: 'drafts.other', slug: 'modules' });
+    const other = mockLandingPage({
+      _id: OTHER_DRAFT_ID,
+      slug: 'modules',
+      language: EN,
+    });
 
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'modules',
-        createContext(other, [modules]),
+        mockGroqValidationContext<SlugValidationContext>([modules], {
+          document: other,
+        }),
       ),
     ).resolves.toBe(false);
   });
 
   it('allows a top-level slug that a nested page uses', async () => {
-    const topLevelFaq = page({ _id: 'drafts.faq', slug: 'faq' });
+    const topLevelFaq = mockLandingPage({
+      _id: 'drafts.faq',
+      slug: 'faq',
+      language: EN,
+    });
 
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'faq',
-        createContext(topLevelFaq, [modules, modulesFaq]),
+        mockGroqValidationContext<SlugValidationContext>(
+          [modules, modulesFaq],
+          { document: topLevelFaq },
+        ),
       ),
     ).resolves.toBe(true);
   });
 
   it('allows the same slug under the same parent in another language', async () => {
-    const dutch = page({
+    const dutch = mockLandingPage({
       _id: 'drafts.faq-nl',
       slug: 'faq',
       parent: 'modules',
@@ -102,22 +106,29 @@ describe(validateLandingSlugUniqueAmongSiblings, () => {
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'faq',
-        createContext(dutch, [modules, modulesFaq]),
+        mockGroqValidationContext<SlugValidationContext>(
+          [modules, modulesFaq],
+          { document: dutch },
+        ),
       ),
     ).resolves.toBe(true);
   });
 
   it('does not count the draft of the same page as a clash', async () => {
-    const draft = page({
+    const draft = mockLandingPage({
       _id: 'drafts.modules-faq',
       slug: 'faq',
       parent: 'modules',
+      language: EN,
     });
 
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'faq',
-        createContext(draft, [modules, modulesFaq]),
+        mockGroqValidationContext<SlugValidationContext>(
+          [modules, modulesFaq],
+          { document: draft },
+        ),
       ),
     ).resolves.toBe(true);
   });
@@ -126,18 +137,28 @@ describe(validateLandingSlugUniqueAmongSiblings, () => {
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'faq',
-        createContext(undefined, [modulesFaq]),
+        mockGroqValidationContext<SlugValidationContext>([modulesFaq], {
+          document: undefined,
+        }),
       ),
     ).resolves.toBe(true);
   });
 
   it('passes when the fetch fails', async () => {
-    const other = page({ _id: 'other', slug: 'faq', parent: 'modules' });
+    const other = mockLandingPage({
+      _id: 'other',
+      slug: 'faq',
+      parent: 'modules',
+      language: EN,
+    });
 
     await expect(
       validateLandingSlugUniqueAmongSiblings(
         'faq',
-        createContext(other, [modulesFaq], new Error('network down')),
+        mockGroqValidationContext<SlugValidationContext>([modulesFaq], {
+          document: other,
+          fetchError: new Error('network down'),
+        }),
       ),
     ).resolves.toBe(true);
   });

@@ -10,15 +10,24 @@ import {
   renderElement,
   screen,
 } from '@blog/ui/testing/custom-render';
+import {
+  MOCK_PERSON_NAME,
+  MOCK_POST_EXCERPT,
+  MOCK_POST_TITLE,
+} from '@blog/ui/testing/fixtures';
 
 import { Hero, type THeroProps } from './hero';
 
-const heroTitle = 'Building a Design System';
-const heroTitleId = 'hero-title';
+const HERO_TITLE_ID = 'hero-title';
+const BODY_TEXT = 'Full bio goes here.';
+const HERO_TEST_ID = 'featured-hero';
+const MEDIA_TEST_ID = 'hero-media';
+const OVERLAY_TEST_ID = 'hero-overlay';
+const EYEBROW = 'Senior frontend engineer';
 
 const setup = customRender(Hero, {
-  title: heroTitle,
-  titleId: heroTitleId,
+  title: MOCK_POST_TITLE,
+  titleId: HERO_TITLE_ID,
   tone: BRAND_VARIANT.PRIMARY,
 });
 
@@ -28,8 +37,8 @@ const renderHero = (
 ) =>
   renderElement(
     <Hero
-      title={heroTitle}
-      titleId={heroTitleId}
+      title={MOCK_POST_TITLE}
+      titleId={HERO_TITLE_ID}
       tone={BRAND_VARIANT.PRIMARY}
       {...props}
     >
@@ -42,6 +51,15 @@ const expectFollows = (before: Element, after: Element) => {
     before.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING,
   ).toBeTruthy();
 };
+
+const PORTRAIT_ALT = `Portrait of ${MOCK_PERSON_NAME}`;
+const HERO_MEDIA_ALT = 'Hero cover photo';
+
+const heroMedia = (
+  <Hero.Media>
+    <img src="/img/hero.jpg" alt={HERO_MEDIA_ALT} />
+  </Hero.Media>
+);
 
 const heroCta = (
   <Hero.Cta>
@@ -66,68 +84,65 @@ describe(`<${Hero.name}/>`, () => {
     });
 
     it('renders the title', () => {
-      expect(
-        screen.getByRole('heading', { name: 'Building a Design System' }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
+      expect(heading).toBeVisible();
     });
 
     it('does not render an excerpt element when excerpt is omitted', () => {
-      expect(
-        screen.queryByText('A walkthrough of Atomic Design with Tailwind.'),
-      ).not.toBeInTheDocument();
+      const excerpt = screen.queryByText(MOCK_POST_EXCERPT);
+      expect(excerpt).not.toBeInTheDocument();
     });
 
     it('does not render body content when Hero.Body is omitted', () => {
-      expect(screen.queryByText('Full bio goes here.')).not.toBeInTheDocument();
+      const body = screen.queryByText(BODY_TEXT);
+      expect(body).not.toBeInTheDocument();
     });
 
     it('does not render a CTA when Hero.Cta is omitted', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      const cta = screen.queryByRole('link');
+      expect(cta).not.toBeInTheDocument();
     });
 
     it('does not render media when Hero.Media is omitted', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      const media = screen.queryByRole('img');
+      expect(media).not.toBeInTheDocument();
     });
 
     it('assigns titleId to the heading element', () => {
-      expect(
-        screen.getByRole('heading', { name: 'Building a Design System' }),
-      ).toHaveAttribute('id', 'hero-title');
+      const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
+      expect(heading).toHaveAttribute('id', HERO_TITLE_ID);
     });
 
     it('does not render avatar content when Hero.Avatar is omitted', () => {
-      expect(
-        screen.queryByAltText('Portrait of Jane Doe'),
-      ).not.toBeInTheDocument();
+      const portrait = screen.queryByAltText(PORTRAIT_ALT);
+      expect(portrait).not.toBeInTheDocument();
     });
 
     it('does not render social content when Hero.Social is omitted', () => {
-      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+      const social = screen.queryByRole('list');
+      expect(social).not.toBeInTheDocument();
     });
   });
 
   it('renders the excerpt when provided', () => {
-    setup({ excerpt: 'A walkthrough of Atomic Design with Tailwind.' });
-    expect(
-      screen.getByText('A walkthrough of Atomic Design with Tailwind.'),
-    ).toBeVisible();
+    setup({ excerpt: MOCK_POST_EXCERPT });
+    const excerpt = screen.getByText(MOCK_POST_EXCERPT);
+    expect(excerpt).toBeVisible();
   });
 
   it('renders Hero.Body between the excerpt and Hero.Cta in the DOM', () => {
     renderHero(
-      { excerpt: 'A walkthrough of Atomic Design with Tailwind.' },
+      { excerpt: MOCK_POST_EXCERPT },
       <>
         <Hero.Body>
-          <p>Full bio goes here.</p>
+          <p>{BODY_TEXT}</p>
         </Hero.Body>
         {heroCta}
       </>,
     );
 
-    const excerpt = screen.getByText(
-      'A walkthrough of Atomic Design with Tailwind.',
-    );
-    const body = screen.getByText('Full bio goes here.');
+    const excerpt = screen.getByText(MOCK_POST_EXCERPT);
+    const body = screen.getByText(BODY_TEXT);
     const cta = screen.getByRole('link', { name: 'Read more' });
 
     expectFollows(excerpt, body);
@@ -140,35 +155,31 @@ describe(`<${Hero.name}/>`, () => {
     });
 
     it('renders Hero.Cta children', () => {
-      expect(screen.getByRole('link')).toHaveAttribute(
-        'href',
-        '/posts/design-system',
-      );
-      expect(screen.getByText('Read more')).toBeVisible();
+      const cta = screen.getByRole('link');
+      const ctaText = screen.getByText('Read more');
+      expect(cta).toHaveAttribute('href', '/posts/design-system');
+      expect(ctaText).toBeVisible();
     });
 
     it('nests the CTA inside the copy column, alongside the heading', () => {
       const copyColumn = screen.getByTestId('hero-copy');
-      expect(copyColumn).toContainElement(
-        screen.getByRole('heading', { name: 'Building a Design System' }),
-      );
-      expect(copyColumn).toContainElement(screen.getByRole('link'));
+      const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
+      const cta = screen.getByRole('link');
+      expect(copyColumn).toContainElement(heading);
+      expect(copyColumn).toContainElement(cta);
     });
   });
 
   it('renders Hero.Media content', () => {
-    renderHero(
-      undefined,
-      <Hero.Media>
-        <img src="/img/hero.jpg" alt="Hero cover photo" />
-      </Hero.Media>,
-    );
-    expect(screen.getByAltText('Hero cover photo')).toBeVisible();
+    renderHero(undefined, heroMedia);
+    const mediaImage = screen.getByAltText(HERO_MEDIA_ALT);
+    expect(mediaImage).toBeVisible();
   });
 
   it('forwards data-testid to the root element', () => {
-    setup({ dataTestId: 'featured-hero' });
-    expect(screen.getByTestId('featured-hero')).toBeVisible();
+    setup({ dataTestId: HERO_TEST_ID });
+    const hero = screen.getByTestId(HERO_TEST_ID);
+    expect(hero).toBeVisible();
   });
 
   it.each([
@@ -188,30 +199,20 @@ describe(`<${Hero.name}/>`, () => {
       props: { variant: HERO_VARIANT.BANNER },
     },
   ])('$name', ({ props }) => {
-    renderHero(
-      props,
-      <Hero.Media>
-        <img src="/img/hero.jpg" alt="Hero cover photo" />
-      </Hero.Media>,
-    );
+    renderHero(props, heroMedia);
 
     const heading = screen.getByRole('heading');
-    const media = screen.getByTestId('hero-media');
+    const media = screen.getByTestId(MEDIA_TEST_ID);
 
     expectFollows(heading, media);
   });
 
   it('keeps Split and Stacked media framed by an intermediate MediaFrame wrapper', () => {
     for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
-      const { unmount } = renderHero(
-        { variant },
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>,
-      );
+      const { unmount } = renderHero({ variant }, heroMedia);
 
-      const wrapper = screen.getByTestId('hero-media');
-      const image = screen.getByAltText('Hero cover photo');
+      const wrapper = screen.getByTestId(MEDIA_TEST_ID);
+      const image = screen.getByAltText(HERO_MEDIA_ALT);
 
       expect(image.parentElement).not.toBe(wrapper);
 
@@ -219,57 +220,34 @@ describe(`<${Hero.name}/>`, () => {
     }
   });
 
-  it('renders Banner media as a direct child of the hero-media wrapper, with no MediaFrame chrome', () => {
-    renderHero(
-      { variant: HERO_VARIANT.BANNER },
-      <Hero.Media>
-        <img src="/img/hero.jpg" alt="Hero cover photo" />
-      </Hero.Media>,
-    );
+  it('renders Banner media unframed, directly inside the hero-media wrapper', () => {
+    renderHero({ variant: HERO_VARIANT.BANNER }, heroMedia);
 
-    const wrapper = screen.getByTestId('hero-media');
-    const image = screen.getByAltText('Hero cover photo');
+    const wrapper = screen.getByTestId(MEDIA_TEST_ID);
+    const image = screen.getByAltText(HERO_MEDIA_ALT);
 
     expect(image.parentElement).toBe(wrapper);
-  });
-
-  it('renders all three variants without throwing', () => {
-    for (const variant of Object.values(HERO_VARIANT)) {
-      const { unmount } = renderHero(
-        { variant },
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>,
-      );
-      expect(screen.getByRole('heading')).toBeVisible();
-      unmount();
-    }
   });
 
   it('renders the Banner overlay hidden from assistive tech', () => {
     renderHero(
       { variant: HERO_VARIANT.BANNER, tone: BRAND_VARIANT.BRAND_PRIMARY },
-      <Hero.Media>
-        <img src="/img/hero.jpg" alt="Hero cover photo" />
-      </Hero.Media>,
+      heroMedia,
     );
 
-    expect(screen.getByTestId('hero-overlay')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+    const overlay = screen.getByTestId(OVERLAY_TEST_ID);
+    expect(overlay).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('renders no overlay on Split or Stacked, regardless of tone', () => {
     for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
       const { unmount } = renderHero(
         { variant, tone: BRAND_VARIANT.BRAND_PRIMARY },
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>,
+        heroMedia,
       );
 
-      expect(screen.queryByTestId('hero-overlay')).not.toBeInTheDocument();
+      const overlay = screen.queryByTestId(OVERLAY_TEST_ID);
+      expect(overlay).not.toBeInTheDocument();
 
       unmount();
     }
@@ -289,33 +267,26 @@ describe(`<${Hero.name}/>`, () => {
   ])('$name', ({ variant, tone }) => {
     const { unmount: unmountWithTone, container: withTone } = renderHero(
       { variant, tone },
-      <Hero.Media>
-        <img src="/img/hero.jpg" alt="Hero cover photo" />
-      </Hero.Media>,
+      heroMedia,
     );
     const withToneHtml = withTone.innerHTML;
     unmountWithTone();
 
-    const { container: withoutTone } = renderHero(
-      { variant },
-      <Hero.Media>
-        <img src="/img/hero.jpg" alt="Hero cover photo" />
-      </Hero.Media>,
-    );
+    const { container: withoutTone } = renderHero({ variant }, heroMedia);
 
     expect(withToneHtml).toBe(withoutTone.innerHTML);
   });
 
   it('renders Hero.Avatar before the eyebrow in the DOM', () => {
     renderHero(
-      { eyebrow: 'Senior frontend engineer' },
+      { eyebrow: EYEBROW },
       <Hero.Avatar>
-        <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+        <img src="/img/jane.jpg" alt={PORTRAIT_ALT} />
       </Hero.Avatar>,
     );
 
-    const avatar = screen.getByAltText('Portrait of Jane Doe');
-    const eyebrowText = screen.getByText('Senior frontend engineer');
+    const avatar = screen.getByAltText(PORTRAIT_ALT);
+    const eyebrowText = screen.getByText(EYEBROW);
 
     expectFollows(avatar, eyebrowText);
   });
@@ -324,11 +295,12 @@ describe(`<${Hero.name}/>`, () => {
     renderHero(
       undefined,
       <Hero.Avatar>
-        <Avatar alt="Jane Doe" name="Jane Doe" />
+        <Avatar alt={MOCK_PERSON_NAME} name={MOCK_PERSON_NAME} />
       </Hero.Avatar>,
     );
 
-    expect(screen.getByText('JD')).toBeVisible();
+    const initials = screen.getByText('JD');
+    expect(initials).toBeVisible();
   });
 
   it('renders Hero.Social after Hero.Cta in the DOM', () => {
@@ -354,29 +326,30 @@ describe(`<${Hero.name}/>`, () => {
       </Hero.Social>,
     );
 
-    expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
+    const githubLink = screen.getByRole('link', { name: 'GitHub' });
+    expect(githubLink).toBeVisible();
   });
 
   it.each(Object.values(BRAND_VARIANT))(
-    'renders a Stacked hero portrait above the eyebrow and a labelled link list after the actions, on %s tone',
+    'orders the Stacked portrait, eyebrow, actions and links on %s tone',
     (tone) => {
       const { unmount } = renderHero(
         {
-          eyebrow: 'Senior frontend engineer',
+          eyebrow: EYEBROW,
           variant: HERO_VARIANT.STACKED,
           tone,
         },
         <>
           <Hero.Avatar>
-            <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+            <img src="/img/jane.jpg" alt={PORTRAIT_ALT} />
           </Hero.Avatar>
           {heroCta}
           {heroSocial}
         </>,
       );
 
-      const avatar = screen.getByAltText('Portrait of Jane Doe');
-      const eyebrowText = screen.getByText('Senior frontend engineer');
+      const avatar = screen.getByAltText(PORTRAIT_ALT);
+      const eyebrowText = screen.getByText(EYEBROW);
       const cta = screen.getByRole('link', { name: 'Read more' });
       const social = screen.getByRole('list', { name: 'Find Jane elsewhere' });
 

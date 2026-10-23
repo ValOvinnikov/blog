@@ -8,7 +8,7 @@ import {
 } from '@blog/db/testing/tenant-token-encryption-key';
 import { MOCK_TENANT_WRITE_TOKEN } from '@blog/db/testing/tenants/fixtures';
 import { decryptSecret } from '@blog/utils';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSanityWriteTokenAndSeededAt } from './set-tenant-sanity-write-token-and-seeded-at';
@@ -49,7 +49,7 @@ describe(setTenantSanityWriteTokenAndSeededAt, () => {
       MOCK_TENANT_WRITE_TOKEN,
     );
     expect(
-      decryptSecret(row?.sanityWriteTokenEncrypted ?? '', TEST_ENCRYPTION_KEY),
+      decryptSecret(row?.sanityWriteTokenEncrypted ?? '', MOCK_ENCRYPTION_KEY),
     ).toBe(MOCK_TENANT_WRITE_TOKEN);
     expect(row?.seededAt).toEqual(SEEDED_AT);
   });

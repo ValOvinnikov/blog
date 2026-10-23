@@ -15,13 +15,18 @@ import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-w
 import { createTenantSanityProject } from '@worker/steps/create-sanity-project';
 import { mapTenantDomain } from '@worker/steps/map-domain';
 import { persistTenantSanityToken } from '@worker/steps/persist-sanity-token';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
+import {
+  MOCK_SANITY_DATASET,
+  MOCK_SANITY_PROJECT_ID,
+  MOCK_TENANT_ID,
+  mockProvisionedTenant,
+  mockTenant,
+} from '@worker/testing/tenant/fixtures';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { ensureInfrastructure } from './ensure-infrastructure';
 
-const TENANT_ID = TEST_TENANT_ID;
-const CTX = { runId: 'run-1' };
 const EXISTING_PROJECT_ID = 'proj-existing';
 
 vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
@@ -64,11 +69,11 @@ function runningSteps(): string[] {
 describe(ensureInfrastructure, () => {
   beforeEach(() => {
     atAttempt(1);
-    vi.mocked(getTenantById).mockResolvedValue(makeTenant());
-    vi.mocked(reactivateTenant).mockResolvedValue(okResult(makeTenant()));
+    vi.mocked(getTenantById).mockResolvedValue(mockTenant());
+    vi.mocked(reactivateTenant).mockResolvedValue(okResult(mockTenant()));
     vi.mocked(createTenantSanityProject).mockResolvedValue({
-      sanityProjectId: 'proj-1',
-      sanityDataset: 'production',
+      sanityProjectId: MOCK_SANITY_PROJECT_ID,
+      sanityDataset: MOCK_SANITY_DATASET,
     });
     vi.mocked(updateProvisioningStep).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
@@ -76,7 +81,7 @@ describe(ensureInfrastructure, () => {
   });
 
   it('reports the four infrastructure steps in order and succeeds', async () => {
-    const result = await ensureInfrastructure(TENANT_ID, CTX);
+    const result = await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(result).toEqual({ ok: true, data: undefined });
     expect(runningSteps()).toEqual([
@@ -88,23 +93,23 @@ describe(ensureInfrastructure, () => {
   });
 
   it('hands the project created for the tenant to the later steps', async () => {
-    await ensureInfrastructure(TENANT_ID, CTX);
+    await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(persistTenantSanityToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        sanityProjectId: 'proj-1',
-        sanityDataset: 'production',
+        sanityProjectId: MOCK_SANITY_PROJECT_ID,
+        sanityDataset: MOCK_SANITY_DATASET,
       }),
       expect.anything(),
     );
     expect(mapTenantDomain).toHaveBeenCalledWith(
-      expect.objectContaining({ sanityProjectId: 'proj-1' }),
+      expect.objectContaining({ sanityProjectId: MOCK_SANITY_PROJECT_ID }),
       expect.anything(),
     );
   });
 
   it('does not unarchive when the tenant has no Sanity project yet', async () => {
-    await ensureInfrastructure(TENANT_ID, CTX);
+    await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(unarchiveSanityProject).not.toHaveBeenCalled();
   });
@@ -112,14 +117,14 @@ describe(ensureInfrastructure, () => {
   it('unarchives the existing Sanity project of a reactivated tenant', async () => {
     vi.mocked(reactivateTenant).mockResolvedValue(
       okResult(
-        makeTenant({
+        mockTenant({
           sanityProjectId: EXISTING_PROJECT_ID,
-          sanityDataset: 'production',
+          sanityDataset: MOCK_SANITY_DATASET,
         }),
       ),
     );
 
-    await ensureInfrastructure(TENANT_ID, CTX);
+    await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(unarchiveSanityProject).toHaveBeenCalledWith(
       expect.objectContaining({ projectId: EXISTING_PROJECT_ID }),
@@ -127,19 +132,16 @@ describe(ensureInfrastructure, () => {
   });
 
   it('succeeds again on a second run against the project the first created', async () => {
-    const existing = makeTenant({
-      sanityProjectId: 'proj-1',
-      sanityDataset: 'production',
-    });
+    const existing = mockProvisionedTenant();
     vi.mocked(reactivateTenant).mockResolvedValue(okResult(existing));
 
-    const first = await ensureInfrastructure(TENANT_ID, CTX);
-    const second = await ensureInfrastructure(TENANT_ID, CTX);
+    const first = await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
+    const second = await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(first).toEqual({ ok: true, data: undefined });
     expect(second).toEqual({ ok: true, data: undefined });
     expect(createTenantSanityProject).toHaveBeenLastCalledWith(
-      expect.objectContaining({ sanityProjectId: 'proj-1' }),
+      expect.objectContaining({ sanityProjectId: MOCK_SANITY_PROJECT_ID }),
       expect.anything(),
     );
   });
@@ -150,7 +152,7 @@ describe(ensureInfrastructure, () => {
       new Error('token mint refused'),
     );
 
-    const result = await ensureInfrastructure(TENANT_ID, CTX);
+    const result = await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(result).toEqual({
       ok: false,
@@ -164,7 +166,9 @@ describe(ensureInfrastructure, () => {
     const failure = new Error('vercel rate limited');
     vi.mocked(mapTenantDomain).mockRejectedValue(failure);
 
-    await expect(ensureInfrastructure(TENANT_ID, CTX)).rejects.toBe(failure);
+    await expect(
+      ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT),
+    ).rejects.toBe(failure);
 
     expect(updateProvisioningStep).not.toHaveBeenCalledWith(
       expect.objectContaining({
@@ -178,7 +182,7 @@ describe(ensureInfrastructure, () => {
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const result = await ensureInfrastructure(TENANT_ID, CTX);
+    const result = await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(result).toEqual({
       ok: false,
@@ -190,9 +194,9 @@ describe(ensureInfrastructure, () => {
   it('throws a fatal error and reports nothing for a missing tenant', async () => {
     vi.mocked(getTenantById).mockResolvedValue(undefined);
 
-    await expect(ensureInfrastructure(TENANT_ID, CTX)).rejects.toThrow(
-      FatalError,
-    );
+    await expect(
+      ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT),
+    ).rejects.toThrow(FatalError);
 
     expect(updateProvisioningStep).not.toHaveBeenCalled();
   });

@@ -1,3 +1,8 @@
+import {
+  MOCK_FRENCH_PATH,
+  MOCK_READER_EMAIL,
+  MOCK_TOKEN,
+} from '@blog/auth/testing/magic-link-fixtures';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 
 import { readRecipientLocale } from './read-recipient-locale';
@@ -7,8 +12,8 @@ const LIVE_LOCALES = [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR];
 const magicLinkTo = (callbackUrl: string) =>
   `https://acme.example.com/api/auth/callback/email?${new URLSearchParams({
     callbackUrl,
-    token: 'abc',
-    email: 'jane@example.com',
+    token: MOCK_TOKEN,
+    email: MOCK_READER_EMAIL,
   })}`;
 
 describe(readRecipientLocale, () => {
@@ -52,7 +57,7 @@ describe(readRecipientLocale, () => {
 
   it('reads a relative return-to path', () => {
     const locale = readRecipientLocale(
-      magicLinkTo('/fr/blog'),
+      magicLinkTo(MOCK_FRENCH_PATH),
       LIVE_LOCALES,
       LOCALE_ISO_CODES.EN,
     );

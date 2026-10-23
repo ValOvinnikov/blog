@@ -2,7 +2,7 @@ import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
-import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { checkOwnerAccess } from '@worker/units/check-owner-access';
 import { createHook, type Hook, sleep } from 'workflow';
 
@@ -52,7 +52,7 @@ describe(ensureOwnerAccess, () => {
   it('keeps checking until the owner is granted access', async () => {
     checksReturn(PENDING_ACCEPTANCE, PENDING_ACCEPTANCE, ELEVATED);
 
-    const outcome = await ensureOwnerAccess(TEST_TENANT_ID);
+    const outcome = await ensureOwnerAccess(MOCK_TENANT_ID);
 
     expect(outcome).toBe(ELEVATED);
     expect(checkOwnerAccess).toHaveBeenCalledTimes(3);
@@ -61,14 +61,14 @@ describe(ensureOwnerAccess, () => {
   it('stops once the owner is stalled', async () => {
     checksReturn(PENDING_ACCEPTANCE, STALLED);
 
-    await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBe(STALLED);
+    await expect(ensureOwnerAccess(MOCK_TENANT_ID)).resolves.toBe(STALLED);
   });
 
   it('checks every minute for the first 30 checks, then hourly', async () => {
     const pending = Array.from({ length: 31 }, () => PENDING_ACCEPTANCE);
     checksReturn(...pending, ELEVATED);
 
-    await ensureOwnerAccess(TEST_TENANT_ID);
+    await ensureOwnerAccess(MOCK_TENANT_ID);
 
     const intervals = vi.mocked(sleep).mock.calls.map(([interval]) => interval);
     expect(intervals.slice(0, 30)).toEqual(Array(30).fill('1m'));
@@ -78,7 +78,7 @@ describe(ensureOwnerAccess, () => {
   it('releases the hook when it finishes', async () => {
     checksReturn(ELEVATED);
 
-    await ensureOwnerAccess(TEST_TENANT_ID);
+    await ensureOwnerAccess(MOCK_TENANT_ID);
 
     expect(hook.dispose).toHaveBeenCalled();
   });
@@ -92,14 +92,14 @@ describe(ensureOwnerAccess, () => {
     it('checks again straight away, without waiting out the sleep', async () => {
       checksReturn(PENDING_ACCEPTANCE, ELEVATED);
 
-      await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBe(ELEVATED);
+      await expect(ensureOwnerAccess(MOCK_TENANT_ID)).resolves.toBe(ELEVATED);
       expect(checkOwnerAccess).toHaveBeenCalledTimes(2);
     });
 
     it('goes back to checking every minute', async () => {
       checksReturn(PENDING_ACCEPTANCE, PENDING_ACCEPTANCE, ELEVATED);
 
-      await ensureOwnerAccess(TEST_TENANT_ID);
+      await ensureOwnerAccess(MOCK_TENANT_ID);
 
       expect(vi.mocked(sleep).mock.calls.at(-1)?.[0]).toBe('1m');
     });
@@ -111,12 +111,12 @@ describe(ensureOwnerAccess, () => {
     });
 
     it('leaves the checks to that run', async () => {
-      await expect(ensureOwnerAccess(TEST_TENANT_ID)).resolves.toBeNull();
+      await expect(ensureOwnerAccess(MOCK_TENANT_ID)).resolves.toBeNull();
       expect(checkOwnerAccess).not.toHaveBeenCalled();
     });
 
     it('releases its own hook', async () => {
-      await ensureOwnerAccess(TEST_TENANT_ID);
+      await ensureOwnerAccess(MOCK_TENANT_ID);
 
       expect(hook.dispose).toHaveBeenCalled();
     });

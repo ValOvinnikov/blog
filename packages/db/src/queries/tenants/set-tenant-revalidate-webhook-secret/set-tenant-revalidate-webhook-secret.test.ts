@@ -8,7 +8,7 @@ import {
 } from '@blog/db/testing/tenant-token-encryption-key';
 import { MOCK_REVALIDATE_WEBHOOK_SECRET } from '@blog/db/testing/tenants/fixtures';
 import { decryptSecret } from '@blog/utils';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantRevalidateWebhookSecret } from './set-tenant-revalidate-webhook-secret';
@@ -46,7 +46,7 @@ describe(setTenantRevalidateWebhookSecret, () => {
     expect(
       decryptSecret(
         row?.revalidateWebhookSecretEncrypted ?? '',
-        TEST_ENCRYPTION_KEY,
+        MOCK_ENCRYPTION_KEY,
       ),
     ).toBe(MOCK_REVALIDATE_WEBHOOK_SECRET);
     expect(row?.revalidateWebhookSecretEncrypted).not.toContain(

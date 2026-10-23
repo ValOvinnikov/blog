@@ -1,84 +1,54 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { evaluate, parse } from 'groq-js';
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
+import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import {
+  callArgs,
+  mockStructureNode,
+  type TMockStructureNode,
+} from '@blog/studio/testing/structure/mock-structure-node';
 import { FileText } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
 
 import { createPageTreeResolver } from './page-tree';
 
+const ALL_MODULES_TITLE = 'All modules';
+
 vi.mock('@sanity/orderable-document-list', () => ({
   OrderableDocumentList: () => null,
 }));
-
-type TCall = { method: string; args: unknown[] };
-type TMockBuilder = { kind: string; calls: TCall[] } & Record<string, unknown>;
-
-const CHAINABLE_METHODS = [
-  'id',
-  'title',
-  'icon',
-  'child',
-  'items',
-  'schemaType',
-  'documentId',
-  'options',
-  'menuItems',
-  'action',
-] as const;
-
-const makeMockBuilder = (kind: string): TMockBuilder => {
-  const calls: TCall[] = [];
-  const builder: TMockBuilder = { kind, calls };
-  for (const method of CHAINABLE_METHODS) {
-    builder[method] = (...args: unknown[]) => {
-      calls.push({ method, args });
-      return builder;
-    };
-  }
-  return builder;
-};
-
-const callArgs = (builder: TMockBuilder, method: string) =>
-  builder.calls.find((call) => call.method === method)?.args;
 
 const makeResolver = (
   dataset: Record<string, unknown>[],
   onlyLanguage?: TLocaleIsoCode,
 ) => {
-  const client = {
-    fetch: async (query: string, params: Record<string, unknown>) =>
-      (await evaluate(parse(query), { dataset, params })).get(),
-  };
+  const client = { fetch: mockGroqFetch(dataset) };
   const S = {
     context: { getClient: () => client, perspectiveStack: ['drafts'] },
-    list: () => makeMockBuilder('list'),
-    listItem: () => makeMockBuilder('listItem'),
-    document: () => makeMockBuilder('document'),
-    component: () => makeMockBuilder('component'),
-    menuItem: () => makeMockBuilder('menuItem'),
+    list: () => mockStructureNode('list'),
+    listItem: () => mockStructureNode('listItem'),
+    document: () => mockStructureNode('document'),
+    component: () => mockStructureNode('component'),
+    menuItem: () => mockStructureNode('menuItem'),
   };
   const resolve = createPageTreeResolver(S as unknown as StructureBuilder, {
-    name: 'page_landing',
+    name: PAGE_LANDING_TYPE,
     icon: FileText,
     onlyLanguage,
   });
   return {
     client,
     resolve: (id: string) =>
-      resolve(id, {} as never) as unknown as Promise<TMockBuilder>,
+      resolve(id, {} as never) as unknown as Promise<TMockStructureNode>,
   };
 };
 
-const modules = { _id: 'modules', _type: 'page_landing', title: 'Modules' };
-const faq = {
-  _id: 'faq',
-  _type: 'page_landing',
-  title: 'FAQ',
-  parent: { _type: 'reference', _ref: 'modules' },
-};
+const modules = mockLandingPage({ _id: 'modules', title: 'Modules' });
+const faq = mockLandingPage({ _id: 'faq', title: 'FAQ', parent: 'modules' });
 
-const sectionPagesOf = (pane: TMockBuilder) => {
-  const [, childrenItem] = callArgs(pane, 'items')?.[0] as TMockBuilder[];
-  return callArgs(childrenItem!, 'child')?.[0] as TMockBuilder;
+const sectionPagesOf = (pane: TMockStructureNode) => {
+  const [, childrenItem] = callArgs(pane, 'items')?.[0] as TMockStructureNode[];
+  return callArgs(childrenItem!, 'child')?.[0] as TMockStructureNode;
 };
 
 describe('createPageTreeResolver', () => {
@@ -93,13 +63,13 @@ describe('createPageTreeResolver', () => {
     const pane = await resolve('faq');
 
     expect(pane.kind).toBe('document');
-    expect(callArgs(pane, 'schemaType')).toEqual(['page_landing']);
+    expect(callArgs(pane, 'schemaType')).toEqual([PAGE_LANDING_TYPE]);
     expect(callArgs(pane, 'documentId')).toEqual(['faq']);
   });
 
   it('offers a page with children as the page plus its section pages', async () => {
     const pane = await resolve('modules');
-    const items = callArgs(pane, 'items')?.[0] as TMockBuilder[];
+    const items = callArgs(pane, 'items')?.[0] as TMockStructureNode[];
 
     expect(pane.kind).toBe('list');
     expect(callArgs(pane, 'title')).toEqual(['Modules']);
@@ -108,7 +78,10 @@ describe('createPageTreeResolver', () => {
       'Section pages',
     ]);
     expect(
-      callArgs(callArgs(items[0]!, 'child')?.[0] as TMockBuilder, 'documentId'),
+      callArgs(
+        callArgs(items[0]!, 'child')?.[0] as TMockStructureNode,
+        'documentId',
+      ),
     ).toEqual(['modules']);
   });
 
@@ -124,12 +97,12 @@ describe('createPageTreeResolver', () => {
   it('titles the pane from the draft when the page has unpublished edits', async () => {
     const { resolve: resolveWithDraft } = makeResolver([
       modules,
-      { ...modules, _id: 'drafts.modules', title: 'All modules' },
+      { ...modules, _id: 'drafts.modules', title: ALL_MODULES_TITLE },
       faq,
     ]);
 
     expect(callArgs(await resolveWithDraft('modules'), 'title')).toEqual([
-      'All modules',
+      ALL_MODULES_TITLE,
     ]);
   });
 
@@ -140,7 +113,7 @@ describe('createPageTreeResolver', () => {
     )?.[0] as Record<string, unknown>;
 
     expect(options).toEqual({
-      type: 'page_landing',
+      type: PAGE_LANDING_TYPE,
       filter: 'parent._ref == $parentId',
       params: { parentId: 'modules' },
       client,
@@ -152,15 +125,23 @@ describe('createPageTreeResolver', () => {
     const resolveChild = callArgs(
       sectionPagesOf(await resolve('modules')),
       'child',
-    )?.[0] as (id: string) => Promise<TMockBuilder>;
+    )?.[0] as (id: string) => Promise<TMockStructureNode>;
 
     expect((await resolveChild('faq')).kind).toBe('document');
     expect((await resolveChild('modules')).kind).toBe('list');
   });
 
   describe('with one live language', () => {
-    const dutchFaq = { ...faq, _id: 'dutch-faq', language: 'NL' };
-    const englishFaq = { ...faq, _id: 'english-faq', language: 'EN' };
+    const dutchFaq = {
+      ...faq,
+      _id: 'dutch-faq',
+      language: LOCALE_ISO_CODES.NL,
+    };
+    const englishFaq = {
+      ...faq,
+      _id: 'english-faq',
+      language: LOCALE_ISO_CODES.EN,
+    };
 
     const sectionPageIds = async (
       dataset: Record<string, unknown>[],
@@ -174,9 +155,7 @@ describe('createPageTreeResolver', () => {
         sectionPagesOf(await resolveInDutch(parentId)),
         'options',
       )?.[0] as { filter: string; params: Record<string, unknown> };
-      return (
-        await evaluate(parse(`*[${filter}]._id`), { dataset, params })
-      ).get();
+      return mockGroqFetch(dataset)(`*[${filter}]._id`, params);
     };
 
     it('lists only section pages in that language or with no language', async () => {
@@ -199,7 +178,7 @@ describe('createPageTreeResolver', () => {
     const menuItems = callArgs(
       sectionPagesOf(await resolve('modules')),
       'menuItems',
-    )?.[0] as TMockBuilder[];
+    )?.[0] as TMockStructureNode[];
 
     expect(menuItems.map((item) => callArgs(item, 'action')?.[0])).toEqual([
       'resetOrder',

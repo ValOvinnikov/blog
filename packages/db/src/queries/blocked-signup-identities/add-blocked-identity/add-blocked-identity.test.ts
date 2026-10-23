@@ -15,7 +15,7 @@ import {
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 import { addBlockedIdentity } from './add-blocked-identity';
 
@@ -28,7 +28,7 @@ const OTHER_REASON = 'Another reason';
 const db = useQueryTestDb(getDbMock);
 
 beforeEach(() => {
-  vi.stubEnv('PERSONAL_DATA_INDEX_KEY', TEST_ENCRYPTION_KEY);
+  vi.stubEnv('PERSONAL_DATA_INDEX_KEY', MOCK_ENCRYPTION_KEY);
 });
 
 afterEach(async () => {

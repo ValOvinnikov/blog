@@ -2,7 +2,7 @@ import { getDeprovisionEnv } from '@worker/testing/deprovision-env/fake-deprovis
 import { getProvisionEnv } from '@worker/testing/provision-env/fake-provision-env';
 import type { TInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 
-export function makeInactivitySweepEnv(): TInactivitySweepEnv {
+export function mockInactivitySweepEnv(): TInactivitySweepEnv {
   const { adminAppBaseUrl, webAppBaseUrl } = getProvisionEnv();
   return {
     adminAppBaseUrl,

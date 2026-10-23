@@ -8,7 +8,7 @@ import {
 } from '@blog/db/testing/tenant-token-encryption-key';
 import { MOCK_TENANT_READ_TOKEN } from '@blog/db/testing/tenants/fixtures';
 import { decryptSecret } from '@blog/utils';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSanityToken } from './set-tenant-sanity-token';
@@ -41,7 +41,7 @@ describe(setTenantSanityToken, () => {
 
     expect(row?.sanityReadTokenEncrypted).not.toContain(MOCK_TENANT_READ_TOKEN);
     expect(
-      decryptSecret(row?.sanityReadTokenEncrypted ?? '', TEST_ENCRYPTION_KEY),
+      decryptSecret(row?.sanityReadTokenEncrypted ?? '', MOCK_ENCRYPTION_KEY),
     ).toBe(MOCK_TENANT_READ_TOKEN);
   });
 
