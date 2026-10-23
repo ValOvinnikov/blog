@@ -14,7 +14,7 @@ export const mockGitHubResponse = (body: unknown, status = 200): Response =>
 const GITHUB_DEFAULT_PER_PAGE = 30;
 const GITHUB_COMPARE_FILE_LIMIT = 300;
 
-export const githubPage = <T>(items: T[], path: string): T[] => {
+export const mockGitHubPage = <T>(items: T[], path: string): T[] => {
   const params = new URL(path, 'https://api.github.com').searchParams;
   const perPage = Number(params.get('per_page') ?? GITHUB_DEFAULT_PER_PAGE);
   const page = Number(params.get('page') ?? 1);
@@ -28,8 +28,8 @@ export const mockGitHubCompareResponse = (
 ): Response =>
   mockGitHubResponse({
     total_commits: commits.length,
-    commits: githubPage(commits, path),
-    files: githubPage(files.slice(0, GITHUB_COMPARE_FILE_LIMIT), path),
+    commits: mockGitHubPage(commits, path),
+    files: mockGitHubPage(files.slice(0, GITHUB_COMPARE_FILE_LIMIT), path),
   });
 
 /** Needs `vi.mock('@platform/utils/env/env')` in the calling test file. */
@@ -65,6 +65,3 @@ export const useGitHubFetch = () => {
     },
   };
 };
-
-export const RELEASE_TAGS_PATH = '/git/matching-refs/tags/v';
-export const MAIN_BRANCH_PATH = '/branches/main';

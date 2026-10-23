@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { RELEASE_FAILURE } from '@platform/constants/release';
+import { MOCK_GITHUB_RELEASE_TAGS_PATH } from '@platform/testing/github/fixtures';
 import {
   mockGitHubResponse,
-  githubPage,
+  mockGitHubPage,
   useGitHubFetch,
-  RELEASE_TAGS_PATH,
 } from '@platform/testing/github/github-fetch';
 
 import { getLatestReleaseTag } from './get-latest-release-tag';
@@ -21,7 +21,7 @@ describe(getLatestReleaseTag, () => {
   const github = useGitHubFetch();
 
   it('returns the numerically greatest release tag', async () => {
-    github.respond(RELEASE_TAGS_PATH, () =>
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
       mockGitHubResponse(tagRefs('v0.9.0', 'v0.10.0', 'v0.2.1')),
     );
 
@@ -30,8 +30,8 @@ describe(getLatestReleaseTag, () => {
 
   it('finds the greatest version among more tags than GitHub lists by default', async () => {
     const tags = Array.from({ length: 40 }, (_, index) => `v1.${index}.0`);
-    github.respond(RELEASE_TAGS_PATH, (path) =>
-      mockGitHubResponse(githubPage(tagRefs(...tags), path)),
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, (path) =>
+      mockGitHubResponse(mockGitHubPage(tagRefs(...tags), path)),
     );
 
     expect(await getLatestReleaseTag()).toEqual({ ok: true, data: 'v1.39.0' });
@@ -39,8 +39,8 @@ describe(getLatestReleaseTag, () => {
 
   it('reads every page of release tags', async () => {
     const tags = Array.from({ length: 150 }, (_, index) => `v2.${index}.0`);
-    github.respond(RELEASE_TAGS_PATH, (path) =>
-      mockGitHubResponse(githubPage(tagRefs(...tags), path)),
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, (path) =>
+      mockGitHubResponse(mockGitHubPage(tagRefs(...tags), path)),
     );
 
     expect(await getLatestReleaseTag()).toEqual({
@@ -51,7 +51,7 @@ describe(getLatestReleaseTag, () => {
 
   it('reports the read as incomplete when the list is still full at the page cap', async () => {
     const fullPage = Array.from({ length: 100 }, (_, index) => `v3.${index}.0`);
-    github.respond(RELEASE_TAGS_PATH, () =>
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
       mockGitHubResponse(tagRefs(...fullPage)),
     );
 
@@ -63,7 +63,7 @@ describe(getLatestReleaseTag, () => {
   });
 
   it('ignores tags that are not release versions', async () => {
-    github.respond(RELEASE_TAGS_PATH, () =>
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
       mockGitHubResponse(tagRefs('v1.0.0', 'v2-beta', 'very-old')),
     );
 
@@ -71,7 +71,7 @@ describe(getLatestReleaseTag, () => {
   });
 
   it('returns no tag when the repository has no release tag yet', async () => {
-    github.respond(RELEASE_TAGS_PATH, () => mockGitHubResponse([]));
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () => mockGitHubResponse([]));
 
     expect(await getLatestReleaseTag()).toEqual({ ok: true, data: undefined });
   });

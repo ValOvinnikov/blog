@@ -2,11 +2,13 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  CAPABILITY,
   NEXT_NAVIGATION_ERROR,
-  type TCapability,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import {
+  MEMBERSHIP_ROLE,
+  PLAN_REGISTRY,
+  TENANT_PLAN,
+} from '@blog/db/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -67,13 +69,15 @@ const DB_UNAVAILABLE = 'db unavailable';
 
 const FREE_TENANT = { id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE };
 const GROWTH_TENANT = { id: 'tenant-2', plan: TENANT_PLAN.GROWTH };
-const PLAN_GATED_CAPABILITIES: TCapability[] = [
-  CAPABILITY.ANALYTICS,
-  CAPABILITY.CONTACT_FORM,
-];
-const PLAN_GATED_FIELDS = CAPABILITY_TOGGLES.filter(({ capability }) =>
-  PLAN_GATED_CAPABILITIES.includes(capability),
+const PLAN_GATED_FIELDS = CAPABILITY_TOGGLES.filter(
+  ({ capability, isComingSoon }) =>
+    !isComingSoon &&
+    PLAN_REGISTRY[TENANT_PLAN.GROWTH].includes(capability) &&
+    !PLAN_REGISTRY[TENANT_PLAN.FREE].includes(capability),
 ).map(({ field }) => field);
+const PLAN_GATED_ON = Object.fromEntries(
+  PLAN_GATED_FIELDS.map((field) => [field, true]),
+);
 
 const VALID_INPUT: TUpdateFeaturesInput = {
   commentsEnabled: false,
@@ -256,20 +260,20 @@ describe(updateFeaturesAction, () => {
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
-  it("writes a GROWTH tenant's submitted toggles over the stored ones", async () => {
+  it('lets a GROWTH tenant switch every plan-gated toggle back off', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: GROWTH_TENANT,
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
-      values: { ...ALL_OFF, bookmarksEnabled: true, analyticsEnabled: true },
+      values: { ...ALL_OFF, ...PLAN_GATED_ON },
       savedAt: new Date(SAVED_AT),
     });
 
-    await updateFeaturesAction('tenant-2', VALID_INPUT);
+    await updateFeaturesAction(GROWTH_TENANT.id, VALID_INPUT);
 
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      'tenant-2',
+      GROWTH_TENANT.id,
       VALID_INPUT,
     );
   });

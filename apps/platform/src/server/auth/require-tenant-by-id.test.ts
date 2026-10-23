@@ -1,7 +1,8 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -23,66 +24,65 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const SIGN_IN_CALLBACK_PREFIX = '/api/auth/signin?callbackUrl=%2F';
+const USER_ID = 'user-1';
 const INVALID_INPUT_SYNTAX = 'invalid input syntax';
 const NOT_A_UUID = 'not-a-uuid';
+const UNKNOWN_TENANT_ID = 'ghost';
 
-describe(requireTenantById, () => {
-  let admin: {
-    id: string;
-    userId: string;
-    role: string;
-    grantedBy: null;
-    grantedVia: string;
-    grantedAt: Date;
-    createdAt: Date;
-  };
+const admin = mockAdmin({ userId: USER_ID });
+const tenant = mockTenant();
 
+const TENANT_READS = [
+  {
+    tenantCase: 'an existing tenant',
+    tenantId: MOCK_TENANT_ID,
+    arrangeRead: () => getTenantByIdMock.mockResolvedValue(tenant),
+  },
+  {
+    tenantCase: 'a malformed id whose read fails',
+    tenantId: NOT_A_UUID,
+    arrangeRead: () =>
+      getTenantByIdMock.mockRejectedValue(new Error(INVALID_INPUT_SYNTAX)),
+  },
+];
+
+describe('requireTenantById', () => {
   beforeEach(() => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    admin = {
-      id: 'admin-1',
-      userId: 'user-1',
-      role: ADMIN_ROLE.ADMIN,
-      grantedBy: null,
-      grantedVia: 'MANUAL',
-      grantedAt: new Date(),
-      createdAt: new Date(),
-    };
+    authMock.mockResolvedValue({ user: { id: USER_ID } });
     getAdminByUserIdMock.mockResolvedValue(admin);
   });
 
-  it.each([MOCK_TENANT_ID, NOT_A_UUID])(
-    'redirects to sign-in without querying admins when signed out, for %s',
-    async (tenantId) => {
+  it.each(TENANT_READS)(
+    'redirects a signed-out visitor to sign-in for $tenantCase',
+    async ({ tenantId, arrangeRead }) => {
       authMock.mockResolvedValue(null);
-      getTenantByIdMock.mockRejectedValue(new Error(INVALID_INPUT_SYNTAX));
+      arrangeRead();
 
       await expect(requireTenantById(tenantId)).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
       );
 
-      expect(redirect).toHaveBeenCalledWith(SIGN_IN_CALLBACK_PREFIX);
+      expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
       expect(getAdminByUserIdMock).not.toHaveBeenCalled();
     },
   );
 
-  it.each([MOCK_TENANT_ID, NOT_A_UUID])(
-    '404s a signed-in user with no admins row, for %s',
-    async (tenantId) => {
+  it.each(TENANT_READS)(
+    '404s a signed-in user with no admins row for $tenantCase',
+    async ({ tenantId, arrangeRead }) => {
       getAdminByUserIdMock.mockResolvedValue(undefined);
-      getTenantByIdMock.mockRejectedValue(new Error(INVALID_INPUT_SYNTAX));
+      arrangeRead();
 
       await expect(requireTenantById(tenantId)).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
       );
 
-      expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
+      expect(getAdminByUserIdMock).toHaveBeenCalledWith(USER_ID);
       expect(redirect).not.toHaveBeenCalled();
     },
   );
@@ -96,43 +96,37 @@ describe(requireTenantById, () => {
   });
 
   it('404s for an unknown tenant id', async () => {
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.ADMIN,
-    });
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    await expect(requireTenantById('ghost')).rejects.toThrow(
+    await expect(requireTenantById(UNKNOWN_TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith('ghost', {
+    expect(getTenantByIdMock).toHaveBeenCalledWith(UNKNOWN_TENANT_ID, {
       includeArchived: true,
     });
   });
 
-  it('returns the tenant and admin for an admins row without checking membership', async () => {
-    const tenant = { id: MOCK_TENANT_ID };
-    getTenantByIdMock.mockResolvedValue(tenant);
+  it.each([
+    { tenantCase: 'a live tenant', resolvedTenant: tenant },
+    {
+      tenantCase: 'an archived tenant',
+      resolvedTenant: mockTenant({
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      }),
+    },
+  ])(
+    'returns $tenantCase and the admin without checking membership',
+    async ({ resolvedTenant }) => {
+      getTenantByIdMock.mockResolvedValue(resolvedTenant);
 
-    const result = await requireTenantById(MOCK_TENANT_ID);
+      const result = await requireTenantById(MOCK_TENANT_ID);
 
-    expect(result).toEqual({ tenant, admin });
-    expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('resolves an archived tenant by requesting it with includeArchived', async () => {
-    const archivedTenant = {
-      id: MOCK_TENANT_ID,
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
-    };
-    getTenantByIdMock.mockResolvedValue(archivedTenant);
-
-    const result = await requireTenantById(MOCK_TENANT_ID);
-
-    expect(result).toEqual({ tenant: archivedTenant, admin });
-    expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      includeArchived: true,
-    });
-  });
+      expect(result).toEqual({ tenant: resolvedTenant, admin });
+      expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+        includeArchived: true,
+      });
+      expect(redirect).not.toHaveBeenCalled();
+    },
+  );
 });

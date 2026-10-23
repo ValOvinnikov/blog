@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
-import { TOAST_EXIT_BUFFER_MS } from '@platform/testing/toast-timing';
+import { MOCK_TOAST_EXIT_BUFFER_MS } from '@platform/testing/toast/fixtures';
 import {
   act,
   fireEvent,
@@ -241,7 +241,7 @@ describe(ToastProvider, () => {
       });
       fireEvent.keyDown(errorDismiss, { key: 'Escape' });
       act(() => {
-        vi.advanceTimersByTime(TOAST_EXIT_BUFFER_MS);
+        vi.advanceTimersByTime(MOCK_TOAST_EXIT_BUFFER_MS);
       });
 
       expect(screen.queryByText(COULDNT_SAVE)).not.toBeInTheDocument();
@@ -282,7 +282,7 @@ describe(ToastProvider, () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_BUFFER_MS);
+      vi.advanceTimersByTime(MOCK_TOAST_EXIT_BUFFER_MS);
     });
 
     expect(screen.queryByText(SAVED_TO_BOOKMARKS)).not.toBeInTheDocument();

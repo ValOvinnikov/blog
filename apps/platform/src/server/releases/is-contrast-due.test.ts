@@ -2,11 +2,13 @@ import { FINDING_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { CONTRAST_WORKFLOW_FILE } from '@platform/constants/release';
 import {
+  MOCK_GITHUB_MAIN_BRANCH_PATH,
+  MOCK_GITHUB_RELEASE_TAGS_PATH,
+} from '@platform/testing/github/fixtures';
+import {
   mockGitHubCompareResponse,
   mockGitHubResponse,
   useGitHubFetch,
-  MAIN_BRANCH_PATH,
-  RELEASE_TAGS_PATH,
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
@@ -49,10 +51,10 @@ describe(isContrastDue, () => {
 
   beforeEach(() => {
     headSha = faker.git.commitSha();
-    github.respond(RELEASE_TAGS_PATH, () =>
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
       mockGitHubResponse([{ ref: `refs/tags/${lastTag}` }]),
     );
-    github.respond(MAIN_BRANCH_PATH, () =>
+    github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: headSha } }),
     );
     github.respond(`/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`, () =>
@@ -93,7 +95,9 @@ describe(isContrastDue, () => {
   });
 
   it('is not due when GitHub cannot be reached', async () => {
-    github.respond(MAIN_BRANCH_PATH, () => mockGitHubResponse({}, 500));
+    github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
+      mockGitHubResponse({}, 500),
+    );
 
     expect(await isContrastDue()).toBe(false);
   });

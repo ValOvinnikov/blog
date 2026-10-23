@@ -9,7 +9,7 @@ const requestWith = (authorization?: string): Request =>
     headers: authorization ? { authorization } : {},
   });
 
-describe('hasBearerSecret', () => {
+describe(hasBearerSecret, () => {
   it('accepts the matching Bearer secret', () => {
     expect(
       hasBearerSecret(
@@ -21,7 +21,10 @@ describe('hasBearerSecret', () => {
 
   it.each([
     ['no Authorization header', undefined],
-    ['a different secret of the same length', 'Bearer a-very-secret-valuX'],
+    [
+      'a different secret of the same length',
+      `Bearer ${MOCK_BEARER_SECRET.slice(0, -1)}X`,
+    ],
     ['a secret of a different length', 'Bearer short'],
     ['the right secret under another scheme', `Basic ${MOCK_BEARER_SECRET}`],
   ])('rejects %s', (_case, authorization) => {

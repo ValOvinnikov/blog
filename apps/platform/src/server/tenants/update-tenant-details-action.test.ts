@@ -181,37 +181,37 @@ describe('updateTenantDetailsAction', () => {
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
 
-    expect(updateTenantDetailsMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      expect.not.objectContaining({ ownerEmail: expect.anything() }),
-    );
+    const [tenantId, input] = updateTenantDetailsMock.mock.lastCall ?? [];
+
+    expect(tenantId).toBe(MOCK_TENANT_ID);
+    expect(input).toStrictEqual(validInput);
   });
 
   it.each([
-    [
-      { outcome: DOMAIN_TAKEN },
-      {
+    {
+      updateResult: { outcome: DOMAIN_TAKEN },
+      expected: {
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
           primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
         },
       },
-    ],
-    [
-      { outcome: DOMAIN_INVALID },
-      {
+    },
+    {
+      updateResult: { outcome: DOMAIN_INVALID },
+      expected: {
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
           primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID },
         },
       },
-    ],
-    [
-      {
+    },
+    {
+      updateResult: {
         outcome: 'domain-locked',
         blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
       },
-      {
+      expected: {
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
           primaryDomain: {
@@ -220,33 +220,33 @@ describe('updateTenantDetailsAction', () => {
           },
         },
       },
-    ],
-    [
-      { outcome: 'provisioning-started' },
-      {
+    },
+    {
+      updateResult: { outcome: 'provisioning-started' },
+      expected: {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: TENANT_REFUSAL.PROVISIONING_STARTED,
       },
-    ],
-    [
-      { outcome: OWNER_EMAIL_TAKEN },
-      {
+    },
+    {
+      updateResult: { outcome: OWNER_EMAIL_TAKEN },
+      expected: {
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
           ownerEmail: { reason: TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN },
         },
       },
-    ],
-    [
-      { outcome: OWNER_ALREADY_JOINED },
-      {
+    },
+    {
+      updateResult: { outcome: OWNER_ALREADY_JOINED },
+      expected: {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
       },
-    ],
+    },
   ])(
-    'maps a rejected $0.outcome update without auditing or refreshing the site',
-    async (updateResult, expected) => {
+    'maps a rejected $updateResult.outcome update without auditing or revalidating',
+    async ({ updateResult, expected }) => {
       updateTenantDetailsMock.mockResolvedValue(updateResult);
 
       const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {

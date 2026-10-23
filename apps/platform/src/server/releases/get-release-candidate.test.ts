@@ -7,11 +7,13 @@ import {
   RELEASE_FAILURE,
 } from '@platform/constants/release';
 import {
+  MOCK_GITHUB_MAIN_BRANCH_PATH,
+  MOCK_GITHUB_RELEASE_TAGS_PATH,
+} from '@platform/testing/github/fixtures';
+import {
   mockGitHubCompareResponse,
   mockGitHubResponse,
   useGitHubFetch,
-  RELEASE_TAGS_PATH,
-  MAIN_BRANCH_PATH,
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
@@ -80,10 +82,10 @@ describe(getReleaseCandidate, () => {
 
   beforeEach(() => {
     headSha = faker.git.commitSha();
-    github.respond(RELEASE_TAGS_PATH, () =>
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
       mockGitHubResponse([{ ref: `refs/tags/${lastTag}` }]),
     );
-    github.respond(MAIN_BRANCH_PATH, () =>
+    github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: headSha } }),
     );
     github.respond(CONTRAST_RUNS_PATH, () =>
@@ -242,7 +244,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with NO_RELEASE_TAG when the repository has no release tag yet', async () => {
-    github.respond(RELEASE_TAGS_PATH, () => mockGitHubResponse([]));
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () => mockGitHubResponse([]));
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
@@ -251,7 +253,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with TAG_LIST_INCOMPLETE when the tag list never stops paging', async () => {
-    github.respond(RELEASE_TAGS_PATH, () =>
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
       mockGitHubResponse(
         Array.from({ length: 100 }, (_, index) => ({
           ref: `refs/tags/v1.${index}.0`,
@@ -276,7 +278,7 @@ describe(getReleaseCandidate, () => {
 
   it('fails with GITHUB_ERROR when GitHub errors', async () => {
     github.respond(
-      MAIN_BRANCH_PATH,
+      MOCK_GITHUB_MAIN_BRANCH_PATH,
       () => new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
     );
 
@@ -288,7 +290,7 @@ describe(getReleaseCandidate, () => {
 
   it('fails with RATE_LIMITED when GitHub rate-limits the request', async () => {
     github.respond(
-      MAIN_BRANCH_PATH,
+      MOCK_GITHUB_MAIN_BRANCH_PATH,
       () => new Response(null, { status: HTTP_STATUS.TOO_MANY_REQUESTS }),
     );
 

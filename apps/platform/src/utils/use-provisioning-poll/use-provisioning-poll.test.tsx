@@ -23,11 +23,11 @@ import {
   mockMapDomainFailedProvisioningSteps,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { MOCK_TOAST_EXIT_BUFFER_MS } from '@platform/testing/toast/fixtures';
 
 import { useProvisioningPoll } from './use-provisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 1500;
-const TOAST_EXIT_BUFFER_MS = 1000;
 const MAX_POLL_TICKS = 400;
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
@@ -580,7 +580,7 @@ describe(useProvisioningPoll, () => {
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(
-          STEP_POLL_INTERVAL_MS + TOAST_EXIT_BUFFER_MS,
+          STEP_POLL_INTERVAL_MS + MOCK_TOAST_EXIT_BUFFER_MS,
         );
       });
       const couldNotRefreshText2 = screen.queryByText(
