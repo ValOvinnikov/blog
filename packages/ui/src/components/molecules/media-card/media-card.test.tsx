@@ -4,12 +4,14 @@ import {
   MOCK_PERSON_NAME,
   MOCK_PUBLISHED_AT,
 } from '@blog/ui/testing/fixtures';
-import { cloneElement } from 'react';
+import { cloneElement, type ComponentProps } from 'react';
 
 import { MediaCard } from './media-card';
 
 const POST_HREF = '/posts/hello-world';
 const MEDIA_TEST_ID = 'media-card-media';
+
+type TMediaCardChildren = ComponentProps<typeof MediaCard>['children'];
 
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react')>();
@@ -249,15 +251,25 @@ describe(`<${MediaCard.name}/>`, () => {
     });
 
     it.each([
-      { name: 'isLead is set', props: { isLead: true } },
-      { name: 'align is "center"', props: { align: 'center' as const } },
-    ])('clones the Media slot when $name', ({ props }) => {
+      {
+        name: 'isLead is set',
+        renderCard: (media: TMediaCardChildren) => (
+          <MediaCard isLead={true}>{media}</MediaCard>
+        ),
+      },
+      {
+        name: 'align is "center"',
+        renderCard: (media: TMediaCardChildren) => (
+          <MediaCard align="center">{media}</MediaCard>
+        ),
+      },
+    ])('clones the Media slot when $name', ({ renderCard }) => {
       renderElement(
-        <MediaCard {...props}>
+        renderCard(
           <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
             <img src="/cover.jpg" alt="Cover photo" />
-          </MediaCard.Media>
-        </MediaCard>,
+          </MediaCard.Media>,
+        ),
       );
       expect(cloneElement).toHaveBeenCalledTimes(1);
     });

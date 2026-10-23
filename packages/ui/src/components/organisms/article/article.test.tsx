@@ -11,8 +11,10 @@ import type { ComponentProps } from 'react';
 
 import { Article } from './article';
 
-const TYPESCRIPT_HREF = '/tag/typescript';
-const TESTING_HREF = '/tag/testing';
+const FOOTER_TAGS = [
+  { label: 'TypeScript', href: '/tag/typescript' },
+  { label: 'Testing', href: '/tag/testing' },
+];
 
 const meta = {
   author: { name: MOCK_PERSON_NAME },
@@ -107,23 +109,13 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('renders Article.Footer tags as links to their routes', () => {
-    renderArticle(
-      {},
-      {
-        tags: [
-          { label: 'TypeScript', href: TYPESCRIPT_HREF },
-          { label: 'Testing', href: TESTING_HREF },
-        ],
-      },
-    );
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
-      'href',
-      TYPESCRIPT_HREF,
-    );
-    expect(screen.getByRole('link', { name: 'Testing' })).toHaveAttribute(
-      'href',
-      TESTING_HREF,
-    );
+    renderArticle({}, { tags: FOOTER_TAGS });
+    for (const tag of FOOTER_TAGS) {
+      expect(screen.getByRole('link', { name: tag.label })).toHaveAttribute(
+        'href',
+        tag.href,
+      );
+    }
   });
 
   it('does not render an Article.Footer when tags is empty', () => {

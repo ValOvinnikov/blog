@@ -4,10 +4,7 @@ const mockPublishedDate = faker.date.past();
 
 export const MOCK_PUBLISHED_AT = mockPublishedDate.toISOString();
 
-export const MOCK_FORMATTED_DATE = mockPublishedDate.toLocaleDateString(
-  'en-GB',
-  { year: 'numeric', month: 'long', day: 'numeric' },
-);
+export const MOCK_FORMATTED_DATE = mockPublishedDate.toDateString();
 
 export const MOCK_POST_TITLE = 'Building a Design System';
 
@@ -16,12 +13,14 @@ export const MOCK_POST_EXCERPT =
 
 export const MOCK_PERSON_NAME = 'Jane Doe';
 
+const mockTopicSlug = faker.lorem.slug(1);
+
 export const MOCK_TOPIC = {
-  label: 'Engineering',
-  href: '/topics/engineering',
+  label: faker.lorem.word(),
+  href: `/topics/${mockTopicSlug}`,
 };
 
 export const MOCK_TAG = {
-  label: 'Architecture',
-  href: '/topics/architecture',
+  label: faker.lorem.words(2),
+  href: `/tags/${faker.lorem.slug(2)}`,
 };
