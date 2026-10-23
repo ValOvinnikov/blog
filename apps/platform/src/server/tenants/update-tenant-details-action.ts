@@ -9,7 +9,7 @@ import {
   type TActionResult,
   type TOutcome,
 } from '@blog/config';
-import { queries, TENANT_PLAN } from '@blog/db';
+import { queries, TENANT_DETAILS_UPDATE_OUTCOME, TENANT_PLAN } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
@@ -109,7 +109,7 @@ export const updateTenantDetailsAction = async (
     );
 
     switch (result.outcome) {
-      case 'updated': {
+      case TENANT_DETAILS_UPDATE_OUTCOME.UPDATED: {
         const { ownerEmail, ...auditedDetails } = parsed.data;
         await revalidateSiteConfig(tenantId);
         await recordAuditEvent({
@@ -124,21 +124,21 @@ export const updateTenantDetailsAction = async (
         });
         return { outcome: ACTION_OUTCOME.SUCCESS, tenant: result.tenant };
       }
-      case 'domain-taken':
+      case TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN:
         return {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrors: {
             primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
           },
         };
-      case 'domain-invalid':
+      case TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_INVALID:
         return {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrors: {
             primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID },
           },
         };
-      case 'domain-locked':
+      case TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_LOCKED:
         return {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrors: {
@@ -148,24 +148,24 @@ export const updateTenantDetailsAction = async (
             },
           },
         };
-      case 'provisioning-started':
+      case TENANT_DETAILS_UPDATE_OUTCOME.PROVISIONING_STARTED:
         return {
           outcome: ACTION_OUTCOME.REFUSED,
           reason: TENANT_REFUSAL.PROVISIONING_STARTED,
         };
-      case 'owner-email-taken':
+      case TENANT_DETAILS_UPDATE_OUTCOME.OWNER_EMAIL_TAKEN:
         return {
           outcome: ACTION_OUTCOME.INVALID,
           fieldErrors: {
             ownerEmail: { reason: TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN },
           },
         };
-      case 'owner-already-joined':
+      case TENANT_DETAILS_UPDATE_OUTCOME.OWNER_ALREADY_JOINED:
         return {
           outcome: ACTION_OUTCOME.REFUSED,
           reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
         };
-      case queries.tenants.OWNS_FREE_TENANT_OUTCOME:
+      case TENANT_DETAILS_UPDATE_OUTCOME.OWNS_FREE_TENANT:
         return {
           outcome: ACTION_OUTCOME.REFUSED,
           reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,

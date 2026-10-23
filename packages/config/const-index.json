@@ -3336,6 +3336,106 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
+    "UPDATED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.UPDATED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_TAKEN": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_LOCKED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_LOCKED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_LOCKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_INVALID": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_INVALID",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "PROVISIONING_STARTED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.PROVISIONING_STARTED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_REFUSAL.PROVISIONING_STARTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_ALREADY_JOINED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNER_ALREADY_JOINED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_REFUSAL.OWNER_ALREADY_JOINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_EMAIL_TAKEN": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNER_EMAIL_TAKEN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNS_FREE_TENANT": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNS_FREE_TENANT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
     "EDITABLE": [
       {
         "ref": "CONTROL_MODE.EDITABLE",
@@ -3686,33 +3786,9 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
-    "DOMAIN_INVALID": [
-      {
-        "ref": "TENANT_FIELD_ERROR.DOMAIN_INVALID",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "DOMAIN_TAKEN": [
-      {
-        "ref": "TENANT_FIELD_ERROR.DOMAIN_TAKEN",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
     "DOMAIN_ATTACHED_ELSEWHERE": [
       {
         "ref": "TENANT_FIELD_ERROR.DOMAIN_ATTACHED_ELSEWHERE",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "DOMAIN_LOCKED": [
-      {
-        "ref": "TENANT_FIELD_ERROR.DOMAIN_LOCKED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
@@ -3766,14 +3842,6 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
-    "OWNER_EMAIL_TAKEN": [
-      {
-        "ref": "TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
     "ALREADY_DEPROVISIONED": [
       {
         "ref": "TENANT_REFUSAL.ALREADY_DEPROVISIONED",
@@ -3813,22 +3881,6 @@
     "LOCALE_IS_ADDITIONAL": [
       {
         "ref": "TENANT_REFUSAL.LOCALE_IS_ADDITIONAL",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "PROVISIONING_STARTED": [
-      {
-        "ref": "TENANT_REFUSAL.PROVISIONING_STARTED",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "OWNER_ALREADY_JOINED": [
-      {
-        "ref": "TENANT_REFUSAL.OWNER_ALREADY_JOINED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

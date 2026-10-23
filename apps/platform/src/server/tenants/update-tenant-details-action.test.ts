@@ -5,8 +5,11 @@ import {
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db/constants';
-import { OWNS_FREE_TENANT_OUTCOME } from '@blog/db/queries/tenants/update-tenant-details/update-tenant-details';
+import {
+  TENANT_DETAILS_UPDATE_OUTCOME,
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STEP,
+} from '@blog/db/constants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -48,15 +51,12 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-vi.mock('@blog/db/utils/env/env', () => ({ env: {} }));
-
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: {
       getTenantById: getTenantByIdMock,
       updateTenantDetails: updateTenantDetailsMock,
-      OWNS_FREE_TENANT_OUTCOME,
     },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
@@ -66,11 +66,16 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
-const UPDATED = 'updated';
-const DOMAIN_TAKEN = 'domain-taken';
-const DOMAIN_INVALID = 'domain-invalid';
-const OWNER_EMAIL_TAKEN = 'owner-email-taken';
-const OWNER_ALREADY_JOINED = 'owner-already-joined';
+const {
+  UPDATED,
+  DOMAIN_TAKEN,
+  DOMAIN_INVALID,
+  DOMAIN_LOCKED,
+  PROVISIONING_STARTED,
+  OWNER_EMAIL_TAKEN,
+  OWNER_ALREADY_JOINED,
+  OWNS_FREE_TENANT,
+} = TENANT_DETAILS_UPDATE_OUTCOME;
 
 const validInput = {
   name: MOCK_TENANT_NAME,
@@ -214,7 +219,7 @@ describe('updateTenantDetailsAction', () => {
     },
     {
       updateResult: {
-        outcome: 'domain-locked',
+        outcome: DOMAIN_LOCKED,
         blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
       },
       expected: {
@@ -228,7 +233,7 @@ describe('updateTenantDetailsAction', () => {
       },
     },
     {
-      updateResult: { outcome: 'provisioning-started' },
+      updateResult: { outcome: PROVISIONING_STARTED },
       expected: {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: TENANT_REFUSAL.PROVISIONING_STARTED,
@@ -251,7 +256,7 @@ describe('updateTenantDetailsAction', () => {
       },
     },
     {
-      updateResult: { outcome: OWNS_FREE_TENANT_OUTCOME },
+      updateResult: { outcome: OWNS_FREE_TENANT },
       expected: {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,

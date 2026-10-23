@@ -4,6 +4,7 @@ import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
   PROVISIONING_STATE,
+  TENANT_DETAILS_UPDATE_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
@@ -22,8 +23,6 @@ import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq, isNull, ne } from 'drizzle-orm';
-
-export const OWNS_FREE_TENANT_OUTCOME = 'owns-free-tenant';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
@@ -51,15 +50,20 @@ function tenantDetailsFields(
   };
 }
 
+const OUTCOME = TENANT_DETAILS_UPDATE_OUTCOME;
+
 export type TUpdateTenantDetailsResult =
-  | { outcome: 'updated'; tenant: TTenant }
-  | TOutcome<'domain-taken'>
-  | { outcome: 'domain-locked'; blockingStep: TTenantProvisioningStep }
-  | TOutcome<'domain-invalid'>
-  | TOutcome<'provisioning-started'>
-  | TOutcome<'owner-already-joined'>
-  | TOutcome<'owner-email-taken'>
-  | TOutcome<typeof OWNS_FREE_TENANT_OUTCOME>;
+  | { outcome: typeof OUTCOME.UPDATED; tenant: TTenant }
+  | TOutcome<typeof OUTCOME.DOMAIN_TAKEN>
+  | {
+      outcome: typeof OUTCOME.DOMAIN_LOCKED;
+      blockingStep: TTenantProvisioningStep;
+    }
+  | TOutcome<typeof OUTCOME.DOMAIN_INVALID>
+  | TOutcome<typeof OUTCOME.PROVISIONING_STARTED>
+  | TOutcome<typeof OUTCOME.OWNER_ALREADY_JOINED>
+  | TOutcome<typeof OUTCOME.OWNER_EMAIL_TAKEN>
+  | TOutcome<typeof OUTCOME.OWNS_FREE_TENANT>;
 
 // Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
 // a completed step; name/plan/locale never lock.
@@ -67,7 +71,7 @@ function lockedFieldOutcome(
   input: TUpdateTenantDetailsInput,
   existing: TTenant,
 ): TMaybeUndefined<
-  Extract<TUpdateTenantDetailsResult, TOutcome<'domain-locked'>>
+  Extract<TUpdateTenantDetailsResult, TOutcome<typeof OUTCOME.DOMAIN_LOCKED>>
 > {
   const steps = existing.provisioningSteps;
 
@@ -77,7 +81,7 @@ function lockedFieldOutcome(
       TENANT_PROVISIONING_STEP_STATUS.DONE
   ) {
     return {
-      outcome: 'domain-locked',
+      outcome: OUTCOME.DOMAIN_LOCKED,
       blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
     };
   }
@@ -93,7 +97,7 @@ export async function updateTenantDetails(
   input: TUpdateTenantDetailsInput,
 ): Promise<TUpdateTenantDetailsResult> {
   if (!isValidDomain(input.primaryDomain)) {
-    return toOutcome('domain-invalid');
+    return toOutcome(OUTCOME.DOMAIN_INVALID);
   }
 
   const db = getDb();
@@ -118,7 +122,7 @@ export async function updateTenantDetails(
     provisioningState === PROVISIONING_STATE.RUNNING ||
     provisioningState === PROVISIONING_STATE.SUCCEEDED
   ) {
-    return toOutcome('provisioning-started');
+    return toOutcome(OUTCOME.PROVISIONING_STARTED);
   }
 
   if (provisioningState === PROVISIONING_STATE.FAILED) {
@@ -135,7 +139,7 @@ export async function updateTenantDetails(
       .where(eq(tenantDomains.domain, input.primaryDomain));
 
     if (domainConflict) {
-      return toOutcome('domain-taken');
+      return toOutcome(OUTCOME.DOMAIN_TAKEN);
     }
   }
 
@@ -164,7 +168,7 @@ export async function updateTenantDetails(
         );
 
       if (joinedOwner) {
-        return toOutcome('owner-already-joined');
+        return toOutcome(OUTCOME.OWNER_ALREADY_JOINED);
       }
 
       const [pendingInvite] = await db
@@ -196,7 +200,7 @@ export async function updateTenantDetails(
         );
 
       if (emailConflict) {
-        return toOutcome('owner-email-taken');
+        return toOutcome(OUTCOME.OWNER_EMAIL_TAKEN);
       }
 
       ownerInviteUpdate = { id: pendingInvite.id, email: normalizedOwnerEmail };
@@ -216,7 +220,7 @@ export async function updateTenantDetails(
       .where(eq(tenants.id, tenantId))
       .returning();
   } catch (error) {
-    if (isFreeOwnerViolation(error)) return toOutcome(OWNS_FREE_TENANT_OUTCOME);
+    if (isFreeOwnerViolation(error)) return toOutcome(OUTCOME.OWNS_FREE_TENANT);
     throw error;
   }
 
@@ -289,5 +293,5 @@ export async function updateTenantDetails(
     }
   }
 
-  return { outcome: 'updated', tenant };
+  return { outcome: OUTCOME.UPDATED, tenant };
 }
