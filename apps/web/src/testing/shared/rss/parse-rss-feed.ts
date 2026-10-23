@@ -2,47 +2,46 @@ import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
 
 const XML_CONTENT_TYPE = 'application/xml';
+const PARSER_ERROR_TAG = 'parsererror';
 
-interface IRssItem {
-  title: TMaybeNull<string>;
-  link: TMaybeNull<string>;
-  description: TMaybeNull<string>;
-  pubDate: TMaybeNull<string>;
-}
+type TRssFields = Record<string, TMaybeNull<string>>;
 
 interface IRssFeed {
   isWellFormed: boolean;
-  title: TMaybeNull<string>;
-  description: TMaybeNull<string>;
-  language: TMaybeNull<string>;
-  link: TMaybeNull<string>;
-  selfLink: TMaybeNull<string>;
-  items: IRssItem[];
+  root: string;
+  channel: TRssFields;
+  items: TRssFields[];
+  selfLink: TRssFields;
 }
 
-const childText = (
-  parent: TMaybeUndefined<Element>,
-  tagName: string,
-): TMaybeNull<string> =>
-  Array.from(parent?.children ?? []).find((child) => child.tagName === tagName)
-    ?.textContent ?? null;
+const isLeaf = (element: Element): boolean => element.children.length === 0;
+
+const toFields = (elements: Element[]): TRssFields =>
+  Object.fromEntries(
+    elements.map(({ tagName, textContent }) => [tagName, textContent]),
+  );
+
+const toAttributes = (element: TMaybeUndefined<Element>): TRssFields =>
+  Object.fromEntries(
+    Array.from(element?.attributes ?? []).map(({ name, value }) => [
+      name,
+      value,
+    ]),
+  );
 
 export const parseRssFeed = (xml: string): IRssFeed => {
   const doc = new DOMParser().parseFromString(xml, XML_CONTENT_TYPE);
-  const [channel] = Array.from(doc.getElementsByTagName('channel'));
+  const channelChildren = Array.from(
+    doc.documentElement.firstElementChild?.children ?? [],
+  );
 
   return {
-    isWellFormed: doc.getElementsByTagName('parsererror').length === 0,
-    title: childText(channel, 'title'),
-    description: childText(channel, 'description'),
-    language: childText(channel, 'language'),
-    link: childText(channel, 'link'),
-    selfLink: getRssSelfLink(doc)?.getAttribute('href') ?? null,
-    items: Array.from(doc.getElementsByTagName('item')).map((item) => ({
-      title: childText(item, 'title'),
-      link: childText(item, 'link'),
-      description: childText(item, 'description'),
-      pubDate: childText(item, 'pubDate'),
-    })),
+    isWellFormed: doc.getElementsByTagName(PARSER_ERROR_TAG).length === 0,
+    root: doc.documentElement.tagName,
+    channel: toFields(channelChildren.filter(isLeaf)),
+    items: channelChildren
+      .filter((child) => !isLeaf(child))
+      .map((item) => toFields(Array.from(item.children))),
+    selfLink: toAttributes(getRssSelfLink(doc)),
   };
 };

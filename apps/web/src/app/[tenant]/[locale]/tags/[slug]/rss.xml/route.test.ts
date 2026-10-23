@@ -9,7 +9,7 @@ import {
 import type { TFeedPost } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
-import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
+import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { DEFAULT_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -70,9 +70,6 @@ const paramsFor = (locale: string = EN) =>
 const params = paramsFor();
 
 const TAG_DESCRIPTION = 'The latest TypeScript posts.';
-const XML_MIME_TYPE = 'application/xml';
-const CHANNEL_DESCRIPTION = 'channel > description';
-const ITEM_LINK = 'item > link';
 
 describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   let GET: typeof import('./route').GET;
@@ -131,16 +128,12 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
       'application/rss+xml; charset=utf-8',
     );
 
-    const doc = new DOMParser().parseFromString(xml, XML_MIME_TYPE);
-    expect(doc.querySelector('parsererror')).toBeNull();
-    expect(doc.querySelector('channel > title')?.textContent).toBe(
-      'TypeScript',
-    );
-    expect(doc.querySelector(CHANNEL_DESCRIPTION)?.textContent).toBe(
-      TAG_DESCRIPTION,
-    );
-    expect(doc.querySelector('item > title')?.textContent).toBe(POST_TITLE);
-    expect(doc.querySelector(ITEM_LINK)?.textContent).toBe(
+    const { isWellFormed, channel, items } = parseRssFeed(xml);
+    expect(isWellFormed).toBe(true);
+    expect(channel.title).toBe('TypeScript');
+    expect(channel.description).toBe(TAG_DESCRIPTION);
+    expect(items[0]?.title).toBe(POST_TITLE);
+    expect(items[0]?.link).toBe(
       `${DEFAULT_TENANT_BASE_URL}/blog/hello-welcome`,
     );
     expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
@@ -154,12 +147,9 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
       params,
     });
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, XML_MIME_TYPE);
+    const { channel } = parseRssFeed(await response.text());
 
-    expect(doc.querySelector(CHANNEL_DESCRIPTION)?.textContent).toBe(
-      'TypeScript',
-    );
+    expect(channel.description).toBe('TypeScript');
   });
 
   it('calls notFound() when the tag fetch fails', async () => {
@@ -199,10 +189,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
       params: paramsFor(NL),
     });
-    const doc = new DOMParser().parseFromString(
-      await response.text(),
-      XML_MIME_TYPE,
-    );
+    const { items } = parseRssFeed(await response.text());
 
     const localizedTenant = { ...tenant, locale: NL };
     expect(getTagPageMock).toHaveBeenCalledWith('typescript', localizedTenant);
@@ -210,25 +197,18 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
       'tag-1',
       localizedTenant,
     );
-    expect(doc.querySelector(ITEM_LINK)?.textContent).toBe(
-      'https://example.com/nl/blog/hello-welcome',
-    );
+    expect(items[0]?.link).toBe('https://example.com/nl/blog/hello-welcome');
   });
 
   it('carries the language, home link and self link of the feed', async () => {
     const response = await GET(new Request(DEFAULT_TENANT_BASE_URL), {
       params: paramsFor(NL),
     });
-    const doc = new DOMParser().parseFromString(
-      await response.text(),
-      XML_MIME_TYPE,
-    );
+    const { channel, selfLink } = parseRssFeed(await response.text());
 
-    expect(doc.querySelector('channel > language')?.textContent).toBe('nl');
-    expect(doc.querySelector('channel > link')?.textContent).toBe(
-      'https://example.com/nl',
-    );
-    expect(getRssSelfLink(doc)?.getAttribute('href')).toBe(
+    expect(channel.language).toBe('nl');
+    expect(channel.link).toBe('https://example.com/nl');
+    expect(selfLink.href).toBe(
       'https://example.com/nl/tags/typescript/rss.xml',
     );
   });

@@ -117,17 +117,17 @@ describe('GET /[locale]/rss.xml', () => {
         'application/rss+xml; charset=utf-8',
       );
 
-      const feed = parseRssFeed(xml);
-      expect(feed.isWellFormed).toBe(true);
-      expect(feed.title).toBe('My Blog');
-      expect(feed.description).toBe(SITE_DESCRIPTION);
-      expect(feed.items).toEqual([
-        {
+      const { isWellFormed, channel, items } = parseRssFeed(xml);
+      expect(isWellFormed).toBe(true);
+      expect(channel.title).toBe('My Blog');
+      expect(channel.description).toBe(SITE_DESCRIPTION);
+      expect(items).toEqual([
+        expect.objectContaining({
           title: ESCAPED_POST_TITLE,
           link: 'https://example.com/blog/hello-welcome',
           description: ESCAPED_POST_EXCERPT,
           pubDate: new Date(post.publishedAt).toUTCString(),
-        },
+        }),
       ]);
     });
 
@@ -140,10 +140,10 @@ describe('GET /[locale]/rss.xml', () => {
 
   it('falls back to a generic channel title and description when site settings fail', async () => {
     getSiteSettingsMock.mockResolvedValue(errorResult(new Error('boom')));
-    const { title, description } = await getParsedFeed();
+    const { channel } = await getParsedFeed();
 
-    expect(title).toBe('Blog');
-    expect(description).toBe('The latest posts.');
+    expect(channel.title).toBe('Blog');
+    expect(channel.description).toBe('The latest posts.');
   });
 
   it('describes the channel with the brand tagline when the index page has no description', async () => {
@@ -153,9 +153,9 @@ describe('GET /[locale]/rss.xml', () => {
     getSiteSettingsMock.mockResolvedValue(
       okResult({ brand: { name: 'My Blog', tagline: SITE_TAGLINE } }),
     );
-    const { description } = await getParsedFeed();
+    const { channel } = await getParsedFeed();
 
-    expect(description).toBe(SITE_TAGLINE);
+    expect(channel.description).toBe(SITE_TAGLINE);
   });
 
   it('describes the channel with the brand tagline when the index page fails to load', async () => {
@@ -163,25 +163,25 @@ describe('GET /[locale]/rss.xml', () => {
     getSiteSettingsMock.mockResolvedValue(
       okResult({ brand: { name: 'My Blog', tagline: SITE_TAGLINE } }),
     );
-    const { description } = await getParsedFeed();
+    const { channel } = await getParsedFeed();
 
-    expect(description).toBe(SITE_TAGLINE);
+    expect(channel.description).toBe(SITE_TAGLINE);
   });
 
   it('carries the language, home link and self link of an unprefixed default-language feed', async () => {
-    const { language, link, selfLink } = await getParsedFeed();
+    const { channel, selfLink } = await getParsedFeed();
 
-    expect(language).toBe('en');
-    expect(link).toBe(BASE_URL);
-    expect(selfLink).toBe(FEED_URL);
+    expect(channel.language).toBe('en');
+    expect(channel.link).toBe(BASE_URL);
+    expect(selfLink.href).toBe(FEED_URL);
   });
 
   it('carries the language, home link and self link of a prefixed feed', async () => {
-    const { language, link, selfLink } = await getParsedFeed(NL);
+    const { channel, selfLink } = await getParsedFeed(NL);
 
-    expect(language).toBe('nl');
-    expect(link).toBe('https://example.com/nl');
-    expect(selfLink).toBe('https://example.com/nl/rss.xml');
+    expect(channel.language).toBe('nl');
+    expect(channel.link).toBe('https://example.com/nl');
+    expect(selfLink.href).toBe('https://example.com/nl/rss.xml');
   });
 
   it('returns an empty feed (no items) when the posts fetch fails', async () => {

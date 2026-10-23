@@ -1,16 +1,19 @@
 /**
  * @vitest-environment jsdom
  */
-import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
+import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
 
 import { buildRssFeed, type TRssItem } from './build-rss-feed';
+
+const FEED_URL = 'https://example.com/nl/rss.xml';
+const LATEST_PUBLISHED_AT = '2026-03-01T00:00:00Z';
 
 const channel = {
   title: 'The Blog',
   description: 'Latest posts',
   link: 'https://example.com/nl',
   language: 'nl',
-  feedUrl: 'https://example.com/nl/rss.xml',
+  feedUrl: FEED_URL,
 };
 
 const item: TRssItem = {
@@ -32,28 +35,24 @@ describe(buildRssFeed, () => {
   });
 
   it('links the channel to its own feed URL', () => {
-    const doc = new DOMParser().parseFromString(
-      buildRssFeed(channel, [item]),
-      'application/xml',
-    );
-    const selfLink = getRssSelfLink(doc);
+    const { selfLink } = parseRssFeed(buildRssFeed(channel, [item]));
 
-    expect(selfLink?.getAttribute('href')).toBe(
-      'https://example.com/nl/rss.xml',
-    );
-    expect(selfLink?.getAttribute('rel')).toBe('self');
-    expect(selfLink?.getAttribute('type')).toBe('application/rss+xml');
+    expect(selfLink).toEqual({
+      href: FEED_URL,
+      rel: 'self',
+      type: 'application/rss+xml',
+    });
   });
 
   it("dates the build to the newest item's publication", () => {
     const xml = buildRssFeed(channel, [
       item,
-      { ...item, publishedAt: '2026-03-01T00:00:00Z' },
+      { ...item, publishedAt: LATEST_PUBLISHED_AT },
       { ...item, publishedAt: '2025-12-01T00:00:00Z' },
     ]);
 
     expect(xml).toContain(
-      `<lastBuildDate>${new Date('2026-03-01T00:00:00Z').toUTCString()}</lastBuildDate>`,
+      `<lastBuildDate>${new Date(LATEST_PUBLISHED_AT).toUTCString()}</lastBuildDate>`,
     );
   });
 
@@ -91,13 +90,12 @@ describe(buildRssFeed, () => {
   });
 
   it('is parseable as XML', () => {
-    const xml = buildRssFeed(channel, [item]);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, 'application/xml');
-    const parserError = doc.querySelector('parsererror');
+    const { isWellFormed, root, items } = parseRssFeed(
+      buildRssFeed(channel, [item]),
+    );
 
-    expect(parserError).toBeNull();
-    expect(doc.querySelector('rss')).not.toBeNull();
-    expect(doc.querySelectorAll('item')).toHaveLength(1);
+    expect(isWellFormed).toBe(true);
+    expect(root).toBe('rss');
+    expect(items).toHaveLength(1);
   });
 });
