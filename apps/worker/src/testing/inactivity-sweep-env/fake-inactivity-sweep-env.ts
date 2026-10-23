@@ -3,9 +3,9 @@ import { getProvisionEnv } from '@worker/testing/provision-env/fake-provision-en
 import type { TInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 
 export function mockInactivitySweepEnv(): TInactivitySweepEnv {
-  const { adminAppBaseUrl, webAppBaseUrl } = getProvisionEnv();
+  const { platformAppBaseUrl, webAppBaseUrl } = getProvisionEnv();
   return {
-    adminAppBaseUrl,
+    platformAppBaseUrl,
     webAppBaseUrl,
     siteConfigRevalidateSecret: getDeprovisionEnv().siteConfigRevalidateSecret,
   };

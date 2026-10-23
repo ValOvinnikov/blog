@@ -14,7 +14,10 @@ import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
 } from '@platform/testing/admins/operator';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -54,7 +57,7 @@ const CONNECTION_ERROR_MESSAGE = 'connection reset';
 
 const tenant = {
   id: MOCK_TENANT_ID,
-  name: 'Acme Inc.',
+  name: MOCK_TENANT_NAME,
   deprovisionedAt: new Date('2026-01-01T00:00:00.000Z') as TMaybeNull<Date>,
 };
 
@@ -89,7 +92,7 @@ describe('deleteTenantAction', () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
     await expect(
-      deleteTenantAction(MOCK_TENANT_ID, { confirm: 'Acme Inc.' }),
+      deleteTenantAction(MOCK_TENANT_ID, { confirm: MOCK_TENANT_NAME }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
@@ -99,7 +102,7 @@ describe('deleteTenantAction', () => {
       notFound();
     });
     await expect(
-      deleteTenantAction(MOCK_TENANT_ID, { confirm: 'Acme Inc.' }),
+      deleteTenantAction(MOCK_TENANT_ID, { confirm: MOCK_TENANT_NAME }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(redirect).not.toHaveBeenCalled();
@@ -110,7 +113,7 @@ describe('deleteTenantAction', () => {
   it('returns an error when the tenant is not found', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
     });
 
     expect(result).toEqual({
@@ -137,7 +140,7 @@ describe('deleteTenantAction', () => {
       outcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED,
     });
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
     });
 
     expect(result).toEqual({
@@ -152,7 +155,7 @@ describe('deleteTenantAction', () => {
       outcome: TENANT_DELETE_OUTCOME.NOT_FOUND,
     });
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
     });
 
     expect(result).toEqual({
@@ -164,7 +167,7 @@ describe('deleteTenantAction', () => {
 
   it('deletes the tenant and records a DELETED audit event when confirm matches', async () => {
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -175,40 +178,39 @@ describe('deleteTenantAction', () => {
       action: AUDIT_ACTION.DELETED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,
-      details: { name: 'Acme Inc.' },
+      details: { name: MOCK_TENANT_NAME },
     });
   });
 
   it('returns an error and records no audit event when the delete mutation throws', async () => {
     deleteTenantMock.mockRejectedValue(new Error(CONNECTION_ERROR_MESSAGE));
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'tenants.delete_failed',
-      expect.objectContaining({
-        tenantId: MOCK_TENANT_ID,
-        error: expect.any(Error),
-      }),
-    );
+    expect(loggerErrorMock).toHaveBeenCalledWith('tenants.delete_failed', {
+      tenantId: MOCK_TENANT_ID,
+      error: new Error(CONNECTION_ERROR_MESSAGE),
+    });
   });
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error(CONNECTION_ERROR_MESSAGE));
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.delete_audit_failed',
-      expect.objectContaining({
+      {
+        action: AUDIT_ACTION.DELETED,
+        targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: MOCK_TENANT_ID,
-        error: expect.any(Error),
-      }),
+        error: new Error(CONNECTION_ERROR_MESSAGE),
+      },
     );
   });
 });

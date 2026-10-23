@@ -17,15 +17,17 @@ import {
 import {
   mockIdleProvisioningSteps,
   mockClientTenant,
+  mockDoneProvisioningSteps,
+  mockFirstStepDoneProvisioningSteps,
+  mockFirstStepRunningProvisioningSteps,
+  mockMapDomainFailedProvisioningSteps,
   MOCK_TENANT_ID,
-  MOCK_RUN_STARTED_AT,
-  MOCK_RUN_PLUS_1_MIN_AT,
 } from '@platform/testing/tenants/fixtures';
-import { TOAST_EXIT_BUFFER_MS } from '@platform/testing/toast-timing';
 
 import { useProvisioningPoll } from './use-provisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 1500;
+const TOAST_EXIT_BUFFER_MS = 1000;
 const MAX_POLL_TICKS = 400;
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
@@ -37,6 +39,8 @@ const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
 );
 
+const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
+const AT_20260812_1419 = '2026-08-12T14:19:00.000Z';
 const FETCH_FAILED = 'fetch failed';
 const DOMAINS_API_ERROR = 'Vercel Domains API returned 500';
 const COULDNT_REFRESH_LATEST_STATUS =
@@ -49,11 +53,17 @@ describe(useProvisioningPoll, () => {
   });
 
   describe('ownerElevationOutcome', () => {
-    it.each([
-      ['has not reported yet', mockIdleProvisioningSteps()],
-      ['is null', null],
-    ])('is undefined while the step %s', (_, provisioningSteps) => {
-      const tenant = mockClientTenant({ provisioningSteps });
+    it('is undefined when the OWNER_ELEVATION step has not reported yet', () => {
+      const tenant = mockClientTenant({
+        provisioningSteps: mockIdleProvisioningSteps(),
+      });
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
+
+      expect(result.current.ownerElevationOutcome).toBeUndefined();
+    });
+
+    it('is undefined when provisioningSteps itself is null', () => {
+      const tenant = mockClientTenant({ provisioningSteps: null });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBeUndefined();
@@ -77,29 +87,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('never influences isProvisioningRunning/isOverallFailed/displayOverallStatus, regardless of its value', () => {
-      const allStepsDone = {
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-      };
+      const allStepsDone = mockDoneProvisioningSteps();
 
       const withoutOwnerElevation = mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
@@ -153,7 +141,7 @@ describe(useProvisioningPoll, () => {
         provisioningSteps: {
           ...mockIdleProvisioningSteps(),
           run: {
-            startedAt: MOCK_RUN_STARTED_AT,
+            startedAt: AT_20260812_1418,
             registry: 'production',
           },
         },
@@ -162,7 +150,7 @@ describe(useProvisioningPoll, () => {
         useProvisioningPoll(withRun),
       );
       expect(withResult.current.provisioningRun).toEqual({
-        startedAt: MOCK_RUN_STARTED_AT,
+        startedAt: AT_20260812_1418,
         registry: 'production',
       });
     });
@@ -173,13 +161,13 @@ describe(useProvisioningPoll, () => {
           ...mockIdleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
+            updatedAt: AT_20260812_1419,
           },
         },
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
-      expect(result.current.stepUpdatedAt[0]).toBe(MOCK_RUN_PLUS_1_MIN_AT);
+      expect(result.current.stepUpdatedAt[0]).toBe(AT_20260812_1419);
       expect(result.current.stepUpdatedAt[1]).toBeUndefined();
     });
 
@@ -235,13 +223,8 @@ describe(useProvisioningPoll, () => {
     it('masks a stale FAILED step to IDLE and reports RUNNING, not FAILED, once a retried run is genuinely PROVISIONING', () => {
       const tenant = mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...mockIdleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: DOMAINS_API_ERROR,
-          },
-        },
+        provisioningSteps:
+          mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -261,13 +244,8 @@ describe(useProvisioningPoll, () => {
     it('still reports a step as FAILED in displayStepStatuses once the tenant is genuinely, currently FAILED', () => {
       const tenant = mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        provisioningSteps: {
-          ...mockIdleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: DOMAINS_API_ERROR,
-          },
-        },
+        provisioningSteps:
+          mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -330,21 +308,11 @@ describe(useProvisioningPoll, () => {
     it('polls while provisioning is non-terminal and applies a fresh result', async () => {
       const tenant = mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...mockIdleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...mockIdleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-        },
+        provisioningSteps: mockFirstStepDoneProvisioningSteps(),
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -419,12 +387,7 @@ describe(useProvisioningPoll, () => {
     );
 
     it('keeps polling, unchanged, while a step is RUNNING', async () => {
-      const runningSteps = {
-        ...mockIdleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      };
+      const runningSteps = mockFirstStepRunningProvisioningSteps();
       const tenant = mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: runningSteps,
@@ -470,12 +433,7 @@ describe(useProvisioningPoll, () => {
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...mockIdleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       });
 
       act(() => {
@@ -497,12 +455,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('stops polling at the cap when a run stops reporting', async () => {
-      const stuckSteps = {
-        ...mockIdleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      };
+      const stuckSteps = mockFirstStepRunningProvisioningSteps();
       const tenant = mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: stuckSteps,
@@ -601,12 +554,7 @@ describe(useProvisioningPoll, () => {
     it('surfaces a poll-error toast, keeps the last-known status, and keeps retrying automatically when a tick rejects, dismissing it once a tick recovers', async () => {
       const tenant = mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...mockIdleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       });
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
         new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
@@ -663,34 +611,55 @@ describe(useProvisioningPoll, () => {
       expect(result.current.dispatchNotice).toBeUndefined();
     });
 
-    it.each([
-      [
-        { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
-        TENANT_REFUSAL.NOT_FOUND,
-      ],
-      [
-        { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED },
-        TENANT_REFUSAL.ARCHIVED,
-      ],
-      [{ outcome: ACTION_OUTCOME.SERVER_ERROR }, ACTION_OUTCOME.SERVER_ERROR],
-    ])(
-      'reports a failed dispatch as the %o notice',
-      async (dispatchResult, notice) => {
-        const tenant = mockClientTenant();
-        retryProvisioningStepActionMock.mockResolvedValue(dispatchResult);
-        const { result } = renderHookWithIntl(() =>
-          useProvisioningPoll(tenant),
-        );
+    it('reports a not-found dispatch error distinctly from a generic one', async () => {
+      const tenant = mockClientTenant();
+      retryProvisioningStepActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.NOT_FOUND,
+      });
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
-        act(() => {
-          result.current.handleDispatch();
-        });
+      act(() => {
+        result.current.handleDispatch();
+      });
 
-        await waitFor(() => {
-          expect(result.current.dispatchNotice).toBe(notice);
-        });
-      },
-    );
+      await waitFor(() => {
+        expect(result.current.dispatchNotice).toBe(TENANT_REFUSAL.NOT_FOUND);
+      });
+    });
+
+    it('reports an archived dispatch error distinctly from a generic one', async () => {
+      const tenant = mockClientTenant();
+      retryProvisioningStepActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.ARCHIVED,
+      });
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
+
+      act(() => {
+        result.current.handleDispatch();
+      });
+
+      await waitFor(() => {
+        expect(result.current.dispatchNotice).toBe(TENANT_REFUSAL.ARCHIVED);
+      });
+    });
+
+    it('reports a generic dispatch error for a dispatch failure', async () => {
+      const tenant = mockClientTenant();
+      retryProvisioningStepActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
+
+      act(() => {
+        result.current.handleDispatch();
+      });
+
+      await waitFor(() => {
+        expect(result.current.dispatchNotice).toBe(ACTION_OUTCOME.SERVER_ERROR);
+      });
+    });
 
     it('reports already-in-progress distinctly from a real failure, and still refreshes', async () => {
       const tenant = mockClientTenant();

@@ -5,7 +5,10 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
 import TenantsPage from './page';
@@ -41,7 +44,7 @@ describe(TenantsPage, () => {
     listTenantsMock.mockResolvedValue([
       {
         id: MOCK_TENANT_ID,
-        name: 'Acme Inc.',
+        name: MOCK_TENANT_NAME,
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'proj-1',
         sanityDataset: 'production',
@@ -55,9 +58,13 @@ describe(TenantsPage, () => {
 
     await setup();
 
+    const tenantName = screen.getByText(MOCK_TENANT_NAME);
+    const table = screen.getByRole('table');
+    const activeStatus = within(table).getByText('Active');
+
     expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: false });
-    expect(screen.getByText('Acme Inc.')).toBeVisible();
-    expect(within(screen.getByRole('table')).getByText('Active')).toBeVisible();
+    expect(tenantName).toBeVisible();
+    expect(activeStatus).toBeVisible();
   });
 
   it('includes archived tenants when ?archived=1 is set', async () => {
@@ -69,9 +76,9 @@ describe(TenantsPage, () => {
   it('does not show the email-alerts banner when RESEND_API_KEY is configured', async () => {
     await setup();
 
-    expect(
-      screen.queryByText(EMAIL_ALERTS_NOT_CONFIGURED),
-    ).not.toBeInTheDocument();
+    const banner = screen.queryByText(EMAIL_ALERTS_NOT_CONFIGURED);
+
+    expect(banner).not.toBeInTheDocument();
   });
 
   it('shows the email-alerts banner when RESEND_API_KEY is unset', async () => {
@@ -79,6 +86,8 @@ describe(TenantsPage, () => {
 
     await setup();
 
-    expect(screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED)).toBeVisible();
+    const banner = screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED);
+
+    expect(banner).toBeVisible();
   });
 });

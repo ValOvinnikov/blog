@@ -8,9 +8,11 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   mockReadyTenant,
   mockTenant,
-  MOCK_TENANT_ID,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -89,7 +91,7 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();
   });
 
@@ -97,14 +99,14 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     await renderForTenant(
       mockTenant({
         id: MOCK_TENANT_ID,
-        name: 'Acme Inc.',
+        name: MOCK_TENANT_NAME,
         primaryDomain: MOCK_TENANT_DOMAIN,
       }),
     );
 
     const tenantHeading = screen.getByRole('heading', {
       level: 1,
-      name: 'Acme Inc.',
+      name: MOCK_TENANT_NAME,
     });
 
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
@@ -120,13 +122,11 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
   it('renders the owner home without waiting for the Vercel domain status', async () => {
     getDomainVerificationStatusMock.mockReturnValue(new Promise(() => {}));
 
-    await renderForTenant(
-      mockTenant({ id: MOCK_TENANT_ID, name: 'Acme Inc.' }),
-    );
+    await renderForTenant(mockTenant({ id: MOCK_TENANT_ID }));
 
     const tenantHeading = screen.getByRole('heading', {
       level: 1,
-      name: 'Acme Inc.',
+      name: MOCK_TENANT_NAME,
     });
     const ownerHeading = screen.getByRole('heading', {
       level: 2,

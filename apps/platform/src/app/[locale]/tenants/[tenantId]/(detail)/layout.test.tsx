@@ -4,9 +4,11 @@ import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
-  MOCK_TENANT_ID,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -59,7 +61,7 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     });
     getTenantByIdMock.mockResolvedValue({
       id: MOCK_TENANT_ID,
-      name: 'Acme Inc.',
+      name: MOCK_TENANT_NAME,
       primaryDomain: MOCK_TENANT_DOMAIN,
     });
   });
@@ -69,7 +71,7 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
   });
 
   it('404s when the signed-in user has no admins row', async () => {
@@ -83,27 +85,34 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
   it('renders the gated content for a platform operator', async () => {
     await setup();
 
-    expect(screen.getByText('tenant content')).toBeVisible();
+    const content = screen.getByText('tenant content');
+
+    expect(content).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('renders both the Platform and Tenant sections in the sidebar', async () => {
     await setup();
 
-    expect(screen.getByText('Platform', { selector: 'p' })).toBeVisible();
-    expect(screen.getByText('Tenant · Acme Inc.')).toBeVisible();
+    const platformSection = screen.getByText('Platform', { selector: 'p' });
+    const tenantSection = screen.getByText(`Tenant · ${MOCK_TENANT_NAME}`);
+
+    expect(platformSection).toBeVisible();
+    expect(tenantSection).toBeVisible();
   });
 
   it('renders no tenant switcher in the sidebar', async () => {
     getTenantByIdMock.mockResolvedValue({
       id: MOCK_TENANT_ID,
       slug: 'acme',
-      name: 'Acme Inc.',
+      name: MOCK_TENANT_NAME,
       primaryDomain: MOCK_TENANT_DOMAIN,
     });
 
     await setup();
 
-    expect(screen.queryByText(MOCK_TENANT_DOMAIN)).not.toBeInTheDocument();
+    const tenantDomain = screen.queryByText(MOCK_TENANT_DOMAIN);
+
+    expect(tenantDomain).not.toBeInTheDocument();
   });
 });

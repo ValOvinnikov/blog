@@ -9,7 +9,7 @@ const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
   VERCEL_TOKEN: 'secret-vercel-token',
   VERCEL_TEAM_ID: undefined,
   VERCEL_PROJECT_ID_WEB: 'prj_web',
-  ADMIN_APP_BASE_URL: 'https://admin.example.com',
+  PLATFORM_APP_BASE_URL: 'https://admin.example.com',
   TENANT_SANITY_DATASET: 'production',
   WEB_APP_URL: 'https://web.example.com',
   SANITY_REVALIDATE_SECRET: 'secret-revalidate',
@@ -17,16 +17,9 @@ const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
 
-const REQUIRED = [
-  'SANITY_MANAGEMENT_TOKEN',
-  'SANITY_ORGANIZATION_ID',
-  'VERCEL_TOKEN',
-  'VERCEL_PROJECT_ID_WEB',
-  'ADMIN_APP_BASE_URL',
-  'TENANT_SANITY_DATASET',
-  'WEB_APP_URL',
-  'SANITY_REVALIDATE_SECRET',
-] as const;
+const REQUIRED = Object.entries(mockEnv)
+  .filter(([, value]) => value !== undefined)
+  .map(([name]) => name);
 
 describe(getProvisionEnv, () => {
   const original = { ...mockEnv };
@@ -39,9 +32,9 @@ describe(getProvisionEnv, () => {
     const provisionEnv = getProvisionEnv();
 
     expect(provisionEnv).toMatchObject({
-      sanityManagementToken: 'secret-management-token',
-      vercelToken: 'secret-vercel-token',
-      webAppBaseUrl: 'https://web.example.com',
+      sanityManagementToken: mockEnv.SANITY_MANAGEMENT_TOKEN,
+      vercelToken: mockEnv.VERCEL_TOKEN,
+      webAppBaseUrl: mockEnv.WEB_APP_URL,
       vercelTeamId: undefined,
     });
   });

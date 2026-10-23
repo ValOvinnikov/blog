@@ -99,7 +99,7 @@ export const RUNTIME_ONLY_EXCLUDED_VARS = new Set([
   // apps/worker: read only in its route handler bodies (WORKER_ENQUEUE_SECRET)
   // and in provision-env.ts, called from workflow steps. apps/platform reads
   // WORKER_ENQUEUE_SECRET only inside the enqueue its Server Actions call.
-  'ADMIN_APP_BASE_URL',
+  'PLATFORM_APP_BASE_URL',
   'SANITY_MANAGEMENT_TOKEN',
   'SANITY_ORGANIZATION_ID',
   'TENANT_SANITY_DATASET',
