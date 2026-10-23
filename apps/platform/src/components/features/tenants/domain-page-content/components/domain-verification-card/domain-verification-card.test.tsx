@@ -31,9 +31,12 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
       level: 2,
       name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
     });
+    const statusBadge = screen.getByText(AWAITING_DNS);
+    const checkedAt = screen.getByText(CHECKED_JUST_NOW);
+
     expect(heading).toBeVisible();
-    expect(screen.getByText(AWAITING_DNS)).toBeVisible();
-    expect(screen.getByText(CHECKED_JUST_NOW)).toBeVisible();
+    expect(statusBadge).toBeVisible();
+    expect(checkedAt).toBeVisible();
     expect(heading.textContent).not.toContain(AWAITING_DNS);
   });
 
@@ -46,9 +49,13 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
       ],
     });
 
-    expect(await screen.findByRole('table')).toBeVisible();
-    expect(screen.getByText(A_RECORD_VALUE)).toBeVisible();
-    expect(screen.getByText(CNAME_RECORD_VALUE)).toBeVisible();
+    const table = await screen.findByRole('table');
+    const aRecord = screen.getByText(A_RECORD_VALUE);
+    const cnameRecord = screen.getByText(CNAME_RECORD_VALUE);
+
+    expect(table).toBeVisible();
+    expect(aRecord).toBeVisible();
+    expect(cnameRecord).toBeVisible();
   });
 
   describe('once verified', () => {
@@ -60,22 +67,24 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     });
 
     it('shows the verified empty state instead of the table once verified', async () => {
-      expect(await screen.findByText('Verified')).toBeVisible();
-      expect(
-        screen.getByText(
-          "This domain is verified — there's nothing left to configure.",
-        ),
-      ).toBeVisible();
-      expect(screen.queryByRole('table')).toBeNull();
+      const verifiedBadge = await screen.findByText('Verified');
+      const emptyState = screen.getByText(
+        "This domain is verified — there's nothing left to configure.",
+      );
+      const table = screen.queryByRole('table');
+
+      expect(verifiedBadge).toBeVisible();
+      expect(emptyState).toBeVisible();
+      expect(table).not.toBeInTheDocument();
     });
 
     it('titles a verified domain as connected', async () => {
-      expect(
-        await screen.findByRole('heading', {
-          level: 2,
-          name: `${MOCK_CUSTOM_DOMAIN} is connected`,
-        }),
-      ).toBeVisible();
+      const heading = await screen.findByRole('heading', {
+        level: 2,
+        name: `${MOCK_CUSTOM_DOMAIN} is connected`,
+      });
+
+      expect(heading).toBeVisible();
     });
   });
 
@@ -85,9 +94,11 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
       dnsRecords: [{ type: 'A', name: '@', value: A_RECORD_VALUE }],
     });
 
-    expect(
-      await screen.findByText(/Add these records at your DNS provider/),
-    ).toBeVisible();
+    const instructions = await screen.findByText(
+      /Add these records at your DNS provider/,
+    );
+
+    expect(instructions).toBeVisible();
   });
 
   it.each([
@@ -100,14 +111,19 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     async (status, badge) => {
       await render({ status, dnsRecords: [] });
 
-      expect(await screen.findByText(badge)).toBeVisible();
-      expect(
-        screen.getByText("DNS records aren't available right now."),
-      ).toBeVisible();
-      expect(
-        screen.queryByText(/Add these records at your DNS provider/),
-      ).toBeNull();
-      expect(screen.queryByRole('table')).toBeNull();
+      const statusBadge = await screen.findByText(badge);
+      const fallback = screen.getByText(
+        "DNS records aren't available right now.",
+      );
+      const instructions = screen.queryByText(
+        /Add these records at your DNS provider/,
+      );
+      const table = screen.queryByRole('table');
+
+      expect(statusBadge).toBeVisible();
+      expect(fallback).toBeVisible();
+      expect(instructions).not.toBeInTheDocument();
+      expect(table).not.toBeInTheDocument();
     },
   );
 
@@ -117,7 +133,10 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
   ])('claims no check for %s', async (status) => {
     await render({ status, dnsRecords: [] });
 
-    expect(await screen.findByRole('heading', { level: 2 })).toBeVisible();
-    expect(screen.queryByText(CHECKED_JUST_NOW)).toBeNull();
+    const heading = await screen.findByRole('heading', { level: 2 });
+    const checkedAt = screen.queryByText(CHECKED_JUST_NOW);
+
+    expect(heading).toBeVisible();
+    expect(checkedAt).not.toBeInTheDocument();
   });
 });

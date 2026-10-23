@@ -35,12 +35,13 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
 
     it('renders a heading and every tenant as a visible link through the select-tenant endpoint', () => {
       const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', { name: 'Choose a workspace' }),
-      ).toBeVisible();
-
+      const heading = within(main).getByRole('heading', {
+        name: 'Choose a workspace',
+      });
       const acmeLink = within(main).getByRole('link', { name: /acme/i });
       const globexLink = within(main).getByRole('link', { name: /globex/i });
+
+      expect(heading).toBeVisible();
       expect(acmeLink).toBeVisible();
       expect(acmeLink).toHaveAttribute(
         'href',
@@ -60,26 +61,27 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
     });
 
     it('labels an archived tenant', () => {
-      expect(
-        within(screen.getByRole('link', { name: /globex/i })).getByText(
-          'Archived',
-        ),
-      ).toBeVisible();
-      expect(
-        within(screen.getByRole('link', { name: /acme/i })).queryByText(
-          'Archived',
-        ),
-      ).not.toBeInTheDocument();
+      const globexLink = screen.getByRole('link', { name: /globex/i });
+      const acmeLink = screen.getByRole('link', { name: /acme/i });
+      const globexBadge = within(globexLink).getByText('Archived');
+      const acmeBadge = within(acmeLink).queryByText('Archived');
+
+      expect(globexBadge).toBeVisible();
+      expect(acmeBadge).not.toBeInTheDocument();
     });
 
     it('offers a sign out', () => {
-      expect(screen.getByRole('button', { name: 'Sign out' })).toBeVisible();
+      const signOutButton = screen.getByRole('button', { name: 'Sign out' });
+
+      expect(signOutButton).toBeVisible();
     });
   });
 
   it('renders nothing for an empty tenant list', () => {
     render(<DashboardTenantPicker tenants={[]} />);
 
-    expect(screen.queryByRole('main')).not.toBeInTheDocument();
+    const main = screen.queryByRole('main');
+
+    expect(main).not.toBeInTheDocument();
   });
 });

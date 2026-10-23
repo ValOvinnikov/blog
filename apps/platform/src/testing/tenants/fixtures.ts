@@ -195,3 +195,7 @@ export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
 export const makeClientTenant = (
   overrides: Partial<TTenant> = {},
 ): TClientTenant => toClientTenant(makeTenant(overrides));
+export const OWNER_EMAIL_LABEL = 'Owner email';
+export const PRIMARY_DOMAIN_LABEL = 'Primary domain';
+export const REACTIVATE_TENANT_LABEL = 'Reactivate tenant';
+export const CONFIRM_TENANT_NAME_LABEL = `Type "${MOCK_TENANT_NAME}" to confirm`;

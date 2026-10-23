@@ -26,29 +26,35 @@ describe(`<${ContrastFindingDetails.name}/>`, () => {
     });
 
     it('shows the short commit SHA and the failure count', () => {
-      expect(screen.getByText('0123456')).toHaveAttribute('title', sha);
-      expect(screen.getByText('3 failures')).toBeVisible();
+      const shortSha = screen.getByText('0123456');
+      const failureCount = screen.getByText('3 failures');
+
+      expect(shortSha).toHaveAttribute('title', sha);
+      expect(failureCount).toBeVisible();
     });
 
     it('links to the workflow run in a new tab and to Releases', () => {
-      expect(
-        screen.getByRole('link', {
-          name: 'View the contrast run for commit 0123456 (opens in new tab)',
-        }),
-      ).toHaveAttribute('href', MOCK_RELEASE_RUN_URL);
-      expect(
-        screen.getByRole('link', { name: 'Open Releases' }),
-      ).toHaveAttribute('href', '/releases');
+      const runLink = screen.getByRole('link', {
+        name: 'View the contrast run for commit 0123456 (opens in new tab)',
+      });
+      const releasesLink = screen.getByRole('link', { name: 'Open Releases' });
+
+      expect(runLink).toHaveAttribute('href', MOCK_RELEASE_RUN_URL);
+      expect(releasesLink).toHaveAttribute('href', '/releases');
     });
 
     it('shows no tag', () => {
-      expect(screen.queryByText(/^Tag /)).not.toBeInTheDocument();
+      const tag = screen.queryByText(/^Tag /);
+
+      expect(tag).not.toBeInTheDocument();
     });
   });
 
   it('shows the release tag once the commit is released', () => {
     render('v1.5.0');
 
-    expect(screen.getByText('Tag v1.5.0')).toBeVisible();
+    const tag = screen.getByText('Tag v1.5.0');
+
+    expect(tag).toBeVisible();
   });
 });

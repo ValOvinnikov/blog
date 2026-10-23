@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import en from '@platform/i18n/messages/en.json';
 import {
   renderWithIntl,
   screen,
@@ -9,13 +10,14 @@ import {
 import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_DOMAIN,
+  OWNER_EMAIL_LABEL,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantDetailsForm } from './tenant-details-form';
 
 const TENANT_NAME = 'Tenant name';
-const OWNER_EMAIL = 'Owner email';
+const NEW_TENANT_NAME = 'Acme';
 const ENTER_A_VALID_EMAIL = 'Enter a valid email.';
 const BEGINNING_PROVISIONING = 'Beginning provisioning…';
 const CONFIRMATION_TOKEN = 'confirmation-token';
@@ -34,29 +36,35 @@ vi.mock('@platform/server/tenants/create-tenant-action', () => ({
 }));
 
 const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
-  await user.type(screen.getByRole('textbox', { name: TENANT_NAME }), 'Acme');
-  await user.type(
-    screen.getByRole('textbox', { name: 'Domain' }),
-    MOCK_TENANT_DOMAIN,
-  );
-  await user.type(
-    screen.getByRole('textbox', { name: OWNER_EMAIL }),
-    MOCK_OWNER_EMAIL,
-  );
+  const nameInput = screen.getByRole('textbox', { name: TENANT_NAME });
+  const domainInput = screen.getByRole('textbox', { name: 'Domain' });
+  const ownerEmailInput = screen.getByRole('textbox', {
+    name: OWNER_EMAIL_LABEL,
+  });
+
+  await user.type(nameInput, NEW_TENANT_NAME);
+  await user.type(domainInput, MOCK_TENANT_DOMAIN);
+  await user.type(ownerEmailInput, MOCK_OWNER_EMAIL);
 };
 
 const clickBeginProvisioning = async (
   user: ReturnType<typeof userEvent.setup>,
 ) => {
-  await user.click(screen.getByRole('button', { name: /begin provisioning/i }));
+  const beginButton = screen.getByRole('button', {
+    name: /begin provisioning/i,
+  });
+
+  await user.click(beginButton);
 };
 
 const clickConfirmInviteOwner = async (
   user: ReturnType<typeof userEvent.setup>,
 ) => {
-  await user.click(
-    await screen.findByRole('button', { name: /confirm & invite owner/i }),
-  );
+  const confirmButton = await screen.findByRole('button', {
+    name: /confirm & invite owner/i,
+  });
+
+  await user.click(confirmButton);
 };
 
 const mockOwnerInviteConfirmation = (overrides: {
@@ -103,26 +111,34 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   });
 
   it('renders every Details-step field from the mock shape', () => {
-    expect(screen.getByRole('textbox', { name: TENANT_NAME })).toBeVisible();
-    expect(screen.getByRole('textbox', { name: 'Domain' })).toBeVisible();
-    expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
-    expect(screen.getByRole('textbox', { name: OWNER_EMAIL })).toBeVisible();
+    const nameInput = screen.getByRole('textbox', { name: TENANT_NAME });
+    const domainInput = screen.getByRole('textbox', { name: 'Domain' });
+    const planGroup = screen.getByRole('group', { name: 'Plan' });
+    const ownerEmailInput = screen.getByRole('textbox', {
+      name: OWNER_EMAIL_LABEL,
+    });
+
+    expect(nameInput).toBeVisible();
+    expect(domainInput).toBeVisible();
+    expect(planGroup).toBeVisible();
+    expect(ownerEmailInput).toBeVisible();
   });
 
   it('defaults the plan to Free', () => {
-    expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const freeButton = screen.getByRole('button', { name: 'Free' });
+
+    expect(freeButton).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('submits the current field values to createTenantAction', async () => {
+    const growthButton = screen.getByRole('button', { name: 'Growth' });
+
     await fillValidForm(user);
-    await user.click(screen.getByRole('button', { name: 'Growth' }));
+    await user.click(growthButton);
     await clickBeginProvisioning(user);
 
     expect(createTenantActionMock).toHaveBeenCalledWith({
-      name: 'Acme',
+      name: NEW_TENANT_NAME,
       domain: MOCK_TENANT_DOMAIN,
       plan: TENANT_PLAN.GROWTH,
       ownerEmail: MOCK_OWNER_EMAIL,
@@ -142,16 +158,20 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     });
 
     it('shows a field-level error returned from the Server Action', async () => {
-      expect(await screen.findByText(ENTER_A_VALID_EMAIL)).toBeVisible();
+      const fieldError = await screen.findByText(ENTER_A_VALID_EMAIL);
+
+      expect(fieldError).toBeVisible();
     });
 
     it('marks the field with a returned error invalid and describes it by that error', async () => {
       await screen.findByText(ENTER_A_VALID_EMAIL);
 
-      const ownerEmail = screen.getByRole('textbox', { name: OWNER_EMAIL });
+      const ownerEmail = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
       expect(ownerEmail).toHaveAttribute('aria-invalid', 'true');
       expect(ownerEmail).toHaveAccessibleDescription(
-        expect.stringContaining(ENTER_A_VALID_EMAIL),
+        `${en.tenantDetailsForm.ownerEmailHint} ${ENTER_A_VALID_EMAIL}`,
       );
     });
   });
@@ -162,24 +182,27 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     await fillValidForm(user);
     await clickBeginProvisioning(user);
 
-    expect(
-      screen.getByRole('status', { name: BEGINNING_PROVISIONING }),
-    ).toBeVisible();
+    const overlay = screen.getByRole('status', {
+      name: BEGINNING_PROVISIONING,
+    });
     const submitButton = screen.getByRole('button', {
       name: BEGINNING_PROVISIONING,
     });
+    const inertForm = screen.getByTestId('tenant-details-form-inert');
+
+    expect(overlay).toBeVisible();
     expect(submitButton).toBeDisabled();
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
-    expect(screen.getByTestId('tenant-details-form-inert')).toHaveAttribute(
-      'inert',
-    );
+    expect(inertForm).toHaveAttribute('inert');
 
     resolveWithServerError();
-    await waitFor(() =>
-      expect(
-        screen.queryByRole('status', { name: BEGINNING_PROVISIONING }),
-      ).not.toBeInTheDocument(),
-    );
+    await waitFor(() => {
+      const settledOverlay = screen.queryByRole('status', {
+        name: BEGINNING_PROVISIONING,
+      });
+
+      expect(settledOverlay).not.toBeInTheDocument();
+    });
   });
 
   it('shows an INVITING_OWNER pending label for the owner-invite confirmation submit', async () => {
@@ -195,15 +218,20 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     await clickBeginProvisioning(user);
     await clickConfirmInviteOwner(user);
 
-    expect(screen.getByRole('status', { name: INVITING_OWNER })).toBeVisible();
-    expect(screen.getByRole('button', { name: INVITING_OWNER })).toBeDisabled();
+    const overlay = screen.getByRole('status', { name: INVITING_OWNER });
+    const submitButton = screen.getByRole('button', { name: INVITING_OWNER });
+
+    expect(overlay).toBeVisible();
+    expect(submitButton).toBeDisabled();
 
     resolveWithServerError();
-    await waitFor(() =>
-      expect(
-        screen.queryByRole('status', { name: INVITING_OWNER }),
-      ).not.toBeInTheDocument(),
-    );
+    await waitFor(() => {
+      const settledOverlay = screen.queryByRole('status', {
+        name: INVITING_OWNER,
+      });
+
+      expect(settledOverlay).not.toBeInTheDocument();
+    });
   });
 
   it('shows a soft owner-invite confirmation, not a blocking error, for an unregistered owner email', async () => {
@@ -217,10 +245,13 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     await fillValidForm(user);
     await clickBeginProvisioning(user);
 
-    expect(
-      await screen.findByRole('button', { name: /confirm & invite owner/i }),
-    ).toBeVisible();
-    expect(screen.getByText(NO_ACCOUNT_FOUND_FOR_OWNER)).toBeVisible();
+    const confirmButton = await screen.findByRole('button', {
+      name: /confirm & invite owner/i,
+    });
+    const confirmation = screen.getByText(NO_ACCOUNT_FOUND_FOR_OWNER);
+
+    expect(confirmButton).toBeVisible();
+    expect(confirmation).toBeVisible();
   });
 
   describe('when the owner invite needs confirmation', () => {
@@ -233,34 +264,38 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     it('resubmits with confirmOwnerInviteToken set once the operator confirms an unchanged owner email', async () => {
       await clickConfirmInviteOwner(user);
 
-      expect(createTenantActionMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          ownerEmail: MOCK_OWNER_EMAIL,
-        }),
-      );
+      expect(createTenantActionMock).toHaveBeenLastCalledWith({
+        name: NEW_TENANT_NAME,
+        domain: MOCK_TENANT_DOMAIN,
+        plan: TENANT_PLAN.FREE,
+        ownerEmail: MOCK_OWNER_EMAIL,
+      });
     });
 
     it('drops the stale confirmation and re-requires a fresh confirm once the owner email is edited', async () => {
       await screen.findByText(NO_ACCOUNT_FOUND_FOR_OWNER);
 
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        '.uk',
-      );
-      expect(
-        screen.queryByText(NO_ACCOUNT_FOUND_FOR_OWNER),
-      ).not.toBeInTheDocument();
-      expect(
-        await screen.findByRole('button', { name: /begin provisioning/i }),
-      ).toBeVisible();
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.type(ownerEmailInput, '.uk');
+
+      const staleConfirmation = screen.queryByText(NO_ACCOUNT_FOUND_FOR_OWNER);
+      const beginButton = await screen.findByRole('button', {
+        name: /begin provisioning/i,
+      });
+
+      expect(staleConfirmation).not.toBeInTheDocument();
+      expect(beginButton).toBeVisible();
 
       await clickBeginProvisioning(user);
 
-      expect(createTenantActionMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          ownerEmail: `${MOCK_OWNER_EMAIL}.uk`,
-        }),
-      );
+      expect(createTenantActionMock).toHaveBeenLastCalledWith({
+        name: NEW_TENANT_NAME,
+        domain: MOCK_TENANT_DOMAIN,
+        plan: TENANT_PLAN.FREE,
+        ownerEmail: `${MOCK_OWNER_EMAIL}.uk`,
+      });
     });
   });
 
@@ -269,25 +304,24 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       email: 'john.doe@example.com',
     });
 
-    await user.type(screen.getByRole('textbox', { name: TENANT_NAME }), 'Acme');
+    const nameInput = screen.getByRole('textbox', { name: TENANT_NAME });
+    const domainInput = screen.getByRole('textbox', { name: 'Domain' });
+    const ownerEmailInput = screen.getByRole('textbox', {
+      name: OWNER_EMAIL_LABEL,
+    });
 
-    await user.type(
-      screen.getByRole('textbox', { name: 'Domain' }),
-      MOCK_TENANT_DOMAIN,
-    );
-
-    await user.type(
-      screen.getByRole('textbox', { name: OWNER_EMAIL }),
-      MIXED_CASE_OWNER_EMAIL,
-    );
+    await user.type(nameInput, NEW_TENANT_NAME);
+    await user.type(domainInput, MOCK_TENANT_DOMAIN);
+    await user.type(ownerEmailInput, MIXED_CASE_OWNER_EMAIL);
     await clickBeginProvisioning(user);
     await clickConfirmInviteOwner(user);
 
-    expect(createTenantActionMock).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        ownerEmail: MIXED_CASE_OWNER_EMAIL,
-      }),
-    );
+    expect(createTenantActionMock).toHaveBeenLastCalledWith({
+      name: NEW_TENANT_NAME,
+      domain: MOCK_TENANT_DOMAIN,
+      plan: TENANT_PLAN.FREE,
+      ownerEmail: MIXED_CASE_OWNER_EMAIL,
+    });
   });
 
   describe('when the owner invite needs confirmation with a token', () => {
@@ -303,29 +337,31 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     it('echoes the confirmation token back once the operator confirms an unchanged owner email', async () => {
       await clickConfirmInviteOwner(user);
 
-      expect(createTenantActionMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          ownerEmail: MOCK_OWNER_EMAIL,
-          confirmOwnerInviteToken: OWNER_CONFIRMATION_TOKEN,
-        }),
-      );
+      expect(createTenantActionMock).toHaveBeenLastCalledWith({
+        name: NEW_TENANT_NAME,
+        domain: MOCK_TENANT_DOMAIN,
+        plan: TENANT_PLAN.FREE,
+        ownerEmail: MOCK_OWNER_EMAIL,
+        confirmOwnerInviteToken: OWNER_CONFIRMATION_TOKEN,
+      });
     });
 
     it('drops the stale token along with the stale confirmation once the owner email is edited', async () => {
       await screen.findByText(NO_ACCOUNT_FOUND_FOR_OWNER);
 
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        '.uk',
-      );
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.type(ownerEmailInput, '.uk');
       await clickBeginProvisioning(user);
 
-      expect(createTenantActionMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          ownerEmail: `${MOCK_OWNER_EMAIL}.uk`,
-          confirmOwnerInviteToken: undefined,
-        }),
-      );
+      expect(createTenantActionMock).toHaveBeenLastCalledWith({
+        name: NEW_TENANT_NAME,
+        domain: MOCK_TENANT_DOMAIN,
+        plan: TENANT_PLAN.FREE,
+        ownerEmail: `${MOCK_OWNER_EMAIL}.uk`,
+        confirmOwnerInviteToken: undefined,
+      });
     });
   });
 
@@ -337,8 +373,8 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     await fillValidForm(user);
     await clickBeginProvisioning(user);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      "Couldn't create the tenant",
-    );
+    const alert = await screen.findByRole('alert');
+
+    expect(alert).toHaveTextContent("Couldn't create the tenant");
   });
 });

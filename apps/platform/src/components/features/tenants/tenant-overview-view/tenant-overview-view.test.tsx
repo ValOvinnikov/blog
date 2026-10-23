@@ -23,7 +23,11 @@ import {
 } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  ARCHIVED_NOTICE_DESCRIPTION,
+  ARCHIVED_NOTICE_TEXT,
+  SAVE_CHANGES,
+} from '@platform/testing/render-in-settings-form';
 import {
   idleProvisioningSteps,
   makeTenant,
@@ -36,6 +40,8 @@ import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_URL,
   mockFirstStepRunningProvisioningSteps,
+  PRIMARY_DOMAIN_LABEL,
+  REACTIVATE_TENANT_LABEL,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
@@ -111,12 +117,9 @@ const setup = async ({ tenant = makeTenant() } = {}) => {
 };
 
 const TENANT_DETAILS = 'Tenant details';
-const SAVE_CHANGES = 'Save changes';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
   'Locked while provisioning is running.';
-const PRIMARY_DOMAIN = 'Primary domain';
 const SUSPEND_TENANT = 'Suspend tenant';
-const REACTIVATE_TENANT = 'Reactivate tenant';
 
 describe(`<${TenantOverviewView.name}/>`, () => {
   beforeEach(() => {
@@ -238,7 +241,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     const domainInput = screen.getByRole('textbox', {
-      name: PRIMARY_DOMAIN,
+      name: PRIMARY_DOMAIN_LABEL,
     });
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
 
@@ -259,7 +262,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
     const domainInput = screen.getByRole('textbox', {
-      name: PRIMARY_DOMAIN,
+      name: PRIMARY_DOMAIN_LABEL,
     });
 
     expect(nameInput).toBeDisabled();
@@ -431,7 +434,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     it("describes the details panel's disabled Save with the archived notice", async () => {
       const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
       expect(saveButton).toHaveAccessibleDescription(
-        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+        ARCHIVED_NOTICE_DESCRIPTION,
       );
     });
   });
@@ -457,7 +460,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       await setup({ tenant: makeTenant({ status: TENANT_STATUS.SUSPENDED }) });
 
       const reactivateButton = screen.getByRole('button', {
-        name: REACTIVATE_TENANT,
+        name: REACTIVATE_TENANT_LABEL,
       });
       const suspendButton = screen.queryByRole('button', {
         name: SUSPEND_TENANT,
@@ -477,7 +480,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         });
 
         const reactivateButton = screen.queryByRole('button', {
-          name: REACTIVATE_TENANT,
+          name: REACTIVATE_TENANT_LABEL,
         });
         expect(reactivateButton).not.toBeInTheDocument();
       },
@@ -495,7 +498,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         name: SUSPEND_TENANT,
       });
       const reactivateButton = screen.queryByRole('button', {
-        name: REACTIVATE_TENANT,
+        name: REACTIVATE_TENANT_LABEL,
       });
 
       expect(suspendButton).not.toBeInTheDocument();

@@ -3,12 +3,12 @@ import { screen } from '@platform/testing/custom-render';
 import { MOCK_EMAIL_LOGO_URL } from '@platform/testing/email/fixtures';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
+import { BLOB_STAGED_LOGO } from '@platform/testing/site-config/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import { EmailLogoField } from './email-logo-field';
 
 const PNG_JPEG_OR_GIF = 'PNG, JPEG, or GIF.';
-const BLOB_STAGED_LOGO = 'blob:staged-logo';
 
 const setup = customRenderInSettingsForm(EmailLogoField, {
   kind: EMAIL_LOGO_KIND.SENDER,
@@ -32,19 +32,25 @@ describe(`<${EmailLogoField.name}/>`, () => {
   it('shows the hint and the upload label before any logo is set', () => {
     setup();
 
-    expect(screen.getByText(PNG_JPEG_OR_GIF)).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Upload email logo' }),
-    ).toBeVisible();
+    const hint = screen.getByText(PNG_JPEG_OR_GIF);
+    const uploadButton = screen.getByRole('button', {
+      name: 'Upload email logo',
+    });
+
+    expect(hint).toBeVisible();
+    expect(uploadButton).toBeVisible();
   });
 
   it('shows the current logo and the replace label once a logo is set', () => {
     setup({ logo: { url: MOCK_EMAIL_LOGO_URL } });
 
-    expect(screen.getByAltText('Current email logo')).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Replace email logo' }),
-    ).toBeVisible();
+    const currentLogo = screen.getByAltText('Current email logo');
+    const replaceButton = screen.getByRole('button', {
+      name: 'Replace email logo',
+    });
+
+    expect(currentLogo).toBeVisible();
+    expect(replaceButton).toBeVisible();
   });
 
   it('stages a picked file with a local preview URL', async () => {
@@ -63,16 +69,17 @@ describe(`<${EmailLogoField.name}/>`, () => {
       new File(['<svg></svg>'], 'logo.svg', { type: 'image/svg+xml' }),
     );
 
+    const unsupportedError = screen.getByText(/SVG and WebP are not supported/);
+
     expect(onStage).not.toHaveBeenCalled();
-    expect(screen.getByText(/SVG and WebP are not supported/)).toBeVisible();
+    expect(unsupportedError).toBeVisible();
   });
 
   it('stages a removal', async () => {
     setup({ logo: { url: MOCK_EMAIL_LOGO_URL }, onStage });
 
-    await userEvent
-      .setup()
-      .click(screen.getByRole('button', { name: 'Remove' }));
+    const removeButton = screen.getByRole('button', { name: 'Remove' });
+    await userEvent.setup().click(removeButton);
 
     expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });

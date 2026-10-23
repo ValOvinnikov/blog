@@ -11,12 +11,11 @@ import {
   makeReadyTenant,
   MOCK_ARCHIVED_AT,
 } from '@platform/testing/tenants/fixtures';
+import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent from '@testing-library/user-event';
 
 import { VoicePageContent } from './voice-page-content';
-
-const NOTHING_HERE = 'Nothing here';
 
 const { EN, DE } = LOCALE_ISO_CODES;
 
@@ -39,11 +38,13 @@ const tenant = makeReadyTenant();
 
 const setup = customRenderAsync(VoicePageContent, { tenant });
 
-const notFoundHeading = () =>
-  within(screen.getByRole('region', { name: 'Page not found' })).getByRole(
-    'textbox',
-    { name: 'Heading' },
-  );
+const notFoundHeading = () => {
+  const notFoundRegion = screen.getByRole('region', {
+    name: 'Page not found',
+  });
+
+  return within(notFoundRegion).getByRole('textbox', { name: 'Heading' });
+};
 
 describe(`<${VoicePageContent.name}/>`, () => {
   beforeEach(() => {
@@ -56,8 +57,11 @@ describe(`<${VoicePageContent.name}/>`, () => {
   it('shows every field at its default when there is no site_config row', async () => {
     await setup();
 
-    expect(notFoundHeading()).toHaveValue('');
-    expect(screen.getAllByText('Default')).toHaveLength(11);
+    const headingInput = notFoundHeading();
+    const defaultBadges = screen.getAllByText('Default');
+
+    expect(headingInput).toHaveValue('');
+    expect(defaultBadges).toHaveLength(11);
   });
 
   it("renders the default language's saved override as the field value", async () => {
@@ -71,7 +75,9 @@ describe(`<${VoicePageContent.name}/>`, () => {
 
     await setup();
 
-    expect(notFoundHeading()).toHaveValue(NOTHING_HERE);
+    const headingInput = notFoundHeading();
+
+    expect(headingInput).toHaveValue(NOTHING_HERE);
   });
 
   describe('with a second live language', () => {
@@ -81,18 +87,26 @@ describe(`<${VoicePageContent.name}/>`, () => {
     });
 
     it('offers a language switcher over the live languages', () => {
-      expect(screen.getByRole('group', { name: 'Language' })).toBeVisible();
+      const languageSwitcher = screen.getByRole('group', { name: 'Language' });
+
+      expect(languageSwitcher).toBeVisible();
     });
 
     it('renders the empty-list specimen in the language being edited', async () => {
       const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'German' }));
+      const germanButton = screen.getByRole('button', { name: 'German' });
+      await user.click(germanButton);
 
       const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
-      const specimen = within(screen.getByTestId('voice-specimen-ARCHIVE'));
-      expect(specimen.getByText(eyebrow)).toBeInTheDocument();
-      expect(specimen.getByText(heading)).toBeInTheDocument();
-      expect(specimen.getByText(count)).toBeInTheDocument();
+      const specimenRoot = screen.getByTestId('voice-specimen-ARCHIVE');
+      const specimen = within(specimenRoot);
+      const eyebrowText = specimen.getByText(eyebrow);
+      const headingText = specimen.getByText(heading);
+      const countText = specimen.getByText(count);
+
+      expect(eyebrowText).toBeInTheDocument();
+      expect(headingText).toBeInTheDocument();
+      expect(countText).toBeInTheDocument();
     });
   });
 
@@ -104,9 +118,10 @@ describe(`<${VoicePageContent.name}/>`, () => {
       },
     });
 
-    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
-    ).not.toBeInTheDocument();
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+    const saveButton = screen.queryByRole('button', { name: 'Save changes' });
+
+    expect(archivedNotice).toBeVisible();
+    expect(saveButton).not.toBeInTheDocument();
   });
 });

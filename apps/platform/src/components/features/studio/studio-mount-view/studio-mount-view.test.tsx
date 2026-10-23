@@ -132,14 +132,16 @@ describe(`<${StudioMountView.name}/>`, () => {
     const studioMount = screen.getByTestId(STUDIO_MOUNT);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projectId: PROJ_GLOBEX,
-        dataset: 'staging',
-        basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
-        title: MOCK_OTHER_TENANT_NAME,
-      }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: PROJ_GLOBEX,
+      dataset: 'staging',
+      basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
+      title: MOCK_OTHER_TENANT_NAME,
+      enabledCapabilities: [],
+      defaultLocale: tenant.locale,
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      loginProvider: undefined,
+    });
   });
 
   it("passes the tenant's effective capabilities to Studio", async () => {
@@ -154,9 +156,16 @@ describe(`<${StudioMountView.name}/>`, () => {
     );
 
     expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(tenant);
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({ enabledCapabilities: [CAPABILITY.COMMENTS] }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: tenant.sanityProjectId,
+      dataset: tenant.sanityDataset,
+      basePath: adminRoutes.dashboardStudio(),
+      title: tenant.name,
+      enabledCapabilities: [CAPABILITY.COMMENTS],
+      defaultLocale: tenant.locale,
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      loginProvider: undefined,
+    });
   });
 
   it("passes the tenant's default and live languages to Studio", async () => {
@@ -174,25 +183,38 @@ describe(`<${StudioMountView.name}/>`, () => {
     );
 
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        defaultLocale: LOCALE_ISO_CODES.NL,
-        liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN],
-      }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: tenant.sanityProjectId,
+      dataset: tenant.sanityDataset,
+      basePath: adminRoutes.dashboardStudio(),
+      title: tenant.name,
+      enabledCapabilities: [],
+      defaultLocale: LOCALE_ISO_CODES.NL,
+      liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN],
+      loginProvider: undefined,
+    });
   });
 
   it('restricts Studio to the given login provider', async () => {
+    const tenant = makeProvisionedTenant();
+
     renderWithIntl(
       await StudioMountView({
-        tenant: makeProvisionedTenant(),
+        tenant,
         basePath: adminRoutes.dashboardStudio(),
         loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
       }),
     );
 
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({ loginProvider: SANITY_LOGIN_PROVIDER.GITHUB }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: tenant.sanityProjectId,
+      dataset: tenant.sanityDataset,
+      basePath: adminRoutes.dashboardStudio(),
+      title: tenant.name,
+      enabledCapabilities: [],
+      defaultLocale: tenant.locale,
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
+    });
   });
 });

@@ -10,17 +10,24 @@ describe(`<${PageHeader.name}/>`, () => {
     });
 
     it('renders the title through a level-1 heading', () => {
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Tenants' }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Tenants',
+      });
+
+      expect(heading).toBeVisible();
     });
 
     it('omits the description when not provided', () => {
-      expect(screen.queryByText(/every site/i)).toBeNull();
+      const description = screen.queryByText(/every site/i);
+
+      expect(description).not.toBeInTheDocument();
     });
 
     it('omits the actions container when not provided', () => {
-      expect(screen.queryByRole('button')).toBeNull();
+      const actionButton = screen.queryByRole('button');
+
+      expect(actionButton).not.toBeInTheDocument();
     });
   });
 
@@ -28,15 +35,18 @@ describe(`<${PageHeader.name}/>`, () => {
     render(
       <PageHeader title="Tenants" description="Every site on the platform." />,
     );
-    expect(screen.getByText('Every site on the platform.')).toBeVisible();
+    const description = screen.getByText('Every site on the platform.');
+
+    expect(description).toBeVisible();
   });
 
   it('renders badges beside the title', () => {
     render(<PageHeader title={MOCK_SITE_NAME} badges={<span>Active</span>} />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      MOCK_SITE_NAME,
-    );
-    expect(screen.getByText('Active')).toBeVisible();
+    const heading = screen.getByRole('heading', { level: 1 });
+    const badge = screen.getByText('Active');
+
+    expect(heading).toHaveTextContent(MOCK_SITE_NAME);
+    expect(badge).toBeVisible();
   });
 
   it('renders right-aligned actions when provided', () => {
@@ -46,13 +56,18 @@ describe(`<${PageHeader.name}/>`, () => {
         actions={<button type="button">Add tenant</button>}
       />,
     );
-    expect(screen.getByRole('button', { name: 'Add tenant' })).toBeVisible();
+    const addButton = screen.getByRole('button', { name: 'Add tenant' });
+
+    expect(addButton).toBeVisible();
   });
 
   it('renders with only the required title, without throwing', () => {
     expect(() => render(<PageHeader title="Tenants" />)).not.toThrow();
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Tenants' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Tenants',
+    });
+
+    expect(heading).toBeVisible();
   });
 });

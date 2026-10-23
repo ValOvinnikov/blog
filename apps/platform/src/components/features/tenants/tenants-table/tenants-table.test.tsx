@@ -36,14 +36,21 @@ describe(`<${TenantsTable.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByText(MOCK_TENANT_NAME)).toBeVisible();
-    expect(screen.getByText(MOCK_TENANT_DOMAIN)).toBeVisible();
-    expect(screen.getByText('Free')).toBeVisible();
-    expect(screen.getByText('Active')).toBeVisible();
+    const acmeName = screen.getByText(MOCK_TENANT_NAME);
+    const acmeDomain = screen.getByText(MOCK_TENANT_DOMAIN);
+    const freePlan = screen.getByText('Free');
+    const activeStatus = screen.getByText('Active');
+    const harborName = screen.getByText(HARBOR_CO);
+    const growthPlan = screen.getByText('Growth');
+    const suspendedStatus = screen.getByText('Suspended');
 
-    expect(screen.getByText(HARBOR_CO)).toBeVisible();
-    expect(screen.getByText('Growth')).toBeVisible();
-    expect(screen.getByText('Suspended')).toBeVisible();
+    expect(acmeName).toBeVisible();
+    expect(acmeDomain).toBeVisible();
+    expect(freePlan).toBeVisible();
+    expect(activeStatus).toBeVisible();
+    expect(harborName).toBeVisible();
+    expect(growthPlan).toBeVisible();
+    expect(suspendedStatus).toBeVisible();
   });
 
   it('links a READY tenant\'s "Manage" control to its overview page', () => {
@@ -60,13 +67,14 @@ describe(`<${TenantsTable.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByRole('link', { name: MANAGE_ACME })).toHaveAttribute(
+    const acmeLink = screen.getByRole('link', { name: MANAGE_ACME });
+    const harborLink = screen.getByRole('link', { name: MANAGE_HARBOR_CO });
+
+    expect(acmeLink).toHaveAttribute('href', `/tenants/${TENANT_ID}`);
+    expect(harborLink).toHaveAttribute(
       'href',
-      `/tenants/${TENANT_ID}`,
+      `/tenants/${MOCK_OTHER_TENANT_ID}`,
     );
-    expect(
-      screen.getByRole('link', { name: MANAGE_HARBOR_CO }),
-    ).toHaveAttribute('href', `/tenants/${MOCK_OTHER_TENANT_ID}`);
   });
 
   it('links a not-yet-ready tenant\'s "Manage" control to its provisioning page', () => {
@@ -86,13 +94,17 @@ describe(`<${TenantsTable.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByRole('link', { name: MANAGE_ACME })).toHaveAttribute(
+    const acmeLink = screen.getByRole('link', { name: MANAGE_ACME });
+    const harborLink = screen.getByRole('link', { name: MANAGE_HARBOR_CO });
+
+    expect(acmeLink).toHaveAttribute(
       'href',
       `/tenants/${TENANT_ID}/provisioning`,
     );
-    expect(
-      screen.getByRole('link', { name: MANAGE_HARBOR_CO }),
-    ).toHaveAttribute('href', `/tenants/${MOCK_OTHER_TENANT_ID}/provisioning`);
+    expect(harborLink).toHaveAttribute(
+      'href',
+      `/tenants/${MOCK_OTHER_TENANT_ID}/provisioning`,
+    );
   });
 
   describe('with one ready tenant', () => {
@@ -101,16 +113,20 @@ describe(`<${TenantsTable.name}/>`, () => {
     });
 
     it('names the scrollable table region and the actions column for screen readers', () => {
-      expect(screen.getByRole('region', { name: 'Tenants' })).toContainElement(
-        screen.getByRole('table'),
-      );
-      expect(
-        screen.getByRole('columnheader', { name: 'Actions' }),
-      ).toBeVisible();
+      const region = screen.getByRole('region', { name: 'Tenants' });
+      const table = screen.getByRole('table');
+      const actionsHeader = screen.getByRole('columnheader', {
+        name: 'Actions',
+      });
+
+      expect(region).toContainElement(table);
+      expect(actionsHeader).toBeVisible();
     });
 
     it('renders the created date as a machine-readable time', () => {
-      expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
+      const createdTime = screen.getByText('Apr 2, 2026');
+
+      expect(createdTime).toHaveAttribute(
         'dateTime',
         MOCK_TENANT_CREATED_AT.toISOString(),
       );
@@ -120,7 +136,10 @@ describe(`<${TenantsTable.name}/>`, () => {
   it('renders an empty state instead of an empty table when there are no tenants', () => {
     render(<TenantsTable tenants={[]} />);
 
-    expect(screen.getByText('No tenants yet.')).toBeVisible();
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    const emptyMessage = screen.getByText('No tenants yet.');
+    const table = screen.queryByRole('table');
+
+    expect(emptyMessage).toBeVisible();
+    expect(table).not.toBeInTheDocument();
   });
 });

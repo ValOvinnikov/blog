@@ -82,9 +82,12 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
 
     await advancePoll(3);
 
-    expect(getTrigger()).toBeEnabled();
-    expect(getTrigger()).not.toHaveAttribute(ARIA_DISABLED);
-    expect(screen.queryByText('Remove domain')).not.toBeInTheDocument();
+    const trigger = getTrigger();
+    const removeDomainStep = screen.queryByText('Remove domain');
+
+    expect(trigger).toBeEnabled();
+    expect(trigger).not.toHaveAttribute(ARIA_DISABLED);
+    expect(removeDomainStep).not.toBeInTheDocument();
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
   });
 
@@ -99,16 +102,21 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByText('Starting…')).toBeVisible();
-    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(getTrigger()).not.toBeDisabled();
+    const startingState = screen.getByText('Starting…');
+    const trigger = getTrigger();
+
+    expect(startingState).toBeVisible();
+    expect(trigger).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(trigger).not.toBeDisabled();
 
     await advancePoll();
+
+    const triggerAfterPoll = getTrigger();
 
     expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
       TENANT_ID,
     );
-    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(triggerAfterPoll).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   it('keeps the trigger aria-disabled while a run is in progress and re-enables it once the run fails', async () => {
@@ -128,12 +136,16 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
       />,
     );
 
-    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
+    const triggerWhileRunning = getTrigger();
+
+    expect(triggerWhileRunning).toHaveAttribute(ARIA_DISABLED, 'true');
 
     await advancePoll();
 
-    expect(getTrigger()).toBeEnabled();
-    expect(getTrigger()).not.toHaveAttribute(ARIA_DISABLED);
+    const triggerAfterFailure = getTrigger();
+
+    expect(triggerAfterFailure).toBeEnabled();
+    expect(triggerAfterFailure).not.toHaveAttribute(ARIA_DISABLED);
   });
 
   it('keeps the trigger enabled and does not poll for a run that had already failed', async () => {
@@ -148,7 +160,9 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
 
     await advancePoll(2);
 
-    expect(getTrigger()).toBeEnabled();
+    const trigger = getTrigger();
+
+    expect(trigger).toBeEnabled();
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
   });
 });

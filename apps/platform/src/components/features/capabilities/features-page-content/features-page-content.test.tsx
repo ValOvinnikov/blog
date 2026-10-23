@@ -54,23 +54,21 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
 
     it('renders CONSOLE featureDefaults with no settings_features or site_config row', () => {
       expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
-      expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-        DATA_CHECKED,
-        '',
-      );
-      expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-        DATA_UNCHECKED,
-        '',
-      );
+      const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+      const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
+
+      expect(bookmarksSwitch).toHaveAttribute(DATA_CHECKED, '');
+      expect(analyticsSwitch).toHaveAttribute(DATA_UNCHECKED, '');
     });
 
     it('enables every toggle for a GROWTH-plan tenant', () => {
-      expect(
-        screen.getByRole('switch', { name: 'Analytics' }),
-      ).not.toHaveAttribute(DATA_DISABLED);
-      expect(
-        screen.getByRole('switch', { name: 'Cookie consent banner' }),
-      ).not.toHaveAttribute(DATA_DISABLED);
+      const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
+      const consentSwitch = screen.getByRole('switch', {
+        name: 'Cookie consent banner',
+      });
+
+      expect(analyticsSwitch).not.toHaveAttribute(DATA_DISABLED);
+      expect(consentSwitch).not.toHaveAttribute(DATA_DISABLED);
     });
   });
 
@@ -89,14 +87,11 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
 
     await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      DATA_UNCHECKED,
-      '',
-    );
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      DATA_CHECKED,
-      '',
-    );
+    const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+    const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
+
+    expect(bookmarksSwitch).toHaveAttribute(DATA_UNCHECKED, '');
+    expect(analyticsSwitch).toHaveAttribute(DATA_CHECKED, '');
   });
 
   it('falls back to EDITORIAL featureDefaults when site_config has that preset saved', async () => {
@@ -107,19 +102,17 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
 
     await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      DATA_CHECKED,
-      '',
-    );
+    const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+
+    expect(bookmarksSwitch).toHaveAttribute(DATA_CHECKED, '');
   });
 
   it('disables the GROWTH-only toggles for a FREE-plan tenant', async () => {
     await setup({ tenant: buildTenant(TENANT_PLAN.FREE) });
 
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      DATA_DISABLED,
-      '',
-    );
+    const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
+
+    expect(analyticsSwitch).toHaveAttribute(DATA_DISABLED, '');
   });
 
   it('clamps a stale out-of-plan value to unchecked+disabled after a plan downgrade', async () => {
@@ -151,9 +144,10 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       },
     });
 
-    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
-    ).not.toBeInTheDocument();
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+    const saveButton = screen.queryByRole('button', { name: 'Save changes' });
+
+    expect(archivedNotice).toBeVisible();
+    expect(saveButton).not.toBeInTheDocument();
   });
 });

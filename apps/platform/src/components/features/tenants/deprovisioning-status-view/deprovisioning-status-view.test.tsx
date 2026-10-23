@@ -26,6 +26,17 @@ const ARCHIVE_TENANT = 'Archive tenant';
 const PURGE_READER_DATA = 'Purge reader data';
 const INVALIDATE_CACHED_PAGES = 'Invalidate cached pages';
 const ARIA_EXPANDED = 'aria-expanded';
+const STARTING_BADGE = 'Starting…';
+const QUEUED_BADGE = 'Queued';
+const STEP_LABELS = [
+  REMOVE_DOMAIN_LABEL,
+  ARCHIVE_SANITY_PROJECT,
+  REVOKE_SANITY_TOKENS_LABEL,
+  CLEAR_PROVISIONING_ARTIFACTS,
+  ARCHIVE_TENANT,
+  PURGE_READER_DATA,
+  INVALIDATE_CACHED_PAGES,
+];
 
 const render = renderWithIntl;
 
@@ -106,27 +117,32 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     });
 
     it('says no run has started yet in the Run card before any run exists', () => {
-      expect(screen.getByText('No run has started yet.')).toBeVisible();
+      const emptyRun = screen.getByText('No run has started yet.');
+
+      expect(emptyRun).toBeVisible();
     });
 
     it('shows the full step list under the Starting badge, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
-      expect(screen.getByText('Starting…')).toBeVisible();
-      expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
-      expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
-      expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
-      expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
-      expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
-      expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
-      expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
-      expect(screen.getAllByText('Queued').length).toBe(7);
-      expect(screen.queryByText('Not started')).not.toBeInTheDocument();
+      const startingBadge = screen.getByText(STARTING_BADGE);
+      const stepLabels = STEP_LABELS.map((label) => screen.getByText(label));
+
+      for (const stepLabel of stepLabels) {
+        expect(stepLabel).toBeVisible();
+      }
+      const queuedBadges = screen.getAllByText(QUEUED_BADGE);
+      const notStartedBadge = screen.queryByText('Not started');
+
+      expect(startingBadge).toBeVisible();
+      expect(queuedBadges).toHaveLength(STEP_LABELS.length);
+      expect(notStartedBadge).not.toBeInTheDocument();
     });
 
     it('renders a fallback Run card header carrying the overall status badge when no run exists yet', () => {
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Run' }),
-      ).toBeVisible();
-      expect(screen.getByText('Starting…')).toBeVisible();
+      const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
+      const startingBadge = screen.getByText(STARTING_BADGE);
+
+      expect(runHeading).toBeVisible();
+      expect(startingBadge).toBeVisible();
     });
   });
 
@@ -146,9 +162,13 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       { deprovisionRequestedAt: MOCK_RUN_PLUS_7_MIN_AT },
     );
 
-    expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(7);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const startingBadge = screen.getByText(STARTING_BADGE);
+    const queuedBadges = screen.getAllByText(QUEUED_BADGE);
+    const errorCard = screen.queryByRole('alert');
+
+    expect(startingBadge).toBeVisible();
+    expect(queuedBadges).toHaveLength(STEP_LABELS.length);
+    expect(errorCard).not.toBeInTheDocument();
   });
 
   describe('with an idle run', () => {
@@ -157,59 +177,65 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     });
 
     it('titles the card "Deprovisioning progress" and renders every step in order', () => {
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: /^Deprovisioning progress/,
-        }),
-      ).toBeVisible();
-      expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
-      expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
-      expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
-      expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
-      expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
-      expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
-      expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
+      const progressHeading = screen.getByRole('heading', {
+        level: 2,
+        name: /^Deprovisioning progress/,
+      });
+
+      expect(progressHeading).toBeVisible();
+      const stepLabels = STEP_LABELS.map((label) => screen.getByText(label));
+
+      for (const stepLabel of stepLabels) {
+        expect(stepLabel).toBeVisible();
+      }
     });
 
     it('shows a 0 of 7 done badge in the steps card summary when nothing has completed yet', () => {
-      expect(screen.getByText('0 of 7 done')).toBeVisible();
+      const doneBadge = screen.getByText('0 of 7 done');
+
+      expect(doneBadge).toBeVisible();
     });
 
     it('renders the run card once a run exists', () => {
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Run' }),
-      ).toBeVisible();
+      const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
+
+      expect(runHeading).toBeVisible();
     });
   });
 
   it('nests the steps and run headings at a caller-supplied level', () => {
     renderView(idleRunSteps(), { headingLevel: 3 });
 
-    expect(
-      screen.getByRole('heading', {
-        level: 3,
-        name: /^Deprovisioning progress/,
-      }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Run' }),
-    ).toBeVisible();
-    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+    const progressHeading = screen.getByRole('heading', {
+      level: 3,
+      name: /^Deprovisioning progress/,
+    });
+    const runHeading = screen.getByRole('heading', { level: 3, name: 'Run' });
+    const levelTwoHeading = screen.queryByRole('heading', { level: 2 });
+
+    expect(progressHeading).toBeVisible();
+    expect(runHeading).toBeVisible();
+    expect(levelTwoHeading).not.toBeInTheDocument();
   });
 
   it('shows the Running badge while a step is in progress, with no error card', () => {
     renderView(runningSteps());
 
-    expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const runningBadges = screen.getAllByText('Running…');
+    const errorCard = screen.queryByRole('alert');
+
+    expect(runningBadges.length).toBeGreaterThan(0);
+    expect(errorCard).not.toBeInTheDocument();
   });
 
   it('shows the Complete badge once every step is done', () => {
     renderView(doneRunSteps());
 
-    expect(screen.getAllByText('Complete').length).toBeGreaterThan(0);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const completeBadges = screen.getAllByText('Complete');
+    const errorCard = screen.queryByRole('alert');
+
+    expect(completeBadges.length).toBeGreaterThan(0);
+    expect(errorCard).not.toBeInTheDocument();
   });
 
   describe('a failed step', () => {
@@ -231,52 +257,60 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         'Sanity Access API POST /access/project/xxxxx000/tokens failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to revoke tokens."}';
       renderFailed(rawError);
 
-      expect(screen.getAllByText('Failed').length).toBeGreaterThan(0);
-      expect(
-        screen.getByRole('heading', {
-          name: 'Missing permission to complete this step',
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByText(
-          `Failed while running "${REVOKE_SANITY_TOKENS_LABEL}".`,
-        ),
-      ).toBeVisible();
-      expect(screen.getByText('Technical details')).toBeVisible();
-      expect(screen.getByText(rawError)).not.toBeVisible();
+      const failedBadges = screen.getAllByText('Failed');
+      const failureHeading = screen.getByRole('heading', {
+        name: 'Missing permission to complete this step',
+      });
+      const failingStep = screen.getByText(
+        `Failed while running "${REVOKE_SANITY_TOKENS_LABEL}".`,
+      );
+      const technicalDetails = screen.getByText('Technical details');
+      const rawErrorText = screen.getByText(rawError);
+
+      expect(failedBadges.length).toBeGreaterThan(0);
+      expect(failureHeading).toBeVisible();
+      expect(failingStep).toBeVisible();
+      expect(technicalDetails).toBeVisible();
+      expect(rawErrorText).not.toBeVisible();
     });
 
     it('renders no retry button', () => {
       renderFailed('fetch failed');
 
-      expect(
-        screen.queryByRole('button', { name: /retry/i }),
-      ).not.toBeInTheDocument();
+      const retryButton = screen.queryByRole('button', { name: /retry/i });
+
+      expect(retryButton).not.toBeInTheDocument();
     });
 
     it('falls back to a generic headline for an unrecognised failure shape', () => {
       renderFailed('CORS API is down');
 
-      expect(
-        screen.getByRole('heading', { name: 'This step failed' }),
-      ).toBeVisible();
+      const failureHeading = screen.getByRole('heading', {
+        name: 'This step failed',
+      });
+
+      expect(failureHeading).toBeVisible();
     });
   });
 
   describe('steps disclosure collapse', () => {
-    const stepsToggle = () =>
+    const getStepsToggle = () =>
       screen.getByRole('button', { name: /Deprovisioning progress/ });
 
     it('is expanded while the run is not done', () => {
       renderView(runningSteps());
 
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
+      const stepsToggle = getStepsToggle();
+
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
       renderView(doneRunSteps());
 
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
+      const stepsToggle = getStepsToggle();
+
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -287,22 +321,24 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       const user = userEvent.setup();
       renderView(runningSteps());
 
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
+      const stepsToggle = getStepsToggle();
+
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
 
-      await user.click(stepsToggle());
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
+      await user.click(stepsToggle);
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
   });
 });

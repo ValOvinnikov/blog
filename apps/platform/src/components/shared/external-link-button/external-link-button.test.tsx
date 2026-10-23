@@ -53,9 +53,9 @@ describe(`<${ExternalLinkButton.name}/>`, () => {
       </ExternalLinkButton>,
     );
 
-    expect(
-      screen.getByRole('link', { name: OPEN_TENANT_SITE }),
-    ).toHaveAttribute('href', MOCK_TENANT_URL);
+    const link = screen.getByRole('link', { name: OPEN_TENANT_SITE });
+
+    expect(link).toHaveAttribute('href', MOCK_TENANT_URL);
   });
 
   it('applies the given title attribute alongside an icon-only ariaLabel', () => {
@@ -67,8 +67,8 @@ describe(`<${ExternalLinkButton.name}/>`, () => {
       />,
     );
 
-    expect(
-      screen.getByRole('link', { name: OPEN_TENANT_IN_NEW_TAB }),
-    ).toHaveAttribute('title', OPEN_TENANT_IN_NEW_TAB);
+    const link = screen.getByRole('link', { name: OPEN_TENANT_IN_NEW_TAB });
+
+    expect(link).toHaveAttribute('title', OPEN_TENANT_IN_NEW_TAB);
   });
 });

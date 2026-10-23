@@ -28,11 +28,14 @@ describe(`<${RecentActivityCard.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByText('Settings updated')).toBeVisible();
-    expect(screen.getByText('Tenant created')).toBeVisible();
-    expect(screen.getAllByText(MOCK_AUDIT_ACTOR_EMAIL)).toHaveLength(2);
-
+    const settingsUpdatedLabel = screen.getByText('Settings updated');
+    const createdLabel = screen.getByText('Tenant created');
+    const actorEmails = screen.getAllByText(MOCK_AUDIT_ACTOR_EMAIL);
     const activityTimes = screen.getAllByText('5m ago');
+
+    expect(settingsUpdatedLabel).toBeVisible();
+    expect(createdLabel).toBeVisible();
+    expect(actorEmails).toHaveLength(2);
     expect(activityTimes).toHaveLength(2);
     for (const time of activityTimes) {
       expect(time).toHaveAttribute(
@@ -47,7 +50,9 @@ describe(`<${RecentActivityCard.name}/>`, () => {
       <RecentActivityCard events={[makeAuditEvent({ actorEmail: null })]} />,
     );
 
-    expect(screen.getByText('Deleted account')).toBeVisible();
+    const deletedAccountLabel = screen.getByText('Deleted account');
+
+    expect(deletedAccountLabel).toBeVisible();
   });
 
   describe('with no activity', () => {
@@ -56,13 +61,18 @@ describe(`<${RecentActivityCard.name}/>`, () => {
     });
 
     it("nests the card's title one level under the page's own h1", () => {
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Recent activity',
+      });
+
+      expect(heading).toBeVisible();
     });
 
     it('shows an empty state when there is no recorded activity', () => {
-      expect(screen.getByText('No activity recorded yet.')).toBeVisible();
+      const emptyState = screen.getByText('No activity recorded yet.');
+
+      expect(emptyState).toBeVisible();
     });
   });
 });

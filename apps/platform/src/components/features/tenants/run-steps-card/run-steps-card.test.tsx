@@ -46,26 +46,33 @@ describe(`<${RunStepsCard.name}/>`, () => {
     });
 
     it('counts the steps that are done', () => {
-      expect(screen.getByText('1 of 3 done')).toBeVisible();
+      const progress = screen.getByText('1 of 3 done');
+
+      expect(progress).toBeVisible();
     });
 
     it('dates a settled step and marks the running one as happening now', () => {
-      expect(screen.getByText('6m ago')).toBeVisible();
-      expect(screen.getByText('now')).toBeVisible();
+      const settledAge = screen.getByText('6m ago');
+      const runningAge = screen.getByText('now');
+
+      expect(settledAge).toBeVisible();
+      expect(runningAge).toBeVisible();
     });
   });
 
   it('labels every step as queued before the run has written any step', () => {
     setup({ isPreRun: true });
 
-    expect(screen.getAllByText('Queued')).toHaveLength(3);
+    const queuedLabels = screen.getAllByText('Queued');
+
+    expect(queuedLabels).toHaveLength(3);
   });
 
   it('takes the heading level it is given', () => {
     setup({ headingLevel: 3 });
 
-    expect(
-      screen.getByRole('heading', { level: 3, name: /Steps/ }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { level: 3, name: /Steps/ });
+
+    expect(heading).toBeVisible();
   });
 });

@@ -44,29 +44,33 @@ describe(`<${StepList.name}/>`, () => {
     });
 
     it('maps each status to its indicator glyph, keeping every glyph decorative', () => {
-      expect(
-        screen.getByText('✓', { selector: HIDDEN_ICON_SELECTOR }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('2', { selector: HIDDEN_ICON_SELECTOR }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('!', { selector: HIDDEN_ICON_SELECTOR }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('4', { selector: HIDDEN_ICON_SELECTOR }),
-      ).toBeVisible();
+      const doneGlyph = screen.getByText('✓', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const runningGlyph = screen.getByText('2', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const failedGlyph = screen.getByText('!', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const idleGlyph = screen.getByText('4', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+
+      expect(doneGlyph).toBeVisible();
+      expect(runningGlyph).toBeVisible();
+      expect(failedGlyph).toBeVisible();
+      expect(idleGlyph).toBeVisible();
     });
 
     it('renders a connector after every step except the last', () => {
-      expect(
-        screen.getAllByText((content) => content.length > 0, {
-          selector: HIDDEN_ICON_SELECTOR,
-        }),
-      ).toHaveLength(steps.length);
-      expect(screen.getAllByTestId('step-connector')).toHaveLength(
-        steps.length - 1,
-      );
+      const glyphs = screen.getAllByText((content) => content.length > 0, {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const connectors = screen.getAllByTestId('step-connector');
+
+      expect(glyphs).toHaveLength(steps.length);
+      expect(connectors).toHaveLength(steps.length - 1);
     });
 
     it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {
@@ -92,7 +96,9 @@ describe(`<${StepList.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByText(RUNNING_NOW)).toBeVisible();
+    const trailingSlot = screen.getByText(RUNNING_NOW);
+
+    expect(trailingSlot).toBeVisible();
   });
 
   it('renders an already-formatted updatedAt as a <time> element carrying the raw ISO value', () => {

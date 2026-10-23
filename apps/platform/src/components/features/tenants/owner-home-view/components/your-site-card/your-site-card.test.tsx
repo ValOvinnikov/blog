@@ -22,29 +22,38 @@ describe(`<${YourSiteCard.name}/>`, () => {
     });
     render(<YourSiteCard tenant={tenant} />);
 
-    expect(screen.getByText(MOCK_SITE_NAME)).toBeVisible();
-    expect(screen.getByText(MOCK_CUSTOM_DOMAIN)).toBeVisible();
-    expect(screen.getByText('Growth')).toBeVisible();
-    expect(screen.getByText('English')).toBeVisible();
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    const name = screen.getByText(MOCK_SITE_NAME);
+    const domain = screen.getByText(MOCK_CUSTOM_DOMAIN);
+    const plan = screen.getByText('Growth');
+    const locale = screen.getByText('English');
+    const textbox = screen.queryByRole('textbox');
+
+    expect(name).toBeVisible();
+    expect(domain).toBeVisible();
+    expect(plan).toBeVisible();
+    expect(locale).toBeVisible();
+    expect(textbox).not.toBeInTheDocument();
   });
 
   it('links the public domain out to the live site', () => {
     const tenant = makeTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN });
     render(<YourSiteCard tenant={tenant} />);
 
-    expect(
-      screen.getByRole('link', {
-        name: `Open ${MOCK_CUSTOM_DOMAIN} in a new tab`,
-      }),
-    ).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
+    const siteLink = screen.getByRole('link', {
+      name: `Open ${MOCK_CUSTOM_DOMAIN} in a new tab`,
+    });
+
+    expect(siteLink).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
   });
 
   it("nests the card's title one level under the page's own h1", () => {
     render(<YourSiteCard tenant={makeTenant()} />);
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Your site' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Your site',
+    });
+
+    expect(heading).toBeVisible();
   });
 });

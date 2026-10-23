@@ -2,7 +2,10 @@ import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { MOCK_CONTACT_RECIPIENT } from '@platform/testing/email/fixtures';
+import {
+  MOCK_CONTACT_RECIPIENT,
+  SEND_CONTACT_MESSAGES_TO,
+} from '@platform/testing/email/fixtures';
 import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
@@ -81,7 +84,6 @@ const setup = customRenderAsync(EmailPageContent, { tenant });
 
 const YOURE_INVITED_ACME_CO = "You're invited to Acme Co";
 const SUPPORT_ACME_EXAMPLE = 'support@acme.example';
-const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
 
 describe(`<${EmailPageContent.name}/>`, () => {
   beforeEach(() => {
@@ -110,28 +112,39 @@ describe(`<${EmailPageContent.name}/>`, () => {
     });
 
     it('renders the Email page heading', () => {
-      expect(screen.getByRole('heading', { name: 'Email' })).toBeVisible();
+      const heading = screen.getByRole('heading', { name: 'Email' });
+
+      expect(heading).toBeVisible();
     });
 
     it('renders blank settings fields when the tenant has no saved email_config row yet', () => {
-      expect(screen.getByLabelText('Sender name')).toHaveValue('');
-      expect(screen.getByLabelText('Reply-to address')).toHaveValue('');
+      const senderNameInput = screen.getByLabelText('Sender name');
+      const replyToInput = screen.getByLabelText('Reply-to address');
+
+      expect(senderNameInput).toHaveValue('');
+      expect(replyToInput).toHaveValue('');
     });
 
     it('hides the contact recipient field on a plan without the contact form', () => {
-      expect(
-        screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
-      ).not.toBeInTheDocument();
+      const contactRecipientInput = screen.queryByLabelText(
+        SEND_CONTACT_MESSAGES_TO,
+      );
+
+      expect(contactRecipientInput).not.toBeInTheDocument();
     });
 
     it("shows each template's authored copy in the tenant's default language", async () => {
       const user = userEvent.setup();
-      await user.click(screen.getByRole('combobox', { name: 'Editing' }));
-      await user.click(
-        await screen.findByRole('option', { name: /^Team invite/ }),
-      );
+      const editingCombobox = screen.getByRole('combobox', { name: 'Editing' });
+      await user.click(editingCombobox);
+      const teamInviteOption = await screen.findByRole('option', {
+        name: /^Team invite/,
+      });
+      await user.click(teamInviteOption);
 
-      expect(screen.getByDisplayValue(YOURE_INVITED_ACME_CO)).toBeVisible();
+      const subjectInput = screen.getByDisplayValue(YOURE_INVITED_ACME_CO);
+
+      expect(subjectInput).toBeVisible();
     });
   });
 
@@ -149,8 +162,11 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
-    expect(screen.getByDisplayValue(SUPPORT_ACME_EXAMPLE)).toBeVisible();
+    const senderNameInput = screen.getByDisplayValue('Acme Co');
+    const replyToInput = screen.getByDisplayValue(SUPPORT_ACME_EXAMPLE);
+
+    expect(senderNameInput).toBeVisible();
+    expect(replyToInput).toBeVisible();
   });
 
   it('shows the stored contact recipient on a plan with the contact form', async () => {
@@ -162,9 +178,11 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
 
-    expect(screen.getByLabelText(SEND_CONTACT_MESSAGES_TO)).toHaveValue(
-      MOCK_CONTACT_RECIPIENT,
+    const contactRecipientInput = screen.getByLabelText(
+      SEND_CONTACT_MESSAGES_TO,
     );
+
+    expect(contactRecipientInput).toHaveValue(MOCK_CONTACT_RECIPIENT);
   });
 
   it('hides the contact recipient field from an editor', async () => {
@@ -178,9 +196,11 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
 
-    expect(
-      screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
-    ).not.toBeInTheDocument();
+    const contactRecipientInput = screen.queryByLabelText(
+      SEND_CONTACT_MESSAGES_TO,
+    );
+
+    expect(contactRecipientInput).not.toBeInTheDocument();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
@@ -191,6 +211,8 @@ describe(`<${EmailPageContent.name}/>`, () => {
       },
     });
 
-    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+
+    expect(archivedNotice).toBeVisible();
   });
 });

@@ -39,16 +39,17 @@ describe(`<${DomainPageContent.name}/>`, () => {
 
     await render();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Domain' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText(
-        'The one piece of setup that is genuinely yours to finish.',
-      ),
-    ).toBeVisible();
-    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
-    expect(screen.queryByRole('heading', { level: 2 })).toBeNull();
+    const title = screen.getByRole('heading', { level: 1, name: 'Domain' });
+    const description = screen.getByText(
+      'The one piece of setup that is genuinely yours to finish.',
+    );
+    const skeletons = screen.getAllByTestId('skeleton');
+    const cardHeading = screen.queryByRole('heading', { level: 2 });
+
+    expect(title).toBeVisible();
+    expect(description).toBeVisible();
+    expect(skeletons.length).toBeGreaterThan(0);
+    expect(cardHeading).toBeNull();
   });
 
   describe('for a live tenant', () => {
@@ -57,14 +58,16 @@ describe(`<${DomainPageContent.name}/>`, () => {
     });
 
     it('replaces the skeleton with the domain card once Vercel answers', async () => {
-      expect(
-        await screen.findByRole('heading', {
-          level: 2,
-          name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
-        }),
-      ).toBeVisible();
-      expect(screen.getByText('Awaiting DNS')).toBeVisible();
-      expect(screen.queryByTestId('skeleton')).toBeNull();
+      const cardHeading = await screen.findByRole('heading', {
+        level: 2,
+        name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
+      });
+      const statusBadge = screen.getByText('Awaiting DNS');
+      const skeleton = screen.queryByTestId('skeleton');
+
+      expect(cardHeading).toBeVisible();
+      expect(statusBadge).toBeVisible();
+      expect(skeleton).toBeNull();
     });
 
     it('loads the domain from Vercel exactly once', async () => {
@@ -76,7 +79,9 @@ describe(`<${DomainPageContent.name}/>`, () => {
     });
 
     it('does not show the archived notice for a live tenant', () => {
-      expect(screen.queryByText(ARCHIVED_NOTICE_TEXT)).not.toBeInTheDocument();
+      const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
+
+      expect(archivedNotice).not.toBeInTheDocument();
     });
   });
 
@@ -88,6 +93,8 @@ describe(`<${DomainPageContent.name}/>`, () => {
       }),
     );
 
-    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+
+    expect(archivedNotice).toBeVisible();
   });
 });

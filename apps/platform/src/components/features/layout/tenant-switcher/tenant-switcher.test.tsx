@@ -46,9 +46,9 @@ describe(`<${TenantSwitcher.name}/>`, () => {
   it('shows the active tenant on the trigger', () => {
     setup();
 
-    expect(
-      screen.getByRole('button', { name: includesTenantName }),
-    ).toHaveTextContent(MOCK_TENANT_DOMAIN);
+    const trigger = screen.getByRole('button', { name: includesTenantName });
+
+    expect(trigger).toHaveTextContent(MOCK_TENANT_DOMAIN);
   });
 
   describe('with the menu open', () => {
@@ -56,34 +56,39 @@ describe(`<${TenantSwitcher.name}/>`, () => {
 
     beforeEach(async () => {
       setup({ tenants: [tenant, archivedTenant] });
-      await user.click(
-        screen.getByRole('button', { name: includesTenantName }),
-      );
+      const trigger = screen.getByRole('button', { name: includesTenantName });
+      await user.click(trigger);
       menu = await screen.findByRole('menu', { name: includesTenantName });
     });
 
     it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', () => {
-      expect(
-        within(menu).getByRole('menuitem', { name: includesTenantName }),
-      ).toHaveAttribute(
+      const activeItem = within(menu).getByRole('menuitem', {
+        name: includesTenantName,
+      });
+      const otherItem = within(menu).getByRole('menuitem', {
+        name: /globex corp/i,
+      });
+
+      expect(activeItem).toHaveAttribute(
         'href',
         `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
       );
-      expect(
-        within(menu).getByRole('menuitem', { name: /globex corp/i }),
-      ).toHaveAttribute(
+      expect(otherItem).toHaveAttribute(
         'href',
         `/api/dashboard/select-tenant?tenantId=${MOCK_OTHER_TENANT_ID}`,
       );
     });
 
     it('marks an archived tenant in its accessible name and leaves others unmarked', () => {
-      expect(
-        within(menu).getByRole('menuitem', { name: includesTenantName }),
-      ).not.toHaveAccessibleName(/archived/i);
-      expect(
-        within(menu).getByRole('menuitem', { name: /globex corp.*archived/i }),
-      ).toBeVisible();
+      const activeItem = within(menu).getByRole('menuitem', {
+        name: includesTenantName,
+      });
+      const archivedItem = within(menu).getByRole('menuitem', {
+        name: /globex corp.*archived/i,
+      });
+
+      expect(activeItem).not.toHaveAccessibleName(/archived/i);
+      expect(archivedItem).toBeVisible();
     });
   });
 
@@ -93,8 +98,10 @@ describe(`<${TenantSwitcher.name}/>`, () => {
       activeTenantId: MOCK_OTHER_TENANT_ID,
     });
 
-    expect(
-      screen.getByRole('button', { name: /globex corp.*archived/i }),
-    ).toBeVisible();
+    const trigger = screen.getByRole('button', {
+      name: /globex corp.*archived/i,
+    });
+
+    expect(trigger).toBeVisible();
   });
 });

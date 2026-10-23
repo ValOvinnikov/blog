@@ -6,7 +6,12 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
-import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  ALL_CHANGES_SAVED,
+  ARCHIVED_NOTICE_TEXT,
+  SAVE_CHANGES,
+  UNSAVED_CHANGES,
+} from '@platform/testing/render-in-settings-form';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_OTHER_TENANT_ID,
@@ -84,11 +89,8 @@ const dispatchBeforeUnload = () => {
   return event;
 };
 
-const ALL_CHANGES_SAVED = 'All changes saved';
-const UNSAVED_CHANGES = 'Unsaved changes';
 const CONTROL_S_CONTROL = '{Control>}s{/Control}';
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
-const SAVE_CHANGES = 'Save changes';
 const SOMETHING_WENT_WRONG_TRY_AGAIN = 'Something went wrong — try again.';
 const MY_TAGLINE = 'My tagline';
 const RESTORE_1_CHANGE = 'Restore 1 change';
@@ -107,23 +109,28 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('renders the title, description and children', () => {
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Features' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText(TOGGLE_CAPABILITIES_FOR_THIS_TENANT),
-      ).toBeVisible();
-      expect(screen.getByText('tab body')).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Features',
+      });
+      const description = screen.getByText(TOGGLE_CAPABILITIES_FOR_THIS_TENANT);
+      const body = screen.getByText('tab body');
+
+      expect(heading).toBeVisible();
+      expect(description).toBeVisible();
+      expect(body).toBeVisible();
     });
 
     it('shows no archived notice when archivedAt is unset', () => {
-      expect(screen.queryByText(ARCHIVED_NOTICE_TEXT)).not.toBeInTheDocument();
+      const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
+
+      expect(archivedNotice).not.toBeInTheDocument();
     });
 
     it('shows no error alert without an error title', () => {
-      expect(
-        screen.queryByText(SOMETHING_WENT_WRONG_TRY_AGAIN),
-      ).not.toBeInTheDocument();
+      const errorAlert = screen.queryByText(SOMETHING_WENT_WRONG_TRY_AGAIN);
+
+      expect(errorAlert).not.toBeInTheDocument();
     });
   });
 
@@ -136,10 +143,11 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('shows no save status and offers no save bar', () => {
-      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('region', { name: UNSAVED_CHANGES }),
-      ).not.toBeInTheDocument();
+      const savedStatus = screen.queryByText(ALL_CHANGES_SAVED);
+      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(savedStatus).not.toBeInTheDocument();
+      expect(saveBar).not.toBeInTheDocument();
     });
 
     it('ignores the save shortcut', async () => {
@@ -149,7 +157,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('lets the page unload without a warning', () => {
-      expect(dispatchBeforeUnload().defaultPrevented).toBe(false);
+      const event = dispatchBeforeUnload();
+
+      expect(event.defaultPrevented).toBe(false);
     });
   });
 
@@ -164,10 +174,11 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('shows the save bar with the change count in place of the saved status', () => {
-      expect(
-        screen.getByRole('region', { name: UNSAVED_CHANGES }),
-      ).toHaveTextContent(THREE_UNSAVED_CHANGES);
-      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const savedStatus = screen.queryByText(ALL_CHANGES_SAVED);
+
+      expect(saveBar).toHaveTextContent(THREE_UNSAVED_CHANGES);
+      expect(savedStatus).not.toBeInTheDocument();
     });
 
     it('announces the change count politely', () => {
@@ -178,13 +189,15 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('calls onSave from the Save button', async () => {
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      await user.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
 
     it('calls onDiscard from the Discard button', async () => {
-      await user.click(screen.getByRole('button', { name: 'Discard' }));
+      const discardButton = screen.getByRole('button', { name: 'Discard' });
+      await user.click(discardButton);
 
       expect(onDiscard).toHaveBeenCalledTimes(1);
     });
@@ -199,7 +212,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('warns before the page unloads', () => {
-      expect(dispatchBeforeUnload().defaultPrevented).toBe(true);
+      const event = dispatchBeforeUnload();
+
+      expect(event.defaultPrevented).toBe(true);
     });
 
     it('never moves focus into the save bar', () => {
@@ -238,17 +253,22 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       );
     };
 
-    const editTagline = () =>
-      user.type(screen.getByRole('textbox', { name: 'Tagline' }), '!');
+    const editTagline = async () => {
+      const taglineInput = screen.getByRole('textbox', { name: 'Tagline' });
+      await user.type(taglineInput, '!');
+    };
 
     beforeEach(async () => {
       renderWithIntl(<TaglineSettings />);
       await editTagline();
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      await user.click(saveButton);
     });
 
     it('shows after a successful save', async () => {
-      expect(await screen.findByText(ALL_CHANGES_SAVED)).toBeVisible();
+      const savedStatus = await screen.findByText(ALL_CHANGES_SAVED);
+
+      expect(savedStatus).toBeVisible();
     });
 
     describe('then edited again', () => {
@@ -258,16 +278,20 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       });
 
       it('disappears on the next edit after a save', () => {
-        expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
+        const savedStatus = screen.queryByText(ALL_CHANGES_SAVED);
+
+        expect(savedStatus).not.toBeInTheDocument();
       });
 
       it('stays hidden after discarding back to clean', async () => {
-        await user.click(screen.getByRole('button', { name: 'Discard' }));
+        const discardButton = screen.getByRole('button', { name: 'Discard' });
+        await user.click(discardButton);
 
-        expect(
-          screen.queryByRole('region', { name: UNSAVED_CHANGES }),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
+        const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+        const savedStatus = screen.queryByText(ALL_CHANGES_SAVED);
+
+        expect(saveBar).not.toBeInTheDocument();
+        expect(savedStatus).not.toBeInTheDocument();
       });
     });
   });
@@ -284,13 +308,17 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   it('shows the archived notice when archivedAt is set', () => {
     renderShell({ archivedAt: MOCK_ARCHIVED_AT });
 
-    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+
+    expect(archivedNotice).toBeVisible();
   });
 
   it('shows the error alert when an error title is set', () => {
     renderShell({}, { errorTitle: SOMETHING_WENT_WRONG_TRY_AGAIN });
 
-    expect(screen.getByText(SOMETHING_WENT_WRONG_TRY_AGAIN)).toBeVisible();
+    const errorAlert = screen.getByText(SOMETHING_WENT_WRONG_TRY_AGAIN);
+
+    expect(errorAlert).toBeVisible();
   });
 
   describe('draft recovery', () => {
@@ -314,7 +342,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     it('offers no draft on a first visit', () => {
       renderShell();
 
-      expect(queryBanner()).not.toBeInTheDocument();
+      const banner = queryBanner();
+
+      expect(banner).not.toBeInTheDocument();
     });
 
     describe('after leaving with unsaved changes', () => {
@@ -327,35 +357,48 @@ describe(`<${SettingsFormShell.name}/>`, () => {
 
         renderShell({ draft: draftFor(SAVED, SAVED, onRestore) });
 
-        expect(queryBanner()).toBeVisible();
-        expect(
-          screen.getByText(
-            'They were kept on this device when you left the page.',
-          ),
-        ).toBeVisible();
-        await user.click(
-          screen.getByRole('button', { name: RESTORE_1_CHANGE }),
+        const banner = queryBanner();
+        const keptNote = screen.getByText(
+          'They were kept on this device when you left the page.',
         );
+        const restoreButton = screen.getByRole('button', {
+          name: RESTORE_1_CHANGE,
+        });
+
+        expect(banner).toBeVisible();
+        expect(keptNote).toBeVisible();
+
+        await user.click(restoreButton);
+        const bannerAfterRestore = queryBanner();
 
         expect(onRestore).toHaveBeenCalledWith(EDITED);
-        expect(queryBanner()).not.toBeInTheDocument();
+        expect(bannerAfterRestore).not.toBeInTheDocument();
       });
 
       it('forgets the draft when it is discarded from the banner', async () => {
         const { unmount } = renderShell();
 
-        await user.click(screen.getByRole('button', { name: 'Discard them' }));
-        expect(queryBanner()).not.toBeInTheDocument();
+        const discardButton = screen.getByRole('button', {
+          name: 'Discard them',
+        });
+        await user.click(discardButton);
+        const bannerAfterDiscard = queryBanner();
+
+        expect(bannerAfterDiscard).not.toBeInTheDocument();
+
         unmount();
         renderShell();
+        const bannerAfterRemount = queryBanner();
 
-        expect(queryBanner()).not.toBeInTheDocument();
+        expect(bannerAfterRemount).not.toBeInTheDocument();
       });
 
       it('offers nothing when the draft matches what is saved now', () => {
         renderShell({ draft: draftFor(EDITED, EDITED) });
 
-        expect(queryBanner()).not.toBeInTheDocument();
+        const banner = queryBanner();
+
+        expect(banner).not.toBeInTheDocument();
       });
 
       it('keeps drafts apart per tenant', () => {
@@ -363,7 +406,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
           draft: { ...draftFor(SAVED), tenantId: MOCK_OTHER_TENANT_ID },
         });
 
-        expect(queryBanner()).not.toBeInTheDocument();
+        const banner = queryBanner();
+
+        expect(banner).not.toBeInTheDocument();
       });
 
       it('keeps drafts apart per language', () => {
@@ -371,7 +416,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
           draft: { ...draftFor(SAVED), language: LOCALE_ISO_CODES.DE },
         });
 
-        expect(queryBanner()).not.toBeInTheDocument();
+        const banner = queryBanner();
+
+        expect(banner).not.toBeInTheDocument();
       });
 
       describe('when someone else saved since', () => {
@@ -384,47 +431,55 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         });
 
         it('says the page was saved after the draft was taken', () => {
-          expect(screen.getByText(/but this page was saved at/)).toBeVisible();
+          const staleNote = screen.getByText(/but this page was saved at/);
+
+          expect(staleNote).toBeVisible();
         });
 
         it('names the fields a restore would overwrite before any restore', () => {
-          expect(
-            screen.getByText(
-              'Restoring replaces 1 of the newer values: Tagline.',
-            ),
-          ).toBeVisible();
-          expect(
-            screen.queryByRole('button', { name: RESTORE_1_CHANGE }),
-          ).not.toBeInTheDocument();
+          const overwriteNote = screen.getByText(
+            'Restoring replaces 1 of the newer values: Tagline.',
+          );
+          const restoreButton = screen.queryByRole('button', {
+            name: RESTORE_1_CHANGE,
+          });
+
+          expect(overwriteNote).toBeVisible();
+          expect(restoreButton).not.toBeInTheDocument();
           expect(onRestore).not.toHaveBeenCalled();
         });
 
         it('shows the saved value beside the draft for each differing field', async () => {
-          await user.click(screen.getByText('Review the difference'));
+          const reviewToggle = screen.getByText('Review the difference');
+          await user.click(reviewToggle);
 
           const row = screen.getByRole('row', { name: /Tagline/ });
-          expect(
-            within(row).getByRole('cell', { name: THEIR_TAGLINE }),
-          ).toBeVisible();
-          expect(
-            within(row).getByRole('cell', { name: MY_TAGLINE }),
-          ).toBeVisible();
+          const savedCell = within(row).getByRole('cell', {
+            name: THEIR_TAGLINE,
+          });
+          const draftCell = within(row).getByRole('cell', { name: MY_TAGLINE });
+
+          expect(savedCell).toBeVisible();
+          expect(draftCell).toBeVisible();
         });
 
         it('restores the draft on Restore anyway', async () => {
-          await user.click(
-            screen.getByRole('button', { name: 'Restore anyway' }),
-          );
+          const restoreAnywayButton = screen.getByRole('button', {
+            name: 'Restore anyway',
+          });
+          await user.click(restoreAnywayButton);
 
           expect(onRestore).toHaveBeenCalledWith(EDITED);
         });
 
         it('forgets the draft on Discard my draft', async () => {
-          await user.click(
-            screen.getByRole('button', { name: 'Discard my draft' }),
-          );
+          const discardDraftButton = screen.getByRole('button', {
+            name: 'Discard my draft',
+          });
+          await user.click(discardDraftButton);
+          const banner = queryBanner();
 
-          expect(queryBanner()).not.toBeInTheDocument();
+          expect(banner).not.toBeInTheDocument();
           expect(onRestore).not.toHaveBeenCalled();
         });
       });
@@ -441,20 +496,24 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       });
 
       it('forgets the draft once the changes are saved', async () => {
-        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        await user.click(saveButton);
         await waitFor(() => expect(baseSave).toHaveBeenCalled());
         unmount();
         renderShell();
+        const banner = queryBanner();
 
-        expect(queryBanner()).not.toBeInTheDocument();
+        expect(banner).not.toBeInTheDocument();
       });
 
       it('forgets the draft once the changes are discarded', async () => {
-        await user.click(screen.getByRole('button', { name: 'Discard' }));
+        const discardButton = screen.getByRole('button', { name: 'Discard' });
+        await user.click(discardButton);
         unmount();
         renderShell();
+        const banner = queryBanner();
 
-        expect(queryBanner()).not.toBeInTheDocument();
+        expect(banner).not.toBeInTheDocument();
       });
     });
 
@@ -472,12 +531,16 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         draft: draftFor(EDITED),
       });
 
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      await user.click(saveButton);
+
       expect(onSave).toHaveBeenCalledTimes(1);
+
       unmount();
       renderShell();
+      const banner = queryBanner();
 
-      expect(queryBanner()).not.toBeInTheDocument();
+      expect(banner).not.toBeInTheDocument();
     });
   });
 });

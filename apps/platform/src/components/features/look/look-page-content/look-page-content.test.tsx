@@ -58,11 +58,11 @@ describe(`<${LookPageContent.name}/>`, () => {
     await setup();
 
     expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(screen.getByRole('heading', { name: 'Look' })).toBeVisible();
-    expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-      ARIA_CHECKED,
-      'true',
-    );
+    const heading = screen.getByRole('heading', { name: 'Look' });
+    const consoleRadio = screen.getByRole('radio', { name: 'Console' });
+
+    expect(heading).toBeVisible();
+    expect(consoleRadio).toHaveAttribute(ARIA_CHECKED, 'true');
   });
 
   it('previews Sign in when a reader feature is on', async () => {
@@ -70,7 +70,9 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    const signInButton = screen.getByRole('button', { name: 'Sign in' });
+
+    expect(signInButton).toBeVisible();
   });
 
   it('previews no Sign in when only non-reader features are on', async () => {
@@ -78,9 +80,9 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('button', { name: 'Sign in' }),
-    ).not.toBeInTheDocument();
+    const signInButton = screen.queryByRole('button', { name: 'Sign in' });
+
+    expect(signInButton).not.toBeInTheDocument();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
@@ -115,10 +117,10 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: 'Editorial' })).toHaveAttribute(
-      ARIA_CHECKED,
-      'true',
-    );
-    expect(screen.getByText('hue 28°')).toBeVisible();
+    const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
+    const hueLabel = screen.getByText('hue 28°');
+
+    expect(editorialRadio).toHaveAttribute(ARIA_CHECKED, 'true');
+    expect(hueLabel).toBeVisible();
   });
 });

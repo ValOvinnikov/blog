@@ -14,10 +14,15 @@ describe(`<${DetailList.name}/>`, () => {
       </DetailList>,
     );
 
-    expect(screen.getByText('Public domain')).toBeVisible();
-    expect(screen.getByText(MOCK_CUSTOM_DOMAIN)).toBeVisible();
-    expect(screen.getByText('Plan')).toBeVisible();
-    expect(screen.getByText('Growth')).toBeVisible();
+    const domainLabel = screen.getByText('Public domain');
+    const domainValue = screen.getByText(MOCK_CUSTOM_DOMAIN);
+    const planLabel = screen.getByText('Plan');
+    const planValue = screen.getByText('Growth');
+
+    expect(domainLabel).toBeVisible();
+    expect(domainValue).toBeVisible();
+    expect(planLabel).toBeVisible();
+    expect(planValue).toBeVisible();
   });
 
   it('renders a trailing action alongside the value', () => {
@@ -32,7 +37,9 @@ describe(`<${DetailList.name}/>`, () => {
       </DetailList>,
     );
 
-    expect(screen.getByRole('button', { name: 'DNS' })).toBeVisible();
+    const dnsButton = screen.getByRole('button', { name: 'DNS' });
+
+    expect(dnsButton).toBeVisible();
   });
 
   it('renders as a real definition list', () => {
@@ -42,8 +49,12 @@ describe(`<${DetailList.name}/>`, () => {
       </DetailList>,
     );
 
-    expect(screen.getByText('Locale').tagName).toBe('DT');
-    expect(screen.getByText('en').tagName).toBe('SPAN');
-    expect(screen.getByText('en').closest('dd')).not.toBeNull();
+    const label = screen.getByText('Locale');
+    const value = screen.getByText('en');
+    const definition = value.closest('dd');
+
+    expect(label.tagName).toBe('DT');
+    expect(value.tagName).toBe('SPAN');
+    expect(definition).not.toBeNull();
   });
 });

@@ -13,9 +13,12 @@ describe(`<${ContentWorkspaceCard.name}/>`, () => {
   it("nests the card's title one level under the page's own h1", () => {
     render(<ContentWorkspaceCard tenant={makeClientTenant()} />);
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Content workspace' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Content workspace',
+    });
+
+    expect(heading).toBeVisible();
   });
 
   it("shows 'Not set' for content-workspace fields the tenant has not been provisioned with yet", () => {
@@ -40,8 +43,12 @@ describe(`<${ContentWorkspaceCard.name}/>`, () => {
     });
     render(<ContentWorkspaceCard tenant={tenant} />);
 
-    expect(screen.getByText('Stored')).toBeVisible();
-    expect(screen.getByText('Active')).toBeVisible();
-    expect(screen.getByText(MOCK_SANITY_PROJECT_ID)).toBeVisible();
+    const storedBadge = screen.getByText('Stored');
+    const activeBadge = screen.getByText('Active');
+    const projectId = screen.getByText(MOCK_SANITY_PROJECT_ID);
+
+    expect(storedBadge).toBeVisible();
+    expect(activeBadge).toBeVisible();
+    expect(projectId).toBeVisible();
   });
 });

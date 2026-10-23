@@ -21,20 +21,19 @@ describe(`<${DomainCard.name}/>`, () => {
   it('shows the public domain and a link to the given DNS href', () => {
     setup();
 
-    expect(screen.getByText(MOCK_TENANT_DOMAIN)).toBeVisible();
-    expect(screen.getByRole('link', { name: 'DNS' })).toHaveAttribute(
-      'href',
-      TENANT_DNS_HREF,
-    );
+    const domain = screen.getByText(MOCK_TENANT_DOMAIN);
+    const dnsLink = screen.getByRole('link', { name: 'DNS' });
+
+    expect(domain).toBeVisible();
+    expect(dnsLink).toHaveAttribute('href', TENANT_DNS_HREF);
   });
 
   it("links to the owner tree's domain page when given that href instead", () => {
     setup({ dnsHref: OWNER_DNS_HREF });
 
-    expect(screen.getByRole('link', { name: 'DNS' })).toHaveAttribute(
-      'href',
-      OWNER_DNS_HREF,
-    );
+    const dnsLink = screen.getByRole('link', { name: 'DNS' });
+
+    expect(dnsLink).toHaveAttribute('href', OWNER_DNS_HREF);
   });
 
   it("nests the card's title one level under the page's own h1", () => {
@@ -42,9 +41,9 @@ describe(`<${DomainCard.name}/>`, () => {
       domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
     });
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Domain' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { level: 2, name: 'Domain' });
+
+    expect(heading).toBeVisible();
   });
 
   it.each([
@@ -54,7 +53,9 @@ describe(`<${DomainCard.name}/>`, () => {
   ])('claims a recent check for a %s status Vercel reported', (status) => {
     setup({ domainVerificationStatus: status });
 
-    expect(screen.getByText('Just now')).toBeVisible();
+    const checkedAt = screen.getByText('Just now');
+
+    expect(checkedAt).toBeVisible();
   });
 
   it.each([
@@ -63,7 +64,10 @@ describe(`<${DomainCard.name}/>`, () => {
   ])('claims no recent check for a %s status', (status) => {
     setup({ domainVerificationStatus: status });
 
-    expect(screen.queryByText('Last checked')).toBeNull();
-    expect(screen.queryByText('Just now')).toBeNull();
+    const lastCheckedLabel = screen.queryByText('Last checked');
+    const checkedAt = screen.queryByText('Just now');
+
+    expect(lastCheckedLabel).not.toBeInTheDocument();
+    expect(checkedAt).not.toBeInTheDocument();
   });
 });

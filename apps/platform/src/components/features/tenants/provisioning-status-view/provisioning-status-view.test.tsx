@@ -16,7 +16,10 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
-import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  ARCHIVED_NOTICE_DESCRIPTION,
+  ARCHIVED_NOTICE_TEXT,
+} from '@platform/testing/render-in-settings-form';
 import {
   idleProvisioningSteps,
   INVITED_PENDING_TEXT,
@@ -123,7 +126,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   ) => {
     retryProvisioningStepActionMock.mockResolvedValue(result);
     renderView();
-    await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
+    const startButton = screen.getByRole('button', {
+      name: START_PROVISIONING,
+    });
+    await user.click(startButton);
   };
 
   it('never lets a rendered poll loop schedule a real setInterval, even for a test that never advances timers', () => {
@@ -173,15 +179,13 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       }),
     });
 
-    const runningText = within(
-      screen.getByRole('heading', { name: 'Provisioning' }),
-    ).queryByText(RUNNING);
-    const runningText2 = within(screen.getByTestId(RUN_STATUS_LIVE)).getByText(
-      RUNNING,
-    );
+    const pageHeading = screen.getByRole('heading', { name: 'Provisioning' });
+    const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+    const headerBadge = within(pageHeading).queryByText(RUNNING);
+    const cardBadge = within(runStatusLive).getByText(RUNNING);
 
-    expect(runningText).not.toBeInTheDocument();
-    expect(runningText2).toBeVisible();
+    expect(headerBadge).not.toBeInTheDocument();
+    expect(cardBadge).toBeVisible();
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
@@ -217,10 +221,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         level: 2,
         name: /^Steps/,
       });
-      const n0Of6Text = within(sidebar).getByText('0 of 6 done');
+      const completionBadge = within(sidebar).getByText('0 of 6 done');
 
       expect(stepsHeading).toBeVisible();
-      expect(n0Of6Text).toBeVisible();
+      expect(completionBadge).toBeVisible();
     });
 
     it('lists all six provisioning steps in order, in operator language', () => {
@@ -260,9 +264,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
-      await user.click(
-        screen.getByRole('button', { name: START_PROVISIONING }),
-      );
+      const startButton = screen.getByRole('button', {
+        name: START_PROVISIONING,
+      });
+      await user.click(startButton);
 
       await waitFor(() => {
         expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
@@ -282,11 +287,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       }),
     });
 
-    const n2Of6Text = within(screen.getByTestId(PROVISIONING_STEPS)).getByText(
-      '2 of 6 done',
-    );
+    const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+    const completionBadge = within(stepsCard).getByText('2 of 6 done');
 
-    expect(n2Of6Text).toBeVisible();
+    expect(completionBadge).toBeVisible();
   });
 
   describe('with the first step running', () => {
@@ -306,12 +310,12 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
     it("shows a running step's number in its circle instead of a spinner", () => {
       const statusList = screen.queryAllByRole('status');
-      const n1Text = screen.getByText('1', {
+      const stepOneGlyph = screen.getByText('1', {
         selector: HIDDEN_ICON_SELECTOR,
       });
 
       expect(statusList).toHaveLength(0);
-      expect(n1Text).toBeVisible();
+      expect(stepOneGlyph).toBeVisible();
     });
 
     it('hides the Start provisioning action once any step has progressed past idle', () => {
@@ -363,10 +367,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       }
     }
 
-    const n1Text = screen.getByText('1', {
+    const stepOneGlyph = screen.getByText('1', {
       selector: HIDDEN_ICON_SELECTOR,
     });
-    const n2Text = screen.getByText('2', {
+    const stepTwoGlyph = screen.getByText('2', {
       selector: HIDDEN_ICON_SELECTOR,
     });
     const checkMark = screen.getByText('✓', {
@@ -376,8 +380,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       selector: HIDDEN_ICON_SELECTOR,
     });
 
-    expect(n1Text).toBeVisible();
-    expect(n2Text).toBeVisible();
+    expect(stepOneGlyph).toBeVisible();
+    expect(stepTwoGlyph).toBeVisible();
     expect(checkMark).toBeVisible();
     expect(failureMark).toBeVisible();
   });
@@ -388,15 +392,14 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     const retryProvisioningButtons = screen.getAllByRole('button', {
       name: RETRY_PROVISIONING,
     });
-    const retryProvisioningButton = within(
-      screen.getByTestId(PROVISIONING_STEPS),
-    ).queryByRole('button', {
+    const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+    const sidebarRetryButton = within(stepsCard).queryByRole('button', {
       name: RETRY_PROVISIONING,
     });
     const failedTexts = screen.getAllByText('Failed');
 
     expect(retryProvisioningButtons).toHaveLength(1);
-    expect(retryProvisioningButton).not.toBeInTheDocument();
+    expect(sidebarRetryButton).not.toBeInTheDocument();
     expect(failedTexts).toHaveLength(2);
   });
 
@@ -409,11 +412,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       }),
     });
 
-    const vercelApiPostText = within(
-      screen.getByTestId(PROVISIONING_STEPS),
-    ).queryByText(VERCEL_DOMAINS_FAILURE);
+    const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+    const rawErrorText = within(stepsCard).queryByText(VERCEL_DOMAINS_FAILURE);
 
-    expect(vercelApiPostText).not.toBeInTheDocument();
+    expect(rawErrorText).not.toBeInTheDocument();
   });
 
   describe('parsed provisioning error card', () => {
@@ -523,12 +525,12 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       const failureMark = screen.queryByText('!', {
         selector: HIDDEN_ICON_SELECTOR,
       });
-      const n4Text = screen.getByText('4', {
+      const stepFourGlyph = screen.getByText('4', {
         selector: HIDDEN_ICON_SELECTOR,
       });
 
       expect(failureMark).not.toBeInTheDocument();
-      expect(n4Text).toBeVisible();
+      expect(stepFourGlyph).toBeVisible();
     });
 
     it('shows no Retry button while the run is genuinely in progress', () => {
@@ -543,7 +545,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   it('re-dispatches the workflow for this tenant when Retry is clicked', async () => {
     renderView({ tenant: failedRunTenant() });
 
-    await user.click(screen.getByRole('button', { name: RETRY_PROVISIONING }));
+    const retryButton = screen.getByRole('button', {
+      name: RETRY_PROVISIONING,
+    });
+    await user.click(retryButton);
 
     await waitFor(() => {
       expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
@@ -572,9 +577,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('immediately hides Start and shows the running badge before the dispatch resolves', async () => {
-      await user.click(
-        screen.getByRole('button', { name: START_PROVISIONING }),
-      );
+      const startButton = screen.getByRole('button', {
+        name: START_PROVISIONING,
+      });
+      await user.click(startButton);
 
       const startProvisioningButton = screen.queryByRole('button', {
         name: START_PROVISIONING,
@@ -591,9 +597,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
       expect(notStartedText).toBeVisible();
 
-      await user.click(
-        screen.getByRole('button', { name: START_PROVISIONING }),
-      );
+      const startButton = screen.getByRole('button', {
+        name: START_PROVISIONING,
+      });
+      await user.click(startButton);
 
       const runningText = within(liveRegion).getByText(RUNNING);
 
@@ -685,7 +692,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
       expect(startProvisioningButton).toHaveAccessibleDescription(
-        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+        ARCHIVED_NOTICE_DESCRIPTION,
       );
     });
   });
@@ -718,7 +725,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
       expect(retryProvisioningButton).toHaveAccessibleDescription(
-        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+        ARCHIVED_NOTICE_DESCRIPTION,
       );
     });
   });
@@ -754,10 +761,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
           TENANT_ID,
         );
         const completeText = within(sidebar).getByText('Complete');
-        const runningText2 = within(sidebar).queryByText(RUNNING);
+        const sidebarRunningText = within(sidebar).queryByText(RUNNING);
 
         expect(completeText).toBeVisible();
-        expect(runningText2).not.toBeInTheDocument();
+        expect(sidebarRunningText).not.toBeInTheDocument();
       });
 
       it('announces a polled step-status transition through a stable aria-live region', async () => {
@@ -810,12 +817,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
       );
       const queuedRunElapsed = screen.getByTestId(QUEUED_RUN_ELAPSED);
-      const startingText = within(
-        screen.getByTestId(RUN_STATUS_LIVE),
-      ).getByText('Starting…');
-      const queuedText = within(screen.getByTestId(FIRST_STEP_LIVE)).getByText(
-        'Queued',
-      );
+      const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+      const firstStepLive = screen.getByTestId(FIRST_STEP_LIVE);
+      const startingText = within(runStatusLive).getByText('Starting…');
+      const queuedText = within(firstStepLive).getByText('Queued');
 
       expect(queuedTheProvisioningText).toBeVisible();
       expect(queuedRunElapsed).toHaveTextContent('0:05 waiting');
@@ -826,9 +831,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      const queuedRunElapsed2 = screen.getByTestId(QUEUED_RUN_ELAPSED);
+      const queuedRunElapsedLater = screen.getByTestId(QUEUED_RUN_ELAPSED);
 
-      expect(queuedRunElapsed2).toHaveTextContent('1:05 waiting');
+      expect(queuedRunElapsedLater).toHaveTextContent('1:05 waiting');
     });
 
     it('drops the queued notice once the workflow has started the run', async () => {
@@ -848,9 +853,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       const queuedTheProvisioningText = screen.queryByText(
         QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
       );
-      const runningText = within(screen.getByTestId(RUN_STATUS_LIVE)).getByText(
-        RUNNING,
-      );
+      const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+      const runningText = within(runStatusLive).getByText(RUNNING);
 
       expect(queuedTheProvisioningText).not.toBeInTheDocument();
       expect(runningText).toBeVisible();
@@ -863,15 +867,18 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       vi.useFakeTimers();
     });
 
-    const stepsToggle = () =>
-      within(screen.getByTestId(PROVISIONING_STEPS)).getByRole('button', {
-        name: /Steps/,
-      });
+    const stepsToggle = () => {
+      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+
+      return within(stepsCard).getByRole('button', { name: /Steps/ });
+    };
 
     it('is expanded while the run is not done', () => {
       renderView({ tenant: provisioningFirstStepRunningTenant() });
 
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
+      const disclosure = stepsToggle();
+
+      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -882,7 +889,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         }),
       });
 
-      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
+      const disclosure = stepsToggle();
+
+      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -953,10 +962,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         });
 
         it("keeps a step's timestamp outside the aria-live status region", () => {
-          const liveRegions = [
-            ...screen.getAllByTestId(/^step-status-live-/),
-            screen.getByTestId(RUN_STATUS_LIVE),
-          ];
+          const stepLiveRegions = screen.getAllByTestId(/^step-status-live-/);
+          const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+          const liveRegions = [...stepLiveRegions, runStatusLive];
           expect(liveRegions.length).toBeGreaterThan(0);
           for (const region of liveRegions) {
             expect(region).not.toHaveTextContent('6m ago');
@@ -1003,9 +1011,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         }),
       });
 
-      const d4Text = screen.queryByText(/\d{4}/);
+      const yearText = screen.queryByText(/\d{4}/);
 
-      expect(d4Text).not.toBeInTheDocument();
+      expect(yearText).not.toBeInTheDocument();
     });
 
     it('renders a Run card header with no run details for a tenant with no run', () => {
@@ -1036,17 +1044,17 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
       const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-      const n6mAgoAugText = screen.getByText(
+      const sixMinutesAgoText = screen.getByText(
         '6m ago · Aug 12, 2026, 2:18 PM UTC',
       );
-      const n2mAgoAugText = screen.getByText(
+      const twoMinutesAgoText = screen.getByText(
         '2m ago · Aug 12, 2026, 2:22 PM UTC',
       );
       const productionText = screen.getByText('production');
 
       expect(runHeading).toBeVisible();
-      expect(n6mAgoAugText).toBeVisible();
-      expect(n2mAgoAugText).toBeVisible();
+      expect(sixMinutesAgoText).toBeVisible();
+      expect(twoMinutesAgoText).toBeVisible();
       expect(productionText).toBeVisible();
     });
   });

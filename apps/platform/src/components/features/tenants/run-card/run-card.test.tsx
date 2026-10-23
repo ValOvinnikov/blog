@@ -37,11 +37,13 @@ describe(`<${RunCard.name}/>`, () => {
 
     const started = screen.getByText('6m ago · Aug 12, 2026, 2:18 PM UTC');
     const finished = screen.getByText('2m ago · Aug 12, 2026, 2:22 PM UTC');
+    const registry = screen.getByText('production');
+
     expect(started.tagName).toBe('TIME');
     expect(started).toHaveAttribute('dateTime', MOCK_RUN_STARTED_AT);
     expect(finished.tagName).toBe('TIME');
     expect(finished).toHaveAttribute('dateTime', MOCK_RUN_PLUS_4_MIN_AT);
-    expect(screen.getByText('production')).toBeVisible();
+    expect(registry).toBeVisible();
   });
 
   it('shows a waiting-to-start placeholder for Started when the run has been admitted but has not yet begun, with no <time> element', () => {
@@ -68,9 +70,9 @@ describe(`<${RunCard.name}/>`, () => {
     });
 
     it('nests the card title one level under the page heading', () => {
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Run' }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', { level: 2, name: 'Run' });
+
+      expect(heading).toBeVisible();
     });
   });
 
@@ -82,9 +84,9 @@ describe(`<${RunCard.name}/>`, () => {
       } as TProvisioningRun,
     });
 
-    expect(
-      screen.queryByRole('link', { name: /workflow log/i }),
-    ).not.toBeInTheDocument();
+    const workflowLink = screen.queryByRole('link', { name: /workflow log/i });
+
+    expect(workflowLink).not.toBeInTheDocument();
   });
 
   it('links out to the workflow run when workflowRunUrl is present', () => {
@@ -104,21 +106,26 @@ describe(`<${RunCard.name}/>`, () => {
   it('takes the heading level it is given', () => {
     setup({ headingLevel: 3 });
 
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Run' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { level: 3, name: 'Run' });
+
+    expect(heading).toBeVisible();
   });
 
   it('says no run has started yet when there is no run', () => {
     setup({ run: undefined });
 
-    expect(screen.getByText('No run has started yet.')).toBeVisible();
-    expect(screen.queryByText('Started')).not.toBeInTheDocument();
+    const emptyMessage = screen.getByText('No run has started yet.');
+    const startedLabel = screen.queryByText('Started');
+
+    expect(emptyMessage).toBeVisible();
+    expect(startedLabel).not.toBeInTheDocument();
   });
 
   it('renders actions in the card header', () => {
     setup({ actions: <span>Complete</span> });
 
-    expect(screen.getByText('Complete')).toBeVisible();
+    const action = screen.getByText('Complete');
+
+    expect(action).toBeVisible();
   });
 });

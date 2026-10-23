@@ -10,13 +10,18 @@ import {
   waitFor,
 } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
-import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  ARCHIVED_NOTICE_TEXT,
+  SAVE_CHANGES,
+} from '@platform/testing/render-in-settings-form';
 import {
   makeClientTenant,
   MOCK_ARCHIVED_AT,
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
+  OWNER_EMAIL_LABEL,
+  PRIMARY_DOMAIN_LABEL,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
@@ -26,6 +31,7 @@ import {
   TenantDetailsPanel,
   type TTenantDetailsPanelProps,
 } from './tenant-details-panel';
+import type { TTenantDetailsValues } from './tenant-details-values';
 
 const render = renderWithIntl;
 
@@ -53,10 +59,7 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
-const PRIMARY_DOMAIN = 'Primary domain';
 const ARIA_PRESSED = 'aria-pressed';
-const OWNER_EMAIL = 'Owner email';
-const SAVE_CHANGES = 'Save changes';
 const NEW_OWNER_EXAMPLE_COM = 'new-owner@example.com';
 const ACME_RENAMED = 'Acme Renamed';
 const THIS_DOMAIN_ALREADY_IN_USE = 'This domain is already in use.';
@@ -70,9 +73,22 @@ const UNSAVED_DOMAIN_EXAMPLE_COM = 'unsaved-domain.example.com';
 const ACME_RENAMED_UNSAVED = 'Acme Renamed (unsaved)';
 const LOCK_ANNOUNCEMENT_LIVE = 'lock-announcement-live';
 const LOCKED_THIS_TENANT_IS_ARCHIVED = 'Locked — this tenant is archived.';
+const ACME_LTD = 'Acme Ltd';
 const SAVE_AND_LEAVE = 'Save and leave';
 
 const DEFAULT_TENANT = makeClientTenant();
+
+const detailsValuesOf = (
+  tenant: TClientTenant,
+  overrides: Partial<TTenantDetailsValues> = {},
+): TTenantDetailsValues => ({
+  name: tenant.name,
+  primaryDomain: tenant.primaryDomain,
+  plan: tenant.plan,
+  locale: tenant.locale,
+  ownerEmail: MOCK_OWNER_EMAIL,
+  ...overrides,
+});
 
 const panel = (props: Partial<TTenantDetailsPanelProps> = {}) => (
   <TenantDetailsPanel
@@ -112,25 +128,25 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
       expect(nameInput).not.toBeDisabled();
 
-      expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        MOCK_TENANT_DOMAIN,
-      );
-      expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute(
-        ARIA_PRESSED,
-        'true',
-      );
-      expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute(
-        ARIA_PRESSED,
-        'true',
-      );
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      expect(primaryDomainInput).toHaveValue(MOCK_TENANT_DOMAIN);
+      const freeButton = screen.getByRole('button', { name: 'Free' });
+      expect(freeButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      const englishButton = screen.getByRole('button', { name: 'English' });
+      expect(englishButton).toHaveAttribute(ARIA_PRESSED, 'true');
 
       const ownerEmailInput = screen.getByRole('textbox', {
-        name: OWNER_EMAIL,
+        name: OWNER_EMAIL_LABEL,
       });
       expect(ownerEmailInput).toHaveValue(MOCK_OWNER_EMAIL);
       expect(ownerEmailInput).toHaveAttribute('type', 'email');
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
     });
 
     it('renders the plan field label as a plain span, not a <label htmlFor> pointing nowhere, while still exposing the accessible name via ariaLabel', () => {
@@ -140,21 +156,25 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(planLabelText.tagName).toBe('SPAN');
       expect(planLabelText).not.toHaveAttribute('for');
 
-      expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
+      const planGroup = screen.getByRole('group', { name: 'Plan' });
+      expect(planGroup).toBeVisible();
     });
 
     it('enables Save when only the owner email is edited', async () => {
       renderPanel();
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
 
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        NEW_OWNER_EXAMPLE_COM,
-      );
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, NEW_OWNER_EXAMPLE_COM);
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeEnabled();
+      expect(saveChangesButton).toBeEnabled();
     });
 
     it('saves the edited values and refreshes on success, sending the unchanged owner email as an ordinary field', async () => {
@@ -162,24 +182,24 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ name: ACME_RENAMED }),
       });
-      renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
+      const tenant = makeClientTenant({
+        id: TENANT_ID,
+        name: MOCK_TENANT_NAME,
       });
+      renderPanel({ tenant });
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, ACME_RENAMED);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
           TENANT_ID,
-          expect.objectContaining({
-            name: ACME_RENAMED,
-            ownerEmail: MOCK_OWNER_EMAIL,
-          }),
+          detailsValuesOf(tenant, { name: ACME_RENAMED }),
         );
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
@@ -190,19 +210,23 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant(),
       });
-      renderPanel({ tenant: makeClientTenant({ id: TENANT_ID }) });
+      const tenant = makeClientTenant({ id: TENANT_ID });
+      renderPanel({ tenant });
 
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        NEW_OWNER_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, NEW_OWNER_EXAMPLE_COM);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
           TENANT_ID,
-          expect.objectContaining({ ownerEmail: NEW_OWNER_EXAMPLE_COM }),
+          detailsValuesOf(tenant, { ownerEmail: NEW_OWNER_EXAMPLE_COM }),
         );
       });
     });
@@ -219,29 +243,37 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
 
       it('shows a field error and does not refresh when saving fails', async () => {
-        await user.clear(screen.getByRole('textbox', { name: PRIMARY_DOMAIN }));
-        await user.type(
-          screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-          'taken.example.com',
-        );
-        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        const primaryDomainInput = screen.getByRole('textbox', {
+          name: PRIMARY_DOMAIN_LABEL,
+        });
+        await user.clear(primaryDomainInput);
+        await user.type(primaryDomainInput, 'taken.example.com');
+        const saveChangesButton = screen.getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        await user.click(saveChangesButton);
 
-        expect(
-          await screen.findByText(THIS_DOMAIN_ALREADY_IN_USE),
-        ).toBeVisible();
+        const thisDomainAlreadyInUseText = await screen.findByText(
+          THIS_DOMAIN_ALREADY_IN_USE,
+        );
+        expect(thisDomainAlreadyInUseText).toBeVisible();
         expect(refreshMock).not.toHaveBeenCalled();
       });
 
       it('does not show a success alert when saving fails', async () => {
-        await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
-        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        const nameInput = screen.getByRole('textbox', { name: 'Name' });
+        await user.type(nameInput, '!');
+        const saveChangesButton = screen.getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        await user.click(saveChangesButton);
 
-        expect(
-          await screen.findByText(THIS_DOMAIN_ALREADY_IN_USE),
-        ).toBeVisible();
-        expect(
-          screen.queryByText(TENANT_DETAILS_SAVED),
-        ).not.toBeInTheDocument();
+        const thisDomainAlreadyInUseText = await screen.findByText(
+          THIS_DOMAIN_ALREADY_IN_USE,
+        );
+        expect(thisDomainAlreadyInUseText).toBeVisible();
+        const savedToast = screen.queryByText(TENANT_DETAILS_SAVED);
+        expect(savedToast).not.toBeInTheDocument();
       });
     });
 
@@ -255,16 +287,19 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       renderPanel();
 
-      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.type(nameInput, '!');
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
       await screen.findByText(ENTER_A_TENANT_NAME);
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
       expect(nameInput).toBeInvalid();
       expect(nameInput).toHaveAccessibleDescription(ENTER_A_TENANT_NAME);
 
       const domainInput = screen.getByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
       expect(domainInput).toBeInvalid();
       expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
@@ -279,17 +314,20 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
       });
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, ACME_RENAMED);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
-      expect(await screen.findByText(TENANT_DETAILS_SAVED)).toBeVisible();
+      const savedToast = await screen.findByText(TENANT_DETAILS_SAVED);
+      expect(savedToast).toBeVisible();
 
-      await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
-      expect(screen.getByText(TENANT_DETAILS_SAVED)).toBeVisible();
+      await user.type(nameInput, ' again');
+      const savedToastAfterEdit = screen.getByText(TENANT_DETAILS_SAVED);
+      expect(savedToastAfterEdit).toBeVisible();
     });
 
     it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
@@ -299,14 +337,17 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       renderPanel();
 
-      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.type(nameInput, '!');
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
-      expect(
-        await screen.findByText(
-          "This tenant's provisioning has already started; its details can no longer be edited.",
-        ),
-      ).toBeVisible();
+      const provisioningStartedError = await screen.findByText(
+        "This tenant's provisioning has already started; its details can no longer be edited.",
+      );
+      expect(provisioningStartedError).toBeVisible();
       expect(refreshMock).not.toHaveBeenCalled();
     });
 
@@ -317,18 +358,22 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       renderPanel({ tenant: makeClientTenant({ id: TENANT_ID }) });
 
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        NEW_OWNER_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, NEW_OWNER_EXAMPLE_COM);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       const message = await screen.findByText(
         "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       );
       expect(message).toBeVisible();
-      expect(screen.queryByText(/couldn.?t save/i)).not.toBeInTheDocument();
+      const saveFailedAlert = screen.queryByText(/couldn.?t save/i);
+      expect(saveFailedAlert).not.toBeInTheDocument();
       expect(refreshMock).not.toHaveBeenCalled();
     });
 
@@ -341,18 +386,21 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       renderPanel();
 
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        'taken@example.com',
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      const ownerEmailInput = await screen.findByRole('textbox', {
-        name: OWNER_EMAIL,
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
       });
-      expect(ownerEmailInput).toBeInvalid();
-      expect(ownerEmailInput).toHaveAccessibleDescription(
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, 'taken@example.com');
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
+
+      const invalidOwnerEmailInput = await screen.findByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      expect(invalidOwnerEmailInput).toBeInvalid();
+      expect(invalidOwnerEmailInput).toHaveAccessibleDescription(
         'This email already has a pending invite on this tenant.',
       );
       expect(refreshMock).not.toHaveBeenCalled();
@@ -364,7 +412,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       renderPanel({ fieldLocks: DOMAIN_LOCKED });
 
       const domainInput = screen.getByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
       expect(domainInput).toHaveValue(MOCK_TENANT_DOMAIN);
       expect(domainInput).toBeDisabled();
@@ -384,14 +432,16 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         fieldLocks: DOMAIN_LOCKED,
       });
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Free' })).not.toBeDisabled();
-      expect(
-        screen.getByRole('button', { name: 'English' }),
-      ).not.toBeDisabled();
-      expect(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-      ).not.toBeDisabled();
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      expect(nameInput).not.toBeDisabled();
+      const freeButton = screen.getByRole('button', { name: 'Free' });
+      expect(freeButton).not.toBeDisabled();
+      const englishButton = screen.getByRole('button', { name: 'English' });
+      expect(englishButton).not.toBeDisabled();
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      expect(ownerEmailInput).not.toBeDisabled();
     });
 
     it('lets the operator correct the unlocked field that caused the failure and save it', async () => {
@@ -414,20 +464,20 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         },
       });
 
-      await user.clear(screen.getByRole('textbox', { name: PRIMARY_DOMAIN }));
-      await user.type(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-        NEW_DOMAIN_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      await user.clear(primaryDomainInput);
+      await user.type(primaryDomainInput, NEW_DOMAIN_EXAMPLE_COM);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
           TENANT_ID,
-          expect.objectContaining({
-            primaryDomain: NEW_DOMAIN_EXAMPLE_COM,
-            name: tenant.name,
-          }),
+          detailsValuesOf(tenant, { primaryDomain: NEW_DOMAIN_EXAMPLE_COM }),
         );
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
@@ -458,20 +508,23 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ locale: LOCALE_ISO_CODES.NL }),
       });
-      renderPanel({
-        tenant: makeClientTenant({
-          id: TENANT_ID,
-          locale: LOCALE_ISO_CODES.EN,
-        }),
+      const tenant = makeClientTenant({
+        id: TENANT_ID,
+        locale: LOCALE_ISO_CODES.EN,
       });
+      renderPanel({ tenant });
 
-      await user.click(screen.getByRole('button', { name: 'Dutch' }));
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const dutchButton = screen.getByRole('button', { name: 'Dutch' });
+      await user.click(dutchButton);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
           TENANT_ID,
-          expect.objectContaining({ locale: LOCALE_ISO_CODES.NL }),
+          detailsValuesOf(tenant, { locale: LOCALE_ISO_CODES.NL }),
         );
       });
     });
@@ -488,15 +541,18 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       renderPanel({ tenant: makeClientTenant({ id: TENANT_ID }) });
 
-      await user.clear(screen.getByRole('textbox', { name: PRIMARY_DOMAIN }));
-      await user.type(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-        NEW_DOMAIN_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      await user.clear(primaryDomainInput);
+      await user.type(primaryDomainInput, NEW_DOMAIN_EXAMPLE_COM);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       const domainInput = await screen.findByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
       expect(domainInput).toBeInvalid();
       expect(domainInput).toHaveAccessibleDescription(
@@ -518,14 +574,24 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         fieldLocks: ALL_LOCKED_RUNNING,
       });
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
-      expect(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-      ).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'English' })).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: OWNER_EMAIL })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Growth' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      expect(nameInput).toBeDisabled();
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      expect(primaryDomainInput).toBeDisabled();
+      const englishButton = screen.getByRole('button', { name: 'English' });
+      expect(englishButton).toBeDisabled();
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      expect(ownerEmailInput).toBeDisabled();
+      const growthButton = screen.getByRole('button', { name: 'Growth' });
+      expect(growthButton).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
     });
   });
 
@@ -533,9 +599,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('exposes a group role with an accessible name, so a forced-focus landing announces something', () => {
       renderPanel();
 
-      expect(
-        screen.getByRole('group', { name: TENANT_DETAIL_FIELDS }),
-      ).toBeVisible();
+      const tenantDetailFieldsGroup = screen.getByRole('group', {
+        name: TENANT_DETAIL_FIELDS,
+      });
+      expect(tenantDetailFieldsGroup).toBeVisible();
     });
   });
 
@@ -548,22 +615,19 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
       const domainInput = screen.getByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
       await user.clear(domainInput);
       await user.type(domainInput, UNSAVED_DOMAIN_EXAMPLE_COM);
-      expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        UNSAVED_DOMAIN_EXAMPLE_COM,
-      );
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      expect(primaryDomainInput).toHaveValue(UNSAVED_DOMAIN_EXAMPLE_COM);
 
       rerender(panel({ fieldLocks: DOMAIN_LOCKED }));
 
-      expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        MOCK_TENANT_DOMAIN,
-      );
-      expect(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-      ).toBeDisabled();
+      expect(primaryDomainInput).toHaveValue(MOCK_TENANT_DOMAIN);
+      expect(primaryDomainInput).toBeDisabled();
     });
 
     it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
@@ -573,9 +637,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       rerender(panel({ fieldLocks: DOMAIN_LOCKED }));
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
-        ACME_RENAMED_UNSAVED,
-      );
+      expect(nameInput).toHaveValue(ACME_RENAMED_UNSAVED);
     });
   });
 
@@ -583,7 +645,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('is disabled when the form is pristine', () => {
       renderPanel();
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
     });
 
     it('enables once a field is edited, and disables again once edited back to the original value', async () => {
@@ -593,11 +658,14 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       await user.clear(nameInput);
       await user.type(nameInput, ACME_RENAMED);
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeEnabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeEnabled();
 
       await user.clear(nameInput);
       await user.type(nameInput, MOCK_TENANT_NAME);
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      expect(saveChangesButton).toBeDisabled();
     });
 
     it('stays disabled and announces the pending state to assistive tech while a save is in flight, even with dirty values', async () => {
@@ -615,19 +683,21 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
       });
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, ACME_RENAMED);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       const saveButton = await screen.findByRole('button', {
         name: 'Saving…',
       });
       expect(saveButton).toBeDisabled();
       expect(saveButton).toHaveAttribute('aria-busy', 'true');
-      expect(screen.getByRole('status')).toHaveTextContent('Saving…');
+      const status = screen.getByRole('status');
+      expect(status).toHaveTextContent('Saving…');
 
       resolveAction({
         outcome: ACTION_OUTCOME.SUCCESS,
@@ -645,12 +715,13 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
       });
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, ACME_RENAMED);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
 
@@ -660,9 +731,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         }),
       );
 
-      expect(
-        await screen.findByRole('button', { name: SAVE_CHANGES }),
-      ).toBeDisabled();
+      const saveChangesButtonAfterRerender = await screen.findByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButtonAfterRerender).toBeDisabled();
     });
   });
 
@@ -672,7 +744,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       rerender(panel({ fieldLocks: DOMAIN_LOCKED }));
 
-      expect(screen.getByTestId(LOCK_ANNOUNCEMENT_LIVE)).toHaveTextContent(
+      const lockAnnouncementLive = screen.getByTestId(LOCK_ANNOUNCEMENT_LIVE);
+      expect(lockAnnouncementLive).toHaveTextContent(
         'Some tenant detail fields are now locked.',
       );
     });
@@ -703,15 +776,20 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
 
       it('disables every field and the Save button, regardless of edits or field locks', async () => {
-        expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
-        expect(
-          screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-        ).toBeDisabled();
-        expect(screen.getByRole('button', { name: 'English' })).toBeDisabled();
-        expect(
-          screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        ).toBeDisabled();
-        expect(screen.getByRole('button', { name: 'Free' })).toBeDisabled();
+        const nameInput = screen.getByRole('textbox', { name: 'Name' });
+        expect(nameInput).toBeDisabled();
+        const primaryDomainInput = screen.getByRole('textbox', {
+          name: PRIMARY_DOMAIN_LABEL,
+        });
+        expect(primaryDomainInput).toBeDisabled();
+        const englishButton = screen.getByRole('button', { name: 'English' });
+        expect(englishButton).toBeDisabled();
+        const ownerEmailInput = screen.getByRole('textbox', {
+          name: OWNER_EMAIL_LABEL,
+        });
+        expect(ownerEmailInput).toBeDisabled();
+        const freeButton = screen.getByRole('button', { name: 'Free' });
+        expect(freeButton).toBeDisabled();
 
         const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
         expect(saveButton).toBeDisabled();
@@ -733,9 +811,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
 
       it('leaves the Save button without a description when no archivedNoticeId is supplied', () => {
-        expect(
-          screen.getByRole('button', { name: SAVE_CHANGES }),
-        ).not.toHaveAttribute('aria-describedby');
+        const saveChangesButton = screen.getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        expect(saveChangesButton).not.toHaveAttribute('aria-describedby');
       });
     });
 
@@ -752,9 +831,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         </>,
       );
 
-      expect(
-        screen.getByRole('button', { name: SAVE_CHANGES }),
-      ).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toHaveAccessibleDescription(
+        ARCHIVED_NOTICE_TEXT,
+      );
     });
   });
 
@@ -768,9 +850,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       rerender(panel({ fieldLocks: ALL_LOCKED_RUNNING }));
 
-      expect(
-        screen.getByRole('group', { name: TENANT_DETAIL_FIELDS }),
-      ).toHaveFocus();
+      const tenantDetailFieldsGroup = screen.getByRole('group', {
+        name: TENANT_DETAIL_FIELDS,
+      });
+      expect(tenantDetailFieldsGroup).toHaveFocus();
       expect(document.body).not.toHaveFocus();
     });
   });
@@ -789,10 +872,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('navigates without asking when nothing is edited', async () => {
-      await user.click(screen.getByRole('link', { name: 'Tenants' }));
+      const tenantsLink = screen.getByRole('link', { name: 'Tenants' });
+      await user.click(tenantsLink);
 
       expect(push).toHaveBeenCalledWith('/tenants');
-      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+      const alertdialog = screen.queryByRole('alertdialog');
+      expect(alertdialog).not.toBeInTheDocument();
     });
 
     describe('with an edited name', () => {
@@ -801,22 +886,25 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       beforeEach(async () => {
         nameInput = screen.getByRole('textbox', { name: 'Name' });
         await user.clear(nameInput);
-        await user.type(nameInput, 'Acme Ltd');
+        await user.type(nameInput, ACME_LTD);
       });
 
       it('asks first, then restores the saved values on Discard and leave', async () => {
-        await user.click(screen.getByRole('link', { name: 'Tenants' }));
+        const tenantsLink = screen.getByRole('link', { name: 'Tenants' });
+        await user.click(tenantsLink);
 
-        expect(
-          screen.getByRole('alertdialog', { name: 'Leave without saving?' }),
-        ).toHaveAccessibleDescription(
+        const leaveWithoutSavingAlertdialog = screen.getByRole('alertdialog', {
+          name: 'Leave without saving?',
+        });
+        expect(leaveWithoutSavingAlertdialog).toHaveAccessibleDescription(
           'You have 1 unsaved change on Tenant details.',
         );
         expect(push).not.toHaveBeenCalled();
 
-        await user.click(
-          screen.getByRole('button', { name: 'Discard and leave' }),
-        );
+        const discardAndLeaveButton = screen.getByRole('button', {
+          name: 'Discard and leave',
+        });
+        await user.click(discardAndLeaveButton);
 
         expect(push).toHaveBeenCalledWith('/tenants');
         expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
@@ -828,13 +916,17 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           tenant: makeClientTenant(),
         });
 
-        await user.click(screen.getByRole('link', { name: 'Tenants' }));
-        await user.click(screen.getByRole('button', { name: SAVE_AND_LEAVE }));
+        const tenantsLink = screen.getByRole('link', { name: 'Tenants' });
+        await user.click(tenantsLink);
+        const saveAndLeaveButton = screen.getByRole('button', {
+          name: SAVE_AND_LEAVE,
+        });
+        await user.click(saveAndLeaveButton);
 
         await waitFor(() => expect(push).toHaveBeenCalledWith('/tenants'));
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({ name: 'Acme Ltd' }),
+          DEFAULT_TENANT.id,
+          detailsValuesOf(DEFAULT_TENANT, { name: ACME_LTD }),
         );
       });
 
@@ -843,14 +935,19 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           outcome: ACTION_OUTCOME.SERVER_ERROR,
         });
 
-        await user.click(screen.getByRole('link', { name: 'Tenants' }));
-        await user.click(screen.getByRole('button', { name: SAVE_AND_LEAVE }));
+        const tenantsLink = screen.getByRole('link', { name: 'Tenants' });
+        await user.click(tenantsLink);
+        const saveAndLeaveButton = screen.getByRole('button', {
+          name: SAVE_AND_LEAVE,
+        });
+        await user.click(saveAndLeaveButton);
 
-        expect(
-          await screen.findByText("Couldn't save tenant details — try again."),
-        ).toBeVisible();
+        const saveFailedMessage = await screen.findByText(
+          "Couldn't save tenant details — try again.",
+        );
+        expect(saveFailedMessage).toBeVisible();
         expect(push).not.toHaveBeenCalled();
-        expect(nameInput).toHaveValue('Acme Ltd');
+        expect(nameInput).toHaveValue(ACME_LTD);
       });
     });
   });
