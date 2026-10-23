@@ -17,3 +17,9 @@ export const mockContactFormModule = (
   contentAlignment: undefined,
   ...overrides,
 });
+
+export const MOCK_CONTACT_MESSAGE = {
+  name: faker.person.fullName(),
+  email: faker.internet.email(),
+  message: faker.lorem.sentences(2),
+};
