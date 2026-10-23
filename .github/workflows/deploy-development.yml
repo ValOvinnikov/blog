@@ -5,17 +5,17 @@ name: Deploy Development
 # currently-suspended behaviour. See the block above `on:` for why and how to
 # restore it (#2648).
 #
-# The dev web app and dev admin panel deploy from here on merge to `main` — but
-# only the app(s) whose turbo graph the merge actually touched (see the `changes`
-# job), and ONLY after the `verify` gate (type-check/lint/test/build on the
+# The dev web app, dev admin panel and dev worker deploy from here on merge to
+# `main` — but only the app(s) whose turbo graph the merge actually touched (see
+# the `changes` job), and ONLY after the `verify` gate (type-check/lint/test/build on the
 # merged commit) passes. The Studio is not deployed: it ships as the
 # `@blog/studio` package and is mounted by the admin panel, so `changes` tracks
 # it only to decide whether the Sanity content migration needs to run. Vercel's
-# native Git integration is disabled for both deployed projects declaratively via
+# native Git integration is disabled for every deployed project declaratively via
 # each app's own vercel.json `git.deploymentEnabled: false` (#445) so nothing
 # deploys pre-merge or ungated — every dev deploy goes through this workflow.
-# Mirrors deploy-production.yml, which deploys both apps unconditionally (a tag
-# is a deliberate full release).
+# deploy-production.yml deploys web and admin unconditionally (a tag is a
+# deliberate full release).
 #
 # TEMPORARY (2026-09-04): automatic deploy-on-merge is disabled to stay inside
 # the Vercel metered-usage allowance during a low-development stretch. Dev
@@ -116,6 +116,7 @@ jobs:
       studio: ${{ steps.studio.outputs.changed }}
       web: ${{ steps.web.outputs.changed }}
       admin: ${{ steps.admin.outputs.changed }}
+      worker: ${{ steps.worker.outputs.changed }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -204,6 +205,18 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Is worker affected?
+        id: worker
+        env:
+          BASE_REF: ${{ steps.baseline.outputs.ref }}
+        run: |
+          set -uo pipefail
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" worker --fallback="$BASE_REF"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
   # Gate: re-run the full suite on the exact merged commit before any deploy.
   # Deploy jobs `needs: verify`, so a dev deploy only happens after checks pass.
   # Skipped entirely (along with every deploy) when no app is affected. Test
@@ -216,7 +229,8 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.studio == 'true' ||
       needs.changes.outputs.web == 'true' ||
-      needs.changes.outputs.admin == 'true'
+      needs.changes.outputs.admin == 'true' ||
+      needs.changes.outputs.worker == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -353,9 +367,10 @@ jobs:
   # serves new code — the same "code never ships ahead of a pending
   # migration" discipline as the content `migrate` job above, for the
   # separate relational store (`packages/db`, see .claude/agents/db.md's
-  # "Migrations" section). `deploy-web` and `deploy-admin` both depend on
-  # `@blog/db` (the Studio never touches Postgres), so this is gated on
-  # web||admin, not `studio`, and only those two need it below. No artifact backup here — dev is the disposable staging line, same
+  # "Migrations" section). `deploy-web`, `deploy-admin` and `deploy-worker` all
+  # depend on `@blog/db` (the Studio never touches Postgres), so this is gated
+  # on web||admin||worker, not `studio`, and only those three need it below. No
+  # artifact backup here — dev is the disposable staging line, same
   # stance as the content migrate job. `drizzle-kit migrate` is a no-op when nothing is
   # pending; a missing DATABASE_URL_UNPOOLED fails the job rather than skipping
   # the steps, for the same reason the content `migrate` job above does. No
@@ -366,7 +381,8 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.web == 'true' ||
-      needs.changes.outputs.admin == 'true'
+      needs.changes.outputs.admin == 'true' ||
+      needs.changes.outputs.worker == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Same reasoning as `migrate` above (#409) — never cancel a running
@@ -532,5 +548,41 @@ jobs:
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
           # A Sensitive var reaches this runner as the literal `[SENSITIVE]`, so the
           # build skips env validation; the deployed app validates at startup.
+          SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+  deploy-worker:
+    name: Deploy dev worker
+    needs: [changes, verify, migrate-db]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.worker == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-dev-worker
+      cancel-in-progress: true
+    environment: development
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_WORKER }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Deploy to Vercel (worker-dev)
+        run: |
+          set -euo pipefail
+          : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the development environment}"
+          : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_WORKER Variable on the development environment}"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
           SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
           npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"

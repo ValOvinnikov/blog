@@ -30,19 +30,20 @@ Architecture rationale lives in `SPEC.md` §13 and
 
 ## Environment matrix
 
-| Concern                | Development                       | Production                         |
-| ---------------------- | --------------------------------- | ---------------------------------- |
-| Sanity project         | separate dev project (id via env) | separate prod project (id via env) |
-| Sanity dataset         | `development`                     | `production`                       |
-| Vercel project (web)   | `web-dev`                         | `web-prod`                         |
-| Vercel project (admin) | `platform-dev`                    | `platform-prod`                    |
-| Web URL (initial)      | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
-| Admin URL (initial)    | `<DEV_ADMIN_URL>`                 | `<PRD_ADMIN_URL>`                  |
-| Deploy trigger         | push/merge to `main`              | push git tag `v*`                  |
-| Web deploy             | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
-| Admin deploy           | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
-| CI gate before deploy  | `verify` job on `main`            | Full gate on the `v*` tag          |
-| Revalidation webhook   | dev → dev site                    | prod → prod site                   |
+| Concern                 | Development                       | Production                         |
+| ----------------------- | --------------------------------- | ---------------------------------- |
+| Sanity project          | separate dev project (id via env) | separate prod project (id via env) |
+| Sanity dataset          | `development`                     | `production`                       |
+| Vercel project (web)    | `web-dev`                         | `web-prod`                         |
+| Vercel project (admin)  | `platform-dev`                    | `platform-prod`                    |
+| Vercel project (worker) | `worker-dev`                      | `worker-prod`                      |
+| Web URL (initial)       | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
+| Admin URL (initial)     | `<DEV_ADMIN_URL>`                 | `<PRD_ADMIN_URL>`                  |
+| Deploy trigger          | push/merge to `main`              | push git tag `v*`                  |
+| Web deploy              | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
+| Admin deploy            | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
+| CI gate before deploy   | `verify` job on `main`            | Full gate on the `v*` tag          |
+| Revalidation webhook    | dev → dev site                    | prod → prod site                   |
 
 > **Project name vs. hostname.** The Vercel _projects_ are named `web-dev`/`web-prod` and `platform-dev`/`platform-prod`; the _hostnames_ they serve are `blog-dev.{your-hosting}` and `admin-dev.{your-hosting}` (and the apex plus `admin.{your-hosting}` in production). The gap is deliberate and it widened when the projects were renamed off their `blog-` prefix (#2426): the product is no longer a blog, but the hostnames are live DNS records wired into OAuth callback registrations, so renaming them is separate work with its own checklist — not a side effect of tidying project names. Both forms appear in this file on purpose: `vercel link` and the project settings use the project name, while anything you visit in a browser uses the hostname. The two Storybook projects follow the same split — `ui-library` happens to match its `ui-library.{your_hosting}` hostname, while `web-ui-library`'s intended hostname, `web-storybook.{your_hosting}`, is not attached to it yet and does not resolve.
 
@@ -134,9 +135,10 @@ operator sees success while the background revalidation POST takes a 500 and
 the site quietly goes stale until the fallback window expires. Dev and prod
 take different values.
 
-### 3. Vercel — four projects · https://vercel.com
+### 3. Vercel — six projects · https://vercel.com
 
-Two projects per environment — a web project and an admin-panel project. The
+Three projects per environment — a web project, an admin-panel project and a
+worker project. The
 Studio is no longer a deploy target of its own: it ships as the `@blog/studio`
 package and is mounted by the admin panel, so it has no project, no hostname
 and no deploy job.
@@ -149,12 +151,19 @@ and no deploy job.
   **Node.js 24.x**. A separate project rather than a second domain on
   `web-dev`/`web-prod`: a Vercel project has exactly one Root Directory,
   and the panel is a second Next.js app under `apps/platform`.
+- **Worker:** `worker-dev`, `worker-prod` — same import flow; **Root Directory
+  `apps/worker`** + tick _"Include files outside of the root directory"_;
+  **Node.js 24.x**. No public hostname: the admin panel reaches it through
+  `WORKER_ENQUEUE_URL`. Its env is listed in
+  [`docs/context/environment-variables.md`](context/environment-variables.md);
+  `platform-*` gets `WORKER_ENQUEUE_URL` (this project's origin) and
+  `WORKER_ENQUEUE_SECRET`.
 
-`web-*` and `platform-*` have Vercel's Git auto-deploy **disabled** — every deploy
+`web-*`, `platform-*` and `worker-*` have Vercel's Git auto-deploy **disabled** — every deploy
 goes through a CI-gated GitHub Actions job (no pre-merge/preview deploys,
 nothing deploys before checks pass). This is set **once, in code**, via each
 app's own `vercel.json`'s `git.deploymentEnabled: false` (`apps/web`,
-`apps/platform`) — since the two projects sharing a Root Directory
+`apps/platform`, `apps/worker`) — since the two projects sharing a Root Directory
 get the same committed file, it can't silently drift the way a per-project
 console toggle (the old "Ignored Build Step" setting) could — a missed
 one-time click on `web-prod` once meant it deployed on every branch push,
@@ -197,6 +206,13 @@ linking + domains remain:
   - [ ] Settings → Domains → add `admin.{your-hosting}`; add the DNS record it
         shows you, same as above. This must match the `ADMIN_APP_BASE_URL`
         Variable in §4 exactly (no trailing slash).
+- [ ] **`worker-dev`**
+  - [ ] From repo root: `npx vercel link` → select `worker-dev`. Read
+        `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
+        `VERCEL_PROJECT_ID_WORKER` for the `development` GitHub Environment.
+        (Then delete the local `.vercel/` dir.)
+- [ ] **`worker-prod`** — same; no deploy job reads its id yet, since
+      `deploy-production.yml` deploys web and admin only.
 
 #### Tenant subdomains — the wildcard and the domains that beat it
 
@@ -499,6 +515,8 @@ names, so their block below applies to **both** environments rather than only to
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-dev**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-dev**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
+- [ ] Variable `VERCEL_PROJECT_ID_WORKER` = `<VERCEL_PROJECT_ID>` (**worker-dev**)
+      — the `deploy-worker` job's target; unset, that job fails naming it.
 - [ ] Every entry in **"Tenant lifecycle — both environments"** below, with this
       environment's own values.
 
@@ -977,9 +995,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    above, for the separate `@blog/db` (Drizzle/Neon) relational store: applies
    any un-applied schema migrations to the **development** Neon branch via
    `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`, a no-op when
-   none are pending). Gated on `web`-or-`admin` (the Studio never touches
-   Postgres, so a studio-only change doesn't trigger it); `deploy-web` and
-   `deploy-admin` `need` it. No artifact backup here,
+   none are pending). Gated on `web`, `admin` or `worker` (the Studio never
+   touches Postgres, so a studio-only change doesn't trigger it);
+   `deploy-web`, `deploy-admin` and `deploy-worker` `need` it. No artifact backup here,
    same disposable-staging-line stance as `migrate`; a missing
    `DATABASE_URL_UNPOOLED` fails the job with a message naming that secret,
    rather than skipping the steps (#2734). Before
@@ -996,6 +1014,11 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    `needs: [changes, verify, migrate-db]` — it depends on `@blog/db` (it
    writes `site_config`), so it is at least as exposed to schema drift as the
    public site is, but not on `migrate`, since it never reads Sanity.
+7. **`deploy-worker`** → `worker-dev` via the Vercel CLI, same mechanism, when
+   the `worker` turbo graph changed. `needs: [changes, verify, migrate-db]` —
+   it writes the tenant registry through `@blog/db`, and reaches Sanity only
+   through the Management API and `@sanity/client`, never the dev dataset's
+   content migrations.
 
    **The personal-data keys may be stored as Sensitive.** The
    build runs on the GitHub runner, where `vercel pull` writes a Sensitive

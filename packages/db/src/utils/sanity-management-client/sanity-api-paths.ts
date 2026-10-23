@@ -22,4 +22,6 @@ export const SANITY_API_PATH = {
   projectRobot: (projectId: string, robotId: string) =>
     `/access/project/${projectId}/robots/${robotId}`,
   projectWebhooks: (projectId: string) => `/hooks/projects/${projectId}`,
+  projectWebhook: (projectId: string, webhookId: string) =>
+    `/hooks/projects/${projectId}/${webhookId}`,
 } as const;

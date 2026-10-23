@@ -2,9 +2,11 @@ import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   idleDeprovisioningSteps,
   makeTenant,
+  REACTIVATE_TENANT_LABEL,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
@@ -65,10 +67,9 @@ const setup = customRenderAsync(TenantDangerPage, {
 
 const NEXT_HTTP_ERROR_FALLBACK_404 = 'NEXT_HTTP_ERROR_FALLBACK;404';
 const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
-const REACTIVATE_TENANT = 'Reactivate tenant';
 const AT_20260410_0000 = '2026-04-10T00:00:00.000Z';
 const DEPROVISION_THIS_TENANT = 'Deprovision this tenant';
-const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
+const DEPROVISIONING_PROGRESS = /^Deprovisioning progress/;
 const TEARDOWN_HISTORY = 'Teardown history';
 
 describe(TenantDangerPage, () => {
@@ -106,10 +107,17 @@ describe(TenantDangerPage, () => {
 
     expect(requireSuperAdminMock).toHaveBeenCalled();
     expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Danger zone' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Deprovision' })).toBeVisible();
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Danger zone',
+    });
+    const deprovisionButton = screen.getByRole('button', {
+      name: 'Deprovision',
+    });
+
+    expect(heading).toBeVisible();
+    expect(deprovisionButton).toBeVisible();
   });
 
   it('never queries the deprovision request when the tenant does not exist', async () => {
@@ -129,16 +137,20 @@ describe(TenantDangerPage, () => {
 
     await setup();
 
+    const startingText = screen.getByText('Starting…');
+
     expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(screen.getByText('Starting…')).toBeVisible();
+    expect(startingText).toBeVisible();
   });
 
   it('never offers reactivation for a live tenant', async () => {
     await setup();
 
-    expect(
-      screen.queryByRole('button', { name: REACTIVATE_TENANT }),
-    ).not.toBeInTheDocument();
+    const reactivateButton = screen.queryByRole('button', {
+      name: REACTIVATE_TENANT_LABEL,
+    });
+
+    expect(reactivateButton).not.toBeInTheDocument();
   });
 
   it('offers reactivation for an already-deprovisioned tenant', async () => {
@@ -150,9 +162,11 @@ describe(TenantDangerPage, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('button', { name: REACTIVATE_TENANT }),
-    ).toBeVisible();
+    const reactivateButton = screen.getByRole('button', {
+      name: REACTIVATE_TENANT_LABEL,
+    });
+
+    expect(reactivateButton).toBeVisible();
   });
 
   it('renders the deprovisioning progress card once a run exists', async () => {
@@ -167,9 +181,11 @@ describe(TenantDangerPage, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
-    ).toBeVisible();
+    const progressHeading = screen.getByRole('heading', {
+      name: DEPROVISIONING_PROGRESS,
+    });
+
+    expect(progressHeading).toBeVisible();
   });
 
   it('renders no deprovisioning progress card when deprovisioningSteps carries no run marker', async () => {
@@ -179,27 +195,29 @@ describe(TenantDangerPage, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: /^Deprovisioning progress/ }),
-    ).not.toBeInTheDocument();
+    const progressHeading = screen.queryByRole('heading', {
+      name: DEPROVISIONING_PROGRESS,
+    });
+
+    expect(progressHeading).not.toBeInTheDocument();
   });
 
   describe('live-tenant reading order (scope guard: unaffected by the archived reorganisation)', () => {
     it('reads header, then the Deprovision card, with no archived notice or history heading', async () => {
       await setup();
 
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: DEPROVISION_THIS_TENANT,
-        }),
-      ).toBeVisible();
-      expect(
-        screen.queryByText(THIS_TENANT_IS_ARCHIVED),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('heading', { name: TEARDOWN_HISTORY }),
-      ).not.toBeInTheDocument();
+      const deprovisionHeading = screen.getByRole('heading', {
+        level: 2,
+        name: DEPROVISION_THIS_TENANT,
+      });
+      const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
+      const historyHeading = screen.queryByRole('heading', {
+        name: TEARDOWN_HISTORY,
+      });
+
+      expect(deprovisionHeading).toBeVisible();
+      expect(archivedNotice).not.toBeInTheDocument();
+      expect(historyHeading).not.toBeInTheDocument();
     });
   });
 
@@ -221,28 +239,31 @@ describe(TenantDangerPage, () => {
 
       await setup();
 
-      expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: 'Reactivate this tenant',
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: 'Delete this tenant permanently',
-        }),
-      ).toBeVisible();
-      expect(
-        screen.queryByRole('heading', { name: DEPROVISION_THIS_TENANT }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole('heading', { name: TEARDOWN_HISTORY }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
-      ).toBeVisible();
+      const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+      const reactivateHeading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Reactivate this tenant',
+      });
+      const deleteHeading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Delete this tenant permanently',
+      });
+      const deprovisionHeading = screen.queryByRole('heading', {
+        name: DEPROVISION_THIS_TENANT,
+      });
+      const historyHeading = screen.getByRole('heading', {
+        name: TEARDOWN_HISTORY,
+      });
+      const progressHeading = screen.getByRole('heading', {
+        name: DEPROVISIONING_PROGRESS,
+      });
+
+      expect(archivedNotice).toBeVisible();
+      expect(reactivateHeading).toBeVisible();
+      expect(deleteHeading).toBeVisible();
+      expect(deprovisionHeading).not.toBeInTheDocument();
+      expect(historyHeading).toBeVisible();
+      expect(progressHeading).toBeVisible();
     });
 
     it('renders no Teardown history section when the tenant has never been through a deprovisioning run', async () => {
@@ -255,9 +276,11 @@ describe(TenantDangerPage, () => {
 
       await setup();
 
-      expect(
-        screen.queryByRole('heading', { name: TEARDOWN_HISTORY }),
-      ).not.toBeInTheDocument();
+      const historyHeading = screen.queryByRole('heading', {
+        name: TEARDOWN_HISTORY,
+      });
+
+      expect(historyHeading).not.toBeInTheDocument();
     });
   });
 });

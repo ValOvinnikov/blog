@@ -17,6 +17,10 @@ import {
 import {
   idleProvisioningSteps,
   makeClientTenant,
+  mockDoneProvisioningSteps,
+  mockFirstStepDoneProvisioningSteps,
+  mockFirstStepRunningProvisioningSteps,
+  mockMapDomainFailedProvisioningSteps,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
@@ -83,29 +87,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('never influences isProvisioningRunning/isOverallFailed/displayOverallStatus, regardless of its value', () => {
-      const allStepsDone = {
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-      };
+      const allStepsDone = mockDoneProvisioningSteps();
 
       const withoutOwnerElevation = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
@@ -241,13 +223,8 @@ describe(useProvisioningPoll, () => {
     it('masks a stale FAILED step to IDLE and reports RUNNING, not FAILED, once a retried run is genuinely PROVISIONING', () => {
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: DOMAINS_API_ERROR,
-          },
-        },
+        provisioningSteps:
+          mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -267,13 +244,8 @@ describe(useProvisioningPoll, () => {
     it('still reports a step as FAILED in displayStepStatuses once the tenant is genuinely, currently FAILED', () => {
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: DOMAINS_API_ERROR,
-          },
-        },
+        provisioningSteps:
+          mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -336,21 +308,11 @@ describe(useProvisioningPoll, () => {
     it('polls while provisioning is non-terminal and applies a fresh result', async () => {
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-        },
+        provisioningSteps: mockFirstStepDoneProvisioningSteps(),
       });
       const { result } = renderHookWithIntl(() => useProvisioningPoll(tenant));
 
@@ -425,12 +387,7 @@ describe(useProvisioningPoll, () => {
     );
 
     it('keeps polling, unchanged, while a step is RUNNING', async () => {
-      const runningSteps = {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      };
+      const runningSteps = mockFirstStepRunningProvisioningSteps();
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: runningSteps,
@@ -476,12 +433,7 @@ describe(useProvisioningPoll, () => {
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       });
 
       act(() => {
@@ -503,12 +455,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('stops polling at the cap when a run stops reporting', async () => {
-      const stuckSteps = {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      };
+      const stuckSteps = mockFirstStepRunningProvisioningSteps();
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: stuckSteps,
@@ -607,12 +554,7 @@ describe(useProvisioningPoll, () => {
     it('surfaces a poll-error toast, keeps the last-known status, and keeps retrying automatically when a tick rejects, dismissing it once a tick recovers', async () => {
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       });
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
         new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),

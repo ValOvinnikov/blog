@@ -1,6 +1,10 @@
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  INVITED_PENDING_TEXT,
+  makeTenant,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import TenantProvisioningPage from './page';
 
@@ -61,7 +65,7 @@ describe(TenantProvisioningPage, () => {
 
     await setup();
 
-    const invitedPendingText = screen.getByText('Invited, pending');
+    const invitedPendingText = screen.getByText(INVITED_PENDING_TEXT);
 
     expect(invitedPendingText).toBeVisible();
   });
