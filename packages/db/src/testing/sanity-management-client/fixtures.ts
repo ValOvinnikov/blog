@@ -19,6 +19,7 @@ export const MOCK_SANITY_CORS_ORIGIN = faker.internet.url({
 export const MOCK_SANITY_WEBHOOK_URL = faker.internet.url({
   appendSlash: false,
 });
+export const MOCK_SANITY_WEBHOOK_ID = faker.string.alphanumeric(10);
 
 export const MOCK_SANITY_EXPECTED_URL = {
   projects: 'https://api.sanity.io/v2021-06-07/projects',
@@ -36,6 +37,7 @@ export const MOCK_SANITY_EXPECTED_URL = {
   robots: `https://api.sanity.io/v2026-07-10/access/project/${MOCK_SANITY_PROJECT_ID}/robots`,
   robot: `https://api.sanity.io/v2026-07-10/access/project/${MOCK_SANITY_PROJECT_ID}/robots/${MOCK_SANITY_ROBOT_ID}`,
   webhooks: `https://api.sanity.io/v2025-08-04/hooks/projects/${MOCK_SANITY_PROJECT_ID}`,
+  webhook: `https://api.sanity.io/v2025-08-04/hooks/projects/${MOCK_SANITY_PROJECT_ID}/${MOCK_SANITY_WEBHOOK_ID}`,
 } as const;
 
 export function mockSanityProjectInput<T extends object>(extra: T) {

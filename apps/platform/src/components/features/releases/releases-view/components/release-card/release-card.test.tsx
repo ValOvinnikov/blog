@@ -8,6 +8,7 @@ import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   makeReleaseCandidate,
   makeReleaseRun,
+  MOCK_RELEASE_RUN_URL,
 } from '@platform/testing/releases/fixtures';
 import userEvent from '@testing-library/user-event';
 
@@ -64,18 +65,21 @@ describe(`<${ReleaseCard.name}/>`, () => {
   it('says no release has run yet', () => {
     setup();
 
-    expect(screen.getByText('No release has run yet.')).toBeVisible();
+    const emptyState = screen.getByText('No release has run yet.');
+
+    expect(emptyState).toBeVisible();
   });
 
   it('shows the latest run with a link to it', () => {
     setup({ releaseRun: okResult(makeReleaseRun()) });
 
-    expect(screen.getByText('Succeeded')).toBeVisible();
-    expect(screen.getByText('Release v1.4.0')).toBeVisible();
-    expect(screen.getByRole('link', { name: /View the run/ })).toHaveAttribute(
-      'href',
-      'https://github.com/acme/blog/actions/runs/42',
-    );
+    const status = screen.getByText('Succeeded');
+    const runTitle = screen.getByText('Release v1.4.0');
+    const runLink = screen.getByRole('link', { name: /View the run/ });
+
+    expect(status).toBeVisible();
+    expect(runTitle).toBeVisible();
+    expect(runLink).toHaveAttribute('href', MOCK_RELEASE_RUN_URL);
   });
 
   it('says the deploy did not run and points to the tenant retry when a tenant migration failed', () => {
@@ -88,13 +92,15 @@ describe(`<${ReleaseCard.name}/>`, () => {
       ),
     });
 
-    expect(screen.getByText('Failed')).toBeVisible();
-    expect(screen.getByText('A tenant migration failed')).toBeVisible();
-    expect(
-      screen.getByText(
-        'The deploy did not run, so the live site is unchanged. Retry that tenant with Run tenant migrations on this page.',
-      ),
-    ).toBeVisible();
+    const status = screen.getByText('Failed');
+    const failureTitle = screen.getByText('A tenant migration failed');
+    const failureHint = screen.getByText(
+      'The deploy did not run, so the live site is unchanged. Retry that tenant with Run tenant migrations on this page.',
+    );
+
+    expect(status).toBeVisible();
+    expect(failureTitle).toBeVisible();
+    expect(failureHint).toBeVisible();
   });
 
   it('refuses a new release while one is running', () => {
@@ -104,54 +110,64 @@ describe(`<${ReleaseCard.name}/>`, () => {
       ),
     });
 
-    expect(screen.getByText('Running')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
-      ARIA_DISABLED,
-      'true',
-    );
-    expect(screen.getByText('A release is running.')).toBeVisible();
+    const status = screen.getByText('Running');
+    const releaseButton = screen.getByRole('button', { name: 'Release' });
+    const refusal = screen.getByText('A release is running.');
+
+    expect(status).toBeVisible();
+    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(refusal).toBeVisible();
   });
 
   it('disables the Release button while production releases are paused', () => {
     releaseSwitch.isEnabled = false;
     setup();
 
-    expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
-      ARIA_DISABLED,
-      'true',
-    );
-    expect(screen.getByText('Production releases are paused.')).toBeVisible();
+    const releaseButton = screen.getByRole('button', { name: 'Release' });
+    const pausedNotice = screen.getByText('Production releases are paused.');
+
+    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(pausedNotice).toBeVisible();
   });
 
   it('has nothing to release when no commit landed since the last tag', () => {
     setup({ hasChanges: false });
 
-    expect(screen.getByText('Nothing has changed since v1.4.0.')).toBeVisible();
+    const noChangesNotice = screen.getByText(
+      'Nothing has changed since v1.4.0.',
+    );
+
+    expect(noChangesNotice).toBeVisible();
   });
 
   it('says the release state is unavailable when GitHub cannot be read', () => {
     setup({ releaseRun: errorResult(GITHUB_FAILURE.GITHUB_ERROR) });
 
-    expect(screen.getByText('Release status is unavailable')).toBeVisible();
+    const unavailableNotice = screen.getByText('Release status is unavailable');
+
+    expect(unavailableNotice).toBeVisible();
   });
 
   it('shows the release as dispatched as soon as it starts', async () => {
     const user = userEvent.setup();
     setup({ releaseRun: okResult(makeReleaseRun()) });
 
-    await user.click(screen.getByRole('button', { name: 'Release' }));
-    await user.type(
-      await screen.findByRole('textbox', { name: 'Version' }),
-      'v1.5.0',
-    );
-    await user.click(screen.getByRole('button', { name: 'Start release' }));
+    const openButton = screen.getByRole('button', { name: 'Release' });
+    await user.click(openButton);
+    const versionInput = await screen.findByRole('textbox', {
+      name: 'Version',
+    });
+    await user.type(versionInput, 'v1.5.0');
+    const startButton = screen.getByRole('button', { name: 'Start release' });
+    await user.click(startButton);
 
-    expect(await screen.findByText('Dispatched')).toBeVisible();
-    expect(await screen.findByText('Release started.')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
-      ARIA_DISABLED,
-      'true',
-    );
+    const dispatchedStatus = await screen.findByText('Dispatched');
+    const startedToast = await screen.findByText('Release started.');
+    const releaseButton = screen.getByRole('button', { name: 'Release' });
+
+    expect(dispatchedStatus).toBeVisible();
+    expect(startedToast).toBeVisible();
+    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   it('follows a running release to its result and refreshes the page', async () => {
@@ -167,7 +183,9 @@ describe(`<${ReleaseCard.name}/>`, () => {
 
     await act(() => vi.advanceTimersByTimeAsync(10_000));
 
-    expect(screen.getByText('Succeeded')).toBeVisible();
+    const status = screen.getByText('Succeeded');
+
+    expect(status).toBeVisible();
     expect(refresh).toHaveBeenCalledOnce();
   });
 });

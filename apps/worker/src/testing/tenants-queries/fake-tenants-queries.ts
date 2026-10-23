@@ -7,6 +7,7 @@ export function withFakeTenantsQueries(
     ...actual,
     beginTenantProvisioning: vi.fn(),
     getTenantById: vi.fn(),
+    listTenants: vi.fn(),
     reactivateTenant: vi.fn(),
     updateProvisioningStep: vi.fn(),
     startProvisioningRun: vi.fn(),

@@ -4,6 +4,7 @@ import {
   PRESET_REGISTRY,
   RADIUS_SCALE,
 } from '@blog/config';
+import { BLOB_STAGED_LOGO } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
 import {
@@ -39,7 +40,7 @@ describe(applyPresetDefaults, () => {
   });
 
   it('keeps the language switcher style and both brand images', () => {
-    const logo = { url: 'blob:staged-logo', file: LOGO_FILE };
+    const logo = { url: BLOB_STAGED_LOGO, file: LOGO_FILE };
     const favicon = { url: SAVED_LOGO_URL };
     const current = {
       ...defaultLookFormValues(),

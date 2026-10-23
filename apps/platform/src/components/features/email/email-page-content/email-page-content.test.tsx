@@ -2,8 +2,18 @@ import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import {
+  MOCK_CONTACT_RECIPIENT,
+  SEND_CONTACT_MESSAGES_TO,
+} from '@platform/testing/email/fixtures';
+import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  makeReadyTenant,
+  MOCK_ARCHIVED_AT,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import { EmailPageContent } from './email-page-content';
@@ -74,8 +84,6 @@ const setup = customRenderAsync(EmailPageContent, { tenant });
 
 const YOURE_INVITED_ACME_CO = "You're invited to Acme Co";
 const SUPPORT_ACME_EXAMPLE = 'support@acme.example';
-const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
-const LEADS_ACME_EXAMPLE = 'leads@acme.example';
 
 describe(`<${EmailPageContent.name}/>`, () => {
   beforeEach(() => {
@@ -98,17 +106,46 @@ describe(`<${EmailPageContent.name}/>`, () => {
     selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
 
-  it('renders the Email page heading', async () => {
-    await setup();
+  describe('with the default tenant', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(screen.getByRole('heading', { name: 'Email' })).toBeVisible();
-  });
+    it('renders the Email page heading', () => {
+      const heading = screen.getByRole('heading', { name: 'Email' });
 
-  it('renders blank settings fields when the tenant has no saved email_config row yet', async () => {
-    await setup();
+      expect(heading).toBeVisible();
+    });
 
-    expect(screen.getByLabelText('Sender name')).toHaveValue('');
-    expect(screen.getByLabelText('Reply-to address')).toHaveValue('');
+    it('renders blank settings fields when the tenant has no saved email_config row yet', () => {
+      const senderNameInput = screen.getByLabelText('Sender name');
+      const replyToInput = screen.getByLabelText('Reply-to address');
+
+      expect(senderNameInput).toHaveValue('');
+      expect(replyToInput).toHaveValue('');
+    });
+
+    it('hides the contact recipient field on a plan without the contact form', () => {
+      const contactRecipientInput = screen.queryByLabelText(
+        SEND_CONTACT_MESSAGES_TO,
+      );
+
+      expect(contactRecipientInput).not.toBeInTheDocument();
+    });
+
+    it("shows each template's authored copy in the tenant's default language", async () => {
+      const user = userEvent.setup();
+      const editingCombobox = screen.getByRole('combobox', { name: 'Editing' });
+      await user.click(editingCombobox);
+      const teamInviteOption = await screen.findByRole('option', {
+        name: /^Team invite/,
+      });
+      await user.click(teamInviteOption);
+
+      const subjectInput = screen.getByDisplayValue(YOURE_INVITED_ACME_CO);
+
+      expect(subjectInput).toBeVisible();
+    });
   });
 
   it("renders the tenant's saved email_config row when one exists", async () => {
@@ -125,71 +162,57 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
-    expect(screen.getByDisplayValue(SUPPORT_ACME_EXAMPLE)).toBeVisible();
-  });
+    const senderNameInput = screen.getByDisplayValue('Acme Co');
+    const replyToInput = screen.getByDisplayValue(SUPPORT_ACME_EXAMPLE);
 
-  it('hides the contact recipient field on a plan without the contact form', async () => {
-    await setup();
-
-    expect(
-      screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
-    ).not.toBeInTheDocument();
+    expect(senderNameInput).toBeVisible();
+    expect(replyToInput).toBeVisible();
   });
 
   it('shows the stored contact recipient on a plan with the contact form', async () => {
     getEmailConfigMock.mockResolvedValue({
       senderName: 'Acme Co',
-      contactRecipient: LEADS_ACME_EXAMPLE,
+      contactRecipient: MOCK_CONTACT_RECIPIENT,
       updatedAt: new Date(),
     });
 
     await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
 
-    expect(screen.getByLabelText(SEND_CONTACT_MESSAGES_TO)).toHaveValue(
-      LEADS_ACME_EXAMPLE,
+    const contactRecipientInput = screen.getByLabelText(
+      SEND_CONTACT_MESSAGES_TO,
     );
+
+    expect(contactRecipientInput).toHaveValue(MOCK_CONTACT_RECIPIENT);
   });
 
   it('hides the contact recipient field from an editor', async () => {
     vi.mocked(requireTenantMembership).mockImplementationOnce(async (id) => ({
       tenant: makeReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
-      membership: {
-        id: 'membership-2',
-        userId: 'user-2',
+      membership: makeMembership({
         tenantId: id,
         role: MEMBERSHIP_ROLE.EDITOR,
-        createdAt: new Date('2026-04-02T00:00:00.000Z'),
-      },
+      }),
     }));
 
     await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
 
-    expect(
-      screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
-    ).not.toBeInTheDocument();
-  });
-
-  it("shows each template's authored copy in the tenant's default language", async () => {
-    await setup();
-
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('combobox', { name: 'Editing' }));
-    await user.click(
-      await screen.findByRole('option', { name: /^Team invite/ }),
+    const contactRecipientInput = screen.queryByLabelText(
+      SEND_CONTACT_MESSAGES_TO,
     );
 
-    expect(screen.getByDisplayValue(YOURE_INVITED_ACME_CO)).toBeVisible();
+    expect(contactRecipientInput).not.toBeInTheDocument();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
     await setup({
       tenant: {
         ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       },
     });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+
+    expect(archivedNotice).toBeVisible();
   });
 });
