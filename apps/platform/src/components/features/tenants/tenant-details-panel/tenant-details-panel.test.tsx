@@ -432,10 +432,13 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('renders the plan control locked with a "provisioning succeeded" reason once every step is DONE', () => {
-      renderPanel({
-        tenant: makeClientTenant({ plan: TENANT_PLAN.GROWTH }),
-        fieldLocks: { plan: { kind: 'succeeded' } },
-      });
+      render(
+        <TenantDetailsPanel
+          tenant={makeClientTenant({ plan: TENANT_PLAN.GROWTH })}
+          fieldLocks={{ plan: { kind: 'succeeded' } }}
+          owner={OWNER}
+        />,
+      );
 
       const planGroup = screen.getByRole('group', { name: 'Plan' });
       expect(planGroup).toHaveAttribute('data-disabled');
@@ -737,7 +740,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('describes the disabled Save button with the page-level archived notice when an archivedNoticeId is supplied', () => {
       render(
         <>
-          {panel({ tenant, archivedNoticeId: 'archived-notice' })}
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NO_LOCKS}
+            owner={OWNER}
+            archivedNoticeId="archived-notice"
+          />
           <p id="archived-notice">This tenant is archived.</p>
         </>,
       );
