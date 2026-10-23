@@ -19,6 +19,7 @@ export function toHomePage(
   defaultLocale: TLocaleIsoCode,
 ): THomePageDocument {
   return {
+    id: raw._id,
     headingBlock: toHeadingBlock(raw.headingBlock),
     headingAlignment: toHeadingAlignment(raw.contentAlignment),
     hero: toHeroSlot(raw.hero),
