@@ -72,7 +72,7 @@ const PROJECT_ID = 'proj456';
 const {
   sanityManagementToken,
   sanityOrganizationId,
-  adminAppBaseUrl,
+  platformAppBaseUrl,
   tenantSanityDataset,
 } = MOCK_PROVISION_ENV;
 
@@ -160,7 +160,7 @@ describe(createTenantSanityProject, () => {
       expect(addSanityCorsOriginMock).toHaveBeenCalledWith({
         token: sanityManagementToken,
         projectId: PROJECT_ID,
-        origin: adminAppBaseUrl,
+        origin: platformAppBaseUrl,
         allowCredentials: true,
       });
       expect(result).toEqual({
@@ -321,7 +321,7 @@ describe(createTenantSanityProject, () => {
     it('only creates the dataset when the project is already persisted but the dataset is missing', async () => {
       listSanityCorsOriginsMock.mockImplementation(async () => {
         callOrder.push('listSanityCorsOrigins');
-        return [{ id: 'cors1', origin: adminAppBaseUrl }];
+        return [{ id: 'cors1', origin: platformAppBaseUrl }];
       });
 
       const result = await createTenantSanityProject(
@@ -360,7 +360,7 @@ describe(createTenantSanityProject, () => {
       expect(addSanityCorsOriginMock).toHaveBeenCalledWith({
         token: sanityManagementToken,
         projectId: MOCK_SANITY_PROJECT_ID,
-        origin: adminAppBaseUrl,
+        origin: platformAppBaseUrl,
         allowCredentials: true,
       });
       expect(result).toEqual({
@@ -377,7 +377,7 @@ describe(createTenantSanityProject, () => {
         });
         listSanityCorsOriginsMock.mockImplementation(async () => {
           callOrder.push('listSanityCorsOrigins');
-          return [{ id: 'cors1', origin: adminAppBaseUrl }];
+          return [{ id: 'cors1', origin: platformAppBaseUrl }];
         });
       });
 

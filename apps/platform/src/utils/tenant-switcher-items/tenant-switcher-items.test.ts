@@ -1,4 +1,9 @@
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  makeReadyTenant,
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import { toTenantSwitcherItems } from './tenant-switcher-items';
 
@@ -12,8 +17,8 @@ describe(toTenantSwitcherItems, () => {
     expect(toTenantSwitcherItems([tenant])).toStrictEqual([
       {
         id: TENANT_ID,
-        name: 'Acme Inc.',
-        primaryDomain: 'acme.example.com',
+        name: MOCK_TENANT_NAME,
+        primaryDomain: MOCK_TENANT_DOMAIN,
         isArchived: false,
       },
     ]);
@@ -25,7 +30,12 @@ describe(toTenantSwitcherItems, () => {
     });
 
     expect(toTenantSwitcherItems([tenant])).toStrictEqual([
-      expect.objectContaining({ isArchived: true }),
+      {
+        id: TENANT_ID,
+        name: MOCK_TENANT_NAME,
+        primaryDomain: MOCK_TENANT_DOMAIN,
+        isArchived: true,
+      },
     ]);
   });
 });
