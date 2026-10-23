@@ -277,7 +277,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
-- **GITHUB_FAILURE**: `NOT_CONFIGURED`, `RATE_LIMITED`, `NOT_FOUND`, `GITHUB_ERROR`
+- **GITHUB_FAILURE**: `GITHUB_ERROR`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 

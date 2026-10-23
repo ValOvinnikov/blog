@@ -54,12 +54,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
-      },
-      {
-        "ref": "GITHUB_FAILURE.RATE_LIMITED",
-        "scope": "app:platform",
-        "from": "@platform/constants/github",
-        "file": "apps/platform/src/constants/github.ts"
       }
     ],
     "UNAVAILABLE": [
@@ -2562,12 +2556,6 @@
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
-        "ref": "GITHUB_FAILURE.NOT_FOUND",
-        "scope": "app:platform",
-        "from": "@platform/constants/github",
-        "file": "apps/platform/src/constants/github.ts"
-      },
-      {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
         "scope": "app:platform",
         "from": "@platform/constants/lead",
@@ -3400,12 +3388,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/domain",
         "file": "apps/platform/src/constants/domain.ts"
-      },
-      {
-        "ref": "GITHUB_FAILURE.NOT_CONFIGURED",
-        "scope": "app:platform",
-        "from": "@platform/constants/github",
-        "file": "apps/platform/src/constants/github.ts"
       }
     ],
     "NOT_ADDED": [
