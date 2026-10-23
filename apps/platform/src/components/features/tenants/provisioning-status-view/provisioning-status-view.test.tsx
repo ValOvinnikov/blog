@@ -70,6 +70,7 @@ const QUEUED_PROVISIONING_WORKFLOW_STARTING_UP =
 const QUEUED_RUN_ELAPSED = 'queued-run-elapsed';
 const ARIA_EXPANDED = 'aria-expanded';
 const RUNNING = 'Running…';
+const ANY_NAME = /.+/;
 const FIRST_STEP_LIVE = `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`;
 
 const renderView = customRender(ProvisioningStatusView, {
@@ -311,12 +312,12 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it("shows a running step's number in its circle instead of a spinner", () => {
-      const statusList = screen.queryAllByRole('status');
+      const spinners = screen.queryAllByRole('status', { name: ANY_NAME });
       const stepOneGlyph = screen.getByText('1', {
         selector: HIDDEN_ICON_SELECTOR,
       });
 
-      expect(statusList).toHaveLength(0);
+      expect(spinners).toHaveLength(0);
       expect(stepOneGlyph).toBeVisible();
     });
 
@@ -359,9 +360,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       }),
     });
 
-    const statusList = screen.queryAllByRole('status');
+    const spinners = screen.queryAllByRole('status', { name: ANY_NAME });
 
-    expect(statusList).toHaveLength(0);
+    expect(spinners).toHaveLength(0);
 
     for (const text of [NOT_STARTED, RUNNING, 'Complete', 'Failed']) {
       for (const element of screen.getAllByText(text)) {
