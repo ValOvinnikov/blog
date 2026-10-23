@@ -1,7 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { takeCreateSiteSlot } from '@platform/server/create-site-gate/create-site-gate';
-import { BLOCKED_OWNER_EMAIL } from '@platform/testing/blocked-signups/fixtures';
+import { MOCK_BLOCKED_OWNER_EMAIL } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -27,7 +27,7 @@ const loggerErrorMock = vi.mocked(logger.error);
 
 const CLIENT_KEY = '203.0.113.7';
 const NOW = new Date('2026-10-21T09:00:00Z');
-const SIGN_UP = { clientKey: CLIENT_KEY, email: BLOCKED_OWNER_EMAIL };
+const SIGN_UP = { clientKey: CLIENT_KEY, email: MOCK_BLOCKED_OWNER_EMAIL };
 
 describe(admitCreateSite, () => {
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe(admitCreateSite, () => {
     const admitted = await admitCreateSite({ ...SIGN_UP, now: NOW });
 
     expect(admitted).toBe(true);
-    expect(isSignupBlockedMock).toHaveBeenCalledWith(BLOCKED_OWNER_EMAIL);
+    expect(isSignupBlockedMock).toHaveBeenCalledWith(MOCK_BLOCKED_OWNER_EMAIL);
     expect(takeSlotMock).toHaveBeenCalledWith(CLIENT_KEY, NOW);
   });
 

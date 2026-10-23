@@ -6,7 +6,7 @@ import {
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
-  makeTenant,
+  mockTenant,
   MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
   MOCK_CUSTOM_DOMAIN_URL,
@@ -21,7 +21,7 @@ vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
-const tenant = makeTenant({
+const tenant = mockTenant({
   name: MOCK_SITE_NAME,
   primaryDomain: MOCK_CUSTOM_DOMAIN,
   plan: TENANT_PLAN.GROWTH,

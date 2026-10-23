@@ -4,7 +4,7 @@ import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   CONFIRM_TENANT_NAME_LABEL,
-  makeClientTenant,
+  mockClientTenant,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -19,7 +19,7 @@ vi.mock('@platform/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: deprovisionTenantActionMock,
 }));
 
-const TENANT = makeClientTenant({ deprovisionedAt: null });
+const TENANT = mockClientTenant({ deprovisionedAt: null });
 
 const setup = customRender(DeprovisionTenantControl, { tenant: TENANT });
 

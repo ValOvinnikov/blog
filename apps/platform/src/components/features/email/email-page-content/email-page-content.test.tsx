@@ -6,13 +6,13 @@ import {
   MOCK_CONTACT_RECIPIENT,
   SEND_CONTACT_MESSAGES_TO,
 } from '@platform/testing/email/fixtures';
-import { makeMembership } from '@platform/testing/memberships/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
-  makeReadyTenant,
+  mockReadyTenant,
   MOCK_ARCHIVED_AT,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 
@@ -72,7 +72,7 @@ vi.mock('@platform/server/email/send-test-email-action', () => ({
   sendTestEmailAction: vi.fn(),
 }));
 
-const tenant = makeReadyTenant();
+const tenant = mockReadyTenant();
 
 const TEMPLATE_LOGO_URLS = {
   [EMAIL_TEMPLATE_TYPE.MAGIC_LINK]: undefined,
@@ -151,7 +151,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
   it("renders the tenant's saved email_config row when one exists", async () => {
     getEmailConfigMock.mockResolvedValue({
       id: 'config-1',
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       senderName: 'Acme Co',
       replyToAddress: SUPPORT_ACME_EXAMPLE,
       footerPostalAddress: '123 Main St',
@@ -187,8 +187,8 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
   it('hides the contact recipient field from an editor', async () => {
     vi.mocked(requireTenantMembership).mockImplementationOnce(async (id) => ({
-      tenant: makeReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
-      membership: makeMembership({
+      tenant: mockReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
+      membership: mockMembership({
         tenantId: id,
         role: MEMBERSHIP_ROLE.EDITOR,
       }),

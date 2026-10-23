@@ -1,8 +1,12 @@
-import type { TMaybeNull } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OTHER_TENANT_NAME,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
 import type { Session } from 'next-auth';
 
 import TenantStudioPage from './page';
@@ -37,6 +41,8 @@ vi.mock('@blog/studio', () => ({
   },
 }));
 
+const GLOBEX_PROJECT_ID = 'proj-globex';
+
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(TenantStudioPage, {
@@ -48,34 +54,37 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      role: ADMIN_ROLE.ADMIN,
+    });
     getTenantByIdMock.mockReset();
   });
 
   it('redirects to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
   });
 
   it('404s a signed-in tenant owner with no admins row, even calling the page directly', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
   it('404s for an unknown tenant id', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
   it("mounts Studio with the routed tenant's coordinates and a tenant-keyed basePath", async () => {
     getTenantByIdMock.mockResolvedValue(
-      makeTenant({
+      mockTenant({
         id: 'tenant-2',
-        name: 'Globex Corp.',
-        sanityProjectId: 'proj-globex',
+        name: MOCK_OTHER_TENANT_NAME,
+        sanityProjectId: GLOBEX_PROJECT_ID,
         sanityDataset: 'production',
         sanityReadTokenEncrypted: 'encrypted-token',
         deprovisionedAt: null,
@@ -87,10 +96,10 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     expect(screen.getByTestId('studio-mount')).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectId: 'proj-globex',
+        projectId: GLOBEX_PROJECT_ID,
         dataset: 'production',
         basePath: '/tenants/tenant-2/studio',
-        title: 'Globex Corp.',
+        title: MOCK_OTHER_TENANT_NAME,
       }),
     );
   });

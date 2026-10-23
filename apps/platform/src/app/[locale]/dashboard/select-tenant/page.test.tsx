@@ -6,7 +6,7 @@ import {
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -64,8 +64,8 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
-        tenant: { id: TENANT_ID },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
+        tenant: { id: MOCK_TENANT_ID },
       },
     ]);
 
@@ -77,8 +77,8 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   it('renders the picker for multiple memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
-        tenant: { id: TENANT_ID, name: MOCK_TENANT_NAME },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
+        tenant: { id: MOCK_TENANT_ID, name: MOCK_TENANT_NAME },
       },
       {
         membership: {

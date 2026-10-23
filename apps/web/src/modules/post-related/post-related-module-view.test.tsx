@@ -3,7 +3,7 @@ import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_POST_RELATED_HEADING } from '@web/testing/modules/post-related/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -16,7 +16,7 @@ const post = mockPostListItem();
 
 const setup = customRender(PostRelatedModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_POST_RELATED_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_POST_RELATED_HEADING }),
   items: [post],
   layout: undefined,
   contentAlignment: undefined,

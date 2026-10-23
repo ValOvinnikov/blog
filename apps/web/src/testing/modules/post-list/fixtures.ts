@@ -1,7 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import type { TPostListModule } from '@blog/service';
 import type { IMediaCardData } from '@web/components/shared/media-card-item';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const MOCK_POST_LIST_HEADING = 'Latest posts';
 
@@ -35,7 +35,7 @@ export const mockPostModuleBase = (
   heading: string = MOCK_POST_LIST_HEADING,
 ): TPostModuleBase => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading }),
+  headingBlock: mockHeadingBlock({ heading }),
   posts: [],
   layout: undefined,
   contentAlignment: undefined,

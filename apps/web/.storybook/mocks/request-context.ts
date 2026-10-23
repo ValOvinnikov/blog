@@ -2,7 +2,7 @@ import type {
   TNotFoundContext,
   TRequestContext,
 } from '@web/server/request-context/request-context';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 /**
  * Storybook-only stand-in for the real module, which throws when
@@ -13,9 +13,9 @@ import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 export const enterRequestContext = async (): Promise<void> => {};
 
 export const getRequestContext = async (): Promise<TRequestContext> =>
-  DEFAULT_REQUEST_CONTEXT;
+  MOCK_REQUEST_CONTEXT;
 
 export const getNotFoundContext = async (): Promise<TNotFoundContext> => ({
-  tenantId: DEFAULT_REQUEST_CONTEXT.tenantId,
-  locale: DEFAULT_REQUEST_CONTEXT.locale,
+  tenantId: MOCK_REQUEST_CONTEXT.tenantId,
+  locale: MOCK_REQUEST_CONTEXT.locale,
 });

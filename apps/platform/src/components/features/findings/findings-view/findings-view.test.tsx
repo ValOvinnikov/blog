@@ -4,14 +4,14 @@ import {
   FINDING_SOURCE,
 } from '@blog/config/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeFinding } from '@platform/testing/findings/fixtures';
+import { mockFinding } from '@platform/testing/findings/fixtures';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 
 import { FindingsView } from './findings-view';
 
 const render = renderWithIntl;
 
-const finding = makeFinding({
+const finding = mockFinding({
   source: FINDING_SOURCE.DOCUMENT_VALIDATION,
   kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
   severity: FINDING_SEVERITY.WARNING,

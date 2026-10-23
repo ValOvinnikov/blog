@@ -7,8 +7,12 @@ import {
   RELEASE_FAILURE,
 } from '@platform/constants/release';
 import {
-  githubCompareJson,
-  githubJson,
+  MOCK_GITHUB_MAIN_BRANCH_PATH,
+  MOCK_GITHUB_RELEASE_TAGS_PATH,
+} from '@platform/testing/github/fixtures';
+import {
+  mockGitHubCompareResponse,
+  mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -45,8 +49,6 @@ vi.mock('@blog/db', async () => ({
 
 type TFile = { filename: string; status: string };
 
-const TAGS_PATH = '/git/matching-refs/tags/v';
-const MAIN_BRANCH_PATH = '/branches/main';
 const CONTRAST_RUNS_PATH = `/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`;
 const RENDERING_FILENAME = 'apps/web/src/app/page.tsx';
 
@@ -68,7 +70,7 @@ describe(getReleaseCandidate, () => {
 
   const compare = (base: string, files: TFile[], commits = [makeCommit()]) => {
     github.respond(`/compare/${base}...${headSha}`, (path) =>
-      githubCompareJson(path, commits, files),
+      mockGitHubCompareResponse(path, commits, files),
     );
   };
 
@@ -80,13 +82,15 @@ describe(getReleaseCandidate, () => {
 
   beforeEach(() => {
     headSha = faker.git.commitSha();
-    github.respond(TAGS_PATH, () =>
-      githubJson([{ ref: `refs/tags/${lastTag}` }]),
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
+      mockGitHubResponse([{ ref: `refs/tags/${lastTag}` }]),
     );
-    github.respond(MAIN_BRANCH_PATH, () =>
-      githubJson({ commit: { sha: headSha } }),
+    github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
+      mockGitHubResponse({ commit: { sha: headSha } }),
     );
-    github.respond(CONTRAST_RUNS_PATH, () => githubJson({ workflow_runs: [] }));
+    github.respond(CONTRAST_RUNS_PATH, () =>
+      mockGitHubResponse({ workflow_runs: [] }),
+    );
     getContrastFindingMock.mockReset().mockResolvedValue(undefined);
     getLatestPassingContrastShaMock.mockReset().mockResolvedValue(undefined);
     listActiveTenantsMock.mockReset().mockResolvedValue([]);
@@ -175,7 +179,7 @@ describe(getReleaseCandidate, () => {
   it('reports contrast as running while a contrast run for HEAD is in progress', async () => {
     compare(lastTag, [{ filename: RENDERING_FILENAME, status: 'modified' }]);
     github.respond(CONTRAST_RUNS_PATH, () =>
-      githubJson({ workflow_runs: [{ status: 'in_progress' }] }),
+      mockGitHubResponse({ workflow_runs: [{ status: 'in_progress' }] }),
     );
 
     expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.RUNNING);
@@ -197,7 +201,7 @@ describe(getReleaseCandidate, () => {
       { tag: '0043_pending', when: pendingWhen },
     ];
     github.respond('/contents/packages/db/migrations/meta/_journal.json', () =>
-      githubJson({
+      mockGitHubResponse({
         content: Buffer.from(JSON.stringify({ entries })).toString('base64'),
       }),
     );
@@ -240,7 +244,7 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with NO_RELEASE_TAG when the repository has no release tag yet', async () => {
-    github.respond(TAGS_PATH, () => githubJson([]));
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () => mockGitHubResponse([]));
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
@@ -249,8 +253,8 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with TAG_LIST_INCOMPLETE when the tag list never stops paging', async () => {
-    github.respond(TAGS_PATH, () =>
-      githubJson(
+    github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
+      mockGitHubResponse(
         Array.from({ length: 100 }, (_, index) => ({
           ref: `refs/tags/v1.${index}.0`,
         })),
@@ -274,7 +278,7 @@ describe(getReleaseCandidate, () => {
 
   it('fails with GITHUB_ERROR when GitHub errors', async () => {
     github.respond(
-      MAIN_BRANCH_PATH,
+      MOCK_GITHUB_MAIN_BRANCH_PATH,
       () => new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
     );
 
@@ -286,7 +290,7 @@ describe(getReleaseCandidate, () => {
 
   it('fails with RATE_LIMITED when GitHub rate-limits the request', async () => {
     github.respond(
-      MAIN_BRANCH_PATH,
+      MOCK_GITHUB_MAIN_BRANCH_PATH,
       () => new Response(null, { status: HTTP_STATUS.TOO_MANY_REQUESTS }),
     );
 

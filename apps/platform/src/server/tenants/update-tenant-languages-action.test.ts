@@ -11,9 +11,12 @@ import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
+import {
+  MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
+} from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -53,12 +56,12 @@ describe(updateTenantLanguagesAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: TENANT_ID, plan: TENANT_PLAN.GROWTH },
+      tenant: { id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     setTenantAdditionalLocalesMock.mockReset();
     insertAuditEventMock.mockReset();
@@ -69,18 +72,18 @@ describe(updateTenantLanguagesAction, () => {
   it('saves the languages and audits the change', async () => {
     setTenantAdditionalLocalesMock.mockResolvedValue(okResult([NL, FR]));
 
-    const result = await updateTenantLanguagesAction(TENANT_ID, [NL, FR]);
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL, FR]);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(setTenantAdditionalLocalesMock).toHaveBeenCalledWith(TENANT_ID, [
-      NL,
-      FR,
-    ]);
+    expect(setTenantAdditionalLocalesMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      [NL, FR],
+    );
     expect(insertAuditEventMock).toHaveBeenCalledWith(
       expect.objectContaining({
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: TENANT_ID,
+        targetId: MOCK_TENANT_ID,
         details: { additionalLocales: [NL, FR] },
       }),
     );
@@ -89,13 +92,13 @@ describe(updateTenantLanguagesAction, () => {
   it('refreshes the public site for the tenant after saving', async () => {
     setTenantAdditionalLocalesMock.mockResolvedValue(okResult([NL]));
 
-    await updateTenantLanguagesAction(TENANT_ID, [NL]);
+    await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL]);
 
-    expect(revalidateSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(revalidateSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('rejects a language outside the supported list without saving', async () => {
-    const result = await updateTenantLanguagesAction(TENANT_ID, ['xx']);
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, ['xx']);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -109,7 +112,7 @@ describe(updateTenantLanguagesAction, () => {
       errorResult(ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED),
     );
 
-    const result = await updateTenantLanguagesAction(TENANT_ID, [NL, FR]);
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL, FR]);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -128,7 +131,7 @@ describe(updateTenantLanguagesAction, () => {
       errorResult(ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED),
     );
 
-    const result = await updateTenantLanguagesAction(TENANT_ID, [NL]);
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL]);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -142,7 +145,7 @@ describe(updateTenantLanguagesAction, () => {
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const result = await updateTenantLanguagesAction(TENANT_ID, [NL]);
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL]);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,

@@ -5,7 +5,7 @@ import {
   MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
   mockFaqQuestion,
 } from '@web/testing/modules/faq/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FaqModuleView } from './faq-module-view';
 
@@ -41,7 +41,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Frequently asked questions' }),
+    headingBlock: mockHeadingBlock({ heading: 'Frequently asked questions' }),
     questions,
     ctaButtons: [],
     contentAlignment: undefined,

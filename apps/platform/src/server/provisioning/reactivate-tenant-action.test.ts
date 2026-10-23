@@ -6,7 +6,7 @@ import {
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { notFound } from 'next/navigation';
 
 const {
@@ -42,7 +42,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 const ARCHIVED_TENANT = {
-  id: TENANT_ID,
+  id: MOCK_TENANT_ID,
   name: 'Acme',
   deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
 };
@@ -73,7 +73,7 @@ describe('reactivateTenantAction', () => {
     });
 
     await expect(
-      reactivateTenantAction(TENANT_ID, { confirm: 'Acme' }),
+      reactivateTenantAction(MOCK_TENANT_ID, { confirm: 'Acme' }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -81,19 +81,19 @@ describe('reactivateTenantAction', () => {
   });
 
   it('starts provisioning and records a REACTIVATED audit event', async () => {
-    const result = await reactivateTenantAction(TENANT_ID, {
+    const result = await reactivateTenantAction(MOCK_TENANT_ID, {
       confirm: 'Acme',
     });
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_ID, {
+    expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       includeArchived: true,
     });
-    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(recordAuditEventMock).toHaveBeenCalledWith(
       expect.objectContaining({
         action: AUDIT_ACTION.REACTIVATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: TENANT_ID,
+        targetId: MOCK_TENANT_ID,
         details: { name: 'Acme' },
       }),
     );
@@ -101,7 +101,9 @@ describe('reactivateTenantAction', () => {
   });
 
   it('rejects an empty confirmation without reading the tenant', async () => {
-    const result = await reactivateTenantAction(TENANT_ID, { confirm: '  ' });
+    const result = await reactivateTenantAction(MOCK_TENANT_ID, {
+      confirm: '  ',
+    });
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(startProvisioningMock).not.toHaveBeenCalled();
@@ -112,7 +114,7 @@ describe('reactivateTenantAction', () => {
   });
 
   it("rejects a confirmation that doesn't match the tenant's live name", async () => {
-    const result = await reactivateTenantAction(TENANT_ID, {
+    const result = await reactivateTenantAction(MOCK_TENANT_ID, {
       confirm: 'acme',
     });
 
@@ -130,7 +132,7 @@ describe('reactivateTenantAction', () => {
       deprovisionedAt: null,
     });
 
-    const result = await reactivateTenantAction(TENANT_ID, {
+    const result = await reactivateTenantAction(MOCK_TENANT_ID, {
       confirm: 'Acme',
     });
 
@@ -165,7 +167,7 @@ describe('reactivateTenantAction', () => {
     async (started) => {
       startProvisioningMock.mockResolvedValue(started);
 
-      const result = await reactivateTenantAction(TENANT_ID, {
+      const result = await reactivateTenantAction(MOCK_TENANT_ID, {
         confirm: 'Acme',
       });
 

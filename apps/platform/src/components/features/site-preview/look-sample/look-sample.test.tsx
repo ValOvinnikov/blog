@@ -1,6 +1,6 @@
 import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import type { CSSProperties } from 'react';
 
@@ -26,7 +26,7 @@ const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 const BASE_PROPS = {
   tenantName: MOCK_TENANT_NAME,
   logoSrc: undefined,
-  theme: SITE_PREVIEW_THEME,
+  theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
   hasReaderAccounts: true,
@@ -128,7 +128,7 @@ describe(LookSample, () => {
       <LookSample
         {...BASE_PROPS}
         theme={{
-          ...SITE_PREVIEW_THEME,
+          ...MOCK_SITE_PREVIEW_THEME,
           isDark: true,
           tokenStyle: {
             '--brand-primary': DARK_ACCENT,
@@ -156,7 +156,7 @@ describe(LookSample, () => {
     render(
       <LookSample
         {...BASE_PROPS}
-        theme={{ ...SITE_PREVIEW_THEME, isDark: true }}
+        theme={{ ...MOCK_SITE_PREVIEW_THEME, isDark: true }}
       />,
     );
 

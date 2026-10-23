@@ -11,10 +11,10 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
-import { makeNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
+import { mockNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
 import {
-  DEFAULT_TENANT_BASE_URL,
-  DEFAULT_TENANT_ID,
+  MOCK_TENANT_BASE_URL,
+  MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -38,13 +38,13 @@ const resolveWritableTenantMock = vi.mocked(resolveWritableTenant);
 const resolveNewsletterLinkLocaleMock = vi.mocked(resolveNewsletterLinkLocale);
 
 const TOKEN = faker.string.alphanumeric(16);
-const CONFIRMED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirmed`;
-const INVALID_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-invalid`;
-const FAILED_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-failed`;
-const UNAVAILABLE_LOCATION = `${DEFAULT_TENANT_BASE_URL}/newsletter/confirm-unavailable`;
+const CONFIRMED_LOCATION = `${MOCK_TENANT_BASE_URL}/newsletter/confirmed`;
+const INVALID_LOCATION = `${MOCK_TENANT_BASE_URL}/newsletter/confirm-invalid`;
+const FAILED_LOCATION = `${MOCK_TENANT_BASE_URL}/newsletter/confirm-failed`;
+const UNAVAILABLE_LOCATION = `${MOCK_TENANT_BASE_URL}/newsletter/confirm-unavailable`;
 
 const toConfirmRequest = (path: string) =>
-  new Request(new URL(path, DEFAULT_TENANT_BASE_URL));
+  new Request(new URL(path, MOCK_TENANT_BASE_URL));
 
 describe('GET /api/newsletter/confirm', () => {
   let request: Request;
@@ -54,9 +54,9 @@ describe('GET /api/newsletter/confirm', () => {
     confirmSubscriberMock.mockResolvedValue(
       toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED),
     );
-    resolveWritableTenantMock.mockResolvedValue(okResult(DEFAULT_TENANT_ID));
+    resolveWritableTenantMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
     resolveNewsletterLinkLocaleMock.mockResolvedValue(
-      makeNewsletterLinkLocale(),
+      mockNewsletterLinkLocale(),
     );
   });
 
@@ -65,16 +65,13 @@ describe('GET /api/newsletter/confirm', () => {
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(response.headers.get('location')).toBe(CONFIRMED_LOCATION);
-    expect(confirmSubscriberMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
-      TOKEN,
-    );
+    expect(confirmSubscriberMock).toHaveBeenCalledWith(MOCK_TENANT_ID, TOKEN);
     expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith(null);
   });
 
   it('sends them to the page in the language the link carries', async () => {
     resolveNewsletterLinkLocaleMock.mockResolvedValue(
-      makeNewsletterLinkLocale({ locale: LOCALE_ISO_CODES.FR }),
+      mockNewsletterLinkLocale({ locale: LOCALE_ISO_CODES.FR }),
     );
     const response = await GET(
       toConfirmRequest(routes.newsletterConfirm(TOKEN, LOCALE_ISO_CODES.FR)),
@@ -84,7 +81,7 @@ describe('GET /api/newsletter/confirm', () => {
       LOCALE_ISO_CODES.FR,
     );
     expect(response.headers.get('location')).toBe(
-      `${DEFAULT_TENANT_BASE_URL}/fr/newsletter/confirmed`,
+      `${MOCK_TENANT_BASE_URL}/fr/newsletter/confirmed`,
     );
   });
 

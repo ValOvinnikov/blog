@@ -4,7 +4,7 @@ import type {
   TPricingPrice,
   TPricingTier,
 } from '@blog/service';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type { IPricingLabels } from '@web/utils/to-pricing-panels';
 
 export const mockPricingPrice = (
@@ -36,7 +36,7 @@ export const mockPricingModule = (
   overrides: Partial<TPricingModule> = {},
 ): TPricingModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Pricing' }),
+  headingBlock: mockHeadingBlock({ heading: 'Pricing' }),
   tiers: [mockPricingTier()],
   footnote: undefined,
   ctaButtons: [],

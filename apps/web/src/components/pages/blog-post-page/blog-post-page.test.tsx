@@ -7,8 +7,9 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -47,12 +48,14 @@ const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 const SUMMARY_REGION_NAME = '30-second summary';
 
 const setup = customRenderServerAsync(BlogPostPage, {
-  slug: mockPostDetail.slug,
+  slug: MOCK_POST_DETAIL.slug,
 });
 
 describe(`<${BlogPostPage.name}/>`, () => {
   beforeEach(() => {
-    getPostMock.mockResolvedValue(okResult({ ...mockPostDetail, modules: [] }));
+    getPostMock.mockResolvedValue(
+      okResult({ ...MOCK_POST_DETAIL, modules: [] }),
+    );
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
   });
 
@@ -63,8 +66,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     it('fetches the post for the given slug with the tenant context', () => {
       expect(getPostMock).toHaveBeenCalledWith(
-        mockPostDetail.slug,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_POST_DETAIL.slug,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -72,38 +75,50 @@ describe(`<${BlogPostPage.name}/>`, () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Engineering' }),
-      ).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      const northwindJournalLink = within(breadcrumbs).getByRole('link', {
+        name: 'Northwind Journal',
+      });
+      const engineeringLink = within(breadcrumbs).getByRole('link', {
+        name: 'Engineering',
+      });
+      const main = screen.getByRole('main');
+
+      expect(northwindJournalLink).toBeVisible();
+      expect(engineeringLink).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
     });
 
     it('renders the post article inside main', () => {
       const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', {
-          level: 1,
-          name: mockPostDetail.title,
-        }),
-      ).toBeVisible();
-      expect(within(main).getByText('Body text.')).toBeVisible();
+      const titleHeading = within(main).getByRole('heading', {
+        level: 1,
+        name: MOCK_POST_DETAIL.title,
+      });
+      const bodyText = within(main).getByText('Body text.');
+
+      expect(titleHeading).toBeVisible();
+      expect(bodyText).toBeVisible();
     });
 
     it('renders exactly one h1, from the post', () => {
-      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-      expect(
-        screen.getByRole('heading', { level: 1, name: mockPostDetail.title }),
-      ).toBeVisible();
+      const h1Headings = screen.getAllByRole('heading', { level: 1 });
+      const titleHeading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_POST_DETAIL.title,
+      });
+
+      expect(h1Headings).toHaveLength(1);
+      expect(titleHeading).toBeVisible();
     });
 
     it('renders no reading-depth control without a skim or asides', () => {
-      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('region', { name: SUMMARY_REGION_NAME }),
-      ).not.toBeInTheDocument();
+      const radiogroup = screen.queryByRole('radiogroup');
+      const summaryRegion = screen.queryByRole('region', {
+        name: SUMMARY_REGION_NAME,
+      });
+
+      expect(radiogroup).not.toBeInTheDocument();
+      expect(summaryRegion).not.toBeInTheDocument();
     });
   });
 
@@ -119,31 +134,33 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPostMock.mockResolvedValueOnce(errorResult(new Error('boom')));
+    getPostMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).toHaveBeenCalledWith(
-      'blog_post_page.fetch_failed',
-      expect.objectContaining({ slug: mockPostDetail.slug }),
-    );
+    expect(logger.error).toHaveBeenCalledWith('blog_post_page.fetch_failed', {
+      slug: MOCK_POST_DETAIL.slug,
+      error: MOCK_ERROR,
+    });
   });
 
   it('renders the reading-depth control once the post has asides', async () => {
     getPostMock.mockResolvedValueOnce(
-      okResult({ ...mockPostDetail, modules: [], hasAsides: true }),
+      okResult({ ...MOCK_POST_DETAIL, modules: [], hasAsides: true }),
     );
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: 'Deep' })).toBeVisible();
+    const deepRadio = screen.getByRole('radio', { name: 'Deep' });
+
+    expect(deepRadio).toBeVisible();
   });
 
   it('renders the 30s option and the skim panel once the post has a skim', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
-        ...mockPostDetail,
+        ...MOCK_POST_DETAIL,
         modules: [],
         postTakeaways: {
           takeaways: ['First.', 'Second.', 'Third.'],
@@ -155,10 +172,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: '30s' })).toBeVisible();
+    const thirtySecondRadio = screen.getByRole('radio', { name: '30s' });
+
+    expect(thirtySecondRadio).toBeVisible();
     const skim = within(screen.getByRole('main')).getByRole('region', {
       name: SUMMARY_REGION_NAME,
     });
-    expect(within(skim).getByText('First.')).toBeVisible();
+    const firstText = within(skim).getByText('First.');
+
+    expect(firstText).toBeVisible();
   });
 });

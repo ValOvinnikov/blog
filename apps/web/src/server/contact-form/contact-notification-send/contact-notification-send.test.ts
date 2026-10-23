@@ -3,6 +3,7 @@ import type { schema } from '@blog/db';
 import type * as emailModule from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
@@ -40,7 +41,6 @@ vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url', () => ({
 
 vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 
-const SITE_URL = `https://${faker.internet.domainName()}`;
 const PLATFORM_URL = `https://${faker.internet.domainName()}`;
 const FROM_ADDRESS = `${faker.company.name()} <${faker.internet.email()}>`;
 const RECIPIENT = faker.internet.email();
@@ -62,11 +62,11 @@ const lead: schema.TLead = {
   createdAt: faker.date.recent(),
 };
 
-describe('sendContactNotification', () => {
+describe(sendContactNotification, () => {
   beforeEach(() => {
     envMock.PLATFORM_APP_URL = PLATFORM_URL;
     envMock.NEWSLETTER_FROM_ADDRESS = FROM_ADDRESS;
-    vi.mocked(getTenantBaseUrl).mockResolvedValue(SITE_URL);
+    vi.mocked(getTenantBaseUrl).mockResolvedValue(MOCK_TENANT_BASE_URL);
     vi.mocked(resolveTenantEmailIdentity).mockResolvedValue({
       brandName: faker.company.name(),
       brand: resolveTenantEmailBrand({
@@ -82,21 +82,20 @@ describe('sendContactNotification', () => {
   it('emails the recipient with Reply-To set to the visitor', async () => {
     await sendContactNotification(lead);
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: RECIPIENT,
-        from: FROM_ADDRESS,
-        replyTo: lead.email,
-        subject: `New message from ${lead.name}`,
-      }),
-    );
+    const [[{ to, from, replyTo, subject }]] = sendEmailMock.mock.calls as [
+      [{ to: string; from: string; replyTo: string; subject: string }],
+    ];
+    expect(to).toBe(RECIPIENT);
+    expect(from).toBe(FROM_ADDRESS);
+    expect(replyTo).toBe(lead.email);
+    expect(subject).toBe(`New message from ${lead.name}`);
   });
 
   it('links the page the message came from and the leads list', async () => {
     await sendContactNotification(lead);
 
     const [{ html }] = sendEmailMock.mock.calls[0] as [{ html: string }];
-    expect(html).toContain(`href="${SITE_URL}${lead.sourcePath}"`);
+    expect(html).toContain(`href="${MOCK_TENANT_BASE_URL}${lead.sourcePath}"`);
     expect(html).toContain(`href="${PLATFORM_URL}/dashboard/leads"`);
   });
 

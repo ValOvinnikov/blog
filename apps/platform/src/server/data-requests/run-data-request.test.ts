@@ -4,11 +4,11 @@ import { errorResult, okResult } from '@blog/utils';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
-  DATA_REQUEST_EMAIL,
-  DATA_REQUEST_EMAIL_INDEX,
-  makePersonalDataMatches,
-  NOT_AN_EMAIL,
-  ONE_OF_EACH_COUNT,
+  MOCK_DATA_REQUEST_EMAIL,
+  MOCK_DATA_REQUEST_EMAIL_INDEX,
+  mockPersonalDataMatches,
+  MOCK_NOT_AN_EMAIL,
+  MOCK_ONE_OF_EACH_COUNT,
 } from '@platform/testing/data-requests/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -42,33 +42,33 @@ const SERVER_ERROR = errorResult({ outcome: ACTION_OUTCOME.SERVER_ERROR });
 describe(runDataRequest, () => {
   beforeEach(() => {
     recordAuditEventMock.mockReset();
-    runMock.mockReset().mockResolvedValue(okResult(makePersonalDataMatches()));
+    runMock.mockReset().mockResolvedValue(okResult(mockPersonalDataMatches()));
     vi.mocked(logger.error).mockReset();
   });
 
   it('runs the request for the trimmed email and returns its data', async () => {
     const result = await runDataRequest(
-      { email: ` ${DATA_REQUEST_EMAIL} ` },
+      { email: ` ${MOCK_DATA_REQUEST_EMAIL} ` },
       STEP,
     );
 
-    expect(runMock).toHaveBeenCalledWith(DATA_REQUEST_EMAIL);
-    expect(result).toEqual({ ok: true, data: makePersonalDataMatches() });
+    expect(runMock).toHaveBeenCalledWith(MOCK_DATA_REQUEST_EMAIL);
+    expect(result).toEqual({ ok: true, data: mockPersonalDataMatches() });
   });
 
   it("audits the request against the email's index with only counts", async () => {
-    await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
+    await runDataRequest({ email: MOCK_DATA_REQUEST_EMAIL }, STEP);
 
     expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
       action: AUDIT_ACTION.PERSONAL_DATA_LOOKED_UP,
       targetType: AUDIT_TARGET_TYPE.PERSONAL_DATA,
-      targetId: DATA_REQUEST_EMAIL_INDEX,
-      details: ONE_OF_EACH_COUNT,
+      targetId: MOCK_DATA_REQUEST_EMAIL_INDEX,
+      details: MOCK_ONE_OF_EACH_COUNT,
     });
   });
 
   it('refuses a value that is not an email without running or auditing', async () => {
-    const result = await runDataRequest({ email: NOT_AN_EMAIL }, STEP);
+    const result = await runDataRequest({ email: MOCK_NOT_AN_EMAIL }, STEP);
 
     expect(result).toEqual(INVALID_EMAIL);
     expect(runMock).not.toHaveBeenCalled();
@@ -78,7 +78,10 @@ describe(runDataRequest, () => {
   it('reports an email the data layer rejects as invalid', async () => {
     runMock.mockResolvedValue(errorResult(ERROR_CODE.DB_INVALID_EMAIL));
 
-    const result = await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
+    const result = await runDataRequest(
+      { email: MOCK_DATA_REQUEST_EMAIL },
+      STEP,
+    );
 
     expect(result).toEqual(INVALID_EMAIL);
     expect(recordAuditEventMock).not.toHaveBeenCalled();
@@ -87,7 +90,10 @@ describe(runDataRequest, () => {
   it('returns a server error and logs when the request fails', async () => {
     runMock.mockResolvedValue(errorResult(ERROR_CODE.DB_NOT_FOUND));
 
-    const result = await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
+    const result = await runDataRequest(
+      { email: MOCK_DATA_REQUEST_EMAIL },
+      STEP,
+    );
     const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
 
     expect(result).toEqual(SERVER_ERROR);
@@ -101,7 +107,10 @@ describe(runDataRequest, () => {
   it('returns a server error without an audit event when the request throws', async () => {
     runMock.mockRejectedValue(new Error('db down'));
 
-    const result = await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
+    const result = await runDataRequest(
+      { email: MOCK_DATA_REQUEST_EMAIL },
+      STEP,
+    );
 
     expect(result).toEqual(SERVER_ERROR);
     expect(recordAuditEventMock).not.toHaveBeenCalled();
@@ -109,10 +118,10 @@ describe(runDataRequest, () => {
 
   it('logs a thrown error by name only, never the email in its message', async () => {
     runMock.mockRejectedValue(
-      new TypeError(`Failed query, params: ${DATA_REQUEST_EMAIL}`),
+      new TypeError(`Failed query, params: ${MOCK_DATA_REQUEST_EMAIL}`),
     );
 
-    await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
+    await runDataRequest({ email: MOCK_DATA_REQUEST_EMAIL }, STEP);
     const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
 
     expect(context).toEqual({

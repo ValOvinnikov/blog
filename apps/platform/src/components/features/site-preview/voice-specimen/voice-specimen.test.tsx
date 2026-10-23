@@ -3,7 +3,7 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import {
   buildVoiceDraft,
   withVoiceValue,
@@ -14,6 +14,9 @@ import { VoiceSpecimen } from './voice-specimen';
 const { EN, DE } = LOCALE_ISO_CODES;
 
 const render = renderWithIntl;
+
+const DRAFT_HEADING = 'Lost at sea';
+const DATA_FOCUSED = 'data-focused';
 
 const defaults = buildVoiceDraft({}, [EN, DE]);
 
@@ -37,7 +40,7 @@ describe(VoiceSpecimen, () => {
         locale={EN}
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
-        theme={SITE_PREVIEW_THEME}
+        theme={MOCK_SITE_PREVIEW_THEME}
       />,
     );
 
@@ -55,13 +58,13 @@ describe(VoiceSpecimen, () => {
       <VoiceSpecimen
         surface={VOICE_SURFACE.NOT_FOUND}
         locale={EN}
-        values={valuesFor(EN, { notFoundHeading: 'Lost at sea' })}
+        values={valuesFor(EN, { notFoundHeading: DRAFT_HEADING })}
         listSamples={en.voiceSpecimen.lists}
-        theme={SITE_PREVIEW_THEME}
+        theme={MOCK_SITE_PREVIEW_THEME}
       />,
     );
 
-    expect(screen.getByText('Lost at sea')).toBeVisible();
+    expect(screen.getByText(DRAFT_HEADING)).toBeVisible();
     expect(
       screen.queryByText(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading),
     ).not.toBeInTheDocument();
@@ -74,7 +77,7 @@ describe(VoiceSpecimen, () => {
         locale={DE}
         values={valuesFor(DE)}
         listSamples={de.voiceSpecimen.lists}
-        theme={SITE_PREVIEW_THEME}
+        theme={MOCK_SITE_PREVIEW_THEME}
       />,
     );
 
@@ -96,7 +99,7 @@ describe(VoiceSpecimen, () => {
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
         openListFieldId="topicEmpty"
-        theme={SITE_PREVIEW_THEME}
+        theme={MOCK_SITE_PREVIEW_THEME}
       />,
     );
 
@@ -113,7 +116,7 @@ describe(VoiceSpecimen, () => {
         locale={EN}
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
-        theme={SITE_PREVIEW_THEME}
+        theme={MOCK_SITE_PREVIEW_THEME}
       />,
     );
 
@@ -131,17 +134,17 @@ describe(VoiceSpecimen, () => {
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
         focusedFieldId="notFoundHeading"
-        theme={SITE_PREVIEW_THEME}
+        theme={MOCK_SITE_PREVIEW_THEME}
       />,
     );
 
     expect(screen.getByTestId('voice-key-notFoundHeading')).toHaveAttribute(
-      'data-focused',
+      DATA_FOCUSED,
       'true',
     );
     expect(
       screen.getByTestId('voice-key-notFoundSupportingText'),
-    ).toHaveAttribute('data-focused', 'false');
+    ).toHaveAttribute(DATA_FOCUSED, 'false');
   });
 
   it('applies the tenant theme to the specimen', () => {
@@ -151,7 +154,7 @@ describe(VoiceSpecimen, () => {
         locale={EN}
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
-        theme={SITE_PREVIEW_THEME}
+        theme={MOCK_SITE_PREVIEW_THEME}
       />,
     );
 

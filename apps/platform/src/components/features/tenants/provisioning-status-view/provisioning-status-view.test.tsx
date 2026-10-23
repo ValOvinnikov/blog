@@ -21,9 +21,9 @@ import {
   ARCHIVED_NOTICE_TEXT,
 } from '@platform/testing/render-in-settings-form';
 import {
-  idleProvisioningSteps,
+  mockIdleProvisioningSteps,
   INVITED_PENDING_TEXT,
-  makeClientTenant,
+  mockClientTenant,
   MOCK_ARCHIVED_AT,
   MOCK_OWNER_EMAIL,
   MOCK_RUN_PLUS_1_MIN_AT,
@@ -37,7 +37,7 @@ import {
   mockFirstStepDoneProvisioningSteps,
   mockFirstStepRunningProvisioningSteps,
   mockMapDomainFailedProvisioningSteps,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -73,27 +73,27 @@ const RUNNING = 'Running…';
 const FIRST_STEP_LIVE = `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`;
 
 const renderView = customRender(ProvisioningStatusView, {
-  tenant: makeClientTenant(),
+  tenant: mockClientTenant(),
   ownerEmail: MOCK_OWNER_EMAIL,
 });
 
 const failedRunTenant = (error = DOMAINS_API_ERROR) =>
-  makeClientTenant({
+  mockClientTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
     provisioningSteps: mockMapDomainFailedProvisioningSteps(error),
   });
 
 const provisioningFirstStepRunningTenant = () =>
-  makeClientTenant({
+  mockClientTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     provisioningSteps: mockFirstStepRunningProvisioningSteps(),
   });
 
 const queuedRunTenant = () =>
-  makeClientTenant({
+  mockClientTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     provisioningSteps: {
-      ...idleProvisioningSteps(),
+      ...mockIdleProvisioningSteps(),
       run: { admittedAt: AT_20261015_1300 } as TProvisioningRun,
     },
   });
@@ -146,7 +146,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('titles the page "Provisioning" and names the tenant in the description', () => {
-    renderView({ tenant: makeClientTenant({ name: MOCK_TENANT_NAME }) });
+    renderView({ tenant: mockClientTenant({ name: MOCK_TENANT_NAME }) });
 
     const provisioningHeading = screen.getByRole('heading', {
       level: 1,
@@ -161,7 +161,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('does not show the archived notice for a live tenant', () => {
-    renderView({ tenant: makeClientTenant({ deprovisionedAt: null }) });
+    renderView({ tenant: mockClientTenant({ deprovisionedAt: null }) });
 
     const thisTenantIsText = screen.queryByText(ARCHIVED_NOTICE_TEXT);
 
@@ -170,7 +170,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
   it('renders the overall status badge in the Run card header, not the page header', () => {
     renderView({
-      tenant: makeClientTenant({
+      tenant: mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...mockFirstStepRunningProvisioningSteps(),
@@ -270,14 +270,16 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       await user.click(startButton);
 
       await waitFor(() => {
-        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
+        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+        );
       });
     });
   });
 
   it("reflects the steps card's completion badge count from the tenant's actual step statuses", () => {
     renderView({
-      tenant: makeClientTenant({
+      tenant: mockClientTenant({
         provisioningSteps: {
           ...mockFirstStepDoneProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
@@ -296,7 +298,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   describe('with the first step running', () => {
     beforeEach(() => {
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningSteps: mockFirstStepRunningProvisioningSteps(),
         }),
       });
@@ -329,7 +331,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
   it('exposes exactly one accessible announcement per step across all four statuses', () => {
     renderView({
-      tenant: makeClientTenant({
+      tenant: mockClientTenant({
         provisioningSteps: {
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
@@ -405,7 +407,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
   it("no longer renders a step's raw error text inline in the sidebar", () => {
     renderView({
-      tenant: makeClientTenant({
+      tenant: mockClientTenant({
         provisioningSteps: mockMapDomainFailedProvisioningSteps(
           VERCEL_DOMAINS_FAILURE,
         ),
@@ -421,10 +423,10 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   describe('parsed provisioning error card', () => {
     const renderFailed = (error: string) => {
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
           provisioningSteps: {
-            ...idleProvisioningSteps(),
+            ...mockIdleProvisioningSteps(),
             [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
               status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
               error,
@@ -503,7 +505,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   describe('a stale FAILED step while a retried run is genuinely in progress', () => {
     beforeEach(() => {
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
           provisioningSteps:
             mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
@@ -551,7 +553,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     await user.click(retryButton);
 
     await waitFor(() => {
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(TENANT_ID);
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
     });
   });
 
@@ -666,7 +670,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   describe('for an archived tenant with every step idle', () => {
     beforeEach(() => {
       renderView({
-        tenant: makeClientTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+        tenant: mockClientTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
       });
     });
 
@@ -700,7 +704,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   describe('for an archived tenant with a failed step', () => {
     beforeEach(() => {
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
           deprovisionedAt: MOCK_ARCHIVED_AT,
           provisioningSteps:
@@ -758,7 +762,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         await pollAndReveal();
 
         expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
+          MOCK_TENANT_ID,
         );
         const completeText = within(sidebar).getByText('Complete');
         const sidebarRunningText = within(sidebar).queryByText(RUNNING);
@@ -787,7 +791,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         provisioningSteps: mockFirstStepDoneProvisioningSteps(),
       });
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         }),
       });
@@ -840,7 +844,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
-          ...idleProvisioningSteps(),
+          ...mockIdleProvisioningSteps(),
           run: { startedAt: '2026-10-15T13:01:00.000Z' },
         },
       });
@@ -883,7 +887,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
     it('is collapsed by default once every step is already done on mount', () => {
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
           provisioningSteps: mockDoneProvisioningSteps(),
         }),
@@ -943,9 +947,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       describe('with the first step done a minute in', () => {
         beforeEach(() => {
           renderView({
-            tenant: makeClientTenant({
+            tenant: mockClientTenant({
               provisioningSteps: {
-                ...idleProvisioningSteps(),
+                ...mockIdleProvisioningSteps(),
                 [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
                   status: TENANT_PROVISIONING_STEP_STATUS.DONE,
                   updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
@@ -974,9 +978,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
       it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
         renderView({
-          tenant: makeClientTenant({
+          tenant: mockClientTenant({
             provisioningSteps: {
-              ...idleProvisioningSteps(),
+              ...mockIdleProvisioningSteps(),
               [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
                 status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
                 error: 'boom',
@@ -994,7 +998,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
     it('shows "now" for a running step instead of a timestamp', () => {
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningSteps: mockFirstStepRunningProvisioningSteps(),
         }),
       });
@@ -1006,7 +1010,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
     it('shows no timestamp for a done step with no recorded updatedAt', () => {
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningSteps: mockFirstStepDoneProvisioningSteps(),
         }),
       });
@@ -1031,9 +1035,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
       vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
       renderView({
-        tenant: makeClientTenant({
+        tenant: mockClientTenant({
           provisioningSteps: {
-            ...idleProvisioningSteps(),
+            ...mockIdleProvisioningSteps(),
             run: {
               startedAt: MOCK_RUN_STARTED_AT,
               finishedAt: MOCK_RUN_PLUS_4_MIN_AT,

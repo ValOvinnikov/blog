@@ -6,7 +6,7 @@ import {
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
-  makeReadyTenant,
+  mockReadyTenant,
   MOCK_ARCHIVED_AT,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
@@ -43,9 +43,9 @@ vi.mock('@blog/studio', () => ({
 }));
 
 const makeProvisionedTenant = (
-  overrides: Parameters<typeof makeReadyTenant>[0] = {},
+  overrides: Parameters<typeof mockReadyTenant>[0] = {},
 ) =>
-  makeReadyTenant({
+  mockReadyTenant({
     sanityReadTokenEncrypted: 'encrypted-token',
     ...overrides,
   });

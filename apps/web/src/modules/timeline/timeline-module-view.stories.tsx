@@ -7,7 +7,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockTimelineItem } from '@web/testing/modules/timeline/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TimelineModuleView } from './timeline-module-view';
 
@@ -47,7 +47,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'How we work' }),
+    headingBlock: mockHeadingBlock({ heading: 'How we work' }),
     markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
     items,
     orientation: TIMELINE_ORIENTATION.VERTICAL,

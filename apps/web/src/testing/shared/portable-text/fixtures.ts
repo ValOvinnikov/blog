@@ -6,12 +6,14 @@ import {
 import type { TPortableTextBody } from '@blog/service';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
+export const MOCK_PARAGRAPH_STYLE = 'normal';
+
 export type TPortableTextSpan = TPortableTextBlock['children'][number];
 
 let keySeq = 0;
 const nextKey = (prefix: string) => `${prefix}-${keySeq++}`;
 
-export const portableTextSpan = (
+export const mockPortableTextSpan = (
   text: string,
   marks?: string[],
 ): TPortableTextSpan => ({
@@ -30,16 +32,16 @@ export type TPortableTextBlockOptions = {
   key?: string;
 };
 
-export const portableTextBlock = (
+export const mockPortableTextBlock = (
   text: string | TPortableTextSpan[],
   options: TPortableTextBlockOptions = {},
 ): TPortableTextBlock => ({
   _type: 'block',
   _key: options.key ?? nextKey('block'),
-  style: options.style ?? 'normal',
+  style: options.style ?? MOCK_PARAGRAPH_STYLE,
   children: Array.isArray(text)
     ? text
-    : [portableTextSpan(text, options.marks)],
+    : [mockPortableTextSpan(text, options.marks)],
   markDefs: options.markDefs,
   listItem: options.listItem,
   level: options.level,
@@ -49,34 +51,34 @@ export const portableTextBlock = (
  * Multiple sibling block types back to back, so any missing vertical
  * spacing between sibling blocks is immediately visible.
  */
-export const richTextDemo: TPortableTextBody = [
-  portableTextBlock(
+export const MOCK_RICH_TEXT_DEMO: TPortableTextBody = [
+  mockPortableTextBlock(
     'This story renders several sibling blocks back to back, so any missing vertical rhythm between them is immediately visible.',
   ),
-  portableTextBlock('A section heading', { style: 'h2' }),
-  portableTextBlock(
+  mockPortableTextBlock('A section heading', { style: 'h2' }),
+  mockPortableTextBlock(
     [
-      portableTextSpan('A paragraph with '),
-      portableTextSpan('bold', ['strong']),
-      portableTextSpan(', '),
-      portableTextSpan('italic', ['em']),
-      portableTextSpan(', and '),
-      portableTextSpan('inline code', ['code']),
-      portableTextSpan(' marks.'),
+      mockPortableTextSpan('A paragraph with '),
+      mockPortableTextSpan('bold', ['strong']),
+      mockPortableTextSpan(', '),
+      mockPortableTextSpan('italic', ['em']),
+      mockPortableTextSpan(', and '),
+      mockPortableTextSpan('inline code', ['code']),
+      mockPortableTextSpan(' marks.'),
     ],
-    { style: 'normal' },
+    { style: MOCK_PARAGRAPH_STYLE },
   ),
-  portableTextBlock('A subsection heading', { style: 'h3' }),
-  portableTextBlock('A paragraph nested under the subsection heading.'),
-  portableTextBlock('A nested subsection heading', { style: 'h4' }),
-  portableTextBlock(
+  mockPortableTextBlock('A subsection heading', { style: 'h3' }),
+  mockPortableTextBlock('A paragraph nested under the subsection heading.'),
+  mockPortableTextBlock('A nested subsection heading', { style: 'h4' }),
+  mockPortableTextBlock(
     'A paragraph nested under the deepest heading level, demonstrating the step-down sizing from h2 through h4.',
   ),
-  portableTextBlock(
+  mockPortableTextBlock(
     [
-      portableTextSpan('A second paragraph with a '),
-      portableTextSpan('link', ['link-1']),
-      portableTextSpan(' in it.'),
+      mockPortableTextSpan('A second paragraph with a '),
+      mockPortableTextSpan('link', ['link-1']),
+      mockPortableTextSpan(' in it.'),
     ],
     {
       markDefs: [
@@ -95,7 +97,7 @@ export const richTextDemo: TPortableTextBody = [
     filename: 'example.ts',
     code: 'export const greet = (name: string) => `Hello, ${name}!`;',
   },
-  portableTextBlock(
+  mockPortableTextBlock(
     'A paragraph after the code block, before an inline image.',
   ),
   {
@@ -104,13 +106,13 @@ export const richTextDemo: TPortableTextBody = [
     image: mockSanityImage({ alt: 'A scenic mountain range at sunset' }),
     layout: IMAGE_LAYOUT.FLOAT_LEFT,
   },
-  portableTextBlock(
+  mockPortableTextBlock(
     'A closing paragraph after the image, long enough to demonstrate text wrapping around the floated image above at the md breakpoint and wider. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
   ),
 ];
 
-export const fullBleedImageDemo: TPortableTextBody = [
-  portableTextBlock(
+export const MOCK_FULL_BLEED_IMAGE_DEMO: TPortableTextBody = [
+  mockPortableTextBlock(
     'A paragraph before a full bleed image. Full bleed images break out of the text measure and reach both viewport edges.',
   ),
   {
@@ -119,7 +121,7 @@ export const fullBleedImageDemo: TPortableTextBody = [
     image: mockSanityImage({ alt: 'A panoramic mountain range' }),
     layout: IMAGE_LAYOUT.FULL_BLEED,
   },
-  portableTextBlock(
+  mockPortableTextBlock(
     'A paragraph after the full bleed image, continuing at the regular text measure.',
   ),
 ];

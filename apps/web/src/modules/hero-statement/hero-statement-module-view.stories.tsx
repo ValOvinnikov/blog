@@ -2,7 +2,7 @@ import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { HeroStatementModuleView } from './hero-statement-module-view';
 
@@ -25,7 +25,7 @@ const meta = {
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     variant: HERO_VARIANT.SPLIT,
     eyebrow: 'Now shipping',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: 'Build faster, ship sooner',
       supportingText:
         'A marketing hero for a landing or home page — an authored statement rather than a resolved post, with zero, one, or two authored actions.',

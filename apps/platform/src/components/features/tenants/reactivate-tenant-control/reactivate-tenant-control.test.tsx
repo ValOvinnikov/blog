@@ -4,7 +4,7 @@ import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   CONFIRM_TENANT_NAME_LABEL,
-  makeClientTenant,
+  mockClientTenant,
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_NAME,
   REACTIVATE_TENANT_LABEL,
@@ -23,7 +23,7 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
   reactivateTenantAction: reactivateTenantActionMock,
 }));
 
-const ARCHIVED_TENANT = makeClientTenant({
+const ARCHIVED_TENANT = mockClientTenant({
   deprovisionedAt: MOCK_ARCHIVED_AT,
 });
 

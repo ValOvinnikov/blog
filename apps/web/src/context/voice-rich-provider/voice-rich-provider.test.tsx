@@ -1,19 +1,12 @@
 import type { TVoicePortableText } from '@blog/config';
 import { render, renderElement, screen } from '@web/testing/custom-render';
+import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
 import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
 
 import { useVoiceRich, VoiceRichProvider } from './voice-rich-provider';
 
-const richTextOf = (text: string): TVoicePortableText => [
-  {
-    _type: 'block',
-    _key: 'a',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'a1', text }],
-  },
-];
-
-const OVERRIDE_VALUE = richTextOf('Nothing published yet.');
+const OVERRIDE_TEXT = 'Nothing published yet.';
+const OVERRIDE_VALUE = mockVoiceRichText(OVERRIDE_TEXT);
 
 const VALUES = {
   blogListEmpty: OVERRIDE_VALUE,
@@ -32,7 +25,9 @@ describe(`<${VoiceRichProvider.name}/>`, () => {
       </VoiceRichProvider>,
     );
 
-    expect(screen.getByText('Article body')).toBeVisible();
+    const body = screen.getByText('Article body');
+
+    expect(body).toBeVisible();
   });
 
   it('exposes the resolved value for a given voice field id, unflattened', () => {
@@ -42,9 +37,9 @@ describe(`<${VoiceRichProvider.name}/>`, () => {
       </VoiceRichProvider>,
     );
 
-    expect(screen.getByTestId('voice-rich')).toHaveTextContent(
-      'Nothing published yet.',
-    );
+    const voiceRich = screen.getByTestId('voice-rich');
+
+    expect(voiceRich).toHaveTextContent(OVERRIDE_TEXT);
   });
 
   it('throws when read outside a VoiceRichProvider', () => {

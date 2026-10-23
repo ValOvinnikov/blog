@@ -15,7 +15,7 @@ import {
   MOCK_FEATURE_LIST_HEADING,
   MOCK_FEATURE_LIST_ITEMS,
 } from '@web/testing/modules/feature-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
@@ -28,7 +28,7 @@ const dataTestId = 'feature-list-module-feature-list-1';
 
 const setup = customRender(FeatureListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
   items: MOCK_FEATURE_LIST_ITEMS,
   ctaButtons: [],
   imageShape: CARD_IMAGE_SHAPE.WIDE,

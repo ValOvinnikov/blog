@@ -18,9 +18,12 @@ import {
   RELEASE_FAILURE,
 } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
-import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
-import { makeReleaseRun } from '@platform/testing/releases/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import {
+  MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_EMAIL,
+} from '@platform/testing/admins/operator';
+import { mockReleaseRun } from '@platform/testing/releases/fixtures';
 import type { Session } from 'next-auth';
 
 const {
@@ -97,14 +100,14 @@ describe('startReleaseAction', () => {
     releaseSwitch.isEnabled = true;
     requireSuperAdminMock
       .mockReset()
-      .mockResolvedValue(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
+      .mockResolvedValue(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     authMock.mockReset().mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     getCandidateComparisonMock
       .mockReset()
       .mockResolvedValue(candidate(false, headSha));
-    getReleaseRunMock.mockReset().mockResolvedValue(okResult(makeReleaseRun()));
+    getReleaseRunMock.mockReset().mockResolvedValue(okResult(mockReleaseRun()));
     resolveContrastStatusMock
       .mockReset()
       .mockResolvedValue(okResult(CONTRAST_STATUS.NONE));
@@ -155,8 +158,8 @@ describe('startReleaseAction', () => {
     });
     expect(insertAuditEventMock).toHaveBeenCalledOnce();
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.RELEASE_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: 'v1.5.0',
@@ -193,8 +196,8 @@ describe('startReleaseAction', () => {
       isOverride: true,
     });
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.RELEASE_OVERRIDE,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: 'v1.5.0',
@@ -245,7 +248,7 @@ describe('startReleaseAction', () => {
   it.each([RELEASE_RUN_STATUS.DISPATCHED, RELEASE_RUN_STATUS.RUNNING])(
     'refuses a second release while one is %s',
     async (status) => {
-      getReleaseRunMock.mockResolvedValue(okResult(makeReleaseRun({ status })));
+      getReleaseRunMock.mockResolvedValue(okResult(mockReleaseRun({ status })));
 
       const result = await startReleaseAction({ version: 'v1.5.0' });
 

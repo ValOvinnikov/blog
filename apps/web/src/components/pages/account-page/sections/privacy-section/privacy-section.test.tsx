@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
-import { makePrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
+import { mockPrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
 
 import { PrivacySection } from './privacy-section';
 
@@ -12,7 +12,7 @@ vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 const setup = () =>
   renderElement(
     <ToastProvider>
-      <PrivacySection {...makePrivacySection()} />
+      <PrivacySection {...mockPrivacySection()} />
     </ToastProvider>,
   );
 
@@ -22,9 +22,12 @@ describe(`<${PrivacySection.name}/>`, () => {
   });
 
   it('renders the panel heading as a level-2 heading', () => {
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Privacy' }),
-    ).toBeVisible();
+    const privacyHeading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Privacy',
+    });
+
+    expect(privacyHeading).toBeVisible();
   });
 
   it('renders the export row as a download link to the export route', () => {
@@ -38,12 +41,10 @@ describe(`<${PrivacySection.name}/>`, () => {
     const deleteButton = screen.getByRole('button', { name: 'Delete account' });
     expect(deleteButton).toBeDisabled();
 
-    await user.type(
-      screen.getByRole('textbox', {
-        name: 'Type your handle to confirm deletion',
-      }),
-      'jane',
-    );
+    const handleTextbox = screen.getByRole('textbox', {
+      name: 'Type your handle to confirm deletion',
+    });
+    await user.type(handleTextbox, 'jane');
 
     expect(deleteButton).toBeEnabled();
   });

@@ -1,4 +1,13 @@
+import { PRESET_ID } from '@blog/config/constants';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import {
+  MOCK_DYNAMIC_SERVER_USAGE_ERROR,
+  MOCK_ERROR,
+} from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 
@@ -22,15 +31,12 @@ vi.mock('next/cache', () => ({
 
 const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
-const TENANT_A_ID = 'tenant-a';
-const TENANT_B_ID = 'tenant-b';
-
 describe(getEffectiveSettingsFeatures, () => {
   beforeEach(() => {
     getRequestTenantIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getRequestTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
   });
@@ -43,7 +49,7 @@ describe(getEffectiveSettingsFeatures, () => {
       newsletterEnabled: true,
       analyticsEnabled: false,
     });
-    getSiteConfigMock.mockResolvedValue({ preset: 'EDITORIAL' });
+    getSiteConfigMock.mockResolvedValue({ preset: PRESET_ID.EDITORIAL });
 
     const result = await getEffectiveSettingsFeatures();
 
@@ -57,46 +63,35 @@ describe(getEffectiveSettingsFeatures, () => {
         ANALYTICS: false,
       },
     });
-    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_A_ID);
+    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it("falls back to the tenant's preset defaults when no settings_features row exists", async () => {
-    getSiteConfigMock.mockResolvedValue({ preset: 'EDITORIAL' });
+  it.each([
+    ["the tenant's preset defaults", { preset: PRESET_ID.EDITORIAL }],
+    ['the console preset with no site_config row', undefined],
+  ])(
+    'falls back to %s when no settings_features row exists',
+    async (_, siteConfig) => {
+      getSiteConfigMock.mockResolvedValue(siteConfig);
 
-    const result = await getEffectiveSettingsFeatures();
+      const result = await getEffectiveSettingsFeatures();
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        COMMENTS: true,
-        RATINGS: true,
-        BOOKMARKS: true,
-        NEWSLETTER: false,
-        ANALYTICS: false,
-        CONSENT_BANNER: false,
-        CONTACT_FORM: true,
-      },
-    });
-  });
+      expect(result).toEqual({
+        ok: true,
+        data: {
+          COMMENTS: true,
+          RATINGS: true,
+          BOOKMARKS: true,
+          NEWSLETTER: false,
+          ANALYTICS: false,
+          CONSENT_BANNER: false,
+          CONTACT_FORM: true,
+        },
+      });
+    },
+  );
 
-  it('falls back to the console preset when there is no site_config row either', async () => {
-    const result = await getEffectiveSettingsFeatures();
-
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        COMMENTS: true,
-        RATINGS: true,
-        BOOKMARKS: true,
-        NEWSLETTER: false,
-        ANALYTICS: false,
-        CONSENT_BANNER: false,
-        CONTACT_FORM: true,
-      },
-    });
-  });
-
-  it('returns ok:true with undefined data when the request has no resolvable tenant', async () => {
+  it('resolves no features when the request has no resolvable tenant', async () => {
     getRequestTenantIdMock.mockResolvedValue(undefined);
 
     const result = await getEffectiveSettingsFeatures();
@@ -105,52 +100,48 @@ describe(getEffectiveSettingsFeatures, () => {
     expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
-  it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
-    await getEffectiveSettingsFeatures(TENANT_A_ID);
+  it('reads the request tenant from the supplied tenant', async () => {
+    await getEffectiveSettingsFeatures(MOCK_TENANT_ID);
 
-    expect(getRequestTenantIdMock).toHaveBeenCalledWith(TENANT_A_ID);
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('returns ok:false when a query rejects', async () => {
-    getSettingsFeaturesMock.mockRejectedValue(new Error('boom'));
+    getSettingsFeaturesMock.mockRejectedValue(MOCK_ERROR);
 
     const result = await getEffectiveSettingsFeatures();
 
     expect(result.ok).toBe(false);
   });
 
-  it("resolves each request's own tenant's features rather than a shared one", async () => {
+  it("resolves each request's own tenant's features", async () => {
     getSettingsFeaturesMock.mockImplementation((tenantId: string) => ({
-      commentsEnabled: tenantId === TENANT_A_ID,
+      commentsEnabled: tenantId === MOCK_TENANT_ID,
       ratingsEnabled: true,
       bookmarksEnabled: true,
       newsletterEnabled: false,
       analyticsEnabled: false,
     }));
-    getSiteConfigMock.mockResolvedValue({ preset: 'CONSOLE' });
+    getSiteConfigMock.mockResolvedValue({ preset: PRESET_ID.CONSOLE });
 
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getRequestTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     const resultA = await getEffectiveSettingsFeatures();
 
-    getRequestTenantIdMock.mockResolvedValue(TENANT_B_ID);
+    getRequestTenantIdMock.mockResolvedValue(MOCK_OTHER_TENANT_ID);
     const resultB = await getEffectiveSettingsFeatures();
 
     expect(resultA.ok && resultA.data?.COMMENTS).toBe(true);
     expect(resultB.ok && resultB.data?.COMMENTS).toBe(false);
-    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_A_ID);
-    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_B_ID);
+    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(MOCK_OTHER_TENANT_ID);
   });
 
-  it("rethrows the header read's dynamic-rendering signal instead of a fetch failure", async () => {
-    const dynamicSignal = Object.assign(
-      new Error(
-        "Dynamic server usage: Route /[tenant]/[locale] couldn't be rendered statically because it used `headers`",
-      ),
-      { digest: 'DYNAMIC_SERVER_USAGE' },
-    );
-    getRequestTenantIdMock.mockRejectedValue(dynamicSignal);
+  it("rethrows the header read's dynamic-rendering signal", async () => {
+    getRequestTenantIdMock.mockRejectedValue(MOCK_DYNAMIC_SERVER_USAGE_ERROR);
 
-    await expect(getEffectiveSettingsFeatures()).rejects.toBe(dynamicSignal);
+    await expect(getEffectiveSettingsFeatures()).rejects.toBe(
+      MOCK_DYNAMIC_SERVER_USAGE_ERROR,
+    );
     expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 });

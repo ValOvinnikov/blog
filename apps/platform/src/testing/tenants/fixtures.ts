@@ -20,7 +20,7 @@ import {
   type TClientTenant,
 } from '@platform/server/tenants/to-client-tenant';
 
-export const idleProvisioningSteps = (): TTenantProvisioningState => {
+export const mockIdleProvisioningSteps = (): TTenantProvisioningState => {
   const idle: TProvisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
   };
@@ -36,7 +36,7 @@ export const idleProvisioningSteps = (): TTenantProvisioningState => {
   };
 };
 
-export const idleDeprovisioningSteps = (): TTenantDeprovisioningState => {
+export const mockIdleDeprovisioningSteps = (): TTenantDeprovisioningState => {
   const idle: TDeprovisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
   };
@@ -52,7 +52,7 @@ export const idleDeprovisioningSteps = (): TTenantDeprovisioningState => {
   };
 };
 
-export const doneDeprovisioningSteps = (): TTenantDeprovisioningState => {
+export const mockDoneDeprovisioningSteps = (): TTenantDeprovisioningState => {
   const done: TDeprovisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
   };
@@ -74,7 +74,7 @@ export const mockDoneProvisioningSteps = (): TTenantProvisioningState => {
   };
 
   return {
-    ...idleProvisioningSteps(),
+    ...mockIdleProvisioningSteps(),
     [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
     [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
     [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
@@ -86,7 +86,7 @@ export const mockDoneProvisioningSteps = (): TTenantProvisioningState => {
 
 export const mockFirstStepRunningProvisioningSteps =
   (): TTenantProvisioningState => ({
-    ...idleProvisioningSteps(),
+    ...mockIdleProvisioningSteps(),
     [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
       status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
     },
@@ -94,7 +94,7 @@ export const mockFirstStepRunningProvisioningSteps =
 
 export const mockFirstStepDoneProvisioningSteps =
   (): TTenantProvisioningState => ({
-    ...idleProvisioningSteps(),
+    ...mockIdleProvisioningSteps(),
     [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     },
@@ -103,17 +103,18 @@ export const mockFirstStepDoneProvisioningSteps =
 export const mockMapDomainFailedProvisioningSteps = (
   error: string,
 ): TTenantProvisioningState => ({
-  ...idleProvisioningSteps(),
+  ...mockIdleProvisioningSteps(),
   [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
     status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
     error,
   },
 });
 
-export const TENANT_ID = faker.string.uuid();
+export const MOCK_TENANT_ID = faker.string.uuid();
 export const MOCK_TENANT_NAME = 'Acme Inc.';
 export const MOCK_TENANT_DOMAIN = 'acme.example.com';
 export const MOCK_TENANT_URL = `https://${MOCK_TENANT_DOMAIN}`;
+export const MOCK_VERCEL_A_RECORD = '76.76.21.21';
 export const MOCK_OTHER_TENANT_ID = faker.string.uuid();
 export const MOCK_OTHER_TENANT_NAME = 'Globex Corp.';
 export const MOCK_OTHER_TENANT_DOMAIN = 'globex.example.org';
@@ -136,9 +137,9 @@ export const MOCK_SANITY_PROJECT_ID = 'proj-1';
 export const MOCK_TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
 const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
 
-export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
+export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
-    id: TENANT_ID,
+    id: MOCK_TENANT_ID,
     name: MOCK_TENANT_NAME,
     primaryDomain: MOCK_TENANT_DOMAIN,
     sanityProjectId: null,
@@ -151,7 +152,7 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-    provisioningSteps: idleProvisioningSteps(),
+    provisioningSteps: mockIdleProvisioningSteps(),
     deprovisioningSteps: null,
     siteType: null,
     siteTemplateVersion: null,
@@ -179,8 +180,8 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   };
 };
 
-export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
-  return makeTenant({
+export const mockReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
+  return mockTenant({
     sanityProjectId: MOCK_SANITY_PROJECT_ID,
     sanityDataset: 'production',
     locale: LOCALE_ISO_CODES.EN,
@@ -192,9 +193,9 @@ export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   });
 };
 
-export const makeClientTenant = (
+export const mockClientTenant = (
   overrides: Partial<TTenant> = {},
-): TClientTenant => toClientTenant(makeTenant(overrides));
+): TClientTenant => toClientTenant(mockTenant(overrides));
 export const OWNER_EMAIL_LABEL = 'Owner email';
 export const PRIMARY_DOMAIN_LABEL = 'Primary domain';
 export const REACTIVATE_TENANT_LABEL = 'Reactivate tenant';

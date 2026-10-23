@@ -7,7 +7,7 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -39,7 +39,7 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(LookPage, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
 describe(`<${LookPage.name}/>`, () => {
@@ -73,12 +73,12 @@ describe(`<${LookPage.name}/>`, () => {
       id: 'admin-1',
       role: ADMIN_ROLE.ADMIN,
     });
-    getTenantByIdMock.mockResolvedValue({ id: TENANT_ID });
+    getTenantByIdMock.mockResolvedValue({ id: MOCK_TENANT_ID });
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(screen.getByRole('heading', { name: 'Look' })).toBeVisible();
     expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
       'aria-checked',

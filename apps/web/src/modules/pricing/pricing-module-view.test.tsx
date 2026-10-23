@@ -4,7 +4,7 @@ import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_ACTIONS,
 } from '@web/testing/modules/cta/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 
 import { PricingModuleView } from './pricing-module-view';
@@ -39,7 +39,7 @@ const mockPricingCard = (
 
 const setup = customRender(PricingModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Pricing' }),
+  headingBlock: mockHeadingBlock({ heading: 'Pricing' }),
   panels: [{ period: undefined, cards: [mockPricingCard()] }],
   footnote: undefined,
   ctaButtons: [],

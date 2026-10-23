@@ -2,10 +2,10 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import {
-  BLOCK_AUTHOR_EMAIL,
-  BLOCKED_ADDRESS_HASH,
-  BLOCKED_ADDRESS_HASH_PREVIEW,
-  makeBlockedIdentityListing,
+  MOCK_BLOCK_AUTHOR_EMAIL,
+  MOCK_BLOCKED_ADDRESS_HASH,
+  MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
+  mockBlockedIdentityListing,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
@@ -30,7 +30,7 @@ describe(loadBlockedSignupEntries, () => {
   });
 
   it('shows a domain as it is stored and who added it', async () => {
-    const listing = makeBlockedIdentityListing();
+    const listing = mockBlockedIdentityListing();
     listBlockedIdentitiesMock.mockResolvedValue(okResult([listing]));
 
     const entries = await loadBlockedSignupEntries();
@@ -42,7 +42,7 @@ describe(loadBlockedSignupEntries, () => {
         displayValue: listing.value,
         reason: listing.reason,
         createdAt: listing.createdAt,
-        addedBy: BLOCK_AUTHOR_EMAIL,
+        addedBy: MOCK_BLOCK_AUTHOR_EMAIL,
       },
     ]);
   });
@@ -50,21 +50,21 @@ describe(loadBlockedSignupEntries, () => {
   it('shows only the start of an address hash', async () => {
     listBlockedIdentitiesMock.mockResolvedValue(
       okResult([
-        makeBlockedIdentityListing({
+        mockBlockedIdentityListing({
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-          value: BLOCKED_ADDRESS_HASH,
+          value: MOCK_BLOCKED_ADDRESS_HASH,
         }),
       ]),
     );
 
     const [entry] = await loadBlockedSignupEntries();
 
-    expect(entry?.displayValue).toBe(BLOCKED_ADDRESS_HASH_PREVIEW);
+    expect(entry?.displayValue).toBe(MOCK_BLOCKED_ADDRESS_HASH_PREVIEW);
   });
 
   it('leaves the author empty when the adding admin is gone', async () => {
     listBlockedIdentitiesMock.mockResolvedValue(
-      okResult([makeBlockedIdentityListing({ addedByEmail: null })]),
+      okResult([mockBlockedIdentityListing({ addedByEmail: null })]),
     );
 
     const [entry] = await loadBlockedSignupEntries();

@@ -3,7 +3,7 @@ import { screen } from '@platform/testing/custom-render';
 import { MOCK_EMAIL_LOGO_URL } from '@platform/testing/email/fixtures';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
-import { BLOB_STAGED_LOGO } from '@platform/testing/site-config/fixtures';
+import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import { EmailLogoField } from './email-logo-field';
@@ -22,7 +22,7 @@ describe(`<${EmailLogoField.name}/>`, () => {
   const onStage = vi.fn();
 
   beforeEach(() => {
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
 
   afterEach(() => {
@@ -59,7 +59,10 @@ describe(`<${EmailLogoField.name}/>`, () => {
 
     await selectFile(file);
 
-    expect(onStage).toHaveBeenCalledWith({ url: BLOB_STAGED_LOGO, file });
+    expect(onStage).toHaveBeenCalledWith({
+      url: MOCK_STAGED_LOGO_BLOB_URL,
+      file,
+    });
   });
 
   it('rejects an unsupported type without staging it', async () => {

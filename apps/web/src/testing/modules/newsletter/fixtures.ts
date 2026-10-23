@@ -1,13 +1,13 @@
 import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const mockNewsletterModule = (
   overrides: Partial<TNewsletterModule> = {},
 ): TNewsletterModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({
+  headingBlock: mockHeadingBlock({
     heading: faker.company.catchPhrase(),
     supportingText: faker.lorem.sentence(),
   }),

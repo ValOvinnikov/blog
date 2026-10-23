@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroBlogModuleView } from '@web/modules/hero-blog/hero-blog-module-view';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
+import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
 
 import { LandingPageLayout } from './landing-page-layout';
 
@@ -39,7 +39,7 @@ const meta = {
         }}
       />
     ),
-    sectionNavigation: makeLandingSectionNavigation(),
+    sectionNavigation: mockLandingSectionNavigation(),
     children: (
       <div className="py-section text-muted text-center">
         Page modules render here

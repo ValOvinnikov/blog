@@ -3,7 +3,18 @@ import userEvent from '@testing-library/user-event';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { customRender, render, screen } from '@web/testing/custom-render';
 import { AppProviders } from '@web/testing/providers';
-import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { ARIA_LIVE_ASSERTIVE_SELECTOR } from '@web/testing/shared/aria/constants';
+import {
+  MOCK_ERROR_DIGEST,
+  MOCK_ERROR_WITH_DIGEST,
+} from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_VOICE_BOLD_TEXT,
+  MOCK_VOICE_ITALIC_TEXT,
+  MOCK_VOICE_LINK_HREF,
+  MOCK_VOICE_LINK_TEXT,
+  mockFormattedVoiceRich,
+} from '@web/testing/shared/voice/fixtures';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { NextIntlClientProvider } from 'next-intl';
 
@@ -17,9 +28,13 @@ vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: reportClientErrorMock,
 }));
 
-const error = Object.assign(new Error('render blew up'), {
-  digest: 'digest-123',
-});
+const {
+  announcement,
+  retry: TRY_AGAIN,
+  goHome: GO_HOME,
+} = SITE_MESSAGES.localeErrorPage;
+
+const error = MOCK_ERROR_WITH_DIGEST;
 const reset = vi.fn();
 
 const setup = customRender(LocaleErrorPage, { error, reset });
@@ -33,48 +48,51 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     });
 
     it('renders the translated heading, copy, and actions', () => {
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Something went wrong' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText(
-          'An unexpected error occurred while rendering this page. You can try again, or head back to the homepage.',
-        ),
-      ).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Something went wrong',
+      });
+      const copy = screen.getByText(
+        'An unexpected error occurred while rendering this page. You can try again, or head back to the homepage.',
+      );
+      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
+
+      expect(heading).toBeVisible();
+      expect(copy).toBeVisible();
+      expect(tryAgainButton).toBeVisible();
     });
 
     it('renders "Go home" as a real link, not a button', () => {
-      const goHomeLink = screen.getByRole('link', { name: 'Go home' });
+      const goHomeLink = screen.getByRole('link', { name: GO_HOME });
+
       expect(goHomeLink).toBeVisible();
       expect(goHomeLink).toHaveAttribute('href', '/');
     });
 
     it('announces the error to assistive technology after mount', () => {
-      expect(
-        screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
-      ).toBeVisible();
-      expect(SITE_MESSAGES.localeErrorPage.announcement).not.toBe(
-        SITE_MESSAGES.localeErrorPage.title,
-      );
+      const liveRegion = screen.getByText(announcement, {
+        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      });
+
+      expect(liveRegion).toBeVisible();
     });
 
-    it('names both available actions in the announcement, matching the rendered controls', () => {
-      const announcement =
-        SITE_MESSAGES.localeErrorPage.announcement.toLowerCase();
+    it('names both actions in the announcement as the controls render them', () => {
       const tryAgainLabel =
-        screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
+        screen.getByRole('button', { name: TRY_AGAIN }).textContent ?? '';
       const goHomeLabel =
-        screen.getByRole('link', { name: 'Go home' }).textContent ?? '';
+        screen.getByRole('link', { name: GO_HOME }).textContent ?? '';
 
-      expect(announcement).toContain(tryAgainLabel.toLowerCase());
-      expect(announcement).toContain(goHomeLabel.toLowerCase());
+      expect(announcement.toLowerCase()).toContain(tryAgainLabel.toLowerCase());
+      expect(announcement.toLowerCase()).toContain(goHomeLabel.toLowerCase());
     });
 
     it('sets aria-atomic on the live region', () => {
-      expect(
-        screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
-      ).toHaveAttribute('aria-atomic', 'true');
+      const liveRegion = screen.getByText(announcement, {
+        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      });
+
+      expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
     });
 
     it('reports the error exactly once on mount, with its digest', () => {
@@ -82,7 +100,7 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       expect(reportClientErrorMock).toHaveBeenCalledWith(
         'locale_error_boundary.render_failed',
         error,
-        { digest: 'digest-123' },
+        { digest: MOCK_ERROR_DIGEST },
       );
     });
 
@@ -94,14 +112,17 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
 
     it('calls reset when "Try again" is clicked', async () => {
       const user = userEvent.setup();
+      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
 
-      await user.click(screen.getByRole('button', { name: 'Try again' }));
+      await user.click(tryAgainButton);
 
       expect(reset).toHaveBeenCalledTimes(1);
     });
 
     it('moves focus to the page container on mount', () => {
-      expect(screen.getByRole('main')).toHaveFocus();
+      const main = screen.getByRole('main');
+
+      expect(main).toHaveFocus();
     });
   });
 
@@ -133,10 +154,7 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       <VoiceRichProvider
         values={{
           ...resolveVoiceRichFields({}, SITE_MESSAGES),
-          localeErrorDescription: makeFormattedVoiceRich({
-            linkText: 'status page',
-            href: 'https://status.example.com',
-          }),
+          localeErrorDescription: mockFormattedVoiceRich(),
         }}
       >
         <LocaleErrorPage error={error} reset={reset} />
@@ -144,11 +162,16 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       { wrapper: AppProviders },
     );
 
-    expect(screen.getByRole('link', { name: 'status page' })).toHaveAttribute(
-      'href',
-      'https://status.example.com',
-    );
-    expect(screen.getByText('bold', { selector: 'strong' })).toBeVisible();
-    expect(screen.getByText('italic', { selector: 'em' })).toBeVisible();
+    const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
+    const bold = screen.getByText(MOCK_VOICE_BOLD_TEXT, {
+      selector: 'strong',
+    });
+    const italic = screen.getByText(MOCK_VOICE_ITALIC_TEXT, {
+      selector: 'em',
+    });
+
+    expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
+    expect(bold).toBeVisible();
+    expect(italic).toBeVisible();
   });
 });

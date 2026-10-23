@@ -6,6 +6,7 @@ import {
 import { okResult } from '@blog/utils';
 import { peekVoiceTenant } from '@web/server/request-context/request-context';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { createTranslator } from 'next-intl';
 
 import requestConfig from './request';
@@ -22,8 +23,6 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
-
-const TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
 
 const OVERRIDES = Object.fromEntries(
   VOICE_FIELDS.map((field) => [field.id, `Tenant copy for ${field.id}`]),
@@ -73,7 +72,7 @@ describe('i18n request config', () => {
 
   describe('with a tenant voice', () => {
     beforeEach(() => {
-      vi.mocked(peekVoiceTenant).mockResolvedValue(TENANT_ID);
+      vi.mocked(peekVoiceTenant).mockResolvedValue(MOCK_TENANT_ID);
     });
 
     it.each(VOICE_FIELDS.map((field) => [field.id, field.path]))(
@@ -93,7 +92,7 @@ describe('i18n request config', () => {
       const { messages } = await resolveConfig(LOCALE_ISO_CODES.EN);
 
       expect(translateAt(messages, NOT_FOUND_HEADING_KEY)).toBe(
-        'Page not found',
+        SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
       );
     });
 

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import {
-  githubJson,
+  mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 
@@ -16,7 +16,7 @@ describe(isWorkflowRunActive, () => {
 
   it('is active while a run for the SHA has not completed', async () => {
     github.respond(runsPath, () =>
-      githubJson({
+      mockGitHubResponse({
         workflow_runs: [{ status: 'completed' }, { status: 'in_progress' }],
       }),
     );
@@ -29,7 +29,7 @@ describe(isWorkflowRunActive, () => {
 
   it('is not active when every run for the SHA has completed', async () => {
     github.respond(runsPath, () =>
-      githubJson({ workflow_runs: [{ status: 'completed' }] }),
+      mockGitHubResponse({ workflow_runs: [{ status: 'completed' }] }),
     );
 
     expect(await isWorkflowRunActive(workflowFile, headSha)).toEqual({

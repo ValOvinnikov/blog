@@ -1,12 +1,12 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import type { TTopicIndexPage } from '@blog/service';
 import type { TResult } from '@blog/utils';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 const topicIndexPage: TTopicIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
-  headingBlock: makeHeadingBlock({
+  headingBlock: mockHeadingBlock({
     heading: 'Topics',
     supportingText: 'Browse every post by topic.',
   }),

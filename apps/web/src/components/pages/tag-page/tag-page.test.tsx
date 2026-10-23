@@ -7,13 +7,17 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_CTA_HEADING,
+  mockCtaModuleData,
+} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_FAQ_PAGE_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
+import { mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -40,9 +44,7 @@ vi.mock('@web/i18n/navigation');
 const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
 
 const resolveTagPageWith = (overrides: Partial<TTagDetailPage>) =>
-  getTagPageMock.mockResolvedValueOnce(okResult(makeTagDetailPage(overrides)));
-
-const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
+  getTagPageMock.mockResolvedValueOnce(okResult(mockTagDetailPage(overrides)));
 
 const TAG_SLUG = 'typescript';
 
@@ -51,15 +53,14 @@ const setup = customRenderServerAsync(TagPage, {
 });
 
 const SUPPORTING_TEXT = 'Posts about TypeScript.';
-const CTA_HEADING = 'Join the list';
 const HERO_HEADING = 'All about TypeScript';
 
 describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockResolvedValue(
       okResult(
-        makeTagDetailPage({
-          headingBlock: makeHeadingBlock({
+        mockTagDetailPage({
+          headingBlock: mockHeadingBlock({
             heading: 'TypeScript',
             supportingText: SUPPORTING_TEXT,
           }),
@@ -76,7 +77,7 @@ describe(`<${TagPage.name}/>`, () => {
     it('fetches the tag for the given slug with the tenant context', () => {
       expect(getTagPageMock).toHaveBeenCalledWith(
         TAG_SLUG,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
@@ -109,7 +110,7 @@ describe(`<${TagPage.name}/>`, () => {
       const scripts = screen.queryAllByTestId(JSON_LD_SCRIPT_TEST_ID);
       expect(
         scripts.some((script) =>
-          script.textContent?.includes(FAQ_PAGE_JSON_LD),
+          script.textContent?.includes(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT),
         ),
       ).toBe(false);
     });
@@ -143,7 +144,7 @@ describe(`<${TagPage.name}/>`, () => {
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
         mockCtaModuleData({
-          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+          headingBlock: mockHeadingBlock({ heading: MOCK_CTA_HEADING }),
         }),
       ),
     );
@@ -151,7 +152,9 @@ describe(`<${TagPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    const ctaRegion = within(main).getByRole('region', {
+      name: MOCK_CTA_HEADING,
+    });
     expect(ctaRegion).toBeVisible();
   });
 
@@ -196,7 +199,7 @@ describe(`<${TagPage.name}/>`, () => {
 
       expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
         'list-1',
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
         expected,
         { termId: 'tag-1' },
       );
@@ -232,7 +235,9 @@ describe(`<${TagPage.name}/>`, () => {
 
     const scripts = screen.getAllByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(
-      scripts.some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+      scripts.some((script) =>
+        script.textContent?.includes(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT),
+      ),
     ).toBe(true);
   });
 });

@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 const SUBSCRIBER_ID = faker.string.uuid();
 const SUBSCRIBER_EMAIL = faker.internet.email();
 
-export const makeSubscriber = (
+export const mockSubscriber = (
   overrides: Partial<queries.subscribers.TPendingSubscriber> = {},
 ): queries.subscribers.TPendingSubscriber => ({
   id: SUBSCRIBER_ID,

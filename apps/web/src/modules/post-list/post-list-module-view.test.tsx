@@ -5,7 +5,7 @@ import {
   MOCK_POST_LIST_HEADING,
   mockPostListItem,
 } from '@web/testing/modules/post-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
@@ -20,7 +20,7 @@ const post = mockPostListItem();
 
 const setup = customRender(PostListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   items: [post],
   layout: undefined,
   contentAlignment: undefined,

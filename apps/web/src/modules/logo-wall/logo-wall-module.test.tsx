@@ -5,8 +5,8 @@ import {
   MOCK_LOGO_ITEMS,
   MOCK_LOGO_WALL_HEADING,
 } from '@web/testing/modules/logo-wall/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { LogoWallModule } from './logo-wall-module';
 
@@ -30,7 +30,7 @@ vi.mock('@web/server/request-context/request-context');
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_LOGO_WALL_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_LOGO_WALL_HEADING }),
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
@@ -58,7 +58,7 @@ describe(`<${LogoWallModule.name}/>`, () => {
     it('fetches the module by id with the tenant Sanity context', () => {
       expect(getLogoWallModuleMock).toHaveBeenCalledWith(
         MODULE_ID,
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 

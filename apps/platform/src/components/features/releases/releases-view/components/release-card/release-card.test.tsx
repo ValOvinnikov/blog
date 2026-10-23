@@ -6,8 +6,8 @@ import { RELEASE_RUN_STATUS } from '@platform/constants/release';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  makeReleaseCandidate,
-  makeReleaseRun,
+  mockReleaseCandidate,
+  mockReleaseRun,
   MOCK_RELEASE_RUN_URL,
 } from '@platform/testing/releases/fixtures';
 import userEvent from '@testing-library/user-event';
@@ -41,7 +41,7 @@ vi.mock('@platform/server/releases/get-release-run-action', () => ({
 const setup = customRender(ReleaseCard, {
   lastTag: 'v1.4.0',
   hasChanges: true,
-  migrations: makeReleaseCandidate().migrations,
+  migrations: mockReleaseCandidate().migrations,
   isOverrideRequired: false,
   releaseRun: okResult(),
 });
@@ -71,7 +71,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
   });
 
   it('shows the latest run with a link to it', () => {
-    setup({ releaseRun: okResult(makeReleaseRun()) });
+    setup({ releaseRun: okResult(mockReleaseRun()) });
 
     const status = screen.getByText('Succeeded');
     const runTitle = screen.getByText('Release v1.4.0');
@@ -85,7 +85,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
   it('says the deploy did not run and points to the tenant retry when a tenant migration failed', () => {
     setup({
       releaseRun: okResult(
-        makeReleaseRun({
+        mockReleaseRun({
           status: RELEASE_RUN_STATUS.FAILED,
           isTenantMigrationFailed: true,
         }),
@@ -106,7 +106,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
   it('refuses a new release while one is running', () => {
     setup({
       releaseRun: okResult(
-        makeReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
+        mockReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
       ),
     });
 
@@ -150,7 +150,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
 
   it('shows the release as dispatched as soon as it starts', async () => {
     const user = userEvent.setup();
-    setup({ releaseRun: okResult(makeReleaseRun()) });
+    setup({ releaseRun: okResult(mockReleaseRun()) });
 
     const openButton = screen.getByRole('button', { name: 'Release' });
     await user.click(openButton);
@@ -173,11 +173,11 @@ describe(`<${ReleaseCard.name}/>`, () => {
   it('follows a running release to its result and refreshes the page', async () => {
     vi.useFakeTimers();
     getReleaseRunActionMock.mockResolvedValue(
-      okResult(makeReleaseRun({ status: RELEASE_RUN_STATUS.SUCCEEDED })),
+      okResult(mockReleaseRun({ status: RELEASE_RUN_STATUS.SUCCEEDED })),
     );
     setup({
       releaseRun: okResult(
-        makeReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
+        mockReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
       ),
     });
 

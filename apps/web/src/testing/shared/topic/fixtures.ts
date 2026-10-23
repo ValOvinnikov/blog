@@ -4,10 +4,11 @@ import type {
   TTopicDetailPage,
   TTopicWithPostCount,
 } from '@blog/service';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { faker } from '@faker-js/faker';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
-export const makeTopic = (overrides: Partial<TTopic> = {}): TTopic => {
+export const mockTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   return {
     id: 'topic-1',
     title: 'Engineering',
@@ -17,25 +18,56 @@ export const makeTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   };
 };
 
-export const makeTopicWithPostCount = (
+export const mockTopicWithPostCount = (
   overrides: Partial<TTopicWithPostCount> = {},
 ): TTopicWithPostCount => {
   return {
-    ...makeTopic(),
+    ...mockTopic(),
     postCount: 0,
     ...overrides,
   };
 };
 
-export const makeTopicDetailPage = (
+export const MOCK_ENGINEERING_TOPIC = mockTopicWithPostCount({
+  description: undefined,
+  postCount: 3,
+});
+
+const [SECOND_TOPIC_TITLE, THIRD_TOPIC_TITLE] = faker.helpers.uniqueArray(
+  faker.lorem.word,
+  2,
+);
+
+const [SECOND_TOPIC_SLUG, THIRD_TOPIC_SLUG] = faker.helpers.uniqueArray(
+  faker.lorem.slug,
+  2,
+);
+
+export const MOCK_SECOND_TOPIC = mockTopicWithPostCount({
+  id: faker.string.uuid(),
+  title: SECOND_TOPIC_TITLE!,
+  slug: SECOND_TOPIC_SLUG!,
+  description: undefined,
+  postCount: 1,
+});
+
+export const MOCK_THIRD_TOPIC = mockTopicWithPostCount({
+  id: faker.string.uuid(),
+  title: THIRD_TOPIC_TITLE!,
+  slug: THIRD_TOPIC_SLUG!,
+  description: undefined,
+  postCount: 2,
+});
+
+export const mockTopicDetailPage = (
   overrides: Partial<TTopicDetailPage> = {},
 ): TTopicDetailPage => {
-  const topic = makeTopic();
+  const topic = mockTopic();
 
   return {
     topic,
     headingAlignment: CONTENT_ALIGNMENT.LEFT,
-    headingBlock: makeHeadingBlock({ heading: 'Engineering' }),
+    headingBlock: mockHeadingBlock({ heading: 'Engineering' }),
     hero: undefined,
     modules: [],
     faqs: [],

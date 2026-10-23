@@ -3,8 +3,8 @@ import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockFaqQuestion } from '@web/testing/modules/faq/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FaqModule } from './faq-module';
 
@@ -29,7 +29,7 @@ vi.mock('@web/server/request-context/request-context');
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Frequently asked questions' }),
+  headingBlock: mockHeadingBlock({ heading: 'Frequently asked questions' }),
   ctaButtons: [],
   contentAlignment: undefined,
   layout: undefined,
@@ -53,7 +53,7 @@ describe(`<${FaqModule.name}/>`, () => {
 
     expect(getFaqModuleMock).toHaveBeenCalledWith(
       'faq-1',
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 

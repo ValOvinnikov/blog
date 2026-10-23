@@ -13,7 +13,7 @@ import {
   NEWSLETTER_OUTCOME,
   SUBSCRIBE_FAILED_EVENT,
 } from '@web/constants/newsletter';
-import { makeSubscriber } from '@web/testing/shared/subscriber/fixtures';
+import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { subscribeToNewsletterAction } from './newsletter-actions';
@@ -74,7 +74,7 @@ vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
 const TENANT_ID = faker.string.uuid();
 const EMAIL = faker.internet.email();
 const COOKIE_SET_FAILED_EVENT = 'newsletter.subscribed_cookie_set_failed';
-const SUBSCRIBER = makeSubscriber({ email: EMAIL });
+const SUBSCRIBER = mockSubscriber({ email: EMAIL });
 const SUCCESS = { outcome: ACTION_OUTCOME.SUCCESS };
 const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR };
 const UNAVAILABLE = { outcome: ACTION_OUTCOME.UNAVAILABLE };
