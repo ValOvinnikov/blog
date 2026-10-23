@@ -21,7 +21,7 @@ import {
 } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 export type TDraftOwner =
@@ -54,7 +54,7 @@ export async function createTenantDraft(
   input: TCreateTenantDraftInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
   if (!isValidDomain(input.domain)) {
-    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+    return errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
   }
 
   const db = getDb();
@@ -122,5 +122,5 @@ export async function createTenantDraft(
     throw error;
   }
 
-  return { ok: true, data: tenant };
+  return okResult(tenant);
 }

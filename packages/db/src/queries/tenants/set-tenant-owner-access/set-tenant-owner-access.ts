@@ -8,7 +8,7 @@ import {
   type TTenantOwnerAccess,
 } from '@blog/db/queries/tenants/tenant-owner-access';
 import { tenants } from '@blog/db/schema/tenants';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 // A field left out keeps its stored value; `null` clears it.
@@ -26,8 +26,8 @@ export async function setTenantOwnerAccess(
     const ownerAccess = await getTenantOwnerAccess(tenantId);
 
     return ownerAccess
-      ? { ok: true, data: ownerAccess }
-      : { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+      ? okResult(ownerAccess)
+      : errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
   const db = getDb();
@@ -49,8 +49,8 @@ export async function setTenantOwnerAccess(
     .returning(tenantOwnerAccessColumns);
 
   if (!row) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: toTenantOwnerAccess(row) };
+  return okResult(toTenantOwnerAccess(row));
 }

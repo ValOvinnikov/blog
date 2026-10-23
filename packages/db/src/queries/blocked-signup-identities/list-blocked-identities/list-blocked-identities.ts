@@ -7,7 +7,7 @@ import {
   blockedSignupIdentities,
   type TBlockedSignupIdentity,
 } from '@blog/db/schema/blocked-signup-identities';
-import type { TResult } from '@blog/utils';
+import { okResult, type TResult } from '@blog/utils';
 import { desc, eq } from 'drizzle-orm';
 
 export type TBlockedIdentityListing = TBlockedSignupIdentity & {
@@ -32,8 +32,7 @@ export async function listBlockedIdentities(): Promise<
       desc(blockedSignupIdentities.id),
     );
 
-  return {
-    ok: true,
-    data: rows.map(({ entry, addedByEmail }) => ({ ...entry, addedByEmail })),
-  };
+  return okResult(
+    rows.map(({ entry, addedByEmail }) => ({ ...entry, addedByEmail })),
+  );
 }

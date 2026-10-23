@@ -13,7 +13,7 @@ import {
   normalizeSignupEmail,
 } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
 import { requirePersonalEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
 export type TAddBlockedIdentityInput = {
@@ -31,15 +31,15 @@ function toStoredValue(
     const domain = normalizeSignupDomain(identity);
 
     return domain
-      ? { ok: true, data: domain }
-      : { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+      ? okResult(domain)
+      : errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
   }
 
   const email = normalizeSignupEmail(identity);
 
   return email
-    ? { ok: true, data: requirePersonalEmailIndex(email.address) }
-    : { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
+    ? okResult(requirePersonalEmailIndex(email.address))
+    : errorResult(ERROR_CODE.DB_INVALID_EMAIL);
 }
 
 export type TAddBlockedIdentityOutcome = {
@@ -69,7 +69,7 @@ export async function addBlockedIdentity({
     .onConflictDoNothing()
     .returning();
 
-  if (inserted) return { ok: true, data: { entry: inserted, created: true } };
+  if (inserted) return okResult({ entry: inserted, created: true });
 
   const [existing] = await db
     .select()
@@ -81,7 +81,7 @@ export async function addBlockedIdentity({
       ),
     );
 
-  if (!existing) return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+  if (!existing) return errorResult(ERROR_CODE.DB_NOT_FOUND);
 
-  return { ok: true, data: { entry: existing, created: false } };
+  return okResult({ entry: existing, created: false });
 }
