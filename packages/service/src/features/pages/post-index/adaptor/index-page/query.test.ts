@@ -1,41 +1,30 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_TEMPLATE_REFERENCE,
+  mockIndexPageDocument,
+  mockRawBlogPage,
+  mockRawHeroRef,
+  mockRawPostLatestRef,
+  mockTemplateLayoutDocuments,
+  mockTemplatedPageDocument,
+} from '@blog/service/testing/pages/fixtures';
+import { evaluateGroqInLocale } from '@blog/service/testing/shared/groq';
 
 import { blogPageQuery } from './query';
 
 describe('blogPageQuery', () => {
-  it('rejects a blog page with no headingBlock', () => {
-    const raw = { ...makeRawBlogPage(), headingBlock: null };
-
-    expect(() => blogPageQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a blog page with no authored SEO', () => {
-    const raw = { ...makeRawBlogPage(), seo: null };
-
-    expect(() => blogPageQuery.parse(raw)).toThrow();
-  });
-
-  it('parses a blog page with no modules set', () => {
-    const raw = makeRawBlogPage({ modules: null });
-
+  it.each([
+    ['with no modules set', mockRawBlogPage({ modules: null })],
+    ['with its hero slot set', mockRawBlogPage({ hero: mockRawHeroRef() })],
+  ])('parses a blog page %s', (_, raw) => {
     expect(() => blogPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('projects the headingBlock object, not the retired postList reference', () => {
-    expect(blogPageQuery.query).toContain(
-      '"headingBlock": headingBlock { heading, supportingText }',
-    );
-    expect(blogPageQuery.query).not.toContain('postList');
-  });
-
-  it('parses a blog page with its hero slot set', () => {
-    const raw = makeRawBlogPage({
-      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-    });
-
-    expect(() => blogPageQuery.parse(raw)).not.toThrow();
+  it.each([
+    ['heading block', { ...mockRawBlogPage(), headingBlock: null }],
+    ['authored SEO', { ...mockRawBlogPage(), seo: null }],
+  ])('rejects a blog page with no %s', (_, raw) => {
+    expect(() => blogPageQuery.parse(raw)).toThrow();
   });
 
   it('parses null as no matching page_postIndex document, rather than throwing', () => {
@@ -44,39 +33,31 @@ describe('blogPageQuery', () => {
 });
 
 describe('blogPageQuery template layout', () => {
-  const templateRef = { _type: 'reference', _ref: 'template-a' };
-  const dataset = [
-    {
-      _id: 'template-a',
-      _type: 'template_postIndex',
-      hero: { _type: 'reference', _ref: 'hero-1' },
-      modules: [{ _key: 'a', _type: 'reference', _ref: 'post-latest-1' }],
-    },
-    { _id: 'hero-1', _type: 'module_heroBlog' },
-    { _id: 'post-latest-1', _type: 'module_postLatest' },
-  ];
-
-  function page(template?: typeof templateRef) {
-    return {
-      _id: 'page-a',
-      _type: 'page_postIndex',
-      ...(template ? { template } : {}),
-    };
-  }
-
-  function run(data: unknown[]): Promise<unknown> {
-    return evaluateGroqExpression(blogPageQuery.query, data, null, {});
-  }
+  const templateRef = MOCK_TEMPLATE_REFERENCE;
+  const dataset = mockTemplateLayoutDocuments({ _type: 'template_postIndex' });
 
   it('resolves the hero and modules of the template the blog page references', async () => {
-    expect(await run([page(templateRef), ...dataset])).toMatchObject({
-      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-      modules: [{ _id: 'post-latest-1', _type: 'module_postLatest' }],
+    expect(
+      await evaluateGroqInLocale(blogPageQuery.query, [
+        mockTemplatedPageDocument({
+          _type: 'page_postIndex',
+          template: templateRef,
+        }),
+        ...dataset,
+      ]),
+    ).toMatchObject({
+      hero: mockRawHeroRef(),
+      modules: [mockRawPostLatestRef()],
     });
   });
 
   it('resolves no hero and no modules for a blog page without a template', async () => {
-    expect(await run([page(), ...dataset])).toMatchObject({
+    expect(
+      await evaluateGroqInLocale(blogPageQuery.query, [
+        mockTemplatedPageDocument({ _type: 'page_postIndex' }),
+        ...dataset,
+      ]),
+    ).toMatchObject({
       hero: null,
       modules: null,
     });
@@ -85,52 +66,61 @@ describe('blogPageQuery template layout', () => {
 
 describe('blogPageQuery language scoping', () => {
   const { EN, NL, FR } = LOCALE_ISO_CODES;
-
-  function page(id: string, heading: string, language?: string) {
-    return {
-      _id: id,
-      _type: 'page_postIndex',
-      headingBlock: { heading },
-      ...(language ? { language } : {}),
-    };
-  }
-
-  function run(dataset: unknown[], locale: string): Promise<unknown> {
-    return evaluateGroqExpression(blogPageQuery.query, dataset, null, {
-      locale,
-      defaultLocale: EN,
-    });
-  }
+  const EN_HEADING = 'Blog';
+  const NL_HEADING = 'Blog NL';
 
   const dataset = [
-    page('page_postIndex', 'Blog', EN),
-    page('page_postIndex-nl', 'Blog NL', NL),
+    mockIndexPageDocument({
+      _type: 'page_postIndex',
+      heading: EN_HEADING,
+      language: EN,
+    }),
+    mockIndexPageDocument({
+      _type: 'page_postIndex',
+      heading: NL_HEADING,
+      language: NL,
+    }),
   ];
 
-  it("resolves each language's own blog page", async () => {
-    expect(await run(dataset, EN)).toMatchObject({
-      headingBlock: { heading: 'Blog' },
-    });
-    expect(await run(dataset, NL)).toMatchObject({
-      headingBlock: { heading: 'Blog NL' },
-    });
-  });
+  it.each([
+    [EN, EN_HEADING],
+    [NL, NL_HEADING],
+  ])(
+    'resolves the %s blog page for its own language',
+    async (locale, heading) => {
+      expect(
+        await evaluateGroqInLocale(blogPageQuery.query, dataset, locale),
+      ).toMatchObject({
+        headingBlock: { heading },
+      });
+    },
+  );
 
-  it('resolves nothing for a language without a blog page, rather than another language', async () => {
-    expect(await run(dataset, FR)).toBeNull();
+  it('resolves nothing for a language without a blog page', async () => {
+    expect(
+      await evaluateGroqInLocale(blogPageQuery.query, dataset, FR),
+    ).toBeNull();
   });
 
   it('resolves a blog page with no language for the default language only', async () => {
-    const legacy = [page('page_postIndex', 'Blog')];
+    const legacy = [
+      mockIndexPageDocument({ _type: 'page_postIndex', heading: EN_HEADING }),
+    ];
 
-    expect(await run(legacy, EN)).toMatchObject({
-      headingBlock: { heading: 'Blog' },
+    expect(
+      await evaluateGroqInLocale(blogPageQuery.query, legacy, EN),
+    ).toMatchObject({
+      headingBlock: { heading: EN_HEADING },
     });
-    expect(await run(legacy, NL)).toBeNull();
+    expect(
+      await evaluateGroqInLocale(blogPageQuery.query, legacy, NL),
+    ).toBeNull();
   });
 
   it('lists the language of every blog page as its translations', async () => {
-    expect(await run(dataset, NL)).toMatchObject({
+    expect(
+      await evaluateGroqInLocale(blogPageQuery.query, dataset, NL),
+    ).toMatchObject({
       translations: [{ language: EN }, { language: NL }],
     });
   });

@@ -1,73 +1,81 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
-  makeRawFeatureHighlightItem,
-  makeRawFeatureHighlightsModule,
+  BRAND_VARIANT,
+  LOCALE_ISO_CODES,
+  MEDIA_ORDER,
+} from '@blog/config/constants';
+import {
+  mockRawFeatureHighlightItem,
+  mockRawFeatureHighlightsModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawParagraphTextBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
-  localizedStrings,
-  localizedValues,
+  MOCK_IMAGE_ASSET_DOCUMENT,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockLocalizedListedText,
+  mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
 
 import { featureHighlightsModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-function localizedBody(values: Partial<Record<string, string>>) {
-  return localizedValues(
-    'internationalizedArrayListedTextValue',
-    Object.fromEntries(
-      Object.entries(values).map(([language, text]) => [
-        language,
-        [makeRawParagraphTextBlock({ _key: `block-${language}`, text })],
-      ]),
-    ),
-  );
-}
+const FEATURE_HIGHLIGHTS_ID = 'feature-highlights-1';
+const UNTRANSLATED_ROW = {
+  heading: 'Sleep better',
+  body: 'Fewer pages.',
+  alt: 'A moon',
+};
 
-function localizedImage(alt: Partial<Record<string, string>>) {
-  return {
-    _type: 'localizedImageWithAlt',
-    asset: { _type: 'reference', _ref: 'image-1' },
-    alt: localizedStrings(alt),
-  };
-}
+const EN_COPY = {
+  heading: 'Why teams switch',
+  row: { heading: 'Ship faster', body: 'Less friction.', alt: 'A rocket' },
+};
+
+const NL_COPY = {
+  heading: 'Waarom teams overstappen',
+  row: {
+    heading: 'Sneller leveren',
+    body: 'Minder frictie.',
+    alt: 'Een raket',
+  },
+};
 
 const featureHighlightsDocument = {
-  _id: 'feature-highlights-1',
+  _id: FEATURE_HIGHLIGHTS_ID,
   _type: 'module_featureHighlights',
-  brandVariant: 'PRIMARY',
-  mediaOrder: 'FIRST',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({
-      [EN]: 'Why teams switch',
-      [NL]: 'Waarom teams overstappen',
-    }),
-  },
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  mediaOrder: MEDIA_ORDER.FIRST,
+  headingBlock: mockLocalizedHeadingBlock({
+    [EN]: EN_COPY.heading,
+    [NL]: NL_COPY.heading,
+  }),
   highlights: [
     {
       _key: 'row-1',
       _type: 'featureHighlight',
-      heading: localizedStrings({
-        [EN]: 'Ship faster',
-        [NL]: 'Sneller leveren',
+      heading: mockLocalizedStrings({
+        [EN]: EN_COPY.row.heading,
+        [NL]: NL_COPY.row.heading,
       }),
-      body: localizedBody({ [EN]: 'Less friction.', [NL]: 'Minder frictie.' }),
-      image: localizedImage({ [EN]: 'A rocket', [NL]: 'Een raket' }),
+      body: mockLocalizedListedText({
+        [EN]: EN_COPY.row.body,
+        [NL]: NL_COPY.row.body,
+      }),
+      image: mockLocalizedImage({
+        [EN]: EN_COPY.row.alt,
+        [NL]: NL_COPY.row.alt,
+      }),
     },
     {
       _key: 'row-2',
       _type: 'featureHighlight',
-      heading: localizedStrings({ [EN]: 'Sleep better' }),
-      body: localizedBody({ [EN]: 'Fewer pages.' }),
-      image: localizedImage({ [EN]: 'A moon' }),
+      heading: mockLocalizedStrings({ [EN]: UNTRANSLATED_ROW.heading }),
+      body: mockLocalizedListedText({ [EN]: UNTRANSLATED_ROW.body }),
+      image: mockLocalizedImage({ [EN]: UNTRANSLATED_ROW.alt }),
     },
   ],
 };
-
-const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
 
 async function runFeatureHighlights(
   document: Record<string, unknown>,
@@ -75,9 +83,9 @@ async function runFeatureHighlights(
 ) {
   const raw = await evaluateGroqExpression(
     featureHighlightsModuleQuery.query,
-    [document, imageAsset],
+    [document, MOCK_IMAGE_ASSET_DOCUMENT],
     undefined,
-    { id: 'feature-highlights-1', locale, defaultLocale: EN },
+    { id: FEATURE_HIGHLIGHTS_ID, locale, defaultLocale: EN },
   );
 
   return featureHighlightsModuleQuery.parse(raw);
@@ -92,47 +100,18 @@ function rowText(module: Awaited<ReturnType<typeof runFeatureHighlights>>) {
 }
 
 describe('featureHighlightsModuleQuery', () => {
-  it('filters to module_featureHighlights documents by id', () => {
-    expect(featureHighlightsModuleQuery.query).toContain(
-      '_type == "module_featureHighlights"',
-    );
-    expect(featureHighlightsModuleQuery.query).toContain('_id == $id');
-  });
-
-  it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawFeatureHighlightsModule(), headingBlock: null };
-
-    expect(() => featureHighlightsModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a module with no highlights', () => {
-    const raw = { ...makeRawFeatureHighlightsModule(), highlights: null };
-
-    expect(() => featureHighlightsModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a highlight with no heading', () => {
+  it.each([
+    ['a module with no headingBlock', { headingBlock: null }, {}],
+    ['a module with no highlights', { highlights: null }, {}],
+    ['a module with no mediaOrder', { mediaOrder: null }, {}],
+    ['a highlight with no heading', {}, { heading: null }],
+    ['a highlight with no body', {}, { body: null }],
+    ['a highlight with no image', {}, { image: null }],
+  ])('rejects %s', (_, moduleOverrides, highlightOverrides) => {
     const raw = {
-      ...makeRawFeatureHighlightsModule(),
-      highlights: [{ ...makeRawFeatureHighlightItem(), heading: null }],
-    };
-
-    expect(() => featureHighlightsModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a highlight with no body', () => {
-    const raw = {
-      ...makeRawFeatureHighlightsModule(),
-      highlights: [{ ...makeRawFeatureHighlightItem(), body: null }],
-    };
-
-    expect(() => featureHighlightsModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a highlight with no image', () => {
-    const raw = {
-      ...makeRawFeatureHighlightsModule(),
-      highlights: [{ ...makeRawFeatureHighlightItem(), image: null }],
+      ...mockRawFeatureHighlightsModule(),
+      highlights: [{ ...mockRawFeatureHighlightItem(), ...highlightOverrides }],
+      ...moduleOverrides,
     };
 
     expect(() => featureHighlightsModuleQuery.parse(raw)).toThrow();
@@ -140,43 +119,32 @@ describe('featureHighlightsModuleQuery', () => {
 
   it('parses a highlight with no action', () => {
     const raw = {
-      ...makeRawFeatureHighlightsModule(),
-      highlights: [makeRawFeatureHighlightItem({ action: null })],
+      ...mockRawFeatureHighlightsModule(),
+      highlights: [mockRawFeatureHighlightItem({ action: null })],
     };
 
-    expect(() => featureHighlightsModuleQuery.parse(raw)).not.toThrow();
     expect(
       featureHighlightsModuleQuery.parse(raw).highlights?.[0]?.action,
     ).toBeNull();
   });
 
-  it('rejects a module with no mediaOrder', () => {
-    const raw = { ...makeRawFeatureHighlightsModule(), mediaOrder: null };
+  it.each([
+    ['picks the heading and each row in the visitor language', NL, NL_COPY],
+    [
+      'falls back to the default language for the heading and each row',
+      FR,
+      EN_COPY,
+    ],
+  ])('%s', async (_, locale, copy) => {
+    const module = await runFeatureHighlights(
+      featureHighlightsDocument,
+      locale,
+    );
 
-    expect(() => featureHighlightsModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('picks the heading and each row in the visitor language', async () => {
-    const module = await runFeatureHighlights(featureHighlightsDocument, NL);
-
-    expect(module.headingBlock.heading).toBe('Waarom teams overstappen');
+    expect(module.headingBlock.heading).toBe(copy.heading);
     expect(rowText(module)).toEqual([
-      {
-        heading: 'Sneller leveren',
-        body: [['Minder frictie.']],
-        alt: 'Een raket',
-      },
-      { heading: 'Sleep better', body: [['Fewer pages.']], alt: 'A moon' },
-    ]);
-  });
-
-  it('falls back to the default language for the heading and each row', async () => {
-    const module = await runFeatureHighlights(featureHighlightsDocument, FR);
-
-    expect(module.headingBlock.heading).toBe('Why teams switch');
-    expect(rowText(module)).toEqual([
-      { heading: 'Ship faster', body: [['Less friction.']], alt: 'A rocket' },
-      { heading: 'Sleep better', body: [['Fewer pages.']], alt: 'A moon' },
+      { ...copy.row, body: [[copy.row.body]] },
+      { ...UNTRANSLATED_ROW, body: [[UNTRANSLATED_ROW.body]] },
     ]);
   });
 
@@ -189,7 +157,7 @@ describe('featureHighlightsModuleQuery', () => {
           ...featureHighlightsDocument,
           highlights: [
             first,
-            { ...second, body: localizedBody({ [FR]: 'Moins.' }) },
+            { ...second, body: mockLocalizedListedText({ [FR]: 'Moins.' }) },
           ],
         },
         NL,

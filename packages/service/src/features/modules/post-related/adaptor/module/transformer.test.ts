@@ -1,14 +1,15 @@
-import { makeRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
+import { BRAND_VARIANT } from '@blog/config/constants';
+import { mockRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
 
 import { toPostRelatedModuleDocument } from './transformer';
 
 describe(toPostRelatedModuleDocument, () => {
   it('maps the module fields, keeping the authored limit', () => {
     const result = toPostRelatedModuleDocument(
-      makeRawPostRelatedModule({ limit: 4 }),
+      mockRawPostRelatedModule({ limit: 4 }),
     );
 
-    expect(result.brandVariant).toBe('PRIMARY');
+    expect(result.brandVariant).toBe(BRAND_VARIANT.PRIMARY);
     expect(result.showImages).toBe(true);
     expect(result.limit).toBe(4);
   });

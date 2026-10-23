@@ -1,61 +1,85 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  CARD_IMAGE_SHAPE,
+  CONTENT_ALIGNMENT,
+  LOCALE_ISO_CODES,
+} from '@blog/config/constants';
+import { MOCK_FEATURE_LIST_MODULE_ID } from '@blog/service/testing/modules/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  MOCK_IMAGE_ASSET_DOCUMENT,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+} from '@blog/service/testing/shared/localized';
 
 import { featureListModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-function moduleHeadingBlock(heading: Partial<Record<string, string>>) {
-  return { _type: 'moduleHeadingBlock', heading: localizedStrings(heading) };
-}
+const TRANSLATED_FEATURE_ID = 'feature-1';
+const ENGLISH_ONLY_FEATURE_ID = 'feature-2';
+const ENGLISH_ONLY_FEATURE = { heading: 'Calm', alt: 'A lake' };
+
+const EN_COPY = {
+  heading: 'What you get',
+  feature: { heading: 'Fast', alt: 'A rocket' },
+};
+
+const NL_COPY = {
+  heading: 'Wat je krijgt',
+  feature: { heading: 'Snel', alt: 'Een raket' },
+};
 
 const featureListDocument = {
-  _id: 'feature-list-1',
+  _id: MOCK_FEATURE_LIST_MODULE_ID,
   _type: 'module_featureList',
-  brandVariant: 'PRIMARY',
-  headingBlock: moduleHeadingBlock({
-    [EN]: 'What you get',
-    [NL]: 'Wat je krijgt',
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockLocalizedHeadingBlock({
+    [EN]: EN_COPY.heading,
+    [NL]: NL_COPY.heading,
   }),
   features: [
-    { _key: 'ref-1', _type: 'reference', _ref: 'feature-1' },
-    { _key: 'ref-2', _type: 'reference', _ref: 'feature-2' },
+    mockReference(TRANSLATED_FEATURE_ID, { _key: 'ref-1' }),
+    mockReference(ENGLISH_ONLY_FEATURE_ID, { _key: 'ref-2' }),
   ],
-  imageShape: 'WIDE',
-  cardAlignment: 'LEFT',
+  imageShape: CARD_IMAGE_SHAPE.WIDE,
+  cardAlignment: CONTENT_ALIGNMENT.LEFT,
 };
 
 const translatedFeature = {
-  _id: 'feature-1',
+  _id: TRANSLATED_FEATURE_ID,
   _type: 'block_feature',
-  headingBlock: moduleHeadingBlock({ [EN]: 'Fast', [NL]: 'Snel' }),
-  image: {
-    _type: 'localizedImageWithAlt',
-    asset: { _type: 'reference', _ref: 'image-1' },
-    alt: localizedStrings({ [EN]: 'A rocket', [NL]: 'Een raket' }),
-  },
+  headingBlock: mockLocalizedHeadingBlock({
+    [EN]: EN_COPY.feature.heading,
+    [NL]: NL_COPY.feature.heading,
+  }),
+  image: mockLocalizedImage({
+    [EN]: EN_COPY.feature.alt,
+    [NL]: NL_COPY.feature.alt,
+  }),
 };
 
 const englishOnlyFeature = {
-  _id: 'feature-2',
+  _id: ENGLISH_ONLY_FEATURE_ID,
   _type: 'block_feature',
-  headingBlock: moduleHeadingBlock({ [EN]: 'Calm' }),
-  image: {
-    _type: 'localizedImageWithAlt',
-    asset: { _type: 'reference', _ref: 'image-1' },
-    alt: localizedStrings({ [EN]: 'A lake' }),
-  },
+  headingBlock: mockLocalizedHeadingBlock({
+    [EN]: ENGLISH_ONLY_FEATURE.heading,
+  }),
+  image: mockLocalizedImage({ [EN]: ENGLISH_ONLY_FEATURE.alt }),
 };
-
-const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
 
 async function runFeatureList(locale: string) {
   const raw = await evaluateGroqExpression(
     featureListModuleQuery.query,
-    [featureListDocument, translatedFeature, englishOnlyFeature, imageAsset],
+    [
+      featureListDocument,
+      translatedFeature,
+      englishOnlyFeature,
+      MOCK_IMAGE_ASSET_DOCUMENT,
+    ],
     undefined,
-    { id: 'feature-list-1', locale, defaultLocale: EN },
+    { id: MOCK_FEATURE_LIST_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return featureListModuleQuery.parse(raw);
@@ -69,23 +93,17 @@ function featureText(module: Awaited<ReturnType<typeof runFeatureList>>) {
 }
 
 describe('featureListModuleQuery', () => {
-  it('picks the heading and each feature in the visitor language', async () => {
-    const module = await runFeatureList(NL);
+  it.each([
+    ['picks the heading and each feature in the visitor language', NL, NL_COPY],
+    [
+      'falls back to the default language for the heading and each feature',
+      FR,
+      EN_COPY,
+    ],
+  ])('%s', async (_, locale, copy) => {
+    const module = await runFeatureList(locale);
 
-    expect(module.headingBlock.heading).toBe('Wat je krijgt');
-    expect(featureText(module)).toEqual([
-      { heading: 'Snel', alt: 'Een raket' },
-      { heading: 'Calm', alt: 'A lake' },
-    ]);
-  });
-
-  it('falls back to the default language for the heading and each feature', async () => {
-    const module = await runFeatureList(FR);
-
-    expect(module.headingBlock.heading).toBe('What you get');
-    expect(featureText(module)).toEqual([
-      { heading: 'Fast', alt: 'A rocket' },
-      { heading: 'Calm', alt: 'A lake' },
-    ]);
+    expect(module.headingBlock.heading).toBe(copy.heading);
+    expect(featureText(module)).toEqual([copy.feature, ENGLISH_ONLY_FEATURE]);
   });
 });

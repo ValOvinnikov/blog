@@ -1,61 +1,63 @@
+import { MOCK_TOPIC_SLUG } from '@blog/service/testing/entities/fixtures';
 import {
-  makeRawExternalLinkDocument,
-  makeRawInternalLinkDocument,
+  MOCK_POST_HREF,
+  MOCK_POST_SLUG,
+  mockLinkView,
+  mockRawExternalLinkDocument,
+  mockRawInternalLinkDocument,
 } from '@blog/service/testing/shared/fixtures';
+import {
+  MOCK_ABOUT_HREF,
+  MOCK_ABOUT_SLUG,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { toLinkDocument } from './to-link-document';
 
+const EXTERNAL_URL = 'https://example.com/docs';
+
 describe(toLinkDocument, () => {
-  it('returns undefined for a null/undefined raw link', () => {
-    expect(toLinkDocument(null)).toBeUndefined();
-    expect(toLinkDocument(undefined)).toBeUndefined();
+  it.each([null, undefined])('returns undefined for a %s raw link', (raw) => {
+    const result = toLinkDocument(raw);
+
+    expect(result).toBeUndefined();
   });
 
   it('resolves an external link to its raw url', () => {
     const result = toLinkDocument(
-      makeRawExternalLinkDocument({ url: 'https://example.com' }),
+      mockRawExternalLinkDocument({ url: EXTERNAL_URL }),
     );
 
-    expect(result).toEqual({
-      label: 'Learn more',
-      href: 'https://example.com',
-      target: undefined,
-      platform: undefined,
-      ariaLabel: undefined,
-    });
+    expect(result).toEqual(mockLinkView({ href: EXTERNAL_URL }));
   });
 
   it('opens external links in a new tab when flagged', () => {
     const result = toLinkDocument(
-      makeRawExternalLinkDocument({
-        url: 'https://example.com',
-        openInNewTab: true,
-      }),
+      mockRawExternalLinkDocument({ openInNewTab: true }),
     );
 
     expect(result?.target).toBe('_blank');
   });
 
   it('returns undefined for an external link with a missing url', () => {
-    const result = toLinkDocument(makeRawExternalLinkDocument({ url: null }));
+    const result = toLinkDocument(mockRawExternalLinkDocument({ url: null }));
 
     expect(result).toBeUndefined();
   });
 
   it.each([
-    ['page_home', undefined, '/'],
-    ['page_landing', 'about', '/about'],
-    ['page_post', 'hello-world', '/blog/hello-world'],
-    ['page_postIndex', undefined, '/blog'],
-    ['page_topic', 'engineering', '/topics/engineering'],
-    ['page_topicIndex', undefined, '/topics'],
-    ['page_tag', 'news', '/tags/news'],
-    ['page_tagIndex', undefined, '/tags'],
+    { _type: 'page_home', slug: undefined, href: '/' },
+    { _type: 'page_landing', slug: MOCK_ABOUT_SLUG, href: MOCK_ABOUT_HREF },
+    { _type: 'page_post', slug: MOCK_POST_SLUG, href: MOCK_POST_HREF },
+    { _type: 'page_postIndex', slug: undefined, href: '/blog' },
+    { _type: 'page_topic', slug: MOCK_TOPIC_SLUG, href: '/topics/engineering' },
+    { _type: 'page_topicIndex', slug: undefined, href: '/topics' },
+    { _type: 'page_tag', slug: 'news', href: '/tags/news' },
+    { _type: 'page_tagIndex', slug: undefined, href: '/tags' },
   ] as const)(
-    'resolves an internal %s reference to its route',
-    (_type, slug, href) => {
+    'resolves an internal $_type reference to its route',
+    ({ _type, slug, href }) => {
       const result = toLinkDocument(
-        makeRawInternalLinkDocument({
+        mockRawInternalLinkDocument({
           internalReference: { _type, slug: slug ?? null },
         }),
       );
@@ -64,49 +66,29 @@ describe(toLinkDocument, () => {
     },
   );
 
-  it('resolves a slugless page_postIndex reference without requiring a slug', () => {
+  it.each([{ _type: 'page_post' }, { _type: 'page_landing' }] as const)(
+    'returns undefined for a $_type reference missing its slug',
+    ({ _type }) => {
+      const result = toLinkDocument(
+        mockRawInternalLinkDocument({
+          internalReference: { _type, slug: null },
+        }),
+      );
+
+      expect(result).toBeUndefined();
+    },
+  );
+
+  it('returns undefined for a dangling internal reference', () => {
     const result = toLinkDocument(
-      makeRawInternalLinkDocument({
-        internalReference: { _type: 'page_postIndex', slug: null },
-      }),
-    );
-
-    expect(result?.href).toBe('/blog');
-  });
-
-  it('returns undefined when a slug-having internal reference is genuinely missing its slug', () => {
-    const result = toLinkDocument(
-      makeRawInternalLinkDocument({
-        internalReference: { _type: 'page_post', slug: null },
-      }),
-    );
-
-    expect(result).toBeUndefined();
-  });
-
-  it('returns undefined for a dangling internal reference rather than throwing', () => {
-    const result = toLinkDocument(
-      makeRawInternalLinkDocument({ internalReference: null }),
+      mockRawInternalLinkDocument({ internalReference: null }),
     );
 
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined when the link has no label in the requested or default language', () => {
-    const result = toLinkDocument(makeRawInternalLinkDocument({ label: null }));
-
-    expect(result).toBeUndefined();
-  });
-
-  it('returns undefined when the referenced page has no slug', () => {
-    const result = toLinkDocument(
-      makeRawInternalLinkDocument({
-        internalReference: {
-          _type: 'page_landing',
-          slug: null,
-        },
-      }),
-    );
+  it('returns undefined when the link has no label in any language', () => {
+    const result = toLinkDocument(mockRawInternalLinkDocument({ label: null }));
 
     expect(result).toBeUndefined();
   });

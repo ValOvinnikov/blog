@@ -1,153 +1,131 @@
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import {
-  makeRawHeadingBlock,
-  makeRawSeo,
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+  mockRawTopic,
+} from '@blog/service/testing/entities/fixtures';
+import { mockRun } from '@blog/service/testing/mock-run-query';
+import {
+  MOCK_CURATED_SUPPORTING_TEXT,
+  mockHeroSlotView,
+  mockRawCtaRef,
+  mockRawHeroRef,
+  mockRawTopicPage,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_PAGE_TOPIC_CACHE_TAG,
+  MOCK_TEMPLATE_TOPIC_CACHE_TAG,
+  MOCK_TOPIC_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  mockRawHeadingBlock,
+  mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getTopicPageDocument } from './loader';
+import { topicPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const DESCRIPTION = 'Posts about engineering.';
+const CURATED_HEADING = 'Engineering, curated';
+const ENTITY = { ...mockRawTopic(), description: DESCRIPTION };
 
-describe('getTopicPageDocument', () => {
+const tenant = mockTenant();
+
+async function loadPage(
+  overrides: Parameters<typeof mockRawTopicPage>[0] = {},
+) {
+  mockRun.mockResolvedValueOnce(mockRawTopicPage(overrides));
+  const result = await getTopicPageDocument(MOCK_TOPIC_SLUG, tenant);
+  if (!result) throw new Error('expected a topic page');
+
+  return result;
+}
+
+describe(getTopicPageDocument, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawTopicPage());
+    mockRun.mockResolvedValue(mockRawTopicPage());
   });
 
   it('loads a topic page with no list module in modules[]', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicPage({ modules: [] }));
+    mockRun.mockResolvedValueOnce(mockRawTopicPage({ modules: [] }));
 
-    const result = await getTopicPageDocument('engineering', tenant);
+    const result = await getTopicPageDocument(MOCK_TOPIC_SLUG, tenant);
 
     expect(result).toBeDefined();
   });
 
-  it('takes the heading/supporting text from the referenced topic, not page_topic.title', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        topic: {
-          _id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: 'Notes on building things.',
-        },
-      }),
-    );
-
-    const result = await getTopicPageDocument('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
+  it('takes the topic from the referenced topic document', async () => {
+    const result = await loadPage({ topic: ENTITY });
 
     expect(result.topic).toEqual({
-      id: 'topic-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: 'Notes on building things.',
+      id: ENTITY._id,
+      title: MOCK_TOPIC_TITLE,
+      slug: MOCK_TOPIC_SLUG,
+      description: DESCRIPTION,
     });
   });
 
-  it('resolves seo from the authored value, with no fallback for an unauthored description', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        seo: makeRawSeo({ metaTitle: 'Engineering', metaDescription: null }),
-      }),
-    );
+  it('resolves seo from the authored value, with no unauthored description fallback', async () => {
+    const { seo } = await loadPage({
+      seo: mockRawSeo({ metaTitle: MOCK_TOPIC_TITLE, metaDescription: null }),
+    });
 
-    const result = await getTopicPageDocument('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(result.seo.title).toBe('Engineering');
-    expect(result.seo.description).toBeUndefined();
+    expect(seo.title).toBe(MOCK_TOPIC_TITLE);
+    expect(seo.description).toBeUndefined();
   });
 
-  it('maps the authored headingBlock straight through', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        headingBlock: makeRawHeadingBlock('Engineering, curated', {
-          supportingText: 'Hand-picked reads.',
-        }),
-      }),
-    );
+  it.each([
+    [
+      'maps the authored headingBlock straight through',
+      MOCK_CURATED_SUPPORTING_TEXT,
+      MOCK_CURATED_SUPPORTING_TEXT,
+    ],
+    [
+      'leaves an unset supportingText undefined, never the topic description',
+      null,
+      undefined,
+    ],
+  ])('%s', async (_, supportingText, expected) => {
+    const { headingBlock } = await loadPage({
+      topic: ENTITY,
+      headingBlock: mockRawHeadingBlock(CURATED_HEADING, { supportingText }),
+    });
 
-    const result = await getTopicPageDocument('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'Engineering, curated',
-      supportingText: 'Hand-picked reads.',
+    expect(headingBlock).toEqual({
+      heading: CURATED_HEADING,
+      supportingText: expected,
     });
   });
 
-  it('leaves supportingText undefined for an unset value, never falling back to the topic description', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        topic: {
-          _id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: 'Notes on building things.',
-        },
-        headingBlock: makeRawHeadingBlock('Engineering, curated'),
-      }),
-    );
+  it.each([
+    ['leaves hero undefined when page_topic.hero is unset', null, undefined],
+    [
+      'maps a set page_topic.hero to a hero slot',
+      mockRawHeroRef(),
+      mockHeroSlotView(),
+    ],
+  ])('%s', async (_, hero, expected) => {
+    const result = await loadPage({ hero });
 
-    const result = await getTopicPageDocument('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'Engineering, curated',
-      supportingText: undefined,
-    });
-  });
-
-  it('leaves hero undefined when page_topic.hero is unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicPage({ hero: null }));
-
-    const result = await getTopicPageDocument('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(result.hero).toBeUndefined();
-  });
-
-  it('maps a set page_topic.hero to a hero slot', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({ hero: { _id: 'hero-1', _type: 'module_heroBlog' } }),
-    );
-
-    const result = await getTopicPageDocument('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
+    expect(result.hero).toEqual(expected);
   });
 
   it('rejects when page_topic.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        hero: { _id: 'cta-1', _type: 'module_cta' as never },
+      mockRawTopicPage({
+        hero: mockRawCtaRef() as never,
       }),
     );
 
-    await expect(getTopicPageDocument('engineering', tenant)).rejects.toThrow();
+    await expect(
+      getTopicPageDocument(MOCK_TOPIC_SLUG, tenant),
+    ).rejects.toThrow();
   });
 
-  it('passes the slug as a query parameter', async () => {
-    await getTopicPageDocument('engineering', tenant);
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ parameters: { slug: 'engineering' } }),
-    );
-  });
-
-  it('resolves undefined, rather than rejecting, when no page_topic matches the slug', async () => {
+  it('resolves undefined when no page_topic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const result = await getTopicPageDocument('nonexistent', tenant);
@@ -155,21 +133,20 @@ describe('getTopicPageDocument', () => {
     expect(result).toBeUndefined();
   });
 
-  it('threads tenant context into the query and scopes its tags to it', async () => {
-    await getTopicPageDocument('engineering', tenant);
+  it('queries the slug for the tenant and scopes its tags to it', async () => {
+    await getTopicPageDocument(MOCK_TOPIC_SLUG, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:page_topic',
-            't:tenant-a:template_topic',
-            't:tenant-a:topic',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(topicPageQuery, {
+      parameters: { slug: MOCK_TOPIC_SLUG },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_PAGE_TOPIC_CACHE_TAG,
+          MOCK_TEMPLATE_TOPIC_CACHE_TAG,
+          MOCK_TOPIC_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

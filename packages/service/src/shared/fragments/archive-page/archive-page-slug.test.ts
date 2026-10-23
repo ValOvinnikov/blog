@@ -4,74 +4,89 @@ import { q } from '@blog/service/sanity/query/query';
 import { inlineLinkFragment } from '@blog/service/shared/fragments/link/inline-link';
 import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
 import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
+import {
+  MOCK_TAG_SLUG,
+  MOCK_TOPIC_SLUG,
+} from '@blog/service/testing/entities/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
+const TAG_WITH_PAGE_ID = 'tag-with-page';
+const TAG_WITHOUT_PAGE_ID = 'tag-without-page';
+const TAG_OTHER_LANGUAGE_ID = 'tag-other-language';
+const TOPIC_WITH_PAGE_ID = 'topic-with-page';
+const TOPIC_WITHOUT_PAGE_ID = 'topic-without-page';
+const TOPIC_OTHER_LANGUAGE_ID = 'topic-other-language';
+const DUTCH_TAG_SLUG = 'typescript-nl';
+const TOPIC_LINK_ID = 'link-to-topic';
+const OTHER_LANGUAGE_TOPIC_LINK_ID = 'link-to-topic-other-language';
+const DUTCH_ONLY_SLUG = 'alleen-nl';
 const { EN, NL } = LOCALE_ISO_CODES;
 
 const localized = [{ _key: 'en', language: EN, value: 'Title' }];
 
 const dataset = [
-  { _id: 'tag-with-page', _type: 'blog_tag', title: localized },
-  { _id: 'tag-without-page', _type: 'blog_tag', title: localized },
-  { _id: 'tag-other-language', _type: 'blog_tag', title: localized },
-  { _id: 'topic-with-page', _type: 'blog_topic', title: localized },
-  { _id: 'topic-without-page', _type: 'blog_topic', title: localized },
-  { _id: 'topic-other-language', _type: 'blog_topic', title: localized },
+  { _id: TAG_WITH_PAGE_ID, _type: 'blog_tag', title: localized },
+  { _id: TAG_WITHOUT_PAGE_ID, _type: 'blog_tag', title: localized },
+  { _id: TAG_OTHER_LANGUAGE_ID, _type: 'blog_tag', title: localized },
+  { _id: TOPIC_WITH_PAGE_ID, _type: 'blog_topic', title: localized },
+  { _id: TOPIC_WITHOUT_PAGE_ID, _type: 'blog_topic', title: localized },
+  { _id: TOPIC_OTHER_LANGUAGE_ID, _type: 'blog_topic', title: localized },
   {
     _id: 'page-tag-en',
     _type: 'page_tag',
-    slug: { current: 'typescript' },
-    tag: { _type: 'reference', _ref: 'tag-with-page' },
+    slug: { current: MOCK_TAG_SLUG },
+    tag: mockReference(TAG_WITH_PAGE_ID),
     language: EN,
   },
   {
     _id: 'page-tag-nl',
     _type: 'page_tag',
-    slug: { current: 'typescript-nl' },
-    tag: { _type: 'reference', _ref: 'tag-with-page' },
+    slug: { current: DUTCH_TAG_SLUG },
+    tag: mockReference(TAG_WITH_PAGE_ID),
     language: NL,
   },
   {
     _id: 'page-tag-nl-only',
     _type: 'page_tag',
-    slug: { current: 'alleen-nl' },
-    tag: { _type: 'reference', _ref: 'tag-other-language' },
+    slug: { current: DUTCH_ONLY_SLUG },
+    tag: mockReference(TAG_OTHER_LANGUAGE_ID),
     language: NL,
   },
   {
     _id: 'page-topic-en',
     _type: 'page_topic',
-    slug: { current: 'engineering' },
-    topic: { _type: 'reference', _ref: 'topic-with-page' },
+    slug: { current: MOCK_TOPIC_SLUG },
+    topic: mockReference(TOPIC_WITH_PAGE_ID),
     language: EN,
   },
   {
     _id: 'page-topic-nl',
     _type: 'page_topic',
     slug: { current: 'techniek' },
-    topic: { _type: 'reference', _ref: 'topic-with-page' },
+    topic: mockReference(TOPIC_WITH_PAGE_ID),
     language: NL,
   },
   {
     _id: 'page-topic-nl-only',
     _type: 'page_topic',
-    slug: { current: 'alleen-nl' },
-    topic: { _type: 'reference', _ref: 'topic-other-language' },
+    slug: { current: DUTCH_ONLY_SLUG },
+    topic: mockReference(TOPIC_OTHER_LANGUAGE_ID),
     language: NL,
   },
   {
-    _id: 'link-to-topic',
+    _id: TOPIC_LINK_ID,
     _type: 'inlineLink',
     label: 'Topic',
     linkType: LINK_TYPE.INTERNAL,
-    internalReference: { _type: 'reference', _ref: 'topic-with-page' },
+    internalReference: mockReference(TOPIC_WITH_PAGE_ID),
   },
   {
-    _id: 'link-to-topic-other-language',
+    _id: OTHER_LANGUAGE_TOPIC_LINK_ID,
     _type: 'inlineLink',
     label: 'Topic',
     linkType: LINK_TYPE.INTERNAL,
-    internalReference: { _type: 'reference', _ref: 'topic-other-language' },
+    internalReference: mockReference(TOPIC_OTHER_LANGUAGE_ID),
   },
 ];
 
@@ -99,59 +114,59 @@ const linkQuery = q.star
 
 describe('archive page slug', () => {
   it('resolves a tag to the slug of its page in the reader language', async () => {
-    expect(await run(tagQuery, 'tag-with-page', EN)).toMatchObject({
-      slug: 'typescript',
+    expect(await run(tagQuery, TAG_WITH_PAGE_ID, EN)).toMatchObject({
+      slug: MOCK_TAG_SLUG,
     });
-    expect(await run(tagQuery, 'tag-with-page', NL)).toMatchObject({
-      slug: 'typescript-nl',
+    expect(await run(tagQuery, TAG_WITH_PAGE_ID, NL)).toMatchObject({
+      slug: DUTCH_TAG_SLUG,
     });
   });
 
   it('resolves a tag with no archive page to null', async () => {
-    expect(await run(tagQuery, 'tag-without-page', EN)).toMatchObject({
+    expect(await run(tagQuery, TAG_WITHOUT_PAGE_ID, EN)).toMatchObject({
       slug: null,
     });
   });
 
   it('resolves a tag whose only page is in another language to null', async () => {
-    expect(await run(tagQuery, 'tag-other-language', EN)).toMatchObject({
+    expect(await run(tagQuery, TAG_OTHER_LANGUAGE_ID, EN)).toMatchObject({
       slug: null,
     });
   });
 
   it('resolves a topic to the slug of its page in the reader language', async () => {
-    expect(await run(topicQuery, 'topic-with-page', EN)).toMatchObject({
-      slug: 'engineering',
+    expect(await run(topicQuery, TOPIC_WITH_PAGE_ID, EN)).toMatchObject({
+      slug: MOCK_TOPIC_SLUG,
     });
-    expect(await run(topicQuery, 'topic-with-page', NL)).toMatchObject({
+    expect(await run(topicQuery, TOPIC_WITH_PAGE_ID, NL)).toMatchObject({
       slug: 'techniek',
     });
   });
 
   it('resolves a topic with no archive page to null', async () => {
-    expect(await run(topicQuery, 'topic-without-page', EN)).toMatchObject({
+    expect(await run(topicQuery, TOPIC_WITHOUT_PAGE_ID, EN)).toMatchObject({
       slug: null,
     });
   });
 
   it('resolves a topic whose only page is in another language to null', async () => {
-    expect(await run(topicQuery, 'topic-other-language', EN)).toMatchObject({
+    expect(await run(topicQuery, TOPIC_OTHER_LANGUAGE_ID, EN)).toMatchObject({
       slug: null,
     });
   });
 
-  it('resolves an inline link to a topic to the slug of its page in the reader language', async () => {
-    expect(await run(linkQuery, 'link-to-topic', EN)).toMatchObject({
-      internalReference: { slug: 'engineering' },
+  it('resolves an inline topic link to its page slug in the reader language', async () => {
+    expect(await run(linkQuery, TOPIC_LINK_ID, EN)).toMatchObject({
+      internalReference: { slug: MOCK_TOPIC_SLUG },
     });
-    expect(await run(linkQuery, 'link-to-topic', NL)).toMatchObject({
+    expect(await run(linkQuery, TOPIC_LINK_ID, NL)).toMatchObject({
       internalReference: { slug: 'techniek' },
     });
   });
 
-  it('resolves an inline link to a topic whose only page is in another language to null', async () => {
+  it('resolves an inline topic link whose only page is in another language to null', async () => {
     expect(
-      await run(linkQuery, 'link-to-topic-other-language', EN),
+      await run(linkQuery, OTHER_LANGUAGE_TOPIC_LINK_ID, EN),
     ).toMatchObject({ internalReference: { slug: null } });
   });
 });

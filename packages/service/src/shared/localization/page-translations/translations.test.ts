@@ -1,43 +1,61 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_ABOUT_EN_PAGE_ID,
+  MOCK_ABOUT_NL_PAGE_ID,
+  MOCK_ABOUT_NL_SLUG,
+  MOCK_ABOUT_SLUG,
+  MOCK_ABOUT_TRANSLATION_METADATA,
+  MOCK_PRICING_EN_PAGE_ID,
+  MOCK_PRICING_NL_PAGE_ID,
+  MOCK_PRICING_NL_SLUG,
+  MOCK_PRICING_SLUG,
+  MOCK_TEAM_EN_PAGE_ID,
+  MOCK_TEAM_NL_PAGE_ID,
+  MOCK_TEAM_SLUG,
+  mockLandingPageDocument,
+  mockTranslationMetadata,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { translationsQuery } from './translations';
 
+const MODULES_EN_PAGE_ID = 'modules-en';
+const MODULES_NL_PAGE_ID = 'modules-nl';
 const { EN, NL } = LOCALE_ISO_CODES;
 
-function page(id: string, language: string, slug?: string) {
-  return {
-    _id: id,
-    _type: 'page_landing',
-    language,
-    ...(slug ? { slug: { current: slug } } : {}),
-  };
-}
-
-function translation(id: string, language: string) {
-  return {
-    _key: language,
-    language,
-    value: { _type: 'reference', _ref: id },
-  };
-}
-
-const aboutEn = page('about-en', EN, 'about');
-const aboutNl = page('about-nl', NL, 'over-ons');
-const contact = page('contact', EN, 'contact');
-const pricing = page('pricing-en', EN, 'pricing');
-const draftOnlyPricingNl = page('drafts.pricing-nl', NL, 'prijzen');
-const team = page('team-en', EN, 'team');
-const slugless = page('team-nl', NL);
-const modulesEn = page('modules-en', EN, 'modules');
-const modulesNl = page('modules-nl', NL, 'modules');
+const aboutEn = mockLandingPageDocument(
+  MOCK_ABOUT_EN_PAGE_ID,
+  EN,
+  MOCK_ABOUT_SLUG,
+);
+const aboutNl = mockLandingPageDocument(
+  MOCK_ABOUT_NL_PAGE_ID,
+  NL,
+  MOCK_ABOUT_NL_SLUG,
+);
+const contact = mockLandingPageDocument('contact', EN, 'contact');
+const pricing = mockLandingPageDocument(
+  MOCK_PRICING_EN_PAGE_ID,
+  EN,
+  MOCK_PRICING_SLUG,
+);
+const draftOnlyPricingNl = mockLandingPageDocument(
+  `drafts.${MOCK_PRICING_NL_PAGE_ID}`,
+  NL,
+  MOCK_PRICING_NL_SLUG,
+);
+const team = mockLandingPageDocument(MOCK_TEAM_EN_PAGE_ID, EN, MOCK_TEAM_SLUG);
+const slugless = mockLandingPageDocument(MOCK_TEAM_NL_PAGE_ID, NL);
+const modulesEn = mockLandingPageDocument(MODULES_EN_PAGE_ID, EN, 'modules');
+const modulesNl = mockLandingPageDocument(MODULES_NL_PAGE_ID, NL, 'modules');
 const faqEn = {
-  ...page('faq-en', EN, 'faq'),
-  parent: { _type: 'reference', _ref: 'modules-en' },
+  ...mockLandingPageDocument('faq-en', EN, 'faq'),
+  parent: mockReference(MODULES_EN_PAGE_ID),
 };
 const faqNl = {
-  ...page('faq-nl', NL, 'vragen'),
-  parent: { _type: 'reference', _ref: 'modules-nl' },
+  ...mockLandingPageDocument('faq-nl', NL, 'vragen'),
+  parent: mockReference(MODULES_NL_PAGE_ID),
 };
 
 const dataset = [
@@ -52,29 +70,19 @@ const dataset = [
   modulesNl,
   faqEn,
   faqNl,
-  {
-    _id: 'meta-faq',
-    _type: 'translation.metadata',
-    translations: [translation('faq-en', EN), translation('faq-nl', NL)],
-  },
-  {
-    _id: 'meta-about',
-    _type: 'translation.metadata',
-    translations: [translation('about-en', EN), translation('about-nl', NL)],
-  },
-  {
-    _id: 'meta-pricing',
-    _type: 'translation.metadata',
-    translations: [
-      translation('pricing-en', EN),
-      translation('pricing-nl', NL),
-    ],
-  },
-  {
-    _id: 'meta-team',
-    _type: 'translation.metadata',
-    translations: [translation('team-en', EN), translation('team-nl', NL)],
-  },
+  mockTranslationMetadata('meta-faq', [
+    [EN, 'faq-en'],
+    [NL, 'faq-nl'],
+  ]),
+  MOCK_ABOUT_TRANSLATION_METADATA,
+  mockTranslationMetadata('meta-pricing', [
+    [EN, MOCK_PRICING_EN_PAGE_ID],
+    [NL, MOCK_PRICING_NL_PAGE_ID],
+  ]),
+  mockTranslationMetadata('meta-team', [
+    [EN, MOCK_TEAM_EN_PAGE_ID],
+    [NL, MOCK_TEAM_NL_PAGE_ID],
+  ]),
 ];
 
 function resolve(root: { _id: string }): Promise<unknown> {
@@ -89,15 +97,15 @@ function resolve(root: { _id: string }): Promise<unknown> {
 describe('translationsQuery', () => {
   it('lists every translation, the page itself included', async () => {
     expect(await resolve(aboutEn)).toEqual([
-      { language: EN, slug: 'about' },
-      { language: NL, slug: 'over-ons' },
+      { language: EN, slug: MOCK_ABOUT_SLUG },
+      { language: NL, slug: MOCK_ABOUT_NL_SLUG },
     ]);
   });
 
   it('lists the same set from a translation', async () => {
     expect(await resolve(aboutNl)).toEqual([
-      { language: EN, slug: 'about' },
-      { language: NL, slug: 'over-ons' },
+      { language: EN, slug: MOCK_ABOUT_SLUG },
+      { language: NL, slug: MOCK_ABOUT_NL_SLUG },
     ]);
   });
 
@@ -106,11 +114,15 @@ describe('translationsQuery', () => {
   });
 
   it('skips a translation that is not published', async () => {
-    expect(await resolve(pricing)).toEqual([{ language: EN, slug: 'pricing' }]);
+    expect(await resolve(pricing)).toEqual([
+      { language: EN, slug: MOCK_PRICING_SLUG },
+    ]);
   });
 
   it('skips a published translation that has no slug', async () => {
-    expect(await resolve(team)).toEqual([{ language: EN, slug: 'team' }]);
+    expect(await resolve(team)).toEqual([
+      { language: EN, slug: MOCK_TEAM_SLUG },
+    ]);
   });
 
   it('lists a nested page by its full path in each language', async () => {

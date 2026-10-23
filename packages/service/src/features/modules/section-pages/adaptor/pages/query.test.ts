@@ -1,5 +1,10 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_ABOUT_SLUG,
+  MOCK_PRICING_SLUG,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { sectionPagesQuery } from './query';
 
@@ -18,16 +23,16 @@ function landing(
     language,
     orderRank,
     headingBlock: { heading: id, supportingText: `${id} summary` },
-    ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
+    ...(parent ? { parent: mockReference(parent) } : {}),
   };
 }
 
 const dataset = [
   landing('modules'),
-  landing('pricing', { parent: 'modules', orderRank: '0|b' }),
+  landing(MOCK_PRICING_SLUG, { parent: 'modules', orderRank: '0|b' }),
   landing('faq', { parent: 'modules', orderRank: '0|a' }),
   landing('billing', { parent: 'faq' }),
-  landing('about'),
+  landing(MOCK_ABOUT_SLUG),
   landing('faq-nl', { parent: 'modules', language: NL }),
 ];
 
@@ -46,7 +51,7 @@ describe('sectionPagesQuery', () => {
   it('returns only the direct children of the hosting page, in drag order', async () => {
     const pages = await run('modules', EN);
 
-    expect(pages.map(({ _id }) => _id)).toEqual(['faq', 'pricing']);
+    expect(pages.map(({ _id }) => _id)).toEqual(['faq', MOCK_PRICING_SLUG]);
   });
 
   it('returns only the children in the request language', async () => {
@@ -56,10 +61,10 @@ describe('sectionPagesQuery', () => {
   });
 
   it('returns nothing for a page without children', async () => {
-    expect(await run('about', EN)).toEqual([]);
+    expect(await run(MOCK_ABOUT_SLUG, EN)).toEqual([]);
   });
 
-  it('returns each child with its slug, heading block and no image when none is authored', async () => {
+  it('returns each child with its slug and heading block, and no unauthored image', async () => {
     const [faq] = await run('modules', EN);
 
     expect(faq).toMatchObject({

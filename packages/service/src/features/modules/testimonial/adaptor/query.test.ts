@@ -1,71 +1,66 @@
-import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawTestimonialModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+  LOCALE_ISO_CODES,
+} from '@blog/config/constants';
+import {
+  MOCK_TESTIMONIAL_MODULE_ID,
+  mockRawTestimonialModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  mockRawPortableTextMarkDef,
+  mockReference,
+} from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
-  localizedStrings,
-  localizedValues,
-  paragraphBlocks,
+  MOCK_IMAGE_ASSET_DOCUMENT,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockLocalizedListedText,
+  mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
 
 import { testimonialModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-function localizedQuote(values: Record<string, string>) {
-  return localizedValues(
-    'internationalizedArrayListedTextValue',
-    Object.fromEntries(
-      Object.entries(values).map(([language, text]) => [
-        language,
-        paragraphBlocks(text),
-      ]),
-    ),
-  );
-}
+const TRANSLATED_ID = 'block-testimonial-1';
+const UNTRANSLATED_ID = 'block-testimonial-2';
+const HEADING = { [EN]: 'What people say', [NL]: 'Wat mensen zeggen' };
+const QUOTE = { [EN]: 'They shipped on time.', [NL]: 'Ze leverden op tijd.' };
+const ROLE = { [EN]: 'Founder, Acme', [NL]: 'Oprichter, Acme' };
+const ALT = { [EN]: 'Jane smiling', [NL]: 'Jane lacht' };
+const UNTRANSLATED_QUOTE = 'A pleasure to work with.';
+const [FIRST_ITEM] = mockRawTestimonialModule().testimonials ?? [];
 
 const testimonialModuleDocument = {
-  _id: 'testimonial-1',
+  _id: MOCK_TESTIMONIAL_MODULE_ID,
   _type: 'module_testimonial',
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({
-      [EN]: 'What people say',
-      [NL]: 'Wat mensen zeggen',
-    }),
-  },
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockLocalizedHeadingBlock(HEADING),
   testimonials: [
-    { _key: 't-1', _type: 'reference', _ref: 'block-testimonial-1' },
-    { _key: 't-2', _type: 'reference', _ref: 'block-testimonial-2' },
+    mockReference(TRANSLATED_ID, { _key: 't-1' }),
+    mockReference(UNTRANSLATED_ID, { _key: 't-2' }),
   ],
 };
 
 const translatedTestimonial = {
-  _id: 'block-testimonial-1',
+  _id: TRANSLATED_ID,
   _type: 'block_testimonial',
   name: 'Jane Doe',
-  quote: localizedQuote({
-    [EN]: 'They shipped on time.',
-    [NL]: 'Ze leverden op tijd.',
-  }),
-  role: localizedStrings({ [EN]: 'Founder, Acme', [NL]: 'Oprichter, Acme' }),
-  image: {
-    _type: 'localizedImageWithAlt',
-    asset: { _type: 'reference', _ref: 'image-1' },
-    alt: localizedStrings({ [EN]: 'Jane smiling', [NL]: 'Jane lacht' }),
-  },
+  quote: mockLocalizedListedText(QUOTE),
+  role: mockLocalizedStrings(ROLE),
+  image: mockLocalizedImage(ALT),
 };
 
 const untranslatedTestimonial = {
-  _id: 'block-testimonial-2',
+  _id: UNTRANSLATED_ID,
   _type: 'block_testimonial',
   name: 'Sam Lee',
-  quote: localizedQuote({ [EN]: 'A pleasure to work with.' }),
-  role: localizedStrings({ [EN]: 'Editor' }),
+  quote: mockLocalizedListedText({ [EN]: UNTRANSLATED_QUOTE }),
+  role: mockLocalizedStrings({ [EN]: 'Editor' }),
 };
-
-const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
 
 async function runTestimonial(
   locale: string,
@@ -77,10 +72,10 @@ async function runTestimonial(
       moduleDocument,
       translatedTestimonial,
       untranslatedTestimonial,
-      imageAsset,
+      MOCK_IMAGE_ASSET_DOCUMENT,
     ],
     undefined,
-    { id: 'testimonial-1', locale, defaultLocale: EN },
+    { id: MOCK_TESTIMONIAL_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return testimonialModuleQuery.parse(raw);
@@ -96,16 +91,6 @@ function testimonialText(module: Awaited<ReturnType<typeof runTestimonial>>) {
 }
 
 describe('testimonialModuleQuery', () => {
-  let firstItem: NonNullable<
-    ReturnType<typeof makeRawTestimonialModule>['testimonials']
-  >[number];
-
-  beforeEach(() => {
-    const [item] = makeRawTestimonialModule().testimonials ?? [];
-    if (!item) throw new Error('expected a fixture testimonial item');
-    firstItem = item;
-  });
-
   it('filters to module_testimonial documents by id', () => {
     expect(testimonialModuleQuery.query).toContain(
       '_type == "module_testimonial"',
@@ -114,53 +99,32 @@ describe('testimonialModuleQuery', () => {
   });
 
   it('parses a module with a fully populated quote', () => {
-    const raw = makeRawTestimonialModule();
+    const raw = mockRawTestimonialModule();
 
     expect(() => testimonialModuleQuery.parse(raw)).not.toThrow();
   });
 
-  it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawTestimonialModule(), headingBlock: null };
+  it.each([
+    ['a module with no headingBlock', { headingBlock: null }],
+    ['a module with no testimonials', { testimonials: null }],
+    ['an item with no name', { testimonials: [{ ...FIRST_ITEM, name: null }] }],
+    [
+      'an item with no quote',
+      { testimonials: [{ ...FIRST_ITEM, quote: null }] },
+    ],
+  ])('rejects %s', (_case, overrides) => {
+    const raw = { ...mockRawTestimonialModule(), ...overrides };
 
     expect(() => testimonialModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a module with no testimonials', () => {
-    const raw = { ...makeRawTestimonialModule(), testimonials: null };
-
-    expect(() => testimonialModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a testimonial item with no name', () => {
-    const raw = {
-      ...makeRawTestimonialModule(),
-      testimonials: [{ ...firstItem, name: null }],
-    };
-
-    expect(() => testimonialModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a testimonial item with no quote', () => {
-    const raw = {
-      ...makeRawTestimonialModule(),
-      testimonials: [{ ...firstItem, quote: null }],
-    };
-
-    expect(() => testimonialModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('defaults displayMode to GRID at read time', () => {
-    expect(testimonialModuleQuery.query).toContain(
-      'coalesce(displayMode, "GRID")',
-    );
   });
 
   it('keeps a resolved inline link mark inside the quote', () => {
+    const markDef = mockRawPortableTextMarkDef();
     const raw = {
-      ...makeRawTestimonialModule(),
+      ...mockRawTestimonialModule(),
       testimonials: [
         {
-          ...firstItem,
+          ...FIRST_ITEM,
           quote: [
             {
               _type: 'block' as const,
@@ -173,13 +137,7 @@ describe('testimonialModuleQuery', () => {
                   text: 'the case study',
                 },
               ],
-              markDefs: [
-                {
-                  _key: 'mark-1',
-                  _type: 'linkRef' as const,
-                  link: makeRawExternalLinkDocument(),
-                },
-              ],
+              markDefs: [markDef],
             },
           ],
         },
@@ -188,55 +146,40 @@ describe('testimonialModuleQuery', () => {
 
     const parsed = testimonialModuleQuery.parse(raw);
 
-    expect(parsed.testimonials?.[0]?.quote[0]?.markDefs?.[0]).toMatchObject({
-      _key: 'mark-1',
-    });
+    expect(parsed.testimonials[0]?.quote[0]?.markDefs).toEqual([markDef]);
   });
 
-  it('picks the heading and each quote, role and photo alt in the visitor language', async () => {
-    const module = await runTestimonial(NL);
+  it.each([
+    [NL, NL],
+    [FR, EN],
+  ])(
+    'resolves a %s visitor to the %s heading and testimonials',
+    async (locale, language) => {
+      const module = await runTestimonial(locale);
 
-    expect(module.headingBlock.heading).toBe('Wat mensen zeggen');
-    expect(testimonialText(module)).toEqual([
-      {
-        name: 'Jane Doe',
-        quote: [['Ze leverden op tijd.']],
-        role: 'Oprichter, Acme',
-        alt: 'Jane lacht',
-      },
-      {
-        name: 'Sam Lee',
-        quote: [['A pleasure to work with.']],
-        role: 'Editor',
-        alt: null,
-      },
-    ]);
-  });
+      expect(module.headingBlock.heading).toBe(HEADING[language]);
+      expect(testimonialText(module)).toEqual([
+        {
+          name: 'Jane Doe',
+          quote: [[QUOTE[language]]],
+          role: ROLE[language],
+          alt: ALT[language],
+        },
+        {
+          name: 'Sam Lee',
+          quote: [[UNTRANSLATED_QUOTE]],
+          role: 'Editor',
+          alt: null,
+        },
+      ]);
+    },
+  );
 
-  it('falls back to the default language for the heading and each testimonial', async () => {
-    const module = await runTestimonial(FR);
+  it('reads an unset displayMode as Grid and cardAlignment as Left', async () => {
+    const { displayMode, cardAlignment } = await runTestimonial(EN);
 
-    expect(module.headingBlock.heading).toBe('What people say');
-    expect(testimonialText(module)).toEqual([
-      {
-        name: 'Jane Doe',
-        quote: [['They shipped on time.']],
-        role: 'Founder, Acme',
-        alt: 'Jane smiling',
-      },
-      {
-        name: 'Sam Lee',
-        quote: [['A pleasure to work with.']],
-        role: 'Editor',
-        alt: null,
-      },
-    ]);
-  });
-
-  it('reads an unset cardAlignment as Left', async () => {
-    const module = await runTestimonial(EN);
-
-    expect(module.cardAlignment).toBe(CONTENT_ALIGNMENT.LEFT);
+    expect(displayMode).toBe(DISPLAY_MODE.GRID);
+    expect(cardAlignment).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('keeps an authored Center cardAlignment', async () => {

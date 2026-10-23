@@ -1,49 +1,74 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  MOCK_CONTENT_MODULE_ID,
+  MOCK_CTA_MODULE_ID,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_ABOUT_PAGE_TITLE,
+  MOCK_HERO_MODULE_ID,
+  mockRawContentRef,
+  mockRawCtaRef,
+  mockRawLandingPage,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  mockRawHeadingBlock,
+  mockReference,
+} from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_ABOUT_EN_PAGE_ID,
+  MOCK_ABOUT_NL_PAGE_ID,
+  MOCK_ABOUT_SLUG,
+  MOCK_ABOUT_TRANSLATION_METADATA,
+  MOCK_PRICING_NL_SLUG,
+  MOCK_PRICING_SLUG,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { landingPageQuery } from './query';
 
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+const TEMPLATE_ID = 'template-about';
+const FAQ_PATH = 'modules/faq';
+
+function runAtPath(dataset: unknown[], segments: string[]): Promise<unknown> {
+  return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
+    slug: segments.at(-1),
+    path: segments.join('/'),
+    locale: EN,
+    defaultLocale: EN,
+  });
+}
+
 describe('landingPageQuery', () => {
-  it('parses a landing page with no modules', () => {
-    const raw = makeRawLandingPage({ modules: null });
-
-    expect(() => landingPageQuery.parse(raw)).not.toThrow();
-  });
-
-  it('rejects a landing page with no authored SEO', () => {
-    const raw = { ...makeRawLandingPage(), seo: null };
-
-    expect(() => landingPageQuery.parse(raw)).toThrow();
-  });
-
-  it('parses a landing page with its hero slot set', () => {
-    const raw = makeRawLandingPage({
-      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-    });
-
-    expect(() => landingPageQuery.parse(raw)).not.toThrow();
-  });
-
-  it('rejects a landing page with no headingBlock', () => {
-    const raw = { ...makeRawLandingPage(), headingBlock: null };
-
-    expect(() => landingPageQuery.parse(raw)).toThrow();
-  });
-
-  it('parses a landing page with a headingBlock heading and supportingText', () => {
-    const raw = makeRawLandingPage({
-      headingBlock: makeRawHeadingBlock('About Us', {
-        supportingText: 'Who we are',
+  it.each([
+    ['with no modules', mockRawLandingPage({ modules: null })],
+    [
+      'with its hero slot set',
+      mockRawLandingPage({
+        hero: { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroBlog' },
       }),
-    });
-
+    ],
+    [
+      'with a headingBlock heading and supportingText',
+      mockRawLandingPage({
+        headingBlock: mockRawHeadingBlock(MOCK_ABOUT_PAGE_TITLE, {
+          supportingText: 'Who we are',
+        }),
+      }),
+    ],
+  ])('parses a landing page %s', (_, raw) => {
     expect(() => landingPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it.each([
+    ['authored SEO', { ...mockRawLandingPage(), seo: null }],
+    ['heading block', { ...mockRawLandingPage(), headingBlock: null }],
+  ])('rejects a landing page with no %s', (_, raw) => {
+    expect(() => landingPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a landing page that has no translation group', () => {
-    const raw = { ...makeRawLandingPage(), translations: null };
+    const raw = { ...mockRawLandingPage(), translations: null };
 
     expect(landingPageQuery.parse(raw)?.translations).toBeNull();
   });
@@ -54,8 +79,6 @@ describe('landingPageQuery', () => {
 });
 
 describe('landingPageQuery language scoping', () => {
-  const { EN, NL, FR } = LOCALE_ISO_CODES;
-
   function landing(
     id: string,
     slug: string,
@@ -71,23 +94,11 @@ describe('landingPageQuery language scoping', () => {
     };
   }
 
-  function link(language: string, id: string) {
-    return {
-      _key: language,
-      language,
-      value: { _type: 'reference', _ref: id },
-    };
-  }
-
   const dataset = [
-    landing('about-en', 'about', 'About', EN),
-    landing('about-nl', 'about', 'Over ons', NL),
+    landing(MOCK_ABOUT_EN_PAGE_ID, MOCK_ABOUT_SLUG, 'About', EN),
+    landing(MOCK_ABOUT_NL_PAGE_ID, MOCK_ABOUT_SLUG, 'Over ons', NL),
     landing('legacy', 'legacy', 'Legacy'),
-    {
-      _id: 'meta-about',
-      _type: 'translation.metadata',
-      translations: [link(EN, 'about-en'), link(NL, 'about-nl')],
-    },
+    MOCK_ABOUT_TRANSLATION_METADATA,
   ];
 
   function run(slug: string, locale: string): Promise<unknown> {
@@ -100,16 +111,16 @@ describe('landingPageQuery language scoping', () => {
   }
 
   it('resolves the same slug to a different page per language', async () => {
-    expect(await run('about', EN)).toMatchObject({
+    expect(await run(MOCK_ABOUT_SLUG, EN)).toMatchObject({
       headingBlock: { heading: 'About' },
     });
-    expect(await run('about', NL)).toMatchObject({
+    expect(await run(MOCK_ABOUT_SLUG, NL)).toMatchObject({
       headingBlock: { heading: 'Over ons' },
     });
   });
 
   it('resolves nothing for a language the page is not authored in', async () => {
-    expect(await run('about', FR)).toBeNull();
+    expect(await run(MOCK_ABOUT_SLUG, FR)).toBeNull();
   });
 
   it('resolves nothing for a page with no language', async () => {
@@ -118,50 +129,48 @@ describe('landingPageQuery language scoping', () => {
   });
 
   it('returns the linked translations with their languages and slugs', async () => {
-    expect(await run('about', NL)).toMatchObject({
+    expect(await run(MOCK_ABOUT_SLUG, NL)).toMatchObject({
       translations: [
-        { language: EN, slug: 'about' },
-        { language: NL, slug: 'about' },
+        { language: EN, slug: MOCK_ABOUT_SLUG },
+        { language: NL, slug: MOCK_ABOUT_SLUG },
       ],
     });
   });
 });
 
 describe('landingPageQuery template layout', () => {
-  const { EN, NL } = LOCALE_ISO_CODES;
-
   function landing(id: string, language: string, template?: string) {
     return {
       _id: id,
       _type: 'page_landing',
-      slug: { current: 'about' },
+      slug: { current: MOCK_ABOUT_SLUG },
       language,
       headingBlock: { heading: id },
-      ...(template ? { template: { _type: 'reference', _ref: template } } : {}),
+      ...(template ? { template: mockReference(template) } : {}),
     };
   }
 
   const dataset = [
-    landing('about-en', EN, 'template-about'),
-    landing('about-nl', NL, 'template-about'),
+    landing(MOCK_ABOUT_EN_PAGE_ID, EN, TEMPLATE_ID),
+    landing(MOCK_ABOUT_NL_PAGE_ID, NL, TEMPLATE_ID),
     {
-      _id: 'template-about',
+      _id: TEMPLATE_ID,
       _type: 'template_landing',
-      hero: { _type: 'reference', _ref: 'hero-1' },
+      hero: mockReference(MOCK_HERO_MODULE_ID),
       modules: [
-        { _key: 'a', _type: 'reference', _ref: 'content-1' },
-        { _key: 'b', _type: 'reference', _ref: 'cta-1' },
+        mockReference(MOCK_CONTENT_MODULE_ID, { _key: 'a' }),
+        mockReference(MOCK_CTA_MODULE_ID, { _key: 'b' }),
       ],
     },
-    { _id: 'hero-1', _type: 'module_heroStatement' },
-    { _id: 'content-1', _type: 'module_content' },
-    { _id: 'cta-1', _type: 'module_cta' },
+    { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroStatement' },
+    mockRawContentRef(),
+    mockRawCtaRef(),
   ];
 
   function run(data: unknown[], locale: string): Promise<unknown> {
     return evaluateGroqExpression(landingPageQuery.query, data, null, {
-      slug: 'about',
-      path: 'about',
+      slug: MOCK_ABOUT_SLUG,
+      path: MOCK_ABOUT_SLUG,
       locale,
       defaultLocale: EN,
     });
@@ -171,17 +180,14 @@ describe('landingPageQuery template layout', () => {
     'resolves the hero and modules of the template the %s page references',
     async (locale) => {
       expect(await run(dataset, locale)).toMatchObject({
-        hero: { _id: 'hero-1', _type: 'module_heroStatement' },
-        modules: [
-          { _id: 'content-1', _type: 'module_content' },
-          { _id: 'cta-1', _type: 'module_cta' },
-        ],
+        hero: { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroStatement' },
+        modules: [mockRawContentRef(), mockRawCtaRef()],
       });
     },
   );
 
   it('resolves no hero and no modules for a page without a template', async () => {
-    expect(await run([landing('about-en', EN)], EN)).toMatchObject({
+    expect(await run([landing(MOCK_ABOUT_EN_PAGE_ID, EN)], EN)).toMatchObject({
       hero: null,
       modules: null,
     });
@@ -189,8 +195,6 @@ describe('landingPageQuery template layout', () => {
 });
 
 describe('landingPageQuery nested paths', () => {
-  const { EN } = LOCALE_ISO_CODES;
-
   function landing(id: string, slug: string, parent?: string) {
     return {
       _id: id,
@@ -198,49 +202,40 @@ describe('landingPageQuery nested paths', () => {
       slug: { current: slug },
       language: EN,
       headingBlock: { heading: id },
-      ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
+      ...(parent ? { parent: mockReference(parent) } : {}),
     };
   }
 
   const dataset = [
     landing('modules', 'modules'),
     landing('faq', 'faq', 'modules'),
-    landing('pricing', 'pricing'),
+    landing(MOCK_PRICING_SLUG, MOCK_PRICING_SLUG),
   ];
 
-  function run(segments: string[]): Promise<unknown> {
-    return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
-      slug: segments.at(-1),
-      path: segments.join('/'),
-      locale: EN,
-      defaultLocale: EN,
-    });
-  }
-
   it('resolves a nested page at its full path', async () => {
-    expect(await run(['modules', 'faq'])).toMatchObject({
+    expect(await runAtPath(dataset, ['modules', 'faq'])).toMatchObject({
       _id: 'faq',
-      path: 'modules/faq',
+      path: FAQ_PATH,
       headingBlock: { heading: 'faq' },
     });
   });
 
   it('resolves nothing for a nested page at its bare slug', async () => {
-    expect(await run(['faq'])).toBeNull();
+    expect(await runAtPath(dataset, ['faq'])).toBeNull();
   });
 
   it('resolves nothing for a top-level page under a parent it does not have', async () => {
-    expect(await run(['modules', 'pricing'])).toBeNull();
+    expect(await runAtPath(dataset, ['modules', MOCK_PRICING_SLUG])).toBeNull();
   });
 
   it('resolves a top-level page at its slug', async () => {
-    expect(await run(['pricing'])).toMatchObject({ path: 'pricing' });
+    expect(await runAtPath(dataset, [MOCK_PRICING_SLUG])).toMatchObject({
+      path: MOCK_PRICING_SLUG,
+    });
   });
 });
 
 describe('landingPageQuery section chain', () => {
-  const { EN, NL } = LOCALE_ISO_CODES;
-
   function landing(
     id: string,
     {
@@ -266,7 +261,7 @@ describe('landingPageQuery section chain', () => {
       ...(orderRank ? { orderRank } : {}),
       ...(sectionNavigation === undefined ? {} : { sectionNavigation }),
       ...(sectionNavigationTitle ? { sectionNavigationTitle } : {}),
-      ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
+      ...(parent ? { parent: mockReference(parent) } : {}),
     };
   }
 
@@ -275,33 +270,30 @@ describe('landingPageQuery section chain', () => {
       sectionNavigation: true,
       sectionNavigationTitle: 'Guides',
     }),
-    landing('pricing', { parent: 'modules', orderRank: '0|b' }),
+    landing(MOCK_PRICING_SLUG, { parent: 'modules', orderRank: '0|b' }),
     landing('faq', { parent: 'modules', orderRank: '0|a' }),
-    landing('prijzen', { parent: 'modules', orderRank: '0|0', language: NL }),
+    landing(MOCK_PRICING_NL_SLUG, {
+      parent: 'modules',
+      orderRank: '0|0',
+      language: NL,
+    }),
     landing('answers', { parent: 'faq' }),
   ];
 
-  function run(segments: string[]): Promise<unknown> {
-    return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
-      slug: segments.at(-1),
-      path: segments.join('/'),
-      locale: EN,
-      defaultLocale: EN,
-    });
-  }
-
   it('returns the page and its ancestors, nearest first', async () => {
-    expect(await run(['modules', 'faq', 'answers'])).toMatchObject({
+    expect(
+      await runAtPath(dataset, ['modules', 'faq', 'answers']),
+    ).toMatchObject({
       sectionChain: [
-        { _id: 'answers', path: 'modules/faq/answers' },
-        { _id: 'faq', path: 'modules/faq' },
+        { _id: 'answers', path: `${FAQ_PATH}/answers` },
+        { _id: 'faq', path: FAQ_PATH },
         { _id: 'modules', path: 'modules' },
       ],
     });
   });
 
   it("returns a section root's children in drag order, in the page's language", async () => {
-    expect(await run(['modules', 'faq'])).toMatchObject({
+    expect(await runAtPath(dataset, ['modules', 'faq'])).toMatchObject({
       sectionChain: [
         { _id: 'faq', sectionNavigation: false, children: null },
         {
@@ -309,9 +301,9 @@ describe('landingPageQuery section chain', () => {
           title: 'modules heading',
           sectionNavigation: true,
           children: [
-            { _id: 'faq', title: 'faq heading', path: 'modules/faq' },
+            { _id: 'faq', title: 'faq heading', path: FAQ_PATH },
             {
-              _id: 'pricing',
+              _id: MOCK_PRICING_SLUG,
               title: 'pricing heading',
               path: 'modules/pricing',
             },
@@ -322,7 +314,7 @@ describe('landingPageQuery section chain', () => {
   });
 
   it("returns each page's sidebar title, or null where none is set", async () => {
-    expect(await run(['modules', 'faq'])).toMatchObject({
+    expect(await runAtPath(dataset, ['modules', 'faq'])).toMatchObject({
       sectionChain: [
         { _id: 'faq', sectionNavigationTitle: null },
         { _id: 'modules', sectionNavigationTitle: 'Guides' },

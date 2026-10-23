@@ -1,22 +1,25 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockListModuleRefs } from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_PAGE_POST_INDEX_CACHE_TAG,
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_TEMPLATE_POST_INDEX_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getIndexPagePagination } from './loader';
+import { indexPageParamsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('getIndexPagePagination', () => {
+describe(getIndexPagePagination, () => {
   it('returns the post count and module refs as queried', async () => {
     const pagination = {
       blogPosts: { total: 20 },
-      moduleRefs: [{ _ref: 'list-1' }],
+      moduleRefs: mockListModuleRefs(),
     };
     mockRun.mockResolvedValueOnce(pagination);
 
@@ -31,18 +34,16 @@ describe('getIndexPagePagination', () => {
 
     await getIndexPagePagination(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:posts',
-            't:tenant-a:page_postIndex',
-            't:tenant-a:template_postIndex',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(indexPageParamsQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_POSTS_CACHE_TAG,
+          MOCK_PAGE_POST_INDEX_CACHE_TAG,
+          MOCK_TEMPLATE_POST_INDEX_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

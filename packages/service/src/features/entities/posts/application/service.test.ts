@@ -1,7 +1,8 @@
 import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
 import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
 import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { createPostsService } from './service';
 
@@ -26,7 +27,7 @@ vi.mock(
   }),
 );
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(createPostsService, () => {
   it('threads tenant context through to the id-list loader', async () => {
@@ -40,9 +41,9 @@ describe(createPostsService, () => {
   it('threads tenant context through to the tag-scoped loader', async () => {
     vi.mocked(getPublishedPostsByTag).mockResolvedValue([]);
 
-    await createPostsService().v1.getPublishedPostsByTag('tag-1', tenant);
+    await createPostsService().v1.getPublishedPostsByTag(MOCK_TAG_ID, tenant);
 
-    expect(getPublishedPostsByTag).toHaveBeenCalledWith('tag-1', tenant);
+    expect(getPublishedPostsByTag).toHaveBeenCalledWith(MOCK_TAG_ID, tenant);
   });
 
   it('threads tenant context through to getAllPublishedPosts', async () => {

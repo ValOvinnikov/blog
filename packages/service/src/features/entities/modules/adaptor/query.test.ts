@@ -1,3 +1,7 @@
+import {
+  MOCK_POST_ID,
+  mockReference,
+} from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import {
@@ -5,37 +9,44 @@ import {
   referencingModuleIdsQuery,
 } from './query';
 
-function reference(id: string) {
-  return { _type: 'reference', _ref: id };
-}
+const OTHER_POST_ID = 'post-2';
+const LINK_TO_POST_ID = 'link-to-post';
+const DIRECT_MODULE_ID = 'module-direct';
+const VIA_LINK_MODULE_ID = 'module-via-link';
+const UNRELATED_MODULE_ID = 'module-unrelated';
+const LEGACY_DIRECT_MODULE_ID = 'blog_module-direct';
 
 const dataset = [
-  { _id: 'post-1', _type: 'page_post' },
+  { _id: MOCK_POST_ID, _type: 'page_post' },
   {
-    _id: 'link-to-post',
+    _id: LINK_TO_POST_ID,
     _type: 'link',
-    internalReference: reference('post-1'),
+    internalReference: mockReference(MOCK_POST_ID),
   },
   {
     _id: 'link-to-other',
     _type: 'link',
-    internalReference: reference('post-2'),
-  },
-  { _id: 'module-direct', _type: 'module_cta', target: reference('post-1') },
-  {
-    _id: 'module-via-link',
-    _type: 'module_hero',
-    link: reference('link-to-post'),
+    internalReference: mockReference(OTHER_POST_ID),
   },
   {
-    _id: 'module-unrelated',
+    _id: DIRECT_MODULE_ID,
     _type: 'module_cta',
-    target: reference('post-2'),
+    target: mockReference(MOCK_POST_ID),
   },
   {
-    _id: 'blog_module-direct',
+    _id: VIA_LINK_MODULE_ID,
+    _type: 'module_hero',
+    link: mockReference(LINK_TO_POST_ID),
+  },
+  {
+    _id: UNRELATED_MODULE_ID,
+    _type: 'module_cta',
+    target: mockReference(OTHER_POST_ID),
+  },
+  {
+    _id: LEGACY_DIRECT_MODULE_ID,
     _type: 'blog_module',
-    target: reference('post-1'),
+    target: mockReference(MOCK_POST_ID),
   },
 ];
 
@@ -63,7 +74,7 @@ async function findModuleIds(documentId: string, linkIds: string[]) {
 
 describe('linkIdsReferencingDocumentQuery', () => {
   it('lists the links that reference the document', async () => {
-    expect(await findLinkIds('post-1')).toEqual(['link-to-post']);
+    expect(await findLinkIds(MOCK_POST_ID)).toEqual([LINK_TO_POST_ID]);
   });
 
   it('lists nothing when no link references the document', async () => {
@@ -73,27 +84,27 @@ describe('linkIdsReferencingDocumentQuery', () => {
 
 describe('referencingModuleIdsQuery', () => {
   it('matches modules that reference the document directly or through a link', async () => {
-    const ids = await findModuleIds('post-1', ['link-to-post']);
+    const ids = await findModuleIds(MOCK_POST_ID, [LINK_TO_POST_ID]);
 
     expect(ids).toHaveLength(2);
-    expect(ids).toEqual(
-      expect.arrayContaining(['module-direct', 'module-via-link']),
+    expect(new Set(ids)).toEqual(
+      new Set([DIRECT_MODULE_ID, VIA_LINK_MODULE_ID]),
     );
   });
 
   it('still matches direct references when no link references the document', async () => {
-    expect(await findModuleIds('post-1', [])).toEqual(['module-direct']);
+    expect(await findModuleIds(MOCK_POST_ID, [])).toEqual([DIRECT_MODULE_ID]);
   });
 
   it('skips modules that reference neither the document nor its links', async () => {
-    expect(await findModuleIds('post-1', ['link-to-post'])).not.toContain(
-      'module-unrelated',
+    expect(await findModuleIds(MOCK_POST_ID, [LINK_TO_POST_ID])).not.toContain(
+      UNRELATED_MODULE_ID,
     );
   });
 
   it('skips documents whose type only contains a module prefix elsewhere', async () => {
-    expect(await findModuleIds('post-1', ['link-to-post'])).not.toContain(
-      'blog_module-direct',
+    expect(await findModuleIds(MOCK_POST_ID, [LINK_TO_POST_ID])).not.toContain(
+      LEGACY_DIRECT_MODULE_ID,
     );
   });
 

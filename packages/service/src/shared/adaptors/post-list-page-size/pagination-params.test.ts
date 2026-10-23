@@ -1,18 +1,13 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPaginationParamsWithPageSizes } from './pagination-params';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
 const { EN, NL } = LOCALE_ISO_CODES;
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(getPaginationParamsWithPageSizes, () => {
   it('pairs each page with its own page size from one request', async () => {

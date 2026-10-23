@@ -1,8 +1,8 @@
 import path from 'node:path';
 
 import nextPlugin from '@next/eslint-plugin-next';
-import checkFile from 'eslint-plugin-check-file';
 
+import { nextAppFolderNaming } from './base.js';
 import { booleanPropPrefixRule } from './boolean-prop-prefix.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import react from './react.js';
@@ -54,19 +54,7 @@ export default [
   ...react,
   nextPlugin.configs.recommended,
   ...storybook(packageJsonPath),
-  {
-    // Next.js App Router uses bracket and paren folder conventions ([locale],
-    // (group)) which are not kebab-case. Override the shared rule for src/app/.
-    plugins: { 'check-file': checkFile },
-    rules: {
-      'check-file/folder-naming-convention': [
-        'error',
-        {
-          'src/!(app)/**/!(__mocks__)/': 'KEBAB_CASE',
-        },
-      ],
-    },
-  },
+  nextAppFolderNaming,
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {

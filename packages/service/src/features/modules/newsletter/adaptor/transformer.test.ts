@@ -1,58 +1,44 @@
 import {
   BRAND_VARIANT,
-  CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
   NEWSLETTER_VARIANT,
-} from '@blog/config';
-import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+} from '@blog/config/constants';
+import {
+  MOCK_NEWSLETTER_HEADING,
+  mockRawNewsletterModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  mockRawHeadingBlock,
+  mockRawWideLayout,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toNewsletterModule } from './transformer';
 
-describe('toNewsletterModule', () => {
+describe(toNewsletterModule, () => {
   it('maps headingBlock straight through', () => {
-    const raw = makeRawNewsletterModule();
+    const raw = mockRawNewsletterModule();
 
     const module = toNewsletterModule(raw);
 
     expect(module.headingBlock).toEqual({
-      heading: 'Stay in the loop',
+      heading: MOCK_NEWSLETTER_HEADING,
       supportingText: 'Get new posts in your inbox.',
     });
   });
 
-  it('maps brandVariant straight through', () => {
-    const raw = makeRawNewsletterModule({
-      brandVariant: BRAND_VARIANT.SECONDARY,
-    });
+  it.each([
+    { brandVariant: BRAND_VARIANT.SECONDARY },
+    { variant: NEWSLETTER_VARIANT.COMPACT },
+    { content: 'A note from the editor.' },
+    { contentAlignment: CONTENT_ALIGNMENT.CENTER },
+  ])('maps an authored %o straight through', (authored) => {
+    const module = toNewsletterModule(mockRawNewsletterModule(authored));
 
-    const module = toNewsletterModule(raw);
-
-    expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
-  });
-
-  it('passes BRAND_PRIMARY through', () => {
-    const raw = makeRawNewsletterModule({
-      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
-    });
-
-    const module = toNewsletterModule(raw);
-
-    expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
-  });
-
-  it('maps variant straight through', () => {
-    const raw = makeRawNewsletterModule({
-      variant: NEWSLETTER_VARIANT.COMPACT,
-    });
-
-    const module = toNewsletterModule(raw);
-
-    expect(module.variant).toBe(NEWSLETTER_VARIANT.COMPACT);
+    expect(module).toMatchObject(authored);
   });
 
   it('flattens the trust cues to their text, skipping a cue with none', () => {
-    const raw = makeRawNewsletterModule({
+    const raw = mockRawNewsletterModule({
       trustCues: [{ text: 'No spam' }, { text: null }, { text: 'Weekly' }],
     });
 
@@ -61,17 +47,20 @@ describe('toNewsletterModule', () => {
     expect(module.trustCues).toEqual(['No spam', 'Weekly']);
   });
 
-  it('leaves trustCues undefined when none are authored (no faked default)', () => {
-    const raw = makeRawNewsletterModule({ trustCues: null });
+  it.each([
+    [{ trustCues: null }, { trustCues: undefined }],
+    [{ content: null }, { content: undefined }],
+    [{ contentAlignment: null }, { contentAlignment: undefined }],
+    [{ layout: null }, { layout: undefined }],
+  ])('maps an unset %o to %o', (unset, expected) => {
+    const module = toNewsletterModule(mockRawNewsletterModule(unset));
 
-    const module = toNewsletterModule(raw);
-
-    expect(module.trustCues).toBeUndefined();
+    expect(module).toMatchObject(expected);
   });
 
-  it('leaves supportingText undefined when not set (no faked default)', () => {
-    const raw = makeRawNewsletterModule({
-      headingBlock: makeRawHeadingBlock('Stay in the loop'),
+  it('leaves supportingText undefined when not set', () => {
+    const raw = mockRawNewsletterModule({
+      headingBlock: mockRawHeadingBlock(MOCK_NEWSLETTER_HEADING),
     });
 
     const module = toNewsletterModule(raw);
@@ -79,67 +68,12 @@ describe('toNewsletterModule', () => {
     expect(module.headingBlock.supportingText).toBeUndefined();
   });
 
-  it('maps content when authored', () => {
-    const raw = makeRawNewsletterModule({ content: 'A note from the editor.' });
-
-    const module = toNewsletterModule(raw);
-
-    expect(module.content).toBe('A note from the editor.');
-  });
-
-  it('leaves content undefined when not set (no faked default)', () => {
-    const raw = makeRawNewsletterModule({ content: null });
-
-    const module = toNewsletterModule(raw);
-
-    expect(module.content).toBeUndefined();
-  });
-
-  it('leaves contentAlignment undefined when unset (no faked default)', () => {
-    const raw = makeRawNewsletterModule({ contentAlignment: null });
-
-    const module = toNewsletterModule(raw);
-
-    expect(module.contentAlignment).toBeUndefined();
-  });
-
-  it('maps contentAlignment when authored', () => {
-    const raw = makeRawNewsletterModule({
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const module = toNewsletterModule(raw);
-
-    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
-  });
-
   it('maps a fully-authored layout object 1:1', () => {
-    const raw = makeRawNewsletterModule({
-      layout: {
-        spacingTop: 'SM',
-        spacingBottom: 'SM',
-        containerWidth: CONTAINER_WIDTH.WIDE,
-        dividerTop: false,
-        dividerBottom: true,
-      },
-    });
+    const layout = mockRawWideLayout();
+    const raw = mockRawNewsletterModule({ layout });
 
     const module = toNewsletterModule(raw);
 
-    expect(module.layout).toEqual({
-      spacingTop: 'SM',
-      spacingBottom: 'SM',
-      containerWidth: CONTAINER_WIDTH.WIDE,
-      dividerTop: false,
-      dividerBottom: true,
-    });
-  });
-
-  it('leaves layout undefined when the field is unset (no faked default)', () => {
-    const raw = makeRawNewsletterModule({ layout: null });
-
-    const module = toNewsletterModule(raw);
-
-    expect(module.layout).toBeUndefined();
+    expect(module.layout).toEqual(layout);
   });
 });

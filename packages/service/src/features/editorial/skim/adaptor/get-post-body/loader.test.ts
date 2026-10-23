@@ -1,16 +1,18 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPublishedPostBody } from './loader';
+import { publishedPostBodyQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const POST_ID = 'post-abc';
+
+const tenant = mockTenant();
 
 describe(getPublishedPostBody, () => {
   beforeEach(() => {
@@ -21,42 +23,25 @@ describe(getPublishedPostBody, () => {
     const body = [{ _type: 'block', _key: 'b1', children: [] }];
     mockRun.mockResolvedValueOnce({ body });
 
-    const result = await getPublishedPostBody('post-1', tenant);
+    const result = await getPublishedPostBody(POST_ID, tenant);
 
     expect(result).toEqual(body);
   });
 
-  it('queries by the given post id', async () => {
-    await getPublishedPostBody('post-abc', tenant);
+  it('queries the post id with tenant context and no ISR tags', async () => {
+    await getPublishedPostBody(POST_ID, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { id: 'post-abc' } }),
-    );
-  });
-
-  it('does not tag the fetch for Next ISR caching (always reads fresh)', async () => {
-    await getPublishedPostBody('post-abc', tenant);
-
-    const [, options] = mockRun.mock.calls[0] as [
-      unknown,
-      Record<string, unknown>,
-    ];
-    expect(options).not.toHaveProperty('next');
+    expect(mockRun).toHaveBeenCalledWith(publishedPostBodyQuery, {
+      parameters: { id: POST_ID },
+      tenant,
+    });
   });
 
   it('propagates when no published post matches the id', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getPublishedPostBody('missing', tenant)).rejects.toThrow();
-  });
-
-  it('threads tenant context into runQuery', async () => {
-    await getPublishedPostBody('post-abc', tenant);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant }),
-    );
+    await expect(
+      getPublishedPostBody(MOCK_MISSING_ID, tenant),
+    ).rejects.toThrow();
   });
 });

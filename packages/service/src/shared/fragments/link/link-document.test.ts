@@ -1,8 +1,16 @@
 import { LINK_TYPE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
+import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  MOCK_ABOUT_EN_PAGE_ID,
+  MOCK_ABOUT_NL_PAGE_ID,
+  MOCK_ABOUT_NL_SLUG,
+  MOCK_ABOUT_SLUG,
+  MOCK_ABOUT_TRANSLATION_METADATA,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { linkDocumentFragment } from './link-document';
 
@@ -14,29 +22,31 @@ const linkDocQuery = q.star
   .project(linkDocumentFragment)
   .notNull();
 
-function reference(id: string) {
-  return { _type: 'reference', _ref: id };
-}
+const CONTACT_PAGE_ID = 'contact-en';
+const MODULES_PAGE_ID = 'modules-en';
+const ENGLISH_URL = 'https://example.com/en';
+const DUTCH_URL = 'https://example.com/nl';
 
 const pages = [
-  { _id: 'about-en', _type: 'page_landing', slug: { current: 'about' } },
-  { _id: 'about-nl', _type: 'page_landing', slug: { current: 'over-ons' } },
-  { _id: 'contact-en', _type: 'page_landing', slug: { current: 'contact' } },
-  { _id: 'modules-en', _type: 'page_landing', slug: { current: 'modules' } },
+  {
+    _id: MOCK_ABOUT_EN_PAGE_ID,
+    _type: 'page_landing',
+    slug: { current: MOCK_ABOUT_SLUG },
+  },
+  {
+    _id: MOCK_ABOUT_NL_PAGE_ID,
+    _type: 'page_landing',
+    slug: { current: MOCK_ABOUT_NL_SLUG },
+  },
+  { _id: CONTACT_PAGE_ID, _type: 'page_landing', slug: { current: 'contact' } },
+  { _id: MODULES_PAGE_ID, _type: 'page_landing', slug: { current: 'modules' } },
   {
     _id: 'faq-en',
     _type: 'page_landing',
     slug: { current: 'faq' },
-    parent: reference('modules-en'),
+    parent: mockReference(MODULES_PAGE_ID),
   },
-  {
-    _id: 'meta-about',
-    _type: 'translation.metadata',
-    translations: [
-      { _key: EN, language: EN, value: reference('about-en') },
-      { _key: NL, language: NL, value: reference('about-nl') },
-    ],
-  },
+  MOCK_ABOUT_TRANSLATION_METADATA,
 ];
 
 function resolveLink(link: Record<string, unknown>, locale: string) {
@@ -53,8 +63,8 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localizedStrings({ [EN]: 'About us', [NL]: 'Over ons' }),
-        internalReference: reference('contact-en'),
+        label: mockLocalizedStrings({ [EN]: 'About us', [NL]: 'Over ons' }),
+        internalReference: mockReference(CONTACT_PAGE_ID),
       },
       NL,
     );
@@ -66,8 +76,8 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localizedStrings({ [EN]: 'About us' }),
-        internalReference: reference('contact-en'),
+        label: mockLocalizedStrings({ [EN]: 'About us' }),
+        internalReference: mockReference(CONTACT_PAGE_ID),
       },
       FR,
     );
@@ -75,18 +85,18 @@ describe('linkDocumentFragment', () => {
     expect(result).toMatchObject({ label: 'About us' });
   });
 
-  it("resolves an internal reference to the page's translation in the requested language", async () => {
+  it("resolves an internal reference to the page's translation in the language", async () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localizedStrings({ [EN]: 'About us' }),
-        internalReference: reference('about-en'),
+        label: mockLocalizedStrings({ [EN]: 'About us' }),
+        internalReference: mockReference(MOCK_ABOUT_EN_PAGE_ID),
       },
       NL,
     );
 
     expect(result).toMatchObject({
-      internalReference: { _type: 'page_landing', slug: 'over-ons' },
+      internalReference: { _type: 'page_landing', slug: MOCK_ABOUT_NL_SLUG },
     });
   });
 
@@ -94,8 +104,8 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localizedStrings({ [EN]: 'Contact' }),
-        internalReference: reference('contact-en'),
+        label: mockLocalizedStrings({ [EN]: 'Contact' }),
+        internalReference: mockReference(CONTACT_PAGE_ID),
       },
       NL,
     );
@@ -109,8 +119,8 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localizedStrings({ [EN]: 'FAQ' }),
-        internalReference: reference('faq-en'),
+        label: mockLocalizedStrings({ [EN]: 'FAQ' }),
+        internalReference: mockReference('faq-en'),
       },
       EN,
     );
@@ -120,21 +130,20 @@ describe('linkDocumentFragment', () => {
     });
   });
 
-  it('resolves an external url in the requested language, falling back to the default', async () => {
+  it('resolves an external url in the requested language, else the default', async () => {
     const link = {
       linkType: LINK_TYPE.EXTERNAL,
-      label: localizedStrings({ [EN]: 'Docs' }),
-      url: localizedStrings({
-        [EN]: 'https://example.com/en',
-        [NL]: 'https://example.com/nl',
+      label: mockLocalizedStrings({ [EN]: 'Docs' }),
+      url: mockLocalizedStrings({
+        [EN]: ENGLISH_URL,
+        [NL]: DUTCH_URL,
       }),
     };
 
-    expect(await resolveLink(link, NL)).toMatchObject({
-      url: 'https://example.com/nl',
-    });
-    expect(await resolveLink(link, FR)).toMatchObject({
-      url: 'https://example.com/en',
-    });
+    const dutchLink = await resolveLink(link, NL);
+    const frenchLink = await resolveLink(link, FR);
+
+    expect(dutchLink).toMatchObject({ url: DUTCH_URL });
+    expect(frenchLink).toMatchObject({ url: ENGLISH_URL });
   });
 });

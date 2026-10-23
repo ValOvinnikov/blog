@@ -1,17 +1,24 @@
-import { makeRawTagWithPostCount } from '@blog/service/testing/entities/fixtures';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  MOCK_DESIGN_TERM,
+  MOCK_ENGINEERING_TERM,
+  mockRawTagWithPostCount,
+} from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_TAGS_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getTags } from './loader';
+import { tagsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const DESCRIPTION = 'All things TypeScript';
+
+const tenant = mockTenant();
 
 describe(getTags, () => {
   beforeEach(() => {
@@ -19,41 +26,36 @@ describe(getTags, () => {
   });
 
   it('maps every raw tag into a domain tag with its post count', async () => {
-    mockRun.mockResolvedValue([
-      makeRawTagWithPostCount({
-        _id: 'a',
-        title: 'Design',
-        slug: 'design',
-        postCount: 3,
-      }),
-      makeRawTagWithPostCount({
-        _id: 'b',
-        title: 'Engineering',
-        slug: 'engineering',
-        postCount: 0,
-      }),
+    mockRun.mockResolvedValueOnce([
+      mockRawTagWithPostCount(MOCK_DESIGN_TERM),
+      mockRawTagWithPostCount(MOCK_ENGINEERING_TERM),
     ]);
 
     const result = await getTags(tenant);
 
-    expect(result.map((t) => t.id)).toEqual(['a', 'b']);
-    expect(result[0]?.title).toBe('Design');
-    expect(result[0]?.postCount).toBe(3);
-    expect(result[1]?.postCount).toBe(0);
+    expect(result.map((t) => t.id)).toEqual([
+      MOCK_DESIGN_TERM._id,
+      MOCK_ENGINEERING_TERM._id,
+    ]);
+    expect(result[0]?.title).toBe(MOCK_DESIGN_TERM.title);
+    expect(result[0]?.postCount).toBe(MOCK_DESIGN_TERM.postCount);
+    expect(result[1]?.postCount).toBe(MOCK_ENGINEERING_TERM.postCount);
   });
 
   it('carries a tag description through when authored', async () => {
-    mockRun.mockResolvedValue([
-      makeRawTagWithPostCount({ description: 'All things TypeScript' }),
+    mockRun.mockResolvedValueOnce([
+      mockRawTagWithPostCount({ description: DESCRIPTION }),
     ]);
 
     const result = await getTags(tenant);
 
-    expect(result[0]?.description).toBe('All things TypeScript');
+    expect(result[0]?.description).toBe(DESCRIPTION);
   });
 
   it('normalises a missing description to undefined', async () => {
-    mockRun.mockResolvedValue([makeRawTagWithPostCount({ description: null })]);
+    mockRun.mockResolvedValueOnce([
+      mockRawTagWithPostCount({ description: null }),
+    ]);
 
     const result = await getTags(tenant);
 
@@ -66,17 +68,15 @@ describe(getTags, () => {
     expect(result).toEqual([]);
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+  it('queries for the tenant with tenant-scoped tags', async () => {
     await getTags(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: ['t:tenant-a:tags', 't:tenant-a:posts'],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(tagsQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_TAGS_CACHE_TAG, MOCK_POSTS_CACHE_TAG],
+      },
+    });
   });
 });

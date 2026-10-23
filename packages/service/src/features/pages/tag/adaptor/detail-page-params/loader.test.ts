@@ -1,38 +1,35 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { MOCK_TAG_SLUG } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { MOCK_PAGE_TAG_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getTagParams } from './loader';
 import { tagParamsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-const tenant = makeTenant();
+const NL_SLUG = 'typescript-nl';
+const ENTRIES = [
+  { slug: MOCK_TAG_SLUG, language: EN },
+  { slug: NL_SLUG, language: NL },
+];
+const tenant = mockTenant();
 
-describe('getTagParams', () => {
+describe(getTagParams, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue([]);
   });
 
   it('returns the slug and language entries', async () => {
-    mockRun.mockResolvedValue([
-      { slug: 'typescript', language: EN },
-      { slug: 'typescript-nl', language: NL },
-    ]);
+    mockRun.mockResolvedValueOnce(ENTRIES);
 
     const params = await getTagParams(tenant, [EN, NL]);
 
-    expect(params).toEqual([
-      { slug: 'typescript', language: EN },
-      { slug: 'typescript-nl', language: NL },
-    ]);
+    expect(params).toEqual(ENTRIES);
   });
 
   it('returns an empty array when there are no tag pages', async () => {
@@ -41,25 +38,17 @@ describe('getTagParams', () => {
     expect(params).toEqual([]);
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getTagParams(tenant, [EN]);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:page_tag'] }),
-      }),
-    );
-  });
-
-  it('passes the live languages to the query', async () => {
+  it('queries the live languages for the tenant and scopes the tags to it', async () => {
     await getTagParams(tenant, [EN, NL]);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { locales: [EN, NL] } }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(tagParamsQuery, {
+      parameters: { locales: [EN, NL] },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_PAGE_TAG_CACHE_TAG],
+      },
+    });
   });
 });
 
@@ -69,13 +58,13 @@ describe('tagParamsQuery', () => {
       {
         _id: 'a',
         _type: 'page_tag',
-        slug: { current: 'typescript' },
+        slug: { current: MOCK_TAG_SLUG },
         language: EN,
       },
       {
         _id: 'b',
         _type: 'page_tag',
-        slug: { current: 'typescript-nl' },
+        slug: { current: NL_SLUG },
         language: NL,
       },
       { _id: 'c', _type: 'page_tag', slug: { current: 'fr' }, language: FR },
@@ -85,9 +74,6 @@ describe('tagParamsQuery', () => {
       await evaluateGroqExpression(tagParamsQuery.query, dataset, null, {
         locales: [EN, NL],
       }),
-    ).toEqual([
-      { slug: 'typescript', language: EN },
-      { slug: 'typescript-nl', language: NL },
-    ]);
+    ).toEqual(ENTRIES);
   });
 });
