@@ -11,13 +11,13 @@ import {
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
 import type * as TenantsQueries from '@blog/db/queries/tenants';
+import { errorResult } from '@blog/utils/result';
 import { seedTenantContent } from '@worker/steps/seed-content';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
+import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { applySiteTemplate } from './apply-site-template';
-
-const CTX = { runId: 'run-1' };
 
 vi.mock('@blog/db/queries/tenants', async (importOriginal) =>
   (
@@ -48,17 +48,16 @@ describe(applySiteTemplate, () => {
     vi.mocked(getStepMetadata).mockReturnValue({
       attempt: 1,
     } as ReturnType<typeof getStepMetadata>);
-    vi.mocked(getTenantById).mockResolvedValue(makeTenant());
-    vi.mocked(updateProvisioningStep).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(getTenantById).mockResolvedValue(mockTenant());
+    vi.mocked(updateProvisioningStep).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
   });
 
   it('seeds the tenant and reports SEED_CONTENT running then done', async () => {
-    const result = await applySiteTemplate(TEST_TENANT_ID, CTX);
+    const result = await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, data: undefined });
     expect(seedTenantContent).toHaveBeenCalledOnce();
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -76,18 +75,18 @@ describe(applySiteTemplate, () => {
   ])(
     'a tenant of site type %s is seeded as %s with the %s preset and the template version',
     async (siteType, seededType, preset) => {
-      const tenant = makeTenant({ siteType });
+      const tenant = mockTenant({ siteType });
       vi.mocked(getTenantById).mockResolvedValue(tenant);
 
-      await applySiteTemplate(TEST_TENANT_ID, CTX);
+      await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
       expect(vi.mocked(seedTenantContent).mock.calls[0]?.[1]).toBe(seededType);
       expect(insertSiteConfigIfMissing).toHaveBeenCalledWith(
-        TEST_TENANT_ID,
+        MOCK_TENANT_ID,
         preset,
       );
       expect(setTenantSiteTemplateVersion).toHaveBeenCalledWith(
-        TEST_TENANT_ID,
+        MOCK_TENANT_ID,
         STARTER_TEMPLATE_VERSION,
       );
     },
@@ -96,7 +95,9 @@ describe(applySiteTemplate, () => {
   it('records neither the preset nor the template version when seeding fails', async () => {
     vi.mocked(seedTenantContent).mockRejectedValue(new Error('seed failed'));
 
-    await applySiteTemplate(TEST_TENANT_ID, CTX).catch(() => undefined);
+    await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT).catch(
+      () => undefined,
+    );
 
     expect(insertSiteConfigIfMissing).not.toHaveBeenCalled();
     expect(setTenantSiteTemplateVersion).not.toHaveBeenCalled();
@@ -105,9 +106,9 @@ describe(applySiteTemplate, () => {
   it('throws a fatal error without seeding for a missing tenant', async () => {
     vi.mocked(getTenantById).mockResolvedValue(undefined);
 
-    await expect(applySiteTemplate(TEST_TENANT_ID, CTX)).rejects.toThrow(
-      FatalError,
-    );
+    await expect(
+      applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT),
+    ).rejects.toThrow(FatalError);
 
     expect(seedTenantContent).not.toHaveBeenCalled();
     expect(insertSiteConfigIfMissing).not.toHaveBeenCalled();

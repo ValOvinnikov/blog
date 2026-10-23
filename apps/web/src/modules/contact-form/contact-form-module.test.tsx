@@ -1,5 +1,6 @@
-import { ACTION_OUTCOME, SITE_MESSAGES } from '@blog/config';
+import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
@@ -11,9 +12,9 @@ import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/cons
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { fillAndSendContactForm } from '@web/testing/modules/contact-form/contact-form-fields';
-import { makeContactFormModule } from '@web/testing/modules/contact-form/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockContactFormModule } from '@web/testing/modules/contact-form/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContactFormModule } from './contact-form-module';
 
@@ -51,7 +52,6 @@ vi.mock(
   () => ({ submitContactMessage: vi.fn() }),
 );
 
-const { submitLabel } = SITE_MESSAGES.contactForm;
 const HEADING = faker.company.catchPhrase();
 const TENANT_ID = faker.string.uuid();
 const PAGE_ID = faker.string.uuid();
@@ -64,9 +64,10 @@ const setup = customRenderAsync(ContactFormModule, {
   id: faker.string.uuid(),
 });
 
+const SUBMIT_LABEL = 'Send message';
+
 describe(`<${ContactFormModule.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: TENANT_ID,
@@ -77,21 +78,22 @@ describe(`<${ContactFormModule.name}/>`, () => {
     vi.mocked(submitContactMessage).mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    getContactFormMock.mockResolvedValue({
-      ok: true,
-      data: makeContactFormModule({
-        headingBlock: makeHeadingBlock({ heading: HEADING }),
-      }),
-    });
+    getContactFormMock.mockResolvedValue(
+      okResult(
+        mockContactFormModule({
+          headingBlock: mockHeadingBlock({ heading: HEADING }),
+        }),
+      ),
+    );
   });
 
   it('renders the heading and the form', async () => {
     await setup();
-    const heading = screen.getByRole('heading', { name: HEADING });
-    const sendButton = screen.getByRole('button', { name: submitLabel });
 
+    const heading = screen.getByRole('heading', { name: HEADING });
+    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
     expect(heading).toBeVisible();
-    expect(sendButton).toBeVisible();
+    expect(submitButton).toBeVisible();
   });
 
   it.each<[string, TModuleComponentProps['context']]>([
@@ -118,7 +120,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
         },
         {
           sourceDocumentId: PAGE_ID,
-          sourceLocale: DEFAULT_REQUEST_CONTEXT.locale,
+          sourceLocale: MOCK_REQUEST_CONTEXT.locale,
         },
       );
     },
@@ -128,11 +130,9 @@ describe(`<${ContactFormModule.name}/>`, () => {
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
 
     await setup();
-    const sendButton = screen.queryByRole('button', {
-      name: submitLabel,
-    });
 
-    expect(sendButton).not.toBeInTheDocument();
+    const submitButton = screen.queryByRole('button', { name: SUBMIT_LABEL });
+    expect(submitButton).not.toBeInTheDocument();
     expect(getContactFormMock).not.toHaveBeenCalled();
   });
 
@@ -144,43 +144,44 @@ describe(`<${ContactFormModule.name}/>`, () => {
     } as never);
 
     await setup();
-    const sendButton = screen.queryByRole('button', {
-      name: submitLabel,
-    });
 
-    expect(sendButton).not.toBeInTheDocument();
+    const submitButton = screen.queryByRole('button', { name: SUBMIT_LABEL });
+    expect(submitButton).not.toBeInTheDocument();
   });
 
   it('renders nothing when the module cannot be loaded', async () => {
-    getContactFormMock.mockResolvedValue({
-      ok: false,
-      error: new Error('contact form unavailable'),
-    });
+    getContactFormMock.mockResolvedValue(
+      errorResult(new Error('contact form unavailable')),
+    );
 
     await setup();
-    const heading = screen.queryByRole('heading', { name: HEADING });
 
+    const heading = screen.queryByRole('heading', { name: HEADING });
     expect(heading).not.toBeInTheDocument();
   });
 
-  it("resolves the request context's tenant", async () => {
-    await setup();
-
-    expect(resolveRequestTenant).toHaveBeenCalledWith(
-      DEFAULT_REQUEST_CONTEXT.tenantId,
-    );
-  });
-
-  it('reads no tenant from the request headers when the route resolved no tenant', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+  it.each([
+    {
+      route: 'a resolved tenant',
+      tenantId: MOCK_REQUEST_CONTEXT.tenantId,
+      expected: MOCK_REQUEST_CONTEXT.tenantId,
+    },
+    {
+      route: 'no tenant',
       tenantId: undefined,
-    });
+      expected: UNRESOLVED_TENANT_PLACEHOLDER,
+    },
+  ])(
+    'resolves the expected tenant when the route found $route',
+    async ({ tenantId, expected }) => {
+      vi.mocked(getRequestContext).mockResolvedValueOnce({
+        ...MOCK_REQUEST_CONTEXT,
+        tenantId,
+      });
 
-    await setup();
+      await setup();
 
-    expect(resolveRequestTenant).toHaveBeenCalledWith(
-      UNRESOLVED_TENANT_PLACEHOLDER,
-    );
-  });
+      expect(resolveRequestTenant).toHaveBeenCalledWith(expected);
+    },
+  );
 });

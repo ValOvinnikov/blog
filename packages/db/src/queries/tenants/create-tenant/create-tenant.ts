@@ -4,7 +4,7 @@ import { type TTenantPlan, type TTenantStatus } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 
 export type TCreateTenantInput = {
   name: string;
@@ -20,7 +20,7 @@ export async function createTenant(
   input: TCreateTenantInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
   if (!isValidDomain(input.primaryDomain)) {
-    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+    return errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
   }
 
   const db = getDb();
@@ -34,5 +34,5 @@ export async function createTenant(
     throw new Error('createTenant: insert returned no row.');
   }
 
-  return { ok: true, data: inserted };
+  return okResult(inserted);
 }

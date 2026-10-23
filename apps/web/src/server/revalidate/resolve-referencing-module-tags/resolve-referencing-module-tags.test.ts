@@ -1,3 +1,9 @@
+import { errorResult, okResult } from '@blog/utils';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { resolveReferencingModuleTags } from './resolve-referencing-module-tags';
@@ -16,34 +22,24 @@ vi.mock('@blog/service', () => ({
 
 const loggerErrorMock = vi.mocked(logger.error);
 
-const TENANT_ID = 'tenant-uuid-1';
-const LOOKUP_FAILURE = 'sanity unreachable';
-
-const tenant = {
-  projectId: 'tenant-a-project',
-  dataset: 'production',
-  token: 'tok',
-};
-
 const input = {
   type: 'page_topic',
   id: 'topic-1',
-  tenantId: TENANT_ID,
-  tenant,
+  tenantId: MOCK_TENANT_ID,
+  tenant: MOCK_TENANT_SANITY_CONTEXT,
 };
 
 describe(resolveReferencingModuleTags, () => {
   beforeEach(() => {
     getReferencingModuleIdsMock.mockReset();
     loggerErrorMock.mockReset();
-    getReferencingModuleIdsMock.mockResolvedValue({ ok: true, data: [] });
+    getReferencingModuleIdsMock.mockResolvedValue(okResult([]));
   });
 
   it('maps every resolved module id onto its per-document purge tag', async () => {
-    getReferencingModuleIdsMock.mockResolvedValue({
-      ok: true,
-      data: ['hero-1', 'cta-2'],
-    });
+    getReferencingModuleIdsMock.mockResolvedValue(
+      okResult(['hero-1', 'cta-2']),
+    );
 
     const result = await resolveReferencingModuleTags(input);
 
@@ -59,35 +55,27 @@ describe(resolveReferencingModuleTags, () => {
   it('looks the document up by its own id in the tenant context', async () => {
     await resolveReferencingModuleTags(input);
 
-    expect(getReferencingModuleIdsMock).toHaveBeenCalledWith('topic-1', tenant);
+    expect(getReferencingModuleIdsMock).toHaveBeenCalledWith(
+      input.id,
+      MOCK_TENANT_SANITY_CONTEXT,
+    );
   });
 
-  it('degrades to no tags when the lookup fails, so the caller can purge the rest', async () => {
-    getReferencingModuleIdsMock.mockResolvedValue({
-      ok: false,
-      error: new Error(LOOKUP_FAILURE),
-    });
+  it('degrades to no tags and logs once when the lookup fails', async () => {
+    getReferencingModuleIdsMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const result = await resolveReferencingModuleTags(input);
 
     expect(result).toEqual([]);
-  });
-
-  it('logs a failed lookup once, with the document and tenant context attached', async () => {
-    const error = new Error(LOOKUP_FAILURE);
-    getReferencingModuleIdsMock.mockResolvedValue({ ok: false, error });
-
-    await resolveReferencingModuleTags(input);
-
     expect(loggerErrorMock).toHaveBeenCalledTimes(1);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'revalidate.referencing_modules_lookup_failed',
-      expect.objectContaining({
-        type: 'page_topic',
-        id: 'topic-1',
-        tenantId: TENANT_ID,
-        error,
-      }),
+      {
+        type: input.type,
+        id: input.id,
+        tenantId: MOCK_TENANT_ID,
+        error: MOCK_ERROR,
+      },
     );
   });
 });

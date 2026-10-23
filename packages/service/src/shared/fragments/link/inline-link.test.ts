@@ -1,6 +1,10 @@
 import { LINK_TYPE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
+import {
+  MOCK_POST_SLUG,
+  mockReference,
+} from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { inlineLinkFragment } from './inline-link';
@@ -18,7 +22,7 @@ describe('inlineLinkFragment', () => {
       label: 'Read more',
       linkType: LINK_TYPE.INTERNAL,
       url: null,
-      internalReference: { _type: 'page_post', slug: 'hello-world' },
+      internalReference: { _type: 'page_post', slug: MOCK_POST_SLUG },
       openInNewTab: null,
       platform: null,
       accessibleLabel: null,
@@ -34,14 +38,14 @@ describe('inlineLinkFragment', () => {
         _type: 'inlineLink',
         label: 'FAQ',
         linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'reference', _ref: 'faq' },
+        internalReference: mockReference('faq'),
       },
       { _id: 'modules', _type: 'page_landing', slug: { current: 'modules' } },
       {
         _id: 'faq',
         _type: 'page_landing',
         slug: { current: 'faq' },
-        parent: { _type: 'reference', _ref: 'modules' },
+        parent: mockReference('modules'),
       },
     ];
 

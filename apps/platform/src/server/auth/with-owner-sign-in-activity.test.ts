@@ -1,4 +1,4 @@
-import { makeMembership } from '@platform/testing/memberships/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import type { NextAuthConfig } from 'next-auth';
 
 import { withOwnerSignInActivity } from './with-owner-sign-in-activity';
@@ -15,7 +15,7 @@ type TSignInMessage = Parameters<
   NonNullable<NonNullable<NextAuthConfig['events']>['signIn']>
 >[0];
 
-const { userId: USER_ID } = makeMembership();
+const { userId: USER_ID } = mockMembership();
 const MESSAGE: TSignInMessage = { user: { id: USER_ID }, account: null };
 
 describe(withOwnerSignInActivity, () => {

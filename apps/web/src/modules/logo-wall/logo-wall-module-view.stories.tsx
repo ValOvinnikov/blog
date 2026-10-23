@@ -1,17 +1,17 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockLogoItem } from '@web/testing/modules/logo-wall/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
 
 const logos = [
-  makeLogoItem({ id: 'logo-1', name: 'Acme Corp' }),
-  makeLogoItem({ id: 'logo-2', name: 'Nimbus Inc' }),
-  makeLogoItem({ id: 'logo-3', name: 'Lighthouse Studio' }),
-  makeLogoItem({
+  mockLogoItem({ id: 'logo-1', name: 'Acme Corp' }),
+  mockLogoItem({ id: 'logo-2', name: 'Nimbus Inc' }),
+  mockLogoItem({ id: 'logo-3', name: 'Lighthouse Studio' }),
+  mockLogoItem({
     id: 'logo-4',
     name: 'Cascade Labs',
     link: {
@@ -22,29 +22,29 @@ const logos = [
       ariaLabel: undefined,
     },
   }),
-  makeLogoItem({ id: 'logo-5', name: 'Meridian Group' }),
+  mockLogoItem({ id: 'logo-5', name: 'Meridian Group' }),
 ];
 
 const manyLogos = [
   ...logos,
-  makeLogoItem({ id: 'logo-6', name: 'Solstice Partners' }),
-  makeLogoItem({ id: 'logo-7', name: 'Vantage Point' }),
+  mockLogoItem({ id: 'logo-6', name: 'Solstice Partners' }),
+  mockLogoItem({ id: 'logo-7', name: 'Vantage Point' }),
 ];
 
 const overflowingLogos = [
   ...manyLogos,
-  makeLogoItem({ id: 'logo-8', name: 'Northwind Traders' }),
-  makeLogoItem({ id: 'logo-9', name: 'Beacon Analytics' }),
-  makeLogoItem({ id: 'logo-10', name: 'Crestline Media' }),
-  makeLogoItem({ id: 'logo-11', name: 'Harborlight Group' }),
-  makeLogoItem({ id: 'logo-12', name: 'Fernbridge Co' }),
+  mockLogoItem({ id: 'logo-8', name: 'Northwind Traders' }),
+  mockLogoItem({ id: 'logo-9', name: 'Beacon Analytics' }),
+  mockLogoItem({ id: 'logo-10', name: 'Crestline Media' }),
+  mockLogoItem({ id: 'logo-11', name: 'Harborlight Group' }),
+  mockLogoItem({ id: 'logo-12', name: 'Fernbridge Co' }),
 ];
 
 const logosWithDarkLogo = logos.map((logo, index) =>
   index % 2 === 0
     ? {
         ...logo,
-        imageDark: makeSanityImage({
+        imageDark: mockSanityImage({
           assetId:
             'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
           alt: logo.name,
@@ -75,7 +75,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Trusted by' }),
+    headingBlock: mockHeadingBlock({ heading: 'Trusted by' }),
     logos,
     ctaButtons: [],
     displayMode: DISPLAY_MODE.GRID,
@@ -115,7 +115,7 @@ export const CarouselOverflowingCenterAligned: TStory = {
 };
 
 export const WithActions: TStory = {
-  args: { ctaButtons: ctaActionsDemo },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const CenterAligned: TStory = {

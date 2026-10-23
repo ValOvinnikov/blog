@@ -3,8 +3,8 @@ import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { addBlockedIdentity } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
 import * as schema from '@blog/db/schema';
 import {
-  BLOCK_REASON,
-  BLOCKED_DOMAIN,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_DOMAIN,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -28,8 +28,8 @@ describe(removeBlockedIdentity, () => {
     const { id: createdByAdminId } = await insertTestAdmin(db());
     const added = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: BLOCKED_DOMAIN,
-      reason: BLOCK_REASON,
+      identity: MOCK_BLOCKED_DOMAIN,
+      reason: MOCK_BLOCK_REASON,
       createdByAdminId,
     });
     if (!added.ok) throw new Error('seed failed');

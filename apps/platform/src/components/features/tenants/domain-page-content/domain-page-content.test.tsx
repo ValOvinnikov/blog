@@ -1,7 +1,13 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  mockTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_CUSTOM_DOMAIN,
+  MOCK_VERCEL_A_RECORD,
+} from '@platform/testing/tenants/fixtures';
 
 import { DomainPageContent } from './domain-page-content';
 
@@ -12,7 +18,7 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 const getProjectDomainMock = vi.mocked(getProjectDomain);
 
 const render = async (
-  tenant = makeTenant({ primaryDomain: 'northwind.dev' }),
+  tenant = mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
 ) => {
   const ui = await DomainPageContent({ tenant });
   await act(async () => {
@@ -20,12 +26,12 @@ const render = async (
   });
 };
 
-describe(DomainPageContent, () => {
+describe(`<${DomainPageContent.name}/>`, () => {
   beforeEach(() => {
     getProjectDomainMock.mockReset();
     getProjectDomainMock.mockResolvedValue({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
+      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
     });
   });
 
@@ -34,58 +40,62 @@ describe(DomainPageContent, () => {
 
     await render();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Domain' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText(
-        'The one piece of setup that is genuinely yours to finish.',
-      ),
-    ).toBeVisible();
-    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
-    expect(screen.queryByRole('heading', { level: 2 })).toBeNull();
-  });
-
-  it('replaces the skeleton with the domain card once Vercel answers', async () => {
-    await render();
-
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: 'Point northwind.dev at us',
-      }),
-    ).toBeVisible();
-    expect(screen.getByText('Awaiting DNS')).toBeVisible();
-    expect(screen.queryByTestId('skeleton')).toBeNull();
-  });
-
-  it('loads the domain from Vercel exactly once', async () => {
-    await render();
-    await screen.findByRole('table');
-
-    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
-      'northwind.dev',
+    const title = screen.getByRole('heading', { level: 1, name: 'Domain' });
+    const description = screen.getByText(
+      'The one piece of setup that is genuinely yours to finish.',
     );
+    const skeletons = screen.getAllByTestId('skeleton');
+    const cardHeading = screen.queryByRole('heading', { level: 2 });
+
+    expect(title).toBeVisible();
+    expect(description).toBeVisible();
+    expect(skeletons.length).toBeGreaterThan(0);
+    expect(cardHeading).toBeNull();
+  });
+
+  describe('for a live tenant', () => {
+    beforeEach(async () => {
+      await render();
+    });
+
+    it('replaces the skeleton with the domain card once Vercel answers', async () => {
+      const cardHeading = await screen.findByRole('heading', {
+        level: 2,
+        name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
+      });
+      const statusBadge = screen.getByText('Awaiting DNS');
+      const skeleton = screen.queryByTestId('skeleton');
+
+      expect(cardHeading).toBeVisible();
+      expect(statusBadge).toBeVisible();
+      expect(skeleton).toBeNull();
+    });
+
+    it('loads the domain from Vercel exactly once', async () => {
+      await screen.findByRole('table');
+
+      expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_CUSTOM_DOMAIN,
+      );
+    });
+
+    it('does not show the archived notice for a live tenant', () => {
+      const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
+
+      expect(archivedNotice).not.toBeInTheDocument();
+    });
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {
     await render(
-      makeTenant({
-        primaryDomain: 'northwind.dev',
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      mockTenant({
+        primaryDomain: MOCK_CUSTOM_DOMAIN,
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       }),
     );
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
-  });
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
 
-  it('does not show the archived notice for a live tenant', async () => {
-    await render(
-      makeTenant({ primaryDomain: 'northwind.dev', deprovisionedAt: null }),
-    );
-
-    expect(
-      screen.queryByText('This tenant is archived'),
-    ).not.toBeInTheDocument();
+    expect(archivedNotice).toBeVisible();
   });
 });

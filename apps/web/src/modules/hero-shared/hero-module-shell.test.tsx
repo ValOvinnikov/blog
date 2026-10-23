@@ -1,41 +1,24 @@
-import { BRAND_VARIANT, CTA_ACTION_VARIANT, HERO_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION,
+} from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { HeroModuleShell } from './hero-module-shell';
 
-const sanityImage = makeSanityImage();
+const sanityImage = mockSanityImage();
 
-const primaryButton = {
-  variant: CTA_ACTION_VARIANT.PRIMARY,
-  appearance: undefined,
-  link: {
-    label: 'Learn more',
-    href: '/learn-more',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-};
-
-const secondaryButton = {
-  variant: CTA_ACTION_VARIANT.SECONDARY,
-  appearance: undefined,
-  link: {
-    label: 'See pricing',
-    href: '/pricing',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-};
+const TITLE = 'Shared hero shell';
+const TITLE_ID = 'shared-hero-shell';
 
 const setup = customRender(HeroModuleShell, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  title: 'Shared hero shell',
-  titleId: 'shared-hero-shell',
+  title: TITLE,
+  titleId: TITLE_ID,
   excerpt: undefined,
   contentPosition: undefined,
   contentAlignment: undefined,
@@ -53,46 +36,50 @@ describe(`<${HeroModuleShell.name}/>`, () => {
       setup();
     });
 
-    it('renders the title as the top-level heading, labelling the Section via titleId', () => {
+    it('renders the title as the top-level heading that labels the section', () => {
       const heading = screen.getByRole('heading', {
         level: 1,
-        name: 'Shared hero shell',
+        name: TITLE,
       });
+      const section = screen.getByRole('region', { name: TITLE });
       expect(heading).toBeVisible();
-      expect(heading).toHaveAttribute('id', 'shared-hero-shell');
-
-      const section = heading.closest('section');
-      expect(section).toHaveAttribute('aria-labelledby', 'shared-hero-shell');
+      expect(heading).toHaveAttribute('id', TITLE_ID);
+      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
     });
 
-    it('renders its children inside the Hero', () => {
-      expect(screen.getByText('Slot content')).toBeVisible();
+    it('renders its children', () => {
+      const slotContent = screen.getByText('Slot content');
+      expect(slotContent).toBeVisible();
     });
 
-    it('renders no Hero.Cta slot when ctaButtons is empty', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    it('renders no actions when none are authored', () => {
+      const link = screen.queryByRole('link');
+      expect(link).not.toBeInTheDocument();
     });
 
-    it('renders no Hero.Media slot when sanityImage is absent', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    it('renders no media without an image', () => {
+      const image = screen.queryByRole('img');
+      expect(image).not.toBeInTheDocument();
     });
   });
 
-  it('renders a link for each authored ctaButton', () => {
-    setup({ ctaButtons: [primaryButton] });
+  it('renders a link for an authored action', () => {
+    setup({ ctaButtons: [MOCK_CTA_PRIMARY_ACTION] });
 
-    const link = screen.getByRole('link', { name: 'Learn more' });
+    const link = screen.getByRole('link', {
+      name: MOCK_CTA_PRIMARY_ACTION.link.label,
+    });
     expect(link).toBeVisible();
-    expect(link).toHaveAttribute('href', '/learn-more');
+    expect(link).toHaveAttribute('href', MOCK_CTA_PRIMARY_ACTION.link.href);
   });
 
-  it('renders every authored ctaButton in order', () => {
-    setup({ ctaButtons: [primaryButton, secondaryButton] });
+  it('renders every authored action in order', () => {
+    setup({ ctaButtons: [MOCK_CTA_PRIMARY_ACTION, MOCK_CTA_SECONDARY_ACTION] });
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(2);
-    expect(links[0]).toHaveTextContent('Learn more');
-    expect(links[1]).toHaveTextContent('See pricing');
+    expect(links[0]).toHaveTextContent(MOCK_CTA_PRIMARY_ACTION.link.label);
+    expect(links[1]).toHaveTextContent(MOCK_CTA_SECONDARY_ACTION.link.label);
   });
 
   it('renders the hero image cropped to a 16:9 (675) height, eagerly', () => {
@@ -104,10 +91,12 @@ describe(`<${HeroModuleShell.name}/>`, () => {
     expect(img).toHaveAttribute('fetchpriority', 'high');
   });
 
-  it('gives the hero image an empty alt on Banner, since it renders as a decorative backdrop there', () => {
+  it('renders the hero image as a decorative backdrop on Banner', () => {
     setup({ variant: HERO_VARIANT.BANNER, sanityImage });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByRole('presentation')).toHaveAttribute('alt', '');
+    const namedImage = screen.queryByRole('img');
+    const backdrop = screen.getByRole('presentation');
+    expect(namedImage).not.toBeInTheDocument();
+    expect(backdrop).toHaveAttribute('alt', '');
   });
 });

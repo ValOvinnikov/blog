@@ -1,36 +1,22 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import {
+  MOCK_DEPROVISION_AUDIT_ACTOR,
+  MOCK_DEPROVISION_ENV,
+  MOCK_PURGED_READER_DATA_COUNTS,
+} from '@blog/db/testing/deprovision-tenant/fixtures';
+import { faker } from '@faker-js/faker';
 
-import type { TDeprovisionEnv } from './env';
 import { recordReaderDataPurgeAuditEvent } from './record-reader-data-purge-audit-event';
 
 const { insertAuditEventMock } = vi.hoisted(() => ({
   insertAuditEventMock: vi.fn(),
 }));
 
+const MOCK_TENANT_ID = faker.string.uuid();
+
 vi.mock('@blog/db/queries/audit-events', () => ({
   insertAuditEvent: insertAuditEventMock,
 }));
-
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
-
-const counts = {
-  subscribers: 3,
-  bookmarks: 5,
-  membershipInvites: 1,
-  leads: 2,
-};
 
 beforeEach(() => {
   insertAuditEventMock.mockReset().mockResolvedValue({});
@@ -43,21 +29,21 @@ afterEach(() => {
 
 describe(recordReaderDataPurgeAuditEvent, () => {
   it('inserts a READER_DATA_PURGED/TENANT audit event with the per-table counts, attributed to the GitHub actor', async () => {
-    await recordReaderDataPurgeAuditEvent('tenant-1', env, counts);
+    await recordReaderDataPurgeAuditEvent(
+      MOCK_TENANT_ID,
+      MOCK_DEPROVISION_ENV,
+      MOCK_PURGED_READER_DATA_COUNTS,
+    );
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'github:octocat',
-      actorEmail: 'octocat@users.noreply.github.com',
+      ...MOCK_DEPROVISION_AUDIT_ACTOR,
       action: AUDIT_ACTION.READER_DATA_PURGED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TENANT_ID,
       details: {
         via: 'deprovision-tenant-workflow',
-        runId: 'run-42',
-        subscribers: 3,
-        bookmarks: 5,
-        membershipInvites: 1,
-        leads: 2,
+        runId: MOCK_DEPROVISION_ENV.githubRunId,
+        ...MOCK_PURGED_READER_DATA_COUNTS,
       },
     });
   });
@@ -66,7 +52,11 @@ describe(recordReaderDataPurgeAuditEvent, () => {
     insertAuditEventMock.mockRejectedValueOnce(new Error('db down'));
 
     await expect(
-      recordReaderDataPurgeAuditEvent('tenant-1', env, counts),
+      recordReaderDataPurgeAuditEvent(
+        MOCK_TENANT_ID,
+        MOCK_DEPROVISION_ENV,
+        MOCK_PURGED_READER_DATA_COUNTS,
+      ),
     ).resolves.toBeUndefined();
 
     expect(console.error).toHaveBeenCalled();
@@ -74,9 +64,9 @@ describe(recordReaderDataPurgeAuditEvent, () => {
 
   it('logs and skips the insert when GITHUB_ACTOR is unset', async () => {
     await recordReaderDataPurgeAuditEvent(
-      'tenant-1',
-      { ...env, githubActor: undefined },
-      counts,
+      MOCK_TENANT_ID,
+      { ...MOCK_DEPROVISION_ENV, githubActor: undefined },
+      MOCK_PURGED_READER_DATA_COUNTS,
     );
 
     expect(insertAuditEventMock).not.toHaveBeenCalled();

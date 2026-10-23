@@ -5,7 +5,7 @@ import {
   type TTenantDomain,
 } from '@blog/db/schema/tenant-domains';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 // Idempotent for the exact same (tenantId, domain) pair, since `domain` is
@@ -20,7 +20,7 @@ export async function addTenantDomain(
   domain: string,
 ): Promise<TResult<TTenantDomain, TErrorCode>> {
   if (!isValidDomain(domain)) {
-    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+    return errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
   }
 
   const db = getDb();
@@ -31,7 +31,7 @@ export async function addTenantDomain(
     .onConflictDoNothing()
     .returning();
 
-  if (inserted) return { ok: true, data: inserted };
+  if (inserted) return okResult(inserted);
 
   const [existing] = await db
     .select()
@@ -39,12 +39,12 @@ export async function addTenantDomain(
     .where(eq(tenantDomains.domain, domain));
 
   if (!existing) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
   if (existing.tenantId !== tenantId) {
-    return { ok: false, error: ERROR_CODE.DB_DUPLICATE_DOMAIN };
+    return errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN);
   }
 
-  return { ok: true, data: existing };
+  return okResult(existing);
 }

@@ -4,8 +4,12 @@ import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
+  MOCK_MISSING_TENANT_ID,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
+import {
   daysAfterLastActivity,
-  LAST_ACTIVITY_AT,
+  MOCK_LAST_ACTIVITY_AT,
 } from '@blog/db/testing/tenants/inactivity';
 
 import { touchTenantActivity } from './touch-tenant-activity';
@@ -17,56 +21,63 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 
 const TOUCHED_AT = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION);
-const EXPECTED_OK = 'expected ok:true';
 
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
 describe(touchTenantActivity, () => {
-  it('moves last activity forward and clears the warning and deletion-notice stamps', async () => {
+  it('moves last activity forward and clears the warning and deletion stamps', async () => {
     const tenant = await insertTestTenant(db(), {
       status: TENANT_STATUS.SUSPENDED,
-      lastActivityAt: LAST_ACTIVITY_AT,
-      inactivityWarnedAt: LAST_ACTIVITY_AT,
-      suspendedAt: LAST_ACTIVITY_AT,
-      deletionNotifiedAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+      inactivityWarnedAt: MOCK_LAST_ACTIVITY_AT,
+      suspendedAt: MOCK_LAST_ACTIVITY_AT,
+      deletionNotifiedAt: MOCK_LAST_ACTIVITY_AT,
     });
 
-    const result = await touchTenantActivity(tenant.id, TOUCHED_AT);
+    const {
+      lastActivityAt,
+      inactivityWarnedAt,
+      deletionNotifiedAt,
+      suspendedAt,
+    } = unwrapOk(await touchTenantActivity(tenant.id, TOUCHED_AT));
 
-    if (!result.ok) throw new Error(EXPECTED_OK);
-    expect(result.data.lastActivityAt).toEqual(TOUCHED_AT);
-    expect(result.data.inactivityWarnedAt).toBeNull();
-    expect(result.data.deletionNotifiedAt).toBeNull();
-    expect(result.data.suspendedAt).toEqual(LAST_ACTIVITY_AT);
+    expect(lastActivityAt).toEqual(TOUCHED_AT);
+    expect(inactivityWarnedAt).toBeNull();
+    expect(deletionNotifiedAt).toBeNull();
+    expect(suspendedAt).toEqual(MOCK_LAST_ACTIVITY_AT);
   });
 
   it('never moves last activity backwards', async () => {
     const tenant = await insertTestTenant(db(), { lastActivityAt: TOUCHED_AT });
 
-    const result = await touchTenantActivity(tenant.id, LAST_ACTIVITY_AT);
+    const { lastActivityAt } = unwrapOk(
+      await touchTenantActivity(tenant.id, MOCK_LAST_ACTIVITY_AT),
+    );
 
-    if (!result.ok) throw new Error(EXPECTED_OK);
-    expect(result.data.lastActivityAt).toEqual(TOUCHED_AT);
+    expect(lastActivityAt).toEqual(TOUCHED_AT);
   });
 
   it('leaves an archived tenant untouched', async () => {
     const tenant = await insertTestTenant(db(), {
       status: TENANT_STATUS.ARCHIVED,
-      deprovisionedAt: LAST_ACTIVITY_AT,
-      lastActivityAt: LAST_ACTIVITY_AT,
+      deprovisionedAt: MOCK_LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     const result = await touchTenantActivity(tenant.id, TOUCHED_AT);
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     const [row] = await db().select().from(schema.tenants);
-    expect(row?.lastActivityAt).toEqual(LAST_ACTIVITY_AT);
+    expect(row?.lastActivityAt).toEqual(MOCK_LAST_ACTIVITY_AT);
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
-    const result = await touchTenantActivity(crypto.randomUUID(), TOUCHED_AT);
+    const result = await touchTenantActivity(
+      MOCK_MISSING_TENANT_ID,
+      TOUCHED_AT,
+    );
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });

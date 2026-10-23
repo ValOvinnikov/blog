@@ -3,10 +3,10 @@ import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
-import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_ID,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterSection } from './newsletter-section';
@@ -33,7 +33,7 @@ const setup = customRenderServerAsync(
 describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: ACCOUNT_USER,
+      user: MOCK_ACCOUNT_USER,
     });
   });
 
@@ -42,23 +42,27 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
   it('renders nothing when no tenant resolves', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       tenantId: undefined,
     });
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
@@ -67,39 +71,50 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
   });
 
   it('shows the active subscription with an unsubscribe button', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'active',
-      subscriber: { email: ACCOUNT_USER.email },
+      subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();
 
+    const subscribedText = screen.getByText('Subscribed');
+    const userEmailText = screen.getByText(MOCK_ACCOUNT_USER.email);
+    const unsubscribeButton = screen.getByRole('button', {
+      name: 'Unsubscribe',
+    });
+
     expect(getSubscriptionStatusMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_ID,
-      ACCOUNT_USER.id,
+      MOCK_TENANT_ID,
+      MOCK_ACCOUNT_USER.id,
     );
-    expect(screen.getByText('Subscribed')).toBeVisible();
-    expect(screen.getByText(ACCOUNT_USER.email)).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
+    expect(subscribedText).toBeVisible();
+    expect(userEmailText).toBeVisible();
+    expect(unsubscribeButton).toBeVisible();
   });
 
   it('offers to resend the confirmation for a pending subscription', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'pending',
-      subscriber: { email: ACCOUNT_USER.email },
+      subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();
 
-    expect(screen.getByText('Pending confirmation')).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Resend confirmation' }),
-    ).toBeVisible();
+    const pendingConfirmationText = screen.getByText('Pending confirmation');
+    const resendConfirmationButton = screen.getByRole('button', {
+      name: 'Resend confirmation',
+    });
+
+    expect(pendingConfirmationText).toBeVisible();
+    expect(resendConfirmationButton).toBeVisible();
   });
 });

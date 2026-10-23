@@ -1,109 +1,85 @@
-import { TAXONOMY_KIND } from '@blog/config';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { TAXONOMY_KIND } from '@blog/config/constants';
+import {
+  MOCK_TOPIC_DESCRIPTION,
+  MOCK_TOPIC_ID,
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+} from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
-  makeRawTaxonomyEntry,
-  makeRawTaxonomyListModule,
+  MOCK_TAXONOMY_LIST_MODULE_ID,
+  mockRawTaxonomyEntry,
+  mockRawTaxonomyListModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_TAGS_CACHE_TAG,
+  MOCK_TOPICS_CACHE_TAG,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getTaxonomyList } from './loader';
+import { taxonomyListModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('getTaxonomyList', () => {
-  it('resolves topic entries from an authored taxonomy', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTaxonomyListModule({
+describe(getTaxonomyList, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(
+      mockRawTaxonomyListModule({
         taxonomy: TAXONOMY_KIND.TOPICS,
-        entries: [
-          makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Engineering' }),
-        ],
+        entries: [mockRawTaxonomyEntry()],
       }),
     );
+  });
 
-    const module = await getTaxonomyList('taxonomy-list-1', tenant);
+  it('resolves topic entries from an authored taxonomy', async () => {
+    const module = await getTaxonomyList(MOCK_TAXONOMY_LIST_MODULE_ID, tenant);
 
     expect(module.taxonomy).toBe(TAXONOMY_KIND.TOPICS);
     expect(module.entries).toEqual([
       {
-        id: 'topic-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: 'Engineering posts',
+        id: MOCK_TOPIC_ID,
+        title: MOCK_TOPIC_TITLE,
+        slug: MOCK_TOPIC_SLUG,
+        description: MOCK_TOPIC_DESCRIPTION,
         postCount: 0,
         latestPosts: [],
       },
     ]);
-  });
-
-  it('resolves tag entries from an authored taxonomy', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTaxonomyListModule({
-        taxonomy: TAXONOMY_KIND.TAGS,
-        entries: [makeRawTaxonomyEntry({ _id: 'tag-1', title: 'TypeScript' })],
-      }),
-    );
-
-    const module = await getTaxonomyList('taxonomy-list-1', tenant);
-
-    expect(module.taxonomy).toBe(TAXONOMY_KIND.TAGS);
-    expect(module.entries).toEqual([
-      {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'engineering',
-        description: 'Engineering posts',
-        postCount: 0,
-        latestPosts: [],
-      },
-    ]);
-  });
-
-  it('degrades to an empty module when no taxonomy is authored', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTaxonomyListModule({ taxonomy: null, entries: null }),
-    );
-
-    const module = await getTaxonomyList('taxonomy-list-1', tenant);
-
-    expect(module.taxonomy).toBeUndefined();
-    expect(module.entries).toEqual([]);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getTaxonomyList('missing', tenant)).rejects.toThrow();
+    await expect(getTaxonomyList(MOCK_MISSING_ID, tenant)).rejects.toThrow();
   });
 
   it('scopes the cache tags to the module id, both taxonomy kinds, and posts', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTaxonomyListModule({ taxonomy: TAXONOMY_KIND.TOPICS }),
-    );
+    await getTaxonomyList(MOCK_TAXONOMY_LIST_MODULE_ID, tenant);
 
-    await getTaxonomyList('taxonomy-list-1', tenant);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:taxonomyList',
-            't:tenant-a:module:taxonomy-list-1',
-            't:tenant-a:topics',
-            't:tenant-a:tags',
-            't:tenant-a:posts',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(taxonomyListModuleQuery, {
+      parameters: { id: MOCK_TAXONOMY_LIST_MODULE_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
+          mockCacheTag(`module:${MOCK_TAXONOMY_LIST_MODULE_ID}`),
+          MOCK_TOPICS_CACHE_TAG,
+          MOCK_TAGS_CACHE_TAG,
+          MOCK_POSTS_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

@@ -1,4 +1,10 @@
 import { q } from '@blog/service/sanity/query/query';
+import {
+  MOCK_TOPIC_DESCRIPTION,
+  MOCK_TOPIC_ID,
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+} from '@blog/service/testing/entities/fixtures';
 
 import { topicFragment } from './topic';
 
@@ -10,10 +16,10 @@ const topicDocQuery = q.star
 describe('topicFragment', () => {
   it('accepts a fully-projected topic (title and resolved slug present)', () => {
     const projected = {
-      _id: 'topic-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: 'Engineering posts',
+      _id: MOCK_TOPIC_ID,
+      title: MOCK_TOPIC_TITLE,
+      slug: MOCK_TOPIC_SLUG,
+      description: MOCK_TOPIC_DESCRIPTION,
     };
 
     expect(topicDocQuery.parse(projected)).toEqual(projected);

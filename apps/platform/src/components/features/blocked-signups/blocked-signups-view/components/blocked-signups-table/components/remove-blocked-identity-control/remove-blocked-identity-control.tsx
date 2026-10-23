@@ -1,6 +1,7 @@
 'use client';
 
 import { ACTION_OUTCOME, SIZE } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
@@ -21,15 +22,12 @@ export const RemoveBlockedIdentityControl = ({
 
   const remove = async () => {
     const result = await removeBlockedIdentityAction(id);
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) return { ok: true as const };
+    if (result.outcome === ACTION_OUTCOME.SUCCESS) return okResult();
 
     const isNotFound =
       result.outcome === ACTION_OUTCOME.REFUSED &&
       result.reason === SIGNUP_BLOCK_REFUSAL.ENTRY_NOT_FOUND;
-    return {
-      ok: false as const,
-      error: t(isNotFound ? 'alreadyRemoved' : 'removalFailed'),
-    };
+    return errorResult(t(isNotFound ? 'alreadyRemoved' : 'removalFailed'));
   };
 
   return (

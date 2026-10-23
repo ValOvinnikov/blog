@@ -1,13 +1,13 @@
 import { BRAND_VARIANT } from '@blog/config';
 import type { TContactFormModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-export const makeContactFormModule = (
+export const mockContactFormModule = (
   overrides: Partial<TContactFormModule> = {},
 ): TContactFormModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({
+  headingBlock: mockHeadingBlock({
     heading: faker.company.catchPhrase(),
     supportingText: faker.lorem.sentence(),
   }),

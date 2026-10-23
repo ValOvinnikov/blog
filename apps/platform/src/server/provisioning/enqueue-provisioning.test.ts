@@ -5,7 +5,7 @@ import {
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
 import { faker } from '@faker-js/faker';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -41,26 +41,28 @@ describe(enqueueProvisioning, () => {
     async (_label, key) => {
       envMock[key] = undefined;
 
-      const status = await enqueueProvisioning(TENANT_ID);
+      const status = await enqueueProvisioning(MOCK_TENANT_ID);
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledWith(
         'worker.enqueue_skipped',
-        expect.objectContaining({ tenantId: TENANT_ID }),
+        expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
       );
       expect(status).toBeNull();
     },
   );
 
   it('POSTs the tenant id to the provision route, signed so the worker accepts it', async () => {
-    await enqueueProvisioning(TENANT_ID);
+    await enqueueProvisioning(MOCK_TENANT_ID);
 
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
     const headers = init.headers as Record<string, string>;
 
     expect(url.toString()).toBe('https://worker-dev.example.com/api/provision');
     expect(init.method).toBe(HTTP_METHOD.POST);
-    expect(JSON.parse(init.body as string)).toEqual({ tenantId: TENANT_ID });
+    expect(JSON.parse(init.body as string)).toEqual({
+      tenantId: MOCK_TENANT_ID,
+    });
     expect(
       isValidEnqueueSignature({
         secret: SECRET,
@@ -80,17 +82,19 @@ describe(enqueueProvisioning, () => {
   ])("returns the worker's %i response status", async (responseStatus) => {
     fetchMock.mockResolvedValue(new Response(null, { status: responseStatus }));
 
-    await expect(enqueueProvisioning(TENANT_ID)).resolves.toBe(responseStatus);
+    await expect(enqueueProvisioning(MOCK_TENANT_ID)).resolves.toBe(
+      responseStatus,
+    );
   });
 
   it('logs and returns null when the request fails', async () => {
     const error = new Error('network down');
     fetchMock.mockRejectedValue(error);
 
-    const status = await enqueueProvisioning(TENANT_ID);
+    const status = await enqueueProvisioning(MOCK_TENANT_ID);
 
     expect(loggerErrorMock).toHaveBeenCalledWith('worker.enqueue_error', {
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       path: PROVISION_PATH,
       error,
     });

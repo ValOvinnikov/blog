@@ -1,3 +1,5 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import { errorResult } from '@blog/utils';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { notFound } from 'next/navigation';
 
@@ -14,12 +16,13 @@ describe(getHomeBreadcrumb.name, () => {
   });
 
   it('calls notFound() when the site settings fail to load', async () => {
-    vi.mocked(getSiteSettings).mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
+    vi.mocked(getSiteSettings).mockResolvedValueOnce(
+      errorResult(new Error('boom')),
+    );
 
-    await expect(getHomeBreadcrumb()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(getHomeBreadcrumb()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
     expect(notFound).toHaveBeenCalledTimes(1);
   });
 });

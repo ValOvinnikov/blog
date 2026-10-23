@@ -1,7 +1,11 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_POST_LIST_ID,
+  MOCK_TAXONOMY_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   testFeatureListModule,
   testHeadingWithoutHero,
@@ -103,7 +107,7 @@ const CTA_MODULE = { id: 'cta-1', type: 'module_cta' } as const;
 const setup = customRenderAsync(HomeModuleRenderer, {
   homePageId: HOME_PAGE_ID,
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
@@ -115,10 +119,10 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     await setup({ hero: { id: HERO_ID, type: 'module_heroStatement' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
-    const hero = screen.getByTestId(HERO_STATEMENT_TEST_ID);
+    const heroStatement = screen.getByTestId(HERO_STATEMENT_TEST_ID);
 
     expect(headings).toHaveLength(1);
-    expect(hero).toHaveTextContent(HERO_ID);
+    expect(heroStatement).toHaveTextContent(HERO_ID);
   });
 
   it('renders the resolved hero before the modules when the page has both', async () => {
@@ -140,9 +144,11 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
+    const stubHero = screen.queryByTestId('stub-hero');
 
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent(PAGE_HEADING);
+    expect(stubHero).not.toBeInTheDocument();
   });
 
   it('renders each module with the home page as its context', async () => {
@@ -159,7 +165,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'post-list-1', type: 'module_postList' },
+    unknownModule: { id: MOCK_POST_LIST_ID, type: 'module_postList' },
     description:
       'renders nothing and warns once for a module absent from the home page allow-list',
   });
@@ -172,7 +178,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
       { id: 'content-1', type: 'module_content' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-latest-1', type: 'module_postLatest' },
-      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
     ],
   });

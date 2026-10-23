@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterUnsubscribePage } from './newsletter-unsubscribe-page';
 
@@ -12,7 +12,7 @@ const setup = customRenderServerAsync(NewsletterUnsubscribePage, {});
 describe(`<${NewsletterUnsubscribePage.name}/>`, () => {
   beforeEach(async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.FR,
     });
     await setup();
@@ -33,7 +33,7 @@ describe(`<${NewsletterUnsubscribePage.name}/>`, () => {
     expect(homeLink).toHaveAttribute('href', '/');
   });
 
-  it('posts to the unsubscribe endpoint in the page language, with no token in the URL', () => {
+  it('posts to the page-language unsubscribe endpoint with no token in the URL', () => {
     const form = screen.getByTestId('newsletter-unsubscribe-form');
     const button = screen.getByRole('button', { name: 'Confirm unsubscribe' });
 

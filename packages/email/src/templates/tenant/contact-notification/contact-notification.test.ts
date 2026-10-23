@@ -1,75 +1,84 @@
-import { TENANT_EMAIL_BRAND as BRAND } from '@blog/email/testing/tenant-email-brand';
+import {
+  MOCK_ESCAPED_UNSAFE_MARKUP,
+  MOCK_JAVASCRIPT_URL,
+  MOCK_TENANT_NAME,
+  MOCK_UNSAFE_MARKUP,
+} from '@blog/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
 
 import {
   buildContactNotificationEmail,
   type TContactNotificationEmailInput,
 } from './contact-notification';
 
+const VISITOR_NAME = 'Ada Lovelace';
+const VISITOR_EMAIL = 'ada@example.com';
+const MESSAGE = 'Hello there';
+const UNSAFE_VISITOR_NAME = '<b>Mallory</b>';
+
 const INPUT: TContactNotificationEmailInput = {
-  siteName: 'Acme Blog',
-  visitorName: 'Ada Lovelace',
-  visitorEmail: 'ada@example.com',
-  message: 'Hello there',
+  siteName: MOCK_TENANT_NAME,
+  visitorName: VISITOR_NAME,
+  visitorEmail: VISITOR_EMAIL,
+  message: MESSAGE,
   pageUrl: 'https://acme.example/en/contact',
   leadsUrl: 'https://platform.example/en/dashboard/leads',
-  brand: BRAND,
+  brand: MOCK_TENANT_EMAIL_BRAND,
 };
 
 describe('buildContactNotificationEmail', () => {
-  it('names the visitor in the subject', () => {
-    const { subject } = buildContactNotificationEmail(INPUT);
+  describe('with the default input', () => {
+    let email: ReturnType<typeof buildContactNotificationEmail>;
 
-    expect(subject).toBe('New message from Ada Lovelace');
-  });
+    beforeEach(() => {
+      email = buildContactNotificationEmail(INPUT);
+    });
 
-  it('names the visitor, their email and the message in the body', () => {
-    const { html } = buildContactNotificationEmail(INPUT);
+    it('names the visitor in the subject', () => {
+      expect(email.subject).toBe('New message from Ada Lovelace');
+    });
 
-    expect(html).toContain('Ada Lovelace');
-    expect(html).toContain('ada@example.com');
-    expect(html).toContain('Hello there');
-  });
+    it('names the visitor, their email and the message in the body', () => {
+      expect(email.html).toContain(VISITOR_NAME);
+      expect(email.html).toContain(VISITOR_EMAIL);
+      expect(email.html).toContain(MESSAGE);
+    });
 
-  it('links the page the message was sent from', () => {
-    const { html } = buildContactNotificationEmail(INPUT);
+    it('links the page the message was sent from', () => {
+      expect(email.html).toContain('href="https://acme.example/en/contact"');
+    });
 
-    expect(html).toContain('href="https://acme.example/en/contact"');
-  });
+    it('links the Leads list', () => {
+      expect(email.html).toContain(
+        'href="https://platform.example/en/dashboard/leads"',
+      );
+    });
 
-  it('links the Leads list', () => {
-    const { html } = buildContactNotificationEmail(INPUT);
-
-    expect(html).toContain(
-      'href="https://platform.example/en/dashboard/leads"',
-    );
-  });
-
-  it('tells the owner that replying answers the visitor', () => {
-    const { html } = buildContactNotificationEmail(INPUT);
-
-    expect(html).toContain(
-      'Reply to this email to answer Ada Lovelace directly.',
-    );
+    it('tells the owner that replying answers the visitor', () => {
+      expect(email.html).toContain(
+        'Reply to this email to answer Ada Lovelace directly.',
+      );
+    });
   });
 
   it('renders HTML in the message as text', () => {
     const { html } = buildContactNotificationEmail({
       ...INPUT,
-      message: '<img src=x onerror=steal()>',
+      message: MOCK_UNSAFE_MARKUP,
     });
 
-    expect(html).not.toContain('<img src=x onerror=steal()>');
-    expect(html).toContain('&lt;img src=x onerror=steal()&gt;');
+    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
+    expect(html).toContain(MOCK_ESCAPED_UNSAFE_MARKUP);
   });
 
   it('renders HTML in the visitor name and email as text', () => {
     const { html } = buildContactNotificationEmail({
       ...INPUT,
-      visitorName: '<b>Mallory</b>',
+      visitorName: UNSAFE_VISITOR_NAME,
       visitorEmail: '"><script>x()</script>@example.com',
     });
 
-    expect(html).not.toContain('<b>Mallory</b>');
+    expect(html).not.toContain(UNSAFE_VISITOR_NAME);
     expect(html).not.toContain('<script>x()</script>');
     expect(html).toContain('&lt;b&gt;Mallory&lt;/b&gt;');
   });
@@ -86,9 +95,9 @@ describe('buildContactNotificationEmail', () => {
   it('does not link a page url with an unsafe scheme', () => {
     const { html } = buildContactNotificationEmail({
       ...INPUT,
-      pageUrl: 'javascript:alert(1)',
+      pageUrl: MOCK_JAVASCRIPT_URL,
     });
 
-    expect(html).not.toContain('href="javascript:alert(1)"');
+    expect(html).not.toContain(`href="${MOCK_JAVASCRIPT_URL}"`);
   });
 });

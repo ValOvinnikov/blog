@@ -1,3 +1,7 @@
+import { MOCK_AUTH_SECRET } from '@blog/auth/testing/session-fixtures';
+
+const FROM_ADDRESS = 'Sign in <sign-in@example.com>';
+
 export {};
 
 const ENV_KEYS = [
@@ -39,7 +43,7 @@ describe('env', () => {
 
   describe('with AUTH_SECRET set', () => {
     beforeEach(() => {
-      process.env['AUTH_SECRET'] = 'test-secret';
+      process.env['AUTH_SECRET'] = MOCK_AUTH_SECRET;
     });
 
     it('leaves every optional credential undefined when none are set', async () => {
@@ -49,12 +53,12 @@ describe('env', () => {
     });
 
     it('exposes configured credentials by their exact env var names', async () => {
-      process.env['MAGIC_LINK_FROM_ADDRESS'] = 'Sign in <sign-in@example.com>';
+      process.env['MAGIC_LINK_FROM_ADDRESS'] = FROM_ADDRESS;
 
       const { env } = await importEnv();
 
-      expect(env.AUTH_SECRET).toBe('test-secret');
-      expect(env.MAGIC_LINK_FROM_ADDRESS).toBe('Sign in <sign-in@example.com>');
+      expect(env.AUTH_SECRET).toBe(MOCK_AUTH_SECRET);
+      expect(env.MAGIC_LINK_FROM_ADDRESS).toBe(FROM_ADDRESS);
     });
   });
 
@@ -72,12 +76,11 @@ describe('env', () => {
     it('throws naming AUTH_SECRET when it is missing and validation is not skipped', async () => {
       await expect(importEnv()).rejects.toThrow();
 
-      expect(consoleError).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['AUTH_SECRET'] }),
-        ]),
+      const [, issues] = consoleError.mock.calls[0] ?? [];
+      const issuePaths = (issues as { path: string[] }[]).map(
+        ({ path }) => path,
       );
+      expect(issuePaths).toContainEqual([ENV_KEYS[0]]);
     });
   });
 

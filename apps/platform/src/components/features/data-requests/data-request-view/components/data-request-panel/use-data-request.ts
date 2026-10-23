@@ -92,7 +92,7 @@ export const useDataRequest = ({
     }
 
     erasedCount.current = result.erasedCount;
-    return okResult(undefined);
+    return okResult();
   };
 
   const finishErase = () => {

@@ -1,19 +1,25 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TTopicIndexPage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
   screen,
   within,
 } from '@web/testing/custom-render';
-import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
-import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  DEFAULT_TENANT_SANITY_CONTEXT,
-  DEFAULT_REQUEST_CONTEXT,
+  MOCK_CTA_HEADING,
+  MOCK_SECOND_CTA_HEADING,
+  mockCtaModuleData,
+} from '@web/testing/modules/cta/fixtures';
+import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
+import {
+  MOCK_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
@@ -39,21 +45,24 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.topicIndex.v1.getIndexPage);
 
 const SUPPORTING_TEXT = 'Browse every post by topic.';
-const CTA_HEADING = 'Join the list';
-const SECOND_CTA_HEADING = 'Write for us';
 const HERO_HEADING = 'Every topic we write about';
 
 const topicIndexPage: TTopicIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
-  headingBlock: makeHeadingBlock({
+  headingBlock: mockHeadingBlock({
     heading: 'Topics',
     supportingText: SUPPORTING_TEXT,
   }),
   hero: undefined,
   modules: [],
-  seo: makeSeo(),
+  seo: mockSeo(),
   translations: [LOCALE_ISO_CODES.EN],
 };
+
+const resolveIndexPageWith = (overrides: Partial<TTopicIndexPage>) =>
+  getIndexPageMock.mockResolvedValueOnce(
+    okResult({ ...topicIndexPage, ...overrides }),
+  );
 
 const setup = customRenderServerAsync(TopicIndexPage, {});
 
@@ -63,18 +72,19 @@ describe(`<${TopicIndexPage.name}/>`, () => {
       await setup();
     });
 
-    it('fetches the index page with the request context Sanity context', () => {
-      expect(getIndexPageMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
-      );
+    it('fetches the index page with the tenant context', () => {
+      expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
     });
 
     it('renders the heading and supporting text inside main', () => {
       const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', { level: 1, name: 'Topics' }),
-      ).toBeVisible();
-      expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
+      const heading = within(main).getByRole('heading', {
+        level: 1,
+        name: 'Topics',
+      });
+      const supportingText = within(main).getByText(SUPPORTING_TEXT);
+      expect(heading).toBeVisible();
+      expect(supportingText).toBeVisible();
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     });
 
@@ -82,109 +92,113 @@ describe(`<${TopicIndexPage.name}/>`, () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
-      expect(within(breadcrumbs).getByText('Topics')).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      const homeLink = within(breadcrumbs).getByRole('link', {
+        name: 'Northwind Journal',
+      });
+      const currentCrumb = within(breadcrumbs).getByText('Topics');
+      const main = screen.getByRole('main');
+      expect(homeLink).toBeVisible();
+      expect(currentCrumb).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
     });
   });
 
   beforeEach(() => {
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getIndexPageMock.mockResolvedValue({ ok: true, data: topicIndexPage });
-    vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) => ({
-      ok: true,
-      data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({
-          heading: id === 'cta-1' ? CTA_HEADING : SECOND_CTA_HEADING,
+    vi.mocked(getRequestContext).mockReset();
+    getIndexPageMock.mockResolvedValue(okResult(topicIndexPage));
+    vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) =>
+      okResult(
+        mockCtaModuleData({
+          headingBlock: mockHeadingBlock({
+            heading:
+              id === 'cta-1' ? MOCK_CTA_HEADING : MOCK_SECOND_CTA_HEADING,
+          }),
         }),
-      }),
-    }));
-  });
-
-  it('logs and calls notFound() when the fetch fails', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).toHaveBeenCalledWith(
-      'topic_index_page.fetch_failed',
-      expect.anything(),
+      ),
     );
   });
 
-  it('calls notFound() without logging when the index page does not exist', async () => {
-    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getIndexPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith('topic_index_page.fetch_failed', {
+      error: MOCK_ERROR,
+    });
   });
 
-  it('redirects to / when this language has no topic index page of its own', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.NL,
-      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+  describe('when there is no index page', () => {
+    beforeEach(() => {
+      getIndexPageMock.mockResolvedValueOnce(okResult());
     });
-    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+    it('calls notFound() without logging when there is no index page', async () => {
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+
+    it('redirects to / when this language has no topic index page', async () => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...MOCK_REQUEST_CONTEXT,
+        locale: LOCALE_ISO_CODES.NL,
+        liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+      });
+
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+      );
+
+      expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    });
   });
 
   it('renders the authored modules inside main in order', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        ...topicIndexPage,
-        modules: [
-          { id: 'cta-1', type: 'module_cta' },
-          { id: 'cta-2', type: 'module_cta' },
-        ],
-      },
+    resolveIndexPageWith({
+      modules: [
+        { id: 'cta-1', type: 'module_cta' },
+        { id: 'cta-2', type: 'module_cta' },
+      ],
     });
 
     await setup();
 
     const main = screen.getByRole('main');
-    expect(within(main).getAllByRole('region')).toEqual([
-      within(main).getByRole('region', { name: CTA_HEADING }),
-      within(main).getByRole('region', { name: SECOND_CTA_HEADING }),
-    ]);
+    const regions = within(main).getAllByRole('region');
+    const ctaRegion = within(main).getByRole('region', {
+      name: MOCK_CTA_HEADING,
+    });
+    const secondCtaRegion = within(main).getByRole('region', {
+      name: MOCK_SECOND_CTA_HEADING,
+    });
+    expect(regions).toEqual([ctaRegion, secondCtaRegion]);
   });
 
   it('renders the hero in place of the heading when one is set', async () => {
-    getIndexPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        ...topicIndexPage,
-        hero: { id: 'hero-1', type: 'module_heroBlog' },
-      },
+    resolveIndexPageWith({
+      hero: { id: 'hero-1', type: 'module_heroBlog' },
     });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
-      ok: true,
-      data: makeHeroBlogData({ heading: HERO_HEADING }),
-    });
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
+      okResult(mockHeroBlogData({ heading: HERO_HEADING })),
+    );
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: HERO_HEADING,
-      }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('heading', { level: 1, name: 'Topics' }),
-    ).not.toBeInTheDocument();
+    const heroHeading = screen.getByRole('heading', {
+      level: 1,
+      name: HERO_HEADING,
+    });
+    const pageHeading = screen.queryByRole('heading', {
+      level: 1,
+      name: 'Topics',
+    });
+    expect(heroHeading).toBeVisible();
+    expect(pageHeading).not.toBeInTheDocument();
   });
 });

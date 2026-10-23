@@ -1,66 +1,53 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeStatItem } from '@web/testing/modules/stats/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_STAT_ITEMS,
+  mockStatItem,
+} from '@web/testing/modules/stats/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { StatsModuleView } from './stats-module-view';
 
+const FIRST_STAT_DESCRIPTION = 'up 38% year over year';
+const FOOTNOTE = 'Figures reflect the trailing 12 months.';
+const STAT_DESCRIPTIONS = [
+  FIRST_STAT_DESCRIPTION,
+  'measured at the edge',
+  'from 12,000 reviews',
+  'across 30 regions',
+];
+
 const stats = [
-  makeStatItem({
-    id: 'stat-1',
-    value: '2.4M',
-    label: 'Monthly readers',
-    description: 'up 38% year over year',
-  }),
-  makeStatItem({
-    id: 'stat-2',
-    value: '<50ms',
-    label: 'Median TTFB',
-  }),
-  makeStatItem({
+  mockStatItem({ description: FIRST_STAT_DESCRIPTION }),
+  ...MOCK_STAT_ITEMS.slice(1),
+  mockStatItem({
     id: 'stat-3',
     value: '4.9/5',
     label: 'Average rating',
   }),
-  makeStatItem({
+  mockStatItem({
     id: 'stat-4',
     value: '24/7',
     label: 'Global coverage',
   }),
 ];
 
-const statsWithDescriptions = [
-  makeStatItem({
-    id: 'stat-1',
-    value: '2.4M',
-    label: 'Monthly readers',
-    description: 'up 38% year over year',
-  }),
-  makeStatItem({
-    id: 'stat-2',
-    value: '<50ms',
-    label: 'Median TTFB',
-    description: 'measured at the edge',
-  }),
-  makeStatItem({
-    id: 'stat-3',
-    value: '4.9/5',
-    label: 'Average rating',
-    description: 'from 12,000 reviews',
-  }),
-  makeStatItem({
-    id: 'stat-4',
-    value: '24/7',
-    label: 'Global coverage',
-    description: 'across 30 regions',
-  }),
-];
+const statsWithDescriptions = stats.map((stat, index) => ({
+  ...stat,
+  description: STAT_DESCRIPTIONS[index],
+}));
+
+const fasterIndexingStat = mockStatItem({
+  id: 'stat-5',
+  value: '3×',
+  label: 'Faster indexing',
+});
 
 const eightCharacterStats = [
-  makeStatItem({ id: 'stat-1', value: '1,234.5K', label: 'Page views' }),
-  makeStatItem({ id: 'stat-2', value: '$12,500+', label: 'Raised' }),
-  makeStatItem({ id: 'stat-3', value: '99.9999%', label: 'Uptime' }),
+  mockStatItem({ id: 'stat-1', value: '1,234.5K', label: 'Page views' }),
+  mockStatItem({ id: 'stat-2', value: '$12,500+', label: 'Raised' }),
+  mockStatItem({ id: 'stat-3', value: '99.9999%', label: 'Uptime' }),
 ];
 
 const meta = {
@@ -80,7 +67,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'By the numbers' }),
+    headingBlock: mockHeadingBlock({ heading: 'By the numbers' }),
     stats: stats.slice(0, 2),
     footnote: undefined,
     ctaButtons: [],
@@ -102,10 +89,7 @@ export const FourFigures: TStory = {
 
 export const FiveFigures: TStory = {
   args: {
-    stats: [
-      ...stats,
-      makeStatItem({ id: 'stat-5', value: '3×', label: 'Faster indexing' }),
-    ],
+    stats: [...stats, fasterIndexingStat],
   },
 };
 
@@ -113,8 +97,8 @@ export const SixFigures: TStory = {
   args: {
     stats: [
       ...stats,
-      makeStatItem({ id: 'stat-5', value: '3×', label: 'Faster indexing' }),
-      makeStatItem({ id: 'stat-6', value: 'Top 10', label: 'Industry rank' }),
+      fasterIndexingStat,
+      mockStatItem({ id: 'stat-6', value: 'Top 10', label: 'Industry rank' }),
     ],
   },
 };
@@ -122,14 +106,14 @@ export const SixFigures: TStory = {
 export const WithFootnote: TStory = {
   args: {
     stats,
-    footnote: 'Figures reflect the trailing 12 months.',
+    footnote: FOOTNOTE,
   },
 };
 
 export const WithActions: TStory = {
   args: {
     stats,
-    ctaButtons: ctaActionsDemo,
+    ctaButtons: MOCK_CTA_ACTIONS,
   },
 };
 
@@ -143,7 +127,7 @@ export const CenterAligned: TStory = {
 export const LeftAlignedWithFootnote: TStory = {
   args: {
     stats,
-    footnote: 'Figures reflect the trailing 12 months.',
+    footnote: FOOTNOTE,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
   },
 };
@@ -151,7 +135,7 @@ export const LeftAlignedWithFootnote: TStory = {
 export const CenterAlignedWithFootnote: TStory = {
   args: {
     stats,
-    footnote: 'Figures reflect the trailing 12 months.',
+    footnote: FOOTNOTE,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
 };

@@ -1,8 +1,30 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
+import {
+  BLOG_PAGINATION_LOOKUP_FAILED_EVENT,
+  DOCUMENT_NOT_FOUND_REASON,
+  FETCH_FAILED_REASON,
+  POST_LOOKUP_FAILED_EVENT,
+  TAG_PAGINATION_LOOKUP_FAILED_EVENT,
+  TAG_PARAMS_LOOKUP_FAILED_EVENT,
+  TOPIC_PAGINATION_LOOKUP_FAILED_EVENT,
+  TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
+  UNSUPPORTED_TYPE_REASON,
+} from '@web/constants/revalidate';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { mockTag } from '@web/testing/shared/tag/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { mockTopic } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import {
   deriveRevalidatePaths,
   isDerivableRevalidateType,
+  POST_TYPE,
 } from './derive-revalidate-paths';
 
 const {
@@ -61,19 +83,26 @@ vi.mock('@blog/service', () => ({
 
 const loggerErrorMock = vi.mocked(logger.error);
 
-const tenant = {
-  projectId: 'project-1',
-  dataset: 'production',
-  token: 'token',
+const post = mockPostCard();
+const tag = mockTag();
+const topic = mockTopic();
+const UNRELATED_TAG_SLUG = 'unrelated-tag';
+const LOCALE_ROOT = `/${MOCK_TENANT_ID}/${LOCALE_ISO_CODES.EN}`;
+
+const postInput = {
+  type: POST_TYPE,
+  id: post.id,
+  tenantId: MOCK_TENANT_ID,
+  tenant: MOCK_TENANT_SANITY_CONTEXT,
 };
 
-const okPost = { id: 'post-1', slug: 'my-post' };
-
-describe('isDerivableRevalidateType', () => {
-  it('is true only for page_post', () => {
-    expect(isDerivableRevalidateType('page_post')).toBe(true);
-    expect(isDerivableRevalidateType('person')).toBe(false);
-    expect(isDerivableRevalidateType('page_home')).toBe(false);
+describe(isDerivableRevalidateType, () => {
+  it.each([
+    [POST_TYPE, true],
+    ['person', false],
+    ['page_home', false],
+  ])('reports %s as derivable: %s', (type, expected) => {
+    expect(isDerivableRevalidateType(type)).toBe(expected);
   });
 });
 
@@ -86,188 +115,96 @@ describe(deriveRevalidatePaths, () => {
     getTopicParamsMock.mockReset();
     getTopicPaginationParamsMock.mockReset();
     loggerErrorMock.mockReset();
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPostsByIdsMock.mockResolvedValue(okResult([post]));
+    getIndexPageParamsMock.mockResolvedValue(okResult([]));
+    getTagParamsMock.mockResolvedValue(okResult([]));
+    getTagPaginationParamsMock.mockResolvedValue(okResult([]));
+    getTopicParamsMock.mockResolvedValue(okResult([]));
+    getTopicPaginationParamsMock.mockResolvedValue(okResult([]));
   });
 
   it('falls back with unsupported_type for an unknown type, skipping the service', async () => {
     const result = await deriveRevalidatePaths({
+      ...postInput,
       type: 'person',
-      id: 'author-1',
-      tenantId: 'tenant-1',
-      tenant,
     });
 
-    expect(result).toEqual({ ok: false, reason: 'unsupported_type' });
+    expect(result).toEqual(errorResult(UNSUPPORTED_TYPE_REASON));
     expect(getPostsByIdsMock).not.toHaveBeenCalled();
   });
 
-  it('resolves every path for a published post, including its tag and topic pages', async () => {
-    getTagParamsMock.mockResolvedValue({
-      ok: true,
-      data: [{ slug: 'typescript' }, { slug: 'unrelated-tag' }],
-    });
-    getTopicParamsMock.mockResolvedValue({
-      ok: true,
-      data: [{ slug: 'engineering' }],
-    });
+  it('resolves every path a published post affects, tag and topic pages included', async () => {
+    getTagParamsMock.mockResolvedValue(
+      okResult([{ slug: tag.slug }, { slug: UNRELATED_TAG_SLUG }]),
+    );
+    getTopicParamsMock.mockResolvedValue(okResult([{ slug: topic.slug }]));
 
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
+    const result = await deriveRevalidatePaths(postInput);
 
-    expect(result).toEqual({
-      ok: true,
-      paths: expect.arrayContaining([
-        '/tenant-1/EN',
-        '/tenant-1/EN/blog',
-        '/tenant-1/EN/blog/my-post',
-        '/tenant-1/EN/tags/typescript',
-        '/tenant-1/EN/tags/unrelated-tag',
-        '/tenant-1/EN/topics/engineering',
+    expect(result).toEqual(
+      okResult([
+        LOCALE_ROOT,
+        `${LOCALE_ROOT}/blog`,
+        `${LOCALE_ROOT}/blog/${post.slug}`,
+        `${LOCALE_ROOT}/tags/${tag.slug}`,
+        `${LOCALE_ROOT}/tags/${UNRELATED_TAG_SLUG}`,
+        `${LOCALE_ROOT}/topics/${topic.slug}`,
       ]),
-    });
+    );
   });
 
-  it('falls back with document_not_found when the id matches no post (e.g. a delete)', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
+  it('falls back with document_not_found when the id matches no post', async () => {
+    getPostsByIdsMock.mockResolvedValue(okResult([]));
 
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
+    const result = await deriveRevalidatePaths(postInput);
 
-    expect(result).toEqual({ ok: false, reason: 'document_not_found' });
+    expect(result).toEqual(errorResult(DOCUMENT_NOT_FOUND_REASON));
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('falls back with fetch_failed and logs when the post lookup fails', async () => {
-    getPostsByIdsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+  it.each([
+    {
+      lookup: 'post by id',
+      mock: getPostsByIdsMock,
+      event: POST_LOOKUP_FAILED_EVENT,
+    },
+    {
+      lookup: 'blog pagination',
+      mock: getIndexPageParamsMock,
+      event: BLOG_PAGINATION_LOOKUP_FAILED_EVENT,
+    },
+    {
+      lookup: 'tag params',
+      mock: getTagParamsMock,
+      event: TAG_PARAMS_LOOKUP_FAILED_EVENT,
+    },
+    {
+      lookup: 'tag pagination',
+      mock: getTagPaginationParamsMock,
+      event: TAG_PAGINATION_LOOKUP_FAILED_EVENT,
+    },
+    {
+      lookup: 'topic params',
+      mock: getTopicParamsMock,
+      event: TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
+    },
+    {
+      lookup: 'topic pagination',
+      mock: getTopicPaginationParamsMock,
+      event: TOPIC_PAGINATION_LOOKUP_FAILED_EVENT,
+    },
+  ])(
+    'falls back with fetch_failed and logs when the $lookup lookup fails',
+    async ({ mock, event }) => {
+      mock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
+      const result = await deriveRevalidatePaths(postInput);
 
-    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.post_lookup_failed',
-      expect.objectContaining({ id: 'post-1' }),
-    );
-  });
-
-  it('falls back with fetch_failed and logs when the blog pagination lookup fails', async () => {
-    getIndexPageParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
-
-    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.blog_pagination_lookup_failed',
-      expect.objectContaining({ id: 'post-1' }),
-    );
-  });
-
-  it('falls back with fetch_failed and logs when the tag params lookup fails', async () => {
-    getTagParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
-
-    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.tag_params_lookup_failed',
-      expect.objectContaining({ id: 'post-1' }),
-    );
-  });
-
-  it('falls back with fetch_failed and logs when the tag pagination lookup fails', async () => {
-    getTagPaginationParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
-
-    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.tag_pagination_lookup_failed',
-      expect.objectContaining({ id: 'post-1' }),
-    );
-  });
-
-  it('falls back with fetch_failed and logs when the topic params lookup fails', async () => {
-    getTopicParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
-
-    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.topic_params_lookup_failed',
-      expect.objectContaining({ id: 'post-1' }),
-    );
-  });
-
-  it('falls back with fetch_failed and logs when the topic pagination lookup fails', async () => {
-    getTopicPaginationParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const result = await deriveRevalidatePaths({
-      type: 'page_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
-
-    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.topic_pagination_lookup_failed',
-      expect.objectContaining({ id: 'post-1' }),
-    );
-  });
+      expect(result).toEqual(errorResult(FETCH_FAILED_REASON));
+      expect(loggerErrorMock).toHaveBeenCalledWith(event, {
+        id: post.id,
+        error: MOCK_ERROR,
+      });
+    },
+  );
 });

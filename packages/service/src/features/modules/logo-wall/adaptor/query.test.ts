@@ -1,98 +1,90 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
-  makeRawLogoItem,
-  makeRawLogoWallModule,
+  BRAND_VARIANT,
+  DISPLAY_MODE,
+  LOCALE_ISO_CODES,
+} from '@blog/config/constants';
+import {
+  MOCK_LOGO_WALL_MODULE_ID,
+  mockRawLogoItem,
+  mockRawLogoWallModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  MOCK_IMAGE_ASSET_DOCUMENT,
+  MOCK_IMAGE_ASSET_DOCUMENT_ID,
+  mockLocalizedHeadingBlock,
+} from '@blog/service/testing/shared/localized';
 
 import { logoWallModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
+const ENGLISH_HEADING = 'Trusted by';
+const DUTCH_HEADING = 'Vertrouwd door';
+
 const logoWallDocument = {
-  _id: 'logo-wall-1',
+  _id: MOCK_LOGO_WALL_MODULE_ID,
   _type: 'module_logoWall',
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({ [EN]: 'Trusted by', [NL]: 'Vertrouwd door' }),
-  },
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockLocalizedHeadingBlock({
+    [EN]: ENGLISH_HEADING,
+    [NL]: DUTCH_HEADING,
+  }),
   logos: [
     {
       _key: 'logo-1',
       _type: 'logoItem',
       name: 'Acme',
-      image: { _type: 'image', asset: { _type: 'reference', _ref: 'image-1' } },
+      image: {
+        _type: 'image',
+        asset: mockReference(MOCK_IMAGE_ASSET_DOCUMENT_ID),
+      },
     },
   ],
 };
 
-const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
-
 async function runLogoWall(locale: string) {
   const raw = await evaluateGroqExpression(
     logoWallModuleQuery.query,
-    [logoWallDocument, imageAsset],
+    [logoWallDocument, MOCK_IMAGE_ASSET_DOCUMENT],
     undefined,
-    { id: 'logo-wall-1', locale, defaultLocale: EN },
+    { id: MOCK_LOGO_WALL_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return logoWallModuleQuery.parse(raw);
 }
 
 describe('logoWallModuleQuery', () => {
-  it('filters to module_logoWall documents by id', () => {
-    expect(logoWallModuleQuery.query).toContain('_type == "module_logoWall"');
-    expect(logoWallModuleQuery.query).toContain('_id == $id');
-  });
-
-  it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawLogoWallModule(), headingBlock: null };
-
-    expect(() => logoWallModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a module with no logos', () => {
-    const raw = { ...makeRawLogoWallModule(), logos: null };
-
-    expect(() => logoWallModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a logo with no image', () => {
-    const raw = {
-      ...makeRawLogoWallModule(),
-      logos: [{ ...makeRawLogoItem(), image: null }],
-    };
-
-    expect(() => logoWallModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a logo with no name', () => {
-    const raw = {
-      ...makeRawLogoWallModule(),
-      logos: [{ ...makeRawLogoItem(), name: null }],
-    };
+  it.each([
+    ['a module with no headingBlock', { headingBlock: null }],
+    ['a module with no logos', { logos: null }],
+    [
+      'a logo with no image',
+      { logos: [{ ...mockRawLogoItem(), image: null }] },
+    ],
+    ['a logo with no name', { logos: [{ ...mockRawLogoItem(), name: null }] }],
+  ])('rejects %s', (_, overrides) => {
+    const raw = { ...mockRawLogoWallModule(), ...overrides };
 
     expect(() => logoWallModuleQuery.parse(raw)).toThrow();
   });
 
   it('parses a logo with no link', () => {
     const raw = {
-      ...makeRawLogoWallModule(),
-      logos: [{ ...makeRawLogoItem(), link: null }],
+      ...mockRawLogoWallModule(),
+      logos: [{ ...mockRawLogoItem(), link: null }],
     };
 
-    expect(() => logoWallModuleQuery.parse(raw)).not.toThrow();
     expect(logoWallModuleQuery.parse(raw).logos?.[0]?.link).toBeNull();
   });
 
   it('parses a logo whose dark-background image has no asset', () => {
     const raw = {
-      ...makeRawLogoWallModule(),
+      ...mockRawLogoWallModule(),
       logos: [
         {
-          ...makeRawLogoItem(),
+          ...mockRawLogoItem(),
           imageDark: { asset: null, hotspot: null, crop: null },
         },
       ],
@@ -101,22 +93,22 @@ describe('logoWallModuleQuery', () => {
     expect(() => logoWallModuleQuery.parse(raw)).not.toThrow();
   });
 
-  it('coalesces displayMode to GRID for documents authored before the field existed', () => {
-    expect(logoWallModuleQuery.query).toContain(
-      'coalesce(displayMode, "GRID")',
-    );
+  it('defaults displayMode to GRID for a document authored without it', async () => {
+    const { displayMode } = await runLogoWall(EN);
+
+    expect(displayMode).toBe(DISPLAY_MODE.GRID);
   });
 
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runLogoWall(NL);
 
-    expect(headingBlock.heading).toBe('Vertrouwd door');
+    expect(headingBlock.heading).toBe(DUTCH_HEADING);
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runLogoWall(FR);
 
-    expect(headingBlock.heading).toBe('Trusted by');
+    expect(headingBlock.heading).toBe(ENGLISH_HEADING);
   });
 
   it('reads a logo name the same in every language', async () => {

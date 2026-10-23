@@ -1,6 +1,11 @@
-import type { ISanityImage } from '@blog/config';
-import { type TSeoResolved, urlForSanityImage } from '@blog/service';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { routes } from '@blog/config';
+import { MOCK_EN_POST_SLUG } from '@web/testing/shared/post/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
+import {
+  MOCK_OG_IMAGE,
+  MOCK_OG_IMAGE_URL,
+} from '@web/testing/shared/seo/og-image-fixtures';
+import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 import type { Metadata } from 'next';
 import {
   resolveOpenGraph,
@@ -9,34 +14,30 @@ import {
 
 import { toMetadata } from './to-metadata';
 
+const TITLE = 'The Blog';
+const DESCRIPTION = 'All the posts.';
+const OG_TITLE = 'The Blog OG';
+const OG_DESCRIPTION = 'All the posts OG.';
+const POST_PATH = routes.post(MOCK_EN_POST_SLUG);
+const BLOG_PATH = routes.blogIndex();
+const DEFAULT_SEO_TITLE = 'Example Title';
+const PUBLISHED_AT = '2026-01-15T00:00:00Z';
+const AUTHOR_NAME = 'Jane Doe';
+
 type TOpenGraphWithType = { type?: string };
 type TTwitterWithCard = { card?: string };
 
 vi.mock('@web/server/request-context/request-context');
 
-const ogImage: ISanityImage = {
-  assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-800x600-jpg',
-  alt: 'The blog OG image',
-  hotspot: undefined,
-  crop: undefined,
-  lqip: undefined,
-  dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
-};
+const seo = mockSeo({
+  title: TITLE,
+  description: DESCRIPTION,
+  ogTitle: OG_TITLE,
+  ogDescription: OG_DESCRIPTION,
+  ogImage: MOCK_OG_IMAGE,
+});
 
-const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
-  ogImage,
-  DEFAULT_TENANT_SANITY_CONTEXT,
-);
-
-const seo: TSeoResolved = {
-  title: 'The Blog',
-  description: 'All the posts.',
-  ogTitle: 'The Blog OG',
-  ogDescription: 'All the posts OG.',
-  ogImage,
-};
-
-describe('toMetadata', () => {
+describe(toMetadata, () => {
   it('maps title as an absolute title object when titleAbsolute is true', async () => {
     const metadata = await toMetadata(seo, {
       canonical: '/',
@@ -44,12 +45,12 @@ describe('toMetadata', () => {
       titleAbsolute: true,
     });
 
-    expect(metadata.title).toEqual({ absolute: 'The Blog' });
+    expect(metadata.title).toEqual({ absolute: TITLE });
   });
 
   it('maps ogType article', async () => {
     const metadata = await toMetadata(seo, {
-      canonical: '/blog/my-post',
+      canonical: POST_PATH,
       ogType: 'article',
     });
 
@@ -72,10 +73,10 @@ describe('toMetadata', () => {
     expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe('summary');
   });
 
-  it('omits description, openGraph.title/description, and twitter.title/description when the source fields are absent', async () => {
+  it('omits the description and OG and twitter title/description when absent', async () => {
     const metadata = await toMetadata(
       {
-        title: 'Example Title',
+        title: DEFAULT_SEO_TITLE,
         description: undefined,
         ogTitle: undefined,
         ogDescription: undefined,
@@ -84,7 +85,7 @@ describe('toMetadata', () => {
       { canonical: '/', ogType: 'website' },
     );
 
-    expect(metadata.title).toBe('Example Title');
+    expect(metadata.title).toBe(DEFAULT_SEO_TITLE);
     expect(metadata.description).toBeUndefined();
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.openGraph?.description).toBeUndefined();
@@ -94,33 +95,32 @@ describe('toMetadata', () => {
 
   it('adds openGraph.publishedTime and authors for article type when provided', async () => {
     const metadata = await toMetadata(seo, {
-      canonical: '/blog/my-post',
+      canonical: POST_PATH,
       ogType: 'article',
       article: {
-        publishedTime: '2026-01-15T00:00:00Z',
-        authors: ['Jane Doe'],
+        publishedTime: PUBLISHED_AT,
+        authors: [AUTHOR_NAME],
       },
     });
 
     expect(
       (metadata.openGraph as { publishedTime?: string })?.publishedTime,
-    ).toBe('2026-01-15T00:00:00Z');
+    ).toBe(PUBLISHED_AT);
     expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
-      'Jane Doe',
+      AUTHOR_NAME,
     ]);
   });
 
   it('adds alternates.types["application/rss+xml"] when feedUrl is provided', async () => {
     const metadata = await toMetadata(seo, {
-      canonical: '/blog',
+      canonical: BLOG_PATH,
       ogType: 'website',
-      feedUrl: '/rss.xml',
+      feedUrl: routes.rssFeed(),
     });
 
     expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/rss.xml',
+      'application/rss+xml': routes.rssFeed(),
     });
-    expect(metadata.alternates?.canonical).toBe('/blog');
   });
 
   describe('for a website page at /blog', () => {
@@ -128,38 +128,36 @@ describe('toMetadata', () => {
 
     beforeEach(async () => {
       metadata = await toMetadata(seo, {
-        canonical: '/blog',
+        canonical: BLOG_PATH,
         ogType: 'website',
       });
     });
 
     it('maps canonical, description, and ogType', async () => {
-      expect(metadata.alternates?.canonical).toBe('/blog');
-      expect(metadata.description).toBe('All the posts.');
+      expect(metadata.alternates?.canonical).toBe(BLOG_PATH);
+      expect(metadata.description).toBe(DESCRIPTION);
       expect((metadata.openGraph as TOpenGraphWithType | null)?.type).toBe(
         'website',
       );
     });
 
     it('maps title as a plain string when titleAbsolute is not set', async () => {
-      expect(metadata.title).toBe('The Blog');
+      expect(metadata.title).toBe(TITLE);
     });
 
     it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', async () => {
-      expect(metadata.openGraph?.title).toBe('The Blog OG');
-      expect(metadata.openGraph?.description).toBe('All the posts OG.');
-      expect(metadata.openGraph?.images).toEqual([
-        { url: EXPECTED_OG_IMAGE_URL },
-      ]);
+      expect(metadata.openGraph?.title).toBe(OG_TITLE);
+      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
+      expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
     });
 
     it('maps twitter card, title, description, and images', async () => {
       expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe(
         'summary_large_image',
       );
-      expect(metadata.twitter?.title).toBe('The Blog OG');
-      expect(metadata.twitter?.description).toBe('All the posts OG.');
-      expect(metadata.twitter?.images).toEqual([EXPECTED_OG_IMAGE_URL]);
+      expect(metadata.twitter?.title).toBe(OG_TITLE);
+      expect(metadata.twitter?.description).toBe(OG_DESCRIPTION);
+      expect(metadata.twitter?.images).toEqual([MOCK_OG_IMAGE_URL]);
     });
 
     it('omits openGraph.publishedTime and authors when article option is not passed', async () => {
@@ -178,7 +176,7 @@ describe('toMetadata', () => {
 });
 
 describe('toMetadata output resolved by Next itself', () => {
-  const metadataBase = new URL('https://example.com');
+  const metadataBase = new URL(MOCK_TENANT_BASE_URL);
   const metadataContext = {
     trailingSlash: false,
     isStaticMetadataRouteFile: false,
@@ -197,7 +195,7 @@ describe('toMetadata output resolved by Next itself', () => {
       );
     });
 
-    it('resolves openGraph.images to undefined, never an injected default, when ogImage is absent', async () => {
+    it('resolves openGraph.images to undefined, never an injected default', async () => {
       const resolved = await resolveOpenGraph(
         metadata.openGraph,
         metadataBase,
@@ -209,7 +207,7 @@ describe('toMetadata output resolved by Next itself', () => {
       expect(resolved?.images).toBeUndefined();
     });
 
-    it('resolves twitter.images to undefined, never an injected default, when ogImage is absent', async () => {
+    it('resolves twitter.images to undefined, never an injected default', async () => {
       const resolved = resolveTwitter(
         metadata.twitter,
         metadataBase,
@@ -223,18 +221,18 @@ describe('toMetadata output resolved by Next itself', () => {
 
   it('still resolves an explicit ogImage unchanged (no fallback applied)', async () => {
     const metadata = await toMetadata(seo, {
-      canonical: '/blog',
+      canonical: BLOG_PATH,
       ogType: 'website',
     });
 
     const resolved = await resolveOpenGraph(
       metadata.openGraph,
       metadataBase,
-      Promise.resolve('/blog'),
+      Promise.resolve(BLOG_PATH),
       metadataContext,
       null,
     );
 
-    expect(resolved?.images).toEqual([{ url: new URL(EXPECTED_OG_IMAGE_URL) }]);
+    expect(resolved?.images).toEqual([{ url: new URL(MOCK_OG_IMAGE_URL) }]);
   });
 });

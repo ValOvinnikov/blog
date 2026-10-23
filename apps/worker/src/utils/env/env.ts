@@ -20,7 +20,7 @@ export const env = createEnv({
     // @env-required: development, production
     VERCEL_PROJECT_ID_WEB: z.string().min(1).optional(),
     // @env-optional
-    ADMIN_APP_BASE_URL: z.string().url().optional(),
+    PLATFORM_APP_BASE_URL: z.string().url().optional(),
     // @env-optional
     TENANT_SANITY_DATASET: z.string().min(1).optional(),
     // @env-required: development, production
@@ -58,7 +58,7 @@ export const env = createEnv({
     VERCEL_TOKEN: process.env.VERCEL_TOKEN,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,
-    ADMIN_APP_BASE_URL: process.env.ADMIN_APP_BASE_URL,
+    PLATFORM_APP_BASE_URL: process.env.PLATFORM_APP_BASE_URL,
     TENANT_SANITY_DATASET: process.env.TENANT_SANITY_DATASET,
     WEB_APP_URL: process.env.WEB_APP_URL,
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,

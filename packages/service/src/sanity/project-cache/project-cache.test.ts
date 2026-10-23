@@ -1,7 +1,12 @@
+import {
+  MOCK_TENANT_DATASET,
+  MOCK_TENANT_PROJECT_ID,
+} from '@blog/service/testing/tenant';
+
 import { createProjectCache } from './project-cache';
 
 function project(projectId: string) {
-  return { projectId, dataset: 'production' };
+  return { projectId, dataset: MOCK_TENANT_DATASET };
 }
 
 describe(createProjectCache, () => {
@@ -14,16 +19,22 @@ describe(createProjectCache, () => {
   });
 
   it('returns the cached entry for a repeated project', () => {
-    const first = getOrCreate(project('tenant-a'), create);
-    const second = getOrCreate(project('tenant-a'), create);
+    const first = getOrCreate(project(MOCK_TENANT_PROJECT_ID), create);
+    const second = getOrCreate(project(MOCK_TENANT_PROJECT_ID), create);
 
     expect(second).toBe(first);
     expect(create).toHaveBeenCalledTimes(1);
   });
 
   it('keeps projects with the same id but different datasets apart', () => {
-    getOrCreate({ projectId: 'tenant-a', dataset: 'production' }, create);
-    getOrCreate({ projectId: 'tenant-a', dataset: 'staging' }, create);
+    getOrCreate(
+      { projectId: MOCK_TENANT_PROJECT_ID, dataset: MOCK_TENANT_DATASET },
+      create,
+    );
+    getOrCreate(
+      { projectId: MOCK_TENANT_PROJECT_ID, dataset: 'staging' },
+      create,
+    );
 
     expect(create).toHaveBeenCalledTimes(2);
   });
@@ -31,14 +42,14 @@ describe(createProjectCache, () => {
   it('replaces an entry that is no longer reusable', () => {
     const getOrCreateToken = createProjectCache<{ token: string }>();
 
-    getOrCreateToken(project('tenant-a'), () => ({ token: 'old' }));
+    getOrCreateToken(project(MOCK_TENANT_PROJECT_ID), () => ({ token: 'old' }));
     const replaced = getOrCreateToken(
-      project('tenant-a'),
+      project(MOCK_TENANT_PROJECT_ID),
       () => ({ token: 'new' }),
       (entry) => entry.token === 'new',
     );
     const reused = getOrCreateToken(
-      project('tenant-a'),
+      project(MOCK_TENANT_PROJECT_ID),
       () => ({ token: 'newer' }),
       (entry) => entry.token === 'new',
     );

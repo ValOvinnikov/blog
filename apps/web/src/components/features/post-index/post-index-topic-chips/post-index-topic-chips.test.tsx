@@ -1,6 +1,6 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 
 import { PostIndexTopicChips } from './post-index-topic-chips';
 
@@ -25,19 +25,19 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
 
   it('renders the topic chip row from the fetched topics', async () => {
     getTopicsSafelyMock.mockResolvedValue([
-      makeTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
+      mockTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
     ]);
 
     await setup();
 
     const nav = screen.getByRole('navigation', { name: 'Topics' });
-    expect(within(nav).getByRole('link', { name: 'All' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-    expect(
-      within(nav).getByRole('link', { name: 'Engineering' }),
-    ).toHaveAttribute('href', '/topics/engineering');
+    const allLink = within(nav).getByRole('link', { name: 'All' });
+    const engineeringLink = within(nav).getByRole('link', {
+      name: 'Engineering',
+    });
+
+    expect(allLink).toHaveAttribute('href', '/blog');
+    expect(engineeringLink).toHaveAttribute('href', '/topics/engineering');
   });
 
   describe('with no topics', () => {
@@ -47,14 +47,14 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
     });
 
     it('renders nothing when there are no topics', async () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'Topics' }),
-      ).not.toBeInTheDocument();
+      const topicsNav = screen.queryByRole('navigation', { name: 'Topics' });
+
+      expect(topicsNav).not.toBeInTheDocument();
     });
 
     it('forwards the request context Sanity context to getTopicsSafely', async () => {
       expect(getTopicsSafelyMock).toHaveBeenCalledWith(
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
   });

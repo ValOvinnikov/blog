@@ -2,10 +2,10 @@ import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
-  tagsListItems,
-  topicsListItems,
+  MOCK_TAGS_LIST_ITEMS,
+  MOCK_TOPICS_LIST_ITEMS,
 } from '@web/testing/modules/taxonomy-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
@@ -30,8 +30,8 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
-    items: topicsListItems,
+    headingBlock: mockHeadingBlock({ heading: 'Browse by topic' }),
+    items: MOCK_TOPICS_LIST_ITEMS,
     layout: undefined,
     contentAlignment: undefined,
     titleId: 'topic-list-title',
@@ -48,20 +48,10 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
-export const Topics: TStory = {
-  args: {
-    headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
-    items: topicsListItems,
-    titleId: 'topic-list-title',
-    dataTestId: 'taxonomy-list-module-topic-list-1',
-    emptyMessage: 'No topics yet.',
-  },
-};
-
 export const Tags: TStory = {
   args: {
-    headingBlock: makeHeadingBlock({ heading: 'Browse by tag' }),
-    items: tagsListItems,
+    headingBlock: mockHeadingBlock({ heading: 'Browse by tag' }),
+    items: MOCK_TAGS_LIST_ITEMS,
     titleId: 'tag-list-title',
     dataTestId: 'taxonomy-list-module-tag-list-1',
     emptyMessage: 'No tags yet.',

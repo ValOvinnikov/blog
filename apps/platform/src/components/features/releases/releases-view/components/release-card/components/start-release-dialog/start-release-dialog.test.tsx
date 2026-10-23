@@ -4,7 +4,7 @@ import {
   RELEASE_REFUSAL,
 } from '@platform/constants/release';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
-import { makeReleaseCandidate } from '@platform/testing/releases/fixtures';
+import { mockReleaseCandidate } from '@platform/testing/releases/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { StartReleaseDialog } from './start-release-dialog';
@@ -18,9 +18,12 @@ vi.mock('@platform/server/releases/start-release-action', () => ({
   startReleaseAction: startReleaseActionMock,
 }));
 
+const START_RELEASE = 'Start release';
+const RELEASE_RUNNING_REASON = 'A release is running.';
+
 const setup = customRender(StartReleaseDialog, {
   lastTag: 'v1.4.0',
-  migrations: makeReleaseCandidate().migrations,
+  migrations: mockReleaseCandidate().migrations,
   isOverrideRequired: false,
   disabledReason: undefined,
   onStarted: onStartedMock,
@@ -46,7 +49,7 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
     user.type(screen.getByRole('textbox', { name: 'Version' }), version);
 
   const confirm = () =>
-    user.click(screen.getByRole('button', { name: 'Start release' }));
+    user.click(screen.getByRole('button', { name: START_RELEASE }));
 
   describe('opened for a release that needs no override', () => {
     beforeEach(async () => {
@@ -73,7 +76,7 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
 
     it('cannot be confirmed before a version is typed', () => {
       expect(
-        screen.getByRole('button', { name: 'Start release' }),
+        screen.getByRole('button', { name: START_RELEASE }),
       ).toBeDisabled();
     });
 
@@ -146,9 +149,7 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
     await open('Release with override');
     await typeVersion('v1.5.0');
 
-    expect(
-      screen.getByRole('button', { name: 'Start release' }),
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: START_RELEASE })).toBeDisabled();
 
     await user.type(
       screen.getByRole('textbox', { name: 'Reason for releasing anyway' }),
@@ -163,12 +164,12 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
   });
 
   it('cannot be opened while it is disabled', () => {
-    setup({ disabledReason: 'A release is running.' });
+    setup({ disabledReason: RELEASE_RUNNING_REASON });
 
     expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
-    expect(screen.getByText('A release is running.')).toBeVisible();
+    expect(screen.getByText(RELEASE_RUNNING_REASON)).toBeVisible();
   });
 });

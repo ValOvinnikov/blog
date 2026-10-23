@@ -4,15 +4,23 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import {
+  MEMBERSHIP_ROLE,
+  PLAN_REGISTRY,
+  TENANT_PLAN,
+} from '@blog/db/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
+import {
+  MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_EMAIL,
+} from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { CAPABILITY_TOGGLES } from '@platform/utils/settings-features-fields/settings-features-fields';
 import type { Session } from 'next-auth';
 
 import {
@@ -59,8 +67,17 @@ const loggerWarnMock = vi.mocked(logger.warn);
 const SAVED_AT = '2026-10-01T00:00:00Z';
 const DB_UNAVAILABLE = 'db unavailable';
 
-const FREE_TENANT = { id: TENANT_ID, plan: TENANT_PLAN.FREE };
+const FREE_TENANT = { id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE };
 const GROWTH_TENANT = { id: 'tenant-2', plan: TENANT_PLAN.GROWTH };
+const PLAN_GATED_FIELDS = CAPABILITY_TOGGLES.filter(
+  ({ capability, isComingSoon }) =>
+    !isComingSoon &&
+    PLAN_REGISTRY[TENANT_PLAN.GROWTH].includes(capability) &&
+    !PLAN_REGISTRY[TENANT_PLAN.FREE].includes(capability),
+).map(({ field }) => field);
+const PLAN_GATED_ON = Object.fromEntries(
+  PLAN_GATED_FIELDS.map((field) => [field, true]),
+);
 
 const VALID_INPUT: TUpdateFeaturesInput = {
   commentsEnabled: false,
@@ -88,7 +105,7 @@ describe(updateFeaturesAction, () => {
     });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     upsertSettingsFeaturesMock.mockReset();
     upsertSettingsFeaturesMock.mockResolvedValue({});
@@ -106,24 +123,24 @@ describe(updateFeaturesAction, () => {
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
-    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       VALID_INPUT,
     );
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
-    await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a payload with a non-boolean field without ever calling the tenant gate', async () => {
-    const result = await updateFeaturesAction(TENANT_ID, {
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
       commentsEnabled: 'yes' as unknown as boolean,
     });
@@ -135,30 +152,54 @@ describe(updateFeaturesAction, () => {
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
-  it('rejects enabling a GROWTH-only capability on a FREE tenant, and writes nothing', async () => {
-    const result = await updateFeaturesAction(TENANT_ID, {
-      ...VALID_INPUT,
-      analyticsEnabled: true,
-    });
+  it.each(PLAN_GATED_FIELDS)(
+    'refuses a FREE tenant switching %s on, and writes nothing',
+    async (field) => {
+      const result = await updateFeaturesAction(MOCK_TENANT_ID, {
+        ...VALID_INPUT,
+        [field]: true,
+      });
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
-    });
-    expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
-    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+      });
+      expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
+      expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(PLAN_GATED_FIELDS)(
+    'lets a GROWTH tenant switch %s on',
+    async (field) => {
+      requireTenantMembershipMock.mockResolvedValue({
+        tenant: GROWTH_TENANT,
+        membership: { role: MEMBERSHIP_ROLE.OWNER },
+      });
+
+      const result = await updateFeaturesAction(GROWTH_TENANT.id, {
+        ...VALID_INPUT,
+        [field]: true,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+        GROWTH_TENANT.id,
+        { ...VALID_INPUT, [field]: true },
+      );
+    },
+  );
 
   it('lets a FREE tenant save an entitled field despite a clamped out-of-plan one', async () => {
-    const result = await updateFeaturesAction(TENANT_ID, {
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: false,
       analyticsEnabled: false,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID, {
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: false,
       analyticsEnabled: false,
@@ -176,10 +217,10 @@ describe(updateFeaturesAction, () => {
       savedAt: new Date(SAVED_AT),
     });
 
-    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID, {
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: true,
       analyticsEnabled: true,
@@ -193,10 +234,10 @@ describe(updateFeaturesAction, () => {
       savedAt: new Date(SAVED_AT),
     });
 
-    await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       VALID_INPUT,
     );
   });
@@ -207,7 +248,7 @@ describe(updateFeaturesAction, () => {
       savedAt: new Date(SAVED_AT),
     });
 
-    const result = await updateFeaturesAction(TENANT_ID, {
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
       bookmarksEnabled: true,
     });
@@ -219,20 +260,20 @@ describe(updateFeaturesAction, () => {
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
-  it("writes a GROWTH tenant's submitted toggles over the stored ones", async () => {
+  it('lets a GROWTH tenant switch every plan-gated toggle back off', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: GROWTH_TENANT,
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
-      values: { ...ALL_OFF, bookmarksEnabled: true, analyticsEnabled: true },
+      values: { ...ALL_OFF, ...PLAN_GATED_ON },
       savedAt: new Date(SAVED_AT),
     });
 
-    await updateFeaturesAction('tenant-2', VALID_INPUT);
+    await updateFeaturesAction(GROWTH_TENANT.id, VALID_INPUT);
 
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      'tenant-2',
+      GROWTH_TENANT.id,
       VALID_INPUT,
     );
   });
@@ -242,66 +283,10 @@ describe(updateFeaturesAction, () => {
       new Error(DB_UNAVAILABLE),
     );
 
-    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects switching the contact form on for a FREE tenant', async () => {
-    const result = await updateFeaturesAction(TENANT_ID, {
-      ...VALID_INPUT,
-      contactFormEnabled: true,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
-    });
-    expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
-  });
-
-  it('lets a GROWTH tenant switch the contact form on and back off', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: GROWTH_TENANT,
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
-    });
-
-    const on = await updateFeaturesAction('tenant-2', {
-      ...VALID_INPUT,
-      contactFormEnabled: true,
-    });
-    const off = await updateFeaturesAction('tenant-2', VALID_INPUT);
-
-    expect(on).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(off).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSettingsFeaturesMock).toHaveBeenNthCalledWith(1, 'tenant-2', {
-      ...VALID_INPUT,
-      contactFormEnabled: true,
-    });
-    expect(upsertSettingsFeaturesMock).toHaveBeenNthCalledWith(
-      2,
-      'tenant-2',
-      VALID_INPUT,
-    );
-  });
-
-  it('allows a GROWTH tenant to enable the same capability', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: GROWTH_TENANT,
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
-    });
-
-    const result = await updateFeaturesAction('tenant-2', {
-      ...VALID_INPUT,
-      analyticsEnabled: true,
-    });
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-2', {
-      ...VALID_INPUT,
-      analyticsEnabled: true,
-    });
   });
 
   it('writes Comments, Ratings and Newsletter off even when the payload switches them on', async () => {
@@ -325,14 +310,14 @@ describe(updateFeaturesAction, () => {
   });
 
   it('does not reject a FREE tenant for switching on a "Coming soon" capability outside its plan', async () => {
-    const result = await updateFeaturesAction(TENANT_ID, {
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
       newsletterEnabled: true,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       VALID_INPUT,
     );
   });
@@ -340,7 +325,7 @@ describe(updateFeaturesAction, () => {
   it('reports failure instead of throwing when the write itself fails', async () => {
     upsertSettingsFeaturesMock.mockRejectedValue(new Error(DB_UNAVAILABLE));
 
-    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
@@ -348,14 +333,14 @@ describe(updateFeaturesAction, () => {
   });
 
   it('records a SETTINGS_UPDATED audit event with the operator as actor', async () => {
-    await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: VALID_INPUT,
     });
   });
@@ -363,13 +348,13 @@ describe(updateFeaturesAction, () => {
   it('still succeeds when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
-    const result = await updateFeaturesAction(TENANT_ID, VALID_INPUT);
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'settings_features.update_audit_failed',
       expect.objectContaining({
-        targetId: TENANT_ID,
+        targetId: MOCK_TENANT_ID,
         error: expect.any(Error),
       }),
     );
@@ -380,9 +365,9 @@ describe(updateFeaturesAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
-    await expect(updateFeaturesAction(TENANT_ID, VALID_INPUT)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
+    await expect(
+      updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
@@ -392,9 +377,9 @@ describe(updateFeaturesAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
-    await expect(updateFeaturesAction(TENANT_ID, VALID_INPUT)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(
+      updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });

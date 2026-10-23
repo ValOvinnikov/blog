@@ -3,7 +3,11 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
-import { idleProvisioningSteps } from '@platform/testing/tenants/fixtures';
+import {
+  mockIdleProvisioningSteps,
+  mockDoneProvisioningSteps,
+  mockFirstStepRunningProvisioningSteps,
+} from '@platform/testing/tenants/fixtures';
 
 import { computeTenantFieldLocks, lockAllFields } from './tenant-field-locks';
 
@@ -11,7 +15,7 @@ describe(computeTenantFieldLocks, () => {
   it('locks nothing while every step is IDLE and provisioningStatus is not PROVISIONING', () => {
     expect(
       computeTenantFieldLocks(
-        idleProvisioningSteps(),
+        mockIdleProvisioningSteps(),
         TENANT_PROVISIONING_STATUS.PENDING,
       ),
     ).toEqual({});
@@ -24,7 +28,7 @@ describe(computeTenantFieldLocks, () => {
   it('locks nothing once MAP_DOMAIN is DONE — MAP_DOMAIN itself failing leaves primaryDomain editable (the real 409 case)', () => {
     const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
     const failedAtMapDomain = {
-      ...idleProvisioningSteps(),
+      ...mockIdleProvisioningSteps(),
       [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
       [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
@@ -44,7 +48,7 @@ describe(computeTenantFieldLocks, () => {
 
   it('locks primaryDomain once MAP_DOMAIN completed and a later step failed', () => {
     const steps = {
-      ...idleProvisioningSteps(),
+      ...mockIdleProvisioningSteps(),
       [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
         status: TENANT_PROVISIONING_STEP_STATUS.DONE,
       },
@@ -74,15 +78,11 @@ describe(computeTenantFieldLocks, () => {
   });
 
   it('locks every field with a "running" reason while a step is RUNNING', () => {
-    const steps = {
-      ...idleProvisioningSteps(),
-      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-      },
-    };
-
     expect(
-      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.PROVISIONING),
+      computeTenantFieldLocks(
+        mockFirstStepRunningProvisioningSteps(),
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      ),
     ).toEqual({
       name: { kind: 'running' },
       primaryDomain: { kind: 'running' },
@@ -93,21 +93,11 @@ describe(computeTenantFieldLocks, () => {
   });
 
   it('locks every field with a "succeeded" reason once every step is DONE', () => {
-    const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
-    const steps = {
-      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
-      [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-      [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
-      [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
-      [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
-      [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
-      [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-      },
-    };
-
     expect(
-      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.READY),
+      computeTenantFieldLocks(
+        mockDoneProvisioningSteps(),
+        TENANT_PROVISIONING_STATUS.READY,
+      ),
     ).toEqual({
       name: { kind: 'succeeded' },
       primaryDomain: { kind: 'succeeded' },
@@ -118,18 +108,7 @@ describe(computeTenantFieldLocks, () => {
   });
 
   it('excludes OWNER_ELEVATION from the fold entirely — a 7th key never changes the result, even with a status the core sequence never produces', () => {
-    const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
-    const coreStepsDone = {
-      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
-      [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-      [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
-      [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
-      [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
-      [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
-      [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-      },
-    };
+    const coreStepsDone = mockDoneProvisioningSteps();
 
     const withoutOwnerElevation = computeTenantFieldLocks(
       coreStepsDone,
@@ -160,7 +139,7 @@ describe(computeTenantFieldLocks, () => {
   it('locks every field with a "running" reason once provisioningStatus is PROVISIONING, even while every step is still IDLE', () => {
     expect(
       computeTenantFieldLocks(
-        idleProvisioningSteps(),
+        mockIdleProvisioningSteps(),
         TENANT_PROVISIONING_STATUS.PROVISIONING,
       ),
     ).toEqual({

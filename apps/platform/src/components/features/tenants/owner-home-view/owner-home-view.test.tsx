@@ -4,7 +4,15 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import { act, customRender, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  mockTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_CUSTOM_DOMAIN,
+  MOCK_CUSTOM_DOMAIN_URL,
+  MOCK_OWNER_JOINED_AT,
+  MOCK_SITE_NAME,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { OwnerHomeView, type TOwnerHomeViewProps } from './owner-home-view';
@@ -13,9 +21,9 @@ vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
-const tenant = makeTenant({
-  name: 'Northwind Field Notes',
-  primaryDomain: 'northwind.dev',
+const tenant = mockTenant({
+  name: MOCK_SITE_NAME,
+  primaryDomain: MOCK_CUSTOM_DOMAIN,
   plan: TENANT_PLAN.GROWTH,
 });
 
@@ -26,7 +34,7 @@ const defaultProps: TOwnerHomeViewProps = {
   ),
   owner: {
     email: 'sam@northwind.dev',
-    joinedAt: new Date('2026-08-12T00:00:00.000Z'),
+    joinedAt: MOCK_OWNER_JOINED_AT,
   },
 };
 
@@ -38,7 +46,7 @@ const setup = async (overrides?: Partial<TOwnerHomeViewProps>) => {
   });
 };
 
-describe(OwnerHomeView, () => {
+describe(`<${OwnerHomeView.name}/>`, () => {
   describe('for a live tenant', () => {
     beforeEach(async () => {
       await setup();
@@ -47,7 +55,7 @@ describe(OwnerHomeView, () => {
     it("renders the tenant's name, status and plan, and an Open site action", () => {
       const tenantHeading = screen.getByRole('heading', {
         level: 1,
-        name: 'Northwind Field Notes',
+        name: MOCK_SITE_NAME,
       });
       const statusText = screen.getByText('Active');
       const planTexts = screen.getAllByText('Growth');
@@ -58,11 +66,11 @@ describe(OwnerHomeView, () => {
       expect(tenantHeading).toBeVisible();
       expect(statusText).toBeVisible();
       expect(planTexts.length).toBeGreaterThan(0);
-      expect(openSiteLink).toHaveAttribute('href', 'https://northwind.dev');
+      expect(openSiteLink).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
     });
 
     it('does not render the archived notice', () => {
-      const archivedNotice = screen.queryByText('This tenant is archived');
+      const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
 
       expect(archivedNotice).not.toBeInTheDocument();
     });
@@ -117,11 +125,11 @@ describe(OwnerHomeView, () => {
     await setup({
       tenant: {
         ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       },
     });
 
-    const archivedNotice = screen.getByText('This tenant is archived');
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
 
     expect(archivedNotice).toBeVisible();
   });
@@ -169,7 +177,7 @@ describe(OwnerHomeView, () => {
 
     const tenantHeading = screen.getByRole('heading', {
       level: 1,
-      name: 'Northwind Field Notes',
+      name: MOCK_SITE_NAME,
     });
     const ownerHeading = screen.getByRole('heading', {
       level: 2,

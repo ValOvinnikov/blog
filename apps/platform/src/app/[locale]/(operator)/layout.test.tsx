@@ -1,20 +1,20 @@
-import type { TMaybeNull } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { usePathname } from '@platform/i18n/navigation';
 import { auth } from '@platform/server/auth/auth';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { redirect, useParams } from 'next/navigation';
 import type { Session } from 'next-auth';
 
 import OperatorLayout from './layout';
 
-const { getAdminByUserIdMock, resolveIsSidebarCollapsedMock } = vi.hoisted(
-  () => ({
+const { getAdminByUserIdMock, resolveIsSidebarCollapsedMock, CONTRAST_DUE } =
+  vi.hoisted(() => ({
     getAdminByUserIdMock: vi.fn(),
     resolveIsSidebarCollapsedMock: vi.fn(),
-  }),
-);
+    CONTRAST_DUE: 'Contrast check due',
+  }));
 
 vi.mock('@platform/server/auth/auth');
 
@@ -29,7 +29,7 @@ vi.mock('@blog/db', () => ({
 vi.mock('@platform/i18n/navigation');
 
 vi.mock('@platform/components/features/releases/contrast-due-banner', () => ({
-  ContrastDueBanner: () => <p>Contrast check due</p>,
+  ContrastDueBanner: () => <p>{CONTRAST_DUE}</p>,
 }));
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
@@ -52,7 +52,7 @@ describe(`<${OperatorLayout.name}/>`, () => {
   it('redirects to sign-in without querying admins when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith(
       '/api/auth/signin?callbackUrl=%2F',
@@ -63,14 +63,14 @@ describe(`<${OperatorLayout.name}/>`, () => {
   it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
     expect(vi.mocked(redirect)).not.toHaveBeenCalled();
   });
 
   it('renders the gated content for a signed-in admin', async () => {
-    getAdminByUserIdMock.mockResolvedValue(makeAdmin());
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
 
     await setup();
 
@@ -80,7 +80,7 @@ describe(`<${OperatorLayout.name}/>`, () => {
 
   it('hides the Releases nav entry from an ADMIN', async () => {
     getAdminByUserIdMock.mockResolvedValue(
-      makeAdmin({ role: ADMIN_ROLE.ADMIN }),
+      mockAdmin({ role: ADMIN_ROLE.ADMIN }),
     );
 
     await setup();
@@ -93,7 +93,7 @@ describe(`<${OperatorLayout.name}/>`, () => {
   it('puts Releases in the breadcrumb only for a SUPERADMIN', async () => {
     vi.mocked(usePathname).mockReturnValue('/releases');
     getAdminByUserIdMock.mockResolvedValue(
-      makeAdmin({ role: ADMIN_ROLE.ADMIN }),
+      mockAdmin({ role: ADMIN_ROLE.ADMIN }),
     );
 
     await setup();
@@ -103,7 +103,7 @@ describe(`<${OperatorLayout.name}/>`, () => {
 
   it('shows the Releases nav entry to a SUPERADMIN', async () => {
     getAdminByUserIdMock.mockResolvedValue(
-      makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
     );
 
     await setup();
@@ -115,23 +115,23 @@ describe(`<${OperatorLayout.name}/>`, () => {
   });
   it('shows the contrast-due banner slot to a SUPERADMIN', async () => {
     getAdminByUserIdMock.mockResolvedValue(
-      makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
     );
 
     await setup();
 
-    expect(screen.getByText('Contrast check due')).toBeVisible();
+    expect(screen.getByText(CONTRAST_DUE)).toBeVisible();
   });
 
   it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
     'never shows the contrast-due banner to an %s',
     async (role) => {
-      getAdminByUserIdMock.mockResolvedValue(makeAdmin({ role }));
+      getAdminByUserIdMock.mockResolvedValue(mockAdmin({ role }));
 
       await setup();
 
       expect(screen.getByText('content')).toBeVisible();
-      expect(screen.queryByText('Contrast check due')).not.toBeInTheDocument();
+      expect(screen.queryByText(CONTRAST_DUE)).not.toBeInTheDocument();
     },
   );
 });

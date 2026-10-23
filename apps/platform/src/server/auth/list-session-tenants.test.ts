@@ -1,7 +1,7 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -84,7 +84,7 @@ describe(listSessionTenants, () => {
       {
         id: 'm-1',
         userId: 'user-1',
-        tenantId: TENANT_ID,
+        tenantId: MOCK_TENANT_ID,
         role: MEMBERSHIP_ROLE.OWNER,
       },
       {
@@ -94,7 +94,7 @@ describe(listSessionTenants, () => {
         role: MEMBERSHIP_ROLE.OWNER,
       },
     ];
-    const tenants = [{ id: TENANT_ID }, { id: 'tenant-2' }];
+    const tenants = [{ id: MOCK_TENANT_ID }, { id: 'tenant-2' }];
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership: memberships[0], tenant: tenants[0] },
       { membership: memberships[1], tenant: tenants[1] },
@@ -119,8 +119,8 @@ describe(listSessionTenants, () => {
     getAdminByUserIdMock.mockResolvedValue(admin);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
-        tenant: { id: TENANT_ID },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
+        tenant: { id: MOCK_TENANT_ID },
       },
     ]);
 
@@ -133,7 +133,11 @@ describe(listSessionTenants, () => {
     authMock.mockResolvedValue({ user: { id: 'super-1' } });
     const admin = { id: 'admin-1', role: ADMIN_ROLE.SUPERADMIN };
     getAdminByUserIdMock.mockResolvedValue(admin);
-    const tenants = [{ id: TENANT_ID }, { id: 'tenant-2' }, { id: 'tenant-3' }];
+    const tenants = [
+      { id: MOCK_TENANT_ID },
+      { id: 'tenant-2' },
+      { id: 'tenant-3' },
+    ];
     listTenantsMock.mockResolvedValue(tenants);
 
     const result = await listSessionTenants();

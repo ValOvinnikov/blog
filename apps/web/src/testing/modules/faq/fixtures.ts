@@ -1,40 +1,49 @@
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import type { TFaqQuestion } from '@blog/service';
 import {
-  portableTextBlock,
-  portableTextSpan,
+  mockPortableTextBlock,
+  mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
-export const makeFaqQuestion = (
+export const mockFaqQuestion = (
   overrides: Partial<TFaqQuestion> = {},
 ): TFaqQuestion => ({
   id: 'faq-1',
   question: 'Do you offer a free trial?',
-  answer: [portableTextBlock('Yes, every plan includes a 14-day free trial.')],
+  answer: [
+    mockPortableTextBlock('Yes, every plan includes a 14-day free trial.'),
+  ],
   ...overrides,
 });
 
-export const faqAnswerWithListAndLinkDemo: TFaqQuestion['answer'] = [
-  portableTextBlock([
-    portableTextSpan('Yes — every plan includes a '),
-    portableTextSpan('14-day free trial', ['strong']),
-    portableTextSpan(', no credit card required.'),
+export const MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK: TFaqQuestion['answer'] = [
+  mockPortableTextBlock([
+    mockPortableTextSpan('Yes — every plan includes a '),
+    mockPortableTextSpan('14-day free trial', ['strong']),
+    mockPortableTextSpan(', no credit card required.'),
   ]),
-  portableTextBlock([portableTextSpan('Full access to every feature')], {
-    listItem: 'bullet',
-  }),
-  portableTextBlock([portableTextSpan('Cancel anytime before it ends')], {
-    listItem: 'bullet',
-  }),
-  portableTextBlock(
+  mockPortableTextBlock(
+    [mockPortableTextSpan('Full access to every feature')],
+    {
+      listItem: 'bullet',
+    },
+  ),
+  mockPortableTextBlock(
+    [mockPortableTextSpan('Cancel anytime before it ends')],
+    {
+      listItem: 'bullet',
+    },
+  ),
+  mockPortableTextBlock(
     [
-      portableTextSpan('See our '),
-      portableTextSpan('pricing page', ['link-1']),
-      portableTextSpan(' for full plan details.'),
+      mockPortableTextSpan('See our '),
+      mockPortableTextSpan('pricing page', ['link-1']),
+      mockPortableTextSpan(' for full plan details.'),
     ],
     {
       markDefs: [
         {
-          _type: 'linkRef',
+          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
           _key: 'link-1',
           link: { href: '/pricing', target: undefined },
         },

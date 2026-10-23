@@ -1,13 +1,25 @@
 import { CARD_IMAGE_SHAPE, ICONS } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { FeatureListCard } from './feature-list-card';
 
 vi.mock('@web/i18n/navigation');
 
-const item = makeFeatureListItem();
+const ICON_TEST_ID = 'feature-card-icon';
+const ICON_PANEL_TEST_ID = 'feature-card-icon-panel';
+const LINK_ARIA_LABEL = 'Read the full engineering deep-dive';
+
+const item = mockFeatureListItem();
+
+const FEATURE_LINK = {
+  label: 'Learn more',
+  href: '/features/fast',
+  target: undefined,
+  platform: undefined,
+  ariaLabel: undefined,
+};
 
 const setup = customRender(FeatureListCard, {
   item,
@@ -24,108 +36,103 @@ describe(`<${FeatureListCard.name}/>`, () => {
     });
 
     it('renders the heading and excerpt from the item headingBlock', () => {
-      expect(
-        screen.getByRole('heading', {
-          level: 3,
-          name: item.headingBlock.heading,
-        }),
-      ).toBeVisible();
-      expect(screen.getByText(item.headingBlock.supportingText!)).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: item.headingBlock.heading,
+      });
+      const excerpt = screen.getByText(item.headingBlock.supportingText!);
+      expect(heading).toBeVisible();
+      expect(excerpt).toBeVisible();
     });
 
     it('renders the chosen icon when the item has no image', () => {
-      expect(screen.getByTestId('feature-card-icon')).toBeVisible();
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      const icon = screen.getByTestId(ICON_TEST_ID);
+      const image = screen.queryByRole('img');
+      expect(icon).toBeVisible();
+      expect(image).not.toBeInTheDocument();
     });
 
     it('renders no link when the item has none', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      const link = screen.queryByRole('link');
+      expect(link).not.toBeInTheDocument();
     });
   });
 
   it('renders the image over the icon when the item has both', () => {
-    const sanityImage = makeSanityImage();
-    setup({ item: makeFeatureListItem({ sanityImage, icon: ICONS.STAR }) });
+    const sanityImage = mockSanityImage();
+    setup({ item: mockFeatureListItem({ sanityImage, icon: ICONS.STAR }) });
 
-    expect(screen.getByRole('img')).toBeVisible();
-    expect(screen.queryByTestId('feature-card-icon')).not.toBeInTheDocument();
+    const image = screen.getByRole('img');
+    const icon = screen.queryByTestId(ICON_TEST_ID);
+    expect(image).toBeVisible();
+    expect(icon).not.toBeInTheDocument();
   });
 
-  it('renders the icon in the small tile when no card in the module has an image', () => {
+  it('renders the icon in the small tile when no card has an image', () => {
     setup({ hasAnyImage: false });
 
-    expect(screen.getByTestId('feature-card-icon')).toBeVisible();
-    expect(
-      screen.queryByTestId('feature-card-icon-panel'),
-    ).not.toBeInTheDocument();
+    const icon = screen.getByTestId(ICON_TEST_ID);
+    const iconPanel = screen.queryByTestId(ICON_PANEL_TEST_ID);
+    expect(icon).toBeVisible();
+    expect(iconPanel).not.toBeInTheDocument();
   });
 
-  it('renders the icon inside the matching image panel when another card in the module has an image', () => {
+  it('renders the icon in an image panel when another card has an image', () => {
     setup({ hasAnyImage: true });
 
-    expect(screen.getByTestId('feature-card-icon-panel')).toBeVisible();
-    expect(screen.getByTestId('feature-card-icon')).toBeVisible();
+    const iconPanel = screen.getByTestId(ICON_PANEL_TEST_ID);
+    const icon = screen.getByTestId(ICON_TEST_ID);
+    expect(iconPanel).toBeVisible();
+    expect(icon).toBeVisible();
   });
 
   describe('with the Icon image shape', () => {
     it('renders the image without an icon panel', () => {
       setup({
         imageShape: CARD_IMAGE_SHAPE.ICON,
-        item: makeFeatureListItem({ sanityImage: makeSanityImage() }),
+        item: mockFeatureListItem({ sanityImage: mockSanityImage() }),
       });
 
-      expect(screen.getByRole('img')).toBeVisible();
-      expect(
-        screen.queryByTestId('feature-card-icon-panel'),
-      ).not.toBeInTheDocument();
+      const image = screen.getByRole('img');
+      const iconPanel = screen.queryByTestId(ICON_PANEL_TEST_ID);
+      expect(image).toBeVisible();
+      expect(iconPanel).not.toBeInTheDocument();
     });
 
-    it('renders the icon in the small tile, not a panel, when another card in the module has an image', () => {
+    it('renders the icon in the small tile even when another card has an image', () => {
       setup({ imageShape: CARD_IMAGE_SHAPE.ICON, hasAnyImage: true });
 
-      expect(screen.getByTestId('feature-card-icon')).toBeVisible();
-      expect(
-        screen.queryByTestId('feature-card-icon-panel'),
-      ).not.toBeInTheDocument();
+      const icon = screen.getByTestId(ICON_TEST_ID);
+      const iconPanel = screen.queryByTestId(ICON_PANEL_TEST_ID);
+      expect(icon).toBeVisible();
+      expect(iconPanel).not.toBeInTheDocument();
     });
   });
 
-  it('wraps the whole card title in a link named by the title when the item has one', () => {
-    setup({
-      item: makeFeatureListItem({
-        link: {
-          label: 'Learn more',
-          href: '/features/fast',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
-      }),
-    });
+  it('links the card title, named by the title, when the item has a link', () => {
+    setup({ item: mockFeatureListItem({ link: FEATURE_LINK }) });
 
     const link = screen.getByRole('link', { name: item.headingBlock.heading });
-    expect(link).toHaveAttribute('href', '/features/fast');
+    expect(link).toHaveAttribute('href', FEATURE_LINK.href);
   });
 
-  it('names the link by its ariaLabel override, not the heading, when one is set', () => {
+  it('names the link by its aria label override when one is set', () => {
     setup({
-      item: makeFeatureListItem({
+      item: mockFeatureListItem({
         link: {
-          label: 'Learn more',
-          href: '/features/fast',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: 'Read the full engineering deep-dive',
+          ...FEATURE_LINK,
+          ariaLabel: LINK_ARIA_LABEL,
         },
       }),
     });
 
     const link = screen.getByRole('link', {
-      name: 'Read the full engineering deep-dive',
+      name: LINK_ARIA_LABEL,
     });
-    expect(link).toHaveAttribute('href', '/features/fast');
-    expect(
-      screen.queryByRole('link', { name: item.headingBlock.heading }),
-    ).not.toBeInTheDocument();
+    const headingLink = screen.queryByRole('link', {
+      name: item.headingBlock.heading,
+    });
+    expect(link).toHaveAttribute('href', FEATURE_LINK.href);
+    expect(headingLink).not.toBeInTheDocument();
   });
 });

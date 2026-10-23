@@ -1,7 +1,11 @@
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { makeFinding } from '@platform/testing/findings/fixtures';
+import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import FindingsPage from './page';
 
@@ -25,17 +29,20 @@ describe(FindingsPage, () => {
 
   it('renders every open finding with its tenant name', async () => {
     listOpenFindingsMock.mockResolvedValue([
-      makeFinding({ id: 'finding-1', tenantId: TENANT_ID }),
-      makeFinding({ id: 'finding-2', tenantId: null, tenantName: null }),
+      mockFinding({ id: 'finding-1', tenantId: MOCK_TENANT_ID }),
+      mockFinding({ id: 'finding-2', tenantId: null, tenantName: null }),
     ]);
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toHaveAttribute(
+    const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
+    const platformWide = screen.getByText('— platform-wide');
+
+    expect(tenantLink).toHaveAttribute(
       'href',
-      `/tenants/${TENANT_ID}`,
+      adminRoutes.tenantOverview(MOCK_TENANT_ID),
     );
-    expect(screen.getByText('— platform-wide')).toBeVisible();
+    expect(platformWide).toBeVisible();
   });
 
   it('shows the healthy empty state when there are no open findings', async () => {
@@ -43,8 +50,10 @@ describe(FindingsPage, () => {
 
     await setup();
 
-    expect(
-      screen.getByText("No open findings. Everything's healthy."),
-    ).toBeVisible();
+    const emptyState = screen.getByText(
+      "No open findings. Everything's healthy.",
+    );
+
+    expect(emptyState).toBeVisible();
   });
 });

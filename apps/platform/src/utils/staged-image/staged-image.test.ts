@@ -1,23 +1,26 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import { UPLOAD_REFUSAL } from '@platform/constants/upload';
+import { UPLOAD_OPERATION, UPLOAD_REFUSAL } from '@platform/constants/upload';
 
 import { persistStagedImage } from './staged-image';
+
+const STORED_URL = 'https://cdn/a';
+const LOCAL_URL = 'blob:local';
 
 describe('persistStagedImage', () => {
   it('uploads a staged file and returns the stored url', async () => {
     const file = new File(['x'], 'logo.png', { type: 'image/png' });
     const upload = vi.fn().mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
-      url: 'https://cdn/a',
+      url: STORED_URL,
     });
     const clear = vi.fn();
 
     const result = await persistStagedImage(
-      { url: 'blob:local', file },
+      { url: LOCAL_URL, file },
       { upload, clear },
     );
 
-    expect(result).toEqual({ ok: true, image: { url: 'https://cdn/a' } });
+    expect(result).toEqual({ ok: true, data: { url: STORED_URL } });
     expect(upload.mock.calls[0]?.[0].get('file')).toBe(file);
     expect(clear).not.toHaveBeenCalled();
   });
@@ -33,7 +36,7 @@ describe('persistStagedImage', () => {
       { upload, clear },
     );
 
-    expect(result).toEqual({ ok: true, image: { url: undefined } });
+    expect(result).toEqual({ ok: true, data: { url: undefined } });
     expect(upload).not.toHaveBeenCalled();
   });
 
@@ -45,17 +48,19 @@ describe('persistStagedImage', () => {
     });
 
     const result = await persistStagedImage(
-      { url: 'blob:local', file },
+      { url: LOCAL_URL, file },
       { upload, clear: vi.fn() },
     );
 
     expect(result).toEqual({
       ok: false,
-      failure: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_MISSING,
+      error: {
+        failure: {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: UPLOAD_REFUSAL.FILE_MISSING,
+        },
+        operation: UPLOAD_OPERATION.UPLOAD,
       },
-      operation: 'UPLOAD',
     });
   });
 
@@ -71,8 +76,10 @@ describe('persistStagedImage', () => {
 
     expect(result).toEqual({
       ok: false,
-      failure: { outcome: ACTION_OUTCOME.SERVER_ERROR },
-      operation: 'CLEAR',
+      error: {
+        failure: { outcome: ACTION_OUTCOME.SERVER_ERROR },
+        operation: UPLOAD_OPERATION.CLEAR,
+      },
     });
   });
 });

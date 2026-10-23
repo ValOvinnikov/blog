@@ -6,17 +6,17 @@ import {
   ICONS,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
 const items = [
-  makeFeatureListItem({
+  mockFeatureListItem({
     id: 'feature-1',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: 'Ship faster',
       supportingText:
         'Every page ships pre-rendered, with ISR keeping content fresh.',
@@ -30,17 +30,17 @@ const items = [
       ariaLabel: undefined,
     },
   }),
-  makeFeatureListItem({
+  mockFeatureListItem({
     id: 'feature-2',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: 'Built for scale',
       supportingText: 'Multi-tenant from the ground up.',
     }),
     icon: ICONS.LAYERS,
   }),
-  makeFeatureListItem({
+  mockFeatureListItem({
     id: 'feature-3',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: 'Secure by default',
       supportingText: 'Every tenant is isolated at the data layer.',
     }),
@@ -77,7 +77,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Why teams choose us' }),
+    headingBlock: mockHeadingBlock({ heading: 'Why teams choose us' }),
     items,
     ctaButtons: [],
     imageShape: CARD_IMAGE_SHAPE.WIDE,
@@ -100,7 +100,7 @@ export const WithImages: TStory = {
   args: {
     items: items.map((item) => ({
       ...item,
-      sanityImage: makeSanityImage(),
+      sanityImage: mockSanityImage(),
     })),
   },
 };
@@ -110,7 +110,7 @@ export const SquareImages: TStory = {
     imageShape: CARD_IMAGE_SHAPE.SQUARE,
     items: items.map((item) => ({
       ...item,
-      sanityImage: makeSanityImage(),
+      sanityImage: mockSanityImage(),
     })),
   },
 };
@@ -120,7 +120,7 @@ export const CircleImages: TStory = {
     imageShape: CARD_IMAGE_SHAPE.CIRCLE,
     items: items.map((item) => ({
       ...item,
-      sanityImage: makeSanityImage(),
+      sanityImage: mockSanityImage(),
     })),
   },
 };
@@ -129,7 +129,7 @@ export const IconShapeImagesAndIcons: TStory = {
   args: {
     imageShape: CARD_IMAGE_SHAPE.ICON,
     items: items.map((item, index) =>
-      index % 2 === 0 ? { ...item, sanityImage: makeSanityImage() } : item,
+      index % 2 === 0 ? { ...item, sanityImage: mockSanityImage() } : item,
     ),
   },
 };
@@ -138,7 +138,7 @@ export const IconShapeImagesAndIcons: TStory = {
 export const MixedImagesAndIcons: TStory = {
   args: {
     items: items.map((item, index) =>
-      index === 0 ? { ...item, sanityImage: makeSanityImage() } : item,
+      index === 0 ? { ...item, sanityImage: mockSanityImage() } : item,
     ),
   },
 };
@@ -162,13 +162,13 @@ export const CarouselOverflowingCenterAligned: TStory = {
     displayMode: DISPLAY_MODE.CAROUSEL,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
     items: Array.from({ length: 8 }, (_, index) =>
-      makeFeatureListItem({ id: `feature-${index + 1}`, icon: ICONS.ROCKET }),
+      mockFeatureListItem({ id: `feature-${index + 1}`, icon: ICONS.ROCKET }),
     ),
   },
 };
 
 export const WithActions: TStory = {
-  args: { ctaButtons: ctaActionsDemo },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const CenterAligned: TStory = {
@@ -182,8 +182,8 @@ export const FiveCards: TStory = {
   args: {
     items: [
       ...items,
-      makeFeatureListItem({ id: 'feature-4', icon: ICONS.ROCKET }),
-      makeFeatureListItem({ id: 'feature-5', icon: ICONS.STAR }),
+      mockFeatureListItem({ id: 'feature-4', icon: ICONS.ROCKET }),
+      mockFeatureListItem({ id: 'feature-5', icon: ICONS.STAR }),
     ],
   },
 };

@@ -17,7 +17,7 @@ const makeBookmarkedPost = (
   };
 };
 
-export const makeBookmarksPageView = (
+export const mockBookmarksPageView = (
   overrides: Partial<IBookmarksPageViewProps> = {},
 ): IBookmarksPageViewProps => {
   const posts = overrides.posts ?? [

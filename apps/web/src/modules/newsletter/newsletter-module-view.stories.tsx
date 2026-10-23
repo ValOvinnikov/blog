@@ -1,7 +1,7 @@
 import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
+import { mockNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -22,7 +22,7 @@ const meta = {
   },
   args: {
     id: 'newsletter-1',
-    ...makeNewsletterModule({ content: faker.lorem.sentences(2) }),
+    ...mockNewsletterModule({ content: faker.lorem.sentences(2) }),
   },
 } satisfies Meta<typeof NewsletterModuleView>;
 

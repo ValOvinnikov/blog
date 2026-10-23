@@ -1,14 +1,22 @@
 import { BRAND_VARIANT, PRICE_PERIOD } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_ACTIONS,
+} from '@web/testing/modules/cta/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 
 import { PricingModuleView } from './pricing-module-view';
 
 vi.mock('@web/i18n/navigation');
 
-const makeCard = (
+const PRICE_LABEL = 'Contact us';
+const HIGHLIGHT_LABEL = 'Most popular';
+const EXTRA_PRICE_LINE = '£99 one-time';
+const FOOTNOTE = 'Prices exclude VAT.';
+
+const mockPricingCard = (
   overrides: Partial<IPricingCardData> = {},
 ): IPricingCardData => ({
   id: 'tier-1',
@@ -31,8 +39,8 @@ const makeCard = (
 
 const setup = customRender(PricingModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Pricing' }),
-  panels: [{ period: undefined, cards: [makeCard()] }],
+  headingBlock: mockHeadingBlock({ heading: 'Pricing' }),
+  panels: [{ period: undefined, cards: [mockPricingCard()] }],
   footnote: undefined,
   ctaButtons: [],
   contentAlignment: undefined,
@@ -41,6 +49,11 @@ const setup = customRender(PricingModuleView, {
   dataTestId: 'pricing-module-pricing-1',
 });
 
+const setupWithCard = (overrides: Partial<IPricingCardData>) =>
+  setup({
+    panels: [{ period: undefined, cards: [mockPricingCard(overrides)] }],
+  });
+
 describe(`<${PricingModuleView.name}/>`, () => {
   describe('with the default panel', () => {
     beforeEach(() => {
@@ -48,23 +61,26 @@ describe(`<${PricingModuleView.name}/>`, () => {
     });
 
     it('renders a tier name and its formatted price', () => {
-      expect(screen.getByRole('heading', { name: 'Starter' })).toBeVisible();
-      expect(screen.getByText('£49')).toBeVisible();
+      const tierName = screen.getByRole('heading', { name: 'Starter' });
+      const price = screen.getByText('£49');
+      expect(tierName).toBeVisible();
+      expect(price).toBeVisible();
     });
 
     it('renders no period switch for a single panel', () => {
-      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+      const periodSwitch = screen.queryByRole('radiogroup');
+      expect(periodSwitch).not.toBeInTheDocument();
     });
   });
 
   it('renders a period switch and shows only the monthly price', () => {
     setup({
       panels: [
-        { period: PRICE_PERIOD.MONTH, cards: [makeCard()] },
+        { period: PRICE_PERIOD.MONTH, cards: [mockPricingCard()] },
         {
           period: PRICE_PERIOD.YEAR,
           cards: [
-            makeCard({
+            mockPricingCard({
               headline: {
                 amount: '£490',
                 compareAt: undefined,
@@ -77,54 +93,43 @@ describe(`<${PricingModuleView.name}/>`, () => {
       ],
     });
 
-    expect(screen.getByRole('radiogroup')).toBeVisible();
-    expect(screen.getByText('£49')).toBeVisible();
-    expect(screen.getByText('£490')).not.toBeVisible();
+    const periodSwitch = screen.getByRole('radiogroup');
+    const monthlyPrice = screen.getByText('£49');
+    const yearlyPrice = screen.getByText('£490');
+    expect(periodSwitch).toBeVisible();
+    expect(monthlyPrice).toBeVisible();
+    expect(yearlyPrice).not.toBeVisible();
   });
 
   it('shows the label of a tier with no prices', () => {
-    setup({
-      panels: [
-        {
-          period: undefined,
-          cards: [makeCard({ headline: undefined, label: 'Contact us' })],
-        },
-      ],
-    });
+    setupWithCard({ headline: undefined, label: PRICE_LABEL });
 
-    expect(screen.getByText('Contact us')).toBeVisible();
+    const label = screen.getByText(PRICE_LABEL);
+    expect(label).toBeVisible();
   });
 
   it('shows the badge of a highlighted tier', () => {
-    setup({
-      panels: [
-        {
-          period: undefined,
-          cards: [makeCard({ highlightLabel: 'Most popular' })],
-        },
-      ],
-    });
+    setupWithCard({ highlightLabel: HIGHLIGHT_LABEL });
 
-    expect(screen.getByText('Most popular')).toBeVisible();
+    const badge = screen.getByText(HIGHLIGHT_LABEL);
+    expect(badge).toBeVisible();
   });
 
   it('renders extra price lines', () => {
-    setup({
-      panels: [
-        {
-          period: undefined,
-          cards: [makeCard({ extras: ['£99 one-time'] })],
-        },
-      ],
-    });
+    setupWithCard({ extras: [EXTRA_PRICE_LINE] });
 
-    expect(screen.getByText('£99 one-time')).toBeVisible();
+    const extra = screen.getByText(EXTRA_PRICE_LINE);
+    expect(extra).toBeVisible();
   });
 
   it('renders the module footnote and actions', () => {
-    setup({ footnote: 'Prices exclude VAT.', ctaButtons: ctaActionsDemo });
+    setup({ footnote: FOOTNOTE, ctaButtons: MOCK_CTA_ACTIONS });
 
-    expect(screen.getByText('Prices exclude VAT.')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).toBeVisible();
+    const footnote = screen.getByText(FOOTNOTE);
+    const action = screen.getByRole('link', {
+      name: MOCK_CTA_PRIMARY_ACTION.link.label,
+    });
+    expect(footnote).toBeVisible();
+    expect(action).toBeVisible();
   });
 });

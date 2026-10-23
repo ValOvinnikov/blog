@@ -1,18 +1,22 @@
 import {
   BRAND_VARIANT,
-  CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
   POST_SOURCE,
-} from '@blog/config';
-import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@blog/config/constants';
+import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { mockRawWideLayout } from '@blog/service/testing/shared/fixtures';
 
 import { toPostFeaturedModule } from './transformer';
 
+const threePosts = ['a', 'b', 'c'].map((_id) => ({
+  post: mockRawPostCard({ _id }),
+}));
+
 describe(toPostFeaturedModule, () => {
   it('maps headingBlock straight through', () => {
-    const raw = makeRawPostFeaturedModule();
+    const raw = mockRawPostFeaturedModule();
 
     const module = toPostFeaturedModule(raw);
 
@@ -22,76 +26,48 @@ describe(toPostFeaturedModule, () => {
     });
   });
 
-  it('maps brandVariant straight through', () => {
-    const raw = makeRawPostFeaturedModule({
-      brandVariant: BRAND_VARIANT.SECONDARY,
-    });
+  it.each([
+    { brandVariant: BRAND_VARIANT.SECONDARY },
+    { contentAlignment: CONTENT_ALIGNMENT.CENTER },
+    { showImages: true },
+    { showImages: false },
+    { displayMode: DISPLAY_MODE.CAROUSEL },
+  ])('maps an authored %o straight through', (authored) => {
+    const module = toPostFeaturedModule(mockRawPostFeaturedModule(authored));
 
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
+    expect(module).toMatchObject(authored);
   });
 
-  it('leaves contentAlignment undefined when unset (no faked default)', () => {
-    const raw = makeRawPostFeaturedModule({ contentAlignment: null });
+  it.each([
+    [{ contentAlignment: null }, { contentAlignment: undefined }],
+    [{ layout: null }, { layout: undefined }],
+  ])('maps an unset %o to %o', (unset, expected) => {
+    const module = toPostFeaturedModule(mockRawPostFeaturedModule(unset));
 
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.contentAlignment).toBeUndefined();
-  });
-
-  it('maps contentAlignment when authored', () => {
-    const raw = makeRawPostFeaturedModule({
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
+    expect(module).toMatchObject(expected);
   });
 
   it('maps a fully-authored layout object 1:1', () => {
-    const raw = makeRawPostFeaturedModule({
-      layout: {
-        spacingTop: 'MD',
-        spacingBottom: 'MD',
-        containerWidth: CONTAINER_WIDTH.WIDE,
-        dividerTop: true,
-        dividerBottom: true,
-      },
-    });
+    const layout = mockRawWideLayout();
+    const raw = mockRawPostFeaturedModule({ layout });
 
     const module = toPostFeaturedModule(raw);
 
-    expect(module.layout).toEqual({
-      spacingTop: 'MD',
-      spacingBottom: 'MD',
-      containerWidth: CONTAINER_WIDTH.WIDE,
-      dividerTop: true,
-      dividerBottom: true,
-    });
+    expect(module.layout).toEqual(layout);
   });
 
-  it('leaves layout undefined when the field is unset (no faked default)', () => {
-    const raw = makeRawPostFeaturedModule({ layout: null });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.layout).toBeUndefined();
-  });
-
-  it('preserves authored order for pinned posts (first is the lead, nothing re-sorted)', () => {
-    const raw = makeRawPostFeaturedModule({
+  it('preserves authored order for pinned posts, the first being the lead', () => {
+    const raw = mockRawPostFeaturedModule({
       postSource: POST_SOURCE.PINNED,
       posts: [
         {
-          post: makeRawPostCard({
+          post: mockRawPostCard({
             _id: 'b',
             publishedAt: '2026-01-01T00:00:00Z',
           }),
         },
         {
-          post: makeRawPostCard({
+          post: mockRawPostCard({
             _id: 'a',
             publishedAt: '2026-02-01T00:00:00Z',
           }),
@@ -104,12 +80,13 @@ describe(toPostFeaturedModule, () => {
     expect(module.posts.map((p) => p.id)).toEqual(['b', 'a']);
   });
 
-  it('reflects a pin the query already dropped for being unpublished', () => {
-    const raw = makeRawPostFeaturedModule({
+  it('drops a pin whose post did not resolve', () => {
+    const raw = mockRawPostFeaturedModule({
       postSource: POST_SOURCE.PINNED,
       posts: [
-        { post: makeRawPostCard({ _id: 'a' }) },
-        { post: makeRawPostCard({ _id: 'c' }) },
+        { post: mockRawPostCard({ _id: 'a' }) },
+        { post: null },
+        { post: mockRawPostCard({ _id: 'c' }) },
       ],
     });
 
@@ -119,45 +96,10 @@ describe(toPostFeaturedModule, () => {
   });
 
   it('does not cut pinned posts by a lingering limit value', () => {
-    const raw = makeRawPostFeaturedModule({
+    const raw = mockRawPostFeaturedModule({
       postSource: POST_SOURCE.PINNED,
       limit: 1,
-      posts: [
-        { post: makeRawPostCard({ _id: 'a' }) },
-        { post: makeRawPostCard({ _id: 'b' }) },
-      ],
-    });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.posts.map((p) => p.id)).toEqual(['a', 'b']);
-  });
-
-  it('cuts the newest-featured source to a limit of 1', () => {
-    const raw = makeRawPostFeaturedModule({
-      postSource: POST_SOURCE.NEWEST_FEATURED,
-      limit: 1,
-      posts: [
-        { post: makeRawPostCard({ _id: 'a' }) },
-        { post: makeRawPostCard({ _id: 'b' }) },
-        { post: makeRawPostCard({ _id: 'c' }) },
-      ],
-    });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.posts.map((p) => p.id)).toEqual(['a']);
-  });
-
-  it('cuts the newest-featured source to a limit of 3', () => {
-    const raw = makeRawPostFeaturedModule({
-      postSource: POST_SOURCE.NEWEST_FEATURED,
-      limit: 3,
-      posts: [
-        { post: makeRawPostCard({ _id: 'a' }) },
-        { post: makeRawPostCard({ _id: 'b' }) },
-        { post: makeRawPostCard({ _id: 'c' }) },
-      ],
+      posts: threePosts,
     });
 
     const module = toPostFeaturedModule(raw);
@@ -165,8 +107,23 @@ describe(toPostFeaturedModule, () => {
     expect(module.posts.map((p) => p.id)).toEqual(['a', 'b', 'c']);
   });
 
+  it.each([
+    [1, ['a']],
+    [3, ['a', 'b', 'c']],
+  ])('cuts the newest-featured source to a limit of %i', (limit, expected) => {
+    const raw = mockRawPostFeaturedModule({
+      postSource: POST_SOURCE.NEWEST_FEATURED,
+      limit,
+      posts: threePosts,
+    });
+
+    const module = toPostFeaturedModule(raw);
+
+    expect(module.posts.map((p) => p.id)).toEqual(expected);
+  });
+
   it('returns an empty posts array when nothing is featured in the dataset', () => {
-    const raw = makeRawPostFeaturedModule({
+    const raw = mockRawPostFeaturedModule({
       postSource: POST_SOURCE.NEWEST_FEATURED,
       limit: 3,
       posts: [],
@@ -175,39 +132,5 @@ describe(toPostFeaturedModule, () => {
     const module = toPostFeaturedModule(raw);
 
     expect(module.posts).toEqual([]);
-  });
-
-  it('passes showImages through when true', () => {
-    const raw = makeRawPostFeaturedModule({ showImages: true });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.showImages).toBe(true);
-  });
-
-  it('passes showImages through when false', () => {
-    const raw = makeRawPostFeaturedModule({ showImages: false });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.showImages).toBe(false);
-  });
-
-  it('passes an authored CAROUSEL displayMode through', () => {
-    const raw = makeRawPostFeaturedModule({
-      displayMode: DISPLAY_MODE.CAROUSEL,
-    });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
-  });
-
-  it('passes the read-time GRID default through when the field is absent from the document', () => {
-    const raw = makeRawPostFeaturedModule({ displayMode: DISPLAY_MODE.GRID });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.displayMode).toBe(DISPLAY_MODE.GRID);
   });
 });

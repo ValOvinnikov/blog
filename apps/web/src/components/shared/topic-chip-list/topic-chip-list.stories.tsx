@@ -1,17 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import {
+  MOCK_SECOND_TOPIC,
+  MOCK_ENGINEERING_TOPIC,
+  MOCK_THIRD_TOPIC,
+} from '@web/testing/shared/topic/fixtures';
 
 import { TopicChipList } from './topic-chip-list';
 
-const topics = [
-  makeTopicWithPostCount({
-    id: 'topic-1',
-    title: 'Engineering',
-    slug: 'engineering',
-  }),
-  makeTopicWithPostCount({ id: 'topic-2', title: 'Design', slug: 'design' }),
-  makeTopicWithPostCount({ id: 'topic-3', title: 'Product', slug: 'product' }),
-];
+const topics = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC, MOCK_THIRD_TOPIC];
 
 const meta = {
   title: 'Components/TopicChipList',
@@ -29,7 +25,7 @@ export const AllActive: TStory = {};
 
 /** `activeSlug` highlights the matching chip instead, as on `/topics/[slug]`. */
 export const TopicActive: TStory = {
-  args: { activeSlug: 'design' },
+  args: { activeSlug: MOCK_SECOND_TOPIC.slug },
 };
 
 export const Empty: TStory = {

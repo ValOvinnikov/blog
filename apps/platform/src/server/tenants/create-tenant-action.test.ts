@@ -7,29 +7,35 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
-import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
+import {
+  MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_EMAIL,
+} from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_DOMAIN,
+  MOCK_OWNER_EMAIL,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
-const OWNER_EMAIL = 'owner@example.com';
 const OWNER_USER_ID = 'user-1';
-const TENANT_NAME = 'Acme';
-const TENANT_DOMAIN = 'acme.example.com';
 const TENANT_ROOT_DOMAIN = 'example.com';
-const PROVISIONING_PATH = `/tenants/${TENANT_ID}/provisioning`;
+const PROVISIONING_PATH = `/tenants/${MOCK_TENANT_ID}/provisioning`;
 const EXISTING_TENANT_ID = 'existing-tenant';
 const OWNER_INVITE_EMAIL_FAILED_EVENT = 'tenants.owner_invite_email_failed';
 const CREATE_DRAFT_FAILED_EVENT = 'tenants.create_draft_failed';
 
-const validOwnerInviteToken = createOwnerInviteToken(OWNER_EMAIL);
+const validOwnerInviteToken = createOwnerInviteToken(MOCK_OWNER_EMAIL);
 
 const {
   requireAdminMock,
@@ -83,10 +89,10 @@ const loggerErrorMock = vi.mocked(logger.error);
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const validInput = {
-  name: TENANT_NAME,
-  domain: TENANT_DOMAIN,
+  name: MOCK_TENANT_NAME,
+  domain: MOCK_TENANT_DOMAIN,
   plan: TENANT_PLAN.FREE,
-  ownerEmail: OWNER_EMAIL,
+  ownerEmail: MOCK_OWNER_EMAIL,
 };
 
 describe('createTenantAction', () => {
@@ -97,18 +103,18 @@ describe('createTenantAction', () => {
     requireAdminMock.mockResolvedValue({ id: 'admin-1' });
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     startProvisioningMock.mockReset();
     startProvisioningMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     signInMock.mockReset();
-    signInMock.mockResolvedValue({ ok: true });
+    signInMock.mockResolvedValue(okResult());
     getUserByEmailMock.mockReset();
     getUserByEmailMock.mockResolvedValue({
       id: OWNER_USER_ID,
-      email: OWNER_EMAIL,
+      email: MOCK_OWNER_EMAIL,
     });
     getTenantByDomainMock.mockReset();
     getTenantByDomainMock.mockResolvedValue(undefined);
@@ -117,10 +123,7 @@ describe('createTenantAction', () => {
       DOMAIN_AVAILABILITY.AVAILABLE,
     );
     createTenantDraftMock.mockReset();
-    createTenantDraftMock.mockResolvedValue({
-      ok: true,
-      data: { id: TENANT_ID },
-    });
+    createTenantDraftMock.mockResolvedValue(okResult({ id: MOCK_TENANT_ID }));
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
@@ -151,7 +154,7 @@ describe('createTenantAction', () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
-      email: OWNER_EMAIL,
+      email: MOCK_OWNER_EMAIL,
       token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -170,7 +173,7 @@ describe('createTenantAction', () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
-      email: OWNER_EMAIL,
+      email: MOCK_OWNER_EMAIL,
       token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -188,7 +191,7 @@ describe('createTenantAction', () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED,
-      email: OWNER_EMAIL,
+      email: MOCK_OWNER_EMAIL,
       token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -206,23 +209,23 @@ describe('createTenantAction', () => {
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(createTenantDraftMock).toHaveBeenCalledWith({
-      name: TENANT_NAME,
-      domain: TENANT_DOMAIN,
+      name: MOCK_TENANT_NAME,
+      domain: MOCK_TENANT_DOMAIN,
       locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
-      owner: { type: 'invite', email: OWNER_EMAIL },
+      owner: { type: 'invite', email: MOCK_OWNER_EMAIL },
     });
     expect(signInMock).toHaveBeenCalledWith('email', {
-      email: OWNER_EMAIL,
+      email: MOCK_OWNER_EMAIL,
       redirect: false,
     });
-    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
   it('logs an error but still redirects when the owner-invite email fails to send', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
-    signInMock.mockResolvedValue({ ok: false, error: 'EmailSignInError' });
+    signInMock.mockResolvedValue(errorResult('EmailSignInError'));
 
     await expect(
       createTenantAction({
@@ -234,11 +237,11 @@ describe('createTenantAction', () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       OWNER_INVITE_EMAIL_FAILED_EVENT,
       expect.objectContaining({
-        tenantId: TENANT_ID,
-        ownerEmail: OWNER_EMAIL,
+        tenantId: MOCK_TENANT_ID,
+        ownerEmail: MOCK_OWNER_EMAIL,
       }),
     );
-    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
@@ -256,12 +259,12 @@ describe('createTenantAction', () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       OWNER_INVITE_EMAIL_FAILED_EVENT,
       expect.objectContaining({
-        tenantId: TENANT_ID,
-        ownerEmail: OWNER_EMAIL,
+        tenantId: MOCK_TENANT_ID,
+        ownerEmail: MOCK_OWNER_EMAIL,
         error: expect.any(Error),
       }),
     );
-    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
@@ -340,39 +343,22 @@ describe('createTenantAction', () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
-  it('proceeds with creation when the domain is free', async () => {
-    checkDomainAvailabilityMock.mockResolvedValue(
-      DOMAIN_AVAILABILITY.AVAILABLE,
-    );
+  it.each([
+    DOMAIN_AVAILABILITY.AVAILABLE,
+    DOMAIN_AVAILABILITY.NOT_CONFIGURED,
+    DOMAIN_AVAILABILITY.ERROR,
+  ])(
+    'proceeds with creation when the domain check reports %s',
+    async (availability) => {
+      checkDomainAvailabilityMock.mockResolvedValue(availability);
 
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
+      await expect(createTenantAction(validInput)).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+      );
 
-    expect(createTenantDraftMock).toHaveBeenCalled();
-  });
-
-  it('proceeds with creation unchecked when Vercel credentials are absent', async () => {
-    checkDomainAvailabilityMock.mockResolvedValue(
-      DOMAIN_AVAILABILITY.NOT_CONFIGURED,
-    );
-
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(createTenantDraftMock).toHaveBeenCalled();
-  });
-
-  it('proceeds with creation when the domain-availability check errors or times out', async () => {
-    checkDomainAvailabilityMock.mockResolvedValue(DOMAIN_AVAILABILITY.ERROR);
-
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(createTenantDraftMock).toHaveBeenCalled();
-  });
+      expect(createTenantDraftMock).toHaveBeenCalled();
+    },
+  );
 
   it('returns a generic error and logs at error level when createTenantDraft throws', async () => {
     createTenantDraftMock.mockRejectedValue(new Error('unique violation'));
@@ -384,15 +370,14 @@ describe('createTenantAction', () => {
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       CREATE_DRAFT_FAILED_EVENT,
-      expect.objectContaining({ domain: TENANT_DOMAIN }),
+      expect.objectContaining({ domain: MOCK_TENANT_DOMAIN }),
     );
   });
 
   it('returns a generic error and logs on any other createTenantDraft failure', async () => {
-    createTenantDraftMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    createTenantDraftMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await createTenantAction(validInput);
 
@@ -402,7 +387,7 @@ describe('createTenantAction', () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       CREATE_DRAFT_FAILED_EVENT,
       expect.objectContaining({
-        domain: TENANT_DOMAIN,
+        domain: MOCK_TENANT_DOMAIN,
         error: ERROR_CODE.DB_NOT_FOUND,
       }),
     );
@@ -415,8 +400,8 @@ describe('createTenantAction', () => {
     );
 
     expect(createTenantDraftMock).toHaveBeenCalledWith({
-      name: TENANT_NAME,
-      domain: TENANT_DOMAIN,
+      name: MOCK_TENANT_NAME,
+      domain: MOCK_TENANT_DOMAIN,
       locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       owner: { type: 'user', userId: OWNER_USER_ID },
@@ -428,7 +413,7 @@ describe('createTenantAction', () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
@@ -458,14 +443,14 @@ describe('createTenantAction', () => {
     );
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: {
-        name: TENANT_NAME,
-        domain: TENANT_DOMAIN,
+        name: MOCK_TENANT_NAME,
+        domain: MOCK_TENANT_DOMAIN,
         plan: TENANT_PLAN.FREE,
         ownerUserId: OWNER_USER_ID,
       },
@@ -485,8 +470,8 @@ describe('createTenantAction', () => {
     expect(insertAuditEventMock).toHaveBeenCalledWith(
       expect.objectContaining({
         details: {
-          name: TENANT_NAME,
-          domain: TENANT_DOMAIN,
+          name: MOCK_TENANT_NAME,
+          domain: MOCK_TENANT_DOMAIN,
           plan: TENANT_PLAN.FREE,
           ownerUserId: null,
         },
@@ -501,12 +486,12 @@ describe('createTenantAction', () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(startProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_audit_failed',
       expect.objectContaining({
-        targetId: TENANT_ID,
+        targetId: MOCK_TENANT_ID,
         error: expect.any(Error),
       }),
     );

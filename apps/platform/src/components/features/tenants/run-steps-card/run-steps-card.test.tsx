@@ -1,5 +1,9 @@
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  MOCK_RUN_PLUS_6_MIN_AT,
+  MOCK_RUN_STARTED_AT,
+} from '@platform/testing/tenants/fixtures';
 
 import { RunStepsCard } from './run-steps-card';
 
@@ -11,7 +15,7 @@ const setup = customRender(RunStepsCard, {
       key: 'first',
       title: 'First step',
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      updatedAt: '2026-08-12T14:18:00.000Z',
+      updatedAt: MOCK_RUN_STARTED_AT,
     },
     {
       key: 'second',
@@ -29,37 +33,46 @@ const setup = customRender(RunStepsCard, {
 describe(`<${RunStepsCard.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
+    vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('counts the steps that are done', () => {
-    setup();
+  describe('with default steps', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByText('1 of 3 done')).toBeVisible();
-  });
+    it('counts the steps that are done', () => {
+      const progress = screen.getByText('1 of 3 done');
 
-  it('dates a settled step and marks the running one as happening now', () => {
-    setup();
+      expect(progress).toBeVisible();
+    });
 
-    expect(screen.getByText('6m ago')).toBeVisible();
-    expect(screen.getByText('now')).toBeVisible();
+    it('dates a settled step and marks the running one as happening now', () => {
+      const settledAge = screen.getByText('6m ago');
+      const runningAge = screen.getByText('now');
+
+      expect(settledAge).toBeVisible();
+      expect(runningAge).toBeVisible();
+    });
   });
 
   it('labels every step as queued before the run has written any step', () => {
     setup({ isPreRun: true });
 
-    expect(screen.getAllByText('Queued')).toHaveLength(3);
+    const queuedLabels = screen.getAllByText('Queued');
+
+    expect(queuedLabels).toHaveLength(3);
   });
 
   it('takes the heading level it is given', () => {
     setup({ headingLevel: 3 });
 
-    expect(
-      screen.getByRole('heading', { level: 3, name: /Steps/ }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { level: 3, name: /Steps/ });
+
+    expect(heading).toBeVisible();
   });
 });

@@ -24,7 +24,6 @@ import {
 } from '@web/utils/validate-contact-message/validate-contact-message';
 
 const SOURCE_PATH_MAX_LENGTH = 2_048;
-const SUBMIT_BLOCKED_EVENT = 'contact_form.submit_blocked';
 
 export type TContactMessageInput = TContactMessageFields & {
   website: string;
@@ -44,6 +43,8 @@ export type TSubmitContactResult = TActionResult<
   TContactField,
   TFieldErrorReason
 >;
+
+const SUBMIT_BLOCKED_EVENT = 'contact_form.submit_blocked';
 
 const BLOCKED = toOutcome(ACTION_OUTCOME.BLOCKED);
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
@@ -114,7 +115,7 @@ export const submitContactMessage = async (
   if (!validation.ok) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: validation.fieldErrors,
+      fieldErrors: validation.error,
     };
   }
 

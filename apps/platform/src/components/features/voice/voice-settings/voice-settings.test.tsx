@@ -12,7 +12,16 @@ import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voic
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  ARCHIVED_NOTICE_DESCRIPTION,
+  SAVE_CHANGES,
+  UNSAVED_CHANGES,
+} from '@platform/testing/render-in-settings-form';
+import {
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
+import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent from '@testing-library/user-event';
@@ -38,7 +47,6 @@ const saveVoiceOverridesActionMock = vi.mocked(saveVoiceOverridesAction);
 mockRouterRefresh();
 
 const { EN, DE } = LOCALE_ISO_CODES;
-const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const richText = (text: string, key: string): TVoicePortableText => [
   {
@@ -52,8 +60,6 @@ const richText = (text: string, key: string): TVoicePortableText => [
     markDefs: [{ _type: 'link', _key: 'l1', href: '/blog' }],
   },
 ];
-
-const NOTHING_HERE = 'Nothing here';
 
 const storedOverrides = {
   [EN]: {
@@ -76,7 +82,7 @@ const VoiceSettingsWithListSamples = (props: TVoiceSettingsProps) => (
 );
 
 const setup = customRender(VoiceSettingsWithListSamples, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   initialDraft: buildVoiceDraft({}, [EN]),
   defaultLocale: EN,
   liveLocales: [EN],
@@ -99,15 +105,26 @@ const notFoundHeading = () =>
 
 const ERROR_PAGE = 'Error page';
 const EMPTY_LISTS = 'Empty lists';
+const BOOKMARKS = 'Bookmarks';
+const GERMAN = 'German';
+const ENGLISH = 'English';
+const LANGUAGE = 'Language';
+const TAG_PAGE = 'Tag page';
+const LOST = 'Lost';
+const RESET = 'Reset';
+const DISCARD = 'Discard';
+const STRONG = 'strong';
+const PLACEHOLDER = 'placeholder';
 const VOICE_SPECIMEN_NOT_FOUND = 'voice-specimen-NOT_FOUND';
 const LOST_AT_SEA = 'Lost at sea';
 const VOICE_KEY_NOTFOUNDHEADING = 'voice-key-notFoundHeading';
 const DATA_FOCUSED = 'data-focused';
 const SHOW_PREVIEW = 'Show preview';
 const BLOG_INDEX_PAGE = 'Blog index page';
-const UNSAVED_CHANGES = 'Unsaved changes';
-const SAVE_CHANGES = 'Save changes';
 const USE_100_CHARACTERS_OR_FEWER = 'Use 100 characters or fewer.';
+const KEEP_NAME_PLACEHOLDER = 'Keep {name} — the site fills it in.';
+const NO_OVERRIDES = 'with no overrides';
+const TWO_LANGUAGES = 'with stored overrides in two live languages';
 
 describe(`<${VoiceSettings.name}/>`, () => {
   let user: ReturnType<typeof userEvent.setup>;
@@ -116,220 +133,297 @@ describe(`<${VoiceSettings.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('shows one card per surface, in page order', () => {
-    setup();
+  describe(NO_OVERRIDES, () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent),
-    ).toEqual([PAGE_NOT_FOUND, ERROR_PAGE, EMPTY_LISTS, 'Bookmarks']);
-  });
+    it('shows one card per surface, in page order', () => {
+      const headings = screen.getAllByRole('heading', { level: 2 });
+      const headingTexts = headings.map((h) => h.textContent);
 
-  it('offers every field with its default as the placeholder', () => {
-    setup();
+      expect(headingTexts).toEqual([
+        PAGE_NOT_FOUND,
+        ERROR_PAGE,
+        EMPTY_LISTS,
+        BOOKMARKS,
+      ]);
+    });
 
-    expect(notFoundHeading()).toHaveAttribute(
-      'placeholder',
-      SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
-    );
-    expect(
-      within(card(PAGE_NOT_FOUND)).getByRole('textbox', {
+    it('offers every field with its default as the placeholder', () => {
+      const headingField = notFoundHeading();
+      const notFoundCard = card(PAGE_NOT_FOUND);
+      const errorCard = card(ERROR_PAGE);
+      const bookmarksCard = card(BOOKMARKS);
+      const supportingText = within(notFoundCard).getByRole('textbox', {
         name: 'Supporting text',
-      }),
-    ).toBeVisible();
-    expect(
-      within(card(ERROR_PAGE)).getByRole('textbox', { name: 'Description' }),
-    ).toBeVisible();
-    expect(
-      within(card('Bookmarks')).getByRole('textbox', {
+      });
+      const errorDescription = within(errorCard).getByRole('textbox', {
+        name: 'Description',
+      });
+      const emptyBookmarks = within(bookmarksCard).getByRole('textbox', {
         name: 'Empty bookmarks',
-      }),
-    ).toBeVisible();
+      });
+
+      expect(headingField).toHaveAttribute(
+        PLACEHOLDER,
+        SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
+      );
+      expect(supportingText).toBeVisible();
+      expect(errorDescription).toBeVisible();
+      expect(emptyBookmarks).toBeVisible();
+    });
+
+    it('tells the editor that buttons and labels are not editable here', () => {
+      const note = screen.getByText(
+        /Buttons, menus and labels are translated for you/,
+      );
+
+      expect(note).toBeVisible();
+    });
+
+    it('marks an edited field customised and unsaved, and Reset returns it to the default', async () => {
+      const section = card(PAGE_NOT_FOUND);
+      const defaultBadges = within(section).getAllByText('Default');
+
+      expect(defaultBadges).toHaveLength(3);
+
+      const headingField = notFoundHeading();
+
+      await user.type(headingField, LOST);
+
+      const customisedBadge = within(section).getByText('Customised');
+      const unsavedBadge = within(section).getByText('Unsaved');
+      const customisedSummary = within(section).getByText(
+        '3 fields · 1 customised',
+      );
+
+      expect(customisedBadge).toBeVisible();
+      expect(unsavedBadge).toBeInTheDocument();
+      expect(customisedSummary).toBeVisible();
+
+      const resetButton = within(section).getByRole('button', { name: RESET });
+
+      await user.click(resetButton);
+
+      const resetHeadingField = notFoundHeading();
+      const defaultSummary = within(section).getByText(
+        '3 fields · all default',
+      );
+
+      expect(resetHeadingField).toHaveValue('');
+      expect(defaultSummary).toBeVisible();
+    });
+
+    it('counts the empty-list card in lists', () => {
+      const section = card(EMPTY_LISTS);
+      const listsSummary = within(section).getByText('5 lists · all default');
+
+      expect(listsSummary).toBeVisible();
+    });
   });
 
-  it('tells the editor that buttons and labels are not editable here', () => {
-    setup();
+  describe(TWO_LANGUAGES, () => {
+    beforeEach(() => {
+      setupBilingual();
+    });
 
-    expect(
-      screen.getByText(/Buttons, menus and labels are translated for you/),
-    ).toBeVisible();
-  });
+    it('summarises each card with its field count and customised count', () => {
+      const notFoundCard = card(PAGE_NOT_FOUND);
+      const errorCard = card(ERROR_PAGE);
+      const bookmarksCard = card(BOOKMARKS);
+      const notFoundSummary = within(notFoundCard).getByText(
+        '3 fields · 2 customised',
+      );
+      const errorSummary = within(errorCard).getByText(
+        '2 fields · all default',
+      );
+      const bookmarksSummary = within(bookmarksCard).getByText(
+        '1 field · 1 customised',
+      );
 
-  it('marks an edited field customised and unsaved, and Reset returns it to the default', async () => {
-    setup();
-    const section = card(PAGE_NOT_FOUND);
+      expect(notFoundSummary).toBeVisible();
+      expect(errorSummary).toBeVisible();
+      expect(bookmarksSummary).toBeVisible();
+    });
 
-    expect(within(section).getAllByText('Default')).toHaveLength(3);
+    it('restores the saved values on Discard', async () => {
+      const headingField = notFoundHeading();
 
-    await user.type(notFoundHeading(), 'Lost');
+      await user.clear(headingField);
 
-    expect(within(section).getByText('Customised')).toBeVisible();
-    expect(within(section).getByText('Unsaved')).toBeInTheDocument();
-    expect(within(section).getByText('3 fields · 1 customised')).toBeVisible();
+      const unsavedRegion = screen.getByRole('region', {
+        name: UNSAVED_CHANGES,
+      });
 
-    await user.click(within(section).getByRole('button', { name: 'Reset' }));
+      expect(unsavedRegion).toHaveTextContent('1 unsaved change');
 
-    expect(notFoundHeading()).toHaveValue('');
-    expect(within(section).getByText('3 fields · all default')).toBeVisible();
-  });
+      const discardButton = screen.getByRole('button', { name: DISCARD });
 
-  it('summarises each card with its field count and customised count', () => {
-    setupBilingual();
+      await user.click(discardButton);
 
-    expect(
-      within(card(PAGE_NOT_FOUND)).getByText('3 fields · 2 customised'),
-    ).toBeVisible();
-    expect(
-      within(card(ERROR_PAGE)).getByText('2 fields · all default'),
-    ).toBeVisible();
-    expect(
-      within(card('Bookmarks')).getByText('1 field · 1 customised'),
-    ).toBeVisible();
-  });
+      const restoredHeadingField = notFoundHeading();
 
-  it('counts the empty-list card in lists', () => {
-    setup();
-
-    expect(
-      within(card(EMPTY_LISTS)).getByText('5 lists · all default'),
-    ).toBeVisible();
+      expect(restoredHeadingField).toHaveValue(NOTHING_HERE);
+    });
   });
 
   describe('specimens', () => {
     it('switches every specimen to the dark ramp from the colour scheme control', async () => {
       setup({ previewTheme: { ...defaultLookFormValues(), accentHue: 28 } });
 
-      await user.click(screen.getByRole('button', { name: 'Dark' }));
+      const darkButton = screen.getByRole('button', { name: 'Dark' });
 
-      expect(screen.getByTestId(VOICE_SPECIMEN_NOT_FOUND)).toHaveStyle({
+      await user.click(darkButton);
+
+      const specimen = screen.getByTestId(VOICE_SPECIMEN_NOT_FOUND);
+
+      expect(specimen).toHaveStyle({
         '--brand-primary-solid': 'oklch(0.7 0.16 28)',
       });
     });
 
-    it('re-renders the specimen beside a field as the editor types', async () => {
-      setup();
-
-      await user.type(notFoundHeading(), LOST_AT_SEA);
-
-      expect(
-        within(screen.getByTestId(VOICE_SPECIMEN_NOT_FOUND)).getByText(
-          LOST_AT_SEA,
-        ),
-      ).toBeVisible();
-    });
-
-    it("outlines the focused field's text in its specimen", async () => {
-      setup();
-
-      await user.click(notFoundHeading());
-
-      expect(screen.getByTestId(VOICE_KEY_NOTFOUNDHEADING)).toHaveAttribute(
-        DATA_FOCUSED,
-        'true',
-      );
-
-      await user.tab();
-
-      expect(screen.getByTestId(VOICE_KEY_NOTFOUNDHEADING)).toHaveAttribute(
-        DATA_FOCUSED,
-        'false',
-      );
-    });
-
-    it('shows the open list in the empty-lists specimen', async () => {
-      setup();
-      const section = card(EMPTY_LISTS);
-
-      await user.click(
-        within(section).getByRole('button', { name: /Topic page/ }),
-      );
-
-      expect(
-        within(screen.getByTestId('voice-specimen-ARCHIVE')).getByText(
-          'No posts in Design yet.',
-        ),
-      ).toBeVisible();
-    });
-
-    it.each([
-      [PAGE_NOT_FOUND, 'The return button is fixed and translated for you.'],
-      [ERROR_PAGE, 'The buttons are fixed and translated for you.'],
-      [
-        EMPTY_LISTS,
-        'The heading comes from Studio; only the message is yours here.',
-      ],
-      ['Bookmarks', 'The page title and panel heading are fixed.'],
-    ])(
-      'labels the %s preview and tells the editor which text is theirs',
-      (surface, note) => {
+    describe(NO_OVERRIDES, () => {
+      beforeEach(() => {
         setup();
-        const preview = within(card(surface)).getByRole('group', {
-          name: 'Live preview',
-        });
-
-        expect(within(preview).getByText(note)).toBeInTheDocument();
-      },
-    );
-
-    it('toggles each preview behind its own Show preview button', async () => {
-      setup();
-      const toggle = within(card('Bookmarks')).getByRole('button', {
-        name: SHOW_PREVIEW,
-        expanded: false,
       });
 
-      await user.click(toggle);
+      it('re-renders the specimen beside a field as the editor types', async () => {
+        const headingField = notFoundHeading();
 
-      expect(
-        within(card('Bookmarks')).getByRole('button', {
-          name: 'Hide preview',
-          expanded: true,
-        }),
-      ).toBeVisible();
-      expect(
-        within(card(ERROR_PAGE)).getByRole('button', {
+        await user.type(headingField, LOST_AT_SEA);
+
+        const specimen = screen.getByTestId(VOICE_SPECIMEN_NOT_FOUND);
+        const typedText = within(specimen).getByText(LOST_AT_SEA);
+
+        expect(typedText).toBeVisible();
+      });
+
+      it("outlines the focused field's text in its specimen", async () => {
+        const headingField = notFoundHeading();
+
+        await user.click(headingField);
+
+        const focusedKey = screen.getByTestId(VOICE_KEY_NOTFOUNDHEADING);
+
+        expect(focusedKey).toHaveAttribute(DATA_FOCUSED, 'true');
+
+        await user.tab();
+
+        const blurredKey = screen.getByTestId(VOICE_KEY_NOTFOUNDHEADING);
+
+        expect(blurredKey).toHaveAttribute(DATA_FOCUSED, 'false');
+      });
+
+      it('shows the open list in the empty-lists specimen', async () => {
+        const section = card(EMPTY_LISTS);
+        const topicRow = within(section).getByRole('button', {
+          name: /Topic page/,
+        });
+
+        await user.click(topicRow);
+
+        const specimen = screen.getByTestId('voice-specimen-ARCHIVE');
+        const sampleMessage = within(specimen).getByText(
+          'No posts in Design yet.',
+        );
+
+        expect(sampleMessage).toBeVisible();
+      });
+
+      it.each([
+        [PAGE_NOT_FOUND, 'The return button is fixed and translated for you.'],
+        [ERROR_PAGE, 'The buttons are fixed and translated for you.'],
+        [
+          EMPTY_LISTS,
+          'The heading comes from Studio; only the message is yours here.',
+        ],
+        [BOOKMARKS, 'The page title and panel heading are fixed.'],
+      ])(
+        'labels the %s preview and tells the editor which text is theirs',
+        (surface, note) => {
+          const section = card(surface);
+          const preview = within(section).getByRole('group', {
+            name: 'Live preview',
+          });
+          const noteText = within(preview).getByText(note);
+
+          expect(noteText).toBeInTheDocument();
+        },
+      );
+
+      it('toggles each preview behind its own Show preview button', async () => {
+        const bookmarksCard = card(BOOKMARKS);
+        const toggle = within(bookmarksCard).getByRole('button', {
           name: SHOW_PREVIEW,
           expanded: false,
-        }),
-      ).toBeVisible();
+        });
+
+        await user.click(toggle);
+
+        const hideButton = within(card(BOOKMARKS)).getByRole('button', {
+          name: 'Hide preview',
+          expanded: true,
+        });
+        const errorShowButton = within(card(ERROR_PAGE)).getByRole('button', {
+          name: SHOW_PREVIEW,
+          expanded: false,
+        });
+
+        expect(hideButton).toBeVisible();
+        expect(errorShowButton).toBeVisible();
+      });
     });
   });
 
   describe('empty lists', () => {
-    it('opens one list at a time, showing the others as compact rows', async () => {
+    beforeEach(() => {
       setup();
-      const section = card(EMPTY_LISTS);
+    });
 
-      expect(
-        within(section).getByRole('textbox', { name: BLOG_INDEX_PAGE }),
-      ).toBeVisible();
+    it('opens one list at a time, showing the others as compact rows', async () => {
+      const section = card(EMPTY_LISTS);
+      const blogIndexField = within(section).getByRole('textbox', {
+        name: BLOG_INDEX_PAGE,
+      });
+
+      expect(blogIndexField).toBeVisible();
       for (const name of [
         /Topic page/,
         /Tag page/,
         /Topics index page/,
         /Tags index page/,
       ]) {
-        expect(
-          within(section).getByRole('button', { name, expanded: false }),
-        ).toBeVisible();
+        const compactRow = within(section).getByRole('button', {
+          name,
+          expanded: false,
+        });
+
+        expect(compactRow).toBeVisible();
       }
 
-      await user.click(
-        within(section).getByRole('button', { name: /Tag page/ }),
-      );
+      const tagRow = within(section).getByRole('button', { name: /Tag page/ });
 
-      expect(
-        within(section).getByRole('textbox', { name: 'Tag page' }),
-      ).toBeVisible();
-      expect(
-        within(section).queryByRole('textbox', { name: BLOG_INDEX_PAGE }),
-      ).not.toBeInTheDocument();
-      expect(
-        within(section).getByRole('button', { name: /Blog index page/ }),
-      ).toHaveTextContent(SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty);
+      await user.click(tagRow);
+
+      const tagField = within(section).getByRole('textbox', {
+        name: TAG_PAGE,
+      });
+      const closedBlogIndexField = within(section).queryByRole('textbox', {
+        name: BLOG_INDEX_PAGE,
+      });
+      const blogIndexRow = within(section).getByRole('button', {
+        name: /Blog index page/,
+      });
+
+      expect(tagField).toBeVisible();
+      expect(closedBlogIndexField).not.toBeInTheDocument();
+      expect(blogIndexRow).toHaveTextContent(
+        SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty,
+      );
     });
 
     it('keeps keyboard focus on a list row as it opens, then tabs into its field', async () => {
-      setup();
       const section = card(EMPTY_LISTS);
       const row = within(section).getByRole('button', { name: /Tag page/ });
 
@@ -341,50 +435,47 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       await user.tab();
 
-      expect(
-        within(section).getByRole('button', { name: 'Bold' }),
-      ).toHaveFocus();
+      const boldButton = within(section).getByRole('button', { name: 'Bold' });
+
+      expect(boldButton).toHaveFocus();
     });
 
     it('titles the open list once, in its header', () => {
-      setup();
+      const section = card(EMPTY_LISTS);
+      const titles = within(section).getAllByText(BLOG_INDEX_PAGE);
 
-      expect(
-        within(card(EMPTY_LISTS)).getAllByText(BLOG_INDEX_PAGE),
-      ).toHaveLength(1);
+      expect(titles).toHaveLength(1);
     });
 
     it('closes the open list from its header', async () => {
-      setup();
       const section = card(EMPTY_LISTS);
+      const openRow = within(section).getByRole('button', {
+        name: /Blog index page/,
+        expanded: true,
+      });
 
-      await user.click(
-        within(section).getByRole('button', {
-          name: /Blog index page/,
-          expanded: true,
-        }),
-      );
+      await user.click(openRow);
 
-      expect(
-        within(section).getByRole('button', {
-          name: /Blog index page/,
-          expanded: false,
-        }),
-      ).toBeVisible();
+      const closedRow = within(section).getByRole('button', {
+        name: /Blog index page/,
+        expanded: false,
+      });
+
+      expect(closedRow).toBeVisible();
     });
 
     it('asks the editor to keep the name placeholder on a topic message', async () => {
-      setup();
+      const topicRow = screen.getByRole('button', { name: /Topic page/ });
 
-      await user.click(screen.getByRole('button', { name: /Topic page/ }));
+      await user.click(topicRow);
 
-      expect(
-        screen.getByText(
-          (_, element) =>
-            element?.tagName === 'SPAN' &&
-            element.textContent === 'Keep {name} — the site fills it in.',
-        ),
-      ).toBeVisible();
+      const hint = screen.getByText(
+        (_, element) =>
+          element?.tagName === 'SPAN' &&
+          element.textContent === KEEP_NAME_PLACEHOLDER,
+      );
+
+      expect(hint).toBeVisible();
     });
   });
 
@@ -392,48 +483,72 @@ describe(`<${VoiceSettings.name}/>`, () => {
     it('shows no language switcher for a single-language site', () => {
       setup();
 
-      expect(
-        screen.queryByRole('group', { name: 'Language' }),
-      ).not.toBeInTheDocument();
+      const switcher = screen.queryByRole('group', { name: LANGUAGE });
+
+      expect(switcher).not.toBeInTheDocument();
     });
 
-    it('describes each live language with its customised count, marking the default', () => {
-      setupBilingual();
+    describe(TWO_LANGUAGES, () => {
+      beforeEach(() => {
+        setupBilingual();
+      });
 
-      const switcher = screen.getByRole('group', { name: 'Language' });
-      expect(
-        within(switcher).getByRole('button', { name: 'English' }),
-      ).toHaveAccessibleDescription('Default language · 3 customised');
-      expect(
-        within(switcher).getByRole('button', { name: 'German' }),
-      ).toHaveAccessibleDescription('1 customised');
-    });
+      it('describes each live language with its customised count, marking the default', () => {
+        const switcher = screen.getByRole('group', { name: LANGUAGE });
+        const englishButton = within(switcher).getByRole('button', {
+          name: ENGLISH,
+        });
+        const germanButton = within(switcher).getByRole('button', {
+          name: GERMAN,
+        });
 
-    it("edits the selected language's values against that language's defaults", async () => {
-      setupBilingual();
+        expect(englishButton).toHaveAccessibleDescription(
+          'Default language · 3 customised',
+        );
+        expect(germanButton).toHaveAccessibleDescription('1 customised');
+      });
 
-      expect(notFoundHeading()).toHaveValue(NOTHING_HERE);
+      it("edits the selected language's values against that language's defaults", async () => {
+        const englishHeadingField = notFoundHeading();
 
-      await user.click(screen.getByRole('button', { name: 'German' }));
+        expect(englishHeadingField).toHaveValue(NOTHING_HERE);
 
-      expect(notFoundHeading()).toHaveValue('');
-      expect(notFoundHeading()).toHaveAttribute(
-        'placeholder',
-        SITE_MESSAGES_BY_LOCALE.DE.notFound.heading,
-      );
-      expect(screen.getByText('German', { selector: 'strong' })).toBeVisible();
-    });
+        const germanButton = screen.getByRole('button', { name: GERMAN });
 
-    it('breaks the unsaved count down by language', async () => {
-      setupBilingual();
+        await user.click(germanButton);
 
-      await user.type(notFoundHeading(), '!');
-      await user.click(screen.getByRole('button', { name: 'German' }));
-      await user.type(notFoundHeading(), 'Weg');
+        const germanHeadingField = notFoundHeading();
+        const germanLabel = screen.getByText(GERMAN, { selector: STRONG });
 
-      expect(
-        screen.getByRole('region', { name: UNSAVED_CHANGES }),
-      ).toHaveTextContent('2 unsaved changesEnglish 1 · German 1');
+        expect(germanHeadingField).toHaveValue('');
+        expect(germanHeadingField).toHaveAttribute(
+          PLACEHOLDER,
+          SITE_MESSAGES_BY_LOCALE.DE.notFound.heading,
+        );
+        expect(germanLabel).toBeVisible();
+      });
+
+      it('breaks the unsaved count down by language', async () => {
+        const englishHeadingField = notFoundHeading();
+
+        await user.type(englishHeadingField, '!');
+
+        const germanButton = screen.getByRole('button', { name: GERMAN });
+
+        await user.click(germanButton);
+
+        const germanHeadingField = notFoundHeading();
+
+        await user.type(germanHeadingField, 'Weg');
+
+        const unsavedRegion = screen.getByRole('region', {
+          name: UNSAVED_CHANGES,
+        });
+
+        expect(unsavedRegion).toHaveTextContent(
+          '2 unsaved changesEnglish 1 · German 1',
+        );
+      });
     });
   });
 
@@ -444,50 +559,76 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
       setupBilingual();
 
-      await user.clear(notFoundHeading());
-      await user.type(notFoundHeading(), 'Lost');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const headingField = notFoundHeading();
 
-      expect(saveVoiceOverridesActionMock).toHaveBeenCalledWith(TENANT_ID, {
-        [EN]: {
-          notFoundHeading: 'Lost',
-          notFoundSupportingText: storedOverrides[EN].notFoundSupportingText,
-          bookmarksEmpty: storedOverrides[EN].bookmarksEmpty,
+      await user.clear(headingField);
+      await user.type(headingField, LOST);
+
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+      await user.click(saveButton);
+
+      expect(saveVoiceOverridesActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        {
+          [EN]: {
+            notFoundHeading: LOST,
+            notFoundSupportingText: storedOverrides[EN].notFoundSupportingText,
+            bookmarksEmpty: storedOverrides[EN].bookmarksEmpty,
+          },
+          [DE]: {
+            localeErrorDescription: storedOverrides[DE].localeErrorDescription,
+          },
         },
-        [DE]: {
-          localeErrorDescription: storedOverrides[DE].localeErrorDescription,
-        },
-      });
-    });
-
-    it('shows a toast and refreshes after a successful save', async () => {
-      const refresh = mockRouterRefresh();
-      saveVoiceOverridesActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.SUCCESS,
-      });
-      setup();
-
-      await user.type(notFoundHeading(), 'Lost');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      expect(await screen.findByText('Voice saved.')).toBeVisible();
-      expect(refresh).toHaveBeenCalled();
-    });
-
-    it('shows an error alert and does not refresh when the save fails', async () => {
-      const refresh = mockRouterRefresh();
-      saveVoiceOverridesActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
-      setup();
-
-      await user.type(notFoundHeading(), 'Lost');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        "Couldn't save",
       );
-      expect(refresh).not.toHaveBeenCalled();
+    });
+
+    describe('with the router refresh observed', () => {
+      let refresh: ReturnType<typeof mockRouterRefresh>;
+
+      beforeEach(() => {
+        refresh = mockRouterRefresh();
+      });
+
+      it('shows a toast and refreshes after a successful save', async () => {
+        saveVoiceOverridesActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.SUCCESS,
+        });
+        setup();
+
+        const headingField = notFoundHeading();
+
+        await user.type(headingField, LOST);
+
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+        await user.click(saveButton);
+
+        const toast = await screen.findByText('Voice saved.');
+
+        expect(toast).toBeVisible();
+        expect(refresh).toHaveBeenCalled();
+      });
+
+      it('shows an error alert and does not refresh when the save fails', async () => {
+        saveVoiceOverridesActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.SERVER_ERROR,
+        });
+        setup();
+
+        const headingField = notFoundHeading();
+
+        await user.type(headingField, LOST);
+
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+        await user.click(saveButton);
+
+        const alert = await screen.findByRole('alert');
+
+        expect(alert).toHaveTextContent("Couldn't save");
+        expect(refresh).not.toHaveBeenCalled();
+      });
     });
 
     it('shows a rejected field inline and counts it on the save bar until edited', async () => {
@@ -501,28 +642,33 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
       setup();
 
-      await user.type(notFoundHeading(), 'Lost');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const headingField = notFoundHeading();
 
-      expect(
-        await screen.findByText(USE_100_CHARACTERS_OR_FEWER),
-      ).toBeVisible();
-      expect(notFoundHeading()).toHaveAccessibleDescription(
-        /Use 100 characters or fewer\./,
-      );
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      await user.type(headingField, LOST);
+
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+      await user.click(saveButton);
+
+      const fieldError = await screen.findByText(USE_100_CHARACTERS_OR_FEWER);
+      const rejectedField = notFoundHeading();
+      const alert = screen.queryByRole('alert');
       const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
-      expect(saveBar).toHaveTextContent('1 field needs attention');
-      expect(within(saveBar).getByRole('link')).toHaveAttribute(
-        'href',
-        `#${notFoundHeading().id}`,
+      const firstFieldLink = within(saveBar).getByRole('link');
+
+      expect(fieldError).toBeVisible();
+      expect(rejectedField).toHaveAccessibleDescription(
+        `${en.voiceFieldHints.notFoundHeading} ${USE_100_CHARACTERS_OR_FEWER}`,
       );
+      expect(alert).not.toBeInTheDocument();
+      expect(saveBar).toHaveTextContent('1 field needs attention');
+      expect(firstFieldLink).toHaveAttribute('href', `#${rejectedField.id}`);
 
-      await user.type(notFoundHeading(), '!');
+      await user.type(rejectedField, '!');
 
-      expect(
-        screen.queryByText(USE_100_CHARACTERS_OR_FEWER),
-      ).not.toBeInTheDocument();
+      const clearedError = screen.queryByText(USE_100_CHARACTERS_OR_FEWER);
+
+      expect(clearedError).not.toBeInTheDocument();
     });
 
     it('switches to the language and opens the list that holds a rejected field', async () => {
@@ -534,27 +680,37 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
       setupBilingual();
 
-      await user.type(notFoundHeading(), '!');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const headingField = notFoundHeading();
 
-      expect(
-        await screen.findByText(
-          'Keep the placeholder {name} — the site fills it in.',
-        ),
-      ).toBeVisible();
-      expect(
-        within(card(EMPTY_LISTS)).getByRole('textbox', { name: 'Tag page' }),
-      ).toBeVisible();
-      expect(screen.getByText('German', { selector: 'strong' })).toBeVisible();
+      await user.type(headingField, '!');
+
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+      await user.click(saveButton);
+
+      const fieldError = await screen.findByText(
+        'Keep the placeholder {name} — the site fills it in.',
+      );
+      const tagField = within(card(EMPTY_LISTS)).getByRole('textbox', {
+        name: TAG_PAGE,
+      });
+      const germanLabel = screen.getByText(GERMAN, { selector: STRONG });
+
+      expect(fieldError).toBeVisible();
+      expect(tagField).toBeVisible();
+      expect(germanLabel).toBeVisible();
     });
 
     describe('when fields are rejected', () => {
       const saveBar = () =>
         screen.getByRole('region', { name: UNSAVED_CHANGES });
-      const goToFirstField = () =>
-        user.click(
-          within(saveBar()).getByRole('link', { name: 'Go to the first one' }),
-        );
+      const goToFirstField = async () => {
+        const firstFieldLink = within(saveBar()).getByRole('link', {
+          name: 'Go to the first one',
+        });
+
+        await user.click(firstFieldLink);
+      };
 
       it('counts a field rejected in two languages once per language', async () => {
         saveVoiceOverridesActionMock.mockResolvedValue({
@@ -568,10 +724,17 @@ describe(`<${VoiceSettings.name}/>`, () => {
         });
         setupBilingual();
 
-        await user.type(notFoundHeading(), '!');
-        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        const headingField = notFoundHeading();
 
-        expect(saveBar()).toHaveTextContent('2 fields need attention');
+        await user.type(headingField, '!');
+
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+        await user.click(saveButton);
+
+        const rejectedBar = saveBar();
+
+        expect(rejectedBar).toHaveTextContent('2 fields need attention');
       });
 
       it('goes to the first rejected field in page order', async () => {
@@ -586,11 +749,18 @@ describe(`<${VoiceSettings.name}/>`, () => {
         });
         setup();
 
-        await user.type(notFoundHeading(), 'Lost');
-        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        const headingField = notFoundHeading();
+
+        await user.type(headingField, LOST);
+
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+        await user.click(saveButton);
         await goToFirstField();
 
-        expect(notFoundHeading()).toHaveFocus();
+        const focusedField = notFoundHeading();
+
+        expect(focusedField).toHaveFocus();
       });
 
       it('opens an earlier rejected list in place of the open one', async () => {
@@ -605,17 +775,26 @@ describe(`<${VoiceSettings.name}/>`, () => {
         });
         setup();
         const section = card(EMPTY_LISTS);
+        const tagRow = within(section).getByRole('button', {
+          name: /Tag page/,
+        });
 
-        await user.click(
-          within(section).getByRole('button', { name: /Tag page/ }),
-        );
-        await user.type(notFoundHeading(), 'Lost');
-        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        await user.click(tagRow);
+
+        const headingField = notFoundHeading();
+
+        await user.type(headingField, LOST);
+
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+        await user.click(saveButton);
         await goToFirstField();
 
-        expect(
-          within(section).getByRole('textbox', { name: 'Topic page' }),
-        ).toHaveFocus();
+        const topicField = within(section).getByRole('textbox', {
+          name: 'Topic page',
+        });
+
+        expect(topicField).toHaveFocus();
       });
 
       it('returns to the language that holds the first rejected field', async () => {
@@ -629,63 +808,78 @@ describe(`<${VoiceSettings.name}/>`, () => {
         });
         setupBilingual();
 
-        await user.type(notFoundHeading(), '!');
-        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-        await user.click(screen.getByRole('button', { name: 'English' }));
+        const headingField = notFoundHeading();
+
+        await user.type(headingField, '!');
+
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+        await user.click(saveButton);
+
+        const englishButton = screen.getByRole('button', { name: ENGLISH });
+
+        await user.click(englishButton);
         await goToFirstField();
 
-        expect(
-          screen.getByText('German', { selector: 'strong' }),
-        ).toBeVisible();
-        expect(
-          within(card(EMPTY_LISTS)).getByRole('textbox', {
-            name: 'Tag page',
-          }),
-        ).toHaveFocus();
+        const germanLabel = screen.getByText(GERMAN, { selector: STRONG });
+        const tagField = within(card(EMPTY_LISTS)).getByRole('textbox', {
+          name: TAG_PAGE,
+        });
+
+        expect(germanLabel).toBeVisible();
+        expect(tagField).toHaveFocus();
       });
     });
   });
 
-  it('restores the saved values on Discard', async () => {
-    setupBilingual();
-
-    await user.clear(notFoundHeading());
-
-    expect(
-      screen.getByRole('region', { name: UNSAVED_CHANGES }),
-    ).toHaveTextContent('1 unsaved change');
-
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
-
-    expect(notFoundHeading()).toHaveValue(NOTHING_HERE);
-  });
-
   describe('archived tenant', () => {
-    it('shows an archived notice and offers no Save', () => {
-      setup({ archivedAt: ARCHIVED_AT });
+    describe('with only the archive date', () => {
+      beforeEach(() => {
+        setup({ archivedAt: MOCK_ARCHIVED_AT });
+      });
 
-      expectArchivedOffersNoSave();
-    });
+      it('shows an archived notice and offers no Save', () => {
+        expectArchivedOffersNoSave();
+      });
 
-    it('describes every control with the archived notice', async () => {
-      setup({ archivedAt: ARCHIVED_AT });
+      it('describes every control with the archived notice', async () => {
+        const section = card(EMPTY_LISTS);
+        const tagRow = within(section).getByRole('button', {
+          name: /Tag page/,
+        });
 
-      await user.click(
-        within(card(EMPTY_LISTS)).getByRole('button', { name: /Tag page/ }),
-      );
+        await user.click(tagRow);
 
-      for (const textbox of screen.getAllByRole('textbox')) {
-        expect(textbox).toHaveAccessibleDescription(/This tenant is archived/);
-      }
+        const textboxes = screen.getAllByRole('textbox');
+        const withArchivedNotice = (hint: string) =>
+          `${ARCHIVED_NOTICE_DESCRIPTION} ${hint}`;
+        const expectedDescriptions = [
+          withArchivedNotice(en.voiceFieldHints.notFoundEyebrow),
+          withArchivedNotice(en.voiceFieldHints.notFoundHeading),
+          withArchivedNotice(en.voiceFieldHints.notFoundSupportingText),
+          withArchivedNotice(en.voiceFieldHints.localeErrorTitle),
+          withArchivedNotice(en.voiceFieldHints.localeErrorDescription),
+          `${withArchivedNotice(en.voiceFieldHints.tagEmpty)} ${KEEP_NAME_PLACEHOLDER}`,
+          withArchivedNotice(en.voiceFieldHints.bookmarksEmpty),
+        ];
+
+        expect(textboxes).toHaveLength(expectedDescriptions.length);
+        for (const [index, textbox] of textboxes.entries()) {
+          expect(textbox).toHaveAccessibleDescription(
+            expectedDescriptions[index],
+          );
+        }
+      });
     });
 
     it('makes the text fields read-only and offers no Reset', () => {
-      setupBilingual({ archivedAt: ARCHIVED_AT });
+      setupBilingual({ archivedAt: MOCK_ARCHIVED_AT });
 
-      expect(notFoundHeading()).toHaveAttribute('readonly');
-      expect(
-        screen.queryByRole('button', { name: 'Reset' }),
-      ).not.toBeInTheDocument();
+      const headingField = notFoundHeading();
+      const resetButton = screen.queryByRole('button', { name: RESET });
+
+      expect(headingField).toHaveAttribute('readonly');
+      expect(resetButton).not.toBeInTheDocument();
     });
   });
 });

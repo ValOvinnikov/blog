@@ -5,7 +5,7 @@ import {
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { findings, type TFinding } from '@blog/db/schema/findings';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
 // Marks one OPEN finding RESOLVED. A stale id, or one already RESOLVED, is a
@@ -22,8 +22,8 @@ export async function resolveFinding(
     .returning();
 
   if (!resolved) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: resolved };
+  return okResult(resolved);
 }

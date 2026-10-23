@@ -83,7 +83,7 @@ export const useContactForm = ({
 
     const validation = validateContactMessage(fields);
     if (!validation.ok) {
-      reportInvalid(validation.fieldErrors);
+      reportInvalid(validation.error);
       return;
     }
 

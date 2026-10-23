@@ -2682,7 +2682,9 @@ needs to look. `warn` — handled, but worth seeing: a fallback engaged, a retry
 a degraded path taken. An expected, user-correctable outcome is never `error`;
 it fires alerts nobody can act on and buries real breakages in routine noise.
 
-**A `TResult` failure is not automatically an `error`.** Since expected
+**A `TResult` failure is not automatically an `error`.** `TResult` and its
+builders, `okResult` (`okResult()` for a success with no value) and
+`errorResult`, live in `@blog/utils`'s `result` module. Since expected
 failures became values rather than exceptions, the instinct to log every
 `!result.ok` uniformly is the main way routine input errors reach the error
 rate. Branch on the `ERROR_CODE` first; log only the branches a human would do

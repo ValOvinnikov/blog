@@ -34,14 +34,14 @@ export const uploadEmailLogoAction = async (
 
   const upload = readUploadedFile(formData);
   if (!upload.ok) return upload.error;
-  const { file, token } = upload;
+  const { file, token } = upload.data;
 
   const validation = await validateEmailLogoUpload(file);
   if (!validation.ok) {
     return validation.error;
   }
 
-  const { buffer, contentType, extension } = validation.asset;
+  const { buffer, contentType, extension } = validation.data;
   const pathname = buildEmailLogoBlobPath(tenant.id, logoTarget, extension);
 
   try {

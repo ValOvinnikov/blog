@@ -1,102 +1,83 @@
-import { makeRawPortableTextMarkDef } from '@blog/service/testing/shared/fixtures';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
+import { mockRawPortableTextMarkDef } from '@blog/service/testing/shared/fixtures';
 
 import { toPortableText } from './to-portable-text-mark-def';
 
+const BLOCK_KEY = 'block-1';
+const SPAN_KEY = 'span-1';
+
 describe(toPortableText, () => {
   it('resolves a linkRef mark to its link document href', () => {
-    const block = {
-      _type: 'block' as const,
-      _key: 'block-1',
-      markDefs: [makeRawPortableTextMarkDef()],
-    };
+    const markDef = mockRawPortableTextMarkDef();
 
-    const result = toPortableText(block);
+    const result = toPortableText({
+      _type: 'block',
+      _key: BLOCK_KEY,
+      markDefs: [markDef],
+    });
 
     expect(result.markDefs?.[0]).toEqual({
-      _key: 'mark-1',
-      _type: 'linkRef',
-      link: {
-        href: 'https://example.com',
-        target: undefined,
-      },
+      _key: markDef._key,
+      _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+      link: { href: markDef.link?.url, target: undefined },
     });
   });
 
-  it('degrades a dangling link reference to an absent link rather than throwing', () => {
-    const block = {
-      _type: 'block' as const,
-      _key: 'block-1',
-      markDefs: [makeRawPortableTextMarkDef({ link: null })],
-    };
+  it('degrades a dangling link reference to an absent link, keeping its key', () => {
+    const result = toPortableText({
+      _type: 'block',
+      _key: BLOCK_KEY,
+      markDefs: [mockRawPortableTextMarkDef({ _key: 'mark-42', link: null })],
+    });
 
-    expect(() => toPortableText(block)).not.toThrow();
-    const result = toPortableText(block);
-    expect(result.markDefs?.[0]?.link).toBeUndefined();
-  });
-
-  it('keeps the mark _key when the link is dangling', () => {
-    const block = {
-      _type: 'block' as const,
-      _key: 'block-1',
-      markDefs: [makeRawPortableTextMarkDef({ _key: 'mark-42', link: null })],
-    };
-
-    const result = toPortableText(block);
-
-    expect(result.markDefs?.[0]?._key).toBe('mark-42');
+    expect(result.markDefs?.[0]).toEqual({
+      _key: 'mark-42',
+      _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+      link: undefined,
+    });
   });
 
   it('spreads every other block field unchanged', () => {
     const block = {
       _type: 'block' as const,
-      _key: 'block-1',
+      _key: BLOCK_KEY,
       style: 'normal' as const,
-      children: [{ _type: 'span' as const, _key: 'span-1', text: 'Hi.' }],
+      children: [{ _type: 'span' as const, _key: SPAN_KEY, text: 'Hi.' }],
       markDefs: null,
     };
 
     const result = toPortableText(block);
 
-    expect(result).toMatchObject({
-      style: 'normal',
-      children: block.children,
-    });
+    expect(result).toEqual({ ...block, markDefs: undefined });
   });
 
   it('normalises a span with no text to an empty string', () => {
-    const block = {
-      _type: 'block' as const,
-      _key: 'block-1',
-      children: [{ _type: 'span' as const, _key: 'span-1' }],
+    const result = toPortableText({
+      _type: 'block',
+      _key: BLOCK_KEY,
+      children: [{ _type: 'span', _key: SPAN_KEY }],
       markDefs: null,
-    };
-
-    const result = toPortableText(block);
+    });
 
     expect(result.children[0]).toEqual({
       _type: 'span',
-      _key: 'span-1',
+      _key: SPAN_KEY,
       text: '',
     });
   });
 
-  describe('with a block that has no markDefs or children', () => {
-    let block: { _type: 'block'; _key: string; markDefs: null };
-
-    beforeEach(() => {
-      block = { _type: 'block', _key: 'block-1', markDefs: null };
+  it('leaves markDefs undefined and children empty when the block has neither', () => {
+    const result = toPortableText({
+      _type: 'block',
+      _key: BLOCK_KEY,
+      markDefs: null,
     });
 
-    it('leaves markDefs undefined when the block has none', () => {
-      const result = toPortableText(block);
-
-      expect(result.markDefs).toBeUndefined();
-    });
-
-    it('normalises missing children to an empty array', () => {
-      const result = toPortableText(block);
-
-      expect(result.children).toEqual([]);
+    expect(result).toEqual({
+      _type: 'block',
+      _key: BLOCK_KEY,
+      children: [],
+      markDefs: undefined,
     });
   });
 });

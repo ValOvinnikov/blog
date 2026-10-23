@@ -1,111 +1,90 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import { fireEvent, renderElement, screen } from '@web/testing/custom-render';
+import {
+  MOCK_ABOUT_LINK,
+  MOCK_BLOG_LINK,
+  MOCK_HOME_LINK,
+} from '@web/testing/shared/link/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { SiteNavigation } from './site-navigation';
 
 vi.mock('@web/i18n/navigation');
 
-const links = [
-  {
-    label: 'Home',
-    href: '/',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-  {
-    label: 'Blog',
-    href: '/blog',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-  {
-    label: 'About',
-    href: '/about',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-];
+const ARIA_EXPANDED = 'aria-expanded';
+const TOGGLE_NAME = 'Toggle navigation menu';
+const BLOG_POST_PATH = `${MOCK_BLOG_LINK.href}/hello-world`;
 
-const getToggle = () =>
-  screen.getByRole('button', { name: 'Toggle navigation menu' });
+const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_ABOUT_LINK];
+
+const getToggle = () => screen.getByRole('button', { name: TOGGLE_NAME });
 
 describe(`<${SiteNavigation.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(usePathname).mockReturnValue('/');
+    vi.mocked(usePathname).mockReturnValue(MOCK_HOME_LINK.href);
   });
 
   it('marks the Home item active only on the exact root path', () => {
     renderElement(<SiteNavigation links={links} />);
 
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(screen.getByRole('link', { name: 'Blog' })).not.toHaveAttribute(
-      'aria-current',
-    );
-    expect(screen.getByRole('link', { name: 'About' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    const homeLink = screen.getByRole('link', { name: MOCK_HOME_LINK.label });
+    const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
+    const aboutLink = screen.getByRole('link', { name: MOCK_ABOUT_LINK.label });
+
+    expect(homeLink).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(blogLink).not.toHaveAttribute(ARIA_CURRENT);
+    expect(aboutLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('does not mark Home active on a nested route', () => {
-    vi.mocked(usePathname).mockReturnValue('/blog');
+    vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
     renderElement(<SiteNavigation links={links} />);
 
-    expect(screen.getByRole('link', { name: 'Home' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    const homeLink = screen.getByRole('link', { name: MOCK_HOME_LINK.label });
+
+    expect(homeLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('marks a section item active via prefix match on nested routes', () => {
-    vi.mocked(usePathname).mockReturnValue('/blog/hello-world');
+    vi.mocked(usePathname).mockReturnValue(BLOG_POST_PATH);
     renderElement(<SiteNavigation links={links} />);
 
-    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(screen.getByRole('link', { name: 'About' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
+    const aboutLink = screen.getByRole('link', { name: MOCK_ABOUT_LINK.label });
+
+    expect(blogLink).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(aboutLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('marks the matching item active on a prerendered tenant-scoped path', () => {
     vi.mocked(usePathname).mockReturnValue(
-      '/0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee/EN/blog/hello-world',
+      `/${MOCK_TENANT_ID}/EN${BLOG_POST_PATH}`,
     );
     renderElement(<SiteNavigation links={links} />);
 
-    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
+
+    expect(blogLink).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('marks Home active on the prerendered tenant-scoped home path', () => {
-    vi.mocked(usePathname).mockReturnValue(
-      '/0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee/EN',
-    );
+    vi.mocked(usePathname).mockReturnValue(`/${MOCK_TENANT_ID}/EN`);
     renderElement(<SiteNavigation links={links} />);
 
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    const homeLink = screen.getByRole('link', { name: MOCK_HOME_LINK.label });
+
+    expect(homeLink).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('does not match a path that merely shares the section prefix', () => {
     vi.mocked(usePathname).mockReturnValue('/blogging');
     renderElement(<SiteNavigation links={links} />);
 
-    expect(screen.getByRole('link', { name: 'Blog' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
+
+    expect(blogLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('renders the actions slot', () => {
@@ -113,7 +92,9 @@ describe(`<${SiteNavigation.name}/>`, () => {
       <SiteNavigation links={links} actions={<button>Toggle</button>} />,
     );
 
-    expect(screen.getByRole('button', { name: 'Toggle' })).toBeVisible();
+    const actionButton = screen.getByRole('button', { name: 'Toggle' });
+
+    expect(actionButton).toBeVisible();
   });
 
   describe('mobile toggle', () => {
@@ -128,15 +109,15 @@ describe(`<${SiteNavigation.name}/>`, () => {
     });
 
     it('passes a real, non-generic accessible name for the toggle', () => {
-      expect(toggle).toHaveAccessibleName('Toggle navigation menu');
+      expect(toggle).toHaveAccessibleName(TOGGLE_NAME);
     });
 
     it('opens the panel on toggle click and reflects it via aria-expanded', async () => {
-      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
 
       await user.click(toggle);
 
-      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('closes on Escape and returns focus to the toggle', async () => {
@@ -144,7 +125,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
       fireEvent.keyDown(document, { key: 'Escape' });
 
-      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
       expect(toggle).toHaveFocus();
     });
 
@@ -153,17 +134,19 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
       fireEvent.mouseDown(document.body);
 
-      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
     it('closes automatically when the route changes', async () => {
       await user.click(toggle);
-      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
 
-      vi.mocked(usePathname).mockReturnValue('/blog');
+      vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
       view.rerender(<SiteNavigation links={links} />);
 
-      expect(getToggle()).toHaveAttribute('aria-expanded', 'false');
+      const rerenderedToggle = getToggle();
+
+      expect(rerenderedToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
   });
 });

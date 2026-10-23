@@ -1,7 +1,7 @@
 import { HTTP_METHOD } from '@blog/config/constants';
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
 
-export function signedRequest(
+export function mockSignedRequest(
   url: string,
   rawBody: string,
   options: { secret: string; timestamp?: number },

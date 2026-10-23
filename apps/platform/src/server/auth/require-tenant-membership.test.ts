@@ -1,7 +1,7 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -37,14 +37,14 @@ describe(requireTenantMembership, () => {
     getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantByIdMock.mockResolvedValue({ id: TENANT_ID });
+    getTenantByIdMock.mockResolvedValue({ id: MOCK_TENANT_ID });
     getAdminByUserIdMock.mockResolvedValue(undefined);
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(requireTenantMembership(TENANT_ID)).rejects.toThrow(
+    await expect(requireTenantMembership(MOCK_TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
@@ -66,11 +66,11 @@ describe(requireTenantMembership, () => {
   it('404s, as for an unknown id, with no admins row and no membership on the tenant', async () => {
     getMembershipMock.mockResolvedValue(undefined);
 
-    await expect(requireTenantMembership(TENANT_ID)).rejects.toThrow(
+    await expect(requireTenantMembership(MOCK_TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
-    expect(getMembershipMock).toHaveBeenCalledWith('user-1', TENANT_ID);
+    expect(getMembershipMock).toHaveBeenCalledWith('user-1', MOCK_TENANT_ID);
     expect(redirect).not.toHaveBeenCalled();
   });
 
@@ -79,12 +79,12 @@ describe(requireTenantMembership, () => {
     async (role) => {
       getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
 
-      const result = await requireTenantMembership(TENANT_ID);
+      const result = await requireTenantMembership(MOCK_TENANT_ID);
 
-      expect(result.tenant).toEqual({ id: TENANT_ID });
+      expect(result.tenant).toEqual({ id: MOCK_TENANT_ID });
       expect(result.membership.role).toBe(MEMBERSHIP_ROLE.OWNER);
       expect(result.membership.userId).toBe('user-1');
-      expect(result.membership.tenantId).toBe(TENANT_ID);
+      expect(result.membership.tenantId).toBe(MOCK_TENANT_ID);
       expect(getMembershipMock).not.toHaveBeenCalled();
       expect(redirect).not.toHaveBeenCalled();
     },
@@ -94,16 +94,16 @@ describe(requireTenantMembership, () => {
     const membership = {
       id: 'membership-1',
       userId: 'user-1',
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       role: MEMBERSHIP_ROLE.OWNER,
       createdAt: new Date(),
     };
     getMembershipMock.mockResolvedValue(membership);
 
-    const result = await requireTenantMembership(TENANT_ID);
+    const result = await requireTenantMembership(MOCK_TENANT_ID);
 
     expect(result).toEqual({
-      tenant: { id: TENANT_ID },
+      tenant: { id: MOCK_TENANT_ID },
       membership,
     });
     expect(redirect).not.toHaveBeenCalled();

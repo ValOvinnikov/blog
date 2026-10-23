@@ -6,9 +6,10 @@ import {
   INACTIVITY_SWEEP_FAILED_EVENT,
   INACTIVITY_SWEEP_NOT_CONFIGURED_EVENT,
 } from '@worker/constants/inactivity-sweep';
-import { TEST_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
-import { FORGED_SECRET } from '@worker/testing/enqueue/fixtures';
-import { makeInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
+import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
+import { MOCK_FORGED_SECRET } from '@worker/testing/enqueue/fixtures';
+import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
+import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
 import { getInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import { runInactivitySweep } from '@worker/utils/inactivity-sweep/run-inactivity-sweep';
 import { logger } from '@worker/utils/logger/logger';
@@ -17,8 +18,7 @@ import { GET } from './route';
 
 const SWEEP_URL = 'https://worker.example.com/api/inactivity-sweep';
 const CRON_SECRET = 'cron-secret';
-const DB_DOWN = 'db down';
-const SWEEP_ENV = makeInactivitySweepEnv();
+const SWEEP_ENV = mockInactivitySweepEnv();
 const ADVANCED = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: 2,
   [INACTIVITY_STAGE.SUSPENSION]: 1,
@@ -56,13 +56,13 @@ describe('GET /api/inactivity-sweep', () => {
     expect(response.status).toBe(HTTP_STATUS.OK);
     await expect(response.json()).resolves.toEqual({ advanced: ADVANCED });
     expect(runInactivitySweep).toHaveBeenCalledWith({
-      now: TEST_NOW,
+      now: MOCK_NOW,
       env: SWEEP_ENV,
     });
   });
 
   it('refuses a request without the cron secret', async () => {
-    const response = await GET(cronRequest(FORGED_SECRET));
+    const response = await GET(cronRequest(MOCK_FORGED_SECRET));
 
     expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     await expect(response.json()).resolves.toEqual({
@@ -84,7 +84,7 @@ describe('GET /api/inactivity-sweep', () => {
   });
 
   it('logs and answers a server error when the sweep cannot run', async () => {
-    vi.mocked(runInactivitySweep).mockRejectedValue(new Error(DB_DOWN));
+    vi.mocked(runInactivitySweep).mockRejectedValue(new Error(MOCK_DB_DOWN));
 
     const response = await GET(cronRequest());
 
@@ -93,7 +93,7 @@ describe('GET /api/inactivity-sweep', () => {
       error: ENQUEUE_ERROR.SERVER_ERROR,
     });
     expect(logger.error).toHaveBeenCalledWith(INACTIVITY_SWEEP_FAILED_EVENT, {
-      error: DB_DOWN,
+      error: MOCK_DB_DOWN,
     });
   });
 });

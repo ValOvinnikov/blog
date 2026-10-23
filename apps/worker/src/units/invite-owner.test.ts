@@ -9,27 +9,27 @@ import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { okResult } from '@blog/utils/result';
+import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
-  makeOwnerAccessTarget,
-  OWNER_EMAIL,
-  SANITY_PROJECT_ID,
+  MOCK_INVITE_SENT_AT,
+  MOCK_OWNER_EMAIL,
+  MOCK_SANITY_INVITE_ID,
+  mockOwnerAccessTarget,
+  mockPendingInvite,
 } from '@worker/testing/owner-access/fixtures';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockProvisionedTenant,
+} from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 import { getStepMetadata } from 'workflow';
 
 import { inviteOwner } from './invite-owner';
 
-const CTX = { runId: 'run-1' };
-const SANITY_OUTAGE = '503';
-const INVITED_TENANT = makeTenant({ sanityProjectId: SANITY_PROJECT_ID });
-const PENDING_INVITE = {
-  id: 'invite-1',
-  email: OWNER_EMAIL,
-  status: 'pending',
-  createdAt: '2026-10-20T09:00:00.000Z',
-};
+const INVITED_TENANT = mockProvisionedTenant();
 
 vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
@@ -55,24 +55,23 @@ describe(inviteOwner, () => {
       attempt: 1,
     } as ReturnType<typeof getStepMetadata>);
     vi.mocked(getTenantById).mockResolvedValue(INVITED_TENANT);
-    vi.mocked(getTenantOwnerEmail).mockResolvedValue(OWNER_EMAIL);
+    vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
-    vi.mocked(listSanityProjectInvites).mockResolvedValue([PENDING_INVITE]);
-    vi.mocked(setTenantOwnerAccess).mockResolvedValue({
-      ok: true,
-      data: {} as never,
-    });
+    vi.mocked(listSanityProjectInvites).mockResolvedValue([
+      mockPendingInvite(),
+    ]);
+    vi.mocked(setTenantOwnerAccess).mockResolvedValue(okResult({} as never));
   });
 
   it("records the owner's pending invite without sending a second one", async () => {
-    const result = await inviteOwner(TEST_TENANT_ID, CTX);
+    const result = await inviteOwner(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, data: undefined });
     expect(createSanityProjectInvite).not.toHaveBeenCalled();
-    expect(setTenantOwnerAccess).toHaveBeenCalledWith(TEST_TENANT_ID, {
-      sanityInviteId: 'invite-1',
-      inviteSentAt: new Date(PENDING_INVITE.createdAt),
+    expect(setTenantOwnerAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      sanityInviteId: MOCK_SANITY_INVITE_ID,
+      inviteSentAt: new Date(MOCK_INVITE_SENT_AT),
       inviteAcceptedAt: null,
     });
   });
@@ -80,18 +79,18 @@ describe(inviteOwner, () => {
   it('sends the invite when the owner has none', async () => {
     vi.mocked(listSanityProjectInvites)
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([PENDING_INVITE]);
+      .mockResolvedValueOnce([mockPendingInvite()]);
 
-    await inviteOwner(TEST_TENANT_ID, CTX);
+    await inviteOwner(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(createSanityProjectInvite).toHaveBeenCalledOnce();
   });
 
   it('sends the owner the invite heads-up once the invite is recorded', async () => {
-    await inviteOwner(TEST_TENANT_ID, CTX);
+    await inviteOwner(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
-      makeOwnerAccessTarget(INVITED_TENANT),
+      mockOwnerAccessTarget(INVITED_TENANT),
       TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
     );
   });
@@ -99,14 +98,14 @@ describe(inviteOwner, () => {
   describe('when the invite cannot be sent', () => {
     beforeEach(() => {
       vi.mocked(listSanityProjectInvites).mockRejectedValue(
-        new Error(SANITY_OUTAGE),
+        new Error(MOCK_SANITY_OUTAGE),
       );
     });
 
     it('retries before its last attempt', async () => {
-      await expect(inviteOwner(TEST_TENANT_ID, CTX)).rejects.toThrow(
-        SANITY_OUTAGE,
-      );
+      await expect(
+        inviteOwner(MOCK_TENANT_ID, MOCK_RUN_CONTEXT),
+      ).rejects.toThrow(MOCK_SANITY_OUTAGE);
     });
 
     it('logs and lets provisioning carry on once the last attempt fails', async () => {
@@ -114,13 +113,13 @@ describe(inviteOwner, () => {
         attempt: 99,
       } as ReturnType<typeof getStepMetadata>);
 
-      const result = await inviteOwner(TEST_TENANT_ID, CTX);
+      const result = await inviteOwner(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-      expect(result).toEqual({ ok: true });
+      expect(result).toEqual({ ok: true, data: undefined });
       expect(logger.error).toHaveBeenCalledWith('owner_access.invite_failed', {
-        tenantId: TEST_TENANT_ID,
-        runId: CTX.runId,
-        error: SANITY_OUTAGE,
+        tenantId: MOCK_TENANT_ID,
+        runId: MOCK_RUN_CONTEXT.runId,
+        error: MOCK_SANITY_OUTAGE,
       });
     });
   });

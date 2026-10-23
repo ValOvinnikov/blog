@@ -1,6 +1,14 @@
 import { SIZE } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
+import {
+  MOCK_STAGED_LOGO_BLOB_URL,
+  CURRENT_LOGO,
+  MOCK_LOGO_URL,
+  REPLACE_LOGO,
+  UPLOAD_LOGO,
+} from '@platform/testing/site-config/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import {
@@ -8,9 +16,14 @@ import {
   type TAssetUploadFieldProps,
 } from './asset-upload-field';
 
+const PNG_JPEG_OR_WEBP = 'PNG, JPEG, or WebP.';
+const CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE = 'Choose a PNG, JPEG, or WebP image.';
+const STORED_LOGO_URL = 'https://example.com/logo.png';
+const LOGO_CONTROL = 'logo-control';
+
 const baseProps: TAssetUploadFieldProps = {
   label: 'Logo',
-  hint: 'PNG, JPEG, or WebP.',
+  hint: PNG_JPEG_OR_WEBP,
   image: { url: undefined },
   onStage: vi.fn(),
   asset: {
@@ -25,15 +38,17 @@ const pngFile = () => new File(['bytes'], 'logo.png', { type: 'image/png' });
 
 const rejectingAsset = {
   ...baseProps.asset,
-  validateFile: () => 'Choose a PNG, JPEG, or WebP image.',
+  validateFile: () => CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE,
 };
 
 describe(`<${AssetUploadField.name}/>`, () => {
+  const onStage = vi.fn();
+
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
 
   afterEach(() => {
@@ -43,27 +58,28 @@ describe(`<${AssetUploadField.name}/>`, () => {
   it('shows no thumbnail or Remove control before any value is set', () => {
     renderWithIntl(<AssetUploadField {...baseProps} />);
 
-    expect(screen.queryByAltText('Current logo')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Remove' }),
-    ).not.toBeInTheDocument();
+    const thumbnail = screen.queryByAltText(CURRENT_LOGO);
+    const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
+    const removeButton = screen.queryByRole('button', { name: 'Remove' });
+
+    expect(thumbnail).not.toBeInTheDocument();
+    expect(uploadButton).toBeVisible();
+    expect(removeButton).not.toBeInTheDocument();
   });
 
   it('shows the thumbnail and a Remove control once a value is set', () => {
     renderWithIntl(
-      <AssetUploadField
-        {...baseProps}
-        image={{ url: 'https://example.blob.vercel-storage.com/logo.png' }}
-      />,
+      <AssetUploadField {...baseProps} image={{ url: MOCK_LOGO_URL }} />,
     );
 
-    expect(screen.getByAltText('Current logo')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeVisible();
+    const thumbnail = screen.getByAltText(CURRENT_LOGO);
+    const removeButton = screen.getByRole('button', { name: 'Remove' });
+
+    expect(thumbnail).toBeVisible();
+    expect(removeButton).toBeVisible();
   });
 
   it('rejects a file client-side without staging it, showing validateFile’s message', async () => {
-    const onStage = vi.fn();
     renderWithIntl(
       <AssetUploadField
         {...baseProps}
@@ -74,33 +90,35 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
     await selectFile(pngFile());
 
-    expect(
-      await screen.findByText('Choose a PNG, JPEG, or WebP image.'),
-    ).toBeVisible();
+    const rejection = await screen.findByText(CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE);
+
+    expect(rejection).toBeVisible();
     expect(onStage).not.toHaveBeenCalled();
   });
 
   it('stages a chosen file with a local preview URL through onStage', async () => {
-    const onStage = vi.fn();
     const file = pngFile();
     renderWithIntl(<AssetUploadField {...baseProps} onStage={onStage} />);
 
     await selectFile(file);
 
-    expect(onStage).toHaveBeenCalledWith({ url: 'blob:staged-logo', file });
+    expect(onStage).toHaveBeenCalledWith({
+      url: MOCK_STAGED_LOGO_BLOB_URL,
+      file,
+    });
   });
 
   it('stages a removal through onStage when Remove is clicked', async () => {
-    const onStage = vi.fn();
     renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        image={{ url: 'https://example.com/logo.png' }}
+        image={{ url: STORED_LOGO_URL }}
         onStage={onStage}
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
+    const removeButton = screen.getByRole('button', { name: 'Remove' });
+    await user.click(removeButton);
 
     expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });
@@ -109,34 +127,33 @@ describe(`<${AssetUploadField.name}/>`, () => {
     renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        image={{ url: 'https://example.com/logo.png' }}
-        control={{ isDisabled: true, describedBy: 'archived-notice' }}
+        image={{ url: STORED_LOGO_URL }}
+        control={{ isDisabled: true, describedBy: ARCHIVED_NOTICE_ID }}
       />,
     );
 
-    const uploadButton = screen.getByRole('button', { name: 'Replace logo' });
+    const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
+    const removeButton = screen.getByRole('button', { name: 'Remove' });
+    const hint = screen.getByText(PNG_JPEG_OR_WEBP);
+
     expect(uploadButton).toBeDisabled();
     expect(uploadButton).toHaveAttribute(
       'aria-describedby',
-      expect.stringContaining('archived-notice'),
+      `${hint.id} ${ARCHIVED_NOTICE_ID}`,
     );
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeDisabled();
+    expect(removeButton).toBeDisabled();
   });
 
   it('describes the upload and remove controls with the hint', () => {
     renderWithIntl(
-      <AssetUploadField
-        {...baseProps}
-        image={{ url: 'https://example.com/logo.png' }}
-      />,
+      <AssetUploadField {...baseProps} image={{ url: STORED_LOGO_URL }} />,
     );
 
-    expect(
-      screen.getByRole('button', { name: 'Replace logo' }),
-    ).toHaveAccessibleDescription('PNG, JPEG, or WebP.');
-    expect(
-      screen.getByRole('button', { name: 'Remove' }),
-    ).toHaveAccessibleDescription('PNG, JPEG, or WebP.');
+    const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
+    const removeButton = screen.getByRole('button', { name: 'Remove' });
+
+    expect(uploadButton).toHaveAccessibleDescription(PNG_JPEG_OR_WEBP);
+    expect(removeButton).toHaveAccessibleDescription(PNG_JPEG_OR_WEBP);
   });
 
   it('announces a rejected file and describes the upload control with it', async () => {
@@ -144,12 +161,11 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
     await selectFile(pngFile());
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Choose a PNG, JPEG, or WebP image.',
-    );
-    expect(
-      screen.getByRole('button', { name: 'Upload logo' }),
-    ).toHaveAccessibleDescription(
+    const alert = await screen.findByRole('alert');
+    const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
+
+    expect(alert).toHaveTextContent(CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE);
+    expect(uploadButton).toHaveAccessibleDescription(
       'PNG, JPEG, or WebP. Choose a PNG, JPEG, or WebP image.',
     );
   });
@@ -158,18 +174,20 @@ describe(`<${AssetUploadField.name}/>`, () => {
     renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        control={{ id: 'logo-control' }}
+        control={{ id: LOGO_CONTROL }}
         error="Couldn't upload the logo — try again."
       />,
     );
 
-    const uploadButton = screen.getByRole('button', { name: 'Upload logo' });
+    const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
     const error = screen.getByText("Couldn't upload the logo — try again.");
+    const alert = screen.queryByRole('alert');
+
     expect(error).toBeVisible();
-    expect(uploadButton).toHaveAttribute('id', 'logo-control');
+    expect(uploadButton).toHaveAttribute('id', LOGO_CONTROL);
     expect(uploadButton).toHaveAccessibleDescription(
       "PNG, JPEG, or WebP. Couldn't upload the logo — try again.",
     );
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(alert).not.toBeInTheDocument();
   });
 });

@@ -1,12 +1,18 @@
 import { HTTP_STATUS } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
-  githubJson,
+  GITHUB_FAILURE,
+  GITHUB_RATE_LIMIT_EXHAUSTED,
+  GITHUB_RATE_LIMIT_REMAINING_HEADER,
+} from '@platform/constants/github';
+import {
+  mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { logger } from '@platform/utils/logger/logger';
 
-import { fetchGitHub, fetchGitHubJson } from './fetch-github';
+import { fetchGitHub, fetchGitHubJson, recoverNotFound } from './fetch-github';
 
 vi.mock('@platform/utils/env/env');
 
@@ -23,41 +29,46 @@ describe(fetchGitHub, () => {
   });
 
   it('returns the response for a 2xx', async () => {
-    github.respond(path, () => githubJson({}));
+    github.respond(path, () => mockGitHubResponse({}));
 
     expect(await fetchGitHub(path)).toEqual(
       expect.objectContaining({ ok: true }),
     );
   });
 
-  it('returns notConfigured without calling GitHub when no token is set', async () => {
+  it('returns NOT_CONFIGURED without calling GitHub when no token is set', async () => {
     github.unsetToken();
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'notConfigured',
+      error: GITHUB_FAILURE.NOT_CONFIGURED,
     });
     expect(github.fetchMock).not.toHaveBeenCalled();
   });
 
-  it('returns notFound for a 404 without logging it', async () => {
-    expect(await fetchGitHub(path)).toEqual({ ok: false, reason: 'notFound' });
+  it('returns NOT_FOUND for a 404 without logging it', async () => {
+    expect(await fetchGitHub(path)).toEqual({
+      ok: false,
+      error: GITHUB_FAILURE.NOT_FOUND,
+    });
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('returns rateLimited for an exhausted quota and logs it at warn', async () => {
+  it('returns RATE_LIMITED for an exhausted quota and logs it at warn', async () => {
     github.respond(
       path,
       () =>
         new Response(null, {
           status: HTTP_STATUS.FORBIDDEN,
-          headers: { 'x-ratelimit-remaining': '0' },
+          headers: {
+            [GITHUB_RATE_LIMIT_REMAINING_HEADER]: GITHUB_RATE_LIMIT_EXHAUSTED,
+          },
         }),
     );
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'rateLimited',
+      error: GITHUB_FAILURE.RATE_LIMITED,
     });
     expect(loggerWarnMock).toHaveBeenCalledWith('github.rate_limited', {
       path,
@@ -65,35 +76,41 @@ describe(fetchGitHub, () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('returns rateLimited for a 429', async () => {
-    github.respond(path, () => new Response(null, { status: 429 }));
+  it('returns RATE_LIMITED for a 429', async () => {
+    github.respond(
+      path,
+      () => new Response(null, { status: HTTP_STATUS.TOO_MANY_REQUESTS }),
+    );
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'rateLimited',
+      error: GITHUB_FAILURE.RATE_LIMITED,
     });
   });
 
-  it('returns githubError for a server error and logs its status', async () => {
-    github.respond(path, () => new Response(null, { status: 502 }));
+  it('returns GITHUB_ERROR for a server error and logs its status', async () => {
+    github.respond(
+      path,
+      () => new Response(null, { status: HTTP_STATUS.BAD_GATEWAY }),
+    );
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: GITHUB_FAILURE.GITHUB_ERROR,
     });
     expect(loggerErrorMock).toHaveBeenCalledWith('github.request_failed', {
       path,
-      responseStatus: 502,
+      responseStatus: HTTP_STATUS.BAD_GATEWAY,
     });
   });
 
-  it('returns githubError when the request itself fails', async () => {
+  it('returns GITHUB_ERROR when the request itself fails', async () => {
     const thrown = new Error(faker.lorem.sentence());
     github.fetchMock.mockRejectedValue(thrown);
 
     expect(await fetchGitHub(path)).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: GITHUB_FAILURE.GITHUB_ERROR,
     });
     expect(loggerErrorMock).toHaveBeenCalledWith('github.request_error', {
       path,
@@ -108,20 +125,36 @@ describe(fetchGitHubJson, () => {
 
   it('returns the parsed body', async () => {
     const value = faker.lorem.word();
-    github.respond(path, () => githubJson({ value }));
+    github.respond(path, () => mockGitHubResponse({ value }));
 
     expect(
       await fetchGitHubJson(path, (body) => (body as { value: string }).value),
     ).toEqual({ ok: true, data: value });
   });
 
-  it('returns githubError when the body does not parse', async () => {
-    github.respond(path, () => githubJson({}));
+  it('returns GITHUB_ERROR when the body does not parse', async () => {
+    github.respond(path, () => mockGitHubResponse({}));
 
     expect(
       await fetchGitHubJson(path, () => {
-        throw new Error('unexpected');
+        throw new Error(faker.lorem.sentence());
       }),
-    ).toEqual({ ok: false, reason: 'githubError' });
+    ).toEqual({ ok: false, error: GITHUB_FAILURE.GITHUB_ERROR });
+  });
+});
+
+describe(recoverNotFound, () => {
+  const fallback = faker.lorem.word();
+
+  it('turns a missing resource into the fallback', () => {
+    expect(
+      recoverNotFound(errorResult(GITHUB_FAILURE.NOT_FOUND), fallback),
+    ).toEqual(okResult(fallback));
+  });
+
+  it('passes any other failure through', () => {
+    const failure = errorResult(GITHUB_FAILURE.RATE_LIMITED);
+
+    expect(recoverNotFound(failure, fallback)).toBe(failure);
   });
 });

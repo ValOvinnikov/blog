@@ -46,6 +46,10 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
       code: "const a = { sameSite: 'strict-mode' }; const b = { sameSite: 'strict-mode' };",
       options,
     },
+    {
+      code: "const a = { target: '_blank' }; const b = { target: '_blank' };",
+      options,
+    },
   ],
   invalid: [
     {
@@ -55,6 +59,11 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
     },
     {
       code: "const a = 'staging-preview'; const b = 'staging-preview';",
+      options,
+      errors: 1,
+    },
+    {
+      code: "const a = { target: 'tenant-workspace' }; const b = { target: 'tenant-workspace' };",
       options,
       errors: 1,
     },
