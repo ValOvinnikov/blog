@@ -1,24 +1,21 @@
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { accountEmailIndex } from '@blog/utils/encryption';
+import {
+  normalizeEmail,
+  normalizeEmailIdentity,
+} from '@blog/utils/normalize-email-identity';
 import { and, asc, eq, gt, isNotNull, like, sql } from 'drizzle-orm';
 
+import { BATCH_SIZE } from './batch-size';
 import type { TPersonalDataKeys } from './personal-data-keys';
 
-const BATCH_SIZE = 500;
 const TAG_SEPARATOR = '+';
-const DOMAIN_SEPARATOR = '@';
 
 interface IStaleUserIndex {
   id: string;
   email: string;
   emailIndex: string;
-}
-
-function hasTagInLocalPart(email: string): boolean {
-  const at = email.lastIndexOf(DOMAIN_SEPARATOR);
-  const localPart = at === -1 ? email : email.slice(0, at);
-  return localPart.includes(TAG_SEPARATOR);
 }
 
 async function findStaleUserIndexes({
@@ -47,7 +44,8 @@ async function findStaleUserIndexes({
       .limit(BATCH_SIZE);
 
     for (const { id, email, emailIndex } of batch) {
-      if (!email || !hasTagInLocalPart(email)) continue;
+      if (!email || normalizeEmailIdentity(email) === normalizeEmail(email))
+        continue;
       const exact = accountEmailIndex(email, indexKey);
       if (emailIndex !== exact) stale.push({ id, email, emailIndex: exact });
     }

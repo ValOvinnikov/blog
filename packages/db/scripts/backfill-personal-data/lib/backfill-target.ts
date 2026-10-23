@@ -3,6 +3,7 @@ import { encryptPersonalData } from '@blog/utils/encryption';
 import { isString } from '@blog/utils/primitives';
 import { and, asc, gt, type SQL, sql } from 'drizzle-orm';
 
+import { BATCH_SIZE } from './batch-size';
 import type { TPersonalDataKeys } from './personal-data-keys';
 import {
   fieldGap,
@@ -10,8 +11,6 @@ import {
   type IPersonalDataTarget,
   targetGap,
 } from './personal-data-targets';
-
-const BATCH_SIZE = 500;
 
 function fillMissing(
   { encrypted, emailIndex }: IPersonalDataField,

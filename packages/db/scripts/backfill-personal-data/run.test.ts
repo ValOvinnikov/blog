@@ -240,7 +240,7 @@ describe(reindexTaggedUserEmails, () => {
     expect(user?.emailIndex).toBe(testPersonalEmailIndex(TAGGED_USER_EMAIL));
   });
 
-  it('leaves untagged users and already-correct rows alone, so a second run does nothing', async () => {
+  it('leaves untagged and already-correct rows alone, so a re-run does nothing', async () => {
     await insertTestUser(db(), {
       email: MOCK_USER_EMAIL,
       emailIndex: mockAccountEmailIndex(MOCK_USER_EMAIL),
