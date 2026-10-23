@@ -44,6 +44,13 @@ const MODULE_PATH_CALLEES = new Set([
   'resolve',
 ]);
 const TEST_TITLE_CALLEES = new Set(['describe', 'it', 'test', 'bench']);
+const GROQD_TYPED_METHODS = new Set([
+  'field',
+  'filterBy',
+  'filterByType',
+  'order',
+]);
+const ISR_CALLEE = 'isr';
 const MAX_LISTED_LOCATIONS = 3;
 
 const isExemptPath = (file) => EXEMPT_PATHS.some((re) => re.test(file));
@@ -125,6 +132,25 @@ const isSanityTypeValue = ({ parent }) =>
   (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
   parent.name.text === SANITY_TYPE_KEY;
 
+// groqd checks its typed builders' arguments against the generated Sanity types, so they cannot drift.
+const isGroqdTypedArgument = ({ parent }) =>
+  ts.isCallExpression(parent) &&
+  ts.isPropertyAccessExpression(parent.expression) &&
+  GROQD_TYPED_METHODS.has(parent.expression.name.text);
+
+// `check:revalidate-tags-sync` checks every `isr(...)` tag against the revalidation webhook's map.
+const isIsrTag = (node) => {
+  const { parent } = node;
+  const tagArgument = ts.isArrayLiteralExpression(parent) ? parent : node;
+  const call = tagArgument.parent;
+  return (
+    ts.isCallExpression(call) &&
+    call.arguments[0] === tagArgument &&
+    ts.isIdentifier(call.expression) &&
+    call.expression.text === ISR_CALLEE
+  );
+};
+
 const isExemptLiteral = (node) => {
   const { parent } = node;
   return (
@@ -145,7 +171,9 @@ const isExemptLiteral = (node) => {
     isEnvReadKey(node) ||
     isStubEnvArgument(node) ||
     isProtocolAttributeValue(node) ||
-    isSanityTypeValue(node)
+    isSanityTypeValue(node) ||
+    isGroqdTypedArgument(node) ||
+    isIsrTag(node)
   );
 };
 
