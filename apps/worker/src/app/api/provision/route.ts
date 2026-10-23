@@ -2,6 +2,7 @@ import { ERROR_CODE, HTTP_STATUS } from '@blog/config/constants';
 import { beginTenantProvisioning } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
+import { PROVISIONING_BEGIN_FAILED_EVENT } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { markRunNotStarted } from '@worker/utils/provisioning-report/provisioning-report';
 import {
@@ -14,14 +15,14 @@ import { start } from 'workflow/api';
 
 export async function POST(request: Request): Promise<Response> {
   const signed = await readSignedTenantRequest(request);
-  if (!signed.ok) return signed.response;
-  const { tenantId } = signed;
+  if (!signed.ok) return signed.error;
+  const { data: tenantId } = signed;
 
   let began: Awaited<ReturnType<typeof beginTenantProvisioning>>;
   try {
     began = await beginTenantProvisioning(tenantId);
   } catch (error) {
-    logger.error('provisioning.begin_failed', {
+    logger.error(PROVISIONING_BEGIN_FAILED_EVENT, {
       tenantId,
       error: sanitizeLogMessage(error),
     });
@@ -40,7 +41,10 @@ export async function POST(request: Request): Promise<Response> {
     if (began.error === ERROR_CODE.DB_NOT_FOUND) {
       return respondError(HTTP_STATUS.NOT_FOUND, ENQUEUE_ERROR.NOT_FOUND);
     }
-    logger.error('provisioning.begin_failed', { tenantId, error: began.error });
+    logger.error(PROVISIONING_BEGIN_FAILED_EVENT, {
+      tenantId,
+      error: began.error,
+    });
     return respondError(
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       ENQUEUE_ERROR.SERVER_ERROR,

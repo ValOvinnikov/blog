@@ -9,6 +9,7 @@ import {
   setTenantProvisioningStatus,
   startProvisioningRun,
 } from '@blog/db/queries/tenants';
+import { errorResult, okResult } from '@blog/utils/result';
 import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
 
 import { beginRun, finishRun } from './run-lifecycle';
@@ -28,10 +29,9 @@ function recordedActions(): string[] {
 
 describe(beginRun, () => {
   it('marks the run as started for the tenant', async () => {
-    vi.mocked(startProvisioningRun).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(startProvisioningRun).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     await beginRun(TEST_TENANT_ID);
 
@@ -43,18 +43,16 @@ describe(beginRun, () => {
 
 describe(finishRun, () => {
   beforeEach(() => {
-    vi.mocked(finishProvisioningRun).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
-    vi.mocked(setTenantProvisioningStatus).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(finishProvisioningRun).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
+    vi.mocked(setTenantProvisioningStatus).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
   });
 
   it('closes the run and audits a successful provisioning', async () => {
-    await finishRun(TEST_TENANT_ID, CTX, { ok: true });
+    await finishRun(TEST_TENANT_ID, CTX, okResult());
 
     expect(finishProvisioningRun).toHaveBeenCalledWith({
       tenantId: TEST_TENANT_ID,
@@ -63,10 +61,11 @@ describe(finishRun, () => {
   });
 
   it('audits the failed step of a failed run without overriding its status', async () => {
-    await finishRun(TEST_TENANT_ID, CTX, {
-      ok: false,
-      failedStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-    });
+    await finishRun(
+      TEST_TENANT_ID,
+      CTX,
+      errorResult({ failedStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN }),
+    );
 
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONING_FAILED]);
     expect(insertAuditEvent).toHaveBeenCalledWith(
@@ -81,10 +80,11 @@ describe(finishRun, () => {
   });
 
   it('marks the tenant failed when a run dies outside any step', async () => {
-    await finishRun(TEST_TENANT_ID, CTX, {
-      ok: false,
-      error: 'workflow crashed',
-    });
+    await finishRun(
+      TEST_TENANT_ID,
+      CTX,
+      errorResult({ message: 'workflow crashed' }),
+    );
 
     expect(setTenantProvisioningStatus).toHaveBeenCalledWith(
       TEST_TENANT_ID,
@@ -97,7 +97,7 @@ describe(finishRun, () => {
     vi.mocked(insertAuditEvent).mockRejectedValue(new Error('db down'));
 
     await expect(
-      finishRun(TEST_TENANT_ID, CTX, { ok: true }),
+      finishRun(TEST_TENANT_ID, CTX, okResult()),
     ).resolves.toBeUndefined();
   });
 });

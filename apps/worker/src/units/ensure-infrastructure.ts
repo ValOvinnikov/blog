@@ -1,5 +1,6 @@
 import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { okResult } from '@blog/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { mapTenantDomain } from '@worker/steps/map-domain';
@@ -48,7 +49,7 @@ export async function ensureInfrastructure(
     const result = await runReportedStep({ tenantId, ctx, step, run });
     if (!result.ok) return result;
   }
-  return { ok: true };
+  return okResult();
 }
 
 ensureInfrastructure.maxRetries = PROVISIONING_UNIT_MAX_RETRIES;
