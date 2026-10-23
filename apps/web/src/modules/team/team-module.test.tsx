@@ -4,6 +4,7 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTeamMember } from '@web/testing/modules/team/fixtures';
@@ -11,6 +12,9 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TeamModule } from './team-module';
+
+const FIRST_MEMBER_ID = 'team-member-1';
+const SECOND_MEMBER_ID = 'team-member-2';
 
 const { getTeamModuleMock } = vi.hoisted(() => ({
   getTeamModuleMock: vi.fn(),
@@ -64,16 +68,15 @@ describe(`<${TeamModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getTeamModuleMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTeamModuleMock.mockResolvedValue(
+      okResult({
         ...baseModule,
         members: [
-          makeTeamMember({ id: 'team-member-1' }),
-          makeTeamMember({ id: 'team-member-2' }),
+          makeTeamMember({ id: FIRST_MEMBER_ID }),
+          makeTeamMember({ id: SECOND_MEMBER_ID }),
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -81,10 +84,7 @@ describe(`<${TeamModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getTeamModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getTeamModuleMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -93,13 +93,10 @@ describe(`<${TeamModule.name}/>`, () => {
 
   it('renders the resolved team member cards', async () => {
     const members = [
-      makeTeamMember({ id: 'team-member-1' }),
-      makeTeamMember({ id: 'team-member-2' }),
+      makeTeamMember({ id: FIRST_MEMBER_ID }),
+      makeTeamMember({ id: SECOND_MEMBER_ID }),
     ];
-    getTeamModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, members },
-    });
+    getTeamModuleMock.mockResolvedValue(okResult({ ...baseModule, members }));
 
     await setup();
 

@@ -34,14 +34,14 @@ export const uploadBrandAssetAction = async (
 
   const upload = readUploadedFile(formData);
   if (!upload.ok) return upload.error;
-  const { file, token } = upload;
+  const { file, token } = upload.data;
 
   const validation = await validateBrandAssetUpload(file, targetKind);
   if (!validation.ok) {
     return validation.error;
   }
 
-  const { buffer, contentType, extension } = validation.asset;
+  const { buffer, contentType, extension } = validation.data;
   const pathname = `tenants/${tenant.id}/${targetKind}.${extension}`;
 
   try {

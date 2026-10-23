@@ -4,6 +4,7 @@ import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTimelineItem } from '@web/testing/modules/timeline/fixtures';
@@ -11,6 +12,8 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TimelineModule } from './timeline-module';
+
+const MODULE_ID = 'timeline-1';
 
 const { getTimelineModuleMock } = vi.hoisted(() => ({
   getTimelineModuleMock: vi.fn(),
@@ -42,7 +45,7 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(TimelineModule, {
-  id: 'timeline-1',
+  id: MODULE_ID,
 });
 
 describe(`<${TimelineModule.name}/>`, () => {
@@ -62,21 +65,17 @@ describe(`<${TimelineModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getTimelineModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, items: [] },
-    });
+    getTimelineModuleMock.mockResolvedValue(
+      okResult({ ...baseModule, items: [] }),
+    );
 
     await setup();
 
-    expect(getTimelineModuleMock).toHaveBeenCalledWith('timeline-1', tenant);
+    expect(getTimelineModuleMock).toHaveBeenCalledWith(MODULE_ID, tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getTimelineModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getTimelineModuleMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -84,16 +83,15 @@ describe(`<${TimelineModule.name}/>`, () => {
   });
 
   it('renders the resolved items as headings', async () => {
-    getTimelineModuleMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTimelineModuleMock.mockResolvedValue(
+      okResult({
         ...baseModule,
         items: [
           makeTimelineItem({ id: 'a', heading: 'Kick-off' }),
           makeTimelineItem({ id: 'b', heading: 'Delivery' }),
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 

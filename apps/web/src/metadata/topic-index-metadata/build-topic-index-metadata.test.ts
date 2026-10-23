@@ -1,8 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -34,7 +35,7 @@ const DESCRIPTION = 'Browse every post by topic.';
 const OG_DESCRIPTION = 'Browse every post by topic OG.';
 const NL_TOPICS_PATH = '/nl/topics';
 
-const seo = makeSeo({
+const seo = mockSeo({
   title: 'Topics',
   description: DESCRIPTION,
   ogTitle: 'Topics OG',
@@ -50,15 +51,14 @@ describe('buildTopicIndexMetadata', () => {
 
   describe('when the index page resolves', () => {
     beforeEach(() => {
-      getTopicIndexPageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getTopicIndexPageMock.mockResolvedValue(
+        okResult({
           headingBlock: { heading: 'Topics' },
           seo,
           modules: [],
           translations: [LOCALE_ISO_CODES.EN],
-        },
-      });
+        }),
+      );
     });
 
     it('reads the page through getTopicIndexPage, the loader TopicIndexPage reads', async () => {
@@ -83,10 +83,7 @@ describe('buildTopicIndexMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the index page fetch fails', async () => {
-      getTopicIndexPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getTopicIndexPageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       const metadata = await buildTopicIndexMetadata();
 
@@ -98,7 +95,7 @@ describe('buildTopicIndexMetadata', () => {
     });
 
     it('returns empty metadata without logging when the index page simply does not exist', async () => {
-      getTopicIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+      getTopicIndexPageMock.mockResolvedValue(okResult());
 
       const metadata = await buildTopicIndexMetadata();
 
@@ -115,15 +112,14 @@ describe('buildTopicIndexMetadata', () => {
       locale: NL,
       liveLocales: [EN, NL],
     });
-    getTopicIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTopicIndexPageMock.mockResolvedValue(
+      okResult({
         headingBlock: { heading: 'Topics' },
         seo,
         modules: [],
         translations,
-      },
-    });
+      }),
+    );
 
     const metadata = await buildTopicIndexMetadata();
 

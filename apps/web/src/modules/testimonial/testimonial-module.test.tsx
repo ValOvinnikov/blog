@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
@@ -6,6 +7,8 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TestimonialModule } from './testimonial-module';
+
+const MODULE_ID = 'testimonial-1';
 
 const { getTestimonialModuleMock } = vi.hoisted(() => ({
   getTestimonialModuleMock: vi.fn(),
@@ -36,7 +39,7 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(TestimonialModule, {
-  id: 'testimonial-1',
+  id: MODULE_ID,
 });
 
 describe(`<${TestimonialModule.name}/>`, () => {
@@ -56,27 +59,20 @@ describe(`<${TestimonialModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getTestimonialModuleMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTestimonialModuleMock.mockResolvedValue(
+      okResult({
         ...baseModule,
-        testimonials: [makeTestimonialItem({ id: 'testimonial-1' })],
-      },
-    });
+        testimonials: [makeTestimonialItem({ id: MODULE_ID })],
+      }),
+    );
 
     await setup();
 
-    expect(getTestimonialModuleMock).toHaveBeenCalledWith(
-      'testimonial-1',
-      tenant,
-    );
+    expect(getTestimonialModuleMock).toHaveBeenCalledWith(MODULE_ID, tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getTestimonialModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getTestimonialModuleMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -85,13 +81,12 @@ describe(`<${TestimonialModule.name}/>`, () => {
 
   it('renders the resolved testimonials', async () => {
     const testimonials = [
-      makeTestimonialItem({ id: 'testimonial-1' }),
+      makeTestimonialItem({ id: MODULE_ID }),
       makeTestimonialItem({ id: 'testimonial-2' }),
     ];
-    getTestimonialModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, testimonials },
-    });
+    getTestimonialModuleMock.mockResolvedValue(
+      okResult({ ...baseModule, testimonials }),
+    );
 
     await setup();
 

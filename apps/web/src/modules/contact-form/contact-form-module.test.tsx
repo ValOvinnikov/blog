@@ -1,4 +1,5 @@
 import { TENANT_STATUS } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
@@ -61,12 +62,13 @@ describe(`<${ContactFormModule.name}/>`, () => {
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
     } as never);
-    getContactFormMock.mockResolvedValue({
-      ok: true,
-      data: makeContactFormModule({
-        headingBlock: makeHeadingBlock({ heading: HEADING }),
-      }),
-    });
+    getContactFormMock.mockResolvedValue(
+      okResult(
+        makeContactFormModule({
+          headingBlock: makeHeadingBlock({ heading: HEADING }),
+        }),
+      ),
+    );
   });
 
   it('renders the heading and the form', async () => {
@@ -102,10 +104,9 @@ describe(`<${ContactFormModule.name}/>`, () => {
   });
 
   it('renders nothing when the module cannot be loaded', async () => {
-    getContactFormMock.mockResolvedValue({
-      ok: false,
-      error: new Error('contact form unavailable'),
-    });
+    getContactFormMock.mockResolvedValue(
+      errorResult(new Error('contact form unavailable')),
+    );
 
     await setup();
 

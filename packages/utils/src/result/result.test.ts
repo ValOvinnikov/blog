@@ -49,4 +49,10 @@ describe(errorResult, () => {
 
     expect(result).toEqual({ ok: false, error });
   });
+
+  it('builds a failure with no error when called without an argument', () => {
+    const result: TResult<number, string | undefined> = errorResult();
+
+    expect(result).toEqual({ ok: false, error: undefined });
+  });
 });

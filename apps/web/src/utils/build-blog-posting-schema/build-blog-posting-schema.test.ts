@@ -5,8 +5,16 @@ import {
   urlForSanityImage,
 } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildBlogPostingSchema } from './build-blog-posting-schema';
+
+const POST_TITLE = 'Hello World';
+const POST_EXCERPT = 'A sufficiently long excerpt for the post.';
+const PUBLISHED_AT = '2026-01-15T00:00:00Z';
+const BASE_URL = 'https://example.com';
+const CUSTOM_DOMAIN_URL = 'https://blog.example.com';
+const NL_POST_SLUG = 'mijn-artikel';
 
 const project: TSanityProjectRef = {
   projectId: 'test-project',
@@ -20,23 +28,23 @@ const heroImage = makeSanityImage();
 
 const post: TPostDetail = {
   id: 'post-1',
-  title: 'Hello World',
+  title: POST_TITLE,
   slug: 'hello-world',
-  excerpt: 'A sufficiently long excerpt for the post.',
-  publishedAt: '2026-01-15T00:00:00Z',
+  excerpt: POST_EXCERPT,
+  publishedAt: PUBLISHED_AT,
   heroImage,
   featured: false,
   body: [],
   postTakeaways: undefined,
   hasAsides: false,
   modules: [],
-  seo: {
-    title: 'Hello World',
-    description: 'A sufficiently long excerpt for the post.',
-    ogTitle: 'Hello World',
-    ogDescription: 'A sufficiently long excerpt for the post.',
+  seo: mockSeo({
+    title: POST_TITLE,
+    description: POST_EXCERPT,
+    ogTitle: POST_TITLE,
+    ogDescription: POST_EXCERPT,
     ogImage: heroImage,
-  },
+  }),
   author: {
     id: 'author-1',
     name: 'Jane Doe',
@@ -61,7 +69,7 @@ describe(buildBlogPostingSchema, () => {
   it('maps a post detail to a BlogPosting schema', () => {
     const schema = buildBlogPostingSchema(
       post,
-      new URL('https://example.com'),
+      new URL(BASE_URL),
       project,
       DEFAULT_LANGUAGE,
     );
@@ -69,11 +77,11 @@ describe(buildBlogPostingSchema, () => {
     expect(schema).toEqual({
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
-      headline: 'Hello World',
-      description: 'A sufficiently long excerpt for the post.',
+      headline: POST_TITLE,
+      description: POST_EXCERPT,
       image: urlForSanityImage(heroImage, project),
-      datePublished: '2026-01-15T00:00:00Z',
-      dateModified: '2026-01-15T00:00:00Z',
+      datePublished: PUBLISHED_AT,
+      dateModified: PUBLISHED_AT,
       author: { '@type': 'Person', name: 'Jane Doe' },
       url: 'https://example.com/blog/hello-world',
       keywords: undefined,
@@ -84,7 +92,7 @@ describe(buildBlogPostingSchema, () => {
   it('omits image when the post has no hero image', () => {
     const schema = buildBlogPostingSchema(
       { ...post, heroImage: undefined },
-      new URL('https://example.com'),
+      new URL(BASE_URL),
       project,
       DEFAULT_LANGUAGE,
     );
@@ -95,7 +103,7 @@ describe(buildBlogPostingSchema, () => {
   it('builds an absolute url from the base URL and the post slug', () => {
     const schema = buildBlogPostingSchema(
       { ...post, slug: 'another-post' },
-      new URL('https://blog.example.com'),
+      new URL(CUSTOM_DOMAIN_URL),
       project,
       DEFAULT_LANGUAGE,
     );
@@ -105,8 +113,8 @@ describe(buildBlogPostingSchema, () => {
 
   it('prefixes the url with the post language when it is not the default', () => {
     const schema = buildBlogPostingSchema(
-      { ...post, slug: 'mijn-artikel' },
-      new URL('https://blog.example.com'),
+      { ...post, slug: NL_POST_SLUG },
+      new URL(CUSTOM_DOMAIN_URL),
       project,
       { locale: NL, defaultLocale: EN },
     );
@@ -116,8 +124,8 @@ describe(buildBlogPostingSchema, () => {
 
   it('sets inLanguage to the language of a non-default post', () => {
     const schema = buildBlogPostingSchema(
-      { ...post, slug: 'mijn-artikel' },
-      new URL('https://blog.example.com'),
+      { ...post, slug: NL_POST_SLUG },
+      new URL(CUSTOM_DOMAIN_URL),
       project,
       { locale: NL, defaultLocale: EN },
     );
@@ -145,7 +153,7 @@ describe(buildBlogPostingSchema, () => {
           { id: 'tag-2', title: 'React', slug: 'react' },
         ],
       },
-      new URL('https://example.com'),
+      new URL(BASE_URL),
       project,
       DEFAULT_LANGUAGE,
     );
@@ -156,7 +164,7 @@ describe(buildBlogPostingSchema, () => {
   it('omits keywords when the post has no tags', () => {
     const schema = buildBlogPostingSchema(
       post,
-      new URL('https://example.com'),
+      new URL(BASE_URL),
       project,
       DEFAULT_LANGUAGE,
     );
@@ -167,7 +175,7 @@ describe(buildBlogPostingSchema, () => {
   it('omits description for a sparse post without throwing', () => {
     const schema = buildBlogPostingSchema(
       { ...post, excerpt: undefined },
-      new URL('https://example.com'),
+      new URL(BASE_URL),
       project,
       DEFAULT_LANGUAGE,
     );

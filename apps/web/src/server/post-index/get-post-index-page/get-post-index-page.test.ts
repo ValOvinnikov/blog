@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostIndexPage } from './get-post-index-page';
@@ -16,7 +17,7 @@ describe(getPostIndexPage, () => {
   });
 
   it('forwards the resolved tenant context to the blog index service', async () => {
-    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getIndexPageMock.mockResolvedValue(okResult());
 
     await getPostIndexPage();
 
@@ -26,7 +27,7 @@ describe(getPostIndexPage, () => {
   });
 
   it('returns the raw TResult from getIndexPage unchanged', async () => {
-    const result = { ok: true, data: { title: 'Blog' } };
+    const result = okResult({ title: 'Blog' });
     getIndexPageMock.mockResolvedValue(result);
 
     await expect(getPostIndexPage()).resolves.toBe(result);
@@ -41,7 +42,7 @@ describe('getPostIndexPage memoization', () => {
 
   it('dedupes the index-page query across one render pass with the same arguments', async () => {
     getIndexPageMock.mockReset();
-    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getIndexPageMock.mockResolvedValue(okResult());
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();

@@ -1,3 +1,4 @@
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSectionPagesModule } from '@web/testing/modules/section-pages/fixtures';
@@ -41,10 +42,9 @@ const setup = customRenderAsync(SectionPagesModule, {
 describe(`<${SectionPagesModule.name}/>`, () => {
   beforeEach(() => {
     getSectionPagesModuleMock.mockReset();
-    getSectionPagesModuleMock.mockResolvedValue({
-      ok: true,
-      data: makeSectionPagesModule(),
-    });
+    getSectionPagesModuleMock.mockResolvedValue(
+      okResult(makeSectionPagesModule()),
+    );
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     loggerWarnMock.mockReset();
@@ -74,10 +74,9 @@ describe(`<${SectionPagesModule.name}/>`, () => {
   });
 
   it('renders nothing when the page has no children', async () => {
-    getSectionPagesModuleMock.mockResolvedValue({
-      ok: true,
-      data: makeSectionPagesModule({ pages: [] }),
-    });
+    getSectionPagesModuleMock.mockResolvedValue(
+      okResult(makeSectionPagesModule({ pages: [] })),
+    );
 
     const { container } = await setup();
 
@@ -85,10 +84,7 @@ describe(`<${SectionPagesModule.name}/>`, () => {
   });
 
   it('renders nothing and logs an error when the fetch fails', async () => {
-    getSectionPagesModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getSectionPagesModuleMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 

@@ -1,5 +1,6 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import {
   BLOCK_AUTHOR_EMAIL,
   BLOCKED_ADDRESS_HASH,
@@ -30,7 +31,7 @@ describe(loadBlockedSignupEntries, () => {
 
   it('shows a domain as it is stored and who added it', async () => {
     const listing = makeBlockedIdentityListing();
-    listBlockedIdentitiesMock.mockResolvedValue({ ok: true, data: [listing] });
+    listBlockedIdentitiesMock.mockResolvedValue(okResult([listing]));
 
     const entries = await loadBlockedSignupEntries();
 
@@ -47,15 +48,14 @@ describe(loadBlockedSignupEntries, () => {
   });
 
   it('shows only the start of an address hash', async () => {
-    listBlockedIdentitiesMock.mockResolvedValue({
-      ok: true,
-      data: [
+    listBlockedIdentitiesMock.mockResolvedValue(
+      okResult([
         makeBlockedIdentityListing({
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
           value: BLOCKED_ADDRESS_HASH,
         }),
-      ],
-    });
+      ]),
+    );
 
     const [entry] = await loadBlockedSignupEntries();
 
@@ -63,10 +63,9 @@ describe(loadBlockedSignupEntries, () => {
   });
 
   it('leaves the author empty when the adding admin is gone', async () => {
-    listBlockedIdentitiesMock.mockResolvedValue({
-      ok: true,
-      data: [makeBlockedIdentityListing({ addedByEmail: null })],
-    });
+    listBlockedIdentitiesMock.mockResolvedValue(
+      okResult([makeBlockedIdentityListing({ addedByEmail: null })]),
+    );
 
     const [entry] = await loadBlockedSignupEntries();
 
@@ -74,10 +73,9 @@ describe(loadBlockedSignupEntries, () => {
   });
 
   it('throws when the list cannot be read', async () => {
-    listBlockedIdentitiesMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    listBlockedIdentitiesMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     await expect(loadBlockedSignupEntries()).rejects.toThrow(
       `Could not list blocked sign-ups: ${ERROR_CODE.DB_NOT_FOUND}`,

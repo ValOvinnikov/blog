@@ -1,4 +1,5 @@
-import { NEWSLETTER_VARIANT } from '@blog/config';
+import { CAPABILITY, NEWSLETTER_VARIANT } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
@@ -8,6 +9,8 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
+
+const MODULE_ID = 'newsletter-1';
 
 const { getNewsletterMock } = vi.hoisted(() => ({
   getNewsletterMock: vi.fn(),
@@ -37,7 +40,7 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
 const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(NewsletterModule, {
-  id: 'newsletter-1',
+  id: MODULE_ID,
 });
 
 describe(`<${NewsletterModule.name}/>`, () => {
@@ -52,10 +55,9 @@ describe(`<${NewsletterModule.name}/>`, () => {
   it("renders the module's own trust cues in the form", async () => {
     const firstCue = faker.lorem.words(2);
     const secondCue = faker.lorem.words(3);
-    getNewsletterMock.mockResolvedValue({
-      ok: true,
-      data: makeNewsletterModule({ trustCues: [firstCue, secondCue] }),
-    });
+    getNewsletterMock.mockResolvedValue(
+      okResult(makeNewsletterModule({ trustCues: [firstCue, secondCue] })),
+    );
 
     await setup();
 
@@ -66,14 +68,15 @@ describe(`<${NewsletterModule.name}/>`, () => {
   it('renders the compact form (no supporting text) for a COMPACT module', async () => {
     const heading = faker.company.catchPhrase();
     const supportingText = faker.lorem.sentence();
-    getNewsletterMock.mockResolvedValue({
-      ok: true,
-      data: makeNewsletterModule({
-        headingBlock: makeHeadingBlock({ heading, supportingText }),
-        variant: NEWSLETTER_VARIANT.COMPACT,
-        trustCues: undefined,
-      }),
-    });
+    getNewsletterMock.mockResolvedValue(
+      okResult(
+        makeNewsletterModule({
+          headingBlock: makeHeadingBlock({ heading, supportingText }),
+          variant: NEWSLETTER_VARIANT.COMPACT,
+          trustCues: undefined,
+        }),
+      ),
+    );
 
     await setup();
 
@@ -92,10 +95,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
 
   describe('when the newsletter fetch fails', () => {
     beforeEach(() => {
-      getNewsletterMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getNewsletterMock.mockResolvedValue(errorResult(new Error('boom')));
     });
 
     it('renders nothing when the fetch fails', async () => {
@@ -117,13 +117,13 @@ describe(`<${NewsletterModule.name}/>`, () => {
 
       await setup();
 
-      expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
+      expect(getNewsletterMock).toHaveBeenCalledWith(MODULE_ID, tenant);
     });
 
     it('checks the NEWSLETTER capability', async () => {
       await setup();
 
-      expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER');
+      expect(isCapabilityEnabled).toHaveBeenCalledWith(CAPABILITY.NEWSLETTER);
     });
   });
 });

@@ -1,3 +1,4 @@
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
@@ -40,17 +41,11 @@ describe(`<${PricingModule.name}/>`, () => {
     getSiteSettingsMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { currency: 'GBP' },
-    });
+    getSiteSettingsMock.mockResolvedValue(okResult({ currency: 'GBP' }));
   });
 
   it('renders nothing when the module fetch fails', async () => {
-    getPricingModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPricingModuleMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -59,10 +54,7 @@ describe(`<${PricingModule.name}/>`, () => {
 
   describe('with a default pricing module', () => {
     beforeEach(() => {
-      getPricingModuleMock.mockResolvedValue({
-        ok: true,
-        data: makePricingModule(),
-      });
+      getPricingModuleMock.mockResolvedValue(okResult(makePricingModule()));
     });
 
     it('calls getPricingModule with the module id and the tenant Sanity context', async () => {
@@ -75,10 +67,7 @@ describe(`<${PricingModule.name}/>`, () => {
     });
 
     it('renders nothing when the site settings fetch fails', async () => {
-      getSiteSettingsMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getSiteSettingsMock.mockResolvedValue(errorResult(new Error('boom')));
 
       const { container } = await setup();
 
@@ -87,28 +76,29 @@ describe(`<${PricingModule.name}/>`, () => {
   });
 
   it('formats prices in the site currency without trailing zeros', async () => {
-    getPricingModuleMock.mockResolvedValue({
-      ok: true,
-      data: makePricingModule({
-        tiers: [
-          makePricingTier({
-            id: 'whole',
-            name: 'Whole',
-            prices: [makePricingPrice({ amount: 49 })],
-          }),
-          makePricingTier({
-            id: 'fraction',
-            name: 'Fraction',
-            prices: [makePricingPrice({ amount: 49.99 })],
-          }),
-          makePricingTier({
-            id: 'free',
-            name: 'Free tier',
-            prices: [makePricingPrice({ amount: 0 })],
-          }),
-        ],
-      }),
-    });
+    getPricingModuleMock.mockResolvedValue(
+      okResult(
+        makePricingModule({
+          tiers: [
+            makePricingTier({
+              id: 'whole',
+              name: 'Whole',
+              prices: [makePricingPrice({ amount: 49 })],
+            }),
+            makePricingTier({
+              id: 'fraction',
+              name: 'Fraction',
+              prices: [makePricingPrice({ amount: 49.99 })],
+            }),
+            makePricingTier({
+              id: 'free',
+              name: 'Free tier',
+              prices: [makePricingPrice({ amount: 0 })],
+            }),
+          ],
+        }),
+      ),
+    );
 
     await setup();
 

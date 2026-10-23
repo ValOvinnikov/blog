@@ -1,11 +1,14 @@
 import {
   CONTENT_ROUTE_REVALIDATE_SECONDS,
   LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { okResult } from '@blog/utils';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { makeTopicDetailPage } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
 import TopicNumberedPage, { generateMetadata, revalidate } from './page';
@@ -77,25 +80,7 @@ describe('TopicNumberedPage', () => {
     });
 
     it('builds metadata for page 2', async () => {
-      getTopicPageMock.mockResolvedValue({
-        ok: true,
-        data: {
-          topic: {
-            id: 'topic-1',
-            title: 'Engineering',
-            slug: 'engineering',
-            description: 'Posts about building things.',
-          },
-          modules: [],
-          seo: {
-            title: 'Engineering',
-            description: 'Posts about building things.',
-            ogTitle: 'Engineering',
-            ogDescription: 'Posts about building things.',
-            ogImage: undefined,
-          },
-        },
-      });
+      getTopicPageMock.mockResolvedValue(okResult(makeTopicDetailPage()));
 
       const metadata = await generateMetadata({
         params: Promise.resolve({
@@ -115,7 +100,7 @@ describe('TopicNumberedPage', () => {
   });
 
   it('redirects /topics/[slug]/page/1 to /topics/[slug] (canonical page 1 has one URL)', async () => {
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(enterRequestContext).toHaveBeenCalled();
 
@@ -137,7 +122,7 @@ describe('TopicNumberedPage', () => {
             page: raw,
           }),
         }),
-      ).rejects.toThrow('NEXT_NOT_FOUND');
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
       expect(vi.mocked(notFound)).toHaveBeenCalled();
     },

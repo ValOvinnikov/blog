@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND, TENANT_STATUS } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
@@ -97,15 +98,13 @@ describe('tenant suspension actions', () => {
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(ACTIVE_TENANT);
     setTenantSuspensionMock.mockReset();
-    setTenantSuspensionMock.mockResolvedValue({ ok: true, data: {} });
+    setTenantSuspensionMock.mockResolvedValue(okResult({}));
     getTenantOwnerEmailMock.mockReset().mockResolvedValue(OWNER_EMAIL);
     saveSignupBlockMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: { entry: ENTRY, created: true } });
+      .mockResolvedValue(okResult({ entry: ENTRY, created: true }));
     recordSignupBlockAddedMock.mockReset();
-    removeBlockedIdentityMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: undefined });
+    removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     vi.mocked(logger.error).mockReset();
     recordAuditEventMock.mockReset();
     revalidateSiteConfigMock.mockReset();
@@ -199,10 +198,9 @@ describe('tenant suspension actions', () => {
   );
 
   it('refuses when the tenant is archived before the write lands', async () => {
-    setTenantSuspensionMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    setTenantSuspensionMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await actions.suspendTenantAction(ACTIVE_TENANT.id);
 
@@ -260,10 +258,9 @@ describe('tenant suspension actions', () => {
     });
 
     it('does not audit a block that was already on the list', async () => {
-      saveSignupBlockMock.mockResolvedValue({
-        ok: true,
-        data: { entry: ENTRY, created: false },
-      });
+      saveSignupBlockMock.mockResolvedValue(
+        okResult({ entry: ENTRY, created: false }),
+      );
 
       const result = await actions.suspendTenantAction(
         ACTIVE_TENANT.id,
@@ -304,10 +301,9 @@ describe('tenant suspension actions', () => {
     });
 
     it('fails without suspending when the block cannot be stored', async () => {
-      saveSignupBlockMock.mockResolvedValue({
-        ok: false,
-        error: ERROR_CODE.DB_INVALID_EMAIL,
-      });
+      saveSignupBlockMock.mockResolvedValue(
+        errorResult(ERROR_CODE.DB_INVALID_EMAIL),
+      );
 
       const result = await actions.suspendTenantAction(
         ACTIVE_TENANT.id,
@@ -332,10 +328,9 @@ describe('tenant suspension actions', () => {
         [
           'is refused',
           () =>
-            setTenantSuspensionMock.mockResolvedValue({
-              ok: false,
-              error: ERROR_CODE.DB_NOT_FOUND,
-            }),
+            setTenantSuspensionMock.mockResolvedValue(
+              errorResult(ERROR_CODE.DB_NOT_FOUND),
+            ),
           { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED },
         ],
         [
@@ -378,14 +373,12 @@ describe('tenant suspension actions', () => {
       });
 
       it('keeps a block that was already on the list', async () => {
-        saveSignupBlockMock.mockResolvedValue({
-          ok: true,
-          data: { entry: ENTRY, created: false },
-        });
-        setTenantSuspensionMock.mockResolvedValue({
-          ok: false,
-          error: ERROR_CODE.DB_NOT_FOUND,
-        });
+        saveSignupBlockMock.mockResolvedValue(
+          okResult({ entry: ENTRY, created: false }),
+        );
+        setTenantSuspensionMock.mockResolvedValue(
+          errorResult(ERROR_CODE.DB_NOT_FOUND),
+        );
 
         await actions.suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
@@ -396,10 +389,9 @@ describe('tenant suspension actions', () => {
         [
           'returns an error',
           () =>
-            removeBlockedIdentityMock.mockResolvedValue({
-              ok: false,
-              error: ERROR_CODE.DB_NOT_FOUND,
-            }),
+            removeBlockedIdentityMock.mockResolvedValue(
+              errorResult(ERROR_CODE.DB_NOT_FOUND),
+            ),
           { error: ERROR_CODE.DB_NOT_FOUND },
         ],
         [
@@ -410,10 +402,9 @@ describe('tenant suspension actions', () => {
       ])(
         'logs once without the address and keeps the failure when the undo %s',
         async (_, failUndo, loggedError) => {
-          setTenantSuspensionMock.mockResolvedValue({
-            ok: false,
-            error: ERROR_CODE.DB_NOT_FOUND,
-          });
+          setTenantSuspensionMock.mockResolvedValue(
+            errorResult(ERROR_CODE.DB_NOT_FOUND),
+          );
           failUndo();
 
           const result = await actions.suspendTenantAction(

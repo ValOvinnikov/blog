@@ -2,6 +2,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { service, type TTranslationMap } from '@blog/service';
+import { TRANSLATION_MAP_FETCH_FAILED_EVENT } from '@web/constants/translation-map';
 import { logger } from '@web/utils/logger/logger';
 
 export const getTenantTranslationMap = async (
@@ -16,12 +17,12 @@ export const getTenantTranslationMap = async (
     const result =
       await service.global.translationMap.v1.getTranslationMap(sanityContext);
     if (!result.ok) {
-      logger.error('translation_map.fetch_failed', { error: result.error });
+      logger.error(TRANSLATION_MAP_FETCH_FAILED_EVENT, { error: result.error });
       return undefined;
     }
     return result.data;
   } catch (error) {
-    logger.error('translation_map.fetch_failed', { error });
+    logger.error(TRANSLATION_MAP_FETCH_FAILED_EVENT, { error });
     return undefined;
   }
 };

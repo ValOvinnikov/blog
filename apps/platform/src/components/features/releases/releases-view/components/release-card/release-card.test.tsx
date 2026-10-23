@@ -1,4 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
+import { GITHUB_FAILURE } from '@platform/constants/github';
+import type * as releaseConstants from '@platform/constants/release';
 import { RELEASE_RUN_STATUS } from '@platform/constants/release';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -10,6 +13,8 @@ import userEvent from '@testing-library/user-event';
 
 import { ReleaseCard } from './release-card';
 
+const ARIA_DISABLED = 'aria-disabled';
+
 const { startReleaseActionMock, getReleaseRunActionMock, releaseSwitch } =
   vi.hoisted(() => ({
     startReleaseActionMock: vi.fn(),
@@ -18,7 +23,7 @@ const { startReleaseActionMock, getReleaseRunActionMock, releaseSwitch } =
   }));
 
 vi.mock('@platform/constants/release', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@platform/constants/release')>()),
+  ...(await importOriginal<typeof releaseConstants>()),
   get IS_PRODUCTION_RELEASE_ENABLED() {
     return releaseSwitch.isEnabled;
   },
@@ -37,7 +42,7 @@ const setup = customRender(ReleaseCard, {
   hasChanges: true,
   migrations: makeReleaseCandidate().migrations,
   isOverrideRequired: false,
-  releaseRun: { ok: true, data: undefined },
+  releaseRun: okResult(),
 });
 
 describe(`<${ReleaseCard.name}/>`, () => {
@@ -49,9 +54,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     startReleaseActionMock
       .mockReset()
       .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
-    getReleaseRunActionMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: undefined });
+    getReleaseRunActionMock.mockReset().mockResolvedValue(okResult());
   });
 
   afterEach(() => {
@@ -65,7 +68,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
   });
 
   it('shows the latest run with a link to it', () => {
-    setup({ releaseRun: { ok: true, data: makeReleaseRun() } });
+    setup({ releaseRun: okResult(makeReleaseRun()) });
 
     expect(screen.getByText('Succeeded')).toBeVisible();
     expect(screen.getByText('Release v1.4.0')).toBeVisible();
@@ -77,13 +80,12 @@ describe(`<${ReleaseCard.name}/>`, () => {
 
   it('says the deploy did not run and points to the tenant retry when a tenant migration failed', () => {
     setup({
-      releaseRun: {
-        ok: true,
-        data: makeReleaseRun({
+      releaseRun: okResult(
+        makeReleaseRun({
           status: RELEASE_RUN_STATUS.FAILED,
           isTenantMigrationFailed: true,
         }),
-      },
+      ),
     });
 
     expect(screen.getByText('Failed')).toBeVisible();
@@ -97,15 +99,14 @@ describe(`<${ReleaseCard.name}/>`, () => {
 
   it('refuses a new release while one is running', () => {
     setup({
-      releaseRun: {
-        ok: true,
-        data: makeReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
-      },
+      releaseRun: okResult(
+        makeReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
+      ),
     });
 
     expect(screen.getByText('Running')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
-      'aria-disabled',
+      ARIA_DISABLED,
       'true',
     );
     expect(screen.getByText('A release is running.')).toBeVisible();
@@ -116,7 +117,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     setup();
 
     expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
-      'aria-disabled',
+      ARIA_DISABLED,
       'true',
     );
     expect(screen.getByText('Production releases are paused.')).toBeVisible();
@@ -129,14 +130,14 @@ describe(`<${ReleaseCard.name}/>`, () => {
   });
 
   it('says the release state is unavailable when GitHub cannot be read', () => {
-    setup({ releaseRun: { ok: false, reason: 'githubError' } });
+    setup({ releaseRun: errorResult(GITHUB_FAILURE.GITHUB_ERROR) });
 
     expect(screen.getByText('Release status is unavailable')).toBeVisible();
   });
 
   it('shows the release as dispatched as soon as it starts', async () => {
     const user = userEvent.setup();
-    setup({ releaseRun: { ok: true, data: makeReleaseRun() } });
+    setup({ releaseRun: okResult(makeReleaseRun()) });
 
     await user.click(screen.getByRole('button', { name: 'Release' }));
     await user.type(
@@ -148,22 +149,20 @@ describe(`<${ReleaseCard.name}/>`, () => {
     expect(await screen.findByText('Dispatched')).toBeVisible();
     expect(await screen.findByText('Release started.')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
-      'aria-disabled',
+      ARIA_DISABLED,
       'true',
     );
   });
 
   it('follows a running release to its result and refreshes the page', async () => {
     vi.useFakeTimers();
-    getReleaseRunActionMock.mockResolvedValue({
-      ok: true,
-      data: makeReleaseRun({ status: RELEASE_RUN_STATUS.SUCCEEDED }),
-    });
+    getReleaseRunActionMock.mockResolvedValue(
+      okResult(makeReleaseRun({ status: RELEASE_RUN_STATUS.SUCCEEDED })),
+    );
     setup({
-      releaseRun: {
-        ok: true,
-        data: makeReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
-      },
+      releaseRun: okResult(
+        makeReleaseRun({ status: RELEASE_RUN_STATUS.RUNNING }),
+      ),
     });
 
     await act(() => vi.advanceTimersByTimeAsync(10_000));

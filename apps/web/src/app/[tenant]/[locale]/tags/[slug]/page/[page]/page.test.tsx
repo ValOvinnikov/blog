@@ -1,10 +1,13 @@
 import {
   CONTENT_ROUTE_REVALIDATE_SECONDS,
   LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { okResult } from '@blog/utils';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
+import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -77,25 +80,7 @@ describe('TagNumberedPage', () => {
     });
 
     it('builds metadata for page 2', async () => {
-      getTagPageMock.mockResolvedValue({
-        ok: true,
-        data: {
-          tag: {
-            id: 'tag-1',
-            title: 'TypeScript',
-            slug: 'typescript',
-            description: 'Posts about TypeScript.',
-          },
-          modules: [],
-          seo: {
-            title: 'TypeScript',
-            description: 'Posts about TypeScript.',
-            ogTitle: 'TypeScript',
-            ogDescription: 'Posts about TypeScript.',
-            ogImage: undefined,
-          },
-        },
-      });
+      getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage()));
 
       const metadata = await generateMetadata({
         params: Promise.resolve({
@@ -115,7 +100,7 @@ describe('TagNumberedPage', () => {
   });
 
   it('redirects /tags/[slug]/page/1 to /tags/[slug] (canonical page 1 has one URL)', async () => {
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(enterRequestContext).toHaveBeenCalled();
 
@@ -137,7 +122,7 @@ describe('TagNumberedPage', () => {
             page: raw,
           }),
         }),
-      ).rejects.toThrow('NEXT_NOT_FOUND');
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
       expect(vi.mocked(notFound)).toHaveBeenCalled();
     },

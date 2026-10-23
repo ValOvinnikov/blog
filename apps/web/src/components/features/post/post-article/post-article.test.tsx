@@ -5,6 +5,7 @@ import {
   type TPortableTextBody,
   urlForSanityImage,
 } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
@@ -65,7 +66,7 @@ const setup = customRenderServerAsync(
 
 describe(`<${PostArticle.name}/>`, () => {
   beforeEach(() => {
-    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+    getPostMock.mockResolvedValue(okResult(mockPostDetail));
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
     vi.mocked(useSession).mockReturnValue({
       data: { user: { id: 'user-1' }, expires: '' },
@@ -76,7 +77,7 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {
-    getPostMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getPostMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -85,7 +86,7 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPostMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
+    getPostMock.mockResolvedValueOnce(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -102,10 +103,9 @@ describe(`<${PostArticle.name}/>`, () => {
     });
 
     it('renders the bookmark toggle and share button in the header meta strip', async () => {
-      getPostMock.mockResolvedValueOnce({
-        ok: true,
-        data: { ...mockPostDetail, tags: [], heroImage: undefined },
-      });
+      getPostMock.mockResolvedValueOnce(
+        okResult({ ...mockPostDetail, tags: [], heroImage: undefined }),
+      );
 
       await setup();
 
@@ -131,13 +131,12 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('renders the topic eyebrow as plain text when the topic has no topic page', async () => {
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPostMock.mockResolvedValueOnce(
+      okResult({
         ...mockPostDetail,
         topic: { ...mockPostDetail.topic, slug: undefined },
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -148,16 +147,15 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('links the author to whatever href the service resolved', async () => {
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPostMock.mockResolvedValueOnce(
+      okResult({
         ...mockPostDetail,
         author: {
           ...mockPostDetail.author,
           profileUrl: AUTHOR_PROFILE_URL,
         },
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -176,10 +174,9 @@ describe(`<${PostArticle.name}/>`, () => {
       lqip: undefined,
       dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
     };
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: { ...mockPostDetail, heroImage },
-    });
+    getPostMock.mockResolvedValueOnce(
+      okResult({ ...mockPostDetail, heroImage }),
+    );
 
     await setup();
 
@@ -193,10 +190,7 @@ describe(`<${PostArticle.name}/>`, () => {
       portableTextBlock('Configuration', { style: 'h2', key: 'configuration' }),
       portableTextBlock('Deployment', { style: 'h2' }),
     ];
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: { ...mockPostDetail, body },
-    });
+    getPostMock.mockResolvedValueOnce(okResult({ ...mockPostDetail, body }));
 
     await setup();
 
@@ -207,16 +201,15 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('renders the post tags as links to routes.tag(slug)', async () => {
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPostMock.mockResolvedValueOnce(
+      okResult({
         ...mockPostDetail,
         tags: [
           { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
           { id: 'tag-2', title: 'React', slug: 'react' },
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -231,16 +224,15 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('omits a tag with no tag page from the footer', async () => {
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPostMock.mockResolvedValueOnce(
+      okResult({
         ...mockPostDetail,
         tags: [
           { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
           { id: 'tag-2', title: 'React', slug: undefined },
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 

@@ -3,6 +3,7 @@ import {
   NEXT_NAVIGATION_ERROR,
   TAXONOMY_KIND,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -36,9 +37,8 @@ vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 
-const topicsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
-  ok: true,
-  data: {
+const topicsResult = (entries: unknown[] = [], showLatestPosts = true) =>
+  okResult({
     brandVariant: BRAND_VARIANT.PRIMARY,
     headingBlock: makeHeadingBlock({ heading: 'Topics' }),
     layout: undefined,
@@ -46,12 +46,10 @@ const topicsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
     taxonomy: TAXONOMY_KIND.TOPICS,
     showLatestPosts,
     entries,
-  },
-});
+  });
 
-const tagsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
-  ok: true,
-  data: {
+const tagsResult = (entries: unknown[] = [], showLatestPosts = true) =>
+  okResult({
     brandVariant: BRAND_VARIANT.PRIMARY,
     headingBlock: makeHeadingBlock({ heading: 'Tags' }),
     layout: undefined,
@@ -59,8 +57,7 @@ const tagsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
     taxonomy: TAXONOMY_KIND.TAGS,
     showLatestPosts,
     entries,
-  },
-});
+  });
 
 const FIRST_POST_TITLE = 'Shipping the new build pipeline';
 const SECOND_POST_TITLE = 'Why we rewrote our test runner';
@@ -209,10 +206,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
     });
 
     it('logs and calls notFound() when the fetch fails', async () => {
-      getTaxonomyListMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getTaxonomyListMock.mockResolvedValue(errorResult(new Error('boom')));
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
