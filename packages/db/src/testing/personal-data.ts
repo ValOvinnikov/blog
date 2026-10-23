@@ -35,6 +35,6 @@ export function testPersonalEmailIndex(email: string): string {
   return personalDataIndex(email, MOCK_OTHER_ENCRYPTION_KEY);
 }
 
-export function testAccountEmailIndex(email: string): string {
+export function mockAccountEmailIndex(email: string): string {
   return accountEmailIndex(email, MOCK_OTHER_ENCRYPTION_KEY);
 }

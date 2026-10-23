@@ -6,12 +6,10 @@ import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
-const NOT_SUBSCRIBED = 'not-subscribed';
-
 export type TSubscriptionStatusResult =
   | { outcome: 'active'; subscriber: TSubscriber }
   | { outcome: 'pending'; subscriber: TSubscriber }
-  | TOutcome<typeof NOT_SUBSCRIBED>;
+  | TOutcome<'not-subscribed'>;
 
 // `subscribers` has no `userId` column, so the row is found through the
 // user's normalized account email.
@@ -26,22 +24,22 @@ export async function getSubscriptionStatus(
     .from(users)
     .where(eq(users.id, userId));
 
-  if (!user?.email) {
-    return toOutcome(NOT_SUBSCRIBED);
-  }
+  const accountEmail = user?.email ? normalizeEmail(user.email) : undefined;
 
-  const [subscriber] = await db
-    .select()
-    .from(subscribers)
-    .where(
-      and(
-        eq(subscribers.tenantId, tenantId),
-        eq(subscribers.email, normalizeEmail(user.email)),
-      ),
-    );
+  const [subscriber] = accountEmail
+    ? await db
+        .select()
+        .from(subscribers)
+        .where(
+          and(
+            eq(subscribers.tenantId, tenantId),
+            eq(subscribers.email, accountEmail),
+          ),
+        )
+    : [];
 
   if (!subscriber) {
-    return toOutcome(NOT_SUBSCRIBED);
+    return toOutcome('not-subscribed');
   }
 
   if (subscriber.status === 'active') {

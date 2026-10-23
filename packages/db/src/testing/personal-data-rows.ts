@@ -5,8 +5,9 @@ import { MOCK_BLOCK_REASON } from '@blog/db/testing/blocked-signup-identities/fi
 import { insertTestLead, type TTestDb } from '@blog/db/testing/fixtures';
 import {
   encryptPersonalValue,
-  personalEmailColumns,
+  emailColumns,
 } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
 
 export const MOCK_PERSONAL_DATA_LEAD_NAME = 'Grace Hopper';
 export const MOCK_PERSONAL_DATA_LEAD_MESSAGE = 'Please call me back.';
@@ -25,16 +26,14 @@ export async function insertTestPersonalDataRows(
   tenantId: string,
   email: string,
 ): Promise<void> {
-  const emailColumns = personalEmailColumns(email);
-  const { emailIndex } = emailColumns;
+  const columns = emailColumns(email, personalDataIndex);
+  const { emailIndex } = columns;
   if (!emailIndex) throw new Error('Stub the personal data keys first.');
 
-  await db
-    .insert(schema.subscribers)
-    .values({ tenantId, email, ...emailColumns });
+  await db.insert(schema.subscribers).values({ tenantId, email, ...columns });
   await insertTestLead(db, tenantId, {
     email,
-    ...emailColumns,
+    ...columns,
     name: MOCK_PERSONAL_DATA_LEAD_NAME,
     nameEncrypted: encryptPersonalValue(MOCK_PERSONAL_DATA_LEAD_NAME),
     message: MOCK_PERSONAL_DATA_LEAD_MESSAGE,
@@ -43,7 +42,7 @@ export async function insertTestPersonalDataRows(
   await db.insert(schema.membershipInvites).values({
     tenantId,
     email,
-    ...emailColumns,
+    ...columns,
     role: MEMBERSHIP_ROLE.EDITOR,
   });
   await db.insert(schema.blockedSignupIdentities).values({

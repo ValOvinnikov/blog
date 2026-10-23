@@ -5,8 +5,9 @@ import {
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
+import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
+import { personalDataIndex } from '@blog/utils/encryption';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq } from 'drizzle-orm';
 
@@ -32,7 +33,7 @@ export async function createPendingSubscriber(
     .values({
       tenantId,
       email: normalizedEmail,
-      ...personalEmailColumns(normalizedEmail),
+      ...emailColumns(normalizedEmail, personalDataIndex),
     })
     .onConflictDoNothing()
     .returning();

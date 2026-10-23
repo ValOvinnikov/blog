@@ -18,6 +18,17 @@ of 500. A value already filled is kept, and a row whose plain value changes
 mid-run is skipped and left for the next run, so running it again is always
 safe — a second run finds nothing to do.
 
+A run also re-indexes `users` whose plain email has a `+` in its local part:
+`emailIndex` is recomputed with `accountEmailIndex` wherever the stored value
+differs, because rows written before the exact-address index hold the old
+`+tag`-dropping value, which `coalesce` never replaces. Untagged rows already
+hash identically under both, so they are untouched. The run prints how many
+`+tag` rows it re-indexed (`--dry-run` prints how many it would).
+
+**Run it right after the deploy that ships the exact-address index.** Until
+then a user with a `+tag` address finds no account on sign-in, and Auth.js
+`createUser` fails on the unique `users.email`.
+
 ## Running it
 
 Human-gated, like a migration: run it against development or production only

@@ -1,19 +1,18 @@
 import { MOCK_USER_EMAIL } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
-  testAccountEmailIndex,
+  mockAccountEmailIndex,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
+import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
 
 import {
-  accountEmailColumns,
   decryptPersonalValue,
+  emailColumns,
   encryptPersonalValue,
-  personalEmailColumns,
   readPersonalValue,
-  requireAccountEmailIndex,
-  requirePersonalEmailIndex,
+  requireEmailIndex,
 } from './personal-data';
 
 describe('with both personal data keys configured', () => {
@@ -33,10 +32,13 @@ describe('with both personal data keys configured', () => {
   });
 
   it.each([
-    [personalEmailColumns, testPersonalEmailIndex],
-    [accountEmailColumns, testAccountEmailIndex],
-  ])('%o gives an email its encrypted form and its index', (columns, index) => {
-    const { emailEncrypted, emailIndex } = columns(MOCK_USER_EMAIL);
+    [personalDataIndex, testPersonalEmailIndex],
+    [accountEmailIndex, mockAccountEmailIndex],
+  ])('%o gives an email its encrypted form and its index', (indexer, index) => {
+    const { emailEncrypted, emailIndex } = emailColumns(
+      MOCK_USER_EMAIL,
+      indexer,
+    );
 
     expect(decryptTestPersonalValue(emailEncrypted)).toBe(MOCK_USER_EMAIL);
     expect(emailIndex).toBe(index(MOCK_USER_EMAIL));
@@ -53,10 +55,12 @@ describe('with both personal data keys configured', () => {
   });
 
   it.each([
-    [requirePersonalEmailIndex, testPersonalEmailIndex],
-    [requireAccountEmailIndex, testAccountEmailIndex],
-  ])('%o indexes an email for lookup', (requireIndex, index) => {
-    expect(requireIndex(MOCK_USER_EMAIL)).toBe(index(MOCK_USER_EMAIL));
+    [personalDataIndex, testPersonalEmailIndex],
+    [accountEmailIndex, mockAccountEmailIndex],
+  ])('%o indexes an email for lookup', (indexer, index) => {
+    expect(requireEmailIndex(MOCK_USER_EMAIL, indexer)).toBe(
+      index(MOCK_USER_EMAIL),
+    );
   });
 });
 
@@ -71,14 +75,14 @@ describe('with no personal data keys configured', () => {
   });
 
   it('leaves the encrypted and index forms empty', () => {
-    expect(personalEmailColumns(MOCK_USER_EMAIL)).toEqual({
+    expect(emailColumns(MOCK_USER_EMAIL, personalDataIndex)).toEqual({
       emailEncrypted: null,
       emailIndex: null,
     });
   });
 
   it('refuses an index lookup', () => {
-    expect(() => requirePersonalEmailIndex(MOCK_USER_EMAIL)).toThrow(
+    expect(() => requireEmailIndex(MOCK_USER_EMAIL, personalDataIndex)).toThrow(
       'PERSONAL_DATA_INDEX_KEY is not configured.',
     );
   });

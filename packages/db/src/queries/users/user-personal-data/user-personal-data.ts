@@ -1,10 +1,11 @@
 import type { TMaybeNull, TNullable } from '@blog/config/types';
 import type { TUser } from '@blog/db/schema/auth';
 import {
-  accountEmailColumns,
+  emailColumns,
   decryptPersonalValue,
   encryptPersonalValue,
 } from '@blog/db/utils/personal-data/personal-data';
+import { accountEmailIndex } from '@blog/utils/encryption';
 
 type TUserPersonalColumns = Pick<
   TUser,
@@ -20,7 +21,7 @@ export function userPersonalColumns({
   name?: TNullable<string>;
 }): Partial<TUserPersonalColumns> {
   return {
-    ...(email !== undefined && accountEmailColumns(email)),
+    ...(email !== undefined && emailColumns(email, accountEmailIndex)),
     ...(name !== undefined && {
       nameEncrypted: name === null ? null : encryptPersonalValue(name),
     }),

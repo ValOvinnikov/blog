@@ -5,8 +5,9 @@ import {
 } from '@blog/db/schema/membership-invites';
 import {
   readPersonalValue,
-  requirePersonalEmailIndex,
+  requireEmailIndex,
 } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq, isNull } from 'drizzle-orm';
 
@@ -20,7 +21,10 @@ export async function findPendingInviteByEmailIndex(
     .from(membershipInvites)
     .where(
       and(
-        eq(membershipInvites.emailIndex, requirePersonalEmailIndex(address)),
+        eq(
+          membershipInvites.emailIndex,
+          requireEmailIndex(address, personalDataIndex),
+        ),
         isNull(membershipInvites.consumedAt),
       ),
     );

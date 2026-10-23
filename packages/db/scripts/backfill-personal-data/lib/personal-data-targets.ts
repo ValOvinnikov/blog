@@ -2,13 +2,14 @@ import { users } from '@blog/db/schema/auth';
 import { leads } from '@blog/db/schema/leads';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { subscribers } from '@blog/db/schema/subscribers';
+import type { TEmailIndexer } from '@blog/db/utils/personal-data/personal-data';
 import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
 import { type SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn, PgTable } from 'drizzle-orm/pg-core';
 
 interface IEmailIndexField {
   column: AnyPgColumn;
-  indexer: (email: string, keyBase64: string) => string;
+  indexer: TEmailIndexer;
 }
 
 export interface IPersonalDataField {
