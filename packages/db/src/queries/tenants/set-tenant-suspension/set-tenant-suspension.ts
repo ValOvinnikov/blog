@@ -6,7 +6,7 @@ import {
   type TSuspensionStatus,
 } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq, inArray, isNull } from 'drizzle-orm';
 
 const suspensionStamp: Record<TSuspensionStatus, Partial<TTenant>> = {
@@ -43,8 +43,8 @@ export async function setTenantSuspension(
     .returning();
 
   if (!tenant) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: tenant };
+  return okResult(tenant);
 }

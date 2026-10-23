@@ -5,9 +5,11 @@ import {
   VOICE_FIELD_KIND,
   type TVoiceFieldErrorReason,
   type TVoiceFieldFailure,
+  type TMaybeUndefined,
   type TVoicePortableText,
 } from '@blog/config';
 import type { TVoiceOverrideValue } from '@blog/db/schema/site-config';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 
 import { normalizeRichValue } from './normalize-voice-rich-text';
 
@@ -15,9 +17,10 @@ const PLACEHOLDER_PATTERN = /\{([^{}]+)\}/g;
 
 type TVoiceField = (typeof VOICE_FIELDS)[number];
 
-type TVoiceFieldValidation =
-  | { ok: true; value: TVoiceOverrideValue | undefined }
-  | { ok: false; error: TVoiceFieldFailure };
+type TVoiceFieldValidation = TResult<
+  TMaybeUndefined<TVoiceOverrideValue>,
+  TVoiceFieldFailure
+>;
 
 function placeholderFailure(
   reason: TVoiceFieldErrorReason,
@@ -63,26 +66,26 @@ function validateTextField(
   field: TVoiceField,
   raw: unknown,
 ): TVoiceFieldValidation {
-  if (raw === undefined || raw === null) return { ok: true, value: undefined };
+  if (raw === undefined || raw === null) return okResult();
   if (typeof raw !== 'string') {
-    return { ok: false, error: { reason: VOICE_FIELD_ERROR.NOT_A_STRING } };
+    return errorResult({ reason: VOICE_FIELD_ERROR.NOT_A_STRING });
   }
 
   const trimmed = raw.trim();
-  if (trimmed === '') return { ok: true, value: undefined };
+  if (trimmed === '') return okResult();
 
   if (field.kind === VOICE_FIELD_KIND.TEXT && /[\r\n]/.test(trimmed)) {
-    return { ok: false, error: { reason: VOICE_FIELD_ERROR.LINE_BREAK } };
+    return errorResult({ reason: VOICE_FIELD_ERROR.LINE_BREAK });
   }
 
   if (trimmed.length > field.max) {
-    return { ok: false, error: tooLongFailure(field) };
+    return errorResult(tooLongFailure(field));
   }
 
   const placeholderError = findPlaceholderError(trimmed, field.placeholders);
-  if (placeholderError) return { ok: false, error: placeholderError };
+  if (placeholderError) return errorResult(placeholderError);
 
-  return { ok: true, value: trimmed };
+  return okResult(trimmed);
 }
 
 function isBlankRichValue(value: TVoicePortableText): boolean {
@@ -108,38 +111,38 @@ function finalizeRichValue(
   field: TVoiceField,
   value: TVoicePortableText,
 ): TVoiceFieldValidation {
-  if (isBlankRichValue(value)) return { ok: true, value: undefined };
+  if (isBlankRichValue(value)) return okResult();
 
   const plainText = portableTextToPlainText(value);
   if (plainText.length > field.max) {
-    return { ok: false, error: tooLongFailure(field) };
+    return errorResult(tooLongFailure(field));
   }
 
   const placeholderError = findPlaceholderError(plainText, field.placeholders);
-  if (placeholderError) return { ok: false, error: placeholderError };
+  if (placeholderError) return errorResult(placeholderError);
 
-  return { ok: true, value };
+  return okResult(value);
 }
 
 function validateRichField(
   field: TVoiceField,
   raw: unknown,
 ): TVoiceFieldValidation {
-  if (raw === undefined || raw === null) return { ok: true, value: undefined };
+  if (raw === undefined || raw === null) return okResult();
 
   if (typeof raw === 'string') {
     return finalizeRichValue(field, coercePlainStringToRichValue(raw));
   }
 
   if (!Array.isArray(raw)) {
-    return { ok: false, error: { reason: VOICE_FIELD_ERROR.NOT_RICH_TEXT } };
+    return errorResult({ reason: VOICE_FIELD_ERROR.NOT_RICH_TEXT });
   }
-  if (raw.length === 0) return { ok: true, value: undefined };
+  if (raw.length === 0) return okResult();
 
   const normalized = normalizeRichValue(raw);
   if (!normalized.ok) return normalized;
 
-  return finalizeRichValue(field, normalized.value);
+  return finalizeRichValue(field, normalized.data);
 }
 
 export function validateVoiceFieldValue(

@@ -13,7 +13,7 @@ import {
 } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import { okResult } from '@blog/utils';
+import { errorResult, okResult } from '@blog/utils';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -162,7 +162,7 @@ describe(saveVoiceOverridesAction, () => {
         },
       },
     };
-    upsertSiteConfigMock.mockResolvedValue({ ok: false, fieldErrorsByLocale });
+    upsertSiteConfigMock.mockResolvedValue(errorResult(fieldErrorsByLocale));
 
     const result = await saveVoiceOverridesAction(TENANT_ID, overridesByLocale);
 

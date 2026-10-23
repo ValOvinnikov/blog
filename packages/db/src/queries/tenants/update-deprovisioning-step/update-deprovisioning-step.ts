@@ -9,7 +9,7 @@ import {
   type TDeprovisioningStepState,
   type TTenant,
 } from '@blog/db/schema/tenants';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 
 export type TUpdateDeprovisioningStepInput = {
@@ -47,8 +47,8 @@ export async function updateDeprovisioningStep(
     .returning();
 
   if (!tenant) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: tenant };
+  return okResult(tenant);
 }

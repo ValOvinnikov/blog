@@ -14,6 +14,7 @@ import type {
   TVoiceOverrides,
   TVoiceOverridesByLocale,
 } from '@blog/db/schema/site-config';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 
 import { validateVoiceFieldValue } from './validate-voice-field';
 
@@ -30,14 +31,10 @@ export type TVoiceOverridesByLocaleInput = Partial<
 
 type TVoiceFieldErrors = TFieldErrors<TVoiceFieldId, TVoiceFieldErrorReason>;
 
-type TVoiceOverridesParseResult =
-  | { ok: true; value: TVoiceOverrides }
-  | { ok: false; fieldErrors: TVoiceFieldErrors };
-
 /** Collects one failure per offending field; a key absent from `VOICE_FIELDS` is a malformed request and throws. */
 function parseVoiceOverrides(
   raw: TVoiceOverridesInput,
-): TVoiceOverridesParseResult {
+): TResult<TVoiceOverrides, TVoiceFieldErrors> {
   const unknownKeys = Object.keys(raw).filter(
     (key) => !VOICE_FIELDS_BY_ID.has(key as TVoiceFieldId),
   );
@@ -58,12 +55,12 @@ function parseVoiceOverrides(
       fieldErrors[field.id] = result.error;
       continue;
     }
-    if (result.value !== undefined) value[field.id] = result.value;
+    if (result.data !== undefined) value[field.id] = result.data;
   }
 
-  if (Object.keys(fieldErrors).length > 0) return { ok: false, fieldErrors };
+  if (Object.keys(fieldErrors).length > 0) return errorResult(fieldErrors);
 
-  return { ok: true, value };
+  return okResult(value);
 }
 
 export function assertKnownLocales(
@@ -79,13 +76,9 @@ export function assertKnownLocales(
   }
 }
 
-type TVoiceOverridesByLocaleParseResult =
-  | { ok: true; value: TVoiceOverridesByLocale }
-  | { ok: false; fieldErrorsByLocale: TVoiceFieldFailuresByLocale };
-
 export function parseVoiceOverridesByLocale(
   raw: TVoiceOverridesByLocaleInput,
-): TVoiceOverridesByLocaleParseResult {
+): TResult<TVoiceOverridesByLocale, TVoiceFieldFailuresByLocale> {
   const value: TVoiceOverridesByLocale = {};
   const fieldErrorsByLocale: TVoiceFieldFailuresByLocale = {};
 
@@ -94,13 +87,13 @@ export function parseVoiceOverridesByLocale(
     if (overrides === undefined) continue;
 
     const result = parseVoiceOverrides(overrides);
-    if (result.ok) value[locale] = result.value;
-    else fieldErrorsByLocale[locale] = result.fieldErrors;
+    if (result.ok) value[locale] = result.data;
+    else fieldErrorsByLocale[locale] = result.error;
   }
 
   if (Object.keys(fieldErrorsByLocale).length > 0) {
-    return { ok: false, fieldErrorsByLocale };
+    return errorResult(fieldErrorsByLocale);
   }
 
-  return { ok: true, value };
+  return okResult(value);
 }
