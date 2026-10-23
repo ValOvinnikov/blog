@@ -10,22 +10,24 @@ import {
   OWNER_EMAIL_RELEASE_FAILED_EVENT,
   OWNER_EMAIL_SEND_FAILED_EVENT,
 } from '@worker/constants/owner-email';
-import { freezeClock, TEST_NOW } from '@worker/testing/clock/frozen-clock';
+import { freezeClock, MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import {
-  makeOwnerAccessTarget,
-  OWNER_EMAIL,
-  SANITY_PROJECT_ID,
+  mockOwnerAccessTarget,
+  MOCK_OWNER_EMAIL,
 } from '@worker/testing/owner-access/fixtures';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockProvisionedTenant,
+} from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access-target';
 
 import { OWNER_EMAIL_COPY } from './owner-email-copy';
 import { sendOwnerEmailOnce, sendPendingOwnerEmails } from './send-owner-email';
 
-const CLAIMED_AT = TEST_NOW;
-const TWO_DAYS_AGO = new Date(TEST_NOW.getTime() - 2 * 24 * 60 * 60_000);
-const AN_HOUR_AGO = new Date(TEST_NOW.getTime() - 60 * 60_000);
+const CLAIMED_AT = MOCK_NOW;
+const TWO_DAYS_AGO = new Date(MOCK_NOW.getTime() - 2 * 24 * 60 * 60_000);
+const AN_HOUR_AGO = new Date(MOCK_NOW.getTime() - 60 * 60_000);
 const RESEND_DOWN = 'Resend is down';
 const CLAIM_REFUSED = 'claim refused';
 const RELEASE_REFUSED = 'release refused';
@@ -41,11 +43,9 @@ vi.mock(import('@blog/email'), async (importOriginal) => ({
 }));
 
 function makeTarget(
-  overrides: Parameters<typeof makeTenant>[0] = {},
+  overrides: Parameters<typeof mockProvisionedTenant>[0] = {},
 ): TOwnerAccessTarget {
-  return makeOwnerAccessTarget(
-    makeTenant({ sanityProjectId: SANITY_PROJECT_ID, ...overrides }),
-  );
+  return mockOwnerAccessTarget(mockProvisionedTenant(overrides));
 }
 
 beforeEach(() => {
@@ -70,13 +70,13 @@ describe(sendOwnerEmailOnce, () => {
     await sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.SITE_READY);
 
     expect(claimTenantOwnerEmail).toHaveBeenCalledWith(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       TENANT_OWNER_EMAIL.SITE_READY,
     );
     const emails = sentEmails();
     const [email] = emails;
     expect(emails).toHaveLength(1);
-    expect(email?.to).toBe(OWNER_EMAIL);
+    expect(email?.to).toBe(MOCK_OWNER_EMAIL);
     expect(email?.from).toBe(DEFAULT_OWNER_EMAIL_FROM_ADDRESS);
   });
 
@@ -96,7 +96,7 @@ describe(sendOwnerEmailOnce, () => {
     const { subject } = OWNER_EMAIL_COPY.FR.siteReady({
       siteName: target.tenant.name,
       siteUrl: `https://${target.tenant.primaryDomain}`,
-      ownerEmail: OWNER_EMAIL,
+      ownerEmail: MOCK_OWNER_EMAIL,
     });
     const [email] = sentEmails();
     expect(email?.subject).toBe(subject);
@@ -128,7 +128,7 @@ describe(sendOwnerEmailOnce, () => {
         sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.INVITE_HEADS_UP),
       ).resolves.toBeUndefined();
       expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
-        tenantId: TEST_TENANT_ID,
+        tenantId: MOCK_TENANT_ID,
         email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
         error: RESEND_DOWN,
       });
@@ -141,7 +141,7 @@ describe(sendOwnerEmailOnce, () => {
       );
 
       expect(releaseTenantOwnerEmail).toHaveBeenCalledWith(
-        TEST_TENANT_ID,
+        MOCK_TENANT_ID,
         TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
         CLAIMED_AT,
       );
@@ -158,7 +158,7 @@ describe(sendOwnerEmailOnce, () => {
       expect(logger.error).toHaveBeenCalledWith(
         OWNER_EMAIL_RELEASE_FAILED_EVENT,
         {
-          tenantId: TEST_TENANT_ID,
+          tenantId: MOCK_TENANT_ID,
           email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
           error: RELEASE_REFUSED,
         },
@@ -177,7 +177,7 @@ describe(sendOwnerEmailOnce, () => {
     expect(sendEmail).not.toHaveBeenCalled();
     expect(releaseTenantOwnerEmail).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       email: TENANT_OWNER_EMAIL.SITE_READY,
       error: CLAIM_REFUSED,
     });

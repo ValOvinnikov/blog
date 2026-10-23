@@ -5,14 +5,17 @@ import {
   OPERATOR_ALERT_KIND,
 } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 
 import { postOperatorAlert } from './operator-alert';
 
+const { adminAppBaseUrl } = MOCK_PROVISION_ENV;
+
 const ALERT = {
   kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-  tenantId: TEST_TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
 } as const;
 
@@ -25,7 +28,7 @@ const fetchMock = vi.fn();
 describe(postOperatorAlert, () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', fetchMock);
-    mockEnv.ADMIN_APP_BASE_URL = 'https://admin.example.com';
+    mockEnv.ADMIN_APP_BASE_URL = adminAppBaseUrl;
     mockEnv.OPERATOR_ALERT_SECRET = 'alert-secret';
     fetchMock.mockResolvedValue(new Response('{}', { status: HTTP_STATUS.OK }));
   });
@@ -38,9 +41,7 @@ describe(postOperatorAlert, () => {
     await expect(postOperatorAlert(ALERT)).resolves.toBe(true);
 
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    expect(String(url)).toBe(
-      'https://admin.example.com/api/internal/operator-alert',
-    );
+    expect(String(url)).toBe(`${adminAppBaseUrl}/api/internal/operator-alert`);
     expect(init.method).toBe(HTTP_METHOD.POST);
     expect(init.headers).toEqual(
       expect.objectContaining({ Authorization: 'Bearer alert-secret' }),
