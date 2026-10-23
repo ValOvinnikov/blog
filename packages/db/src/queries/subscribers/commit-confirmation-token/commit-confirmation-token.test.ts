@@ -1,7 +1,7 @@
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { sha256Hex } from '@blog/utils/hash';
@@ -33,7 +33,7 @@ describe(commitConfirmationToken, () => {
   ): Promise<schema.TSubscriber> {
     const [subscriber] = await db()
       .insert(schema.subscribers)
-      .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, ...overrides })
+      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, ...overrides })
       .returning();
     if (!subscriber) throw new Error('failed to seed a subscriber row');
     return subscriber;

@@ -1,7 +1,7 @@
 import type { TMaybeNull } from '@blog/config/types';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant, TEST_INVITE_EMAIL } from '@blog/db/testing/fixtures';
+import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
 import {
   testPersonalEmailIndex,
   usePersonalDataKeys,
@@ -29,8 +29,8 @@ async function insertInvite(consumedAt: TMaybeNull<Date>): Promise<string> {
     .insert(schema.membershipInvites)
     .values({
       tenantId,
-      email: TEST_INVITE_EMAIL,
-      emailIndex: testPersonalEmailIndex(TEST_INVITE_EMAIL),
+      email: MOCK_INVITE_EMAIL,
+      emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
       consumedAt,
     });
@@ -44,7 +44,7 @@ describe(findPendingInviteByEmailIndex, () => {
     await insertInvite(new Date());
 
     const invites = await findPendingInviteByEmailIndex(
-      TEST_INVITE_EMAIL.toUpperCase(),
+      MOCK_INVITE_EMAIL.toUpperCase(),
     );
 
     expect(invites.map(({ tenantId }) => tenantId).sort()).toEqual(

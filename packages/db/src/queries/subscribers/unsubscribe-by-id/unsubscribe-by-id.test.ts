@@ -2,7 +2,7 @@ import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -24,7 +24,7 @@ afterEach(async () => {
 
 async function insertSubscriber(
   tenantId: string,
-  email: string = TEST_SUBSCRIBER_EMAIL,
+  email: string = MOCK_SUBSCRIBER_EMAIL,
 ): Promise<schema.TSubscriber> {
   const [inserted] = await db()
     .insert(schema.subscribers)

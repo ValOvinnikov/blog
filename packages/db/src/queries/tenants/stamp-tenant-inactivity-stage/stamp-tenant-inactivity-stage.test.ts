@@ -9,7 +9,7 @@ import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   daysAfterLastActivity,
-  LAST_ACTIVITY_AT,
+  MOCK_LAST_ACTIVITY_AT,
 } from '@blog/db/testing/tenants/inactivity';
 
 import { stampTenantInactivityStage } from './stamp-tenant-inactivity-stage';
@@ -31,7 +31,7 @@ afterEach(async () => {
 describe(stampTenantInactivityStage, () => {
   it('stamps the warning once', async () => {
     const tenant = await insertTestTenant(db(), {
-      lastActivityAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     const first = await stampTenantInactivityStage(
@@ -51,7 +51,7 @@ describe(stampTenantInactivityStage, () => {
 
   it('suspends a warned tenant for inactivity', async () => {
     const tenant = await insertTestTenant(db(), {
-      lastActivityAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
       inactivityWarnedAt: DAY_23,
     });
 
@@ -68,7 +68,7 @@ describe(stampTenantInactivityStage, () => {
 
   it('refuses a stage the tenant is not yet due for', async () => {
     const tenant = await insertTestTenant(db(), {
-      lastActivityAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     const stamped = await stampTenantInactivityStage(
@@ -83,7 +83,7 @@ describe(stampTenantInactivityStage, () => {
   it('never sends the deletion notice to a tenant an operator suspended', async () => {
     const tenant = await insertTestTenant(db(), {
       status: TENANT_STATUS.SUSPENDED,
-      lastActivityAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
       suspendedAt: DAY_30,
       suspensionReason: SUSPENSION_REASON.OPERATOR,
     });

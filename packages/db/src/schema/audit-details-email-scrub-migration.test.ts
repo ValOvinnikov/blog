@@ -9,6 +9,7 @@ import {
 import * as schema from '@blog/db/schema';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { findings } from '@blog/db/schema/findings';
+import { MOCK_OPERATOR_EMAIL } from '@blog/db/testing/fixtures';
 import {
   applyMigrationFile,
   listMigrationFiles,
@@ -22,7 +23,6 @@ import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
 const SCRUB_MIGRATION = '0053_scrub_emails_from_audit_and_findings_details.sql';
 const ACTOR_ID = 'operator-1';
-const ACTOR_EMAIL = 'operator@example.com';
 const OWNER_EMAIL = 'owner@acme.example';
 const TENANT_NAME = faker.company.name();
 const TENANT_DOMAIN = faker.internet.domainName();
@@ -45,7 +45,7 @@ async function insertAuditEvent(
 ) {
   const [inserted] = await db
     .insert(auditEvents)
-    .values({ actorId: ACTOR_ID, actorEmail: ACTOR_EMAIL, ...values })
+    .values({ actorId: ACTOR_ID, actorEmail: MOCK_OPERATOR_EMAIL, ...values })
     .returning();
   if (!inserted) throw new Error('failed to seed an audit event');
   return inserted;
@@ -136,14 +136,11 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
       const { fields, ...rest } =
         (await readAuditEvent(db, saved.id))?.details ?? {};
       expect(rest).toEqual({});
-      expect(fields).toEqual(
-        expect.arrayContaining([
-          'senderName',
-          'replyToAddress',
-          'contactRecipient',
-        ]),
-      );
-      expect(fields).toHaveLength(3);
+      expect(Array.isArray(fields) && [...fields].sort()).toEqual([
+        'contactRecipient',
+        'replyToAddress',
+        'senderName',
+      ]);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );

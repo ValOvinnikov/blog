@@ -2,7 +2,7 @@ import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
@@ -31,7 +31,7 @@ async function insertPendingSubscriber(
   const { confirmationToken, confirmationTokenHash } = mintConfirmationToken();
   const [inserted] = await db()
     .insert(schema.subscribers)
-    .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, confirmationTokenHash })
+    .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, confirmationTokenHash })
     .returning();
 
   if (!inserted) throw new Error('failed to seed a subscriber row');
@@ -64,7 +64,7 @@ describe(confirmSubscriber, () => {
     expect(row?.status).toBe('active');
   });
 
-  it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
+  it('reports already confirmed on a repeat confirm, keeping the first confirmedAt', async () => {
     const pending = await insertPendingSubscriber(tenantId);
     const first = await confirmSubscriber(tenantId, pending.confirmationToken);
     if (first.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)

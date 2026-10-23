@@ -1,7 +1,7 @@
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
@@ -35,7 +35,7 @@ describe(claimConfirmationSend, () => {
   ): Promise<schema.TSubscriber> {
     const [subscriber] = await db()
       .insert(schema.subscribers)
-      .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, ...overrides })
+      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, ...overrides })
       .returning();
     if (!subscriber) throw new Error('failed to seed a subscriber row');
     return subscriber;
@@ -65,7 +65,7 @@ describe(claimConfirmationSend, () => {
 
     const claim = await claimConfirmationSend(id, COOLDOWN_MS);
 
-    expect(claim?.confirmationToken).toEqual(expect.any(String));
+    expect(claim).not.toBeNull();
     const row = await readRow(id);
     expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
     expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);

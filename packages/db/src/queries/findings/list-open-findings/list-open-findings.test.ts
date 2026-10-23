@@ -7,7 +7,7 @@ import { openFinding } from '@blog/db/queries/findings/open-finding';
 import { recordContrastResult } from '@blog/db/queries/findings/record-contrast-result';
 import { resolveFinding } from '@blog/db/queries/findings/resolve-finding';
 import * as schema from '@blog/db/schema';
-import { makeContrastResult } from '@blog/db/testing/findings/fixtures';
+import { mockContrastResult } from '@blog/db/testing/findings/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -18,6 +18,9 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+
+const MOCK_PLATFORM_FINDING_IDENTIFIER = 'platform-wide';
+const MOCK_TENANT_NAME = 'Acme';
 
 afterEach(async () => {
   await db().delete(schema.findings);
@@ -46,7 +49,7 @@ describe(listOpenFindings, () => {
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
       kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
       severity: FINDING_SEVERITY.INFO,
-      identifier: 'platform-wide',
+      identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
     });
     expect(resolved.ok).toBe(true);
     if (!resolved.ok) return;
@@ -61,7 +64,9 @@ describe(listOpenFindings, () => {
   });
 
   it('joins each finding to its tenant name and leaves details out', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), { name: 'Acme' });
+    const { id: tenantId } = await insertTestTenant(db(), {
+      name: MOCK_TENANT_NAME,
+    });
     await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOCUMENT_VALIDATION,
@@ -74,53 +79,44 @@ describe(listOpenFindings, () => {
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
       kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
       severity: FINDING_SEVERITY.INFO,
-      identifier: 'platform-wide',
+      identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
     });
 
     const result = await listOpenFindings();
 
-    expect(result).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          tenantId,
-          tenantName: 'Acme',
-          hasDetails: true,
-        }),
-        expect.objectContaining({
-          tenantId: null,
-          tenantName: null,
-          hasDetails: false,
-        }),
-      ]),
+    const tenantScoped = result.find(
+      (finding) => finding.tenantId === tenantId,
     );
+    const platformWide = result.find((finding) => finding.tenantId === null);
+    expect(result).toHaveLength(2);
+    expect(tenantScoped?.tenantName).toBe(MOCK_TENANT_NAME);
+    expect(tenantScoped?.hasDetails).toBe(true);
+    expect(platformWide?.tenantName).toBeNull();
+    expect(platformWide?.hasDetails).toBe(false);
     expect(result.every((finding) => !('details' in finding))).toBe(true);
   });
 
   it('carries the contrast result on a contrast finding and on no other', async () => {
-    const failingRun = makeContrastResult({ tag: 'v1.2.0' });
+    const failingRun = mockContrastResult({ tag: 'v1.2.0' });
     await recordContrastResult(failingRun);
     await openFinding({
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
       kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
       severity: FINDING_SEVERITY.INFO,
-      identifier: 'platform-wide',
+      identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
       details: { reason: 'two owners' },
     });
 
     const result = await listOpenFindings();
 
-    expect(result).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          source: FINDING_SOURCE.CONTRAST_CHECK,
-          contrastResult: failingRun,
-        }),
-        expect.objectContaining({
-          source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
-          contrastResult: null,
-        }),
-      ]),
+    const contrast = result.find(
+      (finding) => finding.source === FINDING_SOURCE.CONTRAST_CHECK,
     );
+    const ownerCheck = result.find(
+      (finding) => finding.source === FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+    );
+    expect(contrast?.contrastResult).toEqual(failingRun);
+    expect(ownerCheck?.contrastResult).toBeNull();
   });
 
   it('returns an empty array when nothing is open', async () => {

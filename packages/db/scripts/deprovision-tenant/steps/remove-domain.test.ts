@@ -1,16 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
 import {
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-
-import type { TDeprovisionEnv } from '../lib/env';
+  MOCK_TENANT_DOMAIN,
+  mockTenant,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { removeTenantDomain } from './remove-domain';
-
-const TENANT_DOMAIN = 'acme.example.com';
 
 const { deleteVercelProjectDomainMock } = vi.hoisted(() => ({
   deleteVercelProjectDomainMock: vi.fn(),
@@ -20,40 +14,7 @@ vi.mock('@blog/db/utils/vercel-client/vercel-project-domains', () => ({
   deleteVercelProjectDomain: deleteVercelProjectDomainMock,
 }));
 
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
-
-function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: TENANT_DOMAIN,
-    sanityProjectId: 'proj123',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'enc',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    provisioningSteps: null,
-    seededAt: new Date(),
-    deprovisionedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  } as TTenant;
-}
+const MOCK_TENANT = mockTenant({ primaryDomain: MOCK_TENANT_DOMAIN });
 
 beforeEach(() => {
   deleteVercelProjectDomainMock.mockReset().mockResolvedValue({
@@ -63,18 +24,21 @@ beforeEach(() => {
 
 describe(removeTenantDomain, () => {
   it('removes the domain from the shared web project', async () => {
-    await removeTenantDomain(baseTenant(), env);
+    await removeTenantDomain(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(deleteVercelProjectDomainMock).toHaveBeenCalledWith({
-      token: env.vercelToken,
+      token: MOCK_DEPROVISION_ENV.vercelToken,
       teamId: undefined,
-      projectId: env.vercelWebProjectId,
-      domain: TENANT_DOMAIN,
+      projectId: MOCK_DEPROVISION_ENV.vercelWebProjectId,
+      domain: MOCK_TENANT_DOMAIN,
     });
   });
 
   it('does not call the API in dry-run mode', async () => {
-    await removeTenantDomain(baseTenant(), { ...env, dryRun: true });
+    await removeTenantDomain(MOCK_TENANT, {
+      ...MOCK_DEPROVISION_ENV,
+      dryRun: true,
+    });
 
     expect(deleteVercelProjectDomainMock).not.toHaveBeenCalled();
   });

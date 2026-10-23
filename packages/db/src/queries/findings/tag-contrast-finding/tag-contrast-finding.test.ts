@@ -1,10 +1,9 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import { recordContrastResult } from '@blog/db/queries/findings/record-contrast-result';
 import * as schema from '@blog/db/schema';
-import { makePassingContrastResult } from '@blog/db/testing/findings/fixtures';
+import { mockPassingContrastResult } from '@blog/db/testing/findings/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
-
-import { recordContrastResult } from '../record-contrast-result';
 
 import { tagContrastFinding } from './tag-contrast-finding';
 
@@ -24,16 +23,15 @@ afterEach(async () => {
 
 describe(tagContrastFinding, () => {
   it('adds the release tag to the SHA’s contrast finding, keeping its result', async () => {
-    const run = makePassingContrastResult();
+    const run = mockPassingContrastResult();
     const tag = makeTag();
     await recordContrastResult(run);
 
     const result = await tagContrastFinding(run.sha, tag);
 
-    expect(result).toEqual({
-      ok: true,
-      data: expect.objectContaining({ details: { ...run, tag } }),
-    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.details).toEqual({ ...run, tag });
   });
 
   it('reports DB_NOT_FOUND for a SHA with no contrast run', async () => {

@@ -1,6 +1,10 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
+import {
+  MOCK_OWNER_EMAIL,
+  insertTestTenant,
+  insertTestUser,
+} from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
@@ -15,7 +19,6 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const OWNER_EMAIL = 'owner@example.com';
 const EDITOR_EMAIL = 'editor@example.com';
 const SIGNED_IN_EMAIL = 'signed-in@example.com';
 const INVITED_EMAIL = 'invited@example.com';
@@ -35,7 +38,7 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('returns the OWNER membership email and joinedAt for the tenant', async () => {
-    await insertTestUser(db(), { id: 'user-1', email: OWNER_EMAIL });
+    await insertTestUser(db(), { id: 'user-1', email: MOCK_OWNER_EMAIL });
     const [membership] = await db()
       .insert(schema.memberships)
       .values({
@@ -48,7 +51,7 @@ describe(getTenantOwnerMembership, () => {
     const result = await getTenantOwnerMembership(tenantId);
 
     expect(result).toEqual({
-      email: OWNER_EMAIL,
+      email: MOCK_OWNER_EMAIL,
       joinedAt: membership!.createdAt,
     });
   });
@@ -66,34 +69,19 @@ describe(getTenantOwnerMembership, () => {
     expect(result).toBeUndefined();
   });
 
-  it('falls back to a pending OWNER invite with its email and no join date', async () => {
-    await db()
-      .insert(schema.membershipInvites)
-      .values({
-        tenantId,
-        email: OWNER_EMAIL,
-        emailEncrypted: encryptPersonalValue(OWNER_EMAIL),
-        role: MEMBERSHIP_ROLE.OWNER,
-      });
-
-    const result = await getTenantOwnerMembership(tenantId);
-
-    expect(result).toEqual({ email: OWNER_EMAIL });
-  });
-
-  it("reads the pending invite's encrypted email rather than the plain column", async () => {
+  it('falls back to a pending OWNER invite, reading its encrypted email', async () => {
     await db()
       .insert(schema.membershipInvites)
       .values({
         tenantId,
         email: faker.internet.email(),
-        emailEncrypted: encryptPersonalValue(OWNER_EMAIL),
+        emailEncrypted: encryptPersonalValue(MOCK_OWNER_EMAIL),
         role: MEMBERSHIP_ROLE.OWNER,
       });
 
     const result = await getTenantOwnerMembership(tenantId);
 
-    expect(result).toEqual({ email: OWNER_EMAIL });
+    expect(result).toEqual({ email: MOCK_OWNER_EMAIL });
   });
 
   it('ignores an OWNER invite that has already been consumed', async () => {
@@ -101,8 +89,8 @@ describe(getTenantOwnerMembership, () => {
       .insert(schema.membershipInvites)
       .values({
         tenantId,
-        email: OWNER_EMAIL,
-        emailEncrypted: encryptPersonalValue(OWNER_EMAIL),
+        email: MOCK_OWNER_EMAIL,
+        emailEncrypted: encryptPersonalValue(MOCK_OWNER_EMAIL),
         role: MEMBERSHIP_ROLE.OWNER,
         consumedAt: new Date('2026-08-12T00:00:00.000Z'),
       });

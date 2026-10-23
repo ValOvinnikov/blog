@@ -1,9 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import {
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import { archiveTenant } from '@blog/db/queries/tenants/archive-tenant';
 import { createTenant } from '@blog/db/queries/tenants/create-tenant';
 import { setTenantProvisioningStatus } from '@blog/db/queries/tenants/set-tenant-provisioning-status';
@@ -15,31 +11,24 @@ import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
 } from '@blog/db/testing/tenant-token-encryption-key';
+import {
+  MOCK_MISSING_TENANT_ID,
+  MOCK_RUN_AT,
+  MOCK_TENANT_READ_TOKEN,
+  MOCK_TENANT_VALUES,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { getTenantSanityCredentials } from './get-tenant-sanity-credentials';
-
-async function insertTenant(): Promise<TTenant> {
-  const result = await createTenant({
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'abc123',
-    sanityDataset: 'production',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
-  });
-  if (!result.ok) throw new Error('setup: createTenant failed.');
-  return result.data;
-}
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-const READ_TOKEN = 'sk-real-token-value';
-
 const db = useQueryTestDb(getDbMock);
 useTenantTokenEncryptionKey();
+
+const { sanityProjectId, sanityDataset } = MOCK_TENANT_VALUES;
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -49,21 +38,26 @@ describe(getTenantSanityCredentials, () => {
   let tenant: TTenant;
 
   beforeEach(async () => {
-    tenant = await insertTenant();
+    tenant = unwrapOk(
+      await createTenant({
+        ...MOCK_TENANT_VALUES,
+        status: TENANT_STATUS.ACTIVE,
+      }),
+    );
   });
 
   describe('with a token set', () => {
     beforeEach(async () => {
-      await setTenantSanityToken(tenant.id, READ_TOKEN);
+      await setTenantSanityToken(tenant.id, MOCK_TENANT_READ_TOKEN);
     });
 
-    it('resolves the decrypted token alongside project/dataset and servable state for an active tenant', async () => {
+    it('resolves the decrypted token, project, dataset and state for an active tenant', async () => {
       const credentials = await getTenantSanityCredentials(tenant.id);
 
       expect(credentials).toEqual({
-        projectId: 'abc123',
-        dataset: 'production',
-        token: READ_TOKEN,
+        projectId: sanityProjectId,
+        dataset: sanityDataset,
+        token: MOCK_TENANT_READ_TOKEN,
         defaultLocale: LOCALE_ISO_CODES.EN,
         status: TENANT_STATUS.ACTIVE,
         deprovisionedAt: null,
@@ -71,26 +65,23 @@ describe(getTenantSanityCredentials, () => {
       });
     });
 
-    it('still resolves working credentials for an archived tenant, tagged with its ARCHIVED status', async () => {
-      const archived = await archiveTenant(tenant.id);
-      if (!archived.ok) throw new Error('setup: archiveTenant failed.');
+    it('still resolves credentials for an archived tenant, with its deprovisionedAt', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(MOCK_RUN_AT));
+      unwrapOk(await archiveTenant(tenant.id));
+      vi.useRealTimers();
 
       const credentials = await getTenantSanityCredentials(tenant.id);
 
-      expect(credentials).toMatchObject({
-        projectId: 'abc123',
-        dataset: 'production',
-        token: READ_TOKEN,
+      expect(credentials).toEqual({
+        projectId: sanityProjectId,
+        dataset: sanityDataset,
+        token: MOCK_TENANT_READ_TOKEN,
+        defaultLocale: LOCALE_ISO_CODES.EN,
         status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: new Date(MOCK_RUN_AT),
+        provisioningStatus: null,
       });
-    });
-
-    it('surfaces deprovisionedAt for a deprovisioned tenant instead of collapsing to undefined', async () => {
-      await archiveTenant(tenant.id);
-
-      const credentials = await getTenantSanityCredentials(tenant.id);
-
-      expect(credentials?.deprovisionedAt).toBeInstanceOf(Date);
     });
 
     it('throws when the encryption key is not configured', async () => {
@@ -102,27 +93,19 @@ describe(getTenantSanityCredentials, () => {
     });
   });
 
-  it('resolves undefined for a mid-provisioning tenant with no token set yet', async () => {
-    await setTenantProvisioningStatus(
-      tenant.id,
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
+  it.each([
+    TENANT_PROVISIONING_STATUS.PROVISIONING,
+    TENANT_PROVISIONING_STATUS.FAILED,
+  ])(
+    'resolves undefined for a %s tenant with no token set yet',
+    async (status) => {
+      await setTenantProvisioningStatus(tenant.id, status);
 
-    await expect(
-      getTenantSanityCredentials(tenant.id),
-    ).resolves.toBeUndefined();
-  });
-
-  it('resolves undefined for a tenant whose provisioning failed and never set a token', async () => {
-    await setTenantProvisioningStatus(
-      tenant.id,
-      TENANT_PROVISIONING_STATUS.FAILED,
-    );
-
-    await expect(
-      getTenantSanityCredentials(tenant.id),
-    ).resolves.toBeUndefined();
-  });
+      await expect(
+        getTenantSanityCredentials(tenant.id),
+      ).resolves.toBeUndefined();
+    },
+  );
 
   it('resolves undefined when the tenant has no token set yet', async () => {
     await expect(
@@ -132,7 +115,7 @@ describe(getTenantSanityCredentials, () => {
 
   it('resolves undefined for an unknown tenant id', async () => {
     await expect(
-      getTenantSanityCredentials('00000000-0000-0000-0000-000000000000'),
+      getTenantSanityCredentials(MOCK_MISSING_TENANT_ID),
     ).resolves.toBeUndefined();
   });
 });

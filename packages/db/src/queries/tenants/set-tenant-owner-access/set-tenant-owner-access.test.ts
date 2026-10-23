@@ -5,7 +5,8 @@ import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
-  makeTenantOwnerAccess,
+  MOCK_MISSING_TENANT_ID,
+  mockTenantOwnerAccess,
   toTenantOwnerAccessColumns,
 } from '@blog/db/testing/tenants/fixtures';
 
@@ -17,8 +18,6 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const MISSING_TENANT_ID = '00000000-0000-0000-0000-000000000000';
-
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
@@ -26,7 +25,7 @@ afterEach(async () => {
 describe(setTenantOwnerAccess, () => {
   it('writes owner access that reads back unchanged', async () => {
     const { id } = await insertTestTenant(db());
-    const ownerAccess = makeTenantOwnerAccess();
+    const ownerAccess = mockTenantOwnerAccess();
 
     await setTenantOwnerAccess(id, ownerAccess);
 
@@ -34,7 +33,7 @@ describe(setTenantOwnerAccess, () => {
   });
 
   it('keeps fields the input leaves out', async () => {
-    const { sanityInviteId, inviteSentAt } = makeTenantOwnerAccess();
+    const { sanityInviteId, inviteSentAt } = mockTenantOwnerAccess();
     const { id } = await insertTestTenant(
       db(),
       toTenantOwnerAccessColumns({
@@ -43,7 +42,7 @@ describe(setTenantOwnerAccess, () => {
         sanityRole: SANITY_PROJECT_ROLE.VIEWER,
       }),
     );
-    const { inviteAcceptedAt, sanityUserId } = makeTenantOwnerAccess();
+    const { inviteAcceptedAt, sanityUserId } = mockTenantOwnerAccess();
 
     const result = await setTenantOwnerAccess(id, {
       inviteAcceptedAt,
@@ -66,11 +65,12 @@ describe(setTenantOwnerAccess, () => {
   });
 
   it('clears a field set to null', async () => {
+    const ownerAccess = mockTenantOwnerAccess();
     const { id } = await insertTestTenant(
       db(),
-      toTenantOwnerAccessColumns(makeTenantOwnerAccess()),
+      toTenantOwnerAccessColumns(ownerAccess),
     );
-    const { sanityInviteId } = makeTenantOwnerAccess();
+    const { sanityInviteId } = mockTenantOwnerAccess();
 
     await setTenantOwnerAccess(id, {
       sanityInviteId,
@@ -78,7 +78,8 @@ describe(setTenantOwnerAccess, () => {
       siteReadySentAt: null,
     });
 
-    expect(await getTenantOwnerAccess(id)).toMatchObject({
+    expect(await getTenantOwnerAccess(id)).toEqual({
+      ...ownerAccess,
       sanityInviteId,
       inviteAcceptedAt: undefined,
       siteReadySentAt: undefined,
@@ -86,7 +87,7 @@ describe(setTenantOwnerAccess, () => {
   });
 
   it('leaves every owner access field untouched given an empty input', async () => {
-    const ownerAccess = makeTenantOwnerAccess();
+    const ownerAccess = mockTenantOwnerAccess();
     const { id } = await insertTestTenant(
       db(),
       toTenantOwnerAccessColumns(ownerAccess),
@@ -99,9 +100,9 @@ describe(setTenantOwnerAccess, () => {
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
-    const { sanityUserId } = makeTenantOwnerAccess();
+    const { sanityUserId } = mockTenantOwnerAccess();
 
-    const result = await setTenantOwnerAccess(MISSING_TENANT_ID, {
+    const result = await setTenantOwnerAccess(MOCK_MISSING_TENANT_ID, {
       sanityUserId,
     });
 

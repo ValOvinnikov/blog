@@ -1,10 +1,10 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
+import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import {
   insertTestTenant,
-  TEST_INVITE_EMAIL,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_INVITE_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
   testPersonalEmailIndex,
@@ -13,7 +13,7 @@ import {
 import {
   deleteTestPersonalDataRows,
   insertTestPersonalDataRows,
-  PERSONAL_DATA_ACTOR_ID,
+  MOCK_PERSONAL_DATA_ACTOR_ID,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { isNull } from 'drizzle-orm';
@@ -34,6 +34,13 @@ const ONE_OF_EACH = {
   blockedSignupIdentities: 1,
   auditEvents: 1,
 };
+const NONE = {
+  subscribers: 0,
+  leads: 0,
+  membershipInvites: 0,
+  blockedSignupIdentities: 0,
+  auditEvents: 0,
+};
 
 afterEach(async () => {
   await deleteTestPersonalDataRows(db());
@@ -42,62 +49,63 @@ afterEach(async () => {
 describe(erasePersonalData, () => {
   beforeEach(async () => {
     const { id: tenantId } = await insertTestTenant(db());
-    await insertTestPersonalDataRows(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
-    await insertTestPersonalDataRows(db(), tenantId, TEST_INVITE_EMAIL);
+    await insertTestPersonalDataRows(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
+    await insertTestPersonalDataRows(db(), tenantId, MOCK_INVITE_EMAIL);
   });
 
   it("erases the mailbox's rows and reports how many of each", async () => {
-    const result = await erasePersonalData(TEST_SUBSCRIBER_EMAIL);
+    const result = await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
 
     expect(result).toEqual({
       ok: true,
       data: {
-        emailIndex: testPersonalEmailIndex(TEST_SUBSCRIBER_EMAIL),
+        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
         erased: ONE_OF_EACH,
       },
     });
   });
 
   it("keeps everyone else's rows", async () => {
-    await erasePersonalData(TEST_SUBSCRIBER_EMAIL);
+    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
 
-    const result = await erasePersonalData(TEST_INVITE_EMAIL);
+    const result = await erasePersonalData(MOCK_INVITE_EMAIL);
 
-    expect(result).toMatchObject({ ok: true, data: { erased: ONE_OF_EACH } });
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
+        erased: ONE_OF_EACH,
+      },
+    });
   });
 
   it('keeps an audit event but clears its email', async () => {
-    await erasePersonalData(TEST_SUBSCRIBER_EMAIL);
+    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
 
     const anonymised = await db()
       .select({ actorId: schema.auditEvents.actorId })
       .from(schema.auditEvents)
       .where(isNull(schema.auditEvents.actorEmail));
 
-    expect(anonymised).toEqual([{ actorId: PERSONAL_DATA_ACTOR_ID }]);
+    expect(anonymised).toEqual([{ actorId: MOCK_PERSONAL_DATA_ACTOR_ID }]);
   });
 
   it('finds nothing left to erase on a second run', async () => {
-    await erasePersonalData(TEST_SUBSCRIBER_EMAIL);
+    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
 
-    const result = await erasePersonalData(TEST_SUBSCRIBER_EMAIL);
+    const result = await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       ok: true,
       data: {
-        erased: {
-          subscribers: 0,
-          leads: 0,
-          membershipInvites: 0,
-          blockedSignupIdentities: 0,
-          auditEvents: 0,
-        },
+        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+        erased: NONE,
       },
     });
   });
 
   it('refuses a value that is not an email address', async () => {
-    await expect(erasePersonalData(NOT_AN_ADDRESS)).resolves.toEqual({
+    await expect(erasePersonalData(MOCK_NOT_AN_ADDRESS)).resolves.toEqual({
       ok: false,
       error: ERROR_CODE.DB_INVALID_EMAIL,
     });

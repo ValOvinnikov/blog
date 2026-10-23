@@ -1,4 +1,6 @@
-import type { TTenant } from '@blog/db/schema/tenants';
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 
 import { runSteps } from './run';
 
@@ -42,25 +44,8 @@ vi.mock('./steps/invalidate-tenant-cache', () => ({
 
 const fetchMock = vi.fn();
 
-const tenant = {
-  id: 'tenant-1',
-  sanityProjectId: 'proj123',
-  sanityDataset: 'production',
-} as TTenant;
-
-const env = {
-  sanityManagementToken: 'sanity-token',
-  vercelToken: 'vercel-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'proj-1',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
+const MOCK_TENANT = mockTenant();
+const MOCK_SANITY_PROJECT_ID = MOCK_TENANT.sanityProjectId;
 
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);
@@ -69,15 +54,17 @@ beforeEach(() => {
     .mockResolvedValueOnce(
       new Response(
         JSON.stringify({
-          id: 'proj123',
+          id: MOCK_SANITY_PROJECT_ID,
           isDisabled: false,
           isDisabledByUser: false,
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     )
     .mockResolvedValueOnce(
-      new Response(JSON.stringify({ isDisabledByUser: true }), { status: 200 }),
+      new Response(JSON.stringify({ isDisabledByUser: true }), {
+        status: HTTP_STATUS.OK,
+      }),
     );
   removeTenantDomainMock.mockReset().mockResolvedValue(undefined);
   revokeTenantSanityTokensMock.mockReset().mockResolvedValue(undefined);
@@ -93,7 +80,7 @@ afterEach(() => {
 
 describe(runSteps, () => {
   it('archives the Sanity project via isDisabledByUser and reaches archive-tenant', async () => {
-    const result = await runSteps(tenant, env);
+    const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: true });
     expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -101,8 +88,10 @@ describe(runSteps, () => {
       string,
       RequestInit,
     ];
-    expect(patchUrl).toBe('https://api.sanity.io/v2021-06-07/projects/proj123');
-    expect(patchInit.method).toBe('PATCH');
+    expect(patchUrl).toBe(
+      `https://api.sanity.io/v2021-06-07/projects/${MOCK_SANITY_PROJECT_ID}`,
+    );
+    expect(patchInit.method).toBe(HTTP_METHOD.PATCH);
     expect(patchInit.body).toBe(JSON.stringify({ isDisabledByUser: true }));
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
@@ -114,15 +103,15 @@ describe(runSteps, () => {
     fetchMock.mockReset().mockResolvedValueOnce(
       new Response(
         JSON.stringify({
-          id: 'proj123',
+          id: MOCK_SANITY_PROJECT_ID,
           isDisabled: false,
           isDisabledByUser: true,
         }),
-        { status: 200 },
+        { status: HTTP_STATUS.OK },
       ),
     );
 
-    const result = await runSteps(tenant, env);
+    const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: true });
     expect(fetchMock).toHaveBeenCalledTimes(1);

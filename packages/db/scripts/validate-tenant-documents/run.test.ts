@@ -4,11 +4,12 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { makeTenant } from '@blog/db/testing/tenants/fixtures';
+import { TENANT_STATUS } from '@blog/db/constants';
+import { mockTenantSanityCredentials } from '@blog/db/testing/tenant-sanity-credentials/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 
 import {
+  DOCUMENT_VALIDATION_IDENTIFIER,
   hasSystemicFailures,
   runValidation,
   runValidationForTenant,
@@ -52,45 +53,30 @@ vi.mock('./lib/notify-operators', () => ({
   notifyOperatorsOfDocumentValidationFailure: notifyMock,
 }));
 
-function tenant(id: string, name: string): TTenant {
-  return makeTenant({
-    id,
-    name,
-    primaryDomain: `${name}.example.com`,
-    sanityProjectId: `proj-${name}`,
-  });
-}
-
-function credentials(tenantId: string) {
-  return {
-    projectId: `proj-${tenantId}`,
-    dataset: 'production',
-    token: `token-${tenantId}`,
-    status: TENANT_STATUS.ACTIVE,
-    deprovisionedAt: null,
-    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-  };
-}
+const MOCK_TENANT = mockTenant();
+const MOCK_TENANTS = [MOCK_TENANT, mockTenant(), mockTenant()];
+const MOCK_CREDENTIALS = mockTenantSanityCredentials();
+const MOCK_FINDING_ID = 'finding-1';
+const MOCK_DOCUMENT_TYPE = 'page_post';
+const MOCK_DOCUMENT_ID = 'doc-1';
 
 beforeEach(() => {
   listActiveTenantsMock.mockReset().mockResolvedValue([]);
   getTenantByIdMock.mockReset();
   getTenantSanityCredentialsMock
     .mockReset()
-    .mockImplementation((tenantId: string) =>
-      Promise.resolve(credentials(tenantId)),
-    );
+    .mockResolvedValue(MOCK_CREDENTIALS);
   validateTenantDocumentsMock.mockReset().mockReturnValue([]);
   listFindingsForTenantMock.mockReset().mockResolvedValue([]);
   openFindingMock.mockReset().mockImplementation(() =>
     Promise.resolve({
       ok: true,
-      data: { finding: { id: 'finding-1' }, isNewlyOpened: true },
+      data: { finding: { id: MOCK_FINDING_ID }, isNewlyOpened: true },
     }),
   );
   resolveFindingMock
     .mockReset()
-    .mockResolvedValue({ ok: true, data: { id: 'finding-1' } });
+    .mockResolvedValue({ ok: true, data: { id: MOCK_FINDING_ID } });
   notifyMock.mockReset().mockResolvedValue(undefined);
 });
 
@@ -109,18 +95,13 @@ describe(runValidation, () => {
   });
 
   it('tallies clean, warning and critical outcomes across tenants', async () => {
-    const tenants = [
-      tenant('t1', 'acme'),
-      tenant('t2', 'globex'),
-      tenant('t3', 'initech'),
-    ];
-    listActiveTenantsMock.mockResolvedValue(tenants);
+    listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS);
     validateTenantDocumentsMock
       .mockReturnValueOnce([])
       .mockReturnValueOnce([
         {
-          documentId: 'doc-1',
-          documentType: 'page_post',
+          documentId: MOCK_DOCUMENT_ID,
+          documentType: MOCK_DOCUMENT_TYPE,
           level: 'warning',
           markers: [],
         },
@@ -128,7 +109,7 @@ describe(runValidation, () => {
       .mockReturnValueOnce([
         {
           documentId: 'doc-2',
-          documentType: 'page_post',
+          documentType: MOCK_DOCUMENT_TYPE,
           level: 'error',
           markers: [],
         },
@@ -147,12 +128,7 @@ describe(runValidation, () => {
   });
 
   it("one tenant's failure does not abort the sweep for the rest", async () => {
-    const tenants = [
-      tenant('t1', 'acme'),
-      tenant('t2', 'globex'),
-      tenant('t3', 'initech'),
-    ];
-    listActiveTenantsMock.mockResolvedValue(tenants);
+    listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS);
     validateTenantDocumentsMock
       .mockReturnValueOnce([])
       .mockImplementationOnce(() => {
@@ -175,14 +151,11 @@ describe(runValidation, () => {
   });
 
   it('notifies operators only when the finding is newly opened, not on a repeat open', async () => {
-    listActiveTenantsMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-      tenant('t2', 'globex'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS.slice(0, 2));
     validateTenantDocumentsMock.mockReturnValue([
       {
-        documentId: 'doc-1',
-        documentType: 'page_post',
+        documentId: MOCK_DOCUMENT_ID,
+        documentType: MOCK_DOCUMENT_TYPE,
         level: 'warning',
         markers: [],
       },
@@ -204,49 +177,24 @@ describe(runValidation, () => {
 
   describe('with one active tenant', () => {
     beforeEach(() => {
-      listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
+      listActiveTenantsMock.mockResolvedValue([MOCK_TENANT]);
     });
 
-    it('tallies a tenant with no Sanity credentials yet as skipped', async () => {
-      getTenantSanityCredentialsMock.mockResolvedValue(undefined);
-
-      const summary = await runValidation();
-
-      expect(summary).toEqual({
-        checked: 1,
-        clean: 0,
-        warning: 0,
-        critical: 0,
-        skipped: 1,
-        errors: 0,
-      });
-      expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
-    });
-
-    it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
-      getTenantSanityCredentialsMock.mockResolvedValue({
-        ...credentials('t1'),
-        status: TENANT_STATUS.SUSPENDED,
-      });
-
-      const summary = await runValidation();
-
-      expect(summary).toEqual({
-        checked: 1,
-        clean: 0,
-        warning: 0,
-        critical: 0,
-        skipped: 1,
-        errors: 0,
-      });
-      expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
-    });
-
-    it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
-      getTenantSanityCredentialsMock.mockResolvedValue({
-        ...credentials('t1'),
-        deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
-      });
+    it.each([
+      ['has no Sanity credentials yet', undefined],
+      [
+        'resolves to a non-ACTIVE status',
+        { ...MOCK_CREDENTIALS, status: TENANT_STATUS.SUSPENDED },
+      ],
+      [
+        'resolves to a deprovisioned timestamp',
+        {
+          ...MOCK_CREDENTIALS,
+          deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
+        },
+      ],
+    ])('tallies a tenant that %s as skipped', async (_case, resolved) => {
+      getTenantSanityCredentialsMock.mockResolvedValue(resolved);
 
       const summary = await runValidation();
 
@@ -262,23 +210,29 @@ describe(runValidation, () => {
     });
 
     it('opens a finding for a tenant with invalid documents', async () => {
-      validateTenantDocumentsMock.mockReturnValue([
+      const invalidDocuments = [
         {
-          documentId: 'doc-1',
-          documentType: 'page_post',
+          documentId: MOCK_DOCUMENT_ID,
+          documentType: MOCK_DOCUMENT_TYPE,
           level: 'error',
           markers: [],
         },
-      ]);
+      ];
+      validateTenantDocumentsMock.mockReturnValue(invalidDocuments);
 
       await runValidation();
 
-      expect(openFindingMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          tenantId: 't1',
-          severity: FINDING_SEVERITY.CRITICAL,
-        }),
-      );
+      expect(openFindingMock).toHaveBeenCalledWith({
+        tenantId: MOCK_TENANT.id,
+        source: FINDING_SOURCE.DOCUMENT_VALIDATION,
+        kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
+        severity: FINDING_SEVERITY.CRITICAL,
+        identifier: DOCUMENT_VALIDATION_IDENTIFIER,
+        details: {
+          invalidDocumentCount: invalidDocuments.length,
+          documents: invalidDocuments,
+        },
+      });
     });
 
     describe('when the tenant validates clean', () => {
@@ -289,8 +243,8 @@ describe(runValidation, () => {
       it('resolves a previously open finding once the tenant validates clean again', async () => {
         listFindingsForTenantMock.mockResolvedValue([
           {
-            id: 'finding-1',
-            tenantId: 't1',
+            id: MOCK_FINDING_ID,
+            tenantId: MOCK_TENANT.id,
             source: FINDING_SOURCE.DOCUMENT_VALIDATION,
             kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
             status: FINDING_STATUS.OPEN,
@@ -299,14 +253,14 @@ describe(runValidation, () => {
 
         await runValidation();
 
-        expect(resolveFindingMock).toHaveBeenCalledWith('finding-1');
+        expect(resolveFindingMock).toHaveBeenCalledWith(MOCK_FINDING_ID);
       });
 
       it('does not resolve an open finding from a different source/kind', async () => {
         listFindingsForTenantMock.mockResolvedValue([
           {
-            id: 'finding-1',
-            tenantId: 't1',
+            id: MOCK_FINDING_ID,
+            tenantId: MOCK_TENANT.id,
             source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
             kind: FINDING_KIND.OWNER_CHECK_STALLED,
             status: FINDING_STATUS.OPEN,
@@ -323,13 +277,13 @@ describe(runValidation, () => {
 
 describe(runValidationForTenant, () => {
   it('validates only the given tenant', async () => {
-    getTenantByIdMock.mockResolvedValue(tenant('t1', 'acme'));
+    getTenantByIdMock.mockResolvedValue(MOCK_TENANT);
     validateTenantDocumentsMock.mockReturnValue([]);
 
-    const summary = await runValidationForTenant('t1');
+    const summary = await runValidationForTenant(MOCK_TENANT.id);
 
     expect(summary.checked).toBe(1);
-    expect(getTenantByIdMock).toHaveBeenCalledWith('t1');
+    expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT.id);
     expect(listActiveTenantsMock).not.toHaveBeenCalled();
   });
 
@@ -344,20 +298,10 @@ describe(runValidationForTenant, () => {
 });
 
 describe(hasSystemicFailures, () => {
-  it('is false when every candidate resolved to an expected outcome', () => {
-    expect(
-      hasSystemicFailures({
-        checked: 3,
-        clean: 1,
-        warning: 1,
-        critical: 1,
-        skipped: 0,
-        errors: 0,
-      }),
-    ).toBe(false);
-  });
-
-  it('is true when at least one candidate threw', () => {
+  it.each([
+    ['false when every candidate resolved to an expected outcome', 0, false],
+    ['true when at least one candidate threw', 1, true],
+  ])('is %s', (_case, errors, expected) => {
     expect(
       hasSystemicFailures({
         checked: 3,
@@ -365,8 +309,8 @@ describe(hasSystemicFailures, () => {
         warning: 0,
         critical: 0,
         skipped: 0,
-        errors: 1,
+        errors,
       }),
-    ).toBe(true);
+    ).toBe(expected);
   });
 });

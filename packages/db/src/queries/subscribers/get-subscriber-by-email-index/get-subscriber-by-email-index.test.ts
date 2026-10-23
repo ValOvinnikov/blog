@@ -1,7 +1,7 @@
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
   testPersonalEmailIndex,
@@ -34,20 +34,20 @@ describe(getSubscriberByEmailIndex, () => {
       .insert(schema.subscribers)
       .values({
         tenantId,
-        email: TEST_SUBSCRIBER_EMAIL,
-        emailIndex: testPersonalEmailIndex(TEST_SUBSCRIBER_EMAIL),
+        email: MOCK_SUBSCRIBER_EMAIL,
+        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
       });
   });
 
   it("finds the tenant's subscriber by the address's index", async () => {
     await expect(
-      getSubscriberByEmailIndex(tenantId, TEST_SUBSCRIBER_EMAIL.toUpperCase()),
-    ).resolves.toMatchObject({ tenantId, email: TEST_SUBSCRIBER_EMAIL });
+      getSubscriberByEmailIndex(tenantId, MOCK_SUBSCRIBER_EMAIL.toUpperCase()),
+    ).resolves.toMatchObject({ tenantId, email: MOCK_SUBSCRIBER_EMAIL });
   });
 
   it("does not find another tenant's subscriber", async () => {
     await expect(
-      getSubscriberByEmailIndex(otherTenantId, TEST_SUBSCRIBER_EMAIL),
+      getSubscriberByEmailIndex(otherTenantId, MOCK_SUBSCRIBER_EMAIL),
     ).resolves.toBeUndefined();
   });
 });

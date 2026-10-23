@@ -12,7 +12,7 @@ import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   daysAfterLastActivity,
-  LAST_ACTIVITY_AT,
+  MOCK_LAST_ACTIVITY_AT,
 } from '@blog/db/testing/tenants/inactivity';
 
 import { listTenantsDueForInactivityStage } from './list-tenants-due-for-inactivity-stage';
@@ -49,7 +49,7 @@ afterEach(async () => {
 describe(listTenantsDueForInactivityStage, () => {
   it('returns a tenant once at each of day 23, 30, 50 and 60', async () => {
     const tenant = await insertTestTenant(db(), {
-      lastActivityAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     for (const [stage, now] of STAMPED_STAGES) {
@@ -66,7 +66,7 @@ describe(listTenantsDueForInactivityStage, () => {
   });
 
   it('returns nothing before day 23', async () => {
-    await insertTestTenant(db(), { lastActivityAt: LAST_ACTIVITY_AT });
+    await insertTestTenant(db(), { lastActivityAt: MOCK_LAST_ACTIVITY_AT });
 
     expect(await dueIds(INACTIVITY_STAGE.SUSPENSION_WARNING, DAY_22)).toEqual(
       [],
@@ -77,7 +77,7 @@ describe(listTenantsDueForInactivityStage, () => {
     await insertTestTenant(db(), {
       status: TENANT_STATUS.ARCHIVED,
       deprovisionedAt: DAY_22,
-      lastActivityAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     for (const stage of Object.values(INACTIVITY_STAGE)) {

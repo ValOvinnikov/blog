@@ -2,7 +2,7 @@ import { CONTRAST_CHECK_OUTCOME } from '@blog/config/constants';
 import type { TContrastResultBody } from '@blog/config/types';
 import { faker } from '@faker-js/faker';
 
-export function makeContrastResult(
+export function mockContrastResult(
   overrides: Partial<TContrastResultBody> = {},
 ): TContrastResultBody {
   return {
@@ -14,10 +14,10 @@ export function makeContrastResult(
   };
 }
 
-export function makePassingContrastResult(
+export function mockPassingContrastResult(
   overrides: Partial<TContrastResultBody> = {},
 ): TContrastResultBody {
-  return makeContrastResult({
+  return mockContrastResult({
     outcome: CONTRAST_CHECK_OUTCOME.PASS,
     failureCount: 0,
     ...overrides,
