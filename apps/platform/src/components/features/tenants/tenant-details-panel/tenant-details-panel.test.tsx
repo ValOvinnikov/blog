@@ -67,6 +67,7 @@ const APPENDED_CHARACTER = '!';
 const ACME_LTD = 'Acme Ltd';
 const TENANTS_PATH = adminRoutes.tenants();
 
+const tEn = makeEnTranslator();
 const panel = en.tenantDetailsPanel;
 const fieldErrors = en.tenantFieldErrors;
 const leaveDialog = en.leavePageDialog;
@@ -85,8 +86,8 @@ const TENANT_DETAILS_SAVED = panel.alertSuccess;
 const TENANT_DETAIL_FIELDS = panel.fieldsGroupLabel;
 const LOCKED_ANNOUNCEMENT = panel.lockedAnnouncement;
 const UNLOCKED_ANNOUNCEMENT = panel.unlockedAnnouncement;
-const LOCKED_CONNECT_DOMAIN_STEP_HAS = makeEnTranslator('tenantDetailsPanel')(
-  'fieldLockedReasonStep',
+const LOCKED_CONNECT_DOMAIN_STEP_HAS = tEn(
+  'tenantDetailsPanel.fieldLockedReasonStep',
   { step: en.provisioningStatusView.stepLabel.MAP_DOMAIN },
 );
 const LOCKED_PROVISIONING_SUCCEEDED = panel.fieldLockedReasonSucceeded;
@@ -103,7 +104,7 @@ const TENANTS_LINK = en.navSections.tenants;
 const SAVE_AND_LEAVE = leaveDialog.saveAndLeave;
 const DISCARD_AND_LEAVE = leaveDialog.discardAndLeave;
 const LEAVE_WITHOUT_SAVING = leaveDialog.title;
-const ONE_UNSAVED_CHANGE = makeEnTranslator('leavePageDialog')('description', {
+const ONE_UNSAVED_CHANGE = tEn('leavePageDialog.description', {
   count: 1,
   page: panel.heading,
 });
