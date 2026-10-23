@@ -127,7 +127,7 @@ describe(runInactivitySweep, () => {
       expect(ownerEmails).toHaveLength(1);
       expect(ownerEmails[0]?.subject).toBe(subject);
       expect(ownerEmails[0]?.html).toContain(
-        `href="${SWEEP_ENV.adminAppBaseUrl}/dashboard"`,
+        `href="${SWEEP_ENV.platformAppBaseUrl}/dashboard"`,
       );
     });
 

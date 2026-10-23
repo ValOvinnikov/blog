@@ -59,11 +59,11 @@ export async function createTenantSanityProject(
     token: env.sanityManagementToken,
     projectId,
   });
-  if (!corsOrigins.some((cors) => cors.origin === env.adminAppBaseUrl)) {
+  if (!corsOrigins.some((cors) => cors.origin === env.platformAppBaseUrl)) {
     await addSanityCorsOrigin({
       token: env.sanityManagementToken,
       projectId,
-      origin: env.adminAppBaseUrl,
+      origin: env.platformAppBaseUrl,
       allowCredentials: true,
     });
   }
