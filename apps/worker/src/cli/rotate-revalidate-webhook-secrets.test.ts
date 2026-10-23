@@ -35,37 +35,26 @@ describe(rotateRevalidateWebhookSecrets, () => {
 
     const summary = await rotateRevalidateWebhookSecrets();
 
-    expect(createTenantRevalidateWebhook).toHaveBeenCalledWith(
-      first,
-      expect.anything(),
-    );
-    expect(createTenantRevalidateWebhook).toHaveBeenCalledWith(
-      second,
-      expect.anything(),
-    );
+    expect(
+      vi.mocked(createTenantRevalidateWebhook).mock.calls.map(([t]) => t),
+    ).toEqual([first, second]);
     expect(summary).toEqual({ rotated: [first.id, second.id], failed: [] });
   });
 
-  it('skips tenants already rotated, so a re-run changes nothing', async () => {
-    vi.mocked(listTenants).mockResolvedValue([
-      provisionedTenant({ revalidateWebhookSecretEncrypted: ENCRYPTED_SECRET }),
-    ]);
+  it.each([
+    {
+      case: 'is already rotated, so a re-run changes nothing',
+      overrides: { revalidateWebhookSecretEncrypted: ENCRYPTED_SECRET },
+    },
+    { case: 'has no Sanity project', overrides: { sanityProjectId: null } },
+    { case: 'has no webhook yet', overrides: { webhookCreatedAt: null } },
+  ])('skips a tenant that $case', async ({ overrides }) => {
+    vi.mocked(listTenants).mockResolvedValue([provisionedTenant(overrides)]);
 
     const summary = await rotateRevalidateWebhookSecrets();
 
     expect(createTenantRevalidateWebhook).not.toHaveBeenCalled();
     expect(summary).toEqual({ rotated: [], failed: [] });
-  });
-
-  it('skips tenants whose provisioning has not reached the webhook', async () => {
-    vi.mocked(listTenants).mockResolvedValue([
-      provisionedTenant({ sanityProjectId: null }),
-      provisionedTenant({ webhookCreatedAt: null }),
-    ]);
-
-    await rotateRevalidateWebhookSecrets();
-
-    expect(createTenantRevalidateWebhook).not.toHaveBeenCalled();
   });
 
   it('reports a failed tenant and still rotates the rest', async () => {

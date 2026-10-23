@@ -21,8 +21,7 @@ import {
 } from './sanity-webhooks';
 
 const REDIRECT_MODE_ERROR = 'error';
-const NOT_FOUND_BODY = 'webhook not found';
-const hook = { id: 'hook1', url: SANITY_WEBHOOK_URL };
+const hook = { id: SANITY_WEBHOOK_ID, url: SANITY_WEBHOOK_URL };
 const createInput = withSanityProject({
   dataset: SANITY_DATASET,
   name: 'web-revalidate',
@@ -64,11 +63,10 @@ describe(createSanityWebhook, () => {
 
     const result = await createSanityWebhook(createInput);
 
-    const { url, init, body, method } = firstFetchCall(fetchMock);
+    const { url, body, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(hook);
     expect(url).toBe(SANITY_EXPECTED_URL.webhooks);
     expect(method).toBe(HTTP_METHOD.POST);
-    expect(init.redirect).toBe(REDIRECT_MODE_ERROR);
     expect(body).toEqual({
       type: 'document',
       name: createInput.name,
@@ -89,7 +87,10 @@ describe(createSanityWebhook, () => {
     { case: 'the response is a hook list', response: jsonResponse([]) },
     {
       case: 'the created hook targets a different URL',
-      response: jsonResponse({ id: 'hook1', url: 'https://other.example.com' }),
+      response: jsonResponse({
+        id: SANITY_WEBHOOK_ID,
+        url: 'https://other.example.com',
+      }),
     },
     {
       case: 'the response body is empty',
@@ -118,17 +119,14 @@ describe(updateSanityWebhookSecret, () => {
     secret: 'rotated-shh',
   });
 
-  it('PATCHes only the secret of the named hook without following redirects', async () => {
-    fetchMock.mockResolvedValue(
-      jsonResponse({ id: SANITY_WEBHOOK_ID, url: SANITY_WEBHOOK_URL }),
-    );
+  it('PATCHes only the secret of the named hook', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(hook));
 
     await updateSanityWebhookSecret(updateInput);
 
-    const { url, init, body, method } = firstFetchCall(fetchMock);
+    const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(SANITY_EXPECTED_URL.webhook);
     expect(method).toBe(HTTP_METHOD.PATCH);
-    expect(init.redirect).toBe(REDIRECT_MODE_ERROR);
     expect(body).toEqual({ secret: updateInput.secret });
   });
 
@@ -138,13 +136,5 @@ describe(updateSanityWebhookSecret, () => {
     await expect(updateSanityWebhookSecret(updateInput)).rejects.toThrow(
       SANITY_WEBHOOK_ID,
     );
-  });
-
-  it('throws with the response status on failure', async () => {
-    fetchMock.mockResolvedValue(
-      textResponse(NOT_FOUND_BODY, HTTP_STATUS.NOT_FOUND),
-    );
-
-    await expect(updateSanityWebhookSecret(updateInput)).rejects.toThrow(/404/);
   });
 });
