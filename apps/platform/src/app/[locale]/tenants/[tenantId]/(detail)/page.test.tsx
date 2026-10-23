@@ -5,7 +5,14 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  INVITED_PENDING_TEXT,
+  makeTenant,
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_URL,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import TenantOverviewPage from './page';
 
@@ -113,7 +120,7 @@ describe(TenantOverviewPage, () => {
         tenant.id,
       );
       expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-        'acme.example.com',
+        MOCK_TENANT_DOMAIN,
       );
       expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
         AUDIT_TARGET_TYPE.TENANT,
@@ -127,7 +134,7 @@ describe(TenantOverviewPage, () => {
 
       const heading = screen.getByRole('heading', {
         level: 1,
-        name: 'Acme Inc.',
+        name: MOCK_TENANT_NAME,
       });
       expect(heading).toBeVisible();
     });
@@ -144,7 +151,7 @@ describe(TenantOverviewPage, () => {
       const openSiteLink = screen.getByRole('link', {
         name: 'Open site (opens in new tab)',
       });
-      expect(openSiteLink).toHaveAttribute('href', 'https://acme.example.com');
+      expect(openSiteLink).toHaveAttribute('href', MOCK_TENANT_URL);
     });
 
     it('never shows an "Open Studio" action — Studio opens from the sidebar', () => {
@@ -180,7 +187,7 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    const pendingBadge = screen.getByText('Invited, pending');
+    const pendingBadge = screen.getByText(INVITED_PENDING_TEXT);
     expect(pendingBadge).toBeVisible();
   });
 
@@ -200,7 +207,7 @@ describe(TenantOverviewPage, () => {
 
     const pageHeading = screen.getByRole('heading', {
       level: 1,
-      name: 'Acme Inc.',
+      name: MOCK_TENANT_NAME,
     });
     const ownerHeading = screen.getByRole('heading', {
       level: 2,

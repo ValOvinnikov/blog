@@ -10,6 +10,7 @@ import {
   type TLookFormContext,
 } from '@platform/components/features/look/look-form-provider';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import {
   defaultLookFormValues,
   type TLookFormValues,
@@ -18,12 +19,17 @@ import userEvent from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
 
+const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
+const MOBILE = 'Mobile';
+const ARIA_PRESSED = 'aria-pressed';
+const PRESSED = 'true';
+
 const renderPreview = (
   values: Partial<TLookFormValues> = {},
   hasReaderAccounts = true,
 ) => {
   const lookForm: TLookFormContext = {
-    tenantName: 'Acme Inc.',
+    tenantName: MOCK_TENANT_NAME,
     values: {
       ...defaultLookFormValues(),
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
@@ -55,14 +61,19 @@ describe(LookPreview, () => {
   it('renders the tenant name and a real site Button primitive from the preview sample', () => {
     renderPreview();
 
-    expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+    const tenantNames = screen.getAllByText(MOCK_TENANT_NAME);
+    const subscribeButton = screen.getByRole('button', { name: 'Subscribe' });
+
+    expect(tenantNames.length).toBeGreaterThan(0);
+    expect(subscribeButton).toBeVisible();
   });
 
   it('applies the accent hue as a live CSS custom property on the preview surface', () => {
     renderPreview({ accentHue: 28 });
 
-    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+    const tokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+
+    expect(tokens).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.51 0.17 28)',
     });
   });
@@ -73,7 +84,9 @@ describe(LookPreview, () => {
       density: DENSITY.COMPACT,
     });
 
-    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+    const tokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+
+    expect(tokens).toHaveStyle({
       '--radius-md': '12px',
       '--spacing-card-x': '0.75rem',
     });
@@ -82,7 +95,9 @@ describe(LookPreview, () => {
   it('carries the outlined card style onto the preview surface', () => {
     renderPreview({ cardStyle: CARD_STYLE.OUTLINED });
 
-    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+    const tokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+
+    expect(tokens).toHaveStyle({
       '--item-border-width': '1px',
       '--item-accent-color': 'var(--border)',
     });
@@ -92,38 +107,40 @@ describe(LookPreview, () => {
     const user = userEvent.setup();
     renderPreview();
 
-    expect(screen.getByRole('button', { name: 'Desktop' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const desktopButton = screen.getByRole('button', { name: 'Desktop' });
+    const mobileButton = screen.getByRole('button', { name: MOBILE });
 
-    await user.click(screen.getByRole('button', { name: 'Mobile' }));
+    expect(desktopButton).toHaveAttribute(ARIA_PRESSED, PRESSED);
 
-    expect(screen.getByRole('button', { name: 'Mobile' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    await user.click(mobileButton);
+
+    expect(mobileButton).toHaveAttribute(ARIA_PRESSED, PRESSED);
   });
 
   it('shows the phone header bar in the mobile preview', async () => {
     const user = userEvent.setup();
     renderPreview();
 
-    await user.click(screen.getByRole('button', { name: 'Mobile' }));
+    const mobileButton = screen.getByRole('button', { name: MOBILE });
+    await user.click(mobileButton);
 
-    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'Posts' }),
-    ).not.toBeInTheDocument();
+    const menuButton = screen.getByRole('button', { name: 'Menu' });
+    const postsLink = screen.queryByRole('link', { name: 'Posts' });
+
+    expect(menuButton).toBeVisible();
+    expect(postsLink).not.toBeInTheDocument();
   });
 
   it('re-derives the swatch color when the preview mode toggles to dark, independent of preset', async () => {
     const user = userEvent.setup();
     renderPreview({ accentHue: 28 });
 
-    await user.click(screen.getByRole('button', { name: 'Dark' }));
+    const darkButton = screen.getByRole('button', { name: 'Dark' });
+    await user.click(darkButton);
 
-    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
+    const tokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+
+    expect(tokens).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.7 0.16 28)',
     });
   });
