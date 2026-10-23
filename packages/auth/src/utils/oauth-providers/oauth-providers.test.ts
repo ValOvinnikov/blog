@@ -21,18 +21,19 @@ describe('oauth-providers', () => {
   });
 
   describe('getEnabledOAuthProviderIds', () => {
-    it.each([
-      ['client id', 'AUTH_GITHUB_ID', MOCK_GITHUB_ID, 'github'],
-      ['client secret', 'AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET, 'google'],
-    ])(
-      'excludes an id when only the %s half of its pair is present',
-      async (_half, envKey, value, providerId) => {
-        process.env[envKey] = value;
-        const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+    it('excludes an id when only the client id half of its pair is present', async () => {
+      process.env['AUTH_GITHUB_ID'] = MOCK_GITHUB_ID;
+      const { getEnabledOAuthProviderIds } = await importOAuthProviders();
 
-        expect(getEnabledOAuthProviderIds()).not.toContain(providerId);
-      },
-    );
+      expect(getEnabledOAuthProviderIds()).not.toContain('github');
+    });
+
+    it('excludes an id when only the client secret half of its pair is present', async () => {
+      process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
+      const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+
+      expect(getEnabledOAuthProviderIds()).not.toContain('google');
+    });
 
     it('excludes an id when neither credential is present', async () => {
       const { getEnabledOAuthProviderIds } = await importOAuthProviders();

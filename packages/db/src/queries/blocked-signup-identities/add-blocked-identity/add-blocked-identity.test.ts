@@ -152,18 +152,12 @@ describe(addBlockedIdentity, () => {
 
   it.each([
     [
-      'address',
       BLOCKED_IDENTITY_KIND.ADDRESS,
       NOT_AN_ADDRESS,
       ERROR_CODE.DB_INVALID_EMAIL,
     ],
-    [
-      'domain',
-      BLOCKED_IDENTITY_KIND.DOMAIN,
-      NOT_A_DOMAIN,
-      ERROR_CODE.DB_INVALID_DOMAIN,
-    ],
-  ])('refuses a malformed %s', async (_name, kind, identity, error) => {
+    [BLOCKED_IDENTITY_KIND.DOMAIN, NOT_A_DOMAIN, ERROR_CODE.DB_INVALID_DOMAIN],
+  ])('refuses a malformed %s identity', async (kind, identity, error) => {
     const result = await addBlockedIdentity({
       kind,
       identity,

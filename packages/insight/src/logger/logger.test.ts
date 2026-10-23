@@ -4,6 +4,7 @@ import {
   MOCK_EVENT,
   MOCK_LINE_SEPARATOR,
   MOCK_PARAGRAPH_SEPARATOR,
+  MOCK_SEPARATORS,
   MOCK_SERVICE,
 } from '@blog/insight/testing/fixtures';
 
@@ -320,10 +321,7 @@ describe(createLogger, () => {
       expect(parsed.text).toBe(multiline);
     });
 
-    it.each([
-      ['U+2028', MOCK_LINE_SEPARATOR],
-      ['U+2029', MOCK_PARAGRAPH_SEPARATOR],
-    ])(
+    it.each(MOCK_SEPARATORS)(
       'neutralizes a raw %s in a plain string context value',
       (_name, separator) => {
         logger.error('note', { text: `first${separator}second` });

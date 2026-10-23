@@ -1,11 +1,11 @@
-export const MOCK_TENANT_ID = 'tenant-1';
-export const MOCK_OTHER_TENANT_ID = 'tenant-2';
+export const MOCK_TENANT_ID = 'tenant-acme';
+export const MOCK_OTHER_TENANT_ID = 'tenant-other';
 export const MOCK_TENANT_NAME = 'Acme Blog';
 export const MOCK_INVITE_ID = 'invite-1';
 export const MOCK_OTHER_INVITE_ID = 'invite-2';
 export const MOCK_DB_ERROR_MESSAGE = 'db error';
-export const MOCK_TOKEN = 'abc';
-export const MOCK_READER_EMAIL = 'jane@example.com';
+export const MOCK_TOKEN = 'magic-link-token';
+export const MOCK_READER_EMAIL = 'reader@acme.example.com';
 export const MOCK_FROM_ADDRESS = 'Sign in <onboarding@resend.dev>';
 export const MOCK_VERIFIED_DOMAIN_FROM_ADDRESS =
   'Sign in <sign-in@mail.valstack.dev>';

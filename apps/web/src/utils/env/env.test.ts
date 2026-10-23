@@ -66,17 +66,30 @@ describe('env', () => {
     restoreEnv();
   });
 
-  it.each([
-    'SANITY_REVALIDATE_SECRET',
-    'ANTHROPIC_API_KEY',
-    'SANITY_GENERATE_SECRET',
-    'WEB_ANALYTICS_ENABLED',
-  ] as const)('leaves %s undefined when absent', async (key) => {
-    delete process.env[key];
+  it('leaves SANITY_REVALIDATE_SECRET undefined when absent', async () => {
+    delete process.env['SANITY_REVALIDATE_SECRET'];
 
     const { env } = await importEnvOnServer();
 
-    expect(env[key]).toBeUndefined();
+    expect(env.SANITY_REVALIDATE_SECRET).toBeUndefined();
+  });
+
+  it('leaves ANTHROPIC_API_KEY and SANITY_GENERATE_SECRET undefined when absent (the skim pipeline stays disabled)', async () => {
+    delete process.env['ANTHROPIC_API_KEY'];
+    delete process.env['SANITY_GENERATE_SECRET'];
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.ANTHROPIC_API_KEY).toBeUndefined();
+    expect(env.SANITY_GENERATE_SECRET).toBeUndefined();
+  });
+
+  it('leaves WEB_ANALYTICS_ENABLED undefined when absent (Analytics/SpeedInsights stay omitted)', async () => {
+    delete process.env['WEB_ANALYTICS_ENABLED'];
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.WEB_ANALYTICS_ENABLED).toBeUndefined();
   });
 
   it('parses WEB_ANALYTICS_ENABLED when set to "true"', async () => {

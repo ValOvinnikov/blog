@@ -11,7 +11,7 @@ export const MOCK_ESCAPED_SCRIPT_MARKUP =
 export const MOCK_ATTRIBUTE_BREAKOUT = '"><img src=x onerror=alert(1)>';
 export const MOCK_PERCENT_ENCODED_ATTRIBUTE_BREAKOUT =
   '%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E';
-export const MOCK_JAVASCRIPT_URL = 'javascript:alert(document.cookie)';
+export const MOCK_JAVASCRIPT_URL = 'javascript:alert(document.domain)';
 export const MOCK_TAB_SPLIT_JAVASCRIPT_URL =
   'java\tscript:alert(document.cookie)';
 export const MOCK_DATA_URL = `data:text/html,${MOCK_SCRIPT_MARKUP}`;
