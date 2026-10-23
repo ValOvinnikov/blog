@@ -1,6 +1,9 @@
-import { renderElement, screen } from '@web/testing/custom-render';
+import { renderElement, screen, within } from '@web/testing/custom-render';
 
 import { PageShell } from './page-shell';
+
+const renderedTestIdOrder = () =>
+  screen.getAllByTestId(/.+/).map((el) => el.getAttribute('data-testid'));
 
 describe(`<${PageShell.name}/>`, () => {
   it('renders Breadcrumbs content outside the main landmark, before it', () => {
@@ -15,13 +18,12 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
+    const order = renderedTestIdOrder();
 
+    const main = within(screen.getByRole('main'));
     expect(order).toEqual(['crumbs', 'content']);
-    expect(screen.getByTestId('crumbs').closest('main')).toBeNull();
-    expect(screen.getByTestId('content').closest('main')).not.toBeNull();
+    expect(main.queryByTestId('crumbs')).not.toBeInTheDocument();
+    expect(main.getByTestId('content')).toBeVisible();
   });
 
   it('renders Heading before Content, both inside main', () => {
@@ -92,9 +94,7 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
+    const order = renderedTestIdOrder();
 
     expect(order).toEqual(['content', 'stray']);
   });
