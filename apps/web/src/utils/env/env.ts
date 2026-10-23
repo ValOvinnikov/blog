@@ -23,6 +23,8 @@ export const env = createEnv({
     // revalidating.
     // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
+    // @env-optional
+    INTERNAL_PAGES_SECRET: z.string().min(1).optional(),
     // Both optional (feature-flag-by-absence, same stance as
     // SANITY_REVALIDATE_SECRET): the publish-time skim-generation pipeline
     // (`/api/generate-skim`) returns 503 without them; the reader path is
@@ -99,6 +101,7 @@ export const env = createEnv({
   runtimeEnv: {
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
+    INTERNAL_PAGES_SECRET: process.env.INTERNAL_PAGES_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     WEB_ANALYTICS_ENABLED: process.env.WEB_ANALYTICS_ENABLED,

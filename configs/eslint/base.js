@@ -129,6 +129,7 @@ export default [
       'check-file/folder-naming-convention': [
         'error',
         { 'src/**/': 'KEBAB_CASE' },
+        { ignoreWords: ['__mocks__'] },
       ],
     },
   },
