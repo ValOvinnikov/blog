@@ -61,7 +61,7 @@ export const saveVoiceOverridesAction = async (
     if (!result.ok) {
       return {
         outcome: ACTION_OUTCOME.INVALID,
-        fieldErrorsByLocale: result.fieldErrorsByLocale,
+        fieldErrorsByLocale: result.error,
       };
     }
 
