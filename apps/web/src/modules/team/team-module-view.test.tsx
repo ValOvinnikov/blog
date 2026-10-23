@@ -16,7 +16,7 @@ import {
   MOCK_TEAM_MEMBERS,
   mockTeamMember,
 } from '@web/testing/modules/team/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TeamModuleView } from './team-module-view';
 
@@ -29,7 +29,7 @@ const dataTestId = 'team-module-team-1';
 
 const setup = customRender(TeamModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_TEAM_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_TEAM_HEADING }),
   members: MOCK_TEAM_MEMBERS,
   showBios: false,
   showSocialLinks: false,

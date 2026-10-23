@@ -1,8 +1,8 @@
 import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
-  fullBleedImageDemo,
-  richTextDemo,
+  MOCK_FULL_BLEED_IMAGE_DEMO,
+  MOCK_RICH_TEXT_DEMO,
 } from '@web/testing/shared/portable-text/fixtures';
 
 import { ContentModuleView } from './content-module-view';
@@ -21,7 +21,7 @@ const meta = {
   args: {
     id: 'content-1',
     brandVariant: BRAND_VARIANT.PRIMARY,
-    body: richTextDemo,
+    body: MOCK_RICH_TEXT_DEMO,
     layout: undefined,
   },
   decorators: [
@@ -54,7 +54,7 @@ export const WithDividerAndLargeSpacing: TStory = {
 };
 
 export const FullBleedImage: TStory = {
-  args: { body: fullBleedImageDemo },
+  args: { body: MOCK_FULL_BLEED_IMAGE_DEMO },
 };
 
 export const CentredInWideContainer: TStory = {

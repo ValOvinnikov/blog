@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { startProvisioning } from './start-provisioning';
@@ -24,9 +24,9 @@ describe(startProvisioning, () => {
   it('succeeds when the worker accepts the run', async () => {
     enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.ACCEPTED);
 
-    const result = await startProvisioning(TENANT_ID);
+    const result = await startProvisioning(MOCK_TENANT_ID);
 
-    expect(enqueueProvisioningMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(enqueueProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(loggerErrorMock).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
@@ -34,7 +34,7 @@ describe(startProvisioning, () => {
   it('refuses as already in progress, without logging, when a run is in progress', async () => {
     enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.CONFLICT);
 
-    const result = await startProvisioning(TENANT_ID);
+    const result = await startProvisioning(MOCK_TENANT_ID);
 
     expect(loggerErrorMock).not.toHaveBeenCalled();
     expect(result).toEqual({
@@ -46,11 +46,11 @@ describe(startProvisioning, () => {
   it('refuses as not found and logs when the worker cannot find the tenant', async () => {
     enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.NOT_FOUND);
 
-    const result = await startProvisioning(TENANT_ID);
+    const result = await startProvisioning(MOCK_TENANT_ID);
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'provisioning.enqueue_not_found',
-      { tenantId: TENANT_ID },
+      { tenantId: MOCK_TENANT_ID },
     );
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -67,11 +67,11 @@ describe(startProvisioning, () => {
     async (responseStatus) => {
       enqueueProvisioningMock.mockResolvedValue(responseStatus);
 
-      const result = await startProvisioning(TENANT_ID);
+      const result = await startProvisioning(MOCK_TENANT_ID);
 
       expect(loggerErrorMock).toHaveBeenCalledWith(
         'provisioning.enqueue_failed',
-        { tenantId: TENANT_ID, responseStatus },
+        { tenantId: MOCK_TENANT_ID, responseStatus },
       );
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     },
@@ -80,7 +80,7 @@ describe(startProvisioning, () => {
   it('returns a server error without a second log when the enqueue never arrived', async () => {
     enqueueProvisioningMock.mockResolvedValue(null);
 
-    const result = await startProvisioning(TENANT_ID);
+    const result = await startProvisioning(MOCK_TENANT_ID);
 
     expect(loggerErrorMock).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });

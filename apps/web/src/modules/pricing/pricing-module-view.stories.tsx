@@ -6,7 +6,7 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
 
 import { PricingModuleView } from './pricing-module-view';
@@ -91,7 +91,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Simple pricing' }),
+    headingBlock: mockHeadingBlock({ heading: 'Simple pricing' }),
     panels: panelsFor(tiers),
     footnote: undefined,
     ctaButtons: [],

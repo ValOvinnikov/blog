@@ -5,8 +5,8 @@ import {
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { checkOwnerAccessAction } from './check-owner-access-action';
@@ -27,7 +27,7 @@ vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
   enqueueWorkerRequest: enqueueWorkerRequestMock,
 }));
 
-const { id: tenantId } = makeTenant();
+const { id: tenantId } = mockTenant();
 
 const loggerErrorMock = vi.mocked(logger.error);
 
@@ -66,10 +66,10 @@ describe.each([
       .calls[0] as [string, (admin: TAdmin) => boolean];
 
     expect(gatedTenantId).toBe(tenantId);
-    expect(isAdminPermitted(makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }))).toBe(
+    expect(isAdminPermitted(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }))).toBe(
       true,
     );
-    expect(isAdminPermitted(makeAdmin())).toBe(false);
+    expect(isAdminPermitted(mockAdmin())).toBe(false);
   });
 
   it('succeeds once the worker accepts the request', async () => {

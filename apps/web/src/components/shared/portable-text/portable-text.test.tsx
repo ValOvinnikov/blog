@@ -12,8 +12,8 @@ import {
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import {
-  portableTextBlock,
-  portableTextSpan,
+  mockPortableTextBlock,
+  mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
 import { PortableText } from './portable-text';
@@ -47,6 +47,7 @@ const CODE_SOURCE = 'const x = 1;';
 const IMAGE_ALT = 'A scenic mountain range';
 const ASIDE_BODY_TEXT = 'Because Y.';
 const NESTED_LINK_TEXT = 'a nested link';
+const HOST_TEST_ID = 'portable-text-host';
 
 const RESOLVED_LINK_REF = {
   _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
@@ -75,7 +76,7 @@ const mockBodyImageBlock = (
 
 describe(`<${PortableText.name}/>`, () => {
   it('renders a normal-style block as a paragraph', () => {
-    const value: TPortableTextBody = [portableTextBlock(PARAGRAPH_TEXT)];
+    const value: TPortableTextBody = [mockPortableTextBlock(PARAGRAPH_TEXT)];
 
     setup({ value });
 
@@ -85,7 +86,7 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('downgrades an h1-style block to a level 2 heading', () => {
     const value: TPortableTextBody = [
-      portableTextBlock('Heading 1', { style: 'h1' }),
+      mockPortableTextBlock('Heading 1', { style: 'h1' }),
     ];
 
     setup({ value });
@@ -103,7 +104,7 @@ describe(`<${PortableText.name}/>`, () => {
     'renders an h%i-style block as a heading of that level',
     (level) => {
       const value: TPortableTextBody = [
-        portableTextBlock(`Heading ${level}`, {
+        mockPortableTextBlock(`Heading ${level}`, {
           style: `h${level}` as TPortableTextBlock['style'],
         }),
       ];
@@ -120,8 +121,11 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('gives every h2/h3 block a stable id from its own _key', () => {
     const value: TPortableTextBody = [
-      portableTextBlock(SECTION_HEADING, { style: 'h2', key: 'section-1' }),
-      portableTextBlock(SUBSECTION_HEADING, { style: 'h3', key: 'section-2' }),
+      mockPortableTextBlock(SECTION_HEADING, { style: 'h2', key: 'section-1' }),
+      mockPortableTextBlock(SUBSECTION_HEADING, {
+        style: 'h3',
+        key: 'section-2',
+      }),
     ];
 
     setup({ value });
@@ -140,10 +144,16 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('keeps heading ids distinct across two PortableText instances', () => {
     const firstBody: TPortableTextBody = [
-      portableTextBlock('Overview', { style: 'h2', key: FIRST_OVERVIEW_KEY }),
+      mockPortableTextBlock('Overview', {
+        style: 'h2',
+        key: FIRST_OVERVIEW_KEY,
+      }),
     ];
     const secondBody: TPortableTextBody = [
-      portableTextBlock('Overview', { style: 'h2', key: SECOND_OVERVIEW_KEY }),
+      mockPortableTextBlock('Overview', {
+        style: 'h2',
+        key: SECOND_OVERVIEW_KEY,
+      }),
     ];
 
     renderElement(<PortableText value={firstBody} />);
@@ -158,7 +168,7 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('renders a blockquote-style block as a blockquote', () => {
     const value: TPortableTextBody = [
-      portableTextBlock('A quote', { style: 'blockquote' }),
+      mockPortableTextBlock('A quote', { style: 'blockquote' }),
     ];
 
     setup({ value });
@@ -173,7 +183,7 @@ describe(`<${PortableText.name}/>`, () => {
     { mark: 'code', text: 'const x = 1' },
   ])('renders the $mark mark as a $mark element', ({ mark, text }) => {
     const value: TPortableTextBody = [
-      portableTextBlock([portableTextSpan(text, [mark])]),
+      mockPortableTextBlock([mockPortableTextSpan(text, [mark])]),
     ];
 
     setup({ value });
@@ -184,11 +194,11 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('renders the sub mark as subscript and the sup mark as superscript', () => {
     const value: TPortableTextBody = [
-      portableTextBlock([
-        portableTextSpan('H'),
-        portableTextSpan('2', ['sub']),
-        portableTextSpan('O and x'),
-        portableTextSpan('n', ['sup']),
+      mockPortableTextBlock([
+        mockPortableTextSpan('H'),
+        mockPortableTextSpan('2', ['sub']),
+        mockPortableTextSpan('O and x'),
+        mockPortableTextSpan('n', ['sup']),
       ]),
     ];
 
@@ -202,10 +212,10 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('renders bullet and numbered lists', () => {
     const value: TPortableTextBody = [
-      portableTextBlock([portableTextSpan('First bullet')], {
+      mockPortableTextBlock([mockPortableTextSpan('First bullet')], {
         listItem: 'bullet',
       }),
-      portableTextBlock([portableTextSpan('Second bullet')], {
+      mockPortableTextBlock([mockPortableTextSpan('Second bullet')], {
         listItem: 'bullet',
       }),
     ];
@@ -220,7 +230,7 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('renders a resolved linkRef annotation as a link', () => {
     const value: TPortableTextBody = [
-      portableTextBlock([portableTextSpan('a link', [LINK_KEY])], {
+      mockPortableTextBlock([mockPortableTextSpan('a link', [LINK_KEY])], {
         markDefs: [RESOLVED_LINK_REF],
       }),
     ];
@@ -233,9 +243,12 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('renders a dangling linkRef annotation as plain text', () => {
     const value: TPortableTextBody = [
-      portableTextBlock([portableTextSpan(DANGLING_LINK_TEXT, [LINK_KEY])], {
-        markDefs: [{ ...RESOLVED_LINK_REF, link: undefined }],
-      }),
+      mockPortableTextBlock(
+        [mockPortableTextSpan(DANGLING_LINK_TEXT, [LINK_KEY])],
+        {
+          markDefs: [{ ...RESOLVED_LINK_REF, link: undefined }],
+        },
+      ),
     ];
 
     setup({ value });
@@ -248,17 +261,21 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('renders sibling blocks bare, with no wrapper of its own', () => {
     const value: TPortableTextBody = [
-      portableTextBlock('Section', { style: 'h2' }),
-      portableTextBlock('First paragraph'),
-      portableTextBlock('Second paragraph'),
+      mockPortableTextBlock('Section', { style: 'h2' }),
+      mockPortableTextBlock('First paragraph'),
+      mockPortableTextBlock('Second paragraph'),
     ];
 
-    const { container } = setup({ value });
+    renderElement(
+      <div data-testid={HOST_TEST_ID}>
+        <PortableText value={value} />
+      </div>,
+    );
 
-    expect(container.children).toHaveLength(3);
-    expect(container.children[0]?.tagName).toBe('H2');
-    expect(container.children[1]?.tagName).toBe('P');
-    expect(container.children[2]?.tagName).toBe('P');
+    const host = screen.getByTestId(HOST_TEST_ID);
+    const tagNames = Array.from(host.children, (child) => child.tagName);
+
+    expect(tagNames).toEqual(['H2', 'P', 'P']);
   });
 
   it('renders a code block with syntax highlighting', () => {
@@ -304,7 +321,10 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('renders an aside block with its body through the same components', () => {
     const value: TPortableTextBody = [
-      mockAsideBlock([portableTextBlock(ASIDE_BODY_TEXT)], ASIDE_KIND.WHY_NOT),
+      mockAsideBlock(
+        [mockPortableTextBlock(ASIDE_BODY_TEXT)],
+        ASIDE_KIND.WHY_NOT,
+      ),
     ];
 
     setup({ value });
@@ -317,7 +337,10 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('labels an aside with its raw kind when no override supplies a label', () => {
     const value: TPortableTextBody = [
-      mockAsideBlock([portableTextBlock('A tangent.')], ASIDE_KIND.DIGRESSION),
+      mockAsideBlock(
+        [mockPortableTextBlock('A tangent.')],
+        ASIDE_KIND.DIGRESSION,
+      ),
     ];
 
     setup({ value });
@@ -328,7 +351,7 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('labels an aside with no kind as CONTEXT', () => {
     const value: TPortableTextBody = [
-      mockAsideBlock([portableTextBlock('Some context.')]),
+      mockAsideBlock([mockPortableTextBlock('Some context.')]),
     ];
 
     setup({ value });
@@ -341,9 +364,12 @@ describe(`<${PortableText.name}/>`, () => {
     const value: TPortableTextBody = [
       mockAsideBlock(
         [
-          portableTextBlock([portableTextSpan(NESTED_LINK_TEXT, [LINK_KEY])], {
-            markDefs: [RESOLVED_LINK_REF],
-          }),
+          mockPortableTextBlock(
+            [mockPortableTextSpan(NESTED_LINK_TEXT, [LINK_KEY])],
+            {
+              markDefs: [RESOLVED_LINK_REF],
+            },
+          ),
         ],
         ASIDE_KIND.CONTEXT,
       ),
@@ -357,10 +383,10 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('keeps the default strong mark when a caller overrides the code mark', () => {
     const value: TPortableTextBody = [
-      portableTextBlock([
-        portableTextSpan('bold text', ['strong']),
-        portableTextSpan(' and '),
-        portableTextSpan('code text', ['code']),
+      mockPortableTextBlock([
+        mockPortableTextSpan('bold text', ['strong']),
+        mockPortableTextSpan(' and '),
+        mockPortableTextSpan('code text', ['code']),
       ]),
     ];
 

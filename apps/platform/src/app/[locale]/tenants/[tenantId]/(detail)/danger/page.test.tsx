@@ -4,10 +4,10 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
-  idleDeprovisioningSteps,
-  makeTenant,
+  mockIdleDeprovisioningSteps,
+  mockTenant,
   REACTIVATE_TENANT_LABEL,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import TenantDangerPage from './page';
@@ -62,7 +62,7 @@ vi.mock(
 );
 
 const setup = customRenderAsync(TenantDangerPage, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
 const NEXT_HTTP_ERROR_FALLBACK_404 = 'NEXT_HTTP_ERROR_FALLBACK;404';
@@ -81,7 +81,7 @@ describe(TenantDangerPage, () => {
       role: ADMIN_ROLE.SUPERADMIN,
     });
     requireTenantByIdMock.mockReset();
-    requireTenantByIdMock.mockResolvedValue({ tenant: makeTenant() });
+    requireTenantByIdMock.mockResolvedValue({ tenant: mockTenant() });
     getLatestDeprovisionRequestedAtMock.mockReset();
     getLatestDeprovisionRequestedAtMock.mockResolvedValue(undefined);
     getTenantDeprovisioningStatusActionMock.mockReset();
@@ -106,7 +106,7 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(requireSuperAdminMock).toHaveBeenCalled();
-    expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
 
     const heading = screen.getByRole('heading', {
       level: 1,
@@ -139,7 +139,9 @@ describe(TenantDangerPage, () => {
 
     const startingText = screen.getByText('Starting…');
 
-    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
     expect(startingText).toBeVisible();
   });
 
@@ -155,7 +157,7 @@ describe(TenantDangerPage, () => {
 
   it('offers reactivation for an already-deprovisioned tenant', async () => {
     requireTenantByIdMock.mockResolvedValue({
-      tenant: makeTenant({
+      tenant: mockTenant({
         deprovisionedAt: new Date(AT_20260410_0000),
       }),
     });
@@ -171,9 +173,9 @@ describe(TenantDangerPage, () => {
 
   it('renders the deprovisioning progress card once a run exists', async () => {
     requireTenantByIdMock.mockResolvedValue({
-      tenant: makeTenant({
+      tenant: mockTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           run: { startedAt: AT_20260812_1418 },
         },
       }),
@@ -190,7 +192,9 @@ describe(TenantDangerPage, () => {
 
   it('renders no deprovisioning progress card when deprovisioningSteps carries no run marker', async () => {
     requireTenantByIdMock.mockResolvedValue({
-      tenant: makeTenant({ deprovisioningSteps: idleDeprovisioningSteps() }),
+      tenant: mockTenant({
+        deprovisioningSteps: mockIdleDeprovisioningSteps(),
+      }),
     });
 
     await setup();
@@ -223,10 +227,10 @@ describe(TenantDangerPage, () => {
 
   describe('archived-tenant reorganisation', () => {
     const archivedTenant = () =>
-      makeTenant({
+      mockTenant({
         deprovisionedAt: new Date(AT_20260410_0000),
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           run: {
             startedAt: AT_20260812_1418,
             finishedAt: '2026-08-12T14:20:00.000Z',
@@ -268,7 +272,7 @@ describe(TenantDangerPage, () => {
 
     it('renders no Teardown history section when the tenant has never been through a deprovisioning run', async () => {
       requireTenantByIdMock.mockResolvedValue({
-        tenant: makeTenant({
+        tenant: mockTenant({
           deprovisionedAt: new Date(AT_20260410_0000),
           deprovisioningSteps: null,
         }),

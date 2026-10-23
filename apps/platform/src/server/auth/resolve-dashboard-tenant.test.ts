@@ -1,6 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 
 import { resolveDashboardTenant } from './resolve-dashboard-tenant';
@@ -16,12 +16,12 @@ vi.mock('./list-session-tenants', () => ({
 
 vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
-const tenant1 = { id: TENANT_ID };
+const tenant1 = { id: MOCK_TENANT_ID };
 const tenant2 = { id: 'tenant-2' };
 const membership1 = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
 };
 const membership2 = {

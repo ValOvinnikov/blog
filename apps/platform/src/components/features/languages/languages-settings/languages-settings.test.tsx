@@ -7,7 +7,7 @@ import {
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LanguagesSettings } from './languages-settings';
@@ -23,7 +23,7 @@ mockRouterRefresh();
 const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
 
 const setup = customRender(LanguagesSettings, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   defaultLocale: EN,
   locales: { stored: [], live: [], limit: 2 },
 });
@@ -93,10 +93,10 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(updateTenantLanguagesActionMock).toHaveBeenCalledWith(TENANT_ID, [
-        NL,
-        FR,
-      ]);
+      expect(updateTenantLanguagesActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        [NL, FR],
+      );
     });
   });
 

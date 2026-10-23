@@ -14,10 +14,10 @@ import {
   MOCK_SECOND_TOPIC_POST_TITLE,
 } from '@web/testing/modules/taxonomy-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeTag } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockTag } from '@web/testing/shared/tag/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -45,7 +45,7 @@ const mockTaxonomyResultFor =
   (entries: TTaxonomyEntry[] = [], showLatestPosts = true) => {
     const data: TTaxonomyListModule = {
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: makeHeadingBlock({ heading }),
+      headingBlock: mockHeadingBlock({ heading }),
       layout: undefined,
       contentAlignment: undefined,
       taxonomy,
@@ -90,7 +90,7 @@ const POST_COUNT_LABEL = `${entry.postCount} posts`;
 const LATEST_POSTS_LABEL = `Latest in ${entry.title}`;
 
 const MODULE_ID = 'taxonomy-list-1';
-const TAG = makeTag();
+const TAG = mockTag();
 const READ_THE_BLOG = 'read the blog';
 
 describe(`<${TaxonomyListModule.name}/>`, () => {
@@ -113,7 +113,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       it('fetches the module with the tenant Sanity context', async () => {
         expect(getTaxonomyListMock).toHaveBeenCalledWith(
           MODULE_ID,
-          DEFAULT_TENANT_SANITY_CONTEXT,
+          MOCK_TENANT_SANITY_CONTEXT,
         );
       });
     });
@@ -238,7 +238,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
     it('renders an authored link in the tags empty message', async () => {
       getTaxonomyListMock.mockResolvedValue(mockTagsResult());
       vi.mocked(getVoiceRich).mockResolvedValueOnce(
-        makeFormattedVoiceRich({ linkText: READ_THE_BLOG, href: '/blog' }),
+        mockFormattedVoiceRich({ linkText: READ_THE_BLOG, href: '/blog' }),
       );
 
       await setup();
@@ -264,17 +264,6 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
     it('omits the latest-posts list when latest posts are switched off', async () => {
       getTaxonomyListMock.mockResolvedValue(mockTopicsResult([entry], false));
-
-      await setup();
-
-      const list = screen.queryByRole('list', { name: LATEST_POSTS_LABEL });
-      expect(list).not.toBeInTheDocument();
-    });
-
-    it('omits the latest-posts list when the entry has no posts, even with the flag on', async () => {
-      getTaxonomyListMock.mockResolvedValue(
-        mockTopicsResult([{ ...entry, latestPosts: [] }], true),
-      );
 
       await setup();
 

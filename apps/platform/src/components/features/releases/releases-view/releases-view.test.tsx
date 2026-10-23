@@ -5,8 +5,8 @@ import { CONTRAST_STATUS, RELEASE_FAILURE } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  makeComparedCommit,
-  makeReleaseCandidate,
+  mockComparedCommit,
+  mockReleaseCandidate,
 } from '@platform/testing/releases/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -26,7 +26,7 @@ vi.mock('@platform/server/releases/get-release-run-action', () => ({
 }));
 
 const setup = customRender(ReleasesView, {
-  result: okResult(makeReleaseCandidate()),
+  result: okResult(mockReleaseCandidate()),
   releaseRun: okResult(),
 });
 
@@ -40,7 +40,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   it('lists the commits since the last tag with the touched areas', () => {
     setup({
       result: okResult(
-        makeReleaseCandidate({
+        mockReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: true,
             [RELEASE_CHANGE.DB_MIGRATION]: false,
@@ -60,7 +60,7 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('says the commit list shows only the newest when it is shorter than the total', () => {
     setup({
-      result: okResult(makeReleaseCandidate({ totalCommits: 140 })),
+      result: okResult(mockReleaseCandidate({ totalCommits: 140 })),
     });
 
     expect(
@@ -70,7 +70,7 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('says the change list is incomplete when GitHub truncated the files', () => {
     setup({
-      result: okResult(makeReleaseCandidate({ isFileListTruncated: true })),
+      result: okResult(mockReleaseCandidate({ isFileListTruncated: true })),
     });
 
     expect(screen.getByText('The change list is incomplete')).toBeVisible();
@@ -80,7 +80,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   it('reads each migration count as a minimum when the counts are a lower bound', () => {
     setup({
       result: okResult(
-        makeReleaseCandidate({
+        mockReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: true,
             [RELEASE_CHANGE.DB_MIGRATION]: true,
@@ -106,7 +106,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   it('reads migration counts exactly when they are not a lower bound', () => {
     setup({
       result: okResult(
-        makeReleaseCandidate({
+        mockReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: false,
             [RELEASE_CHANGE.DB_MIGRATION]: true,
@@ -128,7 +128,7 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('shows only the empty message when there are no commits since the tag', () => {
     setup({
-      result: okResult(makeReleaseCandidate({ commits: [], totalCommits: 0 })),
+      result: okResult(mockReleaseCandidate({ commits: [], totalCommits: 0 })),
     });
 
     expect(
@@ -142,8 +142,8 @@ describe(`<${ReleasesView.name}/>`, () => {
   it('links a failed contrast status to the findings', () => {
     setup({
       result: okResult(
-        makeReleaseCandidate({
-          commits: [makeComparedCommit()],
+        mockReleaseCandidate({
+          commits: [mockComparedCommit()],
           contrastStatus: CONTRAST_STATUS.FAILED,
         }),
       ),
@@ -157,7 +157,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   it('disables the contrast check while a run is in progress', () => {
     setup({
       result: okResult(
-        makeReleaseCandidate({ contrastStatus: CONTRAST_STATUS.RUNNING }),
+        mockReleaseCandidate({ contrastStatus: CONTRAST_STATUS.RUNNING }),
       ),
     });
 
@@ -169,7 +169,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   it('offers the contrast check when it is not running', () => {
     setup({
       result: okResult(
-        makeReleaseCandidate({ contrastStatus: CONTRAST_STATUS.DUE }),
+        mockReleaseCandidate({ contrastStatus: CONTRAST_STATUS.DUE }),
       ),
     });
 
@@ -212,7 +212,7 @@ describe(`<${ReleasesView.name}/>`, () => {
     (contrastStatus) => {
       setup({
         result: okResult(
-          makeReleaseCandidate({
+          mockReleaseCandidate({
             changes: {
               [RELEASE_CHANGE.RENDERING]: true,
               [RELEASE_CHANGE.DB_MIGRATION]: false,
@@ -236,7 +236,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   it('releases without an override when contrast passed', () => {
     setup({
       result: okResult(
-        makeReleaseCandidate({
+        mockReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: true,
             [RELEASE_CHANGE.DB_MIGRATION]: false,

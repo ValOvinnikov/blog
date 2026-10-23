@@ -1084,6 +1084,14 @@
         "file": "packages/config/src/constants/http-methods.ts"
       }
     ],
+    "HEAD": [
+      {
+        "ref": "HTTP_METHOD.HEAD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-methods.ts"
+      }
+    ],
     "POST": [
       {
         "ref": "HTTP_METHOD.POST",
@@ -2114,6 +2122,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "DYNAMIC_SERVER_USAGE": [
+      {
+        "ref": "NEXT_DYNAMIC_ERROR.DYNAMIC_SERVER_USAGE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/next-dynamic-error.ts"
       }
     ],
     "NEXT_NOT_FOUND": [
@@ -4076,6 +4092,14 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "307": [
+      {
+        "ref": "HTTP_STATUS.TEMPORARY_REDIRECT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
     "400": [
       {
         "ref": "HTTP_STATUS.BAD_REQUEST",
@@ -4143,6 +4167,14 @@
     "502": [
       {
         "ref": "HTTP_STATUS.BAD_GATEWAY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "503": [
+      {
+        "ref": "HTTP_STATUS.SERVICE_UNAVAILABLE",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"

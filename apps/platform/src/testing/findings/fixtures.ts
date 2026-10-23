@@ -7,17 +7,17 @@ import {
 import type { TOpenFinding } from '@blog/db/queries/findings';
 import {
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 export const MOCK_FINDING_LAST_SEEN_AT = new Date('2026-04-02T00:00:00.000Z');
 
-export const makeFinding = (
+export const mockFinding = (
   overrides: Partial<TOpenFinding> = {},
 ): TOpenFinding => {
   return {
     id: 'finding-1',
-    tenantId: TENANT_ID,
+    tenantId: MOCK_TENANT_ID,
     source: FINDING_SOURCE.TENANT_PROVISIONING,
     kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
     severity: FINDING_SEVERITY.CRITICAL,

@@ -3,11 +3,16 @@ import type { TLandingPage, TLandingSectionNavigation } from '@blog/service';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
-const FAQ_PATH = 'modules/faq';
+export const MOCK_SECTION_ROOT_PATH = 'modules';
+export const MOCK_SECTION_FAQ_PATH = `${MOCK_SECTION_ROOT_PATH}/faq`;
+export const MOCK_SECTION_PRICING_PATH = `${MOCK_SECTION_ROOT_PATH}/pricing`;
+export const MOCK_SECTION_ROOT_TITLE = 'Modules';
+export const MOCK_SECTION_FAQ_TITLE = 'FAQ';
+export const MOCK_SECTION_PRICING_TITLE = 'Pricing';
 
-export const LANDING_PAGE_OG_IMAGE = mockSanityImage();
+export const MOCK_LANDING_PAGE_OG_IMAGE = mockSanityImage();
 
-export const mockLandingPage: TLandingPage = {
+export const MOCK_LANDING_PAGE: TLandingPage = {
   id: 'about-us',
   path: 'about-us',
   translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'about-us' }],
@@ -22,23 +27,35 @@ export const mockLandingPage: TLandingPage = {
     description: 'Who we are.',
     ogTitle: 'About Us OG',
     ogDescription: 'Who we are OG.',
-    ogImage: LANDING_PAGE_OG_IMAGE,
+    ogImage: MOCK_LANDING_PAGE_OG_IMAGE,
   }),
 };
 
-export const makeLandingSectionNavigation = (
+export const mockLandingSectionNavigation = (
   overrides: Partial<TLandingSectionNavigation> = {},
 ): TLandingSectionNavigation => {
   return {
     title: null,
-    root: { title: 'Modules', path: 'modules', isCurrent: false },
+    root: {
+      title: MOCK_SECTION_ROOT_TITLE,
+      path: MOCK_SECTION_ROOT_PATH,
+      isCurrent: false,
+    },
     pages: [
-      { title: 'FAQ', path: FAQ_PATH, isCurrent: true },
-      { title: 'Pricing', path: 'modules/pricing', isCurrent: false },
+      {
+        title: MOCK_SECTION_FAQ_TITLE,
+        path: MOCK_SECTION_FAQ_PATH,
+        isCurrent: true,
+      },
+      {
+        title: MOCK_SECTION_PRICING_TITLE,
+        path: MOCK_SECTION_PRICING_PATH,
+        isCurrent: false,
+      },
     ],
     breadcrumbs: [
-      { title: 'Modules', path: 'modules' },
-      { title: 'FAQ', path: FAQ_PATH },
+      { title: MOCK_SECTION_ROOT_TITLE, path: MOCK_SECTION_ROOT_PATH },
+      { title: MOCK_SECTION_FAQ_TITLE, path: MOCK_SECTION_FAQ_PATH },
     ],
     parentSection: undefined,
     ...overrides,

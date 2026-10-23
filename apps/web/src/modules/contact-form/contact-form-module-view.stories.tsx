@@ -6,7 +6,7 @@ import {
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockContactFormModule } from '@web/testing/modules/contact-form/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { ContactFormModuleView } from './contact-form-module-view';
 
@@ -30,7 +30,7 @@ const meta = {
     currentLocale: LOCALE_ISO_CODES.EN,
     defaultLocale: LOCALE_ISO_CODES.EN,
     ...mockContactFormModule({
-      privacyNote: [portableTextBlock(faker.lorem.sentence())],
+      privacyNote: [mockPortableTextBlock(faker.lorem.sentence())],
     }),
   },
 } satisfies Meta<typeof ContactFormModuleView>;

@@ -1,7 +1,15 @@
-import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  LOCALE_ISO_CODES,
+  RADIUS_SCALE,
+  SITE_MESSAGES_BY_LOCALE,
+  type TThemeTokens,
+} from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
-import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { StandaloneNotFoundPage } from './standalone-not-found-page';
@@ -36,23 +44,17 @@ vi.mock('@web/utils/to-theme-tokens', () => ({
 
 const messages = SITE_MESSAGES_BY_LOCALE.EN;
 const voicedMessages = { notFound: { commandNotFound: 'command not found' } };
-const voicedSupportingText = makeFormattedVoiceRich();
+const voicedSupportingText = mockFormattedVoiceRich();
 
-const THEME_TOKENS = {
+const THEME_TOKENS: TThemeTokens = {
   accentHue: 250,
-  headingFont: 'SPACE_GROTESK',
-  bodyFont: 'NEWSREADER',
-  radiusScale: 'MD',
-  density: 'DEFAULT',
+  headingFont: FONT_CHOICE.SPACE_GROTESK,
+  bodyFont: FONT_CHOICE.NEWSREADER,
+  radiusScale: RADIUS_SCALE.MD,
+  density: DENSITY.DEFAULT,
 };
 
-const DEFAULT_THEME_TOKENS = {
-  accentHue: 200,
-  headingFont: 'SPACE_GROTESK',
-  bodyFont: 'NEWSREADER',
-  radiusScale: 'MD',
-  density: 'DEFAULT',
-};
+const DEFAULT_THEME_TOKENS: TThemeTokens = { ...THEME_TOKENS, accentHue: 200 };
 
 describe(`<${StandaloneNotFoundPage.name}/>`, () => {
   beforeEach(() => {
@@ -82,19 +84,19 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
 
   describe('given a tenant', () => {
     it('resolves theme tokens and messages with that tenant', async () => {
-      await StandaloneNotFoundPage({ tenant: 'tenant-1' });
+      await StandaloneNotFoundPage({ tenant: MOCK_TENANT_ID });
 
-      expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
+      expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
         messages,
         LOCALE_ISO_CODES.EN,
-        'tenant-1',
+        MOCK_TENANT_ID,
       );
       expect(toThemeTokensMock).not.toHaveBeenCalled();
     });
 
     it('passes the resolved theme tokens through to ThemeScope', async () => {
-      const ui = await StandaloneNotFoundPage({ tenant: 'tenant-1' });
+      const ui = await StandaloneNotFoundPage({ tenant: MOCK_TENANT_ID });
 
       expect(ui.type).toBe(ThemeScope);
       expect(ui.props.themeTokens).toBe(THEME_TOKENS);
@@ -102,19 +104,19 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
 
     it('resolves the tenant’s messages in the given language', async () => {
       await StandaloneNotFoundPage({
-        tenant: 'tenant-1',
+        tenant: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.NL,
       });
 
       expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
         SITE_MESSAGES_BY_LOCALE.NL,
         LOCALE_ISO_CODES.NL,
-        'tenant-1',
+        MOCK_TENANT_ID,
       );
     });
 
-    it('wraps NotFoundPage in its own NextIntlClientProvider, independent of any ancestor provider', async () => {
-      const ui = await StandaloneNotFoundPage({ tenant: 'tenant-1' });
+    it('wraps NotFoundPage in its own NextIntlClientProvider', async () => {
+      const ui = await StandaloneNotFoundPage({ tenant: MOCK_TENANT_ID });
       const provider = ui.props.children;
 
       expect(provider.type).toBe(NextIntlClientProvider);

@@ -10,7 +10,7 @@ import {
   MOCK_LOGO_ITEMS,
   MOCK_LOGO_WALL_HEADING,
 } from '@web/testing/modules/logo-wall/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
 
@@ -29,7 +29,7 @@ const TITLE_ID = 'logo-wall-title';
 
 const setup = customRender(LogoWallModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_LOGO_WALL_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_LOGO_WALL_HEADING }),
   logos: MOCK_LOGO_ITEMS,
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,

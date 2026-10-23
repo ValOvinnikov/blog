@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
-import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 import { redirect } from 'next/navigation';
 
 import { AccountPage } from './account-page';
@@ -35,7 +35,7 @@ const setup = customRenderServerAsync(
 describe(`<${AccountPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: ACCOUNT_USER,
+      user: MOCK_ACCOUNT_USER,
     });
     vi.mocked(queries.account.getLinkedProviders).mockResolvedValue({
       github: true,
@@ -44,7 +44,7 @@ describe(`<${AccountPage.name}/>`, () => {
     });
     vi.mocked(queries.subscribers.getSubscriptionStatus).mockResolvedValue({
       outcome: 'active',
-      subscriber: { email: ACCOUNT_USER.email },
+      subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof queries.subscribers.getSubscriptionStatus>>);
   });
 
@@ -62,27 +62,35 @@ describe(`<${AccountPage.name}/>`, () => {
     });
 
     it('renders the three sections under the page heading, in order', () => {
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Account' }),
-      ).toBeVisible();
-      expect(
-        screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent),
-      ).toEqual(['Connected accounts', 'Newsletter', 'Privacy']);
+      const accountHeading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Account',
+      });
+
+      expect(accountHeading).toBeVisible();
+      const sectionHeadings = screen.getAllByRole('heading', { level: 2 });
+      const sectionTitles = sectionHeadings.map((h) => h.textContent);
+
+      expect(sectionTitles).toEqual([
+        'Connected accounts',
+        'Newsletter',
+        'Privacy',
+      ]);
     });
 
     it('arms account deletion with the handle derived from the session', async () => {
       const user = userEvent.setup();
 
-      await user.type(
-        screen.getByRole('textbox', {
-          name: 'Type your handle to confirm deletion',
-        }),
-        'jane',
-      );
+      const handleTextbox = screen.getByRole('textbox', {
+        name: 'Type your handle to confirm deletion',
+      });
+      await user.type(handleTextbox, 'jane');
 
-      expect(
-        screen.getByRole('button', { name: 'Delete account' }),
-      ).toBeEnabled();
+      const deleteAccountButton = screen.getByRole('button', {
+        name: 'Delete account',
+      });
+
+      expect(deleteAccountButton).toBeEnabled();
     });
   });
 
@@ -93,8 +101,11 @@ describe(`<${AccountPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { level: 2, name: 'Newsletter' }),
-    ).not.toBeInTheDocument();
+    const newsletterHeading = screen.queryByRole('heading', {
+      level: 2,
+      name: 'Newsletter',
+    });
+
+    expect(newsletterHeading).not.toBeInTheDocument();
   });
 });

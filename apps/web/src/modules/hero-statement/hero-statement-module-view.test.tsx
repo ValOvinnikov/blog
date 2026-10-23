@@ -4,7 +4,7 @@ import {
   MOCK_HERO_STATEMENT_HEADING,
   MOCK_HERO_STATEMENT_MODULE_ID,
 } from '@web/testing/modules/hero-statement/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { HeroStatementModuleView } from './hero-statement-module-view';
 
@@ -13,7 +13,7 @@ const setup = customRender(HeroStatementModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: MOCK_HERO_STATEMENT_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_HERO_STATEMENT_HEADING }),
   sanityImage: undefined,
   ctaButtons: [],
   contentPosition: undefined,

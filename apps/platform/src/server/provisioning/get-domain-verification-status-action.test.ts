@@ -1,7 +1,11 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockTenant,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_DOMAIN,
+} from '@platform/testing/tenants/fixtures';
 
 const { requireAdminMock, getTenantByIdMock, getDomainVerificationStatusMock } =
   vi.hoisted(() => ({
@@ -23,8 +27,6 @@ vi.mock('./get-domain-verification-status', () => ({
   getDomainVerificationStatus: getDomainVerificationStatusMock,
 }));
 
-const ACME_EXAMPLE_COM = 'acme.example.com';
-
 describe('getDomainVerificationStatusAction', () => {
   beforeEach(() => {
     requireAdminMock.mockReset();
@@ -40,16 +42,16 @@ describe('getDomainVerificationStatusAction', () => {
     const { getDomainVerificationStatusAction } =
       await import('./get-domain-verification-status-action');
 
-    await expect(getDomainVerificationStatusAction(TENANT_ID)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
+    await expect(
+      getDomainVerificationStatusAction(MOCK_TENANT_ID),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();
   });
 
   it("resolves the domain from the tenant's own database row, never from the caller's argument", async () => {
     getTenantByIdMock.mockResolvedValue(
-      makeTenant({ id: TENANT_ID, primaryDomain: ACME_EXAMPLE_COM }),
+      mockTenant({ id: MOCK_TENANT_ID, primaryDomain: MOCK_TENANT_DOMAIN }),
     );
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.VERIFIED,
@@ -57,15 +59,17 @@ describe('getDomainVerificationStatusAction', () => {
     const { getDomainVerificationStatusAction } =
       await import('./get-domain-verification-status-action');
 
-    const result = await getDomainVerificationStatusAction(TENANT_ID);
+    const result = await getDomainVerificationStatusAction(MOCK_TENANT_ID);
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_ID, {
+    expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       includeArchived: true,
     });
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-      ACME_EXAMPLE_COM,
+      MOCK_TENANT_DOMAIN,
     );
-    expect(getDomainVerificationStatusMock).not.toHaveBeenCalledWith(TENANT_ID);
+    expect(getDomainVerificationStatusMock).not.toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
     expect(result).toBe(DOMAIN_VERIFICATION_STATUS.VERIFIED);
   });
 

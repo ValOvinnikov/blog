@@ -1,5 +1,5 @@
 import type { TTimelineItem } from '@blog/service';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 export const mockTimelineItem = (
   overrides: Partial<TTimelineItem> = {},
@@ -7,7 +7,7 @@ export const mockTimelineItem = (
   id: 'timeline-item-1',
   marker: undefined,
   heading: 'Discovery',
-  body: [portableTextBlock('We learn what you need.')],
+  body: [mockPortableTextBlock('We learn what you need.')],
   ...overrides,
 });
 

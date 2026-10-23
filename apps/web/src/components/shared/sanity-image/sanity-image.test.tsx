@@ -27,6 +27,21 @@ const wideImage: ISanityImage = {
   dimensions: { width: 2400, height: 1260, aspectRatio: 2400 / 1260 },
 };
 
+const OTHER_PROJECT_PATH = 'other-project/other-dataset';
+const OTHER_BASE_URL = `https://cdn.sanity.io/images/${OTHER_PROJECT_PATH}/`;
+const CUSTOM_ALT = 'Custom alt';
+const SIZES = '(min-width: 1024px) 50vw, 100vw';
+const LQIP = 'data:image/webp;base64,fake';
+const ENTROPY_CROP = 'crop=entropy';
+
+const focalParamPattern = (param: string) =>
+  new RegExp(`[?&]fp-${param.replace(/\./, '\\.')}(?:&|$)`);
+
+const focalParams = (x: number, y: number) => ({
+  x: focalParamPattern(`x=${x}`),
+  y: focalParamPattern(`y=${y}`),
+});
+
 const setup = customRender(SanityImage, {
   image,
   width: 960,
@@ -41,132 +56,123 @@ const setupWide = customRender(SanityImage, {
 
 describe(`<${SanityImage.name}/>`, () => {
   describe('with default props', () => {
+    let img: HTMLElement;
+
     beforeEach(() => {
       setup();
+      img = screen.getByRole('img', { name: image.alt });
     });
 
-    it('renders an img pointing at the Sanity CDN with a srcset', () => {
-      const img = screen.getByRole('img', { name: image.alt });
-      expect(img).toHaveAttribute(
-        'src',
-        expect.stringContaining('https://cdn.sanity.io'),
-      );
-      expect(img.getAttribute('srcset')).toContain('cdn.sanity.io');
-    });
-
-    it('renders against the default test baseUrl when no override provider is nested', () => {
-      const img = screen.getByRole('img', { name: image.alt });
+    it('renders the src and srcset against the default base URL', () => {
       expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
-    });
-
-    it('falls back to the image alt text when no override is provided', () => {
-      expect(screen.getByAltText(image.alt)).toBeVisible();
-    });
-
-    it('renders no fetchpriority attribute when priority is omitted (default false)', () => {
-      expect(screen.getByRole('img', { name: image.alt })).not.toHaveAttribute(
-        'fetchpriority',
+      expect(img.getAttribute('srcset')).toContain(
+        STATIC_SANITY_IMAGE_BASE_URL,
       );
+    });
+
+    it('renders no fetchpriority attribute when priority is omitted', () => {
+      expect(img).not.toHaveAttribute('fetchpriority');
     });
   });
 
-  it('renders against the tenant baseUrl supplied by the surrounding SanityImageBaseUrlProvider, not a hardcoded origin', () => {
-    const otherBaseUrl =
-      'https://cdn.sanity.io/images/other-project/other-dataset/';
-
+  it('renders against the base URL of the surrounding provider', () => {
     renderElement(
-      <SanityImageBaseUrlProvider baseUrl={otherBaseUrl}>
+      <SanityImageBaseUrlProvider baseUrl={OTHER_BASE_URL}>
         <SanityImage image={image} width={960} height={720} />
       </SanityImageBaseUrlProvider>,
     );
 
     const img = screen.getByRole('img', { name: image.alt });
-    expect(img.getAttribute('src')).toContain('other-project/other-dataset');
-    expect(img.getAttribute('srcset')).toContain('other-project/other-dataset');
+    expect(img.getAttribute('src')).toContain(OTHER_PROJECT_PATH);
+    expect(img.getAttribute('srcset')).toContain(OTHER_PROJECT_PATH);
   });
 
   it('uses the provided alt override instead of the image alt', () => {
-    setup({ alt: 'Custom alt' });
+    setup({ alt: CUSTOM_ALT });
 
-    expect(screen.getByAltText('Custom alt')).toBeVisible();
-    expect(screen.queryByAltText(image.alt)).not.toBeInTheDocument();
+    const overridden = screen.getByAltText(CUSTOM_ALT);
+    const original = screen.queryByAltText(image.alt);
+    expect(overridden).toBeVisible();
+    expect(original).not.toBeInTheDocument();
   });
 
   it('forwards sizes and loading to the rendered element', () => {
     setup({
-      sizes: '(min-width: 1024px) 50vw, 100vw',
+      sizes: SIZES,
       loading: 'eager',
     });
 
     const img = screen.getByRole('img', { name: image.alt });
-    expect(img).toHaveAttribute('sizes', '(min-width: 1024px) 50vw, 100vw');
+    expect(img).toHaveAttribute('sizes', SIZES);
     expect(img).toHaveAttribute('loading', 'eager');
   });
 
   it('sets fetchpriority="high" on the rendered img when priority is true', () => {
     setup({ priority: true });
 
-    expect(screen.getByRole('img', { name: image.alt })).toHaveAttribute(
-      'fetchpriority',
-      'high',
-    );
+    const img = screen.getByRole('img', { name: image.alt });
+    expect(img).toHaveAttribute('fetchpriority', 'high');
   });
 
-  it('withholds the LQIP preview for a priority image, rendering a single img with no hydration-gated placeholder swap', () => {
+  it('renders a priority image as a single img with no LQIP placeholder', () => {
     setup({
       priority: true,
-      image: { ...image, lqip: 'data:image/webp;base64,fake' },
+      image: { ...image, lqip: LQIP },
     });
 
     const images = screen.getAllByRole('img', { name: image.alt });
     expect(images).toHaveLength(1);
     expect(images[0]).not.toHaveAttribute('data-lqip');
-    expect(images[0]).toHaveAttribute(
-      'src',
-      expect.stringContaining('https://cdn.sanity.io'),
+    expect(images[0]?.getAttribute('src')).toContain(
+      STATIC_SANITY_IMAGE_BASE_URL,
     );
   });
 
-  it('renders the LQIP blur-up placeholder for a non-priority image with a preview available', () => {
+  it('renders a hidden LQIP placeholder for a non-priority image with a preview', () => {
     setup({
-      image: { ...image, lqip: 'data:image/webp;base64,fake' },
+      image: { ...image, lqip: LQIP },
     });
 
-    expect(screen.getByRole('img', { name: image.alt })).toBeVisible();
-    expect(screen.getByRole('presentation')).not.toBeVisible();
+    const img = screen.getByRole('img', { name: image.alt });
+    const placeholder = screen.getByRole('presentation');
+    expect(img).toBeVisible();
+    expect(placeholder).not.toBeVisible();
   });
 
-  it('crops a hotspot-less, mismatched-ratio cover image from its centre instead of an entropy heuristic', () => {
+  it('crops a hotspot-less cover image by its centre, never by entropy', () => {
     setupWide();
 
     const img = screen.getByRole('img', { name: wideImage.alt });
-    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
-    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.5(?:&|$)/);
-    expect(img.getAttribute('src')).not.toContain('crop=entropy');
-    expect(img.getAttribute('srcset')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
-    expect(img.getAttribute('srcset')).not.toContain('crop=entropy');
+    expect(img.getAttribute('src')).not.toContain(ENTROPY_CROP);
+    expect(img.getAttribute('srcset')).toMatch(focalParams(0.5, 0.5).x);
+    expect(img.getAttribute('srcset')).not.toContain(ENTROPY_CROP);
   });
 
-  it('keeps a real hotspot as the focal point instead of the centre fallback', () => {
-    setupWide({
-      image: { ...wideImage, hotspot: { x: 0.2, y: 0.8, width: 1, height: 1 } },
-    });
+  it.each([
+    ['the centre for a hotspot-less image', {}, 0.5, 0.5],
+    [
+      'a real hotspot',
+      { hotspot: { x: 0.2, y: 0.8, width: 1, height: 1 } },
+      0.2,
+      0.8,
+    ],
+    [
+      'the centre of the cropped area when a crop is set',
+      { crop: { top: 0.1, bottom: 0, left: 0.2, right: 0 } },
+      0.5,
+      0.5,
+    ],
+  ] satisfies [string, Partial<ISanityImage>, number, number][])(
+    'uses %s as the focal point',
+    (_case, imageOverrides, x, y) => {
+      setupWide({ image: { ...wideImage, ...imageOverrides } });
 
-    const img = screen.getByRole('img', { name: wideImage.alt });
-    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.2(?:&|$)/);
-    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.8(?:&|$)/);
-  });
-
-  it('centres a hotspot-less focal point on the cropped area rather than the source when a crop is set', () => {
-    setupWide({
-      image: {
-        ...wideImage,
-        crop: { top: 0.1, bottom: 0, left: 0.2, right: 0 },
-      },
-    });
-
-    const img = screen.getByRole('img', { name: wideImage.alt });
-    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
-    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.5(?:&|$)/);
-  });
+      const src = screen
+        .getByRole('img', { name: wideImage.alt })
+        .getAttribute('src');
+      const focal = focalParams(x, y);
+      expect(src).toMatch(focal.x);
+      expect(src).toMatch(focal.y);
+    },
+  );
 });

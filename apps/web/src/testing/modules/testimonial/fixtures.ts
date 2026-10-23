@@ -1,6 +1,6 @@
 import type { TTestimonialItem } from '@blog/service';
 import { faker } from '@faker-js/faker';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 export const MOCK_TESTIMONIAL_MODULE_ID = 'testimonial-1';
 
@@ -9,7 +9,7 @@ export const mockTestimonialItem = (
 ): TTestimonialItem => ({
   id: MOCK_TESTIMONIAL_MODULE_ID,
   name: 'Jordan Reyes',
-  quote: [portableTextBlock('This product changed how our team ships.')],
+  quote: [mockPortableTextBlock('This product changed how our team ships.')],
   role: 'VP Engineering, Acme Co.',
   image: undefined,
   link: undefined,

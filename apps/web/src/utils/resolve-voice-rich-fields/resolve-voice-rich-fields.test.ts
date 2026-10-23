@@ -1,24 +1,22 @@
-import type { TVoicePortableText } from '@blog/config';
+import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@blog/config';
+import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
+import { wrapVoiceText } from '@web/utils/wrap-voice-text';
 
 import { resolveVoiceRichFields } from './resolve-voice-rich-fields';
 
-const richTextOf = (text: string): TVoicePortableText => [
-  {
-    _type: 'block',
-    _key: 'a',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'a1', text }],
-  },
-];
+type TResolvedVoiceRichFields = ReturnType<typeof resolveVoiceRichFields>;
+
+const BLOG_LIST_EMPTY = 'No posts yet.';
+const PLAIN_OVERRIDE = 'Nothing here.';
 
 const BASE_MESSAGES = {
-  blogListPage: { empty: 'No posts yet.' },
+  blogListPage: { empty: BLOG_LIST_EMPTY },
   topicPage: { empty: 'Nothing tagged {name} yet.' },
 };
 
 describe(resolveVoiceRichFields, () => {
   it('returns the stored override unflattened for a field that has one', () => {
-    const override = richTextOf('Nothing published yet.');
+    const override = mockVoiceRichText('Nothing published yet.');
 
     const result = resolveVoiceRichFields(
       { blogListEmpty: override },
@@ -28,43 +26,37 @@ describe(resolveVoiceRichFields, () => {
     expect(result.blogListEmpty).toBe(override);
   });
 
-  it('falls back to the catalog string wrapped as a single paragraph when no override exists', () => {
-    const result = resolveVoiceRichFields({}, BASE_MESSAGES);
+  it.each<{
+    case: string;
+    overrides: Record<string, string>;
+    pick: (result: TResolvedVoiceRichFields) => unknown;
+    text: string;
+  }>([
+    {
+      case: 'the catalog string when no override exists',
+      overrides: {},
+      pick: (result) => result.blogListEmpty,
+      text: BLOG_LIST_EMPTY,
+    },
+    {
+      case: 'a plain-string override',
+      overrides: { topicEmpty: PLAIN_OVERRIDE },
+      pick: (result) => result.topicEmpty,
+      text: PLAIN_OVERRIDE,
+    },
+  ])('wraps $case as a single paragraph', ({ overrides, pick, text }) => {
+    const result = resolveVoiceRichFields(overrides, BASE_MESSAGES);
 
-    expect(result.blogListEmpty).toEqual([
-      {
-        _type: 'block',
-        _key: 'catalog-block',
-        style: 'normal',
-        children: [
-          { _type: 'span', _key: 'catalog-span', text: 'No posts yet.' },
-        ],
-      },
-    ]);
+    expect(pick(result)).toEqual(wrapVoiceText(text));
   });
 
-  it('wraps a plain-string override the same way as a missing one', () => {
-    const result = resolveVoiceRichFields(
-      { topicEmpty: 'Nothing here.' },
-      BASE_MESSAGES,
-    );
+  it('resolves every RICH voice field, not only the ones with overrides', () => {
+    const richFieldIds = VOICE_FIELDS.filter(
+      (field) => field.kind === VOICE_FIELD_KIND.RICH,
+    ).map((field) => field.id);
 
-    expect(result.topicEmpty).toEqual([
-      {
-        _type: 'block',
-        _key: 'catalog-block',
-        style: 'normal',
-        children: [
-          { _type: 'span', _key: 'catalog-span', text: 'Nothing here.' },
-        ],
-      },
-    ]);
-  });
-
-  it('resolves every RICH voice field, not only the ones present in overrides', () => {
     const result = resolveVoiceRichFields({}, BASE_MESSAGES);
 
-    expect(Object.keys(result)).toHaveLength(8);
-    expect(result.localeErrorDescription).toBeDefined();
+    expect(Object.keys(result)).toEqual(richFieldIds);
   });
 });

@@ -8,7 +8,12 @@ import {
   screen,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockTenant,
+  MOCK_TENANT_ID,
+  MOCK_VERCEL_A_RECORD,
+  MOCK_CUSTOM_DOMAIN,
+} from '@platform/testing/tenants/fixtures';
 import type { Session } from 'next-auth';
 
 import TenantDomainPage from './page';
@@ -37,11 +42,8 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantDomainPage, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
-
-const VERCEL_A_RECORD = '76.76.21.21';
-const NORTHWIND_DEV = 'northwind.dev';
 
 describe(`<${TenantDomainPage.name}/>`, () => {
   beforeEach(() => {
@@ -56,7 +58,7 @@ describe(`<${TenantDomainPage.name}/>`, () => {
     getProjectDomainMock.mockReset();
     getProjectDomainMock.mockResolvedValue({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: VERCEL_A_RECORD }],
+      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
     });
   });
 
@@ -79,9 +81,9 @@ describe(`<${TenantDomainPage.name}/>`, () => {
   });
 
   it('renders the domain page heading, live status, and DNS records table', async () => {
-    const tenant = makeTenant({
-      id: TENANT_ID,
-      primaryDomain: NORTHWIND_DEV,
+    const tenant = mockTenant({
+      id: MOCK_TENANT_ID,
+      primaryDomain: MOCK_CUSTOM_DOMAIN,
     });
     getTenantByIdMock.mockResolvedValue(tenant);
 
@@ -89,12 +91,14 @@ describe(`<${TenantDomainPage.name}/>`, () => {
       await setup();
     });
 
-    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(NORTHWIND_DEV);
+    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
+      MOCK_CUSTOM_DOMAIN,
+    );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Domain' }),
     ).toBeVisible();
     expect(screen.getByText('Awaiting DNS')).toBeVisible();
     expect(screen.getByRole('table')).toBeVisible();
-    expect(screen.getByText(VERCEL_A_RECORD)).toBeVisible();
+    expect(screen.getByText(MOCK_VERCEL_A_RECORD)).toBeVisible();
   });
 });

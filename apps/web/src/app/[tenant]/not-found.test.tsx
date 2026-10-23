@@ -1,5 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config';
 import { getNotFoundContext } from '@web/server/request-context/request-context';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import TenantNotFound, { generateMetadata } from './not-found';
 
@@ -22,21 +23,19 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
 
-const TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
-
 describe('TenantNotFound ([tenant] not-found route)', () => {
   describe('generateMetadata', () => {
     it('builds the metadata for the remembered tenant in the served language', async () => {
       const metadata = { title: 'Page not found' };
       buildNotFoundMetadataMock.mockResolvedValue(metadata);
       vi.mocked(getNotFoundContext).mockResolvedValue({
-        tenantId: TENANT_ID,
+        tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.DE,
       });
 
       await expect(generateMetadata()).resolves.toBe(metadata);
       expect(buildNotFoundMetadataMock).toHaveBeenCalledWith({
-        tenant: TENANT_ID,
+        tenant: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.DE,
       });
       expect(headersMock).not.toHaveBeenCalled();
@@ -47,16 +46,16 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     const ui = { type: 'div', props: {} };
     standaloneNotFoundPageMock.mockResolvedValue(ui);
     vi.mocked(getNotFoundContext).mockResolvedValue({
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
     });
 
     const document = await TenantNotFound();
 
-    expect(document.props.lang).toBe('nl');
+    expect(document.props.lang).toBe(LOCALE_BCP47_TAGS.NL);
     expect(document.props.children).toBe(ui);
     expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
-      tenant: TENANT_ID,
+      tenant: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
     });
     expect(headersMock).not.toHaveBeenCalled();

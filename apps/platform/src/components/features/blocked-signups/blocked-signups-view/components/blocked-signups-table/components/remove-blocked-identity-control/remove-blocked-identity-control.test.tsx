@@ -1,8 +1,8 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
 import {
-  BLOCKED_DOMAIN,
-  makeBlockedSignupEntry,
+  MOCK_BLOCKED_DOMAIN,
+  mockBlockedSignupEntry,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -18,7 +18,7 @@ vi.mock('@platform/server/signup-block/remove-blocked-identity-action', () => ({
   removeBlockedIdentityAction: removeBlockedIdentityActionMock,
 }));
 
-const ENTRY = makeBlockedSignupEntry();
+const ENTRY = mockBlockedSignupEntry();
 const CONFIRM_BUTTON = { name: 'Remove block' };
 
 const setup = customRender(RemoveBlockedIdentityControl, { entry: ENTRY });
@@ -37,7 +37,7 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
     setup();
 
     const openDialog = screen.getByRole('button', {
-      name: `Remove block ${BLOCKED_DOMAIN}`,
+      name: `Remove block ${MOCK_BLOCKED_DOMAIN}`,
     });
     await user.click(openDialog);
   });

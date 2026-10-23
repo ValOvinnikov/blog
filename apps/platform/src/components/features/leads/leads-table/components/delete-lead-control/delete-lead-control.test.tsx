@@ -7,7 +7,7 @@ import {
   waitFor,
 } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeleteLeadControl } from './delete-lead-control';
@@ -22,7 +22,7 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
 
 const setup = () =>
   renderWithIntl(
-    <LeadsTenantProvider tenantId={TENANT_ID}>
+    <LeadsTenantProvider tenantId={MOCK_TENANT_ID}>
       <DeleteLeadControl leadId="lead-1" leadName="Ada" />
     </LeadsTenantProvider>,
   );
@@ -63,7 +63,7 @@ describe(`<${DeleteLeadControl.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: DELETE_MESSAGE }));
 
     await waitFor(() => expect(refresh).toHaveBeenCalled());
-    expect(deleteLeadActionMock).toHaveBeenCalledWith(TENANT_ID, 'lead-1');
+    expect(deleteLeadActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, 'lead-1');
   });
 
   it('keeps the dialog open with an error when the delete fails', async () => {

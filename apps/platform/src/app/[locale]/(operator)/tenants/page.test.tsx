@@ -7,7 +7,7 @@ import {
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
@@ -43,7 +43,7 @@ describe(TenantsPage, () => {
   it('renders the real tenant rows from listTenants, excluding archived by default', async () => {
     listTenantsMock.mockResolvedValue([
       {
-        id: TENANT_ID,
+        id: MOCK_TENANT_ID,
         name: MOCK_TENANT_NAME,
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'proj-1',

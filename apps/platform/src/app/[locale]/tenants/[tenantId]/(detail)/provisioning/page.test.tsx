@@ -2,8 +2,8 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   INVITED_PENDING_TEXT,
-  makeTenant,
-  TENANT_ID,
+  mockTenant,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import TenantProvisioningPage from './page';
@@ -29,15 +29,15 @@ vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
 const setup = customRenderAsync(TenantProvisioningPage, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
 describe(TenantProvisioningPage, () => {
-  let tenant: ReturnType<typeof makeTenant>;
+  let tenant: ReturnType<typeof mockTenant>;
 
   beforeEach(() => {
     requireTenantByIdMock.mockReset();
-    tenant = makeTenant();
+    tenant = mockTenant();
     requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
@@ -46,7 +46,7 @@ describe(TenantProvisioningPage, () => {
   it('renders the provisioning status view for the resolved tenant, with no deprovisioning control', async () => {
     await setup();
 
-    expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
     const provisioningHeading = screen.getByRole('heading', {
       level: 1,

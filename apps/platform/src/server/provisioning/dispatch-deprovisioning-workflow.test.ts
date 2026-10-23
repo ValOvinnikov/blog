@@ -1,5 +1,5 @@
 import { HTTP_STATUS, HTTP_METHOD } from '@blog/config';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
@@ -7,6 +7,12 @@ import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workfl
 vi.mock('@platform/utils/env/env');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
+
+const DISPATCH_INPUT = {
+  tenantId: MOCK_TENANT_ID,
+  confirm: 'acme',
+  dryRun: true,
+};
 
 describe(dispatchDeprovisioningWorkflow, () => {
   const fetchMock = vi.fn();
@@ -26,38 +32,23 @@ describe(dispatchDeprovisioningWorkflow, () => {
     vi.unstubAllGlobals();
   });
 
-  it('skips the dispatch call and returns false when no token is configured', async () => {
-    envMock.TENANT_PROVISIONING_GITHUB_TOKEN = undefined;
+  it.each([
+    'TENANT_PROVISIONING_GITHUB_TOKEN',
+    'TENANT_PROVISIONING_GITHUB_REPO',
+  ] as const)(
+    'skips the dispatch and returns false without %s',
+    async (key) => {
+      envMock[key] = undefined;
 
-    const result = await dispatchDeprovisioningWorkflow({
-      tenantId: TENANT_ID,
-      confirm: 'acme',
-      dryRun: true,
-    });
+      const result = await dispatchDeprovisioningWorkflow(DISPATCH_INPUT);
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(result).toBe(false);
-  });
-
-  it('skips the dispatch call and returns false when no repo is configured', async () => {
-    envMock.TENANT_PROVISIONING_GITHUB_REPO = undefined;
-
-    const result = await dispatchDeprovisioningWorkflow({
-      tenantId: TENANT_ID,
-      confirm: 'acme',
-      dryRun: true,
-    });
-
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(result).toBe(false);
-  });
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(result).toBe(false);
+    },
+  );
 
   it('POSTs a workflow_dispatch with tenantId, confirm and dryRun, and returns true', async () => {
-    const result = await dispatchDeprovisioningWorkflow({
-      tenantId: TENANT_ID,
-      confirm: 'acme',
-      dryRun: true,
-    });
+    const result = await dispatchDeprovisioningWorkflow(DISPATCH_INPUT);
 
     expect(fetchMock).toHaveBeenCalledWith(
       'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/deprovision-tenant.yml/dispatches',
@@ -68,38 +59,16 @@ describe(dispatchDeprovisioningWorkflow, () => {
         }),
         body: JSON.stringify({
           ref: 'main',
-          inputs: { tenantId: TENANT_ID, confirm: 'acme', dryRun: 'true' },
+          inputs: { tenantId: MOCK_TENANT_ID, confirm: 'acme', dryRun: 'true' },
         }),
       }),
     );
     expect(result).toBe(true);
   });
 
-  it('omits environment from the dispatch body when no dataset is configured', async () => {
-    await dispatchDeprovisioningWorkflow({
-      tenantId: TENANT_ID,
-      confirm: 'acme',
-      dryRun: true,
-    });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        body: JSON.stringify({
-          ref: 'main',
-          inputs: { tenantId: TENANT_ID, confirm: 'acme', dryRun: 'true' },
-        }),
-      }),
-    );
-  });
-
   it('sends environment from TENANT_PROVISIONING_DATASET when configured', async () => {
     envMock.TENANT_PROVISIONING_DATASET = 'development';
-    await dispatchDeprovisioningWorkflow({
-      tenantId: TENANT_ID,
-      confirm: 'acme',
-      dryRun: true,
-    });
+    await dispatchDeprovisioningWorkflow(DISPATCH_INPUT);
 
     expect(fetchMock).toHaveBeenCalledWith(
       expect.any(String),
@@ -107,7 +76,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
         body: JSON.stringify({
           ref: 'main',
           inputs: {
-            tenantId: TENANT_ID,
+            tenantId: MOCK_TENANT_ID,
             confirm: 'acme',
             dryRun: 'true',
             environment: 'development',
@@ -117,43 +86,30 @@ describe(dispatchDeprovisioningWorkflow, () => {
     );
   });
 
-  it('returns false without throwing when the dispatch responds non-2xx', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(null, { status: HTTP_STATUS.NOT_FOUND }),
+  it.each([
+    [
+      'the dispatch responds non-2xx',
+      () =>
+        fetchMock.mockResolvedValue(
+          new Response(null, { status: HTTP_STATUS.NOT_FOUND }),
+        ),
+    ],
+    [
+      'the request itself fails',
+      () => fetchMock.mockRejectedValue(new Error('network down')),
+    ],
+    [
+      'the request times out',
+      () =>
+        fetchMock.mockRejectedValue(
+          new DOMException('The operation timed out.', 'TimeoutError'),
+        ),
+    ],
+  ])('returns false without throwing when %s', async (_case, arrange) => {
+    arrange();
+
+    await expect(dispatchDeprovisioningWorkflow(DISPATCH_INPUT)).resolves.toBe(
+      false,
     );
-
-    await expect(
-      dispatchDeprovisioningWorkflow({
-        tenantId: TENANT_ID,
-        confirm: 'acme',
-        dryRun: true,
-      }),
-    ).resolves.toBe(false);
-  });
-
-  it('never throws, and returns false, when the request itself fails', async () => {
-    fetchMock.mockRejectedValue(new Error('network down'));
-
-    await expect(
-      dispatchDeprovisioningWorkflow({
-        tenantId: TENANT_ID,
-        confirm: 'acme',
-        dryRun: true,
-      }),
-    ).resolves.toBe(false);
-  });
-
-  it('never throws, and returns false, when the request times out', async () => {
-    fetchMock.mockRejectedValue(
-      new DOMException('The operation timed out.', 'TimeoutError'),
-    );
-
-    await expect(
-      dispatchDeprovisioningWorkflow({
-        tenantId: TENANT_ID,
-        confirm: 'acme',
-        dryRun: true,
-      }),
-    ).resolves.toBe(false);
   });
 });

@@ -441,7 +441,7 @@ tenant)`) is fine: that call is the contract with the outside.
     `vi.importActual(…)` and replaces only `runQuery`; `mockRun`
     (`@blog/service/testing/mock-run-query`) stays the typed handle.
   - **Never restate a `__mocks__` default in `beforeEach`** —
-    `mockResolvedValue(DEFAULT_REQUEST_CONTEXT)`, the default auth session.
+    `mockResolvedValue(MOCK_REQUEST_CONTEXT)`, the default auth session.
     Override only what the case changes.
   - **Override with the `Once` form, or call `vi.mocked(fn).mockReset()` in
     `beforeEach`** — it restores the `vi.fn(impl)` default; never re-set the

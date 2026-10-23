@@ -11,9 +11,9 @@ import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-sa
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
-  makeReadyTenant,
+  mockReadyTenant,
   MOCK_ARCHIVED_AT,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
@@ -39,7 +39,7 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
   getEnabledCapabilities: getEnabledCapabilitiesMock,
 }));
 
-const tenant = makeReadyTenant();
+const tenant = mockReadyTenant();
 
 const setup = customRenderAsync(LookPageContent, { tenant });
 
@@ -57,7 +57,7 @@ describe(`<${LookPageContent.name}/>`, () => {
   it('renders Console defaults when the tenant has no saved site_config row yet', async () => {
     await setup();
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     const heading = screen.getByRole('heading', { name: 'Look' });
     const consoleRadio = screen.getByRole('radio', { name: 'Console' });
 
@@ -99,7 +99,7 @@ describe(`<${LookPageContent.name}/>`, () => {
   it("renders the tenant's saved site_config row when one exists", async () => {
     getSiteConfigMock.mockResolvedValue({
       id: 'config-1',
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       preset: PRESET_ID.EDITORIAL,
       accentHue: 28,
       logoHue: undefined,

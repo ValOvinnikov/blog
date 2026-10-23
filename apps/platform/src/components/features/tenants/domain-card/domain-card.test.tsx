@@ -1,18 +1,18 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
-  makeTenant,
+  mockTenant,
   MOCK_TENANT_DOMAIN,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { DomainCard } from './domain-card';
 
-const TENANT_DNS_HREF = `/tenants/${TENANT_ID}/domain`;
+const TENANT_DNS_HREF = `/tenants/${MOCK_TENANT_ID}/domain`;
 const OWNER_DNS_HREF = '/dashboard/domain';
 
 const setup = customRender(DomainCard, {
-  tenant: makeTenant(),
+  tenant: mockTenant(),
   domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.VERIFIED,
   dnsHref: TENANT_DNS_HREF,
 });

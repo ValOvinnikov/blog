@@ -2,12 +2,12 @@ import { TENANT_PROVISIONING_STATUS } from '@blog/db';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  makeReadyTenant,
+  mockReadyTenant,
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantsTable } from './tenants-table';
@@ -24,8 +24,8 @@ describe(`<${TenantsTable.name}/>`, () => {
     render(
       <TenantsTable
         tenants={[
-          makeReadyTenant(),
-          makeReadyTenant({
+          mockReadyTenant(),
+          mockReadyTenant({
             id: MOCK_OTHER_TENANT_ID,
             name: HARBOR_CO,
             primaryDomain: HARBOR_DOMAIN,
@@ -57,8 +57,8 @@ describe(`<${TenantsTable.name}/>`, () => {
     render(
       <TenantsTable
         tenants={[
-          makeReadyTenant(),
-          makeReadyTenant({
+          mockReadyTenant(),
+          mockReadyTenant({
             id: MOCK_OTHER_TENANT_ID,
             name: HARBOR_CO,
             primaryDomain: HARBOR_DOMAIN,
@@ -70,7 +70,7 @@ describe(`<${TenantsTable.name}/>`, () => {
     const acmeLink = screen.getByRole('link', { name: MANAGE_ACME });
     const harborLink = screen.getByRole('link', { name: MANAGE_HARBOR_CO });
 
-    expect(acmeLink).toHaveAttribute('href', `/tenants/${TENANT_ID}`);
+    expect(acmeLink).toHaveAttribute('href', `/tenants/${MOCK_TENANT_ID}`);
     expect(harborLink).toHaveAttribute(
       'href',
       `/tenants/${MOCK_OTHER_TENANT_ID}`,
@@ -81,10 +81,10 @@ describe(`<${TenantsTable.name}/>`, () => {
     render(
       <TenantsTable
         tenants={[
-          makeReadyTenant({
+          mockReadyTenant({
             provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
           }),
-          makeReadyTenant({
+          mockReadyTenant({
             id: MOCK_OTHER_TENANT_ID,
             name: HARBOR_CO,
             primaryDomain: HARBOR_DOMAIN,
@@ -99,7 +99,7 @@ describe(`<${TenantsTable.name}/>`, () => {
 
     expect(acmeLink).toHaveAttribute(
       'href',
-      `/tenants/${TENANT_ID}/provisioning`,
+      `/tenants/${MOCK_TENANT_ID}/provisioning`,
     );
     expect(harborLink).toHaveAttribute(
       'href',
@@ -109,7 +109,7 @@ describe(`<${TenantsTable.name}/>`, () => {
 
   describe('with one ready tenant', () => {
     beforeEach(() => {
-      render(<TenantsTable tenants={[makeReadyTenant()]} />);
+      render(<TenantsTable tenants={[mockReadyTenant()]} />);
     });
 
     it('names the scrollable table region and the actions column for screen readers', () => {

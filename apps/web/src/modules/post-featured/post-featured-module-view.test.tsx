@@ -8,7 +8,7 @@ import {
   MOCK_THIRD_POST_TITLE,
   mockPostListItem,
 } from '@web/testing/modules/post-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
@@ -39,7 +39,7 @@ const thirdPost = mockPostListItem({
 
 const setup = customRender(PostFeaturedModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: MOCK_POST_FEATURED_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_POST_FEATURED_HEADING }),
   items: [leadPost],
   layout: undefined,
   contentAlignment: undefined,

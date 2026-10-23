@@ -3,11 +3,11 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { SIGNUP_BLOCK_FIELD_ERROR } from '@platform/constants/signup-block';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
-  BLOCK_REASON,
-  BLOCKED_DOMAIN,
-  makeBlockedIdentity,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_DOMAIN,
+  mockBlockedIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -27,8 +27,11 @@ vi.mock('@platform/server/signup-block/add-signup-block', () => ({
   addSignupBlock: addSignupBlockMock,
 }));
 
-const ADMIN = makeAdmin();
-const INPUT = { domain: ` ${BLOCKED_DOMAIN} `, reason: ` ${BLOCK_REASON} ` };
+const ADMIN = mockAdmin();
+const INPUT = {
+  domain: ` ${MOCK_BLOCKED_DOMAIN} `,
+  reason: ` ${MOCK_BLOCK_REASON} `,
+};
 
 describe(addBlockedDomainAction, () => {
   beforeEach(() => {
@@ -36,7 +39,7 @@ describe(addBlockedDomainAction, () => {
     addSignupBlockMock
       .mockReset()
       .mockResolvedValue(
-        okResult({ entry: makeBlockedIdentity(), created: true }),
+        okResult({ entry: mockBlockedIdentity(), created: true }),
       );
     vi.mocked(logger.error).mockReset();
   });
@@ -58,8 +61,8 @@ describe(addBlockedDomainAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(addSignupBlockMock).toHaveBeenCalledWith({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: BLOCKED_DOMAIN,
-      reason: BLOCK_REASON,
+      identity: MOCK_BLOCKED_DOMAIN,
+      reason: MOCK_BLOCK_REASON,
       admin: ADMIN,
     });
   });

@@ -3,8 +3,8 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostRelatedModuleData } from '@web/testing/modules/post-related/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { PostRelatedModule } from './post-related-module';
@@ -48,7 +48,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     expect(getPostRelatedMock).toHaveBeenCalledWith(
       POST_RELATED_ID,
       ANCHOR_POST_ID,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
@@ -82,7 +82,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
         mockPostRelatedModuleData({
-          posts: [makePostCard({ title: FIRST_POST_TITLE })],
+          posts: [mockPostCard({ title: FIRST_POST_TITLE })],
         }),
       ),
     );
@@ -100,7 +100,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
         mockPostRelatedModuleData({
-          posts: [makePostCard({ heroImage: sanityImage })],
+          posts: [mockPostCard({ heroImage: sanityImage })],
           showImages: true,
         }),
       ),
@@ -116,7 +116,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
         mockPostRelatedModuleData({
-          posts: [makePostCard({ heroImage: mockSanityImage() })],
+          posts: [mockPostCard({ heroImage: mockSanityImage() })],
         }),
       ),
     );
@@ -132,7 +132,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       okResult(
         mockPostRelatedModuleData({
           posts: [
-            makePostCard({ title: FIRST_POST_TITLE, excerpt: undefined }),
+            mockPostCard({ title: FIRST_POST_TITLE, excerpt: undefined }),
           ],
         }),
       ),

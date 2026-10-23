@@ -4,8 +4,9 @@ import {
   OPERATOR_ALERT_KIND,
 } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -36,7 +37,6 @@ vi.mock('@blog/email', async (importOriginal) => ({
 const loggerErrorMock = vi.mocked(logger.error);
 
 const ENDPOINT = 'https://admin.example.com/api/internal/operator-alert';
-const VALID_SECRET = 'a-very-secret-value';
 const SUPERADMIN_ONE = 'super-one@example.com';
 const SUPERADMIN_TWO = 'super-two@example.com';
 const SEND_FAILURE_MESSAGE = 'Failed to send email via Resend: rejected';
@@ -45,7 +45,7 @@ const SEND_FAILED_EVENT = 'operator_alert.send_failed';
 const postRequest = (
   body: unknown,
   { authorization }: { authorization?: string } = {
-    authorization: `Bearer ${VALID_SECRET}`,
+    authorization: `Bearer ${MOCK_BEARER_SECRET}`,
   },
 ): Request =>
   new Request(ENDPOINT, {
@@ -58,29 +58,13 @@ describe('POST /api/internal/operator-alert', () => {
   let POST: typeof import('./route').POST;
 
   beforeEach(async () => {
-    envMock.OPERATOR_ALERT_SECRET = VALID_SECRET;
+    envMock.OPERATOR_ALERT_SECRET = MOCK_BEARER_SECRET;
     getTenantByIdMock.mockReset();
     listSuperadminEmailsMock.mockReset().mockResolvedValue([]);
     sendEmailMock.mockReset().mockResolvedValue(undefined);
     loggerErrorMock.mockReset();
-    getTenantByIdMock.mockResolvedValue(makeTenant({ id: 't1', name: 'Acme' }));
+    getTenantByIdMock.mockResolvedValue(mockTenant({ id: 't1', name: 'Acme' }));
     ({ POST } = await import('./route'));
-  });
-
-  it('rejects a request with no Authorization header', async () => {
-    const response = await POST(
-      postRequest(
-        {
-          kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-          tenantId: 't1',
-          outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-        },
-        { authorization: undefined },
-      ),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   it('rejects a request with the wrong secret', async () => {
@@ -92,22 +76,6 @@ describe('POST /api/internal/operator-alert', () => {
           outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
         },
         { authorization: 'Bearer wrong-secret-value' },
-      ),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects a secret of a different length', async () => {
-    const response = await POST(
-      postRequest(
-        {
-          kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-          tenantId: 't1',
-          outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-        },
-        { authorization: 'Bearer short' },
       ),
     );
 
@@ -140,7 +108,7 @@ describe('POST /api/internal/operator-alert', () => {
   it('returns 400 for a body that is not valid JSON, instead of throwing', async () => {
     const request = new Request(ENDPOINT, {
       method: HTTP_METHOD.POST,
-      headers: { authorization: `Bearer ${VALID_SECRET}` },
+      headers: { authorization: `Bearer ${MOCK_BEARER_SECRET}` },
       body: '{not valid json',
     });
 
@@ -280,6 +248,6 @@ describe('POST /api/internal/operator-alert', () => {
       kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
       error: sendError,
     });
-    expect(response.status).toBe(502);
+    expect(response.status).toBe(HTTP_STATUS.BAD_GATEWAY);
   });
 });

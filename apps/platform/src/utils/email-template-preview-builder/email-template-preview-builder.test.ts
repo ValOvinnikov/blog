@@ -4,7 +4,7 @@ import {
   buildMagicLinkEmail,
   buildNewsletterConfirmationEmail,
 } from '@blog/email/templates/tenant';
-import { TENANT_EMAIL_BRAND } from '@platform/testing/tenant-email-brand';
+import { MOCK_TENANT_EMAIL_BRAND } from '@platform/testing/tenant-email-brand';
 
 import {
   buildEmailTemplatePreviewHtml,
@@ -22,7 +22,7 @@ const INPUT: TEmailTemplatePreviewInput = {
       markDefs: [],
     },
   ],
-  brand: TENANT_EMAIL_BRAND,
+  brand: MOCK_TENANT_EMAIL_BRAND,
   brandName: 'Acme Co',
   logoImageUrl: 'https://cdn.example.com/logo.png',
 };

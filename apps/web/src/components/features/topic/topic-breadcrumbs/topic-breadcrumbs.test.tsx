@@ -9,11 +9,12 @@ import {
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { makeTopic } from '@web/testing/shared/topic/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { mockTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
-const SITE_NAME = 'Northwind Journal';
+const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
 const TOPIC_HREF = '/topics/news';
 
 vi.mock('@web/server/request-context/request-context');
@@ -30,7 +31,7 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-const topic = makeTopic({ title: 'News', slug: 'news' });
+const topic = mockTopic({ title: 'News', slug: 'news' });
 const successData = { topic, modules: [], seo: mockSeo() };
 
 const setup = customRenderAsync(TopicBreadcrumbs, {

@@ -1,5 +1,6 @@
 import { okResult } from '@blog/utils';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostPage } from './get-post-page';
 
@@ -25,7 +26,7 @@ describe(getPostPage, () => {
 
     expect(getPostMock).toHaveBeenCalledWith(
       POST_SLUG,
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
@@ -35,41 +36,25 @@ describe(getPostPage, () => {
 
     await expect(getPostPage(POST_SLUG)).resolves.toBe(result);
   });
-});
 
-describe('getPostPage memoization', () => {
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
-  });
-
-  it('dedupes the post query across one render pass with the same arguments', async () => {
-    getPostMock.mockReset();
-    getPostMock.mockResolvedValue(okResult());
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: <T extends (...args: never[]) => unknown>(fn: T) => {
-          const cacheByArgs = new Map<string, unknown>();
-          return ((...args: never[]) => {
-            const key = JSON.stringify(args);
-            if (!cacheByArgs.has(key)) {
-              cacheByArgs.set(key, fn(...args));
-            }
-            return cacheByArgs.get(key);
-          }) as T;
-        },
-      };
+  describe('memoization', () => {
+    afterEach(() => {
+      vi.doUnmock('react');
+      vi.resetModules();
     });
-    vi.resetModules();
 
-    const { getPostPage: freshGetPostPage } = await import('./get-post-page');
+    it('dedupes the post query across one render pass with the same arguments', async () => {
+      getPostMock.mockResolvedValue(okResult());
 
-    await freshGetPostPage(POST_SLUG);
-    await freshGetPostPage(POST_SLUG);
+      vi.doMock('react', withMemoizingReactCache);
+      vi.resetModules();
 
-    expect(getPostMock).toHaveBeenCalledTimes(1);
+      const { getPostPage: freshGetPostPage } = await import('./get-post-page');
+
+      await freshGetPostPage(POST_SLUG);
+      await freshGetPostPage(POST_SLUG);
+
+      expect(getPostMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

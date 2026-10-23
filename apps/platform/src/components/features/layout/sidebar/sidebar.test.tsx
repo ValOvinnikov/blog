@@ -6,7 +6,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
@@ -98,7 +98,7 @@ describe(`<${Sidebar.name}/>`, () => {
               {
                 label: 'Look',
                 icon: ICONS.PALETTE,
-                href: `/tenants/${TENANT_ID}/look`,
+                href: `/tenants/${MOCK_TENANT_ID}/look`,
                 badge: { label: THIS_MILESTONE, tone: 'neutral' },
               },
             ],
@@ -112,7 +112,7 @@ describe(`<${Sidebar.name}/>`, () => {
   });
 
   it('marks the item matching the current pathname active, and no other', () => {
-    setPathname(`/tenants/${TENANT_ID}/look`);
+    setPathname(`/tenants/${MOCK_TENANT_ID}/look`);
 
     render(
       <Sidebar
@@ -123,12 +123,12 @@ describe(`<${Sidebar.name}/>`, () => {
               {
                 label: 'Look',
                 icon: ICONS.PALETTE,
-                href: `/tenants/${TENANT_ID}/look`,
+                href: `/tenants/${MOCK_TENANT_ID}/look`,
               },
               {
                 label: 'Voice',
                 icon: ICONS.QUOTE,
-                href: `/tenants/${TENANT_ID}/voice`,
+                href: `/tenants/${MOCK_TENANT_ID}/voice`,
               },
             ],
           },
@@ -149,17 +149,17 @@ describe(`<${Sidebar.name}/>`, () => {
     {
       description:
         'marks Studio active when its own route is open, same as any other nav item',
-      pathname: `/tenants/${TENANT_ID}/studio`,
+      pathname: `/tenants/${MOCK_TENANT_ID}/studio`,
       items: [
         {
           label: 'Studio',
           icon: ICONS.STUDIO,
-          href: `/tenants/${TENANT_ID}/studio`,
+          href: `/tenants/${MOCK_TENANT_ID}/studio`,
         },
         {
           label: 'Look',
           icon: ICONS.PALETTE,
-          href: `/tenants/${TENANT_ID}/look`,
+          href: `/tenants/${MOCK_TENANT_ID}/look`,
         },
       ],
       activeLabel: 'Studio',
@@ -168,17 +168,17 @@ describe(`<${Sidebar.name}/>`, () => {
     {
       description:
         'switches which item is active when the route changes — the case a shared href could not express',
-      pathname: `/tenants/${TENANT_ID}/voice`,
+      pathname: `/tenants/${MOCK_TENANT_ID}/voice`,
       items: [
         {
           label: 'Look',
           icon: ICONS.PALETTE,
-          href: `/tenants/${TENANT_ID}/look`,
+          href: `/tenants/${MOCK_TENANT_ID}/look`,
         },
         {
           label: 'Voice',
           icon: ICONS.QUOTE,
-          href: `/tenants/${TENANT_ID}/voice`,
+          href: `/tenants/${MOCK_TENANT_ID}/voice`,
         },
       ],
       activeLabel: 'Voice',
@@ -199,7 +199,7 @@ describe(`<${Sidebar.name}/>`, () => {
   });
 
   it('renders an unbuilt destination as an inert, never-active row with its badge text', () => {
-    setPathname(`/tenants/${TENANT_ID}/domain`);
+    setPathname(`/tenants/${MOCK_TENANT_ID}/domain`);
 
     render(
       <Sidebar

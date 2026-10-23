@@ -7,23 +7,25 @@ import {
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  portableTextBlock,
-  portableTextSpan,
+  mockPortableTextBlock,
+  mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const bioDemo = [
-  portableTextBlock(
+  mockPortableTextBlock(
     'Jane has spent the last decade designing developer tools, with a focus on making complex systems feel approachable.',
   ),
-  portableTextBlock(
+  mockPortableTextBlock(
     [
-      portableTextSpan('Outside of work, she writes about design systems on '),
-      portableTextSpan('her blog', ['link-1']),
-      portableTextSpan('.'),
+      mockPortableTextSpan(
+        'Outside of work, she writes about design systems on ',
+      ),
+      mockPortableTextSpan('her blog', ['link-1']),
+      mockPortableTextSpan('.'),
     ],
     {
       markDefs: [
@@ -79,7 +81,7 @@ const meta = {
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     variant: HERO_VARIANT.STACKED,
     eyebrow: 'Product designer',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: "Hi, I'm Jane",
       supportingText:
         'I design and build products for teams who care about craft.',

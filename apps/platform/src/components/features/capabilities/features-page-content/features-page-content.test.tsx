@@ -5,9 +5,9 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
-  makeReadyTenant,
+  mockReadyTenant,
   MOCK_ARCHIVED_AT,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { FeaturesPageContent } from './features-page-content';
@@ -28,7 +28,7 @@ vi.mock('@blog/db', async () => ({
 vi.mock('@platform/server/auth/auth');
 
 const buildTenant = (plan: TTenant['plan']): TTenant =>
-  makeReadyTenant({ plan });
+  mockReadyTenant({ plan });
 
 const setup = customRenderAsync(FeaturesPageContent, {
   tenant: buildTenant(TENANT_PLAN.FREE),
@@ -37,6 +37,8 @@ const setup = customRenderAsync(FeaturesPageContent, {
 const DATA_CHECKED = 'data-checked';
 const DATA_UNCHECKED = 'data-unchecked';
 const DATA_DISABLED = 'data-disabled';
+const BOOKMARKS_LABEL = 'Bookmarks';
+const CONSENT_BANNER_LABEL = 'Cookie consent banner';
 
 describe(`<${FeaturesPageContent.name}/>`, () => {
   beforeEach(() => {
@@ -53,8 +55,12 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     });
 
     it('renders CONSOLE featureDefaults with no settings_features or site_config row', () => {
-      expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
-      const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+      expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+      const bookmarksSwitch = screen.getByRole('switch', {
+        name: BOOKMARKS_LABEL,
+      });
       const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
 
       expect(bookmarksSwitch).toHaveAttribute(DATA_CHECKED, '');
@@ -64,7 +70,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     it('enables every toggle for a GROWTH-plan tenant', () => {
       const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
       const consentSwitch = screen.getByRole('switch', {
-        name: 'Cookie consent banner',
+        name: CONSENT_BANNER_LABEL,
       });
 
       expect(analyticsSwitch).not.toHaveAttribute(DATA_DISABLED);
@@ -87,7 +93,9 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
 
     await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
-    const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+    const bookmarksSwitch = screen.getByRole('switch', {
+      name: BOOKMARKS_LABEL,
+    });
     const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
 
     expect(bookmarksSwitch).toHaveAttribute(DATA_UNCHECKED, '');
@@ -102,7 +110,9 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
 
     await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
 
-    const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+    const bookmarksSwitch = screen.getByRole('switch', {
+      name: BOOKMARKS_LABEL,
+    });
 
     expect(bookmarksSwitch).toHaveAttribute(DATA_CHECKED, '');
   });
@@ -111,8 +121,16 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     await setup({ tenant: buildTenant(TENANT_PLAN.FREE) });
 
     const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
+    const bookmarksSwitch = screen.getByRole('switch', {
+      name: BOOKMARKS_LABEL,
+    });
+    const consentSwitch = screen.getByRole('switch', {
+      name: CONSENT_BANNER_LABEL,
+    });
 
     expect(analyticsSwitch).toHaveAttribute(DATA_DISABLED, '');
+    expect(bookmarksSwitch).toHaveAttribute(DATA_DISABLED, '');
+    expect(consentSwitch).not.toHaveAttribute(DATA_DISABLED);
   });
 
   it('clamps a stale out-of-plan value to unchecked+disabled after a plan downgrade', async () => {

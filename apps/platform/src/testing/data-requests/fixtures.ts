@@ -7,10 +7,10 @@ import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import type { TPersonalDataExport } from '@platform/server/data-requests/export-personal-data-action';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
 
-export const DATA_REQUEST_EMAIL = faker.internet.email().toLowerCase();
-export const DATA_REQUEST_EMAIL_INDEX = faker.string.alphanumeric(43);
-export const DATA_REQUEST_SITE_NAME = faker.company.name();
-export const NOT_AN_EMAIL = faker.lorem.slug();
+export const MOCK_DATA_REQUEST_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_DATA_REQUEST_EMAIL_INDEX = faker.string.alphanumeric(43);
+export const MOCK_DATA_REQUEST_SITE_NAME = faker.company.name();
+export const MOCK_NOT_AN_EMAIL = faker.lorem.slug();
 
 const TENANT_ID = faker.string.uuid();
 const SUBSCRIBER_ID = faker.string.uuid();
@@ -25,16 +25,16 @@ const BLOCK_REASON = faker.lorem.sentence();
 const AUDIT_EVENT_ID = faker.string.uuid();
 const RECORDED_AT = faker.date.past();
 
-export const makePersonalDataMatches = (
+export const mockPersonalDataMatches = (
   overrides: Partial<TPersonalDataMatches> = {},
 ): TPersonalDataMatches => ({
-  emailIndex: DATA_REQUEST_EMAIL_INDEX,
+  emailIndex: MOCK_DATA_REQUEST_EMAIL_INDEX,
   subscribers: [
     {
       tenantId: TENANT_ID,
-      tenantName: DATA_REQUEST_SITE_NAME,
+      tenantName: MOCK_DATA_REQUEST_SITE_NAME,
       id: SUBSCRIBER_ID,
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
       status: SUBSCRIBER_STATUS_VALUE,
       subscribedAt: RECORDED_AT,
       confirmedAt: RECORDED_AT,
@@ -43,10 +43,10 @@ export const makePersonalDataMatches = (
   leads: [
     {
       tenantId: TENANT_ID,
-      tenantName: DATA_REQUEST_SITE_NAME,
+      tenantName: MOCK_DATA_REQUEST_SITE_NAME,
       id: LEAD_ID,
       name: LEAD_NAME,
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
       message: LEAD_MESSAGE,
       sourcePath: LEAD_SOURCE_PATH,
       createdAt: RECORDED_AT,
@@ -55,9 +55,9 @@ export const makePersonalDataMatches = (
   membershipInvites: [
     {
       tenantId: TENANT_ID,
-      tenantName: DATA_REQUEST_SITE_NAME,
+      tenantName: MOCK_DATA_REQUEST_SITE_NAME,
       id: INVITE_ID,
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
       role: MEMBERSHIP_ROLE.EDITOR,
       createdAt: RECORDED_AT,
       consumedAt: undefined,
@@ -73,7 +73,7 @@ export const makePersonalDataMatches = (
   auditEvents: [
     {
       id: AUDIT_EVENT_ID,
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: TENANT_ID,
@@ -83,14 +83,14 @@ export const makePersonalDataMatches = (
   ...overrides,
 });
 
-export const makePersonalDataExport = (): TPersonalDataExport => {
+export const mockPersonalDataExport = (): TPersonalDataExport => {
   const {
     subscribers,
     leads,
     membershipInvites,
     blockedSignupIdentities,
     auditEvents,
-  } = makePersonalDataMatches();
+  } = mockPersonalDataMatches();
 
   return {
     subscribers,
@@ -101,7 +101,7 @@ export const makePersonalDataExport = (): TPersonalDataExport => {
   };
 };
 
-export const ONE_OF_EACH_COUNT = {
+export const MOCK_ONE_OF_EACH_COUNT = {
   subscribers: 1,
   leads: 1,
   membershipInvites: 1,
@@ -109,13 +109,13 @@ export const ONE_OF_EACH_COUNT = {
   auditEvents: 1,
 };
 
-export const makeDataRequestMatch = (
+export const mockDataRequestMatch = (
   overrides: Partial<TDataRequestMatch> = {},
 ): TDataRequestMatch => ({
   key: `${DATA_REQUEST_MATCH_KIND.SUBSCRIBER}-${SUBSCRIBER_ID}`,
   kind: DATA_REQUEST_MATCH_KIND.SUBSCRIBER,
-  siteName: DATA_REQUEST_SITE_NAME,
-  email: DATA_REQUEST_EMAIL,
+  siteName: MOCK_DATA_REQUEST_SITE_NAME,
+  email: MOCK_DATA_REQUEST_EMAIL,
   recordedAt: RECORDED_AT,
   ...overrides,
 });

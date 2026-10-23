@@ -1,7 +1,7 @@
 import { customRender, screen } from '@platform/testing/custom-render';
 import { selectFile } from '@platform/testing/select-file';
 import {
-  BLOB_STAGED_LOGO,
+  MOCK_STAGED_LOGO_BLOB_URL,
   MOCK_LOGO_URL,
 } from '@platform/testing/site-config/fixtures';
 import userEvent from '@testing-library/user-event';
@@ -23,7 +23,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
   const onStage = vi.fn();
 
   beforeEach(() => {
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
 
   it('names a staged file and marks it as saving with changes', () => {
     const file = new File(['bytes'], NEW_LOGO_PNG, { type: 'image/png' });
-    setup({ image: { url: BLOB_STAGED_LOGO, file } });
+    setup({ image: { url: MOCK_STAGED_LOGO_BLOB_URL, file } });
 
     const fileName = screen.getByText(NEW_LOGO_PNG);
     const savesWithChanges = screen.getByText(SAVES_WITH_CHANGES);
@@ -77,7 +77,10 @@ describe(`<${BrandAssetField.name}/>`, () => {
 
     await selectFile(file);
 
-    expect(onStage).toHaveBeenCalledWith({ url: BLOB_STAGED_LOGO, file });
+    expect(onStage).toHaveBeenCalledWith({
+      url: MOCK_STAGED_LOGO_BLOB_URL,
+      file,
+    });
   });
 
   it('rejects an unsupported type without staging it', async () => {

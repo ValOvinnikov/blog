@@ -9,6 +9,7 @@ import {
   EQUALITY_OPERATORS,
   PROCESS_NAME,
   PROTOCOL_ATTRIBUTE_KEYS,
+  PROTOCOL_ATTRIBUTE_VALUES,
   ROLE_QUERY_CALLEES,
   SANITY_TYPE_KEY,
   STUB_ENV_CALLEE,
@@ -165,10 +166,15 @@ const isStubEnvArgument = ({ parent }) =>
   ts.isPropertyAccessExpression(parent.expression) &&
   parent.expression.name.text === STUB_ENV_CALLEE;
 
-const isProtocolAttributeValue = ({ parent }) =>
-  ts.isPropertyAssignment(parent) &&
-  (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
-  PROTOCOL_ATTRIBUTE_KEYS.has(parent.name.text);
+const isProtocolAttributeValue = (node) => {
+  const { parent } = node;
+  return (
+    ts.isPropertyAssignment(parent) &&
+    (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
+    (PROTOCOL_ATTRIBUTE_KEYS.has(parent.name.text) ||
+      PROTOCOL_ATTRIBUTE_VALUES.get(parent.name.text)?.has(node.text) === true)
+  );
+};
 
 // Sanity `_type` names and literal types are checked against the generated types, so they cannot drift.
 const isSanityTypeValue = ({ parent }) =>

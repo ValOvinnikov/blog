@@ -5,7 +5,7 @@ import {
   MOCK_CTA_ACTIONS,
 } from '@web/testing/modules/cta/fixtures';
 import { MOCK_STAT_ITEMS } from '@web/testing/modules/stats/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { StatsModuleView } from './stats-module-view';
 
@@ -17,7 +17,7 @@ const dataTestId = 'stats-module-stats-1';
 
 const setup = customRender(StatsModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'By the numbers' }),
+  headingBlock: mockHeadingBlock({ heading: 'By the numbers' }),
   stats: MOCK_STAT_ITEMS,
   footnote: undefined,
   ctaButtons: [],

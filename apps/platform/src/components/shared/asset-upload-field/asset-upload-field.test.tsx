@@ -3,7 +3,7 @@ import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
 import {
-  BLOB_STAGED_LOGO,
+  MOCK_STAGED_LOGO_BLOB_URL,
   CURRENT_LOGO,
   MOCK_LOGO_URL,
   REPLACE_LOGO,
@@ -48,7 +48,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
 
   afterEach(() => {
@@ -102,7 +102,10 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
     await selectFile(file);
 
-    expect(onStage).toHaveBeenCalledWith({ url: BLOB_STAGED_LOGO, file });
+    expect(onStage).toHaveBeenCalledWith({
+      url: MOCK_STAGED_LOGO_BLOB_URL,
+      file,
+    });
   });
 
   it('stages a removal through onStage when Remove is clicked', async () => {
