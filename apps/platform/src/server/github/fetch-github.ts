@@ -82,3 +82,11 @@ export const fetchGitHubJson = async <T>(
     return errorResult(GITHUB_FAILURE.GITHUB_ERROR);
   }
 };
+
+export const recoverNotFound = <T>(
+  result: TGitHubResult<T>,
+  fallback: T,
+): TGitHubResult<T> =>
+  !result.ok && result.error === GITHUB_FAILURE.NOT_FOUND
+    ? okResult(fallback)
+    : result;

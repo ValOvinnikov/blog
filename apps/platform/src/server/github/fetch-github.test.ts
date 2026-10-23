@@ -1,4 +1,5 @@
 import { HTTP_STATUS } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
   GITHUB_FAILURE,
@@ -11,7 +12,7 @@ import {
 } from '@platform/testing/github/github-fetch';
 import { logger } from '@platform/utils/logger/logger';
 
-import { fetchGitHub, fetchGitHubJson } from './fetch-github';
+import { fetchGitHub, fetchGitHubJson, recoverNotFound } from './fetch-github';
 
 vi.mock('@platform/utils/env/env');
 
@@ -139,5 +140,21 @@ describe(fetchGitHubJson, () => {
         throw new Error(faker.lorem.sentence());
       }),
     ).toEqual({ ok: false, error: GITHUB_FAILURE.GITHUB_ERROR });
+  });
+});
+
+describe(recoverNotFound, () => {
+  const fallback = faker.lorem.word();
+
+  it('turns a missing resource into the fallback', () => {
+    expect(
+      recoverNotFound(errorResult(GITHUB_FAILURE.NOT_FOUND), fallback),
+    ).toEqual(okResult(fallback));
+  });
+
+  it('passes any other failure through', () => {
+    const failure = errorResult(GITHUB_FAILURE.RATE_LIMITED);
+
+    expect(recoverNotFound(failure, fallback)).toBe(failure);
   });
 });
