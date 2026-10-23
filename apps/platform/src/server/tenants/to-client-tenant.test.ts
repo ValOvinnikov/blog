@@ -1,31 +1,35 @@
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
 
 import { toClientTenant } from './to-client-tenant';
 
+const READ_CIPHERTEXT = 'read-ciphertext';
+const WRITE_CIPHERTEXT = 'write-ciphertext';
+
 describe(toClientTenant, () => {
   it('leaves out both Sanity token ciphertexts', () => {
-    const clientTenant = toClientTenant(
-      makeTenant({
-        sanityReadTokenEncrypted: 'read-ciphertext',
-        sanityWriteTokenEncrypted: 'write-ciphertext',
-      }),
+    const serialized = JSON.stringify(
+      toClientTenant(
+        mockTenant({
+          sanityReadTokenEncrypted: READ_CIPHERTEXT,
+          sanityWriteTokenEncrypted: WRITE_CIPHERTEXT,
+        }),
+      ),
     );
 
-    expect(JSON.stringify(clientTenant)).not.toContain('read-ciphertext');
-    expect(JSON.stringify(clientTenant)).not.toContain('write-ciphertext');
+    expect(serialized).not.toContain(READ_CIPHERTEXT);
+    expect(serialized).not.toContain(WRITE_CIPHERTEXT);
   });
 
-  it('reports a stored read token', () => {
-    expect(
-      toClientTenant(makeTenant({ sanityReadTokenEncrypted: 'ciphertext' }))
-        .hasSanityReadToken,
-    ).toBe(true);
-  });
-
-  it('reports a missing read token', () => {
-    expect(
-      toClientTenant(makeTenant({ sanityReadTokenEncrypted: null }))
-        .hasSanityReadToken,
-    ).toBe(false);
-  });
+  it.each([
+    [READ_CIPHERTEXT, true],
+    [null, false],
+  ])(
+    'reports whether a read token is stored (%s → %s)',
+    (sanityReadTokenEncrypted, hasSanityReadToken) => {
+      expect(
+        toClientTenant(mockTenant({ sanityReadTokenEncrypted }))
+          .hasSanityReadToken,
+      ).toBe(hasSanityReadToken);
+    },
+  );
 });

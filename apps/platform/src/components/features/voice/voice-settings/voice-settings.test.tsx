@@ -19,7 +19,7 @@ import {
 } from '@platform/testing/render-in-settings-form';
 import {
   MOCK_ARCHIVED_AT,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -82,7 +82,7 @@ const VoiceSettingsWithListSamples = (props: TVoiceSettingsProps) => (
 );
 
 const setup = customRender(VoiceSettingsWithListSamples, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   initialDraft: buildVoiceDraft({}, [EN]),
   defaultLocale: EN,
   liveLocales: [EN],
@@ -568,16 +568,19 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       await user.click(saveButton);
 
-      expect(saveVoiceOverridesActionMock).toHaveBeenCalledWith(TENANT_ID, {
-        [EN]: {
-          notFoundHeading: LOST,
-          notFoundSupportingText: storedOverrides[EN].notFoundSupportingText,
-          bookmarksEmpty: storedOverrides[EN].bookmarksEmpty,
+      expect(saveVoiceOverridesActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        {
+          [EN]: {
+            notFoundHeading: LOST,
+            notFoundSupportingText: storedOverrides[EN].notFoundSupportingText,
+            bookmarksEmpty: storedOverrides[EN].bookmarksEmpty,
+          },
+          [DE]: {
+            localeErrorDescription: storedOverrides[DE].localeErrorDescription,
+          },
         },
-        [DE]: {
-          localeErrorDescription: storedOverrides[DE].localeErrorDescription,
-        },
-      });
+      );
     });
 
     describe('with the router refresh observed', () => {

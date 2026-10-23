@@ -4,26 +4,26 @@ import {
   TENANT_PROVISIONING_STATUS,
 } from '@blog/db/constants';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
-import { makeMembership } from '@platform/testing/memberships/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
-  makeReadyTenant,
-  makeTenant,
+  mockReadyTenant,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 
 import { siteSetupFor } from './site-setup-for';
 
-const owner = makeMembership();
+const owner = mockMembership();
 
 const virtualAdmin = buildVirtualAdminMembership(
-  makeAdmin().userId,
+  mockAdmin().userId,
   owner.tenantId,
 );
 
 describe(siteSetupFor, () => {
   it("shows the owner their tenant's setup, with retry, while it is not ready", () => {
     const setup = siteSetupFor(
-      makeTenant({ provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED }),
+      mockTenant({ provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED }),
       owner,
       undefined,
     );
@@ -38,20 +38,20 @@ describe(siteSetupFor, () => {
   });
 
   it('shows nothing once provisioning is ready', () => {
-    expect(siteSetupFor(makeReadyTenant(), owner, undefined)).toBeUndefined();
+    expect(siteSetupFor(mockReadyTenant(), owner, undefined)).toBeUndefined();
   });
 
   it('shows nothing for a tenant with no recorded provisioning', () => {
     expect(
-      siteSetupFor(makeTenant({ provisioningStatus: null }), owner, undefined),
+      siteSetupFor(mockTenant({ provisioningStatus: null }), owner, undefined),
     ).toBeUndefined();
   });
 
   it('shows nothing to an editor', () => {
     expect(
       siteSetupFor(
-        makeTenant(),
-        makeMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        mockTenant(),
+        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
         undefined,
       ),
     ).toBeUndefined();
@@ -60,9 +60,9 @@ describe(siteSetupFor, () => {
   it('lets a super-admin viewing the tenant retry', () => {
     expect(
       siteSetupFor(
-        makeTenant(),
+        mockTenant(),
         virtualAdmin,
-        makeAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+        mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
       )?.canRetry,
     ).toBe(true);
   });
@@ -70,9 +70,9 @@ describe(siteSetupFor, () => {
   it('shows a lesser admin the progress without retry', () => {
     expect(
       siteSetupFor(
-        makeTenant(),
+        mockTenant(),
         virtualAdmin,
-        makeAdmin({ role: ADMIN_ROLE.MODERATOR }),
+        mockAdmin({ role: ADMIN_ROLE.MODERATOR }),
       )?.canRetry,
     ).toBe(false);
   });

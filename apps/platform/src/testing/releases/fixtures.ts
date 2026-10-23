@@ -9,7 +9,7 @@ import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 
 const RELEASE_AT = '2026-04-02T10:00:00.000Z';
 
-export const makeComparedCommit = (
+export const mockComparedCommit = (
   overrides: Partial<TComparedCommit> = {},
 ): TComparedCommit => ({
   sha: 'abcdef0123456789abcdef0123456789abcdef01',
@@ -19,12 +19,12 @@ export const makeComparedCommit = (
   ...overrides,
 });
 
-export const makeReleaseCandidate = (
+export const mockReleaseCandidate = (
   overrides: Partial<TReleaseCandidate> = {},
 ): TReleaseCandidate => ({
   headSha: '1234567abcdef1234567abcdef1234567abcdef',
   lastTag: 'v1.4.0',
-  commits: [makeComparedCommit()],
+  commits: [mockComparedCommit()],
   totalCommits: 1,
   isFileListTruncated: false,
   changes: {
@@ -46,7 +46,7 @@ export const makeReleaseCandidate = (
 export const MOCK_RELEASE_RUN_URL =
   'https://github.com/acme/blog/actions/runs/42';
 
-export const makeReleaseRun = (
+export const mockReleaseRun = (
   overrides: Partial<TReleaseRun> = {},
 ): TReleaseRun => ({
   status: RELEASE_RUN_STATUS.SUCCEEDED,

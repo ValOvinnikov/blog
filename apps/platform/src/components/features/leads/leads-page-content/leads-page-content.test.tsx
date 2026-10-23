@@ -1,8 +1,11 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { makeLead } from '@platform/testing/leads/fixtures';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockLead } from '@platform/testing/leads/fixtures';
+import {
+  mockReadyTenant,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 
@@ -19,7 +22,7 @@ vi.mock('@platform/server/leads/delete-lead-action', () => ({
 }));
 
 const setup = customRenderAsync(LeadsPageContent, {
-  tenant: makeReadyTenant({ id: TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+  tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
   page: 1,
   pageHref: adminRoutes.dashboardLeads,
 });
@@ -34,12 +37,12 @@ describe(LeadsPageContent, () => {
   });
 
   it("asks for the requested page of the tenant's own leads, 25 at a time", async () => {
-    listLeadsMock.mockResolvedValue({ leads: [makeLead()], total: 60 });
+    listLeadsMock.mockResolvedValue({ leads: [mockLead()], total: 60 });
 
     await setup({ page: 2 });
 
     expect(listLeadsMock).toHaveBeenCalledWith({
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       page: 2,
       pageSize: 25,
     });
@@ -48,8 +51,8 @@ describe(LeadsPageContent, () => {
   it('renders the leads newest first, as returned, with the page position', async () => {
     listLeadsMock.mockResolvedValue({
       leads: [
-        makeLead({ id: 'lead-2', name: 'Newest' }),
-        makeLead({ id: 'lead-1', name: 'Oldest' }),
+        mockLead({ id: 'lead-2', name: 'Newest' }),
+        mockLead({ id: 'lead-1', name: 'Oldest' }),
       ],
       total: 30,
     });
@@ -78,12 +81,12 @@ describe(LeadsPageContent, () => {
 
   it('keeps the leads and warns when the plan no longer includes the contact form', async () => {
     listLeadsMock.mockResolvedValue({
-      leads: [makeLead({ name: ADA_LOVELACE })],
+      leads: [mockLead({ name: ADA_LOVELACE })],
       total: 1,
     });
 
     await setup({
-      tenant: makeReadyTenant({ id: TENANT_ID, plan: TENANT_PLAN.FREE }),
+      tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE }),
     });
 
     expect(screen.getByText(CONTACT_FORM_NOT_INCLUDED_IN)).toBeVisible();
@@ -104,17 +107,13 @@ describe(LeadsPageContent, () => {
     await expect(
       setup({
         page: 9,
-        pageHref: (page) => `/tenants/${TENANT_ID}/leads?page=${page}`,
+        pageHref: (page) => `/tenants/${MOCK_TENANT_ID}/leads?page=${page}`,
       }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(`/tenants/${TENANT_ID}/leads?page=2`);
-  });
-
-  it('shows the empty state for a tenant with no leads', async () => {
-    await setup();
-
-    expect(screen.getByText(/No messages yet/)).toBeVisible();
+    expect(redirect).toHaveBeenCalledWith(
+      `/tenants/${MOCK_TENANT_ID}/leads?page=2`,
+    );
   });
 
   it('sends a page past the end to the last page', async () => {

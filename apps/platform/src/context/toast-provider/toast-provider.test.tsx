@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
+import { MOCK_TOAST_EXIT_BUFFER_MS } from '@platform/testing/toast/fixtures';
 import {
   act,
   fireEvent,
@@ -21,8 +22,14 @@ const withIntl = (ui: ReactElement, options?: RenderOptions) =>
     options,
   );
 
+const SAVED_TO_BOOKMARKS = 'Saved to bookmarks';
+const BOOKMARK = 'Bookmark';
+const FIRE_SUCCESS = 'fire-success';
+const FIRE_ERROR = 'fire-error';
+const COULDNT_SAVE = "couldn't save";
+const DISMISS_NOTIFICATION = 'Dismiss notification';
+
 const successAction = vi.fn();
-const TOAST_EXIT_BUFFER_MS = 1000;
 
 const ToastHarness = () => {
   const toast = useToast();
@@ -32,36 +39,36 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.success({
-            title: 'Bookmark',
-            message: 'Saved to bookmarks',
+            title: BOOKMARK,
+            message: SAVED_TO_BOOKMARKS,
             action: { label: 'Undo', onAct: successAction, keyHint: '⌘Z' },
           })
         }
       >
-        fire-success
+        {FIRE_SUCCESS}
       </button>
       <button
         onClick={() =>
           toast.error({
-            title: 'Bookmark',
-            message: "couldn't save",
+            title: BOOKMARK,
+            message: COULDNT_SAVE,
           })
         }
       >
-        fire-error
+        {FIRE_ERROR}
       </button>
       <button
         onClick={() =>
           toast.promise(Promise.resolve('done'), {
             loading: {
-              title: 'Bookmark',
+              title: BOOKMARK,
               message: 'saving…',
             },
             success: {
-              title: 'Bookmark',
-              message: 'Saved to bookmarks',
+              title: BOOKMARK,
+              message: SAVED_TO_BOOKMARKS,
             },
-            error: { title: 'Bookmark', message: 'failed' },
+            error: { title: BOOKMARK, message: 'failed' },
           })
         }
       >
@@ -110,50 +117,50 @@ describe(ToastProvider, () => {
     });
 
     it('shows a success toast with polite status semantics when fired', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
 
       expect(screen.getByRole('status')).toBeVisible();
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      expect(screen.getByText(SAVED_TO_BOOKMARKS)).toBeVisible();
     });
 
     it('renders a payload title, so a caller that sets one actually gets it shown', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
 
-      expect(screen.getByText('Bookmark').tagName).toBe('STRONG');
+      expect(screen.getByText(BOOKMARK).tagName).toBe('STRONG');
     });
 
     it('shows an error toast with assertive alert semantics when fired', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-error' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_ERROR }));
 
       expect(screen.getByRole('alert')).toBeVisible();
-      expect(screen.getByText("couldn't save")).toBeVisible();
+      expect(screen.getByText(COULDNT_SAVE)).toBeVisible();
     });
 
     it('dismisses a toast via its close button', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
       fireEvent.click(
-        screen.getByRole('button', { name: 'Dismiss notification' }),
+        screen.getByRole('button', { name: DISMISS_NOTIFICATION }),
       );
       act(() => {
         vi.advanceTimersToNextTimer();
       });
 
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      expect(screen.queryByText(SAVED_TO_BOOKMARKS)).not.toBeInTheDocument();
     });
 
     it('running the action callback also dismisses the toast', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
       fireEvent.click(screen.getByRole('button', { name: /^Undo/ }));
       act(() => {
         vi.advanceTimersToNextTimer();
       });
 
       expect(successAction).toHaveBeenCalledTimes(1);
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      expect(screen.queryByText(SAVED_TO_BOOKMARKS)).not.toBeInTheDocument();
     });
 
     it('pauses auto-dismiss on hover and resumes on mouse-leave', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
       const toastEl = screen.getByRole('status');
 
       act(() => {
@@ -164,21 +171,21 @@ describe(ToastProvider, () => {
       act(() => {
         vi.advanceTimersByTime(4000);
       });
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      expect(screen.getByText(SAVED_TO_BOOKMARKS)).toBeVisible();
 
       fireEvent.mouseLeave(toastEl);
       act(() => {
         vi.runAllTimers();
       });
 
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      expect(screen.queryByText(SAVED_TO_BOOKMARKS)).not.toBeInTheDocument();
     });
 
     it('mouse-leave does not resume the timer while focus remains inside the toast', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
       const toastEl = screen.getByRole('status');
       const dismissButton = screen.getByRole('button', {
-        name: 'Dismiss notification',
+        name: DISMISS_NOTIFICATION,
       });
 
       fireEvent.mouseEnter(toastEl);
@@ -190,7 +197,7 @@ describe(ToastProvider, () => {
       act(() => {
         vi.advanceTimersByTime(4000);
       });
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      expect(screen.getByText(SAVED_TO_BOOKMARKS)).toBeVisible();
 
       act(() => {
         dismissButton.blur();
@@ -198,47 +205,47 @@ describe(ToastProvider, () => {
       act(() => {
         vi.runAllTimers();
       });
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      expect(screen.queryByText(SAVED_TO_BOOKMARKS)).not.toBeInTheDocument();
     });
 
     it('collapses a rapid identical success repeat into one toast with a count suffix', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
 
       expect(screen.getAllByRole('status')).toHaveLength(1);
       expect(screen.getByText('Saved to bookmarks ×2')).toBeVisible();
     });
 
     it('Esc with no toast focused dismisses the newest toast', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-error' }));
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_ERROR }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
 
       fireEvent.keyDown(document, { key: 'Escape' });
       act(() => {
         vi.advanceTimersToNextTimer();
       });
 
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
-      expect(screen.getByText("couldn't save")).toBeVisible();
+      expect(screen.queryByText(SAVED_TO_BOOKMARKS)).not.toBeInTheDocument();
+      expect(screen.getByText(COULDNT_SAVE)).toBeVisible();
     });
 
     it('Esc with focus inside a toast dismisses that toast, not the newest', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-error' }));
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_ERROR }));
+      fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
 
       const errorDismiss = screen.getAllByRole('button', {
-        name: 'Dismiss notification',
+        name: DISMISS_NOTIFICATION,
       })[0]!;
       act(() => {
         errorDismiss.focus();
       });
       fireEvent.keyDown(errorDismiss, { key: 'Escape' });
       act(() => {
-        vi.advanceTimersByTime(TOAST_EXIT_BUFFER_MS);
+        vi.advanceTimersByTime(MOCK_TOAST_EXIT_BUFFER_MS);
       });
 
-      expect(screen.queryByText("couldn't save")).not.toBeInTheDocument();
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      expect(screen.queryByText(COULDNT_SAVE)).not.toBeInTheDocument();
+      expect(screen.getByText(SAVED_TO_BOOKMARKS)).toBeVisible();
     });
 
     it('toast.promise shows the resolved toast when the promise settles quickly', async () => {
@@ -248,7 +255,7 @@ describe(ToastProvider, () => {
       });
 
       expect(screen.getByRole('status')).toBeVisible();
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      expect(screen.getByText(SAVED_TO_BOOKMARKS)).toBeVisible();
       expect(screen.queryByText('saving…')).not.toBeInTheDocument();
     });
   });
@@ -270,15 +277,15 @@ describe(ToastProvider, () => {
       </ToastProvider>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+    fireEvent.click(screen.getByRole('button', { name: FIRE_SUCCESS }));
     expect(pendingFrames.size).toBeGreaterThan(0);
 
     fireEvent.keyDown(document, { key: 'Escape' });
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_BUFFER_MS);
+      vi.advanceTimersByTime(MOCK_TOAST_EXIT_BUFFER_MS);
     });
 
-    expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+    expect(screen.queryByText(SAVED_TO_BOOKMARKS)).not.toBeInTheDocument();
     expect(pendingFrames.size).toBe(0);
   });
 

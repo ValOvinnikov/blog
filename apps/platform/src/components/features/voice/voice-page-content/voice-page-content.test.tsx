@@ -8,7 +8,7 @@ import {
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
-  makeReadyTenant,
+  mockReadyTenant,
   MOCK_ARCHIVED_AT,
 } from '@platform/testing/tenants/fixtures';
 import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
@@ -34,7 +34,7 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('@platform/server/auth/auth');
 
-const tenant = makeReadyTenant();
+const tenant = mockReadyTenant();
 
 const setup = customRenderAsync(VoicePageContent, { tenant });
 

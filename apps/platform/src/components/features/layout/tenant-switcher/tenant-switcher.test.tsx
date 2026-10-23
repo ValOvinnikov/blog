@@ -5,7 +5,7 @@ import {
   MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -15,7 +15,7 @@ import { TenantSwitcher } from './tenant-switcher';
 vi.mock('@platform/i18n/navigation');
 
 const tenant: TTenantSwitcherItem = {
-  id: TENANT_ID,
+  id: MOCK_TENANT_ID,
   name: MOCK_TENANT_NAME,
   primaryDomain: MOCK_TENANT_DOMAIN,
   isArchived: false,
@@ -33,7 +33,7 @@ const includesTenantName = (accessibleName: string) =>
 
 const setup = customRender(TenantSwitcher, {
   tenants: [tenant],
-  activeTenantId: TENANT_ID,
+  activeTenantId: MOCK_TENANT_ID,
 });
 
 describe(`<${TenantSwitcher.name}/>`, () => {
@@ -71,7 +71,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
 
       expect(activeItem).toHaveAttribute(
         'href',
-        `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
+        `/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
       );
       expect(otherItem).toHaveAttribute(
         'href',

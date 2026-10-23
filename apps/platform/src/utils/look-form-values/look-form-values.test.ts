@@ -4,7 +4,10 @@ import {
   PRESET_REGISTRY,
   RADIUS_SCALE,
 } from '@blog/config';
-import { BLOB_STAGED_LOGO } from '@platform/testing/site-config/fixtures';
+import {
+  MOCK_STAGED_LOGO_BLOB_URL,
+  MOCK_LOGO_URL,
+} from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
 import {
@@ -15,7 +18,6 @@ import {
 } from './look-form-values';
 
 const LOGO_FILE = new File(['bytes'], 'logo.png', { type: 'image/png' });
-const SAVED_LOGO_URL = 'https://example.blob.vercel-storage.com/logo.png';
 
 describe(applyPresetDefaults, () => {
   it("takes the preset's theme tokens and clears the logo hue", () => {
@@ -40,8 +42,8 @@ describe(applyPresetDefaults, () => {
   });
 
   it('keeps the language switcher style and both brand images', () => {
-    const logo = { url: BLOB_STAGED_LOGO, file: LOGO_FILE };
-    const favicon = { url: SAVED_LOGO_URL };
+    const logo = { url: MOCK_STAGED_LOGO_BLOB_URL, file: LOGO_FILE };
+    const favicon = { url: MOCK_LOGO_URL };
     const current = {
       ...defaultLookFormValues(),
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
@@ -66,15 +68,15 @@ describe(isFieldChanged, () => {
   });
 
   it('treats a brand image with the same url and file as unchanged, even as a new object', () => {
-    const a = { ...defaultLookFormValues(), logo: { url: SAVED_LOGO_URL } };
-    const b = { ...a, logo: { url: SAVED_LOGO_URL } };
+    const a = { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } };
+    const b = { ...a, logo: { url: MOCK_LOGO_URL } };
 
     expect(isFieldChanged('logo', a, b)).toBe(false);
   });
 
   it('treats a newly staged file as a change', () => {
-    const a = { ...defaultLookFormValues(), logo: { url: SAVED_LOGO_URL } };
-    const b = { ...a, logo: { url: SAVED_LOGO_URL, file: LOGO_FILE } };
+    const a = { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } };
+    const b = { ...a, logo: { url: MOCK_LOGO_URL, file: LOGO_FILE } };
 
     expect(isFieldChanged('logo', a, b)).toBe(true);
   });
@@ -105,7 +107,7 @@ describe(listLostStagedFiles, () => {
     const draft = {
       ...defaultLookFormValues(),
       logo: { url: 'blob:dead', file: {} as File },
-      favicon: { url: SAVED_LOGO_URL },
+      favicon: { url: MOCK_LOGO_URL },
     };
 
     expect(listLostStagedFiles(draft)).toEqual(['logo']);

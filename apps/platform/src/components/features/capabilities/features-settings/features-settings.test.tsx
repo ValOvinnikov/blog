@@ -14,7 +14,7 @@ import {
 } from '@platform/testing/render-in-settings-form';
 import {
   MOCK_ARCHIVED_AT,
-  TENANT_ID,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -56,7 +56,7 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
 };
 
 const setup = customRender(FeaturesSettings, {
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   entitledCapabilities: ALL_ENTITLED,
   initialValues: INITIAL_VALUES,
 });
@@ -272,7 +272,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
       await user.click(saveButton);
 
-      expect(updateFeaturesActionMock).toHaveBeenCalledWith(TENANT_ID, {
+      expect(updateFeaturesActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         ...INITIAL_VALUES,
         bookmarksEnabled: false,
       });

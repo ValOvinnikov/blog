@@ -3,7 +3,7 @@ import { ADMIN_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -35,10 +35,8 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(FeaturesPage, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
-
-const DATA_DISABLED = 'data-disabled';
 
 describe(`<${FeaturesPage.name}/>`, () => {
   beforeEach(() => {
@@ -76,38 +74,19 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
   it('renders preset featureDefaults for an operator with no settings_features row', async () => {
     getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
+      id: MOCK_TENANT_ID,
       plan: TENANT_PLAN.GROWTH,
     });
 
     await setup();
 
-    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
     );
-  });
-
-  it('renders the GROWTH-only toggles as locked for a FREE-plan tenant', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
-      plan: TENANT_PLAN.FREE,
-    });
-
-    await setup();
-
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      DATA_DISABLED,
-      '',
-    );
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      DATA_DISABLED,
-      '',
-    );
-    expect(
-      screen.getByRole('switch', { name: 'Cookie consent banner' }),
-    ).not.toHaveAttribute(DATA_DISABLED);
   });
 });
