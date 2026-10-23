@@ -18,13 +18,20 @@ import {
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 
+export const RAW_HOME_PAGE_ID = 'home-1';
+
+const AUTHOR_AVATAR_ALT = 'Jane avatar';
+const POST_SLUG = 'hello-world';
+const TAXONOMY_LIST_MODULE_ID = 'taxonomy-list-1';
+const POST_LIST_MODULE_ID = 'post-list-1';
+
 export function makeRawAuthor(
   overrides: Partial<TRawPostDetail['author']> = {},
 ): TRawPostDetail['author'] {
   return {
     _id: 'author-1',
     name: 'Jane Doe',
-    image: makeRawSanityImage('Jane avatar'),
+    image: makeRawSanityImage(AUTHOR_AVATAR_ALT),
     profilePage: null,
     role: 'Writer',
     bio: null,
@@ -33,24 +40,16 @@ export function makeRawAuthor(
   };
 }
 
-export function makeRawPostCard(
-  overrides: Partial<TRawPostCard> = {},
-): TRawPostCard {
+function makeRawPostSummary() {
   return {
     _id: 'post-1',
     headingBlock: makeRawHeadingBlock('Hello World', {
       supportingText: 'A sufficiently long excerpt for the card.',
     }),
-    slug: 'hello-world',
+    slug: POST_SLUG,
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawSanityImage(),
     featured: false,
-    author: {
-      _id: 'author-1',
-      name: 'Jane Doe',
-      image: makeRawSanityImage('Jane avatar'),
-      profilePage: null,
-    },
     topic: {
       _id: 'topic-1',
       title: 'Engineering',
@@ -58,6 +57,17 @@ export function makeRawPostCard(
       description: 'Engineering posts',
     },
     wordCount: 400,
+  };
+}
+
+export function makeRawPostCard(
+  overrides: Partial<TRawPostCard> = {},
+): TRawPostCard {
+  const { _id, name, image, profilePage } = makeRawAuthor();
+
+  return {
+    ...makeRawPostSummary(),
+    author: { _id, name, image, profilePage },
     ...overrides,
   };
 }
@@ -66,28 +76,14 @@ export function makeRawPostDetail(
   overrides: Partial<TRawPostDetail> = {},
 ): TRawPostDetail {
   return {
-    _id: 'post-1',
-    headingBlock: makeRawHeadingBlock('Hello World', {
-      supportingText: 'A sufficiently long excerpt for the card.',
-    }),
-    slug: 'hello-world',
-    publishedAt: '2026-01-15T00:00:00Z',
-    heroImage: makeRawSanityImage(),
-    featured: false,
+    ...makeRawPostSummary(),
     body: [],
     postTakeaways: null,
     seo: makeRawSeo(),
     author: makeRawAuthor(),
-    topic: {
-      _id: 'topic-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: 'Engineering posts',
-    },
     tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
     modules: [],
-    wordCount: 400,
-    translations: [{ language: 'EN', slug: 'hello-world' }],
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: POST_SLUG }],
     ...overrides,
   };
 }
@@ -96,6 +92,7 @@ export function makeRawHomePage(
   overrides: Partial<TRawHomePage> = {},
 ): TRawHomePage {
   return {
+    _id: RAW_HOME_PAGE_ID,
     headingBlock: makeRawHeadingBlock('Welcome'),
     contentAlignment: null,
     hero: { _id: 'hero-1', _type: 'module_heroBlog' },
@@ -132,7 +129,7 @@ export function makeRawTopicIndexPage(
     headingBlock: makeRawHeadingBlock('Browse by topic'),
     contentAlignment: null,
     hero: null,
-    modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
+    modules: [{ _id: TAXONOMY_LIST_MODULE_ID, _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
     translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
@@ -146,7 +143,7 @@ export function makeRawTagIndexPage(
     headingBlock: makeRawHeadingBlock('Browse by tag'),
     contentAlignment: null,
     hero: null,
-    modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
+    modules: [{ _id: TAXONOMY_LIST_MODULE_ID, _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
     translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
@@ -161,9 +158,9 @@ export function makeRawTopicPage(
     headingBlock: makeRawHeadingBlock('Engineering'),
     contentAlignment: null,
     hero: null,
-    modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
+    modules: [{ _id: POST_LIST_MODULE_ID, _type: 'module_postList' }],
     seo: makeRawSeo(),
-    translations: [{ language: 'EN', slug: 'engineering' }],
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'engineering' }],
     ...overrides,
   };
 }
@@ -176,9 +173,9 @@ export function makeRawTagPage(
     headingBlock: makeRawHeadingBlock('TypeScript'),
     contentAlignment: null,
     hero: null,
-    modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
+    modules: [{ _id: POST_LIST_MODULE_ID, _type: 'module_postList' }],
     seo: makeRawSeo(),
-    translations: [{ language: 'EN', slug: 'typescript' }],
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'typescript' }],
     ...overrides,
   };
 }
@@ -197,7 +194,7 @@ export function makeRawLandingPage(
       { _id: 'cta-1', _type: 'module_cta' },
     ],
     seo: makeRawSeo(),
-    translations: [{ language: 'EN', slug: 'about' }],
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'about' }],
     showSectionNavigation: null,
     sectionChain: [
       {

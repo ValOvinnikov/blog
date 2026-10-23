@@ -15,6 +15,7 @@ export const homePageQuery = q
   .filterRaw('coalesce(language, $defaultLocale) == $locale')
   .slice(0)
   .project((sub) => ({
+    _id: true,
     headingBlock: sub
       .field('headingBlock')
       .project(pageHeadingBlockFragment)
