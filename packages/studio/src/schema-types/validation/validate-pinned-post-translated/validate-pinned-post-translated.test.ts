@@ -4,6 +4,7 @@ import { setLiveLanguages } from '@blog/studio/schema-types/validation/live-lang
 import { validatePinnedPostTranslated } from '@blog/studio/schema-types/validation/validate-pinned-post-translated/validate-pinned-post-translated';
 import { mockTranslationMetadata } from '@blog/studio/testing/mock-documents';
 import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
+import type { ValidationContext } from 'sanity';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
@@ -21,9 +22,27 @@ const post = (_id: string, language: string, publishedAt = PUBLISHED_AT) => ({
 
 const pinned = { _ref: 'post-en' };
 
+const contextWith = (
+  dataset: unknown[],
+  {
+    postSource = POST_SOURCE.PINNED,
+    fetchError,
+  }: { postSource?: string; fetchError?: Error } = {},
+) => mockGroqValidationContext(dataset, { parent: { postSource }, fetchError });
+
 describe(validatePinnedPostTranslated, () => {
+  let englishPost: ReturnType<typeof post>;
+  let postGroup: ReturnType<typeof mockTranslationMetadata>;
+  let englishOnlyContext: ValidationContext;
+
   beforeEach(() => {
     setLiveLanguages([EN, NL]);
+    englishPost = post('post-en', EN);
+    postGroup = mockTranslationMetadata([
+      ['post-en', EN],
+      ['post-nl', NL],
+    ]);
+    englishOnlyContext = contextWith([englishPost]);
   });
 
   afterEach(() => {
@@ -32,51 +51,28 @@ describe(validatePinnedPostTranslated, () => {
 
   it('warns naming Dutch when an English-only post is pinned and Dutch is live', async () => {
     await expect(
-      validatePinnedPostTranslated(
-        pinned,
-        mockGroqValidationContext([post('post-en', EN)], {
-          parent: { postSource: POST_SOURCE.PINNED },
-        }),
-      ),
+      validatePinnedPostTranslated(pinned, englishOnlyContext),
     ).resolves.toBe(MISSING_DUTCH_WARNING);
   });
 
   it('passes when the pinned post is translated into every live language', async () => {
-    const dataset = [
-      post('post-en', EN),
-      post('post-nl', NL),
-      mockTranslationMetadata([
-        ['post-en', EN],
-        ['post-nl', NL],
-      ]),
-    ];
-
     await expect(
       validatePinnedPostTranslated(
         pinned,
-        mockGroqValidationContext(dataset, {
-          parent: { postSource: POST_SOURCE.PINNED },
-        }),
+        contextWith([englishPost, post('post-nl', NL), postGroup]),
       ),
     ).resolves.toBe(true);
   });
 
   it('does not count a translation that is not published yet', async () => {
-    const dataset = [
-      post('post-en', EN),
-      post('post-nl', NL, SCHEDULED_AT),
-      mockTranslationMetadata([
-        ['post-en', EN],
-        ['post-nl', NL],
-      ]),
-    ];
-
     await expect(
       validatePinnedPostTranslated(
         pinned,
-        mockGroqValidationContext(dataset, {
-          parent: { postSource: POST_SOURCE.PINNED },
-        }),
+        contextWith([
+          englishPost,
+          post('post-nl', NL, SCHEDULED_AT),
+          postGroup,
+        ]),
       ),
     ).resolves.toBe(MISSING_DUTCH_WARNING);
   });
@@ -85,12 +81,7 @@ describe(validatePinnedPostTranslated, () => {
     setLiveLanguages([EN, NL, FR]);
 
     await expect(
-      validatePinnedPostTranslated(
-        pinned,
-        mockGroqValidationContext([post('post-en', EN)], {
-          parent: { postSource: POST_SOURCE.PINNED },
-        }),
-      ),
+      validatePinnedPostTranslated(pinned, englishOnlyContext),
     ).resolves.toBe(
       "The pinned post has no Dutch or French version, so this hero won't show on Dutch or French pages.",
     );
@@ -100,12 +91,7 @@ describe(validatePinnedPostTranslated, () => {
     setLiveLanguages([EN]);
 
     await expect(
-      validatePinnedPostTranslated(
-        pinned,
-        mockGroqValidationContext([post('post-en', EN)], {
-          parent: { postSource: POST_SOURCE.PINNED },
-        }),
-      ),
+      validatePinnedPostTranslated(pinned, englishOnlyContext),
     ).resolves.toBe(true);
   });
 
@@ -113,8 +99,8 @@ describe(validatePinnedPostTranslated, () => {
     await expect(
       validatePinnedPostTranslated(
         pinned,
-        mockGroqValidationContext([post('post-en', EN)], {
-          parent: { postSource: POST_SOURCE.NEWEST_FEATURED },
+        contextWith([englishPost], {
+          postSource: POST_SOURCE.NEWEST_FEATURED,
         }),
       ),
     ).resolves.toBe(true);
@@ -122,12 +108,7 @@ describe(validatePinnedPostTranslated, () => {
 
   it('passes when no post is pinned', async () => {
     await expect(
-      validatePinnedPostTranslated(
-        undefined,
-        mockGroqValidationContext([], {
-          parent: { postSource: POST_SOURCE.PINNED },
-        }),
-      ),
+      validatePinnedPostTranslated(undefined, contextWith([])),
     ).resolves.toBe(true);
   });
 
@@ -135,10 +116,7 @@ describe(validatePinnedPostTranslated, () => {
     await expect(
       validatePinnedPostTranslated(
         pinned,
-        mockGroqValidationContext([], {
-          parent: { postSource: POST_SOURCE.PINNED },
-          fetchError: new Error('network down'),
-        }),
+        contextWith([], { fetchError: new Error('network down') }),
       ),
     ).resolves.toBe(true);
   });

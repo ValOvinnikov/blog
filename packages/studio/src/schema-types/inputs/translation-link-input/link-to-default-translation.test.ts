@@ -7,6 +7,7 @@ import {
 } from '@blog/studio/testing/mock-documents';
 import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import type { Mutation } from '@sanity/client';
+import type { SanityDocument } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
@@ -46,10 +47,18 @@ const weakReference = (language: string, ref: string) => ({
 });
 
 describe(linkToDefaultTranslation, () => {
+  let englishHome: SanityDocument;
+  let dutchHomeDraft: SanityDocument;
+
+  beforeEach(() => {
+    englishHome = mockHomePage({ _id: 'page_home', language: EN });
+    dutchHomeDraft = mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL });
+  });
+
   it("adds the new Home to the default-language Home's translations", async () => {
     const { client, mutations } = createClient([
-      mockHomePage({ _id: 'page_home', language: EN }),
-      mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
+      englishHome,
+      dutchHomeDraft,
       mockTranslationMetadata([['page_home', EN]], {
         _id: 'meta-1',
         schemaTypes: [PAGE_HOME_TYPE],
@@ -77,7 +86,7 @@ describe(linkToDefaultTranslation, () => {
   it('links both Homes in new translations when the default-language Home has none', async () => {
     const { client, mutations } = createClient([
       mockHomePage({ _id: 'drafts.page_home' }),
-      mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
+      dutchHomeDraft,
     ]);
 
     await linkDutchHome(client);
@@ -101,8 +110,8 @@ describe(linkToDefaultTranslation, () => {
 
   it('leaves a Home that is already linked alone', async () => {
     const { client, mutations } = createClient([
-      mockHomePage({ _id: 'page_home', language: EN }),
-      mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
+      englishHome,
+      dutchHomeDraft,
       mockTranslationMetadata(
         [
           ['page_home', EN],
@@ -119,8 +128,8 @@ describe(linkToDefaultTranslation, () => {
 
   it('leaves the translations alone when another Home already holds the language', async () => {
     const { client, mutations } = createClient([
-      mockHomePage({ _id: 'page_home', language: EN }),
-      mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
+      englishHome,
+      dutchHomeDraft,
       mockTranslationMetadata(
         [
           ['page_home', EN],
@@ -136,9 +145,7 @@ describe(linkToDefaultTranslation, () => {
   });
 
   it('creates no link when there is no default-language Home', async () => {
-    const { client, mutations } = createClient([
-      mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
-    ]);
+    const { client, mutations } = createClient([dutchHomeDraft]);
 
     await linkDutchHome(client);
 
@@ -146,9 +153,7 @@ describe(linkToDefaultTranslation, () => {
   });
 
   it('never links the default-language Home to itself', async () => {
-    const { client, mutations } = createClient([
-      mockHomePage({ _id: 'page_home', language: EN }),
-    ]);
+    const { client, mutations } = createClient([englishHome]);
 
     await linkToDefaultTranslation(client, {
       documentId: 'page_home',

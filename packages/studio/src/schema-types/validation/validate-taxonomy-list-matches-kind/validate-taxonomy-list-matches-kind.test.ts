@@ -5,6 +5,7 @@ import {
   mockFetchContext,
   type TMockFetchContext,
 } from '@blog/studio/testing/mock-validation-context';
+import type { SanityDocument } from 'sanity';
 
 const TAXONOMY_LIST_ID = 'taxonomy-list-1';
 const LEGACY_TAXONOMY_LIST_ID = 'taxonomy-list-legacy';
@@ -14,8 +15,14 @@ const MODULE_TYPE_NAME = 'module_taxonomyList';
 
 describe('validateTaxonomyListReferencesMatchKind', () => {
   let validate: ReturnType<typeof validateTaxonomyListReferencesMatchKind>;
+  let modulesDocument: SanityDocument;
 
   beforeEach(() => {
+    modulesDocument = mockDocument({
+      modules: [
+        { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: TAXONOMY_LIST_ID },
+      ],
+    });
     validate = validateTaxonomyListReferencesMatchKind(
       TAXONOMY_KIND.TOPICS,
       MODULE_TYPE_NAME,
@@ -57,13 +64,7 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     });
 
     it('fails when a modules[] entry lists the other kind, targeting that entry', async () => {
-      const document = mockDocument({
-        modules: [
-          { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: TAXONOMY_LIST_ID },
-        ],
-      });
-
-      await expect(validate(document, context)).resolves.toEqual([
+      await expect(validate(modulesDocument, context)).resolves.toEqual([
         { message: MISMATCH_ERROR, path: ['modules', { _key: 'k1' }] },
       ]);
     });
@@ -110,13 +111,8 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     const { context } = mockFetchContext([
       { _id: TAXONOMY_LIST_ID, taxonomy: undefined },
     ]);
-    const document = mockDocument({
-      modules: [
-        { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: TAXONOMY_LIST_ID },
-      ],
-    });
 
-    await expect(validate(document, context)).resolves.toBe(true);
+    await expect(validate(modulesDocument, context)).resolves.toBe(true);
   });
 
   it('fails when the deprecated legacy field lists the other kind, targeting that field', async () => {
@@ -134,12 +130,7 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
 
   it('resolves to true, not an error, when the fetch rejects', async () => {
     const { context } = mockFetchContext(new Error('network down'));
-    const document = mockDocument({
-      modules: [
-        { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: TAXONOMY_LIST_ID },
-      ],
-    });
 
-    await expect(validate(document, context)).resolves.toBe(true);
+    await expect(validate(modulesDocument, context)).resolves.toBe(true);
   });
 });

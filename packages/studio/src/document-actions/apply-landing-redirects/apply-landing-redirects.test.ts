@@ -6,7 +6,7 @@ import {
   mockRedirect,
 } from '@blog/studio/testing/mock-documents';
 import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
-import type { SanityClient } from 'sanity';
+import type { SanityClient, SanityDocument } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
@@ -44,14 +44,26 @@ const createClient = (dataset: unknown[]) => {
 };
 
 describe(applyLandingRedirects, () => {
+  let faq: SanityDocument;
+  let help: SanityDocument;
+  let faqDraft: SanityDocument;
+
+  beforeEach(() => {
+    faq = mockLandingPage({ _id: 'faq', slug: 'faq', language: EN });
+    help = mockLandingPage({ _id: 'help', slug: 'help', language: EN });
+    faqDraft = mockLandingPage({
+      _id: FAQ_DRAFT_ID,
+      slug: 'faq',
+      language: EN,
+    });
+  });
+
   describe('with a single faq page', () => {
     let client: ReturnType<typeof createClient>['client'];
     let operations: ReturnType<typeof createClient>['operations'];
 
     beforeEach(() => {
-      ({ client, operations } = createClient([
-        mockLandingPage({ _id: 'faq', slug: 'faq', language: EN }),
-      ]));
+      ({ client, operations } = createClient([faq]));
     });
 
     it('redirects a renamed page from its old path with an automatic, permanent redirect', async () => {
@@ -77,20 +89,14 @@ describe(applyLandingRedirects, () => {
     });
 
     it('writes nothing when the path is unchanged', async () => {
-      await applyLandingRedirects(
-        client,
-        mockLandingPage({ _id: FAQ_DRAFT_ID, slug: 'faq', language: EN }),
-      );
+      await applyLandingRedirects(client, faqDraft);
 
       expect(operations).toEqual([]);
     });
   });
 
   it('redirects a re-parented page to its path under the new parent', async () => {
-    const { client, operations } = createClient([
-      mockLandingPage({ _id: 'help', slug: 'help', language: EN }),
-      mockLandingPage({ _id: 'faq', slug: 'faq', language: EN }),
-    ]);
+    const { client, operations } = createClient([help, faq]);
 
     await applyLandingRedirects(
       client,
@@ -153,7 +159,7 @@ describe(applyLandingRedirects, () => {
         parent: 'help',
         language: EN,
       }),
-      mockLandingPage({ _id: 'help', slug: 'help', language: EN }),
+      help,
       mockRedirect({
         _id: 'r1',
         source: QUESTIONS_PATH,
@@ -168,10 +174,7 @@ describe(applyLandingRedirects, () => {
       }),
     ]);
 
-    await applyLandingRedirects(
-      client,
-      mockLandingPage({ _id: FAQ_DRAFT_ID, slug: 'faq', language: EN }),
-    );
+    await applyLandingRedirects(client, faqDraft);
 
     expect(operations).toEqual([
       { delete: 'r2' },
@@ -189,10 +192,7 @@ describe(applyLandingRedirects, () => {
   it('writes nothing on a first publish', async () => {
     const { client, operations } = createClient([]);
 
-    await applyLandingRedirects(
-      client,
-      mockLandingPage({ _id: FAQ_DRAFT_ID, slug: 'faq', language: EN }),
-    );
+    await applyLandingRedirects(client, faqDraft);
 
     expect(operations).toEqual([]);
   });

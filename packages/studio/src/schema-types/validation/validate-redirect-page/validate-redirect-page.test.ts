@@ -16,6 +16,7 @@ import {
   mockRedirect,
 } from '@blog/studio/testing/mock-documents';
 import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
+import type { SanityDocument, ValidationContext } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
@@ -57,7 +58,13 @@ const PAGES = [
 ];
 
 describe(validateRedirectDestinationPage, () => {
-  const document = mockRedirect({ _id: 'drafts.r1' });
+  let document: SanityDocument;
+  let context: ValidationContext;
+
+  beforeEach(() => {
+    document = mockRedirect({ _id: 'drafts.r1' });
+    context = mockGroqValidationContext(PAGES, { document });
+  });
 
   it.each([
     '/services',
@@ -70,12 +77,9 @@ describe(validateRedirectDestinationPage, () => {
     '/blog/page/3',
     '/account',
   ])('passes %s, where a page is live', async (path) => {
-    await expect(
-      validateRedirectDestinationPage(
-        path,
-        mockGroqValidationContext(PAGES, { document }),
-      ),
-    ).resolves.toBe(true);
+    await expect(validateRedirectDestinationPage(path, context)).resolves.toBe(
+      true,
+    );
   });
 
   it.each([
@@ -86,12 +90,9 @@ describe(validateRedirectDestinationPage, () => {
     '/blog/hello/extra',
     '/tags/news',
   ])('blocks %s, where no page is published', async (path) => {
-    await expect(
-      validateRedirectDestinationPage(
-        path,
-        mockGroqValidationContext(PAGES, { document }),
-      ),
-    ).resolves.toBe(REDIRECT_DESTINATION_UNPUBLISHED_ERROR);
+    await expect(validateRedirectDestinationPage(path, context)).resolves.toBe(
+      REDIRECT_DESTINATION_UNPUBLISHED_ERROR,
+    );
   });
 
   it('blocks a page that is only published in another language', async () => {
@@ -126,23 +127,23 @@ describe(validateRedirectDestinationPage, () => {
 });
 
 describe(validateRedirectSourcePage, () => {
-  const document = mockRedirect({ _id: 'drafts.r1' });
+  let document: SanityDocument;
+  let context: ValidationContext;
+
+  beforeEach(() => {
+    document = mockRedirect({ _id: 'drafts.r1' });
+    context = mockGroqValidationContext(PAGES, { document });
+  });
 
   it('warns when a page is published at the source', async () => {
     await expect(
-      validateRedirectSourcePage(
-        SERVICES_DESIGN_PATH,
-        mockGroqValidationContext(PAGES, { document }),
-      ),
+      validateRedirectSourcePage(SERVICES_DESIGN_PATH, context),
     ).resolves.toBe(REDIRECT_SOURCE_SHADOWED_WARNING);
   });
 
   it('passes a source with no published page', async () => {
     await expect(
-      validateRedirectSourcePage(
-        '/old-design',
-        mockGroqValidationContext(PAGES, { document }),
-      ),
+      validateRedirectSourcePage('/old-design', context),
     ).resolves.toBe(true);
   });
 

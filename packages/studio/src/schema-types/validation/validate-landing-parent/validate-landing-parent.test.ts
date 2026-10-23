@@ -15,22 +15,16 @@ import type { SanityDocument } from 'sanity';
 const { EN, NL } = LOCALE_ISO_CODES;
 
 describe(validateLandingParent, () => {
-  const modules = mockLandingPage({
-    _id: 'modules',
-    language: EN,
-  });
-  const faq = mockLandingPage({
-    _id: 'faq',
-    parent: 'modules',
-    language: EN,
-  });
+  let modules: SanityDocument;
+  let faq: SanityDocument;
+  let team: SanityDocument;
   let draft: SanityDocument;
 
   beforeEach(() => {
-    draft = mockLandingPage({
-      _id: 'drafts.modules',
-      language: EN,
-    });
+    modules = mockLandingPage({ _id: 'modules', language: EN });
+    faq = mockLandingPage({ _id: 'faq', parent: 'modules', language: EN });
+    team = mockLandingPage({ _id: 'team', language: EN });
+    draft = mockLandingPage({ _id: 'drafts.modules', language: EN });
   });
 
   it('passes a page with no parent', async () => {
@@ -38,17 +32,14 @@ describe(validateLandingParent, () => {
       validateLandingParent(
         undefined,
         mockGroqValidationContext([modules], {
-          document: mockLandingPage({
-            _id: 'team',
-            language: EN,
-          }),
+          document: team,
         }),
       ),
     ).resolves.toBe(true);
   });
 
   it('passes a parent in the same language within the depth bound', async () => {
-    const team = mockLandingPage({
+    const teamDraft = mockLandingPage({
       _id: 'drafts.team',
       language: EN,
     });
@@ -56,7 +47,7 @@ describe(validateLandingParent, () => {
     await expect(
       validateLandingParent(
         mockReference('modules'),
-        mockGroqValidationContext([modules], { document: team }),
+        mockGroqValidationContext([modules], { document: teamDraft }),
       ),
     ).resolves.toBe(true);
   });
@@ -138,10 +129,7 @@ describe(validateLandingParent, () => {
       validateLandingParent(
         mockReference('gone'),
         mockGroqValidationContext([], {
-          document: mockLandingPage({
-            _id: 'team',
-            language: EN,
-          }),
+          document: team,
         }),
       ),
     ).resolves.toBe(true);
@@ -152,10 +140,7 @@ describe(validateLandingParent, () => {
       validateLandingParent(
         mockReference('modules'),
         mockGroqValidationContext([modules], {
-          document: mockLandingPage({
-            _id: 'team',
-            language: EN,
-          }),
+          document: team,
           fetchError: new Error('network down'),
         }),
       ),

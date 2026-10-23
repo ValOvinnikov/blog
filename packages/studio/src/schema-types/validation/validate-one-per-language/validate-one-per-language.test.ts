@@ -3,6 +3,7 @@ import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default
 import { validateOnePerLanguage } from '@blog/studio/schema-types/validation/validate-one-per-language/validate-one-per-language';
 import { mockHomePage } from '@blog/studio/testing/mock-documents';
 import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
+import type { SanityDocument, ValidationContext } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
@@ -11,32 +12,42 @@ const DUTCH_HOME_DRAFT_ID = 'drafts.home-nl';
 const DUPLICATE_DUTCH = "There's already a Home Page in Dutch.";
 const DUPLICATE_ENGLISH = "There's already a Home Page in English.";
 
+const HOME_PAGE_TYPE = { title: 'Home Page' };
+
+const contextWith = (dataset: SanityDocument[], fetchError?: Error) =>
+  mockGroqValidationContext(dataset, { type: HOME_PAGE_TYPE, fetchError });
+
 describe(validateOnePerLanguage, () => {
-  const englishHome = mockHomePage({ _id: 'page_home', language: EN });
+  let englishHome: SanityDocument;
+  let untranslatedHome: SanityDocument;
+  let dutchHomeDraft: SanityDocument;
+  let context: ValidationContext;
+
+  beforeEach(() => {
+    englishHome = mockHomePage({ _id: 'page_home', language: EN });
+    untranslatedHome = mockHomePage({ _id: 'page_home' });
+    dutchHomeDraft = mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL });
+    context = contextWith([englishHome]);
+  });
 
   afterEach(() => {
     setDefaultLanguage(EN);
   });
 
   it('allows a Home in another language', async () => {
-    await expect(
-      validateOnePerLanguage(
-        mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
-        mockGroqValidationContext([englishHome], {
-          type: { title: 'Home Page' },
-        }),
-      ),
-    ).resolves.toBe(true);
+    await expect(validateOnePerLanguage(dutchHomeDraft, context)).resolves.toBe(
+      true,
+    );
   });
 
   it('rejects a second Home in the same language', async () => {
     await expect(
       validateOnePerLanguage(
-        mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
-        mockGroqValidationContext(
-          [englishHome, mockHomePage({ _id: 'home-nl-first', language: NL })],
-          { type: { title: 'Home Page' } },
-        ),
+        dutchHomeDraft,
+        contextWith([
+          englishHome,
+          mockHomePage({ _id: 'home-nl-first', language: NL }),
+        ]),
       ),
     ).resolves.toBe(DUPLICATE_DUTCH);
   });
@@ -45,9 +56,7 @@ describe(validateOnePerLanguage, () => {
     await expect(
       validateOnePerLanguage(
         mockHomePage({ _id: 'drafts.page_home', language: EN }),
-        mockGroqValidationContext([englishHome], {
-          type: { title: 'Home Page' },
-        }),
+        context,
       ),
     ).resolves.toBe(true);
   });
@@ -56,9 +65,7 @@ describe(validateOnePerLanguage, () => {
     await expect(
       validateOnePerLanguage(
         mockHomePage({ _id: 'drafts.home-en', language: EN }),
-        mockGroqValidationContext([mockHomePage({ _id: 'page_home' })], {
-          type: { title: 'Home Page' },
-        }),
+        contextWith([untranslatedHome]),
       ),
     ).resolves.toBe(DUPLICATE_ENGLISH);
   });
@@ -67,34 +74,21 @@ describe(validateOnePerLanguage, () => {
     setDefaultLanguage(NL);
 
     await expect(
-      validateOnePerLanguage(
-        mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL }),
-        mockGroqValidationContext([mockHomePage({ _id: 'page_home' })], {
-          type: { title: 'Home Page' },
-        }),
-      ),
+      validateOnePerLanguage(dutchHomeDraft, contextWith([untranslatedHome])),
     ).resolves.toBe(DUPLICATE_DUTCH);
   });
 
   it('passes when there is no document', async () => {
-    await expect(
-      validateOnePerLanguage(
-        undefined,
-        mockGroqValidationContext([englishHome], {
-          type: { title: 'Home Page' },
-        }),
-      ),
-    ).resolves.toBe(true);
+    await expect(validateOnePerLanguage(undefined, context)).resolves.toBe(
+      true,
+    );
   });
 
   it('passes when the fetch fails', async () => {
     await expect(
       validateOnePerLanguage(
         mockHomePage({ _id: 'home-en', language: EN }),
-        mockGroqValidationContext([englishHome], {
-          type: { title: 'Home Page' },
-          fetchError: new Error('network down'),
-        }),
+        contextWith([englishHome], new Error('network down')),
       ),
     ).resolves.toBe(true);
   });

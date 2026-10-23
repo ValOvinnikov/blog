@@ -19,14 +19,21 @@ const validate = validateSettingMatchesDefaultLanguage({
   initialValue: true,
 });
 
+const englishPage = (showSidebar?: boolean) =>
+  mockLandingPage({ _id: 'about-en', language: EN, showSidebar });
+
 describe(validateSettingMatchesDefaultLanguage, () => {
-  const linked = mockTranslationMetadata([
-    ['about-en', EN],
-    ['about-nl', NL],
-  ]);
+  let linked: ReturnType<typeof mockTranslationMetadata>;
   let dutchPage: SanityDocument;
 
+  const contextFor = (document: SanityDocument, english: SanityDocument) =>
+    mockGroqValidationContext([english, document, linked], { document });
+
   beforeEach(() => {
+    linked = mockTranslationMetadata([
+      ['about-en', EN],
+      ['about-nl', NL],
+    ]);
     dutchPage = mockLandingPage({
       _id: DUTCH_DRAFT_ID,
       language: NL,
@@ -36,41 +43,13 @@ describe(validateSettingMatchesDefaultLanguage, () => {
 
   it('passes a translation with the same value as its default-language page', async () => {
     await expect(
-      validate(
-        false,
-        mockGroqValidationContext(
-          [
-            mockLandingPage({
-              _id: 'about-en',
-              language: EN,
-              showSidebar: false,
-            }),
-            dutchPage,
-            linked,
-          ],
-          { document: dutchPage },
-        ),
-      ),
+      validate(false, contextFor(dutchPage, englishPage(false))),
     ).resolves.toBe(true);
   });
 
   it('warns about a translation with a different value from its default-language page', async () => {
     await expect(
-      validate(
-        false,
-        mockGroqValidationContext(
-          [
-            mockLandingPage({
-              _id: 'about-en',
-              language: EN,
-              showSidebar: true,
-            }),
-            dutchPage,
-            linked,
-          ],
-          { document: dutchPage },
-        ),
-      ),
+      validate(false, contextFor(dutchPage, englishPage(true))),
     ).resolves.toBe(MISMATCH);
   });
 
@@ -81,53 +60,23 @@ describe(validateSettingMatchesDefaultLanguage, () => {
     });
 
     await expect(
-      validate(
-        undefined,
-        mockGroqValidationContext(
-          [
-            mockLandingPage({
-              _id: 'about-en',
-              language: EN,
-              showSidebar: true,
-            }),
-            unsetDutchPage,
-            linked,
-          ],
-          { document: unsetDutchPage },
-        ),
-      ),
+      validate(undefined, contextFor(unsetDutchPage, englishPage(true))),
     ).resolves.toBe(true);
   });
 
   it('warns when an unset default-language value differs from the translation', async () => {
     await expect(
-      validate(
-        false,
-        mockGroqValidationContext(
-          [
-            mockLandingPage({ _id: 'about-en', language: EN }),
-            dutchPage,
-            linked,
-          ],
-          { document: dutchPage },
-        ),
-      ),
+      validate(false, contextFor(dutchPage, englishPage())),
     ).resolves.toBe(MISMATCH);
   });
 
   it('passes the default-language page itself', async () => {
-    const englishPage = mockLandingPage({
-      _id: 'about-en',
-      language: EN,
-      showSidebar: false,
-    });
+    const english = englishPage(false);
 
     await expect(
       validate(
         false,
-        mockGroqValidationContext([englishPage, linked], {
-          document: englishPage,
-        }),
+        mockGroqValidationContext([english, linked], { document: english }),
       ),
     ).resolves.toBe(true);
   });
@@ -142,17 +91,9 @@ describe(validateSettingMatchesDefaultLanguage, () => {
     await expect(
       validate(
         false,
-        mockGroqValidationContext(
-          [
-            mockLandingPage({
-              _id: 'about-en',
-              language: EN,
-              showSidebar: true,
-            }),
-            unlinkedDutchPage,
-          ],
-          { document: unlinkedDutchPage },
-        ),
+        mockGroqValidationContext([englishPage(true), unlinkedDutchPage], {
+          document: unlinkedDutchPage,
+        }),
       ),
     ).resolves.toBe(true);
   });

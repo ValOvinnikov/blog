@@ -6,6 +6,7 @@ import {
   mockTranslationMetadata,
 } from '@blog/studio/testing/mock-documents';
 import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
+import type { SanityDocument } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
@@ -16,49 +17,51 @@ const OTHER_TEMPLATE_ID = 'template-other';
 const MISMATCH = 'This page uses a different template from its English page.';
 
 describe(validateTemplateMatchesDefaultLanguage, () => {
-  const englishPage = mockLandingPage({
-    _id: 'about-en',
-    language: EN,
-    template: mockReference(ABOUT_TEMPLATE_ID),
-  });
-  const linked = mockTranslationMetadata([
-    ['about-en', EN],
-    ['about-nl', NL],
-  ]);
+  let englishPage: SanityDocument;
+  let linked: ReturnType<typeof mockTranslationMetadata>;
 
-  it('passes a translation using the same template as its default-language page', async () => {
-    const dutchPage = mockLandingPage({
-      _id: DUTCH_DRAFT_ID,
-      language: NL,
+  beforeEach(() => {
+    englishPage = mockLandingPage({
+      _id: 'about-en',
+      language: EN,
       template: mockReference(ABOUT_TEMPLATE_ID),
     });
-
-    await expect(
-      validateTemplateMatchesDefaultLanguage(
-        mockReference(ABOUT_TEMPLATE_ID),
-        mockGroqValidationContext([englishPage, dutchPage, linked], {
-          document: dutchPage,
-        }),
-      ),
-    ).resolves.toBe(true);
+    linked = mockTranslationMetadata([
+      ['about-en', EN],
+      ['about-nl', NL],
+    ]);
   });
 
-  it('warns about a translation using a different template from its default-language page', async () => {
-    const dutchPage = mockLandingPage({
-      _id: DUTCH_DRAFT_ID,
-      language: NL,
-      template: mockReference(OTHER_TEMPLATE_ID),
-    });
+  it.each([
+    [
+      'passes a translation using the same template as',
+      ABOUT_TEMPLATE_ID,
+      true,
+    ],
+    [
+      'warns about a translation using a different template from',
+      OTHER_TEMPLATE_ID,
+      MISMATCH,
+    ],
+  ])(
+    '%s its default-language page',
+    async (_description, templateId, expected) => {
+      const dutchPage = mockLandingPage({
+        _id: DUTCH_DRAFT_ID,
+        language: NL,
+        template: mockReference(templateId),
+      });
 
-    await expect(
-      validateTemplateMatchesDefaultLanguage(
-        mockReference(OTHER_TEMPLATE_ID),
-        mockGroqValidationContext([englishPage, dutchPage, linked], {
-          document: dutchPage,
-        }),
-      ),
-    ).resolves.toBe(MISMATCH);
-  });
+      await expect(
+        validateTemplateMatchesDefaultLanguage(
+          mockReference(templateId),
+          mockGroqValidationContext([englishPage, dutchPage, linked], {
+            document: dutchPage,
+          }),
+        ),
+      ).resolves.toBe(expected);
+    },
+  );
 
   it('passes the default-language page itself', async () => {
     await expect(

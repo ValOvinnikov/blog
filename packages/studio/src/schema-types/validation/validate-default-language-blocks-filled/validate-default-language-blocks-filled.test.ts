@@ -35,7 +35,7 @@ describe(validateDefaultLanguageBlocksFilled, () => {
       MOCK_VALIDATION_MESSAGE,
     ],
     ['fails when the field is not set', undefined, MOCK_VALIDATION_MESSAGE],
-  ])('%s', (_description, value, expected) => {
+  ])('%s, as Portable Text', (_description, value, expected) => {
     expect(validate(value)).toBe(expected);
   });
 

@@ -7,6 +7,7 @@ import {
   mockTranslationMetadata,
 } from '@blog/studio/testing/mock-documents';
 import { evaluate, parse } from 'groq-js';
+import type { SanityDocument } from 'sanity';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
@@ -28,20 +29,26 @@ const offeredPages = async (dataset: Record<string, unknown>[]) => {
 };
 
 describe(onePagePerTranslationGroupFilter, () => {
+  let modulesEn: SanityDocument;
+  let modulesNl: SanityDocument;
+  let modulesGroup: ReturnType<typeof mockTranslationMetadata>;
+
+  beforeEach(() => {
+    modulesEn = mockLandingPage({ _id: MODULES_EN_ID, language: EN });
+    modulesNl = mockLandingPage({ _id: MODULES_NL_ID, language: NL });
+    modulesGroup = mockTranslationMetadata([
+      [MODULES_EN_ID, EN],
+      [MODULES_NL_ID, NL],
+    ]);
+  });
+
   afterEach(() => {
     setDefaultLanguage(EN);
   });
 
   it('offers a page translated into two languages once, as its default-language document', async () => {
     await expect(
-      offeredPages([
-        mockLandingPage({ _id: MODULES_EN_ID, language: EN }),
-        mockLandingPage({ _id: MODULES_NL_ID, language: NL }),
-        mockTranslationMetadata([
-          [MODULES_EN_ID, EN],
-          [MODULES_NL_ID, NL],
-        ]),
-      ]),
+      offeredPages([modulesEn, modulesNl, modulesGroup]),
     ).resolves.toEqual([MODULES_EN_ID]);
   });
 
@@ -79,13 +86,10 @@ describe(onePagePerTranslationGroupFilter, () => {
   it('hides the draft of a non-default translation along with its published version', async () => {
     await expect(
       offeredPages([
-        mockLandingPage({ _id: MODULES_EN_ID, language: EN }),
-        mockLandingPage({ _id: MODULES_NL_ID, language: NL }),
+        modulesEn,
+        modulesNl,
         mockLandingPage({ _id: 'drafts.modules-nl', language: NL }),
-        mockTranslationMetadata([
-          [MODULES_EN_ID, EN],
-          [MODULES_NL_ID, NL],
-        ]),
+        modulesGroup,
       ]),
     ).resolves.toEqual([MODULES_EN_ID]);
   });
@@ -100,14 +104,7 @@ describe(onePagePerTranslationGroupFilter, () => {
     setDefaultLanguage(NL);
 
     await expect(
-      offeredPages([
-        mockLandingPage({ _id: MODULES_EN_ID, language: EN }),
-        mockLandingPage({ _id: MODULES_NL_ID, language: NL }),
-        mockTranslationMetadata([
-          [MODULES_EN_ID, EN],
-          [MODULES_NL_ID, NL],
-        ]),
-      ]),
+      offeredPages([modulesEn, modulesNl, modulesGroup]),
     ).resolves.toEqual([MODULES_NL_ID]);
   });
 });

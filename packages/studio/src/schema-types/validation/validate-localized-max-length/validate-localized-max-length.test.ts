@@ -22,7 +22,7 @@ describe(validateLocalizedMaxLength, () => {
       MESSAGE,
     ],
     ['passes when the field is not set', undefined, true],
-  ])('%s', (_description, value, expected) => {
+  ])('%s, at a five-character limit', (_description, value, expected) => {
     expect(validate(value)).toBe(expected);
   });
 });

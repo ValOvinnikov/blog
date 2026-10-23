@@ -534,183 +534,177 @@ describe(buildSections, () => {
     expect(callArgs(result[0]!, 'id')).toEqual(['modules']);
     expect(callArgs(result[2]!, 'id')).toEqual(['settings']);
   });
-  describe('byLanguage items', () => {
-    const buildLandingItem = (locales?: readonly TLocaleIsoCode[]) => {
-      const S = makeMockStructureBuilder();
-      const [item] = getGroupItems(
-        S,
-        [
-          {
-            items: [
-              {
-                schema: {
-                  name: 'landingPage',
-                  title: LANDING_PAGES_TITLE,
-                  icon: List,
-                },
-                mode: 'byLanguage',
+  const buildLandingItem = (
+    mode: 'byLanguage' | 'pageTree',
+    locales?: readonly TLocaleIsoCode[],
+  ) => {
+    const landingS = makeMockStructureBuilder();
+    const [item] = getGroupItems(
+      landingS,
+      [
+        {
+          items: [
+            {
+              schema: {
+                name: 'landingPage',
+                title: LANDING_PAGES_TITLE,
+                icon: List,
               },
-            ],
-          },
-        ],
-        locales,
-      );
-      return { S, item: item! };
-    };
+              mode,
+            },
+          ],
+        },
+      ],
+      locales,
+    );
+    return { landingS, item: item! };
+  };
+
+  describe('byLanguage items', () => {
+    const buildByLanguageItem = (locales?: readonly TLocaleIsoCode[]) =>
+      buildLandingItem('byLanguage', locales);
 
     const listOf = (languageItem: TMockStructureNode) =>
       callArgs(languageItem, 'child')?.[0] as TMockStructureNode;
 
     const buildLanguageLists = (locales?: readonly TLocaleIsoCode[]) => {
-      const { item } = buildLandingItem(locales);
-      const list = callArgs(item, 'child')?.[0] as TMockStructureNode;
-      return callArgs(list, 'items')?.[0] as TMockStructureNode[];
+      const { item } = buildByLanguageItem(locales);
+      return callArgs(listOf(item), 'items')?.[0] as TMockStructureNode[];
     };
 
-    it('shows one plain list of every page with one live language, creating pages in it', () => {
-      const { S, item } = buildLandingItem([LOCALE_ISO_CODES.NL]);
-      const documentList = callArgs(item, 'child')?.[0] as TMockStructureNode;
+    describe('with one live language', () => {
+      let landingS: ReturnType<typeof makeMockStructureBuilder>;
+      let documentList: TMockStructureNode;
+      let item: TMockStructureNode;
 
-      expect(callArgs(item, 'title')).toEqual([LANDING_PAGES_TITLE]);
-      expect(documentList.kind).toBe('documentTypeList');
-      expect(documentList.documentType).toBe('landingPage');
-      expect(callArgs(documentList, 'title')).toEqual([LANDING_PAGES_TITLE]);
-      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
-        [{ templateId: DUTCH_LANDING_TEMPLATE_ID }],
-      ]);
-      expect(S.list).toHaveBeenCalledTimes(1);
-      expect(S.divider).not.toHaveBeenCalled();
+      beforeEach(() => {
+        ({ landingS, item } = buildByLanguageItem([LOCALE_ISO_CODES.NL]));
+        documentList = listOf(item);
+      });
+
+      it('shows one plain list of every page, creating pages in it', () => {
+        expect(callArgs(item, 'title')).toEqual([LANDING_PAGES_TITLE]);
+        expect(documentList.kind).toBe('documentTypeList');
+        expect(documentList.documentType).toBe('landingPage');
+        expect(callArgs(documentList, 'title')).toEqual([LANDING_PAGES_TITLE]);
+        expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+          [{ templateId: DUTCH_LANDING_TEMPLATE_ID }],
+        ]);
+        expect(landingS.list).toHaveBeenCalledTimes(1);
+        expect(landingS.divider).not.toHaveBeenCalled();
+      });
+
+      it('lists only default-language pages, and pages with no language', async () => {
+        expect(await listedIds(documentList)).toEqual([
+          'nl-page',
+          UNSET_PAGE_ID,
+          'nl-child',
+        ]);
+      });
     });
 
-    it('lists only default-language pages, and pages with no language, with one live language', async () => {
-      const { item } = buildLandingItem([LOCALE_ISO_CODES.NL]);
+    describe('with two live languages', () => {
+      let lists: TMockStructureNode[];
 
-      expect(
-        await listedIds(callArgs(item, 'child')?.[0] as TMockStructureNode),
-      ).toEqual(['nl-page', UNSET_PAGE_ID, 'nl-child']);
+      beforeEach(() => {
+        lists = buildLanguageLists([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL]);
+      });
+
+      it('lists the other language again once it is live', async () => {
+        expect(await listedIds(listOf(lists[0]!))).toEqual(['en-page']);
+        expect(await listedIds(listOf(lists.at(-1)!))).toEqual([
+          'en-page',
+          'nl-page',
+          UNSET_PAGE_ID,
+          'nl-child',
+        ]);
+      });
+
+      it('keeps a list per language and all pages', () => {
+        expect(lists.map((list) => list.kind)).toEqual([
+          'listItem',
+          'listItem',
+          'divider',
+          'listItem',
+        ]);
+        expect(
+          lists
+            .filter((list) => list.kind === 'listItem')
+            .map((list) => callArgs(list, 'title')?.[0]),
+        ).toEqual([
+          LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.EN],
+          LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.NL],
+          'All pages',
+        ]);
+      });
     });
 
-    it('lists the other language again once it is live', async () => {
-      const lists = buildLanguageLists([
-        LOCALE_ISO_CODES.EN,
-        LOCALE_ISO_CODES.NL,
-      ]);
+    describe('with every locale live', () => {
+      let lists: TMockStructureNode[];
 
-      expect(await listedIds(listOf(lists[0]!))).toEqual(['en-page']);
-      expect(await listedIds(listOf(lists.at(-1)!))).toEqual([
-        'en-page',
-        'nl-page',
-        UNSET_PAGE_ID,
-        'nl-child',
-      ]);
-    });
+      beforeEach(() => {
+        lists = buildLanguageLists();
+      });
 
-    it('keeps a list per language and all pages with two live languages', () => {
-      const lists = buildLanguageLists([
-        LOCALE_ISO_CODES.EN,
-        LOCALE_ISO_CODES.NL,
-      ]);
+      it('lists every locale by its own name, then a divider, then all pages', () => {
+        expect(lists.map((list) => list.kind)).toEqual([
+          ...Object.values(LOCALE_ISO_CODES).map(() => 'listItem'),
+          'divider',
+          'listItem',
+        ]);
+        expect(
+          lists
+            .filter((list) => list.kind === 'listItem')
+            .map((list) => callArgs(list, 'title')?.[0]),
+        ).toEqual([
+          ...Object.values(LOCALE_ISO_CODES).map(
+            (locale) => LOCALE_NATIVE_LABEL[locale],
+          ),
+          'All pages',
+        ]);
+      });
 
-      expect(lists.map((list) => list.kind)).toEqual([
-        'listItem',
-        'listItem',
-        'divider',
-        'listItem',
-      ]);
-      expect(
-        lists
-          .filter((list) => list.kind === 'listItem')
-          .map((list) => callArgs(list, 'title')?.[0]),
-      ).toEqual([
-        LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.EN],
-        LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.NL],
-        'All pages',
-      ]);
-    });
+      it('lists every page in all pages and offers a template per language', () => {
+        const documentList = listOf(lists.at(-1)!);
 
-    it('lists every locale by its own name, then a divider, then all pages', () => {
-      const lists = buildLanguageLists();
+        expect(callArgs(documentList, 'filter')).toEqual([TYPE_FILTER]);
+        expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+          Object.values(LOCALE_ISO_CODES).map((locale) => ({
+            templateId: `landingPage-${locale}`,
+          })),
+        ]);
+      });
 
-      expect(lists.map((list) => list.kind)).toEqual([
-        ...Object.values(LOCALE_ISO_CODES).map(() => 'listItem'),
-        'divider',
-        'listItem',
-      ]);
-      expect(
-        lists
-          .filter((list) => list.kind === 'listItem')
-          .map((list) => callArgs(list, 'title')?.[0]),
-      ).toEqual([
-        ...Object.values(LOCALE_ISO_CODES).map(
-          (locale) => LOCALE_NATIVE_LABEL[locale],
-        ),
-        'All pages',
-      ]);
-    });
+      it('filters each language list to its language and creates pages in it', () => {
+        const documentList = listOf(lists[0]!);
 
-    it('lists every page in all pages and offers a template per language', () => {
-      const documentList = listOf(buildLanguageLists().at(-1)!);
+        expect(callArgs(documentList, 'filter')).toEqual([
+          '_type == $type && language == $language',
+        ]);
+        expect(callArgs(documentList, 'params')).toEqual([
+          { type: 'landingPage', language: LOCALE_ISO_CODES.EN },
+        ]);
+        expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+          [{ templateId: ENGLISH_LANDING_TEMPLATE_ID }],
+        ]);
+      });
 
-      expect(callArgs(documentList, 'filter')).toEqual([TYPE_FILTER]);
-      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
-        Object.values(LOCALE_ISO_CODES).map((locale) => ({
-          templateId: `landingPage-${locale}`,
-        })),
-      ]);
-    });
+      it('builds every list from the document type list so it keeps the sort menu', () => {
+        const languageLists = lists.filter((list) => list.kind === 'listItem');
 
-    it('filters each language list to its language and creates pages in it', () => {
-      const [english] = buildLanguageLists();
-      const documentList = listOf(english!);
-
-      expect(callArgs(documentList, 'filter')).toEqual([
-        '_type == $type && language == $language',
-      ]);
-      expect(callArgs(documentList, 'params')).toEqual([
-        { type: 'landingPage', language: LOCALE_ISO_CODES.EN },
-      ]);
-      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
-        [{ templateId: ENGLISH_LANDING_TEMPLATE_ID }],
-      ]);
-    });
-
-    it('builds every list from the document type list so it keeps the sort menu', () => {
-      const lists = buildLanguageLists().filter(
-        (list) => list.kind === 'listItem',
-      );
-
-      expect(lists.map((list) => listOf(list).kind)).toEqual(
-        lists.map(() => 'documentTypeList'),
-      );
-      expect(lists.map((list) => listOf(list).documentType)).toEqual(
-        lists.map(() => 'landingPage'),
-      );
+        expect(languageLists.map((list) => listOf(list).kind)).toEqual(
+          languageLists.map(() => 'documentTypeList'),
+        );
+        expect(languageLists.map((list) => listOf(list).documentType)).toEqual(
+          languageLists.map(() => 'landingPage'),
+        );
+      });
     });
   });
 
   describe('pageTree items', () => {
-    const buildTreeItem = (locales?: readonly TLocaleIsoCode[]) => {
-      const S = makeMockStructureBuilder();
-      const [item] = getGroupItems(
-        S,
-        [
-          {
-            items: [
-              {
-                schema: {
-                  name: 'landingPage',
-                  title: LANDING_PAGES_TITLE,
-                  icon: List,
-                },
-                mode: 'pageTree',
-              },
-            ],
-          },
-        ],
-        locales,
-      );
-      return item!;
-    };
+    const buildTreeItem = (locales?: readonly TLocaleIsoCode[]) =>
+      buildLandingItem('pageTree', locales).item;
 
     const documentListOf = (item: TMockStructureNode) =>
       callArgs(item, 'child')?.[0] as TMockStructureNode;
@@ -855,16 +849,6 @@ describe(buildSections, () => {
       ]);
     });
 
-    it('lists one entry per language by its own name, default language first', () => {
-      const items = buildHomeItems([]);
-
-      expect(items.map((item) => callArgs(item, 'title')?.[0])).toEqual([
-        LOCALE_NATIVE_LABEL[NL],
-        LOCALE_NATIVE_LABEL[EN],
-        LOCALE_NATIVE_LABEL[DE],
-      ]);
-    });
-
     it("opens the language's own document by its published id", async () => {
       const [, english] = buildHomeItems([
         { _id: 'home-nl', _type: 'homePage', language: NL },
@@ -885,17 +869,6 @@ describe(buildSections, () => {
       expect(callArgs(child, 'documentId')).toEqual(['homePage']);
     });
 
-    it('creates the default-language document in its language when there is none', async () => {
-      const [dutch] = buildHomeItems([]);
-
-      const child = await resolveChild(dutch!);
-
-      expect(child.kind).toBe('document');
-      expect(callArgs(child, 'initialValueTemplate')).toEqual([
-        DUTCH_HOME_TEMPLATE_ID,
-      ]);
-    });
-
     it('opens a new document in a language that has none', async () => {
       const [, english] = buildHomeItems([
         { _id: 'homePage', _type: 'homePage', language: NL },
@@ -907,6 +880,31 @@ describe(buildSections, () => {
       expect(callArgs(child, 'schemaType')).toEqual(['homePage']);
       expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-EN']);
       expect(callArgs(child, 'documentId')).not.toEqual(['homePage']);
+    });
+
+    describe('with no Home documents', () => {
+      let items: TMockStructureNode[];
+
+      beforeEach(() => {
+        items = buildHomeItems([]);
+      });
+
+      it('lists one entry per language by its own name, default language first', () => {
+        expect(items.map((item) => callArgs(item, 'title')?.[0])).toEqual([
+          LOCALE_NATIVE_LABEL[NL],
+          LOCALE_NATIVE_LABEL[EN],
+          LOCALE_NATIVE_LABEL[DE],
+        ]);
+      });
+
+      it('creates the default-language document in its language when there is none', async () => {
+        const child = await resolveChild(items[0]!);
+
+        expect(child.kind).toBe('document');
+        expect(callArgs(child, 'initialValueTemplate')).toEqual([
+          DUTCH_HOME_TEMPLATE_ID,
+        ]);
+      });
     });
   });
 });
