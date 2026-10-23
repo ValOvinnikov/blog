@@ -24,6 +24,12 @@ export type TRunOutcome<
   T = void,
 > = TResult<T, TRunFailure<TStep>>;
 
+export function isStepFailure<TStep extends string>(
+  failure: TRunFailure<TStep>,
+): failure is { failedStep: TStep } {
+  return 'failedStep' in failure;
+}
+
 export async function beginRun(tenantId: string): Promise<void> {
   'use step';
 
@@ -42,7 +48,7 @@ export async function finishRun(
   const { runId } = ctx;
   await reportRunFinish(tenantId);
 
-  if (!outcome.ok && 'message' in outcome.error) {
+  if (!outcome.ok && !isStepFailure(outcome.error)) {
     logger.error('provisioning.run_failed', {
       tenantId,
       runId,
@@ -67,7 +73,7 @@ export async function finishRun(
     action: outcome.ok
       ? AUDIT_ACTION.PROVISIONED
       : AUDIT_ACTION.PROVISIONING_FAILED,
-    ...(outcome.ok || 'message' in outcome.error
+    ...(outcome.ok || !isStepFailure(outcome.error)
       ? {}
       : { failedStep: outcome.error.failedStep }),
   });

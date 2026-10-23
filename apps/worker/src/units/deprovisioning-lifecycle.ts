@@ -9,7 +9,7 @@ import {
 import { logger } from '@worker/utils/logger/logger';
 import { alertOperatorsToDeleteSanityProject } from '@worker/utils/operator-email/sanity-project-deletion-alert';
 
-import type { TRunOutcome } from './run-lifecycle';
+import { isStepFailure, type TRunOutcome } from './run-lifecycle';
 import { loadTenant, type TUnitContext } from './run-reported-step';
 
 export type TDeprovisioningOutcome = TRunOutcome<
@@ -39,7 +39,7 @@ export async function finishDeprovisioning(
   await reportDeprovisioningRunFinish(tenantId);
   if (outcome.ok) {
     await alertOperatorsToDeleteSanityProject(await loadTenant(tenantId));
-  } else if ('message' in outcome.error) {
+  } else if (!isStepFailure(outcome.error)) {
     logger.error(DEPROVISIONING_RUN_FAILED_EVENT, {
       tenantId,
       runId: ctx.runId,
