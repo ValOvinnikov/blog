@@ -1,63 +1,21 @@
-import type { TMaybeUndefined } from '@blog/config';
-import {
-  HTTP_STATUS,
-  LOCALE_ISO_CODES,
-  OPERATOR_ALERT_KIND,
-} from '@blog/config/constants';
-import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { HTTP_STATUS, OPERATOR_ALERT_KIND } from '@blog/config/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 
 import {
   isNotifiableOutcome,
   notifyOperatorsOfOwnerElevationOutcome,
 } from './notify-operators';
 
-const TENANT_TIMESTAMP = new Date('2026-01-01T00:00:00.000Z');
-
-function tenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 't1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj-acme',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    provisioningSteps: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    createdAt: TENANT_TIMESTAMP,
-    updatedAt: TENANT_TIMESTAMP,
-    ...overrides,
-  } as TTenant;
-}
-
-const originalEnv: Record<string, TMaybeUndefined<string>> = {};
+const MOCK_TENANT = mockTenant();
 
 beforeEach(() => {
-  originalEnv['PLATFORM_APP_BASE_URL'] = process.env['PLATFORM_APP_BASE_URL'];
-  originalEnv['OPERATOR_ALERT_SECRET'] = process.env['OPERATOR_ALERT_SECRET'];
-  process.env['PLATFORM_APP_BASE_URL'] = 'https://platform.example.com';
-  process.env['OPERATOR_ALERT_SECRET'] = 'shared-secret';
+  vi.stubEnv('PLATFORM_APP_BASE_URL', 'https://platform.example.com');
+  vi.stubEnv('OPERATOR_ALERT_SECRET', 'shared-secret');
 });
 
 afterEach(() => {
-  for (const [key, value] of Object.entries(originalEnv)) {
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
+  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
@@ -92,14 +50,14 @@ describe(notifyOperatorsOfOwnerElevationOutcome, () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await notifyOperatorsOfOwnerElevationOutcome({
-      tenant: tenant(),
+      tenant: MOCK_TENANT,
       outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
     });
 
     const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
     expect(JSON.parse(init.body)).toEqual({
       kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-      tenantId: 't1',
+      tenantId: MOCK_TENANT.id,
       outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
     });
   });
@@ -116,7 +74,7 @@ describe(notifyOperatorsOfOwnerElevationOutcome, () => {
 
     await expect(
       notifyOperatorsOfOwnerElevationOutcome({
-        tenant: tenant(),
+        tenant: MOCK_TENANT,
         outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
       }),
     ).resolves.toBeUndefined();
@@ -127,7 +85,7 @@ describe(notifyOperatorsOfOwnerElevationOutcome, () => {
 
     await expect(
       notifyOperatorsOfOwnerElevationOutcome({
-        tenant: tenant(),
+        tenant: MOCK_TENANT,
         outcome: ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
       }),
     ).resolves.toBeUndefined();

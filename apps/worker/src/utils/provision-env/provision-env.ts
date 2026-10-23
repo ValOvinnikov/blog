@@ -31,33 +31,26 @@ export function requireValues<TName extends string>(
 }
 
 export function getProvisionEnv(): TProvisionEnv {
+  const required = requireValues({
+    SANITY_MANAGEMENT_TOKEN: env.SANITY_MANAGEMENT_TOKEN,
+    SANITY_ORGANIZATION_ID: env.SANITY_ORGANIZATION_ID,
+    VERCEL_TOKEN: env.VERCEL_TOKEN,
+    VERCEL_PROJECT_ID_WEB: env.VERCEL_PROJECT_ID_WEB,
+    PLATFORM_APP_BASE_URL: env.PLATFORM_APP_BASE_URL,
+    TENANT_SANITY_DATASET: env.TENANT_SANITY_DATASET,
+    WEB_APP_URL: env.WEB_APP_URL,
+    SANITY_REVALIDATE_SECRET: env.SANITY_REVALIDATE_SECRET,
+  });
+
   return {
-    sanityManagementToken: requireValue(
-      'SANITY_MANAGEMENT_TOKEN',
-      env.SANITY_MANAGEMENT_TOKEN,
-    ),
-    sanityOrganizationId: requireValue(
-      'SANITY_ORGANIZATION_ID',
-      env.SANITY_ORGANIZATION_ID,
-    ),
-    vercelToken: requireValue('VERCEL_TOKEN', env.VERCEL_TOKEN),
+    sanityManagementToken: required.SANITY_MANAGEMENT_TOKEN,
+    sanityOrganizationId: required.SANITY_ORGANIZATION_ID,
+    vercelToken: required.VERCEL_TOKEN,
     vercelTeamId: env.VERCEL_TEAM_ID,
-    vercelWebProjectId: requireValue(
-      'VERCEL_PROJECT_ID_WEB',
-      env.VERCEL_PROJECT_ID_WEB,
-    ),
-    platformAppBaseUrl: requireValue(
-      'PLATFORM_APP_BASE_URL',
-      env.PLATFORM_APP_BASE_URL,
-    ),
-    tenantSanityDataset: requireValue(
-      'TENANT_SANITY_DATASET',
-      env.TENANT_SANITY_DATASET,
-    ),
-    webAppBaseUrl: requireValue('WEB_APP_URL', env.WEB_APP_URL),
-    revalidateSecret: requireValue(
-      'SANITY_REVALIDATE_SECRET',
-      env.SANITY_REVALIDATE_SECRET,
-    ),
+    vercelWebProjectId: required.VERCEL_PROJECT_ID_WEB,
+    platformAppBaseUrl: required.PLATFORM_APP_BASE_URL,
+    tenantSanityDataset: required.TENANT_SANITY_DATASET,
+    webAppBaseUrl: required.WEB_APP_URL,
+    revalidateSecret: required.SANITY_REVALIDATE_SECRET,
   };
 }

@@ -17,16 +17,9 @@ const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
 
-const REQUIRED = [
-  'SANITY_MANAGEMENT_TOKEN',
-  'SANITY_ORGANIZATION_ID',
-  'VERCEL_TOKEN',
-  'VERCEL_PROJECT_ID_WEB',
-  'PLATFORM_APP_BASE_URL',
-  'TENANT_SANITY_DATASET',
-  'WEB_APP_URL',
-  'SANITY_REVALIDATE_SECRET',
-] as const;
+const REQUIRED = Object.entries(mockEnv)
+  .filter(([, value]) => value !== undefined)
+  .map(([name]) => name);
 
 describe(getProvisionEnv, () => {
   const original = { ...mockEnv };

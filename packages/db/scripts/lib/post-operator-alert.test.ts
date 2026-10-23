@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   HTTP_STATUS,
   OPERATOR_ALERT_KIND,
@@ -14,23 +13,13 @@ const STALLED_ELEVATION_ALERT: TOperatorAlertBody = {
   outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
 };
 
-const originalEnv: Record<string, TMaybeUndefined<string>> = {};
-
 beforeEach(() => {
-  originalEnv['PLATFORM_APP_BASE_URL'] = process.env['PLATFORM_APP_BASE_URL'];
-  originalEnv['OPERATOR_ALERT_SECRET'] = process.env['OPERATOR_ALERT_SECRET'];
-  process.env['PLATFORM_APP_BASE_URL'] = 'https://platform.example.com';
-  process.env['OPERATOR_ALERT_SECRET'] = 'shared-secret';
+  vi.stubEnv('PLATFORM_APP_BASE_URL', 'https://platform.example.com');
+  vi.stubEnv('OPERATOR_ALERT_SECRET', 'shared-secret');
 });
 
 afterEach(() => {
-  for (const [key, value] of Object.entries(originalEnv)) {
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
+  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
@@ -103,7 +92,7 @@ describe(postOperatorAlert, () => {
     });
 
     it('does not call fetch and resolves when PLATFORM_APP_BASE_URL is unset', async () => {
-      delete process.env['PLATFORM_APP_BASE_URL'];
+      vi.stubEnv('PLATFORM_APP_BASE_URL', undefined);
 
       await expect(
         postOperatorAlert(STALLED_ELEVATION_ALERT),
@@ -112,7 +101,7 @@ describe(postOperatorAlert, () => {
     });
 
     it('does not call fetch and resolves when OPERATOR_ALERT_SECRET is unset', async () => {
-      delete process.env['OPERATOR_ALERT_SECRET'];
+      vi.stubEnv('OPERATOR_ALERT_SECRET', undefined);
 
       await expect(
         postOperatorAlert(STALLED_ELEVATION_ALERT),
@@ -121,7 +110,7 @@ describe(postOperatorAlert, () => {
     });
 
     it('does not throw when PLATFORM_APP_BASE_URL is not a valid URL', async () => {
-      process.env['PLATFORM_APP_BASE_URL'] = 'not a url';
+      vi.stubEnv('PLATFORM_APP_BASE_URL', 'not a url');
 
       await expect(
         postOperatorAlert(STALLED_ELEVATION_ALERT),
