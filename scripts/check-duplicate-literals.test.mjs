@@ -79,6 +79,7 @@ test('collectLiterals skips values an outside standard spells', () => {
     "within(row).findAllByRole('textbox');",
     "queryByRole('switch');",
     "const cookie = { sameSite: 'strict' };",
+    "const link = { target: '_blank' };",
     "const doc = { _type: 'page_home' };",
     "type TField = Pick<TDoc, 'title' | 'seo'>;",
     "const ref = { '_type': 'reference' };",
