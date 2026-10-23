@@ -3,7 +3,9 @@ import type { TPostListModule } from '@blog/service';
 import type { IMediaCardData } from '@web/components/shared/media-card-item';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-export const makePostListItem = (
+export const MOCK_POST_LIST_HEADING = 'Latest posts';
+
+export const mockPostListItem = (
   overrides: Partial<IMediaCardData> = {},
 ): IMediaCardData => {
   return {
@@ -19,11 +21,11 @@ export const makePostListItem = (
   };
 };
 
-export const makePostListModuleData = (
+export const mockPostListModuleData = (
   overrides: Partial<TPostListModule> = {},
 ): TPostListModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
+  headingBlock: makeHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   posts: [],
   layout: undefined,
   contentAlignment: undefined,
@@ -32,3 +34,9 @@ export const makePostListModuleData = (
   totalPages: 1,
   ...overrides,
 });
+
+export const MOCK_LEAD_POST_TITLE = 'Lead post';
+
+export const MOCK_SECOND_POST_TITLE = 'Second post';
+
+export const MOCK_THIRD_POST_TITLE = 'Third post';

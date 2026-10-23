@@ -1,8 +1,8 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { urlForSanityImage } from '@blog/service';
+import { type TTagDetailPage, urlForSanityImage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import {
@@ -23,7 +23,7 @@ vi.mock('@web/server/tag/get-tag-page/get-tag-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const ogImage = makeSanityImage();
+const ogImage = mockSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   ogImage,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -44,19 +44,23 @@ const seo = mockSeo({
   ogImage,
 });
 
-describe('buildTagMetadata', () => {
+const resolveTagPageWith = (overrides: Partial<TTagDetailPage>) =>
+  getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage(overrides)));
+
+describe(buildTagMetadata, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-    getTagPageMock.mockResolvedValue(okResult(makeTagDetailPage({ seo })));
+    vi.mocked(getRequestContext).mockReset();
+    resolveTagPageWith({ seo });
   });
 
-  it('forwards the slug to getTagPage, the loader TagPage reads', async () => {
+  it('reads the same tag the tag page renders', async () => {
     await buildTagMetadata('typescript');
 
     expect(getTagPageMock).toHaveBeenCalledWith('typescript');
   });
 
-  it('builds page-1 metadata from the resolved seo, self-canonical to /tags/[slug]', async () => {
+  it('builds page-1 metadata from the seo, canonical to the tag', async () => {
     const metadata = await buildTagMetadata('typescript');
 
     expect(metadata.title).toBe('TypeScript');
@@ -72,7 +76,7 @@ describe('buildTagMetadata', () => {
     ]);
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, canonical to its own page URL', async () => {
+  it('suffixes page-N titles with the page, canonical to that page', async () => {
     const metadata = await buildTagMetadata('typescript', 2);
 
     expect(metadata.title).toBe(PAGE_TWO_TITLE);
@@ -84,10 +88,8 @@ describe('buildTagMetadata', () => {
     });
   });
 
-  it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
-    getTagPageMock.mockResolvedValue(
-      okResult(makeTagDetailPage({ seo: mockSeo({ ogTitle: undefined }) })),
-    );
+  it('omits the OG title past page 1 when none is authored', async () => {
+    resolveTagPageWith({ seo: mockSeo({ ogTitle: undefined }) });
 
     const metadata = await buildTagMetadata('typescript', 2);
 
@@ -100,20 +102,20 @@ describe('buildTagMetadata', () => {
       getTagPageMock.mockResolvedValue(errorResult(new Error('boom')));
     });
 
-    it('returns empty metadata when the tag fetch fails', async () => {
-      const metadata = await buildTagMetadata('typescript');
+    it.each([
+      { slug: 'typescript', page: undefined },
+      { slug: 'missing', page: 2 },
+    ])(
+      'returns empty metadata on page $page when the fetch fails',
+      async ({ slug, page }) => {
+        const metadata = await buildTagMetadata(slug, page);
 
-      expect(metadata).toEqual({});
-    });
-
-    it('returns empty metadata for page N when the tag fetch fails', async () => {
-      const metadata = await buildTagMetadata('missing', 2);
-
-      expect(metadata).toEqual({});
-    });
+        expect(metadata).toEqual({});
+      },
+    );
   });
 
-  it('returns empty metadata without logging when the tag simply does not exist', async () => {
+  it('returns empty metadata without logging when no tag matches', async () => {
     getTagPageMock.mockResolvedValue(okResult());
 
     const metadata = await buildTagMetadata('missing');
@@ -121,61 +123,52 @@ describe('buildTagMetadata', () => {
     expect(metadata).toEqual({});
     expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
   });
-});
 
-describe('buildTagMetadata per language', () => {
-  const { EN, NL, DE } = LOCALE_ISO_CODES;
+  describe('for a Dutch-language request', () => {
+    const { EN, NL, DE } = LOCALE_ISO_CODES;
 
-  beforeEach(() => {
-    getTagPageMock.mockReset();
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
+    beforeEach(() => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        locale: NL,
+        liveLocales: [EN, NL],
+      });
+      resolveTagPageWith({
+        seo,
+        translations: [
+          { language: EN, slug: 'design' },
+          { language: NL, slug: 'ontwerp' },
+          { language: DE, slug: 'gestaltung' },
+        ],
+      });
     });
-    getTagPageMock.mockResolvedValue(
-      okResult(
-        makeTagDetailPage({
-          seo,
-          translations: [
-            { language: EN, slug: 'design' },
-            { language: NL, slug: 'ontwerp' },
-            { language: DE, slug: 'gestaltung' },
-          ],
-        }),
-      ),
-    );
-  });
 
-  afterEach(() => {
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-  });
+    it('advertises the feed in its own language', async () => {
+      const metadata = await buildTagMetadata('ontwerp');
 
-  it('advertises the feed in its own language', async () => {
-    const metadata = await buildTagMetadata('ontwerp');
-
-    expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/nl/tags/ontwerp/rss.xml',
+      expect(metadata.alternates?.types).toEqual({
+        'application/rss+xml': '/nl/tags/ontwerp/rss.xml',
+      });
     });
-  });
 
-  it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
-    const metadata = await buildTagMetadata('ontwerp');
+    it('lists each live translation as hreflang, canonical to its prefix', async () => {
+      const metadata = await buildTagMetadata('ontwerp');
 
-    expect(metadata.alternates).toMatchObject({
-      canonical: NL_DESIGN_TAG_PATH,
-      languages: {
-        en: EN_DESIGN_TAG_PATH,
-        nl: NL_DESIGN_TAG_PATH,
-        'x-default': EN_DESIGN_TAG_PATH,
-      },
+      expect(metadata.alternates).toMatchObject({
+        canonical: NL_DESIGN_TAG_PATH,
+        languages: {
+          en: EN_DESIGN_TAG_PATH,
+          nl: NL_DESIGN_TAG_PATH,
+          'x-default': EN_DESIGN_TAG_PATH,
+        },
+      });
     });
-  });
 
-  it('lists no hreflang past page 1', async () => {
-    const metadata = await buildTagMetadata('ontwerp', 2);
+    it('lists no hreflang past page 1', async () => {
+      const metadata = await buildTagMetadata('ontwerp', 2);
 
-    expect(metadata.alternates?.canonical).toBe('/nl/tags/ontwerp/page/2');
-    expect(metadata.alternates?.languages).toBeUndefined();
+      expect(metadata.alternates?.canonical).toBe('/nl/tags/ontwerp/page/2');
+      expect(metadata.alternates?.languages).toBeUndefined();
+    });
   });
 });

@@ -1,10 +1,13 @@
 import { BRAND_VARIANT, MEDIA_ORDER } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
+import {
+  MOCK_FEATURE_HIGHLIGHT_ITEMS,
+  MOCK_FEATURE_HIGHLIGHTS_HEADING,
+} from '@web/testing/modules/feature-highlights/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureHighlightsModule } from './feature-highlights-module';
 
@@ -28,11 +31,9 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Why choose us' }),
+  headingBlock: makeHeadingBlock({ heading: MOCK_FEATURE_HIGHLIGHTS_HEADING }),
   ctaButtons: [],
   mediaOrder: MEDIA_ORDER.FIRST,
   contentAlignment: undefined,
@@ -46,20 +47,9 @@ const setup = customRenderAsync(FeatureHighlightsModule, {
 describe(`<${FeatureHighlightsModule.name}/>`, () => {
   beforeEach(() => {
     getFeatureHighlightsModuleMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls getFeatureHighlightsModule with the module id and tenant context', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
+  it('fetches the module by id with the tenant context', async () => {
     getFeatureHighlightsModuleMock.mockResolvedValue(
       okResult({ ...baseModule, highlights: [] }),
     );
@@ -68,14 +58,12 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
 
     expect(getFeatureHighlightsModuleMock).toHaveBeenCalledWith(
       MODULE_ID,
-      tenant,
+      DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getFeatureHighlightsModuleMock.mockResolvedValue(
-      errorResult(new Error('boom')),
-    );
+    getFeatureHighlightsModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -83,26 +71,18 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
   });
 
   it('renders the resolved highlight rows', async () => {
-    const highlights = [
-      makeFeatureHighlightItem({
-        id: 'highlight-1',
-        heading: 'Fast by default',
-      }),
-      makeFeatureHighlightItem({
-        id: 'highlight-2',
-        heading: 'Built for scale',
-      }),
-    ];
     getFeatureHighlightsModuleMock.mockResolvedValue(
-      okResult({ ...baseModule, highlights }),
+      okResult({ ...baseModule, highlights: MOCK_FEATURE_HIGHLIGHT_ITEMS }),
     );
 
     await setup();
 
-    highlights.forEach((highlight) => {
-      expect(
-        screen.getByRole('heading', { level: 3, name: highlight.heading }),
-      ).toBeVisible();
+    MOCK_FEATURE_HIGHLIGHT_ITEMS.forEach((highlight) => {
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: highlight.heading,
+      });
+      expect(heading).toBeVisible();
     });
   });
 });

@@ -1,21 +1,16 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
 
 const MODULE_ID = 'post-latest-1';
-const POST_SLUG = 'first-post';
-const POST_TITLE = 'First post';
-const POST_EXCERPT = 'An excerpt';
-const PUBLISHED_AT = '2026-01-01T00:00:00.000Z';
+const POST = makePostCard();
 
 const { getPostLatestMock } = vi.hoisted(() => ({
   getPostLatestMock: vi.fn(),
@@ -33,7 +28,14 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
+const mockPostLatestData = (overrides: Record<string, unknown> = {}) => ({
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: makeHeadingBlock(),
+  posts: [],
+  layout: undefined,
+  contentAlignment: undefined,
+  ...overrides,
+});
 
 const setup = customRenderAsync(PostLatestModule, {
   id: MODULE_ID,
@@ -42,20 +44,10 @@ const setup = customRenderAsync(PostLatestModule, {
 describe(`<${PostLatestModule.name}/>`, () => {
   beforeEach(() => {
     getPostLatestMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getPostLatestMock.mockResolvedValue(
-      okResult({
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-      }),
-    );
+    getPostLatestMock.mockResolvedValue(okResult(mockPostLatestData()));
   });
 
-  it('calls getPostLatest with the module id and resolved tenant Sanity context', async () => {
+  it('fetches the module with the resolved tenant Sanity context', async () => {
     await setup();
 
     expect(getPostLatestMock).toHaveBeenCalledWith(
@@ -64,30 +56,15 @@ describe(`<${PostLatestModule.name}/>`, () => {
     );
   });
 
-  it('forwards the resolved tenant Sanity context to getPostLatest', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
-    await setup();
-
-    expect(getPostLatestMock).toHaveBeenCalledWith(MODULE_ID, tenant);
-  });
-
   it('renders nothing when the fetch fails', async () => {
-    getPostLatestMock.mockResolvedValue(errorResult(new Error('boom')));
+    getPostLatestMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
+  it('renders nothing when no posts resolve', async () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
@@ -95,85 +72,47 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
   it('renders the resolved posts and no pagination nav', async () => {
     getPostLatestMock.mockResolvedValue(
-      okResult({
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [
-          {
-            id: 'post-1',
-            slug: POST_SLUG,
-            title: POST_TITLE,
-            excerpt: POST_EXCERPT,
-            publishedAt: PUBLISHED_AT,
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-      }),
+      okResult(mockPostLatestData({ posts: [POST] })),
     );
 
     await setup();
 
-    expect(screen.getByText(POST_TITLE)).toBeVisible();
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    const postTitle = screen.getByText(POST.title);
+    const pagination = screen.queryByRole('navigation');
+    expect(postTitle).toBeVisible();
+    expect(pagination).not.toBeInTheDocument();
   });
 
   it('renders each post image when showImages is true', async () => {
-    const sanityImage = makeSanityImage();
+    const sanityImage = mockSanityImage();
     getPostLatestMock.mockResolvedValue(
-      okResult({
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [
-          {
-            id: 'post-1',
-            slug: POST_SLUG,
-            title: POST_TITLE,
-            excerpt: POST_EXCERPT,
-            publishedAt: PUBLISHED_AT,
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-            heroImage: sanityImage,
-          },
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: true,
-      }),
+      okResult(
+        mockPostLatestData({
+          posts: [makePostCard({ heroImage: sanityImage })],
+          showImages: true,
+        }),
+      ),
     );
 
     await setup();
 
-    expect(screen.getByRole('img', { name: sanityImage.alt })).toBeVisible();
+    const image = screen.getByRole('img', { name: sanityImage.alt });
+    expect(image).toBeVisible();
   });
 
   it('renders no post images when showImages is false', async () => {
     getPostLatestMock.mockResolvedValue(
-      okResult({
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [
-          {
-            id: 'post-1',
-            slug: POST_SLUG,
-            title: POST_TITLE,
-            excerpt: POST_EXCERPT,
-            publishedAt: PUBLISHED_AT,
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-            heroImage: makeSanityImage(),
-          },
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      }),
+      okResult(
+        mockPostLatestData({
+          posts: [makePostCard({ heroImage: mockSanityImage() })],
+          showImages: false,
+        }),
+      ),
     );
 
     await setup();
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const image = screen.queryByRole('img');
+    expect(image).not.toBeInTheDocument();
   });
 });

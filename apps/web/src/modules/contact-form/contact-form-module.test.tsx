@@ -6,7 +6,7 @@ import { isCapabilityEnabled } from '@web/server/settings-features/is-capability
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeContactFormModule } from '@web/testing/modules/contact-form/fixtures';
+import { mockContactFormModule } from '@web/testing/modules/contact-form/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
@@ -55,7 +55,6 @@ const SUBMIT_LABEL = 'Send message';
 
 describe(`<${ContactFormModule.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: TENANT_ID,
@@ -64,7 +63,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
     } as never);
     getContactFormMock.mockResolvedValue(
       okResult(
-        makeContactFormModule({
+        mockContactFormModule({
           headingBlock: makeHeadingBlock({ heading: HEADING }),
         }),
       ),
@@ -74,8 +73,10 @@ describe(`<${ContactFormModule.name}/>`, () => {
   it('renders the heading and the form', async () => {
     await setup();
 
-    expect(screen.getByRole('heading', { name: HEADING })).toBeVisible();
-    expect(screen.getByRole('button', { name: SUBMIT_LABEL })).toBeVisible();
+    const heading = screen.getByRole('heading', { name: HEADING });
+    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+    expect(heading).toBeVisible();
+    expect(submitButton).toBeVisible();
   });
 
   it('renders nothing when the contact form capability is off', async () => {
@@ -83,9 +84,8 @@ describe(`<${ContactFormModule.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('button', { name: SUBMIT_LABEL }),
-    ).not.toBeInTheDocument();
+    const submitButton = screen.queryByRole('button', { name: SUBMIT_LABEL });
+    expect(submitButton).not.toBeInTheDocument();
     expect(getContactFormMock).not.toHaveBeenCalled();
   });
 
@@ -98,9 +98,8 @@ describe(`<${ContactFormModule.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('button', { name: SUBMIT_LABEL }),
-    ).not.toBeInTheDocument();
+    const submitButton = screen.queryByRole('button', { name: SUBMIT_LABEL });
+    expect(submitButton).not.toBeInTheDocument();
   });
 
   it('renders nothing when the module cannot be loaded', async () => {
@@ -110,29 +109,32 @@ describe(`<${ContactFormModule.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: HEADING }),
-    ).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading', { name: HEADING });
+    expect(heading).not.toBeInTheDocument();
   });
 
-  it("resolves the request context's tenant", async () => {
-    await setup();
-
-    expect(resolveRequestTenant).toHaveBeenCalledWith(
-      DEFAULT_REQUEST_CONTEXT.tenantId,
-    );
-  });
-
-  it('reads no tenant from the request headers when the route resolved no tenant', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
+  it.each([
+    {
+      route: 'a resolved tenant',
+      tenantId: DEFAULT_REQUEST_CONTEXT.tenantId,
+      expected: DEFAULT_REQUEST_CONTEXT.tenantId,
+    },
+    {
+      route: 'no tenant',
       tenantId: undefined,
-    });
+      expected: UNRESOLVED_TENANT_PLACEHOLDER,
+    },
+  ])(
+    'resolves the expected tenant when the route found $route',
+    async ({ tenantId, expected }) => {
+      vi.mocked(getRequestContext).mockResolvedValueOnce({
+        ...DEFAULT_REQUEST_CONTEXT,
+        tenantId,
+      });
 
-    await setup();
+      await setup();
 
-    expect(resolveRequestTenant).toHaveBeenCalledWith(
-      UNRESOLVED_TENANT_PLACEHOLDER,
-    );
-  });
+      expect(resolveRequestTenant).toHaveBeenCalledWith(expected);
+    },
+  );
 });

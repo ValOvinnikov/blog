@@ -1,11 +1,11 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import type { TLandingPage, TLandingSectionNavigation } from '@blog/service';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 const FAQ_PATH = 'modules/faq';
 
-export const LANDING_PAGE_OG_IMAGE = makeSanityImage();
+export const LANDING_PAGE_OG_IMAGE = mockSanityImage();
 
 export const mockLandingPage: TLandingPage = {
   id: 'about-us',

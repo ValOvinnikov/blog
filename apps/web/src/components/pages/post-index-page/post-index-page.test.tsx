@@ -8,8 +8,9 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
-import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
@@ -59,13 +60,18 @@ const indexPage: TBlogIndexPage = {
   translations: [LOCALE_ISO_CODES.EN],
 };
 
+const resolveIndexPageWith = (overrides: Partial<TBlogIndexPage>) =>
+  getIndexPageMock.mockResolvedValueOnce(
+    okResult({ ...indexPage, ...overrides }),
+  );
+
 const setup = customRenderServerAsync(PostIndexPage, {
   page: 1,
 });
 
 describe(`<${PostIndexPage.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    vi.mocked(getRequestContext).mockReset();
     getIndexPageMock.mockResolvedValue(okResult(indexPage));
     vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
       okResult([
@@ -87,10 +93,13 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     it('renders the page heading and supporting text inside main', () => {
       const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', { level: 1, name: 'Blog' }),
-      ).toBeVisible();
-      expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
+      const heading = within(main).getByRole('heading', {
+        level: 1,
+        name: 'Blog',
+      });
+      const supportingText = within(main).getByText(SUPPORTING_TEXT);
+      expect(heading).toBeVisible();
+      expect(supportingText).toBeVisible();
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     });
 
@@ -98,20 +107,23 @@ describe(`<${PostIndexPage.name}/>`, () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
-      expect(within(breadcrumbs).getByText('Blog')).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      const homeLink = within(breadcrumbs).getByRole('link', {
+        name: 'Northwind Journal',
+      });
+      const currentCrumb = within(breadcrumbs).getByText('Blog');
+      const main = screen.getByRole('main');
+      expect(homeLink).toBeVisible();
+      expect(currentCrumb).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
     });
 
     it('renders the tenant topic chips inside main', () => {
-      const topics = within(screen.getByRole('main')).getByRole('navigation', {
-        name: 'Topics',
+      const main = screen.getByRole('main');
+      const topics = within(main).getByRole('navigation', { name: 'Topics' });
+      const engineeringChip = within(topics).getByRole('link', {
+        name: 'Engineering',
       });
-      expect(
-        within(topics).getByRole('link', { name: 'Engineering' }),
-      ).toHaveAttribute('href', '/topics/engineering');
+      expect(engineeringChip).toHaveAttribute('href', '/topics/engineering');
       expect(service.entities.topics.v1.getTopics).toHaveBeenCalledWith(
         DEFAULT_TENANT_SANITY_CONTEXT,
       );
@@ -119,50 +131,53 @@ describe(`<${PostIndexPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getIndexPageMock.mockResolvedValueOnce(errorResult(new Error('boom')));
+    getIndexPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).toHaveBeenCalledWith(
-      'post_index_page.fetch_failed',
-      expect.anything(),
-    );
-  });
-
-  it('calls notFound() without logging when the index page does not exist', async () => {
-    getIndexPageMock.mockResolvedValueOnce(okResult());
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).not.toHaveBeenCalled();
-  });
-
-  it('redirects to / when this language has no post index page of its own', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.NL,
-      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+    expect(logger.error).toHaveBeenCalledWith('post_index_page.fetch_failed', {
+      error: MOCK_ERROR,
     });
-    getIndexPageMock.mockResolvedValueOnce(okResult());
+  });
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+  describe('when there is no index page', () => {
+    beforeEach(() => {
+      getIndexPageMock.mockResolvedValueOnce(okResult());
+    });
 
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    it('calls notFound() without logging when there is no index page', async () => {
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
+
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+
+    it('redirects to / when this language has no post index page', async () => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        locale: LOCALE_ISO_CODES.NL,
+        liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+      });
+
+      await expect(setup()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+      );
+
+      expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    });
   });
 
   it('renders the authored modules inside main', async () => {
-    getIndexPageMock.mockResolvedValueOnce(
-      okResult({
-        ...indexPage,
-        modules: [{ id: 'cta-1', type: 'module_cta' }],
-      }),
-    );
+    resolveIndexPageWith({
+      modules: [{ id: 'cta-1', type: 'module_cta' }],
+    });
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
-        makeCtaModuleData({
+        mockCtaModuleData({
           headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
         }),
       ),
@@ -170,43 +185,39 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      within(screen.getByRole('main')).getByRole('region', {
-        name: CTA_HEADING,
-      }),
-    ).toBeVisible();
+    const main = screen.getByRole('main');
+    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    expect(ctaRegion).toBeVisible();
   });
 
   it('renders the hero in place of the page heading when one is set', async () => {
-    getIndexPageMock.mockResolvedValueOnce(
-      okResult({
-        ...indexPage,
-        hero: { id: 'hero-1', type: 'module_heroBlog' },
-      }),
-    );
+    resolveIndexPageWith({
+      hero: { id: 'hero-1', type: 'module_heroBlog' },
+    });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
-      okResult(makeHeroBlogData({ heading: HERO_HEADING })),
+      okResult(mockHeroBlogData({ heading: HERO_HEADING })),
     );
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: HERO_HEADING }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('heading', { level: 1, name: 'Blog' }),
-    ).not.toBeInTheDocument();
+    const heroHeading = screen.getByRole('heading', {
+      level: 1,
+      name: HERO_HEADING,
+    });
+    const pageHeading = screen.queryByRole('heading', {
+      level: 1,
+      name: 'Blog',
+    });
+    expect(heroHeading).toBeVisible();
+    expect(pageHeading).not.toBeInTheDocument();
   });
 
   it('loads post lists for the current page with no archive scope', async () => {
-    getIndexPageMock.mockResolvedValueOnce(
-      okResult({
-        ...indexPage,
-        modules: [{ id: 'list-1', type: 'module_postList' }],
-      }),
-    );
+    resolveIndexPageWith({
+      modules: [{ id: 'list-1', type: 'module_postList' }],
+    });
     vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
-      errorResult(new Error('boom')),
+      errorResult(MOCK_ERROR),
     );
 
     await expect(setup({ page: 2 })).rejects.toThrow(

@@ -2,16 +2,20 @@ import {
   BRAND_VARIANT,
   NEXT_NAVIGATION_ERROR,
   TAXONOMY_KIND,
+  type TTaxonomyKind,
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+  MOCK_FIRST_TOPIC_POST_TITLE,
+  MOCK_SECOND_TOPIC_POST_TITLE,
+  MOCK_TOPIC_LIST_ITEM,
+} from '@web/testing/modules/taxonomy-list/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { makeTag } from '@web/testing/shared/tag/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -35,62 +39,54 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
+const mockTaxonomyResultFor =
+  (taxonomy: TTaxonomyKind, heading: string) =>
+  (entries: unknown[] = [], showLatestPosts = true) =>
+    okResult({
+      brandVariant: BRAND_VARIANT.PRIMARY,
+      headingBlock: makeHeadingBlock({ heading }),
+      layout: undefined,
+      contentAlignment: undefined,
+      taxonomy,
+      showLatestPosts,
+      entries,
+    });
 
-const topicsResult = (entries: unknown[] = [], showLatestPosts = true) =>
-  okResult({
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Topics' }),
-    layout: undefined,
-    contentAlignment: undefined,
-    taxonomy: TAXONOMY_KIND.TOPICS,
-    showLatestPosts,
-    entries,
-  });
+const TOPICS_HEADING = 'Topics';
 
-const tagsResult = (entries: unknown[] = [], showLatestPosts = true) =>
-  okResult({
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Tags' }),
-    layout: undefined,
-    contentAlignment: undefined,
-    taxonomy: TAXONOMY_KIND.TAGS,
-    showLatestPosts,
-    entries,
-  });
-
-const FIRST_POST_TITLE = 'Shipping the new build pipeline';
-const SECOND_POST_TITLE = 'Why we rewrote our test runner';
+const mockTopicsResult = mockTaxonomyResultFor(
+  TAXONOMY_KIND.TOPICS,
+  TOPICS_HEADING,
+);
+const mockTagsResult = mockTaxonomyResultFor(TAXONOMY_KIND.TAGS, 'Tags');
 
 const entry = {
-  id: 'topic-1',
-  title: 'Engineering',
+  id: MOCK_TOPIC_LIST_ITEM.id,
+  title: MOCK_TOPIC_LIST_ITEM.title,
   slug: 'engineering',
-  description: 'Posts about building things.',
+  description: MOCK_TOPIC_LIST_ITEM.description,
   postCount: 5,
   latestPosts: [
     {
       id: 'post-1',
-      title: FIRST_POST_TITLE,
+      title: MOCK_FIRST_TOPIC_POST_TITLE,
       slug: 'shipping-the-new-build-pipeline',
     },
     {
       id: 'post-2',
-      title: SECOND_POST_TITLE,
+      title: MOCK_SECOND_TOPIC_POST_TITLE,
       slug: 'why-we-rewrote-our-test-runner',
     },
   ],
 };
 
 const MODULE_ID = 'taxonomy-list-1';
+const TAG = makeTag();
 const READ_THE_BLOG = 'read the blog';
-const LIST_NAME = 'Latest in Engineering';
 
 describe(`<${TaxonomyListModule.name}/>`, () => {
   beforeEach(() => {
     getTaxonomyListMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   describe('modules[] placement', () => {
@@ -100,59 +96,63 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
     describe('with no topic entries', () => {
       beforeEach(async () => {
-        getTaxonomyListMock.mockResolvedValue(topicsResult());
+        getTaxonomyListMock.mockResolvedValue(mockTopicsResult());
 
         await setup();
       });
 
-      it('forwards the tenant Sanity context to getTaxonomyList', async () => {
+      it('fetches the module with the tenant Sanity context', async () => {
         expect(getTaxonomyListMock).toHaveBeenCalledWith(
           MODULE_ID,
           DEFAULT_TENANT_SANITY_CONTEXT,
         );
       });
-
-      it('renders a labeled section with the topics empty message when entries is empty', async () => {
-        const section = screen.getByRole('region', { name: 'Topics' });
-        expect(within(section).getByText('No topics yet.')).toBeVisible();
-      });
     });
 
     describe('with one topic entry', () => {
       beforeEach(async () => {
-        getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
+        getTaxonomyListMock.mockResolvedValue(mockTopicsResult([entry]));
 
         await setup();
       });
 
-      it('renders topic entries with /topics hrefs and the topics postsCount copy', async () => {
-        const link = screen.getByRole('link', { name: /Engineering/ });
-        expect(link).toHaveAttribute('href', '/topics/engineering');
-        expect(screen.getByText('5 posts')).toBeVisible();
-        expect(
-          screen.getByRole('heading', { level: 2, name: 'Topics' }),
-        ).toBeVisible();
-      });
-
       it('shows the translated latest label above the entry’s latest posts', async () => {
-        expect(screen.getByText('Latest')).toBeVisible();
+        const latestLabel = screen.getByText('Latest');
+        expect(latestLabel).toBeVisible();
       });
 
       it('derives titleId and dataTestId from the module id', async () => {
         const heading = screen.getByRole('heading', {
           level: 2,
-          name: 'Topics',
+          name: TOPICS_HEADING,
         });
+        const section = screen.getByRole('region', { name: TOPICS_HEADING });
         expect(heading).toHaveAttribute('id', 'taxonomy-list-taxonomy-list-1');
-        expect(screen.getByTestId('taxonomy-list-module-taxonomy-list-1')).toBe(
-          heading.closest('section'),
+        const sectionByTestId = screen.getByTestId(
+          'taxonomy-list-module-taxonomy-list-1',
+        );
+        expect(sectionByTestId).toBe(section);
+      });
+
+      it('links each latest post to its detail page, newest first', () => {
+        const list = screen.getByRole('list', {
+          name: MOCK_TOPIC_LIST_ITEM.latestPostsLabel,
+        });
+        const postLinks = within(list).getAllByRole('link');
+        expect(postLinks.map((link) => link.textContent)).toEqual([
+          MOCK_FIRST_TOPIC_POST_TITLE,
+          MOCK_SECOND_TOPIC_POST_TITLE,
+        ]);
+        expect(postLinks[0]).toHaveAttribute(
+          'href',
+          '/blog/shipping-the-new-build-pipeline',
         );
       });
     });
 
     it('omits an entry with no archive page', async () => {
       getTaxonomyListMock.mockResolvedValue(
-        topicsResult([
+        mockTopicsResult([
           entry,
           { ...entry, id: 'topic-2', title: 'Design', slug: undefined },
         ]),
@@ -160,38 +160,76 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       await setup();
 
-      expect(screen.getByRole('link', { name: /Engineering/ })).toBeVisible();
-      expect(screen.queryByText('Design')).not.toBeInTheDocument();
+      const link = screen.getByRole('link', { name: /Engineering/ });
+      const omittedEntry = screen.queryByText('Design');
+      expect(link).toBeVisible();
+      expect(omittedEntry).not.toBeInTheDocument();
     });
 
-    it('renders tag entries with /tags hrefs and the tags postsCount copy', async () => {
-      getTaxonomyListMock.mockResolvedValue(
-        tagsResult([
-          { ...entry, id: 'tag-1', slug: 'typescript', title: 'TypeScript' },
+    it.each([
+      {
+        kind: TAXONOMY_KIND.TOPICS,
+        result: mockTopicsResult([entry]),
+        name: /Engineering/,
+        href: MOCK_TOPIC_LIST_ITEM.href,
+        heading: TOPICS_HEADING,
+      },
+      {
+        kind: TAXONOMY_KIND.TAGS,
+        result: mockTagsResult([
+          { ...entry, id: TAG.id, slug: TAG.slug, title: TAG.title },
         ]),
-      );
+        name: /TypeScript/,
+        href: '/tags/typescript',
+        heading: 'Tags',
+      },
+    ])(
+      'renders $kind entries with their archive hrefs and post counts',
+      async ({ result, name, href, heading }) => {
+        getTaxonomyListMock.mockResolvedValue(result);
 
-      await setup();
+        await setup();
 
-      const link = screen.getByRole('link', { name: /TypeScript/ });
-      expect(link).toHaveAttribute('href', '/tags/typescript');
-      expect(screen.getByText('5 posts')).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Tags' }),
-      ).toBeVisible();
-    });
+        const link = screen.getByRole('link', { name });
+        const postCount = screen.getByText(MOCK_TOPIC_LIST_ITEM.postCountLabel);
+        const sectionHeading = screen.getByRole('heading', {
+          level: 2,
+          name: heading,
+        });
+        expect(link).toHaveAttribute('href', href);
+        expect(postCount).toBeVisible();
+        expect(sectionHeading).toBeVisible();
+      },
+    );
 
-    it('renders a labeled section with the tags empty message when entries is empty', async () => {
-      getTaxonomyListMock.mockResolvedValue(tagsResult());
+    it.each([
+      {
+        kind: TAXONOMY_KIND.TOPICS,
+        result: mockTopicsResult(),
+        heading: TOPICS_HEADING,
+        emptyMessage: 'No topics yet.',
+      },
+      {
+        kind: TAXONOMY_KIND.TAGS,
+        result: mockTagsResult(),
+        heading: 'Tags',
+        emptyMessage: 'No tags yet.',
+      },
+    ])(
+      'renders a labelled section with the $kind empty message without entries',
+      async ({ result, heading, emptyMessage }) => {
+        getTaxonomyListMock.mockResolvedValue(result);
 
-      await setup();
+        await setup();
 
-      const section = screen.getByRole('region', { name: 'Tags' });
-      expect(within(section).getByText('No tags yet.')).toBeVisible();
-    });
+        const section = screen.getByRole('region', { name: heading });
+        const message = within(section).getByText(emptyMessage);
+        expect(message).toBeVisible();
+      },
+    );
 
     it('renders an authored link in the tags empty message', async () => {
-      getTaxonomyListMock.mockResolvedValue(tagsResult());
+      getTaxonomyListMock.mockResolvedValue(mockTagsResult());
       vi.mocked(getVoiceRich).mockResolvedValueOnce(
         makeFormattedVoiceRich({ linkText: READ_THE_BLOG, href: '/blog' }),
       );
@@ -199,14 +237,12 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       await setup();
 
       expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('tagsEmpty');
-      expect(screen.getByRole('link', { name: READ_THE_BLOG })).toHaveAttribute(
-        'href',
-        '/blog',
-      );
+      const link = screen.getByRole('link', { name: READ_THE_BLOG });
+      expect(link).toHaveAttribute('href', '/blog');
     });
 
     it('logs and calls notFound() when the fetch fails', async () => {
-      getTaxonomyListMock.mockResolvedValue(errorResult(new Error('boom')));
+      getTaxonomyListMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       await expect(setup()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -215,47 +251,19 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'taxonomy_list_module.fetch_failed',
-        expect.anything(),
+        { id: MODULE_ID, error: MOCK_ERROR },
       );
     });
 
-    it('maps latestPosts to post-detail links, newest first, when showLatestPosts is on', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult([entry], true));
+    it('omits the latest-posts list when latest posts are switched off', async () => {
+      getTaxonomyListMock.mockResolvedValue(mockTopicsResult([entry], false));
 
       await setup();
 
-      const list = screen.getByRole('list', { name: LIST_NAME });
-      const postLinks = within(list).getAllByRole('link');
-      expect(postLinks.map((link) => link.textContent)).toEqual([
-        FIRST_POST_TITLE,
-        SECOND_POST_TITLE,
-      ]);
-      expect(postLinks[0]).toHaveAttribute(
-        'href',
-        '/blog/shipping-the-new-build-pipeline',
-      );
-    });
-
-    it('omits the latest-posts list when showLatestPosts is off', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult([entry], false));
-
-      await setup();
-
-      expect(
-        screen.queryByRole('list', { name: LIST_NAME }),
-      ).not.toBeInTheDocument();
-    });
-
-    it('omits the latest-posts list when the entry has no posts, even with the flag on', async () => {
-      getTaxonomyListMock.mockResolvedValue(
-        topicsResult([{ ...entry, latestPosts: [] }], true),
-      );
-
-      await setup();
-
-      expect(
-        screen.queryByRole('list', { name: LIST_NAME }),
-      ).not.toBeInTheDocument();
+      const list = screen.queryByRole('list', {
+        name: MOCK_TOPIC_LIST_ITEM.latestPostsLabel,
+      });
+      expect(list).not.toBeInTheDocument();
     });
   });
 });

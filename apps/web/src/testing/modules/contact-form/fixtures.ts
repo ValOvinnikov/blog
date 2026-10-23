@@ -3,7 +3,7 @@ import type { TContactFormModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-export const makeContactFormModule = (
+export const mockContactFormModule = (
   overrides: Partial<TContactFormModule> = {},
 ): TContactFormModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,

@@ -5,16 +5,26 @@ import {
   DISPLAY_MODE,
 } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+  MOCK_CTA_ACTIONS,
+} from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_FEATURE_LIST_HEADING,
+  MOCK_FEATURE_LIST_ITEMS,
+} from '@web/testing/modules/feature-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import type { ReactElement } from 'react';
 
+import type { IFeatureListCarouselProps } from './components/feature-list-carousel/feature-list-carousel';
 import { FeatureListModuleView } from './feature-list-module-view';
 
 const { FeatureListCarousel } = vi.hoisted(() => ({
-  FeatureListCarousel: vi.fn(() => (
-    <div data-testid="feature-list-carousel-stub" />
-  )),
+  FeatureListCarousel: vi.fn<
+    (props: IFeatureListCarouselProps) => ReactElement
+  >(() => <div data-testid="feature-list-carousel-stub" />),
 }));
 
 vi.mock('@web/i18n/navigation');
@@ -23,30 +33,21 @@ vi.mock('./components/feature-list-carousel/feature-list-carousel', () => ({
   FeatureListCarousel,
 }));
 
-const items = [
-  makeFeatureListItem({
-    id: 'feature-1',
-    headingBlock: makeHeadingBlock({ heading: 'Fast by default' }),
-  }),
-  makeFeatureListItem({
-    id: 'feature-2',
-    headingBlock: makeHeadingBlock({ heading: 'Built for scale' }),
-  }),
-];
+const TITLE_ID = 'feature-list-title';
 
 const dataTestId = 'feature-list-module-feature-list-1';
 
 const setup = customRender(FeatureListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Why choose us' }),
-  items,
+  headingBlock: makeHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
+  items: MOCK_FEATURE_LIST_ITEMS,
   ctaButtons: [],
   imageShape: CARD_IMAGE_SHAPE.WIDE,
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
   layout: undefined,
-  titleId: 'feature-list-title',
+  titleId: TITLE_ID,
   dataTestId,
 });
 
@@ -56,30 +57,34 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
       setup();
     });
 
-    it('labels the section with the given titleId', () => {
-      const label = screen.getByText('Why choose us');
-      expect(label).toHaveAttribute('id', 'feature-list-title');
-      expect(label.tagName).toBe('H2');
-
-      const section = label.closest('section');
-      expect(section).toHaveAttribute('aria-labelledby', 'feature-list-title');
+    it('labels the section with its h2 heading', () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_FEATURE_LIST_HEADING,
+      });
+      const section = screen.getByRole('region', {
+        name: MOCK_FEATURE_LIST_HEADING,
+      });
+      expect(heading).toHaveAttribute('id', TITLE_ID);
+      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
       expect(section).toHaveAttribute('data-testid', dataTestId);
     });
 
     it('renders one article with an h3 title per item', () => {
-      expect(screen.getAllByRole('article')).toHaveLength(2);
-      items.forEach((item) => {
-        expect(
-          screen.getByRole('heading', {
-            level: 3,
-            name: item.headingBlock.heading,
-          }),
-        ).toBeVisible();
+      const articles = screen.getAllByRole('article');
+      expect(articles).toHaveLength(2);
+      MOCK_FEATURE_LIST_ITEMS.forEach((item) => {
+        const heading = screen.getByRole('heading', {
+          level: 3,
+          name: item.headingBlock.heading,
+        });
+        expect(heading).toBeVisible();
       });
     });
 
     it('renders no action group when there are no cta buttons', () => {
-      expect(screen.queryAllByRole('link')).toHaveLength(0);
+      const links = screen.queryAllByRole('link');
+      expect(links).toHaveLength(0);
     });
   });
 
@@ -87,7 +92,7 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     [DISPLAY_MODE.CAROUSEL, true],
     [DISPLAY_MODE.GRID, false],
   ])(
-    'renders FeatureListCarousel instead of the grid only when displayMode is %s: %s',
+    'renders the carousel in place of the grid only in %s mode: %s',
     (displayMode, expectedCarousel) => {
       setup({ displayMode });
 
@@ -95,27 +100,32 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
         expectedCarousel ? 1 : 0,
       );
       if (expectedCarousel) {
-        expect(screen.getByTestId('feature-list-carousel-stub')).toBeVisible();
-        expect(FeatureListCarousel).toHaveBeenCalledWith(
-          expect.objectContaining({ items }),
-          undefined,
-        );
-        expect(screen.queryByRole('article')).not.toBeInTheDocument();
+        const carousel = screen.getByTestId('feature-list-carousel-stub');
+        const article = screen.queryByRole('article');
+        const { items } = FeatureListCarousel.mock.calls[0]![0];
+        expect(carousel).toBeVisible();
+        expect(items).toEqual(MOCK_FEATURE_LIST_ITEMS);
+        expect(article).not.toBeInTheDocument();
       }
     },
   );
 
   it('renders the resolved cta buttons when present', () => {
-    setup({ ctaButtons: ctaActionsDemo });
+    setup({ ctaButtons: MOCK_CTA_ACTIONS });
 
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).toHaveAttribute(
+    const primaryLink = screen.getByRole('link', {
+      name: MOCK_CTA_PRIMARY_ACTION.link.label,
+    });
+    const secondaryLink = screen.getByRole('link', {
+      name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+    });
+    expect(primaryLink).toHaveAttribute(
       'href',
-      '/blog',
+      MOCK_CTA_PRIMARY_ACTION.link.href,
     );
-    expect(
-      screen.getByRole('link', {
-        name: 'Learn more about our subscription plans',
-      }),
-    ).toHaveAttribute('href', '/about-us');
+    expect(secondaryLink).toHaveAttribute(
+      'href',
+      MOCK_CTA_SECONDARY_ACTION.link.href,
+    );
   });
 });

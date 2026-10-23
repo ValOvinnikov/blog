@@ -1,12 +1,12 @@
 import type { TPostDetail } from '@blog/service';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 const POST_TITLE = 'Hello World';
 const POST_EXCERPT = 'A sufficiently long excerpt for the card.';
 const HERO_IMAGE_ALT = 'A hero image';
 
-export const POST_DETAIL_AUTHOR_IMAGE = makeSanityImage({
+export const POST_DETAIL_AUTHOR_IMAGE = mockSanityImage({
   assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-400x400-jpg',
   alt: 'Jane Doe',
 });
@@ -17,7 +17,7 @@ export const mockPostDetail: TPostDetail = {
   slug: 'hello-world',
   excerpt: POST_EXCERPT,
   publishedAt: '2026-01-15T00:00:00Z',
-  heroImage: makeSanityImage({ alt: HERO_IMAGE_ALT }),
+  heroImage: mockSanityImage({ alt: HERO_IMAGE_ALT }),
   featured: false,
   body: [
     {
@@ -36,7 +36,7 @@ export const mockPostDetail: TPostDetail = {
     description: POST_EXCERPT,
     ogTitle: POST_TITLE,
     ogDescription: POST_EXCERPT,
-    ogImage: makeSanityImage({ alt: HERO_IMAGE_ALT }),
+    ogImage: mockSanityImage({ alt: HERO_IMAGE_ALT }),
   }),
   author: {
     id: 'author-1',

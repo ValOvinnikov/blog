@@ -5,17 +5,17 @@ import {
   TIMELINE_ORIENTATION,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeTimelineItem } from '@web/testing/modules/timeline/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockTimelineItem } from '@web/testing/modules/timeline/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TimelineModuleView } from './timeline-module-view';
 
 const items = [
-  makeTimelineItem({ id: 'step-1', heading: 'Discovery', marker: '2021' }),
-  makeTimelineItem({ id: 'step-2', heading: 'Design', marker: '2022' }),
-  makeTimelineItem({ id: 'step-3', heading: 'Build', marker: '2023' }),
-  makeTimelineItem({ id: 'step-4', heading: 'Launch', marker: '2024' }),
+  mockTimelineItem({ id: 'step-1', heading: 'Discovery', marker: '2021' }),
+  mockTimelineItem({ id: 'step-2', heading: 'Design', marker: '2022' }),
+  mockTimelineItem({ id: 'step-3', heading: 'Build', marker: '2023' }),
+  mockTimelineItem({ id: 'step-4', heading: 'Launch', marker: '2024' }),
 ];
 
 const meta = {
@@ -82,7 +82,7 @@ export const CenterAligned: TStory = {
 };
 
 export const WithActions: TStory = {
-  args: { ctaButtons: ctaActionsDemo },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const HorizontalOverCapFallsBackToVertical: TStory = {
@@ -90,8 +90,8 @@ export const HorizontalOverCapFallsBackToVertical: TStory = {
     orientation: TIMELINE_ORIENTATION.HORIZONTAL,
     items: [
       ...items,
-      makeTimelineItem({ id: 'step-5', heading: 'Measure', marker: '2025' }),
-      makeTimelineItem({ id: 'step-6', heading: 'Iterate', marker: '2026' }),
+      mockTimelineItem({ id: 'step-5', heading: 'Measure', marker: '2025' }),
+      mockTimelineItem({ id: 'step-6', heading: 'Iterate', marker: '2026' }),
     ],
   },
 };

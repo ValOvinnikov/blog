@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
+import { service, type TLandingPage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { permanentRedirect } from '@web/i18n/navigation';
@@ -10,12 +10,13 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
-import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import {
   makeLandingSectionNavigation,
   mockLandingPage,
 } from '@web/testing/pages/landing-page/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
@@ -45,10 +46,17 @@ vi.mock('@web/i18n/navigation');
 const getPageMock = vi.mocked(service.pages.landing.v1.getPage);
 const getRedirectMock = vi.mocked(service.pages.landing.v1.getRedirect);
 
+const resolvePageWith = (overrides: Partial<TLandingPage>) =>
+  getPageMock.mockResolvedValueOnce(
+    okResult({ ...mockLandingPage, ...overrides }),
+  );
+
 const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
+const LANDING_PATH = 'about-us';
+
 const setup = customRenderServerAsync(LandingPage, {
-  path: 'about-us',
+  path: LANDING_PATH,
 });
 
 const SECTION_NAV_NAME = 'In this section';
@@ -74,7 +82,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
     it('fetches the page for the given path with the tenant context', () => {
       expect(getPageMock).toHaveBeenCalledWith(
-        ['about-us'],
+        [LANDING_PATH],
         DEFAULT_TENANT_SANITY_CONTEXT,
       );
     });
@@ -83,17 +91,21 @@ describe(`<${LandingPage.name}/>`, () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
-      expect(within(breadcrumbs).getByText('About Us')).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      const homeLink = within(breadcrumbs).getByRole('link', {
+        name: 'Northwind Journal',
+      });
+      const currentCrumb = within(breadcrumbs).getByText('About Us');
+      const main = screen.getByRole('main');
+      expect(homeLink).toBeVisible();
+      expect(currentCrumb).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
     });
 
     it('renders no section navigation when the page is outside a section', () => {
-      expect(
-        screen.queryByRole('navigation', { name: SECTION_NAV_NAME }),
-      ).not.toBeInTheDocument();
+      const sectionNav = screen.queryByRole('navigation', {
+        name: SECTION_NAV_NAME,
+      });
+      expect(sectionNav).not.toBeInTheDocument();
     });
 
     it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
@@ -141,15 +153,15 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPageMock.mockResolvedValueOnce(errorResult(new Error('boom')));
+    getPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalledWith(
-      'landing_page.fetch_failed',
-      expect.objectContaining({ path: 'about-us' }),
-    );
+    expect(logger.error).toHaveBeenCalledWith('landing_page.fetch_failed', {
+      path: LANDING_PATH,
+      error: MOCK_ERROR,
+    });
   });
 
   it('calls notFound() when the slug exists only in another language', async () => {
@@ -173,54 +185,47 @@ describe(`<${LandingPage.name}/>`, () => {
   });
 
   it('renders the page heading and supporting text inside main', async () => {
-    getPageMock.mockResolvedValueOnce(
-      okResult({
-        ...mockLandingPage,
-        headingBlock: makeHeadingBlock({
-          heading: 'About Us',
-          supportingText: SUPPORTING_TEXT,
-        }),
+    resolvePageWith({
+      headingBlock: makeHeadingBlock({
+        heading: 'About Us',
+        supportingText: SUPPORTING_TEXT,
       }),
-    );
+    });
 
     await setup();
 
     const main = screen.getByRole('main');
-    expect(
-      within(main).getByRole('heading', { level: 1, name: 'About Us' }),
-    ).toBeVisible();
-    expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
+    const heading = within(main).getByRole('heading', {
+      level: 1,
+      name: 'About Us',
+    });
+    const supportingText = within(main).getByText(SUPPORTING_TEXT);
+    expect(heading).toBeVisible();
+    expect(supportingText).toBeVisible();
   });
 
-  it('renders the section navigation inside main with the current page marked', async () => {
-    getPageMock.mockResolvedValueOnce(
-      okResult({
-        ...mockLandingPage,
-        sectionNavigation: makeLandingSectionNavigation(),
-      }),
-    );
+  it('marks the current page in the section navigation inside main', async () => {
+    resolvePageWith({
+      sectionNavigation: makeLandingSectionNavigation(),
+    });
 
     await setup();
 
-    const sectionNav = within(screen.getByRole('main')).getByRole(
-      'navigation',
-      { name: SECTION_NAV_NAME },
-    );
-    expect(
-      within(sectionNav).getByRole('link', { name: 'FAQ' }),
-    ).toHaveAttribute('aria-current', 'page');
+    const main = screen.getByRole('main');
+    const sectionNav = within(main).getByRole('navigation', {
+      name: SECTION_NAV_NAME,
+    });
+    const faqLink = within(sectionNav).getByRole('link', { name: 'FAQ' });
+    expect(faqLink).toHaveAttribute('aria-current', 'page');
   });
 
   it('renders the authored modules inside main', async () => {
-    getPageMock.mockResolvedValueOnce(
-      okResult({
-        ...mockLandingPage,
-        modules: [{ id: 'cta-1', type: 'module_cta' }],
-      }),
-    );
+    resolvePageWith({
+      modules: [{ id: 'cta-1', type: 'module_cta' }],
+    });
     vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
       okResult(
-        makeCtaModuleData({
+        mockCtaModuleData({
           headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
         }),
       ),
@@ -228,47 +233,43 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      within(screen.getByRole('main')).getByRole('region', {
-        name: CTA_HEADING,
-      }),
-    ).toBeVisible();
+    const main = screen.getByRole('main');
+    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    expect(ctaRegion).toBeVisible();
   });
 
   it('renders the hero in place of the page heading when one is set', async () => {
-    getPageMock.mockResolvedValueOnce(
-      okResult({
-        ...mockLandingPage,
-        hero: { id: 'hero-1', type: 'module_heroBlog' },
-      }),
-    );
+    resolvePageWith({
+      hero: { id: 'hero-1', type: 'module_heroBlog' },
+    });
     vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
-      okResult(makeHeroBlogData({ heading: HERO_HEADING })),
+      okResult(mockHeroBlogData({ heading: HERO_HEADING })),
     );
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: HERO_HEADING }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('heading', { level: 1, name: 'About Us' }),
-    ).not.toBeInTheDocument();
+    const heroHeading = screen.getByRole('heading', {
+      level: 1,
+      name: HERO_HEADING,
+    });
+    const pageHeading = screen.queryByRole('heading', {
+      level: 1,
+      name: 'About Us',
+    });
+    expect(heroHeading).toBeVisible();
+    expect(pageHeading).not.toBeInTheDocument();
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    getPageMock.mockResolvedValueOnce(
-      okResult({
-        ...mockLandingPage,
-        faqs: [
-          {
-            id: 'faq-1',
-            question: 'Do you offer a free trial?',
-            answer: 'Yes.',
-          },
-        ],
-      }),
-    );
+    resolvePageWith({
+      faqs: [
+        {
+          id: 'faq-1',
+          question: 'Do you offer a free trial?',
+          answer: 'Yes.',
+        },
+      ],
+    });
 
     await setup();
 

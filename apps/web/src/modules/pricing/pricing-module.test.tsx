@@ -1,15 +1,12 @@
 import { errorResult, okResult } from '@blog/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
-  makePricingModule,
-  makePricingPrice,
-  makePricingTier,
+  mockPricingModule,
+  mockPricingPrice,
+  mockPricingTier,
 } from '@web/testing/modules/pricing/fixtures';
-import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PricingModule } from './pricing-module';
 
@@ -29,8 +26,6 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const setup = customRenderAsync(PricingModule, {
   id: 'pricing-1',
 });
@@ -39,13 +34,11 @@ describe(`<${PricingModule.name}/>`, () => {
   beforeEach(() => {
     getPricingModuleMock.mockReset();
     getSiteSettingsMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     getSiteSettingsMock.mockResolvedValue(okResult({ currency: 'GBP' }));
   });
 
   it('renders nothing when the module fetch fails', async () => {
-    getPricingModuleMock.mockResolvedValue(errorResult(new Error('boom')));
+    getPricingModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -54,10 +47,10 @@ describe(`<${PricingModule.name}/>`, () => {
 
   describe('with a default pricing module', () => {
     beforeEach(() => {
-      getPricingModuleMock.mockResolvedValue(okResult(makePricingModule()));
+      getPricingModuleMock.mockResolvedValue(okResult(mockPricingModule()));
     });
 
-    it('calls getPricingModule with the module id and the tenant Sanity context', async () => {
+    it('fetches the module with the tenant Sanity context', async () => {
       await setup();
 
       expect(getPricingModuleMock).toHaveBeenCalledWith(
@@ -67,7 +60,7 @@ describe(`<${PricingModule.name}/>`, () => {
     });
 
     it('renders nothing when the site settings fetch fails', async () => {
-      getSiteSettingsMock.mockResolvedValue(errorResult(new Error('boom')));
+      getSiteSettingsMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       const { container } = await setup();
 
@@ -78,22 +71,22 @@ describe(`<${PricingModule.name}/>`, () => {
   it('formats prices in the site currency without trailing zeros', async () => {
     getPricingModuleMock.mockResolvedValue(
       okResult(
-        makePricingModule({
+        mockPricingModule({
           tiers: [
-            makePricingTier({
+            mockPricingTier({
               id: 'whole',
               name: 'Whole',
-              prices: [makePricingPrice({ amount: 49 })],
+              prices: [mockPricingPrice({ amount: 49 })],
             }),
-            makePricingTier({
+            mockPricingTier({
               id: 'fraction',
               name: 'Fraction',
-              prices: [makePricingPrice({ amount: 49.99 })],
+              prices: [mockPricingPrice({ amount: 49.99 })],
             }),
-            makePricingTier({
+            mockPricingTier({
               id: 'free',
               name: 'Free tier',
-              prices: [makePricingPrice({ amount: 0 })],
+              prices: [mockPricingPrice({ amount: 0 })],
             }),
           ],
         }),
@@ -102,8 +95,11 @@ describe(`<${PricingModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('£49')).toBeVisible();
-    expect(screen.getByText('£49.99')).toBeVisible();
-    expect(screen.getByText('Free')).toBeVisible();
+    const wholePrice = screen.getByText('£49');
+    const fractionPrice = screen.getByText('£49.99');
+    const freePrice = screen.getByText('Free');
+    expect(wholePrice).toBeVisible();
+    expect(fractionPrice).toBeVisible();
+    expect(freePrice).toBeVisible();
   });
 });
