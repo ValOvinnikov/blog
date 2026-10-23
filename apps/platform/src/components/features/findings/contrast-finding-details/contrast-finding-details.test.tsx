@@ -1,10 +1,10 @@
 import { CONTRAST_CHECK_OUTCOME } from '@blog/config/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { MOCK_RELEASE_RUN_URL } from '@platform/testing/releases/fixtures';
 
 import { ContrastFindingDetails } from './contrast-finding-details';
 
 const sha = '0123456789abcdef0123456789abcdef01234567';
-const runUrl = 'https://github.com/acme/blog/actions/runs/42';
 
 const render = (tag?: string) =>
   renderWithIntl(
@@ -13,13 +13,13 @@ const render = (tag?: string) =>
         sha,
         outcome: CONTRAST_CHECK_OUTCOME.FAIL,
         failureCount: 3,
-        runUrl,
+        runUrl: MOCK_RELEASE_RUN_URL,
         tag,
       }}
     />,
   );
 
-describe(ContrastFindingDetails, () => {
+describe(`<${ContrastFindingDetails.name}/>`, () => {
   describe('for an unreleased commit', () => {
     beforeEach(() => {
       render();
@@ -35,7 +35,7 @@ describe(ContrastFindingDetails, () => {
         screen.getByRole('link', {
           name: 'View the contrast run for commit 0123456 (opens in new tab)',
         }),
-      ).toHaveAttribute('href', runUrl);
+      ).toHaveAttribute('href', MOCK_RELEASE_RUN_URL);
       expect(
         screen.getByRole('link', { name: 'Open Releases' }),
       ).toHaveAttribute('href', '/releases');

@@ -6,7 +6,11 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_ARCHIVED_AT,
+  MOCK_OTHER_TENANT_ID,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
@@ -267,7 +271,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   it('shows the archived notice when archivedAt is set', () => {
-    renderShell({ archivedAt: new Date('2026-08-26T00:00:00.000Z') });
+    renderShell({ archivedAt: MOCK_ARCHIVED_AT });
 
     expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
   });
@@ -384,7 +388,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     it('keeps drafts apart per tenant', () => {
       leaveWithUnsavedChanges();
 
-      renderShell({ draft: { ...draftFor(SAVED), tenantId: 'tenant-2' } });
+      renderShell({
+        draft: { ...draftFor(SAVED), tenantId: MOCK_OTHER_TENANT_ID },
+      });
 
       expect(queryBanner()).not.toBeInTheDocument();
     });

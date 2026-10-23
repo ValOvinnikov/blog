@@ -2,7 +2,10 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
-import { makeClientTenant } from '@platform/testing/tenants/fixtures';
+import {
+  makeClientTenant,
+  MOCK_ARCHIVED_AT,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -17,7 +20,7 @@ vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
 }));
 
 const TENANT = makeClientTenant({
-  deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+  deprovisionedAt: MOCK_ARCHIVED_AT,
 });
 
 const setup = customRender(DeleteTenantControl, { tenant: TENANT });

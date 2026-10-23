@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { MOCK_ADMIN_EMAIL } from '@platform/testing/admins/fixtures';
 import { screen } from '@platform/testing/custom-render';
 import { EMAIL_BODY } from '@platform/testing/email-draft';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
@@ -40,7 +41,7 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     sendTestEmailActionMock.mockReset();
     sendTestEmailActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
-      to: 'admin@example.com',
+      to: MOCK_ADMIN_EMAIL,
     });
   });
 
@@ -50,7 +51,7 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: SEND_TEST_TO_ME }));
 
     expect(
-      await screen.findByText('Test sent to admin@example.com.'),
+      await screen.findByText(`Test sent to ${MOCK_ADMIN_EMAIL}.`),
     ).toBeVisible();
     expect(sendTestEmailActionMock).toHaveBeenCalledWith(TENANT_ID, {
       templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,

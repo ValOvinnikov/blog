@@ -5,7 +5,10 @@ import {
   FINDING_SOURCE,
 } from '@blog/config/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeFinding } from '@platform/testing/findings/fixtures';
+import {
+  makeFinding,
+  MOCK_FINDING_LAST_SEEN_AT,
+} from '@platform/testing/findings/fixtures';
 import { TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { FindingsTable } from './findings-table';
@@ -15,7 +18,7 @@ const render = renderWithIntl;
 const PLATFORM_WIDE = '— platform-wide';
 const WORKFLOW_RUN_URL = 'https://github.com/acme/blog/actions/runs/7';
 
-describe(FindingsTable, () => {
+describe(`<${FindingsTable.name}/>`, () => {
   it('renders one row per finding with its source, kind, severity and last-seen date', () => {
     render(
       <FindingsTable
@@ -34,7 +37,7 @@ describe(FindingsTable, () => {
     expect(screen.getByText('Warning')).toBeVisible();
     expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
       'dateTime',
-      '2026-04-02T00:00:00.000Z',
+      MOCK_FINDING_LAST_SEEN_AT.toISOString(),
     );
   });
 

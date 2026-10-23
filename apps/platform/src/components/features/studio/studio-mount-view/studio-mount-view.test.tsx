@@ -4,10 +4,18 @@ import {
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import {
+  makeReadyTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { StudioMountView } from './studio-mount-view';
+
+const STUDIO_MOUNT = 'studio-mount';
+const PROJ_GLOBEX = 'proj-globex';
 
 const { studioMountMock, getEnabledCapabilitiesMock, selectLiveLocalesMock } =
   vi.hoisted(() => ({
@@ -29,7 +37,7 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
 vi.mock('@blog/studio', () => ({
   StudioMount: (props: unknown) => {
     studioMountMock(props);
-    return <div data-testid="studio-mount" />;
+    return <div data-testid={STUDIO_MOUNT} />;
   },
 }));
 
@@ -52,7 +60,7 @@ describe(`<${StudioMountView.name}/>`, () => {
 
   it('shows the archived notice instead of mounting Studio for a deprovisioned tenant', async () => {
     const tenant = makeProvisionedTenant({
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
     });
 
     renderWithIntl(
@@ -67,7 +75,7 @@ describe(`<${StudioMountView.name}/>`, () => {
       name: 'Studio',
     });
     const thisTenantIsText = screen.getByText('This tenant is archived');
-    const studioMount = screen.queryByTestId('studio-mount');
+    const studioMount = screen.queryByTestId(STUDIO_MOUNT);
 
     expect(studioHeading).toBeVisible();
     expect(thisTenantIsText).toBeVisible();
@@ -96,7 +104,7 @@ describe(`<${StudioMountView.name}/>`, () => {
         name: 'Studio',
       });
       const studioIsNotText = screen.getByText("Studio isn't ready yet");
-      const studioMount = screen.queryByTestId('studio-mount');
+      const studioMount = screen.queryByTestId(STUDIO_MOUNT);
 
       expect(studioHeading).toBeVisible();
       expect(studioIsNotText).toBeVisible();
@@ -107,28 +115,28 @@ describe(`<${StudioMountView.name}/>`, () => {
 
   it("mounts Studio with the tenant's project and dataset and the given basePath", async () => {
     const tenant = makeProvisionedTenant({
-      id: 'tenant-2',
-      name: 'Globex Corp.',
-      sanityProjectId: 'proj-globex',
+      id: MOCK_OTHER_TENANT_ID,
+      name: MOCK_OTHER_TENANT_NAME,
+      sanityProjectId: PROJ_GLOBEX,
       sanityDataset: 'staging',
     });
 
     renderWithIntl(
       await StudioMountView({
         tenant,
-        basePath: adminRoutes.tenantStudio('tenant-2'),
+        basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
       }),
     );
 
-    const studioMount = screen.getByTestId('studio-mount');
+    const studioMount = screen.getByTestId(STUDIO_MOUNT);
 
     expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectId: 'proj-globex',
+        projectId: PROJ_GLOBEX,
         dataset: 'staging',
-        basePath: adminRoutes.tenantStudio('tenant-2'),
-        title: 'Globex Corp.',
+        basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
+        title: MOCK_OTHER_TENANT_NAME,
       }),
     );
   });

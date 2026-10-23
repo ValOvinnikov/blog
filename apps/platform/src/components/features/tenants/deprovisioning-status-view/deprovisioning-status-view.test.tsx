@@ -8,11 +8,24 @@ import {
   doneDeprovisioningSteps,
   idleDeprovisioningSteps,
   makeClientTenant,
+  MOCK_RUN_PLUS_1_MIN_AT,
+  MOCK_RUN_PLUS_2_MIN_AT,
+  MOCK_RUN_PLUS_7_MIN_AT,
+  MOCK_RUN_STARTED_AT,
 } from '@platform/testing/tenants/fixtures';
 import { useDeprovisioningPoll } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 import userEvent from '@testing-library/user-event';
 
 import { DeprovisioningStatusView } from './deprovisioning-status-view';
+
+const REMOVE_DOMAIN_LABEL = 'Remove domain';
+const ARCHIVE_SANITY_PROJECT = 'Archive Sanity project';
+const REVOKE_SANITY_TOKENS_LABEL = 'Revoke Sanity tokens';
+const CLEAR_PROVISIONING_ARTIFACTS = 'Clear provisioning artifacts';
+const ARCHIVE_TENANT = 'Archive tenant';
+const PURGE_READER_DATA = 'Purge reader data';
+const INVALIDATE_CACHED_PAGES = 'Invalidate cached pages';
+const ARIA_EXPANDED = 'aria-expanded';
 
 const render = renderWithIntl;
 
@@ -69,13 +82,13 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     render(<Wrapper tenant={tenant} />);
 
     expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.getByText('Remove domain')).toBeVisible();
-    expect(screen.getByText('Archive Sanity project')).toBeVisible();
-    expect(screen.getByText('Revoke Sanity tokens')).toBeVisible();
-    expect(screen.getByText('Clear provisioning artifacts')).toBeVisible();
-    expect(screen.getByText('Archive tenant')).toBeVisible();
-    expect(screen.getByText('Purge reader data')).toBeVisible();
-    expect(screen.getByText('Invalidate cached pages')).toBeVisible();
+    expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
+    expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
+    expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
+    expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
+    expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
+    expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
+    expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
     expect(screen.getAllByText('Queued').length).toBe(7);
     expect(screen.queryByText('Not started')).not.toBeInTheDocument();
   });
@@ -89,15 +102,15 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
           error: 'Sanity Access API returned 403',
         },
         run: {
-          startedAt: '2026-08-12T14:18:00.000Z',
-          finishedAt: '2026-08-12T14:19:00.000Z',
+          startedAt: MOCK_RUN_STARTED_AT,
+          finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
         },
       },
     });
     render(
       <Wrapper
         tenant={tenant}
-        deprovisionRequestedAt="2026-08-12T14:25:00.000Z"
+        deprovisionRequestedAt={MOCK_RUN_PLUS_7_MIN_AT}
       />,
     );
 
@@ -110,7 +123,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       },
     });
     render(<Wrapper tenant={tenant} />);
@@ -121,20 +134,20 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         name: /^Deprovisioning progress/,
       }),
     ).toBeVisible();
-    expect(screen.getByText('Remove domain')).toBeVisible();
-    expect(screen.getByText('Archive Sanity project')).toBeVisible();
-    expect(screen.getByText('Revoke Sanity tokens')).toBeVisible();
-    expect(screen.getByText('Clear provisioning artifacts')).toBeVisible();
-    expect(screen.getByText('Archive tenant')).toBeVisible();
-    expect(screen.getByText('Purge reader data')).toBeVisible();
-    expect(screen.getByText('Invalidate cached pages')).toBeVisible();
+    expect(screen.getByText(REMOVE_DOMAIN_LABEL)).toBeVisible();
+    expect(screen.getByText(ARCHIVE_SANITY_PROJECT)).toBeVisible();
+    expect(screen.getByText(REVOKE_SANITY_TOKENS_LABEL)).toBeVisible();
+    expect(screen.getByText(CLEAR_PROVISIONING_ARTIFACTS)).toBeVisible();
+    expect(screen.getByText(ARCHIVE_TENANT)).toBeVisible();
+    expect(screen.getByText(PURGE_READER_DATA)).toBeVisible();
+    expect(screen.getByText(INVALIDATE_CACHED_PAGES)).toBeVisible();
   });
 
   it('shows a 0 of 7 done badge in the steps card summary when nothing has completed yet', () => {
     const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       },
     });
     render(<Wrapper tenant={tenant} />);
@@ -149,7 +162,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
         },
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       },
     });
     render(<Wrapper tenant={tenant} />);
@@ -163,8 +176,8 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       deprovisioningSteps: {
         ...doneDeprovisioningSteps(),
         run: {
-          startedAt: '2026-08-12T14:18:00.000Z',
-          finishedAt: '2026-08-12T14:20:00.000Z',
+          startedAt: MOCK_RUN_STARTED_AT,
+          finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
         },
       },
     });
@@ -178,7 +191,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       },
     });
     render(<Wrapper tenant={tenant} />);
@@ -192,7 +205,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       },
     });
     render(<Wrapper tenant={tenant} headingLevel={3} />);
@@ -229,8 +242,8 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
             error,
           },
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
         },
       });
@@ -249,7 +262,9 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         }),
       ).toBeVisible();
       expect(
-        screen.getByText('Failed while running "Revoke Sanity tokens".'),
+        screen.getByText(
+          `Failed while running "${REVOKE_SANITY_TOKENS_LABEL}".`,
+        ),
       ).toBeVisible();
       expect(screen.getByText('Technical details')).toBeVisible();
       expect(screen.getByText(rawError)).not.toBeVisible();
@@ -283,12 +298,12 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       render(<Wrapper tenant={tenant} />);
 
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -296,14 +311,14 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         deprovisioningSteps: {
           ...doneDeprovisioningSteps(),
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:20:00.000Z',
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
           },
         },
       });
       render(<Wrapper tenant={tenant} />);
 
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'false');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -312,38 +327,38 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
         },
-        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       };
       const tenant = makeClientTenant({ deprovisioningSteps: runningSteps });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: {
           ...doneDeprovisioningSteps(),
           run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:20:00.000Z',
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
           },
         },
-        deprovisionedAt: new Date('2026-08-12T14:20:00.000Z'),
+        deprovisionedAt: new Date(MOCK_RUN_PLUS_2_MIN_AT),
       });
       const user = userEvent.setup();
       render(<Wrapper tenant={tenant} />);
 
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'false');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'false');
 
       await user.click(stepsToggle());
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
+      expect(stepsToggle()).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
   });
 });

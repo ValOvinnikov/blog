@@ -1,20 +1,26 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
+import { MOCK_CUSTOM_DOMAIN } from '@platform/testing/tenants/fixtures';
 
 import { DomainVerificationCard } from './domain-verification-card';
+
+const AWAITING_DNS = 'Awaiting DNS';
+const CHECKED_JUST_NOW = 'Checked just now';
+const A_RECORD_VALUE = '76.76.21.21';
+const CNAME_RECORD_VALUE = 'cname.vercel-dns.com';
 
 const render = (projectDomain: TProjectDomain) =>
   act(async () => {
     renderWithIntl(
       <DomainVerificationCard
-        domain="northwind.dev"
+        domain={MOCK_CUSTOM_DOMAIN}
         projectDomain={Promise.resolve(projectDomain)}
       />,
     );
   });
 
-describe(DomainVerificationCard, () => {
+describe(`<${DomainVerificationCard.name}/>`, () => {
   it('shows the status badge in the card header beside the domain', async () => {
     await render({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
@@ -23,26 +29,26 @@ describe(DomainVerificationCard, () => {
 
     const heading = await screen.findByRole('heading', {
       level: 2,
-      name: 'Point northwind.dev at us',
+      name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
     });
     expect(heading).toBeVisible();
-    expect(screen.getByText('Awaiting DNS')).toBeVisible();
-    expect(screen.getByText('Checked just now')).toBeVisible();
-    expect(heading.textContent).not.toContain('Awaiting DNS');
+    expect(screen.getByText(AWAITING_DNS)).toBeVisible();
+    expect(screen.getByText(CHECKED_JUST_NOW)).toBeVisible();
+    expect(heading.textContent).not.toContain(AWAITING_DNS);
   });
 
   it('renders the DNS records table when pending with known records', async () => {
     await render({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [
-        { type: 'A', name: '@', value: '76.76.21.21' },
-        { type: 'CNAME', name: 'www', value: 'cname.vercel-dns.com' },
+        { type: 'A', name: '@', value: A_RECORD_VALUE },
+        { type: 'CNAME', name: 'www', value: CNAME_RECORD_VALUE },
       ],
     });
 
     expect(await screen.findByRole('table')).toBeVisible();
-    expect(screen.getByText('76.76.21.21')).toBeVisible();
-    expect(screen.getByText('cname.vercel-dns.com')).toBeVisible();
+    expect(screen.getByText(A_RECORD_VALUE)).toBeVisible();
+    expect(screen.getByText(CNAME_RECORD_VALUE)).toBeVisible();
   });
 
   it('shows the verified empty state instead of the table once verified', async () => {
@@ -69,7 +75,7 @@ describe(DomainVerificationCard, () => {
     expect(
       await screen.findByRole('heading', {
         level: 2,
-        name: 'northwind.dev is connected',
+        name: `${MOCK_CUSTOM_DOMAIN} is connected`,
       }),
     ).toBeVisible();
   });
@@ -77,7 +83,7 @@ describe(DomainVerificationCard, () => {
   it('asks for the records only alongside the table', async () => {
     await render({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
+      dnsRecords: [{ type: 'A', name: '@', value: A_RECORD_VALUE }],
     });
 
     expect(
@@ -86,7 +92,7 @@ describe(DomainVerificationCard, () => {
   });
 
   it.each([
-    [DOMAIN_VERIFICATION_STATUS.PENDING, 'Awaiting DNS'],
+    [DOMAIN_VERIFICATION_STATUS.PENDING, AWAITING_DNS],
     [DOMAIN_VERIFICATION_STATUS.NOT_ADDED, 'Not added yet'],
     [DOMAIN_VERIFICATION_STATUS.ERROR, "Couldn't check"],
     [DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED, 'Unavailable'],
@@ -113,6 +119,6 @@ describe(DomainVerificationCard, () => {
     await render({ status, dnsRecords: [] });
 
     expect(await screen.findByRole('heading', { level: 2 })).toBeVisible();
-    expect(screen.queryByText('Checked just now')).toBeNull();
+    expect(screen.queryByText(CHECKED_JUST_NOW)).toBeNull();
   });
 });

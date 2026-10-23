@@ -1,5 +1,11 @@
 import { customRender, screen, within } from '@platform/testing/custom-render';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OTHER_TENANT_DOMAIN,
+  MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
+  MOCK_TENANT_DOMAIN,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -7,19 +13,17 @@ import { TenantSwitcher } from './tenant-switcher';
 
 vi.mock('@platform/i18n/navigation');
 
-const ACME_EXAMPLE_COM = 'acme.example.com';
-
 const tenant: TTenantSwitcherItem = {
   id: TENANT_ID,
   name: 'Acme Inc.',
-  primaryDomain: ACME_EXAMPLE_COM,
+  primaryDomain: MOCK_TENANT_DOMAIN,
   isArchived: false,
 };
 
 const archivedTenant: TTenantSwitcherItem = {
-  id: 'tenant-2',
-  name: 'Globex Corp',
-  primaryDomain: 'globex.example.com',
+  id: MOCK_OTHER_TENANT_ID,
+  name: MOCK_OTHER_TENANT_NAME,
+  primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
   isArchived: true,
 };
 
@@ -40,7 +44,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
 
     expect(
       screen.getByRole('button', { name: /acme inc\./i }),
-    ).toHaveTextContent(ACME_EXAMPLE_COM);
+    ).toHaveTextContent(MOCK_TENANT_DOMAIN);
   });
 
   it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', async () => {
@@ -57,7 +61,10 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     );
     expect(
       within(menu).getByRole('menuitem', { name: /globex corp/i }),
-    ).toHaveAttribute('href', '/api/dashboard/select-tenant?tenantId=tenant-2');
+    ).toHaveAttribute(
+      'href',
+      `/api/dashboard/select-tenant?tenantId=${MOCK_OTHER_TENANT_ID}`,
+    );
   });
 
   it('marks an archived tenant in its accessible name and leaves others unmarked', async () => {
@@ -75,7 +82,10 @@ describe(`<${TenantSwitcher.name}/>`, () => {
   });
 
   it('shows the archived marker on the trigger when the active tenant is archived', () => {
-    setup({ tenants: [tenant, archivedTenant], activeTenantId: 'tenant-2' });
+    setup({
+      tenants: [tenant, archivedTenant],
+      activeTenantId: MOCK_OTHER_TENANT_ID,
+    });
 
     expect(
       screen.getByRole('button', { name: /globex corp.*archived/i }),

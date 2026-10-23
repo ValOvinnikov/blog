@@ -11,6 +11,9 @@ import {
 import { mockRouter } from '@platform/testing/mock-router';
 import {
   makeClientTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_OWNER_EMAIL,
+  MOCK_TENANT_DOMAIN,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
@@ -20,9 +23,7 @@ import { TenantDetailsPanel } from './tenant-details-panel';
 
 const render = renderWithIntl;
 
-const OWNER_EXAMPLE_COM = 'owner@example.com';
-
-const OWNER = { email: OWNER_EXAMPLE_COM };
+const OWNER = { email: MOCK_OWNER_EMAIL };
 
 const NO_LOCKS: TTenantFieldLocks = {};
 const ALL_LOCKED_RUNNING: TTenantFieldLocks = {
@@ -46,7 +47,6 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
-const ACME_EXAMPLE_COM = 'acme.example.com';
 const PRIMARY_DOMAIN = 'Primary domain';
 const ARIA_PRESSED = 'aria-pressed';
 const OWNER_EMAIL = 'Owner email';
@@ -63,7 +63,6 @@ const TENANT_DETAIL_FIELDS = 'Tenant detail fields';
 const UNSAVED_DOMAIN_EXAMPLE_COM = 'unsaved-domain.example.com';
 const ACME_RENAMED_UNSAVED = 'Acme Renamed (unsaved)';
 const LOCK_ANNOUNCEMENT_LIVE = 'lock-announcement-live';
-const AT_20260826_0000 = '2026-08-26T00:00:00.000Z';
 const LOCKED_THIS_TENANT_IS_ARCHIVED = 'Locked — this tenant is archived.';
 const SAVE_AND_LEAVE = 'Save and leave';
 
@@ -82,7 +81,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
       const tenant = makeClientTenant({
         name: 'Acme Inc.',
-        primaryDomain: ACME_EXAMPLE_COM,
+        primaryDomain: MOCK_TENANT_DOMAIN,
         plan: TENANT_PLAN.FREE,
         locale: LOCALE_ISO_CODES.EN,
       });
@@ -99,7 +98,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(nameInput).not.toBeDisabled();
 
       expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        ACME_EXAMPLE_COM,
+        MOCK_TENANT_DOMAIN,
       );
       expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute(
         ARIA_PRESSED,
@@ -113,7 +112,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const ownerEmailInput = screen.getByRole('textbox', {
         name: OWNER_EMAIL,
       });
-      expect(ownerEmailInput).toHaveValue(OWNER_EXAMPLE_COM);
+      expect(ownerEmailInput).toHaveValue(MOCK_OWNER_EMAIL);
       expect(ownerEmailInput).toHaveAttribute('type', 'email');
 
       expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
@@ -183,7 +182,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           TENANT_ID,
           expect.objectContaining({
             name: ACME_RENAMED,
-            ownerEmail: OWNER_EXAMPLE_COM,
+            ownerEmail: MOCK_OWNER_EMAIL,
           }),
         );
       });
@@ -418,7 +417,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('per-field locking', () => {
     it('renders a field whose consuming step already completed as disabled, stating why', () => {
-      const tenant = makeClientTenant({ primaryDomain: ACME_EXAMPLE_COM });
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -430,7 +429,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const domainInput = screen.getByRole('textbox', {
         name: PRIMARY_DOMAIN,
       });
-      expect(domainInput).toHaveValue(ACME_EXAMPLE_COM);
+      expect(domainInput).toHaveValue(MOCK_TENANT_DOMAIN);
       expect(domainInput).toBeDisabled();
       expect(domainInput).toHaveAccessibleDescription(
         LOCKED_CONNECT_DOMAIN_STEP_HAS,
@@ -440,7 +439,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('renders every other field as editable when only one field is locked', () => {
       const tenant = makeClientTenant({
         name: 'Acme Inc.',
-        primaryDomain: ACME_EXAMPLE_COM,
+        primaryDomain: MOCK_TENANT_DOMAIN,
         plan: TENANT_PLAN.FREE,
         locale: LOCALE_ISO_CODES.EN,
       });
@@ -594,7 +593,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('disables every control and disables Save, since nothing can become dirty', () => {
       const tenant = makeClientTenant({
         name: 'Acme Inc.',
-        primaryDomain: ACME_EXAMPLE_COM,
+        primaryDomain: MOCK_TENANT_DOMAIN,
         plan: TENANT_PLAN.GROWTH,
         locale: LOCALE_ISO_CODES.EN,
       });
@@ -636,7 +635,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('mid-edit lock transition', () => {
     it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
-      const tenant = makeClientTenant({ primaryDomain: ACME_EXAMPLE_COM });
+      const tenant = makeClientTenant();
       const { rerender } = render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -663,7 +662,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       );
 
       expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        ACME_EXAMPLE_COM,
+        MOCK_TENANT_DOMAIN,
       );
       expect(
         screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
@@ -865,7 +864,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('disables every field and the Save button, regardless of edits or field locks', async () => {
       const tenant = makeClientTenant({
         name: 'Acme Inc.',
-        deprovisionedAt: new Date(AT_20260826_0000),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       });
       render(
         <TenantDetailsPanel
@@ -892,7 +891,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('exposes an accessible hint for an archived field, reusing the same lock convention as a step/succeeded/running lock', () => {
       const tenant = makeClientTenant({
-        deprovisionedAt: new Date(AT_20260826_0000),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       });
       render(
         <TenantDetailsPanel
@@ -915,7 +914,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('describes the disabled Save button with the page-level archived notice when an archivedNoticeId is supplied', () => {
       const tenant = makeClientTenant({
-        deprovisionedAt: new Date(AT_20260826_0000),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       });
       render(
         <>
@@ -936,7 +935,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('leaves the Save button without a description when no archivedNoticeId is supplied', () => {
       const tenant = makeClientTenant({
-        deprovisionedAt: new Date(AT_20260826_0000),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       });
       render(
         <TenantDetailsPanel

@@ -21,7 +21,11 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
+import {
+  MOCK_ARCHIVED_AT,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   settingsDraftStorageKey,
@@ -60,8 +64,6 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action', () => ({
 
 const isAccentHueAccessibleMock = vi.mocked(isAccentHueAccessible);
 
-const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
-const SAVED_LOGO_URL = 'https://example.blob.vercel-storage.com/logo.png';
 const UPLOADED_LOGO_URL =
   'https://example.blob.vercel-storage.com/logo-new.png';
 const LOGO_FILE = new File(['bytes'], 'logo.png', { type: 'image/png' });
@@ -440,7 +442,7 @@ describe(`<${LookForm.name}/>`, () => {
     setup({
       initialValues: {
         ...defaultLookFormValues(),
-        logo: { url: SAVED_LOGO_URL },
+        logo: { url: MOCK_LOGO_URL },
       },
     });
 
@@ -615,7 +617,7 @@ describe(`<${LookForm.name}/>`, () => {
   describe('archived tenant', () => {
     describe('with only the archive date', () => {
       beforeEach(() => {
-        setup({ archivedAt: ARCHIVED_AT });
+        setup({ archivedAt: MOCK_ARCHIVED_AT });
       });
 
       it('shows an archived notice and offers no Save', () => {
@@ -676,7 +678,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('describes a rejected accent hue with both the archived notice and the error', () => {
       isAccentHueAccessibleMock.mockReturnValue(false);
-      setup({ archivedAt: ARCHIVED_AT });
+      setup({ archivedAt: MOCK_ARCHIVED_AT });
 
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
       expect(slider).toHaveAccessibleDescription(/This tenant is archived/);
@@ -685,7 +687,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('disables Reset to preset and describes it with the archived notice', () => {
       setup({
-        archivedAt: ARCHIVED_AT,
+        archivedAt: MOCK_ARCHIVED_AT,
         initialValues: { ...defaultLookFormValues(), accentHue: 260 },
       });
 
@@ -703,7 +705,7 @@ describe(`<${LookForm.name}/>`, () => {
     setup({
       initialValues: {
         ...defaultLookFormValues(),
-        logo: { url: SAVED_LOGO_URL },
+        logo: { url: MOCK_LOGO_URL },
       },
     });
     await user.click(
@@ -843,7 +845,7 @@ describe(`<${LookForm.name}/>`, () => {
       setup({
         initialValues: {
           ...defaultLookFormValues(),
-          logo: { url: SAVED_LOGO_URL },
+          logo: { url: MOCK_LOGO_URL },
         },
       });
 
@@ -866,7 +868,7 @@ describe(`<${LookForm.name}/>`, () => {
       setup({
         initialValues: {
           ...defaultLookFormValues(),
-          logo: { url: SAVED_LOGO_URL },
+          logo: { url: MOCK_LOGO_URL },
         },
       });
 
@@ -877,7 +879,7 @@ describe(`<${LookForm.name}/>`, () => {
       const savedNote = screen.queryByText(ALL_CHANGES_SAVED);
       expect(logo).toHaveAttribute(
         'src',
-        expect.stringContaining(encodeURIComponent(SAVED_LOGO_URL)),
+        expect.stringContaining(encodeURIComponent(MOCK_LOGO_URL)),
       );
       expect(savedNote).not.toBeInTheDocument();
       expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
@@ -981,7 +983,7 @@ describe(`<${LookForm.name}/>`, () => {
       setup({
         initialValues: {
           ...defaultLookFormValues(),
-          favicon: { url: SAVED_LOGO_URL },
+          favicon: { url: MOCK_LOGO_URL },
         },
       });
 

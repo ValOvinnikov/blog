@@ -1,5 +1,9 @@
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  MOCK_RUN_PLUS_6_MIN_AT,
+  MOCK_RUN_STARTED_AT,
+} from '@platform/testing/tenants/fixtures';
 
 import { RunStepsCard } from './run-steps-card';
 
@@ -11,7 +15,7 @@ const setup = customRender(RunStepsCard, {
       key: 'first',
       title: 'First step',
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      updatedAt: '2026-08-12T14:18:00.000Z',
+      updatedAt: MOCK_RUN_STARTED_AT,
     },
     {
       key: 'second',
@@ -29,7 +33,7 @@ const setup = customRender(RunStepsCard, {
 describe(`<${RunStepsCard.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
+    vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
   });
 
   afterEach(() => {

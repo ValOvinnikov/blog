@@ -1,8 +1,9 @@
 import { render, screen } from '@platform/testing/custom-render';
+import { MOCK_SITE_NAME } from '@platform/testing/tenants/fixtures';
 
 import { PageHeader } from './page-header';
 
-describe(PageHeader, () => {
+describe(`<${PageHeader.name}/>`, () => {
   describe('with only the title', () => {
     beforeEach(() => {
       render(<PageHeader title="Tenants" />);
@@ -31,11 +32,9 @@ describe(PageHeader, () => {
   });
 
   it('renders badges beside the title', () => {
-    render(
-      <PageHeader title="Northwind Field Notes" badges={<span>Active</span>} />,
-    );
+    render(<PageHeader title={MOCK_SITE_NAME} badges={<span>Active</span>} />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Northwind Field Notes',
+      MOCK_SITE_NAME,
     );
     expect(screen.getByText('Active')).toBeVisible();
   });

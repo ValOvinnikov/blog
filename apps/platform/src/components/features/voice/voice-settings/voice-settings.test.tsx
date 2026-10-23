@@ -12,7 +12,10 @@ import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voic
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_ARCHIVED_AT,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent from '@testing-library/user-event';
@@ -38,7 +41,6 @@ const saveVoiceOverridesActionMock = vi.mocked(saveVoiceOverridesAction);
 mockRouterRefresh();
 
 const { EN, DE } = LOCALE_ISO_CODES;
-const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const richText = (text: string, key: string): TVoicePortableText => [
   {
@@ -662,13 +664,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
   describe('archived tenant', () => {
     it('shows an archived notice and offers no Save', () => {
-      setup({ archivedAt: ARCHIVED_AT });
+      setup({ archivedAt: MOCK_ARCHIVED_AT });
 
       expectArchivedOffersNoSave();
     });
 
     it('describes every control with the archived notice', async () => {
-      setup({ archivedAt: ARCHIVED_AT });
+      setup({ archivedAt: MOCK_ARCHIVED_AT });
 
       await user.click(
         within(card(EMPTY_LISTS)).getByRole('button', { name: /Tag page/ }),
@@ -680,7 +682,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('makes the text fields read-only and offers no Reset', () => {
-      setupBilingual({ archivedAt: ARCHIVED_AT });
+      setupBilingual({ archivedAt: MOCK_ARCHIVED_AT });
 
       expect(notFoundHeading()).toHaveAttribute('readonly');
       expect(

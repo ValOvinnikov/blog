@@ -6,7 +6,10 @@ import {
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_ARCHIVED_AT,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -45,8 +48,6 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
   consentBannerEnabled: false,
   contactFormEnabled: true,
 };
-
-const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const setup = customRender(FeaturesSettings, {
   tenantId: TENANT_ID,
@@ -274,7 +275,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
   describe('archived tenant', () => {
     beforeEach(() => {
-      setup({ archivedAt: ARCHIVED_AT });
+      setup({ archivedAt: MOCK_ARCHIVED_AT });
     });
 
     it('shows an archived notice and offers no Save', () => {

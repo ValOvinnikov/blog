@@ -1,10 +1,13 @@
 import { customRender, screen } from '@platform/testing/custom-render';
 import { selectFile } from '@platform/testing/select-file';
+import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import { BrandAssetField } from './brand-asset-field';
 
-const STORED_URL = 'https://example.blob.vercel-storage.com/logo.png';
+const BLOB_STAGED_LOGO = 'blob:staged-logo';
+const SAVES_WITH_CHANGES = 'Saves with changes';
+const NEW_LOGO_PNG = 'new-logo.png';
 
 const setup = customRender(BrandAssetField, {
   kind: 'logo',
@@ -14,7 +17,7 @@ const setup = customRender(BrandAssetField, {
 
 describe(`<${BrandAssetField.name}/>`, () => {
   beforeEach(() => {
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
   });
 
   afterEach(() => {
@@ -31,22 +34,22 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('names the stored file without marking it as saving with changes', () => {
-    setup({ image: { url: `${STORED_URL}?v=2` } });
+    setup({ image: { url: `${MOCK_LOGO_URL}?v=2` } });
 
-    expect(screen.getByText('logo.png')).toBeVisible();
-    expect(screen.queryByText('Saves with changes')).not.toBeInTheDocument();
+    expect(screen.getByText('brand-logo.png')).toBeVisible();
+    expect(screen.queryByText(SAVES_WITH_CHANGES)).not.toBeInTheDocument();
   });
 
   it('names a staged file and marks it as saving with changes', () => {
-    const file = new File(['bytes'], 'new-logo.png', { type: 'image/png' });
-    setup({ image: { url: 'blob:staged-logo', file } });
+    const file = new File(['bytes'], NEW_LOGO_PNG, { type: 'image/png' });
+    setup({ image: { url: BLOB_STAGED_LOGO, file } });
 
-    expect(screen.getByText('new-logo.png')).toBeVisible();
-    expect(screen.getByText('Saves with changes')).toBeVisible();
+    expect(screen.getByText(NEW_LOGO_PNG)).toBeVisible();
+    expect(screen.getByText(SAVES_WITH_CHANGES)).toBeVisible();
   });
 
   it('shows the current alt text and the replace label once a value is set', () => {
-    setup({ image: { url: STORED_URL } });
+    setup({ image: { url: MOCK_LOGO_URL } });
 
     expect(screen.getByAltText('Current logo')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Replace logo' })).toBeVisible();
@@ -59,7 +62,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
 
     await selectFile(file);
 
-    expect(onStage).toHaveBeenCalledWith({ url: 'blob:staged-logo', file });
+    expect(onStage).toHaveBeenCalledWith({ url: BLOB_STAGED_LOGO, file });
   });
 
   it('rejects an unsupported type without staging it', async () => {
@@ -76,7 +79,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
 
   it('stages a removal', async () => {
     const onStage = vi.fn();
-    setup({ image: { url: STORED_URL }, onStage });
+    setup({ image: { url: MOCK_LOGO_URL }, onStage });
 
     await userEvent
       .setup()

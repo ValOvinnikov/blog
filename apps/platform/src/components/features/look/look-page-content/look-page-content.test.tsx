@@ -10,7 +10,11 @@ import {
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  makeReadyTenant,
+  MOCK_ARCHIVED_AT,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
@@ -83,7 +87,7 @@ describe(`<${LookPageContent.name}/>`, () => {
     await setup({
       tenant: {
         ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       },
     });
 

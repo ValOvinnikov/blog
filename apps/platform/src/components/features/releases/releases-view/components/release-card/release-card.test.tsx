@@ -8,6 +8,7 @@ import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   makeReleaseCandidate,
   makeReleaseRun,
+  MOCK_RELEASE_RUN_URL,
 } from '@platform/testing/releases/fixtures';
 import userEvent from '@testing-library/user-event';
 
@@ -74,7 +75,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     expect(screen.getByText('Release v1.4.0')).toBeVisible();
     expect(screen.getByRole('link', { name: /View the run/ })).toHaveAttribute(
       'href',
-      'https://github.com/acme/blog/actions/runs/42',
+      MOCK_RELEASE_RUN_URL,
     );
   });
 

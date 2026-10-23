@@ -2,10 +2,15 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { makeClientTenant } from '@platform/testing/tenants/fixtures';
+import {
+  makeClientTenant,
+  MOCK_ARCHIVED_AT,
+} from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReactivateTenantControl } from './reactivate-tenant-control';
+
+const REACTIVATE_TENANT = 'Reactivate tenant';
 
 const { reactivateTenantActionMock } = vi.hoisted(() => ({
   reactivateTenantActionMock: vi.fn(),
@@ -16,7 +21,7 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
 }));
 
 const ARCHIVED_TENANT = makeClientTenant({
-  deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+  deprovisionedAt: MOCK_ARCHIVED_AT,
 });
 
 const setup = customRender(ReactivateTenantControl, {
@@ -48,7 +53,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
+    await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
 
     expect(
       await screen.findByRole('alertdialog', {
@@ -61,7 +66,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   it('calls the action with the typed name and refreshes on success', async () => {
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
+    await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
     await user.type(
       screen.getByRole('textbox', { name: /type "acme inc\."/i }),
       'Acme Inc.',
@@ -86,7 +91,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
     });
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
+    await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
     await user.type(
       screen.getByRole('textbox', { name: /type "acme inc\."/i }),
       'Acme Inc.',

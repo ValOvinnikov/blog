@@ -19,6 +19,14 @@ import {
 import {
   idleProvisioningSteps,
   makeClientTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_OWNER_EMAIL,
+  MOCK_RUN_PLUS_1_MIN_AT,
+  MOCK_RUN_PLUS_2_MIN_AT,
+  MOCK_RUN_PLUS_4_MIN_AT,
+  MOCK_RUN_PLUS_6_MIN_AT,
+  MOCK_RUN_PLUS_7_MIN_AT,
+  MOCK_RUN_STARTED_AT,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -39,9 +47,7 @@ const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
 );
 
-const AT_20260826_0000 = '2026-08-26T00:00:00.000Z';
 const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
-const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
 const RUN_STATUS_LIVE = 'run-status-live';
 const INVITED_PENDING = 'Invited, pending';
 const PROVISIONING_STEPS = 'provisioning-steps';
@@ -57,11 +63,8 @@ const QUEUED_PROVISIONING_WORKFLOW_STARTING_UP =
   'Queued — the provisioning workflow is starting up';
 const QUEUED_RUN_ELAPSED = 'queued-run-elapsed';
 const ARIA_EXPANDED = 'aria-expanded';
-const AT_20260812_1425 = '2026-08-12T14:25:00.000Z';
-const AT_20260812_1419 = '2026-08-12T14:19:00.000Z';
-const AT_20260812_1420 = '2026-08-12T14:20:00.000Z';
 
-describe(ProvisioningStatusView, () => {
+describe(`<${ProvisioningStatusView.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
@@ -80,7 +83,7 @@ describe(ProvisioningStatusView, () => {
     expect(vi.getTimerCount()).toBe(0);
 
     const { unmount } = render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     expect(vi.isFakeTimers()).toBe(true);
@@ -94,7 +97,7 @@ describe(ProvisioningStatusView, () => {
   it('titles the page "Provisioning" and names the tenant in the description', () => {
     const tenant = makeClientTenant({ name: 'Acme Inc.' });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const provisioningHeading = screen.getByRole('heading', {
@@ -111,10 +114,10 @@ describe(ProvisioningStatusView, () => {
 
   it('shows the archived notice for a deprovisioned tenant', () => {
     const tenant = makeClientTenant({
-      deprovisionedAt: new Date(AT_20260826_0000),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const thisTenantIsText = screen.getByText(THIS_TENANT_IS_ARCHIVED);
@@ -125,7 +128,7 @@ describe(ProvisioningStatusView, () => {
   it('does not show the archived notice for a live tenant', () => {
     const tenant = makeClientTenant({ deprovisionedAt: null });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const thisTenantIsText = screen.queryByText(THIS_TENANT_IS_ARCHIVED);
@@ -141,11 +144,11 @@ describe(ProvisioningStatusView, () => {
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
         },
-        run: { startedAt: AT_20260812_1418 },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const runningText = within(
@@ -173,7 +176,7 @@ describe(ProvisioningStatusView, () => {
   it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
     const tenant = makeClientTenant();
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const invitedPendingText = screen.queryByText(INVITED_PENDING);
@@ -184,7 +187,7 @@ describe(ProvisioningStatusView, () => {
   it('renders no complementary landmark around the main content', () => {
     const tenant = makeClientTenant();
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const complementary = screen.queryByRole('complementary');
@@ -197,7 +200,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const sidebar = screen.getByTestId(PROVISIONING_STEPS);
@@ -224,7 +227,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const n2Of6Text = within(screen.getByTestId(PROVISIONING_STEPS)).getByText(
@@ -237,7 +240,7 @@ describe(ProvisioningStatusView, () => {
   it('lists all six provisioning steps in order, in operator language', () => {
     const tenant = makeClientTenant();
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const headings = [
@@ -265,7 +268,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const firstRunningText = screen.getAllByText('Running…')[0];
@@ -283,7 +286,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const statusList = screen.queryAllByRole('status');
@@ -323,7 +326,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const statusList = screen.queryAllByRole('status');
@@ -367,7 +370,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const retryProvisioningButtons = screen.getAllByRole('button', {
@@ -396,7 +399,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const vercelApiPostText = within(
@@ -411,7 +414,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const alert = screen.queryByRole('alert');
@@ -434,7 +437,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
     };
@@ -522,7 +525,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={staleFailedTenant()}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -539,7 +542,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={staleFailedTenant()}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -558,7 +561,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={staleFailedTenant()}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -582,7 +585,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     await user.click(screen.getByRole('button', { name: RETRY_PROVISIONING }));
@@ -597,7 +600,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const startProvisioningButtons = screen.getAllByRole('button', {
@@ -612,7 +615,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const noRunHasText = screen.getByText('No run has started yet.');
@@ -630,7 +633,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const startProvisioningButton = screen.queryByRole('button', {
@@ -645,7 +648,7 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
@@ -668,7 +671,7 @@ describe(ProvisioningStatusView, () => {
       }),
     );
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
@@ -700,7 +703,7 @@ describe(ProvisioningStatusView, () => {
       }),
     );
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const liveRegion = screen.getByTestId(RUN_STATUS_LIVE);
@@ -728,7 +731,7 @@ describe(ProvisioningStatusView, () => {
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
@@ -753,7 +756,7 @@ describe(ProvisioningStatusView, () => {
       reason: TENANT_REFUSAL.NOT_FOUND,
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
@@ -774,7 +777,7 @@ describe(ProvisioningStatusView, () => {
       reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
@@ -791,10 +794,10 @@ describe(ProvisioningStatusView, () => {
   it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
     const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
-      deprovisionedAt: new Date(AT_20260826_0000),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const startButton = screen.getByRole('button', {
@@ -809,7 +812,7 @@ describe(ProvisioningStatusView, () => {
   it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
     const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      deprovisionedAt: new Date(AT_20260826_0000),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
@@ -819,7 +822,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const retryButton = screen.getByRole('button', {
@@ -834,10 +837,10 @@ describe(ProvisioningStatusView, () => {
   it('describes the disabled Start button with the archived notice, for a screen-reader user', () => {
     const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
-      deprovisionedAt: new Date(AT_20260826_0000),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const startProvisioningButton = screen.getByRole('button', {
@@ -852,7 +855,7 @@ describe(ProvisioningStatusView, () => {
   it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
     const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      deprovisionedAt: new Date(AT_20260826_0000),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
@@ -862,7 +865,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     const retryProvisioningButton = screen.getByRole('button', {
@@ -883,7 +886,7 @@ describe(ProvisioningStatusView, () => {
       reason: TENANT_REFUSAL.ARCHIVED,
     });
     render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail={MOCK_OWNER_EMAIL} />,
     );
 
     await user.click(screen.getByRole('button', { name: START_PROVISIONING }));
@@ -927,7 +930,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -975,7 +978,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1014,7 +1017,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1054,7 +1057,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1103,7 +1106,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1147,7 +1150,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1171,7 +1174,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1204,7 +1207,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1243,43 +1246,43 @@ describe(ProvisioningStatusView, () => {
     });
 
     it("shows a done step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-      vi.setSystemTime(new Date(AT_20260812_1425));
+      vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: AT_20260812_1419,
+            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
         },
       });
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
       const timestamp = screen.getByText('6m ago');
       expect(timestamp.tagName).toBe('TIME');
-      expect(timestamp).toHaveAttribute('dateTime', AT_20260812_1419);
+      expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_1_MIN_AT);
     });
 
     it("keeps a step's timestamp outside the aria-live status region", () => {
-      vi.setSystemTime(new Date(AT_20260812_1425));
+      vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: AT_20260812_1419,
+            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
         },
       });
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1294,27 +1297,27 @@ describe(ProvisioningStatusView, () => {
     });
 
     it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-      vi.setSystemTime(new Date(AT_20260812_1425));
+      vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'boom',
-            updatedAt: AT_20260812_1420,
+            updatedAt: MOCK_RUN_PLUS_2_MIN_AT,
           },
         },
       });
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
       const timestamp = screen.getByText('5m ago');
       expect(timestamp.tagName).toBe('TIME');
-      expect(timestamp).toHaveAttribute('dateTime', AT_20260812_1420);
+      expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_2_MIN_AT);
     });
 
     it('shows "now" for a running step instead of a timestamp', () => {
@@ -1329,7 +1332,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1350,7 +1353,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1366,7 +1369,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 
@@ -1380,13 +1383,13 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
-      vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
+      vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
       const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           run: {
-            startedAt: AT_20260812_1418,
-            finishedAt: '2026-08-12T14:22:00.000Z',
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_4_MIN_AT,
             registry: 'production',
           },
         },
@@ -1394,7 +1397,7 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          ownerEmail="owner@example.com"
+          ownerEmail={MOCK_OWNER_EMAIL}
         />,
       );
 

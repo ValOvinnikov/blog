@@ -2,8 +2,14 @@ import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { MOCK_CONTACT_RECIPIENT } from '@platform/testing/email/fixtures';
+import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  makeReadyTenant,
+  MOCK_ARCHIVED_AT,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import { EmailPageContent } from './email-page-content';
@@ -75,7 +81,6 @@ const setup = customRenderAsync(EmailPageContent, { tenant });
 const YOURE_INVITED_ACME_CO = "You're invited to Acme Co";
 const SUPPORT_ACME_EXAMPLE = 'support@acme.example';
 const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
-const LEADS_ACME_EXAMPLE = 'leads@acme.example';
 
 describe(`<${EmailPageContent.name}/>`, () => {
   beforeEach(() => {
@@ -140,27 +145,24 @@ describe(`<${EmailPageContent.name}/>`, () => {
   it('shows the stored contact recipient on a plan with the contact form', async () => {
     getEmailConfigMock.mockResolvedValue({
       senderName: 'Acme Co',
-      contactRecipient: LEADS_ACME_EXAMPLE,
+      contactRecipient: MOCK_CONTACT_RECIPIENT,
       updatedAt: new Date(),
     });
 
     await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
 
     expect(screen.getByLabelText(SEND_CONTACT_MESSAGES_TO)).toHaveValue(
-      LEADS_ACME_EXAMPLE,
+      MOCK_CONTACT_RECIPIENT,
     );
   });
 
   it('hides the contact recipient field from an editor', async () => {
     vi.mocked(requireTenantMembership).mockImplementationOnce(async (id) => ({
       tenant: makeReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
-      membership: {
-        id: 'membership-2',
-        userId: 'user-2',
+      membership: makeMembership({
         tenantId: id,
         role: MEMBERSHIP_ROLE.EDITOR,
-        createdAt: new Date('2026-04-02T00:00:00.000Z'),
-      },
+      }),
     }));
 
     await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
@@ -186,7 +188,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
     await setup({
       tenant: {
         ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       },
     });
 

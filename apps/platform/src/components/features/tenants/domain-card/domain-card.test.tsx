@@ -1,22 +1,26 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import {
+  makeTenant,
+  MOCK_TENANT_DOMAIN,
+} from '@platform/testing/tenants/fixtures';
 
 import { DomainCard } from './domain-card';
 
 const render = renderWithIntl;
 
-describe(DomainCard, () => {
+describe(`<${DomainCard.name}/>`, () => {
   it('shows the public domain and a link to the given DNS href', () => {
-    const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
+    const tenant = makeTenant();
     render(
       <DomainCard
         tenant={tenant}
-        domainVerificationStatus="VERIFIED"
+        domainVerificationStatus={DOMAIN_VERIFICATION_STATUS.VERIFIED}
         dnsHref={`/tenants/${tenant.id}/domain`}
       />,
     );
 
-    expect(screen.getByText('acme.example.com')).toBeVisible();
+    expect(screen.getByText(MOCK_TENANT_DOMAIN)).toBeVisible();
     expect(screen.getByRole('link', { name: 'DNS' })).toHaveAttribute(
       'href',
       `/tenants/${tenant.id}/domain`,
@@ -24,11 +28,11 @@ describe(DomainCard, () => {
   });
 
   it("links to the owner tree's domain page when given that href instead", () => {
-    const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
+    const tenant = makeTenant();
     render(
       <DomainCard
         tenant={tenant}
-        domainVerificationStatus="VERIFIED"
+        domainVerificationStatus={DOMAIN_VERIFICATION_STATUS.VERIFIED}
         dnsHref="/dashboard/domain"
       />,
     );
@@ -44,7 +48,7 @@ describe(DomainCard, () => {
     render(
       <DomainCard
         tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
+        domainVerificationStatus={DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED}
         dnsHref={`/tenants/${tenant.id}/domain`}
       />,
     );
@@ -54,34 +58,35 @@ describe(DomainCard, () => {
     ).toBeVisible();
   });
 
-  it.each(['NOT_ADDED', 'PENDING', 'VERIFIED'] as const)(
-    'claims a recent check for a %s status Vercel reported',
-    (status) => {
-      render(
-        <DomainCard
-          tenant={makeTenant()}
-          domainVerificationStatus={status}
-          dnsHref="/dashboard/domain"
-        />,
-      );
+  it.each([
+    DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
+    DOMAIN_VERIFICATION_STATUS.PENDING,
+    DOMAIN_VERIFICATION_STATUS.VERIFIED,
+  ])('claims a recent check for a %s status Vercel reported', (status) => {
+    render(
+      <DomainCard
+        tenant={makeTenant()}
+        domainVerificationStatus={status}
+        dnsHref="/dashboard/domain"
+      />,
+    );
 
-      expect(screen.getByText('Just now')).toBeVisible();
-    },
-  );
+    expect(screen.getByText('Just now')).toBeVisible();
+  });
 
-  it.each(['NOT_CONFIGURED', 'ERROR'] as const)(
-    'claims no recent check for a %s status',
-    (status) => {
-      render(
-        <DomainCard
-          tenant={makeTenant()}
-          domainVerificationStatus={status}
-          dnsHref="/dashboard/domain"
-        />,
-      );
+  it.each([
+    DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
+    DOMAIN_VERIFICATION_STATUS.ERROR,
+  ])('claims no recent check for a %s status', (status) => {
+    render(
+      <DomainCard
+        tenant={makeTenant()}
+        domainVerificationStatus={status}
+        dnsHref="/dashboard/domain"
+      />,
+    );
 
-      expect(screen.queryByText('Last checked')).toBeNull();
-      expect(screen.queryByText('Just now')).toBeNull();
-    },
-  );
+    expect(screen.queryByText('Last checked')).toBeNull();
+    expect(screen.queryByText('Just now')).toBeNull();
+  });
 });

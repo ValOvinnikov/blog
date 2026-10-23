@@ -1,7 +1,13 @@
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  makeReadyTenant,
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_CREATED_AT,
+  MOCK_TENANT_DOMAIN,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import { TenantsTable } from './tenants-table';
 
@@ -12,14 +18,14 @@ const HARBOR_DOMAIN = 'harbor.example.com';
 const MANAGE_ACME = 'Manage Acme Inc.';
 const MANAGE_HARBOR_CO = 'Manage Harbor Co.';
 
-describe(TenantsTable, () => {
+describe(`<${TenantsTable.name}/>`, () => {
   it('renders one row per tenant with its name, domain, plan and status', () => {
     render(
       <TenantsTable
         tenants={[
           makeReadyTenant(),
           makeReadyTenant({
-            id: 'tenant-2',
+            id: MOCK_OTHER_TENANT_ID,
             name: HARBOR_CO,
             primaryDomain: HARBOR_DOMAIN,
             plan: TENANT_PLAN.GROWTH,
@@ -30,7 +36,7 @@ describe(TenantsTable, () => {
     );
 
     expect(screen.getByText('Acme Inc.')).toBeVisible();
-    expect(screen.getByText('acme.example.com')).toBeVisible();
+    expect(screen.getByText(MOCK_TENANT_DOMAIN)).toBeVisible();
     expect(screen.getByText('Free')).toBeVisible();
     expect(screen.getByText('Active')).toBeVisible();
 
@@ -45,7 +51,7 @@ describe(TenantsTable, () => {
         tenants={[
           makeReadyTenant(),
           makeReadyTenant({
-            id: 'tenant-2',
+            id: MOCK_OTHER_TENANT_ID,
             name: HARBOR_CO,
             primaryDomain: HARBOR_DOMAIN,
           }),
@@ -59,7 +65,7 @@ describe(TenantsTable, () => {
     );
     expect(
       screen.getByRole('link', { name: MANAGE_HARBOR_CO }),
-    ).toHaveAttribute('href', '/tenants/tenant-2');
+    ).toHaveAttribute('href', `/tenants/${MOCK_OTHER_TENANT_ID}`);
   });
 
   it('links a not-yet-ready tenant\'s "Manage" control to its provisioning page', () => {
@@ -70,7 +76,7 @@ describe(TenantsTable, () => {
             provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
           }),
           makeReadyTenant({
-            id: 'tenant-2',
+            id: MOCK_OTHER_TENANT_ID,
             name: HARBOR_CO,
             primaryDomain: HARBOR_DOMAIN,
             provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
@@ -85,7 +91,7 @@ describe(TenantsTable, () => {
     );
     expect(
       screen.getByRole('link', { name: MANAGE_HARBOR_CO }),
-    ).toHaveAttribute('href', '/tenants/tenant-2/provisioning');
+    ).toHaveAttribute('href', `/tenants/${MOCK_OTHER_TENANT_ID}/provisioning`);
   });
 
   it('names the scrollable table region and the actions column for screen readers', () => {
@@ -102,7 +108,7 @@ describe(TenantsTable, () => {
 
     expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
       'dateTime',
-      '2026-04-02T00:00:00.000Z',
+      MOCK_TENANT_CREATED_AT.toISOString(),
     );
   });
 

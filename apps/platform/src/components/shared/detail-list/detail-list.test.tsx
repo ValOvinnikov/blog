@@ -1,18 +1,21 @@
 import { render, screen } from '@platform/testing/custom-render';
+import { MOCK_CUSTOM_DOMAIN } from '@platform/testing/tenants/fixtures';
 
 import { DetailList } from './detail-list';
 
-describe(DetailList, () => {
+describe(`<${DetailList.name}/>`, () => {
   it('renders each row as a label/value pair', () => {
     render(
       <DetailList>
-        <DetailList.Row label="Public domain">northwind.dev</DetailList.Row>
+        <DetailList.Row label="Public domain">
+          {MOCK_CUSTOM_DOMAIN}
+        </DetailList.Row>
         <DetailList.Row label="Plan">Growth</DetailList.Row>
       </DetailList>,
     );
 
     expect(screen.getByText('Public domain')).toBeVisible();
-    expect(screen.getByText('northwind.dev')).toBeVisible();
+    expect(screen.getByText(MOCK_CUSTOM_DOMAIN)).toBeVisible();
     expect(screen.getByText('Plan')).toBeVisible();
     expect(screen.getByText('Growth')).toBeVisible();
   });
@@ -24,7 +27,7 @@ describe(DetailList, () => {
           label="Public domain"
           action={<button type="button">DNS</button>}
         >
-          northwind.dev
+          {MOCK_CUSTOM_DOMAIN}
         </DetailList.Row>
       </DetailList>,
     );

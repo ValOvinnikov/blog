@@ -3,7 +3,13 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  makeTenant,
+  MOCK_OTHER_TENANT_DOMAIN,
+  MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import { DashboardTenantPicker } from './dashboard-tenant-picker';
 
@@ -14,14 +20,14 @@ const render = renderWithIntl;
 const tenants = [
   makeTenant(),
   makeTenant({
-    id: 'tenant-2',
-    name: 'Globex Corp.',
-    primaryDomain: 'globex.example.com',
+    id: MOCK_OTHER_TENANT_ID,
+    name: MOCK_OTHER_TENANT_NAME,
+    primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
     deprovisionedAt: new Date('2026-01-01'),
   }),
 ];
 
-describe(DashboardTenantPicker, () => {
+describe(`<${DashboardTenantPicker.name}/>`, () => {
   it('renders a heading and every tenant as a visible link through the select-tenant endpoint', () => {
     render(<DashboardTenantPicker tenants={tenants} />);
 
@@ -40,7 +46,7 @@ describe(DashboardTenantPicker, () => {
     expect(globexLink).toBeVisible();
     expect(globexLink).toHaveAttribute(
       'href',
-      '/api/dashboard/select-tenant?tenantId=tenant-2',
+      `/api/dashboard/select-tenant?tenantId=${MOCK_OTHER_TENANT_ID}`,
     );
   });
 

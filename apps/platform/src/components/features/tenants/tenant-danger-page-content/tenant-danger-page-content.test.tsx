@@ -6,6 +6,8 @@ import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
   idleDeprovisioningSteps,
   makeClientTenant,
+  MOCK_RUN_PLUS_1_MIN_AT,
+  MOCK_RUN_STARTED_AT,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
@@ -39,7 +41,7 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
   reactivateTenantAction: vi.fn(),
 }));
 
-const runStarted = { startedAt: '2026-08-12T14:18:00.000Z' };
+const runStarted = { startedAt: MOCK_RUN_STARTED_AT };
 
 const failedSteps = {
   ...idleDeprovisioningSteps(),
@@ -47,7 +49,7 @@ const failedSteps = {
     status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
     error: 'boom',
   },
-  run: { ...runStarted, finishedAt: '2026-08-12T14:19:00.000Z' },
+  run: { ...runStarted, finishedAt: MOCK_RUN_PLUS_1_MIN_AT },
 };
 
 const getTrigger = () => screen.getByRole('button', { name: 'Deprovision' });
@@ -60,7 +62,7 @@ const advancePoll = async (ticks = 1) => {
 
 const ARIA_DISABLED = 'aria-disabled';
 
-describe(TenantDangerPageContent, () => {
+describe(`<${TenantDangerPageContent.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     getTenantDeprovisioningStatusActionMock.mockReset();
@@ -93,7 +95,7 @@ describe(TenantDangerPageContent, () => {
           deprovisionedAt: null,
           deprovisioningSteps: null,
         })}
-        deprovisionRequestedAt="2026-08-12T14:18:00.000Z"
+        deprovisionRequestedAt={MOCK_RUN_STARTED_AT}
       />,
     );
 

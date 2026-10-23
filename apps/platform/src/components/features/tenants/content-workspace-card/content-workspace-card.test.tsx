@@ -1,11 +1,15 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeClientTenant } from '@platform/testing/tenants/fixtures';
+import {
+  makeClientTenant,
+  MOCK_SANITY_PROJECT_ID,
+  MOCK_TENANT_CREATED_AT,
+} from '@platform/testing/tenants/fixtures';
 
 import { ContentWorkspaceCard } from './content-workspace-card';
 
 const render = renderWithIntl;
 
-describe(ContentWorkspaceCard, () => {
+describe(`<${ContentWorkspaceCard.name}/>`, () => {
   it("nests the card's title one level under the page's own h1", () => {
     render(<ContentWorkspaceCard tenant={makeClientTenant()} />);
 
@@ -29,15 +33,15 @@ describe(ContentWorkspaceCard, () => {
 
   it('shows Stored/Active badges once the token and webhook exist', () => {
     const tenant = makeClientTenant({
-      sanityProjectId: 'proj-1',
+      sanityProjectId: MOCK_SANITY_PROJECT_ID,
       sanityDataset: 'production',
       sanityReadTokenEncrypted: 'encrypted-value',
-      webhookCreatedAt: new Date('2026-04-02T00:00:00.000Z'),
+      webhookCreatedAt: MOCK_TENANT_CREATED_AT,
     });
     render(<ContentWorkspaceCard tenant={tenant} />);
 
     expect(screen.getByText('Stored')).toBeVisible();
     expect(screen.getByText('Active')).toBeVisible();
-    expect(screen.getByText('proj-1')).toBeVisible();
+    expect(screen.getByText(MOCK_SANITY_PROJECT_ID)).toBeVisible();
   });
 });

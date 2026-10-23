@@ -1,17 +1,24 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import {
+  MOCK_INVITED_OWNER_EMAIL,
+  MOCK_OWNER_EMAIL,
+  MOCK_OWNER_JOINED_AT,
+} from '@platform/testing/tenants/fixtures';
 
 import { OwnerCard } from './owner-card';
 
+const INVITED_PENDING = 'Invited, pending';
+
 const render = renderWithIntl;
 
-describe(OwnerCard, () => {
+describe(`<${OwnerCard.name}/>`, () => {
   describe('with a resolved owner', () => {
     beforeEach(() => {
       render(
         <OwnerCard
           owner={{
-            email: 'owner@example.com',
-            joinedAt: new Date('2026-08-12T00:00:00.000Z'),
+            email: MOCK_OWNER_EMAIL,
+            joinedAt: MOCK_OWNER_JOINED_AT,
           }}
         />,
       );
@@ -35,23 +42,23 @@ describe(OwnerCard, () => {
       expect(joinedTime.tagName).toBe('TIME');
       expect(joinedTime).toHaveAttribute(
         'dateTime',
-        '2026-08-12T00:00:00.000Z',
+        MOCK_OWNER_JOINED_AT.toISOString(),
       );
     });
   });
 
   it('shows the invited email without a Joined row while the owner is a pending invite', () => {
-    render(<OwnerCard owner={{ email: 'invited@example.com' }} />);
+    render(<OwnerCard owner={{ email: MOCK_INVITED_OWNER_EMAIL }} />);
 
-    expect(screen.getByText('invited@example.com')).toBeVisible();
-    expect(screen.queryByText('Invited, pending')).not.toBeInTheDocument();
+    expect(screen.getByText(MOCK_INVITED_OWNER_EMAIL)).toBeVisible();
+    expect(screen.queryByText(INVITED_PENDING)).not.toBeInTheDocument();
     expect(screen.queryByText('Joined')).not.toBeInTheDocument();
   });
 
   it('shows the invited-pending badge when the tenant has no owner', () => {
     render(<OwnerCard owner={undefined} />);
 
-    expect(screen.getByText('Invited, pending')).toBeVisible();
+    expect(screen.getByText(INVITED_PENDING)).toBeVisible();
     expect(screen.queryByText('Joined')).not.toBeInTheDocument();
   });
 });

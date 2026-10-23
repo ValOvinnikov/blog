@@ -6,11 +6,16 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import {
+  makeReadyTenant,
+  MOCK_ARCHIVED_AT,
+} from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent from '@testing-library/user-event';
 
 import { VoicePageContent } from './voice-page-content';
+
+const NOTHING_HERE = 'Nothing here';
 
 const { EN, DE } = LOCALE_ISO_CODES;
 
@@ -59,14 +64,14 @@ describe(`<${VoicePageContent.name}/>`, () => {
     getSiteConfigMock.mockResolvedValue({
       ...defaultLookFormValues(),
       voiceOverridesByLocale: {
-        [EN]: { notFoundHeading: 'Nothing here' },
+        [EN]: { notFoundHeading: NOTHING_HERE },
         [DE]: { notFoundHeading: 'Nichts hier' },
       },
     });
 
     await setup();
 
-    expect(notFoundHeading()).toHaveValue('Nothing here');
+    expect(notFoundHeading()).toHaveValue(NOTHING_HERE);
   });
 
   it('offers a language switcher over the live languages', async () => {
@@ -99,7 +104,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
     await setup({
       tenant: {
         ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       },
     });
 

@@ -11,7 +11,10 @@ import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
-import { makeAuditEvent } from '@platform/testing/audit-events/fixtures';
+import {
+  makeAuditEvent,
+  MOCK_AUDIT_ACTOR_EMAIL,
+} from '@platform/testing/audit-events/fixtures';
 import {
   act,
   renderWithIntl,
@@ -23,6 +26,13 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   idleProvisioningSteps,
   makeTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_INVITED_OWNER_EMAIL,
+  MOCK_OWNER_EMAIL,
+  MOCK_OWNER_JOINED_AT,
+  MOCK_SANITY_PROJECT_ID,
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_URL,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
@@ -102,9 +112,6 @@ const SAVE_CHANGES = 'Save changes';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
   'Locked while provisioning is running.';
 const PRIMARY_DOMAIN = 'Primary domain';
-const ACME_EXAMPLE_COM = 'acme.example.com';
-const INVITED_EXAMPLE_COM = 'invited@example.com';
-const AT_20260826_0000 = '2026-08-26T00:00:00.000Z';
 const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
 const SUSPEND_TENANT = 'Suspend tenant';
 const REACTIVATE_TENANT = 'Reactivate tenant';
@@ -116,8 +123,8 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantOwnerMembershipMock.mockReset();
     getTenantOwnerMembershipMock.mockResolvedValue({
-      email: 'owner@example.com',
-      joinedAt: new Date('2026-08-12T00:00:00.000Z'),
+      email: MOCK_OWNER_EMAIL,
+      joinedAt: MOCK_OWNER_JOINED_AT,
     });
     listAuditEventsForTargetMock.mockReset();
     listAuditEventsForTargetMock.mockResolvedValue([]);
@@ -315,8 +322,8 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     await setup({
       tenant: makeTenant({
         id: TENANT_ID,
-        primaryDomain: ACME_EXAMPLE_COM,
-        sanityProjectId: 'proj-1',
+        primaryDomain: MOCK_TENANT_DOMAIN,
+        sanityProjectId: MOCK_SANITY_PROJECT_ID,
       }),
     });
 
@@ -333,13 +340,13 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       FINDING_STATUS.OPEN,
     );
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-      ACME_EXAMPLE_COM,
+      MOCK_TENANT_DOMAIN,
     );
 
     const domainStatus = screen.getByText('Verified');
     const ownerJoinedAt = screen.getByText('Aug 12, 2026');
-    const sanityProject = screen.getByText('proj-1');
-    const activityActor = screen.getByText('vo@valstack.dev');
+    const sanityProject = screen.getByText(MOCK_SANITY_PROJECT_ID);
+    const activityActor = screen.getByText(MOCK_AUDIT_ACTOR_EMAIL);
     const finding = screen.getByText('Provisioning step failed');
 
     expect(domainStatus).toBeVisible();
@@ -351,29 +358,29 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('shows a pending invite email in both the owner card and details panel', async () => {
     getTenantOwnerMembershipMock.mockResolvedValue({
-      email: INVITED_EXAMPLE_COM,
+      email: MOCK_INVITED_OWNER_EMAIL,
     });
 
     await setup();
 
-    const ownerEmail = screen.getByText(INVITED_EXAMPLE_COM);
+    const ownerEmail = screen.getByText(MOCK_INVITED_OWNER_EMAIL);
     const ownerEmailInput = screen.getByRole('textbox', {
       name: 'Owner email',
     });
     const joinedLabel = screen.queryByText('Joined');
 
     expect(ownerEmail).toBeVisible();
-    expect(ownerEmailInput).toHaveValue(INVITED_EXAMPLE_COM);
+    expect(ownerEmailInput).toHaveValue(MOCK_INVITED_OWNER_EMAIL);
     expect(joinedLabel).not.toBeInTheDocument();
   });
 
   it('always renders "Open site", linking to the tenant\'s live domain', async () => {
-    await setup({ tenant: makeTenant({ primaryDomain: ACME_EXAMPLE_COM }) });
+    await setup({ tenant: makeTenant() });
 
     const link = screen.getByRole('link', {
       name: 'Open site (opens in new tab)',
     });
-    expect(link).toHaveAttribute('href', 'https://acme.example.com');
+    expect(link).toHaveAttribute('href', MOCK_TENANT_URL);
     expect(link).toHaveAttribute('target', '_blank');
   });
 
@@ -409,7 +416,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   describe('archived tenant', () => {
     const archivedTenant = makeTenant({
-      deprovisionedAt: new Date(AT_20260826_0000),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
     });
 
     beforeEach(async () => {
@@ -478,7 +485,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       await setup({
         tenant: makeTenant({
           status: TENANT_STATUS.ARCHIVED,
-          deprovisionedAt: new Date(AT_20260826_0000),
+          deprovisionedAt: MOCK_ARCHIVED_AT,
         }),
       });
 

@@ -4,6 +4,7 @@ import {
   LOCALE_ISO_CODES,
 } from '@blog/config';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
+import { MOCK_ADMIN_EMAIL } from '@platform/testing/admins/fixtures';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -11,10 +12,17 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import {
+  MOCK_CONTACT_RECIPIENT,
+  MOCK_EMAIL_LOGO_URL,
+} from '@platform/testing/email/fixtures';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { selectFile } from '@platform/testing/select-file';
 import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_ARCHIVED_AT,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import {
   buildEmailDraft,
   withCopy,
@@ -124,7 +132,6 @@ const SEND_TEST_TO_ME = 'Send test to me';
 const GO_TO_THE_FIRST_ONE = 'Go to the first one';
 const ONE_FIELD_NEEDS_ATTENTION = '1 field needs attention';
 const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
-const LEADS_ACME_EXAMPLE = 'leads@acme.example';
 const WELCOME_BACK = 'Welcome back';
 
 describe(`<${EmailSettings.name}/>`, () => {
@@ -147,7 +154,7 @@ describe(`<${EmailSettings.name}/>`, () => {
     sendTestEmailActionMock.mockReset();
     sendTestEmailActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
-      to: 'admin@example.com',
+      to: MOCK_ADMIN_EMAIL,
     });
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
   });
@@ -292,7 +299,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: SEND_TEST_TO_ME }));
 
       expect(
-        await screen.findByText('Test sent to admin@example.com.'),
+        await screen.findByText(`Test sent to ${MOCK_ADMIN_EMAIL}.`),
       ).toBeVisible();
       expect(sendTestEmailActionMock).toHaveBeenCalledWith(TENANT_ID, {
         templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -325,7 +332,7 @@ describe(`<${EmailSettings.name}/>`, () => {
     beforeEach(async () => {
       uploadEmailLogoActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        url: 'https://example.blob.vercel-storage.com/email-logo.png',
+        url: MOCK_EMAIL_LOGO_URL,
       });
       setup();
       await selectFile(new File(['x'], 'logo.png', { type: 'image/png' }));
@@ -454,14 +461,14 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     await user.type(
       screen.getByLabelText(SEND_CONTACT_MESSAGES_TO),
-      LEADS_ACME_EXAMPLE,
+      MOCK_CONTACT_RECIPIENT,
     );
     await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     await waitFor(() =>
       expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
         TENANT_ID,
-        expect.objectContaining({ contactRecipient: LEADS_ACME_EXAMPLE }),
+        expect.objectContaining({ contactRecipient: MOCK_CONTACT_RECIPIENT }),
       ),
     );
   });
@@ -571,7 +578,7 @@ describe(`<${EmailSettings.name}/>`, () => {
   });
 
   it('is read-only for an archived tenant', () => {
-    setup({ archivedAt: new Date('2026-08-26T00:00:00.000Z') });
+    setup({ archivedAt: MOCK_ARCHIVED_AT });
 
     expectArchivedOffersNoSave();
     expect(screen.getByLabelText(SENDER_NAME)).toBeDisabled();

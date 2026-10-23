@@ -1,12 +1,16 @@
 import { AUDIT_ACTION } from '@blog/config';
-import { makeAuditEvent } from '@platform/testing/audit-events/fixtures';
+import {
+  makeAuditEvent,
+  MOCK_AUDIT_ACTOR_EMAIL,
+  MOCK_AUDIT_EVENT_AT,
+} from '@platform/testing/audit-events/fixtures';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { RecentActivityCard } from './recent-activity-card';
 
 const render = renderWithIntl;
 
-describe(RecentActivityCard, () => {
+describe(`<${RecentActivityCard.name}/>`, () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -34,12 +38,15 @@ describe(RecentActivityCard, () => {
 
     expect(screen.getByText('Settings updated')).toBeVisible();
     expect(screen.getByText('Tenant created')).toBeVisible();
-    expect(screen.getAllByText('vo@valstack.dev')).toHaveLength(2);
+    expect(screen.getAllByText(MOCK_AUDIT_ACTOR_EMAIL)).toHaveLength(2);
 
     const activityTimes = screen.getAllByText('5m ago');
     expect(activityTimes).toHaveLength(2);
     for (const time of activityTimes) {
-      expect(time).toHaveAttribute('dateTime', '2026-08-24T12:00:00.000Z');
+      expect(time).toHaveAttribute(
+        'dateTime',
+        MOCK_AUDIT_EVENT_AT.toISOString(),
+      );
     }
   });
 
