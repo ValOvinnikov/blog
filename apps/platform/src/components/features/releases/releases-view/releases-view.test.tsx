@@ -1,5 +1,7 @@
 import { RELEASE_CHANGE } from '@blog/config';
-import { CONTRAST_STATUS } from '@platform/constants/release';
+import { errorResult, okResult } from '@blog/utils';
+import { GITHUB_FAILURE } from '@platform/constants/github';
+import { CONTRAST_STATUS, RELEASE_FAILURE } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -9,6 +11,8 @@ import {
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReleasesView } from './releases-view';
+
+const RUN_CONTRAST_CHECK = 'Run contrast check';
 
 vi.mock('@platform/i18n/navigation');
 vi.mock('@platform/server/releases/start-contrast-check-action', () => ({
@@ -22,8 +26,8 @@ vi.mock('@platform/server/releases/get-release-run-action', () => ({
 }));
 
 const setup = customRender(ReleasesView, {
-  result: { ok: true, data: makeReleaseCandidate() },
-  releaseRun: { ok: true, data: undefined },
+  result: okResult(makeReleaseCandidate()),
+  releaseRun: okResult(),
 });
 
 describe(`<${ReleasesView.name}/>`, () => {
@@ -35,9 +39,8 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('lists the commits since the last tag with the touched areas', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({
+      result: okResult(
+        makeReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: true,
             [RELEASE_CHANGE.DB_MIGRATION]: false,
@@ -45,7 +48,7 @@ describe(`<${ReleasesView.name}/>`, () => {
             [RELEASE_CHANGE.ENV]: false,
           },
         }),
-      },
+      ),
     });
 
     expect(screen.getByRole('heading', { name: 'Releases' })).toBeVisible();
@@ -57,10 +60,7 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('says the commit list shows only the newest when it is shorter than the total', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({ totalCommits: 140 }),
-      },
+      result: okResult(makeReleaseCandidate({ totalCommits: 140 })),
     });
 
     expect(
@@ -70,10 +70,7 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('says the change list is incomplete when GitHub truncated the files', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({ isFileListTruncated: true }),
-      },
+      result: okResult(makeReleaseCandidate({ isFileListTruncated: true })),
     });
 
     expect(screen.getByText('The change list is incomplete')).toBeVisible();
@@ -82,9 +79,8 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('reads each migration count as a minimum when the counts are a lower bound', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({
+      result: okResult(
+        makeReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: true,
             [RELEASE_CHANGE.DB_MIGRATION]: true,
@@ -98,7 +94,7 @@ describe(`<${ReleasesView.name}/>`, () => {
             isLowerBound: true,
           },
         }),
-      },
+      ),
     });
 
     expect(screen.getByText('At least 2 migrations to apply')).toBeVisible();
@@ -109,9 +105,8 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('reads migration counts exactly when they are not a lower bound', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({
+      result: okResult(
+        makeReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: false,
             [RELEASE_CHANGE.DB_MIGRATION]: true,
@@ -125,7 +120,7 @@ describe(`<${ReleasesView.name}/>`, () => {
             isLowerBound: false,
           },
         }),
-      },
+      ),
     });
 
     expect(screen.getByText('1 migration to apply')).toBeVisible();
@@ -133,29 +128,25 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('shows only the empty message when there are no commits since the tag', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({ commits: [], totalCommits: 0 }),
-      },
+      result: okResult(makeReleaseCandidate({ commits: [], totalCommits: 0 })),
     });
 
     expect(
       screen.getByText('No commits since v1.4.0. Main is at the last release.'),
     ).toBeVisible();
     expect(
-      screen.queryByRole('button', { name: 'Run contrast check' }),
+      screen.queryByRole('button', { name: RUN_CONTRAST_CHECK }),
     ).not.toBeInTheDocument();
   });
 
   it('links a failed contrast status to the findings', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({
+      result: okResult(
+        makeReleaseCandidate({
           commits: [makeComparedCommit()],
           contrastStatus: CONTRAST_STATUS.FAILED,
         }),
-      },
+      ),
     });
 
     expect(
@@ -165,33 +156,31 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('disables the contrast check while a run is in progress', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({ contrastStatus: CONTRAST_STATUS.RUNNING }),
-      },
+      result: okResult(
+        makeReleaseCandidate({ contrastStatus: CONTRAST_STATUS.RUNNING }),
+      ),
     });
 
     expect(
-      screen.getByRole('button', { name: 'Run contrast check' }),
+      screen.getByRole('button', { name: RUN_CONTRAST_CHECK }),
     ).toBeDisabled();
   });
 
   it('offers the contrast check when it is not running', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({ contrastStatus: CONTRAST_STATUS.DUE }),
-      },
+      result: okResult(
+        makeReleaseCandidate({ contrastStatus: CONTRAST_STATUS.DUE }),
+      ),
     });
 
     expect(
-      screen.getByRole('button', { name: 'Run contrast check' }),
+      screen.getByRole('button', { name: RUN_CONTRAST_CHECK }),
     ).toBeEnabled();
   });
 
   it('says GitHub is unreachable and retries by refreshing', async () => {
     const refresh = mockRouterRefresh();
-    setup({ result: { ok: false, reason: 'githubError' } });
+    setup({ result: errorResult(GITHUB_FAILURE.GITHUB_ERROR) });
 
     expect(
       screen.getByText('Release information is unavailable'),
@@ -208,7 +197,7 @@ describe(`<${ReleasesView.name}/>`, () => {
   });
 
   it('reports an incomplete tag list instead of a latest release', () => {
-    setup({ result: { ok: false, reason: 'tagListIncomplete' } });
+    setup({ result: errorResult(RELEASE_FAILURE.TAG_LIST_INCOMPLETE) });
 
     expect(screen.getByText(/too long to read in full/)).toBeVisible();
     expect(screen.queryByText('v1.4.0')).not.toBeInTheDocument();
@@ -222,9 +211,8 @@ describe(`<${ReleasesView.name}/>`, () => {
     'releases only with an override when rendering changed and contrast is %s',
     (contrastStatus) => {
       setup({
-        result: {
-          ok: true,
-          data: makeReleaseCandidate({
+        result: okResult(
+          makeReleaseCandidate({
             changes: {
               [RELEASE_CHANGE.RENDERING]: true,
               [RELEASE_CHANGE.DB_MIGRATION]: false,
@@ -233,7 +221,7 @@ describe(`<${ReleasesView.name}/>`, () => {
             },
             contrastStatus,
           }),
-        },
+        ),
       });
 
       expect(
@@ -247,9 +235,8 @@ describe(`<${ReleasesView.name}/>`, () => {
 
   it('releases without an override when contrast passed', () => {
     setup({
-      result: {
-        ok: true,
-        data: makeReleaseCandidate({
+      result: okResult(
+        makeReleaseCandidate({
           changes: {
             [RELEASE_CHANGE.RENDERING]: true,
             [RELEASE_CHANGE.DB_MIGRATION]: false,
@@ -258,7 +245,7 @@ describe(`<${ReleasesView.name}/>`, () => {
           },
           contrastStatus: CONTRAST_STATUS.GREEN,
         }),
-      },
+      ),
     });
 
     expect(screen.getByRole('button', { name: 'Release' })).toBeVisible();

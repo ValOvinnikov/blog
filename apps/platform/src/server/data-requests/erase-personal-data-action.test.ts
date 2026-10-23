@@ -5,6 +5,7 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -40,10 +41,12 @@ vi.mock('@blog/db', async () => ({
 describe(erasePersonalDataAction, () => {
   beforeEach(() => {
     requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
-    erasePersonalDataMock.mockReset().mockResolvedValue({
-      ok: true,
-      data: { emailIndex: DATA_REQUEST_EMAIL_INDEX, erased: ONE_OF_EACH_COUNT },
-    });
+    erasePersonalDataMock.mockReset().mockResolvedValue(
+      okResult({
+        emailIndex: DATA_REQUEST_EMAIL_INDEX,
+        erased: ONE_OF_EACH_COUNT,
+      }),
+    );
     recordAuditEventMock.mockReset();
   });
 
@@ -80,10 +83,9 @@ describe(erasePersonalDataAction, () => {
   });
 
   it('records nothing when the erasure fails', async () => {
-    erasePersonalDataMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    erasePersonalDataMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await erasePersonalDataAction({ email: DATA_REQUEST_EMAIL });
 

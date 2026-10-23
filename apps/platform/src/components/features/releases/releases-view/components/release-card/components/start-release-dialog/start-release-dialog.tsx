@@ -7,6 +7,7 @@ import {
   type TFieldErrors,
   type TMaybeUndefined,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { Alert } from '@platform/components/shared/alert';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { FormField } from '@platform/components/shared/form-field';
@@ -61,16 +62,16 @@ export const StartReleaseDialog = ({
 
     if (result.outcome === ACTION_OUTCOME.SUCCESS) {
       onStarted(startedAt);
-      return { ok: true as const };
+      return okResult();
     }
     if (
       result.outcome === ACTION_OUTCOME.INVALID &&
       Object.keys(result.fieldErrors).length > 0
     ) {
       setFieldErrors(result.fieldErrors);
-      return { ok: false as const };
+      return errorResult();
     }
-    return { ok: false as const, error: t(releaseFailureKey(result)) };
+    return errorResult(t(releaseFailureKey(result)));
   };
 
   const handleOpenChange = (isOpen: boolean) => {

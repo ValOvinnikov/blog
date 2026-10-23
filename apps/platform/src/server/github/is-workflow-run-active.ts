@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
+import {
+  fetchGitHubJson,
+  recoverNotFound,
+  type TGitHubResult,
+} from './fetch-github';
 
 const runsSchema = z.object({
   workflow_runs: z.array(z.object({ status: z.string().nullable() })),
@@ -19,9 +23,5 @@ export const isWorkflowRunActive = async (
         .workflow_runs.some(({ status }) => status !== 'completed'),
   );
 
-  if (!result.ok && result.reason === 'notFound') {
-    return { ok: true, data: false };
-  }
-
-  return result;
+  return recoverNotFound(result, false);
 };
