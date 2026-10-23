@@ -1,7 +1,7 @@
 import { buildStarterDocuments } from '@blog/config';
 import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import { validateDocument, type ValidationClient } from '@sanity/validation';
-import { evaluate, parse } from 'groq-js';
 import { prepareConfig, type SanityDocument, type Schema } from 'sanity';
 
 import { buildStudioConfig } from './studio-config';
@@ -19,8 +19,7 @@ const createDatasetClient = (
   documents: TStarterDocument[],
 ): ValidationClient => {
   const client = {
-    fetch: async (query: string, params: Record<string, unknown>) =>
-      (await evaluate(parse(query), { dataset: documents, params })).get(),
+    fetch: mockGroqFetch(documents),
     withConfig: () => client,
   };
 

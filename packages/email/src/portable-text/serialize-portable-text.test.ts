@@ -1,3 +1,11 @@
+import {
+  MOCK_DATA_URL,
+  MOCK_ESCAPED_SCRIPT_MARKUP,
+  MOCK_JAVASCRIPT_URL,
+  MOCK_SCRIPT_MARKUP,
+  MOCK_TAB_SPLIT_JAVASCRIPT_URL,
+} from '@blog/email/testing/email-fixtures';
+
 import { serializePortableText } from './serialize-portable-text';
 import type { TPortableTextNode } from './types';
 
@@ -105,11 +113,11 @@ describe('serializePortableText', () => {
 
   it('escapes every interpolated text node', () => {
     const html = serializePortableText([
-      block({ children: [span('<script>alert(1)</script>')] }),
+      block({ children: [span(MOCK_SCRIPT_MARKUP)] }),
     ]);
 
-    expect(html).not.toContain('<script>alert(1)</script>');
-    expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+    expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
+    expect(html).toContain(MOCK_ESCAPED_SCRIPT_MARKUP);
   });
 
   it('escapes a malicious link href', () => {
@@ -128,7 +136,7 @@ describe('serializePortableText', () => {
       },
     ]);
 
-    expect(html).not.toContain('<script>alert(1)</script>');
+    expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
   });
 
   it('allows http, https and mailto link hrefs through unchanged', () => {
@@ -144,67 +152,35 @@ describe('serializePortableText', () => {
   });
 
   it('drops the link wrapper for a javascript: href', () => {
-    const html = serializePortableText([
-      linkBlock('javascript:alert(document.cookie)'),
-    ]);
+    const html = serializePortableText([linkBlock(MOCK_JAVASCRIPT_URL)]);
 
     expect(html).not.toContain('<a ');
     expect(html).not.toContain('javascript:');
     expect(html).toBe('<p style="margin:0 0 16px;">Click</p>');
   });
 
-  it('drops the link wrapper for a data: href', () => {
-    const html = serializePortableText([
-      linkBlock('data:text/html,<script>alert(1)</script>'),
-    ]);
-
-    expect(html).not.toContain('<a ');
-    expect(html).not.toContain('data:');
-  });
-
-  it('drops the link wrapper for a vbscript: href', () => {
-    const html = serializePortableText([linkBlock('vbscript:msgbox(1)')]);
-
-    expect(html).not.toContain('<a ');
-    expect(html).not.toContain('vbscript:');
-  });
-
-  it('drops the link wrapper for a javascript: href disguised with case', () => {
-    const html = serializePortableText([
-      linkBlock('JavaScript:alert(document.cookie)'),
-    ]);
-
-    expect(html).not.toContain('<a ');
-  });
-
-  it('drops the link wrapper for a javascript: href with a tab inside the scheme', () => {
-    const html = serializePortableText([
-      linkBlock('java\tscript:alert(document.cookie)'),
-    ]);
-
-    expect(html).not.toContain('<a ');
-  });
-
-  it('drops the link wrapper for a javascript: href with a newline inside the scheme', () => {
-    const html = serializePortableText([
-      linkBlock('java\nscript:alert(document.cookie)'),
-    ]);
-
-    expect(html).not.toContain('<a ');
-  });
-
-  it('drops the link wrapper for a javascript: href with leading whitespace/control characters', () => {
-    const html = serializePortableText([
-      linkBlock('   javascript:alert(document.cookie)'),
-    ]);
-
-    expect(html).not.toContain('<a ');
-  });
-
-  it('drops the link wrapper for a scheme-relative href', () => {
-    const html = serializePortableText([linkBlock('//evil.example/x')]);
-
-    expect(html).not.toContain('<a ');
+  it.each([
+    ['a data:', MOCK_DATA_URL],
+    ['a vbscript:', 'vbscript:msgbox(1)'],
+    [
+      'a javascript: href disguised with case',
+      'JavaScript:alert(document.cookie)',
+    ],
+    [
+      'a javascript: href with a tab inside the scheme',
+      MOCK_TAB_SPLIT_JAVASCRIPT_URL,
+    ],
+    [
+      'a javascript: href with a newline inside the scheme',
+      'java\nscript:alert(document.cookie)',
+    ],
+    [
+      'a javascript: href with leading whitespace',
+      '   javascript:alert(document.cookie)',
+    ],
+    ['a scheme-relative', '//evil.example/x'],
+  ])('drops the link wrapper for %s href', (_name, href) => {
+    expect(serializePortableText([linkBlock(href)])).not.toContain('<a ');
   });
 
   it('drops the link wrapper for an unparseable href', () => {

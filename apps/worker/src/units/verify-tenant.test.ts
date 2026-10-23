@@ -9,12 +9,11 @@ import {
 } from '@blog/db/queries/tenants';
 import { errorResult } from '@blog/utils/result';
 import { verifyTenantSeededContent } from '@worker/steps/verify-seeded-content';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
+import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { getStepMetadata } from 'workflow';
 
 import { verifyTenant } from './verify-tenant';
-
-const CTX = { runId: 'run-1' };
 
 vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
   (
@@ -36,14 +35,14 @@ describe(verifyTenant, () => {
     vi.mocked(getStepMetadata).mockReturnValue({
       attempt: 1,
     } as ReturnType<typeof getStepMetadata>);
-    vi.mocked(getTenantById).mockResolvedValue(makeTenant());
+    vi.mocked(getTenantById).mockResolvedValue(mockTenant());
     vi.mocked(updateProvisioningStep).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
   });
 
   it('verifies the seeded content and reports VERIFY_CONTENT done', async () => {
-    const result = await verifyTenant(TEST_TENANT_ID, CTX);
+    const result = await verifyTenant(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(result).toEqual({ ok: true, data: undefined });
     expect(verifyTenantSeededContent).toHaveBeenCalledOnce();
@@ -63,7 +62,7 @@ describe(verifyTenant, () => {
       new Error('webhook missing'),
     );
 
-    const result = await verifyTenant(TEST_TENANT_ID, CTX);
+    const result = await verifyTenant(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(result).toEqual({
       ok: false,

@@ -1,19 +1,15 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import { ClientError } from '@sanity/client';
+import {
+  MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
+  MOCK_MALFORMED_DOCUMENT_MESSAGE,
+  MOCK_SANITY_MUTATE_URL,
+  mockSanityGrantError,
+} from '@worker/testing/sanity-client-error/fixtures';
 import { retryWithBackoff } from '@worker/utils/retry-with-backoff/retry-with-backoff';
 import type { Mock } from 'vitest';
 
 import { grantPropagationRetryOptions } from './grant-propagation-retry';
-
-function forbiddenClientError(): ClientError {
-  return new ClientError({
-    statusCode: HTTP_STATUS.FORBIDDEN,
-    headers: {},
-    body: { message: 'Forbidden' },
-    url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
-    method: HTTP_METHOD.POST,
-  });
-}
 
 describe(grantPropagationRetryOptions, () => {
   let sleep: Mock<(ms: number) => Promise<void>>;
@@ -23,9 +19,7 @@ describe(grantPropagationRetryOptions, () => {
   });
 
   it('retries an "insufficient permissions" message failure until it gives up, a bounded and stable number of times', async () => {
-    const failure = new Error(
-      'transaction failed: Insufficient permissions; permission "create" required',
-    );
+    const failure = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
     const firstRun = vi.fn().mockRejectedValue(failure);
 
     await expect(
@@ -47,7 +41,7 @@ describe(grantPropagationRetryOptions, () => {
   it('retries a structured ClientError carrying the 403 status code until it succeeds', async () => {
     const fn = vi
       .fn()
-      .mockRejectedValueOnce(forbiddenClientError())
+      .mockRejectedValueOnce(mockSanityGrantError())
       .mockResolvedValueOnce('ok');
 
     const result = await retryWithBackoff(
@@ -67,13 +61,13 @@ describe(grantPropagationRetryOptions, () => {
         statusCode: HTTP_STATUS.BAD_REQUEST,
         headers: {},
         body: { message: 'Malformed mutation' },
-        url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
+        url: MOCK_SANITY_MUTATE_URL,
         method: HTTP_METHOD.POST,
       }),
     ],
     [
       'an error whose message is unrelated to grant propagation',
-      new Error('malformed document'),
+      new Error(MOCK_MALFORMED_DOCUMENT_MESSAGE),
     ],
   ])('does not retry %s', async (_label, otherError) => {
     const fn = vi.fn().mockRejectedValue(otherError);

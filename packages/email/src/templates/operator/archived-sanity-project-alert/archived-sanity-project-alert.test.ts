@@ -1,8 +1,8 @@
 import {
-  ESCAPED_UNSAFE_MARKUP,
-  TEST_TENANT_ID,
-  TEST_TENANT_NAME,
-  UNSAFE_MARKUP,
+  MOCK_ESCAPED_UNSAFE_MARKUP,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+  MOCK_UNSAFE_MARKUP,
 } from '@blog/email/testing/email-fixtures';
 
 import { buildArchivedSanityProjectAlertEmail } from './archived-sanity-project-alert';
@@ -15,8 +15,8 @@ describe(buildArchivedSanityProjectAlertEmail, () => {
 
   beforeEach(() => {
     email = buildArchivedSanityProjectAlertEmail({
-      tenantName: TEST_TENANT_NAME,
-      tenantId: TEST_TENANT_ID,
+      tenantName: MOCK_TENANT_NAME,
+      tenantId: MOCK_TENANT_ID,
       sanityProjectId: SANITY_PROJECT_ID,
       manageUrl: MANAGE_URL,
     });
@@ -47,13 +47,13 @@ describe(buildArchivedSanityProjectAlertEmail, () => {
 
   it('escapes every caller-supplied value in the HTML', () => {
     const { html } = buildArchivedSanityProjectAlertEmail({
-      tenantName: UNSAFE_MARKUP,
-      tenantId: UNSAFE_MARKUP,
-      sanityProjectId: UNSAFE_MARKUP,
+      tenantName: MOCK_UNSAFE_MARKUP,
+      tenantId: MOCK_UNSAFE_MARKUP,
+      sanityProjectId: MOCK_UNSAFE_MARKUP,
       manageUrl: MANAGE_URL,
     });
 
-    expect(html).not.toContain(UNSAFE_MARKUP);
-    expect(html).toContain(ESCAPED_UNSAFE_MARKUP);
+    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
+    expect(html).toContain(MOCK_ESCAPED_UNSAFE_MARKUP);
   });
 });

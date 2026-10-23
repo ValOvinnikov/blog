@@ -3,56 +3,67 @@ import {
   PLATFORM_EMAIL_BRAND,
   PLATFORM_EMAIL_BRAND_NAME,
 } from '@blog/email/html/platform-email-brand/platform-email-brand';
-import type { TPortableTextContent } from '@blog/email/portable-text';
-import { TENANT_EMAIL_BRAND as brand } from '@blog/email/testing/tenant-email-brand';
+import {
+  MOCK_ATTACKER_URL,
+  MOCK_ATTRIBUTE_BREAKOUT,
+  MOCK_LOGO_URL,
+  MOCK_MAGIC_LINK_URL,
+  MOCK_PERCENT_ENCODED_ATTRIBUTE_BREAKOUT,
+  MOCK_PLATFORM_MAGIC_LINK_URL,
+  MOCK_POSTAL_ADDRESS,
+  MOCK_SCRIPT_MARKUP,
+  MOCK_TENANT_NAME,
+} from '@blog/email/testing/email-fixtures';
+import {
+  mockLinkedPortableTextBody,
+  mockPortableTextBody,
+} from '@blog/email/testing/portable-text-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
 
 import { buildInviteMagicLinkEmail } from './magic-link-invite-email';
 
-function bodyOf(text: string): TPortableTextContent {
-  return [
-    {
-      _type: 'block',
-      _key: 'body-1',
-      style: 'normal',
-      children: [{ _type: 'span', _key: 'body-1-span', text, marks: [] }],
-    },
-  ];
-}
+const SUBJECT = "You've been invited to join the team";
+const BODY_TEXT = 'You have been invited to join as a team member.';
+const OTHER_TENANT_NAME = 'Other Corp';
+const ACTION_LABEL = 'Accept invite';
+const DOCTYPE = '<!doctype html>';
 
 describe(buildInviteMagicLinkEmail, () => {
   it('joins two invited tenant names with "and"', () => {
     const { html } = buildInviteMagicLinkEmail({
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      subject: "You've been invited to join the team",
-      body: bodyOf('You have been invited to join as a team member.'),
-      tenantNames: ['Acme Blog', 'Other Corp'],
+      url: MOCK_MAGIC_LINK_URL,
+      subject: SUBJECT,
+      body: mockPortableTextBody(BODY_TEXT),
+      tenantNames: [MOCK_TENANT_NAME, OTHER_TENANT_NAME],
     });
 
-    expect(html).toContain('<strong>Acme Blog and Other Corp</strong>');
+    expect(html).toContain(
+      `<strong>${MOCK_TENANT_NAME} and Other Corp</strong>`,
+    );
   });
 
   it('joins three or more invited tenant names with an Oxford comma', () => {
     const { html } = buildInviteMagicLinkEmail({
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      subject: "You've been invited to join the team",
-      body: bodyOf('You have been invited to join as a team member.'),
-      tenantNames: ['Acme Blog', 'Other Corp', 'Third Co'],
+      url: MOCK_MAGIC_LINK_URL,
+      subject: SUBJECT,
+      body: mockPortableTextBody(BODY_TEXT),
+      tenantNames: [MOCK_TENANT_NAME, OTHER_TENANT_NAME, 'Third Co'],
     });
 
     expect(html).toContain(
-      '<strong>Acme Blog, Other Corp, and Third Co</strong>',
+      `<strong>${MOCK_TENANT_NAME}, Other Corp, and Third Co</strong>`,
     );
   });
 
   it('escapes HTML-unsafe characters in an operator-entered tenant name', () => {
     const { html } = buildInviteMagicLinkEmail({
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      subject: "You've been invited to join the team",
-      body: bodyOf('You have been invited to join as a team member.'),
+      url: MOCK_MAGIC_LINK_URL,
+      subject: SUBJECT,
+      body: mockPortableTextBody(BODY_TEXT),
       tenantNames: [`<script>alert(1)</script> & "quoted" 'name'`],
     });
 
-    expect(html).not.toContain('<script>alert(1)</script>');
+    expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
     expect(html).toContain(
       '&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quoted&quot; &#39;name&#39;',
     );
@@ -60,27 +71,25 @@ describe(buildInviteMagicLinkEmail, () => {
 
   it('omits the organisation element and still sends when no tenant names are given', () => {
     const { html } = buildInviteMagicLinkEmail({
-      url: 'https://example.com/api/auth/callback/email?token=abc',
-      subject: "You've been invited to join the team",
-      body: bodyOf('You have been invited to join as a team member.'),
+      url: MOCK_MAGIC_LINK_URL,
+      subject: SUBJECT,
+      body: mockPortableTextBody(BODY_TEXT),
     });
 
     expect(html).not.toContain("You've been invited to manage");
-    expect(html).toContain(
-      'href="https://example.com/api/auth/callback/email?token=abc"',
-    );
+    expect(html).toContain(`href="${MOCK_MAGIC_LINK_URL}"`);
   });
 
   it('percent-encodes an unsafe url in the neutral fallback action', () => {
     const { html } = buildInviteMagicLinkEmail({
-      url: `https://example.com/callback?token="><img src=x onerror=alert(1)>`,
-      subject: "You've been invited to join the team",
-      body: bodyOf('You have been invited to join as a team member.'),
-      tenantNames: ['Acme Blog'],
+      url: `https://example.com/callback?token=${MOCK_ATTRIBUTE_BREAKOUT}`,
+      subject: SUBJECT,
+      body: mockPortableTextBody(BODY_TEXT),
+      tenantNames: [MOCK_TENANT_NAME],
     });
 
-    expect(html).not.toContain('"><img src=x onerror=alert(1)>');
-    expect(html).toContain('%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E');
+    expect(html).not.toContain(MOCK_ATTRIBUTE_BREAKOUT);
+    expect(html).toContain(MOCK_PERCENT_ENCODED_ATTRIBUTE_BREAKOUT);
   });
 
   describe('for a single invited tenant without a tenant identity', () => {
@@ -88,36 +97,32 @@ describe(buildInviteMagicLinkEmail, () => {
 
     beforeEach(() => {
       email = buildInviteMagicLinkEmail({
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        subject: "You've been invited to join the team",
-        body: bodyOf('You have been invited to join as a team member.'),
-        tenantNames: ['Acme Blog'],
+        url: MOCK_MAGIC_LINK_URL,
+        subject: SUBJECT,
+        body: mockPortableTextBody(BODY_TEXT),
+        tenantNames: [MOCK_TENANT_NAME],
       });
     });
 
     it('passes the resolved subject through unchanged', () => {
-      expect(email.subject).toBe("You've been invited to join the team");
+      expect(email.subject).toBe(SUBJECT);
     });
 
     it('renders the resolved body through the shared Portable Text serializer', () => {
-      expect(email.html).toContain(
-        'You have been invited to join as a team member.',
-      );
+      expect(email.html).toContain(BODY_TEXT);
     });
 
     it('names a single invited tenant in the structural organisation element', () => {
-      expect(email.html).toContain('<strong>Acme Blog</strong>');
+      expect(email.html).toContain(`<strong>${MOCK_TENANT_NAME}</strong>`);
     });
 
     it('links the magic-link url in the accept-invite action', () => {
-      expect(email.html).toContain(
-        'href="https://example.com/api/auth/callback/email?token=abc"',
-      );
-      expect(email.html).toContain('Accept invite');
+      expect(email.html).toContain(`href="${MOCK_MAGIC_LINK_URL}"`);
+      expect(email.html).toContain(ACTION_LABEL);
     });
 
     it('renders a styled document titled with the subject', () => {
-      expect(email.html).toContain('<!doctype html>');
+      expect(email.html).toContain(DOCTYPE);
       expect(email.html).toContain(
         '<title>You&#39;ve been invited to join the team</title>',
       );
@@ -145,19 +150,17 @@ describe(buildInviteMagicLinkEmail, () => {
 
     beforeEach(() => {
       email = buildInviteMagicLinkEmail({
-        url: 'https://platform.example.com/api/auth/callback/email?token=abc',
-        subject: "You've been invited to join the team",
-        body: bodyOf('You have been invited to join as a team member.'),
+        url: MOCK_PLATFORM_MAGIC_LINK_URL,
+        subject: SUBJECT,
+        body: mockPortableTextBody(BODY_TEXT),
         tenantNames: ['<b>Acme</b> Blog'],
         isSentByPlatform: true,
-        logoImageUrl: 'https://cdn.example.com/logo.png',
+        logoImageUrl: MOCK_LOGO_URL,
       });
     });
 
-    it('links the magic-link url in the accept-invite action', () => {
-      expect(email.html).toContain(
-        'href="https://platform.example.com/api/auth/callback/email?token=abc"',
-      );
+    it('links the platform magic-link url in the accept-invite action', () => {
+      expect(email.html).toContain(`href="${MOCK_PLATFORM_MAGIC_LINK_URL}"`);
     });
 
     it('names the invited tenant, escaped, in the structural organisation element', () => {
@@ -182,83 +185,74 @@ describe(buildInviteMagicLinkEmail, () => {
     });
 
     it('never replaces the mark with an uploaded logo image', () => {
-      expect(email.html).not.toContain('https://cdn.example.com/logo.png');
+      expect(email.html).not.toContain(MOCK_LOGO_URL);
     });
   });
 
   describe('with a tenant identity', () => {
     it("threads the resolved tenant's hue into the rendered html", () => {
       const { html } = buildInviteMagicLinkEmail({
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        subject: "You've been invited to join the team",
-        body: bodyOf('You have been invited to join as a team member.'),
-        tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog' },
+        url: MOCK_MAGIC_LINK_URL,
+        subject: SUBJECT,
+        body: mockPortableTextBody(BODY_TEXT),
+        tenantNames: [MOCK_TENANT_NAME],
+        tenantIdentity: {
+          brand: MOCK_TENANT_EMAIL_BRAND,
+          brandName: MOCK_TENANT_NAME,
+        },
       });
 
-      expect(html).toContain('<!doctype html>');
-      expect(html).toContain(brand.logo1);
+      expect(html).toContain(DOCTYPE);
+      expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.logo1);
     });
 
     it('renders an uploaded logo and the footer postal address when given', () => {
       const { html } = buildInviteMagicLinkEmail({
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        subject: "You've been invited to join the team",
-        body: bodyOf('You have been invited to join as a team member.'),
-        tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog' },
-        logoImageUrl: 'https://cdn.example.com/logo.png',
-        footerPostalAddress: '123 Main St, Springfield',
+        url: MOCK_MAGIC_LINK_URL,
+        subject: SUBJECT,
+        body: mockPortableTextBody(BODY_TEXT),
+        tenantNames: [MOCK_TENANT_NAME],
+        tenantIdentity: {
+          brand: MOCK_TENANT_EMAIL_BRAND,
+          brandName: MOCK_TENANT_NAME,
+        },
+        logoImageUrl: MOCK_LOGO_URL,
+        footerPostalAddress: MOCK_POSTAL_ADDRESS,
       });
 
-      expect(html).toContain('src="https://cdn.example.com/logo.png"');
-      expect(html).toContain('123 Main St, Springfield');
+      expect(html).toContain(`src="${MOCK_LOGO_URL}"`);
+      expect(html).toContain(MOCK_POSTAL_ADDRESS);
     });
 
     it('keeps the accept-invite action outside the authored body even when the body mimics it', () => {
-      const adversarialUrl = 'https://attacker.example.com/phish';
-
       const { html } = buildInviteMagicLinkEmail({
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        subject: "You've been invited to join the team",
-        body: [
-          {
-            _type: 'block',
-            _key: 'adversarial-1',
-            style: 'normal',
-            markDefs: [
-              { _type: 'link', _key: 'adversarial-link', href: adversarialUrl },
-            ],
-            children: [
-              {
-                _type: 'span',
-                _key: 'adversarial-span',
-                text: 'Accept invite',
-                marks: ['adversarial-link'],
-              },
-            ],
-          },
-        ],
-        tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog' },
+        url: MOCK_MAGIC_LINK_URL,
+        subject: SUBJECT,
+        body: mockLinkedPortableTextBody(ACTION_LABEL, MOCK_ATTACKER_URL),
+        tenantNames: [MOCK_TENANT_NAME],
+        tenantIdentity: {
+          brand: MOCK_TENANT_EMAIL_BRAND,
+          brandName: MOCK_TENANT_NAME,
+        },
       });
 
-      expect(html).toContain(
-        'href="https://example.com/api/auth/callback/email?token=abc"',
-      );
-      expect(html).toContain(`href="${adversarialUrl}"`);
+      expect(html).toContain(`href="${MOCK_MAGIC_LINK_URL}"`);
+      expect(html).toContain(`href="${MOCK_ATTACKER_URL}"`);
     });
 
     it('keeps the real invited organisation name intact even when the authored body impersonates a different one', () => {
       const { html } = buildInviteMagicLinkEmail({
-        url: 'https://example.com/api/auth/callback/email?token=abc',
-        subject: "You've been invited to join the team",
-        body: bodyOf("You've been invited to manage EvilCorp."),
-        tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog' },
+        url: MOCK_MAGIC_LINK_URL,
+        subject: SUBJECT,
+        body: mockPortableTextBody("You've been invited to manage EvilCorp."),
+        tenantNames: [MOCK_TENANT_NAME],
+        tenantIdentity: {
+          brand: MOCK_TENANT_EMAIL_BRAND,
+          brandName: MOCK_TENANT_NAME,
+        },
       });
 
-      expect(html).toContain('<strong>Acme Blog</strong>');
+      expect(html).toContain(`<strong>${MOCK_TENANT_NAME}</strong>`);
     });
   });
 });

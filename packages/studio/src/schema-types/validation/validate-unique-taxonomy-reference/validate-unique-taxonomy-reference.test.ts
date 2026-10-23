@@ -2,63 +2,37 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
-import type { ValidationContext } from 'sanity';
+import {
+  MOCK_TAXONOMY_REFERENCE_FIELD,
+  mockFetchContext,
+  type TMockFetchContext,
+} from '@blog/studio/testing/mock-validation-context';
 
-const PAGE_TYPE = PAGE_TAG_TYPE;
-const REFERENCE_FIELD = 'tag';
+const TAG_PAGE_ID = 'page-tag-1';
+
 const UNIQUENESS_ERROR =
   'Another Tag Page already references this tag — each tag can only back one Tag Page.';
-
-const createMockContext = (
-  fetchResult: unknown,
-  documentId = 'page-tag-1',
-  language?: string,
-) => {
-  const fetchCalls: { query: string; params: unknown }[] = [];
-  const withConfigCalls: unknown[] = [];
-
-  const getClient = () => ({
-    withConfig: (config: unknown) => {
-      withConfigCalls.push(config);
-
-      return {
-        fetch: async (query: string, params: unknown) => {
-          fetchCalls.push({ query, params });
-          if (fetchResult instanceof Error) throw fetchResult;
-          return fetchResult;
-        },
-      };
-    },
-  });
-
-  const context = {
-    getClient,
-    document: { _id: documentId, language },
-  } as unknown as ValidationContext;
-
-  return { context, fetchCalls, withConfigCalls };
-};
 
 describe('validateUniqueTaxonomyReference', () => {
   let validate: ReturnType<typeof validateUniqueTaxonomyReference>;
 
   beforeEach(() => {
     validate = validateUniqueTaxonomyReference(
-      PAGE_TYPE,
-      REFERENCE_FIELD,
+      PAGE_TAG_TYPE,
+      MOCK_TAXONOMY_REFERENCE_FIELD,
       UNIQUENESS_ERROR,
     );
   });
 
   describe('when no conflicting page exists', () => {
-    let context: ReturnType<typeof createMockContext>['context'];
-    let fetchCalls: ReturnType<typeof createMockContext>['fetchCalls'];
-    let withConfigCalls: ReturnType<
-      typeof createMockContext
-    >['withConfigCalls'];
+    let context: TMockFetchContext['context'];
+    let fetchCalls: TMockFetchContext['fetchCalls'];
+    let withConfigCalls: TMockFetchContext['withConfigCalls'];
 
     beforeEach(() => {
-      ({ context, fetchCalls, withConfigCalls } = createMockContext(0));
+      ({ context, fetchCalls, withConfigCalls } = mockFetchContext(0, {
+        _id: TAG_PAGE_ID,
+      }));
     });
 
     it('passes without querying when no reference is set', async () => {
@@ -96,7 +70,7 @@ describe('validateUniqueTaxonomyReference', () => {
   });
 
   it('flags a conflicting page referencing the same term', async () => {
-    const { context } = createMockContext(1);
+    const { context } = mockFetchContext(1, { _id: TAG_PAGE_ID });
 
     await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(
       UNIQUENESS_ERROR,
@@ -104,27 +78,30 @@ describe('validateUniqueTaxonomyReference', () => {
   });
 
   it('resolves to true, not the uniqueness error, when the fetch rejects', async () => {
-    const { context } = createMockContext(new Error('network down'));
+    const { context } = mockFetchContext(new Error('network down'), {
+      _id: TAG_PAGE_ID,
+    });
 
     await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(true);
   });
 
   it('excludes both the draft and published id of the current document', async () => {
-    const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
+    const { context, fetchCalls } = mockFetchContext(0, {
+      _id: 'drafts.page-tag-1',
+    });
 
     await validate({ _ref: 'tag-1' }, context);
 
     expect(fetchCalls[0]?.params).toMatchObject({
-      publishedId: 'page-tag-1',
+      publishedId: TAG_PAGE_ID,
     });
   });
 
   it('only counts pages in the same language as a conflict', async () => {
-    const { context, fetchCalls } = createMockContext(
-      0,
-      'page-tag-1',
-      LOCALE_ISO_CODES.NL,
-    );
+    const { context, fetchCalls } = mockFetchContext(0, {
+      _id: TAG_PAGE_ID,
+      language: LOCALE_ISO_CODES.NL,
+    });
 
     await validate({ _ref: 'tag-1' }, context);
 
