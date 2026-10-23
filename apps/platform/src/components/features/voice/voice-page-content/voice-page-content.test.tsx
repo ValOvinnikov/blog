@@ -6,6 +6,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   makeReadyTenant,
   MOCK_ARCHIVED_AT,
@@ -103,7 +104,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
       },
     });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();

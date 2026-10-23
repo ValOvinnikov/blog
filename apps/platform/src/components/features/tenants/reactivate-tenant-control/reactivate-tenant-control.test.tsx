@@ -5,12 +5,15 @@ import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   makeClientTenant,
   MOCK_ARCHIVED_AT,
+  MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReactivateTenantControl } from './reactivate-tenant-control';
 
 const REACTIVATE_TENANT = 'Reactivate tenant';
+const REACTIVATE_DIALOG_TITLE = `Reactivate ${MOCK_TENANT_NAME}`;
+const CONFIRM_TENANT_NAME_LABEL = `Type "${MOCK_TENANT_NAME}" to confirm`;
 
 const { reactivateTenantActionMock } = vi.hoisted(() => ({
   reactivateTenantActionMock: vi.fn(),
@@ -35,7 +38,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   const typeTenantNameToConfirm = async () => {
     await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
     await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
+      screen.getByRole('textbox', { name: CONFIRM_TENANT_NAME_LABEL }),
       ARCHIVED_TENANT.name,
     );
   };
@@ -62,7 +65,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
 
     expect(
       await screen.findByRole('alertdialog', {
-        name: /reactivate acme inc\./i,
+        name: REACTIVATE_DIALOG_TITLE,
       }),
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Reactivate' })).toBeDisabled();

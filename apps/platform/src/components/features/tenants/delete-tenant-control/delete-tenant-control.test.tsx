@@ -5,6 +5,7 @@ import { mockRouter } from '@platform/testing/mock-router';
 import {
   makeClientTenant,
   MOCK_ARCHIVED_AT,
+  MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -18,6 +19,9 @@ const { deleteTenantActionMock } = vi.hoisted(() => ({
 vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
   deleteTenantAction: deleteTenantActionMock,
 }));
+
+const DELETE_TENANT_DIALOG_TITLE = `Delete ${MOCK_TENANT_NAME}`;
+const CONFIRM_TENANT_NAME_LABEL = `Type "${MOCK_TENANT_NAME}" to confirm`;
 
 const TENANT = makeClientTenant({
   deprovisionedAt: MOCK_ARCHIVED_AT,
@@ -61,7 +65,7 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
         screen.getByRole('button', { name: 'Delete tenant permanently' }),
       );
       dialog = await screen.findByRole('alertdialog', {
-        name: /delete acme inc\./i,
+        name: DELETE_TENANT_DIALOG_TITLE,
       });
     });
 
@@ -72,8 +76,8 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
       expect(confirmButton).toBeDisabled();
 
       await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
+        screen.getByRole('textbox', { name: CONFIRM_TENANT_NAME_LABEL }),
+        MOCK_TENANT_NAME,
       );
 
       expect(confirmButton).toBeEnabled();
@@ -81,14 +85,14 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
 
     it('calls the action with the typed name and navigates to the tenant list', async () => {
       await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
+        screen.getByRole('textbox', { name: CONFIRM_TENANT_NAME_LABEL }),
+        MOCK_TENANT_NAME,
       );
 
       await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
 
       expect(deleteTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
-        confirm: 'Acme Inc.',
+        confirm: MOCK_TENANT_NAME,
       });
       await vi.waitFor(() =>
         expect(pushMock).toHaveBeenCalledWith(adminRoutes.tenants()),
@@ -101,8 +105,8 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
         fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
       });
       await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
+        screen.getByRole('textbox', { name: CONFIRM_TENANT_NAME_LABEL }),
+        MOCK_TENANT_NAME,
       );
 
       await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
@@ -118,8 +122,8 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
       await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
+        screen.getByRole('textbox', { name: CONFIRM_TENANT_NAME_LABEL }),
+        MOCK_TENANT_NAME,
       );
 
       await user.click(within(dialog).getByRole('button', { name: 'Delete' }));

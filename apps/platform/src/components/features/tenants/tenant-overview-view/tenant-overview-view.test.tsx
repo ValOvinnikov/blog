@@ -23,6 +23,7 @@ import {
 } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   idleProvisioningSteps,
   makeTenant,
@@ -32,7 +33,9 @@ import {
   MOCK_OWNER_JOINED_AT,
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
   MOCK_TENANT_URL,
+  mockFirstStepRunningProvisioningSteps,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
@@ -112,7 +115,6 @@ const SAVE_CHANGES = 'Save changes';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
   'Locked while provisioning is running.';
 const PRIMARY_DOMAIN = 'Primary domain';
-const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
 const SUSPEND_TENANT = 'Suspend tenant';
 const REACTIVATE_TENANT = 'Reactivate tenant';
 
@@ -147,12 +149,15 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('renders the tenant name and status/plan badges', async () => {
     await setup({
-      tenant: makeTenant({ name: 'Acme Inc.', status: TENANT_STATUS.ACTIVE }),
+      tenant: makeTenant({
+        name: MOCK_TENANT_NAME,
+        status: TENANT_STATUS.ACTIVE,
+      }),
     });
 
     const heading = screen.getByRole('heading', {
       level: 1,
-      name: 'Acme Inc.',
+      name: MOCK_TENANT_NAME,
     });
     const titleRow = screen.getByTestId('page-header-title-row');
     const statusBadge = within(titleRow).getByText('Active');
@@ -181,24 +186,19 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('relocates the tenant details panel here as the Identity card', async () => {
-    await setup({ tenant: makeTenant({ name: 'Acme Inc.' }) });
+    await setup({ tenant: makeTenant({ name: MOCK_TENANT_NAME }) });
 
     const detailsTitle = screen.getByText(TENANT_DETAILS);
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
 
     expect(detailsTitle).toBeVisible();
-    expect(nameInput).toHaveValue('Acme Inc.');
+    expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
   });
 
   it('locks every tenant details field while a step is running, saying why', async () => {
     await setup({
       tenant: makeTenant({
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: mockFirstStepRunningProvisioningSteps(),
       }),
     });
 
@@ -424,20 +424,22 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     it('shows the archived notice', async () => {
-      const archivedNotice = screen.getByText(THIS_TENANT_IS_ARCHIVED);
+      const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
       expect(archivedNotice).toBeVisible();
     });
 
     it("describes the details panel's disabled Save with the archived notice", async () => {
       const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      expect(saveButton).toHaveAccessibleDescription(/This tenant is archived/);
+      expect(saveButton).toHaveAccessibleDescription(
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+      );
     });
   });
 
   it('does not show the archived notice for a live tenant', async () => {
     await setup({ tenant: makeTenant({ deprovisionedAt: null }) });
 
-    const archivedNotice = screen.queryByText(THIS_TENANT_IS_ARCHIVED);
+    const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
     expect(archivedNotice).not.toBeInTheDocument();
   });
 

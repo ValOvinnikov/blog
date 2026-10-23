@@ -9,7 +9,10 @@ import {
   makeFinding,
   MOCK_FINDING_LAST_SEEN_AT,
 } from '@platform/testing/findings/fixtures';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import { FindingsTable } from './findings-table';
 
@@ -52,10 +55,9 @@ describe(`<${FindingsTable.name}/>`, () => {
   it("links a finding's tenant name to that tenant's overview page", () => {
     render(<FindingsTable findings={[makeFinding({ tenantId: TENANT_ID })]} />);
 
-    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toHaveAttribute(
-      'href',
-      `/tenants/${TENANT_ID}`,
-    );
+    expect(
+      screen.getByRole('link', { name: MOCK_TENANT_NAME }),
+    ).toHaveAttribute('href', `/tenants/${TENANT_ID}`);
   });
 
   it('shows a platform-wide placeholder instead of a tenant link for a tenant-less finding', () => {

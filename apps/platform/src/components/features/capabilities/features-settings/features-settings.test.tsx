@@ -6,6 +6,7 @@ import {
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   MOCK_ARCHIVED_AT,
   TENANT_ID,
@@ -287,7 +288,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
       expect(bookmarksSwitch).toHaveAttribute(DATA_DISABLED, '');
       expect(bookmarksSwitch).toHaveAccessibleDescription(
-        /This tenant is archived/,
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
       );
 
       await user.click(bookmarksSwitch);

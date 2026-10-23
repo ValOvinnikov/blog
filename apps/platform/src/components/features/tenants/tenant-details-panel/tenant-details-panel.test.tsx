@@ -10,11 +10,13 @@ import {
   waitFor,
 } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   makeClientTenant,
   MOCK_ARCHIVED_AT,
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
@@ -99,7 +101,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
       renderPanel({
         tenant: makeClientTenant({
-          name: 'Acme Inc.',
+          name: MOCK_TENANT_NAME,
           primaryDomain: MOCK_TENANT_DOMAIN,
           plan: TENANT_PLAN.FREE,
           locale: LOCALE_ISO_CODES.EN,
@@ -107,7 +109,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      expect(nameInput).toHaveValue('Acme Inc.');
+      expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
       expect(nameInput).not.toBeDisabled();
 
       expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
@@ -161,7 +163,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         tenant: makeClientTenant({ name: ACME_RENAMED }),
       });
       renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' }),
+        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
       });
 
       await user.clear(screen.getByRole('textbox', { name: 'Name' }));
@@ -274,7 +276,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
       });
       renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' }),
+        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
       });
 
       await user.clear(screen.getByRole('textbox', { name: 'Name' }));
@@ -374,7 +376,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('renders every other field as editable when only one field is locked', () => {
       renderPanel({
         tenant: makeClientTenant({
-          name: 'Acme Inc.',
+          name: MOCK_TENANT_NAME,
           primaryDomain: MOCK_TENANT_DOMAIN,
           plan: TENANT_PLAN.FREE,
           locale: LOCALE_ISO_CODES.EN,
@@ -402,7 +404,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       const tenant = makeClientTenant({
         id: TENANT_ID,
-        name: 'Acme Inc.',
+        name: MOCK_TENANT_NAME,
         primaryDomain: 'taken-domain.example.com',
       });
       renderPanel({
@@ -508,7 +510,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('disables every control and disables Save, since nothing can become dirty', () => {
       renderPanel({
         tenant: makeClientTenant({
-          name: 'Acme Inc.',
+          name: MOCK_TENANT_NAME,
           primaryDomain: MOCK_TENANT_DOMAIN,
           plan: TENANT_PLAN.GROWTH,
           locale: LOCALE_ISO_CODES.EN,
@@ -585,7 +587,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('enables once a field is edited, and disables again once edited back to the original value', async () => {
-      renderPanel({ tenant: makeClientTenant({ name: 'Acme Inc.' }) });
+      renderPanel({ tenant: makeClientTenant({ name: MOCK_TENANT_NAME }) });
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
 
@@ -594,7 +596,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeEnabled();
 
       await user.clear(nameInput);
-      await user.type(nameInput, 'Acme Inc.');
+      await user.type(nameInput, MOCK_TENANT_NAME);
       expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
     });
 
@@ -610,7 +612,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           }),
       );
       renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' }),
+        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
       });
 
       await user.clear(screen.getByRole('textbox', { name: 'Name' }));
@@ -640,7 +642,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
       });
       const { rerender } = renderPanel({
-        tenant: makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' }),
+        tenant: makeClientTenant({ id: TENANT_ID, name: MOCK_TENANT_NAME }),
       });
 
       await user.clear(screen.getByRole('textbox', { name: 'Name' }));
@@ -746,13 +748,13 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             owner={OWNER}
             archivedNoticeId="archived-notice"
           />
-          <p id="archived-notice">This tenant is archived.</p>
+          <p id="archived-notice">{ARCHIVED_NOTICE_TEXT}</p>
         </>,
       );
 
       expect(
         screen.getByRole('button', { name: SAVE_CHANGES }),
-      ).toHaveAccessibleDescription('This tenant is archived.');
+      ).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
     });
   });
 
@@ -817,7 +819,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         );
 
         expect(push).toHaveBeenCalledWith('/tenants');
-        expect(nameInput).toHaveValue('Acme Inc.');
+        expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
       });
 
       it('saves the edits before leaving on Save and leave', async () => {

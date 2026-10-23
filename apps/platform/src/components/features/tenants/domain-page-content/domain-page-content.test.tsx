@@ -1,6 +1,7 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   makeTenant,
   MOCK_ARCHIVED_AT,
@@ -8,8 +9,6 @@ import {
 } from '@platform/testing/tenants/fixtures';
 
 import { DomainPageContent } from './domain-page-content';
-
-const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
 
 vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
   getProjectDomain: vi.fn(),
@@ -77,9 +76,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     });
 
     it('does not show the archived notice for a live tenant', () => {
-      expect(
-        screen.queryByText(THIS_TENANT_IS_ARCHIVED),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText(ARCHIVED_NOTICE_TEXT)).not.toBeInTheDocument();
     });
   });
 
@@ -91,6 +88,6 @@ describe(`<${DomainPageContent.name}/>`, () => {
       }),
     );
 
-    expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
+    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
   });
 });

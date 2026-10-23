@@ -4,6 +4,7 @@ import {
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   makeReadyTenant,
   MOCK_ARCHIVED_AT,
@@ -74,7 +75,7 @@ describe(`<${StudioMountView.name}/>`, () => {
       level: 1,
       name: 'Studio',
     });
-    const thisTenantIsText = screen.getByText('This tenant is archived');
+    const thisTenantIsText = screen.getByText(ARCHIVED_NOTICE_TEXT);
     const studioMount = screen.queryByTestId(STUDIO_MOUNT);
 
     expect(studioHeading).toBeVisible();

@@ -5,7 +5,10 @@ import {
   FINDING_STATUS,
 } from '@blog/config/constants';
 import type { TOpenFinding } from '@blog/db/queries/findings';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 export const MOCK_FINDING_LAST_SEEN_AT = new Date('2026-04-02T00:00:00.000Z');
 
@@ -24,7 +27,7 @@ export const makeFinding = (
     firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
     lastSeenAt: MOCK_FINDING_LAST_SEEN_AT,
     resolvedAt: null,
-    tenantName: 'Acme Inc.',
+    tenantName: MOCK_TENANT_NAME,
     contrastResult: null,
     ...overrides,
   };

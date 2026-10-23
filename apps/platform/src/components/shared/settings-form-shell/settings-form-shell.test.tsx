@@ -6,6 +6,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_OTHER_TENANT_ID,
@@ -88,7 +89,6 @@ const UNSAVED_CHANGES = 'Unsaved changes';
 const CONTROL_S_CONTROL = '{Control>}s{/Control}';
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
 const SAVE_CHANGES = 'Save changes';
-const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
 const SOMETHING_WENT_WRONG_TRY_AGAIN = 'Something went wrong — try again.';
 const MY_TAGLINE = 'My tagline';
 const RESTORE_1_CHANGE = 'Restore 1 change';
@@ -117,9 +117,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('shows no archived notice when archivedAt is unset', () => {
-      expect(
-        screen.queryByText(THIS_TENANT_IS_ARCHIVED),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText(ARCHIVED_NOTICE_TEXT)).not.toBeInTheDocument();
     });
 
     it('shows no error alert without an error title', () => {
@@ -286,7 +284,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   it('shows the archived notice when archivedAt is set', () => {
     renderShell({ archivedAt: MOCK_ARCHIVED_AT });
 
-    expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
+    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
   });
 
   it('shows the error alert when an error title is set', () => {

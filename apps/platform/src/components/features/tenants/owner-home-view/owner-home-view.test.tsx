@@ -4,6 +4,7 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import { act, customRender, screen } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   makeTenant,
   MOCK_ARCHIVED_AT,
@@ -15,8 +16,6 @@ import {
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { OwnerHomeView, type TOwnerHomeViewProps } from './owner-home-view';
-
-const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
@@ -71,7 +70,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     });
 
     it('does not render the archived notice', () => {
-      const archivedNotice = screen.queryByText(THIS_TENANT_IS_ARCHIVED);
+      const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
 
       expect(archivedNotice).not.toBeInTheDocument();
     });
@@ -130,7 +129,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       },
     });
 
-    const archivedNotice = screen.getByText(THIS_TENANT_IS_ARCHIVED);
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
 
     expect(archivedNotice).toBeVisible();
   });

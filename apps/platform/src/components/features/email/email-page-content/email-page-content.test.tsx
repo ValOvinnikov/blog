@@ -5,6 +5,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { MOCK_CONTACT_RECIPIENT } from '@platform/testing/email/fixtures';
 import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   makeReadyTenant,
   MOCK_ARCHIVED_AT,
@@ -190,6 +191,6 @@ describe(`<${EmailPageContent.name}/>`, () => {
       },
     });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    expect(screen.getByText(ARCHIVED_NOTICE_TEXT)).toBeVisible();
   });
 });

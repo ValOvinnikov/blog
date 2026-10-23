@@ -2,11 +2,13 @@ import { SIZE } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
   MOCK_TENANT_URL,
 } from '@platform/testing/tenants/fixtures';
 
 import { ExternalLinkButton } from './external-link-button';
 
+const OPEN_TENANT_SITE = `Open ${MOCK_TENANT_NAME}'s site`;
 const OPEN_TENANT_IN_NEW_TAB = `Open ${MOCK_TENANT_DOMAIN} in a new tab`;
 
 describe(`<${ExternalLinkButton.name}/>`, () => {
@@ -46,16 +48,13 @@ describe(`<${ExternalLinkButton.name}/>`, () => {
 
   it('applies the given ariaLabel as the accessible name', () => {
     renderWithIntl(
-      <ExternalLinkButton
-        href={MOCK_TENANT_URL}
-        ariaLabel="Open Acme Inc.'s site"
-      >
+      <ExternalLinkButton href={MOCK_TENANT_URL} ariaLabel={OPEN_TENANT_SITE}>
         Open site
       </ExternalLinkButton>,
     );
 
     expect(
-      screen.getByRole('link', { name: "Open Acme Inc.'s site" }),
+      screen.getByRole('link', { name: OPEN_TENANT_SITE }),
     ).toHaveAttribute('href', MOCK_TENANT_URL);
   });
 

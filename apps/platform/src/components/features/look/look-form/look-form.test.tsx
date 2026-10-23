@@ -21,9 +21,11 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
+  MOCK_TENANT_NAME,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -105,7 +107,7 @@ const pickLogo = async (user: UserEvent) => {
 
 const setup = customRender(LookForm, {
   tenantId: TENANT_ID,
-  tenantName: 'Acme Inc.',
+  tenantName: MOCK_TENANT_NAME,
   initialValues: defaultLookFormValues(),
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   hasReaderAccounts: true,
@@ -660,7 +662,9 @@ describe(`<${LookForm.name}/>`, () => {
         const softButton = screen.getByRole('button', { name: 'Soft' });
 
         expect(headingFont).toHaveAttribute('data-disabled');
-        expect(bodyFont).toHaveAccessibleDescription(/This tenant is archived/);
+        expect(bodyFont).toHaveAccessibleDescription(
+          expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+        );
         expect(smallButton).toBeDisabled();
         expect(extraLargeButton).toBeDisabled();
         expect(compactButton).toBeDisabled();
@@ -674,7 +678,9 @@ describe(`<${LookForm.name}/>`, () => {
       setup({ archivedAt: MOCK_ARCHIVED_AT });
 
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-      expect(slider).toHaveAccessibleDescription(/This tenant is archived/);
+      expect(slider).toHaveAccessibleDescription(
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+      );
       expect(slider).toHaveAccessibleDescription(/the site would replace it/);
     });
 
@@ -686,7 +692,9 @@ describe(`<${LookForm.name}/>`, () => {
 
       const reset = screen.getByRole('button', { name: RESET_TO_PRESET });
       expect(reset).toBeDisabled();
-      expect(reset).toHaveAccessibleDescription(/This tenant is archived/);
+      expect(reset).toHaveAccessibleDescription(
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+      );
     });
   });
 

@@ -12,6 +12,7 @@ import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voic
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   MOCK_ARCHIVED_AT,
   TENANT_ID,
@@ -686,7 +687,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
         for (const textbox of screen.getAllByRole('textbox')) {
           expect(textbox).toHaveAccessibleDescription(
-            /This tenant is archived/,
+            expect.stringContaining(ARCHIVED_NOTICE_TEXT),
           );
         }
       });

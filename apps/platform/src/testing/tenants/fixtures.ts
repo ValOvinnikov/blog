@@ -84,7 +84,34 @@ export const mockDoneProvisioningSteps = (): TTenantProvisioningState => {
   };
 };
 
+export const mockFirstStepRunningProvisioningSteps =
+  (): TTenantProvisioningState => ({
+    ...idleProvisioningSteps(),
+    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+    },
+  });
+
+export const mockFirstStepDoneProvisioningSteps =
+  (): TTenantProvisioningState => ({
+    ...idleProvisioningSteps(),
+    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
+  });
+
+export const mockMapDomainFailedProvisioningSteps = (
+  error: string,
+): TTenantProvisioningState => ({
+  ...idleProvisioningSteps(),
+  [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    error,
+  },
+});
+
 export const TENANT_ID = faker.string.uuid();
+export const MOCK_TENANT_NAME = 'Acme Inc.';
 export const MOCK_TENANT_DOMAIN = 'acme.example.com';
 export const MOCK_TENANT_URL = `https://${MOCK_TENANT_DOMAIN}`;
 export const MOCK_OTHER_TENANT_ID = faker.string.uuid();
@@ -95,6 +122,7 @@ export const MOCK_CUSTOM_DOMAIN = 'northwind.example.dev';
 export const MOCK_CUSTOM_DOMAIN_URL = `https://${MOCK_CUSTOM_DOMAIN}`;
 export const MOCK_OWNER_EMAIL = 'tenant-owner@example.com';
 export const MOCK_INVITED_OWNER_EMAIL = 'invited-owner@example.com';
+export const INVITED_PENDING_TEXT = 'Invited, pending';
 export const MOCK_OWNER_JOINED_AT = new Date('2026-08-12T09:00:00.000Z');
 export const MOCK_ARCHIVED_AT = new Date('2026-08-26T09:00:00.000Z');
 export const MOCK_RUN_STARTED_AT = '2026-08-12T14:18:30.000Z';
@@ -111,7 +139,7 @@ const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
 export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
     id: TENANT_ID,
-    name: 'Acme Inc.',
+    name: MOCK_TENANT_NAME,
     primaryDomain: MOCK_TENANT_DOMAIN,
     sanityProjectId: null,
     sanityDataset: null,

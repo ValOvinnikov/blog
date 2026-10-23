@@ -6,6 +6,7 @@ import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
@@ -15,7 +16,7 @@ const render = renderWithIntl;
 
 const HARBOR_CO = 'Harbor Co.';
 const HARBOR_DOMAIN = 'harbor.example.com';
-const MANAGE_ACME = 'Manage Acme Inc.';
+const MANAGE_ACME = `Manage ${MOCK_TENANT_NAME}`;
 const MANAGE_HARBOR_CO = 'Manage Harbor Co.';
 
 describe(`<${TenantsTable.name}/>`, () => {
@@ -35,7 +36,7 @@ describe(`<${TenantsTable.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByText('Acme Inc.')).toBeVisible();
+    expect(screen.getByText(MOCK_TENANT_NAME)).toBeVisible();
     expect(screen.getByText(MOCK_TENANT_DOMAIN)).toBeVisible();
     expect(screen.getByText('Free')).toBeVisible();
     expect(screen.getByText('Active')).toBeVisible();

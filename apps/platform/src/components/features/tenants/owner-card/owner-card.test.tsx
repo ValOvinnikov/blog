@@ -1,13 +1,12 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
+  INVITED_PENDING_TEXT,
   MOCK_INVITED_OWNER_EMAIL,
   MOCK_OWNER_EMAIL,
   MOCK_OWNER_JOINED_AT,
 } from '@platform/testing/tenants/fixtures';
 
 import { OwnerCard } from './owner-card';
-
-const INVITED_PENDING = 'Invited, pending';
 
 const render = renderWithIntl;
 
@@ -51,14 +50,14 @@ describe(`<${OwnerCard.name}/>`, () => {
     render(<OwnerCard owner={{ email: MOCK_INVITED_OWNER_EMAIL }} />);
 
     expect(screen.getByText(MOCK_INVITED_OWNER_EMAIL)).toBeVisible();
-    expect(screen.queryByText(INVITED_PENDING)).not.toBeInTheDocument();
+    expect(screen.queryByText(INVITED_PENDING_TEXT)).not.toBeInTheDocument();
     expect(screen.queryByText('Joined')).not.toBeInTheDocument();
   });
 
   it('shows the invited-pending badge when the tenant has no owner', () => {
     render(<OwnerCard owner={undefined} />);
 
-    expect(screen.getByText(INVITED_PENDING)).toBeVisible();
+    expect(screen.getByText(INVITED_PENDING_TEXT)).toBeVisible();
     expect(screen.queryByText('Joined')).not.toBeInTheDocument();
   });
 });

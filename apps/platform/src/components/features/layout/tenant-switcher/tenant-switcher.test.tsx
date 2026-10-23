@@ -4,6 +4,7 @@ import {
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
@@ -15,7 +16,7 @@ vi.mock('@platform/i18n/navigation');
 
 const tenant: TTenantSwitcherItem = {
   id: TENANT_ID,
-  name: 'Acme Inc.',
+  name: MOCK_TENANT_NAME,
   primaryDomain: MOCK_TENANT_DOMAIN,
   isArchived: false,
 };
@@ -26,6 +27,9 @@ const archivedTenant: TTenantSwitcherItem = {
   primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
   isArchived: true,
 };
+
+const includesTenantName = (accessibleName: string) =>
+  accessibleName.includes(MOCK_TENANT_NAME);
 
 const setup = customRender(TenantSwitcher, {
   tenants: [tenant],
@@ -43,7 +47,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     setup();
 
     expect(
-      screen.getByRole('button', { name: /acme inc\./i }),
+      screen.getByRole('button', { name: includesTenantName }),
     ).toHaveTextContent(MOCK_TENANT_DOMAIN);
   });
 
@@ -52,13 +56,15 @@ describe(`<${TenantSwitcher.name}/>`, () => {
 
     beforeEach(async () => {
       setup({ tenants: [tenant, archivedTenant] });
-      await user.click(screen.getByRole('button', { name: /acme inc\./i }));
-      menu = await screen.findByRole('menu', { name: /acme inc\./i });
+      await user.click(
+        screen.getByRole('button', { name: includesTenantName }),
+      );
+      menu = await screen.findByRole('menu', { name: includesTenantName });
     });
 
     it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', () => {
       expect(
-        within(menu).getByRole('menuitem', { name: /acme inc\./i }),
+        within(menu).getByRole('menuitem', { name: includesTenantName }),
       ).toHaveAttribute(
         'href',
         `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
@@ -73,7 +79,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
 
     it('marks an archived tenant in its accessible name and leaves others unmarked', () => {
       expect(
-        within(menu).getByRole('menuitem', { name: /acme inc\./i }),
+        within(menu).getByRole('menuitem', { name: includesTenantName }),
       ).not.toHaveAccessibleName(/archived/i);
       expect(
         within(menu).getByRole('menuitem', { name: /globex corp.*archived/i }),

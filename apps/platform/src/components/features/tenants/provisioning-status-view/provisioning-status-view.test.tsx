@@ -16,8 +16,10 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   idleProvisioningSteps,
+  INVITED_PENDING_TEXT,
   makeClientTenant,
   MOCK_ARCHIVED_AT,
   MOCK_OWNER_EMAIL,
@@ -27,7 +29,11 @@ import {
   MOCK_RUN_PLUS_6_MIN_AT,
   MOCK_RUN_PLUS_7_MIN_AT,
   MOCK_RUN_STARTED_AT,
+  MOCK_TENANT_NAME,
   mockDoneProvisioningSteps,
+  mockFirstStepDoneProvisioningSteps,
+  mockFirstStepRunningProvisioningSteps,
+  mockMapDomainFailedProvisioningSteps,
   TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -46,9 +52,7 @@ const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
 );
 
-const THIS_TENANT_IS_ARCHIVED = 'This tenant is archived';
 const RUN_STATUS_LIVE = 'run-status-live';
-const INVITED_PENDING = 'Invited, pending';
 const PROVISIONING_STEPS = 'provisioning-steps';
 const HIDDEN_ICON_SELECTOR = 'span[aria-hidden="true"]';
 const NOT_STARTED = 'Not started';
@@ -70,38 +74,16 @@ const renderView = customRender(ProvisioningStatusView, {
   ownerEmail: MOCK_OWNER_EMAIL,
 });
 
-const firstStepRunningSteps = () => ({
-  ...idleProvisioningSteps(),
-  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-  },
-});
-
-const firstStepDoneSteps = () => ({
-  ...idleProvisioningSteps(),
-  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  },
-});
-
-const mapDomainFailedSteps = (error = DOMAINS_API_ERROR) => ({
-  ...idleProvisioningSteps(),
-  [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-    error,
-  },
-});
-
 const failedRunTenant = (error = DOMAINS_API_ERROR) =>
   makeClientTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-    provisioningSteps: mapDomainFailedSteps(error),
+    provisioningSteps: mockMapDomainFailedProvisioningSteps(error),
   });
 
 const provisioningFirstStepRunningTenant = () =>
   makeClientTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    provisioningSteps: firstStepRunningSteps(),
+    provisioningSteps: mockFirstStepRunningProvisioningSteps(),
   });
 
 const queuedRunTenant = () =>
@@ -158,14 +140,14 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   it('titles the page "Provisioning" and names the tenant in the description', () => {
-    renderView({ tenant: makeClientTenant({ name: 'Acme Inc.' }) });
+    renderView({ tenant: makeClientTenant({ name: MOCK_TENANT_NAME }) });
 
     const provisioningHeading = screen.getByRole('heading', {
       level: 1,
       name: 'Provisioning',
     });
     const acmeIncEachText = screen.getByText(
-      'Acme Inc. · each step is independently resumable.',
+      `${MOCK_TENANT_NAME} · each step is independently resumable.`,
     );
 
     expect(provisioningHeading).toBeVisible();
@@ -175,7 +157,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   it('does not show the archived notice for a live tenant', () => {
     renderView({ tenant: makeClientTenant({ deprovisionedAt: null }) });
 
-    const thisTenantIsText = screen.queryByText(THIS_TENANT_IS_ARCHIVED);
+    const thisTenantIsText = screen.queryByText(ARCHIVED_NOTICE_TEXT);
 
     expect(thisTenantIsText).not.toBeInTheDocument();
   });
@@ -185,7 +167,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       tenant: makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
-          ...firstStepRunningSteps(),
+          ...mockFirstStepRunningProvisioningSteps(),
           run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       }),
@@ -206,7 +188,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     renderView({ ownerEmail: undefined });
 
     const ownerText = screen.getByText('Owner');
-    const invitedPendingText = screen.getByText(INVITED_PENDING);
+    const invitedPendingText = screen.getByText(INVITED_PENDING_TEXT);
 
     expect(ownerText).toBeVisible();
     expect(invitedPendingText).toBeVisible();
@@ -218,7 +200,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
-      const invitedPendingText = screen.queryByText(INVITED_PENDING);
+      const invitedPendingText = screen.queryByText(INVITED_PENDING_TEXT);
 
       expect(invitedPendingText).not.toBeInTheDocument();
     });
@@ -292,7 +274,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     renderView({
       tenant: makeClientTenant({
         provisioningSteps: {
-          ...firstStepDoneSteps(),
+          ...mockFirstStepDoneProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
           },
@@ -311,7 +293,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     beforeEach(() => {
       renderView({
         tenant: makeClientTenant({
-          provisioningSteps: firstStepRunningSteps(),
+          provisioningSteps: mockFirstStepRunningProvisioningSteps(),
         }),
       });
     });
@@ -421,7 +403,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   it("no longer renders a step's raw error text inline in the sidebar", () => {
     renderView({
       tenant: makeClientTenant({
-        provisioningSteps: mapDomainFailedSteps(VERCEL_DOMAINS_FAILURE),
+        provisioningSteps: mockMapDomainFailedProvisioningSteps(
+          VERCEL_DOMAINS_FAILURE,
+        ),
       }),
     });
 
@@ -519,7 +503,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       renderView({
         tenant: makeClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-          provisioningSteps: mapDomainFailedSteps(),
+          provisioningSteps:
+            mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
         }),
       });
     });
@@ -679,7 +664,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('shows the archived notice for a deprovisioned tenant', () => {
-      const thisTenantIsText = screen.getByText(THIS_TENANT_IS_ARCHIVED);
+      const thisTenantIsText = screen.getByText(ARCHIVED_NOTICE_TEXT);
 
       expect(thisTenantIsText).toBeVisible();
     });
@@ -700,7 +685,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
       expect(startProvisioningButton).toHaveAccessibleDescription(
-        /This tenant is archived/,
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
       );
     });
   });
@@ -711,7 +696,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         tenant: makeClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
           deprovisionedAt: MOCK_ARCHIVED_AT,
-          provisioningSteps: mapDomainFailedSteps(),
+          provisioningSteps:
+            mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
         }),
       });
     });
@@ -732,7 +718,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
       expect(retryProvisioningButton).toHaveAccessibleDescription(
-        /This tenant is archived/,
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
       );
     });
   });
@@ -751,7 +737,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       beforeEach(() => {
         getTenantProvisioningStatusActionMock.mockResolvedValue({
           provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-          provisioningSteps: firstStepDoneSteps(),
+          provisioningSteps: mockFirstStepDoneProvisioningSteps(),
         });
         renderView({ tenant: provisioningFirstStepRunningTenant() });
       });
@@ -791,7 +777,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     it('shows a step that finished between two polls as running before it shows as complete', async () => {
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: firstStepDoneSteps(),
+        provisioningSteps: mockFirstStepDoneProvisioningSteps(),
       });
       renderView({
         tenant: makeClientTenant({
@@ -1001,7 +987,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     it('shows "now" for a running step instead of a timestamp', () => {
       renderView({
         tenant: makeClientTenant({
-          provisioningSteps: firstStepRunningSteps(),
+          provisioningSteps: mockFirstStepRunningProvisioningSteps(),
         }),
       });
 
@@ -1012,7 +998,9 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
     it('shows no timestamp for a done step with no recorded updatedAt', () => {
       renderView({
-        tenant: makeClientTenant({ provisioningSteps: firstStepDoneSteps() }),
+        tenant: makeClientTenant({
+          provisioningSteps: mockFirstStepDoneProvisioningSteps(),
+        }),
       });
 
       const d4Text = screen.queryByText(/\d{4}/);
