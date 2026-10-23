@@ -3,6 +3,11 @@ import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import {
@@ -59,30 +64,29 @@ vi.mock(
   () => ({ getEffectiveSettingsFeatures: getEffectiveSettingsFeaturesMock }),
 );
 
-const TENANT_ID = faker.string.uuid();
-const NAME = faker.person.fullName();
-const EMAIL = faker.internet.email();
-const MESSAGE = faker.lorem.sentences(2);
-const SOURCE_PATH = `/${faker.lorem.slug()}`;
-const LEAD_ID = faker.string.uuid();
+const MOCK_NAME = faker.person.fullName();
+const MOCK_EMAIL = faker.internet.email();
+const MOCK_MESSAGE = faker.lorem.sentences(2);
+const MOCK_SOURCE_PATH = `/${faker.lorem.slug()}`;
+const MOCK_LEAD_ID = faker.string.uuid();
 const BLOCKED = { outcome: ACTION_OUTCOME.BLOCKED };
 const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR };
-const SUBMITTED = {
-  tenantId: TENANT_ID,
-  name: NAME,
-  email: EMAIL,
-  message: MESSAGE,
-  sourcePath: SOURCE_PATH,
+const MOCK_SUBMITTED = {
+  tenantId: MOCK_TENANT_ID,
+  name: MOCK_NAME,
+  email: MOCK_EMAIL,
+  message: MOCK_MESSAGE,
+  sourcePath: MOCK_SOURCE_PATH,
 };
 
 const makeInput = (
   overrides: Partial<TContactMessageInput> = {},
 ): TContactMessageInput => ({
-  name: NAME,
-  email: EMAIL,
-  message: MESSAGE,
+  name: MOCK_NAME,
+  email: MOCK_EMAIL,
+  message: MOCK_MESSAGE,
   website: '',
-  sourcePath: SOURCE_PATH,
+  sourcePath: MOCK_SOURCE_PATH,
   ...overrides,
 });
 
@@ -94,12 +98,8 @@ describe(submitContactMessage, () => {
     getEffectiveSettingsFeaturesMock.mockResolvedValue(
       okResult({ [CAPABILITY.CONTACT_FORM]: true }),
     );
-    resolveRequestTenantMock.mockResolvedValue({
-      id: TENANT_ID,
-      status: TENANT_STATUS.ACTIVE,
-      deprovisionedAt: null,
-    });
-    createLeadMock.mockResolvedValue({ id: LEAD_ID });
+    resolveRequestTenantMock.mockResolvedValue(mockTenant());
+    createLeadMock.mockResolvedValue({ id: MOCK_LEAD_ID });
     sendContactNotificationMock.mockResolvedValue(undefined);
   });
 
@@ -107,15 +107,17 @@ describe(submitContactMessage, () => {
     const result = await submitContactMessage(makeInput());
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(createLeadMock).toHaveBeenCalledWith(SUBMITTED);
-    expect(sendContactNotificationMock).toHaveBeenCalledWith(SUBMITTED);
+    expect(createLeadMock).toHaveBeenCalledWith(MOCK_SUBMITTED);
+    expect(sendContactNotificationMock).toHaveBeenCalledWith(MOCK_SUBMITTED);
   });
 
   it("gates on the resolved tenant's capability without a request context", async () => {
     await submitContactMessage(makeInput());
 
-    expect(getTenantPlanMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(getEffectiveSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getTenantPlanMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getEffectiveSettingsFeaturesMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
   });
 
   it.each([
@@ -124,11 +126,9 @@ describe(submitContactMessage, () => {
     [
       'a suspended tenant',
       () =>
-        resolveRequestTenantMock.mockResolvedValue({
-          id: TENANT_ID,
-          status: TENANT_STATUS.SUSPENDED,
-          deprovisionedAt: null,
-        }),
+        resolveRequestTenantMock.mockResolvedValue(
+          mockTenant({ status: TENANT_STATUS.SUSPENDED }),
+        ),
     ],
     [
       'a plan without the contact form',
@@ -206,14 +206,13 @@ describe(submitContactMessage, () => {
     );
 
     expect(createLeadMock).toHaveBeenCalledWith({
-      ...SUBMITTED,
+      ...MOCK_SUBMITTED,
       sourcePath: '/',
     });
   });
 
   it('still succeeds and logs once when the notification email fails', async () => {
-    const error = new Error(faker.lorem.sentence());
-    sendContactNotificationMock.mockRejectedValue(error);
+    sendContactNotificationMock.mockRejectedValue(MOCK_ERROR);
 
     const result = await submitContactMessage(makeInput());
 
@@ -221,12 +220,12 @@ describe(submitContactMessage, () => {
     expect(vi.mocked(logger.error)).toHaveBeenCalledOnce();
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       'contact_form.notification_send_failed',
-      { leadId: LEAD_ID, error },
+      { leadId: MOCK_LEAD_ID, error: MOCK_ERROR },
     );
   });
 
   it('answers server-error without emailing when the lead cannot be stored', async () => {
-    createLeadMock.mockRejectedValue(new Error(faker.lorem.sentence()));
+    createLeadMock.mockRejectedValue(MOCK_ERROR);
 
     const result = await submitContactMessage(makeInput());
 

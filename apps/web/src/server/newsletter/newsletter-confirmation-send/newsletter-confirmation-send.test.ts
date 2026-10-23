@@ -5,7 +5,6 @@ import {
 } from '@blog/config';
 import { escapeHtml } from '@blog/email';
 import { faker } from '@faker-js/faker';
-import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import {
   firstSentEmail,
   MOCK_AUTHORED_SUBJECT,
@@ -17,6 +16,7 @@ import {
   mockEmailConfig,
   mockEmailTemplate,
 } from '@web/testing/server/newsletter/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
@@ -81,15 +81,14 @@ vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));
 
-const BRAND_NAME = faker.company.name();
-const BRAND = resolveTenantEmailBrand({
+const MOCK_BRAND_NAME = faker.company.name();
+const MOCK_BRAND = resolveTenantEmailBrand({
   preset: PRESET_ID.CONSOLE,
   accentHue: faker.number.int({ max: 359 }),
 });
-const CLAIMED_AT = faker.date.recent();
-const SEND_ERROR = new Error(faker.lorem.sentence());
-const SUBSCRIBER = mockSubscriber();
-const CONFIRM_URL = `${MOCK_TENANT_BASE_URL}/api/newsletter/confirm?token=${MOCK_CONFIRMATION_TOKEN}`;
+const MOCK_CLAIMED_AT = faker.date.recent();
+const MOCK_SUBSCRIBER = mockSubscriber();
+const MOCK_CONFIRM_URL = `${MOCK_TENANT_BASE_URL}/api/newsletter/confirm?token=${MOCK_CONFIRMATION_TOKEN}`;
 
 const sentEmail = () => firstSentEmail(sendEmailMock);
 
@@ -97,44 +96,43 @@ describe(sendNewsletterConfirmation, () => {
   beforeEach(() => {
     sendEmailMock.mockResolvedValue(undefined);
     resolveTenantEmailIdentityMock.mockResolvedValue({
-      brand: BRAND,
-      brandName: BRAND_NAME,
+      brand: MOCK_BRAND,
+      brandName: MOCK_BRAND_NAME,
     });
     getEmailConfigMock.mockResolvedValue(
       mockEmailConfig({ replyToAddress: MOCK_REPLY_TO }),
     );
     getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
     claimConfirmationSendMock.mockResolvedValue({
-      claimedAt: CLAIMED_AT,
+      claimedAt: MOCK_CLAIMED_AT,
       confirmationToken: MOCK_CONFIRMATION_TOKEN,
     });
     releaseConfirmationSendMock.mockResolvedValue(undefined);
     commitConfirmationTokenMock.mockResolvedValue(undefined);
     mintNewsletterUnsubscribeTokenMock.mockReturnValue(MOCK_UNSUBSCRIBE_TOKEN);
-    vi.mocked(getTenantBaseUrl).mockResolvedValue(MOCK_TENANT_BASE_URL);
   });
 
   it('emails the subscriber a confirm link and their own unsubscribe link', async () => {
-    await sendNewsletterConfirmation(MOCK_TENANT_ID, SUBSCRIBER);
+    await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
     const { to, subject, replyTo, headers, html } = sentEmail();
     expect({ to, subject, replyTo, headers }).toEqual({
-      to: SUBSCRIBER.email,
+      to: MOCK_SUBSCRIBER.email,
       subject: MOCK_AUTHORED_SUBJECT,
       replyTo: MOCK_REPLY_TO,
       headers: MOCK_UNSUBSCRIBE_HEADERS,
     });
-    expect(html).toContain(CONFIRM_URL);
+    expect(html).toContain(MOCK_CONFIRM_URL);
     expect(mintNewsletterUnsubscribeTokenMock).toHaveBeenCalledWith(
-      SUBSCRIBER.id,
+      MOCK_SUBSCRIBER.id,
     );
   });
 
   it('stores the new confirm token only once the email is sent', async () => {
-    await sendNewsletterConfirmation(MOCK_TENANT_ID, SUBSCRIBER);
+    await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
     expect(commitConfirmationTokenMock).toHaveBeenCalledWith(
-      SUBSCRIBER.id,
+      MOCK_SUBSCRIBER.id,
       MOCK_CONFIRMATION_TOKEN,
     );
     expect(sendEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
@@ -145,10 +143,10 @@ describe(sendNewsletterConfirmation, () => {
   it('carries the language the reader subscribed in on both links', async () => {
     vi.mocked(getLocale).mockResolvedValueOnce(LOCALE_ISO_CODES.FR);
 
-    await sendNewsletterConfirmation(MOCK_TENANT_ID, SUBSCRIBER);
+    await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
     const { headers, html } = sentEmail();
-    expect(html).toContain(`${CONFIRM_URL}&amp;lang=FR`);
+    expect(html).toContain(`${MOCK_CONFIRM_URL}&amp;lang=FR`);
     expect(headers).toEqual({
       ...MOCK_UNSUBSCRIBE_HEADERS,
       'List-Unsubscribe': `<${MOCK_UNSUBSCRIBE_URL}&lang=FR>`,
@@ -156,44 +154,44 @@ describe(sendNewsletterConfirmation, () => {
   });
 
   it("renders the tenant's own brand and name", async () => {
-    await sendNewsletterConfirmation(MOCK_TENANT_ID, SUBSCRIBER);
+    await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
     const { html } = sentEmail();
     expect(resolveTenantEmailIdentityMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(html).toContain(BRAND.logo1);
-    expect(html).toContain(escapeHtml(BRAND_NAME));
+    expect(html).toContain(MOCK_BRAND.logo1);
+    expect(html).toContain(escapeHtml(MOCK_BRAND_NAME));
   });
 
   it('sends nothing while the last confirmation is inside its cooldown', async () => {
     claimConfirmationSendMock.mockResolvedValue(null);
 
-    await sendNewsletterConfirmation(MOCK_TENANT_ID, SUBSCRIBER);
+    await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
   it('gives back the cooldown and keeps the old token when the send fails', async () => {
-    sendEmailMock.mockRejectedValue(SEND_ERROR);
+    sendEmailMock.mockRejectedValue(MOCK_ERROR);
 
     await expect(
-      sendNewsletterConfirmation(MOCK_TENANT_ID, SUBSCRIBER),
-    ).rejects.toBe(SEND_ERROR);
+      sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER),
+    ).rejects.toBe(MOCK_ERROR);
     expect(releaseConfirmationSendMock).toHaveBeenCalledWith(
-      SUBSCRIBER.id,
-      CLAIMED_AT,
+      MOCK_SUBSCRIBER.id,
+      MOCK_CLAIMED_AT,
     );
     expect(commitConfirmationTokenMock).not.toHaveBeenCalled();
   });
 
   it('gives back the cooldown when storing the new token fails', async () => {
-    commitConfirmationTokenMock.mockRejectedValue(SEND_ERROR);
+    commitConfirmationTokenMock.mockRejectedValue(MOCK_ERROR);
 
     await expect(
-      sendNewsletterConfirmation(MOCK_TENANT_ID, SUBSCRIBER),
-    ).rejects.toBe(SEND_ERROR);
+      sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER),
+    ).rejects.toBe(MOCK_ERROR);
     expect(releaseConfirmationSendMock).toHaveBeenCalledWith(
-      SUBSCRIBER.id,
-      CLAIMED_AT,
+      MOCK_SUBSCRIBER.id,
+      MOCK_CLAIMED_AT,
     );
   });
 });
