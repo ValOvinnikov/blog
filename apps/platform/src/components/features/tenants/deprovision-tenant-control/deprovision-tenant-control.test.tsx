@@ -2,7 +2,11 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { makeClientTenant } from '@platform/testing/tenants/fixtures';
+import {
+  CONFIRM_TENANT_NAME_LABEL,
+  makeClientTenant,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeprovisionTenantControl } from './deprovision-tenant-control';
@@ -19,15 +23,33 @@ const TENANT = makeClientTenant({ deprovisionedAt: null });
 
 const setup = customRender(DeprovisionTenantControl, { tenant: TENANT });
 
+const DEPROVISION = 'Deprovision';
+const DEPROVISION_DIALOG_TITLE = `Deprovision ${MOCK_TENANT_NAME}`;
+const DRY_RUN_LABEL = 'Dry run (preview only, nothing is deleted)';
+const RUN_IN_PROGRESS_HINT =
+  'A deprovisioning run is already in progress for this tenant.';
+
 const openDialog = async (user: UserEvent) => {
-  await user.click(screen.getByRole('button', { name: 'Deprovision' }));
-  return screen.findByRole('alertdialog', { name: /deprovision acme inc\./i });
+  const triggerButton = screen.getByRole('button', { name: DEPROVISION });
+  await user.click(triggerButton);
+
+  return screen.findByRole('alertdialog', { name: DEPROVISION_DIALOG_TITLE });
 };
 
-const getDryRunSwitch = () =>
-  screen.getByRole('switch', {
-    name: 'Dry run (preview only, nothing is deleted)',
+const typeTenantNameAndConfirm = async (
+  user: UserEvent,
+  dialog: HTMLElement,
+) => {
+  const nameInput = screen.getByRole('textbox', {
+    name: CONFIRM_TENANT_NAME_LABEL,
   });
+  await user.type(nameInput, MOCK_TENANT_NAME);
+
+  const confirmButton = within(dialog).getByRole('button', {
+    name: DEPROVISION,
+  });
+  await user.click(confirmButton);
+};
 
 describe(`<${DeprovisionTenantControl.name}/>`, () => {
   let user: UserEvent;
@@ -46,45 +68,42 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   it('titles the card "Deprovision this tenant"', () => {
     setup();
 
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: 'Deprovision this tenant',
-      }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Deprovision this tenant',
+    });
+
+    expect(heading).toBeVisible();
   });
 
   it('does not duplicate a "Danger zone" heading inside the card', () => {
     setup();
 
-    expect(screen.queryByText('Danger zone')).not.toBeInTheDocument();
+    const dangerZoneText = screen.queryByText('Danger zone');
+
+    expect(dangerZoneText).not.toBeInTheDocument();
   });
 
   it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
     setup();
 
     const dialog = await openDialog(user);
+    const confirmButton = within(dialog).getByRole('button', {
+      name: DEPROVISION,
+    });
 
     expect(dialog).toBeVisible();
-    expect(
-      within(dialog).getByRole('button', { name: 'Deprovision' }),
-    ).toBeDisabled();
+    expect(confirmButton).toBeDisabled();
   });
 
   it('calls the action as a dry run with the typed name, then refreshes', async () => {
     setup();
     const dialog = await openDialog(user);
-    await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-      'Acme Inc.',
-    );
 
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Deprovision' }),
-    );
+    await typeTenantNameAndConfirm(user, dialog);
 
     expect(deprovisionTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
       dryRun: true,
     });
     await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
@@ -93,18 +112,13 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   it('runs for real once the dry-run switch is turned off', async () => {
     setup();
     const dialog = await openDialog(user);
-    await user.click(getDryRunSwitch());
-    await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-      'Acme Inc.',
-    );
+    const dryRunSwitch = screen.getByRole('switch', { name: DRY_RUN_LABEL });
+    await user.click(dryRunSwitch);
 
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Deprovision' }),
-    );
+    await typeTenantNameAndConfirm(user, dialog);
 
     expect(deprovisionTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
-      confirm: 'Acme Inc.',
+      confirm: MOCK_TENANT_NAME,
       dryRun: false,
     });
   });
@@ -112,13 +126,20 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   it('turns the dry-run switch back on when the dialog closes', async () => {
     setup();
     await openDialog(user);
-    await user.click(getDryRunSwitch());
-    expect(getDryRunSwitch()).not.toBeChecked();
+    const dryRunSwitch = screen.getByRole('switch', { name: DRY_RUN_LABEL });
+    await user.click(dryRunSwitch);
 
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(dryRunSwitch).not.toBeChecked();
+
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+    await user.click(cancelButton);
     await openDialog(user);
 
-    expect(getDryRunSwitch()).toBeChecked();
+    const reopenedDryRunSwitch = screen.getByRole('switch', {
+      name: DRY_RUN_LABEL,
+    });
+
+    expect(reopenedDryRunSwitch).toBeChecked();
   });
 
   it('shows the error message inline and never refreshes when the action fails', async () => {
@@ -128,18 +149,14 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
     });
     setup();
     const dialog = await openDialog(user);
-    await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-      'Acme Inc.',
+
+    await typeTenantNameAndConfirm(user, dialog);
+
+    const mismatchError = await screen.findByText(
+      "Doesn't match the tenant's name.",
     );
 
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Deprovision' }),
-    );
-
-    expect(
-      await screen.findByText("Doesn't match the tenant's name."),
-    ).toBeVisible();
+    expect(mismatchError).toBeVisible();
     expect(refreshMock).not.toHaveBeenCalled();
   });
 
@@ -147,23 +164,21 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
     it('renders the trigger enabled by default, with no in-progress hint', () => {
       setup();
 
-      expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
-      expect(
-        screen.queryByText(
-          'A deprovisioning run is already in progress for this tenant.',
-        ),
-      ).not.toBeInTheDocument();
+      const trigger = screen.getByRole('button', { name: DEPROVISION });
+      const hint = screen.queryByText(RUN_IN_PROGRESS_HINT);
+
+      expect(trigger).toBeEnabled();
+      expect(hint).not.toBeInTheDocument();
     });
 
     it('marks the trigger aria-disabled and describes it with the hint while a run is in progress', () => {
       setup({ isDeprovisioningInProgress: true });
 
-      const trigger = screen.getByRole('button', { name: 'Deprovision' });
+      const trigger = screen.getByRole('button', { name: DEPROVISION });
+
       expect(trigger).toHaveAttribute('aria-disabled', 'true');
       expect(trigger).not.toBeDisabled();
-      expect(trigger).toHaveAccessibleDescription(
-        'A deprovisioning run is already in progress for this tenant.',
-      );
+      expect(trigger).toHaveAccessibleDescription(RUN_IN_PROGRESS_HINT);
     });
   });
 });

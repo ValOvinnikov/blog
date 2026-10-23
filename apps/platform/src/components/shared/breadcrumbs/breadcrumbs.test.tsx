@@ -1,8 +1,15 @@
 import { render, screen } from '@platform/testing/custom-render';
+import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { Breadcrumbs } from './breadcrumbs';
 
 vi.mock('@platform/i18n/navigation');
+
+const TENANTS = 'Tenants';
+const PLATFORM = 'Platform';
+const LOOK = 'Look';
+const ARIA_CURRENT = 'aria-current';
 
 describe(Breadcrumbs, () => {
   it('renders every ancestor with an href as a real link', () => {
@@ -10,17 +17,16 @@ describe(Breadcrumbs, () => {
       <Breadcrumbs
         ariaLabel="Breadcrumb"
         items={[
-          { label: 'Platform' },
-          { label: 'Tenants', href: '/tenants' },
-          { label: 'Acme Inc.' },
+          { label: PLATFORM },
+          { label: TENANTS, href: adminRoutes.tenants() },
+          { label: MOCK_TENANT_NAME },
         ]}
       />,
     );
 
-    expect(screen.getByRole('link', { name: 'Tenants' })).toHaveAttribute(
-      'href',
-      '/tenants',
-    );
+    const tenantsLink = screen.getByRole('link', { name: TENANTS });
+
+    expect(tenantsLink).toHaveAttribute('href', adminRoutes.tenants());
   });
 
   it('renders the last item as the current, non-clickable label even with an href', () => {
@@ -28,44 +34,43 @@ describe(Breadcrumbs, () => {
       <Breadcrumbs
         ariaLabel="Breadcrumb"
         items={[
-          { label: 'Your site', href: '/dashboard' },
-          { label: 'Look', href: '/dashboard/look' },
+          { label: 'Your site', href: adminRoutes.dashboard() },
+          { label: LOOK, href: adminRoutes.dashboardLook() },
         ]}
       />,
     );
 
-    expect(screen.getByRole('link', { name: 'Your site' })).toHaveAttribute(
-      'href',
-      '/dashboard',
-    );
-    expect(
-      screen.queryByRole('link', { name: 'Look' }),
-    ).not.toBeInTheDocument();
-    const current = screen.getByText('Look');
-    expect(current).toHaveAttribute('aria-current', 'page');
+    const yourSiteLink = screen.getByRole('link', { name: 'Your site' });
+    const lookLink = screen.queryByRole('link', { name: LOOK });
+    const current = screen.getByText(LOOK);
+
+    expect(yourSiteLink).toHaveAttribute('href', adminRoutes.dashboard());
+    expect(lookLink).not.toBeInTheDocument();
+    expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('renders an ancestor with no href as a non-clickable label, not a link', () => {
     render(
       <Breadcrumbs
         ariaLabel="Breadcrumb"
-        items={[{ label: 'Platform' }, { label: 'Tenants' }]}
+        items={[{ label: PLATFORM }, { label: TENANTS }]}
       />,
     );
 
-    expect(
-      screen.queryByRole('link', { name: 'Platform' }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText('Platform')).not.toHaveAttribute('aria-current');
+    const platformLink = screen.queryByRole('link', { name: PLATFORM });
+    const platformText = screen.getByText(PLATFORM);
+
+    expect(platformLink).not.toBeInTheDocument();
+    expect(platformText).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('renders a nav landmark labelled with the given ariaLabel', () => {
     render(
-      <Breadcrumbs ariaLabel="Breadcrumb" items={[{ label: 'Platform' }]} />,
+      <Breadcrumbs ariaLabel="Breadcrumb" items={[{ label: PLATFORM }]} />,
     );
 
-    expect(
-      screen.getByRole('navigation', { name: 'Breadcrumb' }),
-    ).toBeVisible();
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
+    expect(nav).toBeVisible();
   });
 });
