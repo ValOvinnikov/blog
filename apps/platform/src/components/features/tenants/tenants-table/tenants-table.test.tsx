@@ -94,22 +94,26 @@ describe(`<${TenantsTable.name}/>`, () => {
     ).toHaveAttribute('href', `/tenants/${MOCK_OTHER_TENANT_ID}/provisioning`);
   });
 
-  it('names the scrollable table region and the actions column for screen readers', () => {
-    render(<TenantsTable tenants={[makeReadyTenant()]} />);
+  describe('with one ready tenant', () => {
+    beforeEach(() => {
+      render(<TenantsTable tenants={[makeReadyTenant()]} />);
+    });
 
-    expect(screen.getByRole('region', { name: 'Tenants' })).toContainElement(
-      screen.getByRole('table'),
-    );
-    expect(screen.getByRole('columnheader', { name: 'Actions' })).toBeVisible();
-  });
+    it('names the scrollable table region and the actions column for screen readers', () => {
+      expect(screen.getByRole('region', { name: 'Tenants' })).toContainElement(
+        screen.getByRole('table'),
+      );
+      expect(
+        screen.getByRole('columnheader', { name: 'Actions' }),
+      ).toBeVisible();
+    });
 
-  it('renders the created date as a machine-readable time', () => {
-    render(<TenantsTable tenants={[makeReadyTenant()]} />);
-
-    expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
-      'dateTime',
-      MOCK_TENANT_CREATED_AT.toISOString(),
-    );
+    it('renders the created date as a machine-readable time', () => {
+      expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
+        'dateTime',
+        MOCK_TENANT_CREATED_AT.toISOString(),
+      );
+    });
   });
 
   it('renders an empty state instead of an empty table when there are no tenants', () => {

@@ -51,33 +51,32 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     expect(screen.getByText(CNAME_RECORD_VALUE)).toBeVisible();
   });
 
-  it('shows the verified empty state instead of the table once verified', async () => {
-    await render({
-      status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
-      dnsRecords: [],
+  describe('once verified', () => {
+    beforeEach(async () => {
+      await render({
+        status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
+        dnsRecords: [],
+      });
     });
 
-    expect(await screen.findByText('Verified')).toBeVisible();
-    expect(
-      screen.getByText(
-        "This domain is verified — there's nothing left to configure.",
-      ),
-    ).toBeVisible();
-    expect(screen.queryByRole('table')).toBeNull();
-  });
-
-  it('titles a verified domain as connected', async () => {
-    await render({
-      status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
-      dnsRecords: [],
+    it('shows the verified empty state instead of the table once verified', async () => {
+      expect(await screen.findByText('Verified')).toBeVisible();
+      expect(
+        screen.getByText(
+          "This domain is verified — there's nothing left to configure.",
+        ),
+      ).toBeVisible();
+      expect(screen.queryByRole('table')).toBeNull();
     });
 
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: `${MOCK_CUSTOM_DOMAIN} is connected`,
-      }),
-    ).toBeVisible();
+    it('titles a verified domain as connected', async () => {
+      expect(
+        await screen.findByRole('heading', {
+          level: 2,
+          name: `${MOCK_CUSTOM_DOMAIN} is connected`,
+        }),
+      ).toBeVisible();
+    });
   });
 
   it('asks for the records only alongside the table', async () => {

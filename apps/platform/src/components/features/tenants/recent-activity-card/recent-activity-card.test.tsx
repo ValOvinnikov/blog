@@ -15,14 +15,6 @@ describe(`<${RecentActivityCard.name}/>`, () => {
     vi.useRealTimers();
   });
 
-  it("nests the card's title one level under the page's own h1", () => {
-    render(<RecentActivityCard events={[]} />);
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
-    ).toBeVisible();
-  });
-
   it('renders recent activity events with actor email and a generic per-action label', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-24T12:05:00.000Z'));
@@ -58,9 +50,19 @@ describe(`<${RecentActivityCard.name}/>`, () => {
     expect(screen.getByText('Deleted account')).toBeVisible();
   });
 
-  it('shows an empty state when there is no recorded activity', () => {
-    render(<RecentActivityCard events={[]} />);
+  describe('with no activity', () => {
+    beforeEach(() => {
+      render(<RecentActivityCard events={[]} />);
+    });
 
-    expect(screen.getByText('No activity recorded yet.')).toBeVisible();
+    it("nests the card's title one level under the page's own h1", () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
+      ).toBeVisible();
+    });
+
+    it('shows an empty state when there is no recorded activity', () => {
+      expect(screen.getByText('No activity recorded yet.')).toBeVisible();
+    });
   });
 });

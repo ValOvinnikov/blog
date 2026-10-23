@@ -111,6 +111,11 @@ const setup = customRender(LookForm, {
   hasReaderAccounts: true,
 });
 
+const setupWithSavedLogo = () =>
+  setup({
+    initialValues: { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } },
+  });
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -169,18 +174,6 @@ describe(`<${LookForm.name}/>`, () => {
       }
     });
 
-    it('marks only the card holding an unsaved change', async () => {
-      screen.getByRole('slider', { name: ACCENT_HUE }).focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-
-      const colourHeading = screen.getByRole('heading', {
-        name: 'Colour Unsaved',
-      });
-      const typeHeading = screen.getByRole('heading', { name: 'Type' });
-      expect(colourHeading).toBeVisible();
-      expect(typeHeading).toBeVisible();
-    });
-
     it('switches between the Edit and Preview tabs', async () => {
       const editTab = within(
         screen.getByRole('tablist', { name: 'Edit or preview' }),
@@ -231,34 +224,6 @@ describe(`<${LookForm.name}/>`, () => {
       expect(uploadFaviconButton).toHaveAccessibleDescription(hint);
     });
 
-    it("choosing a preset resets every one of that preset's defaults", async () => {
-      await user.click(screen.getByRole('radio', { name: 'Editorial' }));
-
-      const hueReadout = screen.getByText('hue 28°');
-      expect(hueReadout).toBeVisible();
-    });
-
-    it('saves the current form state through updateLookAction', async () => {
-      screen.getByRole('slider', { name: ACCENT_HUE }).focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      await waitFor(() => {
-        expect(updateLookActionMock).toHaveBeenCalledWith(TENANT_ID, {
-          preset: PRESET_ID.CONSOLE,
-          accentHue: 251,
-          logoHue: null,
-          headingFont: FONT_CHOICE.SPACE_GROTESK,
-          bodyFont: FONT_CHOICE.NEWSREADER,
-          radiusScale: RADIUS_SCALE.MD,
-          density: DENSITY.DEFAULT,
-          cardStyle: CARD_STYLE.ACCENT_BAR,
-          headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
-          languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-        });
-      });
-    });
-
     it('saves the chosen header buttons style and marks Shape unsaved', async () => {
       await user.click(screen.getByRole('button', { name: 'Soft' }));
 
@@ -300,15 +265,6 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    it('shows a save-confirmation toast once the save resolves', async () => {
-      screen.getByRole('slider', { name: ACCENT_HUE }).focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      const toast = await screen.findByText('Look saved.');
-      expect(toast).toBeVisible();
-    });
-
     it('offers Save changes only once the form is dirty', async () => {
       const idleSaveButton = screen.queryByRole('button', {
         name: SAVE_CHANGES,
@@ -331,28 +287,6 @@ describe(`<${LookForm.name}/>`, () => {
         name: RESET_TO_PRESET,
       });
       expect(resetButton).not.toBeInTheDocument();
-    });
-
-    it('discards unsaved changes back to the saved values', async () => {
-      screen.getByRole('slider', { name: ACCENT_HUE }).focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-      await user.click(screen.getByRole('button', { name: 'Discard' }));
-
-      const hueReadout = screen.getByText('hue 250°');
-      const saveButton = screen.queryByRole('button', { name: SAVE_CHANGES });
-      expect(hueReadout).toBeVisible();
-      expect(saveButton).not.toBeInTheDocument();
-    });
-
-    it('hides the save bar once the save resolves', async () => {
-      screen.getByRole('slider', { name: ACCENT_HUE }).focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      const savedNote = await screen.findByText(ALL_CHANGES_SAVED);
-      const saveButton = screen.queryByRole('button', { name: SAVE_CHANGES });
-      expect(savedNote).toBeVisible();
-      expect(saveButton).not.toBeInTheDocument();
     });
 
     it('previews a changed radius scale and density before saving', async () => {
@@ -387,26 +321,6 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    it("choosing a preset applies that preset's card style", async () => {
-      await user.click(screen.getByRole('radio', { name: 'Editorial' }));
-
-      const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
-      expect(sampleTokens).toHaveStyle({ '--item-border-width': '1px' });
-    });
-
-    it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
-      const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-      slider.focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-      const changedReadout = screen.getByText('hue 251°');
-      expect(changedReadout).toBeVisible();
-
-      await user.click(screen.getByRole('button', { name: RESET_TO_PRESET }));
-
-      const resetReadout = screen.getByText('hue 250°');
-      expect(resetReadout).toBeVisible();
-    });
-
     it('leaves every Look control enabled for a non-archived tenant', () => {
       const consolePreset = screen.getByRole('radio', { name: 'Console' });
       const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
@@ -424,6 +338,94 @@ describe(`<${LookForm.name}/>`, () => {
       expect(uploadLogoButton).toBeEnabled();
       expect(smallButton).toBeEnabled();
     });
+
+    describe('after nudging the accent hue', () => {
+      beforeEach(async () => {
+        screen.getByRole('slider', { name: ACCENT_HUE }).focus();
+        await user.keyboard(ARROW_RIGHT_KEY);
+      });
+
+      it('marks only the card holding an unsaved change', () => {
+        const colourHeading = screen.getByRole('heading', {
+          name: 'Colour Unsaved',
+        });
+        const typeHeading = screen.getByRole('heading', { name: 'Type' });
+        expect(colourHeading).toBeVisible();
+        expect(typeHeading).toBeVisible();
+      });
+
+      it('discards unsaved changes back to the saved values', async () => {
+        await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+        const hueReadout = screen.getByText('hue 250°');
+        const saveButton = screen.queryByRole('button', { name: SAVE_CHANGES });
+        expect(hueReadout).toBeVisible();
+        expect(saveButton).not.toBeInTheDocument();
+      });
+
+      it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
+        const changedReadout = screen.getByText('hue 251°');
+        expect(changedReadout).toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: RESET_TO_PRESET }));
+
+        const resetReadout = screen.getByText('hue 250°');
+        expect(resetReadout).toBeVisible();
+      });
+
+      describe('and saved', () => {
+        beforeEach(async () => {
+          await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        });
+
+        it('saves the current form state through updateLookAction', async () => {
+          await waitFor(() => {
+            expect(updateLookActionMock).toHaveBeenCalledWith(TENANT_ID, {
+              preset: PRESET_ID.CONSOLE,
+              accentHue: 251,
+              logoHue: null,
+              headingFont: FONT_CHOICE.SPACE_GROTESK,
+              bodyFont: FONT_CHOICE.NEWSREADER,
+              radiusScale: RADIUS_SCALE.MD,
+              density: DENSITY.DEFAULT,
+              cardStyle: CARD_STYLE.ACCENT_BAR,
+              headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+              languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+            });
+          });
+        });
+
+        it('shows a save-confirmation toast once the save resolves', async () => {
+          const toast = await screen.findByText('Look saved.');
+          expect(toast).toBeVisible();
+        });
+
+        it('hides the save bar once the save resolves', async () => {
+          const savedNote = await screen.findByText(ALL_CHANGES_SAVED);
+          const saveButton = screen.queryByRole('button', {
+            name: SAVE_CHANGES,
+          });
+          expect(savedNote).toBeVisible();
+          expect(saveButton).not.toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('after choosing the Editorial preset', () => {
+      beforeEach(async () => {
+        await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+      });
+
+      it("choosing a preset resets every one of that preset's defaults", () => {
+        const hueReadout = screen.getByText('hue 28°');
+        expect(hueReadout).toBeVisible();
+      });
+
+      it("choosing a preset applies that preset's card style", () => {
+        const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+        expect(sampleTokens).toHaveStyle({ '--item-border-width': '1px' });
+      });
+    });
   });
 
   it('drops the tab panels on desktop, where the view tabs are hidden', () => {
@@ -439,12 +441,7 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it("choosing a preset doesn't clear an already-saved brand image", async () => {
-    setup({
-      initialValues: {
-        ...defaultLookFormValues(),
-        logo: { url: MOCK_LOGO_URL },
-      },
-    });
+    setupWithSavedLogo();
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
@@ -523,24 +520,6 @@ describe(`<${LookForm.name}/>`, () => {
     expect(saveBar).toContainElement(alert);
   });
 
-  it('offers Reset to preset for differing saved values with no unsaved edits', async () => {
-    setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
-
-    const unsavedRegion = screen.queryByRole('region', {
-      name: UNSAVED_CHANGES,
-    });
-    expect(unsavedRegion).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: RESET_TO_PRESET }));
-
-    const hueReadout = screen.getByText('hue 250°');
-    const resetButton = screen.queryByRole('button', {
-      name: RESET_TO_PRESET,
-    });
-    expect(hueReadout).toBeVisible();
-    expect(resetButton).not.toBeInTheDocument();
-  });
-
   it('rejects an accent hue the site would replace, with a message, and blocks Save', async () => {
     isAccentHueAccessibleMock.mockImplementation((hue) => hue !== 251);
     setup();
@@ -561,24 +540,19 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   describe('when the accent hue is rejected', () => {
-    const rejectAccentHue = async () => {
+    const goToFirstField = () =>
+      user.click(screen.getByRole('link', { name: GO_TO_FIRST_ONE }));
+
+    beforeEach(async () => {
+      isAccentHueAccessibleMock.mockImplementation((hue) => hue !== 251);
+      setup();
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
       slider.focus();
       await user.keyboard(ARROW_RIGHT_KEY);
       slider.blur();
-    };
-
-    const goToFirstField = () =>
-      user.click(screen.getByRole('link', { name: GO_TO_FIRST_ONE }));
-
-    beforeEach(() => {
-      isAccentHueAccessibleMock.mockImplementation((hue) => hue !== 251);
-      setup();
     });
 
     it('focuses the accent hue slider from the save bar', async () => {
-      await rejectAccentHue();
-
       await goToFirstField();
 
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
@@ -586,7 +560,6 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('returns to the Edit tab and focuses the accent hue slider from the Preview', async () => {
-      await rejectAccentHue();
       await user.click(screen.getByRole('tab', { name: 'Preview' }));
 
       await goToFirstField();
@@ -598,20 +571,40 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('resets to the preset in the draft only, so Discard brings the saved values back', async () => {
-    setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
+  describe('with a saved accent hue off the preset', () => {
+    beforeEach(() => {
+      setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Compact' }));
-    await user.click(screen.getByRole('button', { name: RESET_TO_PRESET }));
+    it('offers Reset to preset for differing saved values with no unsaved edits', async () => {
+      const unsavedRegion = screen.queryByRole('region', {
+        name: UNSAVED_CHANGES,
+      });
+      expect(unsavedRegion).not.toBeInTheDocument();
 
-    const resetReadout = screen.getByText('hue 250°');
-    expect(resetReadout).toBeVisible();
-    expect(updateLookActionMock).not.toHaveBeenCalled();
+      await user.click(screen.getByRole('button', { name: RESET_TO_PRESET }));
 
-    await user.click(screen.getByRole('button', { name: 'Discard' }));
+      const hueReadout = screen.getByText('hue 250°');
+      const resetButton = screen.queryByRole('button', {
+        name: RESET_TO_PRESET,
+      });
+      expect(hueReadout).toBeVisible();
+      expect(resetButton).not.toBeInTheDocument();
+    });
 
-    const savedReadout = screen.getByText('hue 260°');
-    expect(savedReadout).toBeVisible();
+    it('resets to the preset in the draft only, so Discard brings the saved values back', async () => {
+      await user.click(screen.getByRole('button', { name: 'Compact' }));
+      await user.click(screen.getByRole('button', { name: RESET_TO_PRESET }));
+
+      const resetReadout = screen.getByText('hue 250°');
+      expect(resetReadout).toBeVisible();
+      expect(updateLookActionMock).not.toHaveBeenCalled();
+
+      await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+      const savedReadout = screen.getByText('hue 260°');
+      expect(savedReadout).toBeVisible();
+    });
   });
 
   describe('archived tenant', () => {
@@ -702,12 +695,7 @@ describe(`<${LookForm.name}/>`, () => {
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
     unmount();
 
-    setup({
-      initialValues: {
-        ...defaultLookFormValues(),
-        logo: { url: MOCK_LOGO_URL },
-      },
-    });
+    setupWithSavedLogo();
     await user.click(
       screen.getByRole('button', { name: /^Restore \d+ changes$/ }),
     );
@@ -743,14 +731,13 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   describe('brand images', () => {
-    describe(DEFAULT_VALUES_CONTEXT, () => {
-      beforeEach(() => {
+    describe('with a picked logo', () => {
+      beforeEach(async () => {
         setup();
+        await pickLogo(user);
       });
 
-      it('stages a picked logo as an unsaved change without uploading it', async () => {
-        await pickLogo(user);
-
+      it('stages a picked logo as an unsaved change without uploading it', () => {
         const brandHeading = screen.getByRole('heading', {
           name: 'Brand Unsaved',
         });
@@ -761,7 +748,6 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('uploads a staged logo on Save, then saves the rest of the look', async () => {
-        await pickLogo(user);
         await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
         const savedNote = await screen.findByText(ALL_CHANGES_SAVED);
@@ -780,182 +766,163 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    it('locks the edit panel while a save is running', async () => {
+    describe('while the logo upload is pending', () => {
       let resolveUpload: (value: TUploadResult) => void = () => {};
-      uploadBrandAssetActionMock.mockImplementation(
-        () =>
-          new Promise((resolve) => {
-            resolveUpload = resolve;
-          }),
-      );
-      setup();
 
-      await pickLogo(user);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      const lockedPanel = await screen.findByTestId(EDIT_PANEL_TEST_ID);
-      expect(lockedPanel).toHaveAttribute('inert');
-
-      resolveUpload({
-        outcome: ACTION_OUTCOME.SUCCESS,
-        url: UPLOADED_LOGO_URL,
-      });
-      await waitFor(() => {
-        const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
-        expect(editPanel).not.toHaveAttribute('inert');
-      });
-    });
-
-    it('keeps an edit made while the logo uploads as an unsaved change', async () => {
-      let resolveUpload: (value: TUploadResult) => void = () => {};
-      uploadBrandAssetActionMock.mockImplementation(
-        () =>
-          new Promise((resolve) => {
-            resolveUpload = resolve;
-          }),
-      );
-      setup();
-
-      await pickLogo(user);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-      await screen.findByRole('button', { name: 'Saving…' });
-      screen.getByRole('slider', { name: ACCENT_HUE }).focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-      resolveUpload({
-        outcome: ACTION_OUTCOME.SUCCESS,
-        url: UPLOADED_LOGO_URL,
+      beforeEach(async () => {
+        uploadBrandAssetActionMock.mockImplementation(
+          () =>
+            new Promise((resolve) => {
+              resolveUpload = resolve;
+            }),
+        );
+        setup();
+        await pickLogo(user);
+        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
       });
 
-      await waitFor(() => {
-        const unsavedRegion = screen.getByRole('region', {
-          name: UNSAVED_CHANGES,
+      it('locks the edit panel while a save is running', async () => {
+        const lockedPanel = await screen.findByTestId(EDIT_PANEL_TEST_ID);
+        expect(lockedPanel).toHaveAttribute('inert');
+
+        resolveUpload({
+          outcome: ACTION_OUTCOME.SUCCESS,
+          url: UPLOADED_LOGO_URL,
         });
-        expect(unsavedRegion).toHaveTextContent('1 unsaved change');
-      });
-      const hueReadout = screen.getByText('hue 251°');
-      const logo = screen.getByAltText(CURRENT_LOGO);
-      expect(hueReadout).toBeVisible();
-      expect(logo).toHaveAttribute(
-        'src',
-        expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
-      );
-    });
-
-    it('clears a staged removal on Save', async () => {
-      setup({
-        initialValues: {
-          ...defaultLookFormValues(),
-          logo: { url: MOCK_LOGO_URL },
-        },
+        await waitFor(() => {
+          const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
+          expect(editPanel).not.toHaveAttribute('inert');
+        });
       });
 
-      await user.click(screen.getByRole('button', { name: 'Remove' }));
-      const saveButton = await screen.findByRole('button', {
-        name: SAVE_CHANGES,
-      });
-      expect(clearBrandAssetActionMock).not.toHaveBeenCalled();
-      await user.click(saveButton);
+      it('keeps an edit made while the logo uploads as an unsaved change', async () => {
+        await screen.findByRole('button', { name: 'Saving…' });
+        screen.getByRole('slider', { name: ACCENT_HUE }).focus();
+        await user.keyboard(ARROW_RIGHT_KEY);
+        resolveUpload({
+          outcome: ACTION_OUTCOME.SUCCESS,
+          url: UPLOADED_LOGO_URL,
+        });
 
-      await waitFor(() => {
-        expect(clearBrandAssetActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
-          'logo',
+        await waitFor(() => {
+          const unsavedRegion = screen.getByRole('region', {
+            name: UNSAVED_CHANGES,
+          });
+          expect(unsavedRegion).toHaveTextContent('1 unsaved change');
+        });
+        const hueReadout = screen.getByText('hue 251°');
+        const logo = screen.getByAltText(CURRENT_LOGO);
+        expect(hueReadout).toBeVisible();
+        expect(logo).toHaveAttribute(
+          'src',
+          expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
         );
       });
     });
 
-    it('drops a staged logo on Discard, keeping the saved one', async () => {
-      setup({
-        initialValues: {
-          ...defaultLookFormValues(),
-          logo: { url: MOCK_LOGO_URL },
-        },
+    describe('with a saved logo', () => {
+      beforeEach(() => {
+        setupWithSavedLogo();
       });
 
-      await pickLogo(user);
-      await user.click(screen.getByRole('button', { name: 'Discard' }));
+      it('clears a staged removal on Save', async () => {
+        await user.click(screen.getByRole('button', { name: 'Remove' }));
+        const saveButton = await screen.findByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        expect(clearBrandAssetActionMock).not.toHaveBeenCalled();
+        await user.click(saveButton);
 
-      const logo = screen.getByAltText(CURRENT_LOGO);
-      const savedNote = screen.queryByText(ALL_CHANGES_SAVED);
-      expect(logo).toHaveAttribute(
-        'src',
-        expect.stringContaining(encodeURIComponent(MOCK_LOGO_URL)),
-      );
-      expect(savedNote).not.toBeInTheDocument();
-      expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
+        await waitFor(() => {
+          expect(clearBrandAssetActionMock).toHaveBeenCalledWith(
+            TENANT_ID,
+            'logo',
+          );
+        });
+      });
+
+      it('drops a staged logo on Discard, keeping the saved one', async () => {
+        await pickLogo(user);
+        await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+        const logo = screen.getByAltText(CURRENT_LOGO);
+        const savedNote = screen.queryByText(ALL_CHANGES_SAVED);
+        expect(logo).toHaveAttribute(
+          'src',
+          expect.stringContaining(encodeURIComponent(MOCK_LOGO_URL)),
+        );
+        expect(savedNote).not.toBeInTheDocument();
+        expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
+      });
     });
 
-    it('fails the save with the upload error and keeps the draft when the upload fails', async () => {
-      uploadBrandAssetActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
-      setup();
-
-      screen.getByRole('slider', { name: ACCENT_HUE }).focus();
-      await user.keyboard(ARROW_RIGHT_KEY);
-      await pickLogo(user);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      const replaceLogoButton = await screen.findByRole('button', {
-        name: REPLACE_LOGO,
-      });
-      await waitFor(() => {
-        expect(replaceLogoButton).toHaveFocus();
+    describe('when the upload fails', () => {
+      beforeEach(() => {
+        uploadBrandAssetActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.SERVER_ERROR,
+        });
+        setup();
       });
 
-      const hueReadout = screen.getByText('hue 251°');
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      expect(replaceLogoButton).toHaveAccessibleDescription(
-        expect.stringContaining(LOGO_UPLOAD_FAILED),
-      );
-      expect(saveButton).toBeEnabled();
-      expect(updateLookActionMock).not.toHaveBeenCalled();
-      expect(hueReadout).toBeVisible();
-    });
+      it('fails the save with the upload error and keeps the draft when the upload fails', async () => {
+        screen.getByRole('slider', { name: ACCENT_HUE }).focus();
+        await user.keyboard(ARROW_RIGHT_KEY);
+        await pickLogo(user);
+        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
-    it('says beside Save that the save did not go through and links to the failed picker', async () => {
-      uploadBrandAssetActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
+        const replaceLogoButton = await screen.findByRole('button', {
+          name: REPLACE_LOGO,
+        });
+        await waitFor(() => {
+          expect(replaceLogoButton).toHaveFocus();
+        });
+
+        const hueReadout = screen.getByText('hue 251°');
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        expect(replaceLogoButton).toHaveAccessibleDescription(
+          expect.stringContaining(LOGO_UPLOAD_FAILED),
+        );
+        expect(saveButton).toBeEnabled();
+        expect(updateLookActionMock).not.toHaveBeenCalled();
+        expect(hueReadout).toBeVisible();
       });
-      setup();
 
-      await pickLogo(user);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      describe('after saving a picked logo', () => {
+        beforeEach(async () => {
+          await pickLogo(user);
+          await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        });
 
-      const saveBar = await screen.findByRole('region', {
-        name: UNSAVED_CHANGES,
+        it('says beside Save that the save did not go through and links to the failed picker', async () => {
+          const saveBar = await screen.findByRole('region', {
+            name: UNSAVED_CHANGES,
+          });
+          await waitFor(() => {
+            expect(saveBar).toHaveTextContent('Not saved');
+          });
+          expect(saveBar).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
+          expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+          await user.click(screen.getByRole('link', { name: GO_TO_FIRST_ONE }));
+
+          const replaceLogoButton = screen.getByRole('button', {
+            name: REPLACE_LOGO,
+          });
+          expect(replaceLogoButton).toHaveFocus();
+        });
+
+        it('clears the picker error once a new logo is picked', async () => {
+          await screen.findByText(LOGO_UPLOAD_FAILED);
+          await pickLogo(user);
+
+          const error = screen.queryByText(LOGO_UPLOAD_FAILED);
+          const attentionLink = screen.queryByRole('link', {
+            name: GO_TO_FIRST_ONE,
+          });
+          expect(error).not.toBeInTheDocument();
+          expect(attentionLink).not.toBeInTheDocument();
+        });
       });
-      await waitFor(() => {
-        expect(saveBar).toHaveTextContent('Not saved');
-      });
-      expect(saveBar).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-
-      await user.click(screen.getByRole('link', { name: GO_TO_FIRST_ONE }));
-
-      const replaceLogoButton = screen.getByRole('button', {
-        name: REPLACE_LOGO,
-      });
-      expect(replaceLogoButton).toHaveFocus();
-    });
-
-    it('clears the picker error once a new logo is picked', async () => {
-      uploadBrandAssetActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
-      setup();
-
-      await pickLogo(user);
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-      await screen.findByText(LOGO_UPLOAD_FAILED);
-      await pickLogo(user);
-
-      const error = screen.queryByText(LOGO_UPLOAD_FAILED);
-      const attentionLink = screen.queryByRole('link', {
-        name: GO_TO_FIRST_ONE,
-      });
-      expect(error).not.toBeInTheDocument();
-      expect(attentionLink).not.toBeInTheDocument();
     });
 
     it('fails the save with the refusal message when the upload is refused', async () => {

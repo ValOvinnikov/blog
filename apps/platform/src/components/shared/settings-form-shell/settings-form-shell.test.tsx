@@ -101,14 +101,32 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders the title, description and children', () => {
-    renderShell();
+  describe('with the default form', () => {
+    beforeEach(() => {
+      renderShell();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Features' }),
-    ).toBeVisible();
-    expect(screen.getByText(TOGGLE_CAPABILITIES_FOR_THIS_TENANT)).toBeVisible();
-    expect(screen.getByText('tab body')).toBeVisible();
+    it('renders the title, description and children', () => {
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Features' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText(TOGGLE_CAPABILITIES_FOR_THIS_TENANT),
+      ).toBeVisible();
+      expect(screen.getByText('tab body')).toBeVisible();
+    });
+
+    it('shows no archived notice when archivedAt is unset', () => {
+      expect(
+        screen.queryByText(THIS_TENANT_IS_ARCHIVED),
+      ).not.toBeInTheDocument();
+    });
+
+    it('shows no error alert without an error title', () => {
+      expect(
+        screen.queryByText(SOMETHING_WENT_WRONG_TRY_AGAIN),
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe('with no unsaved changes', () => {
@@ -225,39 +243,34 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     const editTagline = () =>
       user.type(screen.getByRole('textbox', { name: 'Tagline' }), '!');
 
-    it('shows after a successful save', async () => {
+    beforeEach(async () => {
       renderWithIntl(<TaglineSettings />);
-
       await editTagline();
       await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+    });
 
+    it('shows after a successful save', async () => {
       expect(await screen.findByText(ALL_CHANGES_SAVED)).toBeVisible();
     });
 
-    it('disappears on the next edit after a save', async () => {
-      renderWithIntl(<TaglineSettings />);
-      await editTagline();
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-      await screen.findByText(ALL_CHANGES_SAVED);
+    describe('then edited again', () => {
+      beforeEach(async () => {
+        await screen.findByText(ALL_CHANGES_SAVED);
+        await editTagline();
+      });
 
-      await editTagline();
+      it('disappears on the next edit after a save', () => {
+        expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
+      });
 
-      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
-    });
+      it('stays hidden after discarding back to clean', async () => {
+        await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-    it('stays hidden after discarding back to clean', async () => {
-      renderWithIntl(<TaglineSettings />);
-      await editTagline();
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-      await screen.findByText(ALL_CHANGES_SAVED);
-      await editTagline();
-
-      await user.click(screen.getByRole('button', { name: 'Discard' }));
-
-      expect(
-        screen.queryByRole('region', { name: UNSAVED_CHANGES }),
-      ).not.toBeInTheDocument();
-      expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('region', { name: UNSAVED_CHANGES }),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByText(ALL_CHANGES_SAVED)).not.toBeInTheDocument();
+      });
     });
   });
 
@@ -274,20 +287,6 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     renderShell({ archivedAt: MOCK_ARCHIVED_AT });
 
     expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
-  });
-
-  it('shows no archived notice when archivedAt is unset', () => {
-    renderShell();
-
-    expect(screen.queryByText(THIS_TENANT_IS_ARCHIVED)).not.toBeInTheDocument();
-  });
-
-  it('shows no error alert without an error title', () => {
-    renderShell();
-
-    expect(
-      screen.queryByText(SOMETHING_WENT_WRONG_TRY_AGAIN),
-    ).not.toBeInTheDocument();
   });
 
   it('shows the error alert when an error title is set', () => {
@@ -320,89 +319,145 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       expect(queryBanner()).not.toBeInTheDocument();
     });
 
-    it('offers to restore exactly the unsaved changes on return', async () => {
-      const onRestore = vi.fn();
-      leaveWithUnsavedChanges();
-
-      renderShell({ draft: draftFor(SAVED, SAVED, onRestore) });
-
-      expect(queryBanner()).toBeVisible();
-      expect(
-        screen.getByText(
-          'They were kept on this device when you left the page.',
-        ),
-      ).toBeVisible();
-      await user.click(screen.getByRole('button', { name: RESTORE_1_CHANGE }));
-
-      expect(onRestore).toHaveBeenCalledWith(EDITED);
-      expect(queryBanner()).not.toBeInTheDocument();
-    });
-
-    it('forgets the draft when it is discarded from the banner', async () => {
-      leaveWithUnsavedChanges();
-      const { unmount } = renderShell();
-
-      await user.click(screen.getByRole('button', { name: 'Discard them' }));
-      expect(queryBanner()).not.toBeInTheDocument();
-      unmount();
-      renderShell();
-
-      expect(queryBanner()).not.toBeInTheDocument();
-    });
-
-    it('forgets the draft once the changes are saved', async () => {
-      const { unmount } = renderShell({
-        changeCount: 1,
-        draft: draftFor(EDITED),
+    describe('after leaving with unsaved changes', () => {
+      beforeEach(() => {
+        leaveWithUnsavedChanges();
       });
 
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-      await waitFor(() => expect(baseSave).toHaveBeenCalled());
-      unmount();
-      renderShell();
+      it('offers to restore exactly the unsaved changes on return', async () => {
+        const onRestore = vi.fn();
 
-      expect(queryBanner()).not.toBeInTheDocument();
-    });
+        renderShell({ draft: draftFor(SAVED, SAVED, onRestore) });
 
-    it('forgets the draft once the changes are discarded', async () => {
-      const { unmount } = renderShell({
-        changeCount: 1,
-        draft: draftFor(EDITED),
+        expect(queryBanner()).toBeVisible();
+        expect(
+          screen.getByText(
+            'They were kept on this device when you left the page.',
+          ),
+        ).toBeVisible();
+        await user.click(
+          screen.getByRole('button', { name: RESTORE_1_CHANGE }),
+        );
+
+        expect(onRestore).toHaveBeenCalledWith(EDITED);
+        expect(queryBanner()).not.toBeInTheDocument();
       });
 
-      await user.click(screen.getByRole('button', { name: 'Discard' }));
-      unmount();
-      renderShell();
+      it('forgets the draft when it is discarded from the banner', async () => {
+        const { unmount } = renderShell();
 
-      expect(queryBanner()).not.toBeInTheDocument();
-    });
+        await user.click(screen.getByRole('button', { name: 'Discard them' }));
+        expect(queryBanner()).not.toBeInTheDocument();
+        unmount();
+        renderShell();
 
-    it('offers nothing when the draft matches what is saved now', () => {
-      leaveWithUnsavedChanges();
-
-      renderShell({ draft: draftFor(EDITED, EDITED) });
-
-      expect(queryBanner()).not.toBeInTheDocument();
-    });
-
-    it('keeps drafts apart per tenant', () => {
-      leaveWithUnsavedChanges();
-
-      renderShell({
-        draft: { ...draftFor(SAVED), tenantId: MOCK_OTHER_TENANT_ID },
+        expect(queryBanner()).not.toBeInTheDocument();
       });
 
-      expect(queryBanner()).not.toBeInTheDocument();
-    });
+      it('offers nothing when the draft matches what is saved now', () => {
+        renderShell({ draft: draftFor(EDITED, EDITED) });
 
-    it('keeps drafts apart per language', () => {
-      leaveWithUnsavedChanges();
-
-      renderShell({
-        draft: { ...draftFor(SAVED), language: LOCALE_ISO_CODES.DE },
+        expect(queryBanner()).not.toBeInTheDocument();
       });
 
-      expect(queryBanner()).not.toBeInTheDocument();
+      it('keeps drafts apart per tenant', () => {
+        renderShell({
+          draft: { ...draftFor(SAVED), tenantId: MOCK_OTHER_TENANT_ID },
+        });
+
+        expect(queryBanner()).not.toBeInTheDocument();
+      });
+
+      it('keeps drafts apart per language', () => {
+        renderShell({
+          draft: { ...draftFor(SAVED), language: LOCALE_ISO_CODES.DE },
+        });
+
+        expect(queryBanner()).not.toBeInTheDocument();
+      });
+
+      describe('when someone else saved since', () => {
+        const THEIRS: TValues = { ...SAVED, tagline: THEIR_TAGLINE };
+        let onRestore: (values: TValues) => void;
+
+        beforeEach(() => {
+          onRestore = vi.fn();
+          renderShell({ draft: draftFor(THEIRS, THEIRS, onRestore) });
+        });
+
+        it('says the page was saved after the draft was taken', () => {
+          expect(screen.getByText(/but this page was saved at/)).toBeVisible();
+        });
+
+        it('names the fields a restore would overwrite before any restore', () => {
+          expect(
+            screen.getByText(
+              'Restoring replaces 1 of the newer values: Tagline.',
+            ),
+          ).toBeVisible();
+          expect(
+            screen.queryByRole('button', { name: RESTORE_1_CHANGE }),
+          ).not.toBeInTheDocument();
+          expect(onRestore).not.toHaveBeenCalled();
+        });
+
+        it('shows the saved value beside the draft for each differing field', async () => {
+          await user.click(screen.getByText('Review the difference'));
+
+          const row = screen.getByRole('row', { name: /Tagline/ });
+          expect(
+            within(row).getByRole('cell', { name: THEIR_TAGLINE }),
+          ).toBeVisible();
+          expect(
+            within(row).getByRole('cell', { name: MY_TAGLINE }),
+          ).toBeVisible();
+        });
+
+        it('restores the draft on Restore anyway', async () => {
+          await user.click(
+            screen.getByRole('button', { name: 'Restore anyway' }),
+          );
+
+          expect(onRestore).toHaveBeenCalledWith(EDITED);
+        });
+
+        it('forgets the draft on Discard my draft', async () => {
+          await user.click(
+            screen.getByRole('button', { name: 'Discard my draft' }),
+          );
+
+          expect(queryBanner()).not.toBeInTheDocument();
+          expect(onRestore).not.toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('with unsaved changes on the page', () => {
+      let unmount: ReturnType<typeof renderShell>['unmount'];
+
+      beforeEach(() => {
+        ({ unmount } = renderShell({
+          changeCount: 1,
+          draft: draftFor(EDITED),
+        }));
+      });
+
+      it('forgets the draft once the changes are saved', async () => {
+        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        await waitFor(() => expect(baseSave).toHaveBeenCalled());
+        unmount();
+        renderShell();
+
+        expect(queryBanner()).not.toBeInTheDocument();
+      });
+
+      it('forgets the draft once the changes are discarded', async () => {
+        await user.click(screen.getByRole('button', { name: 'Discard' }));
+        unmount();
+        renderShell();
+
+        expect(queryBanner()).not.toBeInTheDocument();
+      });
     });
 
     it('still works as a form when storage is blocked', async () => {
@@ -425,62 +480,6 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       renderShell();
 
       expect(queryBanner()).not.toBeInTheDocument();
-    });
-
-    describe('when someone else saved since', () => {
-      const THEIRS: TValues = { ...SAVED, tagline: THEIR_TAGLINE };
-      let onRestore: (values: TValues) => void;
-
-      beforeEach(() => {
-        onRestore = vi.fn();
-        leaveWithUnsavedChanges();
-        renderShell({ draft: draftFor(THEIRS, THEIRS, onRestore) });
-      });
-
-      it('says the page was saved after the draft was taken', () => {
-        expect(screen.getByText(/but this page was saved at/)).toBeVisible();
-      });
-
-      it('names the fields a restore would overwrite before any restore', () => {
-        expect(
-          screen.getByText(
-            'Restoring replaces 1 of the newer values: Tagline.',
-          ),
-        ).toBeVisible();
-        expect(
-          screen.queryByRole('button', { name: RESTORE_1_CHANGE }),
-        ).not.toBeInTheDocument();
-        expect(onRestore).not.toHaveBeenCalled();
-      });
-
-      it('shows the saved value beside the draft for each differing field', async () => {
-        await user.click(screen.getByText('Review the difference'));
-
-        const row = screen.getByRole('row', { name: /Tagline/ });
-        expect(
-          within(row).getByRole('cell', { name: THEIR_TAGLINE }),
-        ).toBeVisible();
-        expect(
-          within(row).getByRole('cell', { name: MY_TAGLINE }),
-        ).toBeVisible();
-      });
-
-      it('restores the draft on Restore anyway', async () => {
-        await user.click(
-          screen.getByRole('button', { name: 'Restore anyway' }),
-        );
-
-        expect(onRestore).toHaveBeenCalledWith(EDITED);
-      });
-
-      it('forgets the draft on Discard my draft', async () => {
-        await user.click(
-          screen.getByRole('button', { name: 'Discard my draft' }),
-        );
-
-        expect(queryBanner()).not.toBeInTheDocument();
-        expect(onRestore).not.toHaveBeenCalled();
-      });
     });
   });
 });

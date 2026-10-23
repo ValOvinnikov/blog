@@ -40,6 +40,8 @@ const rejectingAsset = {
 };
 
 describe(`<${AssetUploadField.name}/>`, () => {
+  const onStage = vi.fn();
+
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
@@ -71,7 +73,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('rejects a file client-side without staging it, showing validateFile’s message', async () => {
-    const onStage = vi.fn();
     renderWithIntl(
       <AssetUploadField
         {...baseProps}
@@ -89,7 +90,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('stages a chosen file with a local preview URL through onStage', async () => {
-    const onStage = vi.fn();
     const file = pngFile();
     renderWithIntl(<AssetUploadField {...baseProps} onStage={onStage} />);
 
@@ -99,7 +99,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('stages a removal through onStage when Remove is clicked', async () => {
-    const onStage = vi.fn();
     renderWithIntl(
       <AssetUploadField
         {...baseProps}

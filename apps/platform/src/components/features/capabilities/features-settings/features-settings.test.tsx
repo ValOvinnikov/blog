@@ -210,17 +210,6 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       setup();
     });
 
-    it('withdraws Save after a successful save, without a remount', async () => {
-      await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      await waitFor(() =>
-        expect(
-          screen.queryByRole('button', { name: SAVE_CHANGES }),
-        ).not.toBeInTheDocument(),
-      );
-    });
-
     it('saves the current toggle state', async () => {
       await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
       await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
@@ -231,12 +220,24 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       });
     });
 
-    it('shows a save-confirmation toast and refreshes after a successful save', async () => {
-      await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+    describe('after toggling Analytics and saving', () => {
+      beforeEach(async () => {
+        await user.click(screen.getByRole('switch', { name: 'Analytics' }));
+        await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      });
 
-      expect(await screen.findByText('Features saved.')).toBeVisible();
-      expect(refresh).toHaveBeenCalled();
+      it('withdraws Save after a successful save, without a remount', async () => {
+        await waitFor(() =>
+          expect(
+            screen.queryByRole('button', { name: SAVE_CHANGES }),
+          ).not.toBeInTheDocument(),
+        );
+      });
+
+      it('shows a save-confirmation toast and refreshes after a successful save', async () => {
+        expect(await screen.findByText('Features saved.')).toBeVisible();
+        expect(refresh).toHaveBeenCalled();
+      });
     });
   });
 

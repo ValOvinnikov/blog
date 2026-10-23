@@ -52,26 +52,35 @@ describe(`<${DomainPageContent.name}/>`, () => {
     expect(screen.queryByRole('heading', { level: 2 })).toBeNull();
   });
 
-  it('replaces the skeleton with the domain card once Vercel answers', async () => {
-    await render();
+  describe('for a live tenant', () => {
+    beforeEach(async () => {
+      await render();
+    });
 
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
-      }),
-    ).toBeVisible();
-    expect(screen.getByText('Awaiting DNS')).toBeVisible();
-    expect(screen.queryByTestId('skeleton')).toBeNull();
-  });
+    it('replaces the skeleton with the domain card once Vercel answers', async () => {
+      expect(
+        await screen.findByRole('heading', {
+          level: 2,
+          name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
+        }),
+      ).toBeVisible();
+      expect(screen.getByText('Awaiting DNS')).toBeVisible();
+      expect(screen.queryByTestId('skeleton')).toBeNull();
+    });
 
-  it('loads the domain from Vercel exactly once', async () => {
-    await render();
-    await screen.findByRole('table');
+    it('loads the domain from Vercel exactly once', async () => {
+      await screen.findByRole('table');
 
-    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
-      MOCK_CUSTOM_DOMAIN,
-    );
+      expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_CUSTOM_DOMAIN,
+      );
+    });
+
+    it('does not show the archived notice for a live tenant', () => {
+      expect(
+        screen.queryByText(THIS_TENANT_IS_ARCHIVED),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {
@@ -83,13 +92,5 @@ describe(`<${DomainPageContent.name}/>`, () => {
     );
 
     expect(screen.getByText(THIS_TENANT_IS_ARCHIVED)).toBeVisible();
-  });
-
-  it('does not show the archived notice for a live tenant', async () => {
-    await render(
-      makeTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN, deprovisionedAt: null }),
-    );
-
-    expect(screen.queryByText(THIS_TENANT_IS_ARCHIVED)).not.toBeInTheDocument();
   });
 });

@@ -164,70 +164,87 @@ describe(`<${EmailSettings.name}/>`, () => {
     window.localStorage.clear();
   });
 
-  it('opens on Sender & footer, with each template marked for the default language', async () => {
-    setup();
+  describe('with the default settings', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByLabelText(SENDER_NAME)).toBeVisible();
-    expect(picker()).toHaveTextContent(/^Sender & footer/);
+    it('opens on Sender & footer, with each template marked for the default language', async () => {
+      expect(screen.getByLabelText(SENDER_NAME)).toBeVisible();
+      expect(picker()).toHaveTextContent(/^Sender & footer/);
 
-    const list = await openPicker(user);
+      const list = await openPicker(user);
 
-    expect(
-      within(list).getByRole('option', { name: /^Sign-in link.*Customised$/ }),
-    ).toBeVisible();
-    expect(
-      within(list).getByRole('option', { name: /^Team invite.*Default$/ }),
-    ).toBeVisible();
-  });
+      expect(
+        within(list).getByRole('option', {
+          name: /^Sign-in link.*Customised$/,
+        }),
+      ).toBeVisible();
+      expect(
+        within(list).getByRole('option', { name: /^Team invite.*Default$/ }),
+      ).toBeVisible();
+    });
 
-  it('opens the email chosen from the picker in the editor', async () => {
-    setup();
+    it('opens the email chosen from the picker in the editor', async () => {
+      await openSignInTemplate(user);
 
-    await openSignInTemplate(user);
+      expect(screen.getByLabelText(SUBJECT_ENGLISH)).toHaveValue(
+        SIGN_IN_TO_ACME,
+      );
+      expect(screen.queryByLabelText(SENDER_NAME)).not.toBeInTheDocument();
+      expect(picker()).toHaveTextContent('Sign-in linkTemplate · Customised');
+    });
 
-    expect(screen.getByLabelText(SUBJECT_ENGLISH)).toHaveValue(SIGN_IN_TO_ACME);
-    expect(screen.queryByLabelText(SENDER_NAME)).not.toBeInTheDocument();
-    expect(picker()).toHaveTextContent('Sign-in linkTemplate · Customised');
-  });
+    it('switches between the Edit and Preview tabs', async () => {
+      const editTab = within(
+        screen.getByRole('tablist', { name: 'Edit or preview' }),
+      ).getByRole('tab', { name: 'Edit' });
+      const previewTab = screen.getByRole('tab', { name: 'Preview' });
+      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(screen.getByRole('tabpanel', { name: 'Edit' })).toContainElement(
+        screen.getByLabelText(SENDER_NAME),
+      );
 
-  it('switches between the Edit and Preview tabs', async () => {
-    setup();
+      await user.click(previewTab);
 
-    const editTab = within(
-      screen.getByRole('tablist', { name: 'Edit or preview' }),
-    ).getByRole('tab', { name: 'Edit' });
-    const previewTab = screen.getByRole('tab', { name: 'Preview' });
-    expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
-    expect(screen.getByRole('tabpanel', { name: 'Edit' })).toContainElement(
-      screen.getByLabelText(SENDER_NAME),
-    );
+      expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(
+        screen.getByRole('tabpanel', { name: 'Preview' }),
+      ).toContainElement(screen.getByRole('region', { name: 'Preview' }));
+    });
 
-    await user.click(previewTab);
+    it("shows the language picker on Sender & footer, describing each language's customised templates", async () => {
+      const picker = screen.getByRole('group', { name: 'Language' });
+      expect(
+        within(picker).getByRole('button', { name: 'English' }),
+      ).toHaveAccessibleDescription('Default language · 1 customised');
+      expect(
+        within(picker).getByRole('button', { name: 'French' }),
+      ).toHaveAccessibleDescription('All default');
 
-    expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
-    expect(screen.getByRole('tabpanel', { name: 'Preview' })).toContainElement(
-      screen.getByRole('region', { name: 'Preview' }),
-    );
-  });
+      await openSignInTemplate(user);
+      await chooseLanguage(user, 'French');
+      await user.type(screen.getByLabelText(SUBJECT_FRENCH), 'Connexion');
 
-  it("shows the language picker on Sender & footer, describing each language's customised templates", async () => {
-    setup();
+      expect(
+        within(picker).getByRole('button', { name: 'French' }),
+      ).toHaveAccessibleDescription('1 customised');
+    });
 
-    const picker = screen.getByRole('group', { name: 'Language' });
-    expect(
-      within(picker).getByRole('button', { name: 'English' }),
-    ).toHaveAccessibleDescription('Default language · 1 customised');
-    expect(
-      within(picker).getByRole('button', { name: 'French' }),
-    ).toHaveAccessibleDescription('All default');
+    it('saves the contact recipient the owner types', async () => {
+      await user.type(
+        screen.getByLabelText(SEND_CONTACT_MESSAGES_TO),
+        MOCK_CONTACT_RECIPIENT,
+      );
+      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
-    await openSignInTemplate(user);
-    await chooseLanguage(user, 'French');
-    await user.type(screen.getByLabelText(SUBJECT_FRENCH), 'Connexion');
-
-    expect(
-      within(picker).getByRole('button', { name: 'French' }),
-    ).toHaveAccessibleDescription('1 customised');
+      await waitFor(() =>
+        expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
+          TENANT_ID,
+          expect.objectContaining({ contactRecipient: MOCK_CONTACT_RECIPIENT }),
+        ),
+      );
+    });
   });
 
   describe('editing a template in two languages', () => {
@@ -454,23 +471,6 @@ describe(`<${EmailSettings.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
 
     expect(await screen.findByText(/not an email address/)).toBeVisible();
-  });
-
-  it('saves the contact recipient the owner types', async () => {
-    setup();
-
-    await user.type(
-      screen.getByLabelText(SEND_CONTACT_MESSAGES_TO),
-      MOCK_CONTACT_RECIPIENT,
-    );
-    await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-    await waitFor(() =>
-      expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
-        TENANT_ID,
-        expect.objectContaining({ contactRecipient: MOCK_CONTACT_RECIPIENT }),
-      ),
-    );
   });
 
   it('clears a saved contact recipient by saving it empty', async () => {

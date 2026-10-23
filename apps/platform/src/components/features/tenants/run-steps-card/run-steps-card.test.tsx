@@ -40,17 +40,19 @@ describe(`<${RunStepsCard.name}/>`, () => {
     vi.useRealTimers();
   });
 
-  it('counts the steps that are done', () => {
-    setup();
+  describe('with default steps', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByText('1 of 3 done')).toBeVisible();
-  });
+    it('counts the steps that are done', () => {
+      expect(screen.getByText('1 of 3 done')).toBeVisible();
+    });
 
-  it('dates a settled step and marks the running one as happening now', () => {
-    setup();
-
-    expect(screen.getByText('6m ago')).toBeVisible();
-    expect(screen.getByText('now')).toBeVisible();
+    it('dates a settled step and marks the running one as happening now', () => {
+      expect(screen.getByText('6m ago')).toBeVisible();
+      expect(screen.getByText('now')).toBeVisible();
+    });
   });
 
   it('labels every step as queued before the run has written any step', () => {

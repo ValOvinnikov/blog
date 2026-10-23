@@ -46,18 +46,31 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     });
   });
 
-  it('renders CONSOLE featureDefaults with no settings_features or site_config row', async () => {
-    await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
+  describe('for a GROWTH-plan tenant', () => {
+    beforeEach(async () => {
+      await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
+    });
 
-    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      DATA_CHECKED,
-      '',
-    );
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      DATA_UNCHECKED,
-      '',
-    );
+    it('renders CONSOLE featureDefaults with no settings_features or site_config row', () => {
+      expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(TENANT_ID);
+      expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
+        DATA_CHECKED,
+        '',
+      );
+      expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
+        DATA_UNCHECKED,
+        '',
+      );
+    });
+
+    it('enables every toggle for a GROWTH-plan tenant', () => {
+      expect(
+        screen.getByRole('switch', { name: 'Analytics' }),
+      ).not.toHaveAttribute(DATA_DISABLED);
+      expect(
+        screen.getByRole('switch', { name: 'Cookie consent banner' }),
+      ).not.toHaveAttribute(DATA_DISABLED);
+    });
   });
 
   it("renders the tenant's saved settings_features row when one exists", async () => {
@@ -126,17 +139,6 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
     expect(analyticsSwitch).toHaveAttribute(DATA_UNCHECKED, '');
     expect(analyticsSwitch).toHaveAttribute(DATA_DISABLED, '');
-  });
-
-  it('enables every toggle for a GROWTH-plan tenant', async () => {
-    await setup({ tenant: buildTenant(TENANT_PLAN.GROWTH) });
-
-    expect(
-      screen.getByRole('switch', { name: 'Analytics' }),
-    ).not.toHaveAttribute(DATA_DISABLED);
-    expect(
-      screen.getByRole('switch', { name: 'Cookie consent banner' }),
-    ).not.toHaveAttribute(DATA_DISABLED);
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

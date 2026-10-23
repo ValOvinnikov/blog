@@ -47,38 +47,38 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     ).toHaveTextContent(MOCK_TENANT_DOMAIN);
   });
 
-  it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', async () => {
-    setup({ tenants: [tenant, archivedTenant] });
+  describe('with the menu open', () => {
+    let menu: HTMLElement;
 
-    await user.click(screen.getByRole('button', { name: /acme inc\./i }));
+    beforeEach(async () => {
+      setup({ tenants: [tenant, archivedTenant] });
+      await user.click(screen.getByRole('button', { name: /acme inc\./i }));
+      menu = await screen.findByRole('menu', { name: /acme inc\./i });
+    });
 
-    const menu = await screen.findByRole('menu', { name: /acme inc\./i });
-    expect(
-      within(menu).getByRole('menuitem', { name: /acme inc\./i }),
-    ).toHaveAttribute(
-      'href',
-      `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
-    );
-    expect(
-      within(menu).getByRole('menuitem', { name: /globex corp/i }),
-    ).toHaveAttribute(
-      'href',
-      `/api/dashboard/select-tenant?tenantId=${MOCK_OTHER_TENANT_ID}`,
-    );
-  });
+    it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', () => {
+      expect(
+        within(menu).getByRole('menuitem', { name: /acme inc\./i }),
+      ).toHaveAttribute(
+        'href',
+        `/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
+      );
+      expect(
+        within(menu).getByRole('menuitem', { name: /globex corp/i }),
+      ).toHaveAttribute(
+        'href',
+        `/api/dashboard/select-tenant?tenantId=${MOCK_OTHER_TENANT_ID}`,
+      );
+    });
 
-  it('marks an archived tenant in its accessible name and leaves others unmarked', async () => {
-    setup({ tenants: [tenant, archivedTenant] });
-
-    await user.click(screen.getByRole('button', { name: /acme inc\./i }));
-
-    const menu = await screen.findByRole('menu', { name: /acme inc\./i });
-    expect(
-      within(menu).getByRole('menuitem', { name: /acme inc\./i }),
-    ).not.toHaveAccessibleName(/archived/i);
-    expect(
-      within(menu).getByRole('menuitem', { name: /globex corp.*archived/i }),
-    ).toBeVisible();
+    it('marks an archived tenant in its accessible name and leaves others unmarked', () => {
+      expect(
+        within(menu).getByRole('menuitem', { name: /acme inc\./i }),
+      ).not.toHaveAccessibleName(/archived/i);
+      expect(
+        within(menu).getByRole('menuitem', { name: /globex corp.*archived/i }),
+      ).toBeVisible();
+    });
   });
 
   it('shows the archived marker on the trigger when the active tenant is archived', () => {

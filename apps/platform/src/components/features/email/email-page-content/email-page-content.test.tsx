@@ -103,17 +103,35 @@ describe(`<${EmailPageContent.name}/>`, () => {
     selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
 
-  it('renders the Email page heading', async () => {
-    await setup();
+  describe('with the default tenant', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(screen.getByRole('heading', { name: 'Email' })).toBeVisible();
-  });
+    it('renders the Email page heading', () => {
+      expect(screen.getByRole('heading', { name: 'Email' })).toBeVisible();
+    });
 
-  it('renders blank settings fields when the tenant has no saved email_config row yet', async () => {
-    await setup();
+    it('renders blank settings fields when the tenant has no saved email_config row yet', () => {
+      expect(screen.getByLabelText('Sender name')).toHaveValue('');
+      expect(screen.getByLabelText('Reply-to address')).toHaveValue('');
+    });
 
-    expect(screen.getByLabelText('Sender name')).toHaveValue('');
-    expect(screen.getByLabelText('Reply-to address')).toHaveValue('');
+    it('hides the contact recipient field on a plan without the contact form', () => {
+      expect(
+        screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
+      ).not.toBeInTheDocument();
+    });
+
+    it("shows each template's authored copy in the tenant's default language", async () => {
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('combobox', { name: 'Editing' }));
+      await user.click(
+        await screen.findByRole('option', { name: /^Team invite/ }),
+      );
+
+      expect(screen.getByDisplayValue(YOURE_INVITED_ACME_CO)).toBeVisible();
+    });
   });
 
   it("renders the tenant's saved email_config row when one exists", async () => {
@@ -132,14 +150,6 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
     expect(screen.getByDisplayValue(SUPPORT_ACME_EXAMPLE)).toBeVisible();
-  });
-
-  it('hides the contact recipient field on a plan without the contact form', async () => {
-    await setup();
-
-    expect(
-      screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
-    ).not.toBeInTheDocument();
   });
 
   it('shows the stored contact recipient on a plan with the contact form', async () => {
@@ -170,18 +180,6 @@ describe(`<${EmailPageContent.name}/>`, () => {
     expect(
       screen.queryByLabelText(SEND_CONTACT_MESSAGES_TO),
     ).not.toBeInTheDocument();
-  });
-
-  it("shows each template's authored copy in the tenant's default language", async () => {
-    await setup();
-
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('combobox', { name: 'Editing' }));
-    await user.click(
-      await screen.findByRole('option', { name: /^Team invite/ }),
-    );
-
-    expect(screen.getByDisplayValue(YOURE_INVITED_ACME_CO)).toBeVisible();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

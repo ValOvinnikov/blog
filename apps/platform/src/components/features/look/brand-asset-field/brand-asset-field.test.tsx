@@ -16,6 +16,8 @@ const setup = customRender(BrandAssetField, {
 });
 
 describe(`<${BrandAssetField.name}/>`, () => {
+  const onStage = vi.fn();
+
   beforeEach(() => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
   });
@@ -56,7 +58,6 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('stages a picked file with a local preview URL', async () => {
-    const onStage = vi.fn();
     const file = new File(['bytes'], 'logo.png', { type: 'image/png' });
     setup({ onStage });
 
@@ -66,7 +67,6 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('rejects an unsupported type without staging it', async () => {
-    const onStage = vi.fn();
     setup({ onStage });
 
     await selectFile(new File(['x'], 'logo.gif', { type: 'image/gif' }));
@@ -78,7 +78,6 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('stages a removal', async () => {
-    const onStage = vi.fn();
     setup({ image: { url: MOCK_LOGO_URL }, onStage });
 
     await userEvent

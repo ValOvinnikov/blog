@@ -56,12 +56,22 @@ describe(`<${RunCard.name}/>`, () => {
     expect(placeholder.tagName).not.toBe('TIME');
   });
 
-  it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
-    setup();
+  describe('with a run still in flight', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const placeholder = screen.getByText('—');
-    expect(placeholder).toBeVisible();
-    expect(placeholder.tagName).not.toBe('TIME');
+    it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
+      const placeholder = screen.getByText('—');
+      expect(placeholder).toBeVisible();
+      expect(placeholder.tagName).not.toBe('TIME');
+    });
+
+    it('nests the card title one level under the page heading', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Run' }),
+      ).toBeVisible();
+    });
   });
 
   it('renders no workflow log link when the run has no workflowRunUrl', () => {
@@ -89,14 +99,6 @@ describe(`<${RunCard.name}/>`, () => {
     expect(link).toHaveAttribute('href', WORKFLOW_RUN_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-  });
-
-  it('nests the card title one level under the page heading', () => {
-    setup();
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Run' }),
-    ).toBeVisible();
   });
 
   it('takes the heading level it is given', () => {

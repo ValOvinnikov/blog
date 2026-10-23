@@ -32,6 +32,14 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   const refreshMock = vi.fn();
   let user: UserEvent;
 
+  const typeTenantNameToConfirm = async () => {
+    await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
+    await user.type(
+      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
+      ARCHIVED_TENANT.name,
+    );
+  };
+
   beforeEach(() => {
     user = userEvent.setup();
     reactivateTenantActionMock.mockReset();
@@ -40,19 +48,16 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
     });
     refreshMock.mockReset();
     mockRouterRefresh(refreshMock);
+    setup();
   });
 
   it('titles the card "Reactivate this tenant"', () => {
-    setup();
-
     expect(
       screen.getByRole('heading', { level: 2, name: 'Reactivate this tenant' }),
     ).toBeVisible();
   });
 
   it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
-    setup();
-
     await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
 
     expect(
@@ -64,13 +69,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   });
 
   it('calls the action with the typed name and refreshes on success', async () => {
-    setup();
-
-    await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
-    await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-      'Acme Inc.',
-    );
+    await typeTenantNameToConfirm();
 
     const confirmButton = screen.getByRole('button', { name: 'Reactivate' });
     expect(confirmButton).toBeEnabled();
@@ -79,7 +78,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
 
     expect(reactivateTenantActionMock).toHaveBeenCalledWith(
       ARCHIVED_TENANT.id,
-      { confirm: 'Acme Inc.' },
+      { confirm: ARCHIVED_TENANT.name },
     );
     await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
   });
@@ -89,13 +88,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
     });
-    setup();
-
-    await user.click(screen.getByRole('button', { name: REACTIVATE_TENANT }));
-    await user.type(
-      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-      'Acme Inc.',
-    );
+    await typeTenantNameToConfirm();
     await user.click(screen.getByRole('button', { name: 'Reactivate' }));
 
     expect(

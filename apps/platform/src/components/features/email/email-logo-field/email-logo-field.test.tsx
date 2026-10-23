@@ -19,6 +19,8 @@ const setup = customRenderInSettingsForm(EmailLogoField, {
 });
 
 describe(`<${EmailLogoField.name}/>`, () => {
+  const onStage = vi.fn();
+
   beforeEach(() => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
   });
@@ -46,7 +48,6 @@ describe(`<${EmailLogoField.name}/>`, () => {
   });
 
   it('stages a picked file with a local preview URL', async () => {
-    const onStage = vi.fn();
     const file = new File(['x'], 'logo.png', { type: 'image/png' });
     setup({ onStage });
 
@@ -56,7 +57,6 @@ describe(`<${EmailLogoField.name}/>`, () => {
   });
 
   it('rejects an unsupported type without staging it', async () => {
-    const onStage = vi.fn();
     setup({ onStage });
 
     await selectFile(
@@ -68,7 +68,6 @@ describe(`<${EmailLogoField.name}/>`, () => {
   });
 
   it('stages a removal', async () => {
-    const onStage = vi.fn();
     setup({ logo: { url: MOCK_EMAIL_LOGO_URL }, onStage });
 
     await userEvent

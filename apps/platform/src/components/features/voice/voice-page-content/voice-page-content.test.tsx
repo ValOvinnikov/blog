@@ -47,13 +47,12 @@ const notFoundHeading = () =>
 describe(`<${VoicePageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
+    getSiteConfigMock.mockResolvedValue(undefined);
     selectLiveLocalesMock.mockReset();
     selectLiveLocalesMock.mockReturnValue([EN]);
   });
 
   it('shows every field at its default when there is no site_config row', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup();
 
     expect(notFoundHeading()).toHaveValue('');
@@ -74,33 +73,29 @@ describe(`<${VoicePageContent.name}/>`, () => {
     expect(notFoundHeading()).toHaveValue(NOTHING_HERE);
   });
 
-  it('offers a language switcher over the live languages', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-    selectLiveLocalesMock.mockReturnValue([EN, DE]);
+  describe('with a second live language', () => {
+    beforeEach(async () => {
+      selectLiveLocalesMock.mockReturnValue([EN, DE]);
+      await setup();
+    });
 
-    await setup();
+    it('offers a language switcher over the live languages', () => {
+      expect(screen.getByRole('group', { name: 'Language' })).toBeVisible();
+    });
 
-    expect(screen.getByRole('group', { name: 'Language' })).toBeVisible();
-  });
+    it('renders the empty-list specimen in the language being edited', async () => {
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('button', { name: 'German' }));
 
-  it('renders the empty-list specimen in the language being edited', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-    selectLiveLocalesMock.mockReturnValue([EN, DE]);
-    const user = userEvent.setup();
-
-    await setup();
-    await user.click(screen.getByRole('button', { name: 'German' }));
-
-    const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
-    const specimen = within(screen.getByTestId('voice-specimen-ARCHIVE'));
-    expect(specimen.getByText(eyebrow)).toBeInTheDocument();
-    expect(specimen.getByText(heading)).toBeInTheDocument();
-    expect(specimen.getByText(count)).toBeInTheDocument();
+      const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
+      const specimen = within(screen.getByTestId('voice-specimen-ARCHIVE'));
+      expect(specimen.getByText(eyebrow)).toBeInTheDocument();
+      expect(specimen.getByText(heading)).toBeInTheDocument();
+      expect(specimen.getByText(count)).toBeInTheDocument();
+    });
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup({
       tenant: {
         ...tenant,
