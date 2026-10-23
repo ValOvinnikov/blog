@@ -10,29 +10,19 @@ import {
 } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
-export const SUBSCRIBER_OWNER = 'Subscriber';
+const SUBSCRIBER_OWNER = 'Subscriber';
 
 export type TUserSubscriber = Pick<TSubscriber, 'id' | 'status'> & {
   email: string;
 };
 
 // The index ignores a `+tag`, which some mail hosts deliver to a different
-// mailbox, so an account only ever reaches the row for its exact address.
-export async function findUserSubscriber(
+// mailbox, so a lookup only ever reaches the row for the exact address.
+export async function findSubscriberByExactEmail(
   tenantId: string,
-  userId: string,
+  normalizedEmail: string,
 ): Promise<TMaybeUndefined<TUserSubscriber>> {
-  const db = getDb();
-  const [user] = await db
-    .select({ emailEncrypted: users.emailEncrypted })
-    .from(users)
-    .where(eq(users.id, userId));
-  if (!user?.emailEncrypted) return undefined;
-
-  const accountEmail = normalizeEmail(
-    decryptPersonalValue(user.emailEncrypted),
-  );
-  const rows = await db
+  const rows = await getDb()
     .select({
       id: subscribers.id,
       status: subscribers.status,
@@ -42,7 +32,7 @@ export async function findUserSubscriber(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.emailIndex, requirePersonalEmailIndex(accountEmail)),
+        eq(subscribers.emailIndex, requirePersonalEmailIndex(normalizedEmail)),
       ),
     );
 
@@ -52,5 +42,21 @@ export async function findUserSubscriber(
       status,
       email: requireDecryptedPersonalValue(emailEncrypted, SUBSCRIBER_OWNER),
     }))
-    .find(({ email }) => normalizeEmail(email) === accountEmail);
+    .find(({ email }) => normalizeEmail(email) === normalizedEmail);
+}
+
+export async function findUserSubscriber(
+  tenantId: string,
+  userId: string,
+): Promise<TMaybeUndefined<TUserSubscriber>> {
+  const [user] = await getDb()
+    .select({ emailEncrypted: users.emailEncrypted })
+    .from(users)
+    .where(eq(users.id, userId));
+  if (!user?.emailEncrypted) return undefined;
+
+  return findSubscriberByExactEmail(
+    tenantId,
+    normalizeEmail(decryptPersonalValue(user.emailEncrypted)),
+  );
 }

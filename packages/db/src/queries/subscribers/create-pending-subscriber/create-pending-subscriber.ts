@@ -5,16 +5,11 @@ import {
 } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import { SUBSCRIBER_OWNER } from '@blog/db/queries/subscribers/user-subscriber';
+import { findSubscriberByExactEmail } from '@blog/db/queries/subscribers/user-subscriber';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
-import {
-  personalEmailColumns,
-  requireDecryptedPersonalValue,
-  requirePersonalEmailIndex,
-} from '@blog/db/utils/personal-data/personal-data';
+import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
-import { and, eq } from 'drizzle-orm';
 
 export type TPendingSubscriber = {
   id: string;
@@ -36,33 +31,18 @@ type TCreatePendingSubscriberResult = TResult<
 
 async function findExisting(
   tenantId: string,
-  emailIndex: string,
+  normalizedEmail: string,
 ): Promise<TMaybeUndefined<TCreatePendingSubscriberResult>> {
-  const [existing] = await getDb()
-    .select({
-      id: subscribers.id,
-      status: subscribers.status,
-      emailEncrypted: subscribers.emailEncrypted,
-    })
-    .from(subscribers)
-    .where(
-      and(
-        eq(subscribers.tenantId, tenantId),
-        eq(subscribers.emailIndex, emailIndex),
-      ),
-    );
+  const existing = await findSubscriberByExactEmail(tenantId, normalizedEmail);
   if (!existing) return undefined;
 
-  const { id, status, emailEncrypted } = existing;
+  const { id, status, email } = existing;
   return okResult({
     outcome:
       status === 'active'
         ? SUBSCRIBER_OUTCOME.ALREADY_ACTIVE
         : SUBSCRIBER_OUTCOME.ALREADY_PENDING,
-    subscriber: {
-      id,
-      email: requireDecryptedPersonalValue(emailEncrypted, SUBSCRIBER_OWNER),
-    },
+    subscriber: { id, email },
   });
 }
 
@@ -73,9 +53,8 @@ export async function createPendingSubscriber(
   email: string,
 ): Promise<TCreatePendingSubscriberResult> {
   const normalizedEmail = normalizeEmail(email);
-  const emailIndex = requirePersonalEmailIndex(normalizedEmail);
 
-  const existing = await findExisting(tenantId, emailIndex);
+  const existing = await findExisting(tenantId, normalizedEmail);
   if (existing) return existing;
 
   const [inserted] = await getDb()
@@ -96,7 +75,7 @@ export async function createPendingSubscriber(
   }
 
   return (
-    (await findExisting(tenantId, emailIndex)) ??
+    (await findExisting(tenantId, normalizedEmail)) ??
     errorResult(ERROR_CODE.DB_NOT_FOUND)
   );
 }

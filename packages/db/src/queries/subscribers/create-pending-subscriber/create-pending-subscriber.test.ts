@@ -63,7 +63,6 @@ describe(createPendingSubscriber, () => {
   it.each([
     ['the same address', MOCK_SUBSCRIBER_EMAIL],
     ['a re-cased, padded address', `  ${MOCK_SUBSCRIBER_EMAIL.toUpperCase()} `],
-    ['a +tag address', MOCK_SUBSCRIBER_TAGGED_EMAIL],
   ])('finds the pending row again for %s', async (_case, email) => {
     const { id } = await insertTestSubscriber(
       db(),
@@ -80,6 +79,27 @@ describe(createPendingSubscriber, () => {
       }),
     );
     expect(await readSubscribers()).toHaveLength(1);
+  });
+
+  it('creates a separate pending row for a +tag address of a subscribed email', async () => {
+    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
+
+    const result = await createPendingSubscriber(
+      tenantId,
+      MOCK_SUBSCRIBER_TAGGED_EMAIL,
+    );
+
+    const rows = await readSubscribers();
+    const tagged = rows.find(
+      ({ email }) => email === MOCK_SUBSCRIBER_TAGGED_EMAIL,
+    );
+    expect(rows).toHaveLength(2);
+    expect(result).toEqual(
+      okResult({
+        outcome: SUBSCRIBER_OUTCOME.CREATED,
+        subscriber: { id: tagged?.id, email: MOCK_SUBSCRIBER_TAGGED_EMAIL },
+      }),
+    );
   });
 
   it('reports an already-confirmed email as active without a new row', async () => {
