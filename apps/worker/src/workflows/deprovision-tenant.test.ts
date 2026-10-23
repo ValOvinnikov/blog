@@ -1,6 +1,6 @@
 import { DEPROVISIONING_STEP } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils/result';
-import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import {
   beginDeprovisioning,
   finishDeprovisioning,
@@ -34,7 +34,7 @@ describe(deprovisionTenant, () => {
   });
 
   it('runs every deprovisioning step in order and finishes the run as successful', async () => {
-    const outcome = await deprovisionTenant(TEST_TENANT_ID);
+    const outcome = await deprovisionTenant(MOCK_TENANT_ID);
 
     expect(outcome).toEqual({ ok: true, data: { skipped: false } });
     expect(stepsRun()).toEqual([
@@ -46,7 +46,7 @@ describe(deprovisionTenant, () => {
       DEPROVISIONING_STEP.PURGE_READER_DATA,
       DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
     ]);
-    expect(finishDeprovisioning).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
+    expect(finishDeprovisioning).toHaveBeenCalledWith(MOCK_TENANT_ID, CTX, {
       ok: true,
       data: { skipped: false },
     });
@@ -55,7 +55,7 @@ describe(deprovisionTenant, () => {
   it('runs nothing and succeeds for an already-deprovisioned tenant', async () => {
     vi.mocked(beginDeprovisioning).mockResolvedValue(false);
 
-    const outcome = await deprovisionTenant(TEST_TENANT_ID);
+    const outcome = await deprovisionTenant(MOCK_TENANT_ID);
 
     expect(outcome).toEqual({ ok: true, data: { skipped: true } });
     expect(runDeprovisioningStep).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe(deprovisionTenant, () => {
         errorResult(DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT),
       );
 
-    await expect(deprovisionTenant(TEST_TENANT_ID)).rejects.toBeInstanceOf(
+    await expect(deprovisionTenant(MOCK_TENANT_ID)).rejects.toBeInstanceOf(
       FatalError,
     );
 
@@ -77,7 +77,7 @@ describe(deprovisionTenant, () => {
       DEPROVISIONING_STEP.REMOVE_DOMAIN,
       DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
     ]);
-    expect(finishDeprovisioning).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
+    expect(finishDeprovisioning).toHaveBeenCalledWith(MOCK_TENANT_ID, CTX, {
       ok: false,
       error: { failedStep: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT },
     });
@@ -86,11 +86,11 @@ describe(deprovisionTenant, () => {
   it('finishes the run as failed when a step throws', async () => {
     vi.mocked(runDeprovisioningStep).mockRejectedValue(new Error(CRASH));
 
-    await expect(deprovisionTenant(TEST_TENANT_ID)).rejects.toBeInstanceOf(
+    await expect(deprovisionTenant(MOCK_TENANT_ID)).rejects.toBeInstanceOf(
       FatalError,
     );
 
-    expect(finishDeprovisioning).toHaveBeenCalledWith(TEST_TENANT_ID, CTX, {
+    expect(finishDeprovisioning).toHaveBeenCalledWith(MOCK_TENANT_ID, CTX, {
       ok: false,
       error: { message: CRASH },
     });
