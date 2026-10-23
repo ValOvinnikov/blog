@@ -5,6 +5,7 @@ import {
 } from '@blog/config/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeFinding } from '@platform/testing/findings/fixtures';
+import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 
 import { FindingsView } from './findings-view';
 
@@ -20,15 +21,20 @@ describe(FindingsView, () => {
   it('renders the page heading and the real findings table', () => {
     render(<FindingsView findings={[finding]} />);
 
-    expect(screen.getByRole('heading', { name: 'Findings' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toBeVisible();
+    const heading = screen.getByRole('heading', { name: 'Findings' });
+    const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
+
+    expect(heading).toBeVisible();
+    expect(tenantLink).toBeVisible();
   });
 
   it('renders the healthy empty state when there are no open findings', () => {
     render(<FindingsView findings={[]} />);
 
-    expect(
-      screen.getByText("No open findings. Everything's healthy."),
-    ).toBeVisible();
+    const emptyState = screen.getByText(
+      "No open findings. Everything's healthy.",
+    );
+
+    expect(emptyState).toBeVisible();
   });
 });

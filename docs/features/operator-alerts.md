@@ -86,7 +86,7 @@ the email in the platform's own look, and sends it.
   An alert cannot render in a tenant's colours.
 - From address: `OPERATOR_ALERT_FROM_ADDRESS`, else
   `Tenant Alerts <onboarding@resend.dev>`.
-- `postOperatorAlert` never throws. An unset `ADMIN_APP_BASE_URL` or
+- `postOperatorAlert` never throws. An unset `PLATFORM_APP_BASE_URL` or
   `OPERATOR_ALERT_SECRET`, a non-2xx response and a network error are each
   logged once and swallowed, so a failed alert never fails the job that
   reports it.
@@ -119,7 +119,7 @@ the email in the platform's own look, and sends it.
   - Platform: `OPERATOR_ALERT_SECRET`, `OPERATOR_ALERT_FROM_ADDRESS`,
     `RESEND_API_KEY`.
   - CI (GitHub Environment): `OPERATOR_ALERT_SECRET` (byte-identical to the
-    platform's), `ADMIN_APP_BASE_URL`.
+    platform's), `PLATFORM_APP_BASE_URL`.
   - Worker: `OPERATOR_ALERT_FROM_ADDRESS`, `RESEND_API_KEY` for the archived
     Sanity project email.
 

@@ -1,23 +1,28 @@
 import { ICONS } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { Tile } from './tile';
 
 const render = renderWithIntl;
 
+const DESCRIPTION = 'Colours, fonts, logo, density';
+
 describe(Tile, () => {
   it('renders a link to the given href with a title and description', () => {
     render(
       <Tile
-        href="/dashboard/look"
+        href={adminRoutes.dashboardLook()}
         icon={ICONS.PALETTE}
         title="Look"
-        description="Colours, fonts, logo, density"
+        description={DESCRIPTION}
       />,
     );
 
     const link = screen.getByRole('link', { name: /Look/ });
-    expect(link).toHaveAttribute('href', '/dashboard/look');
-    expect(screen.getByText('Colours, fonts, logo, density')).toBeVisible();
+    const description = screen.getByText(DESCRIPTION);
+
+    expect(link).toHaveAttribute('href', adminRoutes.dashboardLook());
+    expect(description).toBeVisible();
   });
 });

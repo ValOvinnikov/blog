@@ -6,7 +6,7 @@ export const MOCK_PROVISION_ENV: TProvisionEnv = {
   vercelToken: 'vercel-token',
   vercelTeamId: undefined,
   vercelWebProjectId: 'prj_web',
-  adminAppBaseUrl: 'https://admin.example.com',
+  platformAppBaseUrl: 'https://admin.example.com',
   tenantSanityDataset: 'production',
   webAppBaseUrl: 'https://web.example.com',
   revalidateSecret: 'revalidate-secret',

@@ -85,8 +85,10 @@ describe(`<${SiteSetupCard.name}/>`, () => {
   });
 
   describe('when the viewer can retry a failed setup', () => {
-    const clickTryAgain = () =>
-      user.click(screen.getByRole('button', { name: 'Try again' }));
+    const clickTryAgain = async () => {
+      const tryAgainButton = screen.getByRole('button', { name: 'Try again' });
+      await user.click(tryAgainButton);
+    };
 
     beforeEach(() => {
       setup();
