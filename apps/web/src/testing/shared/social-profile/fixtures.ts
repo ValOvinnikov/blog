@@ -22,14 +22,12 @@ export const mockSocialProfile = ({
   ...overrides,
 });
 
-export const MOCK_LINK_TARGET = '_blank';
-
 export const MOCK_GITHUB_PROFILE: TSocialProfile = {
   platform: SOCIAL_PLATFORMS.GITHUB,
   link: {
     label: SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.GITHUB],
     href: faker.internet.url(),
-    target: MOCK_LINK_TARGET,
+    target: '_blank',
     platform: undefined,
     ariaLabel: undefined,
   },
@@ -40,7 +38,7 @@ export const MOCK_LINKEDIN_PROFILE: TSocialProfile = {
   link: {
     label: SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.LINKEDIN],
     href: faker.internet.url(),
-    target: MOCK_LINK_TARGET,
+    target: '_blank',
     platform: undefined,
     ariaLabel: undefined,
   },
@@ -51,7 +49,7 @@ export const MOCK_MASTODON_PROFILE: TSocialProfile = {
   link: {
     label: SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.MASTODON],
     href: faker.internet.url(),
-    target: MOCK_LINK_TARGET,
+    target: '_blank',
     platform: undefined,
     ariaLabel: undefined,
   },

@@ -1,7 +1,6 @@
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_GITHUB_PROFILE,
-  MOCK_LINK_TARGET,
   MOCK_LINKEDIN_PROFILE,
   MOCK_MASTODON_PROFILE,
 } from '@web/testing/shared/social-profile/fixtures';
@@ -50,6 +49,9 @@ describe(`<${SocialLink.name}/>`, () => {
       name: LINKEDIN_PROFILE_NAME,
     });
 
-    expect(socialLink).toHaveAttribute('target', MOCK_LINK_TARGET);
+    expect(socialLink).toHaveAttribute(
+      'target',
+      MOCK_LINKEDIN_PROFILE.link.target,
+    );
   });
 });
