@@ -1,33 +1,26 @@
 import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_PROJECTION,
 } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
-import { evaluate, parse } from 'groq-js';
-
-const page = (_id: string, slug: string, parent?: string) => ({
-  _id,
-  _type: PAGE_LANDING_TYPE,
-  slug: { _type: 'slug', current: slug },
-  ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
-});
+import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 
 const fetchChain = async (dataset: object[], id: string) => {
-  const result = await evaluate(
-    parse(`*[_id == $id][0]${LANDING_PARENT_CHAIN_PROJECTION}`),
-    { dataset, params: { id } },
+  const result = await mockGroqFetch(dataset)(
+    `*[_id == $id][0]${LANDING_PARENT_CHAIN_PROJECTION}`,
+    { id },
   );
 
-  return flattenLandingParentChain(await result.get());
+  return flattenLandingParentChain(result);
 };
 
 describe(flattenLandingParentChain, () => {
   it('lists a page and its ancestors nearest first', async () => {
     const dataset = [
-      page('modules', 'modules'),
-      page('faq', 'faq', 'modules'),
-      page('billing', 'billing', 'faq'),
+      mockLandingPage({ _id: 'modules', slug: 'modules' }),
+      mockLandingPage({ _id: 'faq', slug: 'faq', parent: 'modules' }),
+      mockLandingPage({ _id: 'billing', slug: 'billing', parent: 'faq' }),
     ];
 
     const chain = await fetchChain(dataset, 'billing');
@@ -40,7 +33,10 @@ describe(flattenLandingParentChain, () => {
   });
 
   it('stops after the maximum depth even when the chain loops', async () => {
-    const dataset = [page('a', 'a', 'b'), page('b', 'b', 'a')];
+    const dataset = [
+      mockLandingPage({ _id: 'a', slug: 'a', parent: 'b' }),
+      mockLandingPage({ _id: 'b', slug: 'b', parent: 'a' }),
+    ];
 
     const chain = await fetchChain(dataset, 'a');
 
