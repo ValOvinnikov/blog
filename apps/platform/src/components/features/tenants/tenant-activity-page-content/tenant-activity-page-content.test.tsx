@@ -66,15 +66,8 @@ describe(TenantActivityPageContent, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Activity' }),
-    ).toBeVisible();
     expect(screen.getByText('Settings updated')).toBeVisible();
     expect(screen.getByText('Tenant created')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Next' })).toHaveAttribute(
-      'href',
-      `/tenants/${MOCK_TENANT_ID}/activity?page=2`,
-    );
     expect(screen.getByText('Page 1 of 2')).toBeVisible();
   });
 

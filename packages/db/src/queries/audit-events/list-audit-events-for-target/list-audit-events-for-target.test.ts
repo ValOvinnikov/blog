@@ -15,6 +15,8 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+const MOCK_TARGET_ID = 'tenant-1';
+
 async function insertEvent(overrides: {
   targetType: TAuditTargetType;
   targetId: string;
@@ -42,26 +44,26 @@ describe(listAuditEventsForTarget, () => {
   it('returns events for the target ordered newest-first', async () => {
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, 1),
       action: AUDIT_ACTION.CREATED,
     });
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, 3),
       action: AUDIT_ACTION.DEPROVISIONED,
     });
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, 2),
       action: AUDIT_ACTION.SETTINGS_UPDATED,
     });
 
     const result = await listAuditEventsForTarget(
       AUDIT_TARGET_TYPE.TENANT,
-      'tenant-1',
+      MOCK_TARGET_ID,
     );
 
     expect(result.map((event) => event.action)).toEqual([
@@ -74,7 +76,7 @@ describe(listAuditEventsForTarget, () => {
   it('defaults to a limit of 20 events', async () => {
     const rows = Array.from({ length: 25 }, (_, index) => ({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, index + 1),
     }));
     for (const row of rows) {
@@ -83,7 +85,7 @@ describe(listAuditEventsForTarget, () => {
 
     const result = await listAuditEventsForTarget(
       AUDIT_TARGET_TYPE.TENANT,
-      'tenant-1',
+      MOCK_TARGET_ID,
     );
 
     expect(result).toHaveLength(20);
@@ -92,7 +94,7 @@ describe(listAuditEventsForTarget, () => {
   it('respects a custom limit option', async () => {
     const rows = Array.from({ length: 5 }, (_, index) => ({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, index + 1),
     }));
     for (const row of rows) {
@@ -101,7 +103,7 @@ describe(listAuditEventsForTarget, () => {
 
     const result = await listAuditEventsForTarget(
       AUDIT_TARGET_TYPE.TENANT,
-      'tenant-1',
+      MOCK_TARGET_ID,
       { limit: 2 },
     );
 
@@ -111,7 +113,7 @@ describe(listAuditEventsForTarget, () => {
   it('skips the offset number of newest events', async () => {
     const rows = Array.from({ length: 3 }, (_, index) => ({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, index + 1),
     }));
     for (const row of rows) {
@@ -120,7 +122,7 @@ describe(listAuditEventsForTarget, () => {
 
     const result = await listAuditEventsForTarget(
       AUDIT_TARGET_TYPE.TENANT,
-      'tenant-1',
+      MOCK_TARGET_ID,
       { limit: 2, offset: 2 },
     );
 
@@ -132,7 +134,7 @@ describe(listAuditEventsForTarget, () => {
   it("does not leak another target's events", async () => {
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, 1),
     });
     await insertEvent({
@@ -142,24 +144,24 @@ describe(listAuditEventsForTarget, () => {
     });
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: 'tenant-1',
+      targetId: MOCK_TARGET_ID,
       createdAt: new Date(2026, 0, 1),
     });
 
     const result = await listAuditEventsForTarget(
       AUDIT_TARGET_TYPE.TENANT,
-      'tenant-1',
+      MOCK_TARGET_ID,
     );
 
     expect(result).toHaveLength(1);
-    expect(result[0]?.targetId).toBe('tenant-1');
+    expect(result[0]?.targetId).toBe(MOCK_TARGET_ID);
     expect(result[0]?.targetType).toBe(AUDIT_TARGET_TYPE.TENANT);
   });
 
   it('returns an empty array when no events exist for the target', async () => {
     const result = await listAuditEventsForTarget(
       AUDIT_TARGET_TYPE.TENANT,
-      'tenant-1',
+      MOCK_TARGET_ID,
     );
 
     expect(result).toEqual([]);

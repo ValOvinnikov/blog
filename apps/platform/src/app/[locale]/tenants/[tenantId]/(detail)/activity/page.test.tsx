@@ -1,6 +1,8 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
+import { MOCK_OPERATOR_ID } from '@platform/testing/admins/operator';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -44,10 +46,10 @@ const setup = customRenderAsync(TenantActivityPage, {
 describe(`<${TenantActivityPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    authMock.mockResolvedValue({ user: { id: faker.string.uuid() } });
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
+      id: MOCK_OPERATOR_ID,
       role: ADMIN_ROLE.ADMIN,
     });
     getTenantByIdMock.mockReset();
