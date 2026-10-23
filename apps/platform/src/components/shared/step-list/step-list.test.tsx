@@ -1,5 +1,5 @@
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
-import { render, screen } from '@platform/testing/custom-render';
+import { render, screen, within } from '@platform/testing/custom-render';
 import { MOCK_RUN_PLUS_1_MIN_AT } from '@platform/testing/tenants/fixtures';
 import type { ComponentProps } from 'react';
 
@@ -74,9 +74,12 @@ describe(`<${StepList.name}/>`, () => {
     });
 
     it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {
-      for (const { statusLabel } of steps) {
-        const status = screen.getByText(statusLabel);
-        expect(status.closest('[aria-live="polite"]')).not.toBeNull();
+      for (const { key, statusLabel } of steps) {
+        const liveRegion = screen.getByTestId(`step-status-live-${key}`);
+        const status = within(liveRegion).getByText(statusLabel);
+
+        expect(liveRegion).toHaveAttribute('aria-live', 'polite');
+        expect(status).toBeVisible();
       }
     });
   });
