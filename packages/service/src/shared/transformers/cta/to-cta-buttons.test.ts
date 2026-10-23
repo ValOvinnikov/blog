@@ -1,22 +1,20 @@
-import { CTA_ACTION_VARIANT, LINK_TYPE } from '@blog/config';
-import { makeRawCtaButton } from '@blog/service/testing/modules/fixtures';
+import { CTA_ACTION_VARIANT } from '@blog/config';
+import { mockRawCtaButton } from '@blog/service/testing/modules/fixtures';
+import { mockRawInternalLinkDocument } from '@blog/service/testing/shared/fixtures';
 
 import { toCtaButtons } from './to-cta-buttons';
 
 describe(toCtaButtons, () => {
-  it('returns an empty array for a null/undefined raw list', () => {
-    expect(toCtaButtons(null)).toEqual([]);
-    expect(toCtaButtons(undefined)).toEqual([]);
-  });
+  it.each([null, undefined, []])('returns an empty array for %j', (raw) => {
+    const result = toCtaButtons(raw);
 
-  it('returns an empty array for an empty raw list', () => {
-    expect(toCtaButtons([])).toEqual([]);
+    expect(result).toEqual([]);
   });
 
   it('maps every resolvable button', () => {
     const raw = [
-      makeRawCtaButton(),
-      makeRawCtaButton({ variant: CTA_ACTION_VARIANT.SECONDARY }),
+      mockRawCtaButton(),
+      mockRawCtaButton({ variant: CTA_ACTION_VARIANT.SECONDARY }),
     ];
 
     const result = toCtaButtons(raw);
@@ -28,16 +26,8 @@ describe(toCtaButtons, () => {
 
   it('drops entries whose link cannot resolve to an href', () => {
     const raw = [
-      makeRawCtaButton({
-        link: {
-          label: 'Broken',
-          linkType: LINK_TYPE.INTERNAL,
-          internalReference: null,
-          url: null,
-          openInNewTab: null,
-        },
-      }),
-      makeRawCtaButton({ variant: CTA_ACTION_VARIANT.SECONDARY }),
+      mockRawCtaButton({ link: mockRawInternalLinkDocument() }),
+      mockRawCtaButton({ variant: CTA_ACTION_VARIANT.SECONDARY }),
     ];
 
     const result = toCtaButtons(raw);

@@ -16,8 +16,8 @@ export async function handleOwnerAccessRequest(
   input: { failureEvent: string; before?: (tenantId: string) => Promise<void> },
 ): Promise<Response> {
   const signed = await readSignedTenantRequest(request);
-  if (!signed.ok) return signed.response;
-  const { tenantId } = signed;
+  if (!signed.ok) return signed.error;
+  const { data: tenantId } = signed;
 
   try {
     const tenant = await getTenantById(tenantId);

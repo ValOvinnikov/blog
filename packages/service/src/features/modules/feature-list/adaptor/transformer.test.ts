@@ -3,20 +3,30 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  ICONS,
   LINK_TYPE,
 } from '@blog/config';
 import {
-  makeRawCtaButton,
-  makeRawFeatureListItem,
-  makeRawFeatureListModule,
+  mockCtaButtonView,
+  mockRawCtaButton,
+  mockRawFeatureListItem,
+  mockRawFeatureListModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  mockLinkView,
+  mockRawSanityImage,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toFeatureListModule } from './transformer';
 
+const FIRST_CARD_ID = 'card-b';
+const SECOND_CARD_ID = 'card-a';
+const ILLUSTRATION_ALT = 'A feature illustration';
+const CARD_LINK = { label: 'Learn more', url: 'https://example.com' };
+
 describe('toFeatureListModule', () => {
-  it('maps brandVariant, headingBlock, imageShape, displayMode and cardAlignment straight through', () => {
-    const raw = makeRawFeatureListModule({
+  it('maps brandVariant, imageShape, displayMode and cardAlignment straight through', () => {
+    const raw = mockRawFeatureListModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
       imageShape: CARD_IMAGE_SHAPE.CIRCLE,
       displayMode: DISPLAY_MODE.CAROUSEL,
@@ -32,7 +42,7 @@ describe('toFeatureListModule', () => {
   });
 
   it('leaves contentAlignment and layout undefined when unset (no faked default)', () => {
-    const raw = makeRawFeatureListModule({
+    const raw = mockRawFeatureListModule({
       contentAlignment: null,
       layout: null,
     });
@@ -44,185 +54,95 @@ describe('toFeatureListModule', () => {
   });
 
   it('keeps the cards in authored order', () => {
-    const raw = makeRawFeatureListModule({
+    const raw = mockRawFeatureListModule({
       features: [
-        makeRawFeatureListItem({ _id: 'card-b' }),
-        makeRawFeatureListItem({ _id: 'card-a' }),
+        mockRawFeatureListItem({ _id: FIRST_CARD_ID }),
+        mockRawFeatureListItem({ _id: SECOND_CARD_ID }),
       ],
     });
 
     const module = toFeatureListModule(raw);
 
-    expect(module.items.map((item) => item.id)).toEqual(['card-b', 'card-a']);
+    expect(module.items.map((item) => item.id)).toEqual([
+      FIRST_CARD_ID,
+      SECOND_CARD_ID,
+    ]);
   });
 
-  it('degrades to an empty items array when features is unset (no throw)', () => {
-    const raw = makeRawFeatureListModule({ features: null });
+  it.each([
+    ['unset', null],
+    ['an empty list', []],
+    ['a single card, below the schema minimum', [mockRawFeatureListItem()]],
+  ])('degrades to an empty items array when features is %s', (_, features) => {
+    const raw = mockRawFeatureListModule({ features });
 
     const module = toFeatureListModule(raw);
 
     expect(module.items).toEqual([]);
   });
 
-  it('degrades to an empty items array when features is present but empty', () => {
-    const raw = makeRawFeatureListModule({ features: [] });
+  it.each([
+    ['only an icon', ICONS.ROCKET, null, ICONS.ROCKET, undefined],
+    ['only an image', null, ILLUSTRATION_ALT, undefined, ILLUSTRATION_ALT],
+    [
+      'an icon and an image',
+      ICONS.ROCKET,
+      ILLUSTRATION_ALT,
+      ICONS.ROCKET,
+      ILLUSTRATION_ALT,
+    ],
+    ['neither icon nor image', null, null, undefined, undefined],
+  ])(
+    'maps a card carrying %s',
+    (_, icon, imageAlt, expectedIcon, expectedAlt) => {
+      const raw = mockRawFeatureListModule({
+        features: [
+          mockRawFeatureListItem({
+            icon,
+            image: imageAlt ? mockRawSanityImage(imageAlt) : null,
+          }),
+          mockRawFeatureListItem(),
+        ],
+      });
 
-    const module = toFeatureListModule(raw);
+      const module = toFeatureListModule(raw);
 
-    expect(module.items).toEqual([]);
-  });
-
-  it('degrades to an empty items array when features has only one card (below the schema minimum)', () => {
-    const raw = makeRawFeatureListModule({
-      features: [makeRawFeatureListItem()],
-    });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.items).toEqual([]);
-  });
-
-  it('maps a card with only an icon, leaving sanityImage undefined', () => {
-    const raw = makeRawFeatureListModule({
-      features: [
-        makeRawFeatureListItem({ icon: 'ROCKET', image: null }),
-        makeRawFeatureListItem(),
-      ],
-    });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.items[0]).toMatchObject({ icon: 'ROCKET' });
-    expect(module.items[0]?.sanityImage).toBeUndefined();
-  });
-
-  it('maps a card with only an image, leaving icon undefined', () => {
-    const raw = makeRawFeatureListModule({
-      features: [
-        makeRawFeatureListItem({
-          icon: null,
-          image: makeRawSanityImage('A feature illustration'),
-        }),
-        makeRawFeatureListItem(),
-      ],
-    });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.items[0]?.icon).toBeUndefined();
-    expect(module.items[0]?.sanityImage?.alt).toBe('A feature illustration');
-  });
-
-  it('maps a card carrying both an icon and an image', () => {
-    const raw = makeRawFeatureListModule({
-      features: [
-        makeRawFeatureListItem({
-          icon: 'ROCKET',
-          image: makeRawSanityImage('A feature illustration'),
-        }),
-        makeRawFeatureListItem(),
-      ],
-    });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.items[0]?.icon).toBe('ROCKET');
-    expect(module.items[0]?.sanityImage?.alt).toBe('A feature illustration');
-  });
-
-  it('leaves a card with neither icon nor image fully undefined for both', () => {
-    const raw = makeRawFeatureListModule({
-      features: [
-        makeRawFeatureListItem({ icon: null, image: null }),
-        makeRawFeatureListItem(),
-      ],
-    });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.items[0]?.icon).toBeUndefined();
-    expect(module.items[0]?.sanityImage).toBeUndefined();
-  });
+      expect(module.items[0]?.icon).toBe(expectedIcon);
+      expect(module.items[0]?.sanityImage?.alt).toBe(expectedAlt);
+    },
+  );
 
   it('resolves a card link to an ILink', () => {
-    const raw = makeRawFeatureListModule({
+    const raw = mockRawFeatureListModule({
       features: [
-        makeRawFeatureListItem({
+        mockRawFeatureListItem({
           link: {
-            label: 'Learn more',
+            label: CARD_LINK.label,
             linkType: LINK_TYPE.EXTERNAL,
-            url: 'https://example.com',
+            url: CARD_LINK.url,
             internalReference: null,
             openInNewTab: null,
           },
         }),
-        makeRawFeatureListItem(),
+        mockRawFeatureListItem(),
       ],
     });
 
     const module = toFeatureListModule(raw);
 
-    expect(module.items[0]?.link).toEqual({
-      label: 'Learn more',
-      href: 'https://example.com',
-      target: undefined,
-      platform: undefined,
-      ariaLabel: undefined,
-    });
-  });
-
-  it('leaves a card link undefined when the card has none', () => {
-    const raw = makeRawFeatureListModule({
-      features: [
-        makeRawFeatureListItem({ link: null }),
-        makeRawFeatureListItem(),
-      ],
-    });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.items[0]?.link).toBeUndefined();
-  });
-
-  it('drops a card link that cannot resolve to an href', () => {
-    const raw = makeRawFeatureListModule({
-      features: [
-        makeRawFeatureListItem({
-          link: {
-            label: 'Broken',
-            linkType: LINK_TYPE.INTERNAL,
-            internalReference: null,
-            url: null,
-            openInNewTab: null,
-          },
-        }),
-        makeRawFeatureListItem(),
-      ],
-    });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.items[0]?.link).toBeUndefined();
-  });
-
-  it('returns an empty array for an absent ctaButtons field', () => {
-    const raw = makeRawFeatureListModule({ ctaButtons: null });
-
-    const module = toFeatureListModule(raw);
-
-    expect(module.ctaButtons).toEqual([]);
+    expect(module.items[0]?.link).toEqual(
+      mockLinkView({ label: CARD_LINK.label, href: CARD_LINK.url }),
+    );
   });
 
   it('maps authored ctaButtons', () => {
-    const raw = makeRawFeatureListModule({
-      ctaButtons: [makeRawCtaButton()],
+    const raw = mockRawFeatureListModule({
+      ctaButtons: [mockRawCtaButton()],
     });
 
     const module = toFeatureListModule(raw);
 
     expect(module.ctaButtons).toHaveLength(1);
-    expect(module.ctaButtons[0]).toMatchObject({
-      link: { label: 'Subscribe', href: '/newsletter' },
-    });
+    expect(module.ctaButtons[0]).toEqual(mockCtaButtonView());
   });
 });

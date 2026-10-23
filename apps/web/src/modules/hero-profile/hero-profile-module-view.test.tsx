@@ -1,39 +1,39 @@
-import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_ACTIONS,
+} from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import {
+  MOCK_HERO_PROFILE_AVATAR_NAME,
+  MOCK_HERO_PROFILE_MODULE_ID,
+} from '@web/testing/modules/hero-profile/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
-const bio = [portableTextBlock('Jane writes about design systems.')];
+const BIO_TEXT = 'Jane writes about design systems.';
+const SUPPORTING_TEXT = 'Building better products.';
+const ARIA_HIDDEN_SELECTOR = '[aria-hidden="true"]';
 
-const sanityImage = makeSanityImage();
+const bio = [portableTextBlock(BIO_TEXT)];
 
-const socialLinks = [
-  {
-    platform: SOCIAL_PLATFORMS.GITHUB,
-    link: {
-      label: 'GitHub',
-      href: 'https://github.com/example',
-      target: '_blank' as const,
-      platform: undefined,
-      ariaLabel: undefined,
-    },
-  },
-];
+const sanityImage = mockSanityImage();
+
+const socialLinks = [mockSocialProfile()];
 
 const heading = 'Building better products';
-const avatarName = 'Jamie Rivera';
 
 const setup = customRender(HeroProfileModuleView, {
-  id: 'hero-profile-1',
+  id: MOCK_HERO_PROFILE_MODULE_ID,
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
   headingBlock: makeHeadingBlock({ heading }),
-  avatarName,
+  avatarName: MOCK_HERO_PROFILE_AVATAR_NAME,
   sanityImage: undefined,
   bio: undefined,
   socialLinks: [],
@@ -48,10 +48,13 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   it('names the section by its top-level heading', () => {
     setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: heading }),
-    ).toBeVisible();
-    expect(screen.getByRole('region', { name: heading })).toBeVisible();
+    const headingElement = screen.getByRole('heading', {
+      level: 1,
+      name: heading,
+    });
+    const region = screen.getByRole('region', { name: heading });
+    expect(headingElement).toBeVisible();
+    expect(region).toBeVisible();
   });
 
   it('gives two instances of the same module distinct heading ids', () => {
@@ -64,8 +67,9 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
         name: heading,
       })
       .map(({ id }) => id);
+    const regions = screen.getAllByRole('region', { name: heading });
     expect(new Set(headingIds).size).toBe(2);
-    expect(screen.getAllByRole('region', { name: heading })).toHaveLength(2);
+    expect(regions).toHaveLength(2);
   });
 
   it('renders the photo sized for an avatar on Stacked', () => {
@@ -82,92 +86,91 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     expect(img.getAttribute('src')).toContain('h=900');
   });
 
-  it('renders the photo as a legible, prioritized background on Banner, with no accessible name since it is a decorative backdrop there', () => {
+  it('renders the photo as a decorative, prioritized backdrop on Banner', () => {
     setup({ variant: HERO_VARIANT.BANNER, sanityImage });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const namedImage = screen.queryByRole('img');
     const img = screen.getByRole('presentation');
+    expect(namedImage).not.toBeInTheDocument();
     expect(img).toHaveAttribute('alt', '');
     expect(img).toHaveAttribute('height', '675');
     expect(img).toHaveAttribute('fetchpriority', 'high');
   });
 
-  it('renders initials derived from the author name (never the heading) instead of an empty avatar when no image resolves on Stacked, exposing the full name to the accessibility tree', () => {
+  it('shows author-name initials and announces the name on a photo-less Stacked', () => {
     setup({ variant: HERO_VARIANT.STACKED, sanityImage: undefined });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('JR')).toBeVisible();
-    expect(screen.queryByText('BB')).not.toBeInTheDocument();
-    expect(
-      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
-    ).toBeNull();
+    const image = screen.queryByRole('img');
+    const authorInitials = screen.getByText('JR');
+    const headingInitials = screen.queryByText('BB');
+    const avatarName = screen.getByText(MOCK_HERO_PROFILE_AVATAR_NAME);
+    expect(image).not.toBeInTheDocument();
+    expect(authorInitials).toBeVisible();
+    expect(headingInitials).not.toBeInTheDocument();
+    expect(avatarName.closest(ARIA_HIDDEN_SELECTOR)).toBeNull();
   });
 
-  it('renders no media on Split when no image resolves', () => {
-    setup({
-      variant: HERO_VARIANT.SPLIT,
-      sanityImage: undefined,
-    });
+  it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.BANNER])(
+    'renders no media on %s when no image resolves',
+    (variant) => {
+      setup({ variant, sanityImage: undefined });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
-  });
+      const image = screen.queryByRole('img');
+      const media = screen.queryByTestId('hero-media');
+      expect(image).not.toBeInTheDocument();
+      expect(media).not.toBeInTheDocument();
+    },
+  );
 
-  it('still announces the profile name to a screen reader on a photo-less Split, with no initials tile shown', () => {
+  it('announces the name with no initials tile on a photo-less Split', () => {
     setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.queryByText('JR')).not.toBeInTheDocument();
-    expect(
-      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
-    ).toBeNull();
+    const image = screen.queryByRole('img');
+    const initials = screen.queryByText('JR');
+    const avatarName = screen.getByText(MOCK_HERO_PROFILE_AVATAR_NAME);
+    expect(image).not.toBeInTheDocument();
+    expect(initials).not.toBeInTheDocument();
+    expect(avatarName.closest(ARIA_HIDDEN_SELECTOR)).toBeNull();
   });
 
-  it('renders no media on Banner when no image resolves', () => {
-    setup({
-      variant: HERO_VARIANT.BANNER,
-      sanityImage: undefined,
-    });
-
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
-  });
-
-  it('renders no Hero.Social slot when there are no social links', () => {
+  it('renders no social list without social links', () => {
     setup({ socialLinks: [] });
 
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    const list = screen.queryByRole('list');
+    expect(list).not.toBeInTheDocument();
   });
 
-  it('renders SocialLinks inside Hero.Social carrying the resolved profiles', () => {
+  it('renders the resolved social profiles as a labelled list of links', () => {
     setup({ socialLinks });
 
     const list = screen.getByRole('list', { name: 'Profiles' });
+    const githubLink = screen.getByRole('link', { name: 'GitHub profile' });
     expect(list).toBeVisible();
-    expect(screen.getByRole('link', { name: 'GitHub profile' })).toBeVisible();
+    expect(githubLink).toBeVisible();
   });
 
-  it('renders no bio text when bio is undefined', () => {
+  it('renders no bio when none is authored', () => {
     setup({ bio: undefined });
 
-    expect(
-      screen.queryByText('Jane writes about design systems.'),
-    ).not.toBeInTheDocument();
+    const bioText = screen.queryByText(BIO_TEXT);
+    expect(bioText).not.toBeInTheDocument();
   });
 
   it('renders the bio after the supporting text and before the actions', () => {
     setup({
       headingBlock: makeHeadingBlock({
         heading,
-        supportingText: 'Building better products.',
+        supportingText: SUPPORTING_TEXT,
       }),
       bio,
-      ctaButtons: ctaActionsDemo,
+      ctaButtons: MOCK_CTA_ACTIONS,
     });
 
-    const supportingText = screen.getByText('Building better products.');
-    const bioText = screen.getByText('Jane writes about design systems.');
-    const action = screen.getByRole('link', { name: 'Subscribe now' });
+    const supportingText = screen.getByText(SUPPORTING_TEXT);
+    const bioText = screen.getByText(BIO_TEXT);
+    const action = screen.getByRole('link', {
+      name: MOCK_CTA_PRIMARY_ACTION.link.label,
+    });
 
     expect(
       supportingText.compareDocumentPosition(bioText) &

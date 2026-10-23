@@ -1,26 +1,32 @@
 import type { ITaxonomyListModuleItem } from '@web/modules/taxonomy-list/taxonomy-list-module-view';
 
-export const topicsListItems: ITaxonomyListModuleItem[] = [
-  {
-    id: 'topic-1',
-    title: 'Engineering',
-    description: 'Posts about building things.',
-    postCountLabel: '5 posts',
-    href: '/topics/engineering',
-    posts: [
-      {
-        id: 'post-1',
-        title: 'Shipping the new build pipeline',
-        href: '/blog/shipping-the-new-build-pipeline',
-      },
-      {
-        id: 'post-2',
-        title: 'Why we rewrote our test runner',
-        href: '/blog/why-we-rewrote-our-test-runner',
-      },
-    ],
-    latestPostsLabel: 'Latest in Engineering',
-  },
+export const MOCK_FIRST_TOPIC_POST_TITLE = 'Shipping the new build pipeline';
+
+export const MOCK_SECOND_TOPIC_POST_TITLE = 'Why we rewrote our test runner';
+
+export const MOCK_TOPIC_LIST_ITEM: ITaxonomyListModuleItem = {
+  id: 'topic-1',
+  title: 'Engineering',
+  description: 'Posts about building things.',
+  postCountLabel: '5 posts',
+  href: '/topics/engineering',
+  posts: [
+    {
+      id: 'post-1',
+      title: MOCK_FIRST_TOPIC_POST_TITLE,
+      href: '/blog/shipping-the-new-build-pipeline',
+    },
+    {
+      id: 'post-2',
+      title: MOCK_SECOND_TOPIC_POST_TITLE,
+      href: '/blog/why-we-rewrote-our-test-runner',
+    },
+  ],
+  latestPostsLabel: 'Latest in Engineering',
+};
+
+export const MOCK_TOPICS_LIST_ITEMS: ITaxonomyListModuleItem[] = [
+  MOCK_TOPIC_LIST_ITEM,
   {
     id: 'topic-2',
     title: 'Design',
@@ -32,7 +38,7 @@ export const topicsListItems: ITaxonomyListModuleItem[] = [
   },
 ];
 
-export const tagsListItems: ITaxonomyListModuleItem[] = [
+export const MOCK_TAGS_LIST_ITEMS: ITaxonomyListModuleItem[] = [
   {
     id: 'tag-1',
     title: 'TypeScript',

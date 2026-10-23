@@ -1,4 +1,5 @@
 import { queries } from '@blog/db';
+import { okResult } from '@blog/utils';
 import type { TChangedFile } from '@platform/server/github/compare-commits';
 import { getDbMigrationJournal } from '@platform/server/github/get-db-migration-journal';
 
@@ -33,7 +34,7 @@ const countMigrationTargets = async (): Promise<TReleaseResult<number>> => {
   const tenants = await readDb(() => queries.tenants.listActiveTenants());
   if (!tenants.ok) return tenants;
 
-  return { ok: true, data: tenants.data.length + CONSOLE_PROJECT_COUNT };
+  return okResult(tenants.data.length + CONSOLE_PROJECT_COUNT);
 };
 
 const countDbMigrations = async (
@@ -41,19 +42,18 @@ const countDbMigrations = async (
   headSha: string,
 ): Promise<TReleaseResult<number>> => {
   const addedTags = listAddedDbMigrationTags(files);
-  if (addedTags.length === 0) return { ok: true, data: 0 };
+  if (addedTags.length === 0) return okResult(0);
 
   const [journal, applied] = await Promise.all([
     getDbMigrationJournal(headSha),
     readDb(() => queries.migrations.listAppliedMigrationTimestamps()),
   ]);
-  if (!journal.ok) return toReleaseFailure(journal.reason);
+  if (!journal.ok) return toReleaseFailure(journal.error);
   if (!applied.ok) return applied;
 
-  return {
-    ok: true,
-    data: countPendingDbMigrations(addedTags, journal.data, applied.data),
-  };
+  return okResult(
+    countPendingDbMigrations(addedTags, journal.data, applied.data),
+  );
 };
 
 /** A tenant whose own ledger lags further behind is not read, so `contentMigrations` is a lower bound for it. */
@@ -69,19 +69,16 @@ export const summariseReleaseMigrations = async ({
   const [targets, dbMigrations] = await Promise.all([
     contentMigrations > 0
       ? countMigrationTargets()
-      : Promise.resolve<TReleaseResult<number>>({ ok: true, data: 0 }),
+      : Promise.resolve<TReleaseResult<number>>(okResult(0)),
     countDbMigrations(files, headSha),
   ]);
   if (!targets.ok) return targets;
   if (!dbMigrations.ok) return dbMigrations;
 
-  return {
-    ok: true,
-    data: {
-      contentMigrations,
-      tenants: targets.data,
-      dbMigrations: dbMigrations.data,
-      isLowerBound: isFileListTruncated,
-    },
-  };
+  return okResult({
+    contentMigrations,
+    tenants: targets.data,
+    dbMigrations: dbMigrations.data,
+    isLowerBound: isFileListTruncated,
+  });
 };

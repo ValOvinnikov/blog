@@ -1,32 +1,36 @@
-import { makeRawNavigation } from '@blog/service/testing/global/fixtures';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  MOCK_LINKED_PAGE_CACHE_TAGS,
+  mockRawNavigation,
+} from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  mockLinkView,
+  mockRawExternalLinkDocument,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getNavigation } from './loader';
+import { navigationQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('getNavigation', () => {
+describe(getNavigation, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawNavigation());
+    mockRun.mockResolvedValue(mockRawNavigation());
   });
 
   it('throws when the navigation document does not exist', async () => {
-    mockRun.mockResolvedValue(null);
+    mockRun.mockResolvedValueOnce(null);
 
     await expect(getNavigation(tenant)).rejects.toThrow();
   });
 
   it('defaults items to an empty array when none are set', async () => {
-    mockRun.mockResolvedValue(makeRawNavigation({ items: null }));
+    mockRun.mockResolvedValueOnce(mockRawNavigation({ items: null }));
 
     const result = await getNavigation(tenant);
 
@@ -34,11 +38,11 @@ describe('getNavigation', () => {
   });
 
   it('maps raw navigation items into a domain object', async () => {
-    mockRun.mockResolvedValue(
-      makeRawNavigation({
+    mockRun.mockResolvedValueOnce(
+      mockRawNavigation({
         items: [
           {
-            link: makeRawExternalLinkDocument({
+            link: mockRawExternalLinkDocument({
               label: 'Blog',
               url: '/blog',
             }),
@@ -50,54 +54,33 @@ describe('getNavigation', () => {
     const result = await getNavigation(tenant);
 
     expect(result.items).toEqual([
-      {
-        label: 'Blog',
-        href: '/blog',
-        target: undefined,
-        platform: undefined,
-        ariaLabel: undefined,
-      },
+      mockLinkView({ label: 'Blog', href: '/blog' }),
     ]);
   });
 
-  it('leaves the language switcher toggle undefined when unset', async () => {
-    const result = await getNavigation(tenant);
+  it.each([
+    ['undefined when unset', {}, undefined],
+    ['through when set', { showLanguageSwitcher: true }, true],
+  ])(
+    'passes the language switcher toggle %s',
+    async (_, overrides, expected) => {
+      mockRun.mockResolvedValueOnce(mockRawNavigation(overrides));
 
-    expect(result.showLanguageSwitcher).toBeUndefined();
-  });
+      const result = await getNavigation(tenant);
 
-  it('passes the language switcher toggle through when set', async () => {
-    mockRun.mockResolvedValue(
-      makeRawNavigation({ showLanguageSwitcher: true }),
-    );
-
-    const result = await getNavigation(tenant);
-
-    expect(result.showLanguageSwitcher).toBe(true);
-  });
+      expect(result.showLanguageSwitcher).toBe(expected);
+    },
+  );
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     await getNavigation(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:navigation',
-            't:tenant-a:page_post',
-            't:tenant-a:page_landing',
-            't:tenant-a:page_postIndex',
-            't:tenant-a:link',
-            't:tenant-a:homePage',
-            't:tenant-a:page_topic',
-            't:tenant-a:page_topicIndex',
-            't:tenant-a:page_tag',
-            't:tenant-a:page_tagIndex',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(navigationQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [mockCacheTag('navigation'), ...MOCK_LINKED_PAGE_CACHE_TAGS],
+      },
+    });
   });
 });

@@ -1,20 +1,22 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { MOCK_PAGE_LANDING_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_ABOUT_NL_SLUG,
+  MOCK_ABOUT_SLUG,
+} from '@blog/service/testing/shared/translated-pages-dataset';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPageSlugs } from './loader';
 import { landingPageParamsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(getPageSlugs, () => {
   beforeEach(() => {
@@ -22,28 +24,28 @@ describe(getPageSlugs, () => {
   });
 
   it('returns the page_landing slug and language entries', async () => {
-    mockRun.mockResolvedValue([
-      { slug: 'about', language: EN },
-      { slug: 'over-ons', language: NL },
+    mockRun.mockResolvedValueOnce([
+      { slug: MOCK_ABOUT_SLUG, language: EN },
+      { slug: MOCK_ABOUT_NL_SLUG, language: NL },
     ]);
 
     const params = await getPageSlugs(tenant, [EN, NL]);
 
     expect(params).toEqual([
-      { slug: 'about', language: EN },
-      { slug: 'over-ons', language: NL },
+      { slug: MOCK_ABOUT_SLUG, language: EN },
+      { slug: MOCK_ABOUT_NL_SLUG, language: NL },
     ]);
   });
 
   it('drops a page whose path did not resolve', async () => {
-    mockRun.mockResolvedValue([
-      { slug: 'about', language: EN },
+    mockRun.mockResolvedValueOnce([
+      { slug: MOCK_ABOUT_SLUG, language: EN },
       { slug: null, language: EN },
     ]);
 
     const params = await getPageSlugs(tenant, [EN]);
 
-    expect(params).toEqual([{ slug: 'about', language: EN }]);
+    expect(params).toEqual([{ slug: MOCK_ABOUT_SLUG, language: EN }]);
   });
 
   it('returns an empty array when no landing pages exist', async () => {
@@ -52,25 +54,17 @@ describe(getPageSlugs, () => {
     expect(params).toEqual([]);
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+  it('queries the live languages for the tenant and scopes the tags to it', async () => {
     await getPageSlugs(tenant, [EN, NL]);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:page_landing'] }),
-      }),
-    );
-  });
-
-  it('passes the live languages to the query', async () => {
-    await getPageSlugs(tenant, [EN, NL]);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { locales: [EN, NL] } }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(landingPageParamsQuery, {
+      parameters: { locales: [EN, NL] },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_PAGE_LANDING_CACHE_TAG],
+      },
+    });
   });
 });
 
@@ -79,13 +73,13 @@ describe('landingPageParamsQuery', () => {
     {
       _id: 'a',
       _type: 'page_landing',
-      slug: { current: 'about' },
+      slug: { current: MOCK_ABOUT_SLUG },
       language: EN,
     },
     {
       _id: 'b',
       _type: 'page_landing',
-      slug: { current: 'over-ons' },
+      slug: { current: MOCK_ABOUT_NL_SLUG },
       language: NL,
     },
     {
@@ -112,8 +106,8 @@ describe('landingPageParamsQuery', () => {
 
   it('restricts to the live languages', async () => {
     expect(await run([NL, EN])).toEqual([
-      { slug: 'about', language: EN },
-      { slug: 'over-ons', language: NL },
+      { slug: MOCK_ABOUT_SLUG, language: EN },
+      { slug: MOCK_ABOUT_NL_SLUG, language: NL },
     ]);
   });
 
@@ -130,14 +124,14 @@ describe('landingPageParamsQuery', () => {
         _type: 'page_landing',
         slug: { current: 'faq' },
         language: EN,
-        parent: { _type: 'reference', _ref: 'modules' },
+        parent: mockReference('modules'),
       },
       {
         _id: 'orphan',
         _type: 'page_landing',
         slug: { current: 'orphan' },
         language: EN,
-        parent: { _type: 'reference', _ref: 'deleted' },
+        parent: mockReference('deleted'),
       },
     ];
 

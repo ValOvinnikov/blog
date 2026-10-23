@@ -1,22 +1,29 @@
 import {
-  BRAND_TAGLINE_SEPARATOR_CHARS,
   BRAND_TAGLINE_SEPARATORS,
+  SANITY_CONTENT_REVALIDATE_SECONDS,
 } from '@blog/config';
-import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
+import { mockRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  mockRawSanityImage,
+  mockSanityImageView,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getSiteSettings } from './loader';
+import { siteSettingsQuery } from './query';
+import type { TRawSiteSettings } from './transformer';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const BRAND_NAME = 'Awesome Blog';
+const BUILD_ITEM = 'build 2026.07';
+const ONLINE_ITEM = 'online';
+const LOGO_ALT = 'Logo';
+const DOT_TAGLINE = 'build 2026.07 · online';
+
+const tenant = mockTenant();
 
 function taglineItems(...texts: (string | null)[]) {
   return texts.map((text, index) => ({
@@ -25,166 +32,103 @@ function taglineItems(...texts: (string | null)[]) {
   }));
 }
 
-describe('getSiteSettings', () => {
+function mockSettingsWithBrand(
+  brand: Partial<TRawSiteSettings['brand']> = {},
+): TRawSiteSettings {
+  return mockRawSiteSettings({
+    brand: {
+      name: BRAND_NAME,
+      tagline: null,
+      logo: mockRawSanityImage(LOGO_ALT),
+      ...brand,
+    },
+  });
+}
+
+describe(getSiteSettings, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: null,
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
+    mockRun.mockResolvedValue(mockSettingsWithBrand());
   });
 
   it('throws when site settings document does not exist', async () => {
-    mockRun.mockResolvedValue(null);
+    mockRun.mockResolvedValueOnce(null);
 
     await expect(getSiteSettings(tenant)).rejects.toThrow();
   });
 
-  it('maps raw site settings into a domain object', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: {
-            items: taglineItems('build 2026.07', 'online'),
-            separator: BRAND_TAGLINE_SEPARATORS.DOT,
-          },
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
-
+  it('maps the brand name', async () => {
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.name).toBe('Awesome Blog');
-    expect(result.brand.tagline).toBe(
-      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.DOT} online`,
-    );
+    expect(result.brand.name).toBe(BRAND_NAME);
   });
 
-  it('maps a missing tagline to undefined', async () => {
-    const result = await getSiteSettings(tenant);
+  it.each([
+    { separator: BRAND_TAGLINE_SEPARATORS.DOT, tagline: DOT_TAGLINE },
+    {
+      separator: BRAND_TAGLINE_SEPARATORS.PIPE,
+      tagline: 'build 2026.07 | online',
+    },
+    {
+      separator: BRAND_TAGLINE_SEPARATORS.BULLET,
+      tagline: 'build 2026.07 • online',
+    },
+    {
+      separator: BRAND_TAGLINE_SEPARATORS.SLASH,
+      tagline: 'build 2026.07 / online',
+    },
+  ])(
+    'joins tagline items with the $separator separator',
+    async ({ separator, tagline }) => {
+      mockRun.mockResolvedValueOnce(
+        mockSettingsWithBrand({
+          tagline: { items: taglineItems(BUILD_ITEM, ONLINE_ITEM), separator },
+        }),
+      );
 
-    expect(result.brand.tagline).toBeUndefined();
-  });
+      const result = await getSiteSettings(tenant);
 
-  it('joins multiple tagline items with the mapped separator', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: {
-            items: taglineItems('build 2026.07', 'online'),
-            separator: BRAND_TAGLINE_SEPARATORS.PIPE,
-          },
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
-
-    const result = await getSiteSettings(tenant);
-
-    expect(result.brand.tagline).toBe(
-      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.PIPE} online`,
-    );
-  });
-
-  it('joins tagline items with the Bullet separator', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: {
-            items: taglineItems('build 2026.07', 'online'),
-            separator: BRAND_TAGLINE_SEPARATORS.BULLET,
-          },
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
-
-    const result = await getSiteSettings(tenant);
-
-    expect(result.brand.tagline).toBe(
-      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.BULLET} online`,
-    );
-  });
-
-  it('joins tagline items with the Slash separator', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: {
-            items: taglineItems('build 2026.07', 'online'),
-            separator: BRAND_TAGLINE_SEPARATORS.SLASH,
-          },
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
-
-    const result = await getSiteSettings(tenant);
-
-    expect(result.brand.tagline).toBe(
-      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.SLASH} online`,
-    );
-  });
+      expect(result.brand.tagline).toBe(tagline);
+    },
+  );
 
   it('joins a single tagline item with no separator character', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: {
-            items: taglineItems('online'),
-            separator: BRAND_TAGLINE_SEPARATORS.DOT,
-          },
-          logo: makeRawSanityImage('Logo'),
+    mockRun.mockResolvedValueOnce(
+      mockSettingsWithBrand({
+        tagline: {
+          items: taglineItems(ONLINE_ITEM),
+          separator: BRAND_TAGLINE_SEPARATORS.DOT,
         },
       }),
     );
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.tagline).toBe('online');
+    expect(result.brand.tagline).toBe(ONLINE_ITEM);
   });
 
   it('skips tagline items with no text in either language', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: {
-            items: taglineItems('build 2026.07', null, 'online'),
-            separator: BRAND_TAGLINE_SEPARATORS.DOT,
-          },
-          logo: makeRawSanityImage('Logo'),
+    mockRun.mockResolvedValueOnce(
+      mockSettingsWithBrand({
+        tagline: {
+          items: taglineItems(BUILD_ITEM, null, ONLINE_ITEM),
+          separator: BRAND_TAGLINE_SEPARATORS.DOT,
         },
       }),
     );
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.tagline).toBe(
-      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.DOT} online`,
-    );
+    expect(result.brand.tagline).toBe(DOT_TAGLINE);
   });
 
-  it('maps an empty tagline items list to undefined', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: { items: [], separator: BRAND_TAGLINE_SEPARATORS.DOT },
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
+  it.each([
+    ['a missing tagline', null],
+    [
+      'an empty tagline items list',
+      { items: [], separator: BRAND_TAGLINE_SEPARATORS.DOT },
+    ],
+  ])('maps %s to undefined', async (_, tagline) => {
+    mockRun.mockResolvedValueOnce(mockSettingsWithBrand({ tagline }));
 
     const result = await getSiteSettings(tenant);
 
@@ -192,15 +136,7 @@ describe('getSiteSettings', () => {
   });
 
   it('leaves logo undefined when no logo is uploaded', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: null,
-          logo: null,
-        },
-      }),
-    );
+    mockRun.mockResolvedValueOnce(mockSettingsWithBrand({ logo: null }));
 
     const result = await getSiteSettings(tenant);
 
@@ -210,13 +146,11 @@ describe('getSiteSettings', () => {
   it('maps an uploaded logo to an image view-model', async () => {
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.logo).toEqual(
-      expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
-    );
+    expect(result.brand.logo).toEqual(mockSanityImageView(LOGO_ALT));
   });
 
   it('returns the currency code', async () => {
-    mockRun.mockResolvedValue(makeRawSiteSettings({ currency: 'EUR' }));
+    mockRun.mockResolvedValueOnce(mockRawSiteSettings({ currency: 'EUR' }));
 
     const result = await getSiteSettings(tenant);
 
@@ -224,16 +158,14 @@ describe('getSiteSettings', () => {
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue(makeRawSiteSettings());
-
     await getSiteSettings(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(siteSettingsQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [mockCacheTag('site-settings')],
+      },
+    });
   });
 });

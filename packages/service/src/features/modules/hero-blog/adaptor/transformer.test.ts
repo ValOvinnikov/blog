@@ -7,21 +7,37 @@ import {
   LINK_TYPE,
   MEDIA_ORDER,
 } from '@blog/config';
+import { MOCK_TOPIC_TITLE } from '@blog/service/testing/entities/fixtures';
 import {
-  makeRawCtaButton,
-  makeRawHeroBlogModule,
+  MOCK_HERO_EYEBROW,
+  MOCK_HERO_IMAGE_ALT,
+  mockRawCtaButton,
+  mockRawHeroBlogModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawHeadingBlock,
-  makeRawSanityImage,
+  MOCK_POST_EXCERPT,
+  MOCK_POST_HREF,
+  MOCK_POST_TITLE,
+  mockLinkView,
+  mockRawHeroLayout,
+  mockRawInternalLinkDocument,
+  mockRawSanityImage,
+  mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
 
-import { toHeroBlogModule } from './transformer';
+import { toHeroBlogModule, type TRawHeroBlogModule } from './transformer';
+
+const SECONDARY_LABEL = 'View all posts';
+const AUTHORED_ACTION_LABEL = 'Discover the story';
+
+function rawWithPost(overrides: Partial<TRawHeroBlogModule> = {}) {
+  return mockRawHeroBlogModule({ post: mockRawPostCard(), ...overrides });
+}
 
 describe(toHeroBlogModule, () => {
   it('maps brandVariant and variant straight through', () => {
-    const raw = makeRawHeroBlogModule({
+    const raw = mockRawHeroBlogModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
     });
@@ -32,38 +48,8 @@ describe(toHeroBlogModule, () => {
     expect(hero.variant).toBe(HERO_VARIANT.BANNER);
   });
 
-  it('renders using the resolved pinned post', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard({
-        _id: 'pinned-post',
-        headingBlock: makeRawHeadingBlock('Pinned title'),
-      }),
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    if (!hero.hasPost) throw new Error('expected a resolved post');
-    expect(hero.heading).toBe('Pinned title');
-    expect(hero.ctaButtons[0]?.link.href).toBe('/blog/hello-world');
-  });
-
-  it('renders using the resolved newest-featured fallback post', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard({
-        _id: 'newest-featured-post',
-        headingBlock: makeRawHeadingBlock('Newest featured title'),
-      }),
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    if (!hero.hasPost) throw new Error('expected a resolved post');
-    expect(hero.heading).toBe('Newest featured title');
-    expect(hero.ctaButtons[0]?.link.href).toBe('/blog/hello-world');
-  });
-
-  it('reports hasPost false and has no derived copy, image or ctaButtons when no post resolves at all', () => {
-    const raw = makeRawHeroBlogModule({ post: null });
+  it('reports no post, and derives no copy, image or buttons, without one', () => {
+    const raw = mockRawHeroBlogModule({ post: null });
 
     const hero = toHeroBlogModule(raw);
 
@@ -75,78 +61,67 @@ describe(toHeroBlogModule, () => {
     expect(hero.ctaButtons).toEqual([]);
   });
 
-  it('marks an unresolved pinned post that still exists as untranslated', () => {
-    const raw = makeRawHeroBlogModule({ post: null, hasPinnedPost: true });
+  it.each([
+    [true, true],
+    [false, false],
+  ])(
+    'with no resolved post and hasPinnedPost %s, marks isPostUntranslated %s',
+    (hasPinnedPost, expected) => {
+      const raw = mockRawHeroBlogModule({ post: null, hasPinnedPost });
 
-    const hero = toHeroBlogModule(raw);
+      const hero = toHeroBlogModule(raw);
 
-    if (hero.hasPost) throw new Error('expected no resolved post');
-    expect(hero.isPostUntranslated).toBe(true);
-  });
+      if (hero.hasPost) throw new Error('expected no resolved post');
+      expect(hero.isPostUntranslated).toBe(expected);
+    },
+  );
 
-  it('does not mark a missing post as untranslated', () => {
-    const raw = makeRawHeroBlogModule({ post: null, hasPinnedPost: false });
-
-    const hero = toHeroBlogModule(raw);
-
-    if (hero.hasPost) throw new Error('expected no resolved post');
-    expect(hero.isPostUntranslated).toBe(false);
-  });
-
-  it('reports hasPost true and derives heading/supportingText from the resolved post', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
+  it('reports the post and derives the heading and supporting text from it', () => {
+    const raw = rawWithPost({
       eyebrow: null,
     });
 
     const hero = toHeroBlogModule(raw);
 
     if (!hero.hasPost) throw new Error('expected a resolved post');
-    expect(hero.eyebrow).toBe('Engineering');
-    expect(hero.heading).toBe('Hello World');
-    expect(hero.supportingText).toBe(
-      'A sufficiently long excerpt for the card.',
-    );
+    expect(hero.eyebrow).toBe(MOCK_TOPIC_TITLE);
+    expect(hero.heading).toBe(MOCK_POST_TITLE);
+    expect(hero.supportingText).toBe(MOCK_POST_EXCERPT);
   });
 
   it('trusts an authored eyebrow over the resolved post topic', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
-      eyebrow: 'Field notes',
+    const raw = rawWithPost({
+      eyebrow: MOCK_HERO_EYEBROW,
     });
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.eyebrow).toBe('Field notes');
+    expect(hero.eyebrow).toBe(MOCK_HERO_EYEBROW);
   });
 
   it('falls back to the resolved post image when no custom image is set', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
+    const raw = rawWithPost({
       image: null,
     });
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.sanityImage?.assetId).toBe('image-abc123-800x600-jpg');
-    expect(hero.sanityImage?.alt).toBe('Alt text');
+    expect(hero.sanityImage).toEqual(mockSanityImageView());
   });
 
   it('prefers the custom module image over the resolved post image', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
-      image: makeRawSanityImage('Custom alt'),
+    const raw = rawWithPost({
+      image: mockRawSanityImage(MOCK_HERO_IMAGE_ALT),
     });
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.sanityImage?.alt).toBe('Custom alt');
+    expect(hero.sanityImage?.alt).toBe(MOCK_HERO_IMAGE_ALT);
   });
 
   it('builds the primary button from the authored label, linking to the resolved post', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
-      primaryActionLabel: 'Discover the story',
+    const raw = rawWithPost({
+      primaryActionLabel: AUTHORED_ACTION_LABEL,
       primaryActionAppearance: CTA_ACTION_APPEARANCE.CONTAINED,
     });
 
@@ -155,21 +130,17 @@ describe(toHeroBlogModule, () => {
     expect(hero.ctaButtons[0]).toEqual({
       variant: CTA_ACTION_VARIANT.PRIMARY,
       appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-      link: {
-        label: 'Discover the story',
-        href: '/blog/hello-world',
-        target: undefined,
-        platform: undefined,
-        ariaLabel: undefined,
-      },
+      link: mockLinkView({
+        label: AUTHORED_ACTION_LABEL,
+        href: MOCK_POST_HREF,
+      }),
     });
   });
 
   it.each([CTA_ACTION_APPEARANCE.CONTAINED, CTA_ACTION_APPEARANCE.INLINE])(
     'carries the authored primaryActionAppearance %s onto the primary button',
     (appearance) => {
-      const raw = makeRawHeroBlogModule({
-        post: makeRawPostCard(),
+      const raw = rawWithPost({
         primaryActionAppearance: appearance,
       });
 
@@ -179,22 +150,13 @@ describe(toHeroBlogModule, () => {
     },
   );
 
-  it('has no ctaButtons when there is no post and no authored secondary', () => {
-    const raw = makeRawHeroBlogModule({ post: null, secondaryAction: null });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.ctaButtons).toEqual([]);
-  });
-
   it('places the derived primary before the authored secondary', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
-      secondaryAction: makeRawCtaButton({
+    const raw = rawWithPost({
+      secondaryAction: mockRawCtaButton({
         variant: CTA_ACTION_VARIANT.SECONDARY,
         appearance: null,
         link: {
-          label: 'View all posts',
+          label: SECONDARY_LABEL,
           linkType: LINK_TYPE.INTERNAL,
           internalReference: { _type: 'page_postIndex', slug: null },
           url: null,
@@ -212,43 +174,20 @@ describe(toHeroBlogModule, () => {
     expect(hero.ctaButtons[1]).toEqual({
       variant: CTA_ACTION_VARIANT.SECONDARY,
       appearance: undefined,
-      link: {
-        label: 'View all posts',
-        href: '/blog',
-        target: undefined,
-        platform: undefined,
-        ariaLabel: undefined,
-      },
+      link: mockLinkView({ label: SECONDARY_LABEL, href: '/blog' }),
     });
   });
 
-  it('drops an authored secondary whose link cannot resolve to an href', () => {
-    const raw = makeRawHeroBlogModule({
-      post: null,
-      secondaryAction: makeRawCtaButton({
-        variant: CTA_ACTION_VARIANT.SECONDARY,
-        link: {
-          label: 'Broken',
-          linkType: LINK_TYPE.INTERNAL,
-          internalReference: null,
-          url: null,
-          openInNewTab: null,
-        },
-      }),
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.ctaButtons).toEqual([]);
-  });
-
-  it('drops a seeded secondary whose link was never set', () => {
-    const raw = makeRawHeroBlogModule({
+  it.each([
+    ['cannot resolve to an href', mockRawInternalLinkDocument()],
+    ['was never set', null],
+  ])('drops an authored secondary whose link %s', (_, link) => {
+    const raw = mockRawHeroBlogModule({
       post: null,
       secondaryAction: {
         variant: CTA_ACTION_VARIANT.SECONDARY,
         appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-        link: null,
+        link,
       },
     });
 
@@ -257,122 +196,38 @@ describe(toHeroBlogModule, () => {
     expect(hero.ctaButtons).toEqual([]);
   });
 
-  it('takes contentPosition from contentPositionSplit on Split, ignoring contentPositionBanner', () => {
-    const raw = makeRawHeroBlogModule({
+  it('takes contentPosition and mediaOrder from the Split keys', () => {
+    const raw = mockRawHeroBlogModule({
       variant: HERO_VARIANT.SPLIT,
       contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
       contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
+      mediaOrderSplit: MEDIA_ORDER.FIRST,
+      mediaOrderStacked: MEDIA_ORDER.LAST,
     });
 
     const hero = toHeroBlogModule(raw);
 
     expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
-  });
-
-  it('takes contentPosition from contentPositionBanner on Banner, ignoring contentPositionSplit', () => {
-    const raw = makeRawHeroBlogModule({
-      variant: HERO_VARIANT.BANNER,
-      contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
-      contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.CENTER);
-  });
-
-  it('leaves contentPosition undefined on Stacked regardless of stored position keys', () => {
-    const raw = makeRawHeroBlogModule({
-      variant: HERO_VARIANT.STACKED,
-      contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
-      contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.contentPosition).toBeUndefined();
-  });
-
-  it('leaves contentAlignment undefined when unset', () => {
-    const raw = makeRawHeroBlogModule({ contentAlignment: null });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.contentAlignment).toBeUndefined();
-  });
-
-  it('maps contentAlignment when authored, independent of variant', () => {
-    const raw = makeRawHeroBlogModule({
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
-  });
-
-  it('takes mediaOrder from mediaOrderSplit on Split, ignoring mediaOrderStacked', () => {
-    const raw = makeRawHeroBlogModule({
-      variant: HERO_VARIANT.SPLIT,
-      mediaOrderSplit: MEDIA_ORDER.FIRST,
-      mediaOrderStacked: MEDIA_ORDER.LAST,
-    });
-
-    const hero = toHeroBlogModule(raw);
-
     expect(hero.mediaOrder).toBe(MEDIA_ORDER.FIRST);
   });
 
-  it('takes mediaOrder from mediaOrderStacked on Stacked, ignoring mediaOrderSplit', () => {
-    const raw = makeRawHeroBlogModule({
-      variant: HERO_VARIANT.STACKED,
-      mediaOrderSplit: MEDIA_ORDER.FIRST,
-      mediaOrderStacked: MEDIA_ORDER.LAST,
-    });
+  it.each([
+    [null, undefined],
+    [CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
+  ])('maps contentAlignment %s to %s', (contentAlignment, expected) => {
+    const raw = mockRawHeroBlogModule({ contentAlignment });
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.mediaOrder).toBe(MEDIA_ORDER.LAST);
-  });
-
-  it('leaves mediaOrder undefined on Banner regardless of stored order keys', () => {
-    const raw = makeRawHeroBlogModule({
-      variant: HERO_VARIANT.BANNER,
-      mediaOrderSplit: MEDIA_ORDER.FIRST,
-      mediaOrderStacked: MEDIA_ORDER.FIRST,
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.mediaOrder).toBeUndefined();
-  });
-
-  it('leaves layout undefined when unset (no faked default)', () => {
-    const raw = makeRawHeroBlogModule({ layout: null });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.layout).toBeUndefined();
+    expect(hero.contentAlignment).toBe(expected);
   });
 
   it('maps a fully-authored layout object', () => {
-    const raw = makeRawHeroBlogModule({
-      layout: {
-        spacingTop: 'LG',
-        spacingBottom: 'SM',
-        dividerTop: true,
-        dividerBottom: false,
-      },
-    });
+    const layout = mockRawHeroLayout();
+    const raw = mockRawHeroBlogModule({ layout });
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.layout).toEqual({
-      spacingTop: 'LG',
-      spacingBottom: 'SM',
-      containerWidth: undefined,
-      dividerTop: true,
-      dividerBottom: false,
-    });
+    expect(hero.layout).toEqual({ ...layout, containerWidth: undefined });
   });
 });

@@ -1,12 +1,15 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
   isReleaseVersionGreater,
   parseReleaseVersion,
 } from '@blog/utils/version';
+import type { TGitHubFailure } from '@platform/constants/github';
+import { RELEASE_FAILURE } from '@platform/constants/release';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
-import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
+import { fetchGitHubJson } from './fetch-github';
 
 const TAG_REF_PREFIX = 'refs/tags/';
 
@@ -16,14 +19,14 @@ const MAX_TAG_PAGES = 10;
 
 const tagRefsSchema = z.array(z.object({ ref: z.string() }));
 
-type TTagListIncomplete = { ok: false; reason: 'tagListIncomplete' };
-
-/** A list still full at the page cap is `tagListIncomplete`, never a read of a different latest tag. */
-export type TLatestReleaseTagResult =
-  TGitHubResult<TMaybeUndefined<string>> | TTagListIncomplete;
+/** A list still full at the page cap is `TAG_LIST_INCOMPLETE`, never a read of a different latest tag. */
+export type TLatestReleaseTagResult = TResult<
+  TMaybeUndefined<string>,
+  TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE
+>;
 
 const listReleaseTagRefs = async (): Promise<
-  TGitHubResult<string[]> | TTagListIncomplete
+  TResult<string[], TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE>
 > => {
   const refs: string[] = [];
 
@@ -35,11 +38,11 @@ const listReleaseTagRefs = async (): Promise<
     if (!result.ok) return result;
 
     refs.push(...result.data);
-    if (result.data.length < TAG_PAGE_SIZE) return { ok: true, data: refs };
+    if (result.data.length < TAG_PAGE_SIZE) return okResult(refs);
   }
 
   logger.warn('github.tag_list_incomplete', { pageCap: MAX_TAG_PAGES });
-  return { ok: false, reason: 'tagListIncomplete' };
+  return errorResult(RELEASE_FAILURE.TAG_LIST_INCOMPLETE);
 };
 
 export const getLatestReleaseTag =
@@ -56,5 +59,5 @@ export const getLatestReleaseTag =
         undefined,
       );
 
-    return { ok: true, data: latest };
+    return okResult(latest);
   };

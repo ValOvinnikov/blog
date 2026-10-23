@@ -1,25 +1,20 @@
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  mockRawSanityImage,
+  mockSanityImageView,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toSanityImage } from './to-sanity-image';
 
-describe('toSanityImage', () => {
+describe(toSanityImage, () => {
   it('maps all fields from raw input', () => {
-    const raw = makeRawSanityImage();
-    const result = toSanityImage(raw);
+    const result = toSanityImage(mockRawSanityImage());
 
-    expect(result).toEqual({
-      assetId: 'image-abc123-800x600-jpg',
-      alt: 'Alt text',
-      hotspot: undefined,
-      crop: undefined,
-      lqip: 'data:image/png;base64,abc123',
-      dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-    });
+    expect(result).toEqual(mockSanityImageView());
   });
 
   it('maps hotspot and crop when present', () => {
     const raw = {
-      ...makeRawSanityImage(),
+      ...mockRawSanityImage(),
       hotspot: {
         _type: 'sanity.imageHotspot' as const,
         x: 0.5,
@@ -52,11 +47,15 @@ describe('toSanityImage', () => {
     });
   });
 
+  it('maps a missing alt text to an empty string', () => {
+    const result = toSanityImage({ ...mockRawSanityImage(), alt: null });
+
+    expect(result?.alt).toBe('');
+  });
+
   it('returns undefined lqip and dimensions when metadata is absent', () => {
-    const raw = {
-      ...makeRawSanityImage(),
-      asset: { _id: 'image-abc123-800x600-jpg', metadata: null },
-    };
+    const image = mockRawSanityImage();
+    const raw = { ...image, asset: { ...image.asset, metadata: null } };
 
     const result = toSanityImage(raw);
 
@@ -64,16 +63,16 @@ describe('toSanityImage', () => {
     expect(result?.dimensions).toBeUndefined();
   });
 
-  it('returns undefined for null', () => {
-    expect(toSanityImage(null)).toBeUndefined();
-  });
+  it.each([
+    { input: 'null', raw: null },
+    { input: 'undefined', raw: undefined },
+    {
+      input: 'an image with no asset',
+      raw: { ...mockRawSanityImage(), asset: null },
+    },
+  ])('returns undefined for $input', ({ raw }) => {
+    const result = toSanityImage(raw);
 
-  it('returns undefined for undefined', () => {
-    expect(toSanityImage(undefined)).toBeUndefined();
-  });
-
-  it('returns undefined when asset is absent', () => {
-    const raw = { ...makeRawSanityImage(), asset: null };
-    expect(toSanityImage(raw)).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 });

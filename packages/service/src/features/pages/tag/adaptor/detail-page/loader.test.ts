@@ -1,151 +1,125 @@
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import {
-  makeRawHeadingBlock,
-  makeRawSeo,
+  MOCK_TAG_SLUG,
+  MOCK_TAG_TITLE,
+  mockRawTag,
+} from '@blog/service/testing/entities/fixtures';
+import { mockRun } from '@blog/service/testing/mock-run-query';
+import {
+  MOCK_CURATED_SUPPORTING_TEXT,
+  MOCK_TAG_PAGE_DESCRIPTION,
+  mockHeroSlotView,
+  mockRawCtaRef,
+  mockRawHeroRef,
+  mockRawTagPage,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_PAGE_TAG_CACHE_TAG,
+  MOCK_TAG_CACHE_TAG,
+  MOCK_TEMPLATE_TAG_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  mockRawHeadingBlock,
+  mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getTagPageDocument } from './loader';
+import { tagPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const CURATED_HEADING = 'TypeScript, curated';
+const ENTITY = { ...mockRawTag(), description: MOCK_TAG_PAGE_DESCRIPTION };
 
-describe('getTagPageDocument', () => {
+const tenant = mockTenant();
+
+async function loadPage(overrides: Parameters<typeof mockRawTagPage>[0] = {}) {
+  mockRun.mockResolvedValueOnce(mockRawTagPage(overrides));
+  const result = await getTagPageDocument(MOCK_TAG_SLUG, tenant);
+  if (!result) throw new Error('expected a tag page');
+
+  return result;
+}
+
+describe(getTagPageDocument, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawTagPage());
+    mockRun.mockResolvedValue(mockRawTagPage());
   });
 
   it('loads a tag page with no list module in modules[]', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagPage({ modules: [] }));
+    mockRun.mockResolvedValueOnce(mockRawTagPage({ modules: [] }));
 
-    const result = await getTagPageDocument('typescript', tenant);
+    const result = await getTagPageDocument(MOCK_TAG_SLUG, tenant);
 
     expect(result).toBeDefined();
   });
 
-  it('takes the heading/supporting text from the referenced tag, not page_tag.title', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({
-        tag: {
-          _id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'Posts about TypeScript.',
-        },
-      }),
-    );
-
-    const result = await getTagPageDocument('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
+  it('takes the tag from the referenced tag document', async () => {
+    const result = await loadPage({ tag: ENTITY });
 
     expect(result.tag).toEqual({
-      id: 'tag-1',
-      title: 'TypeScript',
-      slug: 'typescript',
-      description: 'Posts about TypeScript.',
+      id: ENTITY._id,
+      title: MOCK_TAG_TITLE,
+      slug: MOCK_TAG_SLUG,
+      description: MOCK_TAG_PAGE_DESCRIPTION,
     });
   });
 
-  it('resolves seo from the authored value, with no fallback for an unauthored description', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({
-        seo: makeRawSeo({ metaTitle: 'TypeScript', metaDescription: null }),
-      }),
-    );
+  it('resolves seo from the authored value, with no unauthored description fallback', async () => {
+    const { seo } = await loadPage({
+      seo: mockRawSeo({ metaTitle: MOCK_TAG_TITLE, metaDescription: null }),
+    });
 
-    const result = await getTagPageDocument('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(result.seo.title).toBe('TypeScript');
-    expect(result.seo.description).toBeUndefined();
+    expect(seo.title).toBe(MOCK_TAG_TITLE);
+    expect(seo.description).toBeUndefined();
   });
 
-  it('maps the authored headingBlock straight through', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({
-        headingBlock: makeRawHeadingBlock('TypeScript, curated', {
-          supportingText: 'Hand-picked reads.',
-        }),
-      }),
-    );
+  it.each([
+    [
+      'maps the authored headingBlock straight through',
+      MOCK_CURATED_SUPPORTING_TEXT,
+      MOCK_CURATED_SUPPORTING_TEXT,
+    ],
+    [
+      'leaves an unset supportingText undefined, never the tag description',
+      null,
+      undefined,
+    ],
+  ])('%s', async (_, supportingText, expected) => {
+    const { headingBlock } = await loadPage({
+      tag: ENTITY,
+      headingBlock: mockRawHeadingBlock(CURATED_HEADING, { supportingText }),
+    });
 
-    const result = await getTagPageDocument('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'TypeScript, curated',
-      supportingText: 'Hand-picked reads.',
+    expect(headingBlock).toEqual({
+      heading: CURATED_HEADING,
+      supportingText: expected,
     });
   });
 
-  it('leaves supportingText undefined for an unset value, never falling back to the tag description', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({
-        tag: {
-          _id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'Posts about TypeScript.',
-        },
-        headingBlock: makeRawHeadingBlock('TypeScript, curated'),
-      }),
-    );
+  it.each([
+    ['leaves hero undefined when page_tag.hero is unset', null, undefined],
+    [
+      'maps a set page_tag.hero to a hero slot',
+      mockRawHeroRef(),
+      mockHeroSlotView(),
+    ],
+  ])('%s', async (_, hero, expected) => {
+    const result = await loadPage({ hero });
 
-    const result = await getTagPageDocument('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'TypeScript, curated',
-      supportingText: undefined,
-    });
-  });
-
-  it('leaves hero undefined when page_tag.hero is unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagPage({ hero: null }));
-
-    const result = await getTagPageDocument('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(result.hero).toBeUndefined();
-  });
-
-  it('maps a set page_tag.hero to a hero slot', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({ hero: { _id: 'hero-1', _type: 'module_heroBlog' } }),
-    );
-
-    const result = await getTagPageDocument('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
+    expect(result.hero).toEqual(expected);
   });
 
   it('rejects when page_tag.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawTagPage({ hero: { _id: 'cta-1', _type: 'module_cta' as never } }),
+      mockRawTagPage({ hero: mockRawCtaRef() as never }),
     );
 
-    await expect(getTagPageDocument('typescript', tenant)).rejects.toThrow();
+    await expect(getTagPageDocument(MOCK_TAG_SLUG, tenant)).rejects.toThrow();
   });
 
-  it('passes the slug as a query parameter', async () => {
-    await getTagPageDocument('typescript', tenant);
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ parameters: { slug: 'typescript' } }),
-    );
-  });
-
-  it('resolves undefined, rather than rejecting, when no page_tag matches the slug', async () => {
+  it('resolves undefined when no page_tag matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const result = await getTagPageDocument('nonexistent', tenant);
@@ -153,21 +127,20 @@ describe('getTagPageDocument', () => {
     expect(result).toBeUndefined();
   });
 
-  it('threads tenant context into the query and scopes its tags to it', async () => {
-    await getTagPageDocument('typescript', tenant);
+  it('queries the slug for the tenant and scopes its tags to it', async () => {
+    await getTagPageDocument(MOCK_TAG_SLUG, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:page_tag',
-            't:tenant-a:template_tag',
-            't:tenant-a:tag',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(tagPageQuery, {
+      parameters: { slug: MOCK_TAG_SLUG },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_PAGE_TAG_CACHE_TAG,
+          MOCK_TEMPLATE_TAG_CACHE_TAG,
+          MOCK_TAG_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

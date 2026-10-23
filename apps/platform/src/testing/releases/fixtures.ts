@@ -7,13 +7,15 @@ import type { TComparedCommit } from '@platform/server/github/compare-commits';
 import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 
+const RELEASE_AT = '2026-04-02T10:00:00.000Z';
+
 export const makeComparedCommit = (
   overrides: Partial<TComparedCommit> = {},
 ): TComparedCommit => ({
   sha: 'abcdef0123456789abcdef0123456789abcdef01',
   message: 'feat(web): add a thing\n\nLonger body',
   authorName: 'Jane Doe',
-  authoredAt: '2026-04-02T10:00:00.000Z',
+  authoredAt: RELEASE_AT,
   ...overrides,
 });
 
@@ -41,13 +43,16 @@ export const makeReleaseCandidate = (
   ...overrides,
 });
 
+export const MOCK_RELEASE_RUN_URL =
+  'https://github.com/acme/blog/actions/runs/42';
+
 export const makeReleaseRun = (
   overrides: Partial<TReleaseRun> = {},
 ): TReleaseRun => ({
   status: RELEASE_RUN_STATUS.SUCCEEDED,
   title: 'Release v1.4.0',
-  url: 'https://github.com/acme/blog/actions/runs/42',
-  createdAt: '2026-04-02T10:00:00.000Z',
+  url: MOCK_RELEASE_RUN_URL,
+  createdAt: RELEASE_AT,
   isTenantMigrationFailed: false,
   ...overrides,
 });

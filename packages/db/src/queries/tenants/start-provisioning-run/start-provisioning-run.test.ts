@@ -1,7 +1,20 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import {
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_IDLE_PROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+  MOCK_PROVISIONING_REGISTRY,
+  MOCK_RERUN_AT,
+  MOCK_RUN_AT,
+  MOCK_WORKFLOW_RUN_URL,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { startProvisioningRun } from './start-provisioning-run';
 
@@ -11,11 +24,11 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const NOW = '2026-09-02T12:00:00.000Z';
+const DONE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date(NOW));
+  vi.setSystemTime(new Date(MOCK_RUN_AT));
 });
 
 afterEach(async () => {
@@ -32,68 +45,65 @@ describe(startProvisioningRun, () => {
     });
 
     it('writes startedAt, registry, and workflowRunUrl when all are supplied', async () => {
-      const result = await startProvisioningRun({
-        tenantId: tenant.id,
-        registry: 'production',
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
-      });
+      const { provisioningSteps } = unwrapOk(
+        await startProvisioningRun({
+          tenantId: tenant.id,
+          registry: MOCK_PROVISIONING_REGISTRY,
+          workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
+        }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.provisioningSteps?.run).toEqual({
-        startedAt: NOW,
-        registry: 'production',
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      expect(provisioningSteps?.run).toEqual({
+        startedAt: MOCK_RUN_AT,
+        registry: MOCK_PROVISIONING_REGISTRY,
+        workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
       });
     });
 
     it('omits registry and workflowRunUrl entirely when not supplied', async () => {
-      const result = await startProvisioningRun({ tenantId: tenant.id });
+      const { provisioningSteps } = unwrapOk(
+        await startProvisioningRun({ tenantId: tenant.id }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.provisioningSteps?.run).toEqual({ startedAt: NOW });
+      expect(provisioningSteps?.run).toEqual({ startedAt: MOCK_RUN_AT });
     });
 
     it('replaces a previous run wholesale rather than merging', async () => {
       await startProvisioningRun({
         tenantId: tenant.id,
-        registry: 'development',
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/1',
+        registry: MOCK_PROVISIONING_REGISTRY,
+        workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
       });
 
-      vi.setSystemTime(new Date('2026-09-02T13:00:00.000Z'));
-      const result = await startProvisioningRun({ tenantId: tenant.id });
+      vi.setSystemTime(new Date(MOCK_RERUN_AT));
+      const { provisioningSteps } = unwrapOk(
+        await startProvisioningRun({ tenantId: tenant.id }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.provisioningSteps?.run).toEqual({
-        startedAt: '2026-09-02T13:00:00.000Z',
-      });
+      expect(provisioningSteps?.run).toEqual({ startedAt: MOCK_RERUN_AT });
     });
   });
 
   it('leaves every step entry untouched', async () => {
     const tenant = await insertTestTenant(db(), {
       provisioningSteps: {
-        SANITY_PROJECT: { status: 'DONE' },
-        SEED_CONTENT: { status: 'IDLE' },
-        PERSIST_TOKEN: { status: 'IDLE' },
-        MAP_DOMAIN: { status: 'IDLE' },
-        CREATE_WEBHOOK: { status: 'IDLE' },
-        VERIFY_CONTENT: { status: 'IDLE' },
-        OWNER_ELEVATION: { status: 'IDLE' },
+        ...MOCK_IDLE_PROVISIONING_STEPS,
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
       },
     });
 
-    const result = await startProvisioningRun({ tenantId: tenant.id });
+    const { provisioningSteps } = unwrapOk(
+      await startProvisioningRun({ tenantId: tenant.id }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.SANITY_PROJECT).toEqual({
-      status: 'DONE',
-    });
+    expect(
+      provisioningSteps?.[TENANT_PROVISIONING_STEP.SANITY_PROJECT],
+    ).toEqual(DONE_STEP);
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await startProvisioningRun({
-      tenantId: '00000000-0000-0000-0000-000000000000',
+      tenantId: MOCK_MISSING_TENANT_ID,
     });
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });

@@ -8,7 +8,7 @@ import {
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq, isNull, ne, or, sql } from 'drizzle-orm';
 
 export type TBeginTenantProvisioningResult = {
@@ -31,7 +31,7 @@ export async function beginTenantProvisioning(
     .where(eq(tenants.id, tenantId));
 
   if (!existing) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
   const now = new Date().toISOString();
@@ -103,11 +103,11 @@ export async function beginTenantProvisioning(
     .returning();
 
   if (!tenant) {
-    return { ok: false, error: ERROR_CODE.DB_ALREADY_PROVISIONING };
+    return errorResult(ERROR_CODE.DB_ALREADY_PROVISIONING);
   }
 
-  return {
-    ok: true,
-    data: { tenant, previousProvisioningStatus: existing.provisioningStatus },
-  };
+  return okResult({
+    tenant,
+    previousProvisioningStatus: existing.provisioningStatus,
+  });
 }

@@ -1,9 +1,23 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { ClientError } from '@sanity/client';
-import { makeTenant } from '@worker/testing/tenant/fixtures';
-import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import {
+  MOCK_PROVISION_ENV,
+  MOCK_REVALIDATE_WEBHOOK_URL,
+} from '@worker/testing/provision-env/fake-provision-env';
+import { mockSanityGrantError } from '@worker/testing/sanity-client-error/fixtures';
+import {
+  MOCK_ENCRYPTED_TOKEN,
+  MOCK_SANITY_DATASET,
+  MOCK_SANITY_PROJECT_ID,
+  MOCK_SANITY_READ_TOKEN,
+  MOCK_TENANT_DOMAIN,
+  mockProvisionedTenant,
+} from '@worker/testing/tenant/fixtures';
+import {
+  MOCK_OTHER_WEBHOOK_ID,
+  MOCK_OTHER_WEBHOOK_URL,
+  MOCK_WEBHOOK_ID,
+} from '@worker/testing/webhook/fixtures';
 import type { Mock } from 'vitest';
 
 import {
@@ -19,29 +33,12 @@ vi.mock('@blog/db/queries/tenants', () => ({
   getTenantSanityCredentials: getTenantSanityCredentialsMock,
 }));
 
-const MANAGEMENT_TOKEN = 'mgmt-token';
-const TENANT_DOMAIN = 'acme.example.com';
-
-const env: TProvisionEnv = {
-  sanityManagementToken: MANAGEMENT_TOKEN,
-  sanityOrganizationId: 'org-abc',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  adminAppBaseUrl: 'https://admin.example.com',
-  tenantSanityDataset: 'test-dataset',
-  webAppBaseUrl: 'https://example.com',
-  revalidateSecret: 'revalidate-shh',
-};
-
-const REVALIDATE_WEBHOOK_URL = 'https://example.com/api/revalidate';
+const { sanityManagementToken, vercelToken, vercelWebProjectId } =
+  MOCK_PROVISION_ENV;
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return makeTenant({
-    primaryDomain: TENANT_DOMAIN,
-    sanityProjectId: 'proj123',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'encrypted-token',
+  return mockProvisionedTenant({
+    sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
     provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     seededAt: new Date(),
     ...overrides,
@@ -49,9 +46,9 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 }
 
 const baseCredentials = {
-  projectId: 'proj123',
-  dataset: 'production',
-  token: 'sk-read',
+  projectId: MOCK_SANITY_PROJECT_ID,
+  dataset: MOCK_SANITY_DATASET,
+  token: MOCK_SANITY_READ_TOKEN,
   status: TENANT_STATUS.ACTIVE,
   deprovisionedAt: null,
   provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -74,6 +71,11 @@ function createClientStub(fetch: ReturnType<typeof vi.fn>) {
   };
 }
 
+const REQUIRED_TYPES = [
+  'settings_site',
+  'settings_navigation',
+  'settings_footer',
+];
 const VALID_NAVIGATION_ITEMS = [{ resolved: true }];
 
 function createClientStubResolving(
@@ -96,32 +98,20 @@ function createClientStubResolving(
   );
 }
 
-function grantError(): ClientError {
-  return new ClientError({
-    statusCode: HTTP_STATUS.FORBIDDEN,
-    headers: {},
-    body: { message: 'Forbidden' },
-    url: 'https://api.sanity.io/v2024-01-01/data/query/production',
-    method: HTTP_METHOD.GET,
-  });
-}
-
 function baseDeps(
   overrides: Partial<TVerifyTenantSeededContentDeps> = {},
 ): TVerifyTenantSeededContentDeps {
-  const { createClient } = createClientStubResolving([
-    'settings_site',
-    'settings_navigation',
-    'settings_footer',
-  ]);
+  const { createClient } = createClientStubResolving(REQUIRED_TYPES);
 
   return {
     createClient,
     getCredentials: getTenantSanityCredentialsMock,
     listWebhooks: vi
       .fn()
-      .mockResolvedValue([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]),
-    listDomains: vi.fn().mockResolvedValue([{ name: TENANT_DOMAIN }]),
+      .mockResolvedValue([
+        { id: MOCK_WEBHOOK_ID, url: MOCK_REVALIDATE_WEBHOOK_URL },
+      ]),
+    listDomains: vi.fn().mockResolvedValue([{ name: MOCK_TENANT_DOMAIN }]),
     sleep: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -142,24 +132,24 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('passes when content, webhook, and domain are all verified', async () => {
-    const { createClient, fetch } = createClientStubResolving([
-      'settings_site',
-      'settings_navigation',
-      'settings_footer',
-    ]);
+    const { createClient, fetch } = createClientStubResolving(REQUIRED_TYPES);
     const listWebhooks = vi
       .fn()
-      .mockResolvedValue([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]);
-    const listDomains = vi.fn().mockResolvedValue([{ name: TENANT_DOMAIN }]);
+      .mockResolvedValue([
+        { id: MOCK_WEBHOOK_ID, url: MOCK_REVALIDATE_WEBHOOK_URL },
+      ]);
+    const listDomains = vi
+      .fn()
+      .mockResolvedValue([{ name: MOCK_TENANT_DOMAIN }]);
 
     await verifyTenantSeededContent(
       tenant,
-      env,
+      MOCK_PROVISION_ENV,
       baseDeps({ createClient, listWebhooks, listDomains, sleep }),
     );
 
     expect(fetch).toHaveBeenCalledWith('*[_type in $types]._type', {
-      types: ['settings_site', 'settings_navigation', 'settings_footer'],
+      types: REQUIRED_TYPES,
     });
     expect(fetch).toHaveBeenCalledWith(
       '*[_type == "settings_navigation"][0].items[]{ "resolved": defined(link->_id) }',
@@ -169,145 +159,132 @@ describe(verifyTenantSeededContent, () => {
     );
     expect(createClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectId: 'proj123',
-        dataset: 'production',
-        token: 'sk-read',
+        projectId: MOCK_SANITY_PROJECT_ID,
+        dataset: MOCK_SANITY_DATASET,
+        token: MOCK_SANITY_READ_TOKEN,
         useCdn: false,
       }),
     );
     expect(listWebhooks).toHaveBeenCalledWith({
-      token: MANAGEMENT_TOKEN,
-      projectId: 'proj123',
+      token: sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
     });
     expect(listDomains).toHaveBeenCalledWith({
-      token: 'v-token',
+      token: vercelToken,
       teamId: undefined,
-      projectId: 'prj_web',
+      projectId: vercelWebProjectId,
     });
     expect(sleep).not.toHaveBeenCalled();
   });
 
-  it('fails the run when a required singleton is absent', async () => {
-    const { createClient } = createClientStubResolving([
-      'settings_navigation',
-      'settings_footer',
-    ]);
-
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(/missing required starter document\(s\): settings_site/);
-  });
-
-  it('fails the run when the dataset has none of the required singletons', async () => {
-    const { createClient } = createClientStubResolving([]);
-
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(
+  it.each([
+    [
+      'one is absent',
+      ['settings_navigation', 'settings_footer'],
+      /missing required starter document\(s\): settings_site/,
+    ],
+    [
+      'none exist',
+      [],
       /missing required starter document\(s\): settings_site, settings_navigation, settings_footer/,
-    );
-  });
+    ],
+  ])(
+    'fails the run naming the missing singletons when %s',
+    async (_label, foundTypes, expected) => {
+      const { createClient } = createClientStubResolving(foundTypes);
 
-  it('fails the run when a seeded navigation item has no resolvable link reference', async () => {
-    const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
-      VALID_HOME_PAGE,
-      [{ resolved: false }],
-    );
+      await expect(
+        verifyTenantSeededContent(
+          tenant,
+          MOCK_PROVISION_ENV,
+          baseDeps({ createClient }),
+        ),
+      ).rejects.toThrow(expected);
+    },
+  );
 
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(
-      /"settings_navigation" has 1 item\(s\) with no resolvable "link" reference/,
-    );
-  });
+  it.each([
+    [[{ resolved: false }], 1],
+    [[{ resolved: true }, { resolved: false }, { resolved: false }], 2],
+  ])(
+    'fails the run counting the navigation items with no link reference (%j)',
+    async (navigationItems, unresolvedCount) => {
+      const { createClient } = createClientStubResolving(
+        REQUIRED_TYPES,
+        VALID_HOME_PAGE,
+        navigationItems,
+      );
 
-  it('fails the run and counts every unresolved item when navigation mixes resolved and unresolved items', async () => {
-    const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
-      VALID_HOME_PAGE,
-      [{ resolved: true }, { resolved: false }, { resolved: false }],
-    );
-
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(
-      /"settings_navigation" has 2 item\(s\) with no resolvable "link" reference/,
-    );
-  });
+      await expect(
+        verifyTenantSeededContent(
+          tenant,
+          MOCK_PROVISION_ENV,
+          baseDeps({ createClient }),
+        ),
+      ).rejects.toThrow(
+        `"settings_navigation" has ${unresolvedCount} item(s) with no resolvable "link" reference`,
+      );
+    },
+  );
 
   it('does not throw when settings_navigation has no items field (GROQ evaluates items[] to null, not [])', async () => {
     const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
+      REQUIRED_TYPES,
       VALID_HOME_PAGE,
       null,
     );
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ createClient }),
+      ),
     ).resolves.toBeUndefined();
   });
 
-  it('fails the run when the dataset has no page_home document', async () => {
-    const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
+  it.each([
+    [
+      'there is no page_home document',
       null,
-    );
-
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(/dataset has no "page_home" document/);
-  });
-
-  it('fails the run when the seeded page_home has no headingBlock.heading', async () => {
-    const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
+      /dataset has no "page_home" document/,
+    ],
+    [
+      'page_home has no headingBlock.heading',
       { headingBlock: null, seo: VALID_HOME_PAGE.seo },
-    );
-
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(/missing a non-empty headingBlock\.heading/);
-  });
-
-  it('fails the run when the seeded page_home has no seo.metaTitle', async () => {
-    const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
+      /missing a non-empty headingBlock\.heading/,
+    ],
+    [
+      'page_home has no seo.metaTitle',
       { headingBlock: VALID_HOME_PAGE.headingBlock, seo: null },
-    );
-
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(/missing a non-empty seo\.metaTitle/);
-  });
-
-  it('fails the run when the seeded page_home has a seo.metaTitle shorter than the 30 character schema minimum', async () => {
-    const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
+      /missing a non-empty seo\.metaTitle/,
+    ],
+    [
+      'the seo.metaTitle is under the 30 character minimum',
       { headingBlock: VALID_HOME_PAGE.headingBlock, seo: { metaTitle: 'x' } },
-    );
-
-    await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(
       /has a seo\.metaTitle of 1 characters, outside the 30-60 bound/,
-    );
-  });
-
-  it('fails the run when the seeded page_home has a seo.metaTitle longer than the 60 character schema maximum', async () => {
-    const { createClient } = createClientStubResolving(
-      ['settings_site', 'settings_navigation', 'settings_footer'],
+    ],
+    [
+      'the seo.metaTitle is over the 60 character maximum',
       {
         headingBlock: VALID_HOME_PAGE.headingBlock,
         seo: { metaTitle: 'x'.repeat(61) },
       },
+      /has a seo\.metaTitle of 61 characters, outside the 30-60 bound/,
+    ],
+  ])('fails the run when %s', async (_label, homePage, expected) => {
+    const { createClient } = createClientStubResolving(
+      REQUIRED_TYPES,
+      homePage,
     );
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
-    ).rejects.toThrow(
-      /has a seo\.metaTitle of 61 characters, outside the 30-60 bound/,
-    );
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ createClient }),
+      ),
+    ).rejects.toThrow(expected);
   });
 
   it('throws when the tenant has no persisted Sanity read token yet', async () => {
@@ -315,7 +292,11 @@ describe(verifyTenantSeededContent, () => {
     const createClient = vi.fn();
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ createClient }),
+      ),
     ).rejects.toThrow(/has no persisted Sanity read token yet/);
     expect(createClient).not.toHaveBeenCalled();
   });
@@ -323,19 +304,15 @@ describe(verifyTenantSeededContent, () => {
   it('retries a transient permission-denied content read once and passes once it succeeds', async () => {
     const fetch = vi
       .fn()
-      .mockRejectedValueOnce(grantError())
-      .mockResolvedValueOnce([
-        'settings_site',
-        'settings_navigation',
-        'settings_footer',
-      ])
+      .mockRejectedValueOnce(mockSanityGrantError())
+      .mockResolvedValueOnce(REQUIRED_TYPES)
       .mockResolvedValueOnce(VALID_NAVIGATION_ITEMS)
       .mockResolvedValueOnce(VALID_HOME_PAGE);
     const { createClient } = createClientStub(fetch);
 
     await verifyTenantSeededContent(
       tenant,
-      env,
+      MOCK_PROVISION_ENV,
       baseDeps({ createClient, sleep }),
     );
 
@@ -344,11 +321,15 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('exhausts retries on a persistent permission-denied content read and fails with a token-specific message, not a missing-content one', async () => {
-    const fetch = vi.fn().mockRejectedValue(grantError());
+    const fetch = vi.fn().mockRejectedValue(mockSanityGrantError());
     const { createClient } = createClientStub(fetch);
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ createClient, sleep })),
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ createClient, sleep }),
+      ),
     ).rejects.toThrow(/persisted Sanity read token failed against its dataset/);
 
     expect(fetch.mock.calls.length).toBeGreaterThan(1);
@@ -358,25 +339,31 @@ describe(verifyTenantSeededContent, () => {
     const listWebhooks = vi
       .fn()
       .mockResolvedValue([
-        { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
+        { id: MOCK_OTHER_WEBHOOK_ID, url: MOCK_OTHER_WEBHOOK_URL },
       ]);
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ listWebhooks })),
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ listWebhooks }),
+      ),
     ).rejects.toThrow(
-      /has no revalidate webhook targeting "https:\/\/example\.com\/api\/revalidate"/,
+      /has no revalidate webhook targeting "https:\/\/web\.example\.com\/api\/revalidate"/,
     );
   });
 
   it('retries a transient permission-denied webhook read once and passes once it succeeds', async () => {
     const listWebhooks = vi
       .fn()
-      .mockRejectedValueOnce(grantError())
-      .mockResolvedValueOnce([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]);
+      .mockRejectedValueOnce(mockSanityGrantError())
+      .mockResolvedValueOnce([
+        { id: MOCK_WEBHOOK_ID, url: MOCK_REVALIDATE_WEBHOOK_URL },
+      ]);
 
     await verifyTenantSeededContent(
       tenant,
-      env,
+      MOCK_PROVISION_ENV,
       baseDeps({ listWebhooks, sleep }),
     );
 
@@ -385,10 +372,14 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('exhausts retries on a persistent permission-denied webhook read and fails with a webhook-specific message', async () => {
-    const listWebhooks = vi.fn().mockRejectedValue(grantError());
+    const listWebhooks = vi.fn().mockRejectedValue(mockSanityGrantError());
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ listWebhooks, sleep })),
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ listWebhooks, sleep }),
+      ),
     ).rejects.toThrow(
       /revalidate webhook check against its Sanity project failed/,
     );
@@ -402,7 +393,11 @@ describe(verifyTenantSeededContent, () => {
       .mockResolvedValue([{ name: 'someone-else.example.com' }]);
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ listDomains })),
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ listDomains }),
+      ),
     ).rejects.toThrow(
       /domain "acme\.example\.com" is not mapped on the shared Vercel project/,
     );
@@ -411,12 +406,12 @@ describe(verifyTenantSeededContent, () => {
   it('retries a transient permission-denied domain read once and passes once it succeeds', async () => {
     const listDomains = vi
       .fn()
-      .mockRejectedValueOnce(grantError())
-      .mockResolvedValueOnce([{ name: TENANT_DOMAIN }]);
+      .mockRejectedValueOnce(mockSanityGrantError())
+      .mockResolvedValueOnce([{ name: MOCK_TENANT_DOMAIN }]);
 
     await verifyTenantSeededContent(
       tenant,
-      env,
+      MOCK_PROVISION_ENV,
       baseDeps({ listDomains, sleep }),
     );
 
@@ -425,10 +420,14 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('exhausts retries on a persistent permission-denied domain read and fails with a domain-specific message', async () => {
-    const listDomains = vi.fn().mockRejectedValue(grantError());
+    const listDomains = vi.fn().mockRejectedValue(mockSanityGrantError());
 
     await expect(
-      verifyTenantSeededContent(tenant, env, baseDeps({ listDomains, sleep })),
+      verifyTenantSeededContent(
+        tenant,
+        MOCK_PROVISION_ENV,
+        baseDeps({ listDomains, sleep }),
+      ),
     ).rejects.toThrow(
       /domain mapping check against the shared Vercel project failed/,
     );

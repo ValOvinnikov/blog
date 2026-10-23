@@ -1,9 +1,11 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import type { TLandingPage, TLandingSectionNavigation } from '@blog/service';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
-export const LANDING_PAGE_OG_IMAGE = makeSanityImage();
+const FAQ_PATH = 'modules/faq';
+
+export const LANDING_PAGE_OG_IMAGE = mockSanityImage();
 
 export const mockLandingPage: TLandingPage = {
   id: 'about-us',
@@ -15,7 +17,7 @@ export const mockLandingPage: TLandingPage = {
   modules: [],
   faqs: [],
   sectionNavigation: undefined,
-  seo: makeSeo({
+  seo: mockSeo({
     title: 'About Us',
     description: 'Who we are.',
     ogTitle: 'About Us OG',
@@ -31,12 +33,12 @@ export const makeLandingSectionNavigation = (
     title: null,
     root: { title: 'Modules', path: 'modules', isCurrent: false },
     pages: [
-      { title: 'FAQ', path: 'modules/faq', isCurrent: true },
+      { title: 'FAQ', path: FAQ_PATH, isCurrent: true },
       { title: 'Pricing', path: 'modules/pricing', isCurrent: false },
     ],
     breadcrumbs: [
       { title: 'Modules', path: 'modules' },
-      { title: 'FAQ', path: 'modules/faq' },
+      { title: 'FAQ', path: FAQ_PATH },
     ],
     parentSection: undefined,
     ...overrides,

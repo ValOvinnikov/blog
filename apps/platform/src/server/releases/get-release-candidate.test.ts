@@ -1,8 +1,10 @@
 import { FINDING_STATUS, HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
   CONTRAST_STATUS,
   CONTRAST_WORKFLOW_FILE,
+  RELEASE_FAILURE,
 } from '@platform/constants/release';
 import {
   githubCompareJson,
@@ -72,7 +74,7 @@ describe(getReleaseCandidate, () => {
 
   const candidate = async () => {
     const result = await getReleaseCandidate();
-    if (!result.ok) throw new Error(result.reason);
+    if (!result.ok) throw new Error(result.error);
     return result.data;
   };
 
@@ -237,16 +239,16 @@ describe(getReleaseCandidate, () => {
     expect(migrations.isLowerBound).toBe(true);
   });
 
-  it('fails with noReleaseTag when the repository has no release tag yet', async () => {
+  it('fails with NO_RELEASE_TAG when the repository has no release tag yet', async () => {
     github.respond(TAGS_PATH, () => githubJson([]));
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'noReleaseTag',
+      error: RELEASE_FAILURE.NO_RELEASE_TAG,
     });
   });
 
-  it('fails with tagListIncomplete when the tag list never stops paging', async () => {
+  it('fails with TAG_LIST_INCOMPLETE when the tag list never stops paging', async () => {
     github.respond(TAGS_PATH, () =>
       githubJson(
         Array.from({ length: 100 }, (_, index) => ({
@@ -257,20 +259,20 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'tagListIncomplete',
+      error: RELEASE_FAILURE.TAG_LIST_INCOMPLETE,
     });
   });
 
-  it('fails with notConfigured when the token is missing', async () => {
+  it('fails with NOT_CONFIGURED when the token is missing', async () => {
     github.unsetToken();
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'notConfigured',
+      error: GITHUB_FAILURE.NOT_CONFIGURED,
     });
   });
 
-  it('fails with githubError when GitHub errors', async () => {
+  it('fails with GITHUB_ERROR when GitHub errors', async () => {
     github.respond(
       MAIN_BRANCH_PATH,
       () => new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
@@ -278,26 +280,29 @@ describe(getReleaseCandidate, () => {
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: GITHUB_FAILURE.GITHUB_ERROR,
     });
   });
 
-  it('fails with rateLimited when GitHub rate-limits the request', async () => {
-    github.respond(MAIN_BRANCH_PATH, () => new Response(null, { status: 429 }));
+  it('fails with RATE_LIMITED when GitHub rate-limits the request', async () => {
+    github.respond(
+      MAIN_BRANCH_PATH,
+      () => new Response(null, { status: HTTP_STATUS.TOO_MANY_REQUESTS }),
+    );
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'rateLimited',
+      error: GITHUB_FAILURE.RATE_LIMITED,
     });
   });
 
-  it('fails with dbError when a database read fails', async () => {
+  it('fails with DB_ERROR when a database read fails', async () => {
     compare(lastTag, [{ filename: RENDERING_FILENAME, status: 'modified' }]);
     getContrastFindingMock.mockRejectedValue(new Error('connection lost'));
 
     expect(await getReleaseCandidate()).toEqual({
       ok: false,
-      reason: 'dbError',
+      error: RELEASE_FAILURE.DB_ERROR,
     });
   });
 });

@@ -1,40 +1,39 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_AUTHOR_CACHE_TAG,
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_TOPIC_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPostsByIds } from './loader';
+import { postsByIdsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const FIRST_POST_ID = 'first-post';
+const SECOND_POST_ID = 'second-post';
+const POST_IDS = [FIRST_POST_ID, SECOND_POST_ID];
+
+const tenant = mockTenant();
 
 describe(getPostsByIds, () => {
   it('resolves an id list to post-card data', async () => {
-    mockRun.mockResolvedValue([
-      makeRawPostCard({ _id: 'a' }),
-      makeRawPostCard({ _id: 'b' }),
-    ]);
+    mockRun.mockResolvedValue(POST_IDS.map((_id) => mockRawPostCard({ _id })));
 
-    const result = await getPostsByIds(['a', 'b'], tenant);
+    const result = await getPostsByIds(POST_IDS, tenant);
 
-    expect(result.map((post) => post.id)).toEqual(['a', 'b']);
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { ids: ['a', 'b'] } }),
-    );
+    expect(result.map((post) => post.id)).toEqual(POST_IDS);
   });
 
   it('excludes ids that no longer resolve to a published post', async () => {
-    mockRun.mockResolvedValue([makeRawPostCard({ _id: 'a' })]);
+    mockRun.mockResolvedValue([mockRawPostCard({ _id: FIRST_POST_ID })]);
 
-    const result = await getPostsByIds(['a', 'deleted-id'], tenant);
+    const result = await getPostsByIds([FIRST_POST_ID, 'deleted-id'], tenant);
 
-    expect(result.map((post) => post.id)).toEqual(['a']);
+    expect(result.map((post) => post.id)).toEqual([FIRST_POST_ID]);
   });
 
   it('returns an empty array without querying when given no ids', async () => {
@@ -44,19 +43,22 @@ describe(getPostsByIds, () => {
     expect(mockRun).not.toHaveBeenCalled();
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+  it('queries the ids for the tenant with tenant-scoped tags', async () => {
     mockRun.mockResolvedValue([]);
 
-    await getPostsByIds(['a'], tenant);
+    await getPostsByIds(POST_IDS, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(postsByIdsQuery, {
+      parameters: { ids: POST_IDS },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_POSTS_CACHE_TAG,
+          MOCK_AUTHOR_CACHE_TAG,
+          MOCK_TOPIC_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

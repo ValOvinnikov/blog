@@ -8,9 +8,13 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
 
 import { TagBreadcrumbs } from './tag-breadcrumbs';
+
+const SITE_NAME = 'Northwind Journal';
+const TAG_HREF = '/tags/typescript';
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -27,7 +31,7 @@ vi.mock('@web/server/tag/get-tag-page/get-tag-page', () => ({
 }));
 
 const tag = makeTag({ title: 'TypeScript', slug: 'typescript' });
-const successData = { tag, modules: [], seo: {} };
+const successData = { tag, modules: [], seo: mockSeo() };
 
 const setup = customRenderAsync(TagBreadcrumbs, {
   slug: 'typescript',
@@ -48,22 +52,22 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTagPageMock,
     setup,
     successData,
-    linkSteps: [{ label: 'Northwind Journal', href: '/' }],
+    linkSteps: [{ label: SITE_NAME, href: '/' }],
     currentLabel: 'TypeScript',
   });
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getTagPageMock,
     setup,
     successData,
-    itemPath: '/tags/typescript',
+    itemPath: TAG_HREF,
   });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getTagPageMock,
     setup,
     successData,
     expectedTrail: [
-      { name: 'Northwind Journal', path: '/' },
-      { name: 'TypeScript', path: '/tags/typescript' },
+      { name: SITE_NAME, path: '/' },
+      { name: 'TypeScript', path: TAG_HREF },
     ],
   });
   testNoJsonLdWithoutBaseUrl({

@@ -1,61 +1,46 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { translatedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
+import {
+  MOCK_TAG_ID,
+  mockRawFeedPost,
+} from '@blog/service/testing/entities/fixtures';
+import { evaluateGroqSlugs } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_FEED_UNPROJECTED_FIELDS,
+  MOCK_PUBLISHED_FEED_SLUGS,
+  MOCK_TRANSLATED_POST_DOCUMENTS,
+} from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { tagScopedPublishedPostsQuery } from './query';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-async function slugsIn(locale: string): Promise<string[]> {
-  const posts = (await evaluateGroqExpression(
+function slugsIn(locale: string, tagId = MOCK_TAG_ID): Promise<string[]> {
+  return evaluateGroqSlugs(
     tagScopedPublishedPostsQuery.query,
-    translatedPostDocuments,
-    undefined,
-    { ...{ tagId: 'tag-1' }, locale, defaultLocale: EN },
-  )) as { slug: string }[];
-
-  return posts.map(({ slug }) => slug);
+    MOCK_TRANSLATED_POST_DOCUMENTS,
+    { tagId, locale, defaultLocale: EN },
+  );
 }
 
 describe('tagScopedPublishedPostsQuery', () => {
   it('parses a feed post', () => {
-    const raw = [makeRawFeedPost()];
+    const raw = [mockRawFeedPost()];
 
     expect(() => tagScopedPublishedPostsQuery.parse(raw)).not.toThrow();
   });
 
-  it('filters by page_post type', () => {
-    expect(tagScopedPublishedPostsQuery.query).toContain(
-      '_type == "page_post"',
-    );
+  it.each(MOCK_FEED_UNPROJECTED_FIELDS)('does not project %s', (field) => {
+    expect(tagScopedPublishedPostsQuery.query).not.toContain(field);
   });
 
-  it('excludes posts whose publishedAt is in the future', () => {
-    expect(tagScopedPublishedPostsQuery.query).toContain(
-      'publishedAt <= now()',
-    );
-  });
+  it.each([EN, NL])(
+    'lists only the published %s posts, newest first',
+    async (locale) => {
+      expect(await slugsIn(locale)).toEqual(MOCK_PUBLISHED_FEED_SLUGS[locale]);
+    },
+  );
 
-  it('orders newest first, same as the site-wide feed query', () => {
-    expect(tagScopedPublishedPostsQuery.query).toContain(
-      'order(publishedAt desc)',
-    );
-  });
-
-  it('scopes to the given tag id by reference identity', () => {
-    expect(tagScopedPublishedPostsQuery.query).toContain('references($tagId)');
-  });
-
-  it('does not deref author or an image asset', () => {
-    expect(tagScopedPublishedPostsQuery.query).not.toContain('author->');
-    expect(tagScopedPublishedPostsQuery.query).not.toContain('heroImage');
-    expect(tagScopedPublishedPostsQuery.query).not.toContain('topic->');
-    expect(tagScopedPublishedPostsQuery.query).not.toContain('wordCount');
-  });
-
-  it('lists only published posts in the request language, newest first', async () => {
-    expect(await slugsIn(EN)).toEqual(['only-en', 'design-en', 'notes-en']);
-    expect(await slugsIn(NL)).toEqual(['design-nl']);
+  it('lists no posts for a tag none of them reference', async () => {
+    expect(await slugsIn(EN, 'tag-other')).toEqual([]);
   });
 });

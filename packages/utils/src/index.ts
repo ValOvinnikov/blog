@@ -10,6 +10,7 @@ export * from './normalize-email-identity';
 export * from './pagination';
 export * from './primitives';
 export * from './reading-time';
+export * from './result';
 export * from './sanitize-href';
 export * from './to-outcome';
 export * from './version';

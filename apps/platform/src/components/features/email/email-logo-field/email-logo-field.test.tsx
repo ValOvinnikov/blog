@@ -1,24 +1,28 @@
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import { screen } from '@platform/testing/custom-render';
+import { MOCK_EMAIL_LOGO_URL } from '@platform/testing/email/fixtures';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
+import { BLOB_STAGED_LOGO } from '@platform/testing/site-config/fixtures';
 import userEvent from '@testing-library/user-event';
 
 import { EmailLogoField } from './email-logo-field';
 
-const STORED_URL = 'https://example.blob.vercel-storage.com/email-logo.png';
+const PNG_JPEG_OR_GIF = 'PNG, JPEG, or GIF.';
 
 const setup = customRenderInSettingsForm(EmailLogoField, {
   kind: EMAIL_LOGO_KIND.SENDER,
   label: 'Email logo',
-  hint: 'PNG, JPEG, or GIF.',
+  hint: PNG_JPEG_OR_GIF,
   logo: { url: undefined },
   onStage: vi.fn(),
 });
 
 describe(`<${EmailLogoField.name}/>`, () => {
+  const onStage = vi.fn();
+
   beforeEach(() => {
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(BLOB_STAGED_LOGO);
   });
 
   afterEach(() => {
@@ -28,50 +32,54 @@ describe(`<${EmailLogoField.name}/>`, () => {
   it('shows the hint and the upload label before any logo is set', () => {
     setup();
 
-    expect(screen.getByText('PNG, JPEG, or GIF.')).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Upload email logo' }),
-    ).toBeVisible();
+    const hint = screen.getByText(PNG_JPEG_OR_GIF);
+    const uploadButton = screen.getByRole('button', {
+      name: 'Upload email logo',
+    });
+
+    expect(hint).toBeVisible();
+    expect(uploadButton).toBeVisible();
   });
 
   it('shows the current logo and the replace label once a logo is set', () => {
-    setup({ logo: { url: STORED_URL } });
+    setup({ logo: { url: MOCK_EMAIL_LOGO_URL } });
 
-    expect(screen.getByAltText('Current email logo')).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Replace email logo' }),
-    ).toBeVisible();
+    const currentLogo = screen.getByAltText('Current email logo');
+    const replaceButton = screen.getByRole('button', {
+      name: 'Replace email logo',
+    });
+
+    expect(currentLogo).toBeVisible();
+    expect(replaceButton).toBeVisible();
   });
 
   it('stages a picked file with a local preview URL', async () => {
-    const onStage = vi.fn();
     const file = new File(['x'], 'logo.png', { type: 'image/png' });
     setup({ onStage });
 
     await selectFile(file);
 
-    expect(onStage).toHaveBeenCalledWith({ url: 'blob:staged-logo', file });
+    expect(onStage).toHaveBeenCalledWith({ url: BLOB_STAGED_LOGO, file });
   });
 
   it('rejects an unsupported type without staging it', async () => {
-    const onStage = vi.fn();
     setup({ onStage });
 
     await selectFile(
       new File(['<svg></svg>'], 'logo.svg', { type: 'image/svg+xml' }),
     );
 
+    const unsupportedError = screen.getByText(/SVG and WebP are not supported/);
+
     expect(onStage).not.toHaveBeenCalled();
-    expect(screen.getByText(/SVG and WebP are not supported/)).toBeVisible();
+    expect(unsupportedError).toBeVisible();
   });
 
   it('stages a removal', async () => {
-    const onStage = vi.fn();
-    setup({ logo: { url: STORED_URL }, onStage });
+    setup({ logo: { url: MOCK_EMAIL_LOGO_URL }, onStage });
 
-    await userEvent
-      .setup()
-      .click(screen.getByRole('button', { name: 'Remove' }));
+    const removeButton = screen.getByRole('button', { name: 'Remove' });
+    await userEvent.setup().click(removeButton);
 
     expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });

@@ -1,7 +1,21 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import {
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_IDLE_PROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+  MOCK_PROVISIONING_REGISTRY,
+  MOCK_RUN_AT,
+  MOCK_RUN_FINISHED_AT,
+  MOCK_STEP_ERROR,
+  MOCK_WORKFLOW_RUN_URL,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { startProvisioningRun } from '../start-provisioning-run';
 
@@ -13,11 +27,14 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const NOW = '2026-09-02T12:00:00.000Z';
+const FAILED_STEP = {
+  status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  error: MOCK_STEP_ERROR,
+};
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date(NOW));
+  vi.setSystemTime(new Date(MOCK_RUN_AT));
 });
 
 afterEach(async () => {
@@ -36,55 +53,52 @@ describe(finishProvisioningRun, () => {
     it('merges finishedAt without clobbering startedAt/registry/workflowRunUrl', async () => {
       await startProvisioningRun({
         tenantId: tenant.id,
-        registry: 'production',
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+        registry: MOCK_PROVISIONING_REGISTRY,
+        workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
       });
 
-      vi.setSystemTime(new Date('2026-09-02T12:05:00.000Z'));
-      const result = await finishProvisioningRun({ tenantId: tenant.id });
+      vi.setSystemTime(new Date(MOCK_RUN_FINISHED_AT));
+      const { provisioningSteps } = unwrapOk(
+        await finishProvisioningRun({ tenantId: tenant.id }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.provisioningSteps?.run).toEqual({
-        startedAt: NOW,
-        registry: 'production',
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
-        finishedAt: '2026-09-02T12:05:00.000Z',
+      expect(provisioningSteps?.run).toEqual({
+        startedAt: MOCK_RUN_AT,
+        registry: MOCK_PROVISIONING_REGISTRY,
+        workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
+        finishedAt: MOCK_RUN_FINISHED_AT,
       });
     });
 
     it('sets finishedAt on an absent run rather than throwing', async () => {
-      const result = await finishProvisioningRun({ tenantId: tenant.id });
+      const { provisioningSteps } = unwrapOk(
+        await finishProvisioningRun({ tenantId: tenant.id }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.provisioningSteps?.run).toEqual({ finishedAt: NOW });
+      expect(provisioningSteps?.run).toEqual({ finishedAt: MOCK_RUN_AT });
     });
   });
 
   it('leaves every step entry untouched', async () => {
     const tenant = await insertTestTenant(db(), {
       provisioningSteps: {
-        SANITY_PROJECT: { status: 'FAILED', error: 'boom' },
-        SEED_CONTENT: { status: 'IDLE' },
-        PERSIST_TOKEN: { status: 'IDLE' },
-        MAP_DOMAIN: { status: 'IDLE' },
-        CREATE_WEBHOOK: { status: 'IDLE' },
-        VERIFY_CONTENT: { status: 'IDLE' },
-        OWNER_ELEVATION: { status: 'IDLE' },
+        ...MOCK_IDLE_PROVISIONING_STEPS,
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: FAILED_STEP,
       },
     });
 
-    const result = await finishProvisioningRun({ tenantId: tenant.id });
+    const { provisioningSteps } = unwrapOk(
+      await finishProvisioningRun({ tenantId: tenant.id }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.SANITY_PROJECT).toEqual({
-      status: 'FAILED',
-      error: 'boom',
-    });
+    expect(
+      provisioningSteps?.[TENANT_PROVISIONING_STEP.SANITY_PROJECT],
+    ).toEqual(FAILED_STEP);
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await finishProvisioningRun({
-      tenantId: '00000000-0000-0000-0000-000000000000',
+      tenantId: MOCK_MISSING_TENANT_ID,
     });
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });

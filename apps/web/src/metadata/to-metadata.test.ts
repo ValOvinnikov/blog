@@ -1,5 +1,6 @@
 import type { ISanityImage } from '@blog/config';
-import { type TSeoResolved, urlForSanityImage } from '@blog/service';
+import { urlForSanityImage } from '@blog/service';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import type { Metadata } from 'next';
 import {
@@ -8,6 +9,13 @@ import {
 } from 'next/dist/lib/metadata/resolvers/resolve-opengraph';
 
 import { toMetadata } from './to-metadata';
+
+const DESCRIPTION = 'All the posts.';
+const OG_TITLE = 'The Blog OG';
+const OG_DESCRIPTION = 'All the posts OG.';
+const POST_PATH = '/blog/my-post';
+const DEFAULT_SEO_TITLE = 'Example Title';
+const PUBLISHED_AT = '2026-01-15T00:00:00Z';
 
 type TOpenGraphWithType = { type?: string };
 type TTwitterWithCard = { card?: string };
@@ -28,13 +36,13 @@ const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   DEFAULT_TENANT_SANITY_CONTEXT,
 );
 
-const seo: TSeoResolved = {
+const seo = mockSeo({
   title: 'The Blog',
-  description: 'All the posts.',
-  ogTitle: 'The Blog OG',
-  ogDescription: 'All the posts OG.',
+  description: DESCRIPTION,
+  ogTitle: OG_TITLE,
+  ogDescription: OG_DESCRIPTION,
   ogImage,
-};
+});
 
 describe('toMetadata', () => {
   it('maps title as an absolute title object when titleAbsolute is true', async () => {
@@ -49,7 +57,7 @@ describe('toMetadata', () => {
 
   it('maps ogType article', async () => {
     const metadata = await toMetadata(seo, {
-      canonical: '/blog/my-post',
+      canonical: POST_PATH,
       ogType: 'article',
     });
 
@@ -75,7 +83,7 @@ describe('toMetadata', () => {
   it('omits description, openGraph.title/description, and twitter.title/description when the source fields are absent', async () => {
     const metadata = await toMetadata(
       {
-        title: 'Example Title',
+        title: DEFAULT_SEO_TITLE,
         description: undefined,
         ogTitle: undefined,
         ogDescription: undefined,
@@ -84,7 +92,7 @@ describe('toMetadata', () => {
       { canonical: '/', ogType: 'website' },
     );
 
-    expect(metadata.title).toBe('Example Title');
+    expect(metadata.title).toBe(DEFAULT_SEO_TITLE);
     expect(metadata.description).toBeUndefined();
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.openGraph?.description).toBeUndefined();
@@ -94,17 +102,17 @@ describe('toMetadata', () => {
 
   it('adds openGraph.publishedTime and authors for article type when provided', async () => {
     const metadata = await toMetadata(seo, {
-      canonical: '/blog/my-post',
+      canonical: POST_PATH,
       ogType: 'article',
       article: {
-        publishedTime: '2026-01-15T00:00:00Z',
+        publishedTime: PUBLISHED_AT,
         authors: ['Jane Doe'],
       },
     });
 
     expect(
       (metadata.openGraph as { publishedTime?: string })?.publishedTime,
-    ).toBe('2026-01-15T00:00:00Z');
+    ).toBe(PUBLISHED_AT);
     expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
       'Jane Doe',
     ]);
@@ -135,7 +143,7 @@ describe('toMetadata', () => {
 
     it('maps canonical, description, and ogType', async () => {
       expect(metadata.alternates?.canonical).toBe('/blog');
-      expect(metadata.description).toBe('All the posts.');
+      expect(metadata.description).toBe(DESCRIPTION);
       expect((metadata.openGraph as TOpenGraphWithType | null)?.type).toBe(
         'website',
       );
@@ -146,8 +154,8 @@ describe('toMetadata', () => {
     });
 
     it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', async () => {
-      expect(metadata.openGraph?.title).toBe('The Blog OG');
-      expect(metadata.openGraph?.description).toBe('All the posts OG.');
+      expect(metadata.openGraph?.title).toBe(OG_TITLE);
+      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
       expect(metadata.openGraph?.images).toEqual([
         { url: EXPECTED_OG_IMAGE_URL },
       ]);
@@ -157,8 +165,8 @@ describe('toMetadata', () => {
       expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe(
         'summary_large_image',
       );
-      expect(metadata.twitter?.title).toBe('The Blog OG');
-      expect(metadata.twitter?.description).toBe('All the posts OG.');
+      expect(metadata.twitter?.title).toBe(OG_TITLE);
+      expect(metadata.twitter?.description).toBe(OG_DESCRIPTION);
       expect(metadata.twitter?.images).toEqual([EXPECTED_OG_IMAGE_URL]);
     });
 

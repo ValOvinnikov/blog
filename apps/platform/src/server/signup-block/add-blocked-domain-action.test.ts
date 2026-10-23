@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { SIGNUP_BLOCK_FIELD_ERROR } from '@platform/constants/signup-block';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
 import {
@@ -32,10 +33,11 @@ const INPUT = { domain: ` ${BLOCKED_DOMAIN} `, reason: ` ${BLOCK_REASON} ` };
 describe(addBlockedDomainAction, () => {
   beforeEach(() => {
     requireSuperAdminMock.mockReset().mockResolvedValue(ADMIN);
-    addSignupBlockMock.mockReset().mockResolvedValue({
-      ok: true,
-      data: { entry: makeBlockedIdentity(), created: true },
-    });
+    addSignupBlockMock
+      .mockReset()
+      .mockResolvedValue(
+        okResult({ entry: makeBlockedIdentity(), created: true }),
+      );
     vi.mocked(logger.error).mockReset();
   });
 
@@ -76,10 +78,9 @@ describe(addBlockedDomainAction, () => {
   });
 
   it('reports a domain the list rejects as a field error', async () => {
-    addSignupBlockMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_INVALID_DOMAIN,
-    });
+    addSignupBlockMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_INVALID_DOMAIN),
+    );
 
     const result = await addBlockedDomainAction(INPUT);
 
@@ -92,10 +93,7 @@ describe(addBlockedDomainAction, () => {
   });
 
   it('returns a server error and logs when the write fails', async () => {
-    addSignupBlockMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    addSignupBlockMock.mockResolvedValue(errorResult(ERROR_CODE.DB_NOT_FOUND));
 
     const result = await addBlockedDomainAction(INPUT);
     const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];

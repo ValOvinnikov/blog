@@ -9,11 +9,12 @@ import {
   setTenantProvisioningStatus,
   startProvisioningRun,
 } from '@blog/db/queries/tenants';
-import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { errorResult, okResult } from '@blog/utils/result';
+import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 
 import { beginRun, finishRun } from './run-lifecycle';
-
-const CTX = { runId: 'run-1' };
 
 vi.mock('@blog/db/queries/audit-events', () => ({ insertAuditEvent: vi.fn() }));
 vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
@@ -28,52 +29,50 @@ function recordedActions(): string[] {
 
 describe(beginRun, () => {
   it('marks the run as started for the tenant', async () => {
-    vi.mocked(startProvisioningRun).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(startProvisioningRun).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
-    await beginRun(TEST_TENANT_ID);
+    await beginRun(MOCK_TENANT_ID);
 
     expect(startProvisioningRun).toHaveBeenCalledWith({
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
     });
   });
 });
 
 describe(finishRun, () => {
   beforeEach(() => {
-    vi.mocked(finishProvisioningRun).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
-    vi.mocked(setTenantProvisioningStatus).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(finishProvisioningRun).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
+    vi.mocked(setTenantProvisioningStatus).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
   });
 
   it('closes the run and audits a successful provisioning', async () => {
-    await finishRun(TEST_TENANT_ID, CTX, { ok: true });
+    await finishRun(MOCK_TENANT_ID, MOCK_RUN_CONTEXT, okResult());
 
     expect(finishProvisioningRun).toHaveBeenCalledWith({
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
     });
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONED]);
   });
 
   it('audits the failed step of a failed run without overriding its status', async () => {
-    await finishRun(TEST_TENANT_ID, CTX, {
-      ok: false,
-      failedStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-    });
+    await finishRun(
+      MOCK_TENANT_ID,
+      MOCK_RUN_CONTEXT,
+      errorResult({ failedStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN }),
+    );
 
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONING_FAILED]);
     expect(insertAuditEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         details: expect.objectContaining({
           step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-          runId: CTX.runId,
+          runId: MOCK_RUN_CONTEXT.runId,
         }),
       }),
     );
@@ -81,23 +80,24 @@ describe(finishRun, () => {
   });
 
   it('marks the tenant failed when a run dies outside any step', async () => {
-    await finishRun(TEST_TENANT_ID, CTX, {
-      ok: false,
-      error: 'workflow crashed',
-    });
+    await finishRun(
+      MOCK_TENANT_ID,
+      MOCK_RUN_CONTEXT,
+      errorResult({ message: 'workflow crashed' }),
+    );
 
     expect(setTenantProvisioningStatus).toHaveBeenCalledWith(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       TENANT_PROVISIONING_STATUS.FAILED,
     );
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONING_FAILED]);
   });
 
   it('still finishes when the audit event cannot be written', async () => {
-    vi.mocked(insertAuditEvent).mockRejectedValue(new Error('db down'));
+    vi.mocked(insertAuditEvent).mockRejectedValue(new Error(MOCK_DB_DOWN));
 
     await expect(
-      finishRun(TEST_TENANT_ID, CTX, { ok: true }),
+      finishRun(MOCK_TENANT_ID, MOCK_RUN_CONTEXT, okResult()),
     ).resolves.toBeUndefined();
   });
 });

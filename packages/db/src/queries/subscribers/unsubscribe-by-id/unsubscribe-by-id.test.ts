@@ -2,7 +2,7 @@ import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -24,7 +24,7 @@ afterEach(async () => {
 
 async function insertSubscriber(
   tenantId: string,
-  email: string = TEST_SUBSCRIBER_EMAIL,
+  email: string = MOCK_SUBSCRIBER_EMAIL,
 ): Promise<schema.TSubscriber> {
   const [inserted] = await db()
     .insert(schema.subscribers)
@@ -49,18 +49,6 @@ describe(unsubscribeById, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('deletes the subscriber row', async () => {
-    const subscriber = await insertSubscriber(tenantId);
-
-    const result = await unsubscribeById(tenantId, subscriber.id);
-
-    expect(result).toEqual({
-      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-      subscriber,
-    });
-    expect(await countRows(subscriber.id)).toBe(0);
-  });
-
   it('returns not-found for an unknown subscriber', async () => {
     const result = await unsubscribeById(tenantId, faker.string.uuid());
 
@@ -77,12 +65,29 @@ describe(unsubscribeById, () => {
     expect(await countRows(subscriber.id)).toBe(1);
   });
 
-  it("does not remove another subscriber's row", async () => {
-    const subscriber = await insertSubscriber(tenantId);
-    const other = await insertSubscriber(tenantId, faker.internet.email());
+  describe("with one of the tenant's subscribers", () => {
+    let subscriber: schema.TSubscriber;
 
-    await unsubscribeById(tenantId, subscriber.id);
+    beforeEach(async () => {
+      subscriber = await insertSubscriber(tenantId);
+    });
 
-    expect(await countRows(other.id)).toBe(1);
+    it('deletes the subscriber row', async () => {
+      const result = await unsubscribeById(tenantId, subscriber.id);
+
+      expect(result).toEqual({
+        ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+        subscriber,
+      });
+      expect(await countRows(subscriber.id)).toBe(0);
+    });
+
+    it("does not remove another subscriber's row", async () => {
+      const other = await insertSubscriber(tenantId, faker.internet.email());
+
+      await unsubscribeById(tenantId, subscriber.id);
+
+      expect(await countRows(other.id)).toBe(1);
+    });
   });
 });

@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
   UPLOAD_OPERATION,
   type TUploadOperation,
@@ -21,9 +22,10 @@ export const createStagingHandlers = (
   onClear: () => onStage({ url: undefined }),
 });
 
-type TPersistStagedImageResult =
-  | { ok: true; image: TStagedImage }
-  | { ok: false; failure: TUploadFailure; operation: TUploadOperation };
+type TPersistStagedImageResult = TResult<
+  TStagedImage,
+  { failure: TUploadFailure; operation: TUploadOperation }
+>;
 
 type TPersistStagedImageActions = {
   upload: (formData: FormData) => Promise<TUploadResult>;
@@ -37,13 +39,13 @@ export const persistStagedImage = async (
   if (!image.file) {
     const result = await clear();
     return result.outcome === ACTION_OUTCOME.SUCCESS
-      ? { ok: true, image: { url: undefined } }
-      : { ok: false, failure: result, operation: UPLOAD_OPERATION.CLEAR };
+      ? okResult({ url: undefined })
+      : errorResult({ failure: result, operation: UPLOAD_OPERATION.CLEAR });
   }
   const formData = new FormData();
   formData.append('file', image.file);
   const result = await upload(formData);
   return result.outcome === ACTION_OUTCOME.SUCCESS
-    ? { ok: true, image: { url: result.url } }
-    : { ok: false, failure: result, operation: UPLOAD_OPERATION.UPLOAD };
+    ? okResult({ url: result.url })
+    : errorResult({ failure: result, operation: UPLOAD_OPERATION.UPLOAD });
 };

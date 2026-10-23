@@ -1,9 +1,12 @@
 import { customRender, screen, within } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
-import type { AnchorHTMLAttributes } from 'react';
 
 import { PrimaryNavigation } from './primary-navigation';
+
+const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
+const PANEL_ACTIONS_TEST_ID = 'primary-navigation-panel-actions';
 
 faker.seed(123);
 
@@ -27,40 +30,50 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
 
     it('renders all nav links', () => {
       for (const link of links) {
-        expect(screen.getByRole('link', { name: link.label })).toBeVisible();
+        const navLink = screen.getByRole('link', { name: link.label });
+
+        expect(navLink).toBeVisible();
       }
     });
 
     it('renders as a nav landmark', () => {
-      expect(screen.getByRole('navigation')).toBeVisible();
+      const nav = screen.getByRole('navigation');
+
+      expect(nav).toBeVisible();
     });
 
     it('renders without actions when omitted', () => {
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      const button = screen.queryByRole('button');
+
+      expect(button).not.toBeInTheDocument();
     });
 
     it('renders no mobile panel when mobileToggle is omitted', () => {
-      expect(
-        screen.queryByTestId('primary-navigation-mobile-panel'),
-      ).not.toBeInTheDocument();
+      const mobilePanel = screen.queryByTestId(MOBILE_PANEL_TEST_ID);
+
+      expect(mobilePanel).not.toBeInTheDocument();
     });
   });
 
   it('renders the actions slot when provided', () => {
     setup({ actions: <button>Toggle</button> });
-    expect(screen.getByRole('button', { name: 'Toggle' })).toBeVisible();
+    const actionButton = screen.getByRole('button', { name: 'Toggle' });
+
+    expect(actionButton).toBeVisible();
   });
 
   it('renders panelActions in the bar when there is no mobile toggle', () => {
     setup({ panelActions: <button type="button">Language</button> });
-    expect(screen.getByRole('button', { name: 'Language' })).toBeVisible();
+    const languageButton = screen.getByRole('button', { name: 'Language' });
+
+    expect(languageButton).toBeVisible();
   });
 
   it('renders no drawerActions when there is no mobile toggle', () => {
     setup({ drawerActions: <button type="button">Sign in</button> });
-    expect(
-      screen.queryByRole('button', { name: 'Sign in' }),
-    ).not.toBeInTheDocument();
+    const signInButton = screen.queryByRole('button', { name: 'Sign in' });
+
+    expect(signInButton).not.toBeInTheDocument();
   });
 
   it('forwards target to the anchor when provided on a link', () => {
@@ -74,164 +87,142 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       ],
     });
 
-    expect(screen.getByRole('link', { name: externalLabel })).toHaveAttribute(
-      'target',
-      '_blank',
-    );
+    const externalLink = screen.getByRole('link', { name: externalLabel });
+
+    expect(externalLink).toHaveAttribute('target', '_blank');
     for (const link of links) {
-      expect(
-        screen.getByRole('link', { name: link.label }),
-      ).not.toHaveAttribute('target');
+      const internalLink = screen.getByRole('link', { name: link.label });
+
+      expect(internalLink).not.toHaveAttribute('target');
     }
   });
 
   it('renders each link via linkAs when provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
-      <a href={href} data-testid="custom-link">
-        {children}
-      </a>
-    );
+    setup({ linkAs: MockLink });
+    const mockLinks = screen.getAllByTestId(MOCK_LINK_TEST_ID);
 
-    setup({ linkAs: CustomLink });
-    expect(screen.getAllByTestId('custom-link')).toHaveLength(links.length);
+    expect(mockLinks).toHaveLength(links.length);
   });
 
   describe('mobileToggle', () => {
     const ariaLabel = 'Toggle navigation menu';
     const panelId = 'primary-navigation-panel';
+    const mobileToggle = (
+      isOpen: boolean,
+      onToggle: () => void = () => {},
+    ) => ({ isOpen, onToggle, ariaLabel, panelId });
 
     it('renders the toggle button with the given ariaLabel', () => {
       setup({
-        mobileToggle: {
-          isOpen: false,
-          onToggle: () => {},
-          ariaLabel,
-          panelId,
-        },
-      });
-
-      expect(screen.getByRole('button', { name: ariaLabel })).toBeVisible();
-    });
-
-    it('reflects isOpen as aria-expanded and links the toggle to the panel via aria-controls/id', () => {
-      setup({
-        mobileToggle: {
-          isOpen: true,
-          onToggle: () => {},
-          ariaLabel,
-          panelId,
-        },
+        mobileToggle: mobileToggle(false),
       });
 
       const toggle = screen.getByRole('button', { name: ariaLabel });
+
+      expect(toggle).toBeVisible();
+    });
+
+    it('reflects isOpen as aria-expanded and links the toggle to its panel', () => {
+      setup({
+        mobileToggle: mobileToggle(true),
+      });
+
+      const toggle = screen.getByRole('button', { name: ariaLabel });
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
       expect(toggle).toHaveAttribute('aria-expanded', 'true');
       expect(toggle).toHaveAttribute('aria-controls', panelId);
-      expect(
-        screen.getByTestId('primary-navigation-mobile-panel'),
-      ).toHaveAttribute('id', panelId);
+      expect(mobilePanel).toHaveAttribute('id', panelId);
     });
 
     it('hides the panel when isOpen is false and shows it when isOpen is true', () => {
       const { rerender } = setup({
-        mobileToggle: {
-          isOpen: false,
-          onToggle: () => {},
-          ariaLabel,
-          panelId,
-        },
+        mobileToggle: mobileToggle(false),
       });
 
-      expect(
-        screen.getByTestId('primary-navigation-mobile-panel'),
-      ).not.toBeVisible();
+      const closedPanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
+      expect(closedPanel).not.toBeVisible();
 
       rerender(
-        <PrimaryNavigation
-          links={links}
-          mobileToggle={{
-            isOpen: true,
-            onToggle: () => {},
-            ariaLabel,
-            panelId,
-          }}
-        />,
+        <PrimaryNavigation links={links} mobileToggle={mobileToggle(true)} />,
       );
 
-      const panel = screen.getByTestId('primary-navigation-mobile-panel');
+      const panel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
       expect(panel).toBeVisible();
       for (const link of links) {
-        expect(
-          within(panel).getByRole('link', { name: link.label }),
-        ).toBeVisible();
+        const panelLink = within(panel).getByRole('link', { name: link.label });
+
+        expect(panelLink).toBeVisible();
       }
     });
 
     it('shows panelActions as a row in the open panel', () => {
       setup({
         panelActions: <button type="button">Language</button>,
-        mobileToggle: { isOpen: true, onToggle: () => {}, ariaLabel, panelId },
+        mobileToggle: mobileToggle(true),
       });
 
-      expect(
-        within(
-          screen.getByTestId('primary-navigation-panel-actions'),
-        ).getByRole('button', { name: 'Language' }),
-      ).toBeVisible();
+      const panelActions = screen.getByTestId(PANEL_ACTIONS_TEST_ID);
+      const languageButton = within(panelActions).getByRole('button', {
+        name: 'Language',
+      });
+
+      expect(languageButton).toBeVisible();
     });
 
     it('leaves panelActions out of the closed panel', () => {
       setup({
         panelActions: <button type="button">Language</button>,
-        mobileToggle: { isOpen: false, onToggle: () => {}, ariaLabel, panelId },
+        mobileToggle: mobileToggle(false),
       });
 
-      expect(
-        screen.queryByTestId('primary-navigation-panel-actions'),
-      ).not.toBeInTheDocument();
+      const panelActions = screen.queryByTestId(PANEL_ACTIONS_TEST_ID);
+
+      expect(panelActions).not.toBeInTheDocument();
     });
 
     it('shows drawerActions after the panelActions row in the open panel', () => {
       setup({
         panelActions: <button type="button">Language</button>,
         drawerActions: <button type="button">Sign in</button>,
-        mobileToggle: { isOpen: true, onToggle: () => {}, ariaLabel, panelId },
+        mobileToggle: mobileToggle(true),
       });
 
       const drawerActions = screen.getByTestId(
         'primary-navigation-drawer-actions',
       );
-      expect(
-        within(drawerActions).getByRole('button', { name: 'Sign in' }),
-      ).toBeVisible();
-      expect(
-        screen
-          .getByTestId('primary-navigation-panel-actions')
-          .compareDocumentPosition(drawerActions) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
+      const panelActions = screen.getByTestId(PANEL_ACTIONS_TEST_ID);
+      const signInButton = within(drawerActions).getByRole('button', {
+        name: 'Sign in',
+      });
+      const position = panelActions.compareDocumentPosition(drawerActions);
+
+      expect(signInButton).toBeVisible();
+      expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
     it('leaves drawerActions out of the closed panel and the bar', () => {
       setup({
         drawerActions: <button type="button">Sign in</button>,
-        mobileToggle: { isOpen: false, onToggle: () => {}, ariaLabel, panelId },
+        mobileToggle: mobileToggle(false),
       });
 
-      expect(
-        screen.queryByRole('button', { name: 'Sign in' }),
-      ).not.toBeInTheDocument();
+      const signInButton = screen.queryByRole('button', { name: 'Sign in' });
+
+      expect(signInButton).not.toBeInTheDocument();
     });
 
     it('calls onToggle when the toggle button is clicked', async () => {
       const onToggle = vi.fn();
       setup({
-        mobileToggle: { isOpen: false, onToggle, ariaLabel, panelId },
+        mobileToggle: mobileToggle(false, onToggle),
       });
 
-      await userEvent.click(screen.getByRole('button', { name: ariaLabel }));
+      const toggle = screen.getByRole('button', { name: ariaLabel });
+      await userEvent.click(toggle);
+
       expect(onToggle).toHaveBeenCalledOnce();
     });
   });

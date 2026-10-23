@@ -1,26 +1,34 @@
-import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
+import {
+  MOCK_TOPIC_DESCRIPTION,
+  MOCK_TOPIC_ID,
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+  mockRawTopic,
+} from '@blog/service/testing/entities/fixtures';
 
 import { toTopic } from './to-topic';
 
-describe('toTopic', () => {
+describe(toTopic, () => {
   it('maps all fields from raw input', () => {
-    const raw = makeRawTopic();
-    const result = toTopic(raw);
+    const result = toTopic(mockRawTopic());
 
     expect(result).toEqual({
-      id: 'topic-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: 'Engineering posts',
+      id: MOCK_TOPIC_ID,
+      title: MOCK_TOPIC_TITLE,
+      slug: MOCK_TOPIC_SLUG,
+      description: MOCK_TOPIC_DESCRIPTION,
     });
   });
 
   it('converts null description to undefined', () => {
-    const raw = makeRawTopic({ description: null });
-    expect(toTopic(raw).description).toBeUndefined();
+    const { description } = toTopic(mockRawTopic({ description: null }));
+
+    expect(description).toBeUndefined();
   });
 
   it('maps a topic with no topic page to an undefined slug', () => {
-    expect(toTopic(makeRawTopic({ slug: null })).slug).toBeUndefined();
+    const { slug } = toTopic(mockRawTopic({ slug: null }));
+
+    expect(slug).toBeUndefined();
   });
 });

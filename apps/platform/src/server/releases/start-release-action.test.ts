@@ -7,12 +7,15 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
   CONTRAST_STATUS,
   RELEASE_FIELD_ERROR,
   RELEASE_REFUSAL,
   RELEASE_RUN_STATUS,
+  RELEASE_FAILURE,
 } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import { makeAdmin } from '@platform/testing/admins/fixtures';
@@ -73,9 +76,8 @@ const OVERRIDE_REASON = 'Hotfix for a broken checkout';
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const candidate = (isRenderingChanged: boolean, headSha: string) => ({
-  ok: true,
-  data: {
+const candidate = (isRenderingChanged: boolean, headSha: string) =>
+  okResult({
     headSha,
     lastTag: 'v1.4.0',
     changes: {
@@ -84,8 +86,7 @@ const candidate = (isRenderingChanged: boolean, headSha: string) => ({
       [RELEASE_CHANGE.SANITY_MIGRATION]: false,
       [RELEASE_CHANGE.ENV]: false,
     },
-  },
-});
+  });
 
 describe('startReleaseAction', () => {
   let startReleaseAction: (typeof import('./start-release-action'))['startReleaseAction'];
@@ -103,12 +104,10 @@ describe('startReleaseAction', () => {
     getCandidateComparisonMock
       .mockReset()
       .mockResolvedValue(candidate(false, headSha));
-    getReleaseRunMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: makeReleaseRun() });
+    getReleaseRunMock.mockReset().mockResolvedValue(okResult(makeReleaseRun()));
     resolveContrastStatusMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: CONTRAST_STATUS.NONE });
+      .mockResolvedValue(okResult(CONTRAST_STATUS.NONE));
     dispatchReleaseWorkflowMock.mockReset().mockResolvedValue(true);
     insertAuditEventMock.mockReset().mockResolvedValue({ id: 'event-1' });
     ({ startReleaseAction } = await import('./start-release-action'));
@@ -116,10 +115,7 @@ describe('startReleaseAction', () => {
 
   const overrideNeeded = () => {
     getCandidateComparisonMock.mockResolvedValue(candidate(true, headSha));
-    resolveContrastStatusMock.mockResolvedValue({
-      ok: true,
-      data: CONTRAST_STATUS.DUE,
-    });
+    resolveContrastStatusMock.mockResolvedValue(okResult(CONTRAST_STATUS.DUE));
   };
 
   it('requires a super-admin before reading or dispatching anything', async () => {
@@ -170,10 +166,9 @@ describe('startReleaseAction', () => {
 
   it('releases a passing candidate without an override even when rendering changed', async () => {
     getCandidateComparisonMock.mockResolvedValue(candidate(true, headSha));
-    resolveContrastStatusMock.mockResolvedValue({
-      ok: true,
-      data: CONTRAST_STATUS.GREEN,
-    });
+    resolveContrastStatusMock.mockResolvedValue(
+      okResult(CONTRAST_STATUS.GREEN),
+    );
 
     expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -250,10 +245,7 @@ describe('startReleaseAction', () => {
   it.each([RELEASE_RUN_STATUS.DISPATCHED, RELEASE_RUN_STATUS.RUNNING])(
     'refuses a second release while one is %s',
     async (status) => {
-      getReleaseRunMock.mockResolvedValue({
-        ok: true,
-        data: makeReleaseRun({ status }),
-      });
+      getReleaseRunMock.mockResolvedValue(okResult(makeReleaseRun({ status })));
 
       const result = await startReleaseAction({ version: 'v1.5.0' });
 
@@ -266,10 +258,9 @@ describe('startReleaseAction', () => {
   );
 
   it('is unavailable when the candidate cannot be read', async () => {
-    getCandidateComparisonMock.mockResolvedValue({
-      ok: false,
-      reason: 'rateLimited',
-    });
+    getCandidateComparisonMock.mockResolvedValue(
+      errorResult(GITHUB_FAILURE.RATE_LIMITED),
+    );
 
     expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,
@@ -278,10 +269,9 @@ describe('startReleaseAction', () => {
   });
 
   it('is unavailable when the contrast status cannot be read', async () => {
-    resolveContrastStatusMock.mockResolvedValue({
-      ok: false,
-      reason: 'dbError',
-    });
+    resolveContrastStatusMock.mockResolvedValue(
+      errorResult(RELEASE_FAILURE.DB_ERROR),
+    );
 
     expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
       outcome: ACTION_OUTCOME.UNAVAILABLE,

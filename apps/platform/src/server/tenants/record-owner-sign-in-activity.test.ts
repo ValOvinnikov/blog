@@ -1,5 +1,6 @@
 import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { okResult } from '@blog/utils';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { makeMembership } from '@platform/testing/memberships/fixtures';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
@@ -47,7 +48,7 @@ describe(recordOwnerSignInActivity, () => {
       membershipFor(OWNED_TENANT, MEMBERSHIP_ROLE.OWNER),
       membershipFor(EDITED_TENANT, MEMBERSHIP_ROLE.EDITOR),
     ]);
-    touchTenantActivityMock.mockResolvedValue({ ok: true, data: OWNED_TENANT });
+    touchTenantActivityMock.mockResolvedValue(okResult(OWNED_TENANT));
     wakeTenantFromInactivityMock.mockResolvedValue(null);
   });
 

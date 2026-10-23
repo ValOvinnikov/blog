@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -29,27 +30,19 @@ const STEP = {
   auditDetails: countPersonalDataMatches,
 };
 
-const INVALID_EMAIL = {
-  ok: false,
-  error: {
-    outcome: ACTION_OUTCOME.INVALID,
-    fieldErrors: {
-      email: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID },
-    },
+const INVALID_EMAIL = errorResult({
+  outcome: ACTION_OUTCOME.INVALID,
+  fieldErrors: {
+    email: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID },
   },
-};
+});
 
-const SERVER_ERROR = {
-  ok: false,
-  error: { outcome: ACTION_OUTCOME.SERVER_ERROR },
-};
+const SERVER_ERROR = errorResult({ outcome: ACTION_OUTCOME.SERVER_ERROR });
 
 describe(runDataRequest, () => {
   beforeEach(() => {
     recordAuditEventMock.mockReset();
-    runMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: makePersonalDataMatches() });
+    runMock.mockReset().mockResolvedValue(okResult(makePersonalDataMatches()));
     vi.mocked(logger.error).mockReset();
   });
 
@@ -83,10 +76,7 @@ describe(runDataRequest, () => {
   });
 
   it('reports an email the data layer rejects as invalid', async () => {
-    runMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_INVALID_EMAIL,
-    });
+    runMock.mockResolvedValue(errorResult(ERROR_CODE.DB_INVALID_EMAIL));
 
     const result = await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
 
@@ -95,7 +85,7 @@ describe(runDataRequest, () => {
   });
 
   it('returns a server error and logs when the request fails', async () => {
-    runMock.mockResolvedValue({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    runMock.mockResolvedValue(errorResult(ERROR_CODE.DB_NOT_FOUND));
 
     const result = await runDataRequest({ email: DATA_REQUEST_EMAIL }, STEP);
     const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];

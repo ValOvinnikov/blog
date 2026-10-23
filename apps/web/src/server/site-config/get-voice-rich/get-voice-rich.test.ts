@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, type TVoicePortableText } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { VOICE_RICH_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -45,22 +46,20 @@ describe(getVoiceRich, () => {
     getSiteConfigMock.mockReset();
     getMessagesMock.mockReset();
     getMessagesMock.mockResolvedValue(BASE_MESSAGES);
-    getSiteConfigMock.mockResolvedValue({
-      ok: true,
-      data: { voiceOverridesByLocale: {} },
-    });
+    getSiteConfigMock.mockResolvedValue(
+      okResult({ voiceOverridesByLocale: {} }),
+    );
   });
 
   it('returns the stored override for the given field id', async () => {
     const override = richTextOf(OVERRIDE_EMPTY);
-    getSiteConfigMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getSiteConfigMock.mockResolvedValue(
+      okResult({
         voiceOverridesByLocale: {
           [DEFAULT_REQUEST_CONTEXT.locale]: { blogListEmpty: override },
         },
-      },
-    });
+      }),
+    );
 
     const result = await getVoiceRich(FIELD_ID);
 
@@ -74,7 +73,7 @@ describe(getVoiceRich, () => {
   });
 
   it('falls back to the catalog default and logs when the site config fetch fails', async () => {
-    getSiteConfigMock.mockResolvedValue({ ok: false, error: FETCH_ERROR });
+    getSiteConfigMock.mockResolvedValue(errorResult(FETCH_ERROR));
 
     const result = await getVoiceRich(FIELD_ID);
 
@@ -91,17 +90,16 @@ describe(getVoiceRich, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.DE,
     });
-    getSiteConfigMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getSiteConfigMock.mockResolvedValue(
+      okResult({
         voiceOverridesByLocale: {
           [LOCALE_ISO_CODES.EN]: {
             blogListEmpty: richTextOf(OVERRIDE_EMPTY),
           },
           [LOCALE_ISO_CODES.DE]: { blogListEmpty: override },
         },
-      },
-    });
+      }),
+    );
 
     const result = await getVoiceRich(FIELD_ID);
 
@@ -113,16 +111,15 @@ describe(getVoiceRich, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.DE,
     });
-    getSiteConfigMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getSiteConfigMock.mockResolvedValue(
+      okResult({
         voiceOverridesByLocale: {
           [LOCALE_ISO_CODES.EN]: {
             blogListEmpty: richTextOf(OVERRIDE_EMPTY),
           },
         },
-      },
-    });
+      }),
+    );
 
     const result = await getVoiceRich(FIELD_ID);
 

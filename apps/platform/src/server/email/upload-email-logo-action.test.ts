@@ -7,6 +7,7 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -111,10 +112,7 @@ describe(uploadEmailLogoAction, () => {
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockResolvedValue({ logoAssetUrl: undefined });
-    validateEmailLogoUploadMock.mockResolvedValue({
-      ok: true,
-      asset: VALID_ASSET,
-    });
+    validateEmailLogoUploadMock.mockResolvedValue(okResult(VALID_ASSET));
     putMock.mockResolvedValue({
       url: TENANT_LOGO_URL,
     });
@@ -170,13 +168,12 @@ describe(uploadEmailLogoAction, () => {
   });
 
   it('returns the validation error and never calls Blob when validation fails', async () => {
-    validateEmailLogoUploadMock.mockResolvedValue({
-      ok: false,
-      error: {
+    validateEmailLogoUploadMock.mockResolvedValue(
+      errorResult({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
-      },
-    });
+      }),
+    );
 
     const result = await uploadEmailLogoAction(
       TENANT_ID,

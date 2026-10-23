@@ -1,5 +1,9 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { validateImageAltFilled } from '@blog/studio/schema-types/validation/validate-image-alt-filled/validate-image-alt-filled';
+import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
 import type { ValidationContext } from 'sanity';
+
+const { EN } = LOCALE_ISO_CODES;
 
 const MESSAGE = 'Describe the image.';
 
@@ -15,24 +19,19 @@ describe(validateImageAltFilled, () => {
     ['the image is not set', undefined],
     ['the image has no asset', {}],
   ])('passes with no alt when %s', (_description, parent) => {
-    expect(
-      validate([{ _key: 'EN', language: 'EN' }], buildContext(parent)),
-    ).toBe(true);
+    expect(validate([mockLocalizedValue(EN)], buildContext(parent))).toBe(true);
   });
 
   it('fails when the image has an asset and an empty default-language alt', () => {
     expect(
-      validate(
-        [{ _key: 'EN', language: 'EN' }],
-        buildContext({ asset: ASSET }),
-      ),
+      validate([mockLocalizedValue(EN)], buildContext({ asset: ASSET })),
     ).toBe(MESSAGE);
   });
 
   it('passes when the image has an asset and a default-language alt', () => {
     expect(
       validate(
-        [{ _key: 'EN', language: 'EN', value: 'A portrait' }],
+        [mockLocalizedValue(EN, 'A portrait')],
         buildContext({ asset: ASSET }),
       ),
     ).toBe(true);

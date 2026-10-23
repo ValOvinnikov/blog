@@ -1,14 +1,20 @@
-import { CARD_IMAGE_SHAPE, SOCIAL_PLATFORMS } from '@blog/config';
+import { CARD_IMAGE_SHAPE } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeTeamMember } from '@web/testing/modules/team/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import {
+  MOCK_TEAM_MEMBER_BIO,
+  MOCK_TEAM_MEMBER_PROFILE_URL,
+  mockTeamMember,
+} from '@web/testing/modules/team/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
 
 import { TeamMemberCard } from './team-member-card';
 
 vi.mock('@web/i18n/navigation');
 
-const member = makeTeamMember();
+const member = mockTeamMember();
+const GITHUB_PROFILE = mockSocialProfile();
 
 const setup = customRender(TeamMemberCard, {
   member,
@@ -24,63 +30,52 @@ describe(`<${TeamMemberCard.name}/>`, () => {
   });
 
   it('renders initials, never an empty avatar, when the member has no photo', () => {
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('JR')).toBeVisible();
+    const missingPhoto = screen.queryByRole('img');
+    const initials = screen.getByText('JR');
+    expect(missingPhoto).not.toBeInTheDocument();
+    expect(initials).toBeVisible();
     unmount();
 
-    setup({ member: makeTeamMember({ image: makeSanityImage() }) });
+    setup({ member: mockTeamMember({ image: mockSanityImage() }) });
 
-    expect(screen.getByRole('img')).toBeVisible();
-    expect(screen.queryByText('JR')).not.toBeInTheDocument();
+    const photo = screen.getByRole('img');
+    const hiddenInitials = screen.queryByText('JR');
+    expect(photo).toBeVisible();
+    expect(hiddenInitials).not.toBeInTheDocument();
   });
 
   it("links the person's name only when a profile page is set", () => {
-    expect(
-      screen.queryByRole('link', { name: member.name }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText(member.name, { ignore: '.sr-only' })).toBeVisible();
+    const missingLink = screen.queryByRole('link', { name: member.name });
+    const name = screen.getByText(member.name, { ignore: '.sr-only' });
+    expect(missingLink).not.toBeInTheDocument();
+    expect(name).toBeVisible();
     unmount();
 
     setup({
-      member: makeTeamMember({ profileUrl: '/team/jordan-reyes' }),
+      member: mockTeamMember({ profileUrl: MOCK_TEAM_MEMBER_PROFILE_URL }),
     });
 
-    expect(screen.getByRole('link', { name: member.name })).toHaveAttribute(
-      'href',
-      '/team/jordan-reyes',
-    );
+    const profileLink = screen.getByRole('link', { name: member.name });
+    expect(profileLink).toHaveAttribute('href', MOCK_TEAM_MEMBER_PROFILE_URL);
   });
 
-  it('renders the bio and social links only when the loader supplied them', () => {
-    expect(
-      screen.queryByText('Builds resilient distributed systems.'),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  it('renders the bio and social links only when supplied', () => {
+    const missingBio = screen.queryByText(MOCK_TEAM_MEMBER_BIO);
+    const missingSocialList = screen.queryByRole('list');
+    expect(missingBio).not.toBeInTheDocument();
+    expect(missingSocialList).not.toBeInTheDocument();
     unmount();
 
     setup({
-      member: makeTeamMember({
-        bio: [portableTextBlock('Builds resilient distributed systems.')],
-        socialLinks: [
-          {
-            platform: SOCIAL_PLATFORMS.GITHUB,
-            link: {
-              label: 'GitHub',
-              href: 'https://github.com/jreyes',
-              target: '_blank',
-              platform: undefined,
-              ariaLabel: undefined,
-            },
-          },
-        ],
+      member: mockTeamMember({
+        bio: [portableTextBlock(MOCK_TEAM_MEMBER_BIO)],
+        socialLinks: [GITHUB_PROFILE],
       }),
     });
 
-    expect(
-      screen.getByText('Builds resilient distributed systems.'),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'GitHub profile' }),
-    ).toHaveAttribute('href', 'https://github.com/jreyes');
+    const bio = screen.getByText(MOCK_TEAM_MEMBER_BIO);
+    const socialLink = screen.getByRole('link', { name: 'GitHub profile' });
+    expect(bio).toBeVisible();
+    expect(socialLink).toHaveAttribute('href', GITHUB_PROFILE.link.href);
   });
 });

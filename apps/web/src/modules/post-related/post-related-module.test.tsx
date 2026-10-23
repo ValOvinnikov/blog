@@ -1,12 +1,10 @@
-import { BRAND_VARIANT } from '@blog/config';
-import { getRequestContext } from '@web/server/request-context/request-context';
+import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockPostRelatedModuleData } from '@web/testing/modules/post-related/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { PostRelatedModule } from './post-related-module';
@@ -27,24 +25,11 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const FIRST_POST_TITLE = 'First post';
 const POST_RELATED_ID = 'post-related-1';
 const ANCHOR_POST_ID = 'anchor-post-1';
-const MODULE_HEADING = 'Related reading';
-
-const makePost = (overrides: Record<string, unknown> = {}) => ({
-  id: 'post-1',
-  slug: 'first-post',
-  title: FIRST_POST_TITLE,
-  excerpt: 'An excerpt',
-  publishedAt: '2026-01-01T00:00:00.000Z',
-  topic: { id: 'topic-1', title: 'News', slug: 'news' },
-  readingTimeMinutes: 2,
-  ...overrides,
-});
 
 const setup = customRenderAsync(PostRelatedModule, {
   id: POST_RELATED_ID,
@@ -54,23 +39,10 @@ const setup = customRenderAsync(PostRelatedModule, {
 describe(`<${PostRelatedModule.name}/>`, () => {
   beforeEach(() => {
     getPostRelatedMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    loggerWarnMock.mockReset();
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
+    getPostRelatedMock.mockResolvedValue(okResult(mockPostRelatedModuleData()));
   });
 
-  it('calls getPostRelated with the module id, anchor post id and tenant context', async () => {
+  it('fetches posts related to the anchor post', async () => {
     await setup();
 
     expect(getPostRelatedMock).toHaveBeenCalledWith(
@@ -80,7 +52,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     );
   });
 
-  it('renders nothing and warns once, without calling the service, with no post', async () => {
+  it('renders nothing and warns once without an anchor post', async () => {
     const { container } = await setup({ context: undefined });
 
     expect(container).toBeEmptyDOMElement();
@@ -93,93 +65,82 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPostRelatedMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
+  it('renders nothing when no posts resolve', async () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it('renders the resolved posts and no pagination nav', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
-        posts: [makePost()],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
+    getPostRelatedMock.mockResolvedValue(
+      okResult(
+        mockPostRelatedModuleData({
+          posts: [makePostCard({ title: FIRST_POST_TITLE })],
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(screen.getByText(FIRST_POST_TITLE)).toBeVisible();
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    const postTitle = screen.getByText(FIRST_POST_TITLE);
+    const pagination = screen.queryByRole('navigation');
+    expect(postTitle).toBeVisible();
+    expect(pagination).not.toBeInTheDocument();
   });
 
   it('renders each post image when showImages is true', async () => {
-    const sanityImage = makeSanityImage();
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
-        posts: [makePost({ heroImage: sanityImage })],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: true,
-      },
-    });
+    const sanityImage = mockSanityImage();
+    getPostRelatedMock.mockResolvedValue(
+      okResult(
+        mockPostRelatedModuleData({
+          posts: [makePostCard({ heroImage: sanityImage })],
+          showImages: true,
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(screen.getByRole('img', { name: sanityImage.alt })).toBeVisible();
+    const image = screen.getByRole('img', { name: sanityImage.alt });
+    expect(image).toBeVisible();
   });
 
   it('renders no post images when showImages is false', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
-        posts: [makePost({ heroImage: makeSanityImage() })],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
+    getPostRelatedMock.mockResolvedValue(
+      okResult(
+        mockPostRelatedModuleData({
+          posts: [makePostCard({ heroImage: mockSanityImage() })],
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const image = screen.queryByRole('img');
+    expect(image).not.toBeInTheDocument();
   });
 
   it('renders a related post whose excerpt is absent, without throwing', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: MODULE_HEADING }),
-        posts: [makePost({ excerpt: undefined })],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
+    getPostRelatedMock.mockResolvedValue(
+      okResult(
+        mockPostRelatedModuleData({
+          posts: [
+            makePostCard({ title: FIRST_POST_TITLE, excerpt: undefined }),
+          ],
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(screen.getByText(FIRST_POST_TITLE)).toBeVisible();
+    const postTitle = screen.getByText(FIRST_POST_TITLE);
+    expect(postTitle).toBeVisible();
   });
 });

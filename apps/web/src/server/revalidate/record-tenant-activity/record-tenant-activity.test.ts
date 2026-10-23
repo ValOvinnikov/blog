@@ -1,4 +1,5 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { TENANT_ACTIVITY_TOUCH_FAILED_EVENT } from '@web/constants/revalidate';
 import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -26,10 +27,9 @@ describe(recordTenantActivity, () => {
   });
 
   it("moves the tenant's last activity to the given time", async () => {
-    touchTenantActivityMock.mockResolvedValue({
-      ok: true,
-      data: { id: DEFAULT_TENANT_ID },
-    });
+    touchTenantActivityMock.mockResolvedValue(
+      okResult({ id: DEFAULT_TENANT_ID }),
+    );
 
     await recordTenantActivity(DEFAULT_TENANT_ID, AT);
 
@@ -52,10 +52,9 @@ describe(recordTenantActivity, () => {
   });
 
   it('logs and resolves when the update returns a failure', async () => {
-    touchTenantActivityMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    touchTenantActivityMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     await expect(
       recordTenantActivity(DEFAULT_TENANT_ID, AT),

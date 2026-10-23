@@ -1,14 +1,16 @@
 import {
+  DEPROVISIONING_STEP,
   SUSPENSION_REASON,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
 import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisioning-run';
 import * as schema from '@blog/db/schema';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
+import { MOCK_IDLE_DEPROVISIONING_STEPS } from '@blog/db/testing/tenants/fixtures';
+import { MOCK_LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
 import { eq } from 'drizzle-orm';
 
 import { wakeTenantFromInactivity } from './wake-tenant-from-inactivity';
@@ -19,21 +21,23 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const { DONE, IDLE } = TENANT_PROVISIONING_STEP_STATUS;
-
 async function insertTenantSuspendedForInactivity(
-  deprovisioningSteps: TTenant['deprovisioningSteps'],
+  overrides: Parameters<typeof insertTestTenant>[1] = {},
 ) {
   return insertTestTenant(db(), {
     status: TENANT_STATUS.SUSPENDED,
     suspensionReason: SUSPENSION_REASON.INACTIVITY,
-    deprovisioningSteps,
+    ...overrides,
   });
 }
 
-async function readTenant(tenantId: string) {
+async function readSuspension(tenantId: string) {
   const [row] = await db()
-    .select()
+    .select({
+      status: tenants.status,
+      suspendedAt: tenants.suspendedAt,
+      suspensionReason: tenants.suspensionReason,
+    })
     .from(tenants)
     .where(eq(tenants.id, tenantId));
   return row;
@@ -44,17 +48,15 @@ afterEach(async () => {
 });
 
 describe(wakeTenantFromInactivity, () => {
-  it('returns a tenant suspended for inactivity to active and clears its suspension', async () => {
-    const tenant = await insertTestTenant(db(), {
-      status: TENANT_STATUS.SUSPENDED,
-      suspendedAt: LAST_ACTIVITY_AT,
-      suspensionReason: SUSPENSION_REASON.INACTIVITY,
+  it('reactivates a tenant suspended for inactivity and clears its suspension', async () => {
+    const tenant = await insertTenantSuspendedForInactivity({
+      suspendedAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     const woken = await wakeTenantFromInactivity(tenant.id);
 
     expect(woken?.id).toBe(tenant.id);
-    expect(await readTenant(tenant.id)).toMatchObject({
+    expect(await readSuspension(tenant.id)).toEqual({
       status: TENANT_STATUS.ACTIVE,
       suspendedAt: null,
       suspensionReason: null,
@@ -62,10 +64,7 @@ describe(wakeTenantFromInactivity, () => {
   });
 
   it('wakes a tenant only once', async () => {
-    const tenant = await insertTestTenant(db(), {
-      status: TENANT_STATUS.SUSPENDED,
-      suspensionReason: SUSPENSION_REASON.INACTIVITY,
-    });
+    const tenant = await insertTenantSuspendedForInactivity();
 
     await wakeTenantFromInactivity(tenant.id);
 
@@ -79,8 +78,9 @@ describe(wakeTenantFromInactivity, () => {
     });
 
     expect(await wakeTenantFromInactivity(tenant.id)).toBeNull();
-    expect(await readTenant(tenant.id)).toMatchObject({
+    expect(await readSuspension(tenant.id)).toEqual({
       status: TENANT_STATUS.SUSPENDED,
+      suspendedAt: null,
       suspensionReason: SUSPENSION_REASON.OPERATOR,
     });
   });
@@ -94,34 +94,37 @@ describe(wakeTenantFromInactivity, () => {
   });
 
   it('leaves a deprovisioned tenant untouched', async () => {
-    const tenant = await insertTestTenant(db(), {
-      status: TENANT_STATUS.SUSPENDED,
-      suspensionReason: SUSPENSION_REASON.INACTIVITY,
-      deprovisionedAt: LAST_ACTIVITY_AT,
+    const tenant = await insertTenantSuspendedForInactivity({
+      deprovisionedAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     expect(await wakeTenantFromInactivity(tenant.id)).toBeNull();
-    expect((await readTenant(tenant.id))?.status).toBe(TENANT_STATUS.SUSPENDED);
+    expect((await readSuspension(tenant.id))?.status).toBe(
+      TENANT_STATUS.SUSPENDED,
+    );
   });
 
   it('leaves a tenant suspended once a deprovisioning step is recorded', async () => {
     const tenant = await insertTenantSuspendedForInactivity({
-      run: { startedAt: LAST_ACTIVITY_AT.toISOString() },
-      REMOVE_DOMAIN: { status: DONE },
-      ARCHIVE_SANITY_PROJECT: { status: IDLE },
-      REVOKE_SANITY_TOKENS: { status: IDLE },
-      CLEAR_ARTIFACTS: { status: IDLE },
-      ARCHIVE_TENANT: { status: IDLE },
-      PURGE_READER_DATA: { status: IDLE },
-      INVALIDATE_TENANT_CACHE: { status: IDLE },
+      deprovisioningSteps: {
+        run: { startedAt: MOCK_LAST_ACTIVITY_AT.toISOString() },
+        ...MOCK_IDLE_DEPROVISIONING_STEPS,
+        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+      },
     });
 
     expect(await wakeTenantFromInactivity(tenant.id)).toBeNull();
-    expect((await readTenant(tenant.id))?.status).toBe(TENANT_STATUS.SUSPENDED);
+    expect((await readSuspension(tenant.id))?.status).toBe(
+      TENANT_STATUS.SUSPENDED,
+    );
   });
 
   it('leaves a tenant suspended once its deprovisioning run has started', async () => {
-    const tenant = await insertTenantSuspendedForInactivity(null);
+    const tenant = await insertTenantSuspendedForInactivity({
+      deprovisioningSteps: null,
+    });
     await startDeprovisioningRun({ tenantId: tenant.id });
 
     expect(await wakeTenantFromInactivity(tenant.id)).toBeNull();

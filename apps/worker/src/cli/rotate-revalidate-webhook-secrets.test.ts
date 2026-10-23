@@ -1,7 +1,7 @@
 import { listTenants } from '@blog/db/queries/tenants';
 import { faker } from '@faker-js/faker';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
-import { makeTenant } from '@worker/testing/tenant/fixtures';
+import { mockTenant } from '@worker/testing/tenant/fixtures';
 
 import { rotateRevalidateWebhookSecrets } from './rotate-revalidate-webhook-secrets';
 
@@ -18,8 +18,8 @@ vi.mock('@worker/steps/create-revalidate-webhook');
 
 const ENCRYPTED_SECRET = 'encrypted-secret';
 
-function provisionedTenant(overrides: Parameters<typeof makeTenant>[0] = {}) {
-  return makeTenant({
+function provisionedTenant(overrides: Parameters<typeof mockTenant>[0] = {}) {
+  return mockTenant({
     id: faker.string.uuid(),
     sanityProjectId: faker.string.alphanumeric(8),
     webhookCreatedAt: new Date(),

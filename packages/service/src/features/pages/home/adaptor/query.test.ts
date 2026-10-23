@@ -1,17 +1,30 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_HERO_MODULE_ID,
+  MOCK_POST_LATEST_MODULE_ID,
+  mockRawHomePage,
+} from '@blog/service/testing/pages/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { homePageQuery } from './query';
 
+const { EN, NL, FR } = LOCALE_ISO_CODES;
 const EN_HOME_ID = 'en-home';
 const NL_HOME_ID = 'nl-home';
+
+function run(dataset: unknown[], locale: string): Promise<unknown> {
+  return evaluateGroqExpression(homePageQuery.query, dataset, null, {
+    locale,
+    defaultLocale: EN,
+  });
+}
 
 describe('homePageQuery', () => {
   it.each([
     [
       'whose SEO openGraph has no image',
-      makeRawHomePage({
+      mockRawHomePage({
         seo: {
           metaTitle: 'Home',
           metaDescription: null,
@@ -19,14 +32,14 @@ describe('homePageQuery', () => {
         },
       }),
     ],
-    ['with a headingBlock and no hero', makeRawHomePage({ hero: null })],
+    ['with a headingBlock and no hero', mockRawHomePage({ hero: null })],
   ])('parses a home page %s', (_, raw) => {
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
 
   it.each([
-    ['authored SEO', { ...makeRawHomePage(), seo: null }],
-    ['heading block', { ...makeRawHomePage(), headingBlock: null }],
+    ['authored SEO', { ...mockRawHomePage(), seo: null }],
+    ['heading block', { ...mockRawHomePage(), headingBlock: null }],
   ])('rejects a home page with no %s', (_, raw) => {
     expect(() => homePageQuery.parse(raw)).toThrow();
   });
@@ -37,8 +50,6 @@ describe('homePageQuery', () => {
 });
 
 describe('homePageQuery language scoping', () => {
-  const { EN, NL, FR } = LOCALE_ISO_CODES;
-
   function home(id: string, heading: string, language?: string) {
     return {
       _id: id,
@@ -46,13 +57,6 @@ describe('homePageQuery language scoping', () => {
       headingBlock: { heading },
       ...(language ? { language } : {}),
     };
-  }
-
-  function run(dataset: unknown[], locale: string): Promise<unknown> {
-    return evaluateGroqExpression(homePageQuery.query, dataset, null, {
-      locale,
-      defaultLocale: EN,
-    });
   }
 
   const dataset = [
@@ -90,9 +94,8 @@ describe('homePageQuery language scoping', () => {
 });
 
 describe('homePageQuery template layout', () => {
-  const { EN, NL } = LOCALE_ISO_CODES;
   const TEMPLATE_ID = 'template-home';
-  const MODULE_ID = 'post-latest-1';
+  const MODULE_ID = MOCK_POST_LATEST_MODULE_ID;
 
   function home(id: string, language: string, template?: string) {
     return {
@@ -100,7 +103,7 @@ describe('homePageQuery template layout', () => {
       _type: 'page_home',
       language,
       headingBlock: { heading: id },
-      ...(template ? { template: { _type: 'reference', _ref: template } } : {}),
+      ...(template ? { template: mockReference(template) } : {}),
     };
   }
 
@@ -110,19 +113,12 @@ describe('homePageQuery template layout', () => {
     {
       _id: TEMPLATE_ID,
       _type: 'template_home',
-      hero: { _type: 'reference', _ref: 'hero-1' },
-      modules: [{ _key: 'a', _type: 'reference', _ref: MODULE_ID }],
+      hero: mockReference(MOCK_HERO_MODULE_ID),
+      modules: [mockReference(MODULE_ID, { _key: 'a' })],
     },
-    { _id: 'hero-1', _type: 'module_heroBlog' },
+    { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroBlog' },
     { _id: MODULE_ID, _type: 'module_postLatest' },
   ];
-
-  function run(data: unknown[], locale: string): Promise<unknown> {
-    return evaluateGroqExpression(homePageQuery.query, data, null, {
-      locale,
-      defaultLocale: EN,
-    });
-  }
 
   it.each([
     [EN, EN_HOME_ID],
@@ -132,7 +128,7 @@ describe('homePageQuery template layout', () => {
     async (locale, id) => {
       expect(await run(dataset, locale)).toMatchObject({
         _id: id,
-        hero: { _id: 'hero-1', _type: 'module_heroBlog' },
+        hero: { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroBlog' },
         modules: [{ _id: MODULE_ID, _type: 'module_postLatest' }],
       });
     },

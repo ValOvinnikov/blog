@@ -1,47 +1,52 @@
 import { getPublishedPostBody } from '@blog/service/features/editorial/skim/adaptor/get-post-body/loader';
 import { saveSkimDraft } from '@blog/service/features/editorial/skim/adaptor/save-skim-draft/loader';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockSkimDraftInput } from '@blog/service/testing/editorial/fixtures';
+import {
+  MOCK_MISSING_ID,
+  MOCK_POST_ID,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { createSkimService } from './service';
 
 vi.mock('@blog/service/features/editorial/skim/adaptor/get-post-body/loader');
 vi.mock('@blog/service/features/editorial/skim/adaptor/save-skim-draft/loader');
 
+const SKIM_INPUT = mockSkimDraftInput();
+
 const mockGetPublishedPostBody = vi.mocked(getPublishedPostBody);
 const mockSaveSkimDraft = vi.mocked(saveSkimDraft);
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('createSkimService', () => {
+describe(createSkimService, () => {
   describe('v1.getPublishedPostBody', () => {
     beforeEach(() => {
       mockGetPublishedPostBody.mockResolvedValue([]);
     });
 
-    it('resolves ok:true with the loader data on success', async () => {
+    it('resolves ok:true with the data the loader read for the tenant', async () => {
       const result = await createSkimService().v1.getPublishedPostBody(
-        'post-1',
+        MOCK_POST_ID,
         tenant,
       );
 
       expect(result).toEqual({ ok: true, data: [] });
+      expect(mockGetPublishedPostBody).toHaveBeenCalledWith(
+        MOCK_POST_ID,
+        tenant,
+      );
     });
 
     it('resolves ok:false with the error when the loader throws', async () => {
       const error = new Error('no published post');
-      mockGetPublishedPostBody.mockRejectedValue(error);
+      mockGetPublishedPostBody.mockRejectedValueOnce(error);
 
       const result = await createSkimService().v1.getPublishedPostBody(
-        'missing',
+        MOCK_MISSING_ID,
         tenant,
       );
 
       expect(result).toEqual({ ok: false, error });
-    });
-
-    it('passes tenant context through to the loader', async () => {
-      await createSkimService().v1.getPublishedPostBody('post-1', tenant);
-
-      expect(mockGetPublishedPostBody).toHaveBeenCalledWith('post-1', tenant);
     });
   });
 
@@ -50,45 +55,26 @@ describe('createSkimService', () => {
       mockSaveSkimDraft.mockResolvedValue(undefined);
     });
 
-    it('resolves ok:true after a successful patch', async () => {
+    it('resolves ok:true after saving the input for the tenant', async () => {
       const result = await createSkimService().v1.saveSkimDraft(
-        {
-          postId: 'post-1',
-          takeaways: ['a', 'b', 'c'],
-          model: 'claude-haiku-4-5',
-        },
+        SKIM_INPUT,
         tenant,
       );
 
       expect(result).toEqual({ ok: true, data: undefined });
+      expect(mockSaveSkimDraft).toHaveBeenCalledWith(SKIM_INPUT, tenant);
     });
 
     it('resolves ok:false with the error when the patch throws', async () => {
       const error = new Error('SANITY_API_WRITE_TOKEN is not set');
-      mockSaveSkimDraft.mockRejectedValue(error);
+      mockSaveSkimDraft.mockRejectedValueOnce(error);
 
       const result = await createSkimService().v1.saveSkimDraft(
-        {
-          postId: 'post-1',
-          takeaways: ['a', 'b', 'c'],
-          model: 'claude-haiku-4-5',
-        },
+        SKIM_INPUT,
         tenant,
       );
 
       expect(result).toEqual({ ok: false, error });
-    });
-
-    it('passes tenant context through to the loader', async () => {
-      const input = {
-        postId: 'post-1',
-        takeaways: ['a', 'b', 'c'],
-        model: 'x',
-      };
-
-      await createSkimService().v1.saveSkimDraft(input, tenant);
-
-      expect(mockSaveSkimDraft).toHaveBeenCalledWith(input, tenant);
     });
   });
 });

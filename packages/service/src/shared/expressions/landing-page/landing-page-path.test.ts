@@ -1,3 +1,4 @@
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import {
@@ -5,12 +6,15 @@ import {
   PAGE_PATH_EXPRESSION,
 } from './landing-page-path';
 
+const UNDER_SLUGLESS_ID = 'under-slugless';
+const FAQ_PATH = 'modules/faq';
+
 function landing(id: string, slug: string | null, parent?: string) {
   return {
     _id: id,
     _type: 'page_landing',
     ...(slug ? { slug: { current: slug } } : {}),
-    ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
+    ...(parent ? { parent: mockReference(parent) } : {}),
   };
 }
 
@@ -21,7 +25,7 @@ const dataset = [
   landing('too-deep', 'too-deep', 'answers'),
   landing('orphan', 'orphan', 'deleted'),
   landing('slugless', null),
-  landing('under-slugless', 'under-slugless', 'slugless'),
+  landing(UNDER_SLUGLESS_ID, UNDER_SLUGLESS_ID, 'slugless'),
   { _id: 'post', _type: 'page_post', slug: { current: 'hello' } },
 ];
 
@@ -37,13 +41,13 @@ function resolvePath(id: string, expression: string): Promise<unknown> {
 describe('LANDING_PAGE_PATH_EXPRESSION', () => {
   it.each([
     ['modules', 'modules'],
-    ['faq', 'modules/faq'],
+    ['faq', FAQ_PATH],
     ['answers', 'modules/faq/answers'],
   ])('resolves %s to its full path', async (id, path) => {
     expect(await resolvePath(id, LANDING_PAGE_PATH_EXPRESSION)).toBe(path);
   });
 
-  it.each(['too-deep', 'orphan', 'under-slugless'])(
+  it.each(['too-deep', 'orphan', UNDER_SLUGLESS_ID])(
     'resolves no path for %s',
     async (id) => {
       expect(await resolvePath(id, LANDING_PAGE_PATH_EXPRESSION)).toBeNull();
@@ -53,7 +57,7 @@ describe('LANDING_PAGE_PATH_EXPRESSION', () => {
 
 describe('PAGE_PATH_EXPRESSION', () => {
   it('resolves a landing page to its full path', async () => {
-    expect(await resolvePath('faq', PAGE_PATH_EXPRESSION)).toBe('modules/faq');
+    expect(await resolvePath('faq', PAGE_PATH_EXPRESSION)).toBe(FAQ_PATH);
   });
 
   it('resolves any other page to its slug', async () => {

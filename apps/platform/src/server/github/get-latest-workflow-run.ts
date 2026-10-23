@@ -1,7 +1,11 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { z } from 'zod';
 
-import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
+import {
+  fetchGitHubJson,
+  recoverNotFound,
+  type TGitHubResult,
+} from './fetch-github';
 
 const runsSchema = z.object({
   workflow_runs: z.array(
@@ -48,9 +52,5 @@ export const getLatestWorkflowRun = async (
     },
   );
 
-  if (!result.ok && result.reason === 'notFound') {
-    return { ok: true, data: undefined };
-  }
-
-  return result;
+  return recoverNotFound(result, undefined);
 };

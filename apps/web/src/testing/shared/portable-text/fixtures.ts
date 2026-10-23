@@ -1,6 +1,10 @@
-import { IMAGE_LAYOUT, type TPortableTextBlock } from '@blog/config';
+import {
+  IMAGE_LAYOUT,
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type TPortableTextBlock,
+} from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
 export type TPortableTextSpan = TPortableTextBlock['children'][number];
 
@@ -77,7 +81,7 @@ export const richTextDemo: TPortableTextBody = [
     {
       markDefs: [
         {
-          _type: 'linkRef',
+          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
           _key: 'link-1',
           link: { href: 'https://example.com', target: undefined },
         },
@@ -95,9 +99,9 @@ export const richTextDemo: TPortableTextBody = [
     'A paragraph after the code block, before an inline image.',
   ),
   {
-    _type: 'bodyImage',
+    _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
     _key: nextKey('image'),
-    image: makeSanityImage({ alt: 'A scenic mountain range at sunset' }),
+    image: mockSanityImage({ alt: 'A scenic mountain range at sunset' }),
     layout: IMAGE_LAYOUT.FLOAT_LEFT,
   },
   portableTextBlock(
@@ -110,9 +114,9 @@ export const fullBleedImageDemo: TPortableTextBody = [
     'A paragraph before a full bleed image. Full bleed images break out of the text measure and reach both viewport edges.',
   ),
   {
-    _type: 'bodyImage',
+    _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
     _key: nextKey('image'),
-    image: makeSanityImage({ alt: 'A panoramic mountain range' }),
+    image: mockSanityImage({ alt: 'A panoramic mountain range' }),
     layout: IMAGE_LAYOUT.FULL_BLEED,
   },
   portableTextBlock(

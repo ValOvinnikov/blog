@@ -7,6 +7,7 @@ import {
   RADIUS_SCALE,
   type TLocaleIsoCode,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
@@ -78,17 +79,13 @@ const renderLayout = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
   }) as unknown as Promise<TAnyElement>;
 
 const settingsFailure = () =>
-  getSiteSettingsMock.mockResolvedValue({
-    ok: false,
-    error: 'boom',
-  } as never);
+  getSiteSettingsMock.mockResolvedValue(errorResult('boom') as never);
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'Blog', logo: undefined } },
-    } as never);
+    getSiteSettingsMock.mockResolvedValue(
+      okResult({ brand: { name: 'Blog', logo: undefined } }) as never,
+    );
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     isProductionEnvironmentMock.mockReturnValue(true);

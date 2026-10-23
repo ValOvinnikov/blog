@@ -10,7 +10,7 @@ import {
   type TDedupeKeyParts,
 } from '@blog/db/queries/findings/build-dedupe-key';
 import { findings, type TFinding } from '@blog/db/schema/findings';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq, sql } from 'drizzle-orm';
 
 export type TOpenFindingInput = TDedupeKeyParts & {
@@ -50,7 +50,7 @@ export async function openFinding(
     .returning();
 
   if (inserted) {
-    return { ok: true, data: { finding: inserted, isNewlyOpened: true } };
+    return okResult({ finding: inserted, isNewlyOpened: true });
   }
 
   const [updated] = await db
@@ -65,8 +65,8 @@ export async function openFinding(
     .returning();
 
   if (!updated) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: { finding: updated, isNewlyOpened: false } };
+  return okResult({ finding: updated, isNewlyOpened: false });
 }

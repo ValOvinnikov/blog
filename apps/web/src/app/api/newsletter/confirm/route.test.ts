@@ -6,6 +6,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
@@ -53,10 +54,7 @@ describe('GET /api/newsletter/confirm', () => {
       outcome: SUBSCRIBER_OUTCOME.CONFIRMED,
       subscriber: makeSubscriber(),
     });
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: true,
-      tenantId: DEFAULT_TENANT_ID,
-    });
+    resolveWritableTenantMock.mockResolvedValue(okResult(DEFAULT_TENANT_ID));
     resolveNewsletterLinkLocaleMock.mockResolvedValue(
       makeNewsletterLinkLocale(),
     );
@@ -135,10 +133,9 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('sends an inactive tenant to the unavailable page without confirming', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.INACTIVE,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
+    );
     const response = await GET(request);
 
     expect(response.headers.get('location')).toBe(
@@ -148,10 +145,9 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('sends an unresolved tenant to the failed page without querying the db', async () => {
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: false,
-      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
-    });
+    resolveWritableTenantMock.mockResolvedValue(
+      errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
+    );
     const response = await GET(request);
 
     expect(response.headers.get('location')).toBe(FAILED_LOCATION);

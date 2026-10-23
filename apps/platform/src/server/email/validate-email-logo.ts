@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { ACTION_OUTCOME } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
   readImageUpload,
@@ -35,51 +36,39 @@ export const validateEmailLogoUpload = async (
   if (!read.ok) {
     return read;
   }
-  const { buffer, type, width, height } = read.image;
+  const { buffer, type, width, height } = read.data;
 
   if (type === 'svg') {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
+    });
   }
   if (type === 'webp') {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.EMAIL_LOGO_WEBP,
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.EMAIL_LOGO_WEBP,
+    });
   }
 
   const format = type ? IMAGE_FORMAT_BY_DETECTED_TYPE[type] : undefined;
   if (!format) {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.EMAIL_LOGO_TYPE_UNSUPPORTED,
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.EMAIL_LOGO_TYPE_UNSUPPORTED,
+    });
   }
 
   if (
     width > EMAIL_LOGO_MAX_DIMENSION_PX ||
     height > EMAIL_LOGO_MAX_DIMENSION_PX
   ) {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.IMAGE_TOO_LARGE,
-        values: { size: EMAIL_LOGO_MAX_DIMENSION_PX },
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.IMAGE_TOO_LARGE,
+      values: { size: EMAIL_LOGO_MAX_DIMENSION_PX },
+    });
   }
 
-  return { ok: true, asset: { buffer, ...format } };
+  return okResult({ buffer, ...format });
 };

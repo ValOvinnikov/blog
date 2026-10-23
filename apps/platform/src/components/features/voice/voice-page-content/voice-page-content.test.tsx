@@ -6,7 +6,12 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  makeReadyTenant,
+  MOCK_ARCHIVED_AT,
+} from '@platform/testing/tenants/fixtures';
+import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent from '@testing-library/user-event';
 
@@ -33,79 +38,90 @@ const tenant = makeReadyTenant();
 
 const setup = customRenderAsync(VoicePageContent, { tenant });
 
-const notFoundHeading = () =>
-  within(screen.getByRole('region', { name: 'Page not found' })).getByRole(
-    'textbox',
-    { name: 'Heading' },
-  );
+const notFoundHeading = () => {
+  const notFoundRegion = screen.getByRole('region', {
+    name: 'Page not found',
+  });
+
+  return within(notFoundRegion).getByRole('textbox', { name: 'Heading' });
+};
 
 describe(`<${VoicePageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
+    getSiteConfigMock.mockResolvedValue(undefined);
     selectLiveLocalesMock.mockReset();
     selectLiveLocalesMock.mockReturnValue([EN]);
   });
 
   it('shows every field at its default when there is no site_config row', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup();
 
-    expect(notFoundHeading()).toHaveValue('');
-    expect(screen.getAllByText('Default')).toHaveLength(11);
+    const headingInput = notFoundHeading();
+    const defaultBadges = screen.getAllByText('Default');
+
+    expect(headingInput).toHaveValue('');
+    expect(defaultBadges).toHaveLength(11);
   });
 
   it("renders the default language's saved override as the field value", async () => {
     getSiteConfigMock.mockResolvedValue({
       ...defaultLookFormValues(),
       voiceOverridesByLocale: {
-        [EN]: { notFoundHeading: 'Nothing here' },
+        [EN]: { notFoundHeading: NOTHING_HERE },
         [DE]: { notFoundHeading: 'Nichts hier' },
       },
     });
 
     await setup();
 
-    expect(notFoundHeading()).toHaveValue('Nothing here');
+    const headingInput = notFoundHeading();
+
+    expect(headingInput).toHaveValue(NOTHING_HERE);
   });
 
-  it('offers a language switcher over the live languages', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-    selectLiveLocalesMock.mockReturnValue([EN, DE]);
+  describe('with a second live language', () => {
+    beforeEach(async () => {
+      selectLiveLocalesMock.mockReturnValue([EN, DE]);
+      await setup();
+    });
 
-    await setup();
+    it('offers a language switcher over the live languages', () => {
+      const languageSwitcher = screen.getByRole('group', { name: 'Language' });
 
-    expect(screen.getByRole('group', { name: 'Language' })).toBeVisible();
-  });
+      expect(languageSwitcher).toBeVisible();
+    });
 
-  it('renders the empty-list specimen in the language being edited', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-    selectLiveLocalesMock.mockReturnValue([EN, DE]);
-    const user = userEvent.setup();
+    it('renders the empty-list specimen in the language being edited', async () => {
+      const user = userEvent.setup();
+      const germanButton = screen.getByRole('button', { name: 'German' });
+      await user.click(germanButton);
 
-    await setup();
-    await user.click(screen.getByRole('button', { name: 'German' }));
+      const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
+      const specimenRoot = screen.getByTestId('voice-specimen-ARCHIVE');
+      const specimen = within(specimenRoot);
+      const eyebrowText = specimen.getByText(eyebrow);
+      const headingText = specimen.getByText(heading);
+      const countText = specimen.getByText(count);
 
-    const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
-    const specimen = within(screen.getByTestId('voice-specimen-ARCHIVE'));
-    expect(specimen.getByText(eyebrow)).toBeInTheDocument();
-    expect(specimen.getByText(heading)).toBeInTheDocument();
-    expect(specimen.getByText(count)).toBeInTheDocument();
+      expect(eyebrowText).toBeInTheDocument();
+      expect(headingText).toBeInTheDocument();
+      expect(countText).toBeInTheDocument();
+    });
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup({
       tenant: {
         ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       },
     });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
-    ).not.toBeInTheDocument();
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+    const saveButton = screen.queryByRole('button', { name: 'Save changes' });
+
+    expect(archivedNotice).toBeVisible();
+    expect(saveButton).not.toBeInTheDocument();
   });
 });

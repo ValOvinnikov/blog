@@ -5,7 +5,7 @@ import {
   type TDeprovisioningRun,
   type TTenant,
 } from '@blog/db/schema/tenants';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 
 export type TStartDeprovisioningRunInput = {
@@ -42,8 +42,8 @@ export async function startDeprovisioningRun(
     .returning();
 
   if (!tenant) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: tenant };
+  return okResult(tenant);
 }

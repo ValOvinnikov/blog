@@ -1,3 +1,4 @@
+import { errorResult, okResult } from '@blog/utils/result';
 import { UNKNOWN_RUN_ERROR } from '@worker/constants/provisioning';
 import { applySiteTemplate } from '@worker/units/apply-site-template';
 import { ensureInfrastructure } from '@worker/units/ensure-infrastructure';
@@ -21,21 +22,20 @@ export async function runProvisioningSequence(
     () => verifyTenant(tenantId, ctx),
   ];
 
-  let outcome: TRunOutcome = { ok: true };
+  let outcome: TRunOutcome = okResult();
   try {
     await beginRun(tenantId);
     for (const unit of units) {
       const result = await unit();
       if (!result.ok) {
-        outcome = result;
+        outcome = errorResult({ failedStep: result.error });
         break;
       }
     }
   } catch (error) {
-    outcome = {
-      ok: false,
-      error: error instanceof Error ? error.message : UNKNOWN_RUN_ERROR,
-    };
+    outcome = errorResult({
+      message: error instanceof Error ? error.message : UNKNOWN_RUN_ERROR,
+    });
   }
 
   await finishRun(tenantId, ctx, outcome);

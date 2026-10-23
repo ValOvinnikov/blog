@@ -2,7 +2,7 @@ import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { sha256Hex } from '@blog/utils/hash';
@@ -32,7 +32,7 @@ async function insertSubscriber(
     .insert(schema.subscribers)
     .values({
       tenantId,
-      email: TEST_SUBSCRIBER_EMAIL,
+      email: MOCK_SUBSCRIBER_EMAIL,
       unsubscribeTokenHash: sha256Hex(unsubscribeToken),
       ...overrides,
     })
@@ -43,6 +43,14 @@ async function insertSubscriber(
   return { subscriber: inserted, unsubscribeToken };
 }
 
+async function countRows(id: string): Promise<number> {
+  const rows = await db()
+    .select()
+    .from(schema.subscribers)
+    .where(eq(schema.subscribers.id, id));
+  return rows.length;
+}
+
 describe(unsubscribeByToken, () => {
   let tenantId: string;
 
@@ -50,53 +58,10 @@ describe(unsubscribeByToken, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('deletes the subscriber row matching the unsubscribe token', async () => {
-    const { subscriber, unsubscribeToken } = await insertSubscriber(tenantId);
-
-    const result = await unsubscribeByToken(tenantId, unsubscribeToken);
-
-    expect(result).toEqual({
-      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-      subscriber,
-    });
-
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, subscriber.id));
-    expect(rows).toHaveLength(0);
-  });
-
   it('returns not-found for an unrecognized token', async () => {
     const result = await unsubscribeByToken(tenantId, faker.string.uuid());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
-  });
-
-  it('treats the stored hash like an unknown token', async () => {
-    const { subscriber } = await insertSubscriber(tenantId);
-
-    const result = await unsubscribeByToken(
-      tenantId,
-      subscriber.unsubscribeTokenHash,
-    );
-
-    expect(result).toEqual(
-      await unsubscribeByToken(tenantId, faker.string.uuid()),
-    );
-  });
-
-  it('returns not-found on a second use of the same token', async () => {
-    const { subscriber, unsubscribeToken } = await insertSubscriber(tenantId);
-
-    const first = await unsubscribeByToken(tenantId, unsubscribeToken);
-    const second = await unsubscribeByToken(tenantId, unsubscribeToken);
-
-    expect(first).toEqual({
-      ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-      subscriber,
-    });
-    expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 
   it("returns not-found for another tenant's token", async () => {
@@ -108,26 +73,57 @@ describe(unsubscribeByToken, () => {
     const result = await unsubscribeByToken(tenantTwoId, unsubscribeToken);
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
-
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, subscriber.id));
-    expect(rows).toHaveLength(1);
+    expect(await countRows(subscriber.id)).toBe(1);
   });
 
-  it("does not remove another subscriber's row", async () => {
-    const { unsubscribeToken } = await insertSubscriber(tenantId);
-    const { subscriber: other } = await insertSubscriber(tenantId, {
-      email: faker.internet.email(),
+  describe("with one of the tenant's subscribers", () => {
+    let subscriber: schema.TSubscriber;
+    let unsubscribeToken: string;
+
+    beforeEach(async () => {
+      ({ subscriber, unsubscribeToken } = await insertSubscriber(tenantId));
     });
 
-    await unsubscribeByToken(tenantId, unsubscribeToken);
+    it('deletes the subscriber row matching the unsubscribe token', async () => {
+      const result = await unsubscribeByToken(tenantId, unsubscribeToken);
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, other.id));
-    expect(rows).toHaveLength(1);
+      expect(result).toEqual({
+        ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+        subscriber,
+      });
+      expect(await countRows(subscriber.id)).toBe(0);
+    });
+
+    it('treats the stored hash like an unknown token', async () => {
+      const result = await unsubscribeByToken(
+        tenantId,
+        subscriber.unsubscribeTokenHash,
+      );
+
+      expect(result).toEqual(
+        await unsubscribeByToken(tenantId, faker.string.uuid()),
+      );
+    });
+
+    it('returns not-found on a second use of the same token', async () => {
+      const first = await unsubscribeByToken(tenantId, unsubscribeToken);
+      const second = await unsubscribeByToken(tenantId, unsubscribeToken);
+
+      expect(first).toEqual({
+        ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+        subscriber,
+      });
+      expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
+    });
+
+    it("does not remove another subscriber's row", async () => {
+      const { subscriber: other } = await insertSubscriber(tenantId, {
+        email: faker.internet.email(),
+      });
+
+      await unsubscribeByToken(tenantId, unsubscribeToken);
+
+      expect(await countRows(other.id)).toBe(1);
+    });
   });
 });
