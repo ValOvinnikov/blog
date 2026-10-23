@@ -3,16 +3,25 @@ import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
+import en from '@platform/i18n/messages/en.json';
 import {
   renderWithIntl,
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouter } from '@platform/testing/mock-router';
+import {
+  ARCHIVED_NOTICE_ID,
+  ARCHIVED_NOTICE_TEXT,
+} from '@platform/testing/render-in-settings-form';
 import {
   makeClientTenant,
   TENANT_ID,
+  TENANT_NAME,
+  TENANT_PRIMARY_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -46,44 +55,58 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
-const ACME_EXAMPLE_COM = 'acme.example.com';
-const PRIMARY_DOMAIN = 'Primary domain';
 const ARIA_PRESSED = 'aria-pressed';
-const OWNER_EMAIL = 'Owner email';
-const SAVE_CHANGES = 'Save changes';
 const NEW_OWNER_EXAMPLE_COM = 'new-owner@example.com';
 const ACME_RENAMED = 'Acme Renamed';
-const THIS_DOMAIN_ALREADY_IN_USE = 'This domain is already in use.';
-const ENTER_A_TENANT_NAME = 'Enter a tenant name.';
-const TENANT_DETAILS_SAVED = 'Tenant details saved.';
-const LOCKED_CONNECT_DOMAIN_STEP_HAS =
-  'Locked — the "Connect domain" step has already completed and used this value.';
 const NEW_DOMAIN_EXAMPLE_COM = 'new-domain.example.com';
-const TENANT_DETAIL_FIELDS = 'Tenant detail fields';
 const UNSAVED_DOMAIN_EXAMPLE_COM = 'unsaved-domain.example.com';
 const ACME_RENAMED_UNSAVED = 'Acme Renamed (unsaved)';
 const LOCK_ANNOUNCEMENT_LIVE = 'lock-announcement-live';
 const AT_20260826_0000 = '2026-08-26T00:00:00.000Z';
-const LOCKED_THIS_TENANT_IS_ARCHIVED = 'Locked — this tenant is archived.';
-const SAVE_AND_LEAVE = 'Save and leave';
-const NAME_FIELD = 'Name';
 const APPENDED_CHARACTER = '!';
-const PLAN_LABEL = 'Plan';
-const FREE_OPTION = 'Free';
-const GROWTH_OPTION = 'Growth';
-const ENGLISH_OPTION = 'English';
-const DUTCH_OPTION = 'Dutch';
-const TENANTS_LINK = 'Tenants';
-const ACME_INC = 'Acme Inc.';
 const ACME_LTD = 'Acme Ltd';
-const PROVISIONING_STARTED_MESSAGE =
-  "This tenant's provisioning has already started; its details can no longer be edited.";
-const OWNER_HAS_FREE_TENANT_MESSAGE =
-  'This owner already has a Free site. Archive it or keep this site on its current plan.';
-const OWNER_ALREADY_JOINED_MESSAGE =
-  "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.";
-const SAVE_FAILED_MESSAGE = "Couldn't save tenant details — try again.";
-const ARCHIVED_NOTICE_TEXT = 'This tenant is archived.';
+const TENANTS_PATH = adminRoutes.tenants();
+
+const panel = en.tenantDetailsPanel;
+const fieldErrors = en.tenantFieldErrors;
+const leaveDialog = en.leavePageDialog;
+
+const NAME_FIELD = panel.nameLabel;
+const PRIMARY_DOMAIN = panel.domainLabel;
+const PLAN_LABEL = panel.planLabel;
+const FREE_OPTION = panel.planOptionFree;
+const GROWTH_OPTION = panel.planOptionGrowth;
+const OWNER_EMAIL = panel.ownerEmailLabel;
+const ENGLISH_OPTION = en.languageNames.EN;
+const DUTCH_OPTION = en.languageNames.NL;
+const SAVE_CHANGES = panel.saveButton;
+const SAVING = panel.savingButton;
+const TENANT_DETAILS_SAVED = panel.alertSuccess;
+const TENANT_DETAIL_FIELDS = panel.fieldsGroupLabel;
+const LOCKED_ANNOUNCEMENT = panel.lockedAnnouncement;
+const UNLOCKED_ANNOUNCEMENT = panel.unlockedAnnouncement;
+const LOCKED_CONNECT_DOMAIN_STEP_HAS = makeEnTranslator('tenantDetailsPanel')(
+  'fieldLockedReasonStep',
+  { step: en.provisioningStatusView.stepLabel.MAP_DOMAIN },
+);
+const LOCKED_PROVISIONING_SUCCEEDED = panel.fieldLockedReasonSucceeded;
+const LOCKED_THIS_TENANT_IS_ARCHIVED = panel.fieldLockedReasonArchived;
+const PROVISIONING_STARTED_MESSAGE = panel.errors.provisioningStarted;
+const OWNER_HAS_FREE_TENANT_MESSAGE = panel.errors.ownerHasFreeTenant;
+const OWNER_ALREADY_JOINED_MESSAGE = panel.errors.ownerAlreadyJoined;
+const SAVE_FAILED_MESSAGE = panel.errors.saveFailed;
+const THIS_DOMAIN_ALREADY_IN_USE = fieldErrors.domainTaken;
+const ENTER_A_TENANT_NAME = fieldErrors.nameRequired;
+const ENTER_A_VALID_DOMAIN = fieldErrors.domainInvalid;
+const OWNER_EMAIL_TAKEN = fieldErrors.ownerEmailTaken;
+const TENANTS_LINK = en.navSections.tenants;
+const SAVE_AND_LEAVE = leaveDialog.saveAndLeave;
+const DISCARD_AND_LEAVE = leaveDialog.discardAndLeave;
+const LEAVE_WITHOUT_SAVING = leaveDialog.title;
+const ONE_UNSAVED_CHANGE = makeEnTranslator('leavePageDialog')('description', {
+  count: 1,
+  page: panel.heading,
+});
 
 describe(`<${TenantDetailsPanel.name}/>`, () => {
   const refreshMock = vi.fn();
@@ -99,8 +122,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('every field unlocked (fieldLocks={})', () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
       const tenant = makeClientTenant({
-        name: ACME_INC,
-        primaryDomain: ACME_EXAMPLE_COM,
+        name: TENANT_NAME,
+        primaryDomain: TENANT_PRIMARY_DOMAIN,
         plan: TENANT_PLAN.FREE,
         locale: LOCALE_ISO_CODES.EN,
       });
@@ -113,11 +136,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       );
 
       const nameInput = screen.getByRole('textbox', { name: NAME_FIELD });
-      expect(nameInput).toHaveValue(ACME_INC);
+      expect(nameInput).toHaveValue(TENANT_NAME);
       expect(nameInput).not.toBeDisabled();
 
       const domainInput = screen.getByRole('textbox', { name: PRIMARY_DOMAIN });
-      expect(domainInput).toHaveValue(ACME_EXAMPLE_COM);
+      expect(domainInput).toHaveValue(TENANT_PRIMARY_DOMAIN);
 
       const freeOption = screen.getByRole('button', { name: FREE_OPTION });
       expect(freeOption).toHaveAttribute(ARIA_PRESSED, 'true');
@@ -182,7 +205,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ name: ACME_RENAMED }),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID, name: ACME_INC });
+      const tenant = makeClientTenant({ id: TENANT_ID, name: TENANT_NAME });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -296,7 +319,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         name: PRIMARY_DOMAIN,
       });
       expect(domainInput).toBeInvalid();
-      expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
+      expect(domainInput).toHaveAccessibleDescription(ENTER_A_VALID_DOMAIN);
     });
 
     it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
@@ -304,7 +327,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID, name: ACME_INC });
+      const tenant = makeClientTenant({ id: TENANT_ID, name: TENANT_NAME });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -458,16 +481,14 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         name: OWNER_EMAIL,
       });
       expect(ownerEmailInput).toBeInvalid();
-      expect(ownerEmailInput).toHaveAccessibleDescription(
-        'This email already has a pending invite on this tenant.',
-      );
+      expect(ownerEmailInput).toHaveAccessibleDescription(OWNER_EMAIL_TAKEN);
       expect(refreshMock).not.toHaveBeenCalled();
     });
   });
 
   describe('per-field locking', () => {
     it('renders a field whose consuming step already completed as disabled, stating why', () => {
-      const tenant = makeClientTenant({ primaryDomain: ACME_EXAMPLE_COM });
+      const tenant = makeClientTenant({ primaryDomain: TENANT_PRIMARY_DOMAIN });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -479,7 +500,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const domainInput = screen.getByRole('textbox', {
         name: PRIMARY_DOMAIN,
       });
-      expect(domainInput).toHaveValue(ACME_EXAMPLE_COM);
+      expect(domainInput).toHaveValue(TENANT_PRIMARY_DOMAIN);
       expect(domainInput).toBeDisabled();
       expect(domainInput).toHaveAccessibleDescription(
         LOCKED_CONNECT_DOMAIN_STEP_HAS,
@@ -488,8 +509,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('renders every other field as editable when only one field is locked', () => {
       const tenant = makeClientTenant({
-        name: ACME_INC,
-        primaryDomain: ACME_EXAMPLE_COM,
+        name: TENANT_NAME,
+        primaryDomain: TENANT_PRIMARY_DOMAIN,
         plan: TENANT_PLAN.FREE,
         locale: LOCALE_ISO_CODES.EN,
       });
@@ -525,7 +546,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       const tenant = makeClientTenant({
         id: TENANT_ID,
-        name: ACME_INC,
+        name: TENANT_NAME,
         primaryDomain: 'taken-domain.example.com',
       });
       const nameLocked: TTenantFieldLocks = {
@@ -570,7 +591,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const planGroup = screen.getByRole('group', { name: PLAN_LABEL });
       expect(planGroup).toHaveAttribute('data-disabled');
       expect(planGroup).toHaveAccessibleDescription(
-        'Locked — provisioning has already finished.',
+        LOCKED_PROVISIONING_SUCCEEDED,
       );
 
       const growthOption = screen.getByRole('button', { name: GROWTH_OPTION });
@@ -648,8 +669,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('every field locked (RUNNING/SUCCEEDED)', () => {
     it('disables every control and disables Save, since nothing can become dirty', () => {
       const tenant = makeClientTenant({
-        name: ACME_INC,
-        primaryDomain: ACME_EXAMPLE_COM,
+        name: TENANT_NAME,
+        primaryDomain: TENANT_PRIMARY_DOMAIN,
         plan: TENANT_PLAN.GROWTH,
         locale: LOCALE_ISO_CODES.EN,
       });
@@ -700,7 +721,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('mid-edit lock transition', () => {
     it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
-      const tenant = makeClientTenant({ primaryDomain: ACME_EXAMPLE_COM });
+      const tenant = makeClientTenant({ primaryDomain: TENANT_PRIMARY_DOMAIN });
       const { rerender } = render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -727,12 +748,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const lockedDomainInput = screen.getByRole('textbox', {
         name: PRIMARY_DOMAIN,
       });
-      expect(lockedDomainInput).toHaveValue(ACME_EXAMPLE_COM);
+      expect(lockedDomainInput).toHaveValue(TENANT_PRIMARY_DOMAIN);
       expect(lockedDomainInput).toBeDisabled();
     });
 
     it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
-      const tenant = makeClientTenant({ name: ACME_INC });
+      const tenant = makeClientTenant({ name: TENANT_NAME });
       const { rerender } = render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -776,7 +797,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('enables once a field is edited, and disables again once edited back to the original value', async () => {
-      const tenant = makeClientTenant({ name: ACME_INC });
+      const tenant = makeClientTenant({ name: TENANT_NAME });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -793,7 +814,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(saveButton).toBeEnabled();
 
       await user.clear(nameInput);
-      await user.type(nameInput, ACME_INC);
+      await user.type(nameInput, TENANT_NAME);
       expect(saveButton).toBeDisabled();
     });
 
@@ -808,7 +829,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             resolveAction = resolve;
           }),
       );
-      const tenant = makeClientTenant({ id: TENANT_ID, name: ACME_INC });
+      const tenant = makeClientTenant({ id: TENANT_ID, name: TENANT_NAME });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -824,12 +845,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       await user.click(idleSaveButton);
 
       const saveButton = await screen.findByRole('button', {
-        name: 'Saving…',
+        name: SAVING,
       });
       expect(saveButton).toBeDisabled();
       expect(saveButton).toHaveAttribute('aria-busy', 'true');
       const statusRegion = screen.getByRole('status');
-      expect(statusRegion).toHaveTextContent('Saving…');
+      expect(statusRegion).toHaveTextContent(SAVING);
 
       resolveAction({
         outcome: ACTION_OUTCOME.SUCCESS,
@@ -843,7 +864,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID, name: ACME_INC });
+      const tenant = makeClientTenant({ id: TENANT_ID, name: TENANT_NAME });
       const { rerender } = render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -897,9 +918,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       );
 
       const liveRegion = screen.getByTestId(LOCK_ANNOUNCEMENT_LIVE);
-      expect(liveRegion).toHaveTextContent(
-        'Some tenant detail fields are now locked.',
-      );
+      expect(liveRegion).toHaveTextContent(LOCKED_ANNOUNCEMENT);
     });
 
     it('announces an unlock once a field becomes editable again', () => {
@@ -922,16 +941,14 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           owner={OWNER}
         />,
       );
-      expect(liveRegion).toHaveTextContent(
-        'More tenant detail fields are now editable.',
-      );
+      expect(liveRegion).toHaveTextContent(UNLOCKED_ANNOUNCEMENT);
     });
   });
 
   describe('archived tenant', () => {
     it('disables every field and the Save button, regardless of edits or field locks', async () => {
       const tenant = makeClientTenant({
-        name: ACME_INC,
+        name: TENANT_NAME,
         deprovisionedAt: new Date(AT_20260826_0000),
       });
       render(
@@ -997,9 +1014,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             tenant={tenant}
             fieldLocks={NO_LOCKS}
             owner={OWNER}
-            archivedNoticeId="archived-notice"
+            archivedNoticeId={ARCHIVED_NOTICE_ID}
           />
-          <p id="archived-notice">{ARCHIVED_NOTICE_TEXT}</p>
+          <p id={ARCHIVED_NOTICE_ID}>{ARCHIVED_NOTICE_TEXT}</p>
         </>,
       );
 
@@ -1026,7 +1043,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('focus management on a locking transition', () => {
     it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
-      const tenant = makeClientTenant({ name: ACME_INC });
+      const tenant = makeClientTenant({ name: TENANT_NAME });
       const { rerender } = render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -1062,11 +1079,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       render(
         <>
           <TenantDetailsPanel
-            tenant={makeClientTenant({ name: ACME_INC })}
+            tenant={makeClientTenant({ name: TENANT_NAME })}
             fieldLocks={NO_LOCKS}
             owner={OWNER}
           />
-          <GuardedLink href="/tenants">{TENANTS_LINK}</GuardedLink>
+          <GuardedLink href={TENANTS_PATH}>{TENANTS_LINK}</GuardedLink>
         </>,
       );
 
@@ -1080,7 +1097,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const tenantsLink = screen.getByRole('link', { name: TENANTS_LINK });
       await user.click(tenantsLink);
 
-      expect(push).toHaveBeenCalledWith('/tenants');
+      expect(push).toHaveBeenCalledWith(TENANTS_PATH);
       const leaveDialog = screen.queryByRole('alertdialog');
       expect(leaveDialog).not.toBeInTheDocument();
     });
@@ -1095,20 +1112,18 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       await user.click(tenantsLink);
 
       const leaveDialog = screen.getByRole('alertdialog', {
-        name: 'Leave without saving?',
+        name: LEAVE_WITHOUT_SAVING,
       });
-      expect(leaveDialog).toHaveAccessibleDescription(
-        'You have 1 unsaved change on Tenant details.',
-      );
+      expect(leaveDialog).toHaveAccessibleDescription(ONE_UNSAVED_CHANGE);
       expect(push).not.toHaveBeenCalled();
 
       const discardButton = screen.getByRole('button', {
-        name: 'Discard and leave',
+        name: DISCARD_AND_LEAVE,
       });
       await user.click(discardButton);
 
-      expect(push).toHaveBeenCalledWith('/tenants');
-      expect(nameInput).toHaveValue(ACME_INC);
+      expect(push).toHaveBeenCalledWith(TENANTS_PATH);
+      expect(nameInput).toHaveValue(TENANT_NAME);
     });
 
     it('saves the edits before leaving on Save and leave', async () => {
@@ -1128,7 +1143,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       await user.click(saveAndLeaveButton);
 
-      await waitFor(() => expect(push).toHaveBeenCalledWith('/tenants'));
+      await waitFor(() => expect(push).toHaveBeenCalledWith(TENANTS_PATH));
       expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ name: ACME_LTD }),

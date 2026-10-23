@@ -10,7 +10,7 @@ type TSettingsFormTestState = {
   isPending?: boolean;
 };
 
-const ARCHIVED_NOTICE_ID = 'archived-notice';
+export const ARCHIVED_NOTICE_ID = 'archived-notice';
 
 export const ARCHIVED_NOTICE_TEXT = 'This tenant is archived';
 

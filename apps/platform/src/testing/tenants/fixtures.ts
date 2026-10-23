@@ -85,6 +85,8 @@ const doneProvisioningSteps = (): TTenantProvisioningState => {
 };
 
 export const TENANT_ID = faker.string.uuid();
+export const TENANT_NAME = 'Acme Inc.';
+export const TENANT_PRIMARY_DOMAIN = 'acme.example.com';
 
 const TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
 const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
@@ -92,8 +94,8 @@ const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
 export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
     id: TENANT_ID,
-    name: 'Acme Inc.',
-    primaryDomain: 'acme.example.com',
+    name: TENANT_NAME,
+    primaryDomain: TENANT_PRIMARY_DOMAIN,
     sanityProjectId: null,
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
