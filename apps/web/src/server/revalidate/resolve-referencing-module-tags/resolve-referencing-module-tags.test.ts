@@ -1,3 +1,4 @@
+import { errorResult, okResult } from '@blog/utils';
 import { logger } from '@web/utils/logger/logger';
 
 import { resolveReferencingModuleTags } from './resolve-referencing-module-tags';
@@ -36,14 +37,13 @@ describe(resolveReferencingModuleTags, () => {
   beforeEach(() => {
     getReferencingModuleIdsMock.mockReset();
     loggerErrorMock.mockReset();
-    getReferencingModuleIdsMock.mockResolvedValue({ ok: true, data: [] });
+    getReferencingModuleIdsMock.mockResolvedValue(okResult([]));
   });
 
   it('maps every resolved module id onto its per-document purge tag', async () => {
-    getReferencingModuleIdsMock.mockResolvedValue({
-      ok: true,
-      data: ['hero-1', 'cta-2'],
-    });
+    getReferencingModuleIdsMock.mockResolvedValue(
+      okResult(['hero-1', 'cta-2']),
+    );
 
     const result = await resolveReferencingModuleTags(input);
 
@@ -63,10 +63,9 @@ describe(resolveReferencingModuleTags, () => {
   });
 
   it('degrades to no tags when the lookup fails, so the caller can purge the rest', async () => {
-    getReferencingModuleIdsMock.mockResolvedValue({
-      ok: false,
-      error: new Error(LOOKUP_FAILURE),
-    });
+    getReferencingModuleIdsMock.mockResolvedValue(
+      errorResult(new Error(LOOKUP_FAILURE)),
+    );
 
     const result = await resolveReferencingModuleTags(input);
 
@@ -75,7 +74,7 @@ describe(resolveReferencingModuleTags, () => {
 
   it('logs a failed lookup once, with the document and tenant context attached', async () => {
     const error = new Error(LOOKUP_FAILURE);
-    getReferencingModuleIdsMock.mockResolvedValue({ ok: false, error });
+    getReferencingModuleIdsMock.mockResolvedValue(errorResult(error));
 
     await resolveReferencingModuleTags(input);
 

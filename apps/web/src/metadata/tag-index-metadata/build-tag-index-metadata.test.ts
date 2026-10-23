@@ -1,8 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -30,7 +31,7 @@ const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
 const DESCRIPTION = 'Browse every post by tag.';
 const OG_DESCRIPTION = 'Browse every post by tag OG.';
 
-const seo = makeSeo({
+const seo = mockSeo({
   title: 'Tags',
   description: DESCRIPTION,
   ogTitle: 'Tags OG',
@@ -42,15 +43,14 @@ describe('buildTagIndexMetadata', () => {
   beforeEach(() => {
     getTagIndexPageMock.mockReset();
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTagIndexPageMock.mockResolvedValue(
+      okResult({
         headingBlock: { heading: 'Tags' },
         seo,
         modules: [],
         translations: [LOCALE_ISO_CODES.EN],
-      },
-    });
+      }),
+    );
   });
 
   it('reads the page through getTagIndexPage', async () => {
@@ -74,10 +74,7 @@ describe('buildTagIndexMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the index page fetch fails', async () => {
-      getTagIndexPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getTagIndexPageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       const metadata = await buildTagIndexMetadata();
 
@@ -89,7 +86,7 @@ describe('buildTagIndexMetadata', () => {
     });
 
     it('returns empty metadata without logging when the page does not exist', async () => {
-      getTagIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+      getTagIndexPageMock.mockResolvedValue(okResult());
 
       const metadata = await buildTagIndexMetadata();
 
@@ -106,15 +103,14 @@ describe('buildTagIndexMetadata', () => {
       locale: NL,
       liveLocales: [EN, NL],
     });
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getTagIndexPageMock.mockResolvedValue(
+      okResult({
         headingBlock: { heading: 'Tags' },
         seo,
         modules: [],
         translations,
-      },
-    });
+      }),
+    );
 
     const metadata = await buildTagIndexMetadata();
 

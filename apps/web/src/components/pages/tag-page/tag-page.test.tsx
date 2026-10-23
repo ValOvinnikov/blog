@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import {
   customRenderServerAsync,
@@ -89,22 +90,20 @@ describe(`<${TagPage.name}/>`, () => {
   });
 
   beforeEach(() => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({
-        headingBlock: makeHeadingBlock({
-          heading: 'TypeScript',
-          supportingText: SUPPORTING_TEXT,
+    getTagPageMock.mockResolvedValue(
+      okResult(
+        makeTagDetailPage({
+          headingBlock: makeHeadingBlock({
+            heading: 'TypeScript',
+            supportingText: SUPPORTING_TEXT,
+          }),
         }),
-      }),
-    });
+      ),
+    );
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getTagPageMock.mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getTagPageMock.mockResolvedValueOnce(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -116,7 +115,7 @@ describe(`<${TagPage.name}/>`, () => {
   });
 
   it('calls notFound() without logging when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getTagPageMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -125,18 +124,20 @@ describe(`<${TagPage.name}/>`, () => {
   });
 
   it('renders the authored modules inside main', async () => {
-    getTagPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTagDetailPage({
-        modules: [{ id: 'cta-1', type: 'module_cta' }],
-      }),
-    });
-    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
-      ok: true,
-      data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
-      }),
-    });
+    getTagPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTagDetailPage({
+          modules: [{ id: 'cta-1', type: 'module_cta' }],
+        }),
+      ),
+    );
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
+      okResult(
+        makeCtaModuleData({
+          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+        }),
+      ),
+    );
 
     await setup();
 
@@ -148,16 +149,16 @@ describe(`<${TagPage.name}/>`, () => {
   });
 
   it('renders the hero in place of the tag heading when one is set', async () => {
-    getTagPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTagDetailPage({
-        hero: { id: 'hero-1', type: 'module_heroBlog' },
-      }),
-    });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
-      ok: true,
-      data: makeHeroBlogData({ heading: HERO_HEADING }),
-    });
+    getTagPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTagDetailPage({
+          hero: { id: 'hero-1', type: 'module_heroBlog' },
+        }),
+      ),
+    );
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
+      okResult(makeHeroBlogData({ heading: HERO_HEADING })),
+    );
 
     await setup();
 
@@ -175,16 +176,16 @@ describe(`<${TagPage.name}/>`, () => {
   ])(
     'loads post lists for page $expected of the tag archive',
     async ({ page, expected }) => {
-      getTagPageMock.mockResolvedValueOnce({
-        ok: true,
-        data: makeTagDetailPage({
-          modules: [{ id: 'list-1', type: 'module_postList' }],
-        }),
-      });
-      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getTagPageMock.mockResolvedValueOnce(
+        okResult(
+          makeTagDetailPage({
+            modules: [{ id: 'list-1', type: 'module_postList' }],
+          }),
+        ),
+      );
+      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+        errorResult(new Error('boom')),
+      );
 
       await expect(setup({ page })).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -200,16 +201,16 @@ describe(`<${TagPage.name}/>`, () => {
   );
 
   it('names the tag in an empty post list', async () => {
-    getTagPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTagDetailPage({
-        modules: [{ id: 'list-1', type: 'module_postList' }],
-      }),
-    });
-    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
-      ok: true,
-      data: makePostListModuleData(),
-    });
+    getTagPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTagDetailPage({
+          modules: [{ id: 'list-1', type: 'module_postList' }],
+        }),
+      ),
+    );
+    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+      okResult(makePostListModuleData()),
+    );
 
     await setup();
 
@@ -217,18 +218,19 @@ describe(`<${TagPage.name}/>`, () => {
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    getTagPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTagDetailPage({
-        faqs: [
-          {
-            id: 'faq-1',
-            question: 'Do you offer a free trial?',
-            answer: 'Yes.',
-          },
-        ],
-      }),
-    });
+    getTagPageMock.mockResolvedValueOnce(
+      okResult(
+        makeTagDetailPage({
+          faqs: [
+            {
+              id: 'faq-1',
+              question: 'Do you offer a free trial?',
+              answer: 'Yes.',
+            },
+          ],
+        }),
+      ),
+    );
 
     await setup();
 

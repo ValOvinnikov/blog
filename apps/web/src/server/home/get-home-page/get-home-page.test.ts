@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getHomePage } from './get-home-page';
@@ -16,7 +17,7 @@ describe(getHomePage, () => {
   });
 
   it('forwards the resolved tenant context to the home page service', async () => {
-    getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+    getHomePageMock.mockResolvedValue(okResult());
 
     await getHomePage();
 
@@ -24,7 +25,7 @@ describe(getHomePage, () => {
   });
 
   it('returns the raw TResult from getHomePage unchanged', async () => {
-    const result = { ok: true, data: { modules: [] } };
+    const result = okResult({ modules: [] });
     getHomePageMock.mockResolvedValue(result);
 
     await expect(getHomePage()).resolves.toBe(result);

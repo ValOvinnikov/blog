@@ -3,6 +3,7 @@ import {
   NEXT_NAVIGATION_ERROR,
   TAXONOMY_KIND,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -65,9 +66,8 @@ describe(`<${PostListModule.name}/>`, () => {
     getPostListMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
@@ -75,13 +75,13 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
-      },
-    });
+      }),
+    );
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
     const error = new Error('boom');
-    getPostListMock.mockResolvedValue({ ok: false, error });
+    getPostListMock.mockResolvedValue(errorResult(error));
 
     await expect(setup({ context: { page: 2 } })).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -95,9 +95,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('calls getPostList with the module id and context.page', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
@@ -105,8 +104,8 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 2,
         totalPages: 2,
-      },
-    });
+      }),
+    );
 
     await setup({ context: { page: 2 } });
 
@@ -170,9 +169,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('renders a pager with a fully translated aria-label and correct hrefs', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [FIRST_POST],
@@ -180,8 +178,8 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 2,
         totalPages: 3,
-      },
-    });
+      }),
+    );
 
     await setup({ context: { page: 2 } });
 
@@ -196,9 +194,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('calls notFound() when an explicit page exceeds totalPages', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
@@ -206,8 +203,8 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 5,
         totalPages: 1,
-      },
-    });
+      }),
+    );
 
     await expect(setup({ context: { page: 5 } })).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -225,9 +222,8 @@ describe(`<${PostListModule.name}/>`, () => {
 
   it('renders each post image when showImages is true', async () => {
     const sanityImage = makeSanityImage();
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [
@@ -241,8 +237,8 @@ describe(`<${PostListModule.name}/>`, () => {
         currentPage: 1,
         totalPages: 1,
         showImages: true,
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -250,9 +246,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('renders no post images when showImages is false', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [
@@ -266,8 +261,8 @@ describe(`<${PostListModule.name}/>`, () => {
         currentPage: 1,
         totalPages: 1,
         showImages: false,
-      },
-    });
+      }),
+    );
 
     await setup();
 
@@ -275,9 +270,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('derives href, aria-label, empty message and titleId from a topic archive', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: TOPIC_HEADING }),
         posts: [FIRST_POST],
@@ -285,8 +279,8 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 2,
         totalPages: 3,
-      },
-    });
+      }),
+    );
 
     await setup({
       context: {
@@ -325,9 +319,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('derives href, aria-label, and titleId from context.archive (tag kind)', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: TAG_HEADING }),
         posts: [FIRST_POST],
@@ -335,8 +328,8 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 2,
         totalPages: 3,
-      },
-    });
+      }),
+    );
 
     await setup({
       context: {
@@ -374,9 +367,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('derives the empty message from context.archive (tag kind)', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: TAG_HEADING }),
         posts: [],
@@ -384,8 +376,8 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
-      },
-    });
+      }),
+    );
 
     await setup({
       context: {
@@ -408,9 +400,8 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('keeps the blog-archive defaults intact when context.archive is absent', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getPostListMock.mockResolvedValue(
+      okResult({
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'All posts' }),
         posts: [],
@@ -418,8 +409,8 @@ describe(`<${PostListModule.name}/>`, () => {
         contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
-      },
-    });
+      }),
+    );
 
     await setup({ context: { page: 1 } });
 

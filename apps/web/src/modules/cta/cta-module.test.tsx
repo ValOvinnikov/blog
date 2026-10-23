@@ -1,3 +1,4 @@
+import { errorResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -29,7 +30,7 @@ describe(`<${CtaModule.name}/>`, () => {
     getCtaMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getCtaMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getCtaMock.mockResolvedValue(errorResult(new Error('boom')));
   });
 
   it('renders nothing when the fetch fails', async () => {

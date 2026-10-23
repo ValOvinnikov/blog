@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
@@ -51,10 +52,7 @@ const setup = customRenderServerAsync(BlogPostPage, {
 
 describe(`<${BlogPostPage.name}/>`, () => {
   beforeEach(() => {
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockPostDetail, modules: [] },
-    });
+    getPostMock.mockResolvedValue(okResult({ ...mockPostDetail, modules: [] }));
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
   });
 
@@ -110,7 +108,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {
-    getPostMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getPostMock.mockResolvedValueOnce(okResult());
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -121,7 +119,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getPostMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
+    getPostMock.mockResolvedValueOnce(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -133,10 +131,9 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders the reading-depth control once the post has asides', async () => {
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: { ...mockPostDetail, modules: [], hasAsides: true },
-    });
+    getPostMock.mockResolvedValueOnce(
+      okResult({ ...mockPostDetail, modules: [], hasAsides: true }),
+    );
 
     await setup();
 
@@ -144,9 +141,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders the 30s option and the skim panel once the post has a skim', async () => {
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
+    getPostMock.mockResolvedValueOnce(
+      okResult({
         ...mockPostDetail,
         modules: [],
         postTakeaways: {
@@ -154,8 +150,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
           generatedAt: '2026-01-01T00:00:00.000Z',
           model: 'claude-haiku-4-5',
         },
-      },
-    });
+      }),
+    );
 
     await setup();
 

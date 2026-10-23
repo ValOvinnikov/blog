@@ -1,6 +1,9 @@
+import { okResult } from '@blog/utils';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostPage } from './get-post-page';
+
+const POST_SLUG = 'hello-world';
 
 const { getPostMock } = vi.hoisted(() => ({ getPostMock: vi.fn() }));
 
@@ -16,21 +19,21 @@ describe(getPostPage, () => {
   });
 
   it('forwards the slug and the resolved tenant context to the post service', async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: undefined });
+    getPostMock.mockResolvedValue(okResult());
 
-    await getPostPage('hello-world');
+    await getPostPage(POST_SLUG);
 
     expect(getPostMock).toHaveBeenCalledWith(
-      'hello-world',
+      POST_SLUG,
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });
 
   it('returns the raw TResult from getPost unchanged', async () => {
-    const result = { ok: true, data: { id: 'post-1' } };
+    const result = okResult({ id: 'post-1' });
     getPostMock.mockResolvedValue(result);
 
-    await expect(getPostPage('hello-world')).resolves.toBe(result);
+    await expect(getPostPage(POST_SLUG)).resolves.toBe(result);
   });
 });
 
@@ -42,7 +45,7 @@ describe('getPostPage memoization', () => {
 
   it('dedupes the post query across one render pass with the same arguments', async () => {
     getPostMock.mockReset();
-    getPostMock.mockResolvedValue({ ok: true, data: undefined });
+    getPostMock.mockResolvedValue(okResult());
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();
@@ -64,8 +67,8 @@ describe('getPostPage memoization', () => {
 
     const { getPostPage: freshGetPostPage } = await import('./get-post-page');
 
-    await freshGetPostPage('hello-world');
-    await freshGetPostPage('hello-world');
+    await freshGetPostPage(POST_SLUG);
+    await freshGetPostPage(POST_SLUG);
 
     expect(getPostMock).toHaveBeenCalledTimes(1);
   });

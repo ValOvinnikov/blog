@@ -1,5 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features';
@@ -47,14 +48,10 @@ describe(isCapabilityEnabled, () => {
   beforeEach(() => {
     vi.mocked(getTenantPlan).mockReset();
     vi.mocked(getEffectiveSettingsFeatures).mockReset();
-    vi.mocked(getTenantPlan).mockResolvedValue({
-      ok: true,
-      data: TENANT_PLAN.GROWTH,
-    });
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: ALL_ENABLED,
-    });
+    vi.mocked(getTenantPlan).mockResolvedValue(okResult(TENANT_PLAN.GROWTH));
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue(
+      okResult(ALL_ENABLED),
+    );
   });
 
   it('enables a capability when both the plan entitles it and the toggle is on', async () => {
@@ -64,10 +61,7 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('disables a capability the plan does not entitle, even when the toggle is on', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({
-      ok: true,
-      data: TENANT_PLAN.FREE,
-    });
+    vi.mocked(getTenantPlan).mockResolvedValue(okResult(TENANT_PLAN.FREE));
 
     await expect(isCapabilityEnabled(CAPABILITY.NEWSLETTER)).resolves.toBe(
       false,
@@ -75,10 +69,9 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('disables a capability the tenant has toggled off, even when the plan entitles it', async () => {
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: { ...ALL_ENABLED, [CAPABILITY.NEWSLETTER]: false },
-    });
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue(
+      okResult({ ...ALL_ENABLED, [CAPABILITY.NEWSLETTER]: false }),
+    );
 
     await expect(isCapabilityEnabled(CAPABILITY.NEWSLETTER)).resolves.toBe(
       false,
@@ -90,10 +83,9 @@ describe(isCapabilityEnabled, () => {
       true,
     );
 
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: { ...ALL_ENABLED, [CAPABILITY.CONTACT_FORM]: false },
-    });
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue(
+      okResult({ ...ALL_ENABLED, [CAPABILITY.CONTACT_FORM]: false }),
+    );
 
     await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
       false,
@@ -101,10 +93,7 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('disables the contact form on FREE even with its toggle on', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({
-      ok: true,
-      data: TENANT_PLAN.FREE,
-    });
+    vi.mocked(getTenantPlan).mockResolvedValue(okResult(TENANT_PLAN.FREE));
 
     await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
       false,
@@ -112,33 +101,23 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('resolves false when no tenant is resolved for either read', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: undefined });
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: undefined,
-    });
+    vi.mocked(getTenantPlan).mockResolvedValue(okResult());
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue(okResult());
 
     await expect(isCapabilityEnabled(CAPABILITY.COMMENTS)).resolves.toBe(false);
   });
 
   it('resolves false and logs when the plan fetch fails', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: undefined,
-    });
+    vi.mocked(getTenantPlan).mockResolvedValue(errorResult(new Error('boom')));
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue(okResult());
 
     await expect(isCapabilityEnabled(CAPABILITY.COMMENTS)).resolves.toBe(false);
   });
 
   it('resolves false and logs when the effective features fetch fails', async () => {
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue(
+      errorResult(new Error('boom')),
+    );
 
     await expect(isCapabilityEnabled(CAPABILITY.COMMENTS)).resolves.toBe(false);
   });

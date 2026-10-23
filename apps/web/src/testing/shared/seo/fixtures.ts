@@ -1,6 +1,6 @@
 import type { TSeoResolved } from '@blog/service';
 
-export const makeSeo = (
+export const mockSeo = (
   overrides: Partial<TSeoResolved> = {},
 ): TSeoResolved => {
   return {

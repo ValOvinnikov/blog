@@ -1,3 +1,4 @@
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -53,10 +54,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroBlogData(),
-    });
+    getHeroBlogMock.mockResolvedValue(okResult(makeHeroBlogData()));
 
     await setup();
 
@@ -64,7 +62,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getHeroBlogMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getHeroBlogMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -72,10 +70,9 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   });
 
   it('renders the resolved heading', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroBlogData({ heading: POST_HEADING }),
-    });
+    getHeroBlogMock.mockResolvedValue(
+      okResult(makeHeroBlogData({ heading: POST_HEADING })),
+    );
 
     await setup();
 
@@ -85,10 +82,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   });
 
   it('logs and renders nothing when no post resolves', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeUnresolvedHeroBlogData(),
-    });
+    getHeroBlogMock.mockResolvedValue(okResult(makeUnresolvedHeroBlogData()));
 
     const { container } = await setup();
 
@@ -99,10 +93,9 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   });
 
   it('renders nothing without an error log when the post has no version in the request language', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeUnresolvedHeroBlogData({ isPostUntranslated: true }),
-    });
+    getHeroBlogMock.mockResolvedValue(
+      okResult(makeUnresolvedHeroBlogData({ isPostUntranslated: true })),
+    );
 
     const { container } = await setup();
 
@@ -111,12 +104,13 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   });
 
   it('logs and renders nothing for a stale hasPost: false result carrying a heading', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeStaleUnresolvedHeroBlogData(
-        'Stale hero title left over from an unpublished post',
+    getHeroBlogMock.mockResolvedValue(
+      okResult(
+        makeStaleUnresolvedHeroBlogData(
+          'Stale hero title left over from an unpublished post',
+        ),
       ),
-    });
+    );
 
     const { container } = await setup();
 
@@ -128,10 +122,9 @@ describe(`<${HeroBlogModule.name}/>`, () => {
 
   it('renders the hero image resolving through the Sanity CDN', async () => {
     const sanityImage = makeSanityImage();
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroBlogData({ sanityImage }),
-    });
+    getHeroBlogMock.mockResolvedValue(
+      okResult(makeHeroBlogData({ sanityImage })),
+    );
 
     await setup();
 

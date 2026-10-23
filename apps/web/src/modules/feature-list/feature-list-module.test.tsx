@@ -4,6 +4,7 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
@@ -11,6 +12,8 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureListModule } from './feature-list-module';
+
+const MODULE_ID = 'feature-list-1';
 
 const { getFeatureListMock } = vi.hoisted(() => ({
   getFeatureListMock: vi.fn(),
@@ -42,7 +45,7 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(FeatureListModule, {
-  id: 'feature-list-1',
+  id: MODULE_ID,
 });
 
 describe(`<${FeatureListModule.name}/>`, () => {
@@ -62,27 +65,23 @@ describe(`<${FeatureListModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getFeatureListMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getFeatureListMock.mockResolvedValue(
+      okResult({
         ...baseModule,
         items: [
           makeFeatureListItem({ id: 'feature-1' }),
           makeFeatureListItem({ id: 'feature-2' }),
         ],
-      },
-    });
+      }),
+    );
 
     await setup();
 
-    expect(getFeatureListMock).toHaveBeenCalledWith('feature-list-1', tenant);
+    expect(getFeatureListMock).toHaveBeenCalledWith(MODULE_ID, tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getFeatureListMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getFeatureListMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 
@@ -94,10 +93,7 @@ describe(`<${FeatureListModule.name}/>`, () => {
       makeFeatureListItem({ id: 'feature-1' }),
       makeFeatureListItem({ id: 'feature-2' }),
     ];
-    getFeatureListMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, items },
-    });
+    getFeatureListMock.mockResolvedValue(okResult({ ...baseModule, items }));
 
     await setup();
 

@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   LANDING_PAGE_OG_IMAGE,
@@ -44,13 +45,12 @@ describe('buildLandingPageMetadata', () => {
   });
 
   it('adds no languages when the only translation is the page itself', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getLandingPageMock.mockResolvedValue(
+      okResult({
         ...mockLandingPage,
         translations: [{ language: EN, slug: 'about-us' }],
-      },
-    });
+      }),
+    );
 
     const metadata = await buildLandingPageMetadata('about-us');
 
@@ -58,17 +58,16 @@ describe('buildLandingPageMetadata', () => {
   });
 
   it('uses the full path of a nested page for its canonical and hreflang', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getLandingPageMock.mockResolvedValue(
+      okResult({
         ...mockLandingPage,
         path: FAQ_SLUG,
         translations: [
           { language: EN, slug: FAQ_SLUG },
           { language: NL, slug: 'modules/vragen' },
         ],
-      },
-    });
+      }),
+    );
 
     const metadata = await buildLandingPageMetadata(FAQ_SLUG);
 
@@ -79,17 +78,16 @@ describe('buildLandingPageMetadata', () => {
   });
 
   it('leaves a non-live translation out of the hreflang list', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getLandingPageMock.mockResolvedValue(
+      okResult({
         ...mockLandingPage,
         translations: [
           { language: EN, slug: 'about-us' },
           { language: NL, slug: NL_ABOUT_SLUG },
           { language: DE, slug: 'ueber-uns' },
         ],
-      },
-    });
+      }),
+    );
 
     const metadata = await buildLandingPageMetadata('about-us');
 
@@ -101,16 +99,15 @@ describe('buildLandingPageMetadata', () => {
   });
 
   it('adds no languages when the only other translation is non-live', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getLandingPageMock.mockResolvedValue(
+      okResult({
         ...mockLandingPage,
         translations: [
           { language: EN, slug: 'about-us' },
           { language: DE, slug: 'ueber-uns' },
         ],
-      },
-    });
+      }),
+    );
 
     const metadata = await buildLandingPageMetadata('about-us');
 
@@ -122,16 +119,15 @@ describe('buildLandingPageMetadata', () => {
       ...DEFAULT_REQUEST_CONTEXT,
       liveLocales: [EN, NL, DE],
     });
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
+    getLandingPageMock.mockResolvedValue(
+      okResult({
         ...mockLandingPage,
         translations: [
           { language: NL, slug: NL_ABOUT_SLUG },
           { language: DE, slug: 'ueber-uns' },
         ],
-      },
-    });
+      }),
+    );
 
     const metadata = await buildLandingPageMetadata(NL_ABOUT_SLUG);
 
@@ -143,16 +139,15 @@ describe('buildLandingPageMetadata', () => {
 
   describe('for a page with an EN and a live NL translation', () => {
     beforeEach(() => {
-      getLandingPageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getLandingPageMock.mockResolvedValue(
+        okResult({
           ...mockLandingPage,
           translations: [
             { language: EN, slug: 'about-us' },
             { language: NL, slug: NL_ABOUT_SLUG },
           ],
-        },
-      });
+        }),
+      );
     });
 
     it('treats only the current language as live when the tenant has no live list', async () => {
@@ -190,10 +185,9 @@ describe('buildLandingPageMetadata', () => {
 
   describe('for a page with no translations', () => {
     beforeEach(() => {
-      getLandingPageMock.mockResolvedValue({
-        ok: true,
-        data: { ...mockLandingPage, translations: [] },
-      });
+      getLandingPageMock.mockResolvedValue(
+        okResult({ ...mockLandingPage, translations: [] }),
+      );
     });
 
     it('leaves the alternates without languages for a page with no translations', async () => {
@@ -213,7 +207,7 @@ describe('buildLandingPageMetadata', () => {
 
   describe('for a page with the default fixture', () => {
     beforeEach(() => {
-      getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+      getLandingPageMock.mockResolvedValue(okResult(mockLandingPage));
     });
 
     it('forwards the path to getLandingPage, the loader LandingPage reads', async () => {
@@ -243,17 +237,16 @@ describe('buildLandingPageMetadata', () => {
         locale: NL,
         liveLocales: [EN, NL],
       });
-      getLandingPageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getLandingPageMock.mockResolvedValue(
+        okResult({
           ...mockLandingPage,
           slug: NL_ABOUT_SLUG,
           translations: [
             { language: EN, slug: 'about-us' },
             { language: NL, slug: NL_ABOUT_SLUG },
           ],
-        },
-      });
+        }),
+      );
     });
 
     it('points a non-default translation canonical at its own prefixed address', async () => {
@@ -277,10 +270,7 @@ describe('buildLandingPageMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the page fetch fails', async () => {
-      getLandingPageMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
+      getLandingPageMock.mockResolvedValue(errorResult(new Error('boom')));
 
       const metadata = await buildLandingPageMetadata('missing');
 
@@ -292,7 +282,7 @@ describe('buildLandingPageMetadata', () => {
     });
 
     it('returns empty metadata without logging when the page simply does not exist', async () => {
-      getLandingPageMock.mockResolvedValue({ ok: true, data: undefined });
+      getLandingPageMock.mockResolvedValue(okResult());
 
       const metadata = await buildLandingPageMetadata('missing');
 

@@ -50,13 +50,13 @@ export const subscribeToNewsletterAction = async (
 
   const tenant = await resolveWritableTenant('newsletter.subscribe');
   if (!tenant.ok) {
-    if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+    if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
       logger.warn('newsletter.subscribe_tenant_not_active');
       return UNAVAILABLE;
     }
     return SERVER_ERROR;
   }
-  const { tenantId } = tenant;
+  const { data: tenantId } = tenant;
 
   if (!(await isCapabilityEnabledForTenant(tenantId, CAPABILITY.NEWSLETTER))) {
     logger.warn('newsletter.subscribe_capability_disabled');

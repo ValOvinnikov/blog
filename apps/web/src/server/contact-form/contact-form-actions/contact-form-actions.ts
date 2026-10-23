@@ -38,12 +38,14 @@ export type TSubmitContactResult = TActionResult<
   TFieldErrorReason
 >;
 
+const SUBMIT_BLOCKED_EVENT = 'contact_form.submit_blocked';
+
 const BLOCKED = toOutcome(ACTION_OUTCOME.BLOCKED);
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 const { isBotOrUnverified, isRateLimited } = createPublicWriteGuard({
   name: 'contact-form-submit',
-  blockedEvent: 'contact_form.submit_blocked',
+  blockedEvent: SUBMIT_BLOCKED_EVENT,
   windowMs: 10 * 60_000,
   maxRequests: 5,
 });
@@ -80,7 +82,7 @@ export const submitContactMessage = async (
   if (await isBotOrUnverified()) return BLOCKED;
 
   if (asText(input.website)) {
-    logger.warn('contact_form.submit_blocked', { reason: 'honeypot' });
+    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'honeypot' });
     return BLOCKED;
   }
 
@@ -93,7 +95,7 @@ export const submitContactMessage = async (
   if (await isRateLimited(tenant.id)) return BLOCKED;
 
   if (!(await isContactFormOpen(tenant))) {
-    logger.warn('contact_form.submit_blocked', { reason: 'unavailable' });
+    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'unavailable' });
     return BLOCKED;
   }
 
@@ -105,7 +107,7 @@ export const submitContactMessage = async (
   if (!validation.ok) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: validation.fieldErrors,
+      fieldErrors: validation.error,
     };
   }
 
