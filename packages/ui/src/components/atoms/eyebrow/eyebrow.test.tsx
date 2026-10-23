@@ -5,6 +5,7 @@ import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { Eyebrow } from './eyebrow';
 
 const EYEBROW_TEXT = 'Featured Post';
+const EYEBROW_TEST_ID = 'eyebrow';
 
 const setup = customRender(Eyebrow, {
   children: EYEBROW_TEXT,
@@ -13,7 +14,8 @@ const setup = customRender(Eyebrow, {
 describe(`<${Eyebrow.name}/>`, () => {
   it('renders children', () => {
     setup();
-    expect(screen.getByText(EYEBROW_TEXT)).toBeVisible();
+    const eyebrow = screen.getByText(EYEBROW_TEXT);
+    expect(eyebrow).toBeVisible();
   });
 
   it('renders as a <p> element', () => {
@@ -23,9 +25,8 @@ describe(`<${Eyebrow.name}/>`, () => {
 
   it('renders as a link when href is provided', () => {
     setup({ href: MOCK_TOPIC.href, children: MOCK_TOPIC.label });
-    expect(
-      screen.getByRole('link', { name: MOCK_TOPIC.label }),
-    ).toHaveAttribute('href', MOCK_TOPIC.href);
+    const topicLink = screen.getByRole('link', { name: MOCK_TOPIC.label });
+    expect(topicLink).toHaveAttribute('href', MOCK_TOPIC.href);
   });
 
   it('renders using the custom linkAs component when href is provided', () => {
@@ -34,13 +35,14 @@ describe(`<${Eyebrow.name}/>`, () => {
       linkAs: MockLink,
       children: MOCK_TOPIC.label,
     });
-    expect(screen.getByRole('link', { name: MOCK_TOPIC.label })).toBe(
-      screen.getByTestId(MOCK_LINK_TEST_ID),
-    );
+    const topicLink = screen.getByRole('link', { name: MOCK_TOPIC.label });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(topicLink).toBe(mockLink);
   });
 
   it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'eyebrow' });
-    expect(screen.getByTestId('eyebrow')).toBeVisible();
+    setup({ dataTestId: EYEBROW_TEST_ID });
+    const eyebrow = screen.getByTestId(EYEBROW_TEST_ID);
+    expect(eyebrow).toBeVisible();
   });
 });

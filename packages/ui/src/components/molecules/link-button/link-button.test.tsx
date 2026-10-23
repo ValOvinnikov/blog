@@ -16,10 +16,9 @@ describe(`<${LinkButton.name}/>`, () => {
   it('renders an anchor by default', () => {
     setup();
 
-    expect(screen.getByRole('link', { name: 'Read more' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
+    const link = screen.getByRole('link', { name: 'Read more' });
+
+    expect(link).toHaveAttribute('href', '/blog');
   });
 
   it('supports custom link components through as', () => {
@@ -29,14 +28,17 @@ describe(`<${LinkButton.name}/>`, () => {
       </LinkButton>,
     );
 
-    expect(screen.getByRole('link', { name: 'About' })).toBe(
-      screen.getByTestId(MOCK_LINK_TEST_ID),
-    );
+    const link = screen.getByRole('link', { name: 'About' });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+
+    expect(link).toBe(mockLink);
   });
 
   it('forwards data-testid', () => {
     setup({ dataTestId: 'blog-link', children: 'Blog' });
 
-    expect(screen.getByTestId('blog-link')).toBeVisible();
+    const link = screen.getByTestId('blog-link');
+
+    expect(link).toBeVisible();
   });
 });

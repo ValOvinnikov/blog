@@ -3,13 +3,24 @@ import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { customRender, screen, within } from '@blog/ui/testing/custom-render';
 import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 
 import { QuoteCard } from './quote-card';
 
 const ROLE = 'Head of Product';
 const NAME_TEST_ID = 'quote-card-name';
 const QUOTE_CARD_TEST_ID = 'quote-card';
+const IGNORING_LINK_TEST_ID = 'class-name-ignoring-link';
+const CASE_STUDY_HREF = '/case-studies/ada';
+
+const ClassNameIgnoringLink = ({
+  href,
+  children,
+}: AnchorHTMLAttributes<HTMLAnchorElement>) => (
+  <a href={href} data-testid={IGNORING_LINK_TEST_ID}>
+    {children}
+  </a>
+);
 
 faker.seed(123);
 
@@ -34,10 +45,19 @@ const buildChildrenWithAvatar = (avatar: ReactNode) => [
   </QuoteCard.Name>,
 ];
 
-const buildChildrenWithMockLink = (nameProps?: { dataTestId?: string }) => [
+const buildChildrenWithMockLink = () => [
   <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
-  <QuoteCard.Name key="name" dataTestId={nameProps?.dataTestId}>
-    <MockLink href="/case-studies/ada">{faker.person.fullName()}</MockLink>
+  <QuoteCard.Name key="name">
+    <MockLink href={CASE_STUDY_HREF}>{faker.person.fullName()}</MockLink>
+  </QuoteCard.Name>,
+];
+
+const buildChildrenWithClassNameIgnoringLink = () => [
+  <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
+  <QuoteCard.Name key="name" dataTestId={NAME_TEST_ID}>
+    <ClassNameIgnoringLink href={CASE_STUDY_HREF}>
+      {faker.person.fullName()}
+    </ClassNameIgnoringLink>
   </QuoteCard.Name>,
 ];
 
@@ -59,19 +79,23 @@ describe(`<${QuoteCard.name}/>`, () => {
     setup({ children: buildChildren({ quote, name }) });
 
     const figure = screen.getByRole('figure');
-    expect(within(figure).getByText(quote)).toBeVisible();
-    expect(within(figure).getByText(name)).toBeVisible();
+    const quoteText = within(figure).getByText(quote);
+    const nameText = within(figure).getByText(name);
+    expect(quoteText).toBeVisible();
+    expect(nameText).toBeVisible();
   });
 
   it('renders the quote slot content inside the blockquote', () => {
     setup({ children: buildChildren({ quote }) });
 
-    expect(screen.getByRole('blockquote')).toHaveTextContent(quote);
+    const blockquote = screen.getByRole('blockquote');
+    expect(blockquote).toHaveTextContent(quote);
   });
 
   it('renders the role text when provided', () => {
     setup({ role: ROLE });
-    expect(screen.getByText(ROLE)).toBeVisible();
+    const roleText = screen.getByText(ROLE);
+    expect(roleText).toBeVisible();
   });
 
   describe('with the default props', () => {
@@ -80,12 +104,15 @@ describe(`<${QuoteCard.name}/>`, () => {
     });
 
     it('does not render a role element when omitted', () => {
-      expect(screen.queryByText(/head of/i)).not.toBeInTheDocument();
+      const roleText = screen.queryByText(/head of/i);
+      expect(roleText).not.toBeInTheDocument();
     });
 
     it('renders neither an image nor initials when QuoteCard.Avatar is omitted', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
-      expect(screen.queryByText('AL')).not.toBeInTheDocument();
+      const image = screen.queryByRole('img');
+      const initials = screen.queryByText('AL');
+      expect(image).not.toBeInTheDocument();
+      expect(initials).not.toBeInTheDocument();
     });
   });
 
@@ -99,12 +126,15 @@ describe(`<${QuoteCard.name}/>`, () => {
     });
 
     it('renders the caller-supplied Avatar with its initials fallback', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
-      expect(screen.getByText('AL')).toBeVisible();
+      const image = screen.queryByRole('img');
+      const initials = screen.getByText('AL');
+      expect(image).not.toBeInTheDocument();
+      expect(initials).toBeVisible();
     });
 
     it('announces the quoted person once beside the caller-supplied Avatar', () => {
-      expect(screen.getAllByText('Ada Lovelace')).toHaveLength(1);
+      const personNames = screen.getAllByText('Ada Lovelace');
+      expect(personNames).toHaveLength(1);
     });
   });
 
@@ -118,7 +148,8 @@ describe(`<${QuoteCard.name}/>`, () => {
         />,
       ),
     });
-    expect(screen.getByRole('presentation')).toHaveAttribute(
+    const avatarImage = screen.getByRole('presentation');
+    expect(avatarImage).toHaveAttribute(
       'src',
       'https://example.com/avatar.jpg',
     );
@@ -133,7 +164,8 @@ describe(`<${QuoteCard.name}/>`, () => {
         </QuoteCard.Name>,
       ],
     });
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const link = screen.queryByRole('link');
+    expect(link).not.toBeInTheDocument();
   });
 
   it('renders the name as a link with whatever attributes the caller supplies', () => {
@@ -160,15 +192,14 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('renders a caller-supplied custom link component inside QuoteCard.Name', () => {
     setup({ children: buildChildrenWithMockLink() });
-    expect(screen.getByTestId(MOCK_LINK_TEST_ID)).toBeVisible();
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLink).toBeVisible();
   });
 
-  it('wraps a custom link component in its own focus-treatment element', () => {
-    setup({
-      children: buildChildrenWithMockLink({ dataTestId: NAME_TEST_ID }),
-    });
+  it('wraps a link that ignores className in its own focus element', () => {
+    setup({ children: buildChildrenWithClassNameIgnoringLink() });
     const wrapper = screen.getByTestId(NAME_TEST_ID);
-    const link = screen.getByTestId(MOCK_LINK_TEST_ID);
+    const link = screen.getByTestId(IGNORING_LINK_TEST_ID);
     expect(link.parentElement).toBe(wrapper);
   });
 
@@ -191,6 +222,7 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('forwards data-testid to the root element', () => {
     setup({ dataTestId: QUOTE_CARD_TEST_ID });
-    expect(screen.getByTestId(QUOTE_CARD_TEST_ID)).toBeVisible();
+    const quoteCard = screen.getByTestId(QUOTE_CARD_TEST_ID);
+    expect(quoteCard).toBeVisible();
   });
 });

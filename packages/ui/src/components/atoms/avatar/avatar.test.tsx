@@ -22,17 +22,20 @@ describe(`<${Avatar.name}/>`, () => {
     });
 
     it('renders initials when no src', () => {
-      expect(screen.getByText('JD')).toBeVisible();
+      const initials = screen.getByText('JD');
+      expect(initials).toBeVisible();
     });
 
     it('renders a text alternative for the initials fallback when alt is provided', () => {
-      expect(screen.getByText(MOCK_PERSON_NAME)).toBeVisible();
+      const textAlternative = screen.getByText(MOCK_PERSON_NAME);
+      expect(textAlternative).toBeVisible();
     });
   });
 
   it('renders img when src is provided', () => {
     setup({ src: PHOTO_SRC, alt: PHOTO_ALT });
-    expect(screen.getByRole('img', { name: PHOTO_ALT })).toBeVisible();
+    const photo = screen.getByRole('img', { name: PHOTO_ALT });
+    expect(photo).toBeVisible();
   });
 
   it.each([
@@ -42,18 +45,22 @@ describe(`<${Avatar.name}/>`, () => {
     { case: 'a single token', name: 'madonna', initials: 'MA' },
   ])('derives 2 initials from $case', ({ name, initials }) => {
     setup({ alt: name, name });
-    expect(screen.getByText(initials)).toBeVisible();
+    const derivedInitials = screen.getByText(initials);
+    expect(derivedInitials).toBeVisible();
   });
 
   it('renders no accessible name on the image when alt is empty', () => {
     setup({ src: PHOTO_SRC, alt: '' });
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const photo = screen.queryByRole('img');
+    expect(photo).not.toBeInTheDocument();
   });
 
   it('renders no sr-only name alongside the initials fallback when alt is empty', () => {
     setup({ alt: '' });
-    expect(screen.getByText('JD')).toBeVisible();
-    expect(screen.queryByText(MOCK_PERSON_NAME)).not.toBeInTheDocument();
+    const initials = screen.getByText('JD');
+    const textAlternative = screen.queryByText(MOCK_PERSON_NAME);
+    expect(initials).toBeVisible();
+    expect(textAlternative).not.toBeInTheDocument();
   });
 
   it('calls onImageError when the image fails to load', () => {

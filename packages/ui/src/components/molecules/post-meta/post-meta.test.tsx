@@ -36,8 +36,11 @@ describe(`<${PostMeta.name}/>`, () => {
     });
 
     it('announces the author name once, beside its avatar image', () => {
-      expect(screen.getAllByText(author.name)).toHaveLength(1);
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      const authorNames = screen.getAllByText(author.name);
+      const avatarImage = screen.queryByRole('img');
+
+      expect(authorNames).toHaveLength(1);
+      expect(avatarImage).not.toBeInTheDocument();
     });
 
     it('renders a time element with the correct dateTime attribute and label', () => {
@@ -48,49 +51,59 @@ describe(`<${PostMeta.name}/>`, () => {
     });
 
     it('omits reading time segment when not provided', () => {
-      expect(screen.queryByText(readingTime)).not.toBeInTheDocument();
+      const readingTimeText = screen.queryByText(readingTime);
+
+      expect(readingTimeText).not.toBeInTheDocument();
     });
 
     it('omits the share trigger when share is not provided', () => {
-      expect(
-        screen.queryByRole('button', { name: /share/i }),
-      ).not.toBeInTheDocument();
+      const shareButton = screen.queryByRole('button', { name: /share/i });
+
+      expect(shareButton).not.toBeInTheDocument();
     });
 
     it('renders the author name as plain text when href is not provided', () => {
-      expect(
-        screen.queryByRole('link', { name: author.name }),
-      ).not.toBeInTheDocument();
+      const authorLink = screen.queryByRole('link', { name: author.name });
+
+      expect(authorLink).not.toBeInTheDocument();
     });
   });
 
   it('renders reading time when provided', () => {
     setup({ readingTime });
-    expect(screen.getByText(readingTime)).toBeVisible();
+    const readingTimeText = screen.getByText(readingTime);
+
+    expect(readingTimeText).toBeVisible();
   });
 
   it('falls back to initials when imageUrl is not provided, announcing the name once', () => {
     setup({ author: { name: author.name } });
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getAllByText(author.name)).toHaveLength(1);
+    const avatarImage = screen.queryByRole('img');
+    const authorNames = screen.getAllByText(author.name);
+
+    expect(avatarImage).not.toBeInTheDocument();
+    expect(authorNames).toHaveLength(1);
   });
 
   it('forwards dataTestId to root element', () => {
     setup({ dataTestId: 'post-meta' });
-    expect(screen.getByTestId('post-meta')).toBeVisible();
+    const root = screen.getByTestId('post-meta');
+
+    expect(root).toBeVisible();
   });
 
   it('renders the share slot when share is provided', () => {
     setup({ share: <button>share</button> });
-    expect(screen.getByRole('button', { name: 'share' })).toBeVisible();
+    const shareButton = screen.getByRole('button', { name: 'share' });
+
+    expect(shareButton).toBeVisible();
   });
 
   it('renders the author name as a link to its href when provided', () => {
     setup({ author: { ...author, href: authorHref } });
-    expect(screen.getByRole('link', { name: author.name })).toHaveAttribute(
-      'href',
-      authorHref,
-    );
+    const authorLink = screen.getByRole('link', { name: author.name });
+
+    expect(authorLink).toHaveAttribute('href', authorHref);
   });
 
   it('renders the author link as the linkAs component when provided', () => {
@@ -98,8 +111,9 @@ describe(`<${PostMeta.name}/>`, () => {
       author: { ...author, href: authorHref },
       linkAs: MockLink,
     });
-    expect(screen.getByRole('link', { name: author.name })).toBe(
-      screen.getByTestId(MOCK_LINK_TEST_ID),
-    );
+    const authorLink = screen.getByRole('link', { name: author.name });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+
+    expect(authorLink).toBe(mockLink);
   });
 });

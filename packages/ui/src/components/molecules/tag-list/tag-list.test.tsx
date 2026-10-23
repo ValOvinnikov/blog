@@ -17,7 +17,8 @@ describe(`<${TagList.name}/>`, () => {
   it('renders all tags as visible elements', () => {
     setup();
     for (const tag of tags) {
-      expect(screen.getByText(tag)).toBeVisible();
+      const tagElement = screen.getByText(tag);
+      expect(tagElement).toBeVisible();
     }
   });
 
@@ -28,13 +29,16 @@ describe(`<${TagList.name}/>`, () => {
 
   it('forwards dataTestId', () => {
     setup({ dataTestId: 'tag-list' });
-    expect(screen.getByTestId('tag-list')).toBeVisible();
+    const tagList = screen.getByTestId('tag-list');
+    expect(tagList).toBeVisible();
   });
 
   it('renders a tag without an href as plain text, not a link', () => {
     setup({ tags: [{ label: MOCK_TAG.label }] });
-    expect(screen.getByText(MOCK_TAG.label)).toBeVisible();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const plainTag = screen.getByText(MOCK_TAG.label);
+    const link = screen.queryByRole('link');
+    expect(plainTag).toBeVisible();
+    expect(link).not.toBeInTheDocument();
   });
 
   it('renders linked tags using the custom `linkAs` component', () => {
@@ -42,19 +46,18 @@ describe(`<${TagList.name}/>`, () => {
       tags: [MOCK_TAG],
       linkAs: MockLink,
     });
-    expect(screen.getByRole('link', { name: MOCK_TAG.label })).toBe(
-      screen.getByTestId(MOCK_LINK_TEST_ID),
-    );
+    const tagLink = screen.getByRole('link', { name: MOCK_TAG.label });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(tagLink).toBe(mockLink);
   });
 
   it('renders a mix of plain and linked tags from a single array', () => {
     setup({
       tags: ['Plain', { label: 'Linked', href: LINKED_HREF }],
     });
-    expect(screen.getByText('Plain')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Linked' })).toHaveAttribute(
-      'href',
-      LINKED_HREF,
-    );
+    const plainTag = screen.getByText('Plain');
+    const linkedTag = screen.getByRole('link', { name: 'Linked' });
+    expect(plainTag).toBeVisible();
+    expect(linkedTag).toHaveAttribute('href', LINKED_HREF);
   });
 });

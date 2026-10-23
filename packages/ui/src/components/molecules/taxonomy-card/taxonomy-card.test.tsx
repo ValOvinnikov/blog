@@ -35,17 +35,20 @@ describe(`<${TaxonomyCard.name}/>`, () => {
 
   it('renders description when provided', () => {
     setup({ description: DESCRIPTION });
-    expect(screen.getByText(DESCRIPTION)).toBeVisible();
+    const description = screen.getByText(DESCRIPTION);
+    expect(description).toBeVisible();
   });
 
   it('does not render a description element when omitted', () => {
     setup();
-    expect(screen.queryByText(/posts about/i)).not.toBeInTheDocument();
+    const description = screen.queryByText(/posts about/i);
+    expect(description).not.toBeInTheDocument();
   });
 
   it('renders the pre-formatted post count label as visible text', () => {
     setup({ postCountLabel: '1 post' });
-    expect(screen.getByText('1 post')).toBeVisible();
+    const postCount = screen.getByText('1 post');
+    expect(postCount).toBeVisible();
   });
 
   it('names the link by the visible title followed by the post count', () => {
@@ -60,20 +63,23 @@ describe(`<${TaxonomyCard.name}/>`, () => {
       postCountLabel: '5 posts',
       accessibleNameSeparator: ' — ',
     });
-    expect(
-      screen.getByRole('link', { name: `${MOCK_TOPIC.label} — 5 posts` }),
-    ).toBeVisible();
+    const link = screen.getByRole('link', {
+      name: `${MOCK_TOPIC.label} — 5 posts`,
+    });
+    expect(link).toBeVisible();
   });
 
   it('renders the link via the linkAs component when provided', () => {
     setup({ linkAs: MockLink });
 
-    expect(screen.getByTestId(MOCK_LINK_TEST_ID)).toBeVisible();
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLink).toBeVisible();
   });
 
   it('forwards data-testid to the root element', () => {
     setup({ dataTestId: TAXONOMY_CARD_TEST_ID });
-    expect(screen.getByTestId(TAXONOMY_CARD_TEST_ID)).toBeVisible();
+    const card = screen.getByTestId(TAXONOMY_CARD_TEST_ID);
+    expect(card).toBeVisible();
   });
 
   it('renders TaxonomyCard.Posts as a labelled list of post links', () => {
@@ -89,13 +95,14 @@ describe(`<${TaxonomyCard.name}/>`, () => {
       ),
     });
 
-    expect(screen.getByRole('list', { name: 'Latest posts' })).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: FIRST_POST_TITLE }),
-    ).toHaveAttribute('href', FIRST_POST_HREF);
-    expect(
-      screen.getByRole('link', { name: SECOND_POST_TITLE }),
-    ).toHaveAttribute('href', SECOND_POST_HREF);
+    const postList = screen.getByRole('list', { name: 'Latest posts' });
+    const firstPostLink = screen.getByRole('link', { name: FIRST_POST_TITLE });
+    const secondPostLink = screen.getByRole('link', {
+      name: SECOND_POST_TITLE,
+    });
+    expect(postList).toBeVisible();
+    expect(firstPostLink).toHaveAttribute('href', FIRST_POST_HREF);
+    expect(secondPostLink).toHaveAttribute('href', SECOND_POST_HREF);
   });
 
   it('renders nothing for TaxonomyCard.Posts when posts is empty', () => {
@@ -103,7 +110,8 @@ describe(`<${TaxonomyCard.name}/>`, () => {
       children: <TaxonomyCard.Posts ariaLabel="Latest posts" posts={[]} />,
     });
 
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    const postList = screen.queryByRole('list');
+    expect(postList).not.toBeInTheDocument();
   });
 
   it('resolves a post link to its own href rather than the taxonomy term href', () => {

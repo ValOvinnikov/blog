@@ -28,48 +28,40 @@ describe(`<${Pagination.name}/>`, () => {
     });
 
     it.each([1, 2, 3])('links page %i to its href', (page) => {
-      expect(screen.getByRole('link', { name: String(page) })).toHaveAttribute(
-        'href',
-        createHref(page),
-      );
+      const pageLink = screen.getByRole('link', { name: String(page) });
+      expect(pageLink).toHaveAttribute('href', createHref(page));
     });
 
     it('exposes the page list inside a labelled nav', () => {
-      const nav = screen.getByRole('navigation', { name: ARIA_LABEL });
-      expect(within(nav).getByRole('list')).toBeVisible();
+      const paginationNav = screen.getByRole('navigation', {
+        name: ARIA_LABEL,
+      });
+      const pageList = within(paginationNav).getByRole('list');
+      expect(pageList).toBeVisible();
     });
 
     it('marks the current page with aria-current', () => {
-      expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
-        ARIA_CURRENT,
-        'page',
-      );
-      expect(screen.getByRole('link', { name: '1' })).not.toHaveAttribute(
-        ARIA_CURRENT,
-      );
+      const currentLink = screen.getByRole('link', { name: '2' });
+      const otherLink = screen.getByRole('link', { name: '1' });
+      expect(currentLink).toHaveAttribute(ARIA_CURRENT, 'page');
+      expect(otherLink).not.toHaveAttribute(ARIA_CURRENT);
     });
   });
 
   it('hides previous on the first page', () => {
     setup({ currentPage: 1 });
-    expect(
-      screen.queryByRole('link', { name: PREVIOUS_LABEL }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: NEXT_LABEL })).toHaveAttribute(
-      'href',
-      createHref(2),
-    );
+    const previousLink = screen.queryByRole('link', { name: PREVIOUS_LABEL });
+    const nextLink = screen.getByRole('link', { name: NEXT_LABEL });
+    expect(previousLink).not.toBeInTheDocument();
+    expect(nextLink).toHaveAttribute('href', createHref(2));
   });
 
   it('hides next on the last page', () => {
     setup({ currentPage: 3 });
-    expect(screen.getByRole('link', { name: PREVIOUS_LABEL })).toHaveAttribute(
-      'href',
-      createHref(2),
-    );
-    expect(
-      screen.queryByRole('link', { name: NEXT_LABEL }),
-    ).not.toBeInTheDocument();
+    const previousLink = screen.getByRole('link', { name: PREVIOUS_LABEL });
+    const nextLink = screen.queryByRole('link', { name: NEXT_LABEL });
+    expect(previousLink).toHaveAttribute('href', createHref(2));
+    expect(nextLink).not.toBeInTheDocument();
   });
 
   it('renders nothing when there is a single page', () => {
@@ -80,38 +72,44 @@ describe(`<${Pagination.name}/>`, () => {
   it('renders links via linkAs when provided, one per page link plus prev and next', () => {
     setup({ linkAs: MockLink });
 
-    expect(screen.getAllByTestId(MOCK_LINK_TEST_ID)).toHaveLength(5);
+    const mockLinks = screen.getAllByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLinks).toHaveLength(5);
   });
 
   it('forwards data-testid', () => {
     setup({ currentPage: 1, totalPages: 2, dataTestId: PAGINATION_TEST_ID });
-    expect(screen.getByTestId(PAGINATION_TEST_ID)).toBeVisible();
+    const pagination = screen.getByTestId(PAGINATION_TEST_ID);
+    expect(pagination).toBeVisible();
   });
 
   describe('truncation', () => {
-    const pageLinkNumbers = () =>
-      screen
-        .getAllByRole('link')
+    const pageLinkNumbers = () => {
+      const links = screen.getAllByRole('link');
+      return links
         .map((link) => link.textContent)
         .filter((text) => text !== null && /^\d+$/.test(text))
         .map(Number);
+    };
 
     it('renders every page when the total fits within the visible range', () => {
       setup({ currentPage: 4, totalPages: 7 });
+      const ellipsis = screen.queryByText('…');
       expect(pageLinkNumbers()).toEqual([1, 2, 3, 4, 5, 6, 7]);
-      expect(screen.queryByText('…')).not.toBeInTheDocument();
+      expect(ellipsis).not.toBeInTheDocument();
     });
 
     it('shows a leading run plus the last page, with one ellipsis, near the first page', () => {
       setup({ currentPage: 1, totalPages: 12 });
+      const ellipses = screen.getAllByText('…');
       expect(pageLinkNumbers()).toEqual([1, 2, 3, 4, 5, 12]);
-      expect(screen.getAllByText('…')).toHaveLength(1);
+      expect(ellipses).toHaveLength(1);
     });
 
     it('shows the first page plus a trailing run, with one ellipsis, near the last page', () => {
       setup({ currentPage: 12, totalPages: 12 });
+      const ellipses = screen.getAllByText('…');
       expect(pageLinkNumbers()).toEqual([1, 8, 9, 10, 11, 12]);
-      expect(screen.getAllByText('…')).toHaveLength(1);
+      expect(ellipses).toHaveLength(1);
     });
 
     describe('in the middle of a long run', () => {
@@ -120,12 +118,14 @@ describe(`<${Pagination.name}/>`, () => {
       });
 
       it('shows the first, last and neighbouring pages, with two ellipses', () => {
+        const ellipses = screen.getAllByText('…');
         expect(pageLinkNumbers()).toEqual([1, 5, 6, 7, 12]);
-        expect(screen.getAllByText('…')).toHaveLength(2);
+        expect(ellipses).toHaveLength(2);
       });
 
       it('hides the ellipsis from the accessibility tree', () => {
-        expect(screen.getAllByRole('listitem')).toHaveLength(5);
+        const listItems = screen.getAllByRole('listitem');
+        expect(listItems).toHaveLength(5);
       });
     });
   });

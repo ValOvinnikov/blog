@@ -29,17 +29,20 @@ describe(`<${ShareLink.name}/>`, () => {
   it('renders the given icon alongside the label', () => {
     setup({ icon: <svg data-testid="share-icon" /> });
 
-    expect(screen.getByTestId('share-icon')).toBeVisible();
+    const icon = screen.getByTestId('share-icon');
+    expect(icon).toBeVisible();
   });
 
   it('renders via the as prop when provided', () => {
     setup({ as: MockLink });
 
-    expect(screen.getByTestId(MOCK_LINK_TEST_ID)).toBeVisible();
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLink).toBeVisible();
   });
 
   it('forwards data-testid', () => {
     setup({ dataTestId: SHARE_LINK_TEST_ID });
-    expect(screen.getByTestId(SHARE_LINK_TEST_ID)).toBeVisible();
+    const shareLink = screen.getByTestId(SHARE_LINK_TEST_ID);
+    expect(shareLink).toBeVisible();
   });
 });

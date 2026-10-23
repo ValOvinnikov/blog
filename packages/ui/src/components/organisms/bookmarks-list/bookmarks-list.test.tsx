@@ -32,23 +32,28 @@ describe(`<${BookmarksList.name}/>`, () => {
 
     it('renders a row per bookmark with its date and filename link', () => {
       for (const bookmark of rows) {
-        expect(screen.getByText(bookmark.formattedDate)).toBeVisible();
-        expect(
-          screen.getByRole('link', { name: bookmark.filename }),
-        ).toHaveAttribute('href', bookmark.href);
+        const date = screen.getByText(bookmark.formattedDate);
+        const filenameLink = screen.getByRole('link', {
+          name: bookmark.filename,
+        });
+        expect(date).toBeVisible();
+        expect(filenameLink).toHaveAttribute('href', bookmark.href);
       }
     });
 
     it('exposes the rows as an explicit list', () => {
-      expect(screen.getByRole('list')).toBeVisible();
+      const list = screen.getByRole('list');
+      expect(list).toBeVisible();
     });
 
     it('does not render a prefix glyph when omitted', () => {
-      expect(screen.queryByTestId(PREFIX_TEST_ID)).not.toBeInTheDocument();
+      const prefix = screen.queryByTestId(PREFIX_TEST_ID);
+      expect(prefix).not.toBeInTheDocument();
     });
 
     it('does not render a hint when omitted', () => {
-      expect(screen.queryByText(/saved/)).not.toBeInTheDocument();
+      const hint = screen.queryByText(/saved/);
+      expect(hint).not.toBeInTheDocument();
     });
   });
 
@@ -83,14 +88,17 @@ describe(`<${BookmarksList.name}/>`, () => {
 
   it('renders the hint below the list when provided and rows are not empty', () => {
     setup({ hint: '3 saved' });
-    expect(screen.getByText('3 saved')).toBeVisible();
+    const hint = screen.getByText('3 saved');
+    expect(hint).toBeVisible();
   });
 
   it('renders the empty message instead of the list when rows is empty', () => {
     setup({ rows: [] });
 
-    expect(screen.getByText(EMPTY_MESSAGE)).toBeVisible();
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    const emptyMessage = screen.getByText(EMPTY_MESSAGE);
+    const list = screen.queryByRole('list');
+    expect(emptyMessage).toBeVisible();
+    expect(list).not.toBeInTheDocument();
   });
 
   it('renders a rich empty message with its working link', () => {
@@ -103,25 +111,26 @@ describe(`<${BookmarksList.name}/>`, () => {
       ),
     });
 
-    expect(screen.getByRole('link', { name: 'the blog' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
+    const blogLink = screen.getByRole('link', { name: 'the blog' });
+    expect(blogLink).toHaveAttribute('href', '/blog');
   });
 
   it('does not render the hint in the empty state', () => {
     setup({ rows: [], hint: '3 saved' });
-    expect(screen.queryByText('3 saved')).not.toBeInTheDocument();
+    const hint = screen.queryByText('3 saved');
+    expect(hint).not.toBeInTheDocument();
   });
 
   it('renders filename links via linkAs when provided', () => {
     setup({ linkAs: MockLink });
 
-    expect(screen.getAllByTestId(MOCK_LINK_TEST_ID)).toHaveLength(rows.length);
+    const mockLinks = screen.getAllByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLinks).toHaveLength(rows.length);
   });
 
   it('forwards data-testid', () => {
     setup({ dataTestId: BOOKMARKS_LIST_TEST_ID });
-    expect(screen.getByTestId(BOOKMARKS_LIST_TEST_ID)).toBeVisible();
+    const bookmarksList = screen.getByTestId(BOOKMARKS_LIST_TEST_ID);
+    expect(bookmarksList).toBeVisible();
   });
 });

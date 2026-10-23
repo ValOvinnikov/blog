@@ -45,35 +45,43 @@ describe(`<${Article.name}/>`, () => {
     });
 
     it('renders as an <article> landmark wrapping Header and Body', () => {
-      expect(screen.getByRole('article')).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 1, name: MOCK_POST_TITLE }),
-      ).toBeVisible();
-      expect(screen.getByText(POST_BODY)).toBeVisible();
+      const article = screen.getByRole('article');
+      const title = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_POST_TITLE,
+      });
+      const body = screen.getByText(POST_BODY);
+      expect(article).toBeVisible();
+      expect(title).toBeVisible();
+      expect(body).toBeVisible();
     });
 
     it('renders no topic eyebrow when topic is omitted', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      const link = screen.queryByRole('link');
+      expect(link).not.toBeInTheDocument();
     });
 
     it('does not render a lead paragraph when omitted', () => {
-      expect(screen.queryByText(MOCK_POST_EXCERPT)).not.toBeInTheDocument();
+      const lead = screen.queryByText(MOCK_POST_EXCERPT);
+      expect(lead).not.toBeInTheDocument();
     });
 
     it('does not render a coverMedia wrapper when omitted', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      const coverImage = screen.queryByRole('img');
+      expect(coverImage).not.toBeInTheDocument();
     });
   });
 
   it('renders the topic eyebrow as non-heading text when no href is given', () => {
     renderArticle({ topic: { label: MOCK_TOPIC.label } });
-    expect(screen.getByText(MOCK_TOPIC.label)).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: MOCK_TOPIC.label }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { name: MOCK_TOPIC.label }),
-    ).not.toBeInTheDocument();
+    const eyebrow = screen.getByText(MOCK_TOPIC.label);
+    const eyebrowLink = screen.queryByRole('link', { name: MOCK_TOPIC.label });
+    const eyebrowHeading = screen.queryByRole('heading', {
+      name: MOCK_TOPIC.label,
+    });
+    expect(eyebrow).toBeVisible();
+    expect(eyebrowLink).not.toBeInTheDocument();
+    expect(eyebrowHeading).not.toBeInTheDocument();
   });
 
   describe('with a linked topic eyebrow', () => {
@@ -82,45 +90,48 @@ describe(`<${Article.name}/>`, () => {
     });
 
     it('renders the topic eyebrow as a link when href is given', () => {
-      expect(
-        screen.getByRole('link', { name: MOCK_TOPIC.label }),
-      ).toHaveAttribute('href', MOCK_TOPIC.href);
+      const eyebrowLink = screen.getByRole('link', { name: MOCK_TOPIC.label });
+      expect(eyebrowLink).toHaveAttribute('href', MOCK_TOPIC.href);
     });
 
     it('renders exactly one h1 — the post title — when a topic eyebrow is present', () => {
-      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+      const titleHeadings = screen.getAllByRole('heading', { level: 1 });
+      expect(titleHeadings).toHaveLength(1);
     });
   });
 
   it('renders the lead paragraph when provided', () => {
     renderArticle({ lead: MOCK_POST_EXCERPT });
-    expect(screen.getByText(MOCK_POST_EXCERPT)).toBeVisible();
+    const lead = screen.getByText(MOCK_POST_EXCERPT);
+    expect(lead).toBeVisible();
   });
 
   it('does not render a PostMeta strip when meta is omitted', () => {
     renderArticle({ meta: undefined });
-    expect(screen.queryByText(meta.author.name)).not.toBeInTheDocument();
-    expect(screen.queryByText(meta.formattedDate)).not.toBeInTheDocument();
+    const authorName = screen.queryByText(meta.author.name);
+    const formattedDate = screen.queryByText(meta.formattedDate);
+    expect(authorName).not.toBeInTheDocument();
+    expect(formattedDate).not.toBeInTheDocument();
   });
 
   it('renders coverMedia content when provided', () => {
     renderArticle({ coverMedia: <img src="/cover.jpg" alt="Post cover" /> });
-    expect(screen.getByAltText('Post cover')).toBeVisible();
+    const coverImage = screen.getByAltText('Post cover');
+    expect(coverImage).toBeVisible();
   });
 
   it('renders Article.Footer tags as links to their routes', () => {
     renderArticle({}, { tags: FOOTER_TAGS });
     for (const tag of FOOTER_TAGS) {
-      expect(screen.getByRole('link', { name: tag.label })).toHaveAttribute(
-        'href',
-        tag.href,
-      );
+      const tagLink = screen.getByRole('link', { name: tag.label });
+      expect(tagLink).toHaveAttribute('href', tag.href);
     }
   });
 
   it('does not render an Article.Footer when tags is empty', () => {
     renderArticle({}, { tags: [] });
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const link = screen.queryByRole('link');
+    expect(link).not.toBeInTheDocument();
   });
 
   it('forwards dataTestId to the root element', () => {
@@ -129,6 +140,7 @@ describe(`<${Article.name}/>`, () => {
         <Article.Header title={MOCK_POST_TITLE} meta={meta} />
       </Article>,
     );
-    expect(screen.getByTestId('article')).toBeVisible();
+    const article = screen.getByTestId('article');
+    expect(article).toBeVisible();
   });
 });

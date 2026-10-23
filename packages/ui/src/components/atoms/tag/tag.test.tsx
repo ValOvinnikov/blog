@@ -13,7 +13,8 @@ const setup = customRender(Tag, { children: MOCK_TAG.label });
 describe(`<${Tag.name}/>`, () => {
   it('renders a span element', () => {
     setup();
-    expect(screen.getByText(MOCK_TAG.label).tagName).toBe('SPAN');
+    const tag = screen.getByText(MOCK_TAG.label);
+    expect(tag.tagName).toBe('SPAN');
   });
 
   it('renders as an anchor when `as` is set to "a"', () => {
@@ -22,10 +23,8 @@ describe(`<${Tag.name}/>`, () => {
         {MOCK_TAG.label}
       </Tag>,
     );
-    expect(screen.getByRole('link', { name: MOCK_TAG.label })).toHaveAttribute(
-      'href',
-      MOCK_TAG.href,
-    );
+    const tagLink = screen.getByRole('link', { name: MOCK_TAG.label });
+    expect(tagLink).toHaveAttribute('href', MOCK_TAG.href);
   });
 
   it('renders with a custom component when `as` prop is provided', () => {
@@ -34,8 +33,9 @@ describe(`<${Tag.name}/>`, () => {
         {MOCK_TAG.label}
       </Tag>,
     );
-    const link = screen.getByRole('link', { name: MOCK_TAG.label });
-    expect(link).toBe(screen.getByTestId(MOCK_LINK_TEST_ID));
-    expect(link).toHaveAttribute('href', MOCK_TAG.href);
+    const tagLink = screen.getByRole('link', { name: MOCK_TAG.label });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(tagLink).toBe(mockLink);
+    expect(tagLink).toHaveAttribute('href', MOCK_TAG.href);
   });
 });

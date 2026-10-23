@@ -84,45 +84,50 @@ describe(`<${Hero.name}/>`, () => {
     });
 
     it('renders the title', () => {
-      expect(
-        screen.getByRole('heading', { name: MOCK_POST_TITLE }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
+      expect(heading).toBeVisible();
     });
 
     it('does not render an excerpt element when excerpt is omitted', () => {
-      expect(screen.queryByText(MOCK_POST_EXCERPT)).not.toBeInTheDocument();
+      const excerpt = screen.queryByText(MOCK_POST_EXCERPT);
+      expect(excerpt).not.toBeInTheDocument();
     });
 
     it('does not render body content when Hero.Body is omitted', () => {
-      expect(screen.queryByText(BODY_TEXT)).not.toBeInTheDocument();
+      const body = screen.queryByText(BODY_TEXT);
+      expect(body).not.toBeInTheDocument();
     });
 
     it('does not render a CTA when Hero.Cta is omitted', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      const cta = screen.queryByRole('link');
+      expect(cta).not.toBeInTheDocument();
     });
 
     it('does not render media when Hero.Media is omitted', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      const media = screen.queryByRole('img');
+      expect(media).not.toBeInTheDocument();
     });
 
     it('assigns titleId to the heading element', () => {
-      expect(
-        screen.getByRole('heading', { name: MOCK_POST_TITLE }),
-      ).toHaveAttribute('id', HERO_TITLE_ID);
+      const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
+      expect(heading).toHaveAttribute('id', HERO_TITLE_ID);
     });
 
     it('does not render avatar content when Hero.Avatar is omitted', () => {
-      expect(screen.queryByAltText(PORTRAIT_ALT)).not.toBeInTheDocument();
+      const portrait = screen.queryByAltText(PORTRAIT_ALT);
+      expect(portrait).not.toBeInTheDocument();
     });
 
     it('does not render social content when Hero.Social is omitted', () => {
-      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+      const social = screen.queryByRole('list');
+      expect(social).not.toBeInTheDocument();
     });
   });
 
   it('renders the excerpt when provided', () => {
     setup({ excerpt: MOCK_POST_EXCERPT });
-    expect(screen.getByText(MOCK_POST_EXCERPT)).toBeVisible();
+    const excerpt = screen.getByText(MOCK_POST_EXCERPT);
+    expect(excerpt).toBeVisible();
   });
 
   it('renders Hero.Body between the excerpt and Hero.Cta in the DOM', () => {
@@ -130,7 +135,7 @@ describe(`<${Hero.name}/>`, () => {
       { excerpt: MOCK_POST_EXCERPT },
       <>
         <Hero.Body>
-          <p>Full bio goes here.</p>
+          <p>{BODY_TEXT}</p>
         </Hero.Body>
         {heroCta}
       </>,
@@ -150,30 +155,31 @@ describe(`<${Hero.name}/>`, () => {
     });
 
     it('renders Hero.Cta children', () => {
-      expect(screen.getByRole('link')).toHaveAttribute(
-        'href',
-        '/posts/design-system',
-      );
-      expect(screen.getByText('Read more')).toBeVisible();
+      const cta = screen.getByRole('link');
+      const ctaText = screen.getByText('Read more');
+      expect(cta).toHaveAttribute('href', '/posts/design-system');
+      expect(ctaText).toBeVisible();
     });
 
     it('nests the CTA inside the copy column, alongside the heading', () => {
       const copyColumn = screen.getByTestId('hero-copy');
-      expect(copyColumn).toContainElement(
-        screen.getByRole('heading', { name: MOCK_POST_TITLE }),
-      );
-      expect(copyColumn).toContainElement(screen.getByRole('link'));
+      const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
+      const cta = screen.getByRole('link');
+      expect(copyColumn).toContainElement(heading);
+      expect(copyColumn).toContainElement(cta);
     });
   });
 
   it('renders Hero.Media content', () => {
     renderHero(undefined, heroMedia);
-    expect(screen.getByAltText(HERO_MEDIA_ALT)).toBeVisible();
+    const mediaImage = screen.getByAltText(HERO_MEDIA_ALT);
+    expect(mediaImage).toBeVisible();
   });
 
   it('forwards data-testid to the root element', () => {
     setup({ dataTestId: HERO_TEST_ID });
-    expect(screen.getByTestId(HERO_TEST_ID)).toBeVisible();
+    const hero = screen.getByTestId(HERO_TEST_ID);
+    expect(hero).toBeVisible();
   });
 
   it.each([
@@ -229,10 +235,8 @@ describe(`<${Hero.name}/>`, () => {
       heroMedia,
     );
 
-    expect(screen.getByTestId(OVERLAY_TEST_ID)).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+    const overlay = screen.getByTestId(OVERLAY_TEST_ID);
+    expect(overlay).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('renders no overlay on Split or Stacked, regardless of tone', () => {
@@ -242,7 +246,8 @@ describe(`<${Hero.name}/>`, () => {
         heroMedia,
       );
 
-      expect(screen.queryByTestId(OVERLAY_TEST_ID)).not.toBeInTheDocument();
+      const overlay = screen.queryByTestId(OVERLAY_TEST_ID);
+      expect(overlay).not.toBeInTheDocument();
 
       unmount();
     }
@@ -294,7 +299,8 @@ describe(`<${Hero.name}/>`, () => {
       </Hero.Avatar>,
     );
 
-    expect(screen.getByText('JD')).toBeVisible();
+    const initials = screen.getByText('JD');
+    expect(initials).toBeVisible();
   });
 
   it('renders Hero.Social after Hero.Cta in the DOM', () => {
@@ -320,7 +326,8 @@ describe(`<${Hero.name}/>`, () => {
       </Hero.Social>,
     );
 
-    expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
+    const githubLink = screen.getByRole('link', { name: 'GitHub' });
+    expect(githubLink).toBeVisible();
   });
 
   it.each(Object.values(BRAND_VARIANT))(

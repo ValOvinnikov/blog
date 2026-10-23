@@ -28,15 +28,16 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     });
 
     it('renders a nav landmark with the passed ariaLabel', () => {
-      expect(screen.getByRole('navigation', { name: ariaLabel })).toBeVisible();
+      const nav = screen.getByRole('navigation', { name: ariaLabel });
+
+      expect(nav).toBeVisible();
     });
 
     it('renders every item except the last as a link with the correct label and href', () => {
       for (const item of items.slice(0, -1)) {
-        expect(screen.getByRole('link', { name: item.label })).toHaveAttribute(
-          'href',
-          item.href,
-        );
+        const itemLink = screen.getByRole('link', { name: item.label });
+
+        expect(itemLink).toHaveAttribute('href', item.href);
       }
     });
 
@@ -48,50 +49,52 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     });
 
     it('sets a title attribute on the first item for sighted hover users', () => {
-      expect(
-        screen.getByRole('link', { name: firstItem.label }),
-      ).toHaveAttribute('title', firstItem.label);
+      const homeLink = screen.getByRole('link', { name: firstItem.label });
+
+      expect(homeLink).toHaveAttribute('title', firstItem.label);
     });
 
     it('renders the last item as text with aria-current="page", not a link', () => {
       const current = screen.getByText(lastItem.label);
+      const currentLink = screen.queryByRole('link', { name: lastItem.label });
+
       expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
-      expect(
-        screen.queryByRole('link', { name: lastItem.label }),
-      ).not.toBeInTheDocument();
+      expect(currentLink).not.toBeInTheDocument();
     });
 
     it('preserves trail order', () => {
-      const rendered = screen
-        .getAllByRole('listitem')
-        .map((li) => li.textContent);
+      const listItems = screen.getAllByRole('listitem');
+      const rendered = listItems.map((li) => li.textContent);
+
       expect(rendered).toEqual(items.map((item) => item.label));
     });
 
     it('sets a title attribute on the last item so its full text is available on hover', () => {
-      expect(screen.getByText(lastItem.label)).toHaveAttribute(
-        'title',
-        lastItem.label,
-      );
+      const current = screen.getByText(lastItem.label);
+
+      expect(current).toHaveAttribute('title', lastItem.label);
     });
   });
 
   it('sets a title attribute on the first item even when it is also the current page', () => {
     setup({ items: [firstItem] });
-    expect(screen.getByTitle(firstItem.label)).toHaveAttribute(
-      ARIA_CURRENT,
-      'page',
-    );
+    const current = screen.getByTitle(firstItem.label);
+
+    expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('renders links via the linkAs component when provided', () => {
     setup({ linkAs: MockLink });
     const firstLink = screen.getByRole('link', { name: firstItem.label });
-    expect(screen.getAllByTestId(MOCK_LINK_TEST_ID)).toContain(firstLink);
+    const mockLinks = screen.getAllByTestId(MOCK_LINK_TEST_ID);
+
+    expect(mockLinks).toContain(firstLink);
   });
 
   it('forwards dataTestId to the nav element', () => {
     setup({ dataTestId: 'breadcrumbs' });
-    expect(screen.getByTestId('breadcrumbs')).toBeVisible();
+    const nav = screen.getByTestId('breadcrumbs');
+
+    expect(nav).toBeVisible();
   });
 });
