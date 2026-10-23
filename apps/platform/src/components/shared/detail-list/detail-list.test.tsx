@@ -49,12 +49,10 @@ describe(`<${DetailList.name}/>`, () => {
       </DetailList>,
     );
 
-    const label = screen.getByText('Locale');
-    const value = screen.getByText('en');
-    const definition = value.closest('dd');
+    const term = screen.getByRole('term');
+    const definition = screen.getByRole('definition');
 
-    expect(label.tagName).toBe('DT');
-    expect(value.tagName).toBe('SPAN');
-    expect(definition).not.toBeNull();
+    expect(term).toHaveTextContent('Locale');
+    expect(definition).toHaveTextContent('en');
   });
 });

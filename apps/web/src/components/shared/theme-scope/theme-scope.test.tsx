@@ -1,5 +1,5 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 
 import { ThemeScope } from './theme-scope';
 
@@ -20,11 +20,10 @@ describe(`<${ThemeScope.name}/>`, () => {
   });
 
   it('injects the resolved theme tokens as a <style> block', () => {
-    const style = document.head.querySelector(
-      'style[data-href="tenant-theme"]',
-    );
-    expect(style?.innerHTML).toContain(
+    const style = within(document.head).getByText(
       '--brand-primary: oklch(0.45 0.17 250);',
+      { exact: false, ignore: false },
     );
+    expect(style).toBeInstanceOf(HTMLStyleElement);
   });
 });
