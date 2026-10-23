@@ -10,13 +10,14 @@ export const HomePage = async () => {
   const result = await getHomePage();
   await redirectMissingLanguagePage(result);
 
-  const { headingBlock, headingAlignment, hero, modules, faqs } =
+  const { id, headingBlock, headingAlignment, hero, modules, faqs } =
     guardPageLoaderResult(result, 'home_page.fetch_failed');
 
   return (
     <PageShell>
       <FaqPageSchema faqs={faqs} />
       <HomeModuleRenderer
+        homePageId={id}
         hero={hero}
         headingBlock={headingBlock}
         headingAlignment={headingAlignment}

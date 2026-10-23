@@ -1,4 +1,5 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
@@ -95,8 +96,12 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const PAGE_HEADING = 'Welcome to the blog';
 const HERO_STATEMENT_TEST_ID = 'stub-hero-statement';
+const HOME_PAGE_ID = faker.string.uuid();
+const HERO_ID = 'hero-1';
+const CTA_MODULE = { id: 'cta-1', type: 'module_cta' } as const;
 
 const setup = customRenderAsync(HomeModuleRenderer, {
+  homePageId: HOME_PAGE_ID,
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
@@ -107,25 +112,23 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: PAGE_HEADING });
 
   it('renders the resolved hero, with exactly one h1, when the hero has content', async () => {
-    await setup({ hero: { id: 'hero-1', type: 'module_heroStatement' } });
+    await setup({ hero: { id: HERO_ID, type: 'module_heroStatement' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
+    const hero = screen.getByTestId(HERO_STATEMENT_TEST_ID);
+
     expect(headings).toHaveLength(1);
-    expect(screen.getByTestId(HERO_STATEMENT_TEST_ID)).toHaveTextContent(
-      'hero-1',
-    );
+    expect(hero).toHaveTextContent(HERO_ID);
   });
 
   it('renders the resolved hero before the modules when the page has both', async () => {
     await setup({
-      hero: { id: 'hero-1', type: 'module_heroStatement' },
-      modules: [
-        { id: 'cta-1', type: 'module_cta' },
-        { id: 'content-1', type: 'module_content' },
-      ],
+      hero: { id: HERO_ID, type: 'module_heroStatement' },
+      modules: [CTA_MODULE, { id: 'content-1', type: 'module_content' }],
     });
 
     const nodes = screen.getAllByTestId(/^stub-/);
+
     expect(nodes.map((node) => node.getAttribute('data-testid'))).toEqual([
       HERO_STATEMENT_TEST_ID,
       'stub-cta',
@@ -137,9 +140,18 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
+
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent(PAGE_HEADING);
-    expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
+  });
+
+  it('renders each module with the home page as its context', async () => {
+    await setup({ modules: [CTA_MODULE] });
+
+    expect(ctaModuleMock).toHaveBeenCalledWith(
+      { id: CTA_MODULE.id, context: { homePage: { id: HOME_PAGE_ID } } },
+      undefined,
+    );
   });
 
   testHeroProfileHero({ setup, loggerWarnMock });
@@ -156,7 +168,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: 'cta-1', type: 'module_cta' },
+      CTA_MODULE,
       { id: 'content-1', type: 'module_content' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-latest-1', type: 'module_postLatest' },

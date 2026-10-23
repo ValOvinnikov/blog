@@ -1,9 +1,10 @@
-'use server';
+import 'server-only';
 
 import {
   ACTION_OUTCOME,
   CAPABILITY,
   type TActionResult,
+  type TLocaleIsoCode,
   type TMaybeUndefined,
 } from '@blog/config';
 import { queries, type schema } from '@blog/db';
@@ -23,10 +24,16 @@ import {
 } from '@web/utils/validate-contact-message/validate-contact-message';
 
 const SOURCE_PATH_MAX_LENGTH = 2_048;
+const SUBMIT_BLOCKED_EVENT = 'contact_form.submit_blocked';
 
 export type TContactMessageInput = TContactMessageFields & {
   website: string;
   sourcePath: string;
+};
+
+export type TContactMessageSource = {
+  sourceDocumentId: TMaybeUndefined<string>;
+  sourceLocale: TLocaleIsoCode;
 };
 
 export type TContactRefusal =
@@ -43,7 +50,7 @@ const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 const { isBotOrUnverified, isRateLimited } = createPublicWriteGuard({
   name: 'contact-form-submit',
-  blockedEvent: 'contact_form.submit_blocked',
+  blockedEvent: SUBMIT_BLOCKED_EVENT,
   windowMs: 10 * 60_000,
   maxRequests: 5,
 });
@@ -74,13 +81,15 @@ const storeLead = async (
   }
 };
 
+/** Only an inline Server Action may call this, so the browser never supplies `source`. */
 export const submitContactMessage = async (
   input: TContactMessageInput,
+  { sourceDocumentId, sourceLocale }: TContactMessageSource,
 ): Promise<TSubmitContactResult> => {
   if (await isBotOrUnverified()) return BLOCKED;
 
   if (asText(input.website)) {
-    logger.warn('contact_form.submit_blocked', { reason: 'honeypot' });
+    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'honeypot' });
     return BLOCKED;
   }
 
@@ -93,7 +102,7 @@ export const submitContactMessage = async (
   if (await isRateLimited(tenant.id)) return BLOCKED;
 
   if (!(await isContactFormOpen(tenant))) {
-    logger.warn('contact_form.submit_blocked', { reason: 'unavailable' });
+    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'unavailable' });
     return BLOCKED;
   }
 
@@ -113,6 +122,8 @@ export const submitContactMessage = async (
     tenantId: tenant.id,
     ...validation.data,
     sourcePath: toSourcePath(asText(input.sourcePath)),
+    sourceDocumentId,
+    sourceLocale,
   });
   if (!lead) return SERVER_ERROR;
 
