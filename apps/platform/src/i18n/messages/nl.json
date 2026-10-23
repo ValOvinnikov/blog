@@ -10,6 +10,7 @@
     "signInError": "Probleem bij inloggen",
     "addTenant": "Tenant toevoegen · Admin",
     "tenantOverview": "Tenantoverzicht · Admin",
+    "tenantActivity": "Tenantactiviteit · Admin",
     "tenantProvisioning": "Inrichting · Admin",
     "tenantDanger": "Gevarenzone · Admin",
     "tenantDomain": "Domein · Admin",
@@ -294,6 +295,7 @@
     "notSetValue": "Niet ingesteld",
     "recentActivityCardTitle": "Recente activiteit",
     "recentActivitySourceLabel": "Systeemlog",
+    "viewAllActivityLink": "Alle activiteit bekijken",
     "activityEmpty": "Nog geen activiteit geregistreerd.",
     "activityActorDeleted": "Verwijderd account",
     "relativeJustNow": "Zojuist",
@@ -322,6 +324,10 @@
       "PERSONAL_DATA_EXPORTED": "Persoonsgegevens geëxporteerd",
       "PERSONAL_DATA_ERASED": "Persoonsgegevens gewist"
     }
+  },
+  "tenantActivityPage": {
+    "title": "Activiteit",
+    "description": "Alles wat voor deze tenant is vastgelegd, nieuwste eerst."
   },
   "tenantDomainPage": {
     "pageTitle": "Domein",
@@ -1127,7 +1133,7 @@
     "showMore": "Meer tonen",
     "showLess": "Minder tonen"
   },
-  "leadsPagination": {
+  "pagination": {
     "ariaLabel": "Paginering",
     "previous": "Vorige",
     "next": "Volgende",

@@ -10,6 +10,7 @@
     "signInError": "Problema al iniciar sesión",
     "addTenant": "Añadir cliente · Administración",
     "tenantOverview": "Resumen del cliente · Administración",
+    "tenantActivity": "Actividad del cliente · Administración",
     "tenantProvisioning": "Aprovisionamiento · Administración",
     "tenantDanger": "Zona de peligro · Administración",
     "tenantDomain": "Dominio · Administración",
@@ -294,6 +295,7 @@
     "notSetValue": "Sin definir",
     "recentActivityCardTitle": "Actividad reciente",
     "recentActivitySourceLabel": "Registro del sistema",
+    "viewAllActivityLink": "Ver toda la actividad",
     "activityEmpty": "Todavía no hay actividad registrada.",
     "activityActorDeleted": "Cuenta eliminada",
     "relativeJustNow": "Ahora mismo",
@@ -322,6 +324,10 @@
       "PERSONAL_DATA_EXPORTED": "Datos personales exportados",
       "PERSONAL_DATA_ERASED": "Datos personales borrados"
     }
+  },
+  "tenantActivityPage": {
+    "title": "Actividad",
+    "description": "Todo lo registrado para este cliente, de lo más reciente a lo más antiguo."
   },
   "tenantDomainPage": {
     "pageTitle": "Dominio",
@@ -1127,7 +1133,7 @@
     "showMore": "Mostrar más",
     "showLess": "Mostrar menos"
   },
-  "leadsPagination": {
+  "pagination": {
     "ariaLabel": "Paginación",
     "previous": "Anterior",
     "next": "Siguiente",

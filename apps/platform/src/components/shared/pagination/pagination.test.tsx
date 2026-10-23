@@ -1,15 +1,15 @@
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
-import { LeadsPagination } from './leads-pagination';
+import { Pagination } from './pagination';
 
-const setup = customRender(LeadsPagination, {
+const setup = customRender(Pagination, {
   page: 2,
   totalPages: 3,
   pageHref: adminRoutes.dashboardLeads,
 });
 
-describe(`<${LeadsPagination.name}/>`, () => {
+describe(`<${Pagination.name}/>`, () => {
   it('renders nothing when everything fits on one page', () => {
     setup({ page: 1, totalPages: 1 });
 

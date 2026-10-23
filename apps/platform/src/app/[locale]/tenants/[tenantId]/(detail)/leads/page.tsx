@@ -2,7 +2,7 @@ import { LeadsPageContent } from '@platform/components/features/leads/leads-page
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { renderTenantScopedPage } from '@platform/server/tenant-pages/render-tenant-scoped-page';
-import { parseLeadsPage } from '@platform/utils/leads-pagination/leads-pagination';
+import { parsePage } from '@platform/utils/pagination/pagination';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
 
@@ -23,7 +23,7 @@ export default async function LeadsPage({ params, searchParams }: TProps) {
     ({ tenant }) =>
       LeadsPageContent({
         tenant,
-        page: parseLeadsPage(page),
+        page: parsePage(page),
         pageHref: (nextPage) => adminRoutes.leads(tenant.id, nextPage),
       }),
   );

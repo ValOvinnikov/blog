@@ -108,6 +108,27 @@ describe(listAuditEventsForTarget, () => {
     expect(result).toHaveLength(2);
   });
 
+  it('skips the offset number of newest events', async () => {
+    const rows = Array.from({ length: 3 }, (_, index) => ({
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: 'tenant-1',
+      createdAt: new Date(2026, 0, index + 1),
+    }));
+    for (const row of rows) {
+      await insertEvent(row);
+    }
+
+    const result = await listAuditEventsForTarget(
+      AUDIT_TARGET_TYPE.TENANT,
+      'tenant-1',
+      { limit: 2, offset: 2 },
+    );
+
+    expect(result.map((event) => event.createdAt)).toEqual([
+      new Date(2026, 0, 1),
+    ]);
+  });
+
   it("does not leak another target's events", async () => {
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,

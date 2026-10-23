@@ -10,6 +10,7 @@
     "signInError": "Problem bei der Anmeldung",
     "addTenant": "Mandant hinzufügen · Admin",
     "tenantOverview": "Mandantenübersicht · Admin",
+    "tenantActivity": "Mandantenaktivität · Admin",
     "tenantProvisioning": "Bereitstellung · Admin",
     "tenantDanger": "Gefahrenzone · Admin",
     "tenantDomain": "Domain · Admin",
@@ -294,6 +295,7 @@
     "notSetValue": "Nicht gesetzt",
     "recentActivityCardTitle": "Letzte Aktivitäten",
     "recentActivitySourceLabel": "Systemprotokoll",
+    "viewAllActivityLink": "Alle Aktivitäten anzeigen",
     "activityEmpty": "Noch keine Aktivitäten erfasst.",
     "activityActorDeleted": "Gelöschtes Konto",
     "relativeJustNow": "Gerade eben",
@@ -322,6 +324,10 @@
       "PERSONAL_DATA_EXPORTED": "Personenbezogene Daten exportiert",
       "PERSONAL_DATA_ERASED": "Personenbezogene Daten gelöscht"
     }
+  },
+  "tenantActivityPage": {
+    "title": "Aktivität",
+    "description": "Alles, was für diesen Mandanten protokolliert wurde, neueste zuerst."
   },
   "tenantDomainPage": {
     "pageTitle": "Domain",
@@ -1127,7 +1133,7 @@
     "showMore": "Mehr anzeigen",
     "showLess": "Weniger anzeigen"
   },
-  "leadsPagination": {
+  "pagination": {
     "ariaLabel": "Seitennavigation",
     "previous": "Zurück",
     "next": "Weiter",

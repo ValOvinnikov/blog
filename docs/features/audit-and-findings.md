@@ -18,6 +18,9 @@ code:
   - apps/platform/src/components/features/findings/**
   - apps/platform/src/components/features/tenants/findings-card/**
   - apps/platform/src/components/features/tenants/recent-activity-card/**
+  - apps/platform/src/components/features/tenants/activity-list/**
+  - apps/platform/src/components/features/tenants/tenant-activity-*/**
+  - apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/activity/**
   - apps/platform/src/testing/audit-events/**
   - apps/platform/src/testing/findings/**
   - .github/workflows/validate-tenant-documents.yml
@@ -33,7 +36,7 @@ append-only log of who did what to a tenant: created, reconfigured,
 provisioned, archived, deleted. `findings` holds operational conditions a
 human should act on, each open or resolved and usually tied to a tenant.
 Operators see a tenant's recent activity and open findings on its overview,
-and every open finding on the platform-wide Findings page. Tenant owners see
+its full activity on a page of its own, and every open finding on the platform-wide Findings page. Tenant owners see
 neither.
 
 ## Surfaces and routes
@@ -52,8 +55,13 @@ neither.
   read. ADMINs and MODERATORs never trigger the read.
 - `/tenants/{id}` overview: the Findings card (OPEN findings, with a
   disclosure that loads `details` on open) and the Recent activity card (the
-  last five `TENANT` audit events: action, actor email, relative time). An
-  event whose actor deleted their account shows "Deleted account" instead.
+  last five `TENANT` audit events: action, actor email, relative time), with
+  a View all activity link to the activity page. An event whose actor deleted
+  their account shows "Deleted account" instead.
+- `/tenants/{id}/activity` (operator, gated by `requireTenantById`): every
+  `TENANT` audit event for the tenant, newest first, 25 per page
+  (`?page=n`), rows shown as on the card. A page past the end redirects to
+  the last page.
 - `/tenants/{id}/danger`: reads the latest `DEPROVISION_REQUESTED` time to
   decide whether a deprovisioning run is current or a retry.
 - No page lists `SITE_CONFIG` or `SETTINGS_FEATURES` events, and no UI
@@ -181,6 +189,7 @@ Nothing is configurable. Only admins (any role) see either record.
 - `apps/platform/src/components/features/releases/contrast-due-banner/contrast-due-banner.tsx`
 - `apps/platform/src/server/releases/is-contrast-due.ts`
 - `apps/platform/src/components/features/tenants/tenant-overview-view/tenant-overview-view.tsx`
+- `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/activity/page.tsx`
 
 ## Tests and stories
 
@@ -190,7 +199,8 @@ Nothing is configurable. Only admins (any role) see either record.
 - `apps/platform/src/server/audit/record-audit-event.test.ts`,
   `apps/platform/src/server/findings/get-finding-details-action.test.ts`, the
   findings page test, and the component tests beside the findings table,
-  view, card, details, contrast-finding details and recent-activity card,
+  view, card, details, contrast-finding details, recent-activity card,
+  activity list, activity page content and activity route,
   the contrast-due banner, `is-contrast-due.test.ts` and the operator
   layout test. Fixtures live in
   `apps/platform/src/testing/`. No Storybook.

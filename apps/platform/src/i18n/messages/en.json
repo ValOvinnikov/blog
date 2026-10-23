@@ -10,6 +10,7 @@
     "signInError": "Sign-in problem",
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
+    "tenantActivity": "Tenant activity · Admin",
     "tenantProvisioning": "Provisioning · Admin",
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
@@ -294,6 +295,7 @@
     "notSetValue": "Not set",
     "recentActivityCardTitle": "Recent activity",
     "recentActivitySourceLabel": "System log",
+    "viewAllActivityLink": "View all activity",
     "activityEmpty": "No activity recorded yet.",
     "activityActorDeleted": "Deleted account",
     "relativeJustNow": "Just now",
@@ -322,6 +324,10 @@
       "PERSONAL_DATA_EXPORTED": "Personal data exported",
       "PERSONAL_DATA_ERASED": "Personal data erased"
     }
+  },
+  "tenantActivityPage": {
+    "title": "Activity",
+    "description": "Everything recorded against this tenant, newest first."
   },
   "tenantDomainPage": {
     "pageTitle": "Domain",
@@ -1127,7 +1133,7 @@
     "showMore": "Show more",
     "showLess": "Show less"
   },
-  "leadsPagination": {
+  "pagination": {
     "ariaLabel": "Pagination",
     "previous": "Previous",
     "next": "Next",

@@ -10,6 +10,7 @@
     "signInError": "Problème de connexion",
     "addTenant": "Ajouter un locataire · Administration",
     "tenantOverview": "Aperçu du locataire · Administration",
+    "tenantActivity": "Activité du locataire · Administration",
     "tenantProvisioning": "Provisionnement · Administration",
     "tenantDanger": "Zone de danger · Administration",
     "tenantDomain": "Domaine · Administration",
@@ -294,6 +295,7 @@
     "notSetValue": "Non défini",
     "recentActivityCardTitle": "Activité récente",
     "recentActivitySourceLabel": "Journal système",
+    "viewAllActivityLink": "Voir toute l'activité",
     "activityEmpty": "Aucune activité enregistrée pour le moment.",
     "activityActorDeleted": "Compte supprimé",
     "relativeJustNow": "À l'instant",
@@ -322,6 +324,10 @@
       "PERSONAL_DATA_EXPORTED": "Données personnelles exportées",
       "PERSONAL_DATA_ERASED": "Données personnelles effacées"
     }
+  },
+  "tenantActivityPage": {
+    "title": "Activité",
+    "description": "Tout ce qui a été enregistré pour ce locataire, du plus récent au plus ancien."
   },
   "tenantDomainPage": {
     "pageTitle": "Domaine",
@@ -1127,7 +1133,7 @@
     "showMore": "Afficher plus",
     "showLess": "Afficher moins"
   },
-  "leadsPagination": {
+  "pagination": {
     "ariaLabel": "Pagination",
     "previous": "Précédent",
     "next": "Suivant",
