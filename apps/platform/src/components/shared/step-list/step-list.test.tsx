@@ -74,10 +74,12 @@ describe(`<${StepList.name}/>`, () => {
     });
 
     it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {
-      for (const { statusLabel } of steps) {
-        const status = screen.getByText(statusLabel);
-        expect(status.closest('[aria-live="polite"]')).not.toBeNull();
-      }
+      const liveRegions = screen.getAllByRole('status');
+
+      expect(liveRegions).toHaveLength(steps.length);
+      steps.forEach(({ statusLabel }, index) => {
+        expect(liveRegions[index]).toHaveTextContent(statusLabel);
+      });
     });
   });
 
